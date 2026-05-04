@@ -1690,7 +1690,10 @@ export default function UnifiedQuizEngine() {
           <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
             {(() => {
               const pyq = getPYQCategorization(item);
-              const hasTags = showPYQTags && (pyq.hasPYQData || item.is_ncert || item.exam_info?.is_ncert);
+              const institutes: string[] = Array.isArray((item as any)._institutes)
+                ? Array.from(new Set<string>((item as any)._institutes.filter(Boolean)))
+                : [];
+              const hasTags = (showPYQTags && (pyq.hasPYQData || item.is_ncert || item.exam_info?.is_ncert)) || institutes.length > 0;
               if (!hasTags) return null;
 
               const chips: { label: string; bg: string; fg: string; border: string }[] = [];
@@ -1700,10 +1703,27 @@ export default function UnifiedQuizEngine() {
               if (pyq.isGenericPYQ) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : colors.primary + '10', fg: isZenMode ? '#433422' : colors.primary, border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : colors.primary });
               if (item.is_ncert || item.exam_info?.is_ncert || item.micro_topic === 'NCERT') chips.push({ label: 'NCERT', bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#e0f2fe', fg: isZenMode ? '#433422' : '#0369a1', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#0ea5e9' });
 
+              institutes.slice(0, 2).forEach((inst: string) => {
+                chips.push({
+                  label: inst,
+                  bg: isZenMode ? 'rgba(67, 52, 34, 0.07)' : colors.surfaceStrong,
+                  fg: isZenMode ? '#433422' : colors.textSecondary,
+                  border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : colors.border,
+                });
+              });
+              if (institutes.length > 2) {
+                chips.push({
+                  label: `+${institutes.length - 2} institutes`,
+                  bg: isZenMode ? 'rgba(67, 52, 34, 0.07)' : colors.surfaceStrong,
+                  fg: isZenMode ? '#433422' : colors.textSecondary,
+                  border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : colors.border,
+                });
+              }
+
               return (
                 <View style={{ flexDirection: 'row', gap: 6 }}>
                   {chips.map((chip, idx) => (
-                    <View key={`chip-${item.id}-${idx}`} style={[styles.inlineBadge, { backgroundColor: chip.bg, borderColor: chip.border, paddingHorizontal: 6, paddingVertical: 2, height: 20 }]}>
+                    <View key={`chip-${item.id}-${idx}`} style={[styles.inlineBadge, { backgroundColor: chip.bg, borderColor: chip.border, paddingHorizontal: 6, paddingVertical: 2, height: 20 }]}> 
                       <Text style={{ color: chip.fg, fontWeight: '900', fontSize: 9 }}>{chip.label}</Text>
                     </View>
                   ))}
@@ -1897,7 +1917,7 @@ export default function UnifiedQuizEngine() {
                 <Markdown style={{ body: { color: colors.textSecondary, fontSize: fontSize - 2 } }}>
                   {(activeExplIndex[item.id] ?? -1) === -1 
                     ? (item._explanations && item._explanations.length > 1
-                        ? item._explanations.map((e: any, i: number) => `**${e.source}${e.year ? ' · ' + e.year : ''}:**\n\n${e.text}`).join('\n\n---\n\n')
+                        ? item._explanations.map((e: any, i: number) => `**${e.source}${e.year ? ' · ' + e.year : ''}${e.answer ? ' · Ans: ' + e.answer : ''}:**\n\n${e.text}`).join('\n\n---\n\n')
                         : item.explanation_markdown)
                     : item._explanations?.[activeExplIndex[item.id]]?.text || item.explanation_markdown || 'No explanation available.'}
                 </Markdown>

@@ -1,33 +1,40 @@
 /**
- * Unified merging logic for Canonical questions across the app.
- * Groups questions by canonicalId (from vaultMeta) or falls back to robust text matching.
+ * Unified merging logic for canonical questions across the app.
  *
- * IMPORTANT (2026): For PYQ questions, when text matches, we ALSO require the exam year to match.
- * This is based on the invariant that two repeating PYQs from different institutes/programs
- * will always share the same exam year. This prevents false-positive merges when two
- * different questions happen to have similar text stems.
+ * Updated rule:
+ *   1) Compare by YEAR + TEXT first (primary dedupe key)
+ *   2) Then canonical id
+ *   3) Then text / explanation / options fallbacks
+ *
+ * This prevents duplicate rows in Arena when same question is repeated
+ * across institutes and ensures merged rows retain all institutes + explanations.
  */
 export const mergeQuestions = (questions: any[]) => {
   const mergedQs: any[] = [];
   const canonicalMap = new Map<string, any>();
+  const yearTextMap = new Map<string, any>();
   const textMap = new Map<string, any>();
   const explanationMap = new Map<string, any>();
   const optionsMap = new Map<string, any>();
   const idToMergedId = new Map<string, string>();
 
   const cleanText = (text: string) => {
-    if (!text) return "";
+    if (!text) return '';
     return text
-      .replace(/<[^>]*>?/gm, '') // Strip HTML
+      .replace(/<[^>]*>?/gm, '')
       .toLowerCase()
-      .replace(/[^\w]/g, '')     // Strip EVERYTHING except letters and numbers (removes spaces, punctuation, slashes)
+      .replace(/[\s\n\r\t]+/g, ' ')
+      .replace(/[^\w ]/g, '')
       .trim();
   };
 
+  const getQuestionText = (q: any): string =>
+    String(q?.question_text || q?.statement_line || q?.statement || '');
+
   const getInstitute = (q: any) => {
-    let inst = q.tests?.institute || q.provider;
-    if (!inst && q.test_id) {
-      const parts = q.test_id.split('-');
+    let inst = q?.tests?.institute || q?.provider || q?.source?.institute;
+    if (!inst && q?.test_id) {
+      const parts = String(q.test_id).split('-');
       if (parts.length > 0) {
         const first = parts[0].toLowerCase();
         if (['forum', 'vision', 'insights', 'iasbaba', 'vajiram', 'nextias', 'pw', 'raus'].includes(first)) {
@@ -35,80 +42,123 @@ export const mergeQuestions = (questions: any[]) => {
         }
       }
     }
-    return inst || 'UPSC';
+    return String(inst || 'UPSC').trim();
   };
 
   const getYear = (q: any): string => {
-    const y = q.exam_year || q.source?.year || q.tests?.exam_year || q.tests?.launch_year || '';
+    const y = q?.exam_year || q?.source?.year || q?.tests?.exam_year || q?.tests?.launch_year || '';
     return String(y || '').trim();
   };
 
-  questions.forEach(q => {
+  const buildYearTextKey = (q: any): string => {
+    const year = getYear(q) || 'na';
+    const txt = cleanText(getQuestionText(q));
+    if (!txt) return '';
+    return `${year}__${txt}`;
+  };
+
+  const normalizeExplanation = (txt: string) =>
+    cleanText(txt || '').replace(/\s+/g, ' ').trim();
+
+  questions.forEach((q) => {
     let vaultMeta: any = null;
     try {
       if (q.source_attribution_label) {
         const parsed = typeof q.source_attribution_label === 'string'
           ? JSON.parse(q.source_attribution_label)
           : q.source_attribution_label;
-        vaultMeta = parsed.__vaultMeta;
+        vaultMeta = parsed?.__vaultMeta;
       }
-    } catch (e) { /* ignore */ }
+    } catch {
+      // ignore malformed attribution json
+    }
 
-    // Priority 1: Official Canonical ID
     const cId = vaultMeta?.canonicalId || (vaultMeta?.isCanonical ? q.id : null) || vaultMeta?._canonicalQuestionId;
 
-    // Priority 2: Text Match (PYQ requires same year too)
-    const textKey = cleanText(q.question_text);
+    const questionText = cleanText(getQuestionText(q));
     const year = getYear(q);
-    const isPyq = !!q.is_pyq;
-    // For PYQs, attach year to key so cross-year same-stem questions don't merge
-    const textKeyFinal = isPyq && year ? `${textKey}__${year}` : textKey;
+    const yearTextKey = buildYearTextKey(q);
 
-    const explKey = cleanText(q.explanation_markdown);
-    const explKeyFinal = isPyq && year ? `${explKey}__${year}` : explKey;
+    const explKey = normalizeExplanation(String(q.explanation_markdown || q.explanation || ''));
+    const explanationYearKey = explKey ? `${year || 'na'}__${explKey}` : '';
 
-    // Priority 3: Options Match (Very aggressive)
-    const optionsKey = q.options ? Object.values(q.options).sort().join('|').toLowerCase().replace(/[^\w]/g, '') : null;
-    const optionsKeyFinal = isPyq && year && optionsKey ? `${optionsKey}__${year}` : optionsKey;
+    const optionsKey = q.options
+      ? Object.values(q.options).map((v: any) => String(v || '')).sort().join('|').toLowerCase().replace(/[^\w]/g, '')
+      : '';
+    const optionsYearKey = optionsKey ? `${year || 'na'}__${optionsKey}` : '';
 
     let existing: any = null;
 
-    if (cId) {
-      existing = canonicalMap.get(cId);
-    } else if (textKeyFinal && textKey.length > 30) {
-      existing = textMap.get(textKeyFinal);
-    } else if (explKeyFinal && explKey.length > 100) {
-      existing = explanationMap.get(explKeyFinal);
-    } else if (optionsKeyFinal && optionsKey && optionsKey.length > 50) {
-      existing = optionsMap.get(optionsKeyFinal);
+    // 1) PRIMARY: year + text
+    if (yearTextKey && questionText.length > 20) {
+      existing = yearTextMap.get(yearTextKey) || null;
     }
+
+    // 2) Canonical fallback (only when year doesn't conflict)
+    if (!existing && cId) {
+      const byCanonical = canonicalMap.get(cId) || null;
+      if (byCanonical) {
+        const existingYear = getYear(byCanonical);
+        const yearCompatible = !existingYear || !year || existingYear === year;
+        if (yearCompatible) existing = byCanonical;
+      }
+    }
+
+    // 3) Secondary text fallback
+    if (!existing && questionText && questionText.length > 40) {
+      existing = textMap.get(questionText) || null;
+    }
+
+    // 4) Explanation fallback
+    if (!existing && explanationYearKey && explKey.length > 80) {
+      existing = explanationMap.get(explanationYearKey) || null;
+    }
+
+    // 5) Options fallback
+    if (!existing && optionsYearKey && optionsKey.length > 50) {
+      existing = optionsMap.get(optionsYearKey) || null;
+    }
+
+    const institute = getInstitute(q);
 
     if (existing) {
       idToMergedId.set(q.id, existing.id);
-      mergeData(existing, q, getInstitute(q));
-    } else {
-      prepareQuestion(q, getInstitute(q));
-      if (cId) canonicalMap.set(cId, q);
-      if (textKeyFinal) textMap.set(textKeyFinal, q);
-      if (explKeyFinal) explanationMap.set(explKeyFinal, q);
-      if (optionsKeyFinal) optionsMap.set(optionsKeyFinal, q);
-      idToMergedId.set(q.id, q.id);
-      mergedQs.push(q);
+      mergeData(existing, q, institute, getYear(q), normalizeExplanation);
+      return;
     }
+
+    prepareQuestion(q, institute, getYear(q));
+
+    if (cId) canonicalMap.set(cId, q);
+    if (yearTextKey) yearTextMap.set(yearTextKey, q);
+    if (questionText) textMap.set(questionText, q);
+    if (explanationYearKey) explanationMap.set(explanationYearKey, q);
+    if (optionsYearKey) optionsMap.set(optionsYearKey, q);
+
+    idToMergedId.set(q.id, q.id);
+    mergedQs.push(q);
   });
 
   return { mergedQs, idToMergedId };
 };
 
-const prepareQuestion = (q: any, inst: string) => {
+const prepareQuestion = (q: any, inst: string, year: string) => {
   q._institutes = [inst];
-  q._explanations = q.explanation_markdown
-    ? [{ source: inst, text: q.explanation_markdown, year: q.exam_year || q.source?.year || '' }]
-    : [];
   q._mergedIds = [q.id];
+
+  const expl = String(q.explanation_markdown || q.explanation || '').trim();
+  q._explanations = expl
+    ? [{ source: inst, text: expl, year, answer: q.correct_answer || '' }]
+    : [];
 };
 
-const mergeData = (existing: any, q: any, inst: string) => {
+const mergeData = (
+  existing: any,
+  q: any,
+  inst: string,
+  year: string,
+  normalizeExplanation: (txt: string) => string,
+) => {
   if (!existing._institutes) existing._institutes = [existing.tests?.institute || existing.provider || 'UPSC'];
   if (!existing._institutes.includes(inst)) {
     existing._institutes.push(inst);
@@ -118,26 +168,40 @@ const mergeData = (existing: any, q: any, inst: string) => {
   if (!existing._mergedIds.includes(q.id)) existing._mergedIds.push(q.id);
 
   if (!existing._explanations) {
-    existing._explanations = existing.explanation_markdown
-      ? [{ source: existing._institutes[0], text: existing.explanation_markdown, year: existing.exam_year || existing.source?.year || '' }]
+    const base = String(existing.explanation_markdown || existing.explanation || '').trim();
+    existing._explanations = base
+      ? [{
+          source: existing._institutes[0],
+          text: base,
+          year: String(existing.exam_year || existing.source?.year || ''),
+          answer: existing.correct_answer || '',
+        }]
       : [];
   }
 
-  if (q.explanation_markdown && q.explanation_markdown.trim()) {
-    const qExplStripped = q.explanation_markdown.toLowerCase().replace(/[^\w\s]/g, '');
-    const hasSimilar = existing._explanations.some((e: any) => {
-      const eStripped = e.text.toLowerCase().replace(/[^\w\s]/g, '');
-      return eStripped.includes(qExplStripped.substring(0, 100)) || qExplStripped.includes(eStripped.substring(0, 100));
+  const qText = String(q.explanation_markdown || q.explanation || '').trim();
+  if (qText) {
+    const qNorm = normalizeExplanation(qText);
+    const qAnswer = String(q.correct_answer || '').trim().toUpperCase();
+
+    // Keep one record per institute/year/answer/text combination.
+    const alreadyPresent = existing._explanations.some((e: any) => {
+      const eNorm = normalizeExplanation(String(e.text || ''));
+      const sameSource = String(e.source || '').trim().toLowerCase() === inst.toLowerCase();
+      const sameYear = String(e.year || '') === String(year || '');
+      const sameAnswer = String(e.answer || '').trim().toUpperCase() === qAnswer;
+      return sameSource && sameYear && sameAnswer && eNorm === qNorm;
     });
 
-    if (!hasSimilar) {
+    if (!alreadyPresent) {
       existing._explanations.push({
         source: inst,
-        text: q.explanation_markdown,
-        year: q.exam_year || q.source?.year || ''
+        text: qText,
+        year,
+        answer: q.correct_answer || '',
       });
-      // Keep the main markdown field as the first one for backward compatibility
-      if (!existing.explanation_markdown) existing.explanation_markdown = q.explanation_markdown;
     }
+
+    if (!existing.explanation_markdown) existing.explanation_markdown = qText;
   }
 };

@@ -1199,11 +1199,26 @@ export default function UnifiedArenaSetup() {
                             );
                           })()}
 
-                          {q.tests?.institute ? (
-                            <Text style={[styles.resultTag, { color: colors.textTertiary, backgroundColor: colors.surfaceStrong, marginLeft: 8 }]}>
-                              {q.tests.institute}
-                            </Text>
-                          ) : null}
+                          {(() => {
+                            const institutes = Array.isArray((q as any)._institutes)
+                              ? Array.from(new Set((q as any)._institutes.filter(Boolean)))
+                              : (q.tests?.institute ? [q.tests.institute] : []);
+                            if (institutes.length === 0) return null;
+                            return (
+                              <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 8, gap: 6 }}>
+                                {institutes.slice(0, 2).map((inst: string) => (
+                                  <Text key={`${q.id}-${inst}`} style={[styles.resultTag, { color: colors.textTertiary, backgroundColor: colors.surfaceStrong }]}>
+                                    {inst}
+                                  </Text>
+                                ))}
+                                {institutes.length > 2 ? (
+                                  <Text style={[styles.resultTag, { color: colors.textTertiary, backgroundColor: colors.surfaceStrong }]}>
+                                    +{institutes.length - 2}
+                                  </Text>
+                                ) : null}
+                              </View>
+                            );
+                          })()}
                           <ChevronRight size={16} color={colors.textTertiary} />
 
                         </View>
@@ -1329,6 +1344,17 @@ export default function UnifiedArenaSetup() {
                         <Text style={[styles.resultTag, { color: colors.primary, backgroundColor: colors.primary + '15' }]}>
                           {q.subject}
                         </Text>
+                        {(() => {
+                          const institutes = Array.isArray((q as any)._institutes)
+                            ? Array.from(new Set((q as any)._institutes.filter(Boolean)))
+                            : (q.tests?.institute ? [q.tests.institute] : []);
+                          if (institutes.length === 0) return null;
+                          return institutes.slice(0, 2).map((inst: string) => (
+                            <Text key={`${q.id}-full-${inst}`} style={[styles.resultTag, { color: colors.textTertiary, backgroundColor: colors.surfaceStrong, marginLeft: 8 }]}>
+                              {inst}
+                            </Text>
+                          ));
+                        })()}
                         <ChevronRight size={16} color={colors.textTertiary} />
                       </View>
                     </TouchableOpacity>

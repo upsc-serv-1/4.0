@@ -171,8 +171,8 @@ export const HardnotesService = {
    * Creates subject folders + microtopic sub-folders as requested in the Phase 1 spec.
    * Idempotent — safe to call on every Hardnotes open.
    */
-  async seedUpscSkeleton(_userId: string): Promise<boolean> {`n    return false;`n  }`n    }
-    return true;
+  async seedUpscSkeleton(_userId: string): Promise<boolean> {
+    return false;
   },
 
   /** Build an adjacency map from a flat node list. */

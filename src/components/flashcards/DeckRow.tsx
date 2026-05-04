@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { ChevronRight, Minus, Plus } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { BranchNode } from '../../services/BranchService';
-import { Settings as SettingsIcon, Edit2, FolderPlus, Trash2, FolderInput, Folder } from 'lucide-react-native';
+import { Settings as SettingsIcon, Edit2, FolderPlus, Trash2, FolderInput, Folder, FileDown } from 'lucide-react-native';
 import { Swipeable, RectButton } from 'react-native-gesture-handler';
 
-export type DeckRowAction = 'add' | 'settings' | 'rename' | 'move' | 'delete';
+export type DeckRowAction = 'add' | 'export' | 'settings' | 'rename' | 'move' | 'delete';
 
 interface Props {
   node: BranchNode;
@@ -30,6 +30,10 @@ export function DeckRow({ node, expanded, onToggle, onOpen, onAction }: Props) {
         <ActionBtn
           icon={<FolderPlus size={18} />} bg="#10b981"
           label="Add" onPress={() => { closeSwipe(); onAction('add'); }}
+        />
+        <ActionBtn
+          icon={<FileDown size={18} />} bg="#06b6d4"
+          label="Export" onPress={() => { closeSwipe(); onAction('export'); }}
         />
         <ActionBtn
           icon={<SettingsIcon size={18} />} bg="#3b82f6"

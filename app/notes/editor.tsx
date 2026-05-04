@@ -771,7 +771,7 @@ export default function NoteEditor() {
                   <RenderHtml 
                     source={{ html: formatContent(item.text) || '<i>Point content...</i>' }} 
                     contentWidth={width - 80} 
-                    baseStyle={useMemo(() => ({ color: colors.textPrimary, fontSize: editorFontSize }), [colors.textPrimary, editorFontSize])}
+                    baseStyle={{ color: colors.textPrimary, fontSize: editorFontSize }}
                     tagsStyles={htmlStyles}
                   />
                   {isActuallyEditing && (
@@ -913,12 +913,12 @@ export default function NoteEditor() {
                      <RenderHtml 
                         source={{ html: formatContent(content) }} 
                         contentWidth={width - 40}
-                        baseStyle={useMemo(() => ({ color: zenTextColor, fontSize: 18, lineHeight: 32 }), [zenTextColor])}
-                        tagsStyles={useMemo(() => ({
+                        baseStyle={{ color: zenTextColor, fontSize: 18, lineHeight: 32 }}
+                        tagsStyles={{
                           ...htmlStyles,
                           b: { fontWeight: 'bold', color: zenTextColor },
                           strong: { fontWeight: 'bold', color: zenTextColor }
-                        }), [htmlStyles, zenTextColor])}
+                        }}
                      />
                      {renderHighlights(false)}
                      <TouchableOpacity style={[styles.zenExitBtn, { backgroundColor: 'rgba(0,0,0,0.05)' }]} onPress={toggleZenMode}>
@@ -1050,7 +1050,7 @@ export default function NoteEditor() {
                             <RenderHtml 
                               source={{ html: formatContent(content) }} 
                               contentWidth={width - 40}
-                              baseStyle={useMemo(() => ({ color: colors.textPrimary, fontSize: editorFontSize + 2 }), [colors.textPrimary, editorFontSize])}
+                              baseStyle={{ color: colors.textPrimary, fontSize: editorFontSize + 2 }}
                               tagsStyles={htmlStyles}
                             />
                           </View>

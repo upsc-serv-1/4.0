@@ -8,11 +8,12 @@ export default function NotesLayout() {
         animation: 'slide_from_right',
         animationDuration: 350,
         gestureEnabled: true,
-        fullScreenGestureEnabled: true,
+        fullScreenGestureEnabled: false,
       }}
     >
       <Stack.Screen name="index" />
       <Stack.Screen name="editor" options={{ animation: 'slide_from_right', animationDuration: 280 }} />
+      <Stack.Screen name="pro-editor" options={{ animation: 'slide_from_bottom', animationDuration: 320 }} />
     </Stack>
   );
 }

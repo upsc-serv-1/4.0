@@ -18,8 +18,10 @@ import { useTheme } from '../src/context/ThemeContext';
 import { ThemeSwitcher } from '../src/components/ThemeSwitcher';
 import { PageWrapper } from '../src/components/PageWrapper';
 import { BranchSvc, BranchNode } from '../src/services/BranchService';
-import { DeckRow } from '../src/components/flashcards/DeckRow';
+import { DeckRow, type DeckRowAction } from '../src/components/flashcards/DeckRow';
 import { PremiumMoveModal } from '../src/components/flashcards/PremiumMoveModal';
+import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet';
+import type { ExportPayload, ExportFlashcard } from '../src/lib/unifiedExportEngine';
 
 export default function FlashcardsHub() {
   const { colors } = useTheme();
@@ -44,7 +46,11 @@ export default function FlashcardsHub() {
   
   const FOLDER_COLORS = ['#bae6fd', '#e0e7ff', '#fef3c7', '#fee2e2', '#dcfce7'];
   const [selectedColor, setSelectedColor] = useState(FOLDER_COLORS[0]);
-  
+
+  const [exportSheetVisible, setExportSheetVisible] = useState(false);
+  const [exportPayload, setExportPayload] = useState<ExportPayload | null>(null);
+  const [exportTitle, setExportTitle] = useState('Flashcards Export');
+  const [preparingExportId, setPreparingExportId] = useState<string | null>(null);
 
 
   const load = useCallback(async () => {
@@ -135,6 +141,86 @@ export default function FlashcardsHub() {
     } catch (e: any) { Alert.alert('Error', e?.message); }
   };
 
+  const normalizeLearningState = (value?: string): 'learning' | 'learned' | 'mastered' | 'due' | undefined => {
+    const v = (value || '').toLowerCase();
+    if (v === 'mastered') return 'mastered';
+    if (v === 'review') return 'learned';
+    if (v === 'learning' || v === 'leech') return 'learning';
+    if (v === 'new' || v === 'not_studied') return 'due';
+    return undefined;
+  };
+
+  const handleExportNode = async (node: BranchNode) => {
+    if (!uid) {
+      Alert.alert('Login required', 'Please log in to export flashcards.');
+      return;
+    }
+
+    try {
+      setPreparingExportId(node.id);
+
+      const cardIds = await BranchSvc.listCardIdsInBranch(node.id, {
+        recursive: !!node.is_folder,
+        userId: uid,
+      });
+
+      if (cardIds.length === 0) {
+        Alert.alert('Nothing to export', `${node.name} has no cards yet.`);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('user_cards')
+        .select(`
+          card_id,
+          learning_status,
+          cards!inner(
+            id,
+            front_text,
+            back_text,
+            question_text,
+            answer_text,
+            subject,
+            section_group,
+            microtopic
+          )
+        `)
+        .eq('user_id', uid)
+        .eq('status', 'active')
+        .in('card_id', cardIds);
+
+      if (error) throw error;
+
+      const rows: ExportFlashcard[] = (data ?? []).map((row: any) => {
+        const card = Array.isArray(row.cards) ? row.cards[0] : row.cards;
+        return {
+          id: row.card_id,
+          front: String(card?.front_text || card?.question_text || '').trim() || 'Front unavailable',
+          back: String(card?.back_text || card?.answer_text || '').trim() || 'Back unavailable',
+          deck: node.path || node.name,
+          state: normalizeLearningState(row.learning_status),
+          subject: card?.subject || undefined,
+          micro_topic: card?.microtopic || card?.section_group || undefined,
+        };
+      });
+
+      const uniqueRows: ExportFlashcard[] = Array.from(new Map<string, ExportFlashcard>(rows.map((r) => [r.id, r])).values());
+
+      if (uniqueRows.length === 0) {
+        Alert.alert('Nothing to export', `${node.name} has no active cards yet.`);
+        return;
+      }
+
+      setExportPayload({ kind: 'flashcards', rows: uniqueRows } as ExportPayload);
+      setExportTitle(`${node.name} Flashcards`);
+      setExportSheetVisible(true);
+    } catch (e: any) {
+      Alert.alert('Export failed', e?.message || 'Could not prepare flashcards export.');
+    } finally {
+      setPreparingExportId(null);
+    }
+  };
+
   const openDeck = (node: BranchNode) => {
     if (navLock.current) return;
     navLock.current = true;
@@ -144,8 +230,11 @@ export default function FlashcardsHub() {
     } as any);
   };
 
-  const onAction = (node: BranchNode, action: string) => {
+  const onAction = (node: BranchNode, action: DeckRowAction) => {
     switch (action) {
+      case 'export':
+        handleExportNode(node);
+        break;
       case 'move':
         setMoveModal({ node });
         break;
@@ -251,6 +340,15 @@ export default function FlashcardsHub() {
             </View>
           </View>
         </View>
+
+        {preparingExportId && (
+          <View style={{ paddingHorizontal: 20, paddingBottom: 8 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: '600' }}>Preparing PDF export...</Text>
+            </View>
+          </View>
+        )}
 
         <ScrollView showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />} contentContainerStyle={{ paddingBottom: 100 }}>
           <View style={{ paddingHorizontal: 4 }}>
@@ -366,7 +464,22 @@ export default function FlashcardsHub() {
         </Modal>
 
         <PremiumMoveModal visible={!!moveModal} node={moveModal?.node ?? null} tree={tree} onClose={() => setMoveModal(null)} onConfirm={handleMove} />
-        
+
+        <UnifiedExportSheet
+          visible={exportSheetVisible}
+          onClose={() => setExportSheetVisible(false)}
+          payload={exportPayload}
+          title={exportTitle}
+          initialOptions={{
+            title: exportTitle,
+            moduleName: 'Flashcards',
+            showTOC: false,
+            headerText: 'Dr. UPSC · Flashcards',
+            footerText: exportTitle,
+            sortBy: 'subject',
+          }}
+          hideSections={['content', 'answer', 'sort', 'filters']}
+        />
 
       </View>
     </PageWrapper>

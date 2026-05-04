@@ -59,6 +59,7 @@ import {
 } from 'lucide-react-native';
 import { normalizeTag } from '../src/utils/tagUtils';
 import { buildNotesPdfHtml } from '../src/utils/notesPdfEngine';
+import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet';
 
 type ExportScope = 'all' | 'single' | 'multi';
 type ContentMode = 'questions' | 'questions_answers';
@@ -113,6 +114,7 @@ export default function TaggedRepoScreen() {
 
   // Export state
   const [exportVisible, setExportVisible] = useState(false);
+  const [unifiedExportVisible, setUnifiedExportVisible] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [exportConfig, setExportConfig] = useState<ExportConfig>({
     scope: 'all',
@@ -133,6 +135,12 @@ export default function TaggedRepoScreen() {
   const [pdfShowTOC, setPdfShowTOC] = useState(true);
   const [pdfSpacing, setPdfSpacing] = useState<'compact' | 'comfortable'>('comfortable');
   const [pdfFontFamily, setPdfFontFamily] = useState<'sans' | 'handwriting'>('sans');
+  const [pdfMarginLeftCm, setPdfMarginLeftCm] = useState(1);
+  const [pdfMarginRightCm, setPdfMarginRightCm] = useState(1);
+  const [pdfMarginTopCm, setPdfMarginTopCm] = useState(1);
+  const [pdfMarginBottomCm, setPdfMarginBottomCm] = useState(1);
+  const [pdfQABgColor, setPdfQABgColor] = useState('transparent');
+  const [pdfQALayoutMode, setPdfQALayoutMode] = useState<'unified' | 'split'>('unified');
 
   useEffect(() => {
     if (!loading) {
@@ -226,7 +234,7 @@ export default function TaggedRepoScreen() {
       }))
       .filter((x) => x.questions.length > 0);
 
-    const entries: Array<{ id: string; type: 'microTopicHeading' | 'highlight'; text: string; color?: string; sourceLabel?: string }> = [];
+    const entries: Array<{ id: string; type: 'microTopicHeading' | 'highlight'; text: string; questionText?: string; answerText?: string; color?: string; sourceLabel?: string }> = [];
     const selectedHeadingIds: string[] = [];
 
     groupedByTag.forEach((group) => {
@@ -243,19 +251,22 @@ export default function TaggedRepoScreen() {
           ? `**Q${idx + 1}.** ${q.questionText || 'Question text unavailable'}`
           : `Q${idx + 1}. ${q.questionText || 'Question text unavailable'}`;
 
-        const answerText = exportConfig.content === 'questions_answers'
-          ? `
+        const questionText = `${qLine}${optionsText ? `
 
-**Answer:** ${q.correctAnswer || 'ΓÇö'}
+${optionsText}` : ''}`;
+        const answerText = exportConfig.content === 'questions_answers'
+          ? `**Answer:** ${q.correctAnswer || 'ΓÇö'}
 ${q.explanation || 'No explanation available'}`
           : '';
 
         entries.push({
           id: `${headingId}-${q.id}-${idx}`,
           type: 'highlight',
-          text: `${qLine}${optionsText ? `
+          text: `${questionText}${answerText ? `
 
-${optionsText}` : ''}${answerText}`,
+${answerText}` : ''}`,
+          questionText,
+          answerText,
           sourceLabel: exportConfig.showMetadata
             ? `${q.subject} ΓÇó ${q.sectionGroup} ΓÇó ${q.microTopic}${q.testTitle ? ` ΓÇó ${q.testTitle}` : ''}`
             : undefined,
@@ -267,6 +278,8 @@ ${optionsText}` : ''}${answerText}`,
   };
 
   const runExport = async (cols: 1 | 2) => {
+    if (exporting) return;
+
     if (exportQuestions.length === 0) {
       Alert.alert('Nothing to export', 'No tagged questions match the selected scope.');
       return;
@@ -276,6 +289,8 @@ ${optionsText}` : ''}${answerText}`,
       Alert.alert('Select tags', 'Pick at least one tag for multi-tag export.');
       return;
     }
+
+    const watchdog = setTimeout(() => setExporting(false), 22000);
 
     try {
       setExporting(true);
@@ -299,13 +314,22 @@ ${optionsText}` : ''}${answerText}`,
           includeChecklist: false,
           spacing: pdfSpacing,
           fontFamily: pdfFontFamily,
+          pageMarginTopCm: pdfMarginTopCm,
+          pageMarginRightCm: pdfMarginRightCm,
+          pageMarginBottomCm: pdfMarginBottomCm,
+          pageMarginLeftCm: pdfMarginLeftCm,
+          qaBackgroundColor: pdfQABgColor,
+          qaLayoutMode: pdfQALayoutMode,
           pageBreakBetweenHeadings: exportConfig.pagination === 'tag',
         },
       });
 
       if (Platform.OS === 'ios') {
         const { uri } = await Print.printToFileAsync({ html });
-        await Sharing.shareAsync(uri, { UTIType: 'com.adobe.pdf', mimeType: 'application/pdf' });
+        await Promise.race([
+          Sharing.shareAsync(uri, { UTIType: 'com.adobe.pdf', mimeType: 'application/pdf' }).catch(() => null),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 20000)),
+        ]);
       } else {
         await Print.printAsync({ html });
       }
@@ -316,6 +340,7 @@ ${optionsText}` : ''}${answerText}`,
     } catch (err: any) {
       Alert.alert('Export failed', err?.message || 'Could not generate PDF right now.');
     } finally {
+      clearTimeout(watchdog);
       setExporting(false);
     }
   };
@@ -522,7 +547,7 @@ ${optionsText}` : ''}${answerText}`,
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => setExportVisible(true)}
+            onPress={() => setUnifiedExportVisible(true)}
             style={[styles.iconBtn, { backgroundColor: colors.primary + '15', borderColor: colors.primary + '30' }]}
             testID="tag-export-button"
           >
@@ -823,10 +848,9 @@ ${optionsText}` : ''}${answerText}`,
                   </TouchableOpacity>
                 </View>
 
-                <Text style={[styles.groupTitle, { color: colors.textPrimary }]}>1. Font Size & Margins</Text>
-                <Text style={{ fontSize: 10, color: colors.textSecondary, marginBottom: 8 }}>Fixed: 0.5cm Side ΓÇó 1cm Top/Bottom</Text>
+                <Text style={[styles.groupTitle, { color: colors.textPrimary }]}>1. Font Size</Text>
                 <View style={styles.rowWrap}>
-                  {[12, 14, 16, 18, 20].map((sz) => (
+                  {[6, 8, 10, 12, 14, 16, 18, 20].map((sz) => (
                     <TouchableOpacity
                       key={sz}
                       onPress={() => setPdfFontSize(sz)}
@@ -837,7 +861,18 @@ ${optionsText}` : ''}${answerText}`,
                   ))}
                 </View>
 
-                <Text style={[styles.groupTitle, { color: colors.textPrimary }]}>2. Subheading Highlight Color</Text>
+                <Text style={[styles.groupTitle, { color: colors.textPrimary }]}>2. Page Margins (cm)</Text>
+                <Text style={{ fontSize: 10, color: colors.textSecondary, marginBottom: 8 }}>Default: 1cm on left, right, top, and bottom.</Text>
+                <Text style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 4 }}>Left</Text>
+                <View style={styles.rowWrap}>{[0.5, 0.75, 1, 1.25, 1.5, 2].map((v) => <TouchableOpacity key={`ml-${v}`} onPress={() => setPdfMarginLeftCm(v)} style={[styles.choiceChip, { borderColor: colors.border, backgroundColor: pdfMarginLeftCm === v ? colors.primary + '22' : colors.surface }]}><Text style={{ color: pdfMarginLeftCm === v ? colors.primary : colors.textSecondary }}>{v}</Text></TouchableOpacity>)}</View>
+                <Text style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 4 }}>Right</Text>
+                <View style={styles.rowWrap}>{[0.5, 0.75, 1, 1.25, 1.5, 2].map((v) => <TouchableOpacity key={`mr-${v}`} onPress={() => setPdfMarginRightCm(v)} style={[styles.choiceChip, { borderColor: colors.border, backgroundColor: pdfMarginRightCm === v ? colors.primary + '22' : colors.surface }]}><Text style={{ color: pdfMarginRightCm === v ? colors.primary : colors.textSecondary }}>{v}</Text></TouchableOpacity>)}</View>
+                <Text style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 4 }}>Top</Text>
+                <View style={styles.rowWrap}>{[0.5, 0.75, 1, 1.25, 1.5, 2].map((v) => <TouchableOpacity key={`mt-${v}`} onPress={() => setPdfMarginTopCm(v)} style={[styles.choiceChip, { borderColor: colors.border, backgroundColor: pdfMarginTopCm === v ? colors.primary + '22' : colors.surface }]}><Text style={{ color: pdfMarginTopCm === v ? colors.primary : colors.textSecondary }}>{v}</Text></TouchableOpacity>)}</View>
+                <Text style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 4 }}>Bottom</Text>
+                <View style={styles.rowWrap}>{[0.5, 0.75, 1, 1.25, 1.5, 2].map((v) => <TouchableOpacity key={`mb-${v}`} onPress={() => setPdfMarginBottomCm(v)} style={[styles.choiceChip, { borderColor: colors.border, backgroundColor: pdfMarginBottomCm === v ? colors.primary + '22' : colors.surface }]}><Text style={{ color: pdfMarginBottomCm === v ? colors.primary : colors.textSecondary }}>{v}</Text></TouchableOpacity>)}</View>
+
+                <Text style={[styles.groupTitle, { color: colors.textPrimary }]}>3. Subheading Highlight Color</Text>
                 <View style={styles.rowWrap}>
                   {['#f3f4f6', '#FF6A8820', '#6A5BFF20', '#4FC3F720', '#81C78420', '#FFB74D20'].map((c) => (
                     <TouchableOpacity
@@ -845,6 +880,24 @@ ${optionsText}` : ''}${answerText}`,
                       onPress={() => setPdfSubheadingColor(c)}
                       style={[styles.colorOption, { backgroundColor: c === '#f3f4f6' ? '#e5e7eb' : c, borderColor: pdfSubheadingColor === c ? colors.primary : 'transparent' }]}
                     />
+                  ))}
+                </View>
+
+                <Text style={[styles.groupTitle, { color: colors.textPrimary }]}>4. Q&A Highlight</Text>
+                <Text style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 4 }}>Layout</Text>
+                <View style={styles.rowWrap}>
+                  {(['unified', 'split'] as const).map((mode) => (
+                    <TouchableOpacity key={mode} onPress={() => setPdfQALayoutMode(mode)} style={[styles.choiceChip, { borderColor: colors.border, backgroundColor: pdfQALayoutMode === mode ? colors.primary + '22' : colors.surface }]}>
+                      <Text style={{ color: pdfQALayoutMode === mode ? colors.primary : colors.textSecondary }}>{mode === 'unified' ? 'Unified Box' : 'Split Boxes'}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                <Text style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 4 }}>Background Color</Text>
+                <View style={styles.rowWrap}>
+                  {[{ id: 'transparent', label: 'None', swatch: colors.surfaceStrong }, { id: '#f8fafc', label: 'Mist', swatch: '#f8fafc' }, { id: '#fefce8', label: 'Cream', swatch: '#fefce8' }, { id: '#ecfeff', label: 'Aqua', swatch: '#ecfeff' }, { id: '#fdf2f8', label: 'Blush', swatch: '#fdf2f8' }, { id: '#f0fdf4', label: 'Mint', swatch: '#f0fdf4' }].map((bg) => (
+                    <TouchableOpacity key={bg.id} onPress={() => setPdfQABgColor(bg.id)} style={[styles.choiceChip, { borderColor: pdfQABgColor === bg.id ? colors.primary : colors.border, backgroundColor: bg.swatch }]}>
+                      <Text style={{ color: colors.textPrimary, fontWeight: '700' }}>{bg.label}</Text>
+                    </TouchableOpacity>
                   ))}
                 </View>
 
@@ -964,6 +1017,65 @@ ${optionsText}` : ''}${answerText}`,
             </View>
           </View>
         </Modal>
+
+        {/* Unified Export Sheet (new common engine) */}
+        <UnifiedExportSheet
+          visible={unifiedExportVisible}
+          onClose={() => setUnifiedExportVisible(false)}
+          title="Tagged Questions"
+          initialOptions={{
+            title: 'Tagged Questions',
+            moduleName: 'Tags Library',
+            showTOC: true,
+            headerText: 'Dr. UPSC · Tags',
+            footerText: 'Tagged Questions Export',
+          }}
+          payload={(() => {
+            const groups = uniqueTags
+              .map((tag) => ({
+                tag,
+                questions: allQuestions
+                  .filter((q) => q.normalizedReviewTags.includes(normalizeTag(tag)))
+                  .map((q: any) => ({
+                    id: q.id,
+                    question_text: q.questionText || q.question_text || '',
+                    options: q.options,
+                    correct_answer: q.correctAnswer || q.correct_answer,
+                    explanation_markdown: q.explanation || q.explanation_markdown,
+                    subject: q.subject,
+                    section_group: q.sectionGroup || q.section_group,
+                    micro_topic: q.microTopic || q.micro_topic,
+                    exam_year: q.examYear || q.exam_year,
+                    is_pyq: !!(q.isPyq || q.is_pyq),
+                    is_ncert: !!(q.isNcert || q.is_ncert),
+                    review_tags: q.reviewTags || [],
+                  })),
+              }))
+              .filter((x) => x.questions.length > 0);
+            return { kind: 'tags' as const, groups };
+          })()}
+          renderExtraFilters={(o, setO) => (
+            uniqueTags.length > 0 ? (
+              <View style={{ marginTop: 6 }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 6 }}>SUBJECT / TAG FILTER</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                  {uniqueTags.map(tag => {
+                    const isActive = (o.revisionTags || []).includes(tag);
+                    return (
+                      <TouchableOpacity
+                        key={tag}
+                        onPress={() => setO(prev => ({ ...prev, revisionTags: isActive ? (prev.revisionTags || []).filter(t => t !== tag) : [...(prev.revisionTags || []), tag] }))}
+                        style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: 1, backgroundColor: isActive ? colors.primary : colors.surfaceStrong, borderColor: isActive ? colors.primary : colors.border }}
+                      >
+                        <Text style={{ fontSize: 11, fontWeight: '800', color: isActive ? '#fff' : colors.textPrimary }}>{tag}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            ) : null
+          )}
+        />
       </PageWrapper>
     </SafeAreaView>
   );

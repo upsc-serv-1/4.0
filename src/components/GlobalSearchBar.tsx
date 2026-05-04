@@ -118,12 +118,36 @@ export const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({
                 .or(orConditions.join(','))
                 .limit(10);
 
-              // Apply filters to remote query
+              // Apply filters to remote query (hard filters)
+              if (selectedSubjects.length > 0) remoteQuery = remoteQuery.in('subject', selectedSubjects);
+              if (selectedSections.length > 0) {
+                const rSections = selectedSections.map((s: string) => s === 'General' ? null : s);
+                if (rSections.includes(null)) {
+                  const nonNulls = rSections.filter((s: any) => s !== null);
+                  if (nonNulls.length > 0) remoteQuery = remoteQuery.or(`section_group.in.(${nonNulls.join(',')}),section_group.is.null`);
+                  else remoteQuery = remoteQuery.is('section_group', null);
+                } else {
+                  remoteQuery = remoteQuery.in('section_group', rSections);
+                }
+              }
               if (selectedMicrotopics.length > 0) remoteQuery = remoteQuery.in('micro_topic', selectedMicrotopics);
+              if (pyqFilter === 'PYQ Only') remoteQuery = remoteQuery.eq('is_pyq', true);
+              if (pyqFilter === 'Non-PYQ') remoteQuery = remoteQuery.eq('is_pyq', false);
               if (ncertFilter === 'NCERT Only') {
                 remoteQuery = remoteQuery.eq('is_ncert', true);
               } else if (ncertFilter === 'Non-NCERT') {
-                remoteQuery = remoteQuery.not('is_ncert', 'eq', true);
+                remoteQuery = remoteQuery.or('is_ncert.is.null,is_ncert.eq.false');
+              }
+
+              if (selectedInstitutes.length > 0 || selectedPrograms.length > 0 || examStage !== 'All') {
+                let rtQuery = supabase.from('tests').select('id');
+                if (selectedInstitutes.length > 0) rtQuery = rtQuery.in('institute', selectedInstitutes);
+                if (selectedPrograms.length > 0) rtQuery = rtQuery.in('program_name', selectedPrograms);
+                if (examStage !== 'All') rtQuery = rtQuery.ilike('series', `%${examStage}%`);
+                const { data: rtRows } = await rtQuery;
+                const rtIds = (rtRows || []).map((t: any) => t.id);
+                if (rtIds.length > 0) remoteQuery = remoteQuery.in('test_id', rtIds);
+                else remoteQuery = remoteQuery.in('test_id', ['__NO_MATCH__']);
               }
 
               let { data: remote } = await remoteQuery;
@@ -137,11 +161,34 @@ export const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({
                 }
                 if (fuzzyPatterns.length > 0) {
                   let fuzzyQ = supabase.from('questions').select('*, is_ncert, tests(institute, series, title)').or(fuzzyPatterns.join(',')).limit(5);
+                  if (selectedSubjects.length > 0) fuzzyQ = fuzzyQ.in('subject', selectedSubjects);
+                  if (selectedSections.length > 0) {
+                    const fSections = selectedSections.map((s: string) => s === 'General' ? null : s);
+                    if (fSections.includes(null)) {
+                      const nonNulls = fSections.filter((s: any) => s !== null);
+                      if (nonNulls.length > 0) fuzzyQ = fuzzyQ.or(`section_group.in.(${nonNulls.join(',')}),section_group.is.null`);
+                      else fuzzyQ = fuzzyQ.is('section_group', null);
+                    } else {
+                      fuzzyQ = fuzzyQ.in('section_group', fSections);
+                    }
+                  }
                   if (selectedMicrotopics.length > 0) fuzzyQ = fuzzyQ.in('micro_topic', selectedMicrotopics);
+                  if (pyqFilter === 'PYQ Only') fuzzyQ = fuzzyQ.eq('is_pyq', true);
+                  if (pyqFilter === 'Non-PYQ') fuzzyQ = fuzzyQ.eq('is_pyq', false);
                   if (ncertFilter === 'NCERT Only') {
                     fuzzyQ = fuzzyQ.eq('is_ncert', true);
                   } else if (ncertFilter === 'Non-NCERT') {
-                    fuzzyQ = fuzzyQ.not('is_ncert', 'eq', true);
+                    fuzzyQ = fuzzyQ.or('is_ncert.is.null,is_ncert.eq.false');
+                  }
+                  if (selectedInstitutes.length > 0 || selectedPrograms.length > 0 || examStage !== 'All') {
+                    let ftQuery = supabase.from('tests').select('id');
+                    if (selectedInstitutes.length > 0) ftQuery = ftQuery.in('institute', selectedInstitutes);
+                    if (selectedPrograms.length > 0) ftQuery = ftQuery.in('program_name', selectedPrograms);
+                    if (examStage !== 'All') ftQuery = ftQuery.ilike('series', `%${examStage}%`);
+                    const { data: ftRows } = await ftQuery;
+                    const ftIds = (ftRows || []).map((t: any) => t.id);
+                    if (ftIds.length > 0) fuzzyQ = fuzzyQ.in('test_id', ftIds);
+                    else fuzzyQ = fuzzyQ.in('test_id', ['__NO_MATCH__']);
                   }
                   const { data: fData } = await fuzzyQ;
                   if (fData) remote = [...(remote || []), ...fData];

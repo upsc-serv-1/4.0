@@ -29,6 +29,8 @@ import { FlashcardSvc } from '../../../src/services/FlashcardService';
 import { AddToFlashcardSheet } from '../../../src/components/flashcards/AddToFlashcardSheet';
 import { supabase } from '../../../src/lib/supabase';
 import { useAuth } from '../../../src/context/AuthContext';
+import { UnifiedExportSheet } from '../../../src/components/export/UnifiedExportSheet';
+import { FileDown } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -69,6 +71,38 @@ export default function ResultScreen() {
   
   const scrollY = React.useRef(new Animated.Value(0)).current;
   const [showPYQTags] = useState(true); // Always follow rule from search bar
+  const [exportSheetVisible, setExportSheetVisible] = useState(false);
+
+  const userTags = useMemo(() => {
+    const s = new Set<string>();
+    (questions || []).forEach(q => {
+      const tags = localReviewTags[q.id] || q.reviewTags || [];
+      tags.forEach((t: string) => s.add(t));
+    });
+    return Array.from(s);
+  }, [questions, localReviewTags]);
+
+  const exportPayload = useMemo(() => {
+    if (!questions) return null;
+    const rows = questions.map((q: any) => ({
+      id: q.id,
+      question_text: q.question_text || q.text || q.statement || '',
+      options: q.options,
+      correct_answer: q.correctAnswer || q.correct_answer,
+      selected_answer: q.selectedAnswer || q.selected_answer,
+      is_correct: (q.selectedAnswer || q.selected_answer) ? (q.selectedAnswer === q.correctAnswer) : undefined,
+      explanation_markdown: q.explanation_markdown || q.explanation,
+      subject: q.subject,
+      section_group: q.section_group || q.sectionGroup,
+      micro_topic: q.micro_topic || q.microTopic,
+      exam_year: q.exam_year || q.examYear,
+      is_pyq: !!(q.isPyq || q.is_pyq),
+      is_ncert: !!(q.isNcert || q.is_ncert),
+      review_tags: localReviewTags[q.id] || q.reviewTags || [],
+      time_taken_seconds: q.timeTakenSeconds || q.time_taken_seconds,
+    }));
+    return { kind: 'questions' as const, rows };
+  }, [questions, localReviewTags]);
 
   const headerOpacity = scrollY.interpolate({
     inputRange: [0, 100],
@@ -317,9 +351,14 @@ export default function ResultScreen() {
           <Text style={[styles.headerTitle, { color: colors.textPrimary }]} numberOfLines={1}>
             {testTitle || 'Test Result'}
           </Text>
-          <TouchableOpacity onPress={handleShare} style={styles.headerIcon}>
-            <Share2 color={colors.textPrimary} size={20} />
-          </TouchableOpacity>
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity testID="analysis-export-button" onPress={() => setExportSheetVisible(true)} style={styles.headerIcon}>
+              <FileDown color={colors.textPrimary} size={20} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleShare} style={styles.headerIcon}>
+              <Share2 color={colors.textPrimary} size={20} />
+            </TouchableOpacity>
+          </View>
         </View>
       </Animated.View>
 
@@ -518,6 +557,42 @@ export default function ResultScreen() {
         userId={session?.user?.id || ''}
         cardId={aff.cardId}
         hint={aff.hint}
+      />
+
+      <UnifiedExportSheet
+        visible={exportSheetVisible}
+        onClose={() => setExportSheetVisible(false)}
+        payload={exportPayload}
+        title={testTitle || 'Test Analysis'}
+        initialOptions={{
+          title: testTitle || 'Test Analysis Report',
+          moduleName: 'Full Analysis Report',
+          includePerformanceMetrics: true,
+          showTOC: true,
+          headerText: 'Dr. UPSC · Test Analysis',
+          footerText: testTitle || 'Test Analysis Report',
+        }}
+        renderExtraFilters={(o, setO) => (
+          userTags.length > 0 ? (
+            <View style={{ marginTop: 6 }}>
+              <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 6 }}>REVISION TAGS</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                {userTags.map(tag => {
+                  const isActive = (o.revisionTags || []).includes(tag);
+                  return (
+                    <TouchableOpacity
+                      key={tag}
+                      onPress={() => setO(prev => ({ ...prev, revisionTags: isActive ? (prev.revisionTags || []).filter(t => t !== tag) : [...(prev.revisionTags || []), tag] }))}
+                      style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: 1, backgroundColor: isActive ? colors.primary : colors.surfaceStrong, borderColor: isActive ? colors.primary : colors.border }}
+                    >
+                      <Text style={{ fontSize: 11, fontWeight: '800', color: isActive ? '#fff' : colors.textPrimary }}>{tag}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          ) : null
+        )}
       />
     </View>
   );

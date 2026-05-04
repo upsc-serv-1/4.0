@@ -59,7 +59,8 @@ import {
   Highlighter,
   Sparkles,
   Type,
-  List
+  List,
+  PenTool
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -76,8 +77,11 @@ import { uuidv4 } from '../../src/utils/uuid';
 import { FlashcardSvc } from '../../src/services/FlashcardService';
 import { AddToFlashcardSheet } from '../../src/components/flashcards/AddToFlashcardSheet';
 import { NotebookLocationPicker } from '../../src/components/NotebookLocationPicker';
+import { QuizToHardnotesPicker } from '../../src/components/hardnotes/QuizToHardnotesPicker';
 import { OfflineManager } from '../../src/services/OfflineManager';
 import { LocalQuery } from '../../src/services/LocalQuery';
+import RichNoteEditor from '../../src/components/RichNoteEditor';
+import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 
 const ThemeSwitcher = require('../../src/components/ThemeSwitcher').ThemeSwitcher;
 
@@ -347,6 +351,9 @@ export default function UnifiedQuizEngine() {
 
   // Notebook System State
   const [notebookModalVisible, setNotebookModalVisible] = useState(false);
+  // Hardnotes bridge (Phase 3) — send quiz explanation into a Skia canvas note
+  const [hardnotesPickerVisible, setHardnotesPickerVisible] = useState(false);
+  const [hardnotesPayload, setHardnotesPayload] = useState<{ markdown: string; title: string } | null>(null);  const notebookRichEditorRef = useRef<any>(null);
   const [noteDraftBullets, setNoteDraftBullets] = useState(['']);
   const [activeInputIndex, setActiveInputIndex] = useState(0);
   const [selection, setSelection] = useState({ start: 0, end: 0 });
@@ -365,6 +372,7 @@ export default function UnifiedQuizEngine() {
   const [customSubheading, setCustomSubheading] = useState('');
   const [showPYQTags, setShowPYQTags] = useState(showPYQTagsParam);
   const [activeExplIndex, setActiveExplIndex] = useState<Record<string, number>>({});
+  const [activeExplSource, setActiveExplSource] = useState<Record<string, string>>({});
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [showSaveNameModal, setShowSaveNameModal] = useState(false);
   const [isSavingAttempt, setIsSavingAttempt] = useState(false);
@@ -822,11 +830,23 @@ export default function UnifiedQuizEngine() {
              let fuzzyQ = LocalQuery.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)').or(fuzzyPatterns.join(',')).limit(100);
              // Re-apply same filters
              const insts = params.institutes || params.institute;
-             if (insts && insts !== 'All') {
-                const { data: tRows } = await LocalQuery.from('tests').select('id').in('institute', insts.split(','));
-                if (tRows) fuzzyQ = fuzzyQ.in('test_id', tRows.map((t: any) => t.id));
+             const progs = params.programs || params.program;
+             const stage = params.stage || params.examStage || params.series;
+             if ((insts && insts !== 'All' && insts !== '' && insts !== '[]') || (progs && progs !== 'All' && progs !== '' && progs !== '[]') || (stage && stage !== 'All' && stage !== '' && stage !== '[]')) {
+                let tQuery = LocalQuery.from('tests').select('id');
+                if (insts && insts !== 'All' && insts !== '' && insts !== '[]') tQuery = tQuery.in('institute', insts.split(',').filter(Boolean));
+                if (progs && progs !== 'All' && progs !== '' && progs !== '[]') tQuery = tQuery.in('program_name', progs.split(',').filter(Boolean));
+                if (stage && stage !== 'All' && stage !== '' && stage !== '[]') tQuery = tQuery.ilike('series', '%' + stage + '%');
+                const { data: tRows } = await tQuery;
+                const tIds = (tRows || []).map((t: any) => t.id);
+                if (tIds.length > 0) fuzzyQ = fuzzyQ.in('test_id', tIds);
+                else fuzzyQ = fuzzyQ.in('test_id', ['__NO_MATCH__']);
              }
-             if (params.subject && params.subject !== 'All') fuzzyQ = fuzzyQ.eq('subject', params.subject);
+             const subs = params.subjects || params.subject;
+             if (subs && subs !== 'All' && subs !== '' && subs !== '[]') {
+                const subList = typeof subs === 'string' ? subs.split(',').filter(Boolean) : [];
+                if (subList.length > 0) fuzzyQ = fuzzyQ.in('subject', subList);
+             }
              const pyqM = params.pyqMaster || params.pyqFilter;
              if (pyqM === 'PYQ Only') {
                fuzzyQ = fuzzyQ.eq('is_pyq', true);
@@ -839,7 +859,7 @@ export default function UnifiedQuizEngine() {
                  if (cats.includes('Others')) fOr.push('is_others.eq.true');
                  if (fOr.length > 0) fuzzyQ = fuzzyQ.or(fOr.join(','));
                }
-             } else if (pyqM === 'Non-PYQ') {
+             } else if (pyqM === 'Non-PYQ' || pyqM === 'Non PYQ') {
                fuzzyQ = fuzzyQ.eq('is_pyq', false);
              }
 
@@ -1673,7 +1693,69 @@ export default function UnifiedQuizEngine() {
     if (!item) return null;
     const answerData = currentAnswers[item.id] || { selectedAnswer: null, confidence: null, difficulty: null, errorCategory: null, note: '' };
     const showExplanation = arenaMode === 'learning' && revealedExplanations[item.id];
-    
+
+    const normalizeInstituteLabel = (value: any) => {
+      const raw = String(value || '').trim();
+      if (!raw) return 'Primary';
+      const compact = raw.replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').trim();
+      return compact
+        .split(' ')
+        .filter(Boolean)
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+        .join(' ');
+    };
+
+    const normalizedExplanations = (() => {
+      const list = Array.isArray(item._explanations) ? item._explanations : [];
+      const seen = new Set<string>();
+      const out: any[] = [];
+      list.forEach((e: any, idx: number) => {
+        const source = normalizeInstituteLabel(e?.source || e?.institute || e?.provider || e?.tests?.institute || item.tests?.institute || `Source ${idx + 1}`);
+        const sourceKey = source.toLowerCase();
+        const year = String(e?.year || item.exam_year || '').trim();
+        const answer = String(e?.answer || item.correct_answer || '').trim().toUpperCase();
+        const text = String(e?.text || e?.explanation || '').trim();
+        if (!text) return;
+        const dedupeKey = `${sourceKey}__${year}__${answer}__${text.replace(/\s+/g, ' ').toLowerCase()}`;
+        if (seen.has(dedupeKey)) return;
+        seen.add(dedupeKey);
+        out.push({ source, sourceKey, year, answer, text });
+      });
+
+      if (item.explanation_markdown) {
+        const source = normalizeInstituteLabel(item.tests?.institute || item.source?.institute || 'Primary');
+        const sourceKey = source.toLowerCase();
+        const text = String(item.explanation_markdown).trim();
+        const year = String(item.exam_year || '').trim();
+        const answer = String(item.correct_answer || '').trim().toUpperCase();
+        const dedupeKey = `${sourceKey}__${year}__${answer}__${text.replace(/\s+/g, ' ').toLowerCase()}`;
+        if (text && !seen.has(dedupeKey)) {
+          seen.add(dedupeKey);
+          out.push({ source, sourceKey, year, answer, text });
+        }
+      }
+
+      return out;
+    })();
+
+    const availableExplSources = Array.from(
+      new Map(normalizedExplanations.map((e: any) => [e.sourceKey, e.source])).entries()
+    ).map(([key, label]) => ({ key, label }));
+
+    const selectedExplSource = activeExplSource[item.id] || 'all';
+    const sourceFilteredExplanations = selectedExplSource === 'all'
+      ? normalizedExplanations
+      : normalizedExplanations.filter((e: any) => e.sourceKey === selectedExplSource);
+
+    const displayExplanations = sourceFilteredExplanations.length > 0 ? sourceFilteredExplanations : normalizedExplanations;
+    const rawIdx = activeExplIndex[item.id] ?? -1;
+    const safeIdx = rawIdx >= 0 && rawIdx < displayExplanations.length ? rawIdx : -1;
+    const activeExplanationText = safeIdx === -1
+      ? (displayExplanations.length > 1
+          ? displayExplanations.map((e: any) => `**${e.source}${e.year ? ' · ' + e.year : ''}${e.answer ? ' · Ans: ' + e.answer : ''}:**\n\n${e.text}`).join('\n\n---\n\n')
+          : (displayExplanations[0]?.text || item.explanation_markdown || 'No explanation available.'))
+      : (displayExplanations[safeIdx]?.text || item.explanation_markdown || 'No explanation available.');
+
     return (
       <View style={[styles.questionCard, { backgroundColor: isZenMode ? 'transparent' : colors.surface, borderColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.border, borderWidth: isZenMode ? 0 : 1 }]}>
         <View style={styles.qHeader}>
@@ -1687,7 +1769,10 @@ export default function UnifiedQuizEngine() {
           <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
             {(() => {
               const pyq = getPYQCategorization(item);
-              const hasTags = showPYQTags && (pyq.hasPYQData || item.is_ncert || item.exam_info?.is_ncert);
+              const institutes: string[] = Array.isArray((item as any)._institutes)
+                ? Array.from(new Set<string>((item as any)._institutes.filter(Boolean)))
+                : [];
+              const hasTags = (showPYQTags && (pyq.hasPYQData || item.is_ncert || item.exam_info?.is_ncert)) || institutes.length > 0;
               if (!hasTags) return null;
 
               const chips: { label: string; bg: string; fg: string; border: string }[] = [];
@@ -1697,10 +1782,27 @@ export default function UnifiedQuizEngine() {
               if (pyq.isGenericPYQ) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : colors.primary + '10', fg: isZenMode ? '#433422' : colors.primary, border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : colors.primary });
               if (item.is_ncert || item.exam_info?.is_ncert || item.micro_topic === 'NCERT') chips.push({ label: 'NCERT', bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#e0f2fe', fg: isZenMode ? '#433422' : '#0369a1', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#0ea5e9' });
 
+              institutes.slice(0, 2).forEach((inst: string) => {
+                chips.push({
+                  label: inst,
+                  bg: isZenMode ? 'rgba(67, 52, 34, 0.07)' : colors.surfaceStrong,
+                  fg: isZenMode ? '#433422' : colors.textSecondary,
+                  border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : colors.border,
+                });
+              });
+              if (institutes.length > 2) {
+                chips.push({
+                  label: `+${institutes.length - 2} institutes`,
+                  bg: isZenMode ? 'rgba(67, 52, 34, 0.07)' : colors.surfaceStrong,
+                  fg: isZenMode ? '#433422' : colors.textSecondary,
+                  border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : colors.border,
+                });
+              }
+
               return (
                 <View style={{ flexDirection: 'row', gap: 6 }}>
                   {chips.map((chip, idx) => (
-                    <View key={`chip-${item.id}-${idx}`} style={[styles.inlineBadge, { backgroundColor: chip.bg, borderColor: chip.border, paddingHorizontal: 6, paddingVertical: 2, height: 20 }]}>
+                    <View key={`chip-${item.id}-${idx}`} style={[styles.inlineBadge, { backgroundColor: chip.bg, borderColor: chip.border, paddingHorizontal: 6, paddingVertical: 2, height: 20 }]}> 
                       <Text style={{ color: chip.fg, fontWeight: '900', fontSize: 9 }}>{chip.label}</Text>
                     </View>
                   ))}
@@ -1716,9 +1818,7 @@ export default function UnifiedQuizEngine() {
             </TouchableOpacity>
             <TouchableOpacity 
               onPress={() => {
-                const activeText = (activeExplIndex[item.id] ?? -1) === -1 
-                  ? item.explanation_markdown 
-                  : item._explanations?.[activeExplIndex[item.id]]?.text || item.explanation_markdown || '';
+                const activeText = activeExplanationText || item.explanation_markdown || '';
                 setNoteDraftBullets([activeText || '']); 
                 setCustomSubheading(item.micro_topic || '');
                 setNotebookModalVisible(true);
@@ -1853,38 +1953,82 @@ export default function UnifiedQuizEngine() {
                    <Text style={[styles.explanationTitle, { color: colors.primary }]}>EXPLANATION</Text>
                 </View>
 
-                {item._explanations && item._explanations.length > 1 && (
-                  <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: colors.border + '30' }}>
-                    <TouchableOpacity 
-                      onPress={() => setActiveExplIndex(prev => ({ ...prev, [item.id]: -1 }))}
-                      style={{ 
-                        paddingHorizontal: 12, 
-                        paddingVertical: 6, 
-                        borderRadius: 20, 
-                        backgroundColor: (activeExplIndex[item.id] ?? -1) === -1 ? colors.primary : colors.surfaceStrong,
+                {availableExplSources.length > 1 && (
+                  <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setActiveExplSource(prev => ({ ...prev, [item.id]: 'all' }));
+                        setActiveExplIndex(prev => ({ ...prev, [item.id]: -1 }));
+                      }}
+                      style={{
+                        paddingHorizontal: 12,
+                        paddingVertical: 6,
+                        borderRadius: 20,
+                        backgroundColor: selectedExplSource === 'all' ? colors.primary : colors.surfaceStrong,
                         borderWidth: 1,
                         borderColor: colors.border
                       }}
                     >
-                      <Text style={{ fontSize: 10, fontWeight: '900', color: (activeExplIndex[item.id] ?? -1) === -1 ? '#fff' : colors.textTertiary }}>
-                        Combined
+                      <Text style={{ fontSize: 10, fontWeight: '900', color: selectedExplSource === 'all' ? '#fff' : colors.textTertiary }}>
+                        ALL INSTITUTES
                       </Text>
                     </TouchableOpacity>
-                    {item._explanations.map((expl: any, idx: number) => (
-                      <TouchableOpacity 
-                        key={idx}
-                        onPress={() => setActiveExplIndex(prev => ({ ...prev, [item.id]: idx }))}
-                        style={{ 
-                          paddingHorizontal: 12, 
-                          paddingVertical: 6, 
-                          borderRadius: 20, 
-                          backgroundColor: activeExplIndex[item.id] === idx ? colors.primary : colors.surfaceStrong,
+                    {availableExplSources.map(({ key, label }: any) => (
+                      <TouchableOpacity
+                        key={`src-${item.id}-${key}`}
+                        onPress={() => {
+                          setActiveExplSource(prev => ({ ...prev, [item.id]: key }));
+                          setActiveExplIndex(prev => ({ ...prev, [item.id]: -1 }));
+                        }}
+                        style={{
+                          paddingHorizontal: 12,
+                          paddingVertical: 6,
+                          borderRadius: 20,
+                          backgroundColor: selectedExplSource === key ? colors.primary : colors.surfaceStrong,
                           borderWidth: 1,
                           borderColor: colors.border
                         }}
                       >
-                        <Text style={{ fontSize: 10, fontWeight: '900', color: activeExplIndex[item.id] === idx ? '#fff' : colors.textTertiary }}>
-                          {expl.source || `Source ${idx + 1}`}
+                        <Text style={{ fontSize: 10, fontWeight: '900', color: selectedExplSource === key ? '#fff' : colors.textTertiary }}>
+                          {label}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+
+                {displayExplanations.length > 1 && (
+                  <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: colors.border + '30', flexWrap: 'wrap' }}>
+                    <TouchableOpacity
+                      onPress={() => setActiveExplIndex(prev => ({ ...prev, [item.id]: -1 }))}
+                      style={{
+                        paddingHorizontal: 12,
+                        paddingVertical: 6,
+                        borderRadius: 20,
+                        backgroundColor: safeIdx === -1 ? colors.primary : colors.surfaceStrong,
+                        borderWidth: 1,
+                        borderColor: colors.border
+                      }}
+                    >
+                      <Text style={{ fontSize: 10, fontWeight: '900', color: safeIdx === -1 ? '#fff' : colors.textTertiary }}>
+                        COMBINED ({displayExplanations.length})
+                      </Text>
+                    </TouchableOpacity>
+                    {displayExplanations.map((expl: any, idx: number) => (
+                      <TouchableOpacity
+                        key={`expl-${item.id}-${idx}`}
+                        onPress={() => setActiveExplIndex(prev => ({ ...prev, [item.id]: idx }))}
+                        style={{
+                          paddingHorizontal: 12,
+                          paddingVertical: 6,
+                          borderRadius: 20,
+                          backgroundColor: safeIdx === idx ? colors.primary : colors.surfaceStrong,
+                          borderWidth: 1,
+                          borderColor: colors.border
+                        }}
+                      >
+                        <Text style={{ fontSize: 10, fontWeight: '900', color: safeIdx === idx ? '#fff' : colors.textTertiary }}>
+                          {expl.source || `Source ${idx + 1}`}{expl.year ? ` · ${expl.year}` : ''}
                         </Text>
                       </TouchableOpacity>
                     ))}
@@ -1892,9 +2036,7 @@ export default function UnifiedQuizEngine() {
                 )}
 
                 <Markdown style={{ body: { color: colors.textSecondary, fontSize: fontSize - 2 } }}>
-                  {(activeExplIndex[item.id] ?? -1) === -1 
-                    ? item.explanation_markdown 
-                    : item._explanations?.[activeExplIndex[item.id]]?.text || item.explanation_markdown || 'No explanation available.'}
+                  {activeExplanationText}
                 </Markdown>
               </View>
 
@@ -1902,7 +2044,7 @@ export default function UnifiedQuizEngine() {
                  <TouchableOpacity 
                    style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
                    onPress={() => { 
-                     const activeText = item._explanations?.[activeExplIndex[item.id] || 0]?.text || item.explanation_markdown || '';
+                     const activeText = activeExplanationText || item.explanation_markdown || '';
                      setNoteDraftBullets([activeText]); 
                      setCustomSubheading(item.micro_topic || '');
                      setNotebookModalVisible(true); 
@@ -1911,6 +2053,18 @@ export default function UnifiedQuizEngine() {
                  >
                     <BookOpen size={16} color={colors.primary} />
                     <Text style={[styles.actionBtnText, { color: colors.primary }]}>Notebook</Text>
+                 </TouchableOpacity>
+                 <TouchableOpacity
+                   style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
+                   onPress={() => {
+                     const activeText = activeExplanationText || item.explanation_markdown || '';
+                     setHardnotesPayload({ markdown: activeText, title: item.micro_topic || item.question_text?.slice(0, 40) || 'Quiz Note' });
+                     setHardnotesPickerVisible(true);
+                   }}
+                   data-testid={`engine-hardnotes-btn-${item.id}`}
+                 >
+                    <PenTool size={16} color={colors.primary} />
+                    <Text style={[styles.actionBtnText, { color: colors.primary }]}>Hardnotes</Text>
                  </TouchableOpacity>
                  <TouchableOpacity 
                    style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
@@ -2047,6 +2201,7 @@ export default function UnifiedQuizEngine() {
         microtopic={questions[currentIndex]?.micro_topic}
         applyFormatting={applyFormatting}
         openLocationPicker={() => setLocationPickerVisible(true)}
+        richEditorRef={notebookRichEditorRef}
       />
     );
   };
@@ -2616,6 +2771,15 @@ export default function UnifiedQuizEngine() {
             fetchSubheadings(note_id);
           }}
         />
+        {session?.user?.id && hardnotesPayload && (
+          <QuizToHardnotesPicker
+            visible={hardnotesPickerVisible}
+            userId={session.user.id}
+            explanationMarkdown={hardnotesPayload.markdown}
+            suggestedTitle={hardnotesPayload.title}
+            onClose={() => setHardnotesPickerVisible(false)}
+          />
+        )}
       </SafeAreaView>
     </PageWrapper>
   );
@@ -2657,84 +2821,66 @@ const NotebookModal = (props: any) => {
                         {props.selectedNotebook?.title ? props.selectedNotebook.title.slice(0, 10) : 'LOCATION'}
                       </Text>
                    </TouchableOpacity>
-                   
-                   <TouchableOpacity 
-                     onPress={() => props.splitBullet(props.activeInputIndex)}
-                     style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceStrong, borderRadius: 12 }}
-                   >
-                      <Scissors size={18} color={colors.primary} />
-                   </TouchableOpacity>
-                   
-                   <TouchableOpacity 
-                     onPress={() => props.addBullet(props.activeInputIndex)}
-                     style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceStrong, borderRadius: 12 }}
-                   >
-                      <Plus size={18} color={colors.primary} />
-                   </TouchableOpacity>
                 </View>
               </View>
 
-            <ScrollView style={{ flex: 1, padding: 20 }} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 80 }}>
-            <View style={{ borderBottomWidth: 1, borderBottomColor: colors.border + '30', backgroundColor: colors.surface }}>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ padding: 12, gap: 12 }}>
-                <TouchableOpacity onPress={() => props.applyFormatting('bold')} style={[styles.modalToolBtn, { backgroundColor: colors.surfaceStrong }]}>
-                  <Bold size={18} color={colors.textPrimary} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => props.applyFormatting('italic')} style={[styles.modalToolBtn, { backgroundColor: colors.surfaceStrong }]}>
-                  <Italic size={18} color={colors.textPrimary} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => props.applyFormatting('underline')} style={[styles.modalToolBtn, { backgroundColor: colors.surfaceStrong }]}>
-                  <Underline size={18} color={colors.textPrimary} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => props.applyFormatting('bullet')} style={[styles.modalToolBtn, { backgroundColor: colors.surfaceStrong }]}>
-                  <List size={18} color={colors.textPrimary} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => props.applyFormatting('number')} style={[styles.modalToolBtn, { backgroundColor: colors.surfaceStrong }]}>
-                  <Type size={18} color={colors.textPrimary} />
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  onPress={() => props.applyFormatting('highlight')}
-                  style={[styles.modalToolBtn, { backgroundColor: colors.primary + '20', borderColor: colors.primary + '30' }]}
-                >
-                  <Highlighter size={18} color={colors.primary} />
-                </TouchableOpacity>
-              </ScrollView>
+            <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 80 }}>
+            <View style={{ backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border + '30' }}>
+              <RichToolbar
+                editor={props.richEditorRef}
+                getEditor={() => props.richEditorRef?.current}
+                selectedIconTint={colors.primary}
+                iconTint={colors.textPrimary}
+                style={{ backgroundColor: colors.surface }}
+                actions={[
+                  actions.setBold,
+                  actions.setItalic,
+                  actions.setUnderline,
+                  actions.setStrikethrough,
+                  actions.heading1,
+                  actions.heading2,
+                  actions.insertBulletsList,
+                  actions.insertOrderedList,
+                  actions.checkboxList,
+                  actions.blockquote,
+                  'highlight',
+                  actions.undo,
+                  actions.redo,
+                ]}
+                iconMap={{
+                  [actions.heading1]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '900', fontSize: 14 }}>H1</Text>,
+                  [actions.heading2]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '800', fontSize: 12 }}>H2</Text>,
+                  highlight: ({ tintColor }: any) => (
+                    <View style={{ padding: 4, borderRadius: 4, backgroundColor: '#FFF59D' }}>
+                      <Highlighter size={16} color={tintColor} />
+                    </View>
+                  ),
+                }}
+                highlight={() => {
+                  props.richEditorRef?.current?.focusContentEditor?.();
+                  setTimeout(() => {
+                    props.richEditorRef?.current?.commandDOM?.("document.execCommand('hiliteColor', false, '#FFF59D')");
+                  }, 50);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+              />
             </View>
 
-              {props.noteDraftBullets.map((bullet: string, idx: number) => (
-                <View 
-                  key={idx} 
-                  style={{ 
-                    marginBottom: 16, 
-                    backgroundColor: colors.bg, 
-                    borderRadius: 16, 
-                    padding: 16, 
-                    borderWidth: 1, 
-                    borderColor: props.activeInputIndex === idx ? colors.primary : colors.border,
-                    shadowColor: props.activeInputIndex === idx ? colors.primary : 'transparent',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 4,
-                    elevation: props.activeInputIndex === idx ? 2 : 0
-                  }}
-                >
-                  <TextInput
-                    style={{ color: colors.textPrimary, fontSize: 16, lineHeight: 24 }}
-                    multiline
-                    value={bullet}
-                    placeholder="Capture your thought..."
-                    placeholderTextColor={colors.textTertiary}
-                    onChangeText={(t) => props.updateBullet(idx, t)}
-                    onSelectionChange={(e) => {
-                      props.setSelection(e.nativeEvent.selection);
-                      props.setActiveInputIndex(idx);
-                    }}
-                    onFocus={() => props.setActiveInputIndex(idx)}
-                    selection={props.activeInputIndex === idx ? props.selection : undefined}
-                  />
-                </View>
-              ))}
+            <View style={{ padding: 16, minHeight: 300 }}>
+              <RichNoteEditor
+                ref={props.richEditorRef}
+                html={props.noteDraftBullets?.[0] || ''}
+                onChange={(html: string) => props.updateBullet(0, html)}
+                themeColors={{
+                  bg: colors.bg,
+                  surface: colors.surface,
+                  textPrimary: colors.textPrimary,
+                  border: colors.border,
+                  primary: colors.primary,
+                }}
+                placeholder="Capture your insight... Use the toolbar above for formatting."
+              />
+            </View>
 
               <View style={{ height: 24 }} />
               <Text style={[styles.modalLabel, { color: colors.textTertiary, letterSpacing: 1 }]}>SAVE LOCATION</Text>

@@ -1,6 +1,6 @@
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import {
   ExportOptions, QuestionRow, CardRow,
   buildQuestionsHtml, buildFlashcardsHtml, buildNotesHtml, buildTagsHtml,
@@ -11,6 +11,14 @@ export type ExportPayload =
   | { kind: 'flashcards'; rows: CardRow[] }
   | { kind: 'notes';      blocks: { title: string; html: string }[] }
   | { kind: 'tags';       groups: { tag: string; questions: QuestionRow[] }[] };
+
+const sharePdfWithTimeout = async (uri: string, dialogTitle: string): Promise<void> => {
+  const timeoutMs = 20000;
+  await Promise.race([
+    Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle }).catch(() => null),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs)),
+  ]);
+};
 
 export async function exportPdf(payload: ExportPayload, opts: ExportOptions) {
   let html = '';
@@ -29,7 +37,7 @@ export async function exportPdf(payload: ExportPayload, opts: ExportOptions) {
   const finalUri = (await FileSystem.getInfoAsync(dest)).exists ? dest : uri;
 
   if (await Sharing.isAvailableAsync()) {
-    await Sharing.shareAsync(finalUri, { mimeType: 'application/pdf', dialogTitle: opts.title });
+    await sharePdfWithTimeout(finalUri, opts.title);
   }
   return finalUri;
 }

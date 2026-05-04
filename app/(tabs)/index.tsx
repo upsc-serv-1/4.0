@@ -123,7 +123,7 @@ export default function Home() {
         supabase.from('user_note_nodes')
           .select('id, title, type, updated_at, note_id')
           .eq('user_id', userId)
-          .eq('type', 'note')
+          .in('type', ['note', 'notebook'])
           .order('updated_at', { ascending: false })
           .limit(6),
         supabase.from('user_tags')

@@ -35,6 +35,7 @@ export type ExportColumns = 1 | 2;
 export type ExportContentScope = 'q_only' | 'q_options' | 'q_options_expl';
 export type ExportAnswerPlacement = 'inline' | 'end';
 export type ExportSortBy = 'default' | 'subject' | 'microtopic' | 'difficulty' | 'date';
+export type ExportQaLayoutMode = 'unified' | 'split';
 
 export interface ExportOptions {
   title: string;
@@ -46,6 +47,16 @@ export interface ExportOptions {
   contentScope: ExportContentScope;
   answerPlacement: ExportAnswerPlacement;
   sortBy: ExportSortBy;
+
+  // Page setup (cm)
+  pageMarginTopCm: number;
+  pageMarginRightCm: number;
+  pageMarginBottomCm: number;
+  pageMarginLeftCm: number;
+
+  // Question/answer background customization
+  qaBackgroundColor: string; // 'transparent' for none
+  qaLayoutMode: ExportQaLayoutMode;
 
   showTOC: boolean;
   headerText: string;
@@ -72,6 +83,12 @@ export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): Ex
   contentScope: 'q_options_expl',
   answerPlacement: 'inline',
   sortBy: 'default',
+  pageMarginTopCm: 1,
+  pageMarginRightCm: 1,
+  pageMarginBottomCm: 1,
+  pageMarginLeftCm: 1,
+  qaBackgroundColor: 'transparent',
+  qaLayoutMode: 'unified',
   showTOC: false,
   headerText: 'Dr. UPSC',
   footerText: '',
@@ -154,11 +171,19 @@ const paperBg: Record<ExportPaperStyle, string> = {
 
 // ---------- CSS builder ----------
 
+const clampCm = (value: number, fallback = 1): number => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(0.3, Math.min(4, n));
+};
+
 const baseCss = (o: ExportOptions) => {
   const t = themeTokens[o.theme];
+  const qaBg = o.qaBackgroundColor || 'transparent';
+  const qaBorder = qaBg === 'transparent' ? 'transparent' : 'rgba(15, 23, 42, 0.12)';
   return `
-    :root { --bg:${t.bg}; --fg:${t.fg}; --accent:${t.accent}; --rule:${t.rule}; --card:${t.card}; }
-    @page { size: A4; margin: 18mm 14mm; }
+    :root { --bg:${t.bg}; --fg:${t.fg}; --accent:${t.accent}; --rule:${t.rule}; --card:${t.card}; --qa-bg:${qaBg}; --qa-border:${qaBorder}; }
+    @page { size: A4; margin: ${clampCm(o.pageMarginTopCm)}cm ${clampCm(o.pageMarginRightCm)}cm ${clampCm(o.pageMarginBottomCm)}cm ${clampCm(o.pageMarginLeftCm)}cm; }
     * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     html, body { margin: 0; padding: 0; }
     body {
@@ -221,6 +246,26 @@ const baseCss = (o: ExportOptions) => {
       word-break: break-word;
     }
     .expl b, .expl strong { font-weight: 700; }
+
+    /* Q&A highlight customization */
+    .qa-unified,
+    .qa-question-box,
+    .qa-answer-box {
+      background: var(--qa-bg);
+      border: 1px solid var(--qa-border);
+      border-radius: 8px;
+      padding: 3mm 3.5mm;
+    }
+    .qa-unified .qa-answer {
+      margin-top: 2mm;
+      padding-top: 2mm;
+      border-top: 1px dashed var(--qa-border);
+    }
+    .qa-split-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 2mm;
+    }
 
     /* Rich text preservation */
     b, strong { font-weight: 700; }
@@ -365,6 +410,13 @@ export const sortQuestions = (rows: ExportQuestion[], o: ExportOptions): ExportQ
 
 // ---------- Questions ----------
 
+const renderQaLayoutBlock = (questionHtml: string, answerHtml: string, o: ExportOptions): string => {
+  if (o.qaLayoutMode === 'split') {
+    return `<div class="qa-split-stack"><div class="qa-question-box">${questionHtml}</div>${answerHtml ? `<div class="qa-answer-box">${answerHtml}</div>` : ''}</div>`;
+  }
+  return `<div class="qa-unified"><div class="qa-question">${questionHtml}</div>${answerHtml ? `<div class="qa-answer">${answerHtml}</div>` : ''}</div>`;
+};
+
 export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions): string => {
   const rows = sortQuestions(filterQuestions(rowsRaw, o), o);
 
@@ -406,13 +458,18 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
       ? `${q.time_taken_seconds ? `<span class="metrics">⏱ ${q.time_taken_seconds}s</span>` : ''}${q.is_correct === true ? '<span class="metrics">✓ Correct</span>' : q.is_correct === false ? '<span class="metrics">✗ Incorrect</span>' : q.selected_answer ? '' : '<span class="metrics">— Skipped</span>'}`
       : '';
 
-    return `<div class="item">
+    const questionBlock = `
       <div class="qstem"><span class="qnum">${i + 1}.</span>${renderInline(stem)}${metricsBlock}</div>
       ${meta ? `<div class="metarow">${meta}</div>` : ''}
       ${optsBlock}
+    `;
+
+    const answerBlock = `
       ${inline && showOpts && answer ? `<div class="ans">Answer: ${answer}</div>` : ''}
       ${inline && showExpl && explanation ? `<div class="expl">${renderInline(explanation)}</div>` : ''}
-    </div>`;
+    `.trim();
+
+    return `<div class="item">${renderQaLayoutBlock(questionBlock, answerBlock, o)}</div>`;
   }).join('');
 
   // Answer key appendix if not inline
@@ -493,13 +550,16 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
       const answer = (q.correct_answer || '').toUpperCase();
       const explanation = q.explanation_markdown || q.explanation || '';
       const optsBlock = showOpts && q.options ? `<ul class="opts">${['a','b','c','d'].filter(k => (q.options as any)[k]).map(k => `<li class="${inline && answer === k.toUpperCase() ? 'correct' : ''}"><b>${k.toUpperCase()}.</b> ${renderInline(String((q.options as any)[k]))}</li>`).join('')}</ul>` : '';
-      return `<div class="item">
+      const questionBlock = `
         <div class="qstem"><span class="qnum">${i + 1}.</span>${renderInline(stem)}</div>
         ${meta ? `<div class="metarow">${meta}</div>` : ''}
         ${optsBlock}
-        ${inline && answer ? `<div class="ans">Answer: ${answer}</div>` : ''}
+      `;
+      const answerBlock = `
+        ${inline && showOpts && answer ? `<div class="ans">Answer: ${answer}</div>` : ''}
         ${inline && showExpl && explanation ? `<div class="expl">${renderInline(explanation)}</div>` : ''}
-      </div>`;
+      `.trim();
+      return `<div class="item">${renderQaLayoutBlock(questionBlock, answerBlock, o)}</div>`;
     }).join('');
     return `<div class="tag-section">
       <div class="tag-title">#${escapeHtml(g.tag)} <span style="font-weight:500;opacity:0.7">(${rows.length})</span></div>
@@ -539,6 +599,14 @@ export const renderHtml = (payload: ExportPayload, options: ExportOptions): stri
   }
 };
 
+const sharePdfWithTimeout = async (uri: string, dialogTitle: string): Promise<void> => {
+  const timeoutMs = 20000;
+  await Promise.race([
+    Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle }).catch(() => null),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs)),
+  ]);
+};
+
 export async function exportToPdf(payload: ExportPayload, options: ExportOptions): Promise<string> {
   const html = renderHtml(payload, options);
   const { uri } = await Print.printToFileAsync({ html, base64: false });
@@ -548,7 +616,7 @@ export async function exportToPdf(payload: ExportPayload, options: ExportOptions
   const info = await FileSystem.getInfoAsync(dest);
   const finalUri = info.exists ? dest : uri;
   if (await Sharing.isAvailableAsync()) {
-    await Sharing.shareAsync(finalUri, { mimeType: 'application/pdf', dialogTitle: options.title });
+    await sharePdfWithTimeout(finalUri, options.title);
   }
   return finalUri;
 }

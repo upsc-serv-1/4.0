@@ -9,7 +9,7 @@ import { useTheme } from '../../context/ThemeContext';
 import {
   ExportOptions, ExportPayload, defaultExportOptions, exportToPdf,
   ExportFontFamily, ExportTheme, ExportPaperStyle, ExportContentScope,
-  ExportAnswerPlacement, ExportSortBy,
+  ExportAnswerPlacement, ExportSortBy, ExportQaLayoutMode,
 } from '../../lib/unifiedExportEngine';
 
 interface Props {
@@ -36,7 +36,20 @@ const CHOICES = {
     { id: 'mono' as ExportFontFamily, label: 'Mono' },
     { id: 'handwriting' as ExportFontFamily, label: 'Hand' },
   ],
-  fontSizes: [10, 11, 12, 13, 14, 16, 18, 20, 24],
+  fontSizes: [6, 8, 10, 11, 12, 13, 14, 16, 18, 20, 24],
+  marginsCm: [0.5, 0.75, 1, 1.25, 1.5, 2],
+  qaLayouts: [
+    { id: 'unified' as ExportQaLayoutMode, label: 'Unified Box' },
+    { id: 'split' as ExportQaLayoutMode, label: 'Split Boxes' },
+  ],
+  qaColors: [
+    { id: 'transparent', label: 'None', swatch: 'transparent' },
+    { id: '#f8fafc', label: 'Mist', swatch: '#f8fafc' },
+    { id: '#fefce8', label: 'Cream', swatch: '#fefce8' },
+    { id: '#ecfeff', label: 'Aqua', swatch: '#ecfeff' },
+    { id: '#fdf2f8', label: 'Blush', swatch: '#fdf2f8' },
+    { id: '#f0fdf4', label: 'Mint', swatch: '#f0fdf4' },
+  ],
   themes: [
     { id: 'modern' as ExportTheme, label: 'Modern' },
     { id: 'classic' as ExportTheme, label: 'Classic' },
@@ -89,25 +102,34 @@ export const UnifiedExportSheet: React.FC<Props> = ({
   React.useEffect(() => {
     if (visible) {
       setOpts(defaultExportOptions({ title: title || initialOptions?.title || 'Export', ...(initialOptions || {}) }));
+      setIsExporting(false);
     }
-  }, [visible, title]);
+  }, [visible, title, initialOptions]);
+
+  React.useEffect(() => {
+    if (!visible) setIsExporting(false);
+  }, [visible]);
 
   const set = <K extends keyof ExportOptions>(k: K, v: ExportOptions[K]) => {
     setOpts(prev => ({ ...prev, [k]: v }));
   };
 
   const run = async (cols: 1 | 2) => {
-    if (!payload) return;
+    if (!payload || isExporting) return;
+    let didSucceed = false;
+    const watchdog = setTimeout(() => setIsExporting(false), 22000);
     try {
       setIsExporting(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       await exportToPdf(payload, { ...opts, columns: cols });
-      onClose();
+      didSucceed = true;
     } catch (e: any) {
       console.error('Export failed', e);
       Alert.alert('Export failed', e?.message || 'Could not generate PDF right now.');
     } finally {
+      clearTimeout(watchdog);
       setIsExporting(false);
+      if (didSucceed) onClose();
     }
   };
 
@@ -162,6 +184,35 @@ export const UnifiedExportSheet: React.FC<Props> = ({
               <Row>{CHOICES.papers.map(p => <Chip key={p.id} active={opts.paperStyle === p.id} onPress={() => set('paperStyle', p.id)}>{p.label}</Chip>)}</Row>
             </Section>
 
+            {(payload?.kind === 'questions' || payload?.kind === 'tags') && (
+              <Section title="Q&A Highlight" colors={colors}>
+                <Label colors={colors}>LAYOUT</Label>
+                <Row>{CHOICES.qaLayouts.map(q => <Chip key={q.id} active={opts.qaLayoutMode === q.id} onPress={() => set('qaLayoutMode', q.id)}>{q.label}</Chip>)}</Row>
+                <Label colors={colors}>BACKGROUND</Label>
+                <Row>
+                  {CHOICES.qaColors.map(color => {
+                    const active = opts.qaBackgroundColor === color.id;
+                    return (
+                      <TouchableOpacity
+                        key={color.id}
+                        onPress={() => set('qaBackgroundColor', color.id)}
+                        style={[
+                          styles.colorChip,
+                          {
+                            borderColor: active ? colors.primary : colors.border,
+                            backgroundColor: color.id === 'transparent' ? colors.surfaceStrong : color.swatch,
+                          },
+                        ]}
+                      >
+                        <Text style={{ color: colors.textPrimary, fontSize: 11, fontWeight: '700' }}>{color.label}</Text>
+                        {active ? <Check size={13} color={colors.primary} /> : null}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </Row>
+              </Section>
+            )}
+
             {!hideSections.includes('content') && payload?.kind !== 'notes' && payload?.kind !== 'flashcards' && (
               <Section title="Content" colors={colors}>
                 <Label colors={colors}>INCLUDE</Label>
@@ -212,6 +263,16 @@ export const UnifiedExportSheet: React.FC<Props> = ({
             {showAdvanced && !hideSections.includes('advanced') && (
               <Section title="" colors={colors}>
                 <ToggleRow label="Table of Contents" value={!!opts.showTOC} onChange={v => set('showTOC', v)} colors={colors} />
+                <Label colors={colors}>PAGE MARGINS (CM)</Label>
+                <Text style={{ fontSize: 11, color: colors.textTertiary, marginBottom: 6 }}>Default is 1cm on all sides.</Text>
+                <Label colors={colors}>LEFT</Label>
+                <Row>{CHOICES.marginsCm.map(m => <Chip key={`m-left-${m}`} active={opts.pageMarginLeftCm === m} onPress={() => set('pageMarginLeftCm', m)}>{m}</Chip>)}</Row>
+                <Label colors={colors}>RIGHT</Label>
+                <Row>{CHOICES.marginsCm.map(m => <Chip key={`m-right-${m}`} active={opts.pageMarginRightCm === m} onPress={() => set('pageMarginRightCm', m)}>{m}</Chip>)}</Row>
+                <Label colors={colors}>TOP</Label>
+                <Row>{CHOICES.marginsCm.map(m => <Chip key={`m-top-${m}`} active={opts.pageMarginTopCm === m} onPress={() => set('pageMarginTopCm', m)}>{m}</Chip>)}</Row>
+                <Label colors={colors}>BOTTOM</Label>
+                <Row>{CHOICES.marginsCm.map(m => <Chip key={`m-bottom-${m}`} active={opts.pageMarginBottomCm === m} onPress={() => set('pageMarginBottomCm', m)}>{m}</Chip>)}</Row>
                 <Label colors={colors}>HEADER</Label>
                 <TextInput
                   style={[styles.input, { color: colors.textPrimary, backgroundColor: colors.bg, borderColor: colors.border }]}
@@ -297,6 +358,7 @@ const styles = StyleSheet.create({
   titleInput: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, fontWeight: '700' },
   input: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, fontSize: 13, marginBottom: 8 },
   chip: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, borderWidth: 1 },
+  colorChip: { paddingHorizontal: 10, paddingVertical: 8, borderRadius: 10, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 6 },
   advToggle: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 14, paddingBottom: 6, marginTop: 10, borderTopWidth: 1 },
   footer: { flexDirection: 'row', gap: 10, marginTop: 16 },
   exportBtn: { flex: 1, height: 52, borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },

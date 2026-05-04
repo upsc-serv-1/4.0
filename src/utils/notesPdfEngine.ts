@@ -2,6 +2,7 @@ export type PdfPaperStyle = 'plain' | 'lined' | 'grid' | 'dots';
 export type PdfTheme = 'modern' | 'sepia' | 'historical';
 export type PdfSpacing = 'compact' | 'comfortable';
 export type PdfFontFamily = 'sans' | 'handwriting';
+export type PdfQALayoutMode = 'unified' | 'split';
 
 export interface PdfChecklistItem {
   id: string;
@@ -13,6 +14,8 @@ export interface PdfExportEntry {
   id: string;
   type: 'microTopicHeading' | 'highlight';
   text: string;
+  questionText?: string;
+  answerText?: string;
   color?: string;
   sourceLabel?: string;
 }
@@ -28,6 +31,12 @@ export interface NotesPdfEngineConfig {
   includeChecklist: boolean;
   spacing: PdfSpacing;
   fontFamily: PdfFontFamily;
+  pageMarginTopCm: number;
+  pageMarginRightCm: number;
+  pageMarginBottomCm: number;
+  pageMarginLeftCm: number;
+  qaBackgroundColor: string;
+  qaLayoutMode: PdfQALayoutMode;
   pageBreakBetweenHeadings?: boolean;
 }
 
@@ -51,6 +60,12 @@ export interface NotesPdfEngineInput {
  * Otherwise, the lightweight markdown is converted to HTML.
  */
 const HTML_TAG_REGEX = /<\/?(b|strong|i|em|u|mark|span|ul|ol|li|p|br|div|h[1-6]|blockquote)(\s|>|\/)/i;
+
+const clampCm = (value: number, fallback = 1): number => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(0.3, Math.min(4, n));
+};
 
 const parseMD = (txt: string) => {
   if (!txt) return '';
@@ -102,6 +117,9 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
     });
   })();
 
+  const qaBg = config.qaBackgroundColor || 'transparent';
+  const qaBorder = qaBg === 'transparent' ? 'transparent' : 'rgba(15, 23, 42, 0.12)';
+
   return `
     <!DOCTYPE html>
     <html>
@@ -109,7 +127,7 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
         <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
         <style>
-          @page { margin: 10mm 5mm; }
+          @page { margin: ${clampCm(config.pageMarginTopCm)}cm ${clampCm(config.pageMarginRightCm)}cm ${clampCm(config.pageMarginBottomCm)}cm ${clampCm(config.pageMarginLeftCm)}cm; }
           body {
             font-family: ${config.fontFamily === 'handwriting' ? "'Caveat', cursive" : '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'};
             padding: 0;
@@ -218,6 +236,20 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
             text-transform: uppercase;
             letter-spacing: 0.5px;
           }
+          .qa-unified,
+          .qa-box {
+            background: ${qaBg};
+            border: 1px solid ${qaBorder};
+            border-radius: 8px;
+            padding: 10px 12px;
+          }
+          .qa-unified .qa-answer {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed ${qaBorder};
+          }
+          .qa-split { display: flex; flex-direction: column; gap: 8px; }
+          .qa-question, .qa-answer { overflow-wrap: break-word; word-break: break-word; }
           .group-heading {
             break-after: avoid;
             ${columns === 2 ? 'grid-column: 1 / -1;' : ''}
@@ -303,11 +335,17 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
               }
 
               const cardColor = item.color || '#6366f1';
+              const questionHtml = parseMD(item.questionText || item.text);
+              const answerHtml = item.answerText ? parseMD(item.answerText) : '';
+              const qaBlock = config.qaLayoutMode === 'split'
+                ? `<div class="qa-split"><div class="qa-box qa-question">${questionHtml}</div>${answerHtml ? `<div class="qa-box qa-answer">${answerHtml}</div>` : ''}</div>`
+                : `<div class="qa-unified"><div class="qa-question">${questionHtml}</div>${answerHtml ? `<div class="qa-answer">${answerHtml}</div>` : ''}</div>`;
+
               return `
                 <div class="highlight-card" style="border-left-color: ${cardColor}">
                   <div class="highlight-text">
                     <span class="bullet" style="color: ${cardColor}">●</span>
-                    <div>${parseMD(item.text)}</div>
+                    <div>${qaBlock}</div>
                   </div>
                   ${item.sourceLabel ? `<div class="highlight-source">${parseMD(item.sourceLabel)}</div>` : ''}
                 </div>

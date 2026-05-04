@@ -117,6 +117,8 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
             color: ${config.theme === 'sepia' ? '#433422' : config.theme === 'historical' ? '#2d2419' : '#374151'};
             font-size: ${config.fontSize}px;
             line-height: 1.5;
+            orphans: 2;
+            widows: 2;
             background-color: ${config.theme === 'sepia' ? '#F4ECD8' : config.theme === 'historical' ? '#fdf6e3' : '#ffffff'};
             background-image: ${
               config.paperStyle === 'lined' ? 'linear-gradient(#e5e7eb 1px, transparent 1px)' :
@@ -195,6 +197,8 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
             border-left: 4px solid #6366f1;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            overflow-wrap: break-word;
+            word-break: break-word;
           }
           .highlight-text {
             margin-bottom: 8px;

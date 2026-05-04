@@ -60,7 +60,8 @@ import {
   Sparkles,
   Type,
   List,
-  PenTool
+  PenTool,
+  Eraser
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -1715,7 +1716,7 @@ export default function UnifiedQuizEngine() {
         const year = String(e?.year || item.exam_year || '').trim();
         const answer = String(e?.answer || item.correct_answer || '').trim().toUpperCase();
         const text = String(e?.text || e?.explanation || '').trim();
-        if (!text) return;
+        
         const dedupeKey = `${sourceKey}__${year}__${answer}__${text.replace(/\s+/g, ' ').toLowerCase()}`;
         if (seen.has(dedupeKey)) return;
         seen.add(dedupeKey);
@@ -1752,9 +1753,11 @@ export default function UnifiedQuizEngine() {
     const safeIdx = rawIdx >= 0 && rawIdx < displayExplanations.length ? rawIdx : -1;
     const activeExplanationText = safeIdx === -1
       ? (displayExplanations.length > 1
-          ? displayExplanations.map((e: any) => `**${e.source}${e.year ? ' · ' + e.year : ''}${e.answer ? ' · Ans: ' + e.answer : ''}:**\n\n${e.text}`).join('\n\n---\n\n')
+          ? displayExplanations.map((e: any) => `**${e.source}${e.year ? ' · ' + e.year : ''}${e.answer ? ' · Ans: ' + e.answer : ''}:**\n\n${e.text || '*No explanation provided.*'}`).join('\n\n---\n\n')
           : (displayExplanations[0]?.text || item.explanation_markdown || 'No explanation available.'))
-      : (displayExplanations[safeIdx]?.text || item.explanation_markdown || 'No explanation available.');
+      : (displayExplanations[safeIdx] 
+          ? (displayExplanations[safeIdx].text || '*No explanation provided by this source.*') 
+          : (item.explanation_markdown || 'No explanation available.'));
 
     return (
       <View style={[styles.questionCard, { backgroundColor: isZenMode ? 'transparent' : colors.surface, borderColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.border, borderWidth: isZenMode ? 0 : 1 }]}>
@@ -2787,6 +2790,14 @@ export default function UnifiedQuizEngine() {
 
 const NotebookModal = (props: any) => {
   const { colors } = props;
+  const [showPicker, setShowPicker] = React.useState(false);
+  const HIGHLIGHT_COLORS = ['transparent', '#FF6A88', '#6A5BFF', '#4FC3F7', '#81C784', '#FFB74D', '#BA68C8'];
+  const [highlightColor, setHighlightColor] = React.useState('#FFF59D');
+
+  React.useEffect(() => {
+    AsyncStorage.getItem('notes_editor_highlight_color').then(v => { if (v) setHighlightColor(v); });
+  }, []);
+
   return (
     <Modal visible={props.visible} transparent animationType="fade" onRequestClose={props.onClose}>
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -2825,7 +2836,7 @@ const NotebookModal = (props: any) => {
               </View>
 
             <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 80 }}>
-            <View style={{ backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border + '30' }}>
+            <View style={{ backgroundColor: colors.surface, borderRadius: 16, margin: 12, marginBottom: 0, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' }}>
               <RichToolbar
                 editor={props.richEditorRef}
                 getEditor={() => props.richEditorRef?.current}
@@ -2851,19 +2862,46 @@ const NotebookModal = (props: any) => {
                   [actions.heading1]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '900', fontSize: 14 }}>H1</Text>,
                   [actions.heading2]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '800', fontSize: 12 }}>H2</Text>,
                   highlight: ({ tintColor }: any) => (
-                    <View style={{ padding: 4, borderRadius: 4, backgroundColor: '#FFF59D' }}>
+                    <View style={{ padding: 4, borderRadius: 4, backgroundColor: highlightColor === 'transparent' ? 'transparent' : highlightColor }}>
                       <Highlighter size={16} color={tintColor} />
                     </View>
                   ),
                 }}
                 highlight={() => {
-                  props.richEditorRef?.current?.focusContentEditor?.();
-                  setTimeout(() => {
-                    props.richEditorRef?.current?.commandDOM?.("document.execCommand('hiliteColor', false, '#FFF59D')");
-                  }, 50);
+                  setShowPicker(v => !v);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }}
               />
+              {showPicker && (
+                <View style={{ flexDirection: 'row', gap: 12, padding: 12, borderTopWidth: 1, borderTopColor: colors.border, justifyContent: 'center', backgroundColor: colors.surface, flexWrap: 'wrap' }}>
+                  {HIGHLIGHT_COLORS.map(c => (
+                    <TouchableOpacity 
+                      key={c} 
+                      onPress={async () => {
+                        setHighlightColor(c);
+                        await AsyncStorage.setItem('notes_editor_highlight_color', c);
+                        setShowPicker(false);
+                        props.richEditorRef?.current?.focusContentEditor?.();
+                        setTimeout(() => {
+                          if (c === 'transparent') {
+                            props.richEditorRef?.current?.commandDOM?.("document.execCommand('hiliteColor', false, 'transparent'); document.execCommand('backColor', false, 'transparent')");
+                          } else {
+                            props.richEditorRef?.current?.commandDOM?.(`document.execCommand('hiliteColor', false, '${c}')`);
+                          }
+                        }, 50);
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }} 
+                      style={{ 
+                        width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center',
+                        borderWidth: 2, backgroundColor: c === 'transparent' ? colors.surfaceStrong : c, 
+                        borderColor: c === highlightColor ? colors.primary : 'transparent' 
+                      }} 
+                    >
+                      {c === 'transparent' && <Eraser size={14} color={colors.textSecondary} />}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
             </View>
 
             <View style={{ padding: 16, minHeight: 300 }}>

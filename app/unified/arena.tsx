@@ -692,7 +692,7 @@ export default function UnifiedArenaSetup() {
     let finalParams = {};
 
     if (activeTab === 'search') {
-      const resultIds = searchResults.map(q => q.id).filter(Boolean).join(',');
+      const resultIds = searchResults.map(q => q._mergedIds ? q._mergedIds.join(',') : q.id).filter(Boolean).join(',');
       finalParams = {
         ...baseParams,
         resultIds,

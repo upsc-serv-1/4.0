@@ -148,8 +148,9 @@ const prepareQuestion = (q: any, inst: string, year: string) => {
   q._mergedIds = [q.id];
 
   const expl = String(q.explanation_markdown || q.explanation || '').trim();
-  q._explanations = expl
-    ? [{ source: inst, text: expl, year, answer: q.correct_answer || '' }]
+  const ans = String(q.correct_answer || '').trim();
+  q._explanations = (expl || ans)
+    ? [{ source: inst, text: expl, year, answer: ans }]
     : [];
 };
 
@@ -173,20 +174,22 @@ const mergeData = (
 
   if (!existing._explanations) {
     const base = String(existing.explanation_markdown || existing.explanation || '').trim();
-    existing._explanations = base
+    const baseAns = String(existing.correct_answer || '').trim();
+    existing._explanations = (base || baseAns)
       ? [{
           source: existing._institutes[0],
           text: base,
           year: String(existing.exam_year || existing.source?.year || ''),
-          answer: existing.correct_answer || '',
+          answer: baseAns,
         }]
       : [];
   }
 
   const qText = String(q.explanation_markdown || q.explanation || '').trim();
-  if (qText) {
+  const qAnswer = String(q.correct_answer || '').trim().toUpperCase();
+
+  if (qText || qAnswer) {
     const qNorm = normalizeExplanation(qText);
-    const qAnswer = String(q.correct_answer || '').trim().toUpperCase();
 
     // Keep one record per institute/year/answer/text combination.
     const alreadyPresent = existing._explanations.some((e: any) => {
@@ -206,6 +209,6 @@ const mergeData = (
       });
     }
 
-    if (!existing.explanation_markdown) existing.explanation_markdown = qText;
+    if (!existing.explanation_markdown && qText) existing.explanation_markdown = qText;
   }
 };

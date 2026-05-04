@@ -1315,40 +1315,44 @@ export default function NoteEditor() {
                     </TouchableOpacity>
                   </View>
                 </View>
-                 <View style={{ borderBottomWidth: 1, borderBottomColor: colors.border + '30', backgroundColor: colors.surface }}>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ padding: 12, gap: 12 }}>
-                    <TouchableOpacity onPress={() => applyFormattingModal('bold')} style={styles.modalToolBtn}>
-                      <Bold size={18} color={colors.textPrimary} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => applyFormattingModal('italic')} style={styles.modalToolBtn}>
-                      <Italic size={18} color={colors.textPrimary} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => applyFormattingModal('bullet')} style={styles.modalToolBtn}>
-                      <List size={18} color={colors.textPrimary} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => applyFormattingModal('number')} style={styles.modalToolBtn}>
-                      <Type size={18} color={colors.textPrimary} />
-                    </TouchableOpacity>
-                    
-                    <TouchableOpacity 
-                      onPress={() => setShowPicker(v => !v)}
-                      style={[styles.modalToolBtn, { backgroundColor: highlightColor === 'transparent' ? 'transparent' : highlightColor + '40' }]}
-                    >
-                      <Highlighter size={18} color={colors.textPrimary} />
-                    </TouchableOpacity>
-
-                    <View style={{ width: 1, height: 24, backgroundColor: colors.border, marginHorizontal: 4 }} />
-
-                    <TouchableOpacity onPress={handleSplitPoint} style={styles.modalToolBtn}>
-                      <Scissors size={18} color={colors.primary} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={handleAddPoint} style={styles.modalToolBtn}>
-                      <Plus size={18} color={colors.primary} />
-                    </TouchableOpacity>
-                  </ScrollView>
-
+                <View style={{ backgroundColor: colors.surface, borderRadius: 16, margin: 12, marginBottom: 0, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' }}>
+                  <RichToolbar
+                    editor={modalEditorRef}
+                    getEditor={() => modalEditorRef.current}
+                    selectedIconTint={colors.primary}
+                    iconTint={colors.textPrimary}
+                    style={{ backgroundColor: colors.surface }}
+                    actions={[
+                      actions.setBold,
+                      actions.setItalic,
+                      actions.setUnderline,
+                      actions.setStrikethrough,
+                      actions.heading1,
+                      actions.heading2,
+                      actions.insertBulletsList,
+                      actions.insertOrderedList,
+                      actions.checkboxList,
+                      actions.blockquote,
+                      'highlight',
+                      actions.undo,
+                      actions.redo,
+                    ]}
+                    iconMap={{
+                      [actions.heading1]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '900', fontSize: 14 }}>H1</Text>,
+                      [actions.heading2]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '800', fontSize: 12 }}>H2</Text>,
+                      highlight: ({ tintColor }: any) => (
+                        <View style={{ padding: 4, borderRadius: 4, backgroundColor: highlightColor === 'transparent' ? 'transparent' : highlightColor }}>
+                          <Highlighter size={16} color={tintColor} />
+                        </View>
+                      ),
+                    }}
+                    highlight={() => {
+                      setShowPicker(v => !v);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                  />
                   {showPicker && (
-                    <View style={{ flexDirection: 'row', gap: 12, padding: 12, borderTopWidth: 1, borderTopColor: colors.border, justifyContent: 'center', backgroundColor: colors.bg }}>
+                    <View style={{ flexDirection: 'row', gap: 12, padding: 12, borderTopWidth: 1, borderTopColor: colors.border, justifyContent: 'center', backgroundColor: colors.bg, flexWrap: 'wrap' }}>
                       {HIGHLIGHT_COLORS.map(c => (
                         <TouchableOpacity 
                           key={c} 
@@ -1356,6 +1360,15 @@ export default function NoteEditor() {
                             setHighlightColor(c);
                             await AsyncStorage.setItem('notes_editor_highlight_color', c);
                             setShowPicker(false);
+                            modalEditorRef.current?.focusContentEditor?.();
+                            setTimeout(() => {
+                              if (c === 'transparent') {
+                                modalEditorRef.current?.commandDOM?.("document.execCommand('hiliteColor', false, 'transparent'); document.execCommand('backColor', false, 'transparent')");
+                              } else {
+                                modalEditorRef.current?.commandDOM?.(`document.execCommand('hiliteColor', false, '${c}')`);
+                              }
+                            }, 50);
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                           }} 
                           style={{ 
                             width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center',
@@ -1371,16 +1384,19 @@ export default function NoteEditor() {
                 </View>
 
                 <ScrollView style={{ flex: 1, padding: 20 }}>
-                  <View style={[styles.draftInputContainer, { backgroundColor: colors.bg, borderColor: colors.border, padding: 16, minHeight: 300 }]}>
-                    <TextInput
-                      ref={insertInputRef}
-                      style={{ color: colors.textPrimary, fontSize: 16, lineHeight: 24, textAlignVertical: 'top' }}
-                      multiline
-                      value={insertPointData.text}
-                      onChangeText={(t) => setInsertPointData({ ...insertPointData, text: t })}
-                      onSelectionChange={(e) => setInsertSelection(e.nativeEvent.selection)}
+                  <View style={[styles.draftInputContainer, { backgroundColor: colors.bg, borderColor: colors.border, minHeight: 300 }]}>
+                    <RichNoteEditor
+                      ref={modalEditorRef}
+                      html={insertPointData.text}
+                      onChange={(t) => setInsertPointData({ ...insertPointData, text: t })}
+                      themeColors={{
+                        bg: colors.bg,
+                        surface: colors.surface,
+                        textPrimary: colors.textPrimary,
+                        border: colors.border,
+                        primary: colors.primary,
+                      }}
                       placeholder="Type your note here..."
-                      placeholderTextColor={colors.textTertiary}
                     />
                   </View>
                   <View style={{ height: 40 }} />

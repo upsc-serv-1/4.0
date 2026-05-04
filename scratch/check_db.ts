@@ -1,13 +1,8 @@
+import { createClient } from '@supabase/supabase-js';
 
-import { supabase } from './src/lib/supabase';
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://example.com';
+const SUPABASE_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'key';
 
-async function checkTable() {
-  const { data, error } = await supabase.from('user_tags').select('id').limit(1);
-  if (error) {
-    console.log('user_tags table does not exist or error:', error.message);
-  } else {
-    console.log('user_tags table exists!');
-  }
-}
+console.log("URL", process.env.EXPO_PUBLIC_SUPABASE_URL);
 
-checkTable();
+// Cannot fetch without keys, let's just check the local SQLite schema if it exists!

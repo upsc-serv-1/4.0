@@ -1183,14 +1183,21 @@ export default function UnifiedArenaSetup() {
                       <TouchableOpacity 
                         key={q.id}
                         onPress={() => {
+                          const mergedIds = Array.isArray((q as any)._mergedIds) && (q as any)._mergedIds.length > 0
+                            ? Array.from(new Set((q as any)._mergedIds.filter(Boolean)))
+                            : [q.id];
+
                           router.push({
                             pathname: '/unified/engine',
-                            params: { 
-                              testId: '', 
-                              mode: arenaMode, 
-                              view: viewMode, 
+                            params: {
+                              testId: '',
+                              mode: arenaMode,
+                              view: viewMode,
                               timer: timerMode,
-                              questionId: q.id
+                              questionId: q.id,
+                              // Pass all merged source question IDs so Learn Mode can rebuild
+                              // multi-institute explanations and institute toggles.
+                              resultIds: mergedIds.join(','),
                             }
                           });
                         }}
@@ -1359,9 +1366,20 @@ export default function UnifiedArenaSetup() {
                       key={q.id + '_full'}
                       onPress={() => {
                         setShowAllResultsModal(false);
+                        const mergedIds = Array.isArray((q as any)._mergedIds) && (q as any)._mergedIds.length > 0
+                          ? Array.from(new Set((q as any)._mergedIds.filter(Boolean)))
+                          : [q.id];
+
                         router.push({
                           pathname: '/unified/engine',
-                          params: { testId: '', mode: arenaMode, view: viewMode, timer: timerMode, questionId: q.id }
+                          params: {
+                            testId: '',
+                            mode: arenaMode,
+                            view: viewMode,
+                            timer: timerMode,
+                            questionId: q.id,
+                            resultIds: mergedIds.join(','),
+                          }
                         });
                       }}
                       style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}

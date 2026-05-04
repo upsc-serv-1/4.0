@@ -92,6 +92,7 @@ const CHOICES = {
     { id: 'default' as ExportSortBy, label: 'Default' },
     { id: 'subject' as ExportSortBy, label: 'Subject' },
     { id: 'microtopic' as ExportSortBy, label: 'Microtopic' },
+    { id: 'subject_section_microtopic' as ExportSortBy, label: 'Subject + Section Group + Micro Topic' },
     { id: 'difficulty' as ExportSortBy, label: 'Difficulty' },
     { id: 'date' as ExportSortBy, label: 'Date' },
   ],

@@ -37,7 +37,7 @@ import { useTheme } from '../src/context/ThemeContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { prelimsTaxonomy } from '../src/data/taxonomy';
 import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet';
-import type { ExportPayload } from '../src/lib/unifiedExportEngine';
+import { buildPyqAnalysisSummaryHtml, type ExportPayload } from '../src/lib/unifiedExportEngine';
 
 const { width } = Dimensions.get('window');
 
@@ -267,6 +267,9 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const [questionExportVisible, setQuestionExportVisible] = useState(false);
   const [questionExportScope, setQuestionExportScope] = useState<'selected_subject' | 'all_subjects'>('selected_subject');
   const [questionExportSubject, setQuestionExportSubject] = useState('');
+  const [questionExportSections, setQuestionExportSections] = useState<string[]>([]);
+  const [questionExportMicros, setQuestionExportMicros] = useState<string[]>([]);
+  const [questionExportFilterList, setQuestionExportFilterList] = useState<'subject' | 'section_group' | 'micro_topic'>('subject');
 
   const [rawQuestions, setRawQuestions] = useState<any[]>([]);
   const [testsMetaById, setTestsMetaById] = useState<Record<string, any>>({});
@@ -699,126 +702,69 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const topThreeSubjects = useMemo(() => distributionData.slice(0, 3), [distributionData]);
   const exportSubjects = useMemo(() => distributionData.map(item => item.name), [distributionData]);
 
-  const buildAnalysisExecutiveSummaryHtml = (selectedReports: Record<string, boolean>): string => {
-    const esc = (value: string | number) =>
-      String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-
-    const includeAll = !!selectedReports.full_report;
-    const includeMomentum = includeAll || !!selectedReports.subject_momentum;
-    const includeDistribution = includeAll || !!selectedReports.subject_distribution;
-    const includeHeatmaps = includeAll || !!selectedReports.heatmaps;
-    const includeFocused = includeAll || !!selectedReports.focused_trend;
-
-    const sections: string[] = [];
-
-    if (includeMomentum) {
-      const focusSubjects = distributionData.slice(0, 6);
-      sections.push(`
-        <section class="analysis-block">
-          <h2>Subject Momentum</h2>
-          <table>
-            <thead>
-              <tr><th>Year</th>${focusSubjects.map((subject) => `<th>${esc(subject.name)}</th>`).join('')}</tr>
-            </thead>
-            <tbody>
-              ${years.map((year) => `<tr><td>${esc(year)}</td>${focusSubjects.map((subject) => `<td>${heatmapData[year]?.[subject.name] || 0}</td>`).join('')}</tr>`).join('')}
-            </tbody>
-          </table>
-        </section>
-      `);
-    }
-
-    if (includeDistribution) {
-      const total = Math.max(distributionData.reduce((sum, item) => sum + item.value, 0), 1);
-      sections.push(`
-        <section class="analysis-block">
-          <h2>Subject Distribution</h2>
-          <table>
-            <thead><tr><th>Subject</th><th>Count</th><th>Share</th></tr></thead>
-            <tbody>
-              ${distributionData.slice(0, 12).map((item) => {
-                const pct = ((item.value / total) * 100).toFixed(1);
-                return `<tr><td>${esc(item.name)}</td><td>${item.value}</td><td>${pct}%</td></tr>`;
-              }).join('')}
-            </tbody>
-          </table>
-        </section>
-      `);
-    }
-
-    if (includeHeatmaps) {
-      const renderHeatmapTable = (title: string, rows: HeatmapRow[]) => `
-        <h3>${esc(title)}</h3>
-        <table>
-          <thead><tr><th>Topic</th>${years.map((year) => `<th>${esc(year)}</th>`).join('')}</tr></thead>
-          <tbody>
-            ${rows.slice(0, 10).map((row) => `<tr><td>${esc(row.label)}</td>${years.map((year) => `<td>${row.byYear[year] || 0}</td>`).join('')}</tr>`).join('')}
-          </tbody>
-        </table>
-      `;
-      sections.push(`
-        <section class="analysis-block">
-          <h2>Heatmaps</h2>
-          ${renderHeatmapTable('Subject × Year', subjectHeatmapRows)}
-          ${renderHeatmapTable('Top Topics × Year', topicHeatmapRows)}
-        </section>
-      `);
-    }
-
-    if (includeFocused) {
-      const focusedLabel = focusMicro !== 'All'
-        ? focusMicro
-        : focusSection !== 'All'
-          ? `${focusSubject} / ${focusSection}`
-          : focusSubject !== 'All'
-            ? focusSubject
-            : 'All PYQ';
-      const focusedValues = focusTrendSeries[0]?.values || [];
-      sections.push(`
-        <section class="analysis-block">
-          <h2>Focused Trend</h2>
-          <p class="muted">Selection: ${esc(focusedLabel)}</p>
-          <table>
-            <thead><tr><th>Year</th><th>Questions</th></tr></thead>
-            <tbody>${years.map((year, index) => `<tr><td>${esc(year)}</td><td>${focusedValues[index] || 0}</td></tr>`).join('')}</tbody>
-          </table>
-        </section>
-      `);
-    }
-
-    if (!sections.length) return '';
-
-    return `
-      <style>
-        .analysis-summary h1 { font-size: 21pt; margin: 0 0 3mm; color: #1e40af; }
-        .analysis-summary .muted { color: #475569; font-size: 9pt; margin: 0 0 3mm; }
-        .analysis-summary .analysis-block { margin-bottom: 6mm; padding: 4mm; border: 1px solid #dbeafe; border-radius: 10px; background: #f8fbff; break-inside: avoid; page-break-inside: avoid; }
-        .analysis-summary h2 { font-size: 14pt; margin: 0 0 2mm; color: #0f172a; }
-        .analysis-summary h3 { font-size: 11pt; margin: 3mm 0 2mm; color: #334155; }
-        .analysis-summary table { width: 100%; border-collapse: collapse; margin-top: 2mm; }
-        .analysis-summary th, .analysis-summary td { border: 1px solid #cbd5e1; padding: 6px 7px; font-size: 9pt; text-align: left; }
-        .analysis-summary th { background: #e2e8f0; font-weight: 800; }
-      </style>
-      <section class="analysis-summary">
-        <h1>Executive Summary · PYQ Analysis Reports</h1>
-        <p class="muted">${esc(examStage)} • ${esc(selectedPaper)} • ${esc(selectedRange)} • ${rawQuestions.length} questions</p>
-        ${sections.join('')}
-      </section>
-    `;
-  };
-
-  const questionExportPayload = useMemo<ExportPayload | null>(() => {
-    if (!rawQuestions.length) return null;
-    const filtered = rawQuestions.filter((q) => {
+  const questionExportBaseQuestions = useMemo(() => {
+    return rawQuestions.filter((q) => {
       if (questionExportScope === 'all_subjects') return true;
       if (!questionExportSubject) return true;
       return getAnalyticsSubject(q) === questionExportSubject;
     });
+  }, [rawQuestions, questionExportScope, questionExportSubject]);
+
+  const questionExportSectionOptions = useMemo(() => {
+    const set = new Set<string>();
+    questionExportBaseQuestions.forEach((q) => set.add(q.section_group || 'General'));
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [questionExportBaseQuestions]);
+
+  const questionExportMicroOptions = useMemo(() => {
+    const set = new Set<string>();
+    questionExportBaseQuestions
+      .filter((q) => questionExportSections.length === 0 || questionExportSections.includes(q.section_group || 'General'))
+      .forEach((q) => set.add(q.micro_topic || 'Other'));
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [questionExportBaseQuestions, questionExportSections]);
+
+  const buildAnalysisExecutiveSummaryHtml = (selectedReports: Record<string, boolean>): string => {
+    return buildPyqAnalysisSummaryHtml({
+      selectedReports,
+      examStage,
+      selectedPaper,
+      selectedRange,
+      customYearStart,
+      customYearEnd,
+      questionCount: rawQuestions.length,
+      years,
+      distributionData,
+      overviewSeries: overviewSeries.map((series) => ({
+        label: series.label,
+        values: series.values,
+        color: trendColorMap[series.label] || '#2563eb',
+      })),
+      focusTrendSeries: focusTrendSeries.map((series) => ({
+        label: series.label,
+        values: series.values,
+        color: '#2563eb',
+      })),
+      focusSubject,
+      focusSection,
+      focusMicro,
+      subjectHeatmapRows,
+      topicHeatmapRows,
+      heatmapPalette,
+    });
+  };
+
+  const questionExportPayload = useMemo<ExportPayload | null>(() => {
+    if (!rawQuestions.length) return null;
+
+    const filtered = questionExportBaseQuestions.filter((q) => {
+      const sectionGroup = q.section_group || 'General';
+      const microTopic = q.micro_topic || 'Other';
+      if (questionExportSections.length > 0 && !questionExportSections.includes(sectionGroup)) return false;
+      if (questionExportMicros.length > 0 && !questionExportMicros.includes(microTopic)) return false;
+      return true;
+    });
+
     if (!filtered.length) return null;
 
     const rows = filtered.map((q) => ({
@@ -836,7 +782,13 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     }));
 
     return { kind: 'questions', rows } as ExportPayload;
-  }, [rawQuestions, questionExportScope, questionExportSubject, getAnalyticsYear]);
+  }, [
+    rawQuestions,
+    questionExportBaseQuestions,
+    questionExportSections,
+    questionExportMicros,
+    getAnalyticsYear,
+  ]);
 
   const focusSubjects = useMemo(() => ['All', ...Array.from(new Set(rawQuestions.map(q => getAnalyticsSubject(q))))], [rawQuestions]);
   const focusSections = useMemo(() => {
@@ -917,6 +869,14 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       setQuestionExportSubject(exportSubjects[0]);
     }
   }, [exportSubjects, exportSubject, questionExportSubject]);
+
+  useEffect(() => {
+    setQuestionExportSections((prev) => prev.filter((section) => questionExportSectionOptions.includes(section)));
+  }, [questionExportSectionOptions]);
+
+  useEffect(() => {
+    setQuestionExportMicros((prev) => prev.filter((micro) => questionExportMicroOptions.includes(micro)));
+  }, [questionExportMicroOptions]);
 
   const openModal = (type: 'stage' | 'paper' | 'range') => {
     setModalType(type);
@@ -2000,7 +1960,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                     { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
                     questionExportScope === 'selected_subject' && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
                   ]}
-                  onPress={() => setQuestionExportScope('selected_subject')}
+                  onPress={() => { setQuestionExportScope('selected_subject'); setQuestionExportSections([]); setQuestionExportMicros([]); }}
                 >
                   <Text style={[styles.filterChipText, { color: questionExportScope === 'selected_subject' ? colors.buttonText : colors.textSecondary }]}>Selected Subject</Text>
                 </TouchableOpacity>
@@ -2010,28 +1970,128 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                     { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
                     questionExportScope === 'all_subjects' && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
                   ]}
-                  onPress={() => setQuestionExportScope('all_subjects')}
+                  onPress={() => { setQuestionExportScope('all_subjects'); setQuestionExportSections([]); setQuestionExportMicros([]); }}
                 >
                   <Text style={[styles.filterChipText, { color: questionExportScope === 'all_subjects' ? colors.buttonText : colors.textSecondary }]}>All Subjects</Text>
                 </TouchableOpacity>
               </ScrollView>
 
-              {questionExportScope === 'selected_subject' ? (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-                  {exportSubjects.map(subject => (
-                    <TouchableOpacity
-                      key={`q-export-sub-${subject}`}
-                      style={[
-                        styles.filterChip,
-                        { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
-                        questionExportSubject === subject && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
-                      ]}
-                      onPress={() => setQuestionExportSubject(subject)}
-                    >
-                      <Text style={[styles.filterChipText, { color: questionExportSubject === subject ? colors.buttonText : colors.textSecondary }]}>{subject}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
+              <Text style={[styles.exportGroupLabel, { color: colors.textTertiary }]}>FILTER LIST</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.filterChip,
+                    { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                    questionExportFilterList === 'subject' && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+                  ]}
+                  onPress={() => setQuestionExportFilterList('subject')}
+                >
+                  <Text style={[styles.filterChipText, { color: questionExportFilterList === 'subject' ? colors.buttonText : colors.textSecondary }]}>Subject</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.filterChip,
+                    { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                    questionExportFilterList === 'section_group' && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+                  ]}
+                  onPress={() => setQuestionExportFilterList('section_group')}
+                >
+                  <Text style={[styles.filterChipText, { color: questionExportFilterList === 'section_group' ? colors.buttonText : colors.textSecondary }]}>Section Group</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.filterChip,
+                    { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                    questionExportFilterList === 'micro_topic' && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+                  ]}
+                  onPress={() => setQuestionExportFilterList('micro_topic')}
+                >
+                  <Text style={[styles.filterChipText, { color: questionExportFilterList === 'micro_topic' ? colors.buttonText : colors.textSecondary }]}>Micro Topic</Text>
+                </TouchableOpacity>
+              </ScrollView>
+
+              {questionExportFilterList === 'subject' ? (
+                questionExportScope === 'selected_subject' ? (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                    {exportSubjects.map(subject => (
+                      <TouchableOpacity
+                        key={`q-export-sub-${subject}`}
+                        style={[
+                          styles.filterChip,
+                          { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                          questionExportSubject === subject && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+                        ]}
+                        onPress={() => {
+                          setQuestionExportSubject(subject);
+                          setQuestionExportSections([]);
+                          setQuestionExportMicros([]);
+                        }}
+                      >
+                        <Text style={[styles.filterChipText, { color: questionExportSubject === subject ? colors.buttonText : colors.textSecondary }]}>{subject}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                ) : (
+                  <Text style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 10 }}>
+                    Subject scope: All subjects selected.
+                  </Text>
+                )
+              ) : null}
+
+              {questionExportFilterList === 'section_group' ? (
+                questionExportSectionOptions.length > 0 ? (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                    {questionExportSectionOptions.map(section => {
+                      const active = questionExportSections.includes(section);
+                      return (
+                        <TouchableOpacity
+                          key={`q-export-sec-${section}`}
+                          style={[
+                            styles.filterChip,
+                            { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                            active && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+                          ]}
+                          onPress={() => {
+                            setQuestionExportSections((prev) => prev.includes(section) ? prev.filter((item) => item !== section) : [...prev, section]);
+                          }}
+                        >
+                          <Text style={[styles.filterChipText, { color: active ? colors.buttonText : colors.textSecondary }]}>{section}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                ) : (
+                  <Text style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 10 }}>No section groups available for this scope.</Text>
+                )
+              ) : null}
+
+              {questionExportFilterList === 'micro_topic' ? (
+                questionExportMicroOptions.length > 0 ? (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                    {questionExportMicroOptions.map(micro => {
+                      const active = questionExportMicros.includes(micro);
+                      return (
+                        <TouchableOpacity
+                          key={`q-export-micro-${micro}`}
+                          style={[
+                            styles.filterChip,
+                            { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                            active && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+                          ]}
+                          onPress={() => {
+                            setQuestionExportMicros((prev) => prev.includes(micro) ? prev.filter((item) => item !== micro) : [...prev, micro]);
+                          }}
+                        >
+                          <Text style={[styles.filterChipText, { color: active ? colors.buttonText : colors.textSecondary }]}>{micro}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                ) : (
+                  <Text style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 10 }}>
+                    {questionExportSections.length > 0 ? 'No micro topics for selected section groups.' : 'Select section groups (optional) to narrow micro topics.'}
+                  </Text>
+                )
               ) : null}
 
               <TouchableOpacity
@@ -2097,6 +2157,11 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           footerText: selectedRange,
           contentScope: 'q_options_expl',
           answerPlacement: 'inline',
+          fontSize: 6,
+          subjectFilters: questionExportScope === 'selected_subject' && questionExportSubject ? [questionExportSubject] : [],
+          sectionGroupFilters: questionExportSections,
+          microTopicFilters: questionExportMicros,
+          sortBy: 'subject_section_microtopic',
         }}
       />
 

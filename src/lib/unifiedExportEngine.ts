@@ -34,7 +34,7 @@ export type ExportPaperStyle = 'plain' | 'lined' | 'grid' | 'dotted';
 export type ExportColumns = 1 | 2;
 export type ExportContentScope = 'q_only' | 'q_options' | 'q_options_expl';
 export type ExportAnswerPlacement = 'inline' | 'end';
-export type ExportSortBy = 'default' | 'subject' | 'microtopic' | 'difficulty' | 'date';
+export type ExportSortBy = 'default' | 'subject' | 'microtopic' | 'difficulty' | 'date' | 'subject_section_microtopic';
 export type ExportQaLayoutMode = 'unified' | 'split';
 
 export interface ExportOptions {
@@ -73,6 +73,9 @@ export interface ExportOptions {
   revisionTags?: string[];
   pyqOnly?: boolean;
   ncertOnly?: boolean;
+  subjectFilters?: string[];
+  sectionGroupFilters?: string[];
+  microTopicFilters?: string[];
 }
 
 export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): ExportOptions => ({
@@ -103,6 +106,9 @@ export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): Ex
   revisionTags: [],
   pyqOnly: false,
   ncertOnly: false,
+  subjectFilters: [],
+  sectionGroupFilters: [],
+  microTopicFilters: [],
   ...overrides,
 });
 
@@ -220,8 +226,8 @@ const baseCss = (o: ExportOptions) => {
   const qaBorder = anyBgVisible ? 'rgba(15, 23, 42, 0.12)' : 'transparent';
   return `
     :root { --bg:${t.bg}; --fg:${t.fg}; --accent:${t.accent}; --rule:${t.rule}; --card:${t.card}; --qa-bg:${qaBg}; --qa-q-bg:${qBg}; --qa-a-bg:${aBg}; --qa-border:${qaBorder}; }
-    @page { size: A4; margin: ${clampCm(o.pageMarginTopCm)}cm ${clampCm(o.pageMarginRightCm)}cm ${clampCm(o.pageMarginBottomCm)}cm ${clampCm(o.pageMarginLeftCm)}cm; }
-    * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    @page { size: A4 !important; margin: ${clampCm(o.pageMarginTopCm)}cm ${clampCm(o.pageMarginRightCm)}cm ${clampCm(o.pageMarginBottomCm)}cm ${clampCm(o.pageMarginLeftCm)}cm; }
+    * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     html, body { margin: 0; padding: 0; }
     body {
       background: var(--bg);
@@ -255,6 +261,15 @@ const baseCss = (o: ExportOptions) => {
       margin-bottom: 2mm;
       overflow-wrap: break-word;
       word-break: break-word;
+    }
+    .analysis-card,
+    .analysis-chart,
+    table,
+    tr,
+    svg,
+    svg * {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
     }
     .qnum { color: var(--accent); font-weight: 800; margin-right: 4px; }
     .qstem {
@@ -419,6 +434,22 @@ export const filterQuestions = (rows: ExportQuestion[], o: ExportOptions): Expor
   }
   if (o.pyqOnly) out = out.filter(q => !!q.is_pyq);
   if (o.ncertOnly) out = out.filter(q => !!q.is_ncert);
+
+  if (o.subjectFilters && o.subjectFilters.length > 0) {
+    const subjectSet = new Set(o.subjectFilters.map(normalize));
+    out = out.filter((q) => subjectSet.has(normalize(q.subject || 'General')));
+  }
+
+  if (o.sectionGroupFilters && o.sectionGroupFilters.length > 0) {
+    const sectionSet = new Set(o.sectionGroupFilters.map(normalize));
+    out = out.filter((q) => sectionSet.has(normalize(q.section_group || 'General')));
+  }
+
+  if (o.microTopicFilters && o.microTopicFilters.length > 0) {
+    const microSet = new Set(o.microTopicFilters.map(normalize));
+    out = out.filter((q) => microSet.has(normalize(q.micro_topic || 'Other')));
+  }
+
   return out;
 };
 
@@ -444,6 +475,14 @@ export const sortQuestions = (rows: ExportQuestion[], o: ExportOptions): ExportQ
     }
     case 'date':
       out.sort((a, b) => String(b.attempted_at || '').localeCompare(String(a.attempted_at || '')));
+      break;
+    case 'subject_section_microtopic':
+      out.sort((a, b) =>
+        (a.subject || '').localeCompare(b.subject || '') ||
+        (a.section_group || '').localeCompare(b.section_group || '') ||
+        (a.micro_topic || '').localeCompare(b.micro_topic || '') ||
+        String(a.exam_year || '').localeCompare(String(b.exam_year || ''))
+      );
       break;
     default:
       break;
@@ -719,6 +758,322 @@ export const buildHardnoteHtml = (note: ExportHardnote, o: ExportOptions): strin
     o,
     `<style>${extraCss}</style>${body}`
   );
+};
+
+export type PyqHeatmapPalette = 'spectral' | 'ocean';
+
+export interface PyqHeatmapRow {
+  key?: string;
+  label: string;
+  byYear: Record<string, number>;
+}
+
+export interface BuildPyqAnalysisSummaryInput {
+  selectedReports: Record<string, boolean>;
+  examStage: string;
+  selectedPaper: string;
+  selectedRange: string;
+  customYearStart?: string;
+  customYearEnd?: string;
+  questionCount: number;
+  years: string[];
+  distributionData: Array<{ name: string; value: number }>;
+  overviewSeries: Array<{ label: string; values: number[]; color?: string }>;
+  focusTrendSeries: Array<{ label: string; values: number[]; color?: string }>;
+  focusSubject: string;
+  focusSection: string;
+  focusMicro: string;
+  subjectHeatmapRows: PyqHeatmapRow[];
+  topicHeatmapRows: PyqHeatmapRow[];
+  heatmapPalette: PyqHeatmapPalette;
+}
+
+const normalizeHex = (value: string | undefined, fallback = '#2563EB'): string => {
+  const raw = String(value || '').trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(raw)) return raw;
+  if (/^#[0-9a-fA-F]{3}$/.test(raw)) {
+    return `#${raw[1]}${raw[1]}${raw[2]}${raw[2]}${raw[3]}${raw[3]}`;
+  }
+  return fallback;
+};
+
+const escHtml = (value: string | number) =>
+  String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+const hslToHex = (h: number, s: number, l: number): string => {
+  const hh = ((h % 360) + 360) % 360;
+  const ss = Math.max(0, Math.min(100, s));
+  const ll = Math.max(0, Math.min(100, l));
+  const c = (1 - Math.abs(2 * ll / 100 - 1)) * (ss / 100);
+  const x = c * (1 - Math.abs(((hh / 60) % 2) - 1));
+  const m = ll / 100 - c / 2;
+  let r = 0, g = 0, b = 0;
+
+  if (hh < 60) [r, g, b] = [c, x, 0];
+  else if (hh < 120) [r, g, b] = [x, c, 0];
+  else if (hh < 180) [r, g, b] = [0, c, x];
+  else if (hh < 240) [r, g, b] = [0, x, c];
+  else if (hh < 300) [r, g, b] = [x, 0, c];
+  else [r, g, b] = [c, 0, x];
+
+  const toHex = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
+};
+
+const renderPyqLineChartSvg = (
+  title: string,
+  labels: string[],
+  series: Array<{ label: string; values: number[]; color?: string }>,
+) => {
+  if (!labels.length || !series.length) return '';
+  const widthSvg = 980;
+  const heightSvg = 320;
+  const leftPad = 56;
+  const rightPad = 24;
+  const topPad = 26;
+  const bottomPad = 56;
+  const plotW = widthSvg - leftPad - rightPad;
+  const plotH = heightSvg - topPad - bottomPad;
+  const maxValue = Math.max(...series.flatMap((item) => item.values), 1);
+  const x = (index: number) => leftPad + (labels.length === 1 ? 0 : (index * plotW) / (labels.length - 1));
+  const y = (value: number) => topPad + plotH - (value / maxValue) * plotH;
+
+  const gridLines = [0, 0.25, 0.5, 0.75, 1].map((step) => {
+    const yy = topPad + plotH - step * plotH;
+    const val = Math.round(maxValue * step);
+    return `<line x1="${leftPad}" y1="${yy}" x2="${widthSvg - rightPad}" y2="${yy}" stroke="#E2E8F0" stroke-width="1" fill="none" fill-opacity="1" />
+            <text x="${leftPad - 8}" y="${yy + 4}" text-anchor="end" font-size="10" fill="#64748B" fill-opacity="1">${val}</text>`;
+  }).join('');
+
+  const seriesSvg = series.map((item, idx) => {
+    const color = normalizeHex(item.color, idx % 2 === 0 ? '#2563EB' : '#0EA5E9');
+    const points = item.values.map((value, index) => `${x(index)},${y(value)}`).join(' ');
+    const dots = item.values
+      .map((value, index) => `<circle cx="${x(index)}" cy="${y(value)}" r="3" fill="${color}" fill-opacity="1" stroke="#FFFFFF" stroke-width="1" />`)
+      .join('');
+    return `<polyline fill="none" fill-opacity="1" stroke="${color}" stroke-width="3" points="${points}"/>${dots}`;
+  }).join('');
+
+  const xLabels = labels
+    .map((label, index) => `<text x="${x(index)}" y="${heightSvg - 18}" text-anchor="middle" font-size="10" fill="#475569" fill-opacity="1">${escHtml(label)}</text>`)
+    .join('');
+
+  const legend = series.map((item, idx) => {
+    const color = normalizeHex(item.color, idx % 2 === 0 ? '#2563EB' : '#0EA5E9');
+    return `<span class="legend-item"><span class="legend-dot" style="background:${color}"></span>${escHtml(item.label)}</span>`;
+  }).join('');
+
+  return `
+    <section class="analysis-card">
+      <h3>${escHtml(title)}</h3>
+      <div class="legend-wrap">${legend}</div>
+      <div class="analysis-chart">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${widthSvg} ${heightSvg}" width="100%" height="${heightSvg}">
+          <rect x="${leftPad}" y="${topPad}" width="${plotW}" height="${plotH}" fill="#FFFFFF" fill-opacity="1" stroke="#E2E8F0" stroke-width="1" />
+          ${gridLines}
+          ${seriesSvg}
+          ${xLabels}
+        </svg>
+      </div>
+    </section>
+  `;
+};
+
+const renderPyqDonutSvg = (title: string, rows: Array<{ name: string; value: number }>) => {
+  if (!rows.length) return '';
+  const palette = ['#2563EB', '#14B8A6', '#EF4444', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#10B981', '#84CC16'];
+  const topRows = rows.slice(0, 8);
+  const rest = rows.slice(8).reduce((sum, item) => sum + item.value, 0);
+  const compact = [...topRows];
+  if (rest > 0) compact.push({ name: 'Others', value: rest });
+  const total = Math.max(compact.reduce((sum, item) => sum + item.value, 0), 1);
+  const radius = 66;
+  const circumference = 2 * Math.PI * radius;
+  let cumulative = 0;
+
+  const segments = compact.map((item, index) => {
+    const color = normalizeHex(palette[index % palette.length], '#2563EB');
+    const len = (item.value / total) * circumference;
+    const segment = `<circle cx="90" cy="90" r="${radius}" fill="none" fill-opacity="1" stroke="${color}" stroke-width="34" stroke-dasharray="${len} ${circumference}" stroke-dashoffset="${-cumulative}" transform="rotate(-90 90 90)"/>`;
+    cumulative += len;
+    return segment;
+  }).join('');
+
+  const legend = compact.map((item, index) => {
+    const color = normalizeHex(palette[index % palette.length], '#2563EB');
+    return `<div class="donut-legend-row"><span class="donut-legend-dot" style="background:${color}"></span><span>${escHtml(item.name)}</span><strong>${item.value}</strong></div>`;
+  }).join('');
+
+  return `
+    <section class="analysis-card">
+      <h3>${escHtml(title)}</h3>
+      <div class="donut-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="200" height="200">
+          <circle cx="90" cy="90" r="${radius}" fill="none" fill-opacity="1" stroke="#E2E8F0" stroke-width="34"/>
+          ${segments}
+          <text x="90" y="86" text-anchor="middle" font-size="18" font-weight="700" fill="#0F172A" fill-opacity="1">${total}</text>
+          <text x="90" y="104" text-anchor="middle" font-size="10" fill="#64748B" fill-opacity="1">QUESTIONS</text>
+        </svg>
+        <div class="donut-legend">${legend}</div>
+      </div>
+    </section>
+  `;
+};
+
+const renderPyqHeatmapSvg = (
+  title: string,
+  labelHeader: string,
+  rows: PyqHeatmapRow[],
+  years: string[],
+  palette: PyqHeatmapPalette,
+) => {
+  if (!rows.length) return '';
+  return `
+    <section class="analysis-card">
+      <h3>${escHtml(title)}</h3>
+      <table class="analysis-heatmap-table">
+        <thead><tr><th>${escHtml(labelHeader)}</th>${years.map((year) => `<th>${escHtml(year)}</th>`).join('')}</tr></thead>
+        <tbody>
+          ${rows.map((row) => `
+            <tr>
+              <td>${escHtml(row.label)}</td>
+              ${years.map((year) => {
+                const count = row.byYear[year] || 0;
+                let bg = '#F8FAFC';
+                let tc = '#94A3B8';
+                if (count > 0) {
+                  const capped = Math.min(count, 22);
+                  const ratio = (capped - 1) / 21;
+                  if (palette === 'spectral') {
+                    const h = 70 + (ratio * 155);
+                    const s = 65 + (ratio * 20);
+                    const l = 85 - (ratio * 55);
+                    bg = hslToHex(h, s, l);
+                    tc = l < 55 ? '#FFFFFF' : '#065F46';
+                  } else {
+                    const h = 210 + (ratio * 15);
+                    const s = 60 + (ratio * 35);
+                    const l = 90 - (ratio * 65);
+                    bg = hslToHex(h, s, l);
+                    tc = l < 55 ? '#FFFFFF' : '#1E3A8A';
+                  }
+                }
+
+                return `<td style="padding: 1px; border: none; width: 44px; height: 32px;">
+                  <svg width="44" height="32" viewBox="0 0 44 32" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="44" height="32" rx="5" fill="${normalizeHex(bg, '#F8FAFC')}" fill-opacity="1" />
+                    <text x="22" y="20.5" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="800" fill="${normalizeHex(tc, '#0F172A')}" fill-opacity="1">${count || ''}</text>
+                  </svg>
+                </td>`;
+              }).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </section>
+  `;
+};
+
+export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput): string => {
+  const {
+    selectedReports,
+    examStage,
+    selectedPaper,
+    selectedRange,
+    customYearStart,
+    customYearEnd,
+    questionCount,
+    years,
+    distributionData,
+    overviewSeries,
+    focusTrendSeries,
+    focusSubject,
+    focusSection,
+    focusMicro,
+    subjectHeatmapRows,
+    topicHeatmapRows,
+    heatmapPalette,
+  } = input;
+
+  const includeAll = !!selectedReports.full_report;
+  const includeMomentum = includeAll || !!selectedReports.subject_momentum;
+  const includeDistribution = includeAll || !!selectedReports.subject_distribution;
+  const includeHeatmaps = includeAll || !!selectedReports.heatmaps;
+  const includeFocused = includeAll || !!selectedReports.focused_trend;
+
+  const sections: string[] = [];
+
+  if (includeMomentum && overviewSeries.length > 0) {
+    sections.push(renderPyqLineChartSvg('Subject Momentum', years, overviewSeries));
+  }
+
+  if (includeDistribution && distributionData.length > 0) {
+    sections.push(renderPyqDonutSvg('Subject Distribution (Donut)', distributionData));
+  }
+
+  if (includeHeatmaps) {
+    if (subjectHeatmapRows.length > 0) {
+      sections.push(renderPyqHeatmapSvg('Subject × Year Heatmap', 'Subject', subjectHeatmapRows, years, heatmapPalette));
+    }
+    if (topicHeatmapRows.length > 0) {
+      sections.push(renderPyqHeatmapSvg('Top 20 Topics × Year Heatmap', 'Topic', topicHeatmapRows, years, heatmapPalette));
+    }
+  }
+
+  if (includeFocused && focusTrendSeries.length > 0) {
+    const focusedLabel = focusMicro !== 'All'
+      ? focusMicro
+      : focusSection !== 'All'
+        ? `${focusSubject} / ${focusSection}`
+        : focusSubject !== 'All'
+          ? focusSubject
+          : 'All PYQ';
+
+    const series = focusTrendSeries.map((row, index) => ({ ...row, color: row.color || (index === 0 ? '#2563EB' : '#14B8A6') }));
+    sections.push(renderPyqLineChartSvg(`Focused Trend · ${focusedLabel}`, years, series));
+  }
+
+  if (!sections.length) return '';
+
+  const customRangeLabel = selectedRange === 'Custom Range'
+    ? ` (${escHtml(customYearStart || '')} - ${escHtml(customYearEnd || '')})`
+    : '';
+
+  return `
+    <style>
+      .analysis-summary { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      .analysis-summary h1 { font-size: 21pt; margin: 0 0 3mm; color: #1E40AF; }
+      .analysis-summary .muted { color: #475569; font-size: 9pt; margin: 0 0 3mm; }
+      .analysis-summary .analysis-card { margin-bottom: 6mm; padding: 4mm; border: 1px solid #DBEAFE; border-radius: 10px; background: #F8FBFF; break-inside: avoid !important; page-break-inside: avoid !important; }
+      .analysis-summary h3 { font-size: 12pt; margin: 0 0 2mm; color: #334155; }
+      .analysis-summary .analysis-chart { border: 1px solid #D1D5DB; border-radius: 12px; padding: 10px; background: #FFFFFF; break-inside: avoid !important; page-break-inside: avoid !important; }
+      .analysis-summary .legend-wrap { margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 8px; }
+      .analysis-summary .legend-item { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: #334155; }
+      .analysis-summary .legend-dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
+      .analysis-summary .donut-wrap { border: 1px solid #D1D5DB; border-radius: 12px; display: flex; gap: 18px; padding: 12px; align-items: center; margin-bottom: 2px; break-inside: avoid !important; page-break-inside: avoid !important; }
+      .analysis-summary .donut-legend { flex: 1; }
+      .analysis-summary .donut-legend-row { display: flex; align-items: center; justify-content: space-between; font-size: 11px; padding: 4px 0; color: #334155; }
+      .analysis-summary .donut-legend-dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; margin-right: 7px; }
+      .analysis-summary .analysis-heatmap-table { width: 100%; border-collapse: collapse; margin-top: 2mm; }
+      .analysis-summary .analysis-heatmap-table th,
+      .analysis-summary .analysis-heatmap-table td { border: 1px solid #CBD5E1; padding: 6px 7px; font-size: 9pt; text-align: left; }
+      .analysis-summary .analysis-heatmap-table th { background: #E2E8F0; font-weight: 800; }
+      .analysis-summary table,
+      .analysis-summary tr,
+      .analysis-summary svg,
+      .analysis-summary svg * { break-inside: avoid !important; page-break-inside: avoid !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    </style>
+    <section class="analysis-summary">
+      <h1>Executive Summary · PYQ Analysis Reports</h1>
+      <p class="muted">${escHtml(examStage)} • ${escHtml(selectedPaper)} • ${escHtml(selectedRange)}${customRangeLabel} • ${questionCount} questions</p>
+      ${sections.join('')}
+    </section>
+  `;
 };
 
 // ---------- Generic dispatcher ----------

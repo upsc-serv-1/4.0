@@ -78,6 +78,8 @@ import { AddToFlashcardSheet } from '../../src/components/flashcards/AddToFlashc
 import { NotebookLocationPicker } from '../../src/components/NotebookLocationPicker';
 import { OfflineManager } from '../../src/services/OfflineManager';
 import { LocalQuery } from '../../src/services/LocalQuery';
+import RichNoteEditor from '../../src/components/RichNoteEditor';
+import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 
 const ThemeSwitcher = require('../../src/components/ThemeSwitcher').ThemeSwitcher;
 
@@ -347,6 +349,7 @@ export default function UnifiedQuizEngine() {
 
   // Notebook System State
   const [notebookModalVisible, setNotebookModalVisible] = useState(false);
+  const notebookRichEditorRef = useRef<any>(null);
   const [noteDraftBullets, setNoteDraftBullets] = useState(['']);
   const [activeInputIndex, setActiveInputIndex] = useState(0);
   const [selection, setSelection] = useState({ start: 0, end: 0 });
@@ -1854,7 +1857,7 @@ export default function UnifiedQuizEngine() {
                 </View>
 
                 {item._explanations && item._explanations.length > 1 && (
-                  <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: colors.border + '30' }}>
+                  <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: colors.border + '30', flexWrap: 'wrap' }}>
                     <TouchableOpacity 
                       onPress={() => setActiveExplIndex(prev => ({ ...prev, [item.id]: -1 }))}
                       style={{ 
@@ -1867,7 +1870,7 @@ export default function UnifiedQuizEngine() {
                       }}
                     >
                       <Text style={{ fontSize: 10, fontWeight: '900', color: (activeExplIndex[item.id] ?? -1) === -1 ? '#fff' : colors.textTertiary }}>
-                        Combined
+                        COMBINED ({item._explanations.length})
                       </Text>
                     </TouchableOpacity>
                     {item._explanations.map((expl: any, idx: number) => (
@@ -1884,7 +1887,7 @@ export default function UnifiedQuizEngine() {
                         }}
                       >
                         <Text style={{ fontSize: 10, fontWeight: '900', color: activeExplIndex[item.id] === idx ? '#fff' : colors.textTertiary }}>
-                          {expl.source || `Source ${idx + 1}`}
+                          {expl.source || `Source ${idx + 1}`}{expl.year ? ` · ${expl.year}` : ''}
                         </Text>
                       </TouchableOpacity>
                     ))}
@@ -1893,7 +1896,9 @@ export default function UnifiedQuizEngine() {
 
                 <Markdown style={{ body: { color: colors.textSecondary, fontSize: fontSize - 2 } }}>
                   {(activeExplIndex[item.id] ?? -1) === -1 
-                    ? item.explanation_markdown 
+                    ? (item._explanations && item._explanations.length > 1
+                        ? item._explanations.map((e: any, i: number) => `**${e.source}${e.year ? ' · ' + e.year : ''}:**\n\n${e.text}`).join('\n\n---\n\n')
+                        : item.explanation_markdown)
                     : item._explanations?.[activeExplIndex[item.id]]?.text || item.explanation_markdown || 'No explanation available.'}
                 </Markdown>
               </View>
@@ -2047,6 +2052,7 @@ export default function UnifiedQuizEngine() {
         microtopic={questions[currentIndex]?.micro_topic}
         applyFormatting={applyFormatting}
         openLocationPicker={() => setLocationPickerVisible(true)}
+        richEditorRef={notebookRichEditorRef}
       />
     );
   };
@@ -2657,84 +2663,66 @@ const NotebookModal = (props: any) => {
                         {props.selectedNotebook?.title ? props.selectedNotebook.title.slice(0, 10) : 'LOCATION'}
                       </Text>
                    </TouchableOpacity>
-                   
-                   <TouchableOpacity 
-                     onPress={() => props.splitBullet(props.activeInputIndex)}
-                     style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceStrong, borderRadius: 12 }}
-                   >
-                      <Scissors size={18} color={colors.primary} />
-                   </TouchableOpacity>
-                   
-                   <TouchableOpacity 
-                     onPress={() => props.addBullet(props.activeInputIndex)}
-                     style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceStrong, borderRadius: 12 }}
-                   >
-                      <Plus size={18} color={colors.primary} />
-                   </TouchableOpacity>
                 </View>
               </View>
 
-            <ScrollView style={{ flex: 1, padding: 20 }} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 80 }}>
-            <View style={{ borderBottomWidth: 1, borderBottomColor: colors.border + '30', backgroundColor: colors.surface }}>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ padding: 12, gap: 12 }}>
-                <TouchableOpacity onPress={() => props.applyFormatting('bold')} style={[styles.modalToolBtn, { backgroundColor: colors.surfaceStrong }]}>
-                  <Bold size={18} color={colors.textPrimary} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => props.applyFormatting('italic')} style={[styles.modalToolBtn, { backgroundColor: colors.surfaceStrong }]}>
-                  <Italic size={18} color={colors.textPrimary} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => props.applyFormatting('underline')} style={[styles.modalToolBtn, { backgroundColor: colors.surfaceStrong }]}>
-                  <Underline size={18} color={colors.textPrimary} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => props.applyFormatting('bullet')} style={[styles.modalToolBtn, { backgroundColor: colors.surfaceStrong }]}>
-                  <List size={18} color={colors.textPrimary} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => props.applyFormatting('number')} style={[styles.modalToolBtn, { backgroundColor: colors.surfaceStrong }]}>
-                  <Type size={18} color={colors.textPrimary} />
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  onPress={() => props.applyFormatting('highlight')}
-                  style={[styles.modalToolBtn, { backgroundColor: colors.primary + '20', borderColor: colors.primary + '30' }]}
-                >
-                  <Highlighter size={18} color={colors.primary} />
-                </TouchableOpacity>
-              </ScrollView>
+            <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 80 }}>
+            <View style={{ backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border + '30' }}>
+              <RichToolbar
+                editor={props.richEditorRef}
+                getEditor={() => props.richEditorRef?.current}
+                selectedIconTint={colors.primary}
+                iconTint={colors.textPrimary}
+                style={{ backgroundColor: colors.surface }}
+                actions={[
+                  actions.setBold,
+                  actions.setItalic,
+                  actions.setUnderline,
+                  actions.setStrikethrough,
+                  actions.heading1,
+                  actions.heading2,
+                  actions.insertBulletsList,
+                  actions.insertOrderedList,
+                  actions.checkboxList,
+                  actions.blockquote,
+                  'highlight',
+                  actions.undo,
+                  actions.redo,
+                ]}
+                iconMap={{
+                  [actions.heading1]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '900', fontSize: 14 }}>H1</Text>,
+                  [actions.heading2]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '800', fontSize: 12 }}>H2</Text>,
+                  highlight: ({ tintColor }: any) => (
+                    <View style={{ padding: 4, borderRadius: 4, backgroundColor: '#FFF59D' }}>
+                      <Highlighter size={16} color={tintColor} />
+                    </View>
+                  ),
+                }}
+                highlight={() => {
+                  props.richEditorRef?.current?.focusContentEditor?.();
+                  setTimeout(() => {
+                    props.richEditorRef?.current?.commandDOM?.("document.execCommand('hiliteColor', false, '#FFF59D')");
+                  }, 50);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+              />
             </View>
 
-              {props.noteDraftBullets.map((bullet: string, idx: number) => (
-                <View 
-                  key={idx} 
-                  style={{ 
-                    marginBottom: 16, 
-                    backgroundColor: colors.bg, 
-                    borderRadius: 16, 
-                    padding: 16, 
-                    borderWidth: 1, 
-                    borderColor: props.activeInputIndex === idx ? colors.primary : colors.border,
-                    shadowColor: props.activeInputIndex === idx ? colors.primary : 'transparent',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 4,
-                    elevation: props.activeInputIndex === idx ? 2 : 0
-                  }}
-                >
-                  <TextInput
-                    style={{ color: colors.textPrimary, fontSize: 16, lineHeight: 24 }}
-                    multiline
-                    value={bullet}
-                    placeholder="Capture your thought..."
-                    placeholderTextColor={colors.textTertiary}
-                    onChangeText={(t) => props.updateBullet(idx, t)}
-                    onSelectionChange={(e) => {
-                      props.setSelection(e.nativeEvent.selection);
-                      props.setActiveInputIndex(idx);
-                    }}
-                    onFocus={() => props.setActiveInputIndex(idx)}
-                    selection={props.activeInputIndex === idx ? props.selection : undefined}
-                  />
-                </View>
-              ))}
+            <View style={{ padding: 16, minHeight: 300 }}>
+              <RichNoteEditor
+                ref={props.richEditorRef}
+                html={props.noteDraftBullets?.[0] || ''}
+                onChange={(html: string) => props.updateBullet(0, html)}
+                themeColors={{
+                  bg: colors.bg,
+                  surface: colors.surface,
+                  textPrimary: colors.textPrimary,
+                  border: colors.border,
+                  primary: colors.primary,
+                }}
+                placeholder="Capture your insight... Use the toolbar above for formatting."
+              />
+            </View>
 
               <View style={{ height: 24 }} />
               <Text style={[styles.modalLabel, { color: colors.textTertiary, letterSpacing: 1 }]}>SAVE LOCATION</Text>

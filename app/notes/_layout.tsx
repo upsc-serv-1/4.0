@@ -8,7 +8,7 @@ export default function NotesLayout() {
         animation: 'slide_from_right',
         animationDuration: 350,
         gestureEnabled: true,
-        fullScreenGestureEnabled: true,
+        fullScreenGestureEnabled: false,
       }}
     >
       <Stack.Screen name="index" />

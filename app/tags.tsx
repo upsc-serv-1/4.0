@@ -59,6 +59,7 @@ import {
 } from 'lucide-react-native';
 import { normalizeTag } from '../src/utils/tagUtils';
 import { buildNotesPdfHtml } from '../src/utils/notesPdfEngine';
+import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet';
 
 type ExportScope = 'all' | 'single' | 'multi';
 type ContentMode = 'questions' | 'questions_answers';
@@ -113,6 +114,7 @@ export default function TaggedRepoScreen() {
 
   // Export state
   const [exportVisible, setExportVisible] = useState(false);
+  const [unifiedExportVisible, setUnifiedExportVisible] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [exportConfig, setExportConfig] = useState<ExportConfig>({
     scope: 'all',
@@ -522,7 +524,7 @@ ${optionsText}` : ''}${answerText}`,
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => setExportVisible(true)}
+            onPress={() => setUnifiedExportVisible(true)}
             style={[styles.iconBtn, { backgroundColor: colors.primary + '15', borderColor: colors.primary + '30' }]}
             testID="tag-export-button"
           >
@@ -964,6 +966,65 @@ ${optionsText}` : ''}${answerText}`,
             </View>
           </View>
         </Modal>
+
+        {/* Unified Export Sheet (new common engine) */}
+        <UnifiedExportSheet
+          visible={unifiedExportVisible}
+          onClose={() => setUnifiedExportVisible(false)}
+          title="Tagged Questions"
+          initialOptions={{
+            title: 'Tagged Questions',
+            moduleName: 'Tags Library',
+            showTOC: true,
+            headerText: 'Dr. UPSC · Tags',
+            footerText: 'Tagged Questions Export',
+          }}
+          payload={(() => {
+            const groups = uniqueTags
+              .map((tag) => ({
+                tag,
+                questions: allQuestions
+                  .filter((q) => q.normalizedReviewTags.includes(normalizeTag(tag)))
+                  .map((q: any) => ({
+                    id: q.id,
+                    question_text: q.questionText || q.question_text || '',
+                    options: q.options,
+                    correct_answer: q.correctAnswer || q.correct_answer,
+                    explanation_markdown: q.explanation || q.explanation_markdown,
+                    subject: q.subject,
+                    section_group: q.sectionGroup || q.section_group,
+                    micro_topic: q.microTopic || q.micro_topic,
+                    exam_year: q.examYear || q.exam_year,
+                    is_pyq: !!(q.isPyq || q.is_pyq),
+                    is_ncert: !!(q.isNcert || q.is_ncert),
+                    review_tags: q.reviewTags || [],
+                  })),
+              }))
+              .filter((x) => x.questions.length > 0);
+            return { kind: 'tags' as const, groups };
+          })()}
+          renderExtraFilters={(o, setO) => (
+            uniqueTags.length > 0 ? (
+              <View style={{ marginTop: 6 }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 6 }}>SUBJECT / TAG FILTER</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                  {uniqueTags.map(tag => {
+                    const isActive = (o.revisionTags || []).includes(tag);
+                    return (
+                      <TouchableOpacity
+                        key={tag}
+                        onPress={() => setO(prev => ({ ...prev, revisionTags: isActive ? (prev.revisionTags || []).filter(t => t !== tag) : [...(prev.revisionTags || []), tag] }))}
+                        style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: 1, backgroundColor: isActive ? colors.primary : colors.surfaceStrong, borderColor: isActive ? colors.primary : colors.border }}
+                      >
+                        <Text style={{ fontSize: 11, fontWeight: '800', color: isActive ? '#fff' : colors.textPrimary }}>{tag}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            ) : null
+          )}
+        />
       </PageWrapper>
     </SafeAreaView>
   );

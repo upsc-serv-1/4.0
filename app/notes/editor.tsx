@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { 
   View, 
   Text, 
@@ -955,34 +955,38 @@ export default function NoteEditor() {
                               selectedIconTint={colors.primary}
                               iconTint={colors.textPrimary}
                               style={{ backgroundColor: 'transparent' }}
+                              onPressAddImage={undefined}
                               actions={[
                                 actions.setBold,
                                 actions.setItalic,
                                 actions.setUnderline,
+                                actions.setStrikethrough,
+                                actions.heading1,
+                                actions.heading2,
                                 actions.insertBulletsList,
                                 actions.insertOrderedList,
-                                actions.heading1,
+                                actions.checkboxList,
+                                actions.blockquote,
                                 'highlight',
+                                actions.undo,
+                                actions.redo,
                               ]}
                               iconMap={{
-                                [actions.heading1]: ({ tintColor }: any) => <View style={{ padding: 4 }}><Heading size={20} color={tintColor} /></View>,
+                                [actions.heading1]: ({ tintColor }: any) => <View style={{ padding: 4 }}><Text style={{ color: tintColor, fontWeight: '900', fontSize: 16 }}>H1</Text></View>,
+                                [actions.heading2]: ({ tintColor }: any) => <View style={{ padding: 4 }}><Text style={{ color: tintColor, fontWeight: '800', fontSize: 14 }}>H2</Text></View>,
                                 highlight: ({ tintColor }: any) => (
-                                  <TouchableOpacity 
-                                    onPress={() => {
-                                      setShowPicker(v => !v);
-                                      editorRef.current?.commandDOM(`document.execCommand('backColor', false, '${highlightColor}')`);
-                                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                                    }}
-                                  >
-                                    <View style={{ padding: 6, borderRadius: 6, backgroundColor: highlightColor === 'transparent' ? colors.surfaceStrong : highlightColor }}>
-                                      <Highlighter size={16} color={tintColor} />
-                                    </View>
-                                  </TouchableOpacity>
+                                  <View style={{ padding: 6, borderRadius: 6, backgroundColor: highlightColor === 'transparent' ? 'transparent' : highlightColor }}>
+                                    <Highlighter size={18} color={tintColor} />
+                                  </View>
                                 ),
+                              }}
+                              highlight={() => {
+                                setShowPicker(v => !v);
+                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                               }}
                             />
                             {showPicker && (
-                              <View style={{ flexDirection: 'row', gap: 12, padding: 12, borderTopWidth: 1, borderTopColor: colors.border, justifyContent: 'center', backgroundColor: colors.bg }}>
+                              <View style={{ flexDirection: 'row', gap: 12, padding: 12, borderTopWidth: 1, borderTopColor: colors.border, justifyContent: 'center', backgroundColor: colors.bg, flexWrap: 'wrap' }}>
                                 {HIGHLIGHT_COLORS.map(c => (
                                   <TouchableOpacity 
                                     key={c} 
@@ -990,10 +994,20 @@ export default function NoteEditor() {
                                       setHighlightColor(c);
                                       await AsyncStorage.setItem('notes_editor_highlight_color', c);
                                       setShowPicker(false);
-                                      editorRef.current?.commandDOM(`document.execCommand('backColor', false, '${c}')`);
+                                      // Use pell-editor's built-in setHiliteColor via commandDOM
+                                      // Focus first, then apply on current selection
+                                      editorRef.current?.focusContentEditor?.();
+                                      setTimeout(() => {
+                                        if (c === 'transparent') {
+                                          editorRef.current?.commandDOM?.("document.execCommand('hiliteColor', false, 'transparent'); document.execCommand('backColor', false, 'transparent')");
+                                        } else {
+                                          editorRef.current?.commandDOM?.(`document.execCommand('hiliteColor', false, '${c}')`);
+                                        }
+                                      }, 50);
+                                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                                     }} 
                                     style={{ 
-                                      width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center',
+                                      width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center',
                                       borderWidth: 2, backgroundColor: c === 'transparent' ? colors.surfaceStrong : c, 
                                       borderColor: c === highlightColor ? colors.primary : 'transparent' 
                                     }} 

@@ -1,4 +1,4 @@
-﻿export type PdfPaperStyle = 'plain' | 'lined' | 'grid' | 'dots';
+export type PdfPaperStyle = 'plain' | 'lined' | 'grid' | 'dots';
 export type PdfTheme = 'modern' | 'sepia' | 'historical';
 export type PdfSpacing = 'compact' | 'comfortable';
 export type PdfFontFamily = 'sans' | 'handwriting';
@@ -42,15 +42,32 @@ export interface NotesPdfEngineInput {
   config: NotesPdfEngineConfig;
 }
 
+/**
+ * Preserves rich HTML formatting produced by the editor (bold/italic/underline/mark/ul/ol)
+ * and ALSO supports markdown-like fallback for legacy plain-text notes.
+ *
+ * Detection: if the string already contains an HTML tag (<b>, <i>, <u>, <mark>, <span>, <ul>, <ol>, <p>, <br>, <strong>, <em>)
+ * it is returned AS-IS so the browser can render it properly inside the print HTML.
+ * Otherwise, the lightweight markdown is converted to HTML.
+ */
+const HTML_TAG_REGEX = /<\/?(b|strong|i|em|u|mark|span|ul|ol|li|p|br|div|h[1-6]|blockquote)(\s|>|\/)/i;
+
 const parseMD = (txt: string) => {
   if (!txt) return '';
+  // If already HTML (from rich editor), return unchanged so all formatting (incl. background color / mark / spans with inline styles) survives
+  if (HTML_TAG_REGEX.test(txt)) return txt;
+
+  // Fallback: markdown-lite -> HTML
   return txt
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+    .replace(/__(.*?)__/g, '<u>$1</u>')
+    .replace(/\*(.*?)\*/g, '<i>$1</i>')
     .replace(/_(.*?)_/g, '<i>$1</i>')
-    .replace(/^\s*[\-\*]\s+(.*)/gm, 'ΓÇó $1')
+    .replace(/==(.*?)==/g, '<mark>$1</mark>')
+    .replace(/^\s*[\-\*]\s+(.*)/gm, '• $1')
     .replace(/\n/g, '<br/>');
 };
 
@@ -112,6 +129,28 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
               config.paperStyle === 'dots' ? '24px 24px' : 'auto'
             };
           }
+
+          /* Rich-text formatting preservation (Apple Notes / Notability parity) */
+          b, strong { font-weight: 700; }
+          i, em { font-style: italic; }
+          u { text-decoration: underline; }
+          s, strike, del { text-decoration: line-through; }
+          mark, .highlight {
+            background-color: #FFF59D;
+            color: inherit;
+            padding: 0 2px;
+            border-radius: 2px;
+          }
+          /* pell-rich-editor wraps highlight colors in span style="background-color:..." — preserve them */
+          span[style*="background"] { padding: 0 2px; border-radius: 2px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          blockquote { border-left: 3px solid #6366f1; padding: 4px 12px; margin: 6px 0; color: #555; background: rgba(99,102,241,0.05); border-radius: 4px; }
+          ul, ol { padding-left: 22px; margin: 6px 0; }
+          li { margin: 3px 0; }
+          h1, h2, h3, h4, h5, h6 { line-height: 1.25; margin: 10px 0 6px 0; color: inherit; }
+          a { color: #2563eb; text-decoration: underline; }
+          code { background: rgba(0,0,0,0.06); padding: 1px 4px; border-radius: 3px; font-family: 'Menlo', 'Consolas', monospace; font-size: 0.9em; }
+          pre { background: rgba(0,0,0,0.06); padding: 8px 10px; border-radius: 6px; overflow-x: auto; }
+
           .subject-badge {
             color: #6366f1;
             font-weight: 800;
@@ -120,7 +159,7 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
             text-transform: uppercase;
             margin-bottom: 8px;
           }
-          h1 {
+          h1.doc-title {
             font-size: 2.2em;
             font-weight: 900;
             margin: 0 0 20px 0;
@@ -163,6 +202,7 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
             display: flex;
             gap: 10px;
           }
+          .highlight-text > div { flex: 1; }
           .bullet {
             font-size: 0.8em;
             line-height: 1.8;
@@ -221,17 +261,17 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
           .toc-item { display: block; font-size: 12px; color: inherit; text-decoration: none; margin-bottom: 6px; border-bottom: 1px dashed rgba(0,0,0,0.1); }
           .checklist-pdf { margin-top: 40px; }
           .checklist-item-pdf { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }
-          .checkbox-pdf { width: 14px; height: 14px; border: 1px solid #9ca3af; border-radius: 3px; }
+          .checkbox-pdf { width: 14px; height: 14px; border: 1px solid #9ca3af; border-radius: 3px; flex-shrink: 0; }
           .checkbox-pdf.checked { background: #6366f1; border-color: #6366f1; }
-          * { -webkit-print-color-adjust: exact; box-sizing: border-box; }
+          * { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-sizing: border-box; }
         </style>
       </head>
       <body>
         ${config.watermark ? `<div class="watermark">${config.watermark}</div>` : ''}
-        <div class="footer">${config.footerText} ΓÇó ${new Date().toLocaleDateString()}</div>
+        <div class="footer">${config.footerText} • ${new Date().toLocaleDateString()}</div>
 
         <div class="subject-badge">${subject || 'General'}</div>
-        <h1>${title || 'Untitled Note'}</h1>
+        <h1 class="doc-title">${title || 'Untitled Note'}</h1>
 
         ${config.showTOC ? `
           <div class="toc-container">
@@ -262,7 +302,7 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
               return `
                 <div class="highlight-card" style="border-left-color: ${cardColor}">
                   <div class="highlight-text">
-                    <span class="bullet" style="color: ${cardColor}">ΓùÅ</span>
+                    <span class="bullet" style="color: ${cardColor}">●</span>
                     <div>${parseMD(item.text)}</div>
                   </div>
                   ${item.sourceLabel ? `<div class="highlight-source">${parseMD(item.sourceLabel)}</div>` : ''}

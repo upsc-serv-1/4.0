@@ -1,8 +1,5 @@
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
-import * as FileSystem from 'expo-file-system';
-import { Platform } from 'react-native';
-import { decode } from 'base64-arraybuffer';
 import { supabase } from '../lib/supabase';
 
 export async function pickAndUploadFlashcardImage(userId: string): Promise<string | null> {

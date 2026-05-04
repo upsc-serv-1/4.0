@@ -31,6 +31,38 @@ export const mergeQuestions = (questions: any[]) => {
   const getQuestionText = (q: any): string =>
     String(q?.question_text || q?.statement_line || q?.statement || '');
 
+  const normalizeInstituteLabel = (value: any) => {
+    const raw = String(value || '').trim();
+    if (!raw) return 'UPSC';
+
+    const compact = raw.toLowerCase().replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').trim();
+    const key = compact.replace(/[^a-z0-9]/g, '');
+
+    const map: Record<string, string> = {
+      forum: 'Forum',
+      forumias: 'Forum',
+      vision: 'Vision',
+      visionias: 'Vision',
+      next: 'Next',
+      nextias: 'Next',
+      insights: 'Insights',
+      insightsias: 'Insights',
+      iasbaba: 'IASBABA',
+      vajiram: 'Vajiram',
+      pw: 'PW',
+      raus: 'Raus',
+      drishti: 'Drishti',
+      upsc: 'UPSC',
+    };
+
+    if (map[key]) return map[key];
+    return compact
+      .split(' ')
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+  };
+
   const getInstitute = (q: any) => {
     const testsObj = Array.isArray(q?.tests) ? q.tests[0] : q?.tests;
     let inst = testsObj?.institute || q?.tests?.institute || q?.provider || q?.source?.institute;
@@ -38,12 +70,12 @@ export const mergeQuestions = (questions: any[]) => {
       const parts = String(q.test_id).split('-');
       if (parts.length > 0) {
         const first = parts[0].toLowerCase();
-        if (['forum', 'vision', 'insights', 'iasbaba', 'vajiram', 'nextias', 'pw', 'raus'].includes(first)) {
-          inst = first.charAt(0).toUpperCase() + first.slice(1);
+        if (['forum', 'vision', 'insights', 'iasbaba', 'vajiram', 'nextias', 'next', 'pw', 'raus', 'drishti'].includes(first)) {
+          inst = first;
         }
       }
     }
-    return String(inst || 'UPSC').trim();
+    return normalizeInstituteLabel(inst || 'UPSC');
   };
 
   const getYear = (q: any): string => {
@@ -163,9 +195,16 @@ const mergeData = (
 ) => {
   if (!existing._institutes) {
     const testsObj = Array.isArray(existing.tests) ? existing.tests[0] : existing.tests;
-    existing._institutes = [testsObj?.institute || existing.tests?.institute || existing.provider || 'UPSC'];
+    const baseInstRaw = testsObj?.institute || existing.tests?.institute || existing.provider || 'UPSC';
+    const baseInst = String(baseInstRaw || 'UPSC').trim();
+    existing._institutes = [baseInst];
   }
-  if (!existing._institutes.includes(inst)) {
+  const instKey = String(inst || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const hasInstitute = existing._institutes.some((x: string) => {
+    const key = String(x || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    return key === instKey || key.includes(instKey) || instKey.includes(key);
+  });
+  if (!hasInstitute) {
     existing._institutes.push(inst);
   }
 

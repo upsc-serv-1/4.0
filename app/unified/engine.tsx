@@ -1739,25 +1739,64 @@ export default function UnifiedQuizEngine() {
       return out;
     })();
 
-    const availableExplSources = Array.from(
-      new Map(normalizedExplanations.map((e: any) => [e.sourceKey, e.source])).entries()
-    ).map(([key, label]) => ({ key, label }));
+    const inferredInstitutes = (() => {
+      const list = Array.isArray((item as any)._institutes)
+        ? (item as any)._institutes
+        : [];
+      const normalized = list
+        .map((value: any) => normalizeInstituteLabel(value))
+        .filter(Boolean);
+      const primary = normalizeInstituteLabel(item.tests?.institute || item.source?.institute || '');
+      if (primary && !normalized.includes(primary)) normalized.push(primary);
+      return Array.from(new Set(normalized));
+    })();
 
-    const selectedExplSource = activeExplSource[item.id] || 'all';
+    const availableExplSourceMap = new Map<string, string>();
+    normalizedExplanations.forEach((e: any) => {
+      availableExplSourceMap.set(e.sourceKey, e.source);
+    });
+    inferredInstitutes.forEach((label: string) => {
+      const key = String(label || '').toLowerCase();
+      if (key && !availableExplSourceMap.has(key)) {
+        availableExplSourceMap.set(key, label);
+      }
+    });
+
+    const availableExplSources = Array.from(availableExplSourceMap.entries()).map(([key, label]) => ({ key, label }));
+
+    const selectedExplSourceRaw = activeExplSource[item.id] || 'all';
+    const selectedExplSource = selectedExplSourceRaw === 'all' || availableExplSourceMap.has(selectedExplSourceRaw)
+      ? selectedExplSourceRaw
+      : 'all';
+
     const sourceFilteredExplanations = selectedExplSource === 'all'
       ? normalizedExplanations
       : normalizedExplanations.filter((e: any) => e.sourceKey === selectedExplSource);
 
-    const displayExplanations = sourceFilteredExplanations.length > 0 ? sourceFilteredExplanations : normalizedExplanations;
+    const displayExplanations = sourceFilteredExplanations.length > 0
+      ? sourceFilteredExplanations
+      : (selectedExplSource !== 'all'
+          ? [{
+              source: availableExplSourceMap.get(selectedExplSource) || selectedExplSource,
+              sourceKey: selectedExplSource,
+              year: String(item.exam_year || '').trim(),
+              answer: String(item.correct_answer || '').trim().toUpperCase(),
+              text: '',
+            }]
+          : normalizedExplanations);
+
     const rawIdx = activeExplIndex[item.id] ?? -1;
     const safeIdx = rawIdx >= 0 && rawIdx < displayExplanations.length ? rawIdx : -1;
     const activeExplanationText = safeIdx === -1
       ? (displayExplanations.length > 1
-          ? displayExplanations.map((e: any) => `**${e.source}${e.year ? ' · ' + e.year : ''}${e.answer ? ' · Ans: ' + e.answer : ''}:**\n\n${e.text || '*No explanation provided.*'}`).join('\n\n---\n\n')
+          ? displayExplanations
+              .map((e: any) => `**${e.source}${e.year ? ' · ' + e.year : ''}${e.answer ? ' · Ans: ' + e.answer : ''}:**\n\n${e.text || '*No explanation provided.*'}`)
+              .join('\n\n---\n\n')
           : (displayExplanations[0]?.text || item.explanation_markdown || 'No explanation available.'))
-      : (displayExplanations[safeIdx] 
-          ? (displayExplanations[safeIdx].text || '*No explanation provided by this source.*') 
+      : (displayExplanations[safeIdx]
+          ? (displayExplanations[safeIdx].text || '*No explanation provided by this source.*')
           : (item.explanation_markdown || 'No explanation available.'));
+
 
     return (
       <View style={[styles.questionCard, { backgroundColor: isZenMode ? 'transparent' : colors.surface, borderColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.border, borderWidth: isZenMode ? 0 : 1 }]}>

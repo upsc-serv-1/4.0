@@ -1,99 +1,59 @@
-# Dr. UPSC — Product Requirements Document
+# PRD — Knowledge Vault (Notes Tab Transformation)
 
-## Source
-- Base repo: `https://github.com/upsc-serv-1/4.0/tree/4.6` (public)
-- Stack: Expo Router (React Native 0.81, React 19), Supabase, Zustand, NativeWind, @shopify/react-native-skia, Reanimated + Gesture Handler.
-- Backend: hosted Supabase (URL/anon key hardcoded in `src/lib/supabase.ts`).
+## Original problem statement
+Repo: `upsc-serv-1/4.0` (branch `5.0`). Expo / React Native / Supabase study app for UPSC.
 
-## Core User Persona
-- UPSC aspirants preparing on iPad using Apple Pencil; need a closed-loop study ecosystem (quiz → review → annotate → synthesize).
+User wanted the **Notes tab** transformed into a "Knowledge Vault & Dual-Mode Note System" with:
+1. Subject Hub home (icon grid, no auto-seed)
+2. Aichii hierarchy tree (Folder → Notebook → Note with vertical lines)
+3. Glance Mode — inline-unfold a note's items (highlights, headings, checklist)
+4. Semantic chip filter (use existing review-tag system: defaults + `user_settings.custom_tags`)
+5. Focus Mode — immersive parchment/serif reader (existing Zen mode, deep-linked)
+6. Unified export engine for notes (with notes-specific injections)
 
-## Uniform Terminology (enforced across Hardnotes UI)
-- **Folder** — container in `user_note_nodes` (`type='folder'`), nestable via `parent_id`.
-- **Note** — leaf document; tree row in `user_note_nodes` (`type='note'` or legacy `'notebook'`) with `note_id` → `user_notes` row.
-- **Points** — heterogenous items inside a note, stored in `user_notes.items` (JSONB). Types:
-  - `text` / `checklist` — existing point types
-  - `stroke` — Skia vector path (pen/highlighter/eraser) — Phase 2 output
-  - `base_layer` — locked content pushed from the quiz engine — Phase 3 output
+User explicit constraints:
+- Don't auto-fetch / auto-seed subjects
+- Use the existing review-tag catalog (Tags-tab parity)
+- Use the existing UnifiedExportSheet
+- No changes to Tags / Flashcards / Notes-Pro Skia editor
 
-## What's Been Implemented (this session)
-### Phase 1 — Hardnotes Hub  `app/(tabs)/hardnotes.tsx`
-- New tab "Hardnotes" registered in `TabConfigService.ts`, tab-bar (`app/(tabs)/_layout.tsx`), and `app/customize_tabs.tsx`.
-- Dual-pane layout (sidebar tree + grid) that adapts to mobile via a drawer modal (`< 760px`).
-- Collapsible folder tree in `HardnotesSidebar.tsx`; "All Notes" root, inline "New Folder" creation, client-side filter.
-- `NotesGrid.tsx` 3-column FlatList with folder cards + notebook-style note thumbnails (points count, pin badge, updated-at).
-- Breadcrumb navigation, global in-folder search, `+ New` note quick-create modal.
-- `HardnotesService.ts` encapsulates every `user_note_nodes` / `user_notes` CRUD; idempotent UPSC syllabus seed (History, Polity, Geography, Economy, Environment, **General Science → Physics / Chemistry / Biology / Miscellaneous**, International Relations, Anthropology, Current Affairs, Essays).
-- Home tab recent notes now include legacy `type='notebook'` rows so nothing is orphaned.
+## Architecture
+- **Tech**: Expo Router, React Native 0.81, Supabase JS, Zustand (`useTagStore`), TS 5.3.
+- **DB**: Supabase tables `user_note_nodes` (tree) + `user_notes` (content). No migration needed — `items` JSONB silently extended with optional `tags: string[]` per item (forward-compatible).
+- **Tag catalog**: `useNoteTagCatalog` merges built-in defaults (Imp. Fact / Imp. Concept / Trap Question / Must Revise / Memorize) + `user_settings.custom_tags` + AsyncStorage cache + items-discovered tags. Subscribes to `useTagStore.version` for cross-screen sync.
 
-### Phase 2 — Pro-Note Skia Canvas  `app/notes/pro-editor.tsx`
-- `@shopify/react-native-skia` added to `package.json`.
-- `SkiaCanvas.tsx` — vector canvas with paper background, ruled lines, committed strokes, live in-progress stroke, eraser hit-test.
-- Apple-Pencil friendly: `PanResponder` samples `nativeEvent.force` (pressure) and `altitudeAngle` (tilt); stroke width adapts to pressure `width * (0.5 + 0.5 * p)`.
-- Tools: **Pen**, **Highlighter** (uses Skia `blendMode="multiply"` so text beneath stays crisp), **Eraser** (per-stroke removal by proximity), **Lasso** (UI wired — drag-select logic deferred).
-- `ToolPalette.tsx` — floating toolbar built with Reanimated v4 + Gesture Handler; draggable anywhere on screen, 6 pen + 4 highlighter colors, width slider, undo/redo.
-- `strokes.ts` — `Stroke` + `StrokePoint` types and a smoothed SVG path builder.
-- Persistence: 800ms-debounced upsert to `user_notes.items` — each stroke stored as `{ type: 'stroke', ... }` JSON. No raster images.
-- Save-state pill in header (`Saving…`, `Saved`, `Synced`, `Error`).
+## Files
+**New**
+- `src/hooks/useNoteTagCatalog.ts`
+- `src/components/notes/SubjectHubGrid.tsx`
+- `src/components/notes/SemanticChipRow.tsx`
+- `src/components/notes/GlancePanel.tsx`
 
-### Phase 3 — Smart-Capture Bridge (Quiz → Hardnotes)
-- `QuizToHardnotesPicker.tsx` — iOS-style bottom-sheet folder picker.
-- `app/unified/engine.tsx` extended with a new **Hardnotes** action in the explanation action row (alongside existing "Notebook" button).
-- Flow: tap Hardnotes → pick destination folder → names a new note → creates `user_notes` row with `items: [{ type: 'base_layer', markdown, locked: true, ... }]` → routes to `app/notes/pro-editor.tsx` via `router.push` with `noteId` + `baseLayer` params.
-- Pro-editor renders the quiz explanation as a yellow locked banner at the top of the paper and the user can draw over/under it — auto-save merges everything back into the same `user_notes` row.
+**Edited**
+- `src/components/notes/NoteRow.tsx` — added Play (Focus mode), Export, and Glance toggle
+- `app/notes/index.tsx` — full rewrite around Knowledge Vault flow
+- `app/notes/editor.tsx` — added `?focus=1` deep-link → auto-enables Zen + parchment-serif preview
 
-### Bug Fix
-- Repaired a pre-existing syntax error in `app/unified/engine.tsx:1729-1737` (template string was mistakenly delimited by single-quotes with literal newlines, breaking Metro bundling). The app web build now succeeds.
+## What's implemented (Jan 2026)
+- ✅ Subject Hub grid (2-col card layout, auto-mapped subject icons, palette-stable colors, child counters, inline action dots)
+- ✅ Hub list/grid view toggle
+- ✅ Aichii tree inside folders (existing vertical-line tree retained)
+- ✅ Per-note Glance unfold with checklist toggle persisting to Supabase
+- ✅ Semantic chip row (live-synced with Tags-tab catalog)
+- ✅ "Stream-mode": selecting a chip auto-opens glance for every note in the subtree, fallback heuristic maps `microTopicHeading→Imp.Concept` and `highlight→Imp.Fact` when items aren't yet explicitly tagged
+- ✅ Focus mode deep-link via `/notes/editor?focus=1` (oversized title, sepia parchment, serif preview)
+- ✅ Per-row swipe actions: Read, Add, Export, Rename, Move, Duplicate, Delete
+- ✅ UnifiedExportSheet integration (`kind: 'notes'`) with notes-specific defaults: sepia theme + lined paper + serif font + TOC on
+- ✅ Unfiled root-level notes/notebooks shown under "UNFILED" section
+- ✅ Empty states for both root and inside-folder views
 
-## How to Run (user's local machine)
-```bash
-yarn install              # one-time
-npx expo prebuild         # regenerate iOS/Android native projects (Skia is a native module)
-npx expo run:ios          # open on iPad/iPad Simulator
-# OR
-npx expo start --web      # quick browser preview (Skia works; Apple-Pencil hw data won't be present)
-```
+## P1 / next iteration
+- Per-item Tag picker inside the editor (button to attach review tags to a single highlight, persisting `tags` field to `items` JSONB)
+- Bulk-tag actions in Glance Mode
+- Drag-to-reorder items inside a notebook
+- "Last revised" badge on Subject Hub cards (sourced from `user_notes.updated_at`)
+- Quiz-engine "Save to notebook" picker that creates folders/notebooks inline (user said they'll wire this themselves; component is ready to receive it)
 
-## Files Added / Modified
-### Added
-- `app/(tabs)/hardnotes.tsx`
-- `app/notes/pro-editor.tsx`
-- `src/services/HardnotesService.ts`
-- `src/components/hardnotes/HardnotesSidebar.tsx`
-- `src/components/hardnotes/NotesGrid.tsx`
-- `src/components/hardnotes/SkiaCanvas.tsx`
-- `src/components/hardnotes/ToolPalette.tsx`
-- `src/components/hardnotes/QuizToHardnotesPicker.tsx`
-- `src/components/hardnotes/strokes.ts`
-
-### Modified
-- `app/(tabs)/_layout.tsx` (Hardnotes tab registration + icon + navigate handling)
-- `app/(tabs)/index.tsx` (recent notes include legacy notebook rows)
-- `app/notes/_layout.tsx` (route for `pro-editor`)
-- `app/unified/engine.tsx` (Hardnotes action button + picker wiring + template-string bug fix)
-- `app/customize_tabs.tsx` (expose Hardnotes in tab-customize screen)
-- `src/services/TabConfigService.ts` (`TabKey` + default order include hardnotes)
-- `package.json` (add `@shopify/react-native-skia`)
-
-## Prioritized Backlog
-
-### P0 — Polish / Quality
-- [ ] Lasso tool — implement selection-rect + move/delete.
-- [ ] Pan + pinch-zoom on the canvas paper (currently only ScrollView pinch).
-- [ ] Graceful offline queue for note saves (repo already has `SyncQueue`; wire it into `HardnotesService.saveNoteContent`).
-
-### P1 — UX
-- [ ] Drag-and-drop folder/note reordering in the sidebar (repo already uses `react-native-draggable-flatlist`).
-- [ ] Long-press note card → context menu (Pin / Rename / Move / Archive) — partially plumbed via `HardnotesService.togglePin / archive / rename`.
-- [ ] Multi-page canvas (`pageIndex` on strokes) — currently one tall scroll canvas.
-- [ ] Import existing `notes` tab content into the Hardnotes hub automatically with folder mapping (`subject → folder`).
-
-### P2 — Depth
-- [ ] Search inside note contents (full-text across `items` JSONB).
-- [ ] OCR / snapshot a region and attach as base layer.
-- [ ] Lasso-based clipboard between notes.
-
-## Next Action Items
-1. User runs `yarn install && npx expo prebuild && npx expo run:ios` on Mac to test on iPad.
-2. User evaluates the drawing physics / toolbar ergonomics; report preferences for P0 polish.
-3. Populate a real UPSC-syllabus migration path to map existing `notes`-tab folders into the Hardnotes tree if desired.
+## Known limitations
+- The pre-existing files `src/components/hardnotes/HardnotesSidebar.tsx` and `src/components/hardnotes/QuizCaptureSheet.tsx` carry user-staged local edits with TS syntax errors (visible from `git status` at task start) — untouched by this iteration.
+- Cannot run an automated headless E2E for this stack inside the kubernetes preview (Expo bundler not provisioned). Manual testing required on device.

@@ -1,10 +1,13 @@
 import React, { useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { ChevronRight, Minus, Plus, Folder, BookOpen, FileText, Settings as SettingsIcon, Edit2, FolderPlus, Trash2, FolderInput, FileDown } from 'lucide-react-native';
+import {
+  ChevronRight, Minus, Plus, Folder, BookOpen, FileText,
+  Edit2, FolderPlus, Trash2, FolderInput, FileDown, Play, Sparkles,
+} from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { Swipeable, RectButton } from 'react-native-gesture-handler';
 
-export type NoteRowAction = 'add' | 'duplicate' | 'rename' | 'move' | 'delete';
+export type NoteRowAction = 'add' | 'duplicate' | 'rename' | 'move' | 'delete' | 'play' | 'export';
 
 type NodeType = 'folder' | 'notebook' | 'note';
 
@@ -29,9 +32,12 @@ interface Props {
   onToggle: () => void;
   onOpen: () => void;
   onAction: (action: NoteRowAction) => void;
+  /** Show the Glance "unfold" inline toggle. Only meaningful for notes/notebooks. */
+  glanceExpanded?: boolean;
+  onToggleGlance?: () => void;
 }
 
-export function NoteRow({ node, expanded, onToggle, onOpen, onAction }: Props) {
+export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpanded = false, onToggleGlance }: Props) {
   const { colors } = useTheme();
   const swipeableRef = useRef<Swipeable>(null);
 
@@ -39,15 +45,28 @@ export function NoteRow({ node, expanded, onToggle, onOpen, onAction }: Props) {
     swipeableRef.current?.close();
   };
 
+  const showPlay = node.type === 'note' || (node.type === 'notebook' && !!node.note_id);
+  const showGlanceBtn = (node.type === 'note' || (node.type === 'notebook' && !!node.note_id)) && !!onToggleGlance;
+
   const renderRightActions = () => {
     return (
       <View style={[styles.actionsRow, { backgroundColor: colors.bg }]}>
-        {node.type === 'folder' && (
+        {showPlay && (
+          <ActionBtn
+            icon={<Play size={18} />} bg="#0ea5e9"
+            label="Read" onPress={() => { closeSwipe(); onAction('play'); }}
+          />
+        )}
+        {(node.type === 'folder' || node.type === 'notebook') && (
           <ActionBtn
             icon={<FolderPlus size={18} />} bg="#10b981"
             label="Add" onPress={() => { closeSwipe(); onAction('add'); }}
           />
         )}
+        <ActionBtn
+          icon={<FileDown size={18} />} bg="#06b6d4"
+          label="Export" onPress={() => { closeSwipe(); onAction('export'); }}
+        />
         <ActionBtn
           icon={<Edit2 size={18} />} bg="#f59e0b"
           label="Rename" onPress={() => { closeSwipe(); onAction('rename'); }}
@@ -57,7 +76,7 @@ export function NoteRow({ node, expanded, onToggle, onOpen, onAction }: Props) {
           label="Move" onPress={() => { closeSwipe(); onAction('move'); }}
         />
         <ActionBtn
-          icon={<FileText size={18} />} bg="#06b6d4"
+          icon={<FileText size={18} />} bg="#94a3b8"
           label="Duplicate" onPress={() => { closeSwipe(); onAction('duplicate'); }}
         />
         <ActionBtn
@@ -90,13 +109,13 @@ export function NoteRow({ node, expanded, onToggle, onOpen, onAction }: Props) {
       friction={2}
       rightThreshold={40}
     >
-      <View style={[styles.row, { backgroundColor: colors.bg, borderBottomColor: colors.border + 'A0' }]}>
+      <View style={[styles.row, { backgroundColor: colors.bg, borderBottomColor: colors.border + 'A0' }]} data-testid={`vault-row-${node.id}`}>
         <View style={styles.content}>
           {/* Hierarchy Lines */}
           {Array.from({ length: node.depth }).map((_, i) => (
-            <View 
-              key={i} 
-              style={[styles.verticalLine, { left: i * indentWidth + 20, backgroundColor: colors.border + '80' }]} 
+            <View
+              key={i}
+              style={[styles.verticalLine, { left: i * indentWidth + 20, backgroundColor: colors.border + '80' }]}
             />
           ))}
 
@@ -104,13 +123,13 @@ export function NoteRow({ node, expanded, onToggle, onOpen, onAction }: Props) {
           <View style={[styles.iconArea, { marginLeft: node.depth * indentWidth }]}>
             {node.type !== 'folder' || node.depth === 0 ? (
               <TouchableOpacity onPress={onOpen} style={styles.folderIconWrap}>
-                 <View style={[styles.officialFolderIcon, { backgroundColor: getIconBg() }]}>
-                    {getIcon()}
-                 </View>
+                <View style={[styles.officialFolderIcon, { backgroundColor: getIconBg() }]}>
+                  {getIcon()}
+                </View>
               </TouchableOpacity>
             ) : hasChildren ? (
-              <TouchableOpacity 
-                onPress={onToggle} 
+              <TouchableOpacity
+                onPress={onToggle}
                 style={[styles.circleIcon, { backgroundColor: colors.surface, borderColor: colors.border }]}
               >
                 {expanded ? (
@@ -125,8 +144,8 @@ export function NoteRow({ node, expanded, onToggle, onOpen, onAction }: Props) {
           </View>
 
           {/* Text Area */}
-          <TouchableOpacity 
-            onPress={onOpen} 
+          <TouchableOpacity
+            onPress={onOpen}
             style={styles.textContainer}
             activeOpacity={0.6}
           >
@@ -138,6 +157,35 @@ export function NoteRow({ node, expanded, onToggle, onOpen, onAction }: Props) {
                 {node.type === 'note' ? 'Note' : `${node.childrenCount} item${node.childrenCount === 1 ? '' : 's'}`}
               </Text>
             </View>
+
+            {showGlanceBtn && (
+              <TouchableOpacity
+                onPress={onToggleGlance}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                data-testid={`vault-glance-toggle-${node.id}`}
+                style={[
+                  styles.glanceBtn,
+                  {
+                    backgroundColor: glanceExpanded ? colors.primary + '18' : colors.surface,
+                    borderColor: glanceExpanded ? colors.primary + '50' : colors.border,
+                  },
+                ]}
+              >
+                <Sparkles size={13} color={glanceExpanded ? colors.primary : colors.textTertiary} />
+              </TouchableOpacity>
+            )}
+
+            {showPlay && (
+              <TouchableOpacity
+                onPress={() => onAction('play')}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                data-testid={`vault-play-${node.id}`}
+                style={[styles.playBtn, { backgroundColor: colors.primary + '12' }]}
+              >
+                <Play size={13} color={colors.primary} fill={colors.primary} />
+              </TouchableOpacity>
+            )}
+
             <ChevronRight size={20} color={colors.border} />
           </TouchableOpacity>
         </View>
@@ -210,6 +258,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
+    gap: 8,
   },
   name: {
     fontSize: 17,
@@ -219,5 +268,20 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 12,
     fontWeight: '500',
+  },
+  glanceBtn: {
+    width: 30,
+    height: 30,
+    borderRadius: 9,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playBtn: {
+    width: 30,
+    height: 30,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

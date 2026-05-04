@@ -1,13 +1,26 @@
+/**
+ * Knowledge Vault — the root view of the Notes tab.
+ *
+ * Layout principles (driven by the user's "Aichii Dual-Engine" brief):
+ *   • Root: Subject Hub grid (top-level user folders only — no auto-seed).
+ *   • Inside a folder: Aichii hierarchy tree with vertical lines + Glance.
+ *   • Glance Mode: inline-expand any note row to skim its blocks/checklist.
+ *   • Semantic chip filter: review tags from the existing tag catalog
+ *     (Tags-tab parity) — selecting a chip filters glance content.
+ *   • Focus Mode: Play button → editor with ?focus=1 (zen + parchment).
+ *   • Export: any row → UnifiedExportSheet (kind: 'notes') with all items
+ *     under that subtree.
+ */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Modal,
-  Alert, Pressable, ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Keyboard
+  Alert, Pressable, ActivityIndicator, KeyboardAvoidingView, Platform, Keyboard,
+  RefreshControl, Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 import {
   Folder, BookOpen, FileText, Plus, Search as SearchIcon, X, ChevronLeft, ChevronRight,
-  Layers, FolderPlus,
+  Layers, FolderPlus, LayoutGrid, List as ListIcon,
 } from 'lucide-react-native';
 import { supabase } from '../../src/lib/supabase';
 import { useAuth } from '../../src/context/AuthContext';
@@ -16,12 +29,23 @@ import { PremiumMoveSheet, MoveTarget } from '../../src/components/common/Premiu
 import { ThemeSwitcher } from '../../src/components/ThemeSwitcher';
 import { PageWrapper } from '../../src/components/PageWrapper';
 import { NoteRow, NoteNode, NoteRowAction } from '../../src/components/notes/NoteRow';
+import { SubjectHubGrid } from '../../src/components/notes/SubjectHubGrid';
+import { SemanticChipRow } from '../../src/components/notes/SemanticChipRow';
+import { GlancePanel, NoteItem } from '../../src/components/notes/GlancePanel';
+import { UnifiedExportSheet } from '../../src/components/export/UnifiedExportSheet';
+import type { ExportPayload, ExportNoteBlock } from '../../src/lib/unifiedExportEngine';
+import { useNoteTagCatalog } from '../../src/hooks/useNoteTagCatalog';
+import { normalizeTag } from '../../src/utils/tagUtils';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 type RawNode = {
   id: string; user_id: string; parent_id: string | null;
   type: 'folder' | 'notebook' | 'note'; title: string; note_id: string | null;
   is_archived: boolean; updated_at?: string; created_at?: string;
 };
+
+const ALL_TAG = 'All';
 
 export default function NotesIndex() {
   const { colors } = useTheme();
@@ -33,9 +57,12 @@ export default function NotesIndex() {
   const [allNodes, setAllNodes] = useState<RawNode[]>([]);
   const [search, setSearch] = useState('');
   const [searchVisible, setSearchVisible] = useState(false);
-  
+
   const [currentFolder, setCurrentFolder] = useState<NoteNode | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [glanceOpen, setGlanceOpen] = useState<Set<string>>(new Set());
+  const [activeChip, setActiveChip] = useState<string>(ALL_TAG);
+  const [hubLayout, setHubLayout] = useState<'grid' | 'list'>('grid');
 
   // Modals
   const [addMenuOpen, setAddMenuOpen] = useState(false);
@@ -48,6 +75,14 @@ export default function NotesIndex() {
   const [renameValue, setRenameValue] = useState('');
   const [actionNodeId, setActionNodeId] = useState<string | null>(null);
   const [moveOpen, setMoveOpen] = useState(false);
+
+  // Export sheet
+  const [exportSheet, setExportSheet] = useState<{ visible: boolean; node: NoteNode | null; payload: ExportPayload | null; title: string }>({
+    visible: false, node: null, payload: null, title: 'Notes Export',
+  });
+  const [exportPreparing, setExportPreparing] = useState(false);
+
+  const { tags: catalogTags } = useNoteTagCatalog(session?.user.id);
 
   const load = useCallback(async () => {
     if (!session?.user.id) return;
@@ -69,14 +104,14 @@ export default function NotesIndex() {
   const tree = useMemo(() => {
     const buildTree = (parentId: string | null, depth: number): NoteNode[] => {
       return allNodes
-        .filter(n => n.parent_id === parentId)
-        .map(n => {
+        .filter((n) => n.parent_id === parentId)
+        .map((n) => {
           const children = buildTree(n.id, depth + 1);
           return {
             ...n,
             depth,
             children,
-            childrenCount: children.length
+            childrenCount: children.length,
           } as NoteNode;
         })
         .sort((a, b) => {
@@ -87,24 +122,18 @@ export default function NotesIndex() {
     return buildTree(null, 0);
   }, [allNodes]);
 
-  // Update current folder ref if it changed
+  // Refresh currentFolder reference whenever the tree rebuilds.
   useEffect(() => {
-    if (currentFolder) {
-      const flat = flattenAll(tree);
-      const updated = flat.find(n => n.id === currentFolder.id);
-      if (updated && updated !== currentFolder) {
-        setCurrentFolder(updated);
-      }
-    }
+    if (!currentFolder) return;
+    const flat = flattenAll(tree);
+    const updated = flat.find((n) => n.id === currentFolder.id) || null;
+    if (updated && updated !== currentFolder) setCurrentFolder(updated);
+    if (!updated) setCurrentFolder(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tree]);
 
-  const flattenAll = (nodes: NoteNode[]): NoteNode[] => {
-    return nodes.reduce((acc: NoteNode[], node) => {
-      acc.push(node);
-      acc.push(...flattenAll(node.children));
-      return acc;
-    }, []);
-  };
+  const topLevelFolders = useMemo(() => tree.filter((n) => n.type === 'folder'), [tree]);
+  const topLevelOrphans = useMemo(() => tree.filter((n) => n.type !== 'folder'), [tree]);
 
   const flattenVisible = (nodes: NoteNode[], expandedSet: Set<string>): NoteNode[] => {
     let result: NoteNode[] = [];
@@ -118,27 +147,35 @@ export default function NotesIndex() {
   };
 
   const displayRows = useMemo(() => {
+    if (!currentFolder) return [] as NoteNode[];
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      const allFlats = flattenAll(tree);
-      return allFlats.filter(n => n.title.toLowerCase().includes(q));
+      return flattenAll(currentFolder.children).filter((n) => n.title.toLowerCase().includes(q));
     }
-    
-    if (currentFolder) {
-      const baseDepth = currentFolder.depth + 1;
-      return flattenVisible(currentFolder.children, expanded).map(n => ({
-        ...n,
-        depth: Math.max(0, n.depth - baseDepth)
-      }));
-    }
-    
-    return flattenVisible(tree, expanded);
+    const baseDepth = currentFolder.depth + 1;
+    return flattenVisible(currentFolder.children, expanded).map((n) => ({
+      ...n,
+      depth: Math.max(0, n.depth - baseDepth),
+    }));
   }, [tree, search, currentFolder, expanded]);
+
+  // Auto-open glance for matching notes when chip filter is active inside a folder.
+  useEffect(() => {
+    if (!currentFolder) return;
+    if (normalizeTag(activeChip) === normalizeTag(ALL_TAG)) return;
+    const noteIds = new Set<string>();
+    flattenAll(currentFolder.children).forEach((n) => {
+      if ((n.type === 'note' || n.type === 'notebook') && n.note_id) {
+        noteIds.add(n.id);
+      }
+    });
+    setGlanceOpen(noteIds);
+  }, [activeChip, currentFolder]);
 
   const aggregateStats = useMemo(() => {
     let folders = 0, notebooks = 0, notes = 0;
     const allFlats = flattenAll(currentFolder ? [currentFolder] : tree);
-    allFlats.forEach(n => {
+    allFlats.forEach((n) => {
       if (n.type === 'folder') folders++;
       else if (n.type === 'notebook') notebooks++;
       else if (n.type === 'note') notes++;
@@ -148,8 +185,8 @@ export default function NotesIndex() {
 
   const moveTargets = useMemo<MoveTarget[]>(() => {
     return allNodes
-      .filter(n => n.type === 'folder' || n.type === 'notebook')
-      .map(n => ({
+      .filter((n) => n.type === 'folder' || n.type === 'notebook')
+      .map((n) => ({
         id: n.id,
         name: n.title,
         type: n.type as 'folder' | 'notebook',
@@ -158,7 +195,15 @@ export default function NotesIndex() {
   }, [allNodes]);
 
   const toggleExpand = (id: string) => {
-    setExpanded(prev => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleGlance = (id: string) => {
+    setGlanceOpen((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id); else next.add(id);
       return next;
@@ -175,7 +220,13 @@ export default function NotesIndex() {
     }
   };
 
-  const actionNode = allNodes.find(n => n.id === actionNodeId);
+  const playNode = (n: NoteNode) => {
+    if ((n.type === 'note' || n.type === 'notebook') && n.note_id) {
+      router.push({ pathname: '/notes/editor', params: { id: n.note_id, title: n.title, focus: '1' } });
+    }
+  };
+
+  const actionNode = allNodes.find((n) => n.id === actionNodeId);
 
   // ─── CRUD ───
   const doCreate = async () => {
@@ -195,7 +246,7 @@ export default function NotesIndex() {
       });
     }
     if (createParentId) {
-      setExpanded(prev => {
+      setExpanded((prev) => {
         const next = new Set(prev);
         next.add(createParentId);
         return next;
@@ -259,17 +310,101 @@ export default function NotesIndex() {
           });
           if (error) { Alert.alert('Delete failed', error.message); return; }
           load();
-        }
+        },
       },
     ]);
   };
+
+  /**
+   * Build a notes export payload by fetching user_notes for every note_id
+   * inside the chosen subtree, then flattening into ExportNoteBlock[].
+   */
+  const buildExportPayload = useCallback(async (root: NoteNode): Promise<ExportPayload | null> => {
+    const noteIds: string[] = [];
+    const headingsByNote: Record<string, string> = {};
+    const walk = (n: NoteNode, breadcrumb: string[]) => {
+      const crumb = [...breadcrumb, n.title];
+      if ((n.type === 'note' || n.type === 'notebook') && n.note_id) {
+        noteIds.push(n.note_id);
+        headingsByNote[n.note_id] = crumb.join(' › ');
+      }
+      n.children.forEach((c) => walk(c, crumb));
+    };
+    walk(root, []);
+
+    if (noteIds.length === 0) return null;
+
+    const { data, error } = await supabase
+      .from('user_notes')
+      .select('id, title, subject, items, highlights, content, content_html, updated_at')
+      .in('id', noteIds);
+    if (error) throw error;
+
+    const blocks: ExportNoteBlock[] = [];
+    (data || []).forEach((note: any) => {
+      const breadcrumb = headingsByNote[note.id] || note.title;
+      blocks.push({
+        id: `nb-${note.id}`,
+        type: 'microTopicHeading',
+        text: breadcrumb,
+      });
+      const items: NoteItem[] = Array.isArray(note.items) && note.items.length
+        ? note.items
+        : (Array.isArray(note.highlights) ? note.highlights : []);
+      if (items.length === 0 && (note.content_html || note.content)) {
+        blocks.push({
+          id: `body-${note.id}`,
+          type: 'highlight',
+          text: String(note.content_html || note.content || ''),
+          color: '#6366f1',
+          sourceLabel: note.subject || undefined,
+        });
+      }
+      items.forEach((it, idx) => {
+        if (it.type === 'microTopicHeading') {
+          blocks.push({ id: it.id || `h-${note.id}-${idx}`, type: 'microTopicHeading', text: it.text || '' });
+        } else {
+          blocks.push({
+            id: it.id || `i-${note.id}-${idx}`,
+            type: 'highlight',
+            text: it.text || '',
+            color: it.color,
+            sourceLabel: note.subject || undefined,
+          });
+        }
+      });
+    });
+
+    return { kind: 'notes', blocks };
+  }, []);
+
+  const handleExportNode = useCallback(async (node: NoteNode) => {
+    try {
+      setExportPreparing(true);
+      const payload = await buildExportPayload(node);
+      if (!payload) {
+        Alert.alert('Nothing to export', `${node.title} has no notes inside yet.`);
+        return;
+      }
+      setExportSheet({
+        visible: true,
+        node,
+        payload,
+        title: `${node.title} · Notes`,
+      });
+    } catch (e: any) {
+      Alert.alert('Export failed', e?.message || 'Could not prepare export.');
+    } finally {
+      setExportPreparing(false);
+    }
+  }, [buildExportPayload]);
 
   const onAction = (node: NoteNode, action: NoteRowAction) => {
     setActionNodeId(node.id);
     switch (action) {
       case 'add':
         setCreateParentId(node.id);
-        setCreateType('note');
+        setCreateType(node.type === 'folder' ? 'notebook' : 'note');
         setCreateOpen(true);
         break;
       case 'move':
@@ -285,8 +420,46 @@ export default function NotesIndex() {
       case 'delete':
         doDelete(node);
         break;
+      case 'play':
+        playNode(node);
+        break;
+      case 'export':
+        handleExportNode(node);
+        break;
     }
   };
+
+  const onHubAction = (node: NoteNode, action: 'add' | 'export' | 'rename' | 'move' | 'delete' | 'duplicate' | 'play') => {
+    setActionNodeId(node.id);
+    switch (action) {
+      case 'add':
+        setCreateParentId(node.id);
+        setCreateType('notebook');
+        setCreateOpen(true);
+        break;
+      case 'rename':
+        setRenameValue(node.title);
+        setRenameOpen(true);
+        break;
+      case 'move':
+        setMoveOpen(true);
+        break;
+      case 'delete':
+        doDelete(node);
+        break;
+      case 'duplicate':
+        doDuplicate(node);
+        break;
+      case 'export':
+        handleExportNode(node);
+        break;
+      case 'play':
+        playNode(node);
+        break;
+    }
+  };
+
+  const showSubjectHub = !currentFolder;
 
   return (
     <PageWrapper>
@@ -294,18 +467,29 @@ export default function NotesIndex() {
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
           <View style={styles.headerTop}>
             <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-              <TouchableOpacity onPress={() => currentFolder ? setCurrentFolder(null) : router.back()} style={styles.iconBtn}>
+              <TouchableOpacity
+                onPress={() => currentFolder ? setCurrentFolder(null) : router.back()}
+                style={styles.iconBtn}
+                data-testid="vault-back"
+              >
                 <ChevronLeft size={28} color={colors.primary} />
               </TouchableOpacity>
-              <Text style={[styles.headerTitle, { color: colors.textPrimary }]} numberOfLines={1}>
-                {currentFolder ? currentFolder.title : 'Notes'}
-              </Text>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.eyebrow, { color: colors.primary }]}>KNOWLEDGE VAULT</Text>
+                <Text style={[styles.headerTitle, { color: colors.textPrimary }]} numberOfLines={1}>
+                  {currentFolder ? currentFolder.title : 'My Vault'}
+                </Text>
+              </View>
             </View>
             <View style={styles.headerBtns}>
-              <TouchableOpacity onPress={() => { setCreateParentId(currentFolder?.id ?? null); setAddMenuOpen(true); }} style={styles.iconBtn}>
+              <TouchableOpacity
+                onPress={() => { setCreateParentId(currentFolder?.id ?? null); setAddMenuOpen(true); }}
+                style={styles.iconBtn}
+                data-testid="vault-add-button"
+              >
                 <Plus size={22} color={colors.textPrimary} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setSearchVisible(v => !v)} style={styles.iconBtn}>
+              <TouchableOpacity onPress={() => setSearchVisible((v) => !v)} style={styles.iconBtn} data-testid="vault-search-toggle">
                 <SearchIcon size={22} color={colors.textPrimary} />
               </TouchableOpacity>
               <ThemeSwitcher />
@@ -314,14 +498,25 @@ export default function NotesIndex() {
           {searchVisible && (
             <View style={[styles.searchBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <SearchIcon size={16} color={colors.textTertiary} />
-              <TextInput value={search} onChangeText={setSearch} placeholder="Search..." placeholderTextColor={colors.textTertiary} style={[styles.searchInput, { color: colors.textPrimary }]} autoFocus />
-              <TouchableOpacity onPress={() => { setSearch(''); setSearchVisible(false); Keyboard.dismiss(); }}><X size={16} color={colors.textTertiary} /></TouchableOpacity>
+              <TextInput
+                value={search}
+                onChangeText={setSearch}
+                placeholder="Search…"
+                placeholderTextColor={colors.textTertiary}
+                style={[styles.searchInput, { color: colors.textPrimary }]}
+                autoFocus
+                data-testid="vault-search-input"
+              />
+              <TouchableOpacity onPress={() => { setSearch(''); setSearchVisible(false); Keyboard.dismiss(); }}>
+                <X size={16} color={colors.textTertiary} />
+              </TouchableOpacity>
             </View>
           )}
         </View>
 
+        {/* Stats */}
         <View style={styles.topActionArea}>
-          <View style={[styles.statsBar, { marginHorizontal: 0, width: '100%' }]}>
+          <View style={styles.statsBar}>
             <View style={[styles.statBox, { backgroundColor: '#fef3c712', borderColor: '#f59e0b30' }]}>
               <Folder size={14} color="#f59e0b" />
               <Text style={[styles.statNum, { color: '#f59e0b' }]}>{aggregateStats.folders}</Text>
@@ -340,33 +535,167 @@ export default function NotesIndex() {
           </View>
         </View>
 
+        {/* Semantic chip row — only shown when inside a folder */}
+        {!showSubjectHub && (
+          <SemanticChipRow
+            tags={catalogTags}
+            selected={activeChip}
+            onChange={setActiveChip}
+            hint={activeChip !== ALL_TAG ? `Streaming "${activeChip}" across "${currentFolder?.title}"` : undefined}
+          />
+        )}
+
+        {exportPreparing && (
+          <View style={styles.preparingBar}>
+            <ActivityIndicator size="small" color={colors.primary} />
+            <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: '700', marginLeft: 8 }}>
+              Preparing export…
+            </Text>
+          </View>
+        )}
+
         {loading && !refreshing ? (
-          <View style={[styles.center, { backgroundColor: colors.bg }]}><ActivityIndicator color={colors.primary} /></View>
+          <View style={styles.center}>
+            <ActivityIndicator color={colors.primary} />
+          </View>
         ) : (
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
-            <View style={{ paddingHorizontal: 4 }}>
-              {displayRows.map((item) => (
-                <View key={item.id}>
-                  <NoteRow 
-                    node={item} 
-                    expanded={expanded.has(item.id)} 
-                    onToggle={() => toggleExpand(item.id)} 
-                    onOpen={() => { if (item.type === 'folder' && item.depth === 0) setCurrentFolder(item); else openNode(item); }} 
-                    onAction={(action) => onAction(item, action)} 
-                  />
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 120 }}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
+          >
+            {showSubjectHub ? (
+              // ROOT — Subject Hub Grid
+              <>
+                <View style={styles.hubHeaderRow}>
+                  <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Your Subjects</Text>
+                  <View style={styles.viewToggle}>
+                    <TouchableOpacity
+                      onPress={() => setHubLayout('grid')}
+                      style={styles.viewToggleBtn}
+                      data-testid="vault-hub-grid"
+                    >
+                      <LayoutGrid size={18} color={hubLayout === 'grid' ? colors.primary : colors.textTertiary} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => setHubLayout('list')}
+                      style={styles.viewToggleBtn}
+                      data-testid="vault-hub-list"
+                    >
+                      <ListIcon size={18} color={hubLayout === 'list' ? colors.primary : colors.textTertiary} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              ))}
-            </View>
-            {displayRows.length === 0 && (
-              <View style={styles.empty}>
-                <Layers size={48} color={colors.border} />
-                <Text style={{ color: colors.textTertiary, marginTop: 12 }}>Empty here</Text>
+
+                {hubLayout === 'grid' ? (
+                  <SubjectHubGrid
+                    folders={topLevelFolders}
+                    onOpen={(n) => setCurrentFolder(n)}
+                    onAction={onHubAction}
+                  />
+                ) : (
+                  <View style={{ paddingHorizontal: 4 }}>
+                    {topLevelFolders.map((item) => (
+                      <NoteRow
+                        key={item.id}
+                        node={item}
+                        expanded={expanded.has(item.id)}
+                        onToggle={() => toggleExpand(item.id)}
+                        onOpen={() => setCurrentFolder(item)}
+                        onAction={(action) => onAction(item, action)}
+                      />
+                    ))}
+                  </View>
+                )}
+
+                {topLevelOrphans.length > 0 && (
+                  <View style={{ marginTop: 28 }}>
+                    <Text style={[styles.sectionSubtle, { color: colors.textTertiary }]}>UNFILED</Text>
+                    <View style={{ paddingHorizontal: 4 }}>
+                      {topLevelOrphans.map((item) => {
+                        const isNoteLike = (item.type === 'note' || item.type === 'notebook') && !!item.note_id;
+                        const isGlance = glanceOpen.has(item.id);
+                        return (
+                          <View key={item.id}>
+                            <NoteRow
+                              node={item}
+                              expanded={expanded.has(item.id)}
+                              onToggle={() => toggleExpand(item.id)}
+                              onOpen={() => openNode(item)}
+                              onAction={(action) => onAction(item, action)}
+                              glanceExpanded={isNoteLike && isGlance}
+                              onToggleGlance={isNoteLike ? () => toggleGlance(item.id) : undefined}
+                            />
+                            {isNoteLike && isGlance && item.note_id && (
+                              <GlancePanel
+                                noteId={item.note_id}
+                                contentWidth={SCREEN_WIDTH - 32}
+                                selectedTag={ALL_TAG}
+                                onPlay={() => playNode(item)}
+                                onOpenEdit={() => openNode(item)}
+                              />
+                            )}
+                          </View>
+                        );
+                      })}
+                    </View>
+                  </View>
+                )}
+
+                {topLevelFolders.length === 0 && topLevelOrphans.length === 0 && (
+                  <View style={styles.empty}>
+                    <Layers size={48} color={colors.border} />
+                    <Text style={{ color: colors.textTertiary, marginTop: 12, fontWeight: '700' }}>
+                      Tap + to create your first folder
+                    </Text>
+                  </View>
+                )}
+              </>
+            ) : (
+              // INSIDE A FOLDER — Aichii Tree + Glance
+              <View style={{ paddingHorizontal: 4 }}>
+                {displayRows.map((item) => {
+                  const isNoteLike = (item.type === 'note' || item.type === 'notebook') && !!item.note_id;
+                  const isGlance = glanceOpen.has(item.id);
+                  return (
+                    <View key={item.id}>
+                      <NoteRow
+                        node={item}
+                        expanded={expanded.has(item.id)}
+                        onToggle={() => toggleExpand(item.id)}
+                        onOpen={() => openNode(item)}
+                        onAction={(action) => onAction(item, action)}
+                        glanceExpanded={isNoteLike && isGlance}
+                        onToggleGlance={isNoteLike ? () => toggleGlance(item.id) : undefined}
+                      />
+                      {isNoteLike && isGlance && item.note_id && (
+                        <GlancePanel
+                          noteId={item.note_id}
+                          contentWidth={SCREEN_WIDTH - 32}
+                          selectedTag={activeChip}
+                          onPlay={() => playNode(item)}
+                          onOpenEdit={() => openNode(item)}
+                        />
+                      )}
+                    </View>
+                  );
+                })}
+                {displayRows.length === 0 && (
+                  <View style={styles.empty}>
+                    <Layers size={48} color={colors.border} />
+                    <Text style={{ color: colors.textTertiary, marginTop: 12 }}>Empty here</Text>
+                  </View>
+                )}
               </View>
             )}
           </ScrollView>
         )}
 
-        <TouchableOpacity style={[styles.fab, { backgroundColor: colors.primary }]} onPress={() => { setCreateParentId(currentFolder?.id ?? null); setAddMenuOpen(true); }}>
+        <TouchableOpacity
+          style={[styles.fab, { backgroundColor: colors.primary }]}
+          onPress={() => { setCreateParentId(currentFolder?.id ?? null); setAddMenuOpen(true); }}
+          data-testid="vault-fab"
+        >
           <Plus size={28} color="#04223a" />
         </TouchableOpacity>
 
@@ -374,23 +703,23 @@ export default function NotesIndex() {
         <Modal visible={addMenuOpen} transparent animationType="fade" onRequestClose={() => setAddMenuOpen(false)}>
           <Pressable style={styles.overlay} onPress={() => setAddMenuOpen(false)}>
             <View style={[styles.addMenuContent, { backgroundColor: colors.surface }]}>
-              <AddMenuItem 
-                icon={<FolderPlus size={22} color="#f59e0b" />} 
-                title="Create Folder" 
-                sub="Organize your notes into folders" 
-                onPress={() => { setAddMenuOpen(false); setCreateType('folder'); setCreateOpen(true); }} 
+              <AddMenuItem
+                icon={<FolderPlus size={22} color="#f59e0b" />}
+                title="Create Folder"
+                sub="Organize notes by subject"
+                onPress={() => { setAddMenuOpen(false); setCreateType('folder'); setCreateOpen(true); }}
               />
-              <AddMenuItem 
-                icon={<BookOpen size={22} color="#10b981" />} 
-                title="Create Notebook" 
-                sub="A collection of related notes" 
-                onPress={() => { setAddMenuOpen(false); setCreateType('notebook'); setCreateOpen(true); }} 
+              <AddMenuItem
+                icon={<BookOpen size={22} color="#10b981" />}
+                title="Create Notebook"
+                sub="A collection of related notes"
+                onPress={() => { setAddMenuOpen(false); setCreateType('notebook'); setCreateOpen(true); }}
               />
-              <AddMenuItem 
-                icon={<FileText size={22} color="#0ea5e9" />} 
-                title="Create Note" 
-                sub="A quick standalone note" 
-                onPress={() => { setAddMenuOpen(false); setCreateType('note'); setCreateOpen(true); }} 
+              <AddMenuItem
+                icon={<FileText size={22} color="#0ea5e9" />}
+                title="Create Note"
+                sub="A quick standalone note"
+                onPress={() => { setAddMenuOpen(false); setCreateType('note'); setCreateOpen(true); }}
               />
             </View>
           </Pressable>
@@ -410,16 +739,22 @@ export default function NotesIndex() {
                     <X size={20} color={colors.textPrimary} />
                   </TouchableOpacity>
                 </View>
-                <TextInput 
-                  testID="create-title-input" 
-                  value={createTitle} 
-                  onChangeText={setCreateTitle} 
-                  placeholder="Enter title..." 
+                <TextInput
+                  testID="create-title-input"
+                  data-testid="create-title-input"
+                  value={createTitle}
+                  onChangeText={setCreateTitle}
+                  placeholder="Enter title…"
                   placeholderTextColor={colors.textTertiary}
-                  style={[styles.premiumInput, { color: colors.textPrimary, backgroundColor: colors.surfaceStrong }]} 
-                  autoFocus 
+                  style={[styles.premiumInput, { color: colors.textPrimary, backgroundColor: colors.surfaceStrong }]}
+                  autoFocus
                 />
-                <TouchableOpacity testID="create-confirm" onPress={doCreate} style={[styles.bigCreateBtn, { backgroundColor: colors.primary }]}>
+                <TouchableOpacity
+                  testID="create-confirm"
+                  data-testid="create-confirm"
+                  onPress={doCreate}
+                  style={[styles.bigCreateBtn, { backgroundColor: colors.primary }]}
+                >
                   <Text style={styles.bigCreateBtnTxt}>Create</Text>
                 </TouchableOpacity>
               </View>
@@ -434,11 +769,26 @@ export default function NotesIndex() {
               <Pressable style={{ flex: 1 }} onPress={() => setRenameOpen(false)} />
               <View style={[styles.createSheet, { backgroundColor: colors.surface }]}>
                 <Text style={[styles.dialogTitle, { color: colors.textPrimary, marginBottom: 12 }]}>Rename</Text>
-                <TextInput testID="rename-input" value={renameValue} onChangeText={setRenameValue} autoFocus
-                  style={[styles.premiumInput, { color: colors.textPrimary, backgroundColor: colors.surfaceStrong }]} />
+                <TextInput
+                  testID="rename-input"
+                  data-testid="rename-input"
+                  value={renameValue}
+                  onChangeText={setRenameValue}
+                  autoFocus
+                  style={[styles.premiumInput, { color: colors.textPrimary, backgroundColor: colors.surfaceStrong }]}
+                />
                 <View style={styles.dialogActions}>
-                  <TouchableOpacity onPress={() => setRenameOpen(false)} style={styles.modalCancel}><Text style={{ color: colors.textSecondary, fontWeight: '700' }}>Cancel</Text></TouchableOpacity>
-                  <TouchableOpacity testID="rename-save" onPress={doRename} style={[styles.modalCreate, { backgroundColor: colors.primary }]}><Text style={{ color: '#04223a', fontWeight: '900' }}>Save</Text></TouchableOpacity>
+                  <TouchableOpacity onPress={() => setRenameOpen(false)} style={styles.modalCancel}>
+                    <Text style={{ color: colors.textSecondary, fontWeight: '700' }}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    testID="rename-save"
+                    data-testid="rename-save"
+                    onPress={doRename}
+                    style={[styles.modalCreate, { backgroundColor: colors.primary }]}
+                  >
+                    <Text style={{ color: '#04223a', fontWeight: '900' }}>Save</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
@@ -448,14 +798,41 @@ export default function NotesIndex() {
         <PremiumMoveSheet
           visible={moveOpen}
           title={`Move "${actionNode?.title}" to…`}
-          targets={moveTargets.filter(f => f.id !== actionNode?.id)}
+          targets={moveTargets.filter((f) => f.id !== actionNode?.id)}
           currentSelectedId={actionNode?.parent_id}
           onClose={() => setMoveOpen(false)}
           onConfirm={doMove}
         />
+
+        {/* Unified export sheet */}
+        <UnifiedExportSheet
+          visible={exportSheet.visible}
+          onClose={() => setExportSheet({ ...exportSheet, visible: false })}
+          payload={exportSheet.payload}
+          title={exportSheet.title}
+          initialOptions={{
+            title: exportSheet.title,
+            moduleName: 'Knowledge Vault',
+            theme: 'sepia',
+            paperStyle: 'lined',
+            fontFamily: 'serif',
+            showTOC: true,
+            headerText: 'Dr. UPSC · Notes',
+            footerText: exportSheet.title,
+          }}
+          hideSections={['content', 'answer', 'sort', 'filters']}
+        />
       </View>
     </PageWrapper>
   );
+}
+
+function flattenAll(nodes: NoteNode[]): NoteNode[] {
+  return nodes.reduce<NoteNode[]>((acc, node) => {
+    acc.push(node);
+    acc.push(...flattenAll(node.children));
+    return acc;
+  }, []);
 }
 
 const styles = StyleSheet.create({
@@ -463,35 +840,50 @@ const styles = StyleSheet.create({
   header: { borderBottomWidth: 1, paddingHorizontal: 14, paddingTop: 6, paddingBottom: 8 },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 },
   headerTitle: { fontSize: 26, fontWeight: '900', letterSpacing: -0.5 },
+  eyebrow: { fontSize: 9, fontWeight: '900', letterSpacing: 1.6, marginLeft: 2, marginBottom: 2 },
   headerBtns: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   iconBtn: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
   searchBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, height: 42, borderRadius: 12, borderWidth: 1, gap: 8, marginTop: 4 },
   searchInput: { flex: 1, fontSize: 14 },
-  topActionArea: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginVertical: 16, gap: 12 },
-  statsBar: { flexDirection: 'row', gap: 10, paddingVertical: 12 },
+
+  topActionArea: { paddingHorizontal: 16, marginTop: 12, marginBottom: 8 },
+  statsBar: { flexDirection: 'row', gap: 10 },
   statBox: { flex: 1, alignItems: 'center', paddingVertical: 12, borderRadius: 14, borderWidth: 1, gap: 4 },
   statNum: { fontSize: 20, fontWeight: '900' },
   statLabel: { fontSize: 10, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 },
 
+  hubHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 12,
+  },
+  sectionTitle: { fontSize: 19, fontWeight: '900', letterSpacing: -0.4 },
+  sectionSubtle: { fontSize: 10, fontWeight: '900', letterSpacing: 1.2, paddingHorizontal: 16, marginBottom: 8 },
+  viewToggle: { flexDirection: 'row', gap: 4 },
+  viewToggleBtn: { padding: 8 },
+
+  preparingBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 6 },
+
   fab: { position: 'absolute', bottom: 30, right: 20, width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8 },
   empty: { padding: 80, alignItems: 'center' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
-  
+
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
   dialogTitle: { fontSize: 20, fontWeight: '900' },
   dialogActions: { flexDirection: 'row', gap: 12 },
   modalCancel: { flex: 1, alignItems: 'center', padding: 16 },
   modalCreate: { flex: 1, alignItems: 'center', padding: 16, borderRadius: 16 },
 
-  // Premium Add Menu
   addMenuContent: { borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, paddingBottom: 40, width: '100%', position: 'absolute', bottom: 0 },
   addMenuItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 16, gap: 16 },
   addItemIcon: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   addItemContent: { flex: 1 },
   addItemTitle: { fontSize: 17, fontWeight: '800' },
   addItemSub: { fontSize: 13, marginTop: 2 },
-  
-  // Premium Create Sheet
+
   createSheet: { borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, paddingBottom: 40, width: '100%', position: 'absolute', bottom: 0 },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   closeBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#f2f2f7', alignItems: 'center', justifyContent: 'center' },

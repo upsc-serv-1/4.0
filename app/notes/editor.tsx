@@ -404,6 +404,10 @@ export default function NoteEditor() {
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scrollRef = useRef<ScrollView>(null);
 
+  // Knowledge Vault "Focus Mode" deep-link: /notes/editor?focus=1
+  // Auto-flip into Zen (parchment + serif preview) on first paint so the
+  // user lands directly in the immersive reader experience.
+  const focusFlag = Array.isArray(params.focus) ? params.focus[0] : params.focus;
   useEffect(() => {
     if (id) {
       setViewMode('preview');
@@ -413,6 +417,20 @@ export default function NoteEditor() {
       setLoading(false);
     }
   }, [id]);
+
+  useEffect(() => {
+    if (focusFlag === '1' || focusFlag === 'true') {
+      setViewMode('preview');
+      // small delay to let the layout settle before the zen animation kicks in
+      const t = setTimeout(() => {
+        setIsZenMode(true);
+        Animated.timing(zenAnim, { toValue: 1, duration: 600, useNativeDriver: false }).start();
+      }, 120);
+      return () => clearTimeout(t);
+    }
+    return undefined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusFlag]);
 
   const fetchNote = async () => {
     if (!id) return;

@@ -149,6 +149,36 @@ export interface ExportNoteBlock {
   sourceLabel?: string;
 }
 
+/**
+ * Hardnotes canvas export — a single Skia-drawn note rendered as SVG on A4.
+ * strokes carry the same vector schema used by src/components/hardnotes/strokes.ts
+ * so PDF rendering stays pixel-perfect with the on-device canvas.
+ */
+export interface ExportHardnoteStrokePoint {
+  x: number;
+  y: number;
+  p?: number; // pressure 0..1
+}
+export interface ExportHardnoteStroke {
+  id: string;
+  tool: 'pen' | 'highlighter' | 'eraser' | 'lasso';
+  color: string;
+  width: number;
+  opacity?: number;
+  points: ExportHardnoteStrokePoint[];
+}
+export interface ExportHardnote {
+  title: string;
+  subject?: string;
+  baseLayerMarkdown?: string | null;
+  strokes: ExportHardnoteStroke[];
+  canvasWidth: number;
+  canvasHeight: number;
+  updatedAt?: string;
+  /** Optional breadcrumb e.g. ["Polity", "Constitution"] */
+  breadcrumb?: string[];
+}
+
 // ---------- Theme tokens ----------
 
 const themeTokens: Record<ExportTheme, { bg: string; fg: string; accent: string; rule: string; card: string }> = {
@@ -591,13 +621,110 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
   return wrap(o, `${toc}${sections}`, answerKey);
 };
 
+// ---------- Hardnote (Skia canvas) ----------
+
+/**
+ * Convert a stroke's point series to an SVG path `d` attribute using the
+ * same midpoint-quadratic smoothing used by the on-device Skia canvas.
+ * Keeps the exported PDF visually identical to what the user sees.
+ */
+const hardnoteStrokeToSvgPath = (pts: ExportHardnoteStrokePoint[]): string => {
+  if (!pts.length) return '';
+  let d = `M ${pts[0].x.toFixed(2)} ${pts[0].y.toFixed(2)}`;
+  for (let i = 1; i < pts.length; i++) {
+    const prev = pts[i - 1];
+    const p = pts[i];
+    const mx = (prev.x + p.x) / 2;
+    const my = (prev.y + p.y) / 2;
+    d += ` Q ${prev.x.toFixed(2)} ${prev.y.toFixed(2)} ${mx.toFixed(2)} ${my.toFixed(2)}`;
+  }
+  const last = pts[pts.length - 1];
+  d += ` L ${last.x.toFixed(2)} ${last.y.toFixed(2)}`;
+  return d;
+};
+
+export const buildHardnoteHtml = (note: ExportHardnote, o: ExportOptions): string => {
+  const W = note.canvasWidth || 800;
+  const H = note.canvasHeight || 1200;
+
+  const rules = Array.from({ length: Math.floor(H / 32) })
+    .map((_, i) => `<line x1="0" y1="${(i + 1) * 32}" x2="${W}" y2="${(i + 1) * 32}" stroke="#e5e7eb" stroke-width="1"/>`)
+    .join('');
+
+  const strokesSvg = (note.strokes || [])
+    .filter((s) => s && s.tool !== 'eraser' && s.points?.length > 0)
+    .map((s) => {
+      const d = hardnoteStrokeToSvgPath(s.points);
+      if (!d) return '';
+      const avgP = s.points.reduce((a, p) => a + (p.p ?? 0.5), 0) / s.points.length;
+      const isHL = s.tool === 'highlighter';
+      const width = isHL ? s.width * 1.8 : s.width * (0.5 + 0.5 * avgP);
+      const opacity = isHL ? s.opacity ?? 0.35 : 1;
+      const mix = isHL ? 'multiply' : 'normal';
+      return `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round" opacity="${opacity}" style="mix-blend-mode:${mix}"/>`;
+    })
+    .join('');
+
+  const breadcrumb = (note.breadcrumb || []).filter(Boolean);
+  const crumbLine = breadcrumb.length
+    ? `<div class="hn-crumb">${breadcrumb.map((c) => escapeHtml(c)).join(' › ')}</div>`
+    : '';
+
+  const updated = note.updatedAt ? new Date(note.updatedAt).toLocaleString() : '';
+
+  const baseLayerBlock = note.baseLayerMarkdown
+    ? `<div class="hn-base-layer">
+         <div class="hn-base-label">QUIZ EXPLANATION · LOCKED BASE LAYER</div>
+         <div class="hn-base-body">${renderInline(note.baseLayerMarkdown)}</div>
+       </div>`
+    : '';
+
+  const body = `
+    <div class="hn-meta">
+      ${crumbLine}
+      <div class="hn-stats">
+        <span class="hn-pill">${(note.strokes || []).filter((s) => s.tool !== 'eraser').length} strokes</span>
+        ${note.subject ? `<span class="hn-pill">${escapeHtml(note.subject)}</span>` : ''}
+        ${updated ? `<span class="hn-pill-soft">Updated ${escapeHtml(updated)}</span>` : ''}
+      </div>
+    </div>
+    ${baseLayerBlock}
+    <div class="hn-canvas-wrap">
+      <svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="${W}" height="${H}" fill="#ffffff"/>
+        ${rules}
+        ${strokesSvg}
+      </svg>
+    </div>
+  `;
+
+  const extraCss = `
+    .hn-meta { display:flex; flex-direction:column; gap:2mm; margin-bottom:4mm; }
+    .hn-crumb { font-size:9pt; font-weight:800; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .hn-stats { display:flex; gap:3mm; flex-wrap:wrap; }
+    .hn-pill { font-size:8pt; font-weight:800; padding:1mm 3mm; border-radius:4mm; background:var(--accent); color:#ffffff; }
+    .hn-pill-soft { font-size:8pt; font-weight:700; padding:1mm 3mm; border-radius:4mm; background:var(--rule); color:var(--fg); }
+    .hn-base-layer { border-left:4px solid #f59e0b; background:#fef3c7; padding:3mm 4mm; margin-bottom:5mm; color:#713f12; border-radius:2mm; }
+    .hn-base-label { font-size:8pt; font-weight:900; letter-spacing:1px; color:#b45309; margin-bottom:2mm; }
+    .hn-base-body { font-size:${o.fontSize}pt; line-height:1.45; }
+    .hn-canvas-wrap { border:1px solid var(--rule); border-radius:2mm; overflow:hidden; background:#ffffff; }
+    .hn-canvas-wrap svg { display:block; width:100%; height:auto; }
+  `;
+
+  return wrap(
+    o,
+    `<style>${extraCss}</style>${body}`
+  );
+};
+
 // ---------- Generic dispatcher ----------
 
 export type ExportPayload =
   | { kind: 'questions'; rows: ExportQuestion[] }
   | { kind: 'flashcards'; rows: ExportFlashcard[] }
   | { kind: 'notes'; blocks: ExportNoteBlock[]; selectedHeadingIds?: Set<string> }
-  | { kind: 'tags'; groups: { tag: string; questions: ExportQuestion[] }[] };
+  | { kind: 'tags'; groups: { tag: string; questions: ExportQuestion[] }[] }
+  | { kind: 'hardnote'; note: ExportHardnote };
 
 export const renderHtml = (payload: ExportPayload, options: ExportOptions): string => {
   switch (payload.kind) {
@@ -605,6 +732,7 @@ export const renderHtml = (payload: ExportPayload, options: ExportOptions): stri
     case 'flashcards': return buildFlashcardsHtml(payload.rows, options);
     case 'notes':      return buildNotesBlocksHtml(payload.blocks, options, payload.selectedHeadingIds);
     case 'tags':       return buildTagsHtml(payload.groups, options);
+    case 'hardnote':   return buildHardnoteHtml(payload.note, options);
   }
 };
 

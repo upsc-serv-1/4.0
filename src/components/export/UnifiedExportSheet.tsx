@@ -265,7 +265,7 @@ export const UnifiedExportSheet: React.FC<Props> = ({
               </Section>
             )}
 
-            {!hideSections.includes('content') && payload?.kind !== 'notes' && payload?.kind !== 'flashcards' && (
+            {!hideSections.includes('content') && payload?.kind !== 'notes' && payload?.kind !== 'flashcards' && payload?.kind !== 'hardnote' && (
               <Section title="Content" colors={colors}>
                 <Label colors={colors}>INCLUDE</Label>
                 <Row>{CHOICES.contentScopes.map(c => <Chip key={c.id} active={opts.contentScope === c.id} onPress={() => set('contentScope', c.id)} testID={`export-scope-${c.id}`}>{c.label}</Chip>)}</Row>

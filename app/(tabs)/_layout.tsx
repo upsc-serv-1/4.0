@@ -1,5 +1,5 @@
 import { Tabs, useSegments, useRouter } from 'expo-router';
-import { Home, BarChart2, RotateCcw, LayoutList, Tag, Target, FileText, TrendingUp, BarChart3, Layers, Database } from 'lucide-react-native';
+import { Home, BarChart2, RotateCcw, LayoutList, Tag, Target, FileText, TrendingUp, BarChart3, Layers, Database, PenTool } from 'lucide-react-native';
 import { useAuth } from '../../src/context/AuthContext';
 import { Redirect } from 'expo-router';
 import { View, ActivityIndicator, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
@@ -51,6 +51,7 @@ export default function TabsLayout() {
     flashcards: { title: 'Cards', icon: Layers },
     tags: { title: 'Tags', icon: Tag },
     notes: { title: 'Notes', icon: FileText },
+    hardnotes: { title: 'Hardnotes', icon: PenTool },
     revise: { title: 'Revise', icon: RotateCcw },
     tracker: { title: 'Tracker', icon: LayoutList },
   };
@@ -60,7 +61,7 @@ export default function TabsLayout() {
       <Tabs
         tabBar={(props) => {
           const currentRouteName = props.state.routes[props.state.index].name;
-          if (currentRouteName !== 'index') return null;
+          if (currentRouteName !== 'index' && currentRouteName !== 'hardnotes') return null;
           return <ScrollableTabBar {...props} colors={colors} order={tabOrder} defs={TAB_DEFINITIONS} />;
         }}
         screenOptions={{
@@ -70,6 +71,7 @@ export default function TabsLayout() {
         }}
       >
         <Tabs.Screen name="index" options={{ title: 'Home' }} />
+        <Tabs.Screen name="hardnotes" options={{ title: 'Hardnotes' }} />
       </Tabs>
     </View>
   );
@@ -87,12 +89,15 @@ function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs 
       >
         {order.map((tabKey: TabKey) => {
           if (!defs[tabKey]) return null;
-          const isFocused = tabKey === 'index';
+          const currentRoute = state.routes[state.index].name;
+          const isFocused = tabKey === currentRoute || (tabKey === 'index' && currentRoute === 'index');
           const { icon: Icon, title } = defs[tabKey];
 
           const onPress = () => {
             if (tabKey === 'index') {
               navigation.navigate('index');
+            } else if (tabKey === 'hardnotes') {
+              navigation.navigate('hardnotes');
             } else {
               // Push onto root stack for full-screen view with back gesture
               const path = tabKey === 'arena' ? '/unified/arena' : `/${tabKey}`;

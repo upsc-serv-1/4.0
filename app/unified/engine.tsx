@@ -59,7 +59,8 @@ import {
   Highlighter,
   Sparkles,
   Type,
-  List
+  List,
+  PenTool
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -76,6 +77,7 @@ import { uuidv4 } from '../../src/utils/uuid';
 import { FlashcardSvc } from '../../src/services/FlashcardService';
 import { AddToFlashcardSheet } from '../../src/components/flashcards/AddToFlashcardSheet';
 import { NotebookLocationPicker } from '../../src/components/NotebookLocationPicker';
+import { QuizToHardnotesPicker } from '../../src/components/hardnotes/QuizToHardnotesPicker';
 import { OfflineManager } from '../../src/services/OfflineManager';
 import { LocalQuery } from '../../src/services/LocalQuery';
 import RichNoteEditor from '../../src/components/RichNoteEditor';
@@ -349,7 +351,9 @@ export default function UnifiedQuizEngine() {
 
   // Notebook System State
   const [notebookModalVisible, setNotebookModalVisible] = useState(false);
-  const notebookRichEditorRef = useRef<any>(null);
+  // Hardnotes bridge (Phase 3) — send quiz explanation into a Skia canvas note
+  const [hardnotesPickerVisible, setHardnotesPickerVisible] = useState(false);
+  const [hardnotesPayload, setHardnotesPayload] = useState<{ markdown: string; title: string } | null>(null);  const notebookRichEditorRef = useRef<any>(null);
   const [noteDraftBullets, setNoteDraftBullets] = useState(['']);
   const [activeInputIndex, setActiveInputIndex] = useState(0);
   const [selection, setSelection] = useState({ start: 0, end: 0 });
@@ -1722,13 +1726,7 @@ export default function UnifiedQuizEngine() {
     const safeIdx = rawIdx >= 0 && rawIdx < displayExplanations.length ? rawIdx : -1;
     const activeExplanationText = safeIdx === -1
       ? (displayExplanations.length > 1
-          ? displayExplanations.map((e: any) => `**${e.source}${e.year ? ' · ' + e.year : ''}${e.answer ? ' · Ans: ' + e.answer : ''}:**
-
-${e.text}`).join('
-
----
-
-')
+          ? displayExplanations.map((e: any) => `**${e.source}${e.year ? ' · ' + e.year : ''}${e.answer ? ' · Ans: ' + e.answer : ''}:**\n\n${e.text}`).join('\n\n---\n\n')
           : (displayExplanations[0]?.text || item.explanation_markdown || 'No explanation available.'))
       : (displayExplanations[safeIdx]?.text || item.explanation_markdown || 'No explanation available.');
 
@@ -2031,6 +2029,18 @@ ${e.text}`).join('
                  >
                     <BookOpen size={16} color={colors.primary} />
                     <Text style={[styles.actionBtnText, { color: colors.primary }]}>Notebook</Text>
+                 </TouchableOpacity>
+                 <TouchableOpacity
+                   style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
+                   onPress={() => {
+                     const activeText = activeExplanationText || item.explanation_markdown || '';
+                     setHardnotesPayload({ markdown: activeText, title: item.micro_topic || item.question_text?.slice(0, 40) || 'Quiz Note' });
+                     setHardnotesPickerVisible(true);
+                   }}
+                   data-testid={`engine-hardnotes-btn-${item.id}`}
+                 >
+                    <PenTool size={16} color={colors.primary} />
+                    <Text style={[styles.actionBtnText, { color: colors.primary }]}>Hardnotes</Text>
                  </TouchableOpacity>
                  <TouchableOpacity 
                    style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
@@ -2737,6 +2747,15 @@ ${e.text}`).join('
             fetchSubheadings(note_id);
           }}
         />
+        {session?.user?.id && hardnotesPayload && (
+          <QuizToHardnotesPicker
+            visible={hardnotesPickerVisible}
+            userId={session.user.id}
+            explanationMarkdown={hardnotesPayload.markdown}
+            suggestedTitle={hardnotesPayload.title}
+            onClose={() => setHardnotesPickerVisible(false)}
+          />
+        )}
       </SafeAreaView>
     </PageWrapper>
   );

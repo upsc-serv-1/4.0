@@ -76,6 +76,8 @@ export interface ExportOptions {
   subjectFilters?: string[];
   sectionGroupFilters?: string[];
   microTopicFilters?: string[];
+  yearStart?: number | null;
+  yearEnd?: number | null;
 }
 
 export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): ExportOptions => ({
@@ -109,6 +111,8 @@ export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): Ex
   subjectFilters: [],
   sectionGroupFilters: [],
   microTopicFilters: [],
+  yearStart: null,
+  yearEnd: null,
   ...overrides,
 });
 
@@ -450,6 +454,18 @@ export const filterQuestions = (rows: ExportQuestion[], o: ExportOptions): Expor
     out = out.filter((q) => microSet.has(normalize(q.micro_topic || 'Other')));
   }
 
+  if (o.yearStart != null || o.yearEnd != null) {
+    const start = o.yearStart != null ? Number(o.yearStart) : -Infinity;
+    const end = o.yearEnd != null ? Number(o.yearEnd) : Infinity;
+    const minYear = Math.min(start, end);
+    const maxYear = Math.max(start, end);
+    out = out.filter((q) => {
+      const year = Number(q.exam_year);
+      if (!Number.isFinite(year)) return false;
+      return year >= minYear && year <= maxYear;
+    });
+  }
+
   return out;
 };
 
@@ -786,6 +802,13 @@ export interface BuildPyqAnalysisSummaryInput {
   subjectHeatmapRows: PyqHeatmapRow[];
   topicHeatmapRows: PyqHeatmapRow[];
   heatmapPalette: PyqHeatmapPalette;
+  momentumTitle?: string;
+  distributionTitle?: string;
+  focusedTitle?: string;
+  primaryHeatmapTitle?: string;
+  primaryHeatmapLabel?: string;
+  secondaryHeatmapTitle?: string;
+  secondaryHeatmapLabel?: string;
 }
 
 const normalizeHex = (value: string | undefined, fallback = '#2563EB'): string => {
@@ -998,6 +1021,13 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
     subjectHeatmapRows,
     topicHeatmapRows,
     heatmapPalette,
+    momentumTitle,
+    distributionTitle,
+    focusedTitle,
+    primaryHeatmapTitle,
+    primaryHeatmapLabel,
+    secondaryHeatmapTitle,
+    secondaryHeatmapLabel,
   } = input;
 
   const includeAll = !!selectedReports.full_report;
@@ -1009,19 +1039,19 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
   const sections: string[] = [];
 
   if (includeMomentum && overviewSeries.length > 0) {
-    sections.push(renderPyqLineChartSvg('Subject Momentum', years, overviewSeries));
+    sections.push(renderPyqLineChartSvg(momentumTitle || 'Subject Momentum', years, overviewSeries));
   }
 
   if (includeDistribution && distributionData.length > 0) {
-    sections.push(renderPyqDonutSvg('Subject Distribution (Donut)', distributionData));
+    sections.push(renderPyqDonutSvg(distributionTitle || 'Subject Distribution (Donut)', distributionData));
   }
 
   if (includeHeatmaps) {
     if (subjectHeatmapRows.length > 0) {
-      sections.push(renderPyqHeatmapSvg('Subject × Year Heatmap', 'Subject', subjectHeatmapRows, years, heatmapPalette));
+      sections.push(renderPyqHeatmapSvg(primaryHeatmapTitle || 'Subject × Year Heatmap', primaryHeatmapLabel || 'Subject', subjectHeatmapRows, years, heatmapPalette));
     }
     if (topicHeatmapRows.length > 0) {
-      sections.push(renderPyqHeatmapSvg('Top 20 Topics × Year Heatmap', 'Topic', topicHeatmapRows, years, heatmapPalette));
+      sections.push(renderPyqHeatmapSvg(secondaryHeatmapTitle || 'Top 20 Topics × Year Heatmap', secondaryHeatmapLabel || 'Topic', topicHeatmapRows, years, heatmapPalette));
     }
   }
 
@@ -1035,7 +1065,8 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
           : 'All PYQ';
 
     const series = focusTrendSeries.map((row, index) => ({ ...row, color: row.color || (index === 0 ? '#2563EB' : '#14B8A6') }));
-    sections.push(renderPyqLineChartSvg(`Focused Trend · ${focusedLabel}`, years, series));
+    const focusHeading = focusedTitle || 'Focused Trend';
+    sections.push(renderPyqLineChartSvg(`${focusHeading} · ${focusedLabel}`, years, series));
   }
 
   if (!sections.length) return '';

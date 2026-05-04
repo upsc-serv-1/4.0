@@ -270,6 +270,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const [questionExportSections, setQuestionExportSections] = useState<string[]>([]);
   const [questionExportMicros, setQuestionExportMicros] = useState<string[]>([]);
   const [questionExportFilterList, setQuestionExportFilterList] = useState<'subject' | 'section_group' | 'micro_topic'>('subject');
+  const [questionExportYearMode, setQuestionExportYearMode] = useState<'all' | 'single' | 'range'>('all');
+  const [questionExportSingleYear, setQuestionExportSingleYear] = useState('');
+  const [questionExportYearStart, setQuestionExportYearStart] = useState('');
+  const [questionExportYearEnd, setQuestionExportYearEnd] = useState('');
 
   const [rawQuestions, setRawQuestions] = useState<any[]>([]);
   const [testsMetaById, setTestsMetaById] = useState<Record<string, any>>({});
@@ -724,50 +728,243 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [questionExportBaseQuestions, questionExportSections]);
 
-  const buildAnalysisExecutiveSummaryHtml = (selectedReports: Record<string, boolean>): string => {
-    return buildPyqAnalysisSummaryHtml({
-      selectedReports,
-      examStage,
-      selectedPaper,
-      selectedRange,
-      customYearStart,
-      customYearEnd,
-      questionCount: rawQuestions.length,
-      years,
-      distributionData,
-      overviewSeries: overviewSeries.map((series) => ({
-        label: series.label,
-        values: series.values,
-        color: trendColorMap[series.label] || '#2563eb',
-      })),
-      focusTrendSeries: focusTrendSeries.map((series) => ({
-        label: series.label,
-        values: series.values,
-        color: '#2563eb',
-      })),
-      focusSubject,
-      focusSection,
-      focusMicro,
-      subjectHeatmapRows,
-      topicHeatmapRows,
-      heatmapPalette,
+  const questionExportYearOptions = useMemo(() => {
+    const set = new Set<number>();
+    questionExportBaseQuestions.forEach((q) => {
+      const year = getAnalyticsYear(q);
+      if (typeof year === 'number' && Number.isFinite(year)) {
+        set.add(year);
+      }
     });
-  };
+    return Array.from(set).sort((a, b) => b - a).map(String);
+  }, [questionExportBaseQuestions, getAnalyticsYear]);
 
-  const questionExportPayload = useMemo<ExportPayload | null>(() => {
-    if (!rawQuestions.length) return null;
+  const questionExportYearBounds = useMemo(() => {
+    if (questionExportYearMode === 'all') return { start: null as number | null, end: null as number | null };
 
-    const filtered = questionExportBaseQuestions.filter((q) => {
+    if (questionExportYearMode === 'single') {
+      const year = Number(questionExportSingleYear);
+      if (!Number.isFinite(year)) return { start: null as number | null, end: null as number | null };
+      return { start: year, end: year };
+    }
+
+    const start = Number(questionExportYearStart);
+    const end = Number(questionExportYearEnd);
+    if (!Number.isFinite(start) || !Number.isFinite(end)) {
+      return { start: null as number | null, end: null as number | null };
+    }
+    return { start: Math.min(start, end), end: Math.max(start, end) };
+  }, [questionExportYearMode, questionExportSingleYear, questionExportYearStart, questionExportYearEnd]);
+
+  const questionExportFilteredQuestions = useMemo(() => {
+    return questionExportBaseQuestions.filter((q) => {
       const sectionGroup = q.section_group || 'General';
       const microTopic = q.micro_topic || 'Other';
       if (questionExportSections.length > 0 && !questionExportSections.includes(sectionGroup)) return false;
       if (questionExportMicros.length > 0 && !questionExportMicros.includes(microTopic)) return false;
+
+      if (questionExportYearBounds.start != null || questionExportYearBounds.end != null) {
+        const year = getAnalyticsYear(q);
+        if (!year) return false;
+        if (questionExportYearBounds.start != null && year < questionExportYearBounds.start) return false;
+        if (questionExportYearBounds.end != null && year > questionExportYearBounds.end) return false;
+      }
+
       return true;
     });
+  }, [
+    questionExportBaseQuestions,
+    questionExportSections,
+    questionExportMicros,
+    questionExportYearBounds,
+    getAnalyticsYear,
+  ]);
 
-    if (!filtered.length) return null;
+  const questionExportSummary = useMemo(() => {
+    if (!questionExportFilteredQuestions.length) return null;
 
-    const rows = filtered.map((q) => ({
+    const subjectTotals: Record<string, number> = {};
+    const subjectByYear: Record<string, Record<string, number>> = {};
+    const sectionTotals: Record<string, number> = {};
+    const sectionByYear: Record<string, Record<string, number>> = {};
+    const microTotals: Record<string, number> = {};
+    const microByYear: Record<string, Record<string, number>> = {};
+    const topicTotals: Record<string, number> = {};
+    const topicByYear: Record<string, Record<string, number>> = {};
+    const totalsByYear: Record<string, number> = {};
+
+    questionExportFilteredQuestions.forEach((q) => {
+      const yearNum = getAnalyticsYear(q);
+      if (!yearNum) return;
+      const year = String(yearNum);
+      const subject = getAnalyticsSubject(q);
+      const section = q.section_group || 'General';
+      const micro = q.micro_topic || 'Other';
+      const topic = micro || section;
+
+      subjectTotals[subject] = (subjectTotals[subject] || 0) + 1;
+      if (!subjectByYear[year]) subjectByYear[year] = {};
+      subjectByYear[year][subject] = (subjectByYear[year][subject] || 0) + 1;
+
+      sectionTotals[section] = (sectionTotals[section] || 0) + 1;
+      if (!sectionByYear[section]) sectionByYear[section] = {};
+      sectionByYear[section][year] = (sectionByYear[section][year] || 0) + 1;
+
+      microTotals[micro] = (microTotals[micro] || 0) + 1;
+      if (!microByYear[micro]) microByYear[micro] = {};
+      microByYear[micro][year] = (microByYear[micro][year] || 0) + 1;
+
+      topicTotals[topic] = (topicTotals[topic] || 0) + 1;
+      if (!topicByYear[topic]) topicByYear[topic] = {};
+      topicByYear[topic][year] = (topicByYear[topic][year] || 0) + 1;
+
+      totalsByYear[year] = (totalsByYear[year] || 0) + 1;
+    });
+
+    const summaryYears = Object.keys(totalsByYear).sort((a, b) => Number(b) - Number(a));
+    if (!summaryYears.length) return null;
+
+    const subjectSorted = Object.entries(subjectTotals).sort((a, b) => b[1] - a[1]);
+    const sectionSorted = Object.entries(sectionTotals).sort((a, b) => b[1] - a[1]);
+    const microSorted = Object.entries(microTotals).sort((a, b) => b[1] - a[1]);
+
+    const isSingleSubject = questionExportScope === 'selected_subject' && !!questionExportSubject;
+    const deepDiveSubject = isSingleSubject ? questionExportSubject : null;
+
+    const subjectHeatmapRowsLocal = subjectSorted.slice(0, 16).map(([name]) => ({
+      key: `subject-${name}`,
+      label: name,
+      byYear: summaryYears.reduce((acc, year) => {
+        const count = subjectByYear[year]?.[name] || 0;
+        if (count) acc[year] = count;
+        return acc;
+      }, {} as Record<string, number>),
+    }));
+
+    const topicHeatmapRowsLocal = Object.entries(topicTotals)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+      .map(([name]) => ({
+        key: `topic-${name}`,
+        label: name,
+        byYear: topicByYear[name] || {},
+      }));
+
+    const sectionHeatmapRowsLocal = sectionSorted.slice(0, 20).map(([name]) => ({
+      key: `section-${name}`,
+      label: name,
+      byYear: sectionByYear[name] || {},
+    }));
+
+    const microHeatmapRowsLocal = microSorted.slice(0, 24).map(([name]) => ({
+      key: `micro-${name}`,
+      label: name,
+      byYear: microByYear[name] || {},
+    }));
+
+    const distributionRows = isSingleSubject
+      ? sectionSorted.map(([name, value]) => ({ name, value }))
+      : subjectSorted.map(([name, value]) => ({ name, value }));
+
+    const topTrendSubjects = subjectSorted.slice(0, 4).map(([name]) => name);
+    const overviewSeriesLocal = isSingleSubject && deepDiveSubject
+      ? [{
+          label: deepDiveSubject,
+          values: summaryYears.map((year) => subjectByYear[year]?.[deepDiveSubject] || 0),
+          color: '#2563EB',
+        }]
+      : topTrendSubjects.map((subject, index) => ({
+          label: subject,
+          values: summaryYears.map((year) => subjectByYear[year]?.[subject] || 0),
+          color: TREND_PALETTE[index % TREND_PALETTE.length],
+        }));
+
+    const focusLabel = questionExportMicros.length === 1
+      ? questionExportMicros[0]
+      : questionExportMicros.length > 1
+        ? 'Selected Micro Topics'
+        : questionExportSections.length === 1
+          ? questionExportSections[0]
+          : questionExportSections.length > 1
+            ? 'Selected Section Groups'
+            : deepDiveSubject || 'Selected Scope';
+
+    const focusTrendSeriesLocal = [{
+      label: focusLabel,
+      values: summaryYears.map((year) => totalsByYear[year] || 0),
+      color: '#2563EB',
+    }];
+
+    return {
+      questionCount: questionExportFilteredQuestions.length,
+      years: summaryYears,
+      distributionRows,
+      overviewSeries: overviewSeriesLocal,
+      focusTrendSeries: focusTrendSeriesLocal,
+      focusSubject: deepDiveSubject || 'All',
+      focusSection: questionExportSections.length === 1 ? questionExportSections[0] : 'All',
+      focusMicro: questionExportMicros.length === 1 ? questionExportMicros[0] : 'All',
+      primaryHeatmapRows: isSingleSubject ? sectionHeatmapRowsLocal : subjectHeatmapRowsLocal,
+      secondaryHeatmapRows: isSingleSubject ? microHeatmapRowsLocal : topicHeatmapRowsLocal,
+      momentumTitle: isSingleSubject && deepDiveSubject ? `${deepDiveSubject} Momentum` : 'Subject Momentum',
+      distributionTitle: isSingleSubject ? `${deepDiveSubject} Section Group Distribution` : 'Subject Distribution (Donut)',
+      focusedTitle: isSingleSubject ? `${deepDiveSubject} Focused Trend` : 'Focused Trend',
+      primaryHeatmapTitle: isSingleSubject && deepDiveSubject ? `${deepDiveSubject} Section Group × Year Heatmap` : 'Subject × Year Heatmap',
+      primaryHeatmapLabel: isSingleSubject ? 'Section Group' : 'Subject',
+      secondaryHeatmapTitle: isSingleSubject && deepDiveSubject ? `${deepDiveSubject} Micro Topic × Year Heatmap` : 'Top 20 Topics × Year Heatmap',
+      secondaryHeatmapLabel: isSingleSubject ? 'Micro Topic' : 'Topic',
+    };
+  }, [
+    questionExportFilteredQuestions,
+    questionExportScope,
+    questionExportSubject,
+    questionExportSections,
+    questionExportMicros,
+    getAnalyticsSubject,
+    getAnalyticsYear,
+  ]);
+
+  const buildAnalysisExecutiveSummaryHtml = (selectedReports: Record<string, boolean>): string => {
+    if (!questionExportSummary) return '';
+
+    const yearRangeLabel = questionExportYearBounds.start == null || questionExportYearBounds.end == null
+      ? 'All Years'
+      : questionExportYearBounds.start === questionExportYearBounds.end
+        ? `Year ${questionExportYearBounds.start}`
+        : `${questionExportYearBounds.start}-${questionExportYearBounds.end}`;
+
+    return buildPyqAnalysisSummaryHtml({
+      selectedReports,
+      examStage,
+      selectedPaper,
+      selectedRange: yearRangeLabel,
+      customYearStart: questionExportYearBounds.start != null ? String(questionExportYearBounds.start) : '',
+      customYearEnd: questionExportYearBounds.end != null ? String(questionExportYearBounds.end) : '',
+      questionCount: questionExportSummary.questionCount,
+      years: questionExportSummary.years,
+      distributionData: questionExportSummary.distributionRows,
+      overviewSeries: questionExportSummary.overviewSeries,
+      focusTrendSeries: questionExportSummary.focusTrendSeries,
+      focusSubject: questionExportSummary.focusSubject,
+      focusSection: questionExportSummary.focusSection,
+      focusMicro: questionExportSummary.focusMicro,
+      subjectHeatmapRows: questionExportSummary.primaryHeatmapRows,
+      topicHeatmapRows: questionExportSummary.secondaryHeatmapRows,
+      heatmapPalette,
+      momentumTitle: questionExportSummary.momentumTitle,
+      distributionTitle: questionExportSummary.distributionTitle,
+      focusedTitle: questionExportSummary.focusedTitle,
+      primaryHeatmapTitle: questionExportSummary.primaryHeatmapTitle,
+      primaryHeatmapLabel: questionExportSummary.primaryHeatmapLabel,
+      secondaryHeatmapTitle: questionExportSummary.secondaryHeatmapTitle,
+      secondaryHeatmapLabel: questionExportSummary.secondaryHeatmapLabel,
+    });
+  };
+
+  const questionExportPayload = useMemo<ExportPayload | null>(() => {
+    if (!questionExportFilteredQuestions.length) return null;
+
+    const rows = questionExportFilteredQuestions.map((q) => ({
       id: String(q.id),
       question_text: String(q.question_text || q.statement_line || ''),
       options: q.options,
@@ -783,10 +980,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
     return { kind: 'questions', rows } as ExportPayload;
   }, [
-    rawQuestions,
-    questionExportBaseQuestions,
-    questionExportSections,
-    questionExportMicros,
+    questionExportFilteredQuestions,
+    getAnalyticsSubject,
     getAnalyticsYear,
   ]);
 
@@ -877,6 +1072,30 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   useEffect(() => {
     setQuestionExportMicros((prev) => prev.filter((micro) => questionExportMicroOptions.includes(micro)));
   }, [questionExportMicroOptions]);
+
+  useEffect(() => {
+    if (questionExportYearOptions.length === 0) {
+      setQuestionExportSingleYear('');
+      setQuestionExportYearStart('');
+      setQuestionExportYearEnd('');
+      return;
+    }
+
+    if (!questionExportSingleYear || !questionExportYearOptions.includes(questionExportSingleYear)) {
+      setQuestionExportSingleYear(questionExportYearOptions[0]);
+    }
+
+    const oldestYear = questionExportYearOptions[questionExportYearOptions.length - 1];
+    const newestYear = questionExportYearOptions[0];
+
+    if (!questionExportYearStart || !questionExportYearOptions.includes(questionExportYearStart)) {
+      setQuestionExportYearStart(oldestYear);
+    }
+
+    if (!questionExportYearEnd || !questionExportYearOptions.includes(questionExportYearEnd)) {
+      setQuestionExportYearEnd(newestYear);
+    }
+  }, [questionExportYearOptions, questionExportSingleYear, questionExportYearStart, questionExportYearEnd]);
 
   const openModal = (type: 'stage' | 'paper' | 'range') => {
     setModalType(type);
@@ -2094,6 +2313,109 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                 )
               ) : null}
 
+              <Text style={[styles.exportGroupLabel, { color: colors.textTertiary }]}>YEAR FILTER</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.filterChip,
+                    { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                    questionExportYearMode === 'all' && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+                  ]}
+                  onPress={() => setQuestionExportYearMode('all')}
+                >
+                  <Text style={[styles.filterChipText, { color: questionExportYearMode === 'all' ? colors.buttonText : colors.textSecondary }]}>All Years</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.filterChip,
+                    { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                    questionExportYearMode === 'single' && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+                  ]}
+                  onPress={() => setQuestionExportYearMode('single')}
+                >
+                  <Text style={[styles.filterChipText, { color: questionExportYearMode === 'single' ? colors.buttonText : colors.textSecondary }]}>Single Year</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.filterChip,
+                    { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                    questionExportYearMode === 'range' && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+                  ]}
+                  onPress={() => setQuestionExportYearMode('range')}
+                >
+                  <Text style={[styles.filterChipText, { color: questionExportYearMode === 'range' ? colors.buttonText : colors.textSecondary }]}>Year Range</Text>
+                </TouchableOpacity>
+              </ScrollView>
+
+              {questionExportYearMode === 'single' ? (
+                questionExportYearOptions.length > 0 ? (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                    {questionExportYearOptions.map((year) => {
+                      const active = questionExportSingleYear === year;
+                      return (
+                        <TouchableOpacity
+                          key={`q-export-year-${year}`}
+                          style={[
+                            styles.filterChip,
+                            { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                            active && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+                          ]}
+                          onPress={() => setQuestionExportSingleYear(year)}
+                        >
+                          <Text style={[styles.filterChipText, { color: active ? colors.buttonText : colors.textSecondary }]}>{year}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                ) : (
+                  <Text style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 10 }}>No years available in this filter scope.</Text>
+                )
+              ) : null}
+
+              {questionExportYearMode === 'range' ? (
+                <>
+                  <Text style={{ fontSize: 10, color: colors.textTertiary, fontWeight: '800', marginBottom: 6 }}>FROM</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                    {questionExportYearOptions.map((year) => {
+                      const active = questionExportYearStart === year;
+                      return (
+                        <TouchableOpacity
+                          key={`q-export-year-start-${year}`}
+                          style={[
+                            styles.filterChip,
+                            { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                            active && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+                          ]}
+                          onPress={() => setQuestionExportYearStart(year)}
+                        >
+                          <Text style={[styles.filterChipText, { color: active ? colors.buttonText : colors.textSecondary }]}>{year}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+
+                  <Text style={{ fontSize: 10, color: colors.textTertiary, fontWeight: '800', marginBottom: 6 }}>TO</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                    {questionExportYearOptions.map((year) => {
+                      const active = questionExportYearEnd === year;
+                      return (
+                        <TouchableOpacity
+                          key={`q-export-year-end-${year}`}
+                          style={[
+                            styles.filterChip,
+                            { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                            active && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+                          ]}
+                          onPress={() => setQuestionExportYearEnd(year)}
+                        >
+                          <Text style={[styles.filterChipText, { color: active ? colors.buttonText : colors.textSecondary }]}>{year}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </>
+              ) : null}
+
               <TouchableOpacity
                 style={[styles.exportActionBtn, { borderColor: colors.primary, borderWidth: 1.5, backgroundColor: colors.primary + '15' }]}
                 onPress={() => {
@@ -2154,13 +2476,19 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           moduleName: 'PYQ Analysis',
           showTOC: true,
           headerText: 'PYQ Analysis',
-          footerText: selectedRange,
+          footerText: questionExportYearBounds.start == null || questionExportYearBounds.end == null
+            ? 'All Years'
+            : questionExportYearBounds.start === questionExportYearBounds.end
+              ? `Year ${questionExportYearBounds.start}`
+              : `${questionExportYearBounds.start}-${questionExportYearBounds.end}`,
           contentScope: 'q_options_expl',
           answerPlacement: 'inline',
           fontSize: 6,
           subjectFilters: questionExportScope === 'selected_subject' && questionExportSubject ? [questionExportSubject] : [],
           sectionGroupFilters: questionExportSections,
           microTopicFilters: questionExportMicros,
+          yearStart: questionExportYearBounds.start,
+          yearEnd: questionExportYearBounds.end,
           sortBy: 'subject_section_microtopic',
         }}
       />

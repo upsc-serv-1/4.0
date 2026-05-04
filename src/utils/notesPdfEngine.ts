@@ -36,6 +36,8 @@ export interface NotesPdfEngineConfig {
   pageMarginBottomCm: number;
   pageMarginLeftCm: number;
   qaBackgroundColor: string;
+  qaQuestionBackgroundColor?: string;
+  qaAnswerBackgroundColor?: string;
   qaLayoutMode: PdfQALayoutMode;
   pageBreakBetweenHeadings?: boolean;
 }
@@ -118,7 +120,9 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
   })();
 
   const qaBg = config.qaBackgroundColor || 'transparent';
-  const qaBorder = qaBg === 'transparent' ? 'transparent' : 'rgba(15, 23, 42, 0.12)';
+  const qBg = config.qaQuestionBackgroundColor || qaBg;
+  const aBg = config.qaAnswerBackgroundColor || qaBg;
+  const qaBorder = qaBg === 'transparent' && qBg === 'transparent' && aBg === 'transparent' ? 'transparent' : 'rgba(15, 23, 42, 0.12)';
 
   return `
     <!DOCTYPE html>
@@ -238,11 +242,13 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
           }
           .qa-unified,
           .qa-box {
-            background: ${qaBg};
             border: 1px solid ${qaBorder};
             border-radius: 8px;
             padding: 10px 12px;
           }
+          .qa-unified { background: ${qaBg}; }
+          .qa-box.qa-question { background: ${qBg}; }
+          .qa-box.qa-answer { background: ${aBg}; }
           .qa-unified .qa-answer {
             margin-top: 8px;
             padding-top: 8px;

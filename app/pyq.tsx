@@ -36,6 +36,8 @@ import { PieChart, LineChart } from '../src/components/Charts';
 import { useTheme } from '../src/context/ThemeContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { prelimsTaxonomy } from '../src/data/taxonomy';
+import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet';
+import type { ExportPayload } from '../src/lib/unifiedExportEngine';
 
 const { width } = Dimensions.get('window');
 
@@ -253,6 +255,9 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'stage' | 'paper' | 'range' | null>(null);
   const [exportModalVisible, setExportModalVisible] = useState(false);
+  const [questionExportVisible, setQuestionExportVisible] = useState(false);
+  const [questionExportScope, setQuestionExportScope] = useState<'selected_subject' | 'all_subjects'>('selected_subject');
+  const [questionExportSubject, setQuestionExportSubject] = useState('');
 
   const [rawQuestions, setRawQuestions] = useState<any[]>([]);
   const [testsMetaById, setTestsMetaById] = useState<Record<string, any>>({});
@@ -684,6 +689,33 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
   const topThreeSubjects = useMemo(() => distributionData.slice(0, 3), [distributionData]);
   const exportSubjects = useMemo(() => distributionData.map(item => item.name), [distributionData]);
+
+  const questionExportPayload = useMemo<ExportPayload | null>(() => {
+    if (!rawQuestions.length) return null;
+    const filtered = rawQuestions.filter((q) => {
+      if (questionExportScope === 'all_subjects') return true;
+      if (!questionExportSubject) return true;
+      return getAnalyticsSubject(q) === questionExportSubject;
+    });
+    if (!filtered.length) return null;
+
+    const rows = filtered.map((q) => ({
+      id: String(q.id),
+      question_text: String(q.question_text || q.statement_line || ''),
+      options: q.options,
+      correct_answer: q.correct_answer,
+      explanation_markdown: q.explanation_markdown,
+      subject: getAnalyticsSubject(q),
+      section_group: q.section_group || 'General',
+      micro_topic: q.micro_topic || 'Other',
+      exam_year: getAnalyticsYear(q) || '',
+      is_pyq: !!q.is_pyq,
+      is_ncert: !!q.is_ncert,
+    }));
+
+    return { kind: 'questions', rows } as ExportPayload;
+  }, [rawQuestions, questionExportScope, questionExportSubject, getAnalyticsYear]);
+
   const focusSubjects = useMemo(() => ['All', ...Array.from(new Set(rawQuestions.map(q => getAnalyticsSubject(q))))], [rawQuestions]);
   const focusSections = useMemo(() => {
     if (focusSubject === 'All') return ['All'];
@@ -753,12 +785,16 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   useEffect(() => {
     if (exportSubjects.length === 0) {
       setExportSubject('');
+      setQuestionExportSubject('');
       return;
     }
     if (!exportSubject || !exportSubjects.includes(exportSubject)) {
       setExportSubject(exportSubjects[0]);
     }
-  }, [exportSubjects, exportSubject]);
+    if (!questionExportSubject || !exportSubjects.includes(questionExportSubject)) {
+      setQuestionExportSubject(exportSubjects[0]);
+    }
+  }, [exportSubjects, exportSubject, questionExportSubject]);
 
   const openModal = (type: 'stage' | 'paper' | 'range') => {
     setModalType(type);
@@ -1831,6 +1867,61 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                 <Text style={[styles.exportActionText, { color: colors.textPrimary }]}>Export Focused Trend</Text>
               </TouchableOpacity>
 
+              <Text style={[styles.exportGroupLabel, { color: colors.textTertiary, marginTop: 14 }]}>QUESTION BANK EXPORT (UNIFIED ENGINE)</Text>
+              <Text style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 8 }}>
+                Export full PYQ questions with content scope, appendix answer placement, margins, typography and Q&A highlight controls.
+              </Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.filterChip,
+                    { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                    questionExportScope === 'selected_subject' && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+                  ]}
+                  onPress={() => setQuestionExportScope('selected_subject')}
+                >
+                  <Text style={[styles.filterChipText, { color: questionExportScope === 'selected_subject' ? colors.buttonText : colors.textSecondary }]}>Selected Subject</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.filterChip,
+                    { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                    questionExportScope === 'all_subjects' && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+                  ]}
+                  onPress={() => setQuestionExportScope('all_subjects')}
+                >
+                  <Text style={[styles.filterChipText, { color: questionExportScope === 'all_subjects' ? colors.buttonText : colors.textSecondary }]}>All Subjects</Text>
+                </TouchableOpacity>
+              </ScrollView>
+
+              {questionExportScope === 'selected_subject' ? (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                  {exportSubjects.map(subject => (
+                    <TouchableOpacity
+                      key={`q-export-sub-${subject}`}
+                      style={[
+                        styles.filterChip,
+                        { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                        questionExportSubject === subject && { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+                      ]}
+                      onPress={() => setQuestionExportSubject(subject)}
+                    >
+                      <Text style={[styles.filterChipText, { color: questionExportSubject === subject ? colors.buttonText : colors.textSecondary }]}>{subject}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              ) : null}
+
+              <TouchableOpacity
+                style={[styles.exportActionBtn, { borderColor: colors.primary, borderWidth: 1.5, backgroundColor: colors.primary + '15' }]}
+                onPress={() => {
+                  setExportModalVisible(false);
+                  setQuestionExportVisible(true);
+                }}
+              >
+                <Text style={[styles.exportActionText, { color: colors.primary }]}>Open Unified Question Export</Text>
+              </TouchableOpacity>
+
               <Text style={[styles.exportGroupLabel, { color: colors.textTertiary, marginTop: 14 }]}>SUBJECT-WISE EXPORTS</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
                 {exportSubjects.map(subject => (
@@ -1869,6 +1960,21 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           </View>
         </Pressable>
       </Modal>
+
+      <UnifiedExportSheet
+        visible={questionExportVisible}
+        onClose={() => setQuestionExportVisible(false)}
+        payload={questionExportPayload}
+        title={questionExportScope === 'all_subjects' ? 'PYQ Questions Export' : 'PYQ Subject Export'}
+        initialOptions={{
+          moduleName: 'PYQ Analysis',
+          showTOC: true,
+          headerText: 'PYQ Analysis',
+          footerText: selectedRange,
+          contentScope: 'q_options_expl',
+          answerPlacement: 'inline',
+        }}
+      />
 
       <Modal visible={modalVisible} transparent animationType="fade" onRequestClose={() => setModalVisible(false)}>
         <Pressable style={styles.modalOverlay} onPress={() => setModalVisible(false)}>

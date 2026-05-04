@@ -32,7 +32,8 @@ export const mergeQuestions = (questions: any[]) => {
     String(q?.question_text || q?.statement_line || q?.statement || '');
 
   const getInstitute = (q: any) => {
-    let inst = q?.tests?.institute || q?.provider || q?.source?.institute;
+    const testsObj = Array.isArray(q?.tests) ? q.tests[0] : q?.tests;
+    let inst = testsObj?.institute || q?.tests?.institute || q?.provider || q?.source?.institute;
     if (!inst && q?.test_id) {
       const parts = String(q.test_id).split('-');
       if (parts.length > 0) {
@@ -159,7 +160,10 @@ const mergeData = (
   year: string,
   normalizeExplanation: (txt: string) => string,
 ) => {
-  if (!existing._institutes) existing._institutes = [existing.tests?.institute || existing.provider || 'UPSC'];
+  if (!existing._institutes) {
+    const testsObj = Array.isArray(existing.tests) ? existing.tests[0] : existing.tests;
+    existing._institutes = [testsObj?.institute || existing.tests?.institute || existing.provider || 'UPSC'];
+  }
   if (!existing._institutes.includes(inst)) {
     existing._institutes.push(inst);
   }

@@ -55,7 +55,9 @@ export interface ExportOptions {
   pageMarginLeftCm: number;
 
   // Question/answer background customization
-  qaBackgroundColor: string; // 'transparent' for none
+  qaBackgroundColor: string; // unified mode background
+  qaQuestionBackgroundColor: string; // split mode question background
+  qaAnswerBackgroundColor: string; // split mode answer background
   qaLayoutMode: ExportQaLayoutMode;
 
   showTOC: boolean;
@@ -88,6 +90,8 @@ export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): Ex
   pageMarginBottomCm: 1,
   pageMarginLeftCm: 1,
   qaBackgroundColor: 'transparent',
+  qaQuestionBackgroundColor: 'transparent',
+  qaAnswerBackgroundColor: 'transparent',
   qaLayoutMode: 'unified',
   showTOC: false,
   headerText: 'Dr. UPSC',
@@ -180,9 +184,12 @@ const clampCm = (value: number, fallback = 1): number => {
 const baseCss = (o: ExportOptions) => {
   const t = themeTokens[o.theme];
   const qaBg = o.qaBackgroundColor || 'transparent';
-  const qaBorder = qaBg === 'transparent' ? 'transparent' : 'rgba(15, 23, 42, 0.12)';
+  const qBg = o.qaQuestionBackgroundColor || qaBg;
+  const aBg = o.qaAnswerBackgroundColor || qaBg;
+  const anyBgVisible = qaBg !== 'transparent' || qBg !== 'transparent' || aBg !== 'transparent';
+  const qaBorder = anyBgVisible ? 'rgba(15, 23, 42, 0.12)' : 'transparent';
   return `
-    :root { --bg:${t.bg}; --fg:${t.fg}; --accent:${t.accent}; --rule:${t.rule}; --card:${t.card}; --qa-bg:${qaBg}; --qa-border:${qaBorder}; }
+    :root { --bg:${t.bg}; --fg:${t.fg}; --accent:${t.accent}; --rule:${t.rule}; --card:${t.card}; --qa-bg:${qaBg}; --qa-q-bg:${qBg}; --qa-a-bg:${aBg}; --qa-border:${qaBorder}; }
     @page { size: A4; margin: ${clampCm(o.pageMarginTopCm)}cm ${clampCm(o.pageMarginRightCm)}cm ${clampCm(o.pageMarginBottomCm)}cm ${clampCm(o.pageMarginLeftCm)}cm; }
     * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     html, body { margin: 0; padding: 0; }
@@ -251,11 +258,13 @@ const baseCss = (o: ExportOptions) => {
     .qa-unified,
     .qa-question-box,
     .qa-answer-box {
-      background: var(--qa-bg);
       border: 1px solid var(--qa-border);
       border-radius: 8px;
       padding: 3mm 3.5mm;
     }
+    .qa-unified { background: var(--qa-bg); }
+    .qa-question-box { background: var(--qa-q-bg); }
+    .qa-answer-box { background: var(--qa-a-bg); }
     .qa-unified .qa-answer {
       margin-top: 2mm;
       padding-top: 2mm;

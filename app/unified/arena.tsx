@@ -394,7 +394,36 @@ export default function UnifiedArenaSetup() {
 
             let fuzzyQ = supabase.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)').or(fuzzyPatterns.join(',')).limit(100);
             if (sf.selectedSubjects?.length > 0) fuzzyQ = fuzzyQ.in('subject', sf.selectedSubjects);
-            if (sf.pyqFilter === 'PYQ Only') fuzzyQ = fuzzyQ.eq('is_pyq', true);
+            if (sf.selectedSections?.length > 0) {
+              const fSections = sf.selectedSections.map((s: string) => s === 'General' ? null : s);
+              if (fSections.includes(null)) {
+                const nonNulls = fSections.filter((s: any) => s !== null);
+                if (nonNulls.length > 0) fuzzyQ = fuzzyQ.or(`section_group.in.(${nonNulls.join(',')}),section_group.is.null`);
+                else fuzzyQ = fuzzyQ.is('section_group', null);
+              } else {
+                fuzzyQ = fuzzyQ.in('section_group', fSections);
+              }
+            }
+            if (sf.selectedMicrotopics?.length > 0) fuzzyQ = fuzzyQ.in('micro_topic', sf.selectedMicrotopics);
+            if (sf.pyqFilter === 'PYQ Only') {
+              fuzzyQ = fuzzyQ.eq('is_pyq', true);
+            } else if (sf.pyqFilter === 'Non-PYQ') {
+              fuzzyQ = fuzzyQ.eq('is_pyq', false);
+            }
+            if (sf.ncertFilter === 'NCERT Only') fuzzyQ = fuzzyQ.eq('is_ncert', true);
+            if (sf.ncertFilter === 'Non-NCERT') fuzzyQ = fuzzyQ.or('is_ncert.is.null,is_ncert.eq.false');
+
+            if (sf.selectedInstitutes?.length > 0 || sf.selectedPrograms?.length > 0 || (sf.examStage && sf.examStage !== 'All')) {
+              let tfQuery = supabase.from('tests').select('id');
+              if (sf.selectedInstitutes?.length > 0) tfQuery = tfQuery.in('institute', sf.selectedInstitutes);
+              if (sf.selectedPrograms?.length > 0) tfQuery = tfQuery.in('program_name', sf.selectedPrograms);
+              if (sf.examStage && sf.examStage !== 'All') tfQuery = tfQuery.ilike('series', `%${sf.examStage}%`);
+              const { data: tfRows } = await tfQuery;
+              const tfIds = (tfRows || []).map((t: any) => t.id);
+              if (tfIds.length > 0) fuzzyQ = fuzzyQ.in('test_id', tfIds);
+              else fuzzyQ = fuzzyQ.in('test_id', ['__NO_MATCH__']);
+            }
+
             const { data: fData } = await fuzzyQ;
             if (fData && fData.length > 0) {
               const existingIds = new Set((data || []).map((d: any) => d.id));

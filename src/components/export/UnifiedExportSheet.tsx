@@ -188,28 +188,80 @@ export const UnifiedExportSheet: React.FC<Props> = ({
               <Section title="Q&A Highlight" colors={colors}>
                 <Label colors={colors}>LAYOUT</Label>
                 <Row>{CHOICES.qaLayouts.map(q => <Chip key={q.id} active={opts.qaLayoutMode === q.id} onPress={() => set('qaLayoutMode', q.id)}>{q.label}</Chip>)}</Row>
-                <Label colors={colors}>BACKGROUND</Label>
-                <Row>
-                  {CHOICES.qaColors.map(color => {
-                    const active = opts.qaBackgroundColor === color.id;
-                    return (
-                      <TouchableOpacity
-                        key={color.id}
-                        onPress={() => set('qaBackgroundColor', color.id)}
-                        style={[
-                          styles.colorChip,
-                          {
-                            borderColor: active ? colors.primary : colors.border,
-                            backgroundColor: color.id === 'transparent' ? colors.surfaceStrong : color.swatch,
-                          },
-                        ]}
-                      >
-                        <Text style={{ color: colors.textPrimary, fontSize: 11, fontWeight: '700' }}>{color.label}</Text>
-                        {active ? <Check size={13} color={colors.primary} /> : null}
-                      </TouchableOpacity>
-                    );
-                  })}
-                </Row>
+
+                {opts.qaLayoutMode === 'split' ? (
+                  <>
+                    <Label colors={colors}>QUESTION BOX COLOR</Label>
+                    <Row>
+                      {CHOICES.qaColors.map(color => {
+                        const active = opts.qaQuestionBackgroundColor === color.id;
+                        return (
+                          <TouchableOpacity
+                            key={`q-${color.id}`}
+                            onPress={() => set('qaQuestionBackgroundColor', color.id)}
+                            style={[
+                              styles.colorChip,
+                              {
+                                borderColor: active ? colors.primary : colors.border,
+                                backgroundColor: color.id === 'transparent' ? colors.surfaceStrong : color.swatch,
+                              },
+                            ]}
+                          >
+                            <Text style={{ color: colors.textPrimary, fontSize: 11, fontWeight: '700' }}>{color.label}</Text>
+                            {active ? <Check size={13} color={colors.primary} /> : null}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </Row>
+                    <Label colors={colors}>ANSWER BOX COLOR</Label>
+                    <Row>
+                      {CHOICES.qaColors.map(color => {
+                        const active = opts.qaAnswerBackgroundColor === color.id;
+                        return (
+                          <TouchableOpacity
+                            key={`a-${color.id}`}
+                            onPress={() => set('qaAnswerBackgroundColor', color.id)}
+                            style={[
+                              styles.colorChip,
+                              {
+                                borderColor: active ? colors.primary : colors.border,
+                                backgroundColor: color.id === 'transparent' ? colors.surfaceStrong : color.swatch,
+                              },
+                            ]}
+                          >
+                            <Text style={{ color: colors.textPrimary, fontSize: 11, fontWeight: '700' }}>{color.label}</Text>
+                            {active ? <Check size={13} color={colors.primary} /> : null}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </Row>
+                  </>
+                ) : (
+                  <>
+                    <Label colors={colors}>UNIFIED BOX COLOR</Label>
+                    <Row>
+                      {CHOICES.qaColors.map(color => {
+                        const active = opts.qaBackgroundColor === color.id;
+                        return (
+                          <TouchableOpacity
+                            key={`u-${color.id}`}
+                            onPress={() => set('qaBackgroundColor', color.id)}
+                            style={[
+                              styles.colorChip,
+                              {
+                                borderColor: active ? colors.primary : colors.border,
+                                backgroundColor: color.id === 'transparent' ? colors.surfaceStrong : color.swatch,
+                              },
+                            ]}
+                          >
+                            <Text style={{ color: colors.textPrimary, fontSize: 11, fontWeight: '700' }}>{color.label}</Text>
+                            {active ? <Check size={13} color={colors.primary} /> : null}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </Row>
+                  </>
+                )}
               </Section>
             )}
 

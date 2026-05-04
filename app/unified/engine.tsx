@@ -368,6 +368,7 @@ export default function UnifiedQuizEngine() {
   const [customSubheading, setCustomSubheading] = useState('');
   const [showPYQTags, setShowPYQTags] = useState(showPYQTagsParam);
   const [activeExplIndex, setActiveExplIndex] = useState<Record<string, number>>({});
+  const [activeExplSource, setActiveExplSource] = useState<Record<string, string>>({});
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [showSaveNameModal, setShowSaveNameModal] = useState(false);
   const [isSavingAttempt, setIsSavingAttempt] = useState(false);
@@ -825,11 +826,23 @@ export default function UnifiedQuizEngine() {
              let fuzzyQ = LocalQuery.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)').or(fuzzyPatterns.join(',')).limit(100);
              // Re-apply same filters
              const insts = params.institutes || params.institute;
-             if (insts && insts !== 'All') {
-                const { data: tRows } = await LocalQuery.from('tests').select('id').in('institute', insts.split(','));
-                if (tRows) fuzzyQ = fuzzyQ.in('test_id', tRows.map((t: any) => t.id));
+             const progs = params.programs || params.program;
+             const stage = params.stage || params.examStage || params.series;
+             if ((insts && insts !== 'All' && insts !== '' && insts !== '[]') || (progs && progs !== 'All' && progs !== '' && progs !== '[]') || (stage && stage !== 'All' && stage !== '' && stage !== '[]')) {
+                let tQuery = LocalQuery.from('tests').select('id');
+                if (insts && insts !== 'All' && insts !== '' && insts !== '[]') tQuery = tQuery.in('institute', insts.split(',').filter(Boolean));
+                if (progs && progs !== 'All' && progs !== '' && progs !== '[]') tQuery = tQuery.in('program_name', progs.split(',').filter(Boolean));
+                if (stage && stage !== 'All' && stage !== '' && stage !== '[]') tQuery = tQuery.ilike('series', '%' + stage + '%');
+                const { data: tRows } = await tQuery;
+                const tIds = (tRows || []).map((t: any) => t.id);
+                if (tIds.length > 0) fuzzyQ = fuzzyQ.in('test_id', tIds);
+                else fuzzyQ = fuzzyQ.in('test_id', ['__NO_MATCH__']);
              }
-             if (params.subject && params.subject !== 'All') fuzzyQ = fuzzyQ.eq('subject', params.subject);
+             const subs = params.subjects || params.subject;
+             if (subs && subs !== 'All' && subs !== '' && subs !== '[]') {
+                const subList = typeof subs === 'string' ? subs.split(',').filter(Boolean) : [];
+                if (subList.length > 0) fuzzyQ = fuzzyQ.in('subject', subList);
+             }
              const pyqM = params.pyqMaster || params.pyqFilter;
              if (pyqM === 'PYQ Only') {
                fuzzyQ = fuzzyQ.eq('is_pyq', true);
@@ -842,7 +855,7 @@ export default function UnifiedQuizEngine() {
                  if (cats.includes('Others')) fOr.push('is_others.eq.true');
                  if (fOr.length > 0) fuzzyQ = fuzzyQ.or(fOr.join(','));
                }
-             } else if (pyqM === 'Non-PYQ') {
+             } else if (pyqM === 'Non-PYQ' || pyqM === 'Non PYQ') {
                fuzzyQ = fuzzyQ.eq('is_pyq', false);
              }
 
@@ -1676,7 +1689,49 @@ export default function UnifiedQuizEngine() {
     if (!item) return null;
     const answerData = currentAnswers[item.id] || { selectedAnswer: null, confidence: null, difficulty: null, errorCategory: null, note: '' };
     const showExplanation = arenaMode === 'learning' && revealedExplanations[item.id];
-    
+
+    const normalizedExplanations = (() => {
+      const list = Array.isArray(item._explanations) ? item._explanations : [];
+      const seen = new Set<string>();
+      const out: any[] = [];
+      list.forEach((e: any, idx: number) => {
+        const source = String(e?.source || `Source ${idx + 1}`).trim();
+        const year = String(e?.year || '').trim();
+        const answer = String(e?.answer || '').trim().toUpperCase();
+        const text = String(e?.text || '').trim();
+        if (!text) return;
+        const dedupeKey = `${source.toLowerCase()}__${year}__${answer}__${text.replace(/\s+/g, ' ').toLowerCase()}`;
+        if (seen.has(dedupeKey)) return;
+        seen.add(dedupeKey);
+        out.push({ source, year, answer, text });
+      });
+      if (out.length === 0 && item.explanation_markdown) {
+        out.push({ source: String(item.tests?.institute || 'Primary'), year: String(item.exam_year || ''), answer: String(item.correct_answer || ''), text: String(item.explanation_markdown) });
+      }
+      return out;
+    })();
+
+    const availableExplSources = Array.from(new Set(normalizedExplanations.map((e: any) => e.source).filter(Boolean)));
+    const selectedExplSource = activeExplSource[item.id] || 'all';
+    const sourceFilteredExplanations = selectedExplSource === 'all'
+      ? normalizedExplanations
+      : normalizedExplanations.filter((e: any) => e.source === selectedExplSource);
+
+    const displayExplanations = sourceFilteredExplanations.length > 0 ? sourceFilteredExplanations : normalizedExplanations;
+    const rawIdx = activeExplIndex[item.id] ?? -1;
+    const safeIdx = rawIdx >= 0 && rawIdx < displayExplanations.length ? rawIdx : -1;
+    const activeExplanationText = safeIdx === -1
+      ? (displayExplanations.length > 1
+          ? displayExplanations.map((e: any) => `**${e.source}${e.year ? ' · ' + e.year : ''}${e.answer ? ' · Ans: ' + e.answer : ''}:**
+
+${e.text}`).join('
+
+---
+
+')
+          : (displayExplanations[0]?.text || item.explanation_markdown || 'No explanation available.'))
+      : (displayExplanations[safeIdx]?.text || item.explanation_markdown || 'No explanation available.');
+
     return (
       <View style={[styles.questionCard, { backgroundColor: isZenMode ? 'transparent' : colors.surface, borderColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.border, borderWidth: isZenMode ? 0 : 1 }]}>
         <View style={styles.qHeader}>
@@ -1876,37 +1931,81 @@ export default function UnifiedQuizEngine() {
                    <Text style={[styles.explanationTitle, { color: colors.primary }]}>EXPLANATION</Text>
                 </View>
 
-                {item._explanations && item._explanations.length > 1 && (
-                  <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: colors.border + '30', flexWrap: 'wrap' }}>
-                    <TouchableOpacity 
-                      onPress={() => setActiveExplIndex(prev => ({ ...prev, [item.id]: -1 }))}
-                      style={{ 
-                        paddingHorizontal: 12, 
-                        paddingVertical: 6, 
-                        borderRadius: 20, 
-                        backgroundColor: (activeExplIndex[item.id] ?? -1) === -1 ? colors.primary : colors.surfaceStrong,
+                {availableExplSources.length > 1 && (
+                  <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setActiveExplSource(prev => ({ ...prev, [item.id]: 'all' }));
+                        setActiveExplIndex(prev => ({ ...prev, [item.id]: -1 }));
+                      }}
+                      style={{
+                        paddingHorizontal: 12,
+                        paddingVertical: 6,
+                        borderRadius: 20,
+                        backgroundColor: selectedExplSource === 'all' ? colors.primary : colors.surfaceStrong,
                         borderWidth: 1,
                         borderColor: colors.border
                       }}
                     >
-                      <Text style={{ fontSize: 10, fontWeight: '900', color: (activeExplIndex[item.id] ?? -1) === -1 ? '#fff' : colors.textTertiary }}>
-                        COMBINED ({item._explanations.length})
+                      <Text style={{ fontSize: 10, fontWeight: '900', color: selectedExplSource === 'all' ? '#fff' : colors.textTertiary }}>
+                        ALL INSTITUTES
                       </Text>
                     </TouchableOpacity>
-                    {item._explanations.map((expl: any, idx: number) => (
-                      <TouchableOpacity 
-                        key={idx}
-                        onPress={() => setActiveExplIndex(prev => ({ ...prev, [item.id]: idx }))}
-                        style={{ 
-                          paddingHorizontal: 12, 
-                          paddingVertical: 6, 
-                          borderRadius: 20, 
-                          backgroundColor: activeExplIndex[item.id] === idx ? colors.primary : colors.surfaceStrong,
+                    {availableExplSources.map((source: string) => (
+                      <TouchableOpacity
+                        key={`src-${item.id}-${source}`}
+                        onPress={() => {
+                          setActiveExplSource(prev => ({ ...prev, [item.id]: source }));
+                          setActiveExplIndex(prev => ({ ...prev, [item.id]: -1 }));
+                        }}
+                        style={{
+                          paddingHorizontal: 12,
+                          paddingVertical: 6,
+                          borderRadius: 20,
+                          backgroundColor: selectedExplSource === source ? colors.primary : colors.surfaceStrong,
                           borderWidth: 1,
                           borderColor: colors.border
                         }}
                       >
-                        <Text style={{ fontSize: 10, fontWeight: '900', color: activeExplIndex[item.id] === idx ? '#fff' : colors.textTertiary }}>
+                        <Text style={{ fontSize: 10, fontWeight: '900', color: selectedExplSource === source ? '#fff' : colors.textTertiary }}>
+                          {source}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+
+                {displayExplanations.length > 1 && (
+                  <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: colors.border + '30', flexWrap: 'wrap' }}>
+                    <TouchableOpacity
+                      onPress={() => setActiveExplIndex(prev => ({ ...prev, [item.id]: -1 }))}
+                      style={{
+                        paddingHorizontal: 12,
+                        paddingVertical: 6,
+                        borderRadius: 20,
+                        backgroundColor: safeIdx === -1 ? colors.primary : colors.surfaceStrong,
+                        borderWidth: 1,
+                        borderColor: colors.border
+                      }}
+                    >
+                      <Text style={{ fontSize: 10, fontWeight: '900', color: safeIdx === -1 ? '#fff' : colors.textTertiary }}>
+                        COMBINED ({displayExplanations.length})
+                      </Text>
+                    </TouchableOpacity>
+                    {displayExplanations.map((expl: any, idx: number) => (
+                      <TouchableOpacity
+                        key={`expl-${item.id}-${idx}`}
+                        onPress={() => setActiveExplIndex(prev => ({ ...prev, [item.id]: idx }))}
+                        style={{
+                          paddingHorizontal: 12,
+                          paddingVertical: 6,
+                          borderRadius: 20,
+                          backgroundColor: safeIdx === idx ? colors.primary : colors.surfaceStrong,
+                          borderWidth: 1,
+                          borderColor: colors.border
+                        }}
+                      >
+                        <Text style={{ fontSize: 10, fontWeight: '900', color: safeIdx === idx ? '#fff' : colors.textTertiary }}>
                           {expl.source || `Source ${idx + 1}`}{expl.year ? ` · ${expl.year}` : ''}
                         </Text>
                       </TouchableOpacity>
@@ -1915,11 +2014,7 @@ export default function UnifiedQuizEngine() {
                 )}
 
                 <Markdown style={{ body: { color: colors.textSecondary, fontSize: fontSize - 2 } }}>
-                  {(activeExplIndex[item.id] ?? -1) === -1 
-                    ? (item._explanations && item._explanations.length > 1
-                        ? item._explanations.map((e: any, i: number) => `**${e.source}${e.year ? ' · ' + e.year : ''}${e.answer ? ' · Ans: ' + e.answer : ''}:**\n\n${e.text}`).join('\n\n---\n\n')
-                        : item.explanation_markdown)
-                    : item._explanations?.[activeExplIndex[item.id]]?.text || item.explanation_markdown || 'No explanation available.'}
+                  {activeExplanationText}
                 </Markdown>
               </View>
 
@@ -1927,7 +2022,7 @@ export default function UnifiedQuizEngine() {
                  <TouchableOpacity 
                    style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
                    onPress={() => { 
-                     const activeText = item._explanations?.[activeExplIndex[item.id] || 0]?.text || item.explanation_markdown || '';
+                     const activeText = activeExplanationText || item.explanation_markdown || '';
                      setNoteDraftBullets([activeText]); 
                      setCustomSubheading(item.micro_topic || '');
                      setNotebookModalVisible(true); 

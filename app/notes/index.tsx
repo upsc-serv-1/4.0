@@ -127,9 +127,13 @@ export default function NotesIndex() {
     if (!currentFolder) return;
     const flat = flattenAll(tree);
     const updated = flat.find((n) => n.id === currentFolder.id) || null;
-    if (updated && updated !== currentFolder) setCurrentFolder(updated);
-    if (!updated) setCurrentFolder(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
+    // Compare IDs to avoid infinite loops caused by new object references from flattenAll
+    if (updated && updated.id !== currentFolder.id) {
+      setCurrentFolder(updated);
+    } else if (!updated && currentFolder) {
+      setCurrentFolder(null);
+    }
   }, [tree]);
 
   const topLevelFolders = useMemo(() => tree.filter((n) => n.type === 'folder'), [tree]);

@@ -143,8 +143,9 @@ export const UnifiedExportSheet: React.FC<Props> = ({
   const [notesSelectedHeadings, setNotesSelectedHeadings] = useState<Set<string>>(new Set());
 
   // Re-seed when sheet opens
+  const wasVisible = React.useRef(false);
   React.useEffect(() => {
-    if (visible) {
+    if (visible && !wasVisible.current) {
       setOpts(defaultExportOptions({ title: title || initialOptions?.title || 'Export', ...(initialOptions || {}) }));
       // Recompute initial analysis state directly to avoid dependency issues
       const newAnalysisState = analysisReports.reduce((acc, report) => {
@@ -167,7 +168,8 @@ export const UnifiedExportSheet: React.FC<Props> = ({
 
       setIsExporting(false);
     }
-  }, [visible]);
+    wasVisible.current = visible;
+  }, [visible, title, initialOptions, analysisReports, payload]);
 
   React.useEffect(() => {
     if (!visible) setIsExporting(false);

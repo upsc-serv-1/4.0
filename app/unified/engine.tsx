@@ -1557,18 +1557,57 @@ export default function UnifiedQuizEngine() {
     }
   };
 
-  // Paper mode helper: close transient overlays first, then execute the same
-  // add-to-flashcard flow used by list/card modes.
-  const handlePaperAddToFlashcards = (q: Question, opts?: { closeExplanation?: boolean }) => {
+  const runAfterPaperOverlayClose = (
+    callback: () => void,
+    opts?: { closeExplanation?: boolean; delayMs?: number }
+  ) => {
     if (opts?.closeExplanation) {
       setExplanationModalQId(null);
     }
+
     setShowPaperQuickMenu(false);
+
+    const delay = opts?.closeExplanation
+      ? (opts?.delayMs ?? 280)
+      : (opts?.delayMs ?? 0);
+
     requestAnimationFrame(() => {
-      setTimeout(() => {
-        handleAddToFlashcards(q);
-      }, opts?.closeExplanation ? 120 : 0);
+      setTimeout(callback, delay);
     });
+  };
+
+  const openNotebookFromQuestion = (
+    q: Question,
+    explanationText?: string,
+    opts?: { closeExplanation?: boolean }
+  ) => {
+    runAfterPaperOverlayClose(() => {
+      const activeText = explanationText || q.explanation_markdown || '';
+      setNoteDraftBullets([activeText]);
+      setCustomSubheading(q.micro_topic || '');
+      setNotebookModalVisible(true);
+      fetchHierarchy();
+    }, opts);
+  };
+
+  const openHardnoteFromQuestion = (
+    q: Question,
+    explanationText?: string,
+    opts?: { closeExplanation?: boolean }
+  ) => {
+    runAfterPaperOverlayClose(() => {
+      const activeText = explanationText || q.explanation_markdown || '';
+      setHardnotesPayload({ markdown: activeText, title: q.micro_topic || q.question_text?.slice(0, 40) || 'Quiz Note' });
+      setHardnotesPickerVisible(true);
+    }, opts);
+  };
+
+  // Paper mode helper: close transient overlays first, then execute the same
+  // add-to-flashcard flow used by list/card modes.
+  const handlePaperAddToFlashcards = (q: Question, opts?: { closeExplanation?: boolean }) => {
+    runAfterPaperOverlayClose(() => {
+      handleAddToFlashcards(q);
+    }, opts);
   };
 
 
@@ -2376,12 +2415,9 @@ export default function UnifiedQuizEngine() {
               <View style={styles.actionRow}>
                  <TouchableOpacity 
                    style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
-                   onPress={() => { 
+                   onPress={() => {
                      const activeText = activeExplanationText || item.explanation_markdown || '';
-                     setNoteDraftBullets([activeText]); 
-                     setCustomSubheading(item.micro_topic || '');
-                     setNotebookModalVisible(true); 
-                     fetchHierarchy(); 
+                     openNotebookFromQuestion(item, activeText);
                    }}
                  >
                     <BookOpen size={16} color={colors.primary} />
@@ -2391,8 +2427,7 @@ export default function UnifiedQuizEngine() {
                    style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
                    onPress={() => {
                      const activeText = activeExplanationText || item.explanation_markdown || '';
-                     setHardnotesPayload({ markdown: activeText, title: item.micro_topic || item.question_text?.slice(0, 40) || 'Quiz Note' });
-                     setHardnotesPickerVisible(true);
+                     openHardnoteFromQuestion(item, activeText);
                    }}
                    data-testid={`engine-hardnotes-btn-${item.id}`}
                  >
@@ -3277,8 +3312,7 @@ export default function UnifiedQuizEngine() {
                   style={StyleSheet.absoluteFill}
                   onPress={() => setExplanationModalQId(null)}
                 />
-                <Pressable
-                  onPress={() => { /* swallow */ }}
+                <View
                   style={[stylesPaper.modalCard, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
                 >
                   {/* Header */}
@@ -3433,11 +3467,11 @@ export default function UnifiedQuizEngine() {
 
                     <TouchableOpacity
                       onPress={() => {
-                        const activeText = explanations[safeIdx]?.text || q.explanation_markdown || '';
-                        setNoteDraftBullets([activeText]);
-                        setCustomSubheading(q.micro_topic || '');
-                        setNotebookModalVisible(true);
-                        fetchHierarchy();
+                        openNotebookFromQuestion(
+                          q,
+                          text,
+                          { closeExplanation: true }
+                        );
                       }}
                       style={[stylesPaper.stickyBtn, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}
                       testID="paper-modal-notebook"
@@ -3448,9 +3482,11 @@ export default function UnifiedQuizEngine() {
 
                     <TouchableOpacity
                       onPress={() => {
-                        const activeText = explanations[safeIdx]?.text || q.explanation_markdown || '';
-                        setHardnotesPayload({ markdown: activeText, title: q.micro_topic || q.question_text?.slice(0, 40) || 'Quiz Note' });
-                        setHardnotesPickerVisible(true);
+                        openHardnoteFromQuestion(
+                          q,
+                          text,
+                          { closeExplanation: true }
+                        );
                       }}
                       style={[stylesPaper.stickyBtn, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}
                       testID="paper-modal-hardnote"
@@ -3460,7 +3496,11 @@ export default function UnifiedQuizEngine() {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      onPress={() => handleQuickSave(q)}
+                      onPress={() => {
+                        runAfterPaperOverlayClose(() => {
+                          handleQuickSave(q);
+                        }, { closeExplanation: true });
+                      }}
                       style={[stylesPaper.stickyBtn, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}
                       testID="paper-modal-quicksave"
                     >
@@ -3468,7 +3508,7 @@ export default function UnifiedQuizEngine() {
                       <Text style={[stylesPaper.stickyBtnText, { color: colors.textPrimary }]}>Quick Save</Text>
                     </TouchableOpacity>
                   </View>
-                </Pressable>
+                </View>
               </View>
             );
           })()}

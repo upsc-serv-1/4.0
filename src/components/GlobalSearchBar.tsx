@@ -21,6 +21,7 @@ import { QuestionCache } from '../services/QuestionCache';
 import { useTheme } from '../context/ThemeContext';
 import { supabase } from '../lib/supabase';
 import * as Haptics from 'expo-haptics';
+import { buildArenaEngineSearchParams } from '../utils/arenaSearchNavigation';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -354,38 +355,44 @@ export const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({
     } catch (err) { console.error(err); }
   };
 
+  const getCurrentFilters = () => ({
+    examStage,
+    selectedSubjects,
+    selectedSections,
+    selectedMicrotopics,
+    selectedInstitutes,
+    selectedPrograms,
+    pyqFilter,
+    pyqCategory,
+    ncertFilter,
+    searchFields,
+    searchMode
+  });
+
+  const openArenaIndexSearch = (term: string, filters: any) => {
+    const cleanedTerm = String(term || '').trim();
+    if (!cleanedTerm) return;
+
+    router.push({
+      pathname: '/unified/engine',
+      params: buildArenaEngineSearchParams(cleanedTerm, filters)
+    } as any);
+  };
+
   const handleSearch = () => {
     setIsDropdownVisible(false);
-    if (!query.trim()) return;
+    const cleanedQuery = query.trim();
+    if (!cleanedQuery) return;
 
-    // Construct filters
-    const filters = {
-      examStage,
-      selectedSubjects,
-      selectedSections,
-      selectedMicrotopics,
-      selectedInstitutes,
-      selectedPrograms,
-      pyqFilter,
-      pyqCategory,
-      ncertFilter,
-      searchFields,
-      searchMode
-    };
+    const filters = getCurrentFilters();
 
     if (onSearch) {
-      onSearch(query, filters);
-      saveSearch(query);
+      onSearch(cleanedQuery, filters);
     } else {
-      router.push({
-        pathname: '/unified/arena',
-        params: {
-          tab: 'search',
-          query: query,
-          filters: JSON.stringify(filters)
-        }
-      } as any);
+      openArenaIndexSearch(cleanedQuery, filters);
     }
+
+    saveSearch(cleanedQuery);
 
     // Dismiss AFTER triggering search to ensure no event loss
     setIsDropdownVisible(false);
@@ -507,13 +514,17 @@ export const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({
                 onPress={() => {
                   setIsDropdownVisible(false);
                   Keyboard.dismiss();
-                  router.push({
-                    pathname: '/unified/engine',
-                    params: {
-                      questionId: item.id,
-                      source: 'instant_search'
-                    }
-                  } as any);
+
+                  const selectedQuery = (query || item.question_text || '').replace(/<[^>]*>/g, '').trim();
+                  const filters = getCurrentFilters();
+
+                  if (onSearch) {
+                    onSearch(selectedQuery, filters);
+                  } else {
+                    openArenaIndexSearch(selectedQuery, filters);
+                  }
+
+                  saveSearch(selectedQuery);
                 }}
               >
                 <View style={{ flex: 1 }}>
@@ -581,34 +592,19 @@ export const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({
               }
             ]}
             onPress={() => {
-              console.log('[GlobalSearch] SEE ALL pressed, query:', query);
-              const currentQuery = query;
-              const filters = {
-                examStage,
-                selectedSubjects,
-                selectedSections,
-                selectedMicrotopics,
-                selectedInstitutes,
-                selectedPrograms,
-                pyqFilter,
-                pyqCategory,
-                searchFields,
-                searchMode
-              };
+              const currentQuery = query.trim();
+              const filters = getCurrentFilters();
+
               setIsDropdownVisible(false);
               Keyboard.dismiss();
+
               if (onSearch) {
                 onSearch(currentQuery, filters);
               } else {
-                router.push({
-                  pathname: '/unified/arena',
-                  params: {
-                    tab: 'search',
-                    query: currentQuery,
-                    filters: JSON.stringify(filters)
-                  }
-                } as any);
+                openArenaIndexSearch(currentQuery, filters);
               }
+
+              saveSearch(currentQuery);
             }}
           >
             <Text style={[styles.seeAllText, { color: '#fff' }]}>
@@ -637,7 +633,12 @@ export const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({
               onPress={() => {
                 setQuery(s);
                 saveSearch(s); // Re-rank it
-                onSearch(s, { examStage, selectedInstitutes, selectedPrograms, selectedSubjects, selectedSections, selectedMicrotopics, pyqFilter, pyqCategory, searchFields, searchMode });
+                const filters = getCurrentFilters();
+                if (onSearch) {
+                  onSearch(s, filters);
+                } else {
+                  openArenaIndexSearch(s, filters);
+                }
               }}
               style={[
                 styles.chip,

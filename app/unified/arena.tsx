@@ -40,6 +40,7 @@ import { useQuizStore } from '../../src/store/quizStore';
 import { mergeQuestions } from '../../src/utils/merger';
 import { OfflineManager } from '../../src/services/OfflineManager';
 import { LocalQuery } from '../../src/services/LocalQuery';
+import { buildArenaEngineSearchParams } from '../../src/utils/arenaSearchNavigation';
 
 const { width } = Dimensions.get('window');
 
@@ -1253,27 +1254,13 @@ export default function UnifiedArenaSetup() {
 
                   router.push({
                     pathname: '/unified/engine',
-                    params: {
+                    params: buildArenaEngineSearchParams(q, nextFilters, {
                       mode: 'learning',
-                      view: 'list',
-                      timer: 'none',
-                      showPYQTags: 'true',
-                      query: q,
-                      searchMode: nextFilters.searchMode,
-                      searchFields: nextFilters.searchFields?.join(','),
-                      subject: nextFilters.selectedSubjects?.[0] || 'All',
-                      subjects: nextFilters.selectedSubjects?.join(','),
-                      section: nextFilters.selectedSections?.join('|') || '',
-                      microtopic: nextFilters.selectedMicrotopics?.join('|') || '',
-                      institutes: nextFilters.selectedInstitutes?.join(',') || '',
-                      programs: nextFilters.selectedPrograms?.join(',') || '',
-                      examStage: nextFilters.examStage,
-                      pyqFilter: nextFilters.pyqFilter,
-                      pyqCategory: nextFilters.pyqCategory?.join(','),
-                      ncertFilter: nextFilters.ncertFilter,
-                      testId: '',
-                    },
-                  });
+                      view: viewMode,
+                      timer: timerMode,
+                      showPYQTags: 'true'
+                    })
+                  } as any);
                 }}
               />
 

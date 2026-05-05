@@ -23,6 +23,7 @@ import { WidgetService, Widget } from '../../src/services/WidgetService';
 import { useWidgetData } from '../../src/hooks/useWidgetData';
 import { WidgetRenderer } from '../../src/components/widgets/WidgetRenderer';
 import { GlobalSearchBar } from '../../src/components/GlobalSearchBar';
+import { buildArenaEngineSearchParams } from '../../src/utils/arenaSearchNavigation';
 import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
 
 type Stats = {
@@ -307,7 +308,12 @@ export default function Home() {
               <View style={styles.searchContainer}>
                 <GlobalSearchBar
                   placeholder="Search topics, notes, or PYQs..."
-                  onSearch={(q, f) => router.push({ pathname: "/unified/arena", params: { tab: 'search', query: q, filters: JSON.stringify(f) } } as any)}
+                  onSearch={(q, f) => {
+                    router.push({
+                      pathname: '/unified/engine',
+                      params: buildArenaEngineSearchParams(q, f)
+                    } as any);
+                  }}
                 />
               </View>
             </View>

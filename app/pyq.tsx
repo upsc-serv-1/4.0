@@ -1666,7 +1666,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         </TouchableOpacity>
       ) : <View style={styles.headerIcon} />}
       <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>PYQ Analysis</Text>
-      <TouchableOpacity onPress={() => setExportModalVisible(true)} style={[styles.headerIcon, { borderColor: colors.border, backgroundColor: colors.surface }]}>
+      <TouchableOpacity onPress={() => setQuestionExportVisible(true)} style={[styles.headerIcon, { borderColor: colors.border, backgroundColor: colors.surface }]}>
         <Download color={colors.primary} size={18} />
       </TouchableOpacity>
     </View>

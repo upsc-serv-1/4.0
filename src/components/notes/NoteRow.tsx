@@ -35,9 +35,11 @@ interface Props {
   /** Show the Glance "unfold" inline toggle. Only meaningful for notes/notebooks. */
   glanceExpanded?: boolean;
   onToggleGlance?: () => void;
+  /** Optional style override for the row container */
+  style?: any;
 }
 
-export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpanded = false, onToggleGlance }: Props) {
+export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpanded = false, onToggleGlance, style }: Props) {
   const { colors } = useTheme();
   const swipeableRef = useRef<Swipeable>(null);
 
@@ -109,7 +111,7 @@ export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpa
       friction={2}
       rightThreshold={40}
     >
-      <View style={[styles.row, { backgroundColor: colors.bg, borderBottomColor: colors.border + 'A0' }]} data-testid={`vault-row-${node.id}`}>
+      <View style={[styles.row, { backgroundColor: colors.bg, borderBottomColor: colors.border + 'A0' }, style]} data-testid={`vault-row-${node.id}`}>
         <View style={styles.content}>
           {/* Hierarchy Lines */}
           {Array.from({ length: node.depth }).map((_, i) => (

@@ -671,40 +671,33 @@ export default function NotesIndex() {
                         onAction={(action) => onAction(item, action)}
                       />
                     ))}
-                  </View>
-                )}
-
-                {topLevelOrphans.length > 0 && (
-                  <View style={{ marginTop: 28 }}>
-                    <Text style={[styles.sectionSubtle, { color: colors.textTertiary }]}>UNFILED</Text>
-                    <View style={{ paddingHorizontal: 4 }}>
-                      {topLevelOrphans.map((item) => {
-                        const isNoteLike = (item.type === 'note' || item.type === 'notebook') && !!item.note_id;
-                        const isGlance = glanceOpen.has(item.id);
-                        return (
-                          <View key={item.id}>
-                            <NoteRow
-                              node={item}
-                              expanded={expanded.has(item.id)}
-                              onToggle={() => toggleExpand(item.id)}
-                              onOpen={() => openNode(item)}
-                              onAction={(action) => onAction(item, action)}
-                              glanceExpanded={isNoteLike && isGlance}
-                              onToggleGlance={isNoteLike ? () => toggleGlance(item.id) : undefined}
+                    {topLevelOrphans.map((item) => {
+                      const isNoteLike = (item.type === 'note' || item.type === 'notebook') && !!item.note_id;
+                      const isGlance = glanceOpen.has(item.id);
+                      return (
+                        <View key={item.id}>
+                          <NoteRow
+                            node={item}
+                            expanded={expanded.has(item.id)}
+                            onToggle={() => toggleExpand(item.id)}
+                            onOpen={() => openNode(item)}
+                            onAction={(action) => onAction(item, action)}
+                            glanceExpanded={isNoteLike && isGlance}
+                            onToggleGlance={isNoteLike ? () => toggleGlance(item.id) : undefined}
+                            style={{ opacity: 0.55, borderStyle: 'dashed', borderColor: colors.border, borderWidth: 0.5, borderRadius: 12, marginHorizontal: 4 }}
+                          />
+                          {isNoteLike && isGlance && item.note_id && (
+                            <GlancePanel
+                              noteId={item.note_id}
+                              contentWidth={SCREEN_WIDTH - 32}
+                              selectedTag={ALL_TAG}
+                              onPlay={() => playNode(item)}
+                              onOpenEdit={() => openNode(item)}
                             />
-                            {isNoteLike && isGlance && item.note_id && (
-                              <GlancePanel
-                                noteId={item.note_id}
-                                contentWidth={SCREEN_WIDTH - 32}
-                                selectedTag={ALL_TAG}
-                                onPlay={() => playNode(item)}
-                                onOpenEdit={() => openNode(item)}
-                              />
-                            )}
-                          </View>
-                        );
-                      })}
-                    </View>
+                          )}
+                        </View>
+                      );
+                    })}
                   </View>
                 )}
 

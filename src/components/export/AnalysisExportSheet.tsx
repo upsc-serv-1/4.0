@@ -70,6 +70,7 @@ export interface AnalysisExportQuestion {
   is_pyq?: boolean;
   is_ncert?: boolean;
   difficulty?: string;
+  review_tags?: string[];
   time_taken_seconds?: number;
 }
 
@@ -79,9 +80,9 @@ export interface AnalysisExportSheetProps {
   /** All questions available for export (test-history questions or PYQ bank) */
   questions: AnalysisExportQuestion[];
   /** Aggregated analytics computed by useAggregateTestAnalytics */
-  trends: any;
-  cumulative: any;
-  weaknesses: string[];
+  trends?: any;
+  cumulative?: any;
+  weaknesses?: string[];
   /** Forecast rows builder (optional — if not provided forecast will be skipped) */
   buildForecastRows?: (filteredQuestions: AnalysisExportQuestion[]) => Array<{
     key: string;
@@ -96,6 +97,20 @@ export interface AnalysisExportSheetProps {
   }>;
   title?: string;
   userName?: string;
+  /**
+   * analytics: keeps existing performance full-report page
+   * pyq: uses PYQ summary engine for full report and toggles
+   */
+  reportVariant?: 'analytics' | 'pyq';
+  /** Optional metadata used by PYQ summary header. */
+  pyqMeta?: {
+    examStage?: string;
+    selectedPaper?: string;
+    selectedRange?: string;
+    customYearStart?: string;
+    customYearEnd?: string;
+    heatmapPalette?: 'spectral' | 'ocean';
+  };
 }
 
 const CHOICES = {
@@ -149,20 +164,30 @@ const CHOICES = {
     { id: 'year' as ExportSortBy, label: 'Year' },
     { id: 'difficulty' as ExportSortBy, label: 'Difficulty' },
   ],
-  reportToggles: [
-    { key: 'full_report' as keyof AnalysisReportToggles, label: 'Full Report (Performance Analytics)' },
-    { key: 'subject_momentum' as keyof AnalysisReportToggles, label: 'Subject Momentum' },
-    { key: 'subject_distribution' as keyof AnalysisReportToggles, label: 'Subject Distribution (Donut)' },
-    { key: 'heatmaps' as keyof AnalysisReportToggles, label: 'Heatmaps' },
-    { key: 'focused_trend' as keyof AnalysisReportToggles, label: 'Focused Trend' },
-    { key: 'forecast' as keyof AnalysisReportToggles, label: 'Forecast (Probable 2026 Topics)' },
-  ],
   scopes: [
     { id: 'report_only' as AnalysisExportScope, label: 'Report only' },
     { id: 'report_with_pyqs' as AnalysisExportScope, label: 'Report + PYQs' },
     { id: 'pyqs_only' as AnalysisExportScope, label: 'Only PYQs' },
   ],
 };
+
+const ANALYTICS_REPORT_TOGGLES: Array<{ key: keyof AnalysisReportToggles; label: string }> = [
+  { key: 'full_report', label: 'Full Report (Performance Analytics)' },
+  { key: 'subject_momentum', label: 'Subject Momentum' },
+  { key: 'subject_distribution', label: 'Subject Distribution (Donut)' },
+  { key: 'heatmaps', label: 'Heatmaps' },
+  { key: 'focused_trend', label: 'Focused Trend' },
+  { key: 'forecast', label: 'Forecast (Probable 2026 Topics)' },
+];
+
+const PYQ_REPORT_TOGGLES: Array<{ key: keyof AnalysisReportToggles; label: string }> = [
+  { key: 'full_report', label: 'Full report' },
+  { key: 'subject_momentum', label: 'Subject momentum' },
+  { key: 'subject_distribution', label: 'Subject distribution' },
+  { key: 'heatmaps', label: 'Heatmap' },
+  { key: 'focused_trend', label: 'Focus trend' },
+  { key: 'forecast', label: 'Forecast' },
+];
 
 const defaultReports: AnalysisReportToggles = {
   full_report: true,
@@ -174,8 +199,17 @@ const defaultReports: AnalysisReportToggles = {
 };
 
 export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
-  visible, onClose, questions, trends, cumulative, weaknesses,
-  buildForecastRows, title = 'Analysis Export', userName = 'Aspirant',
+  visible,
+  onClose,
+  questions,
+  trends,
+  cumulative,
+  weaknesses = [],
+  buildForecastRows,
+  title = 'Analysis Export',
+  userName = 'Aspirant',
+  reportVariant = 'analytics',
+  pyqMeta,
 }) => {
   const { colors } = useTheme();
 
@@ -183,6 +217,8 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [selectedSections, setSelectedSections] = useState<string[]>([]);
   const [selectedMicros, setSelectedMicros] = useState<string[]>([]);
+  const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>([]);
+  const [selectedRevisionTags, setSelectedRevisionTags] = useState<string[]>([]);
   const [yearMode, setYearMode] = useState<'all' | 'single' | 'range'>('all');
   const [singleYear, setSingleYear] = useState<string>('');
   const [yearStartIn, setYearStartIn] = useState<string>('');
@@ -204,6 +240,8 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
       setSelectedSubjects([]);
       setSelectedSections([]);
       setSelectedMicros([]);
+      setSelectedDifficulties([]);
+      setSelectedRevisionTags([]);
       setYearMode('all');
       setSingleYear('');
       setYearStartIn('');
@@ -221,6 +259,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
 
   const includeReport = scope === 'report_only' || scope === 'report_with_pyqs';
   const includePyqs = scope === 'report_with_pyqs' || scope === 'pyqs_only';
+  const reportToggleChoices = reportVariant === 'pyq' ? PYQ_REPORT_TOGGLES : ANALYTICS_REPORT_TOGGLES;
 
   // Derive subject → section → micro hierarchy from supplied questions
   const hierarchy = useMemo(() => {
@@ -261,6 +300,26 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
     return Array.from(set).sort();
   }, [hierarchy, selectedSubjects, selectedSections]);
 
+  const difficultyOptions = useMemo(() => {
+    const set = new Set<string>();
+    questions.forEach((q) => {
+      const value = String(q.difficulty || '').trim();
+      if (value) set.add(value);
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [questions]);
+
+  const revisionTagOptions = useMemo(() => {
+    const set = new Set<string>();
+    questions.forEach((q) => {
+      (q.review_tags || []).forEach((tag) => {
+        const value = String(tag || '').trim();
+        if (value) set.add(value);
+      });
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [questions]);
+
   // ---- Filtering pipeline (applies to both analysis and PYQ export) ----
   const yearBounds = useMemo(() => {
     if (yearMode === 'all') return { start: null as number | null, end: null as number | null };
@@ -289,6 +348,16 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
         const mt = (q.micro_topic || 'Other').trim() || 'Other';
         if (!selectedMicros.includes(mt)) return false;
       }
+      if (selectedDifficulties.length > 0) {
+        const difficulty = String(q.difficulty || '').trim();
+        if (!difficulty || !selectedDifficulties.includes(difficulty)) return false;
+      }
+      if (selectedRevisionTags.length > 0) {
+        const rowTags = (q.review_tags || []).map((tag) => String(tag || '').trim().toLowerCase()).filter(Boolean);
+        if (!rowTags.length) return false;
+        const wanted = selectedRevisionTags.map((tag) => tag.toLowerCase());
+        if (!wanted.some((tag) => rowTags.includes(tag))) return false;
+      }
       if (yearBounds.start != null || yearBounds.end != null) {
         const y = Number(q.exam_year);
         if (!Number.isFinite(y)) return false;
@@ -297,16 +366,17 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
       }
       return true;
     });
-  }, [questions, selectedSubjects, selectedSections, selectedMicros, yearBounds]);
+  }, [questions, selectedSubjects, selectedSections, selectedMicros, selectedDifficulties, selectedRevisionTags, yearBounds]);
 
   // ---- Build analysis summary input (same structure as pyq.tsx) ----
   const buildAnalysisHtml = (): string => {
     if (!includeReport) return '';
     const pieces: string[] = [];
 
-    // Full report uses the existing generateAnalyticsPdfHtml engine — exact
-    // same charts as currently rendered on-screen (copy-paste preservation).
-    if (reports.full_report) {
+    const canRenderAnalyticsFullReport = reportVariant === 'analytics' && !!trends && !!cumulative;
+
+    // Analytics variant keeps the existing dedicated full report renderer.
+    if (reports.full_report && canRenderAnalyticsFullReport) {
       const fullHtml = generateAnalyticsPdfHtml({
         userName,
         timestamp: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }),
@@ -329,16 +399,24 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
       pieces.push(bodyMatch ? bodyMatch[1] : fullHtml);
     }
 
-    // Other report pieces use buildPyqAnalysisSummaryHtml (momentum, donut,
-    // heatmaps, focused trend, forecast) — identical colors to PYQ section.
-    const needSummary = reports.subject_momentum || reports.subject_distribution
-      || reports.heatmaps || reports.focused_trend || reports.forecast;
+    // PYQ variant (and analytics non-full toggles) use the PYQ summary engine
+    // so charts/donuts stay identical to existing export graphics.
+    const summaryReports: AnalysisReportToggles = canRenderAnalyticsFullReport
+      ? { ...reports, full_report: false }
+      : reports;
+
+    const needSummary = Object.values(summaryReports).some(Boolean);
     if (needSummary) {
-      const summary = buildSummaryFromFilteredQuestions(filteredQuestions, {
-        ...reports,
-        // full_report is drawn separately; don't let summary draw everything
-        full_report: false,
-      }, buildForecastRows, yearBounds, selectedSubjects, selectedSections, selectedMicros);
+      const summary = buildSummaryFromFilteredQuestions(
+        filteredQuestions,
+        summaryReports,
+        buildForecastRows,
+        yearBounds,
+        selectedSubjects,
+        selectedSections,
+        selectedMicros,
+        pyqMeta,
+      );
       if (summary) pieces.push(summary);
     }
 
@@ -365,6 +443,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
       is_pyq: !!q.is_pyq,
       is_ncert: !!q.is_ncert,
       difficulty: q.difficulty,
+      review_tags: q.review_tags,
       time_taken_seconds: q.time_taken_seconds,
     }));
     return { kind: 'questions', rows };
@@ -404,9 +483,16 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
         // Questions + optional report prepend via unified engine.
         await exportToPdf(
           pyqPayload as ExportPayload,
-          { ...opts, columns, yearStart: yearBounds.start, yearEnd: yearBounds.end,
-            subjectFilters: selectedSubjects, sectionGroupFilters: selectedSections,
-            microTopicFilters: selectedMicros },
+          {
+            ...opts,
+            columns,
+            yearStart: yearBounds.start,
+            yearEnd: yearBounds.end,
+            subjectFilters: selectedSubjects,
+            sectionGroupFilters: selectedSections,
+            microTopicFilters: selectedMicros,
+            revisionTags: selectedRevisionTags,
+          },
           { prependHtml },
         );
       }
@@ -605,10 +691,46 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
               )}
             </Section>
 
+            <Section title="Difficulty Filter" colors={colors}>
+              {difficultyOptions.length === 0 ? (
+                <Text style={{ color: colors.textTertiary, fontSize: 12 }}>No difficulty tags available in this scope.</Text>
+              ) : (
+                <Row>
+                  {difficultyOptions.map((difficulty) => (
+                    <CheckRow
+                      key={`diff-${difficulty}`}
+                      active={selectedDifficulties.includes(difficulty)}
+                      onPress={() => setSelectedDifficulties((prev) => toggleArr(prev, difficulty))}
+                      label={difficulty}
+                      testID={`analysis-difficulty-${difficulty}`}
+                    />
+                  ))}
+                </Row>
+              )}
+            </Section>
+
+            <Section title="Revision Type Filter" colors={colors}>
+              {revisionTagOptions.length === 0 ? (
+                <Text style={{ color: colors.textTertiary, fontSize: 12 }}>No revision tags available in this scope.</Text>
+              ) : (
+                <Row>
+                  {revisionTagOptions.map((tag) => (
+                    <CheckRow
+                      key={`rev-${tag}`}
+                      active={selectedRevisionTags.includes(tag)}
+                      onPress={() => setSelectedRevisionTags((prev) => toggleArr(prev, tag))}
+                      label={tag}
+                      testID={`analysis-revision-${tag}`}
+                    />
+                  ))}
+                </Row>
+              )}
+            </Section>
+
             {includeReport && (
               <Section title="Report Types" colors={colors}>
                 <Row>
-                  {CHOICES.reportToggles.map(t => (
+                  {reportToggleChoices.map(t => (
                     <CheckRow
                       key={`rep-${t.key}`}
                       active={reports[t.key]}
@@ -715,7 +837,22 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
                 </Section>
 
                 <Section title="Sort By" colors={colors}>
-                  <Row>{CHOICES.sortBys.map(s => <Chip key={s.id} active={opts.sortBy === s.id} onPress={() => set('sortBy', s.id)} testID={`analysis-sort-${s.id}`}>{s.label}</Chip>)}</Row>
+                  <Label colors={colors}>STRUCTURAL SORTING</Label>
+                  <Row>
+                    {CHOICES.sortBys
+                      .filter((s) => ['default', 'subject', 'subject_section', 'subject_section_microtopic'].includes(s.id))
+                      .map(s => (
+                        <Chip key={s.id} active={opts.sortBy === s.id} onPress={() => set('sortBy', s.id)} testID={`analysis-sort-${s.id}`}>{s.label}</Chip>
+                      ))}
+                  </Row>
+                  <Label colors={colors}>ADDITIONAL SORTING</Label>
+                  <Row>
+                    {CHOICES.sortBys
+                      .filter((s) => ['year', 'difficulty'].includes(s.id))
+                      .map(s => (
+                        <Chip key={s.id} active={opts.sortBy === s.id} onPress={() => set('sortBy', s.id)} testID={`analysis-sort-${s.id}`}>{s.label}</Chip>
+                      ))}
+                  </Row>
                 </Section>
 
                 <Section title="Filters" colors={colors}>
@@ -866,6 +1003,7 @@ function buildSummaryFromFilteredQuestions(
   selectedSubjects: string[],
   selectedSections: string[],
   selectedMicros: string[],
+  pyqMeta?: AnalysisExportSheetProps['pyqMeta'],
 ): string {
   if (!rows.length) return '';
 
@@ -975,18 +1113,18 @@ function buildSummaryFromFilteredQuestions(
 
   return buildPyqAnalysisSummaryHtml({
     selectedReports: {
-      full_report: false,
+      full_report: reports.full_report,
       subject_momentum: reports.subject_momentum,
       subject_distribution: reports.subject_distribution,
       heatmaps: reports.heatmaps,
       focused_trend: reports.focused_trend,
       forecast: reports.forecast,
     },
-    examStage: 'Analysis',
-    selectedPaper: selectedSubjects.length ? selectedSubjects.join(', ') : 'All Subjects',
-    selectedRange: yearLabel,
-    customYearStart: yearBounds.start != null ? String(yearBounds.start) : '',
-    customYearEnd: yearBounds.end != null ? String(yearBounds.end) : '',
+    examStage: pyqMeta?.examStage || 'Analysis',
+    selectedPaper: pyqMeta?.selectedPaper || (selectedSubjects.length ? selectedSubjects.join(', ') : 'All Subjects'),
+    selectedRange: pyqMeta?.selectedRange || yearLabel,
+    customYearStart: pyqMeta?.customYearStart || (yearBounds.start != null ? String(yearBounds.start) : ''),
+    customYearEnd: pyqMeta?.customYearEnd || (yearBounds.end != null ? String(yearBounds.end) : ''),
     questionCount: rows.length,
     years: summaryYears,
     distributionData,
@@ -997,7 +1135,7 @@ function buildSummaryFromFilteredQuestions(
     focusMicro: selectedMicros.length === 1 ? selectedMicros[0] : 'All',
     subjectHeatmapRows: isSingleSubject ? sectionHeatmapRows : subjectHeatmapRows,
     topicHeatmapRows: isSingleSubject ? microHeatmapRows : topicHeatmapRows,
-    heatmapPalette: 'spectral',
+    heatmapPalette: pyqMeta?.heatmapPalette || 'spectral',
     momentumTitle: isSingleSubject && deepDiveSubject ? `${deepDiveSubject} Momentum` : 'Subject Momentum',
     distributionTitle: isSingleSubject ? `${deepDiveSubject} Section Distribution` : 'Subject Distribution (Donut)',
     focusedTitle: isSingleSubject ? `${deepDiveSubject} Focused Trend` : 'Focused Trend',

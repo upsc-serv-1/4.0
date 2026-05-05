@@ -36,7 +36,7 @@ import { PieChart, LineChart } from '../src/components/Charts';
 import { useTheme } from '../src/context/ThemeContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { prelimsTaxonomy } from '../src/data/taxonomy';
-import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet';
+import { AnalysisExportSheet } from '../src/components/export/AnalysisExportSheet';
 import { buildPyqAnalysisSummaryHtml, type ExportPayload } from '../src/lib/unifiedExportEngine';
 import { useDownloadManager } from '../src/context/DownloadManagerContext';
 import { useExportGuard } from '../src/lib/useExportGuard';
@@ -2635,32 +2635,61 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         </Pressable>
       </Modal>
 
-      <UnifiedExportSheet
+      <AnalysisExportSheet
         visible={questionExportVisible}
         onClose={() => setQuestionExportVisible(false)}
-        payload={questionExportPayload}
-        title={questionExportScope === 'all_subjects' ? 'PYQ Questions Export' : 'PYQ Subject Export'}
-        analysisReports={ANALYSIS_REPORT_OPTIONS}
-        onBuildAnalysisHtml={buildAnalysisExecutiveSummaryHtml}
-        initialOptions={useMemo(() => ({
-          moduleName: 'PYQ Analysis',
-          showTOC: true,
-          headerText: 'PYQ Analysis',
-          footerText: questionExportYearBounds.start == null || questionExportYearBounds.end == null
-            ? 'All Years'
-            : questionExportYearBounds.start === questionExportYearBounds.end
-              ? `Year ${questionExportYearBounds.start}`
-              : `${questionExportYearBounds.start}-${questionExportYearBounds.end}`,
-          contentScope: 'q_options_expl',
-          answerPlacement: 'inline',
-          fontSize: 6,
-          subjectFilters: questionExportScope === 'selected_subject' && questionExportSubject ? [questionExportSubject] : [],
-          sectionGroupFilters: questionExportSections,
-          microTopicFilters: questionExportMicros,
-          yearStart: questionExportYearBounds.start,
-          yearEnd: questionExportYearBounds.end,
-          sortBy: 'subject_section_microtopic',
-        }), [questionExportScope, questionExportSubject, questionExportSections, questionExportMicros, questionExportYearBounds])}
+        reportVariant="pyq"
+        title="PYQ Unified Export"
+        questions={rawQuestions.map((q: any) => ({
+          id: String(q.id),
+          question_text: q.question_text || q.statement_line || '',
+          options: q.options,
+          correct_answer: q.correct_answer,
+          explanation_markdown: q.explanation_markdown,
+          subject: getAnalyticsSubject(q),
+          section_group: q.section_group || 'General',
+          micro_topic: q.micro_topic || 'Other',
+          exam_year: getAnalyticsYear(q) || undefined,
+          is_pyq: !!q.is_pyq,
+          is_ncert: !!q.is_ncert,
+          difficulty: q.difficulty || q.difficulty_level,
+          review_tags: q.review_tags,
+        }))}
+        buildForecastRows={(rows) => {
+          const predictive = buildPredictive(
+            rows,
+            (entry: any) => {
+              const y = Number(entry.exam_year);
+              return Number.isFinite(y) ? y : null;
+            },
+            {
+              level: 'micro_topic',
+              getSubject: (entry: any) => String(entry.subject || 'General'),
+            }
+          );
+          const hots = probableHotsFor2026(predictive, 1, 12);
+          return hots.map((row) => ({
+            key: row.key,
+            label: row.key,
+            totalQuestions: row.totalQuestions,
+            streak: row.streak,
+            trend: row.trend,
+            forecastPoint: row.forecast2026.point,
+            forecastLow: row.forecast2026.low,
+            forecastHigh: row.forecast2026.high,
+            hotScore: row.hotScore,
+          }));
+        }}
+        pyqMeta={{
+          examStage,
+          selectedPaper,
+          selectedRange: selectedRange === 'Custom Range'
+            ? `Custom Range (${customYearStart}-${customYearEnd})`
+            : selectedRange,
+          customYearStart,
+          customYearEnd,
+          heatmapPalette,
+        }}
       />
 
       <Modal visible={modalVisible} transparent animationType="fade" onRequestClose={() => setModalVisible(false)}>

@@ -759,21 +759,33 @@ export default function UnifiedQuizEngine() {
 
       let finalQs = mergedQs;
       const resIds = typeof params.resultIds === 'string' ? params.resultIds.split(',').filter((id: string) => id.trim().length > 0) : null;
-      const hasQuestionSequence = finalQs.some((q: any) => Number.isFinite(Number(q.question_number)));
+      const parseQuestionNumber = (q: any) => {
+        const raw = q?.question_number;
+        if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+        const text = String(raw ?? '').trim();
+        if (!text) return Number.MAX_SAFE_INTEGER;
+        const numeric = Number(text);
+        if (Number.isFinite(numeric)) return numeric;
+        const match = text.match(/-?\d+(?:\.\d+)?/);
+        return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
+      };
+      const hasQuestionSequence = finalQs.some((q: any) => parseQuestionNumber(q) !== Number.MAX_SAFE_INTEGER);
 
       if (resIds && resIds.length > 0) {
         const orderedMergedIds = resIds.map(id => idToMergedId.get(id) || id);
         const uniqueOrderedIds = Array.from(new Set(orderedMergedIds));
         finalQs = uniqueOrderedIds.map(id => mergedQs.find(q => q.id === id)).filter(Boolean);
       } else if (useExactPaperSequence) {
-        // Paper-wise learn/exam must keep uploaded order. Never apply search-style ranking here.
+        // Paper-wise learn/exam must keep uploaded order.
+        // Sort strictly by `question_number`; preserve uploaded order for ties.
         if (hasQuestionSequence) {
-          finalQs = [...finalQs].sort((a: any, b: any) => {
-            const qNoA = Number.isFinite(Number(a.question_number)) ? Number(a.question_number) : Number.MAX_SAFE_INTEGER;
-            const qNoB = Number.isFinite(Number(b.question_number)) ? Number(b.question_number) : Number.MAX_SAFE_INTEGER;
-            if (qNoA !== qNoB) return qNoA - qNoB;
-            return String(a.id || '').localeCompare(String(b.id || ''));
-          });
+          finalQs = [...finalQs]
+            .map((q: any, idx: number) => ({ q, idx, qNo: parseQuestionNumber(q) }))
+            .sort((a, b) => {
+              if (a.qNo !== b.qNo) return a.qNo - b.qNo;
+              return a.idx - b.idx;
+            })
+            .map(({ q }) => q);
         } else {
           finalQs = [...finalQs];
         }

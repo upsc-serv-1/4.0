@@ -1501,6 +1501,20 @@ export default function UnifiedQuizEngine() {
     }
   };
 
+  // Paper mode helper: close transient overlays first, then execute the same
+  // add-to-flashcard flow used by list/card modes.
+  const handlePaperAddToFlashcards = (q: Question, opts?: { closeExplanation?: boolean }) => {
+    if (opts?.closeExplanation) {
+      setExplanationModalQId(null);
+    }
+    setShowPaperQuickMenu(false);
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        handleAddToFlashcards(q);
+      }, opts?.closeExplanation ? 120 : 0);
+    });
+  };
+
 
 
 
@@ -2425,7 +2439,7 @@ export default function UnifiedQuizEngine() {
               <Flag size={16} color={answerData.isReview ? '#eab308' : colors.textTertiary} fill={answerData.isReview ? '#eab308' : 'transparent'} />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => handleAddToFlashcards(item)}
+              onPress={() => handlePaperAddToFlashcards(item)}
               disabled={savingFlashcard[item.id]}
               testID={`paper-flashcard-${item.id}`}
             >
@@ -2563,7 +2577,7 @@ export default function UnifiedQuizEngine() {
         <ScrollView
           contentContainerStyle={{
             paddingHorizontal: isPaperWide ? 22 : 12,
-            paddingTop: isPaperWide ? 10 : 6,
+            paddingTop: isPaperWide ? 2 : 0,
             paddingBottom: 110,
           }}
           testID="paper-scroll"
@@ -3222,7 +3236,7 @@ export default function UnifiedQuizEngine() {
 
                   {/* Scrollable body */}
                   <ScrollView
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, minHeight: 0 }}
                     contentContainerStyle={{ padding: 18, paddingBottom: 24 }}
                     showsVerticalScrollIndicator
                     nestedScrollEnabled
@@ -3310,12 +3324,7 @@ export default function UnifiedQuizEngine() {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      onPress={() => {
-                        setExplanationModalQId(null);
-                        setTimeout(() => {
-                          handleAddToFlashcards(q);
-                        }, 120);
-                      }}
+                      onPress={() => handlePaperAddToFlashcards(q, { closeExplanation: true })}
                       disabled={savingFlashcard[q.id]}
                       style={[stylesPaper.stickyBtn, { backgroundColor: flashcardedIds.has(q.id) ? colors.primary + '15' : colors.surfaceStrong, borderColor: flashcardedIds.has(q.id) ? colors.primary : colors.border }]}
                       testID="paper-modal-flashcard"
@@ -4087,7 +4096,8 @@ const stylesPaper = StyleSheet.create({
   modalCard: {
     width: '100%',
     maxWidth: 720,
-    maxHeight: '90%',
+    height: Math.min(height * 0.9, 780),
+    minHeight: 320,
     borderRadius: 24,
     overflow: 'hidden',
   },

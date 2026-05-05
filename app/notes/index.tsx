@@ -20,7 +20,7 @@ import {
 import { useRouter } from 'expo-router';
 import {
   Folder, BookOpen, FileText, Plus, Search as SearchIcon, X, ChevronLeft, ChevronRight,
-  Layers, FolderPlus, LayoutGrid, List as ListIcon,
+  Layers, FolderPlus, LayoutGrid, List as ListIcon, Sparkles,
 } from 'lucide-react-native';
 import { supabase } from '../../src/lib/supabase';
 import { useAuth } from '../../src/context/AuthContext';
@@ -177,14 +177,15 @@ export default function NotesIndex() {
   }, [activeChip, currentFolder]);
 
   const aggregateStats = useMemo(() => {
-    let folders = 0, notebooks = 0, notes = 0;
+    let folders = 0, notebooks = 0, notes = 0, glances = 0;
     const allFlats = flattenAll(currentFolder ? [currentFolder] : tree);
     allFlats.forEach((n) => {
       if (n.type === 'folder') folders++;
       else if (n.type === 'notebook') notebooks++;
       else if (n.type === 'note') notes++;
+      if (n.note_id) glances++;
     });
-    return { folders, notebooks, notes };
+    return { folders, notebooks, notes, glances };
   }, [tree, currentFolder]);
 
   const moveTargets = useMemo<MoveTarget[]>(() => {
@@ -547,20 +548,41 @@ export default function NotesIndex() {
         {/* Stats */}
         <View style={styles.topActionArea}>
           <View style={styles.statsBar}>
-            <View style={[styles.statBox, { backgroundColor: '#fef3c712', borderColor: '#f59e0b30' }]}>
-              <Folder size={14} color="#f59e0b" />
-              <Text style={[styles.statNum, { color: '#f59e0b' }]}>{aggregateStats.folders}</Text>
-              <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Folders</Text>
+            <View style={[styles.statBox, { backgroundColor: '#fef3c712' }]}>
+              <View style={[styles.statIconBox, { backgroundColor: '#fef3c712' }]}>
+                <Folder size={15} color="#f59e0b" />
+              </View>
+              <View>
+                <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.folders}</Text>
+                <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Folders</Text>
+              </View>
             </View>
-            <View style={[styles.statBox, { backgroundColor: '#dcfce712', borderColor: '#10b98130' }]}>
-              <BookOpen size={14} color="#10b981" />
-              <Text style={[styles.statNum, { color: '#10b981' }]}>{aggregateStats.notebooks}</Text>
-              <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Notebooks</Text>
+            <View style={[styles.statBox, { backgroundColor: '#dcfce712' }]}>
+              <View style={[styles.statIconBox, { backgroundColor: '#dcfce712' }]}>
+                <BookOpen size={15} color="#10b981" />
+              </View>
+              <View>
+                <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.notebooks}</Text>
+                <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Notebooks</Text>
+              </View>
             </View>
-            <View style={[styles.statBox, { backgroundColor: '#e0f2fe12', borderColor: '#0ea5e930' }]}>
-              <FileText size={14} color="#0ea5e9" />
-              <Text style={[styles.statNum, { color: '#0ea5e9' }]}>{aggregateStats.notes}</Text>
-              <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Notes</Text>
+            <View style={[styles.statBox, { backgroundColor: '#e0f2fe12' }]}>
+              <View style={[styles.statIconBox, { backgroundColor: '#e0f2fe12' }]}>
+                <FileText size={15} color="#0ea5e9" />
+              </View>
+              <View>
+                <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.notes}</Text>
+                <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Notes</Text>
+              </View>
+            </View>
+            <View style={[styles.statBox, { backgroundColor: '#f5f0ff12' }]}>
+              <View style={[styles.statIconBox, { backgroundColor: '#f5f0ff12' }]}>
+                <Sparkles size={15} color="#7c5fe8" />
+              </View>
+              <View>
+                <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.glances}</Text>
+                <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Glances</Text>
+              </View>
             </View>
           </View>
         </View>
@@ -877,10 +899,11 @@ const styles = StyleSheet.create({
   searchInput: { flex: 1, fontSize: 14 },
 
   topActionArea: { paddingHorizontal: 16, marginTop: 12, marginBottom: 8 },
-  statsBar: { flexDirection: 'row', gap: 10 },
-  statBox: { flex: 1, alignItems: 'center', paddingVertical: 12, borderRadius: 14, borderWidth: 1, gap: 4 },
-  statNum: { fontSize: 20, fontWeight: '900' },
-  statLabel: { fontSize: 10, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 },
+  statsBar: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingBottom: 14 },
+  statBox: { width: '47%', flexDirection: 'row', alignItems: 'center', paddingVertical: 11, paddingHorizontal: 13, borderRadius: 14, gap: 10 },
+  statIconBox: { width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  statNum: { fontSize: 20, fontWeight: '800', lineHeight: 22 },
+  statLabel: { fontSize: 10, fontWeight: '600', marginTop: 1 },
 
   hubHeaderRow: {
     flexDirection: 'row',

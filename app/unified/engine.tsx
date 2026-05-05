@@ -393,24 +393,30 @@ export default function UnifiedQuizEngine() {
   // 🆕 Declare arenaMode FIRST — fixes TDZ crash
   const [arenaMode, setArenaMode] = useState<'learning' | 'exam'>((params.mode as 'learning' | 'exam') || 'learning');
 
-  // Prevent accidental exit during formal exams (gesture/back button)
+  // Prevent accidental exit during formal exams and unsaved learning sessions
   usePreventRemove(
-    !isNavigatingAway.current && arenaMode === 'exam',
+    !isNavigatingAway.current && (arenaMode === 'exam' || (arenaMode === 'learning' && hasUnsavedLearningProgress)),
     ({ data }) => {
-      // data.action = the navigation action the OS wants to perform
+      const isLearningExit = arenaMode === 'learning';
       Alert.alert(
-        'Exit Exam?',
-        'Your attempt is in progress. What would you like to do?',
+        isLearningExit ? 'Exit Learn Session?' : 'Exit Exam?',
+        isLearningExit
+          ? 'You have unsaved progress. What would you like to do?'
+          : 'Your attempt is in progress. What would you like to do?',
         [
           {
             text: 'Cancel',
             style: 'cancel',
-            onPress: () => {}, // Stay on screen
+            onPress: () => {},
           },
           {
             text: 'Exit without saving',
             style: 'destructive',
             onPress: () => {
+              if (isLearningExit) {
+                clearStoredAnswers();
+                setRevealedExplanations({});
+              }
               isNavigatingAway.current = true;
               navigation.dispatch(data.action);
             },
@@ -419,8 +425,11 @@ export default function UnifiedQuizEngine() {
             text: 'Save & Exit',
             onPress: async () => {
               try {
-                // reuse your existing save function
-                await handleFinalSubmit();
+                if (isLearningExit) {
+                  await commitManualSave(`Learn Session - ${new Date().toLocaleDateString()}`);
+                } else {
+                  await handleFinalSubmit();
+                }
               } catch (e) {
                 console.warn('Save on exit failed', e);
               } finally {
@@ -430,24 +439,24 @@ export default function UnifiedQuizEngine() {
             },
           },
         ],
-        { cancelable: false } // ⚠️ prevents outside-tap-to-dismiss on Android
+        { cancelable: false }
       );
     }
   );
 
   useEffect(() => {
-    if (arenaMode !== 'exam') return;
+    const shouldGuardBack = arenaMode === 'exam' || (arenaMode === 'learning' && hasUnsavedLearningProgress);
+    if (!shouldGuardBack) return;
+
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-      // Returning true = we've "handled" back; navigation.dispatch in the Alert will actually do the exit
       if (!isNavigatingAway.current) {
-        // Manually trigger the same flow
         navigation.dispatch({ type: 'GO_BACK' } as any);
         return true;
       }
       return false;
     });
     return () => sub.remove();
-  }, [arenaMode]);
+  }, [arenaMode, hasUnsavedLearningProgress]);
 
   // 1. Config from Params
   const showPYQTagsParam = params.showPYQTags !== 'false';
@@ -672,29 +681,29 @@ export default function UnifiedQuizEngine() {
     const newTags = tags.includes(tag) ? tags.filter(t => t !== tag) : [...tags, tag];
     store.setMetadata(qId, { studyTags: newTags }, false);
     // Explicitly trigger sync with the *newest* data to prevent the "one step behind" race condition
-    if (session?.user?.id) {
-       StudentSync.enqueue('question_state', {
-         userId: session.user.id,
-         questionId: qId,
-         testId: questions.find(q => q.id === qId)?.tests?.id || 'manual',
-         patch: { review_tags: newTags }
-       });
+    if (arenaMode === 'exam' && session?.user?.id) {
+      StudentSync.enqueue('question_state', {
+        userId: session.user.id,
+        questionId: qId,
+        testId: questions.find(q => q.id === qId)?.tests?.id || 'manual',
+        patch: { review_tags: newTags }
+      });
     }
   };
 
   const toggleGuess = (qId: string, selectedAnswer: string | null | undefined, guessValue: string) => {
     const currentGuess = currentAnswers[qId]?.confidence || null;
-    store.setAnswer(qId, selectedAnswer ?? null, currentGuess === guessValue ? null : guessValue);
+    store.setAnswer(qId, selectedAnswer ?? null, currentGuess === guessValue ? null : guessValue, arenaMode === 'exam');
   };
 
   const toggleDifficulty = (qId: string, difficultyValue: string) => {
     const currentDifficulty = currentAnswers[qId]?.difficulty || null;
-    store.setMetadata(qId, { difficulty: currentDifficulty === difficultyValue ? null : difficultyValue });
+    store.setMetadata(qId, { difficulty: currentDifficulty === difficultyValue ? null : difficultyValue }, arenaMode === 'exam');
   };
 
   const toggleMistakeType = (qId: string, errorType: string) => {
     const currentError = currentAnswers[qId]?.errorCategory || null;
-    store.setMetadata(qId, { errorCategory: currentError === errorType ? null : errorType });
+    store.setMetadata(qId, { errorCategory: currentError === errorType ? null : errorType }, arenaMode === 'exam');
   };
 
   const NOTE_PREFS_KEY = 'notebook_save_prefs';
@@ -702,6 +711,26 @@ export default function UnifiedQuizEngine() {
 
   // 3. Store Selectors
   const currentAnswers = store.answers;
+  const clearStoredAnswers = store.clearAnswers;
+
+  const hasUnsavedLearningProgress = useMemo(() => {
+    if (arenaMode !== 'learning') return false;
+    const values = Object.values(currentAnswers || {});
+    return values.some((entry: any) => {
+      if (!entry) return false;
+      return Boolean(
+        entry.selectedAnswer ||
+        entry.confidence ||
+        entry.difficulty ||
+        entry.errorCategory ||
+        (Array.isArray(entry.studyTags) && entry.studyTags.length > 0) ||
+        (entry.note && String(entry.note).trim().length > 0) ||
+        (entry.timeSpentSeconds || 0) > 0 ||
+        entry.isReview ||
+        entry.isBookmarked
+      );
+    });
+  }, [arenaMode, currentAnswers]);
 
   // 4. Fetch Questions
   useEffect(() => {
@@ -831,7 +860,7 @@ export default function UnifiedQuizEngine() {
       }
       
       if (session?.user?.id && finalQs.length > 0) {
-        const shouldLoadAnswers = arenaMode === 'learning' && params.testId && !params.testId.startsWith('custom_');
+        const shouldLoadAnswers = arenaMode === 'exam' && params.testId && !params.testId.startsWith('custom_');
         store.loadStates(mergedQs.map(q => q.id), !!shouldLoadAnswers);
         checkFlashcards(finalQs.map(q => q.id));
       }
@@ -1414,7 +1443,7 @@ export default function UnifiedQuizEngine() {
 
   // 7. Action Handlers
   const handleOptionSelect = (qId: string, label: string) => {
-    store.setAnswer(qId, label);
+    store.setAnswer(qId, label, undefined, arenaMode === 'exam');
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     
     // REDUNDANT: store.setAnswer already triggers sync via store.syncAnswer
@@ -1715,12 +1744,45 @@ export default function UnifiedQuizEngine() {
   };
 
   const handleExit = () => {
-    if (params.mode === 'exam') {
+    if (arenaMode === 'exam') {
       setShowSaveSessionModal(true);
-    } else {
+      return;
+    }
+
+    if (!hasUnsavedLearningProgress) {
       isNavigatingAway.current = true;
       router.back();
+      return;
     }
+
+    Alert.alert(
+      'Exit Learn Session?',
+      'You have unsaved progress. What would you like to do?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+          onPress: () => {},
+        },
+        {
+          text: 'Exit without saving',
+          style: 'destructive',
+          onPress: () => {
+            clearStoredAnswers();
+            setRevealedExplanations({});
+            isNavigatingAway.current = true;
+            router.back();
+          },
+        },
+        {
+          text: 'Save & Exit',
+          onPress: async () => {
+            await handleSaveAndExit();
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   const commitManualSave = async (customName: string) => {
@@ -1816,7 +1878,10 @@ export default function UnifiedQuizEngine() {
   };
 
   const handleSaveAndExit = async () => {
-    await commitManualSave(sessionName || 'Exam Session');
+    const fallbackName = arenaMode === 'learning'
+      ? `Learn Session - ${new Date().toLocaleDateString()}`
+      : 'Exam Session';
+    await commitManualSave(sessionName || fallbackName);
     await AsyncStorage.removeItem(INDEX_PERSIST_KEY);
     router.back();
   };
@@ -2076,7 +2141,7 @@ export default function UnifiedQuizEngine() {
             })()}
             
             <TouchableOpacity 
-              onPress={() => store.setMetadata(item.id, { isReview: !answerData.isReview })}
+              onPress={() => store.setMetadata(item.id, { isReview: !answerData.isReview }, arenaMode === 'exam')}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: answerData.isReview ? (isZenMode ? '#43342220' : '#fef9c3') : 'transparent' }}
             >
                <Flag size={18} color={answerData.isReview ? (isZenMode ? '#433422' : '#eab308') : (isZenMode ? '#43342240' : colors.textTertiary)} fill={answerData.isReview ? (isZenMode ? '#433422' : '#eab308') : 'transparent'} />
@@ -2460,7 +2525,7 @@ export default function UnifiedQuizEngine() {
           </View>
           <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
             <TouchableOpacity
-              onPress={() => store.setMetadata(item.id, { isReview: !answerData.isReview })}
+              onPress={() => store.setMetadata(item.id, { isReview: !answerData.isReview }, arenaMode === 'exam')}
               testID={`paper-review-${item.id}`}
             >
               <Flag size={16} color={answerData.isReview ? '#eab308' : colors.textTertiary} fill={answerData.isReview ? '#eab308' : 'transparent'} />
@@ -3342,7 +3407,7 @@ export default function UnifiedQuizEngine() {
                   {/* Sticky action bar — full-text labels */}
                   <View style={[stylesPaper.stickyBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
                     <TouchableOpacity
-                      onPress={() => store.setMetadata(q.id, { isReview: !ans.isReview })}
+                      onPress={() => store.setMetadata(q.id, { isReview: !ans.isReview }, arenaMode === 'exam')}
                       style={[stylesPaper.stickyBtn, { backgroundColor: ans.isReview ? '#fef9c3' : colors.surfaceStrong, borderColor: ans.isReview ? '#eab308' : colors.border }]}
                       testID="paper-modal-review"
                     >

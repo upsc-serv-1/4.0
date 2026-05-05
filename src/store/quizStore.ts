@@ -24,11 +24,12 @@ interface QuizState {
 
   // Actions
   startTest: (testId: string, userId: string, attemptId?: string) => void;
-  setAnswer: (questionId: string, answer: string | null, confidence?: string | null) => void;
+  setAnswer: (questionId: string, answer: string | null, confidence?: string | null, autoSync?: boolean) => void;
   setMetadata: (questionId: string, patch: { difficulty?: string | null; errorCategory?: string | null; note?: string | null; isReview?: boolean; isBookmarked?: boolean; studyTags?: string[] }, autoSync?: boolean) => void;
   incrementTime: (questionId: string) => void;
   syncAnswer: (questionId: string) => void;
   loadStates: (questionIds: string[], loadAnswers?: boolean) => Promise<void>;
+  clearAnswers: () => void;
 }
 
 // Map to track debounced sync timeouts per question
@@ -52,7 +53,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     });
   },
 
-  setAnswer: (questionId, answer, confidence) => {
+  setAnswer: (questionId, answer, confidence, autoSync = true) => {
     set((state) => {
       const current = state.answers[questionId] || { 
         selectedAnswer: null, 
@@ -77,7 +78,9 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     });
 
     // Trigger debounced sync outside set() so it reads the new state
-    get().syncAnswer(questionId);
+    if (autoSync) {
+      get().syncAnswer(questionId);
+    }
   },
 
   setMetadata: (questionId, patch, autoSync = true) => {
@@ -241,5 +244,9 @@ export const useQuizStore = create<QuizState>((set, get) => ({
         return { answers: newAnswers };
       });
     }
+  },
+
+  clearAnswers: () => {
+    set({ answers: {} });
   },
 }));

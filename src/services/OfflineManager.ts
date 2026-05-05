@@ -20,6 +20,7 @@ import { QuestionCache } from './QuestionCache';
 // ─── Storage Keys ────────────────────────────────────────────────
 const OFFLINE_META_KEY     = '@offline_meta';
 const OFFLINE_TESTS_KEY    = '@offline_tests';
+const OFFLINE_METADATA_CONSOLIDATED_KEY = '@offline_metadata_consolidated_v1';
 const USER_STATES_PREFIX   = '@user_states_';
 const USER_NOTES_PREFIX    = '@user_notes_';
 const USER_NOTE_NODES_PREFIX = '@user_note_nodes_';
@@ -551,32 +552,51 @@ class OfflineManagerService {
   }
 
   async getConsolidatedMetadata(): Promise<any[]> {
-    const tests = await this.getOfflineTests();
-    if (!tests || tests.length === 0) return [];
-    const flattened: any[] = [];
-    for (const t of tests) {
-      const questions = await this.getOfflineQuestions(t.id);
-      if (questions.length === 0) {
-        flattened.push({
-          subject: null, section_group: null, micro_topic: null,
-          is_ncert: null,
-          test_id: t.id, institute: t.institute, program_name: t.program_name,
-          series: t.series, title: t.title,
-        });
-      } else {
-        for (const q of questions) {
+    // Try MMKV cache first for instant return
+    const cached = KVStore.getJson<any[]>(OFFLINE_METADATA_CONSOLIDATED_KEY);
+    
+    // Rebuild in background
+    const buildMetadata = async () => {
+      const tests = await this.getOfflineTests();
+      if (!tests || tests.length === 0) return [];
+      const flattened: any[] = [];
+      for (const t of tests) {
+        const questions = await this.getOfflineQuestions(t.id);
+        if (questions.length === 0) {
           flattened.push({
-            subject: q.subject || null,
-            section_group: q.section_group || null,
-            micro_topic: q.micro_topic || null,
-            is_ncert: q.is_ncert ?? null,
+            subject: null, section_group: null, micro_topic: null,
+            is_ncert: null,
             test_id: t.id, institute: t.institute, program_name: t.program_name,
             series: t.series, title: t.title,
           });
+        } else {
+          for (const q of questions) {
+            flattened.push({
+              subject: q.subject || null,
+              section_group: q.section_group || null,
+              micro_topic: q.micro_topic || null,
+              is_ncert: q.is_ncert ?? null,
+              test_id: t.id, institute: t.institute, program_name: t.program_name,
+              series: t.series, title: t.title,
+            });
+          }
         }
       }
+      // Persist to MMKV for next cold start
+      if (flattened.length > 0) {
+        KVStore.setJson(OFFLINE_METADATA_CONSOLIDATED_KEY, flattened);
+      }
+      return flattened;
+    };
+
+    if (cached && Array.isArray(cached) && cached.length > 0) {
+      // Return cached immediately, refresh in background
+      buildMetadata().catch(console.error);
+      return cached;
     }
-    return flattened;
+
+    // No cache or empty cache, build synchronously
+    return buildMetadata();
   }
 
   async getOfflineCards(userId: string): Promise<any[]> {
@@ -595,6 +615,7 @@ class OfflineManagerService {
     await QuestionCache.clearCache();
     KVStore.delete(OFFLINE_META_KEY);
     KVStore.delete(OFFLINE_TESTS_KEY);
+    KVStore.delete(OFFLINE_METADATA_CONSOLIDATED_KEY);
     KVStore.deletePrefix(USER_STATES_PREFIX);
     KVStore.deletePrefix(USER_NOTES_PREFIX);
     KVStore.deletePrefix(USER_NOTE_NODES_PREFIX);

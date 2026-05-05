@@ -46,7 +46,7 @@ const { width } = Dimensions.get('window');
 
 let arenaMetadataCache: any[] | null = null;
 let arenaMetadataCachedAt = 0;
-const ARENA_METADATA_CACHE_TTL_MS = 90_000;
+const ARENA_METADATA_CACHE_TTL_MS = 300_000; // 5 minutes (was 90s)
 
 // --- Helper Components ---
 
@@ -505,7 +505,11 @@ export default function UnifiedArenaSetup() {
       return;
     }
 
-    setRefreshingMetadata(true);
+    // Only show "Syncing filters..." when there's no warm cache
+    if (!hasWarmCache) {
+      setRefreshingMetadata(true);
+    }
+    
     try {
       const flattened = await OfflineManager.getConsolidatedMetadata();
       const normalized = Array.isArray(flattened) ? flattened : [];

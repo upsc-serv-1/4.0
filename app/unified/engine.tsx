@@ -457,6 +457,7 @@ export default function UnifiedQuizEngine() {
   const initialView: 'list' | 'card' | 'paper' = (params.view as any)
     || (arenaMode === 'exam' ? 'paper' : 'list');
   const [viewMode, setViewMode] = useState<'list' | 'card' | 'paper'>(initialView);
+  const isPaperMode = viewMode === 'paper';
   const timerType = (params.timer as 'countdown' | 'stopwatch' | 'none') || 'none';
   const [showModeSelection, setShowModeSelection] = useState(params.mode === 'choice');
 
@@ -541,7 +542,14 @@ export default function UnifiedQuizEngine() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     }
   };
+
+  const handleClockButtonPress = () => {
+    if (timerType === 'none') setShowTimerPicker(true);
+    else setShowClockControl(true);
+  };
   const [showQuickMenu, setShowQuickMenu] = useState(false);
+  const [showPaperQuickMenu, setShowPaperQuickMenu] = useState(false);
+  const [showPaperPagination, setShowPaperPagination] = useState(false);
   // Simulated Exam Mode (paper view) state
   const [paperPage, setPaperPage] = useState(0); // current paper page (0-indexed)
   const [explanationModalQId, setExplanationModalQId] = useState<string | null>(null); // open explanation modal for this question id
@@ -705,6 +713,13 @@ export default function UnifiedQuizEngine() {
       return () => clearTimeout(scrollTimer);
     }
   }, [showIndex, viewMode]);
+
+  useEffect(() => {
+    if (!isPaperMode) {
+      setShowPaperQuickMenu(false);
+      setShowPaperPagination(false);
+    }
+  }, [isPaperMode]);
 
   const fetchQuestions = async () => {
     setLoading(true);
@@ -2546,17 +2561,14 @@ export default function UnifiedQuizEngine() {
     return (
       <View style={{ flex: 1 }}>
         <ScrollView
-          contentContainerStyle={{ padding: isPaperWide ? 24 : 14, paddingBottom: 90 }}
+          contentContainerStyle={{
+            paddingHorizontal: isPaperWide ? 22 : 12,
+            paddingTop: isPaperWide ? 10 : 6,
+            paddingBottom: 110,
+          }}
           testID="paper-scroll"
         >
-          {/* Page banner */}
-          <View style={{ alignItems: 'center', marginBottom: 14 }}>
-            <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textTertiary, letterSpacing: 2 }}>
-              SIMULATED EXAM PAPER · PAGE {paperPage + 1} OF {totalPaperPages}
-            </Text>
-            <View style={{ width: 60, height: 2, backgroundColor: colors.border, marginTop: 6 }} />
-          </View>
-          <View style={{ flexDirection: 'row', gap: isPaperWide ? 32 : 0 }}>
+          <View style={{ flexDirection: 'row', gap: isPaperWide ? 28 : 0 }}>
             {columns.map((col, colIdx) => (
               <View key={`col-${colIdx}`} style={{ flex: 1, gap: isPaperWide ? 20 : 14 }}>
                 {col.map((q) => {
@@ -2568,37 +2580,66 @@ export default function UnifiedQuizEngine() {
           </View>
         </ScrollView>
 
-        {/* Pagination footer */}
-        <View style={[stylesPaper.pagerBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
-          <TouchableOpacity
-            onPress={() => setPaperPage(p => Math.max(0, p - 1))}
-            disabled={paperPage === 0}
-            style={[stylesPaper.pagerBtn, { backgroundColor: colors.surfaceStrong, opacity: paperPage === 0 ? 0.4 : 1 }]}
-            testID="paper-prev"
-          >
-            <ArrowLeft size={18} color={colors.textPrimary} />
-            <Text style={{ color: colors.textPrimary, fontWeight: '800' }}>Prev</Text>
-          </TouchableOpacity>
-          <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center', flex: 1 }}>
-            {Array.from({ length: totalPaperPages }).map((_, p) => (
-              <TouchableOpacity
-                key={`pgnum-${p}`}
-                onPress={() => setPaperPage(p)}
-                style={[stylesPaper.pageDot, p === paperPage && { backgroundColor: colors.primary, borderColor: colors.primary }]}
-                testID={`paper-page-${p}`}
+        {/* Floating pagination: hidden by default, toggle from bottom-right */}
+        <View pointerEvents="box-none" style={stylesPaper.paginationDock}>
+          {showPaperPagination && (
+            <View style={[stylesPaper.paginationPopup, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
+              <View style={stylesPaper.paginationTopRow}>
+                <TouchableOpacity
+                  onPress={() => setPaperPage(p => Math.max(0, p - 1))}
+                  disabled={paperPage === 0}
+                  style={[stylesPaper.pagerBtn, { backgroundColor: colors.surfaceStrong, opacity: paperPage === 0 ? 0.4 : 1 }]}
+                  testID="paper-prev"
+                >
+                  <ArrowLeft size={16} color={colors.textPrimary} />
+                  <Text style={{ color: colors.textPrimary, fontWeight: '800', fontSize: 12 }}>Prev</Text>
+                </TouchableOpacity>
+
+                <Text style={{ color: colors.textSecondary, fontWeight: '800', fontSize: 11 }}>
+                  Page {paperPage + 1} / {totalPaperPages}
+                </Text>
+
+                <TouchableOpacity
+                  onPress={() => setPaperPage(p => Math.min(totalPaperPages - 1, p + 1))}
+                  disabled={paperPage >= totalPaperPages - 1}
+                  style={[stylesPaper.pagerBtn, { backgroundColor: colors.primary, opacity: paperPage >= totalPaperPages - 1 ? 0.4 : 1 }]}
+                  testID="paper-next"
+                >
+                  <Text style={{ color: colors.buttonText, fontWeight: '800', fontSize: 12 }}>Next</Text>
+                  <ArrowRight size={16} color={colors.buttonText} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Horizontal scrolling for large page counts (50+, etc.) */}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator
+                style={stylesPaper.paginationScroller}
+                contentContainerStyle={stylesPaper.paginationScrollerContent}
               >
-                <Text style={{ color: p === paperPage ? colors.buttonText : colors.textSecondary, fontWeight: '900', fontSize: 11 }}>{p + 1}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+                {Array.from({ length: totalPaperPages }).map((_, p) => (
+                  <TouchableOpacity
+                    key={`pgnum-${p}`}
+                    onPress={() => setPaperPage(p)}
+                    style={[stylesPaper.pageDot, p === paperPage && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                    testID={`paper-page-${p}`}
+                  >
+                    <Text style={{ color: p === paperPage ? colors.buttonText : colors.textSecondary, fontWeight: '900', fontSize: 11 }}>{p + 1}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
           <TouchableOpacity
-            onPress={() => setPaperPage(p => Math.min(totalPaperPages - 1, p + 1))}
-            disabled={paperPage >= totalPaperPages - 1}
-            style={[stylesPaper.pagerBtn, { backgroundColor: colors.primary, opacity: paperPage >= totalPaperPages - 1 ? 0.4 : 1 }]}
-            testID="paper-next"
+            onPress={() => setShowPaperPagination(v => !v)}
+            style={[stylesPaper.paginationToggle, { backgroundColor: colors.primary }]}
+            testID="paper-pagination-toggle"
           >
-            <Text style={{ color: colors.buttonText, fontWeight: '800' }}>Next</Text>
-            <ArrowRight size={18} color={colors.buttonText} />
+            <Layout size={16} color={colors.buttonText} />
+            <Text style={{ color: colors.buttonText, fontWeight: '900', fontSize: 11 }}>
+              {showPaperPagination ? 'Hide Pages' : `Pages ${paperPage + 1}/${totalPaperPages}`}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -2664,7 +2705,7 @@ export default function UnifiedQuizEngine() {
   return (
     <PageWrapper>
       <SafeAreaView style={[styles.container, { backgroundColor: zenBg }]}>
-        <StatusBar hidden={isZenMode} barStyle={isZenMode ? 'dark-content' : 'default'} />
+        <StatusBar hidden={isZenMode || isPaperMode} barStyle={isZenMode ? 'dark-content' : 'default'} />
         {isZenMode && (
           <TouchableOpacity 
             style={styles.floatingZenExit} 
@@ -2674,6 +2715,7 @@ export default function UnifiedQuizEngine() {
             <Minimize2 size={24} color="#433422" />
           </TouchableOpacity>
         )}
+        {!isPaperMode && (
         <View style={[styles.header, { borderBottomColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.border }]}>
           <TouchableOpacity onPress={handleExit} style={styles.headerBtn}>
             <ChevronLeft size={24} color={isZenMode ? '#433422' : colors.textPrimary} />
@@ -2732,10 +2774,7 @@ export default function UnifiedQuizEngine() {
               <LayoutGrid size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => {
-                if (timerType === 'none') setShowTimerPicker(true);
-                else setShowClockControl(true);
-              }}
+              onPress={handleClockButtonPress}
               style={[styles.headerBtn, timerType !== 'none' && { flexDirection: 'row', gap: 4 }]}
               testID="engine-clock-btn"
             >
@@ -2757,6 +2796,71 @@ export default function UnifiedQuizEngine() {
             </TouchableOpacity>
           </View>
         </View>
+        )}
+
+        {isPaperMode && (
+          <View pointerEvents="box-none" style={stylesPaper.topRightDock}>
+            <TouchableOpacity
+              onPress={() => setShowPaperQuickMenu(v => !v)}
+              style={[stylesPaper.topRightToggle, { backgroundColor: colors.surface, borderColor: colors.border }]}
+              testID="paper-top-toggle"
+            >
+              <MoreVertical size={18} color={colors.textPrimary} />
+            </TouchableOpacity>
+          </View>
+        )}
+
+        <Modal
+          visible={isPaperMode && showPaperQuickMenu}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowPaperQuickMenu(false)}
+        >
+          <Pressable style={StyleSheet.absoluteFill} onPress={() => setShowPaperQuickMenu(false)}>
+            <View style={[stylesPaper.paperQuickMenu, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
+              <TouchableOpacity
+                style={stylesPaper.paperQuickMenuItem}
+                onPress={() => { setShowPaperQuickMenu(false); handleExit(); }}
+              >
+                <ChevronLeft size={16} color={colors.textPrimary} />
+                <Text style={{ color: colors.textPrimary, fontWeight: '800', fontSize: 12 }}>Back</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={stylesPaper.paperQuickMenuItem}
+                onPress={() => { setShowPaperQuickMenu(false); handleClockButtonPress(); }}
+                testID="paper-quick-clock"
+              >
+                <Clock size={16} color={timerType !== 'none' && isTimerActive ? colors.primary : colors.textPrimary} />
+                <Text style={{ color: colors.textPrimary, fontWeight: '800', fontSize: 12 }}>Clock</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={stylesPaper.paperQuickMenuItem}
+                onPress={() => { setShowPaperQuickMenu(false); setShowSaveNameModal(true); }}
+              >
+                <Save size={16} color={colors.textPrimary} />
+                <Text style={{ color: colors.textPrimary, fontWeight: '800', fontSize: 12 }}>Save</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={stylesPaper.paperQuickMenuItem}
+                onPress={() => { setShowPYQTags(!showPYQTags); setShowPaperQuickMenu(false); }}
+              >
+                <TagIcon size={16} color={showPYQTags ? colors.primary : colors.textPrimary} />
+                <Text style={{ color: showPYQTags ? colors.primary : colors.textPrimary, fontWeight: '800', fontSize: 12 }}>PYQ</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={stylesPaper.paperQuickMenuItem}
+                onPress={() => { setShowNavigator(true); setShowPaperQuickMenu(false); }}
+              >
+                <LayoutGrid size={16} color={colors.textPrimary} />
+                <Text style={{ color: colors.textPrimary, fontWeight: '800', fontSize: 12 }}>Palette</Text>
+              </TouchableOpacity>
+            </View>
+          </Pressable>
+        </Modal>
 
         {loading ? (
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -3057,11 +3161,14 @@ export default function UnifiedQuizEngine() {
               : (explanations[safeIdx]?.text || 'No explanation provided.');
 
             return (
-              <Pressable
+              <View
                 style={[stylesPaper.modalBackdrop, Platform.OS !== 'android' && ({ backdropFilter: 'blur(8px)' } as any)]}
-                onPress={() => setExplanationModalQId(null)}
                 testID="paper-explanation-modal"
               >
+                <Pressable
+                  style={StyleSheet.absoluteFill}
+                  onPress={() => setExplanationModalQId(null)}
+                />
                 <Pressable
                   onPress={() => { /* swallow */ }}
                   style={[stylesPaper.modalCard, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
@@ -3115,9 +3222,11 @@ export default function UnifiedQuizEngine() {
 
                   {/* Scrollable body */}
                   <ScrollView
-                    style={{ maxHeight: 400 }}
+                    style={{ flex: 1 }}
                     contentContainerStyle={{ padding: 18, paddingBottom: 24 }}
                     showsVerticalScrollIndicator
+                    nestedScrollEnabled
+                    keyboardShouldPersistTaps="handled"
                   >
                     <Markdown
                       style={{
@@ -3201,7 +3310,12 @@ export default function UnifiedQuizEngine() {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      onPress={() => handleAddToFlashcards(q)}
+                      onPress={() => {
+                        setExplanationModalQId(null);
+                        setTimeout(() => {
+                          handleAddToFlashcards(q);
+                        }, 120);
+                      }}
                       disabled={savingFlashcard[q.id]}
                       style={[stylesPaper.stickyBtn, { backgroundColor: flashcardedIds.has(q.id) ? colors.primary + '15' : colors.surfaceStrong, borderColor: flashcardedIds.has(q.id) ? colors.primary : colors.border }]}
                       testID="paper-modal-flashcard"
@@ -3252,7 +3366,7 @@ export default function UnifiedQuizEngine() {
                     </TouchableOpacity>
                   </View>
                 </Pressable>
-              </Pressable>
+              </View>
             );
           })()}
         </Modal>
@@ -3873,6 +3987,78 @@ const stylesPaper = StyleSheet.create({
     paddingVertical: 10,
     borderTopWidth: 1,
     gap: 12,
+  },
+  paginationDock: {
+    position: 'absolute',
+    right: 12,
+    bottom: 12,
+    alignItems: 'flex-end',
+    gap: 8,
+  },
+  paginationPopup: {
+    width: Math.min(width - 24, 560),
+    borderWidth: 1,
+    borderRadius: 16,
+    padding: 10,
+    gap: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  paginationTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  paginationScroller: {
+    maxHeight: 46,
+  },
+  paginationScrollerContent: {
+    gap: 8,
+    paddingRight: 6,
+  },
+  paginationToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 999,
+  },
+  topRightDock: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 18 : 12,
+    right: 12,
+    zIndex: 999,
+  },
+  topRightToggle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  paperQuickMenu: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 66 : 56,
+    right: 12,
+    width: 168,
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 8,
+    gap: 6,
+  },
+  paperQuickMenuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 10,
   },
   pagerBtn: {
     flexDirection: 'row',

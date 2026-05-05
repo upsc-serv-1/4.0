@@ -61,7 +61,8 @@ import {
   Type,
   List,
   PenTool,
-  Eraser
+  Eraser,
+  ExternalLink
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -1557,6 +1558,36 @@ export default function UnifiedQuizEngine() {
     }
   };
 
+  // Secondary navigation: jump to the original source (test / book / paper)
+  // that contained this question.  Loads the full source set with the tapped
+  // question pre-selected.  Skips no-op when we are already in that source.
+  const handleViewSource = (q: Question) => {
+    if (!q?.test_id) {
+      Alert.alert('No source available', 'This question has no original source attached.');
+      return;
+    }
+    if (params.testId === q.test_id) {
+      // Already viewing in source context — just jump to that question.
+      const idx = questions.findIndex(item => item.id === q.id);
+      if (idx >= 0) {
+        setCurrentIndex(idx);
+        setShowIndex(false);
+      }
+      return;
+    }
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    isNavigatingAway.current = true;
+    router.push({
+      pathname: '/unified/engine',
+      params: {
+        testId: q.test_id,
+        questionId: q.id,
+        mode: 'learning',
+        view: 'list',
+      },
+    } as any);
+  };
+
   const runAfterPaperOverlayClose = (
     callback: () => void,
     opts?: { closeExplanation?: boolean; delayMs?: number }
@@ -2221,6 +2252,18 @@ export default function UnifiedQuizEngine() {
                  />
                )}
             </TouchableOpacity>
+            {!!item.test_id && params.testId !== item.test_id && (
+              <TouchableOpacity
+                testID={`engine-view-source-header-${item.id}`}
+                onPress={() => handleViewSource(item)}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                 <ExternalLink
+                   size={20}
+                   color={isZenMode ? '#43342240' : colors.textTertiary}
+                 />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 

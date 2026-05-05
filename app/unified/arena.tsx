@@ -218,6 +218,7 @@ export default function UnifiedArenaSetup() {
   const [showPYQTags, setShowPYQTags] = useState(true);
   const [showTopicModal, setShowTopicModal] = useState(false);
   const [topicSearch, setTopicSearch] = useState('');
+  const [paperVisibleCount, setPaperVisibleCount] = useState(40);
 
   // 3. Dynamic Data State
   const [metadata, setMetadata] = useState<any[]>(() => arenaMetadataCache || []);
@@ -287,7 +288,8 @@ export default function UnifiedArenaSetup() {
     activeTab,
     searchQuery,
     searchFilters,
-    ncertFilter
+    ncertFilter,
+    metadata
   ]);
 
   useEffect(() => {
@@ -299,6 +301,12 @@ export default function UnifiedArenaSetup() {
       fetchSearchResults();
     }
   }, [searchQuery, searchFilters, activeTab]);
+
+  useEffect(() => {
+    if (activeTab === 'paper') {
+      setPaperVisibleCount(40);
+    }
+  }, [activeTab, selectedInstitute, selectedProgram, selectedExamStage, selectedTestId]);
 
   const fetchSearchResults = async () => {
     if (!searchQuery && Object.keys(searchFilters).length === 0) {
@@ -552,6 +560,40 @@ export default function UnifiedArenaSetup() {
         }
       }
 
+      if (activeTab === 'paper') {
+        // Let the tab switch paint first, then compute lightweight count from cached metadata.
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        const isNcert = (v: any) => {
+          if (v === true || v === 1) return true;
+          if (typeof v === 'string') {
+            const x = v.trim().toLowerCase();
+            return x === 'true' || x === '1' || x === 'yes';
+          }
+          return false;
+        };
+
+        let rows = metadata.filter((m: any) => !!m.test_id);
+
+        if (selectedTestId) {
+          rows = rows.filter((m: any) => m.test_id === selectedTestId);
+        } else {
+          if (selectedInstitute !== 'All') rows = rows.filter((m: any) => m.institute === selectedInstitute);
+          if (selectedProgram !== 'All') rows = rows.filter((m: any) => m.program_name === selectedProgram);
+          if (selectedExamStage !== 'All') rows = rows.filter((m: any) => m.series === selectedExamStage);
+        }
+
+        if (ncertFilter === 'NCERT Only') {
+          rows = rows.filter((m: any) => isNcert(m.is_ncert));
+        } else if (ncertFilter === 'Non-NCERT') {
+          rows = rows.filter((m: any) => !isNcert(m.is_ncert));
+        }
+
+        setQuestionCount(rows.length);
+        setCalculatingCount(false);
+        return;
+      }
+
       let query = LocalQuery.from('questions').select('id', { count: 'exact', head: true });
 
       if (activeTab === 'topic') {
@@ -617,24 +659,6 @@ export default function UnifiedArenaSetup() {
       } else if (activeTab === 'search') {
         setCalculatingCount(false);
         return;
-      } else if (activeTab === 'paper') {
-        if (selectedTestId) {
-          query = query.eq('test_id', selectedTestId);
-        } else {
-          let tQuery = LocalQuery.from('tests').select('id');
-          if (selectedInstitute !== 'All') tQuery = tQuery.eq('institute', selectedInstitute);
-          if (selectedProgram !== 'All') tQuery = tQuery.eq('program_name', selectedProgram);
-          if (selectedExamStage !== 'All') tQuery = tQuery.eq('series', selectedExamStage);
-
-          const { data: testRows } = await tQuery;
-          const testIds = (testRows || []).map(t => t.id);
-          if (testIds.length > 0) query = query.in('test_id', testIds);
-          else {
-            setQuestionCount(0);
-            setCalculatingCount(false);
-            return;
-          }
-        }
       }
 
       const { count, error } = await query;
@@ -708,6 +732,8 @@ export default function UnifiedArenaSetup() {
     });
     return Array.from(tests.values()).sort((a, b) => String(a.title).localeCompare(String(b.title)));
   }, [metadata, selectedInstitute, selectedProgram, selectedExamStage]);
+
+  const visiblePaperTests = useMemo(() => testList.slice(0, paperVisibleCount), [testList, paperVisibleCount]);
 
   const [showPreFlight, setShowPreFlight] = useState(false);
 
@@ -1153,7 +1179,7 @@ export default function UnifiedArenaSetup() {
                 </Text>
               </View>
 
-              {testList.map(test => (
+              {visiblePaperTests.map(test => (
                 <TouchableOpacity
                   key={test.id}
                   onPress={() => {
@@ -1179,6 +1205,17 @@ export default function UnifiedArenaSetup() {
                   )}
                 </TouchableOpacity>
               ))}
+
+              {testList.length > paperVisibleCount && (
+                <TouchableOpacity
+                  onPress={() => setPaperVisibleCount((prev) => Math.min(prev + 40, testList.length))}
+                  style={{ marginHorizontal: 20, marginBottom: 12, paddingVertical: 12, borderRadius: 12, borderWidth: 1, borderColor: colors.primary + '55', alignItems: 'center' }}
+                >
+                  <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 12 }}>
+                    Show More ({paperVisibleCount}/{testList.length})
+                  </Text>
+                </TouchableOpacity>
+              )}
 
               {testList.length === 0 && (
                 <View style={{ padding: 40, alignItems: 'center' }}>

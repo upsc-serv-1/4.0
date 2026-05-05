@@ -553,6 +553,7 @@ class OfflineManagerService {
       if (questions.length === 0) {
         flattened.push({
           subject: null, section_group: null, micro_topic: null,
+          is_ncert: null,
           test_id: t.id, institute: t.institute, program_name: t.program_name,
           series: t.series, title: t.title,
         });
@@ -562,6 +563,7 @@ class OfflineManagerService {
             subject: q.subject || null,
             section_group: q.section_group || null,
             micro_topic: q.micro_topic || null,
+            is_ncert: q.is_ncert ?? null,
             test_id: t.id, institute: t.institute, program_name: t.program_name,
             series: t.series, title: t.title,
           });

@@ -90,7 +90,7 @@ function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs 
   return (
     <View style={[styles.tabBarContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
       <ScrollView
-        horizontal={!isTablet}
+        horizontal
         scrollEnabled={!isTablet}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={[

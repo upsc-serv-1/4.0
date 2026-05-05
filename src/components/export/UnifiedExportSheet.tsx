@@ -9,7 +9,7 @@ import { useTheme } from '../../context/ThemeContext';
 import {
   ExportOptions, ExportPayload, defaultExportOptions, exportToPdf,
   ExportFontFamily, ExportTheme, ExportPaperStyle, ExportContentScope,
-  ExportAnswerPlacement, ExportSortBy, ExportQaLayoutMode,
+  ExportAnswerPlacement, ExportSortBy, ExportQaLayoutMode, ExportVisualStyle,
 } from '../../lib/unifiedExportEngine';
 
 export interface AnalysisReportOption {
@@ -95,6 +95,10 @@ const CHOICES = {
     { id: 'subject_section_microtopic' as ExportSortBy, label: 'Subject + Section Group + Micro Topic' },
     { id: 'difficulty' as ExportSortBy, label: 'Difficulty' },
     { id: 'date' as ExportSortBy, label: 'Date' },
+  ],
+  visualStyles: [
+    { id: 'document' as ExportVisualStyle, label: 'Document' },
+    { id: 'flashcard' as ExportVisualStyle, label: 'Flashcard Style' },
   ],
   statusFilters: [
     { id: 'all', label: 'All' },
@@ -269,6 +273,13 @@ export const UnifiedExportSheet: React.FC<Props> = ({
               <Label colors={colors}>PAPER</Label>
               <Row>{CHOICES.papers.map(p => <Chip key={p.id} active={opts.paperStyle === p.id} onPress={() => set('paperStyle', p.id)}>{p.label}</Chip>)}</Row>
             </Section>
+
+
+            {(payload?.kind === 'questions' || payload?.kind === 'tags') && (
+              <Section title="Visual Style" colors={colors}>
+                <Row>{CHOICES.visualStyles.map(v => <Chip key={v.id} active={opts.visualStyle === v.id} onPress={() => set('visualStyle', v.id)}>{v.label}</Chip>)}</Row>
+              </Section>
+            )}
 
             {(payload?.kind === 'questions' || payload?.kind === 'tags') && (
               <Section title="Q&A Highlight" colors={colors}>

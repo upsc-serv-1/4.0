@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, NavLink, useNavigate } from 'react-router-dom';
 import { supabase } from './lib/supabase';
-import { LayoutDashboard, FileQuestion, FileText, Users, LogOut } from 'lucide-react';
+import { LayoutDashboard, FileQuestion, FileText, Users, LogOut, Layers } from 'lucide-react';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import QuestionsPage from './pages/QuestionsPage';
 import TestsPage from './pages/TestsPage';
 import UserPerformancePage from './pages/UserPerformancePage';
+import DedupManager from './pages/DedupManager';
 
 export default function App() {
   const [session, setSession] = useState<any>(null);
@@ -57,6 +58,7 @@ function Shell() {
         <NavItem to="/dashboard" icon={<LayoutDashboard size={18} />}>Dashboard</NavItem>
         <NavItem to="/questions" icon={<FileQuestion size={18} />}>Questions</NavItem>
         <NavItem to="/tests" icon={<FileText size={18} />}>Tests</NavItem>
+        <NavItem to="/dedup" icon={<Layers size={18} />}>Dedup Manager</NavItem>
         <NavItem to="/users" icon={<Users size={18} />}>User Performance</NavItem>
         <div className="mt-auto">
           <button onClick={async () => { await supabase.auth.signOut(); navigate('/'); }}
@@ -70,6 +72,7 @@ function Shell() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/questions" element={<QuestionsPage />} />
           <Route path="/tests" element={<TestsPage />} />
+          <Route path="/dedup" element={<DedupManager />} />
           <Route path="/users" element={<UserPerformancePage />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

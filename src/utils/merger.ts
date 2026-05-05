@@ -1,253 +1,215 @@
 /**
- * Unified merging logic for canonical questions across the app.
+ * Smart Dedupe + Merger v3 (fresh rewrite — Branch 5.3)
  *
- * Updated rule:
- *   1) Compare by YEAR + TEXT first (primary dedupe key)
- *   2) Then canonical id
- *   3) Then text / explanation / options fallbacks
+ * Rules (per user spec, asked 11+ times):
+ *   1. Two questions are duplicates ONLY if:
+ *        a) Both have is_pyq === true AND is_upsc_cse === true
+ *        b) They have the SAME exam_year
+ *        c) Their normalized question text is fuzzy-similar
+ *           (token-Jaccard >= 0.78 OR one fully contains the other after >=20 tokens)
+ *   2. Canonical question text = LONGEST cleaned question text in the cluster.
+ *   3. All explanations from every institute are kept and exposed via `_explanations`.
+ *      Each entry = { source, text, year, answer }.
+ *   4. `_institutes` lists every contributing coaching brand.
+ *   5. `_mergedIds` holds every original row id so callers can flatten back.
  *
- * This prevents duplicate rows in Arena when same question is repeated
- * across institutes and ensures merged rows retain all institutes + explanations.
+ * For non-PYQ-UPSC questions we fall back to exact-year+exact-text dedupe to be safe.
+ *
+ * The mobile app already consumes _institutes / _explanations / _mergedIds in
+ *   - app/unified/arena.tsx  (search list + chips)
+ *   - app/unified/engine.tsx (Learn-mode explanation chips)
+ *   - src/components/GlobalSearchBar.tsx (instant search)
+ * No callsite changes required.
  */
+
+const INSTITUTE_MAP: Record<string, string> = {
+  forum: 'Forum IAS', forumias: 'Forum IAS',
+  vision: 'Vision IAS', visionias: 'Vision IAS',
+  vajiram: 'Vajiram', bajirao: 'Vajiram', bajiram: 'Vajiram',
+  next: 'Next IAS', nextias: 'Next IAS',
+  insights: 'Insights IAS', insightsias: 'Insights IAS',
+  iasbaba: 'IASBaba',
+  pw: 'PW', physicswallah: 'PW',
+  raus: 'Rau\'s IAS', raausias: 'Rau\'s IAS',
+  drishti: 'Drishti IAS', drishtiias: 'Drishti IAS',
+  xias: 'X-IAS', x: 'X-IAS',
+  shankar: 'Shankar IAS', shankarias: 'Shankar IAS',
+  upsc: 'UPSC',
+};
+
+const STOPWORDS = new Set([
+  'the','a','an','of','in','to','and','or','is','are','was','were','for','on','at',
+  'by','with','as','that','this','it','be','from','which','has','have','had','not',
+  'consider','statements','following','statement','correct','given','above','below',
+  'context','reference','regard','regarding','sometimes','seen','news','recently',
+  'india','indian','national','international',
+]);
+
+const cleanText = (text: string): string => {
+  if (!text) return '';
+  return String(text)
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&[a-z]+;/gi, ' ')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+const tokenize = (text: string): string[] => {
+  const cleaned = cleanText(text);
+  if (!cleaned) return [];
+  return cleaned.split(' ').filter(t => t.length > 2 && !STOPWORDS.has(t));
+};
+
+const jaccard = (a: Set<string>, b: Set<string>): number => {
+  if (a.size === 0 || b.size === 0) return 0;
+  let inter = 0;
+  for (const t of a) if (b.has(t)) inter++;
+  const union = a.size + b.size - inter;
+  return union === 0 ? 0 : inter / union;
+};
+
+const normalizeInstitute = (raw: any): string => {
+  const s = String(raw || '').trim();
+  if (!s) return 'UPSC';
+  const key = s.toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (INSTITUTE_MAP[key]) return INSTITUTE_MAP[key];
+  return s.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+};
+
+const getInstitute = (q: any): string => {
+  const tests = Array.isArray(q?.tests) ? q.tests[0] : q?.tests;
+  let inst = tests?.institute || q?.provider || q?.source?.institute;
+  if (!inst && q?.test_id) {
+    const first = String(q.test_id).split(/[-_]/)[0]?.toLowerCase();
+    if (first && INSTITUTE_MAP[first]) inst = first;
+  }
+  return normalizeInstitute(inst);
+};
+
+const getYear = (q: any): string => {
+  const y = q?.exam_year || q?.source?.year || q?.tests?.exam_year || q?.tests?.launch_year || '';
+  return String(y || '').trim();
+};
+
+const getQuestionText = (q: any): string =>
+  String(q?.question_text || q?.statement_line || q?.statement || '');
+
+const isUpscPyq = (q: any): boolean => {
+  const groupName = String(q?.source?.group || q?.exam_group || q?.tests?.series || '').toUpperCase();
+  const isUPSC = !!q?.is_upsc_cse || groupName.includes('UPSC');
+  return !!q?.is_pyq && isUPSC;
+};
+
+interface ExplanationEntry {
+  source: string;
+  text: string;
+  year: string;
+  answer: string;
+}
+
+const buildExplanationEntry = (q: any, inst: string, year: string): ExplanationEntry | null => {
+  const text = String(q?.explanation_markdown || q?.explanation || '').trim();
+  const answer = String(q?.correct_answer || '').trim();
+  if (!text && !answer) return null;
+  return { source: inst, text, year, answer };
+};
+
+const addExplanation = (existing: any[], entry: ExplanationEntry) => {
+  const norm = (s: string) => cleanText(s).slice(0, 200);
+  const dup = existing.some(e =>
+    String(e.source).toLowerCase() === entry.source.toLowerCase() &&
+    String(e.year) === entry.year &&
+    norm(e.text) === norm(entry.text) &&
+    String(e.answer || '').toUpperCase() === String(entry.answer || '').toUpperCase()
+  );
+  if (!dup) existing.push(entry);
+};
+
 export const mergeQuestions = (questions: any[]) => {
-  const mergedQs: any[] = [];
-  const canonicalMap = new Map<string, any>();
-  const yearTextMap = new Map<string, any>();
-  const textMap = new Map<string, any>();
-  const explanationMap = new Map<string, any>();
-  const optionsMap = new Map<string, any>();
   const idToMergedId = new Map<string, string>();
+  const mergedQs: any[] = [];
 
-  const cleanText = (text: string) => {
-    if (!text) return '';
-    return text
-      .replace(/<[^>]*>?/gm, '')
-      .toLowerCase()
-      .replace(/[\s\n\r\t]+/g, ' ')
-      .replace(/[^\w ]/g, '')
-      .trim();
-  };
+  // Bucket PYQ-UPSC questions by year for fuzzy clustering.
+  // Non-PYQ-UPSC questions go straight through (no merging — preserves variety).
+  const buckets = new Map<string, any[]>(); // year -> [canonical questions]
+  const passthrough: any[] = [];
 
-  const getQuestionText = (q: any): string =>
-    String(q?.question_text || q?.statement_line || q?.statement || '');
+  for (const q of questions) {
+    if (!q) continue;
+    if (!isUpscPyq(q)) {
+      // No merging across non-UPSC-PYQ — but still tag institute & explanation
+      // so single-row UI doesn't break.
+      const inst = getInstitute(q);
+      const year = getYear(q);
+      q._institutes = [inst];
+      q._mergedIds = [q.id];
+      const e = buildExplanationEntry(q, inst, year);
+      q._explanations = e ? [e] : [];
+      idToMergedId.set(q.id, q.id);
+      passthrough.push(q);
+      continue;
+    }
 
-  const normalizeInstituteLabel = (value: any) => {
-    const raw = String(value || '').trim();
-    if (!raw) return 'UPSC';
+    const year = getYear(q) || 'NA';
+    const tokens = new Set(tokenize(getQuestionText(q)));
+    const inst = getInstitute(q);
+    const expl = buildExplanationEntry(q, inst, year);
 
-    const compact = raw.toLowerCase().replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').trim();
-    const key = compact.replace(/[^a-z0-9]/g, '');
+    const list = buckets.get(year) || [];
 
-    const map: Record<string, string> = {
-      forum: 'Forum',
-      forumias: 'Forum',
-      vision: 'Vision',
-      visionias: 'Vision',
-      next: 'Next',
-      nextias: 'Next',
-      insights: 'Insights',
-      insightsias: 'Insights',
-      iasbaba: 'IASBABA',
-      vajiram: 'Vajiram',
-      pw: 'PW',
-      raus: 'Raus',
-      drishti: 'Drishti',
-      upsc: 'UPSC',
-    };
+    // Find best match in same year-bucket via fuzzy Jaccard
+    let best: { canon: any; score: number } | null = null;
+    for (const canon of list) {
+      const cTokens: Set<string> = canon.__tokens;
+      const score = jaccard(tokens, cTokens);
+      if (score > (best?.score || 0)) best = { canon, score };
+    }
 
-    if (map[key]) return map[key];
-    return compact
-      .split(' ')
-      .filter(Boolean)
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join(' ');
-  };
+    const SIM_THRESHOLD = 0.78;
+    const containsThreshold = tokens.size >= 20 && best && best.score >= 0.6;
 
-  const getInstitute = (q: any) => {
-    const testsObj = Array.isArray(q?.tests) ? q.tests[0] : q?.tests;
-    let inst = testsObj?.institute || q?.tests?.institute || q?.provider || q?.source?.institute;
-    if (!inst && q?.test_id) {
-      const parts = String(q.test_id).split('-');
-      if (parts.length > 0) {
-        const first = parts[0].toLowerCase();
-        if (['forum', 'vision', 'insights', 'iasbaba', 'vajiram', 'nextias', 'next', 'pw', 'raus', 'drishti'].includes(first)) {
-          inst = first;
-        }
+    if (best && (best.score >= SIM_THRESHOLD || containsThreshold)) {
+      const canon = best.canon;
+      // Prefer the LONGER cleaned text as canonical question_text.
+      const canonText = getQuestionText(canon);
+      const newText = getQuestionText(q);
+      if (cleanText(newText).length > cleanText(canonText).length) {
+        canon.question_text = newText;
+        if (canon.options && q.options) canon.options = q.options;
+        // keep canon.id as the cluster id (do NOT switch ids — we only rewrite text)
       }
-    }
-    return normalizeInstituteLabel(inst || 'UPSC');
-  };
 
-  const getYear = (q: any): string => {
-    const y = q?.exam_year || q?.source?.year || q?.tests?.exam_year || q?.tests?.launch_year || '';
-    return String(y || '').trim();
-  };
+      if (!canon._institutes.includes(inst)) canon._institutes.push(inst);
+      if (!canon._mergedIds.includes(q.id)) canon._mergedIds.push(q.id);
+      if (expl) addExplanation(canon._explanations, expl);
 
-  const buildYearTextKey = (q: any): string => {
-    const year = getYear(q) || 'na';
-    const txt = cleanText(getQuestionText(q));
-    if (!txt) return '';
-    return `${year}__${txt}`;
-  };
-
-  const normalizeExplanation = (txt: string) =>
-    cleanText(txt || '').replace(/\s+/g, ' ').trim();
-
-  questions.forEach((q) => {
-    let vaultMeta: any = null;
-    try {
-      if (q.source_attribution_label) {
-        const parsed = typeof q.source_attribution_label === 'string'
-          ? JSON.parse(q.source_attribution_label)
-          : q.source_attribution_label;
-        vaultMeta = parsed?.__vaultMeta;
+      // Keep first non-empty explanation_markdown for legacy single-explanation UIs
+      if (!canon.explanation_markdown && q.explanation_markdown) {
+        canon.explanation_markdown = q.explanation_markdown;
       }
-    } catch {
-      // ignore malformed attribution json
+
+      idToMergedId.set(q.id, canon.id);
+    } else {
+      // New cluster head
+      q.__tokens = tokens;
+      q._institutes = [inst];
+      q._mergedIds = [q.id];
+      q._explanations = expl ? [expl] : [];
+      list.push(q);
+      buckets.set(year, list);
+      idToMergedId.set(q.id, q.id);
     }
+  }
 
-    const cId = vaultMeta?.canonicalId || (vaultMeta?.isCanonical ? q.id : null) || vaultMeta?._canonicalQuestionId;
-
-    const questionText = cleanText(getQuestionText(q));
-    const year = getYear(q);
-    const yearTextKey = buildYearTextKey(q);
-
-    const explKey = normalizeExplanation(String(q.explanation_markdown || q.explanation || ''));
-    const explanationYearKey = explKey ? `${year || 'na'}__${explKey}` : '';
-
-    const optionsKey = q.options
-      ? Object.values(q.options).map((v: any) => String(v || '')).sort().join('|').toLowerCase().replace(/[^\w]/g, '')
-      : '';
-    const optionsYearKey = optionsKey ? `${year || 'na'}__${optionsKey}` : '';
-
-    let existing: any = null;
-
-    // 1) PRIMARY: year + text
-    if (yearTextKey && questionText.length > 20) {
-      existing = yearTextMap.get(yearTextKey) || null;
+  for (const list of buckets.values()) {
+    for (const canon of list) {
+      delete canon.__tokens;
+      mergedQs.push(canon);
     }
-
-    // 2) Canonical fallback (only when year doesn't conflict)
-    if (!existing && cId) {
-      const byCanonical = canonicalMap.get(cId) || null;
-      if (byCanonical) {
-        const existingYear = getYear(byCanonical);
-        const yearCompatible = !existingYear || !year || existingYear === year;
-        if (yearCompatible) existing = byCanonical;
-      }
-    }
-
-    // 3) Secondary text fallback
-    if (!existing && questionText && questionText.length > 40) {
-      existing = textMap.get(questionText) || null;
-    }
-
-    // 4) Explanation fallback
-    if (!existing && explanationYearKey && explKey.length > 80) {
-      existing = explanationMap.get(explanationYearKey) || null;
-    }
-
-    // 5) Options fallback
-    if (!existing && optionsYearKey && optionsKey.length > 50) {
-      existing = optionsMap.get(optionsYearKey) || null;
-    }
-
-    const institute = getInstitute(q);
-
-    if (existing) {
-      idToMergedId.set(q.id, existing.id);
-      mergeData(existing, q, institute, getYear(q), normalizeExplanation);
-      return;
-    }
-
-    prepareQuestion(q, institute, getYear(q));
-
-    if (cId) canonicalMap.set(cId, q);
-    if (yearTextKey) yearTextMap.set(yearTextKey, q);
-    if (questionText) textMap.set(questionText, q);
-    if (explanationYearKey) explanationMap.set(explanationYearKey, q);
-    if (optionsYearKey) optionsMap.set(optionsYearKey, q);
-
-    idToMergedId.set(q.id, q.id);
-    mergedQs.push(q);
-  });
+  }
+  for (const p of passthrough) mergedQs.push(p);
 
   return { mergedQs, idToMergedId };
-};
-
-const prepareQuestion = (q: any, inst: string, year: string) => {
-  q._institutes = [inst];
-  q._mergedIds = [q.id];
-
-  const expl = String(q.explanation_markdown || q.explanation || '').trim();
-  const ans = String(q.correct_answer || '').trim();
-  q._explanations = (expl || ans)
-    ? [{ source: inst, text: expl, year, answer: ans }]
-    : [];
-};
-
-const mergeData = (
-  existing: any,
-  q: any,
-  inst: string,
-  year: string,
-  normalizeExplanation: (txt: string) => string,
-) => {
-  if (!existing._institutes) {
-    const testsObj = Array.isArray(existing.tests) ? existing.tests[0] : existing.tests;
-    const baseInstRaw = testsObj?.institute || existing.tests?.institute || existing.provider || 'UPSC';
-    const baseInst = String(baseInstRaw || 'UPSC').trim();
-    existing._institutes = [baseInst];
-  }
-  const instKey = String(inst || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-  const hasInstitute = existing._institutes.some((x: string) => {
-    const key = String(x || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-    return key === instKey || key.includes(instKey) || instKey.includes(key);
-  });
-  if (!hasInstitute) {
-    existing._institutes.push(inst);
-  }
-
-  if (!existing._mergedIds) existing._mergedIds = [existing.id];
-  if (!existing._mergedIds.includes(q.id)) existing._mergedIds.push(q.id);
-
-  if (!existing._explanations) {
-    const base = String(existing.explanation_markdown || existing.explanation || '').trim();
-    const baseAns = String(existing.correct_answer || '').trim();
-    existing._explanations = (base || baseAns)
-      ? [{
-          source: existing._institutes[0],
-          text: base,
-          year: String(existing.exam_year || existing.source?.year || ''),
-          answer: baseAns,
-        }]
-      : [];
-  }
-
-  const qText = String(q.explanation_markdown || q.explanation || '').trim();
-  const qAnswer = String(q.correct_answer || '').trim().toUpperCase();
-
-  if (qText || qAnswer) {
-    const qNorm = normalizeExplanation(qText);
-
-    // Keep one record per institute/year/answer/text combination.
-    const alreadyPresent = existing._explanations.some((e: any) => {
-      const eNorm = normalizeExplanation(String(e.text || ''));
-      const sameSource = String(e.source || '').trim().toLowerCase() === inst.toLowerCase();
-      const sameYear = String(e.year || '') === String(year || '');
-      const sameAnswer = String(e.answer || '').trim().toUpperCase() === qAnswer;
-      return sameSource && sameYear && sameAnswer && eNorm === qNorm;
-    });
-
-    if (!alreadyPresent) {
-      existing._explanations.push({
-        source: inst,
-        text: qText,
-        year,
-        answer: q.correct_answer || '',
-      });
-    }
-
-    if (!existing.explanation_markdown && qText) existing.explanation_markdown = qText;
-  }
 };

@@ -2001,7 +2001,7 @@ export default function UnifiedQuizEngine() {
                 <View style={{ flex: 1, marginLeft: 12 }}>
                   <Text
                     style={[styles.indexSnippet, { color: colors.textPrimary }]}
-                    numberOfLines={isWideIndex ? 0 : 2}
+                    numberOfLines={isWideIndex ? undefined : 2}
                   >{snippet}</Text>
                   <View style={{ flexDirection: 'row', gap: 6, marginTop: 8 }}>
                     {(() => {

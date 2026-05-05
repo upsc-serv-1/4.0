@@ -76,7 +76,7 @@ export function NotesGrid({ folderNodes, noteNodes, notesById, onOpenFolder }: P
           <TouchableOpacity
             onPress={() =>
               router.push({
-                pathname: '/notes/pro-editor',
+                pathname: '/hardnotes/editor',
                 params: { noteId: item.node.note_id || '', nodeId: item.node.id, title: item.node.title },
               } as any)
             }

@@ -67,7 +67,15 @@ export function HardnotesSidebar({ userId, nodes, selectedFolderId, onSelectFold
       <View key={n.id}>
         <TouchableOpacity
           activeOpacity={0.7}
-          onPress={() => {`n            onSelectFolder(n.id);`n            if (kids.length > 0) toggle(n.id);`n          }}`n          onLongPress={() => {`n            setCreating({ parentId: n.id });`n            setExpanded((prev) => new Set(prev).add(n.id));`n          }}`n          delayLongPress={350}
+          onPress={() => {
+            onSelectFolder(n.id);
+            if (kids.length > 0) toggle(n.id);
+          }}
+          onLongPress={() => {
+            setCreating({ parentId: n.id });
+            setExpanded((prev) => new Set(prev).add(n.id));
+          }}
+          delayLongPress={350}
           style={[
             styles.row,
             { paddingLeft: 12 + depth * 16 },

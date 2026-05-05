@@ -111,7 +111,7 @@ export function QuizCaptureSheet({
       setCreating(false);
       onClose();
       router.push({
-        pathname: '/notes/pro-editor',
+        pathname: '/hardnotes/editor',
         params: {
           noteId: note.id,
           title: note.title,

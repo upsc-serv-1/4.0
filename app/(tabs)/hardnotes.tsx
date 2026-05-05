@@ -123,7 +123,7 @@ export default function Hardnotes() {
       setNewNoteInputVisible(false);
       await refresh();
       router.push({
-        pathname: '/notes/pro-editor',
+        pathname: '/hardnotes/editor',
         params: { noteId: note.id, nodeId: node.id, title: note.title },
       } as any);
     } catch (e: any) {

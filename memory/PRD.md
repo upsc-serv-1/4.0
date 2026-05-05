@@ -1,59 +1,77 @@
-# PRD — Knowledge Vault (Notes Tab Transformation)
+# PRD — UPSC Study App (5.3 branch)
 
-## Original problem statement
-Repo: `upsc-serv-1/4.0` (branch `5.0`). Expo / React Native / Supabase study app for UPSC.
+## Live work history
 
-User wanted the **Notes tab** transformed into a "Knowledge Vault & Dual-Mode Note System" with:
-1. Subject Hub home (icon grid, no auto-seed)
-2. Aichii hierarchy tree (Folder → Notebook → Note with vertical lines)
-3. Glance Mode — inline-unfold a note's items (highlights, headings, checklist)
-4. Semantic chip filter (use existing review-tag system: defaults + `user_settings.custom_tags`)
-5. Focus Mode — immersive parchment/serif reader (existing Zen mode, deep-linked)
-6. Unified export engine for notes (with notes-specific injections)
+### Iteration 1 — Knowledge Vault (Notes tab)  [completed earlier]
+Subject Hub grid + Aichii tree + Glance Mode + chip filter (review-tag catalog) +
+Focus Mode (`?focus=1`) + UnifiedExportSheet integration. Files: `app/notes/index.tsx`,
+`app/notes/editor.tsx`, `src/components/notes/{SubjectHubGrid, SemanticChipRow, GlancePanel}.tsx`,
+`src/hooks/useNoteTagCatalog.ts`. *Notes-Pro left untouched, as instructed.*
 
-User explicit constraints:
-- Don't auto-fetch / auto-seed subjects
-- Use the existing review-tag catalog (Tags-tab parity)
-- Use the existing UnifiedExportSheet
-- No changes to Tags / Flashcards / Notes-Pro Skia editor
+### Iteration 2 — Hardnotes "Three-Lens" Editor  [this iteration]
 
-## Architecture
-- **Tech**: Expo Router, React Native 0.81, Supabase JS, Zustand (`useTagStore`), TS 5.3.
-- **DB**: Supabase tables `user_note_nodes` (tree) + `user_notes` (content). No migration needed — `items` JSONB silently extended with optional `tags: string[]` per item (forward-compatible).
-- **Tag catalog**: `useNoteTagCatalog` merges built-in defaults (Imp. Fact / Imp. Concept / Trap Question / Must Revise / Memorize) + `user_settings.custom_tags` + AsyncStorage cache + items-discovered tags. Subscribes to `useTagStore.version` for cross-screen sync.
+**Problem**: Two capture popups (Add to Notebook vs Add to Hardnote), two destinations
+(classic editor vs Skia pro-editor) and no way to pen-annotate existing bullets.
 
-## Files
-**New**
-- `src/hooks/useNoteTagCatalog.ts`
-- `src/components/notes/SubjectHubGrid.tsx`
-- `src/components/notes/SemanticChipRow.tsx`
-- `src/components/notes/GlancePanel.tsx`
+**Solution**: A single editor at `/hardnotes/editor` with three lenses, anchored
+per-bullet ink, and a unified `Point` data shape.
 
-**Edited**
-- `src/components/notes/NoteRow.tsx` — added Play (Focus mode), Export, and Glance toggle
-- `app/notes/index.tsx` — full rewrite around Knowledge Vault flow
-- `app/notes/editor.tsx` — added `?focus=1` deep-link → auto-enables Zen + parchment-serif preview
+#### New files
+- `src/components/hardnotes/useHardnoteDoc.ts` — debounced load/save hook with a
+  canonical `Point` type. Normalises legacy `highlight`, `microTopicHeading`,
+  `base_layer` items on read; nothing to migrate manually.
+- `src/components/hardnotes/InkBulletCard.tsx` — atomic bullet card. Renders rich
+  HTML (RenderHtml) in display mode, swaps to a TextInput with B/I/highlight
+  toolbar in edit mode, and overlays a transparent Skia canvas in Ink lens.
+  **Strokes are stored on `point.strokes[]` so they follow the bullet on
+  reorder/delete** (no orphaned ink).
+- `src/components/hardnotes/InkToolbar.tsx` — floating Notability-style palette
+  (pen / highlighter / eraser · 6 colors · 3 widths · undo).
+- `src/components/hardnotes/LensSwitcher.tsx` — segmented control: 🔍 Glance · 📖 Focus · ✏️ Ink.
+- `app/hardnotes/editor.tsx` — orchestrator page.
+- `app/hardnotes/_layout.tsx` — Expo Router stack layout.
 
-## What's implemented (Jan 2026)
-- ✅ Subject Hub grid (2-col card layout, auto-mapped subject icons, palette-stable colors, child counters, inline action dots)
-- ✅ Hub list/grid view toggle
-- ✅ Aichii tree inside folders (existing vertical-line tree retained)
-- ✅ Per-note Glance unfold with checklist toggle persisting to Supabase
-- ✅ Semantic chip row (live-synced with Tags-tab catalog)
-- ✅ "Stream-mode": selecting a chip auto-opens glance for every note in the subtree, fallback heuristic maps `microTopicHeading→Imp.Concept` and `highlight→Imp.Fact` when items aren't yet explicitly tagged
-- ✅ Focus mode deep-link via `/notes/editor?focus=1` (oversized title, sepia parchment, serif preview)
-- ✅ Per-row swipe actions: Read, Add, Export, Rename, Move, Duplicate, Delete
-- ✅ UnifiedExportSheet integration (`kind: 'notes'`) with notes-specific defaults: sepia theme + lined paper + serif font + TOC on
-- ✅ Unfiled root-level notes/notebooks shown under "UNFILED" section
-- ✅ Empty states for both root and inside-folder views
+#### Edited files
+- `src/components/hardnotes/QuizCaptureSheet.tsx` — routes to `/hardnotes/editor` on commit.
+- `src/components/hardnotes/NotesGrid.tsx` — opens notes in `/hardnotes/editor`.
+- `app/(tabs)/hardnotes.tsx` — "New Note" CTA routes to `/hardnotes/editor`.
+- `src/components/hardnotes/HardnotesSidebar.tsx` — fixed pre-existing PowerShell
+  `` `n `` literal-escape corruption that blocked TS compile.
 
-## P1 / next iteration
-- Per-item Tag picker inside the editor (button to attach review tags to a single highlight, persisting `tags` field to `items` JSONB)
-- Bulk-tag actions in Glance Mode
-- Drag-to-reorder items inside a notebook
-- "Last revised" badge on Subject Hub cards (sourced from `user_notes.updated_at`)
-- Quiz-engine "Save to notebook" picker that creates folders/notebooks inline (user said they'll wire this themselves; component is ready to receive it)
+#### Deliberately untouched (user's safety nets)
+- `app/notes/pro-editor.tsx` (legacy Skia canvas editor)
+- `app/notes/editor.tsx` (classic rich editor + Knowledge Vault flow)
+- The "Add to Notebook" inline popup inside `app/unified/engine.tsx`
 
-## Known limitations
-- The pre-existing files `src/components/hardnotes/HardnotesSidebar.tsx` and `src/components/hardnotes/QuizCaptureSheet.tsx` carry user-staged local edits with TS syntax errors (visible from `git status` at task start) — untouched by this iteration.
-- Cannot run an automated headless E2E for this stack inside the kubernetes preview (Expo bundler not provisioned). Manual testing required on device.
+## Architecture decisions
+
+1. **Per-bullet stroke anchoring** — strokes live inside the point object
+   (`point.strokes[]`) using the point's local coord space. Reordering a bullet
+   moves its ink with it, deleting a bullet deletes its annotations, and Glance/
+   Focus lenses still render the strokes read-only as visual decoration.
+2. **Three lenses share data, swap behaviour** — same `Point[]` rendered three
+   ways. No content duplication, instant lens flip.
+3. **Inline text-edit + highlight pill** — selection → 4-color highlight pill
+   wraps in `<mark style="background:X">…</mark>`; B/I wrap in `<b>`/`<i>`. All
+   stored as HTML inside `point.text`; rendered via `react-native-render-html`.
+4. **Locked references survive** — old `base_layer` items are surfaced as
+   `point.locked = true` with a "LOCKED REFERENCE" chip and a sepia tint. User
+   can toggle the lock per-point.
+
+## Validation
+- `npx tsc --noEmit` clean across the entire project (excluding the unrelated
+  `5.1/` documentation folder, which contains `.tsx`-suffixed prose files).
+- *Cannot run automated E2E inside the kubernetes preview* — this is a native
+  Expo app. The user must `yarn install && npx expo start` and test on device.
+
+## P1 / Next iteration
+- Drag-to-reorder bullets in Glance lens (gesture wired, just needs hook-up to
+  `doc.reorderPoints`).
+- Lasso + move + scissor inside Ink lens (existing primitives in `SkiaCanvas`
+  can be ported into the per-bullet flow).
+- Per-item "Tag with review tag" picker (catalog already merged via
+  `useNoteTagCatalog`).
+- PDF export rendering Skia overlays alongside bullets (currently exports text
+  only via `UnifiedExportSheet`).
+- Add a "Migrate this note → Hardnote" action in `app/notes/editor.tsx` so the
+  user can move a classic note into the new lens system without losing data.

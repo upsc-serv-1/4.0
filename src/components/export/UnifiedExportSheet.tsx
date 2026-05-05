@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet,
   TextInput, Switch, ActivityIndicator, Platform, Alert,
@@ -126,24 +126,21 @@ export const UnifiedExportSheet: React.FC<Props> = ({
   }));
   const [isExporting, setIsExporting] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
-
-  const initialAnalysisState = useMemo<Record<string, boolean>>(
-    () => analysisReports.reduce((acc, report) => {
-      acc[report.key] = !!report.defaultSelected;
-      return acc;
-    }, {} as Record<string, boolean>),
-    [analysisReports]
-  );
-  const [selectedAnalysisReports, setSelectedAnalysisReports] = useState<Record<string, boolean>>(initialAnalysisState);
+  const [selectedAnalysisReports, setSelectedAnalysisReports] = useState<Record<string, boolean>>({});
 
   // Re-seed when sheet opens
   React.useEffect(() => {
     if (visible) {
       setOpts(defaultExportOptions({ title: title || initialOptions?.title || 'Export', ...(initialOptions || {}) }));
-      setSelectedAnalysisReports(initialAnalysisState);
+      // Recompute initial analysis state directly to avoid dependency issues
+      const newAnalysisState = analysisReports.reduce((acc, report) => {
+        acc[report.key] = !!report.defaultSelected;
+        return acc;
+      }, {} as Record<string, boolean>);
+      setSelectedAnalysisReports(newAnalysisState);
       setIsExporting(false);
     }
-  }, [visible, title, initialOptions, initialAnalysisState]);
+  }, [visible, title, initialOptions]);
 
   React.useEffect(() => {
     if (!visible) setIsExporting(false);

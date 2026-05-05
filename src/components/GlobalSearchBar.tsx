@@ -412,20 +412,50 @@ export const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({
     handleSearch();
   };
 
+  const toBool = (value: any) => {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'number') return value === 1;
+    if (typeof value === 'string') {
+      const v = value.trim().toLowerCase();
+      return v === 'true' || v === '1' || v === 'yes';
+    }
+    return false;
+  };
+
   const getPYQCategorization = (item: any) => {
-    const groupName = (item.source?.group || item.exam_group || '').toUpperCase();
-    const rawYear = item.source?.year || item.exam_year || item.launch_year || item.tests?.launch_year || '';
+    const examInfo = (item?.exam_info && typeof item.exam_info === 'object' && !Array.isArray(item.exam_info))
+      ? item.exam_info
+      : (item?.source && typeof item.source === 'object' && !Array.isArray(item.source) ? item.source : {});
+
+    const isPYQ = toBool(item?.is_pyq) || toBool(item?.isPyq) || toBool(examInfo?.isPyq) || toBool(examInfo?.is_pyq);
+    if (!isPYQ) {
+      return {
+        hasPYQData: false,
+        isUPSC: false,
+        isAllied: false,
+        isOther: false,
+        groupName: '',
+        year: '',
+      };
+    }
+
+    const rawGroup = String(examInfo?.group || item?.exam_group || '').trim();
+    const upperGroup = rawGroup.toUpperCase();
+
+    const isUPSC = toBool(examInfo?.is_upsc_cse) || toBool(item?.is_upsc_cse) || upperGroup.includes('UPSC CSE') || upperGroup === 'UPSC';
+    const isAllied = toBool(examInfo?.is_allied) || toBool(item?.is_allied) || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => upperGroup.includes(g));
+    const isOther = toBool(examInfo?.is_others) || toBool(item?.is_others) || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => upperGroup.includes(g));
+
+    // IMPORTANT: never use test launch_year for PYQ year chips.
+    const rawYear = examInfo?.year ?? item?.exam_year ?? item?.examYear ?? '';
     const year = typeof rawYear === 'string' ? rawYear.trim() : String(rawYear).trim();
 
-    const isUPSC = item.is_upsc_cse || groupName.includes('UPSC CSE') || groupName === 'UPSC';
-    const isAllied = item.is_allied || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => groupName.includes(g));
-    const isOther = item.is_others || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => groupName.includes(g));
-
     return {
+      hasPYQData: true,
       isUPSC,
       isAllied,
       isOther,
-      groupName: item.source?.group || item.exam_group || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ'),
+      groupName: rawGroup || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ'),
       year
     };
   };
@@ -493,7 +523,7 @@ export const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({
                     </Text>
                     {(() => {
                       const pyq = getPYQCategorization(item);
-                      if (!item.is_pyq && !pyq.isUPSC && !pyq.isAllied && !pyq.isOther) return null;
+                      if (!pyq.hasPYQData) return null;
 
                       let bgColor = '#f1f5f9';
                       let textColor = '#475569';

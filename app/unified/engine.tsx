@@ -207,26 +207,60 @@ const OptionButton = ({ label, text, isSelected, isCorrect, isWrong, showResult,
 
 // --- Main Screen ---
 
-export const getPYQCategorization = (item: any) => {
-  const groupName = (item.source?.group || item.exam_group || '').toUpperCase();
-  const rawYear = item.source?.year || item.exam_year || item.launch_year || item.tests?.launch_year || '';
-  const year = typeof rawYear === 'string' ? rawYear.trim() : String(rawYear).trim();
-  
-  const isUPSC = item.is_upsc_cse || groupName.includes('UPSC CSE') || groupName === 'UPSC';
-  const isAllied = item.is_allied || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => groupName.includes(g));
-  const isOther = item.is_others || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => groupName.includes(g));
-  
-  const hasPYQData = !!item.is_pyq;
-  const isGenericPYQ = hasPYQData && !isUPSC && !isAllied && !isOther;
+const toBool = (value: any) => {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value === 1;
+  if (typeof value === 'string') {
+    const v = value.trim().toLowerCase();
+    return v === 'true' || v === '1' || v === 'yes';
+  }
+  return false;
+};
 
-  return { 
-    hasPYQData, 
-    isUPSC, 
-    isAllied, 
-    isOther, 
-    isGenericPYQ, 
-    groupName: item.source?.group || item.exam_group || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ'), 
-    year 
+const getExamInfo = (item: any) => {
+  if (item?.exam_info && typeof item.exam_info === 'object' && !Array.isArray(item.exam_info)) return item.exam_info;
+  if (item?.source && typeof item.source === 'object' && !Array.isArray(item.source)) return item.source;
+  return {} as any;
+};
+
+export const getPYQCategorization = (item: any) => {
+  const examInfo = getExamInfo(item);
+  const isPYQ = toBool(item?.is_pyq) || toBool(item?.isPyq) || toBool(examInfo?.isPyq) || toBool(examInfo?.is_pyq);
+
+  if (!isPYQ) {
+    return {
+      hasPYQData: false,
+      isUPSC: false,
+      isAllied: false,
+      isOther: false,
+      isGenericPYQ: false,
+      groupName: '',
+      year: '',
+    };
+  }
+
+  const rawGroup = String(examInfo?.group || item?.exam_group || '').trim();
+  const groupNameUpper = rawGroup.toUpperCase();
+
+  const isUPSC = toBool(examInfo?.is_upsc_cse) || toBool(item?.is_upsc_cse) || groupNameUpper === 'UPSC' || groupNameUpper.includes('UPSC CSE');
+  const isAllied = toBool(examInfo?.is_allied) || toBool(item?.is_allied) || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => groupNameUpper.includes(g));
+  const isOther = toBool(examInfo?.is_others) || toBool(item?.is_others) || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => groupNameUpper.includes(g));
+
+  // IMPORTANT: never use test launch_year for PYQ year chips.
+  const rawYear = examInfo?.year ?? item?.exam_year ?? item?.examYear ?? '';
+  const year = typeof rawYear === 'string' ? rawYear.trim() : String(rawYear).trim();
+
+  const groupName = rawGroup || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ');
+  const isGenericPYQ = !isUPSC && !isAllied && !isOther;
+
+  return {
+    hasPYQData: true,
+    isUPSC,
+    isAllied,
+    isOther,
+    isGenericPYQ,
+    groupName,
+    year,
   };
 };
 
@@ -1894,18 +1928,17 @@ export default function UnifiedQuizEngine() {
           <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
             {(() => {
               const pyq = getPYQCategorization(item);
-              const institutes: string[] = Array.isArray((item as any)._institutes)
-                ? Array.from(new Set<string>((item as any)._institutes.filter(Boolean)))
-                : [];
-              const hasTags = (showPYQTags && (pyq.hasPYQData || item.is_ncert || item.exam_info?.is_ncert)) || institutes.length > 0;
+              const hasTags = showPYQTags && (pyq.hasPYQData || item.is_ncert || item.exam_info?.is_ncert || item.source?.is_ncert);
               if (!hasTags) return null;
 
               const chips: { label: string; bg: string; fg: string; border: string }[] = [];
-              if (pyq.isUPSC) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#dcfce7', fg: isZenMode ? '#433422' : '#15803d', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#22c55e' });
-              if (pyq.isAllied) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#fef9c3', fg: isZenMode ? '#433422' : '#a16207', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#eab308' });
-              if (pyq.isOther) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#f1f5f9', fg: isZenMode ? '#433422' : '#475569', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#94a3b8' });
-              if (pyq.isGenericPYQ) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : colors.primary + '10', fg: isZenMode ? '#433422' : colors.primary, border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : colors.primary });
-              if (item.is_ncert || item.exam_info?.is_ncert || item.micro_topic === 'NCERT') chips.push({ label: 'NCERT', bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#e0f2fe', fg: isZenMode ? '#433422' : '#0369a1', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#0ea5e9' });
+              if (pyq.hasPYQData && pyq.isUPSC) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#dcfce7', fg: isZenMode ? '#433422' : '#15803d', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#22c55e' });
+              if (pyq.hasPYQData && pyq.isAllied) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#fef9c3', fg: isZenMode ? '#433422' : '#a16207', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#eab308' });
+              if (pyq.hasPYQData && pyq.isOther) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#f1f5f9', fg: isZenMode ? '#433422' : '#475569', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#94a3b8' });
+              if (pyq.hasPYQData && pyq.isGenericPYQ) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : colors.primary + '10', fg: isZenMode ? '#433422' : colors.primary, border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : colors.primary });
+              if (item.is_ncert || item.exam_info?.is_ncert || item.source?.is_ncert || item.micro_topic === 'NCERT') chips.push({ label: 'NCERT', bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#e0f2fe', fg: isZenMode ? '#433422' : '#0369a1', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#0ea5e9' });
+
+              if (chips.length === 0) return null;
 
               // NOTE: Institute chips intentionally omitted here. Institute/program/year
               // metadata is rendered as a single canonical line inside the explanation

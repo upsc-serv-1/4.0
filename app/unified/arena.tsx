@@ -1208,14 +1208,32 @@ export default function UnifiedArenaSetup() {
                           {q.subject}
                         </Text>
                         {(() => {
-                          if (!q.is_pyq && !q.exam_group && !q.source?.group) return null;
-                          const groupName = (q.source?.group || q.exam_group || '').toUpperCase();
-                          const year = String(q.source?.year || q.exam_year || '').trim();
-                          const isUPSC = q.is_upsc_cse || groupName.includes('UPSC CSE') || groupName === 'UPSC';
-                          const isAllied = q.is_allied || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => groupName.includes(g));
-                          const isOther = q.is_others || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => groupName.includes(g));
+                          const toBool = (value: any) => {
+                            if (typeof value === 'boolean') return value;
+                            if (typeof value === 'number') return value === 1;
+                            if (typeof value === 'string') {
+                              const v = value.trim().toLowerCase();
+                              return v === 'true' || v === '1' || v === 'yes';
+                            }
+                            return false;
+                          };
 
-                          const dispName = q.source?.group || q.exam_group || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ');
+                          const examInfo = (q?.exam_info && typeof q.exam_info === 'object' && !Array.isArray(q.exam_info))
+                            ? q.exam_info
+                            : (q?.source && typeof q.source === 'object' && !Array.isArray(q.source) ? q.source : {});
+
+                          const isPYQ = toBool(q?.is_pyq) || toBool(q?.isPyq) || toBool(examInfo?.isPyq) || toBool(examInfo?.is_pyq);
+                          if (!isPYQ) return null;
+
+                          const rawGroup = String(examInfo?.group || q?.exam_group || '').trim();
+                          const groupName = rawGroup.toUpperCase();
+                          const year = String(examInfo?.year ?? q?.exam_year ?? q?.examYear ?? '').trim();
+
+                          const isUPSC = toBool(examInfo?.is_upsc_cse) || toBool(q?.is_upsc_cse) || groupName.includes('UPSC CSE') || groupName === 'UPSC';
+                          const isAllied = toBool(examInfo?.is_allied) || toBool(q?.is_allied) || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => groupName.includes(g));
+                          const isOther = toBool(examInfo?.is_others) || toBool(q?.is_others) || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => groupName.includes(g));
+
+                          const dispName = rawGroup || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ');
 
                           let bgColor = '#f59e0b15';
                           let textColor = '#f59e0b';
@@ -1223,7 +1241,7 @@ export default function UnifiedArenaSetup() {
                           if (isUPSC) { bgColor = '#dcfce7'; textColor = '#15803d'; }
                           else if (isAllied) { bgColor = '#fef9c3'; textColor = '#a16207'; }
                           else if (isOther) { bgColor = '#f1f5f9'; textColor = '#475569'; }
-                          else if (q.is_pyq) { bgColor = colors.primary + '15'; textColor = colors.primary; }
+                          else { bgColor = colors.primary + '15'; textColor = colors.primary; }
 
                           return (
                             <Text style={[styles.resultTag, { color: textColor, backgroundColor: bgColor, marginLeft: 8 }]}>

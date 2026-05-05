@@ -85,9 +85,9 @@ export const CompareWindowsPanel: React.FC<Props> = ({
 
       <View style={[styles.headerRow, { borderColor: colors.border }]}>
         <Text style={[styles.h, { color: colors.textTertiary, flex: 1 }]}>{level.toUpperCase()}</Text>
-        <Text style={[styles.h, { color: colors.textTertiary, width: 50, textAlign: 'right' }]}>A</Text>
-        <Text style={[styles.h, { color: colors.textTertiary, width: 50, textAlign: 'right' }]}>B</Text>
-        <Text style={[styles.h, { color: colors.textTertiary, width: 80, textAlign: 'right' }]}>Δ</Text>
+        <Text style={[styles.h, { color: colors.textTertiary, width: 36, textAlign: 'center' }]}>A</Text>
+        <Text style={[styles.h, { color: colors.textTertiary, width: 36, textAlign: 'center' }]}>B</Text>
+        <Text style={[styles.h, { color: colors.textTertiary, width: 100, textAlign: 'right' }]}>Δ CHANGE</Text>
       </View>
 
       {rows.length === 0 ? (
@@ -98,11 +98,14 @@ export const CompareWindowsPanel: React.FC<Props> = ({
         return (
           <View key={r.key} style={[styles.row, { borderBottomColor: colors.border + '60' }]}>
             <Text style={[styles.k, { color: colors.textPrimary, flex: 1 }]} numberOfLines={1}>{r.key}</Text>
-            <Text style={[styles.v, { color: colors.textSecondary, width: 50, textAlign: 'right' }]}>{r.a}</Text>
-            <Text style={[styles.v, { color: colors.textSecondary, width: 50, textAlign: 'right' }]}>{r.b}</Text>
+            <Text style={[styles.v, { color: colors.textSecondary, width: 36, textAlign: 'center' }]}>{r.a}</Text>
+            <Text style={[styles.v, { color: colors.textSecondary, width: 36, textAlign: 'center' }]}>{r.b}</Text>
             <View style={styles.delta}>
-              <Icon size={14} color={fg} />
-              <Text style={{ color: fg, fontWeight: '800', fontSize: 12 }}>{r.delta > 0 ? '+' : ''}{r.delta} ({r.pct > 0 ? '+' : ''}{r.pct}%)</Text>
+              <Icon size={12} color={fg} />
+              <View style={{ alignItems: 'flex-end' }}>
+                <Text style={{ color: fg, fontWeight: '800', fontSize: 11 }} numberOfLines={1}>{r.delta > 0 ? '+' : ''}{r.delta}</Text>
+                <Text style={{ color: fg, fontWeight: '600', fontSize: 9, opacity: 0.8 }} numberOfLines={1}>{r.pct > 0 ? '+' : ''}{r.pct}%</Text>
+              </View>
             </View>
           </View>
         );
@@ -123,9 +126,9 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', borderBottomWidth: 1, paddingBottom: 6, marginBottom: 4 },
   h: { fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 1 },
-  k: { fontWeight: '700', fontSize: 13 },
-  v: { fontWeight: '700', fontSize: 12 },
-  delta: { flexDirection: 'row', alignItems: 'center', gap: 4, width: 80, justifyContent: 'flex-end' },
+  k: { fontWeight: '700', fontSize: 12, flexShrink: 1 },
+  v: { fontWeight: '700', fontSize: 11 },
+  delta: { flexDirection: 'row', alignItems: 'center', gap: 4, width: 100, justifyContent: 'flex-end' },
   empty: { fontSize: 12, fontWeight: '600', textAlign: 'center', paddingVertical: 12 },
 });
 

@@ -2,8 +2,8 @@ import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Modal, Pressable, FlatList, Vibration, useWindowDimensions, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { 
-  TrendingUp, Target, BookOpen, BarChart3, ChevronRight, Layout, Play, Clock, 
+import {
+  TrendingUp, Target, BookOpen, BarChart3, ChevronRight, Layout, Play, Clock,
   RotateCcw, Zap, History, Plus, GripVertical, Sliders, CheckCircle2, Shuffle,
   Search as SearchIcon, FileText, Tag, Layers, Star, Award
 } from 'lucide-react-native';
@@ -25,12 +25,12 @@ import { WidgetRenderer } from '../../src/components/widgets/WidgetRenderer';
 import { GlobalSearchBar } from '../../src/components/GlobalSearchBar';
 import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
 
-type Stats = { 
-  attempts: number; 
-  accuracy: number; 
-  dueCards: number; 
-  totalNotes: number; 
-  streak: number; 
+type Stats = {
+  attempts: number;
+  accuracy: number;
+  dueCards: number;
+  totalNotes: number;
+  streak: number;
   syllabusPercent: number;
   subjectProgress: { label: string; progress: number; color: string }[];
 };
@@ -56,14 +56,14 @@ export default function Home() {
 
   const CARD_GAP = 12;
   const CARD_WIDTH = (windowWidth - spacing.lg * 2 - CARD_GAP) / 2;
-  
-  const [stats, setStats] = useState<Stats>({ 
+
+  const [stats, setStats] = useState<Stats>({
     attempts: 0, accuracy: 0, dueCards: 0, totalNotes: 0, streak: 5, syllabusPercent: 0, subjectProgress: []
   });
   const [recentNotes, setRecentNotes] = useState<NoteNode[]>([]);
-  const [topTags, setTopTags] = useState<{name: string, count: number}[]>([]);
+  const [topTags, setTopTags] = useState<{ name: string, count: number }[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-  
+
   // PYQ Picker
   const [pyqPickerVisible, setPyqPickerVisible] = useState(false);
   const [pyqStartYear, setPyqStartYear] = useState('2013');
@@ -85,7 +85,7 @@ export default function Home() {
 
   const activeWidgets = useMemo(() => widgets.filter(w => !w.is_archived), [widgets]);
   const archivedWidgets = useMemo(() => widgets.filter(w => w.is_archived), [widgets]);
-  
+
   useEffect(() => {
     AsyncStorage.getItem('dashboard_widget_config').then(val => {
       if (val) {
@@ -107,8 +107,8 @@ export default function Home() {
 
     try {
       const [
-        { data: qs }, 
-        { count: notesCount }, 
+        { data: qs },
+        { count: notesCount },
         { count: cardsCount },
         { data: notesData },
         { data: tagsData }
@@ -138,10 +138,10 @@ export default function Home() {
 
       const total = qs?.length || 0;
       const correct = qs?.filter(x => x.is_incorrect_last_attempt === false)?.length || 0;
-      
+
       let syllabusPercent = 0;
       let subjectProgress: { label: string; progress: number; color: string }[] = [];
-      
+
       const progress = await SyllabusService.getProgress(userId);
       let totalItems = 0;
       let completedItems = 0;
@@ -176,7 +176,7 @@ export default function Home() {
           });
         });
       });
-      
+
       syllabusPercent = totalItems ? Math.round((completedItems / totalItems) * 100) : 0;
       subjectProgress = Object.entries(subjectStats).map(([label, s]) => ({
         label, progress: s.total ? s.completed / s.total : 0, color: s.color
@@ -255,7 +255,7 @@ export default function Home() {
   const handleLongPressOut = () => { if (longPressTimer.current) clearTimeout(longPressTimer.current); };
 
   const renderNoteCard = ({ item }: { item: NoteNode }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[styles.noteCard, { borderColor: colors.border, backgroundColor: colors.surface }]}
       onPress={() => router.push({ pathname: '/notes/editor', params: { id: item.note_id } })}
     >
@@ -305,8 +305,8 @@ export default function Home() {
               </View>
 
               <View style={styles.searchContainer}>
-                <GlobalSearchBar 
-                  placeholder="Search topics, notes, or PYQs..." 
+                <GlobalSearchBar
+                  placeholder="Search topics, notes, or PYQs..."
                   onSearch={(q, f) => router.push({ pathname: "/unified/arena", params: { tab: 'search', query: q, filters: JSON.stringify(f) } } as any)}
                 />
               </View>
@@ -318,7 +318,7 @@ export default function Home() {
                 <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>PRODUCTIVITY PULSE</Text>
                 <Zap size={14} color={colors.primary} />
               </View>
-              
+
               <View style={styles.pulseGrid}>
                 <TouchableOpacity style={[styles.pulseCard, { width: CARD_WIDTH, borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => router.push('/flashcards/review')}>
                   <LinearGradient colors={['rgba(255,149,0,0.15)', 'transparent']} style={styles.cardGlow} />
@@ -358,7 +358,7 @@ export default function Home() {
             </View>
 
             {/* 4. Syllabus Tracker Widget */}
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.trackerWidget, { backgroundColor: colors.surface, borderColor: colors.border }]}
               onLongPress={() => setConfigVisible(true)}
               onPress={() => router.push('/tracker')}
@@ -387,10 +387,10 @@ export default function Home() {
                       <Text style={[styles.subPer, { color: colors.textTertiary }]}>{Math.round(sp.progress * 100)}%</Text>
                     </View>
                     <View style={[styles.barBase, { backgroundColor: colors.border + '50' }]}>
-                      <LinearGradient 
-                        colors={[sp.color, sp.color + '90']} 
+                      <LinearGradient
+                        colors={[sp.color, sp.color + '90']}
                         start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                        style={[styles.barInner, { width: `${Math.max(sp.progress * 100, 5)}%` }]} 
+                        style={[styles.barInner, { width: `${Math.max(sp.progress * 100, 5)}%` }]}
                       />
                     </View>
                   </View>
@@ -698,7 +698,7 @@ const styles = StyleSheet.create({
   countInput: { height: 50, borderRadius: 14, borderWidth: 1, paddingHorizontal: 16, fontSize: 16, fontWeight: '700' },
   launchBtn: { height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginTop: 10 },
   launchBtnTxt: { color: '#fff', fontSize: 16, fontWeight: '800' },
-  
+
   catRow: { flexDirection: 'row', gap: 10 },
   catBtn: { flex: 1, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   catText: { fontSize: 14, fontWeight: '700' },
@@ -709,3 +709,4 @@ const styles = StyleSheet.create({
   applyText: { color: '#fff', fontSize: 16, fontWeight: '800' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
 });
+

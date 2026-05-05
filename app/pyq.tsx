@@ -1257,8 +1257,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       params: {
         mode: (opts.mode && opts.mode !== 'choice') ? opts.mode : 'learning',
         view: 'list',
-        institutes: 'UPSC',
         pyqFilter: 'PYQ Only',
+        pyqSource: 'UPSC',
         subject: s,
         section: sec,
         microtopic: m,
@@ -1993,6 +1993,14 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           </TouchableOpacity>
         </View>
 
+        {/* How-to instructions for the heatmap */}
+        <View style={{ backgroundColor: colors.primary + '08', borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: colors.primary + '20' }}>
+          <Text style={{ color: colors.primary, fontSize: 11, fontWeight: '800', letterSpacing: 0.5, marginBottom: 4 }}>HOW TO USE THIS HEATMAP</Text>
+          <Text style={{ color: colors.textSecondary, fontSize: 11, fontWeight: '600', lineHeight: 17 }}>
+            {'• Tap a row label (left) to open deep-dive sections & micro-topics.\n• Tap any cell number to directly open those questions in Learn Mode.\n• Tap the ▶ icon on a row to open all questions for that topic.'}
+          </Text>
+        </View>
+
         {/* TOP HALF: Global Subject Heatmap */}
         <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border, paddingBottom: 20 }]}>
           <Text style={[styles.panelTitle, { color: colors.textPrimary }]}>1. Choose a Subject</Text>
@@ -2179,60 +2187,61 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     <View style={[styles.container, { backgroundColor: isEmbedded ? 'transparent' : colors.bg }]}>
       {renderHeader()}
 
-      <View style={[styles.filterWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        {[
-          { label: 'Stage', value: examStage, type: 'stage' as const },
-          { label: 'Paper', value: selectedPaper, type: 'paper' as const },
-          { label: 'Years', value: selectedRange, type: 'range' as const },
-        ].map(item => (
-          <TouchableOpacity key={item.label} style={[styles.selector, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} onPress={() => openModal(item.type)}>
-            <Text style={[styles.selectorLabel, { color: colors.textTertiary }]}>{item.label}</Text>
-            <View style={styles.selectorValue}>
-              <Text style={[styles.selectorText, { color: colors.textPrimary }]} numberOfLines={1}>{item.value}</Text>
-              <ChevronDown size={14} color={colors.textTertiary} />
-            </View>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {selectedRange === 'Custom Range' ? (
-        <View style={[styles.rangeBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <View style={styles.rangeInputWrap}>
-            <Text style={[styles.rangeLabel, { color: colors.textTertiary }]}>From</Text>
-            <TextInput value={customYearStart} onChangeText={setCustomYearStart} keyboardType="number-pad" maxLength={4} style={[styles.yearInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} />
-          </View>
-          <View style={styles.rangeInputWrap}>
-            <Text style={[styles.rangeLabel, { color: colors.textTertiary }]}>To</Text>
-            <TextInput value={customYearEnd} onChangeText={setCustomYearEnd} keyboardType="number-pad" maxLength={4} style={[styles.yearInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} />
-          </View>
-        </View>
-      ) : null}
-
-      <ActiveFiltersBar
-        filters={[
-          { id: 'stage', label: examStage },
-          { id: 'paper', label: selectedPaper },
-          { id: 'range', label: selectedRange },
-          ...selSubjects.map((s) => ({ id: `sub-${s}`, label: s, onRemove: () => setSelSubjects((p) => p.filter((x) => x !== s)) })),
-          ...selSections.map((s) => ({ id: `sec-${s}`, label: s, onRemove: () => setSelSections((p) => p.filter((x) => x !== s)) })),
-          ...selMicros.map((s) => ({ id: `mic-${s}`, label: s, onRemove: () => setSelMicros((p) => p.filter((x) => x !== s)) })),
-        ] as ActiveFilter[]}
-      />
-      <SelectionSummaryBar
-        subjects={selSubjects.length}
-        sections={selSections.length}
-        micros={selMicros.length}
-        onClear={() => {
-          const prev = { selSubjects, selSections, selMicros };
-          setSelSubjects([]); setSelSections([]); setSelMicros([]);
-          setUndoSpec({
-            message: 'Selection cleared',
-            onUndo: () => { setSelSubjects(prev.selSubjects); setSelSections(prev.selSections); setSelMicros(prev.selMicros); },
-          });
-        }}
-      />
-
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Filter chips scroll away with content */}
+        <View style={[styles.filterWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          {[
+            { label: 'Stage', value: examStage, type: 'stage' as const },
+            { label: 'Paper', value: selectedPaper, type: 'paper' as const },
+            { label: 'Years', value: selectedRange, type: 'range' as const },
+          ].map(item => (
+            <TouchableOpacity key={item.label} style={[styles.selector, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} onPress={() => openModal(item.type)}>
+              <Text style={[styles.selectorLabel, { color: colors.textTertiary }]}>{item.label}</Text>
+              <View style={styles.selectorValue}>
+                <Text style={[styles.selectorText, { color: colors.textPrimary }]} numberOfLines={1}>{item.value}</Text>
+                <ChevronDown size={14} color={colors.textTertiary} />
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {selectedRange === 'Custom Range' ? (
+          <View style={[styles.rangeBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={styles.rangeInputWrap}>
+              <Text style={[styles.rangeLabel, { color: colors.textTertiary }]}>From</Text>
+              <TextInput value={customYearStart} onChangeText={setCustomYearStart} keyboardType="number-pad" maxLength={4} style={[styles.yearInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} />
+            </View>
+            <View style={styles.rangeInputWrap}>
+              <Text style={[styles.rangeLabel, { color: colors.textTertiary }]}>To</Text>
+              <TextInput value={customYearEnd} onChangeText={setCustomYearEnd} keyboardType="number-pad" maxLength={4} style={[styles.yearInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} />
+            </View>
+          </View>
+        ) : null}
+
+        <ActiveFiltersBar
+          filters={[
+            { id: 'stage', label: examStage },
+            { id: 'paper', label: selectedPaper },
+            { id: 'range', label: selectedRange },
+            ...selSubjects.map((s) => ({ id: `sub-${s}`, label: s, onRemove: () => setSelSubjects((p) => p.filter((x) => x !== s)) })),
+            ...selSections.map((s) => ({ id: `sec-${s}`, label: s, onRemove: () => setSelSections((p) => p.filter((x) => x !== s)) })),
+            ...selMicros.map((s) => ({ id: `mic-${s}`, label: s, onRemove: () => setSelMicros((p) => p.filter((x) => x !== s)) })),
+          ] as ActiveFilter[]}
+        />
+        <SelectionSummaryBar
+          subjects={selSubjects.length}
+          sections={selSections.length}
+          micros={selMicros.length}
+          onClear={() => {
+            const prev = { selSubjects, selSections, selMicros };
+            setSelSubjects([]); setSelSections([]); setSelMicros([]);
+            setUndoSpec({
+              message: 'Selection cleared',
+              onUndo: () => { setSelSubjects(prev.selSubjects); setSelSections(prev.selSections); setSelMicros(prev.selMicros); },
+            });
+          }}
+        />
+
         {loading ? (
           <View style={[styles.loaderBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <ActivityIndicator size="large" color={colors.primary} />
@@ -2305,7 +2314,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
       <Modal visible={exportModalVisible} transparent animationType="fade" onRequestClose={() => setExportModalVisible(false)}>
         <Pressable style={styles.modalOverlay} onPress={() => setExportModalVisible(false)}>
-          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}> 
+          <Pressable style={[styles.modalContent, { backgroundColor: colors.surface }]} onPress={(e) => e.stopPropagation()}> 
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Export PYQ PDF</Text>
               <TouchableOpacity onPress={() => setExportModalVisible(false)}><X size={22} color={colors.textPrimary} /></TouchableOpacity>
@@ -2622,7 +2631,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                 <Text style={[styles.exportActionText, { color: colors.textPrimary }]}>Export All Subjects Deep Dive</Text>
               </TouchableOpacity>
             </ScrollView>
-          </View>
+          </Pressable>
         </Pressable>
       </Modal>
 

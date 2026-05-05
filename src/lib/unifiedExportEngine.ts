@@ -195,24 +195,24 @@ export interface ExportHardnote {
 // ---------- Theme tokens ----------
 
 const themeTokens: Record<ExportTheme, { bg: string; fg: string; accent: string; rule: string; card: string }> = {
-  modern:     { bg: '#ffffff', fg: '#111827', accent: '#6366f1', rule: '#e5e7eb', card: '#ffffff' },
-  classic:    { bg: '#ffffff', fg: '#111111', accent: '#1d4ed8', rule: '#e5e7eb', card: '#ffffff' },
-  sepia:      { bg: '#F4ECD8', fg: '#433422', accent: '#9a3412', rule: '#d9c7a3', card: '#fdf6e3' },
+  modern: { bg: '#ffffff', fg: '#111827', accent: '#6366f1', rule: '#e5e7eb', card: '#ffffff' },
+  classic: { bg: '#ffffff', fg: '#111111', accent: '#1d4ed8', rule: '#e5e7eb', card: '#ffffff' },
+  sepia: { bg: '#F4ECD8', fg: '#433422', accent: '#9a3412', rule: '#d9c7a3', card: '#fdf6e3' },
   historical: { bg: '#fdf6e3', fg: '#2d2419', accent: '#7c2d12', rule: '#d6c9a8', card: '#fffaf0' },
-  dark:       { bg: '#0b0f17', fg: '#e5e7eb', accent: '#60a5fa', rule: '#1f2937', card: '#111827' },
+  dark: { bg: '#0b0f17', fg: '#e5e7eb', accent: '#60a5fa', rule: '#1f2937', card: '#111827' },
 };
 
 const fontFamilyCss: Record<ExportFontFamily, string> = {
-  sans:        `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif`,
-  serif:       `'Georgia', 'Times New Roman', serif`,
+  sans: `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif`,
+  serif: `'Georgia', 'Times New Roman', serif`,
   handwriting: `'Caveat', 'Patrick Hand', cursive`,
-  mono:        `'Menlo', 'Consolas', 'JetBrains Mono', 'Courier New', monospace`,
+  mono: `'Menlo', 'Consolas', 'JetBrains Mono', 'Courier New', monospace`,
 };
 
 const paperBg: Record<ExportPaperStyle, string> = {
-  plain:  'none',
-  lined:  `repeating-linear-gradient(to bottom, transparent 0, transparent 27px, var(--rule) 28px)`,
-  grid:   `linear-gradient(to right, var(--rule) 1px, transparent 1px) 0 0/24px 24px, linear-gradient(to bottom, var(--rule) 1px, transparent 1px) 0 0/24px 24px`,
+  plain: 'none',
+  lined: `repeating-linear-gradient(to bottom, transparent 0, transparent 27px, var(--rule) 28px)`,
+  grid: `linear-gradient(to right, var(--rule) 1px, transparent 1px) 0 0/24px 24px, linear-gradient(to bottom, var(--rule) 1px, transparent 1px) 0 0/24px 24px`,
   dotted: `radial-gradient(var(--rule) 1px, transparent 1px) 0 0/16px 16px`,
 };
 
@@ -586,13 +586,13 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
     ? `<div class="answer-key">
         <h2>Answer Key${showExpl ? ' & Explanations' : ''}</h2>
         ${rows.map((q, i) => {
-          const a = (q.correct_answer || '').toUpperCase();
-          const e = q.explanation_markdown || q.explanation || '';
-          return `<div class="ak-row">
+      const a = (q.correct_answer || '').toUpperCase();
+      const e = q.explanation_markdown || q.explanation || '';
+      return `<div class="ak-row">
             <span class="ak-num">${i + 1}.</span>${a ? `<b>Ans: ${a}</b>` : ''}
             ${showExpl && e ? `<div class="expl" style="margin-top:1mm">${renderInline(e)}</div>` : ''}
           </div>`;
-        }).join('')}
+    }).join('')}
       </div>`
     : '';
 
@@ -658,7 +658,7 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
       const meta = [q.subject, q.micro_topic, q.exam_year].filter(Boolean).map(x => `<span class="pill">${escapeHtml(String(x))}</span>`).join('');
       const answer = (q.correct_answer || '').toUpperCase();
       const explanation = q.explanation_markdown || q.explanation || '';
-      const optsBlock = showOpts && q.options ? `<ul class="opts">${['a','b','c','d'].filter(k => (q.options as any)[k]).map(k => `<li class="${inline && answer === k.toUpperCase() ? 'correct' : ''}"><b>${k.toUpperCase()}.</b> ${renderInline(String((q.options as any)[k]))}</li>`).join('')}</ul>` : '';
+      const optsBlock = showOpts && q.options ? `<ul class="opts">${['a', 'b', 'c', 'd'].filter(k => (q.options as any)[k]).map(k => `<li class="${inline && answer === k.toUpperCase() ? 'correct' : ''}"><b>${k.toUpperCase()}.</b> ${renderInline(String((q.options as any)[k]))}</li>`).join('')}</ul>` : '';
       const questionBlock = `
         <div class="qstem"><span class="qnum">${i + 1}.</span>${renderInline(stem)}</div>
         ${meta ? `<div class="metarow">${meta}</div>` : ''}
@@ -681,10 +681,10 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
     ? `<div class="answer-key">
         <h2>Answer Key${showExpl ? ' & Explanations' : ''}</h2>
         ${groups.flatMap((g, gi) => g.questions.map((q, i) => {
-          const a = (q.correct_answer || '').toUpperCase();
-          const e = q.explanation_markdown || q.explanation || '';
-          return `<div class="ak-row"><span class="ak-num">#${escapeHtml(g.tag)} · ${i + 1}.</span>${a ? `<b>Ans: ${a}</b>` : ''}${showExpl && e ? `<div class="expl" style="margin-top:1mm">${renderInline(e)}</div>` : ''}</div>`;
-        })).join('')}
+      const a = (q.correct_answer || '').toUpperCase();
+      const e = q.explanation_markdown || q.explanation || '';
+      return `<div class="ak-row"><span class="ak-num">#${escapeHtml(g.tag)} · ${i + 1}.</span>${a ? `<b>Ans: ${a}</b>` : ''}${showExpl && e ? `<div class="expl" style="margin-top:1mm">${renderInline(e)}</div>` : ''}</div>`;
+    })).join('')}
       </div>`
     : '';
 
@@ -871,7 +871,7 @@ const hslToHex = (h: number, s: number, l: number): string => {
   else if (hh < 180) [r, g, b] = [0, c, x];
   else if (hh < 240) [r, g, b] = [0, x, c];
   else if (hh < 300) [r, g, b] = [x, 0, c];
-  else [r, g, b] = [c, 0, x];
+  else[r, g, b] = [c, 0, x];
 
   const toHex = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, '0');
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
@@ -995,34 +995,34 @@ const renderPyqHeatmapSvg = (
             <tr>
               <td>${escHtml(row.label)}</td>
               ${years.map((year) => {
-                const count = row.byYear[year] || 0;
-                let bg = '#F8FAFC';
-                let tc = '#94A3B8';
-                if (count > 0) {
-                  const capped = Math.min(count, 22);
-                  const ratio = (capped - 1) / 21;
-                  if (palette === 'spectral') {
-                    const h = 70 + (ratio * 155);
-                    const s = 65 + (ratio * 20);
-                    const l = 85 - (ratio * 55);
-                    bg = hslToHex(h, s, l);
-                    tc = l < 55 ? '#FFFFFF' : '#065F46';
-                  } else {
-                    const h = 210 + (ratio * 15);
-                    const s = 60 + (ratio * 35);
-                    const l = 90 - (ratio * 65);
-                    bg = hslToHex(h, s, l);
-                    tc = l < 55 ? '#FFFFFF' : '#1E3A8A';
-                  }
-                }
+    const count = row.byYear[year] || 0;
+    let bg = '#F8FAFC';
+    let tc = '#94A3B8';
+    if (count > 0) {
+      const capped = Math.min(count, 22);
+      const ratio = (capped - 1) / 21;
+      if (palette === 'spectral') {
+        const h = 70 + (ratio * 155);
+        const s = 65 + (ratio * 20);
+        const l = 85 - (ratio * 55);
+        bg = hslToHex(h, s, l);
+        tc = l < 55 ? '#FFFFFF' : '#065F46';
+      } else {
+        const h = 210 + (ratio * 15);
+        const s = 60 + (ratio * 35);
+        const l = 90 - (ratio * 65);
+        bg = hslToHex(h, s, l);
+        tc = l < 55 ? '#FFFFFF' : '#1E3A8A';
+      }
+    }
 
-                return `<td style="padding: 1px; border: none; width: 44px; height: 32px;">
+    return `<td style="padding: 1px; border: none; width: 44px; height: 32px;">
                   <svg width="44" height="32" viewBox="0 0 44 32" xmlns="http://www.w3.org/2000/svg">
                     <rect width="44" height="32" rx="5" fill="${normalizeHex(bg, '#F8FAFC')}" fill-opacity="1" />
                     <text x="22" y="20.5" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="800" fill="${normalizeHex(tc, '#0F172A')}" fill-opacity="1">${count || ''}</text>
                   </svg>
                 </td>`;
-              }).join('')}
+  }).join('')}
             </tr>
           `).join('')}
         </tbody>
@@ -1214,11 +1214,11 @@ export type ExportPayload =
 
 export const renderHtml = (payload: ExportPayload, options: ExportOptions): string => {
   switch (payload.kind) {
-    case 'questions':  return buildQuestionsHtml(payload.rows, options);
+    case 'questions': return buildQuestionsHtml(payload.rows, options);
     case 'flashcards': return buildFlashcardsHtml(payload.rows, options);
-    case 'notes':      return buildNotesBlocksHtml(payload.blocks, options, payload.selectedHeadingIds);
-    case 'tags':       return buildTagsHtml(payload.groups, options);
-    case 'hardnote':   return buildHardnoteHtml(payload.note, options);
+    case 'notes': return buildNotesBlocksHtml(payload.blocks, options, payload.selectedHeadingIds);
+    case 'tags': return buildTagsHtml(payload.groups, options);
+    case 'hardnote': return buildHardnoteHtml(payload.note, options);
   }
 };
 
@@ -1248,7 +1248,7 @@ export async function exportToPdf(payload: ExportPayload, options: ExportOptions
   const { uri } = await Print.printToFileAsync({ html, base64: false });
   const safe = options.title.replace(/[^a-z0-9-_ ]/gi, '_').slice(0, 48) || 'export';
   const dest = `${FileSystem.cacheDirectory}${safe}.pdf`;
-  try { await FileSystem.moveAsync({ from: uri, to: dest }); } catch {}
+  try { await FileSystem.moveAsync({ from: uri, to: dest }); } catch { }
   const info = await FileSystem.getInfoAsync(dest);
   const finalUri = info.exists ? dest : uri;
   if (await Sharing.isAvailableAsync()) {

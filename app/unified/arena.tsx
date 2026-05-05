@@ -201,7 +201,7 @@ export default function UnifiedArenaSetup() {
   const [searchFilters, setSearchFilters] = useState<any>(() => {
     try {
       if (params.filters) return JSON.parse(params.filters as string);
-    } catch (e) {}
+    } catch (e) { }
     return {};
   });
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -225,7 +225,7 @@ export default function UnifiedArenaSetup() {
         .select('review_tags')
         .eq('user_id', session.user.id)
         .not('review_tags', 'is', null);
-      
+
       const tags = new Set<string>();
       tagData?.forEach(row => {
         if (Array.isArray(row.review_tags)) row.review_tags.forEach(t => tags.add(t));
@@ -264,13 +264,13 @@ export default function UnifiedArenaSetup() {
   useEffect(() => {
     updateQuestionCount();
   }, [
-    selectedSubject, 
-    selectedSection, 
-    selectedMicrotopic, 
-    pyqMaster, 
-    selectedExamCategory, 
-    selectedInstitute, 
-    selectedProgram, 
+    selectedSubject,
+    selectedSection,
+    selectedMicrotopic,
+    pyqMaster,
+    selectedExamCategory,
+    selectedInstitute,
+    selectedProgram,
     selectedExamStage,
     selectedTestId,
     selectedTags,
@@ -280,7 +280,7 @@ export default function UnifiedArenaSetup() {
     searchFilters,
     ncertFilter
   ]);
-  
+
   useEffect(() => {
     setShowPYQTags(arenaMode === 'learning');
   }, [arenaMode]);
@@ -441,7 +441,7 @@ export default function UnifiedArenaSetup() {
       }
 
       const { mergedQs } = mergeQuestions(allFreshData);
-      
+
       mergedQs.sort((a: any, b: any) => {
         const aText = (a.question_text + ' ' + (a.explanation_markdown || '')).toLowerCase();
         const bText = (b.question_text + ' ' + (b.explanation_markdown || '')).toLowerCase();
@@ -536,7 +536,7 @@ export default function UnifiedArenaSetup() {
           }
         }
         if (selectedMicrotopic.length > 0) query = query.in('micro_topic', selectedMicrotopic);
-        
+
         if (pyqMaster === 'PYQ Only') {
           query = query.eq('is_pyq', true);
           if (selectedExamCategory.length > 0) {
@@ -557,19 +557,19 @@ export default function UnifiedArenaSetup() {
         }
 
         if (selectedTags.length > 0) {
-           const orQuery = selectedTags.map(t => `review_tags.cs.["${t}"]`).join(',');
-           const { data: tagIds, error: tagErr } = await LocalQuery.from('question_states')
-             .select('question_id')
-             .eq('user_id', session.user.id)
-             .or(orQuery);
-           
-           if (!tagErr && tagIds) {
-             const ids = tagIds.map(t => t.question_id);
-             if (ids.length > 0) query = query.in('id', ids);
-             else { setQuestionCount(0); setCalculatingCount(false); return; }
-           } else {
-             setQuestionCount(0); setCalculatingCount(false); return;
-           }
+          const orQuery = selectedTags.map(t => `review_tags.cs.["${t}"]`).join(',');
+          const { data: tagIds, error: tagErr } = await LocalQuery.from('question_states')
+            .select('question_id')
+            .eq('user_id', session.user.id)
+            .or(orQuery);
+
+          if (!tagErr && tagIds) {
+            const ids = tagIds.map(t => t.question_id);
+            if (ids.length > 0) query = query.in('id', ids);
+            else { setQuestionCount(0); setCalculatingCount(false); return; }
+          } else {
+            setQuestionCount(0); setCalculatingCount(false); return;
+          }
         }
 
         if (selectedInstitute !== 'All' || selectedProgram !== 'All') {
@@ -591,7 +591,7 @@ export default function UnifiedArenaSetup() {
           if (selectedInstitute !== 'All') tQuery = tQuery.eq('institute', selectedInstitute);
           if (selectedProgram !== 'All') tQuery = tQuery.eq('program_name', selectedProgram);
           if (selectedExamStage !== 'All') tQuery = tQuery.eq('series', selectedExamStage);
-          
+
           const { data: testRows } = await tQuery;
           const testIds = (testRows || []).map(t => t.id);
           if (testIds.length > 0) query = query.in('test_id', testIds);
@@ -661,7 +661,7 @@ export default function UnifiedArenaSetup() {
       if (selectedInstitute !== 'All' && m.institute !== selectedInstitute) return;
       if (selectedProgram !== 'All' && m.program_name !== selectedProgram) return;
       if (selectedExamStage !== 'All' && m.series !== selectedExamStage) return;
-      
+
       if (!tests.has(m.test_id)) {
         tests.set(m.test_id, {
           id: m.test_id,
@@ -681,7 +681,7 @@ export default function UnifiedArenaSetup() {
   const handleLaunch = (mode: 'learning' | 'exam', timer?: string) => {
     setShowPreFlight(false);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    
+
     const baseParams = {
       mode: mode,
       view: viewMode,
@@ -709,7 +709,7 @@ export default function UnifiedArenaSetup() {
         pyqFilter: searchFilters.pyqFilter,
         pyqCategory: searchFilters.pyqCategory?.join(','),
         ncertFilter: searchFilters.ncertFilter,
-        testId: '', 
+        testId: '',
       };
     } else if (activeTab === 'topic') {
       finalParams = {
@@ -773,14 +773,14 @@ export default function UnifiedArenaSetup() {
         onRequestClose={() => setShowTopicModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <TouchableOpacity 
-            style={styles.modalDismisser} 
-            activeOpacity={1} 
-            onPress={() => setShowTopicModal(false)} 
+          <TouchableOpacity
+            style={styles.modalDismisser}
+            activeOpacity={1}
+            onPress={() => setShowTopicModal(false)}
           />
           <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '90%', paddingHorizontal: 0 }]}>
             <View style={[styles.modalHandle, { backgroundColor: colors.border }]} />
-            
+
             <View style={{ paddingHorizontal: 24, marginBottom: 16 }}>
               <View style={styles.modalHeader}>
                 <View style={{ flex: 1 }}>
@@ -796,8 +796,8 @@ export default function UnifiedArenaSetup() {
 
               <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.bg, borderRadius: 16, paddingHorizontal: 12, height: 48, marginTop: 12, borderWidth: 1, borderColor: colors.border }}>
                 <Search size={18} color={colors.textTertiary} />
-                <TextInput 
-                  placeholder="Find a microtopic..." 
+                <TextInput
+                  placeholder="Find a microtopic..."
                   placeholderTextColor={colors.textTertiary}
                   style={{ flex: 1, marginLeft: 10, color: colors.textPrimary, fontWeight: '600' }}
                   value={topicSearch}
@@ -813,15 +813,15 @@ export default function UnifiedArenaSetup() {
 
             <View style={{ borderBottomWidth: 1, borderBottomColor: colors.border, paddingBottom: 16 }}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 24, gap: 10 }}>
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={() => {
-                      setSelectedSection([]);
-                      setSelectedMicrotopic([]);
+                    setSelectedSection([]);
+                    setSelectedMicrotopic([]);
                   }}
                   style={[
-                      styles.chip, 
-                      { backgroundColor: colors.surfaceStrong, borderColor: colors.border, paddingHorizontal: 20 }, 
-                      selectedSection.length === 0 && { backgroundColor: colors.primary, borderColor: colors.primary }
+                    styles.chip,
+                    { backgroundColor: colors.surfaceStrong, borderColor: colors.border, paddingHorizontal: 20 },
+                    selectedSection.length === 0 && { backgroundColor: colors.primary, borderColor: colors.primary }
                   ]}
                 >
                   <Text style={[styles.chipText, { color: colors.textSecondary, fontSize: 13 }, selectedSection.length === 0 && { color: '#fff' }]}>All Sections</Text>
@@ -829,7 +829,7 @@ export default function UnifiedArenaSetup() {
                 {subjectSections.map(s => {
                   const isSelected = selectedSection.includes(s);
                   return (
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       key={s}
                       onPress={() => {
                         let newSecs = [...selectedSection];
@@ -839,9 +839,9 @@ export default function UnifiedArenaSetup() {
                         setSelectedMicrotopic([]);
                       }}
                       style={[
-                          styles.chip, 
-                          { backgroundColor: colors.surfaceStrong, borderColor: colors.border, paddingHorizontal: 16 }, 
-                          isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }
+                        styles.chip,
+                        { backgroundColor: colors.surfaceStrong, borderColor: colors.border, paddingHorizontal: 16 },
+                        isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }
                       ]}
                     >
                       <Text style={[styles.chipText, { color: colors.textSecondary, fontSize: 13 }, isSelected && { color: '#fff' }]}>{s}</Text>
@@ -852,60 +852,60 @@ export default function UnifiedArenaSetup() {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 24, paddingBottom: 120 }}>
-               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                  <Text style={{ fontSize: 11, fontWeight: '900', color: colors.textTertiary, letterSpacing: 1.5 }}>MICRO-TOPICS ({subjectMicrotopics.length})</Text>
-                  {selectedMicrotopic.length > 0 && (
-                    <TouchableOpacity onPress={() => setSelectedMicrotopic([])}>
-                      <Text style={{ fontSize: 11, fontWeight: '800', color: colors.primary }}>CLEAR ({selectedMicrotopic.length})</Text>
-                    </TouchableOpacity>
-                  )}
-               </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <Text style={{ fontSize: 11, fontWeight: '900', color: colors.textTertiary, letterSpacing: 1.5 }}>MICRO-TOPICS ({subjectMicrotopics.length})</Text>
+                {selectedMicrotopic.length > 0 && (
+                  <TouchableOpacity onPress={() => setSelectedMicrotopic([])}>
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: colors.primary }}>CLEAR ({selectedMicrotopic.length})</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
 
-               <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                  {subjectMicrotopics.length === 0 ? (
-                      <View style={{ flex: 1, padding: 40, alignItems: 'center' }}>
-                         <Text style={{ color: colors.textTertiary, fontSize: 14, textAlign: 'center' }}>No matching topics found.</Text>
-                      </View>
-                  ) : (
-                      subjectMicrotopics.map((m, idx) => {
-                        const isSelected = selectedMicrotopic.includes(m);
-                        return (
-                          <TouchableOpacity 
-                            key={m}
-                            onPress={() => {
-                              let newMt = [...selectedMicrotopic];
-                              if (isSelected) newMt = newMt.filter(x => x !== m);
-                              else newMt.push(m);
-                              setSelectedMicrotopic(newMt);
-                            }}
-                            style={{
-                                width: '48%',
-                                backgroundColor: isSelected ? colors.primary + '10' : colors.surface,
-                                borderColor: isSelected ? colors.primary : colors.border,
-                                borderWidth: 1.5,
-                                borderRadius: 16,
-                                padding: 12,
-                                marginBottom: 12,
-                                minHeight: 64,
-                                justifyContent: 'center'
-                            }}
-                          >
-                            <Text style={{ color: isSelected ? colors.primary : colors.textPrimary, fontSize: 12, fontWeight: isSelected ? '800' : '600' }} numberOfLines={3}>{m}</Text>
-                            {isSelected && (
-                              <View style={{ position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: 10, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: colors.surface }}>
-                                <Check size={10} color="#fff" />
-                              </View>
-                            )}
-                          </TouchableOpacity>
-                        );
-                      })
-                  )}
-               </View>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                {subjectMicrotopics.length === 0 ? (
+                  <View style={{ flex: 1, padding: 40, alignItems: 'center' }}>
+                    <Text style={{ color: colors.textTertiary, fontSize: 14, textAlign: 'center' }}>No matching topics found.</Text>
+                  </View>
+                ) : (
+                  subjectMicrotopics.map((m, idx) => {
+                    const isSelected = selectedMicrotopic.includes(m);
+                    return (
+                      <TouchableOpacity
+                        key={m}
+                        onPress={() => {
+                          let newMt = [...selectedMicrotopic];
+                          if (isSelected) newMt = newMt.filter(x => x !== m);
+                          else newMt.push(m);
+                          setSelectedMicrotopic(newMt);
+                        }}
+                        style={{
+                          width: '48%',
+                          backgroundColor: isSelected ? colors.primary + '10' : colors.surface,
+                          borderColor: isSelected ? colors.primary : colors.border,
+                          borderWidth: 1.5,
+                          borderRadius: 16,
+                          padding: 12,
+                          marginBottom: 12,
+                          minHeight: 64,
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <Text style={{ color: isSelected ? colors.primary : colors.textPrimary, fontSize: 12, fontWeight: isSelected ? '800' : '600' }} numberOfLines={3}>{m}</Text>
+                        {isSelected && (
+                          <View style={{ position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: 10, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: colors.surface }}>
+                            <Check size={10} color="#fff" />
+                          </View>
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })
+                )}
+              </View>
             </ScrollView>
 
             <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 24, backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.border }}>
-              <TouchableOpacity 
-                style={[styles.launchBtn, { backgroundColor: colors.primary, height: 56, borderRadius: 18, shadowColor: colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 4 }]} 
+              <TouchableOpacity
+                style={[styles.launchBtn, { backgroundColor: colors.primary, height: 56, borderRadius: 18, shadowColor: colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 4 }]}
                 onPress={() => setShowTopicModal(false)}
               >
                 <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16, letterSpacing: 1 }}>SAVE SELECTION</Text>
@@ -937,21 +937,21 @@ export default function UnifiedArenaSetup() {
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          
+
           <View style={[styles.tabBar, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => setActiveTab('topic')}
               style={[styles.tab, activeTab === 'topic' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }]}
             >
               <Text style={[styles.tabText, { color: activeTab === 'topic' ? colors.primary : colors.textSecondary }]}>Topic-Wise</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => setActiveTab('paper')}
               style={[styles.tab, activeTab === 'paper' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }]}
             >
               <Text style={[styles.tabText, { color: activeTab === 'paper' ? colors.primary : colors.textSecondary }]}>Paper-Wise</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => setActiveTab('search')}
               style={[styles.tab, activeTab === 'search' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }]}
             >
@@ -961,7 +961,7 @@ export default function UnifiedArenaSetup() {
 
           {activeTab === 'topic' && (
             <View style={styles.filterSection}>
-              
+
               <View style={[styles.filterGroupCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                 <View style={styles.groupHeader}>
                   <Filter size={14} color={colors.primary} />
@@ -979,14 +979,14 @@ export default function UnifiedArenaSetup() {
                 />
 
                 <View style={{ marginTop: 8 }}>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     onPress={() => setShowTopicModal(true)}
-                    style={{ 
-                      flexDirection: 'row', 
-                      alignItems: 'center', 
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
                       justifyContent: 'space-between',
-                      backgroundColor: colors.primary + '10', 
-                      padding: 16, 
+                      backgroundColor: colors.primary + '10',
+                      padding: 16,
                       borderRadius: 16,
                       borderWidth: 1,
                       borderColor: colors.primary + '30',
@@ -1000,7 +1000,7 @@ export default function UnifiedArenaSetup() {
                       <View>
                         <Text style={{ fontSize: 14, fontWeight: '800', color: colors.textPrimary }}>Micro-Topic Selector</Text>
                         <Text style={{ fontSize: 11, color: colors.textTertiary, fontWeight: '600' }}>
-                          {selectedSection.length > 0 || selectedMicrotopic.length > 0 
+                          {selectedSection.length > 0 || selectedMicrotopic.length > 0
                             ? `${selectedSection.length} Sections, ${selectedMicrotopic.length} Topics`
                             : 'Select specific chapters or topics'}
                         </Text>
@@ -1077,210 +1077,210 @@ export default function UnifiedArenaSetup() {
           )}
 
           {activeTab === 'paper' && (
-             <View style={styles.paperContent}>
-                <View style={[styles.filterGroupCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                  <View style={styles.groupHeader}>
-                    <Layout size={14} color={colors.primary} />
-                    <Text style={[styles.groupTitle, { color: colors.textPrimary }]}>Paper Configuration</Text>
+            <View style={styles.paperContent}>
+              <View style={[styles.filterGroupCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <View style={styles.groupHeader}>
+                  <Layout size={14} color={colors.primary} />
+                  <Text style={[styles.groupTitle, { color: colors.textPrimary }]}>Paper Configuration</Text>
+                </View>
+                <FilterRow
+                  title="Exam Stage"
+                  items={examStages}
+                  selected={selectedExamStage}
+                  onSelect={setSelectedExamStage}
+                />
+                <FilterRow
+                  title="Institute"
+                  items={institutes}
+                  selected={selectedInstitute}
+                  onSelect={(val: string) => {
+                    setSelectedInstitute(val);
+                    setSelectedProgram('All');
+                  }}
+                />
+                <FilterRow
+                  title="Program"
+                  items={programs}
+                  selected={selectedProgram}
+                  onSelect={setSelectedProgram}
+                />
+                <FilterRow
+                  title="Curriculum"
+                  items={['NCERT Only', 'Non-NCERT']}
+                  selected={ncertFilter}
+                  onSelect={setNcertFilter}
+                />
+              </View>
+
+              <View style={{ marginHorizontal: 20, marginBottom: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Text style={{ fontSize: 11, fontWeight: '900', color: colors.textTertiary, letterSpacing: 1 }}>
+                  CHOOSE TEST ({testList.length})
+                </Text>
+              </View>
+
+              {testList.map(test => (
+                <TouchableOpacity
+                  key={test.id}
+                  onPress={() => {
+                    setSelectedTestId(test.id === selectedTestId ? null : test.id);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                  style={[
+                    styles.testCard,
+                    { backgroundColor: colors.surface, borderColor: colors.border },
+                    selectedTestId === test.id && { borderColor: colors.primary, borderWidth: 2 }
+                  ]}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.testTitle, { color: colors.textPrimary }]}>{test.title}</Text>
+                    <Text style={[styles.testSubtitle, { color: colors.textTertiary }]}>
+                      {test.institute} • {test.program}
+                    </Text>
                   </View>
-                  <FilterRow
-                    title="Exam Stage"
-                    items={examStages}
-                    selected={selectedExamStage}
-                    onSelect={setSelectedExamStage}
-                  />
-                  <FilterRow
-                    title="Institute"
-                    items={institutes}
-                    selected={selectedInstitute}
-                    onSelect={(val: string) => {
-                      setSelectedInstitute(val);
-                      setSelectedProgram('All');
-                    }}
-                  />
-                  <FilterRow
-                    title="Program"
-                    items={programs}
-                    selected={selectedProgram}
-                    onSelect={setSelectedProgram}
-                  />
-                  <FilterRow
-                    title="Curriculum"
-                    items={['NCERT Only', 'Non-NCERT']}
-                    selected={ncertFilter}
-                    onSelect={setNcertFilter}
-                  />
-                </View>
-
-                <View style={{ marginHorizontal: 20, marginBottom: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                   <Text style={{ fontSize: 11, fontWeight: '900', color: colors.textTertiary, letterSpacing: 1 }}>
-                      CHOOSE TEST ({testList.length})
-                   </Text>
-                </View>
-
-                {testList.map(test => (
-                  <TouchableOpacity 
-                    key={test.id}
-                    onPress={() => {
-                      setSelectedTestId(test.id === selectedTestId ? null : test.id);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    }}
-                    style={[
-                      styles.testCard, 
-                      { backgroundColor: colors.surface, borderColor: colors.border },
-                      selectedTestId === test.id && { borderColor: colors.primary, borderWidth: 2 }
-                    ]}
-                  >
-                    <View style={{ flex: 1 }}>
-                      <Text style={[styles.testTitle, { color: colors.textPrimary }]}>{test.title}</Text>
-                      <Text style={[styles.testSubtitle, { color: colors.textTertiary }]}>
-                        {test.institute} • {test.program}
-                      </Text>
+                  {selectedTestId === test.id && (
+                    <View style={{ backgroundColor: colors.primary, borderRadius: 12, padding: 4 }}>
+                      <Check size={16} color="#fff" />
                     </View>
-                    {selectedTestId === test.id && (
-                      <View style={{ backgroundColor: colors.primary, borderRadius: 12, padding: 4 }}>
-                         <Check size={16} color="#fff" />
-                      </View>
-                    )}
-                  </TouchableOpacity>
-                ))}
+                  )}
+                </TouchableOpacity>
+              ))}
 
-                {testList.length === 0 && (
-                  <View style={{ padding: 40, alignItems: 'center' }}>
-                     <Text style={{ color: colors.textTertiary }}>No tests found for the selected filters.</Text>
-                  </View>
-                )}
-             </View>
+              {testList.length === 0 && (
+                <View style={{ padding: 40, alignItems: 'center' }}>
+                  <Text style={{ color: colors.textTertiary }}>No tests found for the selected filters.</Text>
+                </View>
+              )}
+            </View>
           )}
 
           {activeTab === 'search' && (
-             <View style={{ padding: 20 }}>
-                <GlobalSearchBar 
-                  placeholder="Search for specific keywords..."
-                  initialQuery={searchQuery}
-                  hideDropdown={true}
-                  onSearch={(q, f) => {
-                    setSearchQuery(q);
-                    setSearchFilters(f);
-                  }}
-                />
+            <View style={{ padding: 20 }}>
+              <GlobalSearchBar
+                placeholder="Search for specific keywords..."
+                initialQuery={searchQuery}
+                hideDropdown={true}
+                onSearch={(q, f) => {
+                  setSearchQuery(q);
+                  setSearchFilters(f);
+                }}
+              />
 
-                {loadingSearch ? (
-                  <View style={{ marginTop: 40, alignItems: 'center' }}>
-                    <ActivityIndicator color={colors.primary} />
-                  </View>
-                ) : (
-                  <View style={{ marginTop: 24 }}>
-                    {searchResults.length > 0 && (
-                      <View style={{ marginBottom: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Text style={{ fontSize: 12, fontWeight: '800', color: colors.textTertiary }}>
-                          MATCHING QUESTIONS ({searchResults.length})
+              {loadingSearch ? (
+                <View style={{ marginTop: 40, alignItems: 'center' }}>
+                  <ActivityIndicator color={colors.primary} />
+                </View>
+              ) : (
+                <View style={{ marginTop: 24 }}>
+                  {searchResults.length > 0 && (
+                    <View style={{ marginBottom: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Text style={{ fontSize: 12, fontWeight: '800', color: colors.textTertiary }}>
+                        MATCHING QUESTIONS ({searchResults.length})
+                      </Text>
+                    </View>
+                  )}
+
+                  {searchResults.map((q) => (
+                    <TouchableOpacity
+                      key={q.id}
+                      onPress={() => {
+                        router.push({
+                          pathname: '/unified/engine',
+                          params: {
+                            testId: '',
+                            mode: arenaMode,
+                            view: viewMode,
+                            timer: timerMode,
+                            questionId: q.id
+                          }
+                        });
+                      }}
+                      style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                    >
+                      <Text style={[styles.resultText, { color: colors.textPrimary }]} numberOfLines={3}>
+                        {q.question_text.replace(/<[^>]*>/g, '')}
+                      </Text>
+                      <View style={styles.resultMeta}>
+                        <Text style={[styles.resultTag, { color: colors.primary, backgroundColor: colors.primary + '15' }]}>
+                          {q.subject}
                         </Text>
+                        {(() => {
+                          if (!q.is_pyq && !q.exam_group && !q.source?.group) return null;
+                          const groupName = (q.source?.group || q.exam_group || '').toUpperCase();
+                          const year = String(q.source?.year || q.exam_year || '').trim();
+                          const isUPSC = q.is_upsc_cse || groupName.includes('UPSC CSE') || groupName === 'UPSC';
+                          const isAllied = q.is_allied || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => groupName.includes(g));
+                          const isOther = q.is_others || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => groupName.includes(g));
+
+                          const dispName = q.source?.group || q.exam_group || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ');
+
+                          let bgColor = '#f59e0b15';
+                          let textColor = '#f59e0b';
+
+                          if (isUPSC) { bgColor = '#dcfce7'; textColor = '#15803d'; }
+                          else if (isAllied) { bgColor = '#fef9c3'; textColor = '#a16207'; }
+                          else if (isOther) { bgColor = '#f1f5f9'; textColor = '#475569'; }
+                          else if (q.is_pyq) { bgColor = colors.primary + '15'; textColor = colors.primary; }
+
+                          return (
+                            <Text style={[styles.resultTag, { color: textColor, backgroundColor: bgColor, marginLeft: 8 }]}>
+                              {`${dispName} ${year}`.trim()}
+                            </Text>
+                          );
+                        })()}
+
+                        {(() => {
+                          const institutes = Array.isArray((q as any)._institutes)
+                            ? Array.from(new Set((q as any)._institutes.filter(Boolean)))
+                            : (q.tests?.institute ? [q.tests.institute] : []);
+                          if (institutes.length === 0) return null;
+                          return (
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 8, gap: 6 }}>
+                              {institutes.slice(0, 2).map((inst: string) => (
+                                <Text key={`${q.id}-${inst}`} style={[styles.resultTag, { color: colors.textTertiary, backgroundColor: colors.surfaceStrong }]}>
+                                  {inst}
+                                </Text>
+                              ))}
+                              {institutes.length > 2 ? (
+                                <Text style={[styles.resultTag, { color: colors.textTertiary, backgroundColor: colors.surfaceStrong }]}>
+                                  +{institutes.length - 2}
+                                </Text>
+                              ) : null}
+                            </View>
+                          );
+                        })()}
+                        <ChevronRight size={16} color={colors.textTertiary} />
+
                       </View>
-                    )}
+                    </TouchableOpacity>
+                  ))}
 
-                    {searchResults.map((q) => (
-                      <TouchableOpacity 
-                        key={q.id}
-                        onPress={() => {
-                          router.push({
-                            pathname: '/unified/engine',
-                            params: { 
-                              testId: '', 
-                              mode: arenaMode, 
-                              view: viewMode, 
-                              timer: timerMode,
-                              questionId: q.id
-                            }
-                          });
-                        }}
-                        style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                      >
-                        <Text style={[styles.resultText, { color: colors.textPrimary }]} numberOfLines={3}>
-                          {q.question_text.replace(/<[^>]*>/g, '')}
-                        </Text>
-                        <View style={styles.resultMeta}>
-                          <Text style={[styles.resultTag, { color: colors.primary, backgroundColor: colors.primary + '15' }]}>
-                            {q.subject}
-                          </Text>
-                          {(() => {
-                            if (!q.is_pyq && !q.exam_group && !q.source?.group) return null;
-                            const groupName = (q.source?.group || q.exam_group || '').toUpperCase();
-                            const year = String(q.source?.year || q.exam_year || '').trim();
-                            const isUPSC = q.is_upsc_cse || groupName.includes('UPSC CSE') || groupName === 'UPSC';
-                            const isAllied = q.is_allied || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => groupName.includes(g));
-                            const isOther = q.is_others || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => groupName.includes(g));
-                            
-                            const dispName = q.source?.group || q.exam_group || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ');
-                            
-                            let bgColor = '#f59e0b15';
-                            let textColor = '#f59e0b';
-                            
-                            if (isUPSC) { bgColor = '#dcfce7'; textColor = '#15803d'; }
-                            else if (isAllied) { bgColor = '#fef9c3'; textColor = '#a16207'; }
-                            else if (isOther) { bgColor = '#f1f5f9'; textColor = '#475569'; }
-                            else if (q.is_pyq) { bgColor = colors.primary + '15'; textColor = colors.primary; }
+                  {searchResults.length >= 50 && (
+                    <TouchableOpacity
+                      style={[styles.seeAllBtn, { borderColor: colors.primary }]}
+                      onPress={() => setShowAllResultsModal(true)}
+                    >
+                      <Text style={[styles.seeAllBtnText, { color: colors.primary }]}>
+                        SEE ALL {questionCount} RESULTS
+                      </Text>
+                    </TouchableOpacity>
+                  )}
 
-                            return (
-                              <Text style={[styles.resultTag, { color: textColor, backgroundColor: bgColor, marginLeft: 8 }]}>
-                                {`${dispName} ${year}`.trim()}
-                              </Text>
-                            );
-                          })()}
-
-                          {(() => {
-                            const institutes = Array.isArray((q as any)._institutes)
-                              ? Array.from(new Set((q as any)._institutes.filter(Boolean)))
-                              : (q.tests?.institute ? [q.tests.institute] : []);
-                            if (institutes.length === 0) return null;
-                            return (
-                              <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 8, gap: 6 }}>
-                                {institutes.slice(0, 2).map((inst: string) => (
-                                  <Text key={`${q.id}-${inst}`} style={[styles.resultTag, { color: colors.textTertiary, backgroundColor: colors.surfaceStrong }]}>
-                                    {inst}
-                                  </Text>
-                                ))}
-                                {institutes.length > 2 ? (
-                                  <Text style={[styles.resultTag, { color: colors.textTertiary, backgroundColor: colors.surfaceStrong }]}>
-                                    +{institutes.length - 2}
-                                  </Text>
-                                ) : null}
-                              </View>
-                            );
-                          })()}
-                          <ChevronRight size={16} color={colors.textTertiary} />
-
-                        </View>
-                      </TouchableOpacity>
-                    ))}
-
-                    {searchResults.length >= 50 && (
-                      <TouchableOpacity 
-                        style={[styles.seeAllBtn, { borderColor: colors.primary }]}
-                        onPress={() => setShowAllResultsModal(true)}
-                      >
-                        <Text style={[styles.seeAllBtnText, { color: colors.primary }]}>
-                          SEE ALL {questionCount} RESULTS
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-
-                    {searchResults.length === 0 && searchQuery !== '' && (
-                      <View style={{ padding: 40, alignItems: 'center' }}>
-                        <Text style={{ color: colors.textTertiary }}>No results found for "{searchQuery}"</Text>
-                      </View>
-                    )}
-                  </View>
-                )}
-              </View>
-            )}
+                  {searchResults.length === 0 && searchQuery !== '' && (
+                    <View style={{ padding: 40, alignItems: 'center' }}>
+                      <Text style={{ color: colors.textTertiary }}>No results found for "{searchQuery}"</Text>
+                    </View>
+                  )}
+                </View>
+              )}
+            </View>
+          )}
 
           <View style={[styles.filterGroupCard, { backgroundColor: colors.surface, borderColor: colors.border, marginHorizontal: 20, marginTop: 10, marginBottom: 40 }]}>
             <View style={styles.groupHeader}>
               <Layout size={14} color={colors.primary} />
               <Text style={[styles.groupTitle, { color: colors.textPrimary }]}>General Preferences</Text>
             </View>
-            
+
             <FilterRow
               title="View Mode"
               items={['List View', 'Card View']}
@@ -1290,7 +1290,7 @@ export default function UnifiedArenaSetup() {
               allowAll={false}
             />
 
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => setShowPYQTags(!showPYQTags)}
               activeOpacity={0.8}
               style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, borderTopWidth: 1, borderTopColor: colors.border + '30', marginTop: 8 }}
@@ -1306,17 +1306,17 @@ export default function UnifiedArenaSetup() {
 
         <View style={[styles.footer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
           <View style={{ flex: 1.2 }}>
-             <Text style={[styles.countText, { color: colors.textPrimary }]}>
-               {calculatingCount ? '...' : (questionCount || 0)}
-             </Text>
-             <Text style={[styles.countLabel, { color: colors.textTertiary }]} numberOfLines={2}>
-               Targeted Questions{"\n"}(Pre-Dedupe)
-             </Text>
+            <Text style={[styles.countText, { color: colors.textPrimary }]}>
+              {calculatingCount ? '...' : (questionCount || 0)}
+            </Text>
+            <Text style={[styles.countLabel, { color: colors.textTertiary }]} numberOfLines={2}>
+              Targeted Questions{"\n"}(Pre-Dedupe)
+            </Text>
           </View>
-          
+
           <View style={{ flexDirection: 'row', gap: 8, flex: 3 }}>
-            <TouchableOpacity 
-              style={[styles.launchBtn, { backgroundColor: colors.surfaceStrong, borderColor: colors.primary, borderWidth: 1 }]} 
+            <TouchableOpacity
+              style={[styles.launchBtn, { backgroundColor: colors.surfaceStrong, borderColor: colors.primary, borderWidth: 1 }]}
               onPress={() => { handleLaunch('learning'); }}
               disabled={calculatingCount || questionCount === 0}
             >
@@ -1324,8 +1324,8 @@ export default function UnifiedArenaSetup() {
               <Text style={[styles.launchBtnText, { color: colors.primary, fontSize: 14 }]}>Learn</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={[styles.launchBtn, { backgroundColor: colors.primary }]} 
+            <TouchableOpacity
+              style={[styles.launchBtn, { backgroundColor: colors.primary }]}
               onPress={() => { setArenaMode('exam'); setShowExamModal(true); }}
               disabled={calculatingCount || questionCount === 0}
             >
@@ -1346,49 +1346,49 @@ export default function UnifiedArenaSetup() {
           <View style={[styles.fullModalOverlay, { backgroundColor: colors.bg }]}>
             <SafeAreaView style={{ flex: 1 }}>
               <View style={styles.fullModalHeader}>
-                 <TouchableOpacity onPress={() => setShowAllResultsModal(false)} style={styles.backBtn}>
-                    <ChevronLeft size={24} color={colors.textPrimary} />
-                 </TouchableOpacity>
-                 <Text style={[styles.fullModalTitle, { color: colors.textPrimary }]}>All Results ({questionCount})</Text>
-                 <View style={{ width: 40 }} />
+                <TouchableOpacity onPress={() => setShowAllResultsModal(false)} style={styles.backBtn}>
+                  <ChevronLeft size={24} color={colors.textPrimary} />
+                </TouchableOpacity>
+                <Text style={[styles.fullModalTitle, { color: colors.textPrimary }]}>All Results ({questionCount})</Text>
+                <View style={{ width: 40 }} />
               </View>
 
               <ScrollView contentContainerStyle={{ padding: 20 }}>
-                 {searchResults.map((q) => (
-                    <TouchableOpacity 
-                      key={q.id + '_full'}
-                      onPress={() => {
-                        setShowAllResultsModal(false);
-                        router.push({
-                          pathname: '/unified/engine',
-                          params: { testId: '', mode: arenaMode, view: viewMode, timer: timerMode, questionId: q.id }
-                        });
-                      }}
-                      style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                    >
-                      <Text style={[styles.resultText, { color: colors.textPrimary }]} numberOfLines={4}>
-                        {q.question_text.replace(/<[^>]*>/g, '')}
+                {searchResults.map((q) => (
+                  <TouchableOpacity
+                    key={q.id + '_full'}
+                    onPress={() => {
+                      setShowAllResultsModal(false);
+                      router.push({
+                        pathname: '/unified/engine',
+                        params: { testId: '', mode: arenaMode, view: viewMode, timer: timerMode, questionId: q.id }
+                      });
+                    }}
+                    style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                  >
+                    <Text style={[styles.resultText, { color: colors.textPrimary }]} numberOfLines={4}>
+                      {q.question_text.replace(/<[^>]*>/g, '')}
+                    </Text>
+                    <View style={styles.resultMeta}>
+                      <Text style={[styles.resultTag, { color: colors.primary, backgroundColor: colors.primary + '15' }]}>
+                        {q.subject}
                       </Text>
-                      <View style={styles.resultMeta}>
-                        <Text style={[styles.resultTag, { color: colors.primary, backgroundColor: colors.primary + '15' }]}>
-                          {q.subject}
-                        </Text>
-                        {(() => {
-                          const institutes = Array.isArray((q as any)._institutes)
-                            ? Array.from(new Set((q as any)._institutes.filter(Boolean)))
-                            : (q.tests?.institute ? [q.tests.institute] : []);
-                          if (institutes.length === 0) return null;
-                          return institutes.slice(0, 2).map((inst: string) => (
-                            <Text key={`${q.id}-full-${inst}`} style={[styles.resultTag, { color: colors.textTertiary, backgroundColor: colors.surfaceStrong, marginLeft: 8 }]}>
-                              {inst}
-                            </Text>
-                          ));
-                        })()}
-                        <ChevronRight size={16} color={colors.textTertiary} />
-                      </View>
-                    </TouchableOpacity>
-                 ))}
-                 <View style={{ height: 100 }} />
+                      {(() => {
+                        const institutes = Array.isArray((q as any)._institutes)
+                          ? Array.from(new Set((q as any)._institutes.filter(Boolean)))
+                          : (q.tests?.institute ? [q.tests.institute] : []);
+                        if (institutes.length === 0) return null;
+                        return institutes.slice(0, 2).map((inst: string) => (
+                          <Text key={`${q.id}-full-${inst}`} style={[styles.resultTag, { color: colors.textTertiary, backgroundColor: colors.surfaceStrong, marginLeft: 8 }]}>
+                            {inst}
+                          </Text>
+                        ));
+                      })()}
+                      <ChevronRight size={16} color={colors.textTertiary} />
+                    </View>
+                  </TouchableOpacity>
+                ))}
+                <View style={{ height: 100 }} />
               </ScrollView>
             </SafeAreaView>
           </View>
@@ -1399,14 +1399,14 @@ export default function UnifiedArenaSetup() {
             <View style={{ backgroundColor: colors.surface, borderRadius: 24, padding: 24 }}>
               <Text style={{ fontSize: 20, fontWeight: '900', color: colors.textPrimary, marginBottom: 8 }}>Exam Mode Setup</Text>
               <Text style={{ fontSize: 13, color: colors.textTertiary, marginBottom: 24 }}>Choose your timer preference for this session.</Text>
-              
+
               <View style={{ gap: 12 }}>
                 {[
                   { id: 'stopwatch', label: 'Stopwatch', sub: 'Count upwards', icon: Clock },
                   { id: 'countdown', label: 'Default Timer', sub: '2 mins per question', icon: Target },
                   { id: 'none', label: 'No Timer', sub: 'Relaxed practice', icon: XCircle }
                 ].map((opt) => (
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     key={opt.id}
                     onPress={() => { handleLaunch('exam', opt.id); setShowExamModal(false); }}
                     style={{ flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border }}
@@ -1422,7 +1422,7 @@ export default function UnifiedArenaSetup() {
                   </TouchableOpacity>
                 ))}
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => setShowExamModal(false)}
                 style={{ marginTop: 24, alignItems: 'center' }}
               >
@@ -1487,3 +1487,4 @@ const styles = StyleSheet.create({
   toggleTrack: { width: 44, height: 24, borderRadius: 12, padding: 2, justifyContent: 'center' },
   toggleThumb: { width: 20, height: 20, borderRadius: 10, position: 'absolute' },
 });
+

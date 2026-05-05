@@ -1933,6 +1933,9 @@ export default function UnifiedQuizEngine() {
     const end = start + pageSize;
     const pageQuestions = questions.slice(start, end);
     const totalPages = Math.ceil(questions.length / pageSize);
+    // Tablet / iPad (>= 768 logical px) shows the full 40-word snippet.
+    // Phones keep the compact 2-line truncation.
+    const isWideIndex = width >= 768;
 
     return (
       <View style={{ flex: 1, backgroundColor: zenBg }}>
@@ -1965,7 +1968,10 @@ export default function UnifiedQuizEngine() {
                 </View>
                 
                 <View style={{ flex: 1, marginLeft: 12 }}>
-                  <Text style={[styles.indexSnippet, { color: colors.textPrimary }]} numberOfLines={2}>{snippet}</Text>
+                  <Text
+                    style={[styles.indexSnippet, { color: colors.textPrimary }]}
+                    numberOfLines={isWideIndex ? 0 : 2}
+                  >{snippet}</Text>
                   <View style={{ flexDirection: 'row', gap: 6, marginTop: 8 }}>
                     {(() => {
                       if (!showPYQTags) return null;

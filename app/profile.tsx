@@ -24,6 +24,7 @@ import {
   ChevronRight,
   BookOpen,
   LayoutList,
+  Layers,
   ArrowUp,
   ArrowDown,
   Download,
@@ -276,6 +277,7 @@ export default function Profile() {
         <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
           <Row testID="profile-theme" icon={<Palette color={colors.primary} size={20} />} label="Zen Theme" sub="Change global appearance" right={<ThemeSwitcher />} />
           <Row testID="profile-tabs" icon={<LayoutList color={colors.primary} size={20} />} label="Customize Tabs" sub="Reorder bottom bar" onPress={() => router.push('/customize_tabs')} />
+          <Row testID="profile-dedup" icon={<Layers color={colors.primary} size={20} />} label="Dedup Manager" sub="Smart-merge UPSC PYQs across institutes" onPress={() => router.push('/dedup-manager')} />
           <Row testID="profile-widgets" icon={<BarChart3 color={colors.primary} size={20} />} label="Manage Widgets" sub="Long-press dashboard header for 4s to edit" onPress={() => Alert.alert('Widget Editor', 'Go to Dashboard and long-press the header area for 4 seconds to enter widget edit mode. You can add, remove, and rearrange widgets.')} />
           {isAnalyticsAdmin ? (
             <Row testID="profile-analytics-layout" icon={<BarChart3 color={colors.primary} size={20} />} label="Analytics Layout Admin" sub="Arrange review and overall cards" onPress={() => setLayoutAdminVisible(true)} />

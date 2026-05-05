@@ -76,14 +76,56 @@ const ANALYSIS_REPORT_OPTIONS: Array<{ key: AnalysisReportKey; label: string }> 
 type HeatmapRow = {
   key: string;
   label: string;
+  /**
+   * Optional visual variant of the label. When provided the grid renders this
+   * (e.g. "Economy · Banking") while still delivering the original `label`
+   * value through callbacks — keeping navigation logic intact.
+   */
+  displayLabel?: string;
   byYear: Record<string, number>;
 };
 
-// Reduced width by 30% (from 132 to 92)
-const HEATMAP_LABEL_WIDTH = 150;
-const HEATMAP_CELL_WIDTH = 48;
-const HEATMAP_ROW_HEIGHT = 60;
-const HEATMAP_MAX_BODY_HEIGHT = 450;
+// Heatmap base dimensions (phone defaults). Responsive logic below expands
+// these on larger screens (iPads/tablets) so the grid uses available width.
+const HEATMAP_LABEL_WIDTH = 170;
+const HEATMAP_CELL_WIDTH = 54;
+const HEATMAP_ROW_HEIGHT = 58;
+const HEATMAP_MAX_BODY_HEIGHT = 520;
+
+// Responsive helper: expands cell width / label width based on screen width.
+// On iPads (>=768), it attempts to fill the available horizontal space
+// across the year axis while keeping comfortable minimums.
+const getResponsiveHeatmapDims = (screenWidth: number, yearsCount: number, isCompact?: boolean) => {
+  // Panel horizontal padding (24) + outer screen padding approximations.
+  // We leave ~56px of chrome for panel padding+margins.
+  const available = Math.max(320, screenWidth - 56);
+  const isTablet = screenWidth >= 768;
+  const isLargeTablet = screenWidth >= 1024;
+
+  let labelWidth: number;
+  let cellWidth: number;
+  let rowHeight: number;
+
+  if (isLargeTablet) {
+    labelWidth = isCompact ? 220 : 260;
+    rowHeight = 60;
+    // Target fit: divide remaining space across years but clamp to 64-120
+    const remaining = available - labelWidth;
+    const ideal = Math.floor(remaining / Math.max(1, yearsCount));
+    cellWidth = Math.max(68, Math.min(120, ideal));
+  } else if (isTablet) {
+    labelWidth = isCompact ? 200 : 230;
+    rowHeight = 58;
+    const remaining = available - labelWidth;
+    const ideal = Math.floor(remaining / Math.max(1, yearsCount));
+    cellWidth = Math.max(62, Math.min(96, ideal));
+  } else {
+    labelWidth = isCompact ? 150 : 180;
+    rowHeight = HEATMAP_ROW_HEIGHT;
+    cellWidth = HEATMAP_CELL_WIDTH;
+  }
+  return { labelWidth, cellWidth, rowHeight, isTablet };
+};
 
 function StickyHeatmapTable({
   title,
@@ -98,6 +140,7 @@ function StickyHeatmapTable({
   heatmapPalette,
   maxValue,
   labelWidth,
+  compactLabel,
 }: {
   title: string;
   labelHeader: string;
@@ -111,8 +154,13 @@ function StickyHeatmapTable({
   heatmapPalette: 'spectral' | 'ocean';
   maxValue?: number;
   labelWidth?: number;
+  compactLabel?: boolean;
 }) {
-  const finalLabelWidth = labelWidth || HEATMAP_LABEL_WIDTH;
+  const screenW = Dimensions.get('window').width;
+  const dims = getResponsiveHeatmapDims(screenW, years.length, compactLabel);
+  const finalLabelWidth = labelWidth || dims.labelWidth;
+  const finalCellWidth = dims.cellWidth;
+  const finalRowHeight = dims.rowHeight;
   const headerRef = useRef<ScrollView | null>(null);
 
   const handleBodyHorizontalScroll = (x: number) => {
@@ -127,7 +175,7 @@ function StickyHeatmapTable({
       ) : (
         <View style={[styles.heatmapFrame, { borderColor: colors.border }]}> 
           <View style={[styles.heatmapStickyHeaderRow, { borderBottomColor: colors.border, backgroundColor: colors.surfaceStrong }]}> 
-            <View style={[styles.heatmapStickyLabelHeader, { borderRightColor: colors.border, width: finalLabelWidth }]}> 
+            <View style={[styles.heatmapStickyLabelHeader, { borderRightColor: colors.border, width: finalLabelWidth, height: finalRowHeight }]}> 
               <Text style={[styles.heatmapLabelHeaderText, { color: colors.textTertiary }]}>{labelHeader}</Text>
             </View>
             <ScrollView
@@ -138,7 +186,7 @@ function StickyHeatmapTable({
             >
               <View style={styles.heatmapYearHeaderTrack}>
                 {years.map((year) => (
-                  <View key={`header-${labelHeader}-${year}`} style={[styles.heatmapYearHeaderCell, { borderRightColor: colors.border }]}> 
+                  <View key={`header-${labelHeader}-${year}`} style={[styles.heatmapYearHeaderCell, { borderRightColor: colors.border, width: finalCellWidth, height: finalRowHeight }]}> 
                     <Text style={[styles.heatmapYearHeaderText, { color: colors.textTertiary }]}>{year}</Text>
                   </View>
                 ))}
@@ -152,13 +200,13 @@ function StickyHeatmapTable({
                 {rows.map((row) => (
                   <TouchableOpacity 
                     key={`label-${row.key}`} 
-                    style={[styles.heatmapStickyLabelCell, { borderBottomColor: colors.border + '55' }]}
+                    style={[styles.heatmapStickyLabelCell, { borderBottomColor: colors.border + '55', width: finalLabelWidth, height: finalRowHeight }]}
                     onPress={() => onRowPress?.(row.label)}
                     activeOpacity={0.7}
                   > 
                     <View style={styles.heatmapLabelRow}>
-                      <Text style={[styles.heatmapStickyLabelText, { color: colors.textSecondary, flex: 1, fontSize: 10, lineHeight: 14 }]} numberOfLines={3}>
-                        {row.label}
+                      <Text style={[styles.heatmapStickyLabelText, { color: colors.textSecondary, flex: 1, fontSize: 11, lineHeight: 15 }]} numberOfLines={2}>
+                        {row.displayLabel || row.label}
                       </Text>
                       {onLabelActionPress && (
                         <TouchableOpacity 
@@ -182,7 +230,7 @@ function StickyHeatmapTable({
               >
                 <View>
                   {rows.map((row) => (
-                    <View key={`data-${row.key}`} style={[styles.heatmapDataRow, { borderBottomColor: colors.border + '55' }]}> 
+                    <View key={`data-${row.key}`} style={[styles.heatmapDataRow, { borderBottomColor: colors.border + '55', height: finalRowHeight }]}> 
                       {years.map((year) => {
                         const count = row.byYear[year] || 0;
                         let bgColor = colors.surfaceStrong;
@@ -223,13 +271,13 @@ function StickyHeatmapTable({
                                 opacity,
                                 borderRadius: 6,
                                 margin: 1,
-                                width: HEATMAP_CELL_WIDTH - 2,
-                                height: HEATMAP_ROW_HEIGHT - 2,
+                                width: finalCellWidth - 2,
+                                height: finalRowHeight - 2,
                               }
                             ]}
                             onPress={() => onCellPress?.(row.label, year)}
                           >
-                            <Text style={[styles.heatCellText, { color: textColor, fontSize: 10, fontWeight: '800' }]}>{count || ''}</Text>
+                            <Text style={[styles.heatCellText, { color: textColor, fontSize: 11, fontWeight: '800' }]}>{count || ''}</Text>
                           </TouchableOpacity>
                         );
                       })}
@@ -513,6 +561,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     setMicroTopicData([]);
   };
 
+  const [topicSubjectMap, setTopicSubjectMap] = useState<Record<string, string>>({});
+
   const processAnalytics = (data: any[]) => {
     if (!data.length) {
       clearComputedState();
@@ -523,6 +573,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     const yearSubjectMap: Record<string, Record<string, number>> = {};
     const topicMap: Record<string, number> = {};
     const topicYearMap: Record<string, Record<string, number>> = {};
+    const topicToSubject: Record<string, string> = {};
 
     data.forEach(q => {
       const subject = getAnalyticsSubject(q);
@@ -538,6 +589,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       topicMap[topic] = (topicMap[topic] || 0) + 1;
       if (!topicYearMap[topic]) topicYearMap[topic] = {};
       topicYearMap[topic][yearKey] = (topicYearMap[topic][yearKey] || 0) + 1;
+      if (!topicToSubject[topic]) topicToSubject[topic] = subject;
     });
 
     const sortedSubjects = Object.entries(subjectMap).sort((a, b) => b[1] - a[1]);
@@ -546,7 +598,11 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     setDistributionData(sortedSubjects.map(([name, value]) => ({ name, value })));
     setHeatmapData(yearSubjectMap);
     setTopTopics(hottestTopics);
-    setTrendSubjects(sortedSubjects.slice(0, 4).map(([name]) => name));
+    setTopicSubjectMap(topicToSubject);
+    // Default to Economy-only trend selection when available; otherwise fall back
+    // to top subject. Users can add more via chips.
+    const economy = sortedSubjects.find(([name]) => name.toLowerCase() === 'economy');
+    setTrendSubjects(economy ? ['Economy'] : sortedSubjects.slice(0, 1).map(([name]) => name));
 
     const filteredTopicHeatmap: Record<string, Record<string, number>> = {};
     hottestTopics.forEach(topic => {
@@ -659,12 +715,17 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   }, [distributionData, years, heatmapData]);
 
   const topicHeatmapRows = useMemo<HeatmapRow[]>(() => {
-    return topTopics.map(topic => ({
-      key: `topic-${topic}`,
-      label: topic,
-      byYear: topicYearHeatmap[topic] || {},
-    }));
-  }, [topTopics, topicYearHeatmap]);
+    return topTopics.map(topic => {
+      const subject = topicSubjectMap[topic];
+      const combined = subject && subject !== topic ? `${subject} · ${topic}` : topic;
+      return {
+        key: `topic-${topic}`,
+        label: topic,          // original topic — used by callbacks
+        displayLabel: combined, // visual label (subject + topic single column)
+        byYear: topicYearHeatmap[topic] || {},
+      };
+    });
+  }, [topTopics, topicYearHeatmap, topicSubjectMap]);
 
   const sectionHeatmapRows = useMemo<HeatmapRow[]>(() => {
     return heatmapSections.map(item => ({

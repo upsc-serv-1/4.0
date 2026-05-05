@@ -730,6 +730,42 @@ export default function UnifiedQuizEngine() {
   const NOTE_PREFS_KEY = 'notebook_save_prefs';
   const listRef = useRef<FlatList>(null);
 
+  // Robust scroll helper for list view palette jumps
+  const scrollToIndexRobust = useCallback((targetIndex: number) => {
+    if (viewMode !== 'list') return;
+    
+    const AVERAGE_ITEM_HEIGHT = 220;
+    
+    const attemptScroll = () => {
+      try {
+        listRef.current?.scrollToIndex({ 
+          index: targetIndex, 
+          animated: true, 
+          viewPosition: 0 
+        });
+      } catch (e) {
+        // Fall back to offset-based scroll if index fails
+        listRef.current?.scrollToOffset({ 
+          offset: Math.max(0, targetIndex * AVERAGE_ITEM_HEIGHT), 
+          animated: true 
+        });
+        // Retry scrollToIndex after layout settles
+        setTimeout(() => {
+          try {
+            listRef.current?.scrollToIndex({ 
+              index: targetIndex, 
+              animated: false, 
+              viewPosition: 0 
+            });
+          } catch {}
+        }, 300);
+      }
+    };
+    
+    // Small delay to let modal close animation complete
+    setTimeout(attemptScroll, 50);
+  }, [viewMode]);
+
   // 3. Store Selectors
   const currentAnswers = store.answers;
   const clearStoredAnswers = store.clearAnswers;
@@ -777,7 +813,7 @@ export default function UnifiedQuizEngine() {
       }, 300); // Increased delay for stability
       return () => clearTimeout(scrollTimer);
     }
-  }, [showIndex, viewMode]);
+  }, [showIndex, viewMode, currentIndex]); // Added currentIndex dependency
 
   useEffect(() => {
     if (!isPaperMode) {
@@ -3205,14 +3241,9 @@ export default function UnifiedQuizEngine() {
                               } else if (viewMode === 'card') { 
                                 setCurrentIndex(idx); 
                               } else {
+                                // List view: use robust scroll helper
                                 setCurrentIndex(idx);
-                                requestAnimationFrame(() => {
-                                  try {
-                                    listRef.current?.scrollToIndex({ index: idx, animated: true, viewPosition: 0 });
-                                  } catch {
-                                    listRef.current?.scrollToOffset({ offset: Math.max(0, idx * 220), animated: true });
-                                  }
-                                });
+                                scrollToIndexRobust(idx);
                               }
                             }, 100);
                           }}

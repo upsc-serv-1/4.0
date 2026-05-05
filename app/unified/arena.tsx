@@ -848,6 +848,7 @@ export default function UnifiedArenaSetup() {
             <View style={{ borderBottomWidth: 1, borderBottomColor: colors.border, paddingBottom: 16 }}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 24, gap: 10 }}>
                 <TouchableOpacity
+                  activeOpacity={1}
                   onPress={() => {
                     setSelectedSection([]);
                     setSelectedMicrotopic([]);
@@ -865,11 +866,12 @@ export default function UnifiedArenaSetup() {
                   return (
                     <TouchableOpacity
                       key={s}
+                      activeOpacity={1}
                       onPress={() => {
-                        let newSecs = [...selectedSection];
-                        if (isSelected) newSecs = newSecs.filter(x => x !== s);
-                        else newSecs.push(s);
-                        setSelectedSection(newSecs);
+                        setSelectedSection(prev => {
+                          if (prev.includes(s)) return prev.filter(x => x !== s);
+                          return [...prev, s];
+                        });
                         setSelectedMicrotopic([]);
                       }}
                       style={[
@@ -906,11 +908,12 @@ export default function UnifiedArenaSetup() {
                     return (
                       <TouchableOpacity
                         key={m}
+                        activeOpacity={1}
                         onPress={() => {
-                          let newMt = [...selectedMicrotopic];
-                          if (isSelected) newMt = newMt.filter(x => x !== m);
-                          else newMt.push(m);
-                          setSelectedMicrotopic(newMt);
+                          setSelectedMicrotopic(prev => {
+                            if (prev.includes(m)) return prev.filter(x => x !== m);
+                            return [...prev, m];
+                          });
                         }}
                         style={{
                           width: '48%',

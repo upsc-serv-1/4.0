@@ -336,7 +336,7 @@ export default function NotesIndex() {
 
     const { data, error } = await supabase
       .from('user_notes')
-      .select('id, title, subject, items, highlights, content, content_html, updated_at')
+      .select('id, title, subject, items, highlights, checklist_notes, content, content_html, updated_at')
       .in('id', noteIds);
     if (error) throw error;
 
@@ -351,6 +351,19 @@ export default function NotesIndex() {
       const items: NoteItem[] = Array.isArray(note.items) && note.items.length
         ? note.items
         : (Array.isArray(note.highlights) ? note.highlights : []);
+
+      let checklistItems: Array<{ id?: string; text?: string; checked?: boolean }> = [];
+      if (Array.isArray(note.checklist_notes)) {
+        checklistItems = note.checklist_notes;
+      } else if (typeof note.checklist_notes === 'string' && note.checklist_notes.trim()) {
+        try {
+          const parsed = JSON.parse(note.checklist_notes);
+          if (Array.isArray(parsed)) checklistItems = parsed;
+        } catch {
+          // Ignore malformed legacy checklist payloads.
+        }
+      }
+
       if (items.length === 0 && (note.content_html || note.content)) {
         blocks.push({
           id: `body-${note.id}`,
@@ -360,6 +373,7 @@ export default function NotesIndex() {
           sourceLabel: note.subject || undefined,
         });
       }
+
       items.forEach((it, idx) => {
         if (it.type === 'microTopicHeading') {
           blocks.push({ id: it.id || `h-${note.id}-${idx}`, type: 'microTopicHeading', text: it.text || '' });
@@ -372,6 +386,18 @@ export default function NotesIndex() {
             sourceLabel: note.subject || undefined,
           });
         }
+      });
+
+      checklistItems.forEach((entry, idx) => {
+        if (!entry?.text) return;
+        blocks.push({
+          id: entry.id || `check-${note.id}-${idx}`,
+          type: 'checklist',
+          text: String(entry.text),
+          checked: !!entry.checked,
+          color: '#6366f1',
+          sourceLabel: note.subject || undefined,
+        });
       });
     });
 

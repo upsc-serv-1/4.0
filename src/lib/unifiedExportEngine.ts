@@ -80,6 +80,10 @@ export interface ExportOptions {
   microTopicFilters?: string[];
   yearStart?: number | null;
   yearEnd?: number | null;
+
+  // Notes-specific injections
+  notesSubheadingColor?: string;
+  notesChecklistMode?: boolean;
 }
 
 export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): ExportOptions => ({
@@ -116,6 +120,8 @@ export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): Ex
   microTopicFilters: [],
   yearStart: null,
   yearEnd: null,
+  notesSubheadingColor: '#f3f4f6',
+  notesChecklistMode: true,
   ...overrides,
 });
 
@@ -156,10 +162,11 @@ export interface ExportFlashcard {
 
 export interface ExportNoteBlock {
   id: string;
-  type: 'microTopicHeading' | 'highlight';
+  type: 'microTopicHeading' | 'highlight' | 'checklist';
   text: string;
   color?: string;
   sourceLabel?: string;
+  checked?: boolean;
 }
 
 /**
@@ -634,9 +641,12 @@ export const buildFlashcardsHtml = (rows: ExportFlashcard[], o: ExportOptions): 
 
 export const buildNotesBlocksHtml = (blocks: ExportNoteBlock[], o: ExportOptions, selectedHeadingIds?: Set<string>): string => {
   const selected = selectedHeadingIds && selectedHeadingIds.size > 0 ? selectedHeadingIds : null;
+  const headingBg = o.notesSubheadingColor || '#f3f4f6';
+  const includeChecklist = !!o.notesChecklistMode;
+
   let currentHeading = '';
   let isRendering = true;
-  const filtered = blocks.filter(b => {
+  const filtered = blocks.filter((b) => {
     if (b.type === 'microTopicHeading') {
       currentHeading = b.id;
       isRendering = selected ? selected.has(b.id) : true;
@@ -644,16 +654,24 @@ export const buildNotesBlocksHtml = (blocks: ExportNoteBlock[], o: ExportOptions
     }
     if (!currentHeading) return true;
     return isRendering;
-  });
+  }).filter((b) => includeChecklist || b.type !== 'checklist');
 
   const toc = o.showTOC
-    ? `<div class="toc"><div class="toc-title">Table of Contents</div>${filtered.filter(f => f.type === 'microTopicHeading').map(h => `<div class="toc-item">${renderInline(h.text)}</div>`).join('')}</div>`
+    ? `<div class="toc"><div class="toc-title">Table of Contents</div>${filtered.filter((f) => f.type === 'microTopicHeading').map((h) => `<div class="toc-item">${renderInline(h.text)}</div>`).join('')}</div>`
     : '';
 
-  const body = filtered.map(b => {
+  const body = filtered.map((b) => {
     if (b.type === 'microTopicHeading') {
-      return `<div class="microheading">${renderInline(b.text)}</div>`;
+      return `<div class="microheading" style="background:${headingBg}">${renderInline(b.text)}</div>`;
     }
+
+    if (b.type === 'checklist') {
+      return `<div class="note" style="display:flex;align-items:flex-start;gap:8px;border-left-color:${b.color || 'var(--accent)'}">
+        <span style="width:16px;height:16px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid #94a3b8;border-radius:3px;background:${b.checked ? '#6366f1' : 'transparent'};color:#fff;font-size:${o.fontSize - 3}pt;line-height:1">${b.checked ? '✓' : ''}</span>
+        <div style="flex:1;${b.checked ? 'text-decoration:line-through;opacity:0.65;' : ''}">${renderInline(b.text)}</div>
+      </div>`;
+    }
+
     return `<div class="note" style="border-left-color:${b.color || 'var(--accent)'}">${renderInline(b.text)}${b.sourceLabel ? `<div style="font-size:${o.fontSize - 4}pt;font-weight:700;color:var(--accent);margin-top:2mm;text-transform:uppercase;letter-spacing:0.5px">${escapeHtml(b.sourceLabel)}</div>` : ''}</div>`;
   }).join('');
 

@@ -108,6 +108,14 @@ const CHOICES = {
     { id: 'incorrect', label: 'Incorrect' },
     { id: 'unattempted', label: 'Unattempted' },
   ],
+  noteHeadingColors: [
+    { id: '#f3f4f6', label: 'Slate' },
+    { id: '#FF6A8820', label: 'Rose' },
+    { id: '#6A5BFF20', label: 'Indigo' },
+    { id: '#4FC3F720', label: 'Cyan' },
+    { id: '#81C78420', label: 'Green' },
+    { id: '#FFB74D20', label: 'Amber' },
+  ],
 };
 
 export const UnifiedExportSheet: React.FC<Props> = ({
@@ -129,6 +137,7 @@ export const UnifiedExportSheet: React.FC<Props> = ({
   const [isExporting, setIsExporting] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [selectedAnalysisReports, setSelectedAnalysisReports] = useState<Record<string, boolean>>({});
+  const [notesSelectedHeadings, setNotesSelectedHeadings] = useState<Set<string>>(new Set());
 
   // Re-seed when sheet opens
   React.useEffect(() => {
@@ -140,9 +149,22 @@ export const UnifiedExportSheet: React.FC<Props> = ({
         return acc;
       }, {} as Record<string, boolean>);
       setSelectedAnalysisReports(newAnalysisState);
+
+      if (payload?.kind === 'notes') {
+        const allHeadingIds = payload.blocks
+          .filter((b) => b.type === 'microTopicHeading')
+          .map((b) => b.id);
+        const seeded = payload.selectedHeadingIds && payload.selectedHeadingIds.size > 0
+          ? new Set(payload.selectedHeadingIds)
+          : new Set(allHeadingIds);
+        setNotesSelectedHeadings(seeded);
+      } else {
+        setNotesSelectedHeadings(new Set());
+      }
+
       setIsExporting(false);
     }
-  }, [visible, title, initialOptions]);
+  }, [visible, title, initialOptions, analysisReports, payload]);
 
   React.useEffect(() => {
     if (!visible) setIsExporting(false);
@@ -165,7 +187,11 @@ export const UnifiedExportSheet: React.FC<Props> = ({
         ? onBuildAnalysisHtml(selectedAnalysisReports)
         : '';
 
-      await exportToPdf(payload, { ...opts, columns: cols }, { prependHtml });
+      const payloadForExport: ExportPayload = payload.kind === 'notes'
+        ? { ...payload, selectedHeadingIds: notesSelectedHeadings }
+        : payload;
+
+      await exportToPdf(payloadForExport, { ...opts, columns: cols }, { prependHtml });
       didSucceed = true;
     } catch (e: any) {
       console.error('Export failed', e);
@@ -213,6 +239,10 @@ export const UnifiedExportSheet: React.FC<Props> = ({
       <Text style={{ color: active ? colors.primary : colors.textPrimary, fontWeight: '800', fontSize: 12 }}>{label}</Text>
     </TouchableOpacity>
   );
+
+  const noteHeadings = payload?.kind === 'notes'
+    ? payload.blocks.filter((b) => b.type === 'microTopicHeading')
+    : [];
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -394,6 +424,92 @@ export const UnifiedExportSheet: React.FC<Props> = ({
             {!hideSections.includes('filters') && payload?.kind !== 'questions' && renderExtraFilters && (
               <Section title="Filters" colors={colors}>
                 {renderExtraFilters(opts, setOpts)}
+              </Section>
+            )}
+
+            {payload?.kind === 'notes' && (
+              <Section title="Notes Export Options" colors={colors}>
+                <Label colors={colors}>SUBHEADING HIGHLIGHT COLOR</Label>
+                <Row>
+                  {CHOICES.noteHeadingColors.map((color) => {
+                    const active = (opts.notesSubheadingColor || '#f3f4f6') === color.id;
+                    return (
+                      <TouchableOpacity
+                        key={`notes-heading-${color.id}`}
+                        onPress={() => set('notesSubheadingColor', color.id)}
+                        style={[
+                          styles.colorChip,
+                          {
+                            borderColor: active ? colors.primary : colors.border,
+                            backgroundColor: color.id === '#f3f4f6' ? '#e5e7eb' : color.id,
+                          },
+                        ]}
+                      >
+                        <Text style={{ color: colors.textPrimary, fontSize: 11, fontWeight: '700' }}>{color.label}</Text>
+                        {active ? <Check size={13} color={colors.primary} /> : null}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </Row>
+
+                <ToggleRow label="Checklist mode export" value={!!opts.notesChecklistMode} onChange={(v: boolean) => set('notesChecklistMode', v)} colors={colors} />
+                <ToggleRow label="Table of Contents" value={!!opts.showTOC} onChange={(v: boolean) => set('showTOC', v)} colors={colors} />
+
+                <Label colors={colors}>SUBHEADINGS TO INCLUDE</Label>
+                {noteHeadings.length === 0 ? (
+                  <Text style={{ color: colors.textTertiary, fontSize: 12, fontStyle: 'italic' }}>No subheadings found in this note.</Text>
+                ) : (
+                  <>
+                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 8 }}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          const allIds = noteHeadings.map((h) => h.id);
+                          if (notesSelectedHeadings.size === allIds.length) setNotesSelectedHeadings(new Set());
+                          else setNotesSelectedHeadings(new Set(allIds));
+                        }}
+                        style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: colors.primary + '14' }}
+                      >
+                        <Text style={{ color: colors.primary, fontSize: 10, fontWeight: '800' }}>
+                          {notesSelectedHeadings.size === noteHeadings.length ? 'DESELECT ALL' : 'SELECT ALL'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={{ gap: 8 }}>
+                      {noteHeadings.map((heading) => {
+                        const active = notesSelectedHeadings.has(heading.id);
+                        return (
+                          <TouchableOpacity
+                            key={`heading-toggle-${heading.id}`}
+                            onPress={() => {
+                              setNotesSelectedHeadings((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(heading.id)) next.delete(heading.id);
+                                else next.add(heading.id);
+                                return next;
+                              });
+                            }}
+                            style={{
+                              borderWidth: 1,
+                              borderColor: active ? colors.primary : colors.border,
+                              backgroundColor: active ? colors.primary + '10' : colors.surfaceStrong,
+                              borderRadius: 10,
+                              paddingHorizontal: 10,
+                              paddingVertical: 10,
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              gap: 8,
+                            }}
+                          >
+                            <View style={{ width: 16, height: 16, borderRadius: 4, borderWidth: 1.5, borderColor: active ? colors.primary : colors.textTertiary, backgroundColor: active ? colors.primary : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+                              {active ? <Check size={11} color="#fff" /> : null}
+                            </View>
+                            <Text style={{ color: colors.textPrimary, fontSize: 12, fontWeight: '700', flex: 1 }} numberOfLines={1}>{heading.text || 'Untitled heading'}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </>
+                )}
               </Section>
             )}
 

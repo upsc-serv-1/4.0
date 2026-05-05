@@ -76,6 +76,8 @@ import RichNoteEditor from '../../src/components/RichNoteEditor';
 import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 import RenderHtml from 'react-native-render-html';
 import { buildNotesPdfHtml } from '@/src/utils/notesPdfEngine';
+import { UnifiedExportSheet } from '@/src/components/export/UnifiedExportSheet';
+import type { ExportPayload, ExportNoteBlock } from '@/src/lib/unifiedExportEngine';
 
 const { width, height } = Dimensions.get('window');
 
@@ -137,6 +139,9 @@ export default function NoteEditor() {
   const [showColorPicker, setShowColorPicker] = useState<number | null>(null);
   const [nextRevision, setNextRevision] = useState<string | null>(null);
   const [isExportMenuVisible, setIsExportMenuVisible] = useState(false);
+  const [unifiedExportVisible, setUnifiedExportVisible] = useState(false);
+  const [unifiedExportPayload, setUnifiedExportPayload] = useState<ExportPayload | null>(null);
+  const [unifiedExportTitle, setUnifiedExportTitle] = useState('Notes Export');
   const [activeBlockAction, setActiveBlockAction] = useState<{ id: string, text: string, type: string, index: number } | null>(null);
   const [insertPointData, setInsertPointData] = useState<{ index: number, visible: boolean, text: string, isEditing?: boolean }>({ index: -1, visible: false, text: '' });
   const [insertSelection, setInsertSelection] = useState({ start: 0, end: 0 });
@@ -707,6 +712,61 @@ export default function NoteEditor() {
     }
     setIsExportMenuVisible(true);
   };
+
+  const openUnifiedExportSheet = useCallback(() => {
+    const blocks: ExportNoteBlock[] = [];
+
+    blocks.push({
+      id: `root-${id || 'draft'}`,
+      type: 'microTopicHeading',
+      text: title || 'Untitled Note',
+    });
+
+    if ((content || '').trim()) {
+      blocks.push({
+        id: `body-${id || 'draft'}`,
+        type: 'highlight',
+        text: content,
+        color: '#6366f1',
+        sourceLabel: subject || undefined,
+      });
+    }
+
+    items.forEach((item, idx) => {
+      if (item.type === 'microTopicHeading') {
+        blocks.push({
+          id: item.id || `heading-${idx}`,
+          type: 'microTopicHeading',
+          text: item.text || '',
+        });
+      } else {
+        blocks.push({
+          id: item.id || `highlight-${idx}`,
+          type: 'highlight',
+          text: item.text || '',
+          color: item.color,
+          sourceLabel: subject || undefined,
+        });
+      }
+    });
+
+    checklist.forEach((entry, idx) => {
+      if (!entry?.text?.trim()) return;
+      blocks.push({
+        id: entry.id || `check-${idx}`,
+        type: 'checklist',
+        text: entry.text,
+        checked: !!entry.checked,
+        color: '#6366f1',
+        sourceLabel: subject || undefined,
+      });
+    });
+
+    setUnifiedExportPayload({ kind: 'notes', blocks });
+    setUnifiedExportTitle(`${title || 'Untitled Note'} · Notes`);
+    setUnifiedExportVisible(true);
+  }, [checklist, content, id, items, subject, title]);
+
   const renderHighlights = (allowAdd: boolean) => {
     let isCurrentExpanded = true; 
     const currentItems = items || [];
@@ -879,7 +939,7 @@ export default function NoteEditor() {
               <TouchableOpacity onPress={() => handleSave(false)} style={styles.saveBtn}>
                 {saving ? <ActivityIndicator size="small" color={colors.primary} /> : <Save size={22} color={colors.primary} />}
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setIsExportMenuVisible(true)} style={styles.headerIcon}>
+              <TouchableOpacity onPress={openUnifiedExportSheet} style={styles.headerIcon}>
                  <FileDown size={22} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
@@ -1298,6 +1358,26 @@ export default function NoteEditor() {
           subject={subject}
           sectionGroup={folderName}
           microtopic={title}
+        />
+
+        <UnifiedExportSheet
+          visible={unifiedExportVisible}
+          onClose={() => setUnifiedExportVisible(false)}
+          payload={unifiedExportPayload}
+          title={unifiedExportTitle}
+          initialOptions={{
+            title: unifiedExportTitle,
+            moduleName: 'Knowledge Vault',
+            theme: 'sepia',
+            paperStyle: 'lined',
+            fontFamily: 'serif',
+            showTOC: true,
+            headerText: 'Dr. UPSC · Notes',
+            footerText: unifiedExportTitle,
+            notesChecklistMode: true,
+            notesSubheadingColor: '#f3f4f6',
+          }}
+          hideSections={['content', 'answer', 'sort', 'filters']}
         />
 
         {/* Point Insertion Modal */}

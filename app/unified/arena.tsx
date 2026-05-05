@@ -83,6 +83,7 @@ const FilterRow = ({ title, items, selected, onSelect, multi = false, visible = 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
         {allowAll && (
           <TouchableOpacity
+            activeOpacity={1}
             style={[
               styles.chip,
               { backgroundColor: colors.surface, borderColor: colors.border },
@@ -98,6 +99,7 @@ const FilterRow = ({ title, items, selected, onSelect, multi = false, visible = 
 
         {multi && items.length > 1 && showSelectAll && (
           <TouchableOpacity
+            activeOpacity={1}
             style={[
               styles.chip,
               { backgroundColor: colors.surface, borderColor: colors.border },
@@ -113,6 +115,7 @@ const FilterRow = ({ title, items, selected, onSelect, multi = false, visible = 
         {items.map((item: string) => (
           <TouchableOpacity
             key={item}
+            activeOpacity={1}
             style={[
               styles.chip,
               { backgroundColor: colors.surface, borderColor: colors.border },
@@ -147,6 +150,7 @@ const ToggleButton = ({ options, activeValue, onSelect, style }: any) => {
         return (
           <TouchableOpacity
             key={opt.value}
+            activeOpacity={1}
             onPress={() => onSelect(opt.value)}
             style={[
               styles.toggleBtn,

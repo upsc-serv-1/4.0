@@ -141,11 +141,11 @@ logical change).
 
 Each commit must be pushed to `origin/5.8` immediately after it lands.
 
-- [ ] **1.** Paperwise vs Search Order
-- [ ] **2.** PYQ Tagging cleanup
-- [ ] **3.** Arena performance (silent metadata cache)
-- [ ] **4.** Offline mode — preserve cached questions
-- [ ] **5.** Palette List-View jump
+- [x] **1.** Paperwise vs Search Order (✅ commit: 20bd65b)
+- [x] **2.** PYQ Tagging cleanup (✅ commit: b6c65aa)
+- [x] **3.** Arena performance (silent metadata cache) (✅ commit: b40479f)
+- [x] **4.** Offline mode — preserve cached questions (✅ commit: e02ff0e)
+- [x] **5.** Palette List-View jump (✅ commit: 4197784)
 
 ---
 

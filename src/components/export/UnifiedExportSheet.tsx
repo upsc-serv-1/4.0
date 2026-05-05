@@ -204,7 +204,10 @@ export const UnifiedExportSheet: React.FC<Props> = ({
     } finally {
       clearTimeout(watchdog);
       setIsExporting(false);
-      if (didSucceed) onClose();
+    }
+
+    if (didSucceed) {
+      Alert.alert('Export ready', 'Your PDF was generated and opened in the share/download sheet.');
     }
   };
 

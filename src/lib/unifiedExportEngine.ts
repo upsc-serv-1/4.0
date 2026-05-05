@@ -27,6 +27,7 @@
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system/legacy';
+import * as Linking from 'expo-linking';
 
 export type ExportFontFamily = 'sans' | 'serif' | 'handwriting' | 'mono';
 export type ExportTheme = 'modern' | 'classic' | 'sepia' | 'historical' | 'dark';
@@ -218,7 +219,7 @@ const fontFamilyCss: Record<ExportFontFamily, string> = {
 
 const paperBg: Record<ExportPaperStyle, string> = {
   plain:  'none',
-  lined:  `repeating-linear-gradient(to bottom, #ffffff 0, #ffffff 27px, var(--rule) 28px)`,
+  lined:  `repeating-linear-gradient(to bottom, #ffffff 0, #ffffff 27px, #dbe4f3 28px)`,
   grid:   `linear-gradient(to right, var(--rule) 1px, transparent 1px) 0 0/24px 24px, linear-gradient(to bottom, var(--rule) 1px, transparent 1px) 0 0/24px 24px`,
   dotted: `radial-gradient(var(--rule) 1px, transparent 1px) 0 0/16px 16px`,
 };
@@ -1320,10 +1321,9 @@ export async function exportToPdf(payload: ExportPayload, options: ExportOptions
   const info = await FileSystem.getInfoAsync(dest);
   const finalUri = info.exists ? dest : uri;
   if (await Sharing.isAvailableAsync()) {
-    // Fire-and-forget share to avoid sticky loader states on some Android share sheets.
-    setTimeout(() => {
-      Sharing.shareAsync(finalUri, { mimeType: 'application/pdf', dialogTitle: options.title }).catch(() => null);
-    }, 0);
+    await sharePdfWithTimeout(finalUri, options.title);
+  } else {
+    await Linking.openURL(finalUri).catch(() => null);
   }
   return finalUri;
 }

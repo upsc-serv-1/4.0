@@ -256,10 +256,11 @@ export default function HardnoteEditor() {
         initialOptions={{
           title: doc.title || 'Hardnote',
           moduleName: 'Hardnotes',
-          theme: 'sepia',
-          paperStyle: 'lined',
-          fontFamily: 'serif',
-          showTOC: true,
+          theme: 'modern',
+          paperStyle: 'plain',
+          fontFamily: 'sans',
+          fontSize: 6,
+          showTOC: false,
           headerText: 'Dr. UPSC · Hardnotes',
           footerText: doc.title || 'Hardnote',
         }}

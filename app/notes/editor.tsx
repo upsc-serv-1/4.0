@@ -732,6 +732,18 @@ export default function NoteEditor() {
       });
     }
 
+    checklist.forEach((entry, idx) => {
+      if (!entry?.text?.trim()) return;
+      blocks.push({
+        id: entry.id || `check-${idx}`,
+        type: 'checklist',
+        text: entry.text,
+        checked: !!entry.checked,
+        color: '#6366f1',
+        sourceLabel: subject || undefined,
+      });
+    });
+
     items.forEach((item, idx) => {
       if (item.type === 'microTopicHeading') {
         blocks.push({
@@ -748,18 +760,6 @@ export default function NoteEditor() {
           sourceLabel: subject || undefined,
         });
       }
-    });
-
-    checklist.forEach((entry, idx) => {
-      if (!entry?.text?.trim()) return;
-      blocks.push({
-        id: entry.id || `check-${idx}`,
-        type: 'checklist',
-        text: entry.text,
-        checked: !!entry.checked,
-        color: '#6366f1',
-        sourceLabel: subject || undefined,
-      });
     });
 
     setUnifiedExportPayload({ kind: 'notes', blocks });
@@ -1368,14 +1368,15 @@ export default function NoteEditor() {
           initialOptions={useMemo(() => ({
             title: unifiedExportTitle,
             moduleName: 'Knowledge Vault',
-            theme: 'sepia',
-            paperStyle: 'lined',
-            fontFamily: 'serif',
-            showTOC: true,
+            theme: 'modern',
+            paperStyle: 'plain',
+            fontFamily: 'sans',
+            fontSize: 6,
+            showTOC: false,
             headerText: 'Dr. UPSC · Notes',
             footerText: unifiedExportTitle,
             notesChecklistMode: true,
-            notesSubheadingColor: '#f3f4f6',
+            notesSubheadingColor: '#6A5BFF20',
           }), [unifiedExportTitle])}
           hideSections={['content', 'answer', 'sort', 'filters']}
         />

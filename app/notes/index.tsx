@@ -379,6 +379,18 @@ export default function NotesIndex() {
         });
       }
 
+      checklistItems.forEach((entry, idx) => {
+        if (!entry?.text) return;
+        blocks.push({
+          id: entry.id || `check-${note.id}-${idx}`,
+          type: 'checklist',
+          text: String(entry.text),
+          checked: !!entry.checked,
+          color: '#6366f1',
+          sourceLabel: note.subject || undefined,
+        });
+      });
+
       items.forEach((it, idx) => {
         if (it.type === 'microTopicHeading') {
           blocks.push({ id: it.id || `h-${note.id}-${idx}`, type: 'microTopicHeading', text: it.text || '' });
@@ -391,18 +403,6 @@ export default function NotesIndex() {
             sourceLabel: note.subject || undefined,
           });
         }
-      });
-
-      checklistItems.forEach((entry, idx) => {
-        if (!entry?.text) return;
-        blocks.push({
-          id: entry.id || `check-${note.id}-${idx}`,
-          type: 'checklist',
-          text: String(entry.text),
-          checked: !!entry.checked,
-          color: '#6366f1',
-          sourceLabel: note.subject || undefined,
-        });
       });
     });
 
@@ -872,12 +872,14 @@ export default function NotesIndex() {
           initialOptions={{
             title: exportSheet.title,
             moduleName: 'Knowledge Vault',
-            theme: 'sepia',
-            paperStyle: 'lined',
-            fontFamily: 'serif',
-            showTOC: true,
+            theme: 'modern',
+            paperStyle: 'plain',
+            fontFamily: 'sans',
+            fontSize: 6,
+            showTOC: false,
             headerText: 'Dr. UPSC · Notes',
             footerText: exportSheet.title,
+            notesSubheadingColor: '#6A5BFF20',
           }}
           hideSections={['content', 'answer', 'sort', 'filters']}
         />

@@ -2731,16 +2731,22 @@ export default function UnifiedQuizEngine() {
             >
               <LayoutGrid size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
             </TouchableOpacity>
-            {timerType !== 'none' && (
-              <TouchableOpacity
-                onPress={() => setShowClockControl(true)}
-                style={[styles.headerBtn, { flexDirection: 'row', gap: 4 }]}
-                testID="engine-clock-btn"
-              >
-                <Clock size={16} color={isTimerActive ? colors.primary : (isZenMode ? '#433422' : colors.textTertiary)} />
+            <TouchableOpacity
+              onPress={() => {
+                if (timerType === 'none') setShowTimerPicker(true);
+                else setShowClockControl(true);
+              }}
+              style={[styles.headerBtn, timerType !== 'none' && { flexDirection: 'row', gap: 4 }]}
+              testID="engine-clock-btn"
+            >
+              <Clock 
+                size={timerType === 'none' ? 20 : 16} 
+                color={timerType !== 'none' && isTimerActive ? colors.primary : (isZenMode ? '#433422' : (timerType === 'none' ? colors.textPrimary : colors.textTertiary))} 
+              />
+              {timerType !== 'none' && (
                 <Text style={{ color: isZenMode ? '#433422' : colors.textSecondary, fontSize: 10, fontWeight: '800' }}>{formatTime(seconds)}</Text>
-              </TouchableOpacity>
-            )}
+              )}
+            </TouchableOpacity>
             {!showIndex && (
               <TouchableOpacity onPress={() => setShowIndex(true)} style={styles.headerBtn}>
                 <ListIcon size={20} color={isZenMode ? '#433422' : colors.textPrimary} />

@@ -88,6 +88,12 @@ const getInstitute = (q: any): string => {
   return normalizeInstitute(inst);
 };
 
+const getProgram = (q: any): string => {
+  const tests = Array.isArray(q?.tests) ? q.tests[0] : q?.tests;
+  const p = tests?.program_name || q?.program_name || q?.source?.program || q?.source?.series || tests?.series || '';
+  return String(p || '').trim();
+};
+
 const getYear = (q: any): string => {
   const y = q?.exam_year || q?.source?.year || q?.tests?.exam_year || q?.tests?.launch_year || '';
   return String(y || '').trim();
@@ -104,6 +110,7 @@ const isUpscPyq = (q: any): boolean => {
 
 interface ExplanationEntry {
   source: string;
+  program: string;
   text: string;
   year: string;
   answer: string;
@@ -112,14 +119,16 @@ interface ExplanationEntry {
 const buildExplanationEntry = (q: any, inst: string, year: string): ExplanationEntry | null => {
   const text = String(q?.explanation_markdown || q?.explanation || '').trim();
   const answer = String(q?.correct_answer || '').trim();
+  const program = getProgram(q);
   if (!text && !answer) return null;
-  return { source: inst, text, year, answer };
+  return { source: inst, program, text, year, answer };
 };
 
 const addExplanation = (existing: any[], entry: ExplanationEntry) => {
   const norm = (s: string) => cleanText(s).slice(0, 200);
   const dup = existing.some(e =>
     String(e.source).toLowerCase() === entry.source.toLowerCase() &&
+    String(e.program || '').toLowerCase() === String(entry.program || '').toLowerCase() &&
     String(e.year) === entry.year &&
     norm(e.text) === norm(entry.text) &&
     String(e.answer || '').toUpperCase() === String(entry.answer || '').toUpperCase()

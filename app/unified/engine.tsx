@@ -65,6 +65,7 @@ import {
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PinchGestureHandler, State as GHState } from 'react-native-gesture-handler';
 import { useTheme } from '../../src/context/ThemeContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
 import { supabase } from '../../src/lib/supabase';
@@ -380,6 +381,45 @@ export default function UnifiedQuizEngine() {
   const [savingFlashcard, setSavingFlashcard] = useState<Record<string, boolean>>({});
   const [lastNoteTap, setLastNoteTap] = useState(0);
   const [fontSize, setFontSize] = useState(16);
+  const baseFontSizeRef = useRef(16);
+  const [showZoomIndicator, setShowZoomIndicator] = useState(false);
+  const zoomTimerRef = useRef<any>(null);
+  const FONT_SIZE_KEY = 'engine_font_size_v1';
+
+  // Load saved font size on mount
+  useEffect(() => {
+    AsyncStorage.getItem(FONT_SIZE_KEY).then((saved) => {
+      if (saved) {
+        const n = parseInt(saved, 10);
+        if (!isNaN(n) && n >= 12 && n <= 32) {
+          setFontSize(n);
+          baseFontSizeRef.current = n;
+        }
+      }
+    }).catch(() => {});
+  }, []);
+
+  // Persist whenever font size changes (debounced via setItem fire-and-forget)
+  useEffect(() => {
+    AsyncStorage.setItem(FONT_SIZE_KEY, String(fontSize)).catch(() => {});
+  }, [fontSize]);
+
+  const onPinchGestureEvent = (event: any) => {
+    const scale = event.nativeEvent.scale;
+    // Map gesture scale to 0.8x – 2.0x of base size
+    let next = baseFontSizeRef.current * scale;
+    next = Math.max(12, Math.min(32, next)); // 0.75x – 2.0x of 16
+    setFontSize(Math.round(next));
+    setShowZoomIndicator(true);
+    if (zoomTimerRef.current) clearTimeout(zoomTimerRef.current);
+    zoomTimerRef.current = setTimeout(() => setShowZoomIndicator(false), 1200);
+  };
+  const onPinchHandlerStateChange = (event: any) => {
+    if (event.nativeEvent.state === GHState.END || event.nativeEvent.state === GHState.CANCELLED) {
+      baseFontSizeRef.current = fontSize;
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    }
+  };
   const [showQuickMenu, setShowQuickMenu] = useState(false);
   const [showFontSlider, setShowFontSlider] = useState(false);
   const [showNavigator, setShowNavigator] = useState(false);
@@ -649,8 +689,33 @@ export default function UnifiedQuizEngine() {
           if (idChunk.length === 0) break;
           query = query.in('id', idChunk);
         } else if (params.questionId) {
-          if (from > 0) break; // Only one question
-          query = query.eq('id', params.questionId);
+          if (from > 0) break; // Only one question (cluster head)
+          // PARITY FIX: fetch sibling rows so the merger can rebuild the full
+          // multi-institute explanation cluster, exactly like the index path.
+          const SELECT_COLS = 'id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)';
+          const { data: tgt } = await supabase
+            .from('questions')
+            .select(SELECT_COLS)
+            .eq('id', params.questionId);
+          const target: any = tgt && tgt[0];
+          if (!target) break;
+          let siblings: any[] = [];
+          const groupName = String(target.source?.group || target.exam_group || target.tests?.series || '').toUpperCase();
+          const isUpsc = !!target.is_upsc_cse || groupName.includes('UPSC');
+          const examYear = String(target.exam_year || '').trim();
+          if (target.is_pyq && isUpsc && examYear) {
+            const { data: sibs } = await supabase
+              .from('questions')
+              .select(SELECT_COLS)
+              .eq('exam_year', examYear)
+              .eq('is_pyq', true)
+              .eq('is_upsc_cse', true)
+              .neq('id', target.id)
+              .limit(2000);
+            siblings = sibs || [];
+          }
+          allFreshData.push(target, ...siblings);
+          break;
         } else {
           // General filters
           const term = typeof params.query === 'string' ? params.query.trim() : '';
@@ -1713,31 +1778,44 @@ export default function UnifiedQuizEngine() {
       list.forEach((e: any, idx: number) => {
         const source = normalizeInstituteLabel(e?.source || e?.institute || e?.provider || e?.tests?.institute || item.tests?.institute || `Source ${idx + 1}`);
         const sourceKey = source.toLowerCase();
+        const program = String(e?.program || item.tests?.program_name || '').trim();
         const year = String(e?.year || item.exam_year || '').trim();
         const answer = String(e?.answer || item.correct_answer || '').trim().toUpperCase();
         const text = String(e?.text || e?.explanation || '').trim();
-        
-        const dedupeKey = `${sourceKey}__${year}__${answer}__${text.replace(/\s+/g, ' ').toLowerCase()}`;
+
+        const dedupeKey = `${sourceKey}__${program.toLowerCase()}__${year}__${answer}__${text.replace(/\s+/g, ' ').toLowerCase()}`;
         if (seen.has(dedupeKey)) return;
         seen.add(dedupeKey);
-        out.push({ source, sourceKey, year, answer, text });
+        out.push({ source, sourceKey, program, year, answer, text });
       });
 
       if (item.explanation_markdown) {
         const source = normalizeInstituteLabel(item.tests?.institute || item.source?.institute || 'Primary');
         const sourceKey = source.toLowerCase();
         const text = String(item.explanation_markdown).trim();
+        const program = String(item.tests?.program_name || '').trim();
         const year = String(item.exam_year || '').trim();
         const answer = String(item.correct_answer || '').trim().toUpperCase();
-        const dedupeKey = `${sourceKey}__${year}__${answer}__${text.replace(/\s+/g, ' ').toLowerCase()}`;
+        const dedupeKey = `${sourceKey}__${program.toLowerCase()}__${year}__${answer}__${text.replace(/\s+/g, ' ').toLowerCase()}`;
         if (text && !seen.has(dedupeKey)) {
           seen.add(dedupeKey);
-          out.push({ source, sourceKey, year, answer, text });
+          out.push({ source, sourceKey, program, year, answer, text });
         }
       }
 
       return out;
     })();
+
+    // Standardised single-line metadata: "INSTITUTE NAME – PROGRAM NAME – YEAR"
+    // Hide any segment that is empty (per spec).
+    const formatMetaLine = (e: any): string => {
+      const segs = [
+        String(e?.source || '').toUpperCase().trim(),
+        String(e?.program || '').toUpperCase().trim(),
+        String(e?.year || '').trim(),
+      ].filter(Boolean);
+      return segs.join(' – ');
+    };
 
     const inferredInstitutes = (() => {
       const list = Array.isArray((item as any)._institutes)
@@ -1779,6 +1857,7 @@ export default function UnifiedQuizEngine() {
           ? [{
               source: availableExplSourceMap.get(selectedExplSource) || selectedExplSource,
               sourceKey: selectedExplSource,
+              program: String(item.tests?.program_name || '').trim(),
               year: String(item.exam_year || '').trim(),
               answer: String(item.correct_answer || '').trim().toUpperCase(),
               text: '',
@@ -1790,12 +1869,16 @@ export default function UnifiedQuizEngine() {
     const activeExplanationText = safeIdx === -1
       ? (displayExplanations.length > 1
           ? displayExplanations
-              .map((e: any) => `**${e.source}${e.year ? ' · ' + e.year : ''}${e.answer ? ' · Ans: ' + e.answer : ''}:**\n\n${e.text || '*No explanation provided.*'}`)
+              .map((e: any) => `**${formatMetaLine(e) || e.source}${e.answer ? ' · Ans: ' + e.answer : ''}:**\n\n${e.text || '*No explanation provided.*'}`)
               .join('\n\n---\n\n')
           : (displayExplanations[0]?.text || item.explanation_markdown || 'No explanation available.'))
       : (displayExplanations[safeIdx]
           ? (displayExplanations[safeIdx].text || '*No explanation provided by this source.*')
           : (item.explanation_markdown || 'No explanation available.'));
+
+    const activeExplanationMeta = safeIdx >= 0 && displayExplanations[safeIdx]
+      ? formatMetaLine(displayExplanations[safeIdx])
+      : '';
 
 
     return (
@@ -1824,22 +1907,9 @@ export default function UnifiedQuizEngine() {
               if (pyq.isGenericPYQ) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : colors.primary + '10', fg: isZenMode ? '#433422' : colors.primary, border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : colors.primary });
               if (item.is_ncert || item.exam_info?.is_ncert || item.micro_topic === 'NCERT') chips.push({ label: 'NCERT', bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#e0f2fe', fg: isZenMode ? '#433422' : '#0369a1', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#0ea5e9' });
 
-              institutes.slice(0, 2).forEach((inst: string) => {
-                chips.push({
-                  label: inst,
-                  bg: isZenMode ? 'rgba(67, 52, 34, 0.07)' : colors.surfaceStrong,
-                  fg: isZenMode ? '#433422' : colors.textSecondary,
-                  border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : colors.border,
-                });
-              });
-              if (institutes.length > 2) {
-                chips.push({
-                  label: `+${institutes.length - 2} institutes`,
-                  bg: isZenMode ? 'rgba(67, 52, 34, 0.07)' : colors.surfaceStrong,
-                  fg: isZenMode ? '#433422' : colors.textSecondary,
-                  border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : colors.border,
-                });
-              }
+              // NOTE: Institute chips intentionally omitted here. Institute/program/year
+              // metadata is rendered as a single canonical line inside the explanation
+              // card (see formatMetaLine usage below) to avoid multi-layer duplication.
 
               return (
                 <View style={{ flexDirection: 'row', gap: 6 }}>
@@ -1889,7 +1959,7 @@ export default function UnifiedQuizEngine() {
           </View>
         </View>
 
-        <Markdown style={{ body: { color: zenTextColor, fontSize: fontSize, lineHeight: fontSize * 1.5, fontWeight: '700' } }}>
+        <Markdown style={{ body: { color: zenTextColor, fontSize: fontSize, lineHeight: fontSize * 1.5, fontWeight: '500', fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' }) } }}>
           {item.statement_line || item.question_text}
         </Markdown>
 
@@ -2070,14 +2140,14 @@ export default function UnifiedQuizEngine() {
                         }}
                       >
                         <Text style={{ fontSize: 10, fontWeight: '900', color: safeIdx === idx ? '#fff' : colors.textTertiary }}>
-                          {expl.source || `Source ${idx + 1}`}{expl.year ? ` · ${expl.year}` : ''}
+                          {formatMetaLine(expl) || expl.source || `Source ${idx + 1}`}
                         </Text>
                       </TouchableOpacity>
                     ))}
                   </View>
                 )}
 
-                <Markdown style={{ body: { color: colors.textSecondary, fontSize: fontSize - 2 } }}>
+                <Markdown style={{ body: { color: colors.textPrimary, fontSize: fontSize, lineHeight: fontSize * 1.5, fontWeight: '500', fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' }) } }}>
                   {activeExplanationText}
                 </Markdown>
               </View>
@@ -2180,12 +2250,21 @@ export default function UnifiedQuizEngine() {
               </View>
 
               <View style={{ marginTop: 32, padding: 16, borderTopWidth: 1, borderTopColor: colors.border + '50' }}>
-                 <Text style={{ fontSize: 10, color: colors.textTertiary, textAlign: 'center', lineHeight: 16 }}>
-                    {item.tests?.institute?.toUpperCase() || 'UPSC'} • {item.tests?.program_name?.toUpperCase() || 'GENERAL'} • {item.tests?.title?.toUpperCase() || 'MOCK'} • Q#{item.question_number || 'NA'}
-                 </Text>
-                 <Text style={{ fontSize: 8, color: colors.textTertiary, textAlign: 'center', marginTop: 4, opacity: 0.5 }}>
-                    ID: {item.id}
-                 </Text>
+                 {(() => {
+                   // Single-layer canonical metadata: INSTITUTE – PROGRAM – YEAR
+                   const primaryEntry = displayExplanations[0] || {
+                     source: normalizeInstituteLabel(item.tests?.institute || ''),
+                     program: String(item.tests?.program_name || '').trim(),
+                     year: String(item.exam_year || '').trim(),
+                   };
+                   const line = formatMetaLine(primaryEntry);
+                   if (!line) return null;
+                   return (
+                     <Text style={{ fontSize: 10, color: colors.textTertiary, textAlign: 'center', lineHeight: 16, fontWeight: '700', letterSpacing: 0.5 }}>
+                        {line}
+                     </Text>
+                   );
+                 })()}
               </View>
             </>
           )}
@@ -2563,7 +2642,9 @@ export default function UnifiedQuizEngine() {
             </Modal>
 
             {showIndex ? renderQuestionIndex() : (
-              viewMode === 'list' ? (
+              <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
+                <View style={{ flex: 1 }}>
+              {viewMode === 'list' ? (
                 <FlatList
                   ref={listRef}
                   data={questions}
@@ -2598,7 +2679,14 @@ export default function UnifiedQuizEngine() {
                     </TouchableOpacity>
                   </View>
                 </View>
-              )
+              )}
+              {showZoomIndicator && (
+                <View pointerEvents="none" style={{ position: 'absolute', top: 16, alignSelf: 'center', backgroundColor: 'rgba(0,0,0,0.75)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18, zIndex: 999 }}>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 12, letterSpacing: 0.5 }}>Aa  {fontSize}px</Text>
+                </View>
+              )}
+                </View>
+              </PinchGestureHandler>
             )}
           </>
         )}

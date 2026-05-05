@@ -709,4 +709,3 @@ const styles = StyleSheet.create({
   applyText: { color: '#fff', fontSize: 16, fontWeight: '800' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
 });
-

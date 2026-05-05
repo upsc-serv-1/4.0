@@ -1487,4 +1487,3 @@ const styles = StyleSheet.create({
   toggleTrack: { width: 44, height: 24, borderRadius: 12, padding: 2, justifyContent: 'center' },
   toggleThumb: { width: 20, height: 20, borderRadius: 10, position: 'absolute' },
 });
-

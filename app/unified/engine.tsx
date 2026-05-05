@@ -22,17 +22,17 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { usePreventRemove, useNavigation } from '@react-navigation/native';
-import {
-  ChevronLeft,
-  ChevronRight,
-  Clock,
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Clock, 
   Target,
-  Check,
-  X,
+  Check, 
+  X, 
   XCircle,
-  Info,
-  HelpCircle,
-  Save,
+  Info, 
+  HelpCircle, 
+  Save, 
   Trash2,
   BookOpen,
   Tag as TagIcon,
@@ -143,8 +143,8 @@ const ERROR_TYPES = [
   'Skipped'
 ];
 const DEFAULT_STUDY_TAGS = [
-  'Imp. Fact',
-  'Imp. Concept',
+  'Imp. Fact', 
+  'Imp. Concept', 
   'Trap Question',
   'Must Revise',
   'Memorize'
@@ -154,7 +154,7 @@ const DEFAULT_STUDY_TAGS = [
 
 const OptionButton = ({ label, text, isSelected, isCorrect, isWrong, showResult, onSelect, disabled }: any) => {
   const { colors } = useTheme();
-
+  
   let borderColor = colors.border;
   let backgroundColor = colors.surface;
   let textColor = colors.textPrimary;
@@ -205,73 +205,37 @@ const OptionButton = ({ label, text, isSelected, isCorrect, isWrong, showResult,
   );
 };
 
-// --- Uniform Markdown Styles (Issue 3: normalise all heading/text sizes) ---
-const getUniformMarkdownStyles = (size: number, textColor: string) => {
-  const fontFamily = Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' });
-  const base = {
-    color: textColor,
-    fontSize: size,
-    lineHeight: size * 1.5,
-    fontFamily,
-  };
-  return {
-    body: { ...base, fontWeight: '500' as const },
-    paragraph: { ...base, marginVertical: 4 },
-    text: { ...base },
-    strong: { ...base, fontWeight: '700' as const },
-    em: { ...base, fontStyle: 'italic' as const },
-    heading1: { ...base, fontWeight: '700' as const, marginVertical: 6 },
-    heading2: { ...base, fontWeight: '700' as const, marginVertical: 5 },
-    heading3: { ...base, fontWeight: '700' as const, marginVertical: 4 },
-    heading4: { ...base, fontWeight: '700' as const, marginVertical: 3 },
-    heading5: { ...base, fontWeight: '600' as const, marginVertical: 2 },
-    heading6: { ...base, fontWeight: '600' as const, marginVertical: 2 },
-    bullet_list: { ...base },
-    ordered_list: { ...base },
-    list_item: { ...base, marginVertical: 2 },
-    blockquote: { ...base, borderLeftWidth: 3, borderLeftColor: '#d1d5db', paddingLeft: 10, fontStyle: 'italic' as const, opacity: 0.9 },
-    code_inline: { ...base, fontSize: size - 1, fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }), backgroundColor: 'rgba(0,0,0,0.05)', paddingHorizontal: 4, borderRadius: 3 },
-    code_block: { ...base, fontSize: size - 1, fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }), backgroundColor: 'rgba(0,0,0,0.05)', padding: 8, borderRadius: 6 },
-    fence: { ...base, fontSize: size - 1, fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }), backgroundColor: 'rgba(0,0,0,0.05)', padding: 8, borderRadius: 6 },
-    table: { borderWidth: 1, borderColor: '#d1d5db' },
-    th: { ...base, fontWeight: '700' as const, padding: 4 },
-    td: { ...base, padding: 4 },
-    link: { ...base, color: '#2563eb', textDecorationLine: 'underline' as const },
-    hr: { borderBottomWidth: 1, borderBottomColor: '#d1d5db', marginVertical: 8 },
-  };
-};
-
 // --- Main Screen ---
 
 export const getPYQCategorization = (item: any) => {
   const groupName = (item.source?.group || item.exam_group || '').toUpperCase();
   const rawYear = item.source?.year || item.exam_year || item.launch_year || item.tests?.launch_year || '';
   const year = typeof rawYear === 'string' ? rawYear.trim() : String(rawYear).trim();
-
+  
   const isUPSC = item.is_upsc_cse || groupName.includes('UPSC CSE') || groupName === 'UPSC';
   const isAllied = item.is_allied || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => groupName.includes(g));
   const isOther = item.is_others || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => groupName.includes(g));
-
+  
   const hasPYQData = !!item.is_pyq;
   const isGenericPYQ = hasPYQData && !isUPSC && !isAllied && !isOther;
 
-  return {
-    hasPYQData,
-    isUPSC,
-    isAllied,
-    isOther,
-    isGenericPYQ,
-    groupName: item.source?.group || item.exam_group || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ'),
-    year
+  return { 
+    hasPYQData, 
+    isUPSC, 
+    isAllied, 
+    isOther, 
+    isGenericPYQ, 
+    groupName: item.source?.group || item.exam_group || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ'), 
+    year 
   };
 };
 
 export default function UnifiedQuizEngine() {
   const { colors } = useTheme();
-  const params = useLocalSearchParams<{
-    subject?: string,
-    mode?: string,
-    view?: string,
+  const params = useLocalSearchParams<{ 
+    subject?: string, 
+    mode?: string, 
+    view?: string, 
     timer?: string,
     showPYQTags?: string,
     questionId?: string,
@@ -300,8 +264,7 @@ export default function UnifiedQuizEngine() {
     examStage?: string,
     series?: string,
     subjects?: string,
-    ncertFilter?: string,
-    pyqSource?: string
+    ncertFilter?: string
   }>();
   const routeParams = params as any;
   const router = useRouter();
@@ -326,7 +289,7 @@ export default function UnifiedQuizEngine() {
           {
             text: 'Cancel',
             style: 'cancel',
-            onPress: () => { }, // Stay on screen
+            onPress: () => {}, // Stay on screen
           },
           {
             text: 'Exit without saving',
@@ -392,7 +355,7 @@ export default function UnifiedQuizEngine() {
   const [notebookModalVisible, setNotebookModalVisible] = useState(false);
   // Hardnotes bridge (Phase 3) — send quiz explanation into a Skia canvas note
   const [hardnotesPickerVisible, setHardnotesPickerVisible] = useState(false);
-  const [hardnotesPayload, setHardnotesPayload] = useState<{ markdown: string; title: string } | null>(null); const notebookRichEditorRef = useRef<any>(null);
+  const [hardnotesPayload, setHardnotesPayload] = useState<{ markdown: string; title: string } | null>(null);  const notebookRichEditorRef = useRef<any>(null);
   const [noteDraftBullets, setNoteDraftBullets] = useState(['']);
   const [activeInputIndex, setActiveInputIndex] = useState(0);
   const [selection, setSelection] = useState({ start: 0, end: 0 });
@@ -433,12 +396,12 @@ export default function UnifiedQuizEngine() {
           baseFontSizeRef.current = n;
         }
       }
-    }).catch(() => { });
+    }).catch(() => {});
   }, []);
 
   // Persist whenever font size changes (debounced via setItem fire-and-forget)
   useEffect(() => {
-    AsyncStorage.setItem(FONT_SIZE_KEY, String(fontSize)).catch(() => { });
+    AsyncStorage.setItem(FONT_SIZE_KEY, String(fontSize)).catch(() => {});
   }, [fontSize]);
 
   const onPinchGestureEvent = (event: any) => {
@@ -454,7 +417,7 @@ export default function UnifiedQuizEngine() {
   const onPinchHandlerStateChange = (event: any) => {
     if (event.nativeEvent.state === GHState.END || event.nativeEvent.state === GHState.CANCELLED) {
       baseFontSizeRef.current = fontSize;
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => { });
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     }
   };
   const [showQuickMenu, setShowQuickMenu] = useState(false);
@@ -516,20 +479,9 @@ export default function UnifiedQuizEngine() {
   const sessionAttemptId = useMemo(() => `${sessionTestId}__${Date.now()}`, [sessionTestId]);
 
   // 0. Persistence: Load and Save currentIndex
-  // When entering via questionId (instant search), use a unique key to avoid stale index collisions
-  const INDEX_PERSIST_KEY = useMemo(() => {
-    if (params.questionId) return `quiz_index_qid_${params.questionId}`;
-    return `quiz_index_${sessionTestId}`;
-  }, [sessionTestId, params.questionId]);
+  const INDEX_PERSIST_KEY = useMemo(() => `quiz_index_${sessionTestId}`, [sessionTestId]);
 
   useEffect(() => {
-    // When entering via questionId (instant search), skip stale index load — start at 0
-    if (params.questionId) {
-      setCurrentIndex(0);
-      setShowIndex(false);
-      setIsReady(true);
-      return;
-    }
     const loadIndex = async () => {
       try {
         const saved = await AsyncStorage.getItem(INDEX_PERSIST_KEY);
@@ -568,7 +520,7 @@ export default function UnifiedQuizEngine() {
         .select('review_tags')
         .eq('user_id', session.user.id)
         .not('review_tags', 'is', null);
-
+      
       if (data) {
         const allTags = new Set(DEFAULT_STUDY_TAGS);
         data.forEach(row => {
@@ -588,12 +540,12 @@ export default function UnifiedQuizEngine() {
     store.setMetadata(qId, { studyTags: newTags }, false);
     // Explicitly trigger sync with the *newest* data to prevent the "one step behind" race condition
     if (session?.user?.id) {
-      StudentSync.enqueue('question_state', {
-        userId: session.user.id,
-        questionId: qId,
-        testId: questions.find(q => q.id === qId)?.tests?.id || 'manual',
-        patch: { review_tags: newTags }
-      });
+       StudentSync.enqueue('question_state', {
+         userId: session.user.id,
+         questionId: qId,
+         testId: questions.find(q => q.id === qId)?.tests?.id || 'manual',
+         patch: { review_tags: newTags }
+       });
     }
   };
 
@@ -613,15 +565,13 @@ export default function UnifiedQuizEngine() {
   }, [sessionTestId, sessionAttemptId, session?.user?.id]);
 
   useEffect(() => {
-    // Skip auto-scroll when entering via questionId — the jump logic in processResults handles it
-    if (params.questionId) return;
     if (!showIndex && viewMode === 'list' && currentIndex >= 0) {
       const scrollTimer = setTimeout(() => {
         try {
-          listRef.current?.scrollToIndex({
-            index: currentIndex,
+          listRef.current?.scrollToIndex({ 
+            index: currentIndex, 
             animated: true,
-            viewPosition: 0
+            viewPosition: 0 
           });
         } catch (e) {
           console.warn("Scroll to index failed", e);
@@ -634,24 +584,13 @@ export default function UnifiedQuizEngine() {
   const fetchQuestions = async () => {
     setLoading(true);
     let tagList: string[] = [];
-
-    // Helper to process results.
-    // baseIds: when present, restricts the final list to only show clusters
-    // that contain at least one of these original IDs. This prevents:
-    //   - Search clicks from loading 200 questions then jumping (flickering)
-    //   - Heatmap cells from ballooning to 400 questions after sibling fetch
-    const processResults = (data: any[], baseIds?: string[]) => {
+    
+    // Helper to process results
+    const processResults = (data: any[]) => {
       const { mergedQs, idToMergedId } = mergeQuestions(data || []);
-
+      
       let finalQs = mergedQs;
-
-      // Cluster filter: only keep merged clusters that contain a base question
-      if (baseIds && baseIds.length > 0 && baseIds.length < mergedQs.length) {
-        const targetMergedIds = new Set(baseIds.map(id => idToMergedId.get(id) || id));
-        finalQs = mergedQs.filter(q => targetMergedIds.has(q.id));
-      }
-
-      const resIds = typeof params.resultIds === 'string' ? params.resultIds.split(',').filter((id: string) => id.trim().length > 0) : null;
+              const resIds = typeof params.resultIds === 'string' ? params.resultIds.split(',').filter((id: string) => id.trim().length > 0) : null;
       const hasQuestionSequence = mergedQs.some(q => Number.isFinite(Number(q.question_number)));
 
       if (resIds && resIds.length > 0) {
@@ -675,7 +614,7 @@ export default function UnifiedQuizEngine() {
           const bText = (b.question_text + ' ' + (b.explanation_markdown || '')).toLowerCase();
           const aExact = term && aText.includes(term);
           const bExact = term && bText.includes(term);
-
+          
           if (aExact && !bExact) return -1;
           if (!aExact && bExact) return 1;
 
@@ -695,7 +634,7 @@ export default function UnifiedQuizEngine() {
       }
 
       setQuestions(finalQs);
-
+      
       if (params.questionId && !hasJumped) {
         const jumpId = params.questionId;
         const targetId = idToMergedId.get(jumpId) || jumpId;
@@ -706,7 +645,7 @@ export default function UnifiedQuizEngine() {
           setHasJumped(true);
         }
       }
-
+      
       if (session?.user?.id && finalQs.length > 0) {
         const shouldLoadAnswers = arenaMode === 'learning' && params.testId && !params.testId.startsWith('custom_');
         store.loadStates(mergedQs.map(q => q.id), !!shouldLoadAnswers);
@@ -739,11 +678,11 @@ export default function UnifiedQuizEngine() {
       let from = 0;
       const CHUNK = 1000;
       const MAX_TOTAL = 10000; // Safety cap to prevent memory issues
-
+      
       while (from < MAX_TOTAL) {
         let query = supabase.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)');
         const resIds = typeof params.resultIds === 'string' ? params.resultIds.split(',').filter((id: string) => id.trim().length > 0) : null;
-
+        
         if (resIds && resIds.length > 0) {
           // If we have specific IDs, chunk those IDs specifically
           const idChunk = resIds.slice(from, from + CHUNK);
@@ -783,7 +722,7 @@ export default function UnifiedQuizEngine() {
           if (term) {
             const fields = typeof params.searchFields === 'string' ? params.searchFields.split(',') : ['Questions'];
             const mode = params.searchMode || 'Matching';
-
+            
             if (mode === 'Exact') {
               const termPattern = `%${term}%`;
               const filters = [];
@@ -817,17 +756,17 @@ export default function UnifiedQuizEngine() {
             const stage = params.stage || params.examStage || params.series;
             const paper = params.paper;
 
-            if ((insts && insts !== 'All' && insts !== '' && insts !== '[]') ||
-              (progs && progs !== 'All' && progs !== '' && progs !== '[]') ||
-              (stage && stage !== 'All' && stage !== '' && stage !== '[]')) {
-
+            if ((insts && insts !== 'All' && insts !== '' && insts !== '[]') || 
+                (progs && progs !== 'All' && progs !== '' && progs !== '[]') ||
+                (stage && stage !== 'All' && stage !== '' && stage !== '[]')) {
+              
               let tQuery = LocalQuery.from('tests').select('id');
-
+              
               if (insts && insts !== 'All' && insts !== '' && insts !== '[]') {
                 const instList = typeof insts === 'string' ? insts.split(',').filter(Boolean) : [];
                 if (instList.length > 0) tQuery = tQuery.in('institute', instList);
               }
-
+              
               if (progs && progs !== 'All' && progs !== '' && progs !== '[]') {
                 const progList = typeof progs === 'string' ? progs.split(',').filter(Boolean) : [];
                 if (progList.length > 0) tQuery = tQuery.in('program_name', progList);
@@ -842,7 +781,7 @@ export default function UnifiedQuizEngine() {
                 const paperNorm = paper.replace('GS ', '');
                 tQuery = tQuery.or(`title.ilike.%${paper}%,title.ilike.%${paperNorm}%,series.ilike.%${paper}%`);
               }
-
+              
               const { data: testRows } = await tQuery;
               const tIds = (testRows || []).map((t: any) => t.id);
               if (tIds.length > 0) query = query.in('test_id', tIds);
@@ -922,13 +861,13 @@ export default function UnifiedQuizEngine() {
             const orQuery = tagList.map(t => `review_tags.cs.["${t}"]`).join(',');
             const { data: tagIds } = await LocalQuery.from('question_states').select('question_id').eq('user_id', session.user.id).or(orQuery);
             if (tagIds && tagIds.length > 0) {
-              const slicedTagIds = tagIds.map((t: any) => t.question_id).slice(from, from + CHUNK);
-              if (slicedTagIds.length === 0) break;
-              query = query.in('id', slicedTagIds);
+               const slicedTagIds = tagIds.map((t: any) => t.question_id).slice(from, from + CHUNK);
+               if (slicedTagIds.length === 0) break;
+               query = query.in('id', slicedTagIds);
             } else break;
           } else {
-            // If no specific IDs/tags, use standard range pagination
-            query = query.range(from, from + CHUNK - 1);
+             // If no specific IDs/tags, use standard range pagination
+             query = query.range(from, from + CHUNK - 1);
           }
         }
 
@@ -938,125 +877,84 @@ export default function UnifiedQuizEngine() {
         // ΓöÇ FUZZY FALLBACK (Search Tab Parity): If results are sparse, try 1-char tolerance
         const term = typeof params.query === 'string' ? params.query.trim() : '';
         if (params.searchMode !== 'Exact' && term && term.length > 3) {
-          const words = term.split(/\s+/).filter(Boolean);
-          if (words.length === 1) {
-            const word = words[0];
-            const fuzzyPatterns = [];
-            const fields = typeof params.searchFields === 'string' ? params.searchFields.split(',') : ['Questions'];
+           const words = term.split(/\s+/).filter(Boolean);
+           if (words.length === 1) {
+             const word = words[0];
+             const fuzzyPatterns = [];
+             const fields = typeof params.searchFields === 'string' ? params.searchFields.split(',') : ['Questions'];
 
-            for (let i = 0; i < word.length; i++) {
-              const pattern = word.substring(0, i) + '%' + word.substring(i + 1);
-              if (fields.includes('Questions') || fields.includes('question_text')) {
-                fuzzyPatterns.push(`question_text.ilike.%${pattern}%`);
-              }
-              if (fields.includes('Explanations') || fields.includes('explanation_markdown')) {
-                fuzzyPatterns.push(`explanation_markdown.ilike.%${pattern}%`);
-              }
-            }
+             for (let i = 0; i < word.length; i++) {
+               const pattern = word.substring(0, i) + '%' + word.substring(i + 1);
+               if (fields.includes('Questions') || fields.includes('question_text')) {
+                 fuzzyPatterns.push(`question_text.ilike.%${pattern}%`);
+               }
+               if (fields.includes('Explanations') || fields.includes('explanation_markdown')) {
+                 fuzzyPatterns.push(`explanation_markdown.ilike.%${pattern}%`);
+               }
+             }
+             
+             let fuzzyQ = LocalQuery.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)').or(fuzzyPatterns.join(',')).limit(100);
+             // Re-apply same filters
+             const insts = params.institutes || params.institute;
+             const progs = params.programs || params.program;
+             const stage = params.stage || params.examStage || params.series;
+             if ((insts && insts !== 'All' && insts !== '' && insts !== '[]') || (progs && progs !== 'All' && progs !== '' && progs !== '[]') || (stage && stage !== 'All' && stage !== '' && stage !== '[]')) {
+                let tQuery = LocalQuery.from('tests').select('id');
+                if (insts && insts !== 'All' && insts !== '' && insts !== '[]') tQuery = tQuery.in('institute', insts.split(',').filter(Boolean));
+                if (progs && progs !== 'All' && progs !== '' && progs !== '[]') tQuery = tQuery.in('program_name', progs.split(',').filter(Boolean));
+                if (stage && stage !== 'All' && stage !== '' && stage !== '[]') tQuery = tQuery.ilike('series', '%' + stage + '%');
+                const { data: tRows } = await tQuery;
+                const tIds = (tRows || []).map((t: any) => t.id);
+                if (tIds.length > 0) fuzzyQ = fuzzyQ.in('test_id', tIds);
+                else fuzzyQ = fuzzyQ.in('test_id', ['__NO_MATCH__']);
+             }
+             const subs = params.subjects || params.subject;
+             if (subs && subs !== 'All' && subs !== '' && subs !== '[]') {
+                const subList = typeof subs === 'string' ? subs.split(',').filter(Boolean) : [];
+                if (subList.length > 0) fuzzyQ = fuzzyQ.in('subject', subList);
+             }
+             const pyqM = params.pyqMaster || params.pyqFilter;
+             if (pyqM === 'PYQ Only') {
+               fuzzyQ = fuzzyQ.eq('is_pyq', true);
+               const pyqCat = params.examCategory || params.pyqCategory;
+               if (pyqCat && pyqCat !== 'All' && pyqCat !== '' && pyqCat !== '[]') {
+                 const cats = typeof pyqCat === 'string' ? pyqCat.split(',').filter(Boolean) : [];
+                 const fOr = [];
+                 if (cats.includes('UPSC CSE') || cats.includes('UPSC')) fOr.push('is_upsc_cse.eq.true');
+                 if (cats.includes('Allied Exams') || cats.includes('Allied')) fOr.push('is_allied.eq.true');
+                 if (cats.includes('Others')) fOr.push('is_others.eq.true');
+                 if (fOr.length > 0) fuzzyQ = fuzzyQ.or(fOr.join(','));
+               }
+             } else if (pyqM === 'Non-PYQ' || pyqM === 'Non PYQ') {
+               fuzzyQ = fuzzyQ.eq('is_pyq', false);
+             }
 
-            let fuzzyQ = LocalQuery.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)').or(fuzzyPatterns.join(',')).limit(100);
-            // Re-apply same filters
-            const insts = params.institutes || params.institute;
-            const progs = params.programs || params.program;
-            const stage = params.stage || params.examStage || params.series;
-            if ((insts && insts !== 'All' && insts !== '' && insts !== '[]') || (progs && progs !== 'All' && progs !== '' && progs !== '[]') || (stage && stage !== 'All' && stage !== '' && stage !== '[]')) {
-              let tQuery = LocalQuery.from('tests').select('id');
-              if (insts && insts !== 'All' && insts !== '' && insts !== '[]') tQuery = tQuery.in('institute', insts.split(',').filter(Boolean));
-              if (progs && progs !== 'All' && progs !== '' && progs !== '[]') tQuery = tQuery.in('program_name', progs.split(',').filter(Boolean));
-              if (stage && stage !== 'All' && stage !== '' && stage !== '[]') tQuery = tQuery.ilike('series', '%' + stage + '%');
-              const { data: tRows } = await tQuery;
-              const tIds = (tRows || []).map((t: any) => t.id);
-              if (tIds.length > 0) fuzzyQ = fuzzyQ.in('test_id', tIds);
-              else fuzzyQ = fuzzyQ.in('test_id', ['__NO_MATCH__']);
-            }
-            const subs = params.subjects || params.subject;
-            if (subs && subs !== 'All' && subs !== '' && subs !== '[]') {
-              const subList = typeof subs === 'string' ? subs.split(',').filter(Boolean) : [];
-              if (subList.length > 0) fuzzyQ = fuzzyQ.in('subject', subList);
-            }
-            const pyqM = params.pyqMaster || params.pyqFilter;
-            if (pyqM === 'PYQ Only') {
-              fuzzyQ = fuzzyQ.eq('is_pyq', true);
-              const pyqCat = params.examCategory || params.pyqCategory;
-              if (pyqCat && pyqCat !== 'All' && pyqCat !== '' && pyqCat !== '[]') {
-                const cats = typeof pyqCat === 'string' ? pyqCat.split(',').filter(Boolean) : [];
-                const fOr = [];
-                if (cats.includes('UPSC CSE') || cats.includes('UPSC')) fOr.push('is_upsc_cse.eq.true');
-                if (cats.includes('Allied Exams') || cats.includes('Allied')) fOr.push('is_allied.eq.true');
-                if (cats.includes('Others')) fOr.push('is_others.eq.true');
-                if (fOr.length > 0) fuzzyQ = fuzzyQ.or(fOr.join(','));
-              }
-            } else if (pyqM === 'Non-PYQ' || pyqM === 'Non PYQ') {
-              fuzzyQ = fuzzyQ.eq('is_pyq', false);
-            }
+             if (params.ncertFilter === 'NCERT Only') {
+               fuzzyQ = fuzzyQ.eq('is_ncert', true);
+             } else if (params.ncertFilter === 'Non-NCERT') {
+               fuzzyQ = fuzzyQ.or('is_ncert.is.null,is_ncert.eq.false');
+             }
 
-            if (params.ncertFilter === 'NCERT Only') {
-              fuzzyQ = fuzzyQ.eq('is_ncert', true);
-            } else if (params.ncertFilter === 'Non-NCERT') {
-              fuzzyQ = fuzzyQ.or('is_ncert.is.null,is_ncert.eq.false');
-            }
-
-            const { data: fData } = await fuzzyQ;
-            if (fData && fData.length > 0) {
-              const existingIds = new Set((data || []).map((d: any) => d.id));
-              const merged = [...(data || [])];
-              fData.forEach((fd: any) => {
-                if (!existingIds.has(fd.id)) merged.push(fd);
-              });
-              data = merged;
-            }
-          }
+             const { data: fData } = await fuzzyQ;
+             if (fData && fData.length > 0) {
+               const existingIds = new Set((data || []).map((d: any) => d.id));
+               const merged = [...(data || [])];
+               fData.forEach((fd: any) => {
+                 if (!existingIds.has(fd.id)) merged.push(fd);
+               });
+               data = merged;
+             }
+           }
         }
-
+        
         if (!data || data.length === 0) break;
-
+        
         allFreshData.push(...data);
         if (data.length < CHUNK) break;
         from += CHUNK;
       }
 
-      // Capture the IDs of the 'real' questions before adding sibling rows.
-      // For search clicks (questionId), restrict to just that one question.
-      // For heatmap cells / normal queries, restrict to the filtered result set.
-      const baseIds = params.questionId
-        ? [params.questionId]
-        : allFreshData.map((q: any) => q.id);
-
-      // ── Issue 6: When coming from PYQ heatmap (pyqSource='UPSC'), also fetch
-      // sibling questions from OTHER institutes for the same exam years so the
-      // merger can build multi-institute explanation clusters.
-      if (params.pyqSource === 'UPSC' && allFreshData.length > 0) {
-        try {
-          const examYears = Array.from(new Set(
-            allFreshData
-              .map((q: any) => String(q.exam_year || '').trim())
-              .filter(Boolean)
-          ));
-          if (examYears.length > 0) {
-            const existingIds = new Set(allFreshData.map((q: any) => q.id));
-            const SELECT_COLS = 'id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)';
-            // Fetch PYQ questions from non-UPSC institutes for the same years
-            const { data: siblings } = await supabase
-              .from('questions')
-              .select(SELECT_COLS)
-              .eq('is_pyq', true)
-              .in('exam_year', examYears)
-              .limit(3000);
-            if (siblings) {
-              siblings.forEach((s: any) => {
-                if (!existingIds.has(s.id)) {
-                  allFreshData.push(s);
-                  existingIds.add(s.id);
-                }
-              });
-            }
-          }
-        } catch (sibErr) {
-          console.warn('[Engine] Sibling fetch for multi-institute explns failed:', sibErr);
-        }
-      }
-
-      processResults(allFreshData, baseIds);
+      processResults(allFreshData);
     } catch (err) {
       console.error('Fetch error:', err);
       // If we didn't find local data and server failed, show empty
@@ -1127,7 +1025,7 @@ export default function UnifiedQuizEngine() {
 
   const createNewNotebook = async () => {
     if (!newNotebookName.trim() || !selectedFolder || !session?.user?.id) return;
-
+    
     // First, create the actual note document
     const { data: noteData, error: noteError } = await supabase.from('user_notes').insert({
       user_id: session.user.id,
@@ -1157,7 +1055,7 @@ export default function UnifiedQuizEngine() {
 
   const fetchHierarchy = async () => {
     if (!session?.user?.id) return;
-
+    
     // 1. Load Folders
     const { data: folderData } = await LocalQuery.from('user_note_nodes').select('*').eq('user_id', session.user.id).eq('type', 'folder');
     setFolders(folderData || []);
@@ -1172,7 +1070,7 @@ export default function UnifiedQuizEngine() {
         const lastFolder = folderData?.find((f: any) => f.id === prefs.folderId);
         if (lastFolder) {
           setSelectedFolder(lastFolder);
-
+          
           // 4. Load Notebooks for this folder
           const { data: notebookData } = await LocalQuery.from('user_note_nodes').select('*').eq('parent_id', lastFolder.id).eq('type', 'note');
           setNotebooks(notebookData || []);
@@ -1250,13 +1148,13 @@ export default function UnifiedQuizEngine() {
     const idx = activeInputIndex;
     const content = noteDraftBullets[idx] || '';
     const { start, end } = selection;
-
+    
     const before = content.substring(0, start);
     const selected = content.substring(start, end);
     const after = content.substring(end);
-
+    
     let formatted = selected;
-    switch (type) {
+    switch(type) {
       case 'bold': formatted = `<b>${selected}</b>`; break;
       case 'italic': formatted = `<i>${selected}</i>`; break;
       case 'underline': formatted = `<u>${selected}</u>`; break;
@@ -1264,15 +1162,15 @@ export default function UnifiedQuizEngine() {
       case 'number': formatted = `<ol><li>${selected}</li></ol>`; break;
       case 'highlight': formatted = `<mark>${selected}</mark>`; break;
     }
-
+    
     const next = [...noteDraftBullets];
     next[idx] = before + formatted + after;
     setNoteDraftBullets(next);
-
+    
     // Update selection to be inside the tags if it was empty, or after if it was selection
     const newPos = start + formatted.length;
     setSelection({ start: newPos, end: newPos });
-
+    
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
@@ -1281,25 +1179,25 @@ export default function UnifiedQuizEngine() {
     setIsSavingToNotebook(true);
     try {
       const finalSub = showCustomSubheadingInput ? customSubheading : selectedSubheading;
-
+      
       const { data: noteData, error: fetchError } = await LocalQuery.from('user_notes').select('items').eq('id', selectedNotebook.note_id).single();
       if (fetchError) throw fetchError;
-
+      
       const currentItems = Array.isArray(noteData?.items) ? noteData.items : [];
       const newItemsToAdd = [];
-
+      
       if (finalSub && finalSub !== 'General') {
         const headingExists = currentItems.some((i: any) => i.type === 'microTopicHeading' && i.text === finalSub);
         if (!headingExists) {
-          newItemsToAdd.push({
-            id: Date.now().toString() + '-h',
-            type: 'microTopicHeading',
-            text: finalSub,
-            addedAt: new Date().toISOString()
-          });
+           newItemsToAdd.push({
+             id: Date.now().toString() + '-h',
+             type: 'microTopicHeading',
+             text: finalSub,
+             addedAt: new Date().toISOString()
+           });
         }
       }
-
+      
       const bullets = noteDraftBullets.filter(b => b.trim()).map((b, i) => ({
         id: (Date.now() + i).toString(),
         type: 'highlight',
@@ -1310,7 +1208,7 @@ export default function UnifiedQuizEngine() {
       }));
 
       newItemsToAdd.push(...bullets);
-
+      
       const { error } = await supabase.from('user_notes').update({
         items: [...currentItems, ...newItemsToAdd],
         updated_at: new Date().toISOString()
@@ -1334,7 +1232,7 @@ export default function UnifiedQuizEngine() {
   const handleOptionSelect = (qId: string, label: string) => {
     store.setAnswer(qId, label);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
+    
     // REDUNDANT: store.setAnswer already triggers sync via store.syncAnswer
     // Removing the direct StudentSync.enqueue here to prevent double-processing
     // and potential session-refresh loops.
@@ -1379,12 +1277,12 @@ export default function UnifiedQuizEngine() {
         .select('items')
         .eq('id', prefs.notebookId)
         .single();
-
+      
       if (fetchError) throw fetchError;
 
       const currentItems = Array.isArray(noteData?.items) ? noteData.items : [];
       const heading = prefs.subheading || 'Quick Saves';
-
+      
       // 2. Ensure heading exists
       const newItems = [...currentItems];
       const headingExists = newItems.some((i: any) => i.type === 'microTopicHeading' && i.text === heading);
@@ -1428,7 +1326,7 @@ export default function UnifiedQuizEngine() {
     try {
       const cardId = await FlashcardSvc.createFromQuestion(session.user.id, q);
       setFlashcardedIds(prev => new Set([...prev, q.id]));
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => { });
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       setAff({
         visible: true,
         cardId,
@@ -1455,10 +1353,10 @@ export default function UnifiedQuizEngine() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     Alert.alert("Success", "Note saved successfully.");
     if (currentIndex < questions.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      setRevealedExplanations({});
+       setCurrentIndex(currentIndex + 1);
+       setRevealedExplanations({});
     } else {
-      setShowExitModal(true);
+        setShowExitModal(true);
     }
   };
 
@@ -1495,91 +1393,91 @@ export default function UnifiedQuizEngine() {
     setShowExitModal(false);
     if (submitting) return;
     setSubmitting(true);
-
+    
     // Auto-save test attempt for Quiz Mode
     if (session?.user?.id && sessionTestId) {
-      try {
-        // 1. Prepare Version 2 attempt_payload
-        const attemptQuestions = buildAttemptQuestions();
-        const attempted = attemptQuestions.filter(row => row.selected_answer !== null).length;
-        const skipped = questions.length - attempted;
-        const correct = attemptQuestions.filter(row => row.is_correct).length;
-        const durationSec = getSessionDurationSeconds();
+       try {
+         // 1. Prepare Version 2 attempt_payload
+         const attemptQuestions = buildAttemptQuestions();
+         const attempted = attemptQuestions.filter(row => row.selected_answer !== null).length;
+         const skipped = questions.length - attempted;
+         const correct = attemptQuestions.filter(row => row.is_correct).length;
+         const durationSec = getSessionDurationSeconds();
+         
+         const attempt_payload = {
+           version: 2,
+           test_id: sessionTestId,
+           title: customTestName || 'Practice Session',
+           total_questions: questions.length,
+           attempted,
+           skipped,
+           score: correct,
+           duration_seconds: durationSec,
+           questions: questions.map(q => {
+             const answerData = store.answers[q.id] || {};
+             return {
+               question_id: q.id,
+               selected_answer: answerData.selectedAnswer || null,
+               correct_answer: q.correct_answer,
+               is_correct: answerData.selectedAnswer === q.correct_answer,
+               time_spent_seconds: answerData.timeSpentSeconds || 0,
+               subject: q.subject || null,
+               micro_topic: q.micro_topic || null,
+               is_pyq: !!q.is_pyq,
+               confidence: answerData.confidence || null,
+               error_category: answerData.errorCategory || null,
+               review_tags: answerData.studyTags || [],
+             };
+           }),
+         };
 
-        const attempt_payload = {
-          version: 2,
-          test_id: sessionTestId,
-          title: customTestName || 'Practice Session',
-          total_questions: questions.length,
-          attempted,
-          skipped,
-          score: correct,
-          duration_seconds: durationSec,
-          questions: questions.map(q => {
-            const answerData = store.answers[q.id] || {};
-            return {
-              question_id: q.id,
-              selected_answer: answerData.selectedAnswer || null,
-              correct_answer: q.correct_answer,
-              is_correct: answerData.selectedAnswer === q.correct_answer,
-              time_spent_seconds: answerData.timeSpentSeconds || 0,
-              subject: q.subject || null,
-              micro_topic: q.micro_topic || null,
-              is_pyq: !!q.is_pyq,
-              confidence: answerData.confidence || null,
-              error_category: answerData.errorCategory || null,
-              review_tags: answerData.studyTags || [],
-            };
-          }),
-        };
+         // 2. Synchronous submission to get the real attemptId
+         const attemptId = await StudentSync.submitAttemptNow({
+           userId: session.user.id,
+           testId: sessionTestId,
+           attempt: { 
+             score: correct,
+             attempt_payload, 
+             started_at: new Date(sessionStartRef.current).toISOString(),
+             submitted_at: new Date().toISOString(),
+           }
+         });
 
-        // 2. Synchronous submission to get the real attemptId
-        const attemptId = await StudentSync.submitAttemptNow({
-          userId: session.user.id,
-          testId: sessionTestId,
-          attempt: {
-            score: correct,
-            attempt_payload,
-            started_at: new Date(sessionStartRef.current).toISOString(),
-            submitted_at: new Date().toISOString(),
-          }
-        });
+         // 3. Per-question question_state writes (with real attemptId)
+         questions.forEach(q => {
+           const answerData = store.answers[q.id] || {};
+           StudentSync.enqueue('question_state', {
+             userId: session.user.id,
+             questionId: q.id,
+             testId: sessionTestId,
+             attemptId: attemptId,
+             patch: {
+               selected_answer: answerData.selectedAnswer || null,
+               time_spent_seconds: answerData.timeSpentSeconds || 0,
+               confidence: answerData.confidence || null,
+               review_tags: answerData.studyTags || [],
+               error_category: answerData.errorCategory || null,
+               status: answerData.selectedAnswer === q.correct_answer ? 'Correct' : 'Incorrect',
+             },
+           });
+         });
 
-        // 3. Per-question question_state writes (with real attemptId)
-        questions.forEach(q => {
-          const answerData = store.answers[q.id] || {};
-          StudentSync.enqueue('question_state', {
-            userId: session.user.id,
-            questionId: q.id,
-            testId: sessionTestId,
-            attemptId: attemptId,
-            patch: {
-              selected_answer: answerData.selectedAnswer || null,
-              time_spent_seconds: answerData.timeSpentSeconds || 0,
-              confidence: answerData.confidence || null,
-              review_tags: answerData.studyTags || [],
-              error_category: answerData.errorCategory || null,
-              status: answerData.selectedAnswer === q.correct_answer ? 'Correct' : 'Incorrect',
-            },
-          });
-        });
+         // Clear persistence
+         await AsyncStorage.removeItem(INDEX_PERSIST_KEY);
 
-        // Clear persistence
-        await AsyncStorage.removeItem(INDEX_PERSIST_KEY);
-
-        setSummary({
-          totalQuestions: questions.length,
-          attempted,
-          skipped,
-          durationSec,
-          attemptId: attemptId
-        });
-      } catch (err) {
-        console.error('Final submit error:', err);
-        Alert.alert("Error", "Failed to submit attempt.");
-      } finally {
-        setSubmitting(false);
-      }
+         setSummary({
+           totalQuestions: questions.length,
+           attempted,
+           skipped,
+           durationSec,
+           attemptId: attemptId
+         });
+       } catch (err) {
+         console.error('Final submit error:', err);
+         Alert.alert("Error", "Failed to submit attempt.");
+       } finally {
+         setSubmitting(false);
+       }
     } else {
       isNavigatingAway.current = true;
       router.replace('/(tabs)/analyse');
@@ -1611,7 +1509,7 @@ export default function UnifiedQuizEngine() {
     if (mins && !isNaN(parseInt(mins))) {
       setSeconds(parseInt(mins) * 60);
     } else if (questions.length > 0) {
-      setSeconds(questions.length * 120);
+      setSeconds(questions.length * 120); 
     }
     setIsTimerActive(true);
     setShowTimerPicker(false);
@@ -1630,12 +1528,12 @@ export default function UnifiedQuizEngine() {
   const commitManualSave = async (customName: string) => {
     if (isSavingAttempt) return;
     setIsSavingAttempt(true);
-
+    
     try {
       questions.forEach(q => store.syncAnswer(q.id));
       const submissionTime = new Date().toISOString();
       const testId = params.testId || (questions[0]?.test_id) || `unified_${Date.now()}`;
-
+      
       // Build V2 payload (same as handleFinalSubmit)
       const attemptQuestions = buildAttemptQuestions();
       const attempted = attemptQuestions.filter(row => row.selected_answer !== null).length;
@@ -1699,10 +1597,10 @@ export default function UnifiedQuizEngine() {
       setShowSaveSessionModal(false);
       setShowSaveNameModal(false);
       setCustomTestName('');
-
+      
       // Clear persisted index
       await AsyncStorage.removeItem(INDEX_PERSIST_KEY);
-
+      
       // Show summary modal (same as exam submit) — navigation happens from the modal
       setSummary({
         totalQuestions: questions.length,
@@ -1749,19 +1647,19 @@ export default function UnifiedQuizEngine() {
             const actualIndex = start + index;
             const snippet = (item.statement_line || item.question_text || '').replace(/<[^>]*>/g, '').slice(0, 80) + '...';
             const isAnswered = !!store.answers[item.id];
-
+            
             return (
-              <TouchableOpacity
-                onPress={() => {
-                  setCurrentIndex(actualIndex);
-                  setShowIndex(false);
+              <TouchableOpacity 
+                onPress={() => { 
+                  setCurrentIndex(actualIndex); 
+                  setShowIndex(false); 
                 }}
                 style={[styles.indexItem, { backgroundColor: colors.surface, borderColor: colors.border }, isAnswered && { borderColor: colors.primary + '40' }]}
               >
                 <View style={[styles.indexNum, { backgroundColor: isAnswered ? colors.primary : colors.surfaceStrong }]}>
                   <Text style={{ color: isAnswered ? colors.buttonText : colors.textSecondary, fontWeight: '900', fontSize: 12 }}>{actualIndex + 1}</Text>
                 </View>
-
+                
                 <View style={{ flex: 1, marginLeft: 12 }}>
                   <Text style={[styles.indexSnippet, { color: colors.textPrimary }]} numberOfLines={2}>{snippet}</Text>
                   <View style={{ flexDirection: 'row', gap: 6, marginTop: 8 }}>
@@ -1787,9 +1685,9 @@ export default function UnifiedQuizEngine() {
                             </View>
                           )}
                           {pyq.isGenericPYQ && (
-                            <View style={[styles.inlineBadge, { backgroundColor: colors.primary + '10', borderColor: colors.primary }]}>
-                              <Text style={{ color: colors.primary, fontWeight: '900', fontSize: 9 }}>{`${pyq.groupName} ${pyq.year}`.trim()}</Text>
-                            </View>
+                             <View style={[styles.inlineBadge, { backgroundColor: colors.primary + '10', borderColor: colors.primary }]}>
+                               <Text style={{ color: colors.primary, fontWeight: '900', fontSize: 9 }}>{`${pyq.groupName} ${pyq.year}`.trim()}</Text>
+                             </View>
                           )}
                         </View>
                       );
@@ -1809,18 +1707,18 @@ export default function UnifiedQuizEngine() {
 
         {totalPages > 1 && (
           <View style={[styles.pagination, { borderTopColor: colors.border, backgroundColor: colors.surface }]}>
-            <TouchableOpacity
-              disabled={currentPage === 0}
+            <TouchableOpacity 
+              disabled={currentPage === 0} 
               onPress={() => setCurrentPage(p => p - 1)}
               style={[styles.pageBtn, currentPage === 0 && { opacity: 0.3 }]}
             >
               <ArrowLeft size={18} color={colors.textPrimary} />
             </TouchableOpacity>
-
+            
             <Text style={{ color: colors.textPrimary, fontWeight: '900' }}>Page {currentPage + 1} of {totalPages}</Text>
 
-            <TouchableOpacity
-              disabled={currentPage >= totalPages - 1}
+            <TouchableOpacity 
+              disabled={currentPage >= totalPages - 1} 
               onPress={() => setCurrentPage(p => p + 1)}
               style={[styles.pageBtn, currentPage >= totalPages - 1 && { opacity: 0.3 }]}
             >
@@ -1830,28 +1728,28 @@ export default function UnifiedQuizEngine() {
         )}
 
         <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 16, paddingBottom: Platform.OS === 'ios' ? 32 : 16, flexDirection: 'row', gap: 12, borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.surface }}>
-          <TouchableOpacity
-            style={{ flex: 1, height: 50, borderRadius: 12, backgroundColor: colors.primary + '15', alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8 }}
-            onPress={() => {
-              setArenaMode('learning');
-              setShowIndex(false);
-            }}
-          >
-            <BookOpen size={18} color={colors.primary} />
-            <Text style={{ color: colors.primary, fontWeight: '900' }}>LEARN MODE</Text>
-          </TouchableOpacity>
+           <TouchableOpacity 
+             style={{ flex: 1, height: 50, borderRadius: 12, backgroundColor: colors.primary + '15', alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8 }}
+             onPress={() => {
+               setArenaMode('learning');
+               setShowIndex(false);
+             }}
+           >
+             <BookOpen size={18} color={colors.primary} />
+             <Text style={{ color: colors.primary, fontWeight: '900' }}>LEARN MODE</Text>
+           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={{ flex: 1, height: 50, borderRadius: 12, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8 }}
-            onPress={() => {
-              setArenaMode('exam');
-              setShowIndex(false);
-              setViewMode('card');
-            }}
-          >
-            <Target size={18} color="#fff" />
-            <Text style={{ color: '#fff', fontWeight: '900' }}>EXAM MODE</Text>
-          </TouchableOpacity>
+           <TouchableOpacity 
+             style={{ flex: 1, height: 50, borderRadius: 12, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8 }}
+             onPress={() => {
+               setArenaMode('exam');
+               setShowIndex(false);
+               setViewMode('card'); 
+             }}
+           >
+             <Target size={18} color="#fff" />
+             <Text style={{ color: '#fff', fontWeight: '900' }}>EXAM MODE</Text>
+           </TouchableOpacity>
         </View>
       </View>
     );
@@ -1935,7 +1833,7 @@ export default function UnifiedQuizEngine() {
     normalizedExplanations.forEach((e: any) => {
       availableExplSourceMap.set(e.sourceKey, e.source);
     });
-    inferredInstitutes.forEach((label: any) => {
+    inferredInstitutes.forEach((label: string) => {
       const key = String(label || '').toLowerCase();
       if (key && !availableExplSourceMap.has(key)) {
         availableExplSourceMap.set(key, label);
@@ -1956,27 +1854,27 @@ export default function UnifiedQuizEngine() {
     const displayExplanations = sourceFilteredExplanations.length > 0
       ? sourceFilteredExplanations
       : (selectedExplSource !== 'all'
-        ? [{
-          source: availableExplSourceMap.get(selectedExplSource) || selectedExplSource,
-          sourceKey: selectedExplSource,
-          program: String(item.tests?.program_name || '').trim(),
-          year: String(item.exam_year || '').trim(),
-          answer: String(item.correct_answer || '').trim().toUpperCase(),
-          text: '',
-        }]
-        : normalizedExplanations);
+          ? [{
+              source: availableExplSourceMap.get(selectedExplSource) || selectedExplSource,
+              sourceKey: selectedExplSource,
+              program: String(item.tests?.program_name || '').trim(),
+              year: String(item.exam_year || '').trim(),
+              answer: String(item.correct_answer || '').trim().toUpperCase(),
+              text: '',
+            }]
+          : normalizedExplanations);
 
     const rawIdx = activeExplIndex[item.id] ?? -1;
     const safeIdx = rawIdx >= 0 && rawIdx < displayExplanations.length ? rawIdx : -1;
     const activeExplanationText = safeIdx === -1
       ? (displayExplanations.length > 1
-        ? displayExplanations
-          .map((e: any) => `**${formatMetaLine(e) || e.source}${e.answer ? ' · Ans: ' + e.answer : ''}:**\n\n${e.text || '*No explanation provided.*'}`)
-          .join('\n\n---\n\n')
-        : (displayExplanations[0]?.text || item.explanation_markdown || 'No explanation available.'))
+          ? displayExplanations
+              .map((e: any) => `**${formatMetaLine(e) || e.source}${e.answer ? ' · Ans: ' + e.answer : ''}:**\n\n${e.text || '*No explanation provided.*'}`)
+              .join('\n\n---\n\n')
+          : (displayExplanations[0]?.text || item.explanation_markdown || 'No explanation available.'))
       : (displayExplanations[safeIdx]
-        ? (displayExplanations[safeIdx].text || '*No explanation provided by this source.*')
-        : (item.explanation_markdown || 'No explanation available.'));
+          ? (displayExplanations[safeIdx].text || '*No explanation provided by this source.*')
+          : (item.explanation_markdown || 'No explanation available.'));
 
     const activeExplanationMeta = safeIdx >= 0 && displayExplanations[safeIdx]
       ? formatMetaLine(displayExplanations[safeIdx])
@@ -2016,52 +1914,52 @@ export default function UnifiedQuizEngine() {
               return (
                 <View style={{ flexDirection: 'row', gap: 6 }}>
                   {chips.map((chip, idx) => (
-                    <View key={`chip-${item.id}-${idx}`} style={[styles.inlineBadge, { backgroundColor: chip.bg, borderColor: chip.border, paddingHorizontal: 6, paddingVertical: 2, height: 20 }]}>
+                    <View key={`chip-${item.id}-${idx}`} style={[styles.inlineBadge, { backgroundColor: chip.bg, borderColor: chip.border, paddingHorizontal: 6, paddingVertical: 2, height: 20 }]}> 
                       <Text style={{ color: chip.fg, fontWeight: '900', fontSize: 9 }}>{chip.label}</Text>
                     </View>
                   ))}
                 </View>
               );
             })()}
-
-            <TouchableOpacity
+            
+            <TouchableOpacity 
               onPress={() => store.setMetadata(item.id, { isReview: !answerData.isReview })}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: answerData.isReview ? (isZenMode ? '#43342220' : '#fef9c3') : 'transparent' }}
             >
-              <Flag size={18} color={answerData.isReview ? (isZenMode ? '#433422' : '#eab308') : (isZenMode ? '#43342240' : colors.textTertiary)} fill={answerData.isReview ? (isZenMode ? '#433422' : '#eab308') : 'transparent'} />
+               <Flag size={18} color={answerData.isReview ? (isZenMode ? '#433422' : '#eab308') : (isZenMode ? '#43342240' : colors.textTertiary)} fill={answerData.isReview ? (isZenMode ? '#433422' : '#eab308') : 'transparent'} />
             </TouchableOpacity>
-            <TouchableOpacity
+            <TouchableOpacity 
               onPress={() => {
                 const activeText = activeExplanationText || item.explanation_markdown || '';
-                setNoteDraftBullets([activeText || '']);
+                setNoteDraftBullets([activeText || '']); 
                 setCustomSubheading(item.micro_topic || '');
                 setNotebookModalVisible(true);
                 fetchHierarchy();
               }}
             >
-              <BookOpen
-                size={20}
-                color={isZenMode ? '#43342240' : colors.textTertiary}
-              />
+               <BookOpen 
+                 size={20} 
+                 color={isZenMode ? '#43342240' : colors.textTertiary} 
+               />
             </TouchableOpacity>
-            <TouchableOpacity
+            <TouchableOpacity 
               onPress={() => handleAddToFlashcards(item)}
               disabled={savingFlashcard[item.id]}
             >
-              {savingFlashcard[item.id] ? (
-                <ActivityIndicator size="small" color={colors.primary} />
-              ) : (
-                <Zap
-                  size={20}
-                  color={flashcardedIds.has(item.id) ? (isZenMode ? '#433422' : colors.primary) : (isZenMode ? '#43342240' : colors.textTertiary)}
-                  fill={flashcardedIds.has(item.id) ? (isZenMode ? '#433422' : colors.primary) : 'transparent'}
-                />
-              )}
+               {savingFlashcard[item.id] ? (
+                 <ActivityIndicator size="small" color={colors.primary} />
+               ) : (
+                 <Zap 
+                   size={20} 
+                   color={flashcardedIds.has(item.id) ? (isZenMode ? '#433422' : colors.primary) : (isZenMode ? '#43342240' : colors.textTertiary)} 
+                   fill={flashcardedIds.has(item.id) ? (isZenMode ? '#433422' : colors.primary) : 'transparent'} 
+                 />
+               )}
             </TouchableOpacity>
           </View>
         </View>
 
-        <Markdown style={getUniformMarkdownStyles(fontSize, zenTextColor)}>
+        <Markdown style={{ body: { color: zenTextColor, fontSize: fontSize, lineHeight: fontSize * 1.5, fontWeight: '500', fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' }) } }}>
           {item.statement_line || item.question_text}
         </Markdown>
 
@@ -2088,7 +1986,7 @@ export default function UnifiedQuizEngine() {
         </View>
 
         {arenaMode === 'learning' && !showExplanation && (
-          <TouchableOpacity
+          <TouchableOpacity 
             style={[styles.revealBtn, { borderColor: colors.primary }]}
             onPress={() => { setRevealedExplanations(prev => ({ ...prev, [item.id]: true })); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
           >
@@ -2150,7 +2048,7 @@ export default function UnifiedQuizEngine() {
                   <Text style={[styles.chipText, { color: (answerData.studyTags || []).includes(tag) ? colors.primary : colors.textSecondary }]}>{tag}</Text>
                 </TouchableOpacity>
               ))}
-              <TouchableOpacity
+              <TouchableOpacity 
                 onPress={() => setIsAddingTag(true)}
                 style={[styles.chip, { backgroundColor: colors.surfaceStrong, borderColor: colors.border, borderStyle: 'dashed' }]}
               >
@@ -2163,12 +2061,53 @@ export default function UnifiedQuizEngine() {
             <>
               <View style={[styles.explanationBox, { backgroundColor: colors.bg, marginBottom: 16 }]}>
                 <View style={styles.explanationHeader}>
-                  <Info size={16} color={colors.primary} />
-                  <Text style={[styles.explanationTitle, { color: colors.primary }]}>EXPLANATION</Text>
+                   <Info size={16} color={colors.primary} />
+                   <Text style={[styles.explanationTitle, { color: colors.primary }]}>EXPLANATION</Text>
                 </View>
 
-                {/* Institute-level filter row removed per user request — only the
-                    COMBINED + individual explanation chips (below) are shown */}
+                {availableExplSources.length > 1 && (
+                  <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setActiveExplSource(prev => ({ ...prev, [item.id]: 'all' }));
+                        setActiveExplIndex(prev => ({ ...prev, [item.id]: -1 }));
+                      }}
+                      style={{
+                        paddingHorizontal: 12,
+                        paddingVertical: 6,
+                        borderRadius: 20,
+                        backgroundColor: selectedExplSource === 'all' ? colors.primary : colors.surfaceStrong,
+                        borderWidth: 1,
+                        borderColor: colors.border
+                      }}
+                    >
+                      <Text style={{ fontSize: 10, fontWeight: '900', color: selectedExplSource === 'all' ? '#fff' : colors.textTertiary }}>
+                        ALL INSTITUTES
+                      </Text>
+                    </TouchableOpacity>
+                    {availableExplSources.map(({ key, label }: any) => (
+                      <TouchableOpacity
+                        key={`src-${item.id}-${key}`}
+                        onPress={() => {
+                          setActiveExplSource(prev => ({ ...prev, [item.id]: key }));
+                          setActiveExplIndex(prev => ({ ...prev, [item.id]: -1 }));
+                        }}
+                        style={{
+                          paddingHorizontal: 12,
+                          paddingVertical: 6,
+                          borderRadius: 20,
+                          backgroundColor: selectedExplSource === key ? colors.primary : colors.surfaceStrong,
+                          borderWidth: 1,
+                          borderColor: colors.border
+                        }}
+                      >
+                        <Text style={{ fontSize: 10, fontWeight: '900', color: selectedExplSource === key ? '#fff' : colors.textTertiary }}>
+                          {label}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
 
                 {displayExplanations.length > 1 && (
                   <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: colors.border + '30', flexWrap: 'wrap' }}>
@@ -2208,124 +2147,124 @@ export default function UnifiedQuizEngine() {
                   </View>
                 )}
 
-                <Markdown style={getUniformMarkdownStyles(fontSize, colors.textPrimary)}>
+                <Markdown style={{ body: { color: colors.textPrimary, fontSize: fontSize, lineHeight: fontSize * 1.5, fontWeight: '500', fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' }) } }}>
                   {activeExplanationText}
                 </Markdown>
               </View>
 
               <View style={styles.actionRow}>
-                <TouchableOpacity
-                  style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
-                  onPress={() => {
-                    const activeText = activeExplanationText || item.explanation_markdown || '';
-                    setNoteDraftBullets([activeText]);
-                    setCustomSubheading(item.micro_topic || '');
-                    setNotebookModalVisible(true);
-                    fetchHierarchy();
-                  }}
-                >
-                  <BookOpen size={16} color={colors.primary} />
-                  <Text style={[styles.actionBtnText, { color: colors.primary }]}>Notebook</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
-                  onPress={() => {
-                    const activeText = activeExplanationText || item.explanation_markdown || '';
-                    setHardnotesPayload({ markdown: activeText, title: item.micro_topic || item.question_text?.slice(0, 40) || 'Quiz Note' });
-                    setHardnotesPickerVisible(true);
-                  }}
-                  data-testid={`engine-hardnotes-btn-${item.id}`}
-                >
-                  <PenTool size={16} color={colors.primary} />
-                  <Text style={[styles.actionBtnText, { color: colors.primary }]}>Hardnotes</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
-                  onPress={() => handleAddToFlashcards(item)}
-                  disabled={savingFlashcard[item.id]}
-                >
-                  {savingFlashcard[item.id] ? (
-                    <ActivityIndicator size="small" color={colors.primary} />
-                  ) : (
-                    <>
-                      <Zap size={16} color={colors.primary} />
-                      <Text style={[styles.actionBtnText, { color: colors.primary }]}>Flashcard</Text>
-                    </>
-                  )}
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.actionBtn, { backgroundColor: colors.surfaceStrong }]}
-                  onPress={() => handleQuickSave(item)}
-                >
-                  <Save size={16} color={colors.textPrimary} />
-                  <Text style={[styles.actionBtnText, { color: colors.textPrimary }]}>Save</Text>
-                </TouchableOpacity>
+                 <TouchableOpacity 
+                   style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
+                   onPress={() => { 
+                     const activeText = activeExplanationText || item.explanation_markdown || '';
+                     setNoteDraftBullets([activeText]); 
+                     setCustomSubheading(item.micro_topic || '');
+                     setNotebookModalVisible(true); 
+                     fetchHierarchy(); 
+                   }}
+                 >
+                    <BookOpen size={16} color={colors.primary} />
+                    <Text style={[styles.actionBtnText, { color: colors.primary }]}>Notebook</Text>
+                 </TouchableOpacity>
+                 <TouchableOpacity
+                   style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
+                   onPress={() => {
+                     const activeText = activeExplanationText || item.explanation_markdown || '';
+                     setHardnotesPayload({ markdown: activeText, title: item.micro_topic || item.question_text?.slice(0, 40) || 'Quiz Note' });
+                     setHardnotesPickerVisible(true);
+                   }}
+                   data-testid={`engine-hardnotes-btn-${item.id}`}
+                 >
+                    <PenTool size={16} color={colors.primary} />
+                    <Text style={[styles.actionBtnText, { color: colors.primary }]}>Hardnotes</Text>
+                 </TouchableOpacity>
+                 <TouchableOpacity 
+                   style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
+                   onPress={() => handleAddToFlashcards(item)}
+                   disabled={savingFlashcard[item.id]}
+                 >
+                    {savingFlashcard[item.id] ? (
+                      <ActivityIndicator size="small" color={colors.primary} />
+                    ) : (
+                      <>
+                        <Zap size={16} color={colors.primary} />
+                        <Text style={[styles.actionBtnText, { color: colors.primary }]}>Flashcard</Text>
+                      </>
+                    )}
+                 </TouchableOpacity>
+                 <TouchableOpacity 
+                   style={[styles.actionBtn, { backgroundColor: colors.surfaceStrong }]}
+                   onPress={() => handleQuickSave(item)}
+                 >
+                    <Save size={16} color={colors.textPrimary} />
+                    <Text style={[styles.actionBtnText, { color: colors.textPrimary }]}>Save</Text>
+                 </TouchableOpacity>
               </View>
 
               <View style={[styles.noteSection, { marginTop: 24, padding: 20, borderRadius: 24, backgroundColor: colors.surfaceStrong + '50', borderWidth: 1, borderColor: colors.border }]}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                  <View style={{ width: 3, height: 16, backgroundColor: colors.primary, marginRight: 8, borderRadius: 2 }} />
-                  <Text style={{ fontSize: 11, fontWeight: '900', color: colors.primary, letterSpacing: 1 }}>YOUR INSIGHTS</Text>
-                </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                    <View style={{ width: 3, height: 16, backgroundColor: colors.primary, marginRight: 8, borderRadius: 2 }} />
+                    <Text style={{ fontSize: 11, fontWeight: '900', color: colors.primary, letterSpacing: 1 }}>YOUR INSIGHTS</Text>
+                  </View>
 
-                <View style={[styles.controlRow, { marginBottom: 16 }]}>
-                  <Text style={[styles.controlLabel, { color: colors.textTertiary }]}>MISTAKE TYPE</Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
-                    {ERROR_TYPES.map(type => (
-                      <TouchableOpacity
-                        key={type}
-                        onPress={() => store.setMetadata(item.id, { errorCategory: type })}
-                        style={[styles.chip, { backgroundColor: colors.surface, borderColor: colors.border }, answerData.errorCategory === type && { backgroundColor: colors.primary + '20', borderColor: colors.primary }]}
-                      >
-                        <Text style={[styles.chipText, { color: answerData.errorCategory === type ? colors.primary : colors.textSecondary }]}>{type}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
+                  <View style={[styles.controlRow, { marginBottom: 16 }]}>
+                    <Text style={[styles.controlLabel, { color: colors.textTertiary }]}>MISTAKE TYPE</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
+                      {ERROR_TYPES.map(type => (
+                        <TouchableOpacity
+                          key={type}
+                          onPress={() => store.setMetadata(item.id, { errorCategory: type })}
+                          style={[styles.chip, { backgroundColor: colors.surface, borderColor: colors.border }, answerData.errorCategory === type && { backgroundColor: colors.primary + '20', borderColor: colors.primary }]}
+                        >
+                          <Text style={[styles.chipText, { color: answerData.errorCategory === type ? colors.primary : colors.textSecondary }]}>{type}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
 
-                <View style={[styles.noteInputWrapper, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 16, borderStyle: 'dashed' }]}>
-                  <TextInput
-                    style={[styles.noteInput, { color: colors.textPrimary, padding: 16, minHeight: 80 }]}
-                    placeholder="Double-tap to record your strategy..."
-                    multiline
-                    placeholderTextColor={colors.textSecondary || '#6B7280'}
-                    value={answerData.note || ''}
-                    onChangeText={(val) => store.setMetadata(item.id, { note: val }, false)}
-                  />
-                </View>
-                <TouchableOpacity
-                  onPress={() => handleCommitToMemory(item.id)}
-                  style={{ marginTop: 16 }}
-                >
-                  <LinearGradient
-                    colors={['#FF6B6B', '#7B2CBF']}
-                    locations={[0, 1]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={{ height: 54, borderRadius: 18, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 10, shadowColor: '#7B2CBF', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 }}
+                  <View style={[styles.noteInputWrapper, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 16, borderStyle: 'dashed' }]}>
+                      <TextInput
+                        style={[styles.noteInput, { color: colors.textPrimary, padding: 16, minHeight: 80 }]}
+                        placeholder="Double-tap to record your strategy..."
+                        multiline
+                        placeholderTextColor={colors.textSecondary || '#6B7280'}
+                        value={answerData.note || ''}
+                        onChangeText={(val) => store.setMetadata(item.id, { note: val }, false)}
+                      />
+                  </View>
+                  <TouchableOpacity 
+                    onPress={() => handleCommitToMemory(item.id)}
+                    style={{ marginTop: 16 }}
                   >
-                    <Save size={20} color="#fff" />
-                    <Text style={{ color: '#fff', fontSize: 16, fontWeight: '900' }}>Commit to Memory</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
+                    <LinearGradient 
+                      colors={['#FF6B6B', '#7B2CBF']} 
+                      locations={[0, 1]}
+                      start={{ x: 0, y: 0 }} 
+                      end={{ x: 1, y: 0 }} 
+                      style={{ height: 54, borderRadius: 18, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 10, shadowColor: '#7B2CBF', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 }}
+                    >
+                       <Save size={20} color="#fff" />
+                       <Text style={{ color: '#fff', fontSize: 16, fontWeight: '900' }}>Commit to Memory</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
               </View>
 
               <View style={{ marginTop: 32, padding: 16, borderTopWidth: 1, borderTopColor: colors.border + '50' }}>
-                {(() => {
-                  // Single-layer canonical metadata: INSTITUTE – PROGRAM – YEAR
-                  const primaryEntry = displayExplanations[0] || {
-                    source: normalizeInstituteLabel(item.tests?.institute || ''),
-                    program: String(item.tests?.program_name || '').trim(),
-                    year: String(item.exam_year || '').trim(),
-                  };
-                  const line = formatMetaLine(primaryEntry);
-                  if (!line) return null;
-                  return (
-                    <Text style={{ fontSize: 10, color: colors.textTertiary, textAlign: 'center', lineHeight: 16, fontWeight: '700', letterSpacing: 0.5 }}>
-                      {line}
-                    </Text>
-                  );
-                })()}
+                 {(() => {
+                   // Single-layer canonical metadata: INSTITUTE – PROGRAM – YEAR
+                   const primaryEntry = displayExplanations[0] || {
+                     source: normalizeInstituteLabel(item.tests?.institute || ''),
+                     program: String(item.tests?.program_name || '').trim(),
+                     year: String(item.exam_year || '').trim(),
+                   };
+                   const line = formatMetaLine(primaryEntry);
+                   if (!line) return null;
+                   return (
+                     <Text style={{ fontSize: 10, color: colors.textTertiary, textAlign: 'center', lineHeight: 16, fontWeight: '700', letterSpacing: 0.5 }}>
+                        {line}
+                     </Text>
+                   );
+                 })()}
               </View>
             </>
           )}
@@ -2393,8 +2332,8 @@ export default function UnifiedQuizEngine() {
       <SafeAreaView style={[styles.container, { backgroundColor: zenBg }]}>
         <StatusBar hidden={isZenMode} barStyle={isZenMode ? 'dark-content' : 'default'} />
         {isZenMode && (
-          <TouchableOpacity
-            style={styles.floatingZenExit}
+          <TouchableOpacity 
+            style={styles.floatingZenExit} 
             onPress={() => setIsZenMode(false)}
             activeOpacity={0.7}
           >
@@ -2405,19 +2344,19 @@ export default function UnifiedQuizEngine() {
           <TouchableOpacity onPress={handleExit} style={styles.headerBtn}>
             <ChevronLeft size={24} color={isZenMode ? '#433422' : colors.textPrimary} />
           </TouchableOpacity>
-
+          
           <View style={styles.headerTitleContainer}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
               <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
                 {showIndex ? 'Arena Index' : `Q${currentIndex + 1}/${questions.length}`}
               </Text>
 
-              <TouchableOpacity
+              <TouchableOpacity 
                 onPress={() => setShowSaveNameModal(true)}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 6,
+                style={{ 
+                  flexDirection: 'row', 
+                  alignItems: 'center', 
+                  gap: 6, 
                   backgroundColor: colors.primary + '15',
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -2428,14 +2367,14 @@ export default function UnifiedQuizEngine() {
                 <Save size={14} color={colors.primary} />
                 <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 11 }}>SAVE</Text>
               </TouchableOpacity>
-
+              
               {timerType !== 'none' && (
-                <TouchableOpacity
+                <TouchableOpacity 
                   onPress={() => setShowClockControl(true)}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 6,
+                  style={{ 
+                    flexDirection: 'row', 
+                    alignItems: 'center', 
+                    gap: 6, 
                     backgroundColor: isTimerActive ? colors.primary + '10' : colors.surfaceStrong,
                     paddingHorizontal: 10,
                     paddingVertical: 4,
@@ -2445,11 +2384,11 @@ export default function UnifiedQuizEngine() {
                   }}
                 >
                   <Clock size={14} color={isTimerActive ? colors.primary : colors.textTertiary} />
-                  <Text style={{
-                    color: isTimerActive ? colors.primary : colors.textTertiary,
-                    fontWeight: '900',
+                  <Text style={{ 
+                    color: isTimerActive ? colors.primary : colors.textTertiary, 
+                    fontWeight: '900', 
                     fontSize: 13,
-                    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace'
+                    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' 
                   }}>
                     {formatTime(seconds)}
                   </Text>
@@ -2486,43 +2425,43 @@ export default function UnifiedQuizEngine() {
             <Modal visible={showQuickMenu} transparent animationType="none" onRequestClose={() => setShowQuickMenu(false)}>
               <Pressable style={StyleSheet.absoluteFill} onPress={() => setShowQuickMenu(false)}>
                 <View style={[styles.verticalMenu, { backgroundColor: colors.surface, borderColor: colors.border, top: Platform.OS === 'ios' ? 100 : 80 }]}>
-                  <TouchableOpacity
-                    style={styles.utilBtn}
+                  <TouchableOpacity 
+                    style={styles.utilBtn} 
                     onPress={() => { setShowFontSlider(true); setShowQuickMenu(false); }}
                   >
                     <Text style={{ fontWeight: '900', color: colors.textPrimary, fontSize: 16 }}>Aa</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity
-                    style={styles.utilBtn}
+                  <TouchableOpacity 
+                    style={styles.utilBtn} 
                     onPress={() => { setShowNavigator(true); setShowQuickMenu(false); }}
                   >
                     <LayoutGrid size={24} color={colors.textPrimary} />
                   </TouchableOpacity>
 
-                  <TouchableOpacity
-                    style={styles.utilBtn}
+                  <TouchableOpacity 
+                    style={styles.utilBtn} 
                     onPress={() => { setShowPYQTags(!showPYQTags); setShowQuickMenu(false); }}
                   >
                     <Text style={{ fontWeight: '900', color: showPYQTags ? colors.primary : colors.textTertiary, fontSize: 10 }}>PYQ</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity
-                    style={styles.utilBtn}
+                  <TouchableOpacity 
+                    style={styles.utilBtn} 
                     onPress={() => { setShowTimerPicker(true); setShowQuickMenu(false); }}
                   >
                     <Clock size={24} color={timerType !== 'none' ? colors.primary : colors.textTertiary} />
                   </TouchableOpacity>
 
-                  <TouchableOpacity
-                    style={styles.utilBtn}
+                  <TouchableOpacity 
+                    style={styles.utilBtn} 
                     onPress={() => { toggleZenMode(); setShowQuickMenu(false); }}
                   >
                     <Sparkles size={24} color={isZenMode ? colors.primary : colors.textTertiary} />
                   </TouchableOpacity>
-
+                  
                   <View style={{ height: 1, backgroundColor: colors.border, width: '100%', marginVertical: 4 }} />
-
+                  
                   <ThemeSwitcher />
                 </View>
               </Pressable>
@@ -2554,14 +2493,14 @@ export default function UnifiedQuizEngine() {
                       <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Navigator</Text>
                       <Text style={{ fontSize: 11, color: colors.textTertiary }}>Jump to any question</Text>
                     </View>
-                    <TouchableOpacity
+                    <TouchableOpacity 
                       onPress={() => setShowNavigator(false)}
                       style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center' }}
                     >
                       <X size={20} color={colors.textPrimary} />
                     </TouchableOpacity>
                   </View>
-                  <View style={{ flexDirection: 'row', gap: 12, paddingHorizontal: 16, marginBottom: 16 }}>
+                   <View style={{ flexDirection: 'row', gap: 12, paddingHorizontal: 16, marginBottom: 16 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                       <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#22c55e' }} />
                       <Text style={{ fontSize: 10, fontWeight: '700', color: colors.textTertiary }}>Answered</Text>
@@ -2576,7 +2515,7 @@ export default function UnifiedQuizEngine() {
                     </View>
                   </View>
 
-                  <ScrollView
+                  <ScrollView 
                     contentContainerStyle={[styles.paletteGrid, { paddingBottom: 40 }]}
                     showsVerticalScrollIndicator={true}
                   >
@@ -2596,20 +2535,20 @@ export default function UnifiedQuizEngine() {
                       else if (isMissed) { itemBg = '#ef4444'; itemBorder = '#ef4444'; itemText = '#fff'; }
 
                       return (
-                        <TouchableOpacity
-                          key={q.id}
-                          onPress={() => {
-                            setShowNavigator(false);
+                        <TouchableOpacity 
+                          key={q.id} 
+                          onPress={() => { 
+                            setShowNavigator(false); 
                             setTimeout(() => {
-                              if (viewMode === 'card') {
-                                setCurrentIndex(idx);
-                              } else {
-                                listRef.current?.scrollToIndex({ index: idx, animated: true });
+                              if (viewMode === 'card') { 
+                                setCurrentIndex(idx); 
+                              } else { 
+                                listRef.current?.scrollToIndex({ index: idx, animated: true }); 
                               }
                             }, 100);
                           }}
                           style={[
-                            styles.paletteItem,
+                            styles.paletteItem, 
                             { backgroundColor: itemBg, borderColor: itemBorder },
                             isActive && { borderWidth: 3, borderColor: colors.primary }
                           ]}
@@ -2631,65 +2570,65 @@ export default function UnifiedQuizEngine() {
                     <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                       <Text style={[styles.modalTitle, { color: colors.textPrimary, marginBottom: 12 }]}>Timer Setup</Text>
                       <Text style={{ color: colors.textTertiary, marginBottom: 24, fontSize: 13 }}>Choose how you want to track your time.</Text>
-
+                      
                       <View style={{ gap: 12 }}>
-                        <TouchableOpacity
+                        <TouchableOpacity 
                           style={{ flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border }}
-                          onPress={() => {
+                          onPress={() => { 
                             router.setParams({ timer: 'stopwatch' });
                             setIsTimerActive(true);
                             setShowTimerPicker(false);
                           }}
                         >
-                          <Clock size={20} color={colors.primary} style={{ marginRight: 12 }} />
-                          <View>
-                            <Text style={{ fontWeight: '800', color: colors.textPrimary }}>Stopwatch</Text>
-                            <Text style={{ fontSize: 11, color: colors.textTertiary }}>Count upwards from zero</Text>
-                          </View>
+                           <Clock size={20} color={colors.primary} style={{ marginRight: 12 }} />
+                           <View>
+                             <Text style={{ fontWeight: '800', color: colors.textPrimary }}>Stopwatch</Text>
+                             <Text style={{ fontSize: 11, color: colors.textTertiary }}>Count upwards from zero</Text>
+                           </View>
                         </TouchableOpacity>
 
-                        <View
+                        <View 
                           style={{ flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border }}
                         >
-                          <Target size={20} color={colors.primary} style={{ marginRight: 12 }} />
-                          <View style={{ flex: 1 }}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Text style={{ fontWeight: '800', color: colors.textPrimary }}>Exam Timer</Text>
-                              <TextInput
-                                style={{ width: 80, height: 36, backgroundColor: colors.bg, borderRadius: 8, textAlign: 'center', fontSize: 14, color: colors.textPrimary, borderWidth: 1, borderColor: colors.border }}
-                                placeholder="Mins"
-                                keyboardType="number-pad"
-                                value={customTimeInput}
-                                onChangeText={setCustomTimeInput}
-                                placeholderTextColor={colors.textTertiary}
-                                returnKeyType="done"
-                                onSubmitEditing={(e) => handleStartCountdown(e.nativeEvent.text)}
-                              />
-                            </View>
-                            <Text style={{ fontSize: 11, color: colors.textTertiary }}>{customTimeInput ? `${customTimeInput} mins total` : '2 mins per question (Default)'}</Text>
-                          </View>
+                           <Target size={20} color={colors.primary} style={{ marginRight: 12 }} />
+                           <View style={{ flex: 1 }}>
+                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Text style={{ fontWeight: '800', color: colors.textPrimary }}>Exam Timer</Text>
+                                <TextInput 
+                                  style={{ width: 80, height: 36, backgroundColor: colors.bg, borderRadius: 8, textAlign: 'center', fontSize: 14, color: colors.textPrimary, borderWidth: 1, borderColor: colors.border }}
+                                  placeholder="Mins"
+                                  keyboardType="number-pad"
+                                  value={customTimeInput}
+                                  onChangeText={setCustomTimeInput}
+                                  placeholderTextColor={colors.textTertiary}
+                                  returnKeyType="done"
+                                  onSubmitEditing={(e) => handleStartCountdown(e.nativeEvent.text)}
+                                />
+                             </View>
+                             <Text style={{ fontSize: 11, color: colors.textTertiary }}>{customTimeInput ? `${customTimeInput} mins total` : '2 mins per question (Default)'}</Text>
+                           </View>
                         </View>
 
-                        <TouchableOpacity
+                        <TouchableOpacity 
                           style={{ flex: 1, height: 50, backgroundColor: colors.primary, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginTop: 8 }}
                           onPress={() => handleStartCountdown()}
                         >
                           <Text style={{ color: '#fff', fontWeight: '900' }}>START TIMER</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity
+                        <TouchableOpacity 
                           style={{ flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border }}
-                          onPress={() => {
+                          onPress={() => { 
                             router.setParams({ timer: 'none' });
                             setIsTimerActive(false);
                             setShowTimerPicker(false);
                           }}
                         >
-                          <XCircle size={20} color={colors.textTertiary} style={{ marginRight: 12 }} />
-                          <View>
-                            <Text style={{ fontWeight: '800', color: colors.textPrimary }}>No Timer</Text>
-                            <Text style={{ fontSize: 11, color: colors.textTertiary }}>Hide all time tracking</Text>
-                          </View>
+                           <XCircle size={20} color={colors.textTertiary} style={{ marginRight: 12 }} />
+                           <View>
+                             <Text style={{ fontWeight: '800', color: colors.textPrimary }}>No Timer</Text>
+                             <Text style={{ fontSize: 11, color: colors.textTertiary }}>Hide all time tracking</Text>
+                           </View>
                         </TouchableOpacity>
                       </View>
 
@@ -2705,47 +2644,47 @@ export default function UnifiedQuizEngine() {
             {showIndex ? renderQuestionIndex() : (
               <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
                 <View style={{ flex: 1 }}>
-                  {viewMode === 'list' ? (
-                    <FlatList
-                      ref={listRef}
-                      data={questions}
-                      renderItem={renderQuestionBlock}
-                      keyExtractor={(item) => item.id}
-                      initialScrollIndex={currentIndex >= 0 ? currentIndex : undefined}
-                      contentContainerStyle={styles.listContent}
-                      onViewableItemsChanged={onViewableItemsChanged}
-                      viewabilityConfig={viewabilityConfig}
-                      initialNumToRender={10}
-                      maxToRenderPerBatch={5}
-                      windowSize={5}
-                      removeClippedSubviews={Platform.OS === 'android'}
-                      onScrollToIndexFailed={(info) => {
-                        const wait = new Promise(resolve => setTimeout(resolve, 500));
-                        wait.then(() => {
-                          listRef.current?.scrollToIndex({ index: info.index, animated: false });
-                        });
-                      }}
-                    />
-                  ) : (
-                    <View style={{ flex: 1 }}>
-                      <ScrollView>{renderQuestionBlock({ item: questions[currentIndex], index: currentIndex })}</ScrollView>
-                      <View style={[styles.cardNav, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
-                        <TouchableOpacity onPress={() => setCurrentIndex(prev => Math.max(0, prev - 1))} style={[styles.navBtn, { backgroundColor: colors.surfaceStrong }]} disabled={currentIndex === 0}>
-                          <ArrowLeft size={20} color={colors.textPrimary} />
-                          <Text style={{ color: colors.textPrimary }}>Back</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setCurrentIndex(prev => Math.min(questions.length - 1, prev + 1))} style={[styles.navBtn, { backgroundColor: colors.primary }]} disabled={currentIndex === questions.length - 1}>
-                          <Text style={{ color: colors.buttonText }}>Next</Text>
-                          <ArrowRight size={20} color={colors.buttonText} />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  )}
-                  {showZoomIndicator && (
-                    <View pointerEvents="none" style={{ position: 'absolute', top: 16, alignSelf: 'center', backgroundColor: 'rgba(0,0,0,0.75)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18, zIndex: 999 }}>
-                      <Text style={{ color: '#fff', fontWeight: '900', fontSize: 12, letterSpacing: 0.5 }}>Aa  {fontSize}px</Text>
-                    </View>
-                  )}
+              {viewMode === 'list' ? (
+                <FlatList
+                  ref={listRef}
+                  data={questions}
+                  renderItem={renderQuestionBlock}
+                  keyExtractor={(item) => item.id}
+                  initialScrollIndex={currentIndex >= 0 ? currentIndex : undefined}
+                  contentContainerStyle={styles.listContent}
+                  onViewableItemsChanged={onViewableItemsChanged}
+                  viewabilityConfig={viewabilityConfig}
+                  initialNumToRender={10}
+                  maxToRenderPerBatch={5}
+                  windowSize={5}
+                  removeClippedSubviews={Platform.OS === 'android'}
+                  onScrollToIndexFailed={(info) => {
+                    const wait = new Promise(resolve => setTimeout(resolve, 500));
+                    wait.then(() => {
+                      listRef.current?.scrollToIndex({ index: info.index, animated: false });
+                    });
+                  }}
+                />
+              ) : (
+                <View style={{ flex: 1 }}>
+                  <ScrollView>{renderQuestionBlock({ item: questions[currentIndex], index: currentIndex })}</ScrollView>
+                  <View style={[styles.cardNav, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
+                    <TouchableOpacity onPress={() => setCurrentIndex(prev => Math.max(0, prev - 1))} style={[styles.navBtn, { backgroundColor: colors.surfaceStrong }]} disabled={currentIndex === 0}>
+                      <ArrowLeft size={20} color={colors.textPrimary} />
+                      <Text style={{ color: colors.textPrimary }}>Back</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setCurrentIndex(prev => Math.min(questions.length - 1, prev + 1))} style={[styles.navBtn, { backgroundColor: colors.primary }]} disabled={currentIndex === questions.length - 1}>
+                      <Text style={{ color: colors.buttonText }}>Next</Text>
+                      <ArrowRight size={20} color={colors.buttonText} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+              {showZoomIndicator && (
+                <View pointerEvents="none" style={{ position: 'absolute', top: 16, alignSelf: 'center', backgroundColor: 'rgba(0,0,0,0.75)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18, zIndex: 999 }}>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 12, letterSpacing: 0.5 }}>Aa  {fontSize}px</Text>
+                </View>
+              )}
                 </View>
               </PinchGestureHandler>
             )}
@@ -2757,19 +2696,19 @@ export default function UnifiedQuizEngine() {
           <View style={styles.modalOverlay}>
             <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
               <Text style={[styles.modalTitle, { color: colors.textPrimary, marginBottom: 20 }]}>Timer Controls</Text>
-
+              
               <View style={{ gap: 12 }}>
-                <TouchableOpacity
+                <TouchableOpacity 
                   style={{ flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, backgroundColor: colors.surfaceStrong }}
                   onPress={() => { setIsTimerActive(!isTimerActive); setShowClockControl(false); }}
                 >
-                  {isTimerActive ? <XCircle size={20} color={colors.primary} /> : <Target size={20} color={colors.primary} />}
-                  <Text style={{ fontWeight: '800', color: colors.textPrimary, marginLeft: 12 }}>{isTimerActive ? 'Pause Timer' : 'Resume Timer'}</Text>
+                   {isTimerActive ? <XCircle size={20} color={colors.primary} /> : <Target size={20} color={colors.primary} />}
+                   <Text style={{ fontWeight: '800', color: colors.textPrimary, marginLeft: 12 }}>{isTimerActive ? 'Pause Timer' : 'Resume Timer'}</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
+                <TouchableOpacity 
                   style={{ flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, backgroundColor: colors.surfaceStrong }}
-                  onPress={() => {
+                  onPress={() => { 
                     if (timerType === 'countdown') {
                       if (customTimeInput) setSeconds(parseInt(customTimeInput) * 60);
                       else setSeconds(questions.length * 120);
@@ -2778,16 +2717,16 @@ export default function UnifiedQuizEngine() {
                     setShowClockControl(false);
                   }}
                 >
-                  <Clock size={20} color={colors.primary} />
-                  <Text style={{ fontWeight: '800', color: colors.textPrimary, marginLeft: 12 }}>Reset Timer</Text>
+                   <Clock size={20} color={colors.primary} />
+                   <Text style={{ fontWeight: '800', color: colors.textPrimary, marginLeft: 12 }}>Reset Timer</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
+                <TouchableOpacity 
                   style={{ flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, backgroundColor: colors.surfaceStrong }}
                   onPress={() => { setShowClockControl(false); setShowTimerPicker(true); }}
                 >
-                  <Target size={20} color={colors.primary} />
-                  <Text style={{ fontWeight: '800', color: colors.textPrimary, marginLeft: 12 }}>Change Setup</Text>
+                   <Target size={20} color={colors.primary} />
+                   <Text style={{ fontWeight: '800', color: colors.textPrimary, marginLeft: 12 }}>Change Setup</Text>
                 </TouchableOpacity>
               </View>
 
@@ -2804,8 +2743,8 @@ export default function UnifiedQuizEngine() {
             <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
               <Text style={[styles.modalTitle, { color: colors.textPrimary, marginBottom: 12 }]}>Finish Session</Text>
               <Text style={{ color: colors.textTertiary, marginBottom: 20, fontSize: 13 }}>Give your session a name to save your progress.</Text>
-
-              <TextInput
+              
+              <TextInput 
                 style={{ backgroundColor: colors.bg, borderRadius: 12, padding: 16, fontSize: 16, color: colors.textPrimary, marginBottom: 20, borderWidth: 1, borderColor: colors.border }}
                 placeholder="e.g. Agriculture Practice #1"
                 placeholderTextColor={colors.textTertiary}
@@ -2814,19 +2753,19 @@ export default function UnifiedQuizEngine() {
               />
 
               <View style={{ flexDirection: 'row', gap: 8 }}>
-                <TouchableOpacity
+                <TouchableOpacity 
                   style={{ flex: 1, padding: 16, borderRadius: 12, backgroundColor: colors.surfaceStrong, alignItems: 'center' }}
                   onPress={() => { setShowSaveSessionModal(false); router.back(); }}
                 >
                   <Text style={{ fontWeight: '800', color: colors.textPrimary }}>Discard</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                <TouchableOpacity 
                   style={{ flex: 1, padding: 16, borderRadius: 12, backgroundColor: colors.surfaceStrong, alignItems: 'center' }}
                   onPress={() => setShowSaveSessionModal(false)}
                 >
                   <Text style={{ fontWeight: '800', color: colors.textPrimary }}>Cancel</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                <TouchableOpacity 
                   style={{ flex: 1.2, padding: 16, borderRadius: 12, backgroundColor: colors.primary, alignItems: 'center' }}
                   onPress={handleSaveAndExit}
                 >
@@ -2842,7 +2781,7 @@ export default function UnifiedQuizEngine() {
           <View style={styles.modalOverlay}>
             <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
               <Text style={[styles.modalTitle, { color: colors.textPrimary, marginBottom: 12 }]}>New Study Tag</Text>
-              <TextInput
+              <TextInput 
                 style={{ backgroundColor: colors.bg, borderRadius: 12, padding: 16, fontSize: 16, color: colors.textPrimary, marginBottom: 20, borderWidth: 1, borderColor: colors.border }}
                 placeholder="e.g. TRAP"
                 autoFocus
@@ -2851,13 +2790,13 @@ export default function UnifiedQuizEngine() {
                 onChangeText={setNewTagText}
               />
               <View style={{ flexDirection: 'row', gap: 12 }}>
-                <TouchableOpacity
+                <TouchableOpacity 
                   style={{ flex: 1, padding: 16, borderRadius: 12, backgroundColor: colors.surfaceStrong, alignItems: 'center' }}
                   onPress={() => setIsAddingTag(false)}
                 >
                   <Text style={{ fontWeight: '800', color: colors.textPrimary }}>Cancel</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                <TouchableOpacity 
                   style={{ flex: 2, padding: 16, borderRadius: 12, backgroundColor: colors.primary, alignItems: 'center' }}
                   onPress={handleCreateTag}
                 >
@@ -2869,7 +2808,7 @@ export default function UnifiedQuizEngine() {
         </Modal>
 
         {renderNotebookModal()}
-        <SaveNameModal
+        <SaveNameModal 
           visible={showSaveNameModal}
           onClose={() => setShowSaveNameModal(false)}
           onSave={commitManualSave}
@@ -2879,14 +2818,14 @@ export default function UnifiedQuizEngine() {
         />
 
         {/* POST-SUBMISSION SUMMARY MODAL */}
-        <Modal visible={!!summary} transparent animationType="fade" onRequestClose={() => { }}>
+        <Modal visible={!!summary} transparent animationType="fade" onRequestClose={() => {}}>
           <View style={[styles.modalOverlay, { backgroundColor: 'rgba(0,0,0,0.7)' }]}>
             <View style={[styles.modalContent, { backgroundColor: colors.surface, padding: 30 }]}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 24 }}>
                 <Clock color={colors.primary} size={32} />
                 <Text style={[styles.modalTitle, { color: colors.textPrimary, fontSize: 24 }]}>Session Completed</Text>
               </View>
-
+              
               <View style={{ gap: 16, marginBottom: 32 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: colors.border }}>
                   <Text style={{ color: colors.textTertiary, fontWeight: '600' }}>Questions</Text>
@@ -2990,7 +2929,7 @@ const NotebookModal = (props: any) => {
     <Modal visible={props.visible} transparent animationType="fade" onRequestClose={props.onClose}>
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
         <Pressable style={StyleSheet.absoluteFill} onPress={props.onClose} />
-
+        
         <SafeAreaView style={{ flex: 1 }} pointerEvents="box-none">
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -2999,236 +2938,236 @@ const NotebookModal = (props: any) => {
             pointerEvents="box-none"
           >
             <View style={{ flex: 1, backgroundColor: colors.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, marginTop: 60, overflow: 'hidden' }}>
-
+              
               <View style={{ flexDirection: 'row', alignItems: 'center', padding: 12, borderBottomWidth: 1, borderBottomColor: colors.border }}>
                 <TouchableOpacity onPress={props.onClose} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
                   <X size={24} color={colors.textPrimary} />
                 </TouchableOpacity>
-
+                
                 <View style={{ flex: 1, marginLeft: 8 }}>
                   <Text style={{ fontSize: 16, fontWeight: '900', color: colors.textPrimary }}>Notebook Editor</Text>
                   <Text style={{ fontSize: 10, color: colors.textTertiary }}>Drafting insights...</Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-                  <TouchableOpacity
-                    onPress={() => props.openLocationPicker?.()}
-                    style={{ height: 36, paddingHorizontal: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary + '15', borderRadius: 12, flexDirection: 'row', gap: 4 }}
-                  >
-                    <BookOpen size={14} color={colors.primary} />
-                    <Text style={{ color: colors.primary, fontWeight: '900', fontSize: 11 }} numberOfLines={1}>
-                      {props.selectedNotebook?.title ? props.selectedNotebook.title.slice(0, 10) : 'LOCATION'}
-                    </Text>
-                  </TouchableOpacity>
+                   <TouchableOpacity 
+                     onPress={() => props.openLocationPicker?.()}
+                     style={{ height: 36, paddingHorizontal: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary + '15', borderRadius: 12, flexDirection: 'row', gap: 4 }}
+                   >
+                      <BookOpen size={14} color={colors.primary} />
+                      <Text style={{ color: colors.primary, fontWeight: '900', fontSize: 11 }} numberOfLines={1}>
+                        {props.selectedNotebook?.title ? props.selectedNotebook.title.slice(0, 10) : 'LOCATION'}
+                      </Text>
+                   </TouchableOpacity>
                 </View>
               </View>
 
-              <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 80 }}>
-                <View style={{ backgroundColor: colors.surface, borderRadius: 16, margin: 12, marginBottom: 0, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' }}>
-                  <RichToolbar
-                    editor={props.richEditorRef}
-                    getEditor={() => props.richEditorRef?.current}
-                    selectedIconTint={colors.primary}
-                    iconTint={colors.textPrimary}
-                    style={{ backgroundColor: colors.surface }}
-                    actions={[
-                      actions.setBold,
-                      actions.setItalic,
-                      actions.setUnderline,
-                      actions.setStrikethrough,
-                      actions.heading1,
-                      actions.heading2,
-                      actions.insertBulletsList,
-                      actions.insertOrderedList,
-                      actions.checkboxList,
-                      actions.blockquote,
-                      'highlight',
-                      actions.undo,
-                      actions.redo,
-                    ]}
-                    iconMap={{
-                      [actions.heading1]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '900', fontSize: 14 }}>H1</Text>,
-                      [actions.heading2]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '800', fontSize: 12 }}>H2</Text>,
-                      highlight: ({ tintColor }: any) => (
-                        <View style={{ padding: 4, borderRadius: 4, backgroundColor: highlightColor === 'transparent' ? 'transparent' : highlightColor }}>
-                          <Highlighter size={16} color={tintColor} />
-                        </View>
-                      ),
-                    }}
-                    highlight={() => {
-                      setShowPicker(v => !v);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    }}
-                  />
-                  {showPicker && (
-                    <View style={{ flexDirection: 'row', gap: 12, padding: 12, borderTopWidth: 1, borderTopColor: colors.border, justifyContent: 'center', backgroundColor: colors.surface, flexWrap: 'wrap' }}>
-                      {HIGHLIGHT_COLORS.map(c => (
-                        <TouchableOpacity
-                          key={c}
-                          onPress={async () => {
-                            setHighlightColor(c);
-                            await AsyncStorage.setItem('notes_editor_highlight_color', c);
-                            setShowPicker(false);
-                            props.richEditorRef?.current?.focusContentEditor?.();
-                            setTimeout(() => {
-                              if (c === 'transparent') {
-                                props.richEditorRef?.current?.commandDOM?.("document.execCommand('hiliteColor', false, 'transparent'); document.execCommand('backColor', false, 'transparent')");
-                              } else {
-                                props.richEditorRef?.current?.commandDOM?.(`document.execCommand('hiliteColor', false, '${c}')`);
-                              }
-                            }, 50);
-                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                          }}
-                          style={{
-                            width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center',
-                            borderWidth: 2, backgroundColor: c === 'transparent' ? colors.surfaceStrong : c,
-                            borderColor: c === highlightColor ? colors.primary : 'transparent'
-                          }}
-                        >
-                          {c === 'transparent' && <Eraser size={14} color={colors.textSecondary} />}
-                        </TouchableOpacity>
-                      ))}
+            <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 80 }}>
+            <View style={{ backgroundColor: colors.surface, borderRadius: 16, margin: 12, marginBottom: 0, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' }}>
+              <RichToolbar
+                editor={props.richEditorRef}
+                getEditor={() => props.richEditorRef?.current}
+                selectedIconTint={colors.primary}
+                iconTint={colors.textPrimary}
+                style={{ backgroundColor: colors.surface }}
+                actions={[
+                  actions.setBold,
+                  actions.setItalic,
+                  actions.setUnderline,
+                  actions.setStrikethrough,
+                  actions.heading1,
+                  actions.heading2,
+                  actions.insertBulletsList,
+                  actions.insertOrderedList,
+                  actions.checkboxList,
+                  actions.blockquote,
+                  'highlight',
+                  actions.undo,
+                  actions.redo,
+                ]}
+                iconMap={{
+                  [actions.heading1]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '900', fontSize: 14 }}>H1</Text>,
+                  [actions.heading2]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '800', fontSize: 12 }}>H2</Text>,
+                  highlight: ({ tintColor }: any) => (
+                    <View style={{ padding: 4, borderRadius: 4, backgroundColor: highlightColor === 'transparent' ? 'transparent' : highlightColor }}>
+                      <Highlighter size={16} color={tintColor} />
                     </View>
-                  )}
-                </View>
-
-                <View style={{ padding: 16, minHeight: 300 }}>
-                  <RichNoteEditor
-                    ref={props.richEditorRef}
-                    html={props.noteDraftBullets?.[0] || ''}
-                    onChange={(html: string) => props.updateBullet(0, html)}
-                    themeColors={{
-                      bg: colors.bg,
-                      surface: colors.surface,
-                      textPrimary: colors.textPrimary,
-                      border: colors.border,
-                      primary: colors.primary,
-                    }}
-                    placeholder="Capture your insight... Use the toolbar above for formatting."
-                  />
-                </View>
-
-                <View style={{ height: 24 }} />
-                <Text style={[styles.modalLabel, { color: colors.textTertiary, letterSpacing: 1 }]}>SAVE LOCATION</Text>
-                <Text style={{ fontSize: 11, color: colors.textTertiary, marginBottom: 10 }}>
-                  {props.selectedNotebook?.title
-                    ? `Selected: ${props.selectedFolder?.title ? props.selectedFolder.title + ' / ' : ''}${props.selectedNotebook.title}`
-                    : 'Tap LOCATION at top, or pick below'}
-                </Text>
-                <ScrollView horizontal style={{ marginBottom: 16 }}>
-                  {props.folders.map((f: any) => (
-                    <TouchableOpacity key={f.id} onPress={() => props.setSelectedFolder(f)} style={[styles.modalChip, { borderColor: colors.border }, props.selectedFolder?.id === f.id && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
-                      <Text style={{ color: props.selectedFolder?.id === f.id ? '#fff' : colors.textPrimary }}>{f.title}</Text>
+                  ),
+                }}
+                highlight={() => {
+                  setShowPicker(v => !v);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+              />
+              {showPicker && (
+                <View style={{ flexDirection: 'row', gap: 12, padding: 12, borderTopWidth: 1, borderTopColor: colors.border, justifyContent: 'center', backgroundColor: colors.surface, flexWrap: 'wrap' }}>
+                  {HIGHLIGHT_COLORS.map(c => (
+                    <TouchableOpacity 
+                      key={c} 
+                      onPress={async () => {
+                        setHighlightColor(c);
+                        await AsyncStorage.setItem('notes_editor_highlight_color', c);
+                        setShowPicker(false);
+                        props.richEditorRef?.current?.focusContentEditor?.();
+                        setTimeout(() => {
+                          if (c === 'transparent') {
+                            props.richEditorRef?.current?.commandDOM?.("document.execCommand('hiliteColor', false, 'transparent'); document.execCommand('backColor', false, 'transparent')");
+                          } else {
+                            props.richEditorRef?.current?.commandDOM?.(`document.execCommand('hiliteColor', false, '${c}')`);
+                          }
+                        }, 50);
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }} 
+                      style={{ 
+                        width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center',
+                        borderWidth: 2, backgroundColor: c === 'transparent' ? colors.surfaceStrong : c, 
+                        borderColor: c === highlightColor ? colors.primary : 'transparent' 
+                      }} 
+                    >
+                      {c === 'transparent' && <Eraser size={14} color={colors.textSecondary} />}
                     </TouchableOpacity>
                   ))}
-                  <TouchableOpacity onPress={() => props.setShowNewFolderInput(true)} style={[styles.modalChip, { borderColor: colors.border, borderStyle: 'dashed', paddingHorizontal: 12, justifyContent: 'center' }]}>
-                    <Text style={{ color: colors.textTertiary, fontWeight: '700' }}>+ New Folder</Text>
+                </View>
+              )}
+            </View>
+
+            <View style={{ padding: 16, minHeight: 300 }}>
+              <RichNoteEditor
+                ref={props.richEditorRef}
+                html={props.noteDraftBullets?.[0] || ''}
+                onChange={(html: string) => props.updateBullet(0, html)}
+                themeColors={{
+                  bg: colors.bg,
+                  surface: colors.surface,
+                  textPrimary: colors.textPrimary,
+                  border: colors.border,
+                  primary: colors.primary,
+                }}
+                placeholder="Capture your insight... Use the toolbar above for formatting."
+              />
+            </View>
+
+              <View style={{ height: 24 }} />
+              <Text style={[styles.modalLabel, { color: colors.textTertiary, letterSpacing: 1 }]}>SAVE LOCATION</Text>
+              <Text style={{ fontSize: 11, color: colors.textTertiary, marginBottom: 10 }}>
+                {props.selectedNotebook?.title
+                  ? `Selected: ${props.selectedFolder?.title ? props.selectedFolder.title + ' / ' : ''}${props.selectedNotebook.title}`
+                  : 'Tap LOCATION at top, or pick below'}
+              </Text>
+              <ScrollView horizontal style={{ marginBottom: 16 }}>
+                {props.folders.map((f: any) => (
+                  <TouchableOpacity key={f.id} onPress={() => props.setSelectedFolder(f)} style={[styles.modalChip, { borderColor: colors.border }, props.selectedFolder?.id === f.id && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
+                    <Text style={{ color: props.selectedFolder?.id === f.id ? '#fff' : colors.textPrimary }}>{f.title}</Text>
                   </TouchableOpacity>
-                </ScrollView>
-
-                {props.showNewFolderInput && (
-                  <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
-                    <TextInput
-                      style={{ flex: 1, height: 40, borderWidth: 1, borderColor: colors.border, borderRadius: 8, paddingHorizontal: 12, color: colors.textPrimary }}
-                      placeholder="Folder Name"
-                      placeholderTextColor={colors.textTertiary}
-                      value={props.newFolderName}
-                      onChangeText={props.setNewFolderName}
-                    />
-                    <TouchableOpacity onPress={props.createNewFolder} style={{ width: 40, height: 40, backgroundColor: colors.primary, borderRadius: 8, alignItems: 'center', justifyContent: 'center' }}>
-                      <Check size={16} color="#fff" />
-                    </TouchableOpacity>
-                  </View>
-                )}
-
-                {props.selectedFolder && (
-                  <>
-                    <Text style={[styles.modalLabel, { color: colors.textTertiary }]}>NOTEBOOK</Text>
-                    <ScrollView horizontal style={{ marginBottom: 16 }}>
-                      {props.notebooks.map((n: any) => (
-                        <TouchableOpacity key={n.id} onPress={() => props.setSelectedNotebook(n)} style={[styles.modalChip, { borderColor: colors.border }, props.selectedNotebook?.id === n.id && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
-                          <Text style={{ color: props.selectedNotebook?.id === n.id ? '#fff' : colors.textPrimary }}>{n.title}</Text>
-                        </TouchableOpacity>
-                      ))}
-                      <TouchableOpacity onPress={() => props.setShowNewNotebookInput(true)} style={[styles.modalChip, { borderColor: colors.border, borderStyle: 'dashed', paddingHorizontal: 12, justifyContent: 'center' }]}>
-                        <Text style={{ color: colors.textTertiary, fontWeight: '700' }}>+ New Notebook</Text>
-                      </TouchableOpacity>
-                    </ScrollView>
-
-                    {props.showNewNotebookInput && (
-                      <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
-                        <TextInput
-                          style={{ flex: 1, height: 40, borderWidth: 1, borderColor: colors.border, borderRadius: 8, paddingHorizontal: 12, color: colors.textPrimary }}
-                          placeholder="Notebook Name"
-                          placeholderTextColor={colors.textTertiary}
-                          value={props.newNotebookName}
-                          onChangeText={props.setNewNotebookName}
-                        />
-                        <TouchableOpacity onPress={props.createNewNotebook} style={{ width: 40, height: 40, backgroundColor: colors.primary, borderRadius: 8, alignItems: 'center', justifyContent: 'center' }}>
-                          <Check size={16} color="#fff" />
-                        </TouchableOpacity>
-                      </View>
-                    )}
-                  </>
-                )}
-
-                {props.selectedNotebook && (
-                  <>
-                    <Text style={[styles.modalLabel, { color: colors.textTertiary }]}>SUBHEADING</Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
-                      {(() => {
-                        const micro = props.microtopic;
-                        const last = props.selectedSubheading;
-                        const others = (props.subheadings || []).filter((s: string) => s !== micro && s !== last);
-
-                        const list = [];
-                        if (micro) list.push(micro);
-                        if (last && last !== micro) list.push(last);
-                        list.push(...others);
-
-                        return list.map((s: string) => (
-                          <TouchableOpacity
-                            key={s}
-                            onPress={() => { props.setSelectedSubheading(s); props.setCustomSubheading(''); }}
-                            style={[
-                              styles.modalChip,
-                              { borderColor: colors.border },
-                              props.selectedSubheading === s && { backgroundColor: colors.primary, borderColor: colors.primary },
-                              s === props.microtopic && props.selectedSubheading !== s && { borderColor: colors.primary + '50', borderStyle: 'dashed' }
-                            ]}
-                          >
-                            <Text style={{ color: props.selectedSubheading === s ? '#fff' : colors.textPrimary, fontWeight: s === props.microtopic ? '900' : '500' }}>
-                              {s} {s === props.microtopic ? '(Topic)' : ''}
-                            </Text>
-                          </TouchableOpacity>
-                        ));
-                      })()}
-                      <TouchableOpacity onPress={() => props.setShowCustomSubheadingInput(true)} style={[styles.modalChip, { borderColor: colors.border, borderStyle: 'dashed', paddingHorizontal: 12, justifyContent: 'center' }]}>
-                        <Text style={{ color: colors.textTertiary, fontWeight: '700' }}>+ Custom</Text>
-                      </TouchableOpacity>
-                    </ScrollView>
-
-                    {(props.showCustomSubheadingInput || props.customSubheading || props.subheadings.length === 0) && (
-                      <View style={{ marginBottom: 16 }}>
-                        <TextInput
-                          style={{ flex: 1, height: 40, borderWidth: 1, borderColor: colors.border, borderRadius: 8, paddingHorizontal: 12, color: colors.textPrimary }}
-                          placeholder="Custom Subheading (e.g. Microtopic)"
-                          placeholderTextColor={colors.textTertiary}
-                          value={props.customSubheading}
-                          onChangeText={(t) => { props.setCustomSubheading(t); props.setSelectedSubheading(''); }}
-                        />
-                      </View>
-                    )}
-                  </>
-                )}
-
-                <TouchableOpacity onPress={props.onSave} style={[styles.launchBtn, { backgroundColor: colors.primary }]}>
-                  {props.isSaving ? <ActivityIndicator color="#fff" /> : <Text style={{ color: '#fff', fontWeight: '900' }}>SAVE</Text>}
+                ))}
+                <TouchableOpacity onPress={() => props.setShowNewFolderInput(true)} style={[styles.modalChip, { borderColor: colors.border, borderStyle: 'dashed', paddingHorizontal: 12, justifyContent: 'center' }]}>
+                  <Text style={{ color: colors.textTertiary, fontWeight: '700' }}>+ New Folder</Text>
                 </TouchableOpacity>
               </ScrollView>
-            </View>
-          </KeyboardAvoidingView>
-        </SafeAreaView>
+
+              {props.showNewFolderInput && (
+                <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
+                  <TextInput 
+                    style={{ flex: 1, height: 40, borderWidth: 1, borderColor: colors.border, borderRadius: 8, paddingHorizontal: 12, color: colors.textPrimary }}
+                    placeholder="Folder Name"
+                    placeholderTextColor={colors.textTertiary}
+                    value={props.newFolderName}
+                    onChangeText={props.setNewFolderName}
+                  />
+                  <TouchableOpacity onPress={props.createNewFolder} style={{ width: 40, height: 40, backgroundColor: colors.primary, borderRadius: 8, alignItems: 'center', justifyContent: 'center' }}>
+                    <Check size={16} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {props.selectedFolder && (
+                <>
+                  <Text style={[styles.modalLabel, { color: colors.textTertiary }]}>NOTEBOOK</Text>
+                  <ScrollView horizontal style={{ marginBottom: 16 }}>
+                    {props.notebooks.map((n: any) => (
+                      <TouchableOpacity key={n.id} onPress={() => props.setSelectedNotebook(n)} style={[styles.modalChip, { borderColor: colors.border }, props.selectedNotebook?.id === n.id && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
+                        <Text style={{ color: props.selectedNotebook?.id === n.id ? '#fff' : colors.textPrimary }}>{n.title}</Text>
+                      </TouchableOpacity>
+                    ))}
+                    <TouchableOpacity onPress={() => props.setShowNewNotebookInput(true)} style={[styles.modalChip, { borderColor: colors.border, borderStyle: 'dashed', paddingHorizontal: 12, justifyContent: 'center' }]}>
+                      <Text style={{ color: colors.textTertiary, fontWeight: '700' }}>+ New Notebook</Text>
+                    </TouchableOpacity>
+                  </ScrollView>
+
+                  {props.showNewNotebookInput && (
+                    <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
+                      <TextInput 
+                        style={{ flex: 1, height: 40, borderWidth: 1, borderColor: colors.border, borderRadius: 8, paddingHorizontal: 12, color: colors.textPrimary }}
+                        placeholder="Notebook Name"
+                        placeholderTextColor={colors.textTertiary}
+                        value={props.newNotebookName}
+                        onChangeText={props.setNewNotebookName}
+                      />
+                      <TouchableOpacity onPress={props.createNewNotebook} style={{ width: 40, height: 40, backgroundColor: colors.primary, borderRadius: 8, alignItems: 'center', justifyContent: 'center' }}>
+                        <Check size={16} color="#fff" />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </>
+              )}
+
+              {props.selectedNotebook && (
+                <>
+                  <Text style={[styles.modalLabel, { color: colors.textTertiary }]}>SUBHEADING</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
+                    {(() => {
+                      const micro = props.microtopic;
+                      const last = props.selectedSubheading;
+                      const others = (props.subheadings || []).filter((s: string) => s !== micro && s !== last);
+                      
+                      const list = [];
+                      if (micro) list.push(micro);
+                      if (last && last !== micro) list.push(last);
+                      list.push(...others);
+                      
+                      return list.map((s: string) => (
+                        <TouchableOpacity 
+                          key={s} 
+                          onPress={() => { props.setSelectedSubheading(s); props.setCustomSubheading(''); }} 
+                          style={[
+                            styles.modalChip, 
+                            { borderColor: colors.border }, 
+                            props.selectedSubheading === s && { backgroundColor: colors.primary, borderColor: colors.primary },
+                            s === props.microtopic && props.selectedSubheading !== s && { borderColor: colors.primary + '50', borderStyle: 'dashed' }
+                          ]}
+                        >
+                          <Text style={{ color: props.selectedSubheading === s ? '#fff' : colors.textPrimary, fontWeight: s === props.microtopic ? '900' : '500' }}>
+                            {s} {s === props.microtopic ? '(Topic)' : ''}
+                          </Text>
+                        </TouchableOpacity>
+                      ));
+                    })()}
+                    <TouchableOpacity onPress={() => props.setShowCustomSubheadingInput(true)} style={[styles.modalChip, { borderColor: colors.border, borderStyle: 'dashed', paddingHorizontal: 12, justifyContent: 'center' }]}>
+                      <Text style={{ color: colors.textTertiary, fontWeight: '700' }}>+ Custom</Text>
+                    </TouchableOpacity>
+                  </ScrollView>
+
+                  {(props.showCustomSubheadingInput || props.customSubheading || props.subheadings.length === 0) && (
+                    <View style={{ marginBottom: 16 }}>
+                      <TextInput 
+                        style={{ flex: 1, height: 40, borderWidth: 1, borderColor: colors.border, borderRadius: 8, paddingHorizontal: 12, color: colors.textPrimary }}
+                        placeholder="Custom Subheading (e.g. Microtopic)"
+                        placeholderTextColor={colors.textTertiary}
+                        value={props.customSubheading}
+                        onChangeText={(t) => { props.setCustomSubheading(t); props.setSelectedSubheading(''); }}
+                      />
+                    </View>
+                  )}
+                </>
+              )}
+
+              <TouchableOpacity onPress={props.onSave} style={[styles.launchBtn, { backgroundColor: colors.primary }]}>
+                {props.isSaving ? <ActivityIndicator color="#fff" /> : <Text style={{ color: '#fff', fontWeight: '900' }}>SAVE</Text>}
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
       </View>
     </Modal>
   );
@@ -3332,10 +3271,10 @@ const SaveNameModal = ({ visible, onClose, onSave, value, setValue, isSaving }: 
               <X size={20} color={colors.textTertiary} />
             </TouchableOpacity>
           </View>
-
+          
           <Text style={{ color: colors.textSecondary, marginBottom: 16, fontSize: 13 }}>Give this attempt a name to find it in your history later.</Text>
-
-          <TextInput
+          
+          <TextInput 
             style={{ backgroundColor: colors.surfaceStrong, color: colors.textPrimary, borderColor: colors.border, height: 50, paddingHorizontal: 15, borderRadius: 12, borderWidth: 1 }}
             placeholder="e.g. Modern History Revision"
             placeholderTextColor={colors.textTertiary}
@@ -3345,15 +3284,15 @@ const SaveNameModal = ({ visible, onClose, onSave, value, setValue, isSaving }: 
           />
 
           <View style={{ flexDirection: 'row', gap: 12, marginTop: 24 }}>
-            <TouchableOpacity
-              style={{ flex: 1, padding: 14, alignItems: 'center' }}
+            <TouchableOpacity 
+              style={{ flex: 1, padding: 14, alignItems: 'center' }} 
               onPress={onClose}
               disabled={isSaving}
             >
               <Text style={{ color: colors.textTertiary, fontWeight: 'bold' }}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={{ flex: 2, padding: 14, backgroundColor: isSaving ? colors.primary + '80' : colors.primary, borderRadius: 12, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8 }}
+            <TouchableOpacity 
+              style={{ flex: 2, padding: 14, backgroundColor: isSaving ? colors.primary + '80' : colors.primary, borderRadius: 12, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8 }} 
               onPress={() => onSave(value)}
               disabled={isSaving}
             >

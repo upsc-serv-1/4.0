@@ -35,24 +35,31 @@ import { FileDown } from 'lucide-react-native';
 const { width } = Dimensions.get('window');
 
 const getPYQCategorization = (item: any) => {
-  const isPYQ = !!(item.is_pyq || item.isPyq);
-  const groupName = item.examGroup || item.exam_group || '';
-  const year = (item.exam_year || item.examYear || '').toString().trim();
-  
-  if (!isPYQ) return { hasPYQData: false };
+  // Strict tagging contract (branch 5.8): chip only when is_pyq=true AND
+  // the exam metadata is present in exam_info. Never read launch_year /
+  // exam_year / exam_group as fallbacks.
+  const examInfo = (item?.exam_info && typeof item.exam_info === 'object' && !Array.isArray(item.exam_info))
+    ? item.exam_info
+    : (item?.source && typeof item.source === 'object' && !Array.isArray(item.source) ? item.source : {});
+
+  const isPYQ = !!item.is_pyq;
+  const groupName = String(examInfo?.group || examInfo?.exam_name || '').trim();
+  const year = String(examInfo?.year ?? '').trim();
+
+  if (!isPYQ || (!groupName && !year)) return { hasPYQData: false };
 
   const upperGroup = groupName.toUpperCase();
   const isUPSC = upperGroup.includes('UPSC CSE') || upperGroup === 'UPSC' || upperGroup.includes('IAS');
   const isAllied = ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => upperGroup.includes(g));
   const isOther = ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => upperGroup.includes(g));
-  
-  return { 
-    hasPYQData: true, 
-    isUPSC, 
-    isAllied, 
-    isOther, 
-    groupName, 
-    year 
+
+  return {
+    hasPYQData: true,
+    isUPSC,
+    isAllied,
+    isOther,
+    groupName: groupName || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ'),
+    year,
   };
 };
 

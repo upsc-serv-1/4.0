@@ -95,7 +95,12 @@ const getProgram = (q: any): string => {
 };
 
 const getYear = (q: any): string => {
-  const y = q?.exam_year || q?.source?.year || q?.tests?.exam_year || q?.tests?.launch_year || '';
+  // Strict: never fall back to tests.launch_year. PYQ year must come from
+  // the question row (exam_info / source.year / exam_year) so the chip
+  // matches what the user actually answered.
+  const tests = Array.isArray(q?.tests) ? q.tests[0] : q?.tests;
+  const examInfo = q?.exam_info && typeof q.exam_info === 'object' ? q.exam_info : null;
+  const y = examInfo?.year || q?.exam_year || q?.source?.year || tests?.exam_year || '';
   return String(y || '').trim();
 };
 

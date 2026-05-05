@@ -307,8 +307,16 @@ const buildCanonicalExplanations = (item: any) => {
 };
 
 export const getPYQCategorization = (item: any) => {
+  // Strict tagging contract (branch 5.8):
+  //   • Show a PYQ chip ONLY when item.is_pyq === true (the canonical
+  //     boolean column on questions). Stale exam_info.is_pyq blobs are
+  //     not trusted because they leak onto non-PYQ rows.
+  //   • Exam name comes ONLY from exam_info.group / exam_info.exam_name.
+  //   • Year      comes ONLY from exam_info.year.
+  //   • Never read tests.launch_year, item.exam_year or item.exam_group.
+  //   • If both name and year are missing, render NO chip.
   const examInfo = getExamInfo(item);
-  const isPYQ = toBool(item?.is_pyq) || toBool(item?.isPyq) || toBool(examInfo?.isPyq) || toBool(examInfo?.is_pyq);
+  const isPYQ = toBool(item?.is_pyq);
 
   if (!isPYQ) {
     return {
@@ -322,16 +330,28 @@ export const getPYQCategorization = (item: any) => {
     };
   }
 
-  const rawGroup = String(examInfo?.group || item?.exam_group || '').trim();
+  const rawGroup = String(examInfo?.group || examInfo?.exam_name || '').trim();
   const groupNameUpper = rawGroup.toUpperCase();
 
-  const isUPSC = toBool(examInfo?.is_upsc_cse) || toBool(item?.is_upsc_cse) || groupNameUpper === 'UPSC' || groupNameUpper.includes('UPSC CSE');
-  const isAllied = toBool(examInfo?.is_allied) || toBool(item?.is_allied) || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => groupNameUpper.includes(g));
-  const isOther = toBool(examInfo?.is_others) || toBool(item?.is_others) || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => groupNameUpper.includes(g));
+  const isUPSC = toBool(examInfo?.is_upsc_cse) || groupNameUpper === 'UPSC' || groupNameUpper.includes('UPSC CSE');
+  const isAllied = toBool(examInfo?.is_allied) || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => groupNameUpper.includes(g));
+  const isOther = toBool(examInfo?.is_others) || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => groupNameUpper.includes(g));
 
-  // IMPORTANT: never use test launch_year for PYQ year chips.
-  const rawYear = examInfo?.year ?? item?.exam_year ?? item?.examYear ?? '';
+  const rawYear = examInfo?.year ?? '';
   const year = typeof rawYear === 'string' ? rawYear.trim() : String(rawYear).trim();
+
+  // Without a usable group/year there is nothing meaningful to show.
+  if (!rawGroup && !year) {
+    return {
+      hasPYQData: false,
+      isUPSC: false,
+      isAllied: false,
+      isOther: false,
+      isGenericPYQ: false,
+      groupName: '',
+      year: '',
+    };
+  }
 
   const groupName = rawGroup || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ');
   const isGenericPYQ = !isUPSC && !isAllied && !isOther;

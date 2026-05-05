@@ -23,6 +23,8 @@ import { WidgetService, Widget } from '../../src/services/WidgetService';
 import { useWidgetData } from '../../src/hooks/useWidgetData';
 import { WidgetRenderer } from '../../src/components/widgets/WidgetRenderer';
 import { GlobalSearchBar } from '../../src/components/GlobalSearchBar';
+import { useNetwork } from '../../src/context/NetworkContext';
+import { OfflineManager } from '../../src/services/OfflineManager';
 import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
 
 type Stats = {
@@ -50,12 +52,21 @@ const normalizeText = (value: string) =>
 export default function Home() {
   const { colors } = useTheme();
   const { session } = useAuth();
+  const { online } = useNetwork();
   const { width: windowWidth } = useWindowDimensions();
   const userId = session?.user.id;
   const name = (session?.user.user_metadata as any)?.display_name || session?.user.email?.split('@')[0] || 'Aspirant';
 
+  const isTablet = windowWidth >= 768;
+  const sectionInset = isTablet ? 28 : 20;
   const CARD_GAP = 12;
-  const CARD_WIDTH = (windowWidth - spacing.lg * 2 - CARD_GAP) / 2;
+  const CARD_WIDTH = (windowWidth - sectionInset * 2 - CARD_GAP) / 2;
+  const RESUME_CARD_WIDTH = isTablet
+    ? Math.max(180, (windowWidth - sectionInset * 2 - 16 * 3) / 4)
+    : 160;
+  const NOTE_CARD_WIDTH = isTablet
+    ? Math.max(200, (windowWidth - sectionInset * 2 - 16 * 2) / 3)
+    : 180;
 
   const [stats, setStats] = useState<Stats>({
     attempts: 0, accuracy: 0, dueCards: 0, totalNotes: 0, streak: 5, syllabusPercent: 0, subjectProgress: []
@@ -97,13 +108,46 @@ export default function Home() {
     AsyncStorage.getItem('optional_choice').then(val => {
       if (val) setOptionalChoice(val);
     });
-    if (userId) WidgetService.list(userId).then(setWidgets);
+
+    let cancelled = false;
+    const loadWidgets = async () => {
+      if (!userId) return;
+      try {
+        const list = await WidgetService.list(userId);
+        if (!cancelled) setWidgets(list);
+      } catch (err) {
+        console.warn('[Home] Widget list fallback to offline cache', err);
+        const cached = OfflineManager.getCollectionSync('user_widgets', userId) as Widget[];
+        if (!cancelled && cached.length) {
+          setWidgets([...cached].sort((a, b) => (a.position ?? 0) - (b.position ?? 0)));
+        }
+      }
+    };
+
+    loadWidgets();
+    return () => { cancelled = true; };
   }, [userId]);
 
   const load = useCallback(async () => {
     if (!userId) return;
     const cached = await cacheGet<Stats>(`home:${userId}`);
     if (cached) setStats(cached);
+
+    if (!online) {
+      const offlineNotes = await OfflineManager.getOfflineNotes(userId);
+      const latestNotes = (offlineNotes || [])
+        .sort((a: any, b: any) => String(b.updated_at || '').localeCompare(String(a.updated_at || '')))
+        .slice(0, 6)
+        .map((n: any) => ({
+          id: String(n.id),
+          title: String(n.title || 'Untitled Note'),
+          type: 'note' as const,
+          updated_at: n.updated_at || new Date().toISOString(),
+          note_id: String(n.id),
+        }));
+      if (latestNotes.length > 0) setRecentNotes(latestNotes);
+      return;
+    }
 
     try {
       const [
@@ -189,7 +233,7 @@ export default function Home() {
       setStats(next);
       await cacheSet(`home:${userId}`, next);
     } catch (err) { console.error("Home Load Error:", err); }
-  }, [userId, widgetCategory, selectedSubjects, optionalChoice]);
+  }, [userId, online, widgetCategory, selectedSubjects, optionalChoice]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
@@ -221,6 +265,10 @@ export default function Home() {
   };
 
   const startRandomPyqTest = useCallback(async (startYear: number, endYear: number, count: number) => {
+    if (!online) {
+      Alert.alert('Offline mode', 'Random PYQ generation needs internet. You can continue using downloaded content offline.');
+      return false;
+    }
     try {
       const { data: testRows, error: testErr } = await supabase.from('tests').select('id, title, launch_year, exam_year, institute, program_id, program_name, series').limit(5000);
       if (testErr) throw testErr;
@@ -238,7 +286,7 @@ export default function Home() {
       router.push({ pathname: '/unified/engine', params: { mode: 'exam', view: 'list', timer: 'countdown', resultIds: selected.join(','), title: `Random PYQ ${startYear}-${endYear}` } } as any);
       return true;
     } catch (e: any) { Alert.alert('Launch failed', e?.message || 'Error'); return false; }
-  }, []);
+  }, [online]);
 
   const submitRandomPyqPicker = async () => {
     const startYear = Number(pyqStartYear);
@@ -256,7 +304,7 @@ export default function Home() {
 
   const renderNoteCard = ({ item }: { item: NoteNode }) => (
     <TouchableOpacity
-      style={[styles.noteCard, { borderColor: colors.border, backgroundColor: colors.surface }]}
+      style={[styles.noteCard, { width: NOTE_CARD_WIDTH, borderColor: colors.border, backgroundColor: colors.surface }]}
       onPress={() => router.push({ pathname: '/notes/editor', params: { id: item.note_id } })}
     >
       <LinearGradient colors={[colors.primary + '10', 'transparent']} style={styles.cardGlow} />
@@ -291,7 +339,7 @@ export default function Home() {
         ListHeaderComponent={() => (
           <>
             {/* 1. Header Section */}
-            <View style={styles.heroSection}>
+            <View style={[styles.heroSection, { paddingHorizontal: sectionInset }]}>
               <View style={styles.headerRow}>
                 <View>
                   <Text style={[styles.greeting, { color: colors.textTertiary }]}>WELCOME BACK</Text>
@@ -319,7 +367,7 @@ export default function Home() {
                 <Zap size={14} color={colors.primary} />
               </View>
 
-              <View style={styles.pulseGrid}>
+              <View style={[styles.pulseGrid, { paddingHorizontal: sectionInset }]}>
                 <TouchableOpacity style={[styles.pulseCard, { width: CARD_WIDTH, borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => router.push('/flashcards/review')}>
                   <LinearGradient colors={['rgba(255,149,0,0.15)', 'transparent']} style={styles.cardGlow} />
                   <View style={[styles.iconCircle, { backgroundColor: '#FF950020' }]}>
@@ -348,18 +396,18 @@ export default function Home() {
 
             {/* 3. Resume Study Section */}
             <View style={styles.resumeContainer}>
-              <Text style={[styles.sectionLabel, { color: colors.textTertiary, marginLeft: 20 }]}>RESUME STUDY</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.resumeScroll}>
-                <ResumeAction icon={<Layout size={20} color="#007AFF" />} title="Tracker" sub="Daily Syllabus" onPress={() => router.push('/tracker')} colors={colors} />
-                <ResumeAction icon={<Layers size={20} color="#AF52DE" />} title="Flashcards" sub="Smart Review" onPress={() => router.push('/flashcards')} colors={colors} />
-                <ResumeAction icon={<BarChart3 size={20} color="#34C759" />} title="Analyse" sub="Performance" onPress={() => router.push('/analyse')} colors={colors} />
-                <ResumeAction icon={<History size={20} color="#FF9500" />} title="Archive" sub="Review PYQs" onPress={() => router.push('/pyq')} colors={colors} />
+              <Text style={[styles.sectionLabel, { color: colors.textTertiary, marginLeft: sectionInset }]}>RESUME STUDY</Text>
+              <ScrollView horizontal={!isTablet} showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.resumeScroll, { paddingHorizontal: sectionInset }, isTablet && { flexGrow: 1, justifyContent: 'space-between' }]}>
+                <ResumeAction icon={<Layout size={20} color="#007AFF" />} title="Tracker" sub="Daily Syllabus" onPress={() => router.push('/tracker')} colors={colors} width={RESUME_CARD_WIDTH} />
+                <ResumeAction icon={<Layers size={20} color="#AF52DE" />} title="Flashcards" sub="Smart Review" onPress={() => router.push('/flashcards')} colors={colors} width={RESUME_CARD_WIDTH} />
+                <ResumeAction icon={<BarChart3 size={20} color="#34C759" />} title="Analyse" sub="Performance" onPress={() => router.push('/analyse')} colors={colors} width={RESUME_CARD_WIDTH} />
+                <ResumeAction icon={<History size={20} color="#FF9500" />} title="Archive" sub="Review PYQs" onPress={() => router.push('/pyq')} colors={colors} width={RESUME_CARD_WIDTH} />
               </ScrollView>
             </View>
 
             {/* 4. Syllabus Tracker Widget */}
             <TouchableOpacity
-              style={[styles.trackerWidget, { backgroundColor: colors.surface, borderColor: colors.border }]}
+              style={[styles.trackerWidget, { marginHorizontal: sectionInset, backgroundColor: colors.surface, borderColor: colors.border }]}
               onLongPress={() => setConfigVisible(true)}
               onPress={() => router.push('/tracker')}
             >
@@ -405,19 +453,19 @@ export default function Home() {
                 <TouchableOpacity onPress={() => router.push('/notes')}><Text style={{ color: colors.primary, fontSize: 12, fontWeight: '700' }}>View All</Text></TouchableOpacity>
               </View>
               <FlatList
-                horizontal
+                horizontal={!isTablet}
                 data={recentNotes}
                 renderItem={renderNoteCard}
                 keyExtractor={item => item.id}
                 showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.notesScroll}
+                contentContainerStyle={[styles.notesScroll, { paddingHorizontal: sectionInset }, isTablet && { flexGrow: 1 }]}
               />
             </View>
 
             {/* 6. Quick Tags Chips */}
             <View style={styles.tagsSection}>
-              <Text style={[styles.sectionLabel, { color: colors.textTertiary, marginLeft: 20 }]}>TOP TAGS</Text>
-              <View style={styles.tagCloud}>
+              <Text style={[styles.sectionLabel, { color: colors.textTertiary, marginLeft: sectionInset }]}>TOP TAGS</Text>
+              <View style={[styles.tagCloud, { paddingHorizontal: sectionInset }]}>
                 {topTags.map((tag, idx) => {
                   const tagColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
                   const tagColor = tagColors[idx % tagColors.length];
@@ -439,7 +487,7 @@ export default function Home() {
             </View>
 
             {/* 7. Random PYQ Test Widget */}
-            <TouchableOpacity style={styles.pyqBanner} onPress={() => setPyqPickerVisible(true)}>
+            <TouchableOpacity style={[styles.pyqBanner, { marginHorizontal: sectionInset }]} onPress={() => setPyqPickerVisible(true)}>
               <LinearGradient colors={['#0f172a', '#1e293b']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.pyqBannerInner}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.pyqBannerTitle}>Random PYQ Test</Text>
@@ -457,12 +505,12 @@ export default function Home() {
               </LinearGradient>
             </TouchableOpacity>
 
-            <Text style={[styles.sectionLabel, { color: colors.textTertiary, marginLeft: 20, marginTop: 32 }]}>MY CUSTOM WIDGETS</Text>
+            <Text style={[styles.sectionLabel, { color: colors.textTertiary, marginLeft: sectionInset, marginTop: 32 }]}>MY CUSTOM WIDGETS</Text>
           </>
         )}
         renderItem={({ item, drag, isActive }) => (
           <ScaleDecorator>
-            <TouchableOpacity onLongPress={drag} style={{ paddingHorizontal: 20, marginBottom: 12 }}>
+            <TouchableOpacity onLongPress={drag} style={{ paddingHorizontal: sectionInset, marginBottom: 12 }}>
               <WidgetRenderer widgetKey={item.widget_key} data={widgetData} onArchive={() => WidgetService.archive(userId!, item.id).then(load)} />
             </TouchableOpacity>
           </ScaleDecorator>
@@ -538,9 +586,9 @@ export default function Home() {
   );
 }
 
-function ResumeAction({ icon, title, sub, onPress, colors }: any) {
+function ResumeAction({ icon, title, sub, onPress, colors, width }: any) {
   return (
-    <TouchableOpacity style={[styles.resumeBtn, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={onPress}>
+    <TouchableOpacity style={[styles.resumeBtn, { width: width || 160, backgroundColor: colors.surface, borderColor: colors.border }]} onPress={onPress}>
       <View style={styles.resumeIconWrap}>{icon}</View>
       <View>
         <Text style={[styles.resumeTitle, { color: colors.textPrimary }]}>{title}</Text>

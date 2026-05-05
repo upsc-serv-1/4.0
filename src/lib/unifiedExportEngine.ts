@@ -412,7 +412,7 @@ const renderInline = (txt: string = ''): string => {
 
 const wrap = (o: ExportOptions, body: string, extras: string = '') => `<!doctype html>
 <html><head><meta charset="utf-8"/><style>${baseCss(o)}</style></head>
-<body>
+<body class="${o.visualStyle === 'flashcard' ? 'layout-flashcard' : ''}">
   ${o.watermark ? `<div class="watermark">${escapeHtml(o.watermark)}</div>` : ''}
   ${o.footerText ? `<div class="footer">${escapeHtml(o.footerText)} • ${new Date().toLocaleDateString()}</div>` : ''}
   <div class="paper">
@@ -542,8 +542,8 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
 
   const showOpts = o.contentScope !== 'q_only';
   const showExpl = o.contentScope === 'q_options_expl';
-  const inline = o.answerPlacement === 'inline';
   const isFlashStyle = o.visualStyle === 'flashcard';
+  const inline = isFlashStyle ? true : o.answerPlacement === 'inline';
 
   const itemsHtml = rows.map((q, i) => {
     const stem = q.question_text || q.statement || '';
@@ -578,11 +578,18 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
       ${inline && showExpl && explanation ? `<div class="expl">${renderInline(explanation)}</div>` : ''}
     `.trim();
 
+    if (isFlashStyle) {
+      const right = answerBlock || `<div class="expl">Answer/explanation hidden for this card.</div>`;
+      return `<div class="card">
+        <div class="side"><div class="card-face-label">Question</div>${questionBlock}</div>
+        <div class="side"><div class="card-face-label">Answer & Explanation</div>${right}</div>
+      </div>`;
+    }
     return `<div class="item">${renderQaLayoutBlock(questionBlock, answerBlock, o)}</div>`;
   }).join('');
 
   // Answer key appendix if not inline
-  const answerKey = !inline && (o.contentScope !== 'q_only')
+  const answerKey = !isFlashStyle && !inline && (o.contentScope !== 'q_only')
     ? `<div class="answer-key">
         <h2>Answer Key${showExpl ? ' & Explanations' : ''}</h2>
         ${rows.map((q, i) => {
@@ -649,7 +656,8 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
 
   const showOpts = o.contentScope !== 'q_only';
   const showExpl = o.contentScope === 'q_options_expl';
-  const inline = o.answerPlacement === 'inline';
+  const isFlashStyle = o.visualStyle === 'flashcard';
+  const inline = isFlashStyle ? true : o.answerPlacement === 'inline';
 
   const sections = groups.map(g => {
     const rows = sortQuestions(filterQuestions(g.questions, o), o);
@@ -668,7 +676,14 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
         ${inline && showOpts && answer ? `<div class="ans">Answer: ${answer}</div>` : ''}
         ${inline && showExpl && explanation ? `<div class="expl">${renderInline(explanation)}</div>` : ''}
       `.trim();
-      return `<div class="item">${renderQaLayoutBlock(questionBlock, answerBlock, o)}</div>`;
+      if (isFlashStyle) {
+      const right = answerBlock || `<div class="expl">Answer/explanation hidden for this card.</div>`;
+      return `<div class="card">
+        <div class="side"><div class="card-face-label">Question</div>${questionBlock}</div>
+        <div class="side"><div class="card-face-label">Answer & Explanation</div>${right}</div>
+      </div>`;
+    }
+    return `<div class="item">${renderQaLayoutBlock(questionBlock, answerBlock, o)}</div>`;
     }).join('');
     return `<div class="tag-section">
       <div class="tag-title">#${escapeHtml(g.tag)} <span style="font-weight:500;opacity:0.7">(${rows.length})</span></div>
@@ -677,7 +692,7 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
   }).join('');
 
   // Appendix answer key (if placement === 'end')
-  const answerKey = !inline && showOpts
+  const answerKey = !isFlashStyle && !inline && showOpts
     ? `<div class="answer-key">
         <h2>Answer Key${showExpl ? ' & Explanations' : ''}</h2>
         ${groups.flatMap((g, gi) => g.questions.map((q, i) => {

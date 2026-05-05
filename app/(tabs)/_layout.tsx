@@ -2,7 +2,7 @@ import { Tabs, useSegments, useRouter } from 'expo-router';
 import { Home, BarChart2, RotateCcw, LayoutList, Tag, Target, FileText, TrendingUp, BarChart3, Layers, Database, PenTool } from 'lucide-react-native';
 import { useAuth } from '../../src/context/AuthContext';
 import { Redirect } from 'expo-router';
-import { View, ActivityIndicator, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, ScrollView, TouchableOpacity, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import { useTheme } from '../../src/context/ThemeContext';
 import { useState, useEffect, useCallback } from 'react';
 import { TabConfigService, TabKey } from '../../src/services/TabConfigService';
@@ -79,15 +79,26 @@ export default function TabsLayout() {
 
 function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs }: any) {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
+
+  const visibleOrder = order.filter((tabKey: TabKey) => !!defs[tabKey]);
+  const tabletItemWidth = isTablet
+    ? Math.max(74, Math.floor((Math.max(width, 768) - 20) / Math.max(1, visibleOrder.length)))
+    : undefined;
 
   return (
     <View style={[styles.tabBarContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
-        contentContainerStyle={styles.scrollContent}
+      <ScrollView
+        horizontal={!isTablet}
+        scrollEnabled={!isTablet}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.scrollContent,
+          isTablet && styles.scrollContentTablet,
+        ]}
       >
-        {order.map((tabKey: TabKey) => {
+        {visibleOrder.map((tabKey: TabKey) => {
           if (!defs[tabKey]) return null;
           const currentRoute = state.routes[state.index].name;
           const isFocused = tabKey === currentRoute || (tabKey === 'index' && currentRoute === 'index');
@@ -109,7 +120,11 @@ function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs 
             <TouchableOpacity
               key={tabKey}
               onPress={onPress}
-              style={styles.tabItem}
+              style={[
+                styles.tabItem,
+                isTablet && styles.tabItemTablet,
+                isTablet && tabletItemWidth ? { width: tabletItemWidth } : null,
+              ]}
             >
               <Icon 
                 color={isFocused ? colors.primary : colors.textTertiary} 
@@ -150,12 +165,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     alignItems: 'center',
   },
+  scrollContentTablet: {
+    width: '100%',
+    justifyContent: 'space-between',
+    paddingHorizontal: 6,
+  },
   tabItem: {
     paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
     height: '100%',
     minWidth: 80,
+  },
+  tabItemTablet: {
+    minWidth: 0,
+    paddingHorizontal: 8,
   },
   tabLabel: {
     fontSize: 10,

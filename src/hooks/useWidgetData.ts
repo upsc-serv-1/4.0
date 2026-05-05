@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { OfflineManager } from '../services/OfflineManager';
+import { useNetwork } from '../context/NetworkContext';
 
 export interface WidgetData {
   loading: boolean;
@@ -40,6 +41,7 @@ function dayStr(d: Date) { return d.toISOString().split('T')[0]; }
 
 export function useWidgetData(userId: string | undefined) {
   const [data, setData] = useState<WidgetData>(EMPTY);
+  const { online } = useNetwork();
 
   const refresh = useCallback(async () => {
     if (!userId) return;
@@ -171,6 +173,11 @@ export function useWidgetData(userId: string | undefined) {
       }
 
       // 2. FRESH: Background fetch from server
+      if (!online) {
+        setData(prev => ({ ...prev, loading: false }));
+        return;
+      }
+
       const [statesRes, cardsRes, notesRes, attemptsRes] = await Promise.all([
         supabase.from('question_states').select('question_id, is_incorrect_last_attempt, updated_at, review_tags').eq('user_id', userId),
         supabase.from('user_cards').select('id, learning_status, next_review, status').eq('user_id', userId),
@@ -185,7 +192,7 @@ export function useWidgetData(userId: string | undefined) {
       console.error('[WidgetData] Main refresh error:', err);
       setData(prev => ({ ...prev, loading: false }));
     }
-  }, [userId]);
+  }, [userId, online]);
 
   useEffect(() => { refresh(); }, [refresh]);
 

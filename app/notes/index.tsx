@@ -621,20 +621,34 @@ export default function NotesIndex() {
               <>
                 <View style={styles.hubHeaderRow}>
                   <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Your Subjects</Text>
-                  <View style={styles.viewToggle}>
+                  <View style={[styles.viewToggle, { backgroundColor: colors.surfaceStrong }]}>
                     <TouchableOpacity
                       onPress={() => setHubLayout('grid')}
-                      style={styles.viewToggleBtn}
+                      style={[
+                        styles.viewToggleBtn,
+                        hubLayout === 'grid' && { backgroundColor: colors.surface }
+                      ]}
                       data-testid="vault-hub-grid"
                     >
-                      <LayoutGrid size={18} color={hubLayout === 'grid' ? colors.primary : colors.textTertiary} />
+                      <LayoutGrid size={11} color={hubLayout === 'grid' ? colors.textPrimary : colors.textTertiary} />
+                      <Text style={[
+                        styles.viewToggleText,
+                        { color: hubLayout === 'grid' ? colors.textPrimary : colors.textTertiary }
+                      ]}>Grid</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => setHubLayout('list')}
-                      style={styles.viewToggleBtn}
+                      style={[
+                        styles.viewToggleBtn,
+                        hubLayout === 'list' && { backgroundColor: colors.surface }
+                      ]}
                       data-testid="vault-hub-list"
                     >
-                      <ListIcon size={18} color={hubLayout === 'list' ? colors.primary : colors.textTertiary} />
+                      <ListIcon size={11} color={hubLayout === 'list' ? colors.textPrimary : colors.textTertiary} />
+                      <Text style={[
+                        styles.viewToggleText,
+                        { color: hubLayout === 'list' ? colors.textPrimary : colors.textTertiary }
+                      ]}>List</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -915,8 +929,9 @@ const styles = StyleSheet.create({
   },
   sectionTitle: { fontSize: 19, fontWeight: '900', letterSpacing: -0.4 },
   sectionSubtle: { fontSize: 10, fontWeight: '900', letterSpacing: 1.2, paddingHorizontal: 16, marginBottom: 8 },
-  viewToggle: { flexDirection: 'row', gap: 4 },
-  viewToggleBtn: { padding: 8 },
+  viewToggle: { flexDirection: 'row', backgroundColor: colors.surfaceStrong, borderRadius: 10, padding: 3, gap: 2 },
+  viewToggleBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8 },
+  viewToggleText: { fontSize: 11, fontWeight: '700' },
 
   preparingBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 6 },
 

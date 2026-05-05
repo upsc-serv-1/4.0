@@ -29,7 +29,6 @@ import {
   Zap,
   ArrowRight,
   Layout,
-  ChevronLeft,
   XCircle,
 } from 'lucide-react-native';
 import { useTheme } from '../../src/context/ThemeContext';
@@ -214,7 +213,6 @@ export default function UnifiedArenaSetup() {
   });
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
-  const [showAllResultsModal, setShowAllResultsModal] = useState(false);
   const [showPYQTags, setShowPYQTags] = useState(true);
   const [showTopicModal, setShowTopicModal] = useState(false);
   const [topicSearch, setTopicSearch] = useState('');
@@ -760,10 +758,8 @@ export default function UnifiedArenaSetup() {
     let finalParams = {};
 
     if (activeTab === 'search') {
-      const resultIds = searchResults.map(q => q._mergedIds ? q._mergedIds.join(',') : q.id).filter(Boolean).join(',');
       finalParams = {
         ...baseParams,
-        resultIds,
         query: searchQuery,
         searchMode: searchFilters.searchMode,
         searchFields: searchFilters.searchFields?.join(','),
@@ -1249,136 +1245,43 @@ export default function UnifiedArenaSetup() {
                 initialQuery={searchQuery}
                 hideDropdown={true}
                 onSearch={(q, f) => {
+                  const nextFilters = f || {};
                   setSearchQuery(q);
-                  setSearchFilters(f);
+                  setSearchFilters(nextFilters);
+
+                  if (!q?.trim()) return;
+
+                  router.push({
+                    pathname: '/unified/engine',
+                    params: {
+                      mode: 'learning',
+                      view: 'list',
+                      timer: 'none',
+                      showPYQTags: 'true',
+                      query: q,
+                      searchMode: nextFilters.searchMode,
+                      searchFields: nextFilters.searchFields?.join(','),
+                      subject: nextFilters.selectedSubjects?.[0] || 'All',
+                      subjects: nextFilters.selectedSubjects?.join(','),
+                      section: nextFilters.selectedSections?.join('|') || '',
+                      microtopic: nextFilters.selectedMicrotopics?.join('|') || '',
+                      institutes: nextFilters.selectedInstitutes?.join(',') || '',
+                      programs: nextFilters.selectedPrograms?.join(',') || '',
+                      examStage: nextFilters.examStage,
+                      pyqFilter: nextFilters.pyqFilter,
+                      pyqCategory: nextFilters.pyqCategory?.join(','),
+                      ncertFilter: nextFilters.ncertFilter,
+                      testId: '',
+                    },
+                  });
                 }}
               />
 
-              {loadingSearch ? (
-                <View style={{ marginTop: 40, alignItems: 'center' }}>
-                  <ActivityIndicator color={colors.primary} />
-                </View>
-              ) : (
-                <View style={{ marginTop: 24 }}>
-                  {searchResults.length > 0 && (
-                    <View style={{ marginBottom: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Text style={{ fontSize: 12, fontWeight: '800', color: colors.textTertiary }}>
-                        MATCHING QUESTIONS ({searchResults.length})
-                      </Text>
-                    </View>
-                  )}
-
-                  {searchResults.map((q) => (
-                    <TouchableOpacity
-                      key={q.id}
-                      onPress={() => {
-                        router.push({
-                          pathname: '/unified/engine',
-                          params: {
-                            testId: '',
-                            mode: arenaMode,
-                            view: viewMode,
-                            timer: timerMode,
-                            questionId: q.id
-                          }
-                        });
-                      }}
-                      style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                    >
-                      <Text style={[styles.resultText, { color: colors.textPrimary }]} numberOfLines={3}>
-                        {q.question_text.replace(/<[^>]*>/g, '')}
-                      </Text>
-                      <View style={styles.resultMeta}>
-                        <Text style={[styles.resultTag, { color: colors.primary, backgroundColor: colors.primary + '15' }]}>
-                          {q.subject}
-                        </Text>
-                        {(() => {
-                          const toBool = (value: any) => {
-                            if (typeof value === 'boolean') return value;
-                            if (typeof value === 'number') return value === 1;
-                            if (typeof value === 'string') {
-                              const v = value.trim().toLowerCase();
-                              return v === 'true' || v === '1' || v === 'yes';
-                            }
-                            return false;
-                          };
-
-                          const examInfo = (q?.exam_info && typeof q.exam_info === 'object' && !Array.isArray(q.exam_info))
-                            ? q.exam_info
-                            : (q?.source && typeof q.source === 'object' && !Array.isArray(q.source) ? q.source : {});
-
-                          const isPYQ = toBool(q?.is_pyq) || toBool(q?.isPyq) || toBool(examInfo?.isPyq) || toBool(examInfo?.is_pyq);
-                          if (!isPYQ) return null;
-
-                          const rawGroup = String(examInfo?.group || q?.exam_group || '').trim();
-                          const groupName = rawGroup.toUpperCase();
-                          const year = String(examInfo?.year ?? q?.exam_year ?? q?.examYear ?? '').trim();
-
-                          const isUPSC = toBool(examInfo?.is_upsc_cse) || toBool(q?.is_upsc_cse) || groupName.includes('UPSC CSE') || groupName === 'UPSC';
-                          const isAllied = toBool(examInfo?.is_allied) || toBool(q?.is_allied) || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => groupName.includes(g));
-                          const isOther = toBool(examInfo?.is_others) || toBool(q?.is_others) || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => groupName.includes(g));
-
-                          const dispName = rawGroup || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ');
-
-                          let bgColor = '#f59e0b15';
-                          let textColor = '#f59e0b';
-
-                          if (isUPSC) { bgColor = '#dcfce7'; textColor = '#15803d'; }
-                          else if (isAllied) { bgColor = '#fef9c3'; textColor = '#a16207'; }
-                          else if (isOther) { bgColor = '#f1f5f9'; textColor = '#475569'; }
-                          else { bgColor = colors.primary + '15'; textColor = colors.primary; }
-
-                          return (
-                            <Text style={[styles.resultTag, { color: textColor, backgroundColor: bgColor, marginLeft: 8 }]}>
-                              {`${dispName} ${year}`.trim()}
-                            </Text>
-                          );
-                        })()}
-
-                        {(() => {
-                          const institutes = Array.isArray((q as any)._institutes)
-                            ? Array.from(new Set((q as any)._institutes.filter(Boolean)))
-                            : (q.tests?.institute ? [q.tests.institute] : []);
-                          if (institutes.length === 0) return null;
-                          return (
-                            <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 8, gap: 6 }}>
-                              {institutes.slice(0, 2).map((inst: string) => (
-                                <Text key={`${q.id}-${inst}`} style={[styles.resultTag, { color: colors.textTertiary, backgroundColor: colors.surfaceStrong }]}>
-                                  {inst}
-                                </Text>
-                              ))}
-                              {institutes.length > 2 ? (
-                                <Text style={[styles.resultTag, { color: colors.textTertiary, backgroundColor: colors.surfaceStrong }]}>
-                                  +{institutes.length - 2}
-                                </Text>
-                              ) : null}
-                            </View>
-                          );
-                        })()}
-                        <ChevronRight size={16} color={colors.textTertiary} />
-
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-
-                  {searchResults.length >= 50 && (
-                    <TouchableOpacity
-                      style={[styles.seeAllBtn, { borderColor: colors.primary }]}
-                      onPress={() => setShowAllResultsModal(true)}
-                    >
-                      <Text style={[styles.seeAllBtnText, { color: colors.primary }]}>
-                        SEE ALL {questionCount} RESULTS
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-
-                  {searchResults.length === 0 && searchQuery !== '' && (
-                    <View style={{ padding: 40, alignItems: 'center' }}>
-                      <Text style={{ color: colors.textTertiary }}>No results found for "{searchQuery}"</Text>
-                    </View>
-                  )}
-                </View>
-              )}
+              <View style={{ marginTop: 16, padding: 14, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface }}>
+                <Text style={{ fontSize: 12, color: colors.textTertiary, lineHeight: 18 }}>
+                  Press search on the keyboard to open matching questions directly in Arena Index.
+                </Text>
+              </View>
             </View>
           )}
 
@@ -1443,63 +1346,6 @@ export default function UnifiedArenaSetup() {
         </View>
 
         {renderTopicModal()}
-
-        <Modal
-          visible={showAllResultsModal}
-          transparent
-          animationType="slide"
-          onRequestClose={() => setShowAllResultsModal(false)}
-        >
-          <View style={[styles.fullModalOverlay, { backgroundColor: colors.bg }]}>
-            <SafeAreaView style={{ flex: 1 }}>
-              <View style={styles.fullModalHeader}>
-                <TouchableOpacity onPress={() => setShowAllResultsModal(false)} style={styles.backBtn}>
-                  <ChevronLeft size={24} color={colors.textPrimary} />
-                </TouchableOpacity>
-                <Text style={[styles.fullModalTitle, { color: colors.textPrimary }]}>All Results ({questionCount})</Text>
-                <View style={{ width: 40 }} />
-              </View>
-
-              <ScrollView contentContainerStyle={{ padding: 20 }}>
-                {searchResults.map((q) => (
-                  <TouchableOpacity
-                    key={q.id + '_full'}
-                    onPress={() => {
-                      setShowAllResultsModal(false);
-                      router.push({
-                        pathname: '/unified/engine',
-                        params: { testId: '', mode: arenaMode, view: viewMode, timer: timerMode, questionId: q.id }
-                      });
-                    }}
-                    style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                  >
-                    <Text style={[styles.resultText, { color: colors.textPrimary }]} numberOfLines={4}>
-                      {q.question_text.replace(/<[^>]*>/g, '')}
-                    </Text>
-                    <View style={styles.resultMeta}>
-                      <Text style={[styles.resultTag, { color: colors.primary, backgroundColor: colors.primary + '15' }]}>
-                        {q.subject}
-                      </Text>
-                      {(() => {
-                        const institutes = Array.isArray((q as any)._institutes)
-                          ? Array.from(new Set((q as any)._institutes.filter(Boolean)))
-                          : (q.tests?.institute ? [q.tests.institute] : []);
-                        if (institutes.length === 0) return null;
-                        return institutes.slice(0, 2).map((inst: string) => (
-                          <Text key={`${q.id}-full-${inst}`} style={[styles.resultTag, { color: colors.textTertiary, backgroundColor: colors.surfaceStrong, marginLeft: 8 }]}>
-                            {inst}
-                          </Text>
-                        ));
-                      })()}
-                      <ChevronRight size={16} color={colors.textTertiary} />
-                    </View>
-                  </TouchableOpacity>
-                ))}
-                <View style={{ height: 100 }} />
-              </ScrollView>
-            </SafeAreaView>
-          </View>
-        </Modal>
 
         <Modal visible={showExamModal} transparent animationType="fade">
           <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 24 }}>

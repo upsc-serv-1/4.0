@@ -1908,7 +1908,9 @@ export default function UnifiedQuizEngine() {
           contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
           renderItem={({ item, index }) => {
             const actualIndex = start + index;
-            const snippet = (item.statement_line || item.question_text || '').replace(/<[^>]*>/g, '').slice(0, 80) + '...';
+            const cleanText = (item.statement_line || item.question_text || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+            const words = cleanText ? cleanText.split(' ') : [];
+            const snippet = words.slice(0, 40).join(' ') + (words.length > 40 ? '...' : '');
             const isAnswered = !!store.answers[item.id];
             
             return (

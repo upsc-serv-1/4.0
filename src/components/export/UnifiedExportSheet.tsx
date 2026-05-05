@@ -304,7 +304,7 @@ export const UnifiedExportSheet: React.FC<Props> = ({
             </Section>
 
 
-            {(payload?.kind === 'questions' || payload?.kind === 'tags') && (
+            {payload && (
               <Section title="Visual Style" colors={colors}>
                 <Row>{CHOICES.visualStyles.map(v => <Chip key={v.id} active={opts.visualStyle === v.id} onPress={() => set('visualStyle', v.id)}>{v.label}</Chip>)}</Row>
               </Section>

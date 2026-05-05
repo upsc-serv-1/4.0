@@ -89,7 +89,7 @@ export interface ExportOptions {
 export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): ExportOptions => ({
   title: 'Export',
   fontFamily: 'sans',
-  fontSize: 12,
+  fontSize: 6,
   columns: 1,
   theme: 'modern',
   paperStyle: 'plain',
@@ -100,9 +100,9 @@ export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): Ex
   pageMarginRightCm: 1,
   pageMarginBottomCm: 1,
   pageMarginLeftCm: 1,
-  qaBackgroundColor: 'transparent',
-  qaQuestionBackgroundColor: 'transparent',
-  qaAnswerBackgroundColor: 'transparent',
+  qaBackgroundColor: '#6A5BFF20',
+  qaQuestionBackgroundColor: '#6A5BFF20',
+  qaAnswerBackgroundColor: '#6A5BFF20',
   qaLayoutMode: 'unified',
   visualStyle: 'document',
   showTOC: false,
@@ -120,7 +120,7 @@ export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): Ex
   microTopicFilters: [],
   yearStart: null,
   yearEnd: null,
-  notesSubheadingColor: '#f3f4f6',
+  notesSubheadingColor: '#6A5BFF20',
   notesChecklistMode: true,
   ...overrides,
 });
@@ -218,7 +218,7 @@ const fontFamilyCss: Record<ExportFontFamily, string> = {
 
 const paperBg: Record<ExportPaperStyle, string> = {
   plain:  'none',
-  lined:  `repeating-linear-gradient(to bottom, transparent 0, transparent 27px, var(--rule) 28px)`,
+  lined:  `repeating-linear-gradient(to bottom, #ffffff 0, #ffffff 27px, var(--rule) 28px)`,
   grid:   `linear-gradient(to right, var(--rule) 1px, transparent 1px) 0 0/24px 24px, linear-gradient(to bottom, var(--rule) 1px, transparent 1px) 0 0/24px 24px`,
   dotted: `radial-gradient(var(--rule) 1px, transparent 1px) 0 0/16px 16px`,
 };
@@ -252,7 +252,7 @@ const baseCss = (o: ExportOptions) => {
       orphans: 2;
       widows: 2;
     }
-    .paper { background-image: ${paperBg[o.paperStyle]}; padding: 4px; min-height: 100%; }
+    .paper { background-color: ${o.paperStyle === 'lined' ? '#ffffff' : 'var(--bg)'}; background-image: ${paperBg[o.paperStyle]}; padding: 4px; min-height: 100%; }
 
     h1.cover { font-size: ${o.fontSize + 14}pt; margin: 0 0 6mm 0; color: var(--accent); font-weight: 900; letter-spacing: -0.5px; }
     .meta { color: var(--accent); font-size: ${o.fontSize - 2}pt; margin-bottom: 6mm; }
@@ -346,8 +346,8 @@ const baseCss = (o: ExportOptions) => {
     i, em { font-style: italic; }
     u { text-decoration: underline; }
     s, strike, del { text-decoration: line-through; }
-    mark, .highlight { background-color: #FFF59D; color: inherit; padding: 0 2px; border-radius: 2px; }
-    span[style*="background"] { padding: 0 2px; border-radius: 2px; }
+    mark, .highlight { background-color: #FFF59D; color: inherit; padding: 0 2px; border-radius: 2px; font-size: inherit !important; line-height: inherit !important; }
+    span[style*="background"] { padding: 0 2px; border-radius: 2px; font-size: inherit !important; line-height: inherit !important; }
     blockquote { border-left: 3px solid var(--accent); padding: 4px 12px; margin: 6px 0; color: var(--fg); background: rgba(0,0,0,0.04); border-radius: 4px; }
     ul, ol { padding-left: 22px; margin: 4px 0; }
     li { margin: 2px 0; }
@@ -404,10 +404,32 @@ const escapeHtml = (s: string = ''): string =>
 
 const HTML_TAG_REGEX = /<\/?(b|strong|i|em|u|mark|span|ul|ol|li|p|br|div|h[1-6]|blockquote)(\s|>|\/)/i;
 
+const sanitizeRichHtml = (raw: string = ''): string => {
+  if (!raw) return '';
+  const stripStyleProps = (styles: string) => {
+    const cleaned = styles
+      .split(';')
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .filter((part) => !/^(font-size|font-family|line-height)\s*:/i.test(part));
+    return cleaned.join('; ');
+  };
+
+  return raw
+    .replace(/style="([^"]*)"/gi, (_, styles: string) => {
+      const next = stripStyleProps(styles);
+      return next ? `style="${next}"` : '';
+    })
+    .replace(/style='([^']*)'/gi, (_, styles: string) => {
+      const next = stripStyleProps(styles);
+      return next ? `style='${next}'` : '';
+    });
+};
+
 // Preserve rich HTML; convert markdown for plain text
 const renderInline = (txt: string = ''): string => {
   if (!txt) return '';
-  if (HTML_TAG_REGEX.test(txt)) return txt;
+  if (HTML_TAG_REGEX.test(txt)) return sanitizeRichHtml(txt);
   return escapeHtml(txt)
     .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
     .replace(/__(.*?)__/g, '<u>$1</u>')
@@ -1298,7 +1320,10 @@ export async function exportToPdf(payload: ExportPayload, options: ExportOptions
   const info = await FileSystem.getInfoAsync(dest);
   const finalUri = info.exists ? dest : uri;
   if (await Sharing.isAvailableAsync()) {
-    await sharePdfWithTimeout(finalUri, options.title);
+    // Fire-and-forget share to avoid sticky loader states on some Android share sheets.
+    setTimeout(() => {
+      Sharing.shareAsync(finalUri, { mimeType: 'application/pdf', dialogTitle: options.title }).catch(() => null);
+    }, 0);
   }
   return finalUri;
 }

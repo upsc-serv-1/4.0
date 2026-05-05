@@ -43,6 +43,7 @@ import { useExportGuard } from '../src/lib/useExportGuard';
 import { ActiveFiltersBar, ActiveFilter } from '../src/components/pyq/ActiveFiltersBar';
 import { SelectionSummaryBar } from '../src/components/pyq/SelectionSummaryBar';
 import { PredictiveInsightsPanel } from '../src/components/pyq/PredictiveInsightsPanel';
+import { buildPredictive, probableHotsFor2026 } from '../src/lib/pyqPredictive';
 import { CompareWindowsPanel } from '../src/components/pyq/CompareWindowsPanel';
 import { UndoToast, UndoSpec } from '../src/components/common/UndoToast';
 
@@ -63,7 +64,7 @@ const PYQ_PAGE_SIZE = 1000;
 
 type HubKey = 'overview' | 'focused' | 'pilot' | 'forecast' | 'compare';
 type ExportMode = 'all' | 'momentum' | 'distribution' | 'heatmaps' | 'focused' | 'subject_one' | 'subject_all';
-type AnalysisReportKey = 'full_report' | 'subject_momentum' | 'subject_distribution' | 'heatmaps' | 'focused_trend';
+type AnalysisReportKey = 'full_report' | 'subject_momentum' | 'subject_distribution' | 'heatmaps' | 'focused_trend' | 'forecast';
 
 const ANALYSIS_REPORT_OPTIONS: Array<{ key: AnalysisReportKey; label: string }> = [
   { key: 'full_report', label: 'Include Full Report' },
@@ -71,6 +72,7 @@ const ANALYSIS_REPORT_OPTIONS: Array<{ key: AnalysisReportKey; label: string }> 
   { key: 'subject_distribution', label: 'Subject Distribution' },
   { key: 'heatmaps', label: 'Heatmaps' },
   { key: 'focused_trend', label: 'Focused Trend' },
+  { key: 'forecast', label: 'Forecast (Probable 2026 Topics)' },
 ];
 
 type HeatmapRow = {
@@ -1007,6 +1009,42 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         ? `Year ${questionExportYearBounds.start}`
         : `${questionExportYearBounds.start}-${questionExportYearBounds.end}`;
 
+    // Forecast data — produced from currently filtered raw questions so the
+    // Forecast export honours the user's subject / section / year selections.
+    let forecastRows: Array<{
+      key: string;
+      label: string;
+      totalQuestions: number;
+      streak: number;
+      trend: 'rising' | 'falling' | 'stable';
+      forecastPoint: number;
+      forecastLow: number;
+      forecastHigh: number;
+      hotScore: number;
+    }> | undefined;
+    if (selectedReports.forecast || selectedReports.full_report) {
+      try {
+        const predictive = buildPredictive(rawQuestions, getAnalyticsYear, {
+          level: 'micro_topic',
+          getSubject: getAnalyticsSubject,
+        });
+        const hots = probableHotsFor2026(predictive, 1, 12);
+        forecastRows = hots.map((row) => ({
+          key: row.key,
+          label: row.key,
+          totalQuestions: row.totalQuestions,
+          streak: row.streak,
+          trend: row.trend,
+          forecastPoint: row.forecast2026.point,
+          forecastLow: row.forecast2026.low,
+          forecastHigh: row.forecast2026.high,
+          hotScore: row.hotScore,
+        }));
+      } catch {
+        forecastRows = undefined;
+      }
+    }
+
     return buildPyqAnalysisSummaryHtml({
       selectedReports,
       examStage,
@@ -1032,6 +1070,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       primaryHeatmapLabel: questionExportSummary.primaryHeatmapLabel,
       secondaryHeatmapTitle: questionExportSummary.secondaryHeatmapTitle,
       secondaryHeatmapLabel: questionExportSummary.secondaryHeatmapLabel,
+      forecastRows,
+      forecastTitle: questionExportScope === 'selected_subject' && questionExportSubject
+        ? `Forecast — ${questionExportSubject} (Probable 2026 Topics)`
+        : 'Forecast — Probable 2026 Topics',
     });
   };
 

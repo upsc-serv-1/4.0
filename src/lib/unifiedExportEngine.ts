@@ -820,6 +820,24 @@ export interface BuildPyqAnalysisSummaryInput {
   primaryHeatmapLabel?: string;
   secondaryHeatmapTitle?: string;
   secondaryHeatmapLabel?: string;
+  /**
+   * Optional Forecast (Predictive Insights) data — when supplied and
+   * `selectedReports.forecast` (or `full_report`) is true, an executive
+   * summary section listing probable hot topics, rising topics and the
+   * frequency-weighted importance leaderboard is appended to the report.
+   */
+  forecastRows?: Array<{
+    key: string;
+    label: string;
+    totalQuestions: number;
+    streak: number;
+    trend: 'rising' | 'falling' | 'stable';
+    forecastPoint: number;
+    forecastLow: number;
+    forecastHigh: number;
+    hotScore: number;
+  }>;
+  forecastTitle?: string;
 }
 
 const normalizeHex = (value: string | undefined, fallback = '#2563EB'): string => {
@@ -1013,6 +1031,68 @@ const renderPyqHeatmapSvg = (
   `;
 };
 
+const renderPyqForecastSection = (
+  title: string,
+  rows: Array<{
+    key: string;
+    label: string;
+    totalQuestions: number;
+    streak: number;
+    trend: 'rising' | 'falling' | 'stable';
+    forecastPoint: number;
+    forecastLow: number;
+    forecastHigh: number;
+    hotScore: number;
+  }>,
+) => {
+  if (!rows.length) return '';
+  const trendColor: Record<string, string> = {
+    rising: '#15803D',
+    falling: '#B91C1C',
+    stable: '#475569',
+  };
+  const trendBg: Record<string, string> = {
+    rising: '#DCFCE7',
+    falling: '#FEE2E2',
+    stable: '#E5E7EB',
+  };
+  const body = rows.map((r, i) => `
+    <tr>
+      <td style="text-align:center;color:#94A3B8;font-weight:800;">${i + 1}</td>
+      <td><strong>${escHtml(r.label || r.key)}</strong></td>
+      <td style="text-align:right;">${r.totalQuestions}</td>
+      <td style="text-align:right;">${r.streak}y</td>
+      <td style="text-align:right;">${r.forecastPoint}<span style="color:#94A3B8;font-size:9pt;"> (${r.forecastLow}–${r.forecastHigh})</span></td>
+      <td style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:999px;background:${trendBg[r.trend]};color:${trendColor[r.trend]};font-weight:800;font-size:9pt;">${r.trend.toUpperCase()}</span></td>
+      <td style="text-align:right;color:#1E40AF;font-weight:800;">${r.hotScore}</td>
+    </tr>
+  `).join('');
+
+  return `
+    <section class="analysis-card">
+      <h3>${escHtml(title)}</h3>
+      <table class="analysis-heatmap-table">
+        <thead>
+          <tr>
+            <th style="width:32px;text-align:center;">#</th>
+            <th>Topic</th>
+            <th style="text-align:right;">Total</th>
+            <th style="text-align:right;">Streak</th>
+            <th style="text-align:right;">2026 Forecast</th>
+            <th style="text-align:center;">Trend</th>
+            <th style="text-align:right;">Hot Score</th>
+          </tr>
+        </thead>
+        <tbody>${body}</tbody>
+      </table>
+      <p style="font-size:9pt;color:#64748B;margin-top:6px;font-style:italic;">
+        Forecast = linear projection over the last 8 years with an 80% confidence band.
+        Hot Score combines FWI (0.55), recent slope (0.30) and 2026 forecast (0.15).
+      </p>
+    </section>
+  `;
+};
+
 export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput): string => {
   const {
     selectedReports,
@@ -1046,6 +1126,7 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
   const includeDistribution = includeAll || !!selectedReports.subject_distribution;
   const includeHeatmaps = includeAll || !!selectedReports.heatmaps;
   const includeFocused = includeAll || !!selectedReports.focused_trend;
+  const includeForecast = includeAll || !!selectedReports.forecast;
 
   const sections: string[] = [];
 
@@ -1078,6 +1159,10 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
     const series = focusTrendSeries.map((row, index) => ({ ...row, color: row.color || (index === 0 ? '#2563EB' : '#14B8A6') }));
     const focusHeading = focusedTitle || 'Focused Trend';
     sections.push(renderPyqLineChartSvg(`${focusHeading} · ${focusedLabel}`, years, series));
+  }
+
+  if (includeForecast && input.forecastRows && input.forecastRows.length > 0) {
+    sections.push(renderPyqForecastSection(input.forecastTitle || 'Forecast — Probable 2026 Topics', input.forecastRows));
   }
 
   if (!sections.length) return '';

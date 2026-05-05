@@ -8,6 +8,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   ArrowLeft, Play, Plus, ArrowUpDown, SlidersHorizontal, MoreHorizontal, BookOpen, X, Check, Info, Clock,
 } from 'lucide-react-native';
+import { supabase } from '../../src/lib/supabase';
 import { useAuth } from '../../src/context/AuthContext';
 import { useTheme } from '../../src/context/ThemeContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
@@ -88,6 +89,8 @@ export default function MicrotopicScreen() {
       
       let cardIds: string[] = [];
       let baseCards: any[] = [];
+      const offlineCards: any[] = (((OfflineManager as any).getCollectionSync('cards') ?? []) as any[])
+        .filter((c: any) => !c.deleted);
 
       if (isBranchMode) {
         // AnkiPro branch mode: get cards from this branch (+ descendants if recursive)
@@ -95,13 +98,36 @@ export default function MicrotopicScreen() {
         cardIds = await BranchSvc.listCardIdsInBranch(String(branchId), { recursive: isRecursive, userId: uid });
         if (cardIds.length > 0) {
           const idSet = new Set(cardIds);
-          baseCards = ((OfflineManager as any).getCollectionSync('cards') ?? [])
-            .filter((c: any) => !c.deleted && idSet.has(c.id));
+          const offlineById = new Map(offlineCards.filter((c: any) => idSet.has(c.id)).map((c: any) => [c.id, c]));
+          const missingIds = cardIds.filter((id) => !offlineById.has(id));
+
+          const fetchedCards: any[] = [];
+          if (missingIds.length > 0) {
+            const CHUNK = 200;
+            for (let i = 0; i < missingIds.length; i += CHUNK) {
+              const slice = missingIds.slice(i, i + CHUNK);
+              const { data, error } = await supabase
+                .from('cards')
+                .select('*')
+                .in('id', slice);
+              if (error) throw error;
+              fetchedCards.push(...(data ?? []));
+            }
+          }
+
+          const mergedById = new Map<string, any>([
+            ...Array.from(offlineById.entries()),
+            ...fetchedCards.map((c: any) => [c.id, c]),
+          ]);
+
+          // Preserve branch order so the newest inserted card appears deterministically.
+          baseCards = cardIds
+            .map((id) => mergedById.get(id))
+            .filter(Boolean);
         }
       } else {
         // Legacy subject/section/microtopic mode
-        baseCards = ((OfflineManager as any).getCollectionSync('cards') ?? [])
-          .filter((c: any) => !c.deleted)
+        baseCards = offlineCards
           .filter((c: any) => c.subject === subject && c.microtopic === microtopic)
           .filter((c: any) => section && section !== 'General'
             ? c.section_group === section
@@ -110,8 +136,19 @@ export default function MicrotopicScreen() {
       }
 
       const cardIdSet = new Set(cardIds);
-      const progress = ((OfflineManager as any).getCollectionSync('user_cards', uid) ?? [])
+      let progress = ((OfflineManager as any).getCollectionSync('user_cards', uid) ?? [])
         .filter((p: any) => p.user_id === uid && cardIdSet.has(p.card_id));
+
+      if (cardIds.length > 0) {
+        const { data: freshProgress, error: progressErr } = await supabase
+          .from('user_cards')
+          .select('card_id, status, learning_status, next_review, last_reviewed, updated_at, interval_days')
+          .eq('user_id', uid)
+          .in('card_id', cardIds);
+        if (!progressErr && freshProgress) {
+          progress = freshProgress;
+        }
+      }
 
       const progressMap = new Map<string, any>();
       progress?.forEach((p: any) => progressMap.set(p.card_id, p));

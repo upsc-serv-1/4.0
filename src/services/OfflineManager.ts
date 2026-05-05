@@ -195,9 +195,15 @@ class OfflineManagerService {
       });
 
       try {
+        // Preserve the originally uploaded sequence so paper-wise learn/exam
+        // can render the exact book order even from MMKV cache.
         const questions = await this.fetchAllRows(
           'questions',
-          (query) => query.eq('test_id', test.id)
+          (query) =>
+            query
+              .eq('test_id', test.id)
+              .order('question_number', { ascending: true })
+              .order('id', { ascending: true })
         );
 
         if (questions && questions.length > 0) {

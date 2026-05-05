@@ -799,26 +799,26 @@ export default function UnifiedQuizEngine() {
         const match = text.match(/-?\d+(?:\.\d+)?/);
         return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
       };
-      const hasQuestionSequence = finalQs.some((q: any) => parseQuestionNumber(q) !== Number.MAX_SAFE_INTEGER);
 
       if (resIds && resIds.length > 0) {
         const orderedMergedIds = resIds.map(id => idToMergedId.get(id) || id);
         const uniqueOrderedIds = Array.from(new Set(orderedMergedIds));
         finalQs = uniqueOrderedIds.map(id => mergedQs.find(q => q.id === id)).filter(Boolean);
       } else if (useExactPaperSequence) {
-        // Paper-wise learn/exam must keep uploaded order.
-        // Sort strictly by `question_number`; preserve uploaded order for ties.
-        if (hasQuestionSequence) {
-          finalQs = [...finalQs]
-            .map((q: any, idx: number) => ({ q, idx, qNo: parseQuestionNumber(q) }))
-            .sort((a, b) => {
-              if (a.qNo !== b.qNo) return a.qNo - b.qNo;
-              return a.idx - b.idx;
-            })
-            .map(({ q }) => q);
-        } else {
-          finalQs = [...finalQs];
-        }
+        // Paper-wise learn/exam must keep the exact uploaded book order.
+        // Sort strictly by `question_number`; use stable `id` as the
+        // secondary key so even cached/offline data (which may arrive in
+        // arbitrary order) still produces the deterministic book sequence.
+        finalQs = [...finalQs]
+          .map((q: any, idx: number) => ({ q, idx, qNo: parseQuestionNumber(q) }))
+          .sort((a, b) => {
+            if (a.qNo !== b.qNo) return a.qNo - b.qNo;
+            const idA = String(a.q?.id ?? '');
+            const idB = String(b.q?.id ?? '');
+            if (idA && idB && idA !== idB) return idA < idB ? -1 : 1;
+            return a.idx - b.idx;
+          })
+          .map(({ q }) => q);
       } else {
         // Apply priority sorting: Relevance → UPSC Priority → Newest Year.
         finalQs = [...finalQs].sort((a: any, b: any) => {

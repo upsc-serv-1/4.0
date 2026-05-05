@@ -1188,11 +1188,18 @@ export default function UnifiedQuizEngine() {
         from += CHUNK;
       }
 
-      processResults(allFreshData);
+      // Only process fresh data if we actually got some rows.
+      // Never blow away cached questions with empty server response.
+      if (allFreshData.length > 0) {
+        processResults(allFreshData);
+      }
     } catch (err) {
       console.error('Fetch error:', err);
-      // If we didn't find local data and server failed, show empty
-      if (!localFound) setQuestions([]);
+      // If we didn't find local data and server failed, show empty.
+      // But if localFound=true, keep the cached questions rendered.
+      if (!localFound) {
+        setQuestions([]);
+      }
     } finally {
       setLoading(false);
     }

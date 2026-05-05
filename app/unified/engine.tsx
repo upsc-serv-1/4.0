@@ -460,6 +460,10 @@ export default function UnifiedQuizEngine() {
     }
   };
   const [showQuickMenu, setShowQuickMenu] = useState(false);
+  // Simulated Exam Mode (paper view) state
+  const [paperPage, setPaperPage] = useState(0); // current paper page (0-indexed)
+  const [explanationModalQId, setExplanationModalQId] = useState<string | null>(null); // open explanation modal for this question id
+  const [paperPageSize, setPaperPageSize] = useState(6); // 6 questions/page (can fall back to 4–5 visually)
   const [showFontSlider, setShowFontSlider] = useState(false);
   const [showNavigator, setShowNavigator] = useState(false);
   const [showIndex, setShowIndex] = useState(arenaMode === 'learning');
@@ -604,7 +608,7 @@ export default function UnifiedQuizEngine() {
   }, [sessionTestId, sessionAttemptId, session?.user?.id]);
 
   useEffect(() => {
-    if (!showIndex && viewMode === 'list' && currentIndex >= 0) {
+  if (!showIndex && viewMode === 'list' && currentIndex >= 0) {
       const scrollTimer = setTimeout(() => {
         try {
           listRef.current?.scrollToIndex({ 
@@ -2311,6 +2315,241 @@ export default function UnifiedQuizEngine() {
     );
   };
 
+  // ============================================================
+  // SIMULATED EXAM MODE — "PAPER" VIEW
+  // 6 questions per page on tablets in a 2-column grid (printed-paper feel).
+  // Falls back to 1 column on phones (< 768 logical px).
+  // Tap on the explanation pill opens a centered modal (see render below).
+  // ============================================================
+  const isPaperWide = width >= 768; // iPad / large screen → 2 columns
+  const totalPaperPages = Math.max(1, Math.ceil(questions.length / paperPageSize));
+
+  const renderPaperQuestion = (item: Question, globalIdx: number) => {
+    if (!item) return null;
+    const answerData = currentAnswers[item.id] || { selectedAnswer: null, confidence: null, difficulty: null, errorCategory: null, note: '' };
+    return (
+      <View
+        key={`paper-q-${item.id}`}
+        style={[
+          stylesPaper.qCard,
+          {
+            backgroundColor: isZenMode ? 'transparent' : colors.surface,
+            borderColor: isZenMode ? 'rgba(67,52,34,0.15)' : colors.border,
+          },
+        ]}
+        testID={`paper-question-${globalIdx}`}
+      >
+        {/* Q number badge + per-question icons row */}
+        <View style={stylesPaper.qHeaderRow}>
+          <View style={[stylesPaper.qNum, { backgroundColor: isZenMode ? '#433422' : colors.primary }]}>
+            <Text style={{ color: isZenMode ? '#F4ECD8' : colors.buttonText, fontWeight: '900', fontSize: 12 }}>
+              {globalIdx + 1}
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
+            <TouchableOpacity
+              onPress={() => store.setMetadata(item.id, { isReview: !answerData.isReview })}
+              testID={`paper-review-${item.id}`}
+            >
+              <Flag size={16} color={answerData.isReview ? '#eab308' : colors.textTertiary} fill={answerData.isReview ? '#eab308' : 'transparent'} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => handleAddToFlashcards(item)}
+              disabled={savingFlashcard[item.id]}
+              testID={`paper-flashcard-${item.id}`}
+            >
+              {savingFlashcard[item.id] ? (
+                <ActivityIndicator size="small" color={colors.primary} />
+              ) : (
+                <Zap size={16} color={flashcardedIds.has(item.id) ? colors.primary : colors.textTertiary} fill={flashcardedIds.has(item.id) ? colors.primary : 'transparent'} />
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Question stem */}
+        <Markdown
+          style={{
+            body: {
+              color: zenTextColor,
+              fontSize: fontSize - 1,
+              lineHeight: (fontSize - 1) * 1.5,
+              fontWeight: '500',
+              fontFamily: Platform.select({ ios: 'Georgia', android: 'serif', default: 'serif' }),
+            },
+          }}
+        >
+          {item.statement_line || item.question_text}
+        </Markdown>
+
+        {/* Options — compact */}
+        <View style={{ marginTop: 8 }}>
+          {Object.entries(item.options || {}).map(([label, text]) => {
+            const isSelected = answerData.selectedAnswer === label;
+            const isCorrect = label.toLowerCase() === item.correct_answer?.toLowerCase();
+            const isWrong = isSelected && !isCorrect;
+            return (
+              <OptionButton
+                key={label}
+                label={label}
+                text={text}
+                isSelected={isSelected}
+                isCorrect={isCorrect}
+                isWrong={isWrong}
+                showResult={arenaMode === 'learning' && !!answerData.selectedAnswer}
+                onSelect={() => handleOptionSelect(item.id, label)}
+                disabled={false}
+              />
+            );
+          })}
+        </View>
+
+        {/* Inline chips: Confidence (Guess), Difficulty, Study Tags, Mistake type */}
+        <View style={{ marginTop: 10, gap: 6 }}>
+          {/* Confidence */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <Text style={{ fontSize: 9, fontWeight: '900', color: colors.textTertiary, letterSpacing: 0.5, marginRight: 4 }}>GUESS</Text>
+            {CONFIDENCE_LEVELS.map(level => (
+              <TouchableOpacity
+                key={level.value}
+                onPress={() => store.setAnswer(item.id, answerData.selectedAnswer, level.value)}
+                style={[stylesPaper.miniChip, { borderColor: colors.border, backgroundColor: colors.bg }, answerData.confidence === level.value && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+              >
+                <Text style={{ fontSize: 10, fontWeight: '700', color: answerData.confidence === level.value ? colors.buttonText : colors.textSecondary }}>{level.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          {/* Difficulty */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <Text style={{ fontSize: 9, fontWeight: '900', color: colors.textTertiary, letterSpacing: 0.5, marginRight: 4 }}>DIFFICULTY</Text>
+            {DIFFICULTIES.map(diff => (
+              <TouchableOpacity
+                key={diff.value}
+                onPress={() => store.setMetadata(item.id, { difficulty: diff.value })}
+                style={[stylesPaper.miniChip, { borderColor: colors.border }, answerData.difficulty === diff.value && { backgroundColor: diff.color + '20', borderColor: diff.color }]}
+              >
+                <Text style={{ fontSize: 10, fontWeight: '700', color: answerData.difficulty === diff.value ? diff.color : colors.textSecondary }}>{diff.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          {/* Study Tags (Revision tags) */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <Text style={{ fontSize: 9, fontWeight: '900', color: colors.textTertiary, letterSpacing: 0.5, marginRight: 4 }}>TAGS</Text>
+            {[...userStudyTags].slice(0, 6).map(tag => {
+              const selected = (answerData.studyTags || []).includes(tag);
+              return (
+                <TouchableOpacity
+                  key={tag}
+                  onPress={() => toggleStudyTag(item.id, answerData.studyTags || [], tag)}
+                  style={[stylesPaper.miniChip, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }, selected && { backgroundColor: colors.primary + '20', borderColor: colors.primary }]}
+                >
+                  <Text style={{ fontSize: 10, fontWeight: '700', color: selected ? colors.primary : colors.textSecondary }}>{tag}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Show Explanation pill — opens centered modal */}
+        {arenaMode === 'learning' && (
+          <TouchableOpacity
+            style={[stylesPaper.explBtn, { borderColor: colors.primary }]}
+            onPress={() => {
+              setExplanationModalQId(item.id);
+              setRevealedExplanations(prev => ({ ...prev, [item.id]: true }));
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+            }}
+            testID={`paper-explanation-btn-${item.id}`}
+          >
+            <Lightbulb size={14} color={colors.primary} />
+            <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 12 }}>Explanation</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  };
+
+  const renderPaperPage = () => {
+    const startIdx = paperPage * paperPageSize;
+    const pageQuestions = questions.slice(startIdx, startIdx + paperPageSize);
+    if (pageQuestions.length === 0) {
+      return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+          <Text style={{ color: colors.textTertiary }}>No questions on this page.</Text>
+        </View>
+      );
+    }
+    // Build columns for 2-column grid; on narrow screens, single column.
+    const columns: Question[][] = isPaperWide ? [[], []] : [[]];
+    pageQuestions.forEach((q, i) => {
+      const colIdx = isPaperWide ? i % 2 : 0;
+      columns[colIdx].push(q);
+    });
+
+    return (
+      <View style={{ flex: 1 }}>
+        <ScrollView
+          contentContainerStyle={{ padding: isPaperWide ? 24 : 14, paddingBottom: 90 }}
+          testID="paper-scroll"
+        >
+          {/* Page banner */}
+          <View style={{ alignItems: 'center', marginBottom: 14 }}>
+            <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textTertiary, letterSpacing: 2 }}>
+              SIMULATED EXAM PAPER · PAGE {paperPage + 1} OF {totalPaperPages}
+            </Text>
+            <View style={{ width: 60, height: 2, backgroundColor: colors.border, marginTop: 6 }} />
+          </View>
+          <View style={{ flexDirection: 'row', gap: isPaperWide ? 32 : 0 }}>
+            {columns.map((col, colIdx) => (
+              <View key={`col-${colIdx}`} style={{ flex: 1, gap: isPaperWide ? 20 : 14 }}>
+                {col.map((q) => {
+                  const globalIdx = questions.findIndex(qq => qq.id === q.id);
+                  return renderPaperQuestion(q, globalIdx);
+                })}
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+
+        {/* Pagination footer */}
+        <View style={[stylesPaper.pagerBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
+          <TouchableOpacity
+            onPress={() => setPaperPage(p => Math.max(0, p - 1))}
+            disabled={paperPage === 0}
+            style={[stylesPaper.pagerBtn, { backgroundColor: colors.surfaceStrong, opacity: paperPage === 0 ? 0.4 : 1 }]}
+            testID="paper-prev"
+          >
+            <ArrowLeft size={18} color={colors.textPrimary} />
+            <Text style={{ color: colors.textPrimary, fontWeight: '800' }}>Prev</Text>
+          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center', flex: 1 }}>
+            {Array.from({ length: totalPaperPages }).map((_, p) => (
+              <TouchableOpacity
+                key={`pgnum-${p}`}
+                onPress={() => setPaperPage(p)}
+                style={[stylesPaper.pageDot, p === paperPage && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                testID={`paper-page-${p}`}
+              >
+                <Text style={{ color: p === paperPage ? colors.buttonText : colors.textSecondary, fontWeight: '900', fontSize: 11 }}>{p + 1}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <TouchableOpacity
+            onPress={() => setPaperPage(p => Math.min(totalPaperPages - 1, p + 1))}
+            disabled={paperPage >= totalPaperPages - 1}
+            style={[stylesPaper.pagerBtn, { backgroundColor: colors.primary, opacity: paperPage >= totalPaperPages - 1 ? 0.4 : 1 }]}
+            testID="paper-next"
+          >
+            <Text style={{ color: colors.buttonText, fontWeight: '800' }}>Next</Text>
+            <ArrowRight size={18} color={colors.buttonText} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
+
+
   const renderNotebookModal = () => {
     return (
       <NotebookModal
@@ -2598,7 +2837,10 @@ export default function UnifiedQuizEngine() {
                           onPress={() => { 
                             setShowNavigator(false); 
                             setTimeout(() => {
-                              if (viewMode === 'card') { 
+                              if (viewMode === 'paper') {
+                                setPaperPage(Math.floor(idx / paperPageSize));
+                                setCurrentIndex(idx);
+                              } else if (viewMode === 'card') { 
                                 setCurrentIndex(idx); 
                               } else { 
                                 listRef.current?.scrollToIndex({ index: idx, animated: true }); 
@@ -2702,7 +2944,9 @@ export default function UnifiedQuizEngine() {
             {showIndex ? renderQuestionIndex() : (
               <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
                 <View style={{ flex: 1 }}>
-              {viewMode === 'list' ? (
+              {viewMode === 'paper' ? (
+                renderPaperPage()
+              ) : viewMode === 'list' ? (
                 <FlatList
                   ref={listRef}
                   data={questions}
@@ -3315,6 +3559,108 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   }
+});
+
+// Simulated Exam Mode (paper view) styles
+const stylesPaper = StyleSheet.create({
+  qCard: {
+    borderWidth: 1,
+    borderRadius: 14,
+    padding: 14,
+    gap: 6,
+  },
+  qHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  qNum: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  miniChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  explBtn: {
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+  },
+  pagerBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    gap: 12,
+  },
+  pagerBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 12,
+  },
+  pageDot: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalCard: {
+    width: '100%',
+    maxWidth: 720,
+    maxHeight: '90%',
+    borderRadius: 24,
+    overflow: 'hidden',
+  },
+  stickyBar: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+  },
+  stickyBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  stickyBtnText: {
+    fontSize: 12,
+    fontWeight: '800',
+  },
 });
 
 const SaveNameModal = ({ visible, onClose, onSave, value, setValue, isSaving }: any) => {

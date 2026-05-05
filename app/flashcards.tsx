@@ -470,14 +470,14 @@ export default function FlashcardsHub() {
           onClose={() => setExportSheetVisible(false)}
           payload={exportPayload}
           title={exportTitle}
-          initialOptions={{
+          initialOptions={useMemo(() => ({
             title: exportTitle,
             moduleName: 'Flashcards',
             showTOC: false,
             headerText: 'Dr. UPSC · Flashcards',
             footerText: exportTitle,
             sortBy: 'subject',
-          }}
+          }), [exportTitle])}
           hideSections={['content', 'answer', 'sort', 'filters']}
         />
 

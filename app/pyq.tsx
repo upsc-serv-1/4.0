@@ -2642,7 +2642,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         title={questionExportScope === 'all_subjects' ? 'PYQ Questions Export' : 'PYQ Subject Export'}
         analysisReports={ANALYSIS_REPORT_OPTIONS}
         onBuildAnalysisHtml={buildAnalysisExecutiveSummaryHtml}
-        initialOptions={{
+        initialOptions={useMemo(() => ({
           moduleName: 'PYQ Analysis',
           showTOC: true,
           headerText: 'PYQ Analysis',
@@ -2660,7 +2660,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           yearStart: questionExportYearBounds.start,
           yearEnd: questionExportYearBounds.end,
           sortBy: 'subject_section_microtopic',
-        }}
+        }), [questionExportScope, questionExportSubject, questionExportSections, questionExportMicros, questionExportYearBounds])}
       />
 
       <Modal visible={modalVisible} transparent animationType="fade" onRequestClose={() => setModalVisible(false)}>

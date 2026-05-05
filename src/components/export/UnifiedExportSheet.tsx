@@ -118,16 +118,19 @@ const CHOICES = {
   ],
 };
 
+const DEFAULT_ANALYSIS_REPORTS: AnalysisReportOption[] = [];
+const DEFAULT_HIDE_SECTIONS: Array<'content' | 'sort' | 'answer' | 'filters' | 'advanced'> = [];
+
 export const UnifiedExportSheet: React.FC<Props> = ({
   visible,
   onClose,
   payload,
   initialOptions,
   title,
-  analysisReports = [],
+  analysisReports = DEFAULT_ANALYSIS_REPORTS,
   onBuildAnalysisHtml,
   renderExtraFilters,
-  hideSections = [],
+  hideSections = DEFAULT_HIDE_SECTIONS,
 }) => {
   const { colors } = useTheme();
   const [opts, setOpts] = useState<ExportOptions>(() => defaultExportOptions({
@@ -164,7 +167,7 @@ export const UnifiedExportSheet: React.FC<Props> = ({
 
       setIsExporting(false);
     }
-  }, [visible, title, initialOptions, analysisReports, payload]);
+  }, [visible]);
 
   React.useEffect(() => {
     if (!visible) setIsExporting(false);

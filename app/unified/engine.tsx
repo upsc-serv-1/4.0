@@ -682,6 +682,21 @@ export default function UnifiedQuizEngine() {
     }
   };
 
+  const toggleGuess = (qId: string, selectedAnswer: string | null | undefined, guessValue: string) => {
+    const currentGuess = currentAnswers[qId]?.confidence || null;
+    store.setAnswer(qId, selectedAnswer ?? null, currentGuess === guessValue ? null : guessValue);
+  };
+
+  const toggleDifficulty = (qId: string, difficultyValue: string) => {
+    const currentDifficulty = currentAnswers[qId]?.difficulty || null;
+    store.setMetadata(qId, { difficulty: currentDifficulty === difficultyValue ? null : difficultyValue });
+  };
+
+  const toggleMistakeType = (qId: string, errorType: string) => {
+    const currentError = currentAnswers[qId]?.errorCategory || null;
+    store.setMetadata(qId, { errorCategory: currentError === errorType ? null : errorType });
+  };
+
   const NOTE_PREFS_KEY = 'notebook_save_prefs';
   const listRef = useRef<FlatList>(null);
 
@@ -2131,7 +2146,7 @@ export default function UnifiedQuizEngine() {
                   {CONFIDENCE_LEVELS.map(level => (
                     <TouchableOpacity
                       key={level.value}
-                      onPress={() => store.setAnswer(item.id, answerData.selectedAnswer, level.value)}
+                      onPress={() => toggleGuess(item.id, answerData.selectedAnswer, level.value)}
                       style={[styles.chip, { backgroundColor: colors.bg, borderColor: colors.border }, answerData.confidence === level.value && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                     >
                       <Text style={[styles.chipText, { color: answerData.confidence === level.value ? colors.buttonText : colors.textSecondary }]}>{level.label}</Text>
@@ -2146,7 +2161,7 @@ export default function UnifiedQuizEngine() {
                   {DIFFICULTIES.map(diff => (
                     <TouchableOpacity
                       key={diff.value}
-                      onPress={() => store.setMetadata(item.id, { difficulty: diff.value })}
+                      onPress={() => toggleDifficulty(item.id, diff.value)}
                       style={[styles.difficultyBtn, { borderColor: colors.border }, answerData.difficulty === diff.value && { backgroundColor: diff.color + '20', borderColor: diff.color }]}
                     >
                       <Text style={[styles.difficultyText, { color: answerData.difficulty === diff.value ? diff.color : colors.textSecondary }]}>{diff.label}</Text>
@@ -2340,7 +2355,7 @@ export default function UnifiedQuizEngine() {
                       {ERROR_TYPES.map(type => (
                         <TouchableOpacity
                           key={type}
-                          onPress={() => store.setMetadata(item.id, { errorCategory: type })}
+                          onPress={() => toggleMistakeType(item.id, type)}
                           style={[styles.chip, { backgroundColor: colors.surface, borderColor: colors.border }, answerData.errorCategory === type && { backgroundColor: colors.primary + '20', borderColor: colors.primary }]}
                         >
                           <Text style={[styles.chipText, { color: answerData.errorCategory === type ? colors.primary : colors.textSecondary }]}>{type}</Text>
@@ -2498,7 +2513,7 @@ export default function UnifiedQuizEngine() {
             {CONFIDENCE_LEVELS.map(level => (
               <TouchableOpacity
                 key={level.value}
-                onPress={() => store.setAnswer(item.id, answerData.selectedAnswer, level.value)}
+                onPress={() => toggleGuess(item.id, answerData.selectedAnswer, level.value)}
                 style={[stylesPaper.miniChip, { borderColor: colors.border, backgroundColor: colors.bg }, answerData.confidence === level.value && { backgroundColor: colors.primary, borderColor: colors.primary }]}
               >
                 <Text style={{ fontSize: 10, fontWeight: '700', color: answerData.confidence === level.value ? colors.buttonText : colors.textSecondary }}>{level.label}</Text>
@@ -2511,7 +2526,7 @@ export default function UnifiedQuizEngine() {
             {DIFFICULTIES.map(diff => (
               <TouchableOpacity
                 key={diff.value}
-                onPress={() => store.setMetadata(item.id, { difficulty: diff.value })}
+                onPress={() => toggleDifficulty(item.id, diff.value)}
                 style={[stylesPaper.miniChip, { borderColor: colors.border }, answerData.difficulty === diff.value && { backgroundColor: diff.color + '20', borderColor: diff.color }]}
               >
                 <Text style={{ fontSize: 10, fontWeight: '700', color: answerData.difficulty === diff.value ? diff.color : colors.textSecondary }}>{diff.label}</Text>
@@ -3263,7 +3278,7 @@ export default function UnifiedQuizEngine() {
                         {ERROR_TYPES.map(type => (
                           <TouchableOpacity
                             key={type}
-                            onPress={() => store.setMetadata(q.id, { errorCategory: type })}
+                            onPress={() => toggleMistakeType(q.id, type)}
                             style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 14, borderWidth: 1, borderColor: colors.border, backgroundColor: ans.errorCategory === type ? colors.primary + '20' : colors.surfaceStrong }}
                           >
                             <Text style={{ fontSize: 11, fontWeight: '700', color: ans.errorCategory === type ? colors.primary : colors.textSecondary }}>{type}</Text>

@@ -13,7 +13,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-nativ
 import {
   BookOpen, Scale, Scroll, TrendingUp, Globe, Leaf, Atom, Hash, Palette, Shield,
   Map as MapIcon, Heart, Users, Settings as SettingsIcon, Folder, FileDown, Edit2,
-  Trash2, FolderInput, FolderPlus, Play,
+  Trash2, FolderInput, FolderPlus, Play, MoreHorizontal,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { NoteNode } from './NoteRow';
@@ -113,6 +113,15 @@ export function SubjectHubGrid({ folders, onOpen, onAction }: Props) {
               },
             ]}
           >
+            {/* More button */}
+            <TouchableOpacity
+              onPress={() => onAction(node, 'rename')}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+              style={[styles.moreBtn, { backgroundColor: colors.surfaceStrong }]}
+            >
+              <MoreHorizontal size={11} color={colors.textTertiary} />
+            </TouchableOpacity>
+
             <View style={[styles.iconWrap, { backgroundColor: bg }]}>
               <Icon size={26} color={fg} strokeWidth={1.8} />
             </View>
@@ -130,49 +139,34 @@ export function SubjectHubGrid({ folders, onOpen, onAction }: Props) {
                 item{counts.total === 1 ? '' : 's'}
               </Text>
             </View>
-            <View style={styles.metaRow}>
-              {counts.folders > 0 && (
-                <Text style={[styles.metaPill, { color: colors.textTertiary }]}>
-                  {counts.folders} fld
-                </Text>
-              )}
-              {counts.notebooks > 0 && (
-                <Text style={[styles.metaPill, { color: colors.textTertiary }]}>
-                  {counts.notebooks} nb
-                </Text>
-              )}
+
+            {/* Glance-type chips */}
+            <View style={styles.chipsRow}>
               {counts.notes > 0 && (
-                <Text style={[styles.metaPill, { color: colors.textTertiary }]}>
-                  {counts.notes} note{counts.notes === 1 ? '' : 's'}
-                </Text>
+                <View style={[styles.typeChip, { backgroundColor: bg + '66' }]}>
+                  <Text style={[styles.typeChipText, { color: fg }]}>Notes</Text>
+                </View>
+              )}
+              {counts.folders > 0 && (
+                <View style={[styles.typeChip, { backgroundColor: bg + '66' }]}>
+                  <Text style={[styles.typeChipText, { color: fg }]}>Folders</Text>
+                </View>
               )}
             </View>
 
-            <View style={styles.actionRow}>
-              <ActionDot icon={<Play size={13} color={fg} />} onPress={() => onAction(node, 'play')} bg={fg + '14'} testID={`vault-subject-play-${node.id}`} />
-              <ActionDot icon={<FolderPlus size={13} color="#10b981" />} onPress={() => onAction(node, 'add')} bg="#dcfce7" testID={`vault-subject-add-${node.id}`} />
-              <ActionDot icon={<FileDown size={13} color="#0ea5e9" />} onPress={() => onAction(node, 'export')} bg="#e0f2fe" testID={`vault-subject-export-${node.id}`} />
-              <ActionDot icon={<Edit2 size={13} color="#f59e0b" />} onPress={() => onAction(node, 'rename')} bg="#fef3c7" testID={`vault-subject-rename-${node.id}`} />
-              <ActionDot icon={<FolderInput size={13} color="#8b5cf6" />} onPress={() => onAction(node, 'move')} bg="#ede9fe" testID={`vault-subject-move-${node.id}`} />
-              <ActionDot icon={<Trash2 size={13} color="#ef4444" />} onPress={() => onAction(node, 'delete')} bg="#fee2e2" testID={`vault-subject-delete-${node.id}`} />
+            {/* Progress bar */}
+            <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
+              <View
+                style={[
+                  styles.progressBar,
+                  { backgroundColor: fg, width: Math.min(100, counts.total * 10) + '%' },
+                ]}
+              />
             </View>
           </Pressable>
         );
       })}
     </View>
-  );
-}
-
-function ActionDot({ icon, onPress, bg, testID }: { icon: React.ReactNode; onPress: () => void; bg: string; testID?: string }) {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      data-testid={testID}
-      hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-      style={[styles.actionDot, { backgroundColor: bg }]}
-    >
-      {icon}
-    </TouchableOpacity>
   );
 }
 
@@ -186,7 +180,7 @@ const styles = StyleSheet.create({
   card: {
     width: '47.5%',
     flexGrow: 1,
-    borderRadius: 22,
+    borderRadius: 18,
     borderWidth: 1,
     padding: 16,
     minHeight: 180,
@@ -195,6 +189,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 14,
     elevation: 2,
+  },
+  moreBtn: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 22,
+    height: 22,
+    borderRadius: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
   },
   iconWrap: {
     width: 48,
@@ -228,22 +233,11 @@ const styles = StyleSheet.create({
   },
   countText: { fontSize: 13, fontWeight: '900', letterSpacing: -0.3 },
   countLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase' },
-  metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
-  metaPill: { fontSize: 10, fontWeight: '700', letterSpacing: 0.4 },
-
-  actionRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    marginTop: 'auto',
-  },
-  actionDot: {
-    width: 28,
-    height: 28,
-    borderRadius: 9,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 3, marginBottom: 10 },
+  typeChip: { paddingHorizontal: 7, paddingVertical: 2, borderRadius: 20 },
+  typeChipText: { fontSize: 9, fontWeight: '800' },
+  progressTrack: { height: 2.5, borderRadius: 2, marginTop: 10, overflow: 'hidden' },
+  progressBar: { height: 2.5, borderRadius: 2 },
 
   empty: {
     alignItems: 'center',

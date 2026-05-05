@@ -369,7 +369,12 @@ export default function UnifiedQuizEngine() {
 
   // 1. Config from Params
   const showPYQTagsParam = params.showPYQTags !== 'false';
-  const [viewMode, setViewMode] = useState<'list' | 'card'>((params.view as 'list' | 'card') || 'list');
+  // viewMode: 'list' | 'card' | 'paper'
+  // 'paper' is the new Simulated Exam Mode (printed-paper layout, 2-column grid).
+  // When the student launches in Exam mode from Arena, we default to 'paper'.
+  const initialView: 'list' | 'card' | 'paper' = (params.view as any)
+    || (arenaMode === 'exam' ? 'paper' : 'list');
+  const [viewMode, setViewMode] = useState<'list' | 'card' | 'paper'>(initialView);
   const timerType = (params.timer as 'countdown' | 'stopwatch' | 'none') || 'none';
   const [showModeSelection, setShowModeSelection] = useState(params.mode === 'choice');
 
@@ -2435,6 +2440,26 @@ export default function UnifiedQuizEngine() {
           <View style={styles.headerActions}>
             <TouchableOpacity onPress={toggleZenMode} style={styles.headerBtn}>
               <Sparkles size={20} color={isZenMode ? '#433422' : colors.primary} />
+            </TouchableOpacity>
+            {/* Paper / List view toggle (always visible). 'paper' = Simulated Exam Mode. */}
+            <TouchableOpacity
+              onPress={() => {
+                setViewMode(prev => prev === 'paper' ? 'list' : 'paper');
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+              }}
+              style={[styles.headerBtn, viewMode === 'paper' && { backgroundColor: (isZenMode ? '#43342220' : colors.primary + '15'), borderRadius: 10 }]}
+              testID="engine-paper-toggle"
+            >
+              <BookOpen size={20} color={viewMode === 'paper' ? (isZenMode ? '#433422' : colors.primary) : (isZenMode ? '#433422' : colors.textPrimary)} />
+            </TouchableOpacity>
+            {/* Palette / Navigator — promoted out of the quick menu so it's
+                always one tap away (essential during a paper-style exam). */}
+            <TouchableOpacity
+              onPress={() => setShowNavigator(true)}
+              style={styles.headerBtn}
+              testID="engine-palette-btn"
+            >
+              <LayoutGrid size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
             </TouchableOpacity>
             {!showIndex && (
               <TouchableOpacity onPress={() => setShowIndex(true)} style={styles.headerBtn}>

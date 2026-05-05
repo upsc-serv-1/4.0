@@ -93,16 +93,59 @@ export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpa
   const indentWidth = 40;
 
   const getIcon = () => {
-    if (node.type === 'note') return <FileText size={18} color="#0ea5e9" />;
-    if (node.type === 'notebook') return <BookOpen size={18} color="#10b981" />;
-    return <Folder size={18} color="#f59e0b" />;
+    if (node.type === 'note') return <FileText size={18} color={colors.primary} />;
+    if (node.type === 'notebook') return <BookOpen size={18} color={colors.primary} />;
+    return <Folder size={18} color={colors.textSecondary} />;
   };
 
   const getIconBg = () => {
-    if (node.type === 'note') return '#e0f2fe';
-    if (node.type === 'notebook') return '#dcfce7';
-    return '#fef3c7';
+    if (node.type === 'note') return colors.primary + '15';
+    if (node.type === 'notebook') return colors.primary + '15';
+    return colors.surfaceStrong;
   };
+
+  // Depth-specific container styles
+  const getContainerStyles = () => {
+    if (node.depth === 0) {
+      return {
+        backgroundColor: colors.surface,
+        borderRadius: expanded ? 14 : 14,
+        borderBottomLeftRadius: expanded ? 0 : 14,
+        borderBottomRightRadius: expanded ? 0 : 14,
+        marginHorizontal: 0,
+        marginBottom: 3,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+      };
+    } else if (node.depth === 1) {
+      return {
+        backgroundColor: colors.surfaceStrong,
+        borderRadius: expanded ? 10 : 10,
+        borderBottomLeftRadius: expanded ? 0 : 10,
+        borderBottomRightRadius: expanded ? 0 : 10,
+        marginLeft: 10,
+        marginBottom: 2,
+        paddingVertical: 7,
+        paddingHorizontal: 10,
+        borderLeftWidth: 1.5,
+        borderLeftColor: colors.border + '60',
+        paddingLeft: 10,
+      };
+    } else {
+      return {
+        backgroundColor: colors.surface,
+        borderRadius: 8,
+        marginLeft: 20,
+        marginBottom: 2,
+        paddingVertical: 6,
+        paddingHorizontal: 9,
+        borderLeftWidth: 1.5,
+        borderLeftColor: colors.border + '60',
+      };
+    }
+  };
+
+  const containerStyle = getContainerStyles();
 
   return (
     <Swipeable
@@ -111,39 +154,22 @@ export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpa
       friction={2}
       rightThreshold={40}
     >
-      <View style={[styles.row, { backgroundColor: colors.bg, borderBottomColor: colors.border + 'A0' }, style]} data-testid={`vault-row-${node.id}`}>
+      <View
+        style={[
+          styles.row,
+          { backgroundColor: colors.bg, borderBottomColor: colors.border + 'A0' },
+          containerStyle,
+          style,
+        ]}
+        data-testid={`vault-row-${node.id}`}
+      >
         <View style={styles.content}>
-          {/* Hierarchy Lines */}
-          {Array.from({ length: node.depth }).map((_, i) => (
-            <View
-              key={i}
-              style={[styles.verticalLine, { left: i * indentWidth + 20, backgroundColor: colors.border + '80' }]}
-            />
-          ))}
-
-          {/* Toggle / Icon Area */}
-          <View style={[styles.iconArea, { marginLeft: node.depth * indentWidth }]}>
-            {node.type !== 'folder' || node.depth === 0 ? (
-              <TouchableOpacity onPress={onOpen} style={styles.folderIconWrap}>
-                <View style={[styles.officialFolderIcon, { backgroundColor: getIconBg() }]}>
-                  {getIcon()}
-                </View>
-              </TouchableOpacity>
-            ) : hasChildren ? (
-              <TouchableOpacity
-                onPress={onToggle}
-                style={[styles.circleIcon, { backgroundColor: colors.surface, borderColor: colors.border }]}
-              >
-                {expanded ? (
-                  <Minus size={14} color={colors.textTertiary} strokeWidth={3} />
-                ) : (
-                  <Plus size={14} color={colors.textTertiary} strokeWidth={3} />
-                )}
-              </TouchableOpacity>
-            ) : (
-              <View style={styles.circlePlaceholder} />
-            )}
-          </View>
+          {/* Icon */}
+          <TouchableOpacity onPress={onOpen} style={styles.iconWrap}>
+            <View style={[styles.iconBox, { backgroundColor: getIconBg() }]}>
+              {getIcon()}
+            </View>
+          </TouchableOpacity>
 
           {/* Text Area */}
           <TouchableOpacity
@@ -166,14 +192,13 @@ export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpa
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 data-testid={`vault-glance-toggle-${node.id}`}
                 style={[
-                  styles.glanceBtn,
+                  styles.glancePill,
                   {
                     backgroundColor: glanceExpanded ? colors.primary + '18' : colors.surface,
-                    borderColor: glanceExpanded ? colors.primary + '50' : colors.border,
                   },
                 ]}
               >
-                <Sparkles size={13} color={glanceExpanded ? colors.primary : colors.textTertiary} />
+                <Text style={[styles.glancePillText, { color: colors.primary }]}>Glances</Text>
               </TouchableOpacity>
             )}
 
@@ -217,41 +242,17 @@ const styles = StyleSheet.create({
   action: { alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 12, height: '100%' },
   actionCircle: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   actionLabel: { fontSize: 8, fontWeight: '800', textTransform: 'uppercase' },
-  row: { paddingHorizontal: 4, borderBottomWidth: 1 },
-  content: { flexDirection: 'row', alignItems: 'center', minHeight: 70 },
-  verticalLine: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: 1,
-  },
-  iconArea: {
+  row: { paddingHorizontal: 4, borderBottomWidth: 0 },
+  content: { flexDirection: 'row', alignItems: 'center', minHeight: 60 },
+  iconWrap: {
     width: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 10,
   },
-  circleIcon: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 1.5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  circlePlaceholder: {
-    width: 22,
-  },
-  folderIconWrap: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  officialFolderIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
+  iconBox: {
+    width: 30,
+    height: 30,
+    borderRadius: 9,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -259,7 +260,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 8,
     gap: 8,
   },
   name: {
@@ -271,13 +272,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
   },
-  glanceBtn: {
-    width: 30,
-    height: 30,
-    borderRadius: 9,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+  glancePill: {
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 20,
+  },
+  glancePillText: {
+    fontSize: 9,
+    fontWeight: '800',
   },
   playBtn: {
     width: 30,

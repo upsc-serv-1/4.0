@@ -2504,6 +2504,16 @@ export default function UnifiedQuizEngine() {
                     <Save size={16} color={colors.textPrimary} />
                     <Text style={[styles.actionBtnText, { color: colors.textPrimary }]}>Save</Text>
                  </TouchableOpacity>
+                 {!!item.test_id && params.testId !== item.test_id && (
+                   <TouchableOpacity
+                     testID={`engine-view-source-action-${item.id}`}
+                     style={[styles.actionBtn, { backgroundColor: colors.surfaceStrong }]}
+                     onPress={() => handleViewSource(item)}
+                   >
+                      <ExternalLink size={16} color={colors.textPrimary} />
+                      <Text style={[styles.actionBtnText, { color: colors.textPrimary }]}>View Source</Text>
+                   </TouchableOpacity>
+                 )}
               </View>
 
               <View style={[styles.noteSection, { marginTop: 24, padding: 20, borderRadius: 24, backgroundColor: colors.surfaceStrong + '50', borderWidth: 1, borderColor: colors.border }]}>

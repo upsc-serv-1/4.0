@@ -187,14 +187,14 @@ export default function UnifiedArenaSetup() {
   const [activeTab, setActiveTab] = useState<'topic' | 'paper' | 'search'>(initialTab);
 
   // 2. Filter Selections
-  const [selectedSubject, setSelectedSubject] = useState('All');
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [selectedSection, setSelectedSection] = useState<string[]>([]);
   const [selectedMicrotopic, setSelectedMicrotopic] = useState<string[]>([]);
 
   const [pyqMaster, setPyqMaster] = useState('All');
   const [selectedExamCategory, setSelectedExamCategory] = useState<string[]>([]);
 
-  const [selectedInstitute, setSelectedInstitute] = useState('All');
+  const [selectedInstitutes, setSelectedInstitutes] = useState<string[]>([]);
   const [selectedProgram, setSelectedProgram] = useState('All');
   const [selectedExamStage, setSelectedExamStage] = useState('All');
   const [selectedTestId, setSelectedTestId] = useState<string | null>(null);
@@ -258,7 +258,8 @@ export default function UnifiedArenaSetup() {
 
   // 🆕 Sync Pilot Dashboard Filters
   useEffect(() => {
-    if (params.subject) setSelectedSubject(params.subject as string);
+    if (params.subjects) setSelectedSubjects(String(params.subjects).split(',').filter(Boolean));
+    else if (params.subject && params.subject !== 'All') setSelectedSubjects([params.subject as string]);
     if (params.section) {
       const sList = (params.section as string).split('|').filter(Boolean);
       setSelectedSection(sList);
@@ -274,12 +275,12 @@ export default function UnifiedArenaSetup() {
   useEffect(() => {
     updateQuestionCount();
   }, [
-    selectedSubject,
+    selectedSubjects,
     selectedSection,
     selectedMicrotopic,
     pyqMaster,
     selectedExamCategory,
-    selectedInstitute,
+    selectedInstitutes,
     selectedProgram,
     selectedExamStage,
     selectedTestId,
@@ -306,7 +307,7 @@ export default function UnifiedArenaSetup() {
     if (activeTab === 'paper') {
       setPaperVisibleCount(40);
     }
-  }, [activeTab, selectedInstitute, selectedProgram, selectedExamStage, selectedTestId]);
+  }, [activeTab, selectedInstitutes, selectedProgram, selectedExamStage, selectedTestId]);
 
   const fetchSearchResults = async () => {
     if (!searchQuery && Object.keys(searchFilters).length === 0) {
@@ -541,12 +542,12 @@ export default function UnifiedArenaSetup() {
 
       const isDefaultAllQuestions =
         activeTab === 'topic' &&
-        selectedSubject === 'All' &&
+        selectedSubjects.length === 0 &&
         selectedSection.length === 0 &&
         selectedMicrotopic.length === 0 &&
         pyqMaster === 'All' &&
         selectedExamCategory.length === 0 &&
-        selectedInstitute === 'All' &&
+        selectedInstitutes.length === 0 &&
         selectedProgram === 'All' &&
         selectedTags.length === 0 &&
         ncertFilter === 'All';
@@ -578,7 +579,7 @@ export default function UnifiedArenaSetup() {
         if (selectedTestId) {
           rows = rows.filter((m: any) => m.test_id === selectedTestId);
         } else {
-          if (selectedInstitute !== 'All') rows = rows.filter((m: any) => m.institute === selectedInstitute);
+          if (selectedInstitutes.length > 0) rows = rows.filter((m: any) => selectedInstitutes.includes(m.institute));
           if (selectedProgram !== 'All') rows = rows.filter((m: any) => m.program_name === selectedProgram);
           if (selectedExamStage !== 'All') rows = rows.filter((m: any) => m.series === selectedExamStage);
         }
@@ -597,7 +598,7 @@ export default function UnifiedArenaSetup() {
       let query = LocalQuery.from('questions').select('id', { count: 'exact', head: true });
 
       if (activeTab === 'topic') {
-        if (selectedSubject !== 'All') query = query.eq('subject', selectedSubject);
+        if (selectedSubjects.length > 0) query = query.in('subject', selectedSubjects);
         if (selectedSection.length > 0) {
           const sections = selectedSection.map(s => s === "General" ? null : s);
           if (sections.includes(null)) {
@@ -648,9 +649,9 @@ export default function UnifiedArenaSetup() {
           }
         }
 
-        if (selectedInstitute !== 'All' || selectedProgram !== 'All') {
+        if (selectedInstitutes.length > 0 || selectedProgram !== 'All') {
           let tQuery = LocalQuery.from('tests').select('id');
-          if (selectedInstitute !== 'All') tQuery = tQuery.eq('institute', selectedInstitute);
+          if (selectedInstitutes.length > 0) tQuery = tQuery.in('institute', selectedInstitutes);
           if (selectedProgram !== 'All') tQuery = tQuery.eq('program_name', selectedProgram);
           const { data: testRows } = await tQuery;
           const testIds = (testRows || []).map(t => t.id);
@@ -676,24 +677,31 @@ export default function UnifiedArenaSetup() {
   }, [metadata]);
 
   const sections = useMemo(() => {
-    if (selectedSubject === 'All') return [];
+    const base = selectedSubjects.length > 0
+      ? metadata.filter(m => selectedSubjects.includes(m.subject))
+      : metadata;
+
     return Array.from(new Set(
-      metadata
-        .filter(m => m.subject === selectedSubject)
+      base
         .map(m => m.section_group)
         .filter(Boolean)
     )).sort();
-  }, [metadata, selectedSubject]);
+  }, [metadata, selectedSubjects]);
 
   const microtopics = useMemo(() => {
     if (selectedSection.length === 0) return [];
+
     return Array.from(new Set(
       metadata
-        .filter(m => m.subject === selectedSubject && selectedSection.includes(m.section_group))
+        .filter(m => {
+          const subjectMatch = selectedSubjects.length === 0 || selectedSubjects.includes(m.subject);
+          const sectionMatch = selectedSection.includes(m.section_group);
+          return subjectMatch && sectionMatch;
+        })
         .map(m => m.micro_topic)
         .filter(Boolean)
     )).sort();
-  }, [metadata, selectedSubject, selectedSection]);
+  }, [metadata, selectedSubjects, selectedSection]);
 
   const examCategories = ['UPSC CSE', 'Allied Exams', 'Others'];
 
@@ -703,10 +711,10 @@ export default function UnifiedArenaSetup() {
 
   const programs = useMemo(() => {
     let base = metadata;
-    if (selectedInstitute !== 'All') base = base.filter(m => m.institute === selectedInstitute);
+    if (selectedInstitutes.length > 0) base = base.filter(m => selectedInstitutes.includes(m.institute));
     if (selectedExamStage !== 'All') base = base.filter(m => m.series === selectedExamStage);
     return Array.from(new Set(base.map(m => m.program_name).filter(Boolean))).sort();
-  }, [metadata, selectedInstitute, selectedExamStage]);
+  }, [metadata, selectedInstitutes, selectedExamStage]);
 
   const examStages = useMemo(() => {
     return Array.from(new Set(metadata.map(m => m.series).filter(Boolean))).sort();
@@ -716,7 +724,7 @@ export default function UnifiedArenaSetup() {
     const tests = new Map();
     metadata.forEach(m => {
       if (!m.test_id) return;
-      if (selectedInstitute !== 'All' && m.institute !== selectedInstitute) return;
+      if (selectedInstitutes.length > 0 && !selectedInstitutes.includes(m.institute)) return;
       if (selectedProgram !== 'All' && m.program_name !== selectedProgram) return;
       if (selectedExamStage !== 'All' && m.series !== selectedExamStage) return;
 
@@ -731,7 +739,7 @@ export default function UnifiedArenaSetup() {
       }
     });
     return Array.from(tests.values()).sort((a, b) => String(a.title).localeCompare(String(b.title)));
-  }, [metadata, selectedInstitute, selectedProgram, selectedExamStage]);
+  }, [metadata, selectedInstitutes, selectedProgram, selectedExamStage]);
 
   const visiblePaperTests = useMemo(() => testList.slice(0, paperVisibleCount), [testList, paperVisibleCount]);
 
@@ -774,12 +782,14 @@ export default function UnifiedArenaSetup() {
     } else if (activeTab === 'topic') {
       finalParams = {
         ...baseParams,
-        subject: selectedSubject,
+        subject: selectedSubjects[0] || 'All',
+        subjects: selectedSubjects.join(','),
         section: selectedSection.join('|'),
         microtopic: selectedMicrotopic.join('|'),
         pyqMaster: pyqMaster,
         examCategory: Array.isArray(selectedExamCategory) ? selectedExamCategory.join(',') : (selectedExamCategory || ''),
-        institute: selectedInstitute,
+        institute: selectedInstitutes[0] || 'All',
+        institutes: selectedInstitutes.join(','),
         program: selectedProgram,
         tags: selectedTags.join('|'),
         ncertFilter: ncertFilter,
@@ -793,7 +803,8 @@ export default function UnifiedArenaSetup() {
         microtopic: '',
         pyqMaster: 'All',
         examCategory: '',
-        institute: selectedInstitute,
+        institute: selectedInstitutes[0] || 'All',
+        institutes: selectedInstitutes.join(','),
         program: selectedProgram,
         examStage: selectedExamStage,
         tags: '',
@@ -810,13 +821,16 @@ export default function UnifiedArenaSetup() {
 
   const renderTopicModal = () => {
     const subjectSections = Array.from(new Set(
-      metadata.filter(m => m.subject === selectedSubject).map(m => m.section_group).filter(Boolean)
+      metadata
+        .filter(m => selectedSubjects.length === 0 || selectedSubjects.includes(m.subject))
+        .map(m => m.section_group)
+        .filter(Boolean)
     )).sort();
 
     const subjectMicrotopics = Array.from(new Set(
       metadata
         .filter(m => {
-          const subjectMatch = m.subject === selectedSubject;
+          const subjectMatch = selectedSubjects.length === 0 || selectedSubjects.includes(m.subject);
           const sectionMatch = selectedSection.length === 0 || selectedSection.includes(m.section_group);
           const searchMatch = !topicSearch || m.micro_topic?.toLowerCase().includes(topicSearch.toLowerCase());
           return subjectMatch && sectionMatch && searchMatch;
@@ -845,7 +859,7 @@ export default function UnifiedArenaSetup() {
               <View style={styles.modalHeader}>
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.modalTitle, { color: colors.textPrimary, fontSize: 24 }]}>Topic Browser</Text>
-                  <Text style={{ fontSize: 13, color: colors.textTertiary, fontWeight: '600' }}>{selectedSubject} • {selectedSection.length || 'All'} Sections</Text>
+                  <Text style={{ fontSize: 13, color: colors.textTertiary, fontWeight: '600' }}>{selectedSubjects.length || 'All'} Subjects • {selectedSection.length || 'All'} Sections</Text>
                 </View>
                 <TouchableOpacity onPress={() => setShowTopicModal(false)}>
                   <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center' }}>
@@ -1031,12 +1045,13 @@ export default function UnifiedArenaSetup() {
                 <FilterRow
                   title="Subject"
                   items={subjects}
-                  selected={selectedSubject}
-                  onSelect={(val: string) => {
-                    setSelectedSubject(val);
+                  selected={selectedSubjects}
+                  onSelect={(vals: string[]) => {
+                    setSelectedSubjects(vals);
                     setSelectedSection([]);
                     setSelectedMicrotopic([]);
                   }}
+                  multi
                 />
 
                 <View style={{ marginTop: 8 }}>
@@ -1119,18 +1134,19 @@ export default function UnifiedArenaSetup() {
                 <FilterRow
                   title="Institute"
                   items={institutes}
-                  selected={selectedInstitute}
-                  onSelect={(val: string) => {
-                    setSelectedInstitute(val);
+                  selected={selectedInstitutes}
+                  onSelect={(vals: string[]) => {
+                    setSelectedInstitutes(vals);
                     setSelectedProgram('All');
                   }}
+                  multi
                 />
                 <FilterRow
                   title="Program"
                   items={programs}
                   selected={selectedProgram}
                   onSelect={setSelectedProgram}
-                  visible={selectedInstitute !== 'All'}
+                  visible={selectedInstitutes.length > 0}
                 />
               </View>
 
@@ -1153,11 +1169,12 @@ export default function UnifiedArenaSetup() {
                 <FilterRow
                   title="Institute"
                   items={institutes}
-                  selected={selectedInstitute}
-                  onSelect={(val: string) => {
-                    setSelectedInstitute(val);
+                  selected={selectedInstitutes}
+                  onSelect={(vals: string[]) => {
+                    setSelectedInstitutes(vals);
                     setSelectedProgram('All');
                   }}
+                  multi
                 />
                 <FilterRow
                   title="Program"

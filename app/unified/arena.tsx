@@ -44,6 +44,10 @@ import { LocalQuery } from '../../src/services/LocalQuery';
 
 const { width } = Dimensions.get('window');
 
+let arenaMetadataCache: any[] | null = null;
+let arenaMetadataCachedAt = 0;
+const ARENA_METADATA_CACHE_TTL_MS = 90_000;
+
 // --- Helper Components ---
 
 const FilterRow = ({ title, items, selected, onSelect, multi = false, visible = true, showSelectAll = true, allowAll = true }: any) => {
@@ -216,8 +220,9 @@ export default function UnifiedArenaSetup() {
   const [topicSearch, setTopicSearch] = useState('');
 
   // 3. Dynamic Data State
-  const [loading, setLoading] = useState(true);
-  const [metadata, setMetadata] = useState<any[]>([]);
+  const [metadata, setMetadata] = useState<any[]>(() => arenaMetadataCache || []);
+  const [loading, setLoading] = useState(!arenaMetadataCache);
+  const [refreshingMetadata, setRefreshingMetadata] = useState(false);
   const [userTags, setUserTags] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState<number | null>(null);
   const [calculatingCount, setCalculatingCount] = useState(false);
@@ -476,10 +481,34 @@ export default function UnifiedArenaSetup() {
   };
 
   const fetchMetadata = async () => {
-    setLoading(true);
+    const hasWarmCache = Array.isArray(arenaMetadataCache) && arenaMetadataCache.length > 0;
+
+    if (hasWarmCache) {
+      // Immediate paint from warm cache to avoid entry lag/faded loading state.
+      setMetadata(arenaMetadataCache || []);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+
+    const isCacheFresh = hasWarmCache && (Date.now() - arenaMetadataCachedAt) < ARENA_METADATA_CACHE_TTL_MS;
+    if (isCacheFresh) {
+      fetchUserTags();
+      return;
+    }
+
+    setRefreshingMetadata(true);
     try {
       const flattened = await OfflineManager.getConsolidatedMetadata();
-      setMetadata(flattened);
+      const normalized = Array.isArray(flattened) ? flattened : [];
+
+      if (normalized.length > 0) {
+        arenaMetadataCache = normalized;
+        arenaMetadataCachedAt = Date.now();
+        setMetadata(normalized);
+      } else if (!hasWarmCache) {
+        setMetadata([]);
+      }
 
       if (session?.user?.id) {
         await fetchUserTags();
@@ -487,7 +516,8 @@ export default function UnifiedArenaSetup() {
     } catch (err) {
       console.error('Metadata fetch error:', err);
     } finally {
-      setLoading(false);
+      setRefreshingMetadata(false);
+      if (!hasWarmCache) setLoading(false);
     }
   };
 
@@ -921,15 +951,6 @@ export default function UnifiedArenaSetup() {
     );
   };
 
-  if (loading) {
-    return (
-      <View style={[styles.loadingContainer, { backgroundColor: colors.bg }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={{ color: colors.textSecondary, marginTop: 10 }}>Preparing Arena Metadata...</Text>
-      </View>
-    );
-  }
-
   return (
     <PageWrapper>
       <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
@@ -941,6 +962,13 @@ export default function UnifiedArenaSetup() {
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+
+          {(loading || refreshingMetadata) && (
+            <View style={[styles.metadataRefreshBanner, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: '700' }}>Syncing filters…</Text>
+            </View>
+          )}
 
           <View style={[styles.tabBar, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}>
             <TouchableOpacity
@@ -1461,6 +1489,17 @@ export default function UnifiedArenaSetup() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  metadataRefreshBanner: {
+    marginHorizontal: 20,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
   header: { padding: 24, paddingBottom: 16 },
   title: { fontSize: 28, fontWeight: '900', letterSpacing: -0.5 },
   subtitle: { fontSize: 14, fontWeight: '600', marginTop: 4 },

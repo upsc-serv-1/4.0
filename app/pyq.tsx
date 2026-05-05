@@ -141,6 +141,7 @@ function StickyHeatmapTable({
   maxValue,
   labelWidth,
   compactLabel,
+  preferredCellWidth,
 }: {
   title: string;
   labelHeader: string;
@@ -155,11 +156,13 @@ function StickyHeatmapTable({
   maxValue?: number;
   labelWidth?: number;
   compactLabel?: boolean;
+  /** Minimum cell width to honour even on small screens (defaults to responsive). */
+  preferredCellWidth?: number;
 }) {
   const screenW = Dimensions.get('window').width;
   const dims = getResponsiveHeatmapDims(screenW, years.length, compactLabel);
   const finalLabelWidth = labelWidth || dims.labelWidth;
-  const finalCellWidth = dims.cellWidth;
+  const finalCellWidth = Math.max(preferredCellWidth || 0, dims.cellWidth);
   const finalRowHeight = dims.rowHeight;
   const headerRef = useRef<ScrollView | null>(null);
 
@@ -1674,9 +1677,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
               labels={years}
               data={overviewSeries}
               colors={overviewSeries.map(series => trendColorMap[series.label] || colors.primary)}
-              height={300}
+              height={320}
               width={Math.max(width * 1.45, years.length * 96, 420)}
               topInset={30}
+              showValues
             />
           </ScrollView>
         ) : (
@@ -1693,8 +1697,9 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           size={258}
           canvasWidth={640}
           canvasHeight={390}
-          centerLabel={String(donutData.reduce((sum, item) => sum + item.count, 0))}
-          centerSubLabel="QUESTIONS"
+          centerLabel={`${donutData.reduce((sum, item) => sum + item.count, 0)} questions`}
+          centerSubLabel=""
+          labelPlacement="below"
           colors={donutData.map((_, index) => TREND_PALETTE[index % TREND_PALETTE.length])}
           onPress={tag => {
             if (tag === 'Others') return;
@@ -1760,6 +1765,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       baseColor="#1d4ed8"
       colors={colors}
       heatmapPalette={heatmapPalette}
+      preferredCellWidth={72}
       onCellPress={(topic, year) => handleHeatmapPress(topic, { micro: topic }, year)}
       onRowPress={(topic) => handleHeatmapPress(topic, { micro: topic })}
     />

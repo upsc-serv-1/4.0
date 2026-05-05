@@ -165,6 +165,9 @@ interface PieChartProps {
   colors?: string[];
   centerLabel?: string;
   centerSubLabel?: string;
+  /** When 'below', the total label is rendered under the donut instead of
+   * inside its center — keeps the chart visually clean. */
+  labelPlacement?: 'center' | 'below';
 }
 
 export const PieChart = ({
@@ -176,6 +179,7 @@ export const PieChart = ({
   colors: customColors,
   centerLabel,
   centerSubLabel,
+  labelPlacement = 'center',
 }: PieChartProps) => {
   const { colors: themeColors } = useTheme();
   const total = data.reduce((acc, curr) => acc + curr.count, 0);
@@ -254,10 +258,20 @@ export const PieChart = ({
           ) : null}
         </Svg>
         <View style={[StyleSheet.absoluteFillObject, { width: chartWidth, height: chartHeight, alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', paddingTop: 22 }]}>
-          <Text style={{ fontSize: 24, fontWeight: '900', color: themeColors.textPrimary }}>{centerLabel || total}</Text>
-          <Text style={{ fontSize: 10, fontWeight: '800', color: themeColors.textSecondary }}>{centerSubLabel || 'TOTAL Qs'}</Text>
+          {labelPlacement === 'center' ? (
+            <>
+              <Text style={{ fontSize: 24, fontWeight: '900', color: themeColors.textPrimary }}>{centerLabel || total}</Text>
+              <Text style={{ fontSize: 10, fontWeight: '800', color: themeColors.textSecondary }}>{centerSubLabel || 'TOTAL Qs'}</Text>
+            </>
+          ) : null}
         </View>
       </View>
+      {labelPlacement === 'below' ? (
+        <View style={{ alignItems: 'center', marginTop: -16 }}>
+          <Text style={{ fontSize: 22, fontWeight: '900', color: themeColors.textPrimary }}>{centerLabel || total}</Text>
+          <Text style={{ fontSize: 10, fontWeight: '800', color: themeColors.textSecondary, letterSpacing: 0.5 }}>{centerSubLabel || 'TOTAL QUESTIONS'}</Text>
+        </View>
+      ) : null}
     </View>
   );
 };
@@ -476,6 +490,7 @@ export const LineChart = ({
   stickyY = false,
   backgroundColor,
   labelStep = 1,
+  showValues = false,
 }: {
   data: { label: string, values: number[] }[],
   height?: number,
@@ -486,6 +501,7 @@ export const LineChart = ({
   stickyY?: boolean,
   backgroundColor?: string,
   labelStep?: number,
+  showValues?: boolean,
 }) => {
   const { colors: theme } = useTheme();
   const safeLabelStep = Math.max(1, labelStep || 1);
@@ -581,15 +597,28 @@ export const LineChart = ({
               const x = paddingLeft + (i / (labels.length - 1 || 1)) * (chartWidth - paddingRight - 10) + 10;
               const y = topInset + chartHeight - (val / maxValue) * chartHeight;
               return (
-                <Circle
-                  key={i}
-                  cx={x}
-                  cy={y}
-                  r={4}
-                  fill={palette[seriesIndex % palette.length]}
-                  stroke="#fff"
-                  strokeWidth="2"
-                />
+                <G key={i}>
+                  <Circle
+                    cx={x}
+                    cy={y}
+                    r={4}
+                    fill={palette[seriesIndex % palette.length]}
+                    stroke="#fff"
+                    strokeWidth="2"
+                  />
+                  {showValues && val > 0 ? (
+                    <SvgText
+                      x={x}
+                      y={y - 8}
+                      fill={theme.textPrimary}
+                      fontSize="10"
+                      textAnchor="middle"
+                      fontWeight="800"
+                    >
+                      {val}
+                    </SvgText>
+                  ) : null}
+                </G>
               );
             })}
           </G>

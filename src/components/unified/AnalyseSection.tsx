@@ -1,15 +1,13 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Dimensions, Modal, Alert, Platform } from 'react-native';
-import * as Print from 'expo-print';
-import * as Sharing from 'expo-sharing';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Dimensions, Modal } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { spacing, radius } from '../../theme';
 import { useAggregateTestAnalytics } from '../../hooks/useTestAnalytics';
 import { LineChart, RadarChart, BarChart, DonutChart, ScatterPlot } from '../Charts';
-import { 
-  AlertTriangle, TrendingUp, Filter, Lightbulb, Clock, ShieldAlert, 
-  BarChart2 as BarChartIcon, Target, Download, CheckSquare, Square, X,
-  CheckCircle2, XCircle, HelpCircle, BarChart3
+import {
+  AlertTriangle, TrendingUp, Filter, Lightbulb, Clock,
+  BarChart2 as BarChartIcon, Target, Download,
+  CheckCircle2, XCircle, HelpCircle, BarChart3,
 } from 'lucide-react-native';
 import { DEFAULT_ANALYTICS_LAYOUT, loadAnalyticsLayout } from '../../utils/analyticsLayout';
 import {
@@ -17,7 +15,8 @@ import {
   buildAggregateTestTrends,
   evaluateRepeatedWeaknesses,
 } from '../../lib/hierarchical-analytics';
-import { generateAnalyticsPdfHtml } from '../../utils/pdf-helpers';
+import { AnalysisExportSheet, AnalysisExportQuestion } from '../export/AnalysisExportSheet';
+import { buildPredictive, probableHotsFor2026 } from '../../lib/pyqPredictive';
 
 interface AnalyseSectionProps {
   userId: string;
@@ -35,31 +34,20 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
     rawAllQuestions,
     rawAttemptsForTrend,
   } = useAggregateTestAnalytics(userId);
-  
+
   const screenWidth = Dimensions.get('window').width;
   const isCompactScreen = screenWidth < 390;
-  
+
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>(['All']);
   const [statusFilter, setStatusFilter] = useState<'all' | 'correct' | 'incorrect' | 'skipped'>('all');
   const [heatmapMode, setHeatmapMode] = useState<'mastery' | 'accuracy'>('mastery');
   const [sectionOrder, setSectionOrder] = useState<string[]>(DEFAULT_ANALYTICS_LAYOUT.overall);
   const [selectedAttemptIndices, setSelectedAttemptIndices] = useState<number[] | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
-  const [isExportModalVisible, setIsExportModalVisible] = useState(false);
-  const [exportSections, setExportSections] = useState<Record<string, boolean>>({
-    trajectory: true,
-    proficiency: true,
-    heatmap: true,
-    fatigue: true,
-    mistakes: true,
-    weaknesses: true,
-    drilldown: true,
-  });
+  const [isExportSheetVisible, setIsExportSheetVisible] = useState(false);
 
   useEffect(() => {
     loadAnalyticsLayout().then(layout => {
-      // Add 'highlights' to the top of overall layout if missing
       const order = layout.overall;
       if (!order.includes('highlights')) {
         setSectionOrder(['highlights', ...order]);
@@ -94,7 +82,6 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
     const filteredAttempts = safeAttempts.filter(attempt => selectedTestIds.has(attempt.test_id));
     let filteredQuestions = safeQuestions.filter(question => question?.testId && selectedTestIds.has(question.testId));
 
-    // Apply Multi-Subject Filter to Questions
     if (!selectedSubjects.includes('All')) {
       filteredQuestions = filteredQuestions.filter(q => {
         const matchesPYQ = selectedSubjects.includes('PYQ') && q.isPyq;
@@ -108,7 +95,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
         const isCorrect = q.selectedAnswer?.toLowerCase() === q.correctAnswer?.toLowerCase() && !!q.selectedAnswer;
         const isIncorrect = q.selectedAnswer?.toLowerCase() !== q.correctAnswer?.toLowerCase() && !!q.selectedAnswer;
         const isSkipped = !q.selectedAnswer;
-        
+
         if (statusFilter === 'correct') return isCorrect;
         if (statusFilter === 'incorrect') return isIncorrect;
         if (statusFilter === 'skipped') return isSkipped;
@@ -116,7 +103,6 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
       });
     }
 
-    // Build subject-specific trends if a filter is active
     let historicalScores = [];
     if (selectedSubjects.includes('All') && statusFilter === 'all') {
       historicalScores = buildAggregateTestTrends(filteredAttempts).historicalScores;
@@ -134,7 +120,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
           attemptIndex: index + 1,
           testId: attempt.test_id,
           date: attempt.submitted_at,
-          score: attempt.score, // Keep original attempt score for reference
+          score: attempt.score,
           accuracy: stats.total > 0 ? (stats.correct / stats.total) * 100 : 0,
           totalQuestionsAttempted: stats.total
         };
@@ -153,12 +139,60 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
       trends: filteredTrends,
       cumulativeHierarchy: filteredCumulativeHierarchy,
       repeatedWeaknesses: filteredRepeatedWeaknesses,
+      filteredQuestions,
     };
   }, [selectedAttemptIndices, rawAttemptsForTrend, allQuestions, rawAllQuestions, statusFilter, selectedSubjects]);
 
   const activeTrends = filteredAggregate?.trends || trends;
   const activeCumulative = filteredAggregate?.cumulativeHierarchy || cumulativeHierarchy;
   const activeWeaknesses = filteredAggregate?.repeatedWeaknesses || repeatedWeaknesses;
+  const activeQuestionsForExport = filteredAggregate?.filteredQuestions
+    || (Array.isArray(allQuestions) && allQuestions.length > 0 ? allQuestions : rawAllQuestions)
+    || [];
+
+  // Map QuestionAttempt → AnalysisExportQuestion for the sheet.
+  const exportQuestions: AnalysisExportQuestion[] = useMemo(() => {
+    return (activeQuestionsForExport || []).map((q: any) => ({
+      id: String(q.id),
+      question_text: q.question_text || q.statement || '',
+      options: q.options,
+      correct_answer: q.correctAnswer || q.correct_answer,
+      selected_answer: q.selectedAnswer || q.selected_answer,
+      is_correct: (q.selectedAnswer ?? q.selected_answer)
+        ? String(q.selectedAnswer || q.selected_answer).toLowerCase() === String(q.correctAnswer || q.correct_answer || '').toLowerCase()
+        : undefined,
+      explanation_markdown: q.explanation_markdown,
+      explanation: q.explanation,
+      subject: q.subject || 'General',
+      section_group: q.sectionGroup || q.section_group || 'General',
+      micro_topic: q.microTopic || q.micro_topic || 'Other',
+      exam_year: q.examYear || q.exam_year,
+      is_pyq: !!q.isPyq || !!q.is_pyq,
+      is_ncert: !!q.is_ncert,
+      difficulty: q.difficultyLevel || q.difficulty,
+      time_taken_seconds: q.timeSpentSeconds || q.time_taken_seconds,
+    }));
+  }, [activeQuestionsForExport]);
+
+  const buildForecastRows = (rows: AnalysisExportQuestion[]) => {
+    const predictive = buildPredictive(
+      rows,
+      (q: any) => Number(q.exam_year) || null,
+      { level: 'micro_topic' }
+    );
+    const hots = probableHotsFor2026(predictive, 1, 12);
+    return hots.map((row) => ({
+      key: row.key,
+      label: row.key,
+      totalQuestions: row.totalQuestions,
+      streak: row.streak,
+      trend: row.trend,
+      forecastPoint: row.forecast2026.point,
+      forecastLow: row.forecast2026.low,
+      forecastHigh: row.forecast2026.high,
+      hotScore: row.hotScore,
+    }));
+  };
 
   if (loading && !activeTrends) {
     return (
@@ -185,7 +219,6 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
 
   const subjects = Object.keys(activeCumulative.subjects).sort();
   const allAvailableSubjects = Object.keys(cumulativeHierarchy.subjects).sort();
-  // activePerf now always points to the overall aggregation of the filtered questions
   const activePerf = activeCumulative?.overall || { accuracy: 0, total: 0, advanced: { errors: {}, confidence: {}, difficulty: {}, fatigue: {} } };
   const subjectsWithData = subjects.filter(s => activeCumulative.subjects[s].total > 0);
   const proficiencyData = subjectsWithData.map(s => ({
@@ -195,12 +228,9 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
   }));
 
   const drillDownItems: { name: string; accuracy: number; total: number; isSection?: boolean }[] = [];
-  
-  // Logic for Drill-Down:
-  // 1. If 'All' is in selection OR multiple subjects are selected -> Show Subject-level breakdown
-  // 2. If exactly one specific subject is selected -> Show Section-level breakdown
+
   const isSingleSubject = selectedSubjects.length === 1 && selectedSubjects[0] !== 'All' && selectedSubjects[0] !== 'PYQ';
-  
+
   if (!isSingleSubject) {
     subjectsWithData.forEach(s => {
       drillDownItems.push({ name: s, accuracy: activeCumulative.subjects[s].accuracy, total: activeCumulative.subjects[s].total });
@@ -216,41 +246,11 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
   }
   drillDownItems.sort((a, b) => a.accuracy - b.accuracy);
 
-  const selectedTestsLabel = !selectedAttemptIndices 
-    ? "All Tests" 
-    : selectedAttemptIndices.length === 1 
-      ? `1 Test (#${selectedAttemptIndices[0]})` 
+  const selectedTestsLabel = !selectedAttemptIndices
+    ? "All Tests"
+    : selectedAttemptIndices.length === 1
+      ? `1 Test (#${selectedAttemptIndices[0]})`
       : `${selectedAttemptIndices.length} Tests`;
-
-  // === PDF Export Function ===
-  const exportAnalysisPdf = async () => {
-    setIsExporting(true);
-    try {
-      const html = generateAnalyticsPdfHtml({
-        userName: "Aspirant",
-        timestamp: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }),
-        filterLabel: selectedTestsLabel,
-        trends: activeTrends,
-        cumulative: activeCumulative,
-        weaknesses: activeWeaknesses,
-        sections: exportSections
-      });
-
-      const { uri } = await Print.printToFileAsync({ html });
-      
-      if (Platform.OS === 'ios') {
-        await Sharing.shareAsync(uri);
-      } else {
-        await Sharing.shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
-      }
-    } catch (err) {
-      console.error('PDF Export Error:', err);
-      Alert.alert('Export Failed', 'An error occurred while generating the PDF report.');
-    } finally {
-      setIsExporting(false);
-      setIsExportModalVisible(false);
-    }
-  };
 
   const sectionBlocks: Record<string, React.ReactNode> = {
     highlights: (
@@ -272,7 +272,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
           <Text style={[styles.insightTitle, { color: colors.primary }]}>Growth Insight</Text>
         </View>
         <Text style={[styles.insightText, { color: colors.textPrimary }]}>
-          {activeTrends.historicalScores.length < 3 
+          {activeTrends.historicalScores.length < 3
             ? "Complete at least 3 tests to unlock deeper trajectory and fatigue analysis."
             : activeTrends.historicalScores[activeTrends.historicalScores.length-1].accuracy > activeTrends.historicalScores[0].accuracy
               ? "Your accuracy is trending upwards! Focus on maintaining consistency in your 'Logical Elimination' zones."
@@ -306,16 +306,16 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
           <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>Performance Trajectory</Text>
         </View>
         <Text style={[styles.chartSubLabel, { color: colors.textTertiary, marginBottom: 8 }]}>Overall Score Trajectory</Text>
-        <LineChart 
-          data={[{ label: 'Score', values: activeTrends.historicalScores.map(t => t.score) }]} 
+        <LineChart
+          data={[{ label: 'Score', values: activeTrends.historicalScores.map(t => t.score) }]}
           labels={activeTrends.historicalScores.map(t => `#${t.attemptIndex}`)}
           height={180}
           colors={[colors.primary]}
         />
         <View style={styles.chartDivider} />
         <Text style={[styles.chartSubLabel, { color: colors.textTertiary, marginBottom: 8 }]}>Negative Marking Penalty</Text>
-        <LineChart 
-          data={[{ label: 'Penalty', values: activeTrends.negativeMarkingTrends.map(t => t.negativeMarksPenalty) }]} 
+        <LineChart
+          data={[{ label: 'Penalty', values: activeTrends.negativeMarkingTrends.map(t => t.negativeMarksPenalty) }]}
           labels={activeTrends.historicalScores.map(t => `#${t.attemptIndex}`)}
           height={180}
           colors={['#ef4444']}
@@ -330,8 +330,8 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
             {!isSingleSubject ? 'Subject Proficiency Map' : `${selectedSubjects[0]} Section Map`}
           </Text>
         </View>
-        <RadarChart 
-          data={!isSingleSubject 
+        <RadarChart
+          data={!isSingleSubject
             ? proficiencyData.map(p => ({ label: p.subject, value: p.accuracy }))
             : Object.values(activeCumulative.subjects[selectedSubjects[0]]?.sectionGroups || {})
                 .filter(sg => sg.total > 0)
@@ -348,18 +348,18 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
           <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>The Elimination Zone</Text>
         </View>
         <Text style={[styles.cardSubtitle, { color: colors.textTertiary }]}>Score vs. Questions Attempted (Efficiency Analysis)</Text>
-        <ScatterPlot 
+        <ScatterPlot
           data={activeTrends.historicalScores
             .filter(t => t.totalQuestionsAttempted !== undefined && t.score !== undefined)
-            .map(t => ({ x: t.totalQuestionsAttempted, y: t.score }))} 
-          height={200} 
+            .map(t => ({ x: t.totalQuestionsAttempted, y: t.score }))}
+          height={200}
         />
       </View>
     ),
     theme_heatmap: (selectedSubjects.includes('All') || selectedSubjects.includes('PYQ') || isSingleSubject) ? (() => {
       const heatmapRows = drillDownItems.filter(item => item.isSection);
       const displayRows = heatmapRows.length > 0 ? heatmapRows : drillDownItems.slice(0, 10);
-      
+
       if (displayRows.length === 0) return null;
 
       return (
@@ -424,7 +424,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
           <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>Fatigue & Difficulty Analysis</Text>
         </View>
         <Text style={[styles.chartSubtitle, { color: colors.textTertiary, marginBottom: 10 }]}>Performance by Test Half</Text>
-        <BarChart 
+        <BarChart
           data={Object.entries(activePerf?.advanced?.fatigue || {}).map(([half, stats]) => ({
             label: half === '1' ? 'First Half' : 'Second Half',
             value: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0
@@ -433,7 +433,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
         />
         <View style={styles.chartDivider} />
         <Text style={[styles.chartSubtitle, { color: colors.textTertiary, marginBottom: 10 }]}>Difficulty-wise Accuracy</Text>
-        <BarChart 
+        <BarChart
           data={Object.entries(activePerf?.advanced?.difficulty || {}).map(([level, stats]) => ({
             label: level,
             value: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0
@@ -449,7 +449,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
           <AlertTriangle size={24} color={'#ef4444'} />
           <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>Weak Areas (&lt;50% Accuracy)</Text>
         </View>
-        
+
         {activePerf?.advanced?.weakAreas && activePerf.advanced.weakAreas.length > 0 ? (
           <View style={styles.weakList}>
             {activePerf.advanced.weakAreas.map((area, index) => (
@@ -477,46 +477,45 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      
-      {/* 1. Global Actions Row (Filter + Export) */}
-      <View style={[styles.globalActionsRow, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <TouchableOpacity 
+
+      {/* Top-right single Export button + compact Filter entry */}
+      <View style={[styles.topBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <TouchableOpacity
+          testID="analysis-filter-btn"
           onPress={() => setIsModalVisible(true)}
-          style={[styles.globalActionBtn, { borderRightWidth: 1, borderRightColor: colors.border }]}
+          style={styles.topFilter}
         >
-          <Filter color={colors.primary} size={18} />
+          <Filter color={colors.primary} size={16} />
           <View style={{ flex: 1 }}>
-            <Text style={[styles.globalActionLabel, { color: colors.textTertiary }]}>Filter Data</Text>
-            <Text style={[styles.globalActionValue, { color: colors.textPrimary }]} numberOfLines={1}>{selectedTestsLabel}</Text>
+            <Text style={[styles.topLabel, { color: colors.textTertiary }]}>Filter Data</Text>
+            <Text style={[styles.topValue, { color: colors.textPrimary }]} numberOfLines={1}>{selectedTestsLabel}</Text>
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          onPress={() => setIsExportModalVisible(true)}
-          style={styles.globalActionBtn}
+        <TouchableOpacity
+          testID="analysis-export-btn"
+          onPress={() => setIsExportSheetVisible(true)}
+          style={[styles.exportTopBtn, { backgroundColor: colors.primary }]}
         >
-          <Download color={colors.primary} size={18} />
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.globalActionLabel, { color: colors.textTertiary }]}>Export Report</Text>
-            <Text style={[styles.globalActionValue, { color: colors.textPrimary }]}>Professional PDF</Text>
-          </View>
+          <Download color="#fff" size={16} />
+          <Text style={styles.exportTopBtnText}>Export</Text>
         </TouchableOpacity>
       </View>
 
-      {/* 2. Sticky Filter Bar (Subjects) */}
+      {/* Sticky Filter Bar (Subjects) */}
       <View style={[styles.stickyFilterContainer, { backgroundColor: colors.bg }]}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
           {['All', 'PYQ', ...allAvailableSubjects].map(filter => {
             const isSelected = selectedSubjects.includes(filter);
             return (
-              <TouchableOpacity 
+              <TouchableOpacity
                 key={filter}
                 style={[
-                  styles.filterChip, 
+                  styles.filterChip,
                   { borderColor: colors.border },
-                  isSelected && { 
-                    backgroundColor: filter === 'PYQ' ? '#dcfce7' : colors.primary, 
-                    borderColor: filter === 'PYQ' ? '#15803d' : colors.primary 
+                  isSelected && {
+                    backgroundColor: filter === 'PYQ' ? '#dcfce7' : colors.primary,
+                    borderColor: filter === 'PYQ' ? '#15803d' : colors.primary
                   }
                 ]}
                 onPress={() => {
@@ -533,7 +532,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
                 }}
               >
                 <Text style={[
-                  styles.filterText, 
+                  styles.filterText,
                   { color: colors.textSecondary },
                   isSelected && { color: filter === 'PYQ' ? '#15803d' : '#fff' }
                 ]}>
@@ -545,7 +544,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
         </ScrollView>
       </View>
 
-      {/* 2.1 Status Filter Bar (Correct/Incorrect/Skipped) */}
+      {/* Status Filter Bar */}
       <View style={{ marginBottom: spacing.md }}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 4 }}>
           {[
@@ -562,9 +561,9 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
                 onPress={() => setStatusFilter(pill.id)}
                 style={[
                   styles.statusPill,
-                  { 
-                    backgroundColor: isSelected ? colors.primary : colors.surface, 
-                    borderColor: isSelected ? colors.primary : colors.border 
+                  {
+                    backgroundColor: isSelected ? colors.primary : colors.surface,
+                    borderColor: isSelected ? colors.primary : colors.border
                   }
                 ]}
               >
@@ -579,7 +578,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
       </View>
 
       {sectionOrder.map(key => sectionBlocks[key]).filter(Boolean)}
-      
+
       {/* Test Selection Modal */}
       <Modal
         visible={isModalVisible}
@@ -595,15 +594,15 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
                 <Text style={{ color: colors.primary, fontWeight: '800' }}>DONE</Text>
               </TouchableOpacity>
             </View>
-            
+
             <View style={styles.modalActions}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => setSelectedAttemptIndices(null)}
                 style={[styles.actionChip, { backgroundColor: !selectedAttemptIndices ? colors.primary : colors.bg, borderColor: colors.border }]}
               >
                 <Text style={{ color: !selectedAttemptIndices ? '#fff' : colors.textSecondary, fontSize: 12, fontWeight: '700' }}>All Tests</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => {
                   const allScores = activeTrends.historicalScores;
                   const last5 = allScores.slice(-5).map(t => t.attemptIndex);
@@ -619,7 +618,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
               {[...activeTrends.historicalScores].reverse().map((t) => {
                 const isSelected = !selectedAttemptIndices || selectedAttemptIndices.includes(t.attemptIndex);
                 return (
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     key={t.attemptIndex}
                     style={[styles.testItem, { borderBottomColor: colors.border + '30' }]}
                     onPress={() => {
@@ -649,61 +648,17 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
         </View>
       </Modal>
 
-      {/* Export Selection Modal */}
-      <Modal
-        visible={isExportModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setIsExportModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: colors.surface, borderColor: colors.border, padding: 0 }]}>
-            <View style={[styles.modalHeader, { padding: spacing.lg, paddingBottom: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border }]}>
-               <View>
-                 <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>PDF Export Settings</Text>
-                 <Text style={{ color: colors.textTertiary, fontSize: 12 }}>Customize your performance report</Text>
-               </View>
-               <TouchableOpacity onPress={() => setIsExportModalVisible(false)}>
-                 <X color={colors.textSecondary} size={24} />
-               </TouchableOpacity>
-            </View>
-
-            <ScrollView style={{ padding: spacing.lg, maxHeight: 400 }}>
-              <Text style={{ color: colors.textTertiary, fontSize: 11, fontWeight: '900', letterSpacing: 1, marginBottom: 12 }}>SELECT SECTIONS TO INCLUDE</Text>
-              
-              {Object.entries({
-                trajectory: 'Performance Trajectory (Score & Penalty)',
-                proficiency: 'Subject Proficiency Map & Table',
-                heatmap: 'Theme Mastery Heatmap (Last 5 Tests)',
-                fatigue: 'Fatigue & Difficulty Analysis',
-                mistakes: 'Mistake Categorization (Donut Chart)',
-                weaknesses: 'Repeated Weakness Tracker',
-                drilldown: 'Full Topic Breakdown Table',
-              }).map(([key, label]) => (
-                <TouchableOpacity 
-                  key={key} 
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 }}
-                  onPress={() => setExportSections(prev => ({ ...prev, [key]: !prev[key] }))}
-                >
-                  {exportSections[key] ? <CheckSquare color={colors.primary} size={22} /> : <Square color={colors.textTertiary} size={22} />}
-                  <Text style={{ color: colors.textPrimary, fontSize: 14, fontWeight: '600' }}>{label}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-
-            <View style={{ padding: spacing.lg, borderTopWidth: 1, borderTopColor: colors.border }}>
-               <TouchableOpacity 
-                 disabled={isExporting}
-                 onPress={exportAnalysisPdf}
-                 style={[styles.exportBtn, { backgroundColor: colors.primary, opacity: isExporting ? 0.6 : 1 }]}
-               >
-                 {isExporting ? <ActivityIndicator color="#fff" size="small" /> : <Download color="#fff" size={20} />}
-                 <Text style={{ color: '#fff', fontWeight: '900', letterSpacing: 1 }}>{isExporting ? 'GENERATING PDF...' : 'GENERATE PDF REPORT'}</Text>
-               </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      {/* New Unified Analysis Export Sheet */}
+      <AnalysisExportSheet
+        visible={isExportSheetVisible}
+        onClose={() => setIsExportSheetVisible(false)}
+        questions={exportQuestions}
+        trends={activeTrends}
+        cumulative={activeCumulative}
+        weaknesses={activeWeaknesses}
+        buildForecastRows={buildForecastRows}
+        title="Analysis Export"
+      />
 
     </ScrollView>
   );
@@ -719,31 +674,46 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  globalActionsRow: {
+  topBar: {
     flexDirection: 'row',
-    borderRadius: 20,
+    alignItems: 'center',
+    gap: 10,
+    borderRadius: 16,
     borderWidth: 1,
-    overflow: 'hidden',
+    padding: 10,
     marginBottom: spacing.md,
     marginTop: spacing.md,
   },
-  globalActionBtn: {
+  topFilter: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
-    gap: 12,
+    gap: 10,
   },
-  globalActionLabel: {
-    fontSize: 10,
+  topLabel: {
+    fontSize: 9,
     fontWeight: '800',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  globalActionValue: {
+  topValue: {
+    fontSize: 13,
+    fontWeight: '800',
+    marginTop: 1,
+  },
+  exportTopBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+  },
+  exportTopBtnText: {
+    color: '#fff',
     fontSize: 13,
     fontWeight: '900',
-    marginTop: 1,
+    letterSpacing: 0.3,
   },
   highlightRow: {
     flexDirection: 'row',
@@ -794,26 +764,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
     flexWrap: 'wrap',
     flexShrink: 1,
-  },
-  chartFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: spacing.md,
-  },
-  footerItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  footerText: {
-    fontSize: 11,
-    fontWeight: '600',
   },
   insightCard: {
     padding: spacing.lg,
@@ -871,6 +821,10 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
   },
+  heatmapCellText: {
+    fontSize: 10,
+    fontWeight: '800',
+  },
   stickyFilterContainer: {
     marginHorizontal: -spacing.lg,
     paddingHorizontal: spacing.lg,
@@ -903,46 +857,40 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
   },
-  drillList: {
+  weakList: {
     marginTop: spacing.sm,
   },
-  drillItem: {
+  weakItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
   },
-  drillInfo: {
-    flex: 1,
-    paddingRight: 10,
-  },
-  drillItemName: {
+  weakItemName: {
     fontSize: 15,
     fontWeight: '700',
-    flexWrap: 'wrap',
-    flexShrink: 1,
   },
-  repeatedBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginTop: 6,
+  weakItemType: {
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    marginTop: 2,
+    letterSpacing: 0.5,
   },
-  repeatedBadgeText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#854d0e',
-  },
-  accuracyBadge: {
+  weakBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
   },
-  accuracyBadgeText: {
+  weakBadgeText: {
     fontSize: 13,
     fontWeight: '800',
+  },
+  emptyText: {
+    fontSize: 13,
+    textAlign: 'center',
+    paddingVertical: spacing.lg,
   },
   modalOverlay: {
     flex: 1,
@@ -1006,65 +954,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  exportBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    padding: 16,
-    borderRadius: 16,
-  },
-  modeToggle: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  modeToggleText: {
-    fontSize: 9,
-    fontWeight: '900',
-    letterSpacing: 0.5,
-  },
-  heatmapGrid: {
-    flexDirection: 'column',
-    marginBottom: 2,
-  },
-  heatmapRow: {
-    flexDirection: 'row',
-    marginBottom: 2,
-  },
-  heatmapCell: {
-    width: 45,
-    height: 45,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 4,
-  },
-  heatmapHeaderCell: {
-    width: 80,
-    backgroundColor: 'transparent',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-  },
-  heatmapHeaderText: {
-    fontSize: 10,
-    fontWeight: '700',
-    textAlign: 'center',
-    width: 45,
-  },
-  heatmapRowTitle: {
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  heatmapCellText: {
-    fontSize: 10,
-    fontWeight: '800',
-  },
   chartSubtitle: {
     fontSize: 12,
     fontWeight: '700',
     marginTop: spacing.md,
-    marginBottom: spacing.sm, 
+    marginBottom: spacing.sm,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },

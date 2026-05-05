@@ -34,7 +34,7 @@ export type ExportPaperStyle = 'plain' | 'lined' | 'grid' | 'dotted';
 export type ExportColumns = 1 | 2;
 export type ExportContentScope = 'q_only' | 'q_options' | 'q_options_expl';
 export type ExportAnswerPlacement = 'inline' | 'end';
-export type ExportSortBy = 'default' | 'subject' | 'microtopic' | 'difficulty' | 'date' | 'subject_section_microtopic';
+export type ExportSortBy = 'default' | 'subject' | 'microtopic' | 'difficulty' | 'date' | 'year' | 'subject_section' | 'subject_section_microtopic';
 export type ExportQaLayoutMode = 'unified' | 'split';
 export type ExportVisualStyle = 'document' | 'flashcard';
 
@@ -501,6 +501,19 @@ export const sortQuestions = (rows: ExportQuestion[], o: ExportOptions): ExportQ
     }
     case 'date':
       out.sort((a, b) => String(b.attempted_at || '').localeCompare(String(a.attempted_at || '')));
+      break;
+    case 'year':
+      out.sort((a, b) => {
+        const ay = Number(a.exam_year) || 0;
+        const by = Number(b.exam_year) || 0;
+        return by - ay;
+      });
+      break;
+    case 'subject_section':
+      out.sort((a, b) =>
+        (a.subject || '').localeCompare(b.subject || '') ||
+        (a.section_group || '').localeCompare(b.section_group || '')
+      );
       break;
     case 'subject_section_microtopic':
       out.sort((a, b) =>

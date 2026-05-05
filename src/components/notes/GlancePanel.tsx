@@ -13,10 +13,17 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Pressable } from 'react-native';
 import RenderHtml from 'react-native-render-html';
 import { Check, Sparkles, ListChecks, BookOpen as BookIcon, Tag as TagIcon, Play } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../context/ThemeContext';
 import { supabase } from '../../lib/supabase';
 import { normalizeTag } from '../../utils/tagUtils';
+
+const GLANCE_COLORS: Record<string, { bg: string; border: string; text: string }> = {
+  'imp. concept': { bg: '#eef2ff', border: '#4a7fe8', text: '#4a7fe8' },
+  'imp. fact':    { bg: '#fff7e6', border: '#e08030', text: '#e08030' },
+  'trap question':{ bg: '#fff0f3', border: '#e05a7a', text: '#e05a7a' },
+  'memorize':     { bg: '#f5f0ff', border: '#7c5fe8', text: '#7c5fe8' },
+  'must revise':  { bg: '#f0f9ee', border: '#2a9e60', text: '#2a9e60' },
+};
 
 export type NoteItem = {
   id: string;
@@ -66,6 +73,8 @@ const parseChecklist = (raw: any): ChecklistEntry[] => {
 
 export function GlancePanel({ noteId, contentWidth, selectedTag, onPlay, onOpenEdit }: Props) {
   const { colors } = useTheme();
+  const DEFAULT_GLANCE = { bg: colors.surfaceStrong, border: colors.border, text: colors.textSecondary };
+  
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<NoteItem[]>([]);
   const [checklist, setChecklist] = useState<ChecklistEntry[]>([]);
@@ -231,14 +240,30 @@ export function GlancePanel({ noteId, contentWidth, selectedTag, onPlay, onOpenE
           {filteredItems.map((it, idx) => {
             if (it.type === 'microTopicHeading') {
               return (
-                <View key={it.id || `h-${idx}`} style={styles.headingChip}>
-                  <Text style={[styles.headingText, { color: colors.textPrimary }]} numberOfLines={2}>
+                <View key={it.id || `h-${idx}`} style={styles.headingDivider}>
+                  <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+                  <Text style={[styles.headingText, { color: colors.textTertiary }]}>
                     {(it.text || 'Heading').toUpperCase()}
                   </Text>
+                  <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
                 </View>
               );
             }
-            const accent = it.color || colors.primary;
+
+            // Determine tag-based color
+            const tagList = Array.isArray(it.tags) ? it.tags : [];
+            let glanceStyle = DEFAULT_GLANCE;
+            for (const tag of tagList) {
+              const normalized = normalizeTag(tag);
+              if (GLANCE_COLORS[normalized]) {
+                glanceStyle = GLANCE_COLORS[normalized];
+                break;
+              }
+            }
+
+            const isTrapQuestion = tagList.some(t => normalizeTag(t) === 'trap question');
+            const [revealed, setRevealed] = useState(!isTrapQuestion);
+
             return (
               <Pressable
                 key={it.id || `i-${idx}`}
@@ -249,41 +274,46 @@ export function GlancePanel({ noteId, contentWidth, selectedTag, onPlay, onOpenE
                 ]}
                 data-testid={`vault-glance-item-${it.id || idx}`}
               >
-                <LinearGradient
-                  colors={[accent + '18', accent + '04']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 0, y: 1 }}
+                <View
                   style={[
                     styles.card,
                     {
-                      borderColor: colors.border,
-                      borderLeftColor: accent,
+                      backgroundColor: glanceStyle.bg,
+                      borderLeftColor: glanceStyle.border,
                     },
                   ]}
                 >
-                  <RenderHtml
-                    source={{ html: toHtml(it.text || '<i>(empty)</i>') }}
-                    contentWidth={contentWidth - 64}
-                    baseStyle={{ color: colors.textPrimary, fontSize: 13, lineHeight: 19 }}
-                    tagsStyles={{
-                      b: { fontWeight: '700' as const, color: colors.textPrimary },
-                      strong: { fontWeight: '700' as const, color: colors.textPrimary },
-                      i: { fontStyle: 'italic' as const },
-                      em: { fontStyle: 'italic' as const },
-                      mark: { backgroundColor: '#FFE066', color: '#0f172a', borderRadius: 3 },
-                      p: { marginVertical: 0, color: colors.textPrimary },
-                    }}
-                  />
-                  {Array.isArray(it.tags) && it.tags.length > 0 && (
-                    <View style={styles.tagsRow}>
-                      {it.tags.slice(0, 3).map((t) => (
-                        <View key={t} style={[styles.tinyTag, { backgroundColor: accent + '20' }]}>
-                          <Text style={[styles.tinyTagText, { color: accent }]}>#{t}</Text>
-                        </View>
-                      ))}
-                    </View>
+                  {/* Tag label */}
+                  {tagList.length > 0 && (
+                    <Text style={[styles.tagLabel, { color: glanceStyle.text }]}>
+                      {tagList[0].toUpperCase()}
+                    </Text>
                   )}
-                </LinearGradient>
+
+                  {/* Content */}
+                  {revealed ? (
+                    <RenderHtml
+                      source={{ html: toHtml(it.text || '<i>(empty)</i>') }}
+                      contentWidth={contentWidth - 64}
+                      baseStyle={{ color: colors.textPrimary, fontSize: 13, lineHeight: 19 }}
+                      tagsStyles={{
+                        b: { fontWeight: '700' as const, color: colors.textPrimary },
+                        strong: { fontWeight: '700' as const, color: colors.textPrimary },
+                        i: { fontStyle: 'italic' as const },
+                        em: { fontStyle: 'italic' as const },
+                        mark: { backgroundColor: '#FFE066', color: '#0f172a', borderRadius: 3 },
+                        p: { marginVertical: 0, color: colors.textPrimary },
+                      }}
+                    />
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => setRevealed(true)}
+                      style={[styles.revealBtn, { borderColor: colors.textTertiary + '60' }]}
+                    >
+                      <Text style={[styles.revealBtnText, { color: colors.textTertiary }]}>REVEAL</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               </Pressable>
             );
           })}
@@ -372,25 +402,37 @@ const styles = StyleSheet.create({
   },
   checkText: { flex: 1, fontSize: 13, fontWeight: '600' },
 
-  headingChip: {
-    backgroundColor: 'rgba(99,102,241,0.07)',
-    borderLeftWidth: 3,
-    borderLeftColor: '#6366f1',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginVertical: 4,
+  headingDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 8,
   },
-  headingText: { fontSize: 12, fontWeight: '900', letterSpacing: 0.6 },
+  dividerLine: { flex: 1, height: 0.5 },
+  headingText: { fontSize: 8, fontWeight: '900', letterSpacing: 1.2, marginHorizontal: 8 },
 
   cardWrap: { marginVertical: 4 },
   card: {
-    borderRadius: 12,
-    borderWidth: 1,
-    borderLeftWidth: 4,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderLeftWidth: 2.5,
+    paddingVertical: 9,
+    paddingHorizontal: 11,
   },
+  tagLabel: {
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 1,
+    marginBottom: 3,
+  },
+  revealBtn: {
+    alignSelf: 'center',
+    borderWidth: 0.5,
+    borderStyle: 'dashed',
+    borderRadius: 20,
+    paddingHorizontal: 11,
+    paddingVertical: 3,
+    marginTop: 6,
+  },
+  revealBtnText: { fontSize: 9, fontWeight: '700' },
   tagsRow: { flexDirection: 'row', gap: 4, marginTop: 6, flexWrap: 'wrap' },
   tinyTag: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 },
   tinyTagText: { fontSize: 9, fontWeight: '900', letterSpacing: 0.4 },

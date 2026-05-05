@@ -2993,6 +2993,255 @@ export default function UnifiedQuizEngine() {
           </>
         )}
 
+        {/* ============================================================
+            SIMULATED EXAM MODE — Centered Explanation Modal
+            Opens when student taps "Explanation" in paper view.
+            • backdrop blur, • scrollable body, • sticky action bar with
+            full-text labels (Notebook, Hardnotes, Flashcard, Save,
+            Review, Commit-to-Memory).
+        ============================================================ */}
+        <Modal
+          visible={!!explanationModalQId}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setExplanationModalQId(null)}
+        >
+          {(() => {
+            const q = questions.find(qq => qq.id === explanationModalQId);
+            if (!q) return null;
+            const ans = currentAnswers[q.id] || { selectedAnswer: null, isReview: false, note: '' };
+            // Build the explanation list (same logic as inline)
+            const explanations: any[] = [];
+            const list = Array.isArray(q._explanations) ? q._explanations : [];
+            list.forEach((e: any, idx: number) => {
+              const source = String(e?.source || e?.institute || `Source ${idx + 1}`).trim();
+              explanations.push({
+                source,
+                text: String(e?.text || e?.explanation || '').trim(),
+                year: String(e?.year || q.exam_year || '').trim(),
+                program: String(e?.program || q.tests?.program_name || '').trim(),
+                answer: String(e?.answer || q.correct_answer || '').trim().toUpperCase(),
+              });
+            });
+            if (q.explanation_markdown) {
+              explanations.push({
+                source: q.tests?.institute || q.source?.institute || 'Primary',
+                text: String(q.explanation_markdown).trim(),
+                year: String(q.exam_year || '').trim(),
+                program: String(q.tests?.program_name || '').trim(),
+                answer: String(q.correct_answer || '').trim().toUpperCase(),
+              });
+            }
+            const activeIdx = activeExplIndex[q.id] ?? -1;
+            const safeIdx = activeIdx >= 0 && activeIdx < explanations.length ? activeIdx : -1;
+            const text = safeIdx === -1
+              ? (explanations.length === 0
+                  ? 'No explanation available.'
+                  : explanations.map(e => `**${e.source}${e.year ? ' · ' + e.year : ''}${e.answer ? ' · Ans: ' + e.answer : ''}**\n\n${e.text || '*No explanation provided.*'}`).join('\n\n---\n\n'))
+              : (explanations[safeIdx]?.text || 'No explanation provided.');
+
+            return (
+              <Pressable
+                style={[stylesPaper.modalBackdrop, Platform.OS !== 'android' && ({ backdropFilter: 'blur(8px)' } as any)]}
+                onPress={() => setExplanationModalQId(null)}
+                testID="paper-explanation-modal"
+              >
+                <Pressable
+                  onPress={() => { /* swallow */ }}
+                  style={[stylesPaper.modalCard, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
+                >
+                  {/* Header */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 11, fontWeight: '900', color: colors.primary, letterSpacing: 1.5 }}>EXPLANATION</Text>
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: colors.textPrimary, marginTop: 2 }} numberOfLines={1}>
+                        Q{questions.findIndex(qq => qq.id === q.id) + 1} · Correct: {String(q.correct_answer || '').toUpperCase()}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => setExplanationModalQId(null)}
+                      style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center' }}
+                      testID="paper-explanation-close"
+                    >
+                      <X size={20} color={colors.textPrimary} />
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Source tabs */}
+                  {explanations.length > 1 && (
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingVertical: 10 }}
+                      style={{ borderBottomWidth: 1, borderBottomColor: colors.border + '30', flexGrow: 0 }}
+                    >
+                      <TouchableOpacity
+                        onPress={() => setActiveExplIndex(prev => ({ ...prev, [q.id]: -1 }))}
+                        style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, backgroundColor: safeIdx === -1 ? colors.primary : colors.surfaceStrong, borderWidth: 1, borderColor: colors.border }}
+                      >
+                        <Text style={{ fontSize: 10, fontWeight: '900', color: safeIdx === -1 ? colors.buttonText : colors.textTertiary }}>
+                          ALL ({explanations.length})
+                        </Text>
+                      </TouchableOpacity>
+                      {explanations.map((e: any, i: number) => (
+                        <TouchableOpacity
+                          key={`m-tab-${i}`}
+                          onPress={() => setActiveExplIndex(prev => ({ ...prev, [q.id]: i }))}
+                          style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, backgroundColor: safeIdx === i ? colors.primary : colors.surfaceStrong, borderWidth: 1, borderColor: colors.border }}
+                        >
+                          <Text style={{ fontSize: 10, fontWeight: '900', color: safeIdx === i ? colors.buttonText : colors.textTertiary }}>
+                            {String(e.source).toUpperCase()}{e.year ? ' · ' + e.year : ''}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  )}
+
+                  {/* Scrollable body */}
+                  <ScrollView
+                    style={{ maxHeight: 400 }}
+                    contentContainerStyle={{ padding: 18, paddingBottom: 24 }}
+                    showsVerticalScrollIndicator
+                  >
+                    <Markdown
+                      style={{
+                        body: {
+                          color: colors.textPrimary,
+                          fontSize: fontSize,
+                          lineHeight: fontSize * 1.55,
+                          fontWeight: '500',
+                          fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' }),
+                        },
+                      }}
+                    >
+                      {text}
+                    </Markdown>
+
+                    {/* Mistake type chips inside modal */}
+                    <View style={{ marginTop: 18, paddingTop: 14, borderTopWidth: 1, borderTopColor: colors.border + '40' }}>
+                      <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textTertiary, letterSpacing: 1, marginBottom: 8 }}>MISTAKE TYPE</Text>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                        {ERROR_TYPES.map(type => (
+                          <TouchableOpacity
+                            key={type}
+                            onPress={() => store.setMetadata(q.id, { errorCategory: type })}
+                            style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 14, borderWidth: 1, borderColor: colors.border, backgroundColor: ans.errorCategory === type ? colors.primary + '20' : colors.surfaceStrong }}
+                          >
+                            <Text style={{ fontSize: 11, fontWeight: '700', color: ans.errorCategory === type ? colors.primary : colors.textSecondary }}>{type}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+
+                    {/* Commit-to-Memory text box */}
+                    <View style={{ marginTop: 16 }}>
+                      <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textTertiary, letterSpacing: 1, marginBottom: 8 }}>COMMIT TO MEMORY</Text>
+                      <TextInput
+                        style={{
+                          backgroundColor: colors.surfaceStrong,
+                          color: colors.textPrimary,
+                          padding: 12,
+                          borderRadius: 12,
+                          borderWidth: 1,
+                          borderColor: colors.border,
+                          minHeight: 80,
+                          textAlignVertical: 'top',
+                          fontSize: 14,
+                        }}
+                        placeholder="Capture your strategy / mnemonic..."
+                        placeholderTextColor={colors.textTertiary}
+                        multiline
+                        value={ans.note || ''}
+                        onChangeText={(val) => store.setMetadata(q.id, { note: val }, false)}
+                        testID="paper-modal-note-input"
+                      />
+                      <TouchableOpacity
+                        onPress={() => handleCommitToMemory(q.id)}
+                        style={{ marginTop: 10 }}
+                        testID="paper-modal-commit-btn"
+                      >
+                        <LinearGradient
+                          colors={['#FF6B6B', '#7B2CBF']}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                          style={{ height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8 }}
+                        >
+                          <Save size={18} color="#fff" />
+                          <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>Commit to Memory</Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    </View>
+                  </ScrollView>
+
+                  {/* Sticky action bar — full-text labels */}
+                  <View style={[stylesPaper.stickyBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
+                    <TouchableOpacity
+                      onPress={() => store.setMetadata(q.id, { isReview: !ans.isReview })}
+                      style={[stylesPaper.stickyBtn, { backgroundColor: ans.isReview ? '#fef9c3' : colors.surfaceStrong, borderColor: ans.isReview ? '#eab308' : colors.border }]}
+                      testID="paper-modal-review"
+                    >
+                      <Flag size={14} color={ans.isReview ? '#a16207' : colors.textPrimary} fill={ans.isReview ? '#eab308' : 'transparent'} />
+                      <Text style={[stylesPaper.stickyBtnText, { color: ans.isReview ? '#a16207' : colors.textPrimary }]}>{ans.isReview ? 'Marked for Review' : 'Mark for Review'}</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => handleAddToFlashcards(q)}
+                      disabled={savingFlashcard[q.id]}
+                      style={[stylesPaper.stickyBtn, { backgroundColor: flashcardedIds.has(q.id) ? colors.primary + '15' : colors.surfaceStrong, borderColor: flashcardedIds.has(q.id) ? colors.primary : colors.border }]}
+                      testID="paper-modal-flashcard"
+                    >
+                      {savingFlashcard[q.id] ? (
+                        <ActivityIndicator size="small" color={colors.primary} />
+                      ) : (
+                        <Zap size={14} color={flashcardedIds.has(q.id) ? colors.primary : colors.textPrimary} fill={flashcardedIds.has(q.id) ? colors.primary : 'transparent'} />
+                      )}
+                      <Text style={[stylesPaper.stickyBtnText, { color: flashcardedIds.has(q.id) ? colors.primary : colors.textPrimary }]}>{flashcardedIds.has(q.id) ? 'Flashcard Saved' : 'Add to Flashcards'}</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        const activeText = explanations[safeIdx]?.text || q.explanation_markdown || '';
+                        setNoteDraftBullets([activeText]);
+                        setCustomSubheading(q.micro_topic || '');
+                        setNotebookModalVisible(true);
+                        fetchHierarchy();
+                      }}
+                      style={[stylesPaper.stickyBtn, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}
+                      testID="paper-modal-notebook"
+                    >
+                      <BookOpen size={14} color={colors.textPrimary} />
+                      <Text style={[stylesPaper.stickyBtnText, { color: colors.textPrimary }]}>Save to Notebook</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        const activeText = explanations[safeIdx]?.text || q.explanation_markdown || '';
+                        setHardnotesPayload({ markdown: activeText, title: q.micro_topic || q.question_text?.slice(0, 40) || 'Quiz Note' });
+                        setHardnotesPickerVisible(true);
+                      }}
+                      style={[stylesPaper.stickyBtn, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}
+                      testID="paper-modal-hardnote"
+                    >
+                      <PenTool size={14} color={colors.textPrimary} />
+                      <Text style={[stylesPaper.stickyBtnText, { color: colors.textPrimary }]}>Hardnote</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => handleQuickSave(q)}
+                      style={[stylesPaper.stickyBtn, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}
+                      testID="paper-modal-quicksave"
+                    >
+                      <Save size={14} color={colors.textPrimary} />
+                      <Text style={[stylesPaper.stickyBtnText, { color: colors.textPrimary }]}>Quick Save</Text>
+                    </TouchableOpacity>
+                  </View>
+                </Pressable>
+              </Pressable>
+            );
+          })()}
+        </Modal>
+
+
         {/* Clock Control Modal */}
         <Modal visible={showClockControl} transparent animationType="fade" onRequestClose={() => setShowClockControl(false)}>
           <View style={styles.modalOverlay}>

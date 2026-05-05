@@ -87,7 +87,7 @@ import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 
 const ThemeSwitcher = require('../../src/components/ThemeSwitcher').ThemeSwitcher;
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 // --- Types ---
 interface Question {

@@ -152,7 +152,7 @@ const DEFAULT_STUDY_TAGS = [
 
 // --- Sub-Components ---
 
-const OptionButton = ({ label, text, isSelected, isCorrect, isWrong, showResult, onSelect, disabled }: any) => {
+const OptionButton = ({ label, text, isSelected, isCorrect, isWrong, showResult, onSelect, disabled, fontSize = 16 }: any) => {
   const { colors } = useTheme();
   
   let borderColor = colors.border;
@@ -198,7 +198,7 @@ const OptionButton = ({ label, text, isSelected, isCorrect, isWrong, showResult,
           {label}
         </Text>
       </View>
-      <Text style={[styles.optionText, { color: textColor, fontWeight: (isCorrect && showResult) || isSelected ? '700' : '500' }]}>{text}</Text>
+      <Text style={[styles.optionText, { color: textColor, fontWeight: (isCorrect && showResult) || isSelected ? '700' : '500', fontSize: Math.max(12, fontSize - 1), lineHeight: Math.max(18, (fontSize - 1) * 1.35) }]}>{text}</Text>
       {showResult && isCorrect && <Check size={18} color="#22c55e" style={{ marginLeft: 'auto' }} />}
       {showResult && isWrong && <X size={18} color="#ef4444" style={{ marginLeft: 'auto' }} />}
     </TouchableOpacity>
@@ -221,6 +221,88 @@ const getExamInfo = (item: any) => {
   if (item?.exam_info && typeof item.exam_info === 'object' && !Array.isArray(item.exam_info)) return item.exam_info;
   if (item?.source && typeof item.source === 'object' && !Array.isArray(item.source)) return item.source;
   return {} as any;
+};
+
+const normalizeInstituteLabel = (value: any) => {
+  const raw = String(value || '').trim();
+  if (!raw) return 'Primary';
+  const compact = raw.replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return compact
+    .split(' ')
+    .filter(Boolean)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+};
+
+const extractYearFromText = (value: any): string => {
+  const match = String(value || '').match(/\b(19|20)\d{2}\b/);
+  return match ? match[0] : '';
+};
+
+const normalizeProgramLabel = (value: any): string => {
+  const raw = String(value || '').replace(/[_]+/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!raw) return '';
+
+  // Program-level uniqueness: "Revision – PYQ Workbook – 2026" and
+  // "Revision – PYQ Workbook" should resolve to one canonical program label.
+  const withoutYear = raw
+    .replace(/\b(19|20)\d{2}\b/g, '')
+    .replace(/[\-–—|:]\s*$/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
+  return withoutYear || raw;
+};
+
+const normalizeExplText = (value: any): string =>
+  String(value || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+
+const buildCanonicalExplanations = (item: any) => {
+  const list = Array.isArray(item?._explanations) ? item._explanations : [];
+  const out: any[] = [];
+  const seen = new Map<string, number>();
+
+  const pushEntry = (entry: any) => {
+    const source = normalizeInstituteLabel(entry?.source || entry?.institute || entry?.provider || entry?.tests?.institute || item?.tests?.institute || item?.source?.institute || 'Primary');
+    const sourceKey = source.toLowerCase();
+    const rawProgram = String(entry?.program || item?.tests?.program_name || '').trim();
+    const program = normalizeProgramLabel(rawProgram);
+    const year = String(entry?.year || item?.exam_year || extractYearFromText(rawProgram) || '').trim();
+    const answer = String(entry?.answer || item?.correct_answer || '').trim().toUpperCase();
+    const text = String(entry?.text || entry?.explanation || '').trim();
+
+    if (!text && !answer) return;
+
+    const dedupeKey = `${sourceKey}__${program.toLowerCase()}__${answer}__${normalizeExplText(text)}`;
+    const existingIdx = seen.get(dedupeKey);
+
+    if (existingIdx !== undefined) {
+      const existing = out[existingIdx];
+      if (!existing.year && year) existing.year = year;
+      if (!existing.text && text) existing.text = text;
+      return;
+    }
+
+    seen.set(dedupeKey, out.length);
+    out.push({ source, sourceKey, program, year, answer, text });
+  };
+
+  list.forEach((e: any) => pushEntry(e));
+
+  if (item?.explanation_markdown) {
+    pushEntry({
+      source: item?.tests?.institute || item?.source?.institute || 'Primary',
+      program: item?.tests?.program_name || '',
+      year: item?.exam_year || '',
+      answer: item?.correct_answer || '',
+      text: item?.explanation_markdown,
+    });
+  }
+
+  return out;
 };
 
 export const getPYQCategorization = (item: any) => {
@@ -630,24 +712,41 @@ export default function UnifiedQuizEngine() {
     
     // Helper to process results
     const processResults = (data: any[]) => {
-      const { mergedQs, idToMergedId } = mergeQuestions(data || []);
-      
+      const rawQs = data || [];
+      const useExactPaperSequence = !!params.testId;
+
+      let mergedQs: any[] = rawQs;
+      let idToMergedId = new Map<string, string>();
+
+      if (useExactPaperSequence) {
+        mergedQs = rawQs;
+        rawQs.forEach((q: any) => idToMergedId.set(q.id, q.id));
+      } else {
+        const merged = mergeQuestions(rawQs);
+        mergedQs = merged.mergedQs;
+        idToMergedId = merged.idToMergedId;
+      }
+
       let finalQs = mergedQs;
-              const resIds = typeof params.resultIds === 'string' ? params.resultIds.split(',').filter((id: string) => id.trim().length > 0) : null;
-      const hasQuestionSequence = mergedQs.some(q => Number.isFinite(Number(q.question_number)));
+      const resIds = typeof params.resultIds === 'string' ? params.resultIds.split(',').filter((id: string) => id.trim().length > 0) : null;
+      const hasQuestionSequence = finalQs.some((q: any) => Number.isFinite(Number(q.question_number)));
 
       if (resIds && resIds.length > 0) {
         const orderedMergedIds = resIds.map(id => idToMergedId.get(id) || id);
         const uniqueOrderedIds = Array.from(new Set(orderedMergedIds));
         finalQs = uniqueOrderedIds.map(id => mergedQs.find(q => q.id === id)).filter(Boolean);
-      } else if (params.testId && hasQuestionSequence) {
-        // For a single uploaded test, preserve original paper sequence from JSON (Q1, Q2, Q3...).
-        finalQs = [...finalQs].sort((a: any, b: any) => {
-          const qNoA = Number.isFinite(Number(a.question_number)) ? Number(a.question_number) : Number.MAX_SAFE_INTEGER;
-          const qNoB = Number.isFinite(Number(b.question_number)) ? Number(b.question_number) : Number.MAX_SAFE_INTEGER;
-          if (qNoA !== qNoB) return qNoA - qNoB;
-          return String(a.id || '').localeCompare(String(b.id || ''));
-        });
+      } else if (useExactPaperSequence) {
+        // Paper-wise learn/exam must keep uploaded order. Never apply search-style ranking here.
+        if (hasQuestionSequence) {
+          finalQs = [...finalQs].sort((a: any, b: any) => {
+            const qNoA = Number.isFinite(Number(a.question_number)) ? Number(a.question_number) : Number.MAX_SAFE_INTEGER;
+            const qNoB = Number.isFinite(Number(b.question_number)) ? Number(b.question_number) : Number.MAX_SAFE_INTEGER;
+            if (qNoA !== qNoB) return qNoA - qNoB;
+            return String(a.id || '').localeCompare(String(b.id || ''));
+          });
+        } else {
+          finalQs = [...finalQs];
+        }
       } else {
         // Apply priority sorting: Relevance → UPSC Priority → Newest Year.
         finalQs = [...finalQs].sort((a: any, b: any) => {
@@ -1803,58 +1902,14 @@ export default function UnifiedQuizEngine() {
     const answerData = currentAnswers[item.id] || { selectedAnswer: null, confidence: null, difficulty: null, errorCategory: null, note: '' };
     const showExplanation = arenaMode === 'learning' && revealedExplanations[item.id];
 
-    const normalizeInstituteLabel = (value: any) => {
-      const raw = String(value || '').trim();
-      if (!raw) return 'Primary';
-      const compact = raw.replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').trim();
-      return compact
-        .split(' ')
-        .filter(Boolean)
-        .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-        .join(' ');
-    };
-
-    const normalizedExplanations = (() => {
-      const list = Array.isArray(item._explanations) ? item._explanations : [];
-      const seen = new Set<string>();
-      const out: any[] = [];
-      list.forEach((e: any, idx: number) => {
-        const source = normalizeInstituteLabel(e?.source || e?.institute || e?.provider || e?.tests?.institute || item.tests?.institute || `Source ${idx + 1}`);
-        const sourceKey = source.toLowerCase();
-        const program = String(e?.program || item.tests?.program_name || '').trim();
-        const year = String(e?.year || item.exam_year || '').trim();
-        const answer = String(e?.answer || item.correct_answer || '').trim().toUpperCase();
-        const text = String(e?.text || e?.explanation || '').trim();
-
-        const dedupeKey = `${sourceKey}__${program.toLowerCase()}__${year}__${answer}__${text.replace(/\s+/g, ' ').toLowerCase()}`;
-        if (seen.has(dedupeKey)) return;
-        seen.add(dedupeKey);
-        out.push({ source, sourceKey, program, year, answer, text });
-      });
-
-      if (item.explanation_markdown) {
-        const source = normalizeInstituteLabel(item.tests?.institute || item.source?.institute || 'Primary');
-        const sourceKey = source.toLowerCase();
-        const text = String(item.explanation_markdown).trim();
-        const program = String(item.tests?.program_name || '').trim();
-        const year = String(item.exam_year || '').trim();
-        const answer = String(item.correct_answer || '').trim().toUpperCase();
-        const dedupeKey = `${sourceKey}__${program.toLowerCase()}__${year}__${answer}__${text.replace(/\s+/g, ' ').toLowerCase()}`;
-        if (text && !seen.has(dedupeKey)) {
-          seen.add(dedupeKey);
-          out.push({ source, sourceKey, program, year, answer, text });
-        }
-      }
-
-      return out;
-    })();
+    const normalizedExplanations = buildCanonicalExplanations(item);
 
     // Standardised single-line metadata: "INSTITUTE NAME – PROGRAM NAME – YEAR"
     // Hide any segment that is empty (per spec).
     const formatMetaLine = (e: any): string => {
       const segs = [
         String(e?.source || '').toUpperCase().trim(),
-        String(e?.program || '').toUpperCase().trim(),
+        normalizeProgramLabel(String(e?.program || '')).toUpperCase().trim(),
         String(e?.year || '').trim(),
       ].filter(Boolean);
       return segs.join(' – ');
@@ -2022,6 +2077,7 @@ export default function UnifiedQuizEngine() {
                 showResult={arenaMode === 'learning' && !!answerData.selectedAnswer}
                 onSelect={() => handleOptionSelect(item.id, label)}
                 disabled={arenaMode === 'learning' && showExplanation}
+                fontSize={fontSize}
               />
             );
           })}
@@ -2296,7 +2352,7 @@ export default function UnifiedQuizEngine() {
                    // Single-layer canonical metadata: INSTITUTE – PROGRAM – YEAR
                    const primaryEntry = displayExplanations[0] || {
                      source: normalizeInstituteLabel(item.tests?.institute || ''),
-                     program: String(item.tests?.program_name || '').trim(),
+                     program: normalizeProgramLabel(String(item.tests?.program_name || '').trim()),
                      year: String(item.exam_year || '').trim(),
                    };
                    const line = formatMetaLine(primaryEntry);
@@ -2399,6 +2455,7 @@ export default function UnifiedQuizEngine() {
                 showResult={arenaMode === 'learning' && !!answerData.selectedAnswer}
                 onSelect={() => handleOptionSelect(item.id, label)}
                 disabled={false}
+                fontSize={fontSize}
               />
             );
           })}
@@ -2645,32 +2702,6 @@ export default function UnifiedQuizEngine() {
                 <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 11 }}>SAVE</Text>
               </TouchableOpacity>
               
-              {timerType !== 'none' && (
-                <TouchableOpacity 
-                  onPress={() => setShowClockControl(true)}
-                  style={{ 
-                    flexDirection: 'row', 
-                    alignItems: 'center', 
-                    gap: 6, 
-                    backgroundColor: isTimerActive ? colors.primary + '10' : colors.surfaceStrong,
-                    paddingHorizontal: 10,
-                    paddingVertical: 4,
-                    borderRadius: 12,
-                    borderWidth: 1,
-                    borderColor: isTimerActive ? colors.primary + '30' : colors.border
-                  }}
-                >
-                  <Clock size={14} color={isTimerActive ? colors.primary : colors.textTertiary} />
-                  <Text style={{ 
-                    color: isTimerActive ? colors.primary : colors.textTertiary, 
-                    fontWeight: '900', 
-                    fontSize: 13,
-                    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' 
-                  }}>
-                    {formatTime(seconds)}
-                  </Text>
-                </TouchableOpacity>
-              )}
             </View>
           </View>
 
@@ -2700,6 +2731,16 @@ export default function UnifiedQuizEngine() {
             >
               <LayoutGrid size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
             </TouchableOpacity>
+            {timerType !== 'none' && (
+              <TouchableOpacity
+                onPress={() => setShowClockControl(true)}
+                style={[styles.headerBtn, { flexDirection: 'row', gap: 4 }]}
+                testID="engine-clock-btn"
+              >
+                <Clock size={16} color={isTimerActive ? colors.primary : (isZenMode ? '#433422' : colors.textTertiary)} />
+                <Text style={{ color: isZenMode ? '#433422' : colors.textSecondary, fontSize: 10, fontWeight: '800' }}>{formatTime(seconds)}</Text>
+              </TouchableOpacity>
+            )}
             {!showIndex && (
               <TouchableOpacity onPress={() => setShowIndex(true)} style={styles.headerBtn}>
                 <ListIcon size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
@@ -2729,12 +2770,6 @@ export default function UnifiedQuizEngine() {
                     <Text style={{ fontWeight: '900', color: colors.textPrimary, fontSize: 16 }}>Aa</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity 
-                    style={styles.utilBtn} 
-                    onPress={() => { setShowNavigator(true); setShowQuickMenu(false); }}
-                  >
-                    <LayoutGrid size={24} color={colors.textPrimary} />
-                  </TouchableOpacity>
 
                   <TouchableOpacity 
                     style={styles.utilBtn} 
@@ -2743,19 +2778,7 @@ export default function UnifiedQuizEngine() {
                     <Text style={{ fontWeight: '900', color: showPYQTags ? colors.primary : colors.textTertiary, fontSize: 10 }}>PYQ</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity 
-                    style={styles.utilBtn} 
-                    onPress={() => { setShowTimerPicker(true); setShowQuickMenu(false); }}
-                  >
-                    <Clock size={24} color={timerType !== 'none' ? colors.primary : colors.textTertiary} />
-                  </TouchableOpacity>
 
-                  <TouchableOpacity 
-                    style={styles.utilBtn} 
-                    onPress={() => { toggleZenMode(); setShowQuickMenu(false); }}
-                  >
-                    <Sparkles size={24} color={isZenMode ? colors.primary : colors.textTertiary} />
-                  </TouchableOpacity>
                   
                   <View style={{ height: 1, backgroundColor: colors.border, width: '100%', marginVertical: 4 }} />
                   
@@ -2842,8 +2865,15 @@ export default function UnifiedQuizEngine() {
                                 setCurrentIndex(idx);
                               } else if (viewMode === 'card') { 
                                 setCurrentIndex(idx); 
-                              } else { 
-                                listRef.current?.scrollToIndex({ index: idx, animated: true }); 
+                              } else {
+                                setCurrentIndex(idx);
+                                requestAnimationFrame(() => {
+                                  try {
+                                    listRef.current?.scrollToIndex({ index: idx, animated: true, viewPosition: 0 });
+                                  } catch {
+                                    listRef.current?.scrollToOffset({ offset: Math.max(0, idx * 220), animated: true });
+                                  }
+                                });
                               }
                             }, 100);
                           }}
@@ -3011,27 +3041,7 @@ export default function UnifiedQuizEngine() {
             if (!q) return null;
             const ans = currentAnswers[q.id] || { selectedAnswer: null, isReview: false, note: '' };
             // Build the explanation list (same logic as inline)
-            const explanations: any[] = [];
-            const list = Array.isArray(q._explanations) ? q._explanations : [];
-            list.forEach((e: any, idx: number) => {
-              const source = String(e?.source || e?.institute || `Source ${idx + 1}`).trim();
-              explanations.push({
-                source,
-                text: String(e?.text || e?.explanation || '').trim(),
-                year: String(e?.year || q.exam_year || '').trim(),
-                program: String(e?.program || q.tests?.program_name || '').trim(),
-                answer: String(e?.answer || q.correct_answer || '').trim().toUpperCase(),
-              });
-            });
-            if (q.explanation_markdown) {
-              explanations.push({
-                source: q.tests?.institute || q.source?.institute || 'Primary',
-                text: String(q.explanation_markdown).trim(),
-                year: String(q.exam_year || '').trim(),
-                program: String(q.tests?.program_name || '').trim(),
-                answer: String(q.correct_answer || '').trim().toUpperCase(),
-              });
-            }
+            const explanations: any[] = buildCanonicalExplanations(q);
             const activeIdx = activeExplIndex[q.id] ?? -1;
             const safeIdx = activeIdx >= 0 && activeIdx < explanations.length ? activeIdx : -1;
             const text = safeIdx === -1

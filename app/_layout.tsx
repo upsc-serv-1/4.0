@@ -9,6 +9,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useOfflineBootstrap } from '../src/hooks/useOfflineBootstrap';
 import { OfflineBanner } from '../src/components/OfflineBanner';
+import { DownloadManagerProvider } from '../src/context/DownloadManagerContext';
+import { DownloadManager } from '../src/components/pyq/DownloadManager';
 
 export default function RootLayout() {
   return (
@@ -17,7 +19,9 @@ export default function RootLayout() {
         <AuthProvider>
           <NetworkProvider>
             <ThemeProvider>
-              <RootStack />
+              <DownloadManagerProvider>
+                <RootStack />
+              </DownloadManagerProvider>
             </ThemeProvider>
           </NetworkProvider>
         </AuthProvider>
@@ -59,6 +63,7 @@ function RootStack() {
         <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
         <Stack.Screen name="notes" options={{ animation: 'slide_from_right', gestureEnabled: true, fullScreenGestureEnabled: false }} />
       </Stack>
+      <DownloadManager />
     </View>
   );
 }

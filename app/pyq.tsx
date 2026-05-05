@@ -38,6 +38,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { prelimsTaxonomy } from '../src/data/taxonomy';
 import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet';
 import { buildPyqAnalysisSummaryHtml, type ExportPayload } from '../src/lib/unifiedExportEngine';
+import { useDownloadManager } from '../src/context/DownloadManagerContext';
+import { useExportGuard } from '../src/lib/useExportGuard';
+import { ActiveFiltersBar, ActiveFilter } from '../src/components/pyq/ActiveFiltersBar';
+import { SelectionSummaryBar } from '../src/components/pyq/SelectionSummaryBar';
+import { PredictiveInsightsPanel } from '../src/components/pyq/PredictiveInsightsPanel';
+import { CompareWindowsPanel } from '../src/components/pyq/CompareWindowsPanel';
+import { UndoToast, UndoSpec } from '../src/components/common/UndoToast';
 
 const { width } = Dimensions.get('window');
 
@@ -54,7 +61,7 @@ const TREND_PALETTE = [
 ];
 const PYQ_PAGE_SIZE = 1000;
 
-type HubKey = 'overview' | 'focused' | 'pilot';
+type HubKey = 'overview' | 'focused' | 'pilot' | 'forecast' | 'compare';
 type ExportMode = 'all' | 'momentum' | 'distribution' | 'heatmaps' | 'focused' | 'subject_one' | 'subject_all';
 type AnalysisReportKey = 'full_report' | 'subject_momentum' | 'subject_distribution' | 'heatmaps' | 'focused_trend';
 
@@ -292,6 +299,9 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const [exportSubject, setExportSubject] = useState('');
 
   const [heatmapPalette, setHeatmapPalette] = useState<'spectral' | 'ocean'>('spectral');
+  const [undoSpec, setUndoSpec] = useState<UndoSpec | null>(null);
+  const downloads = useDownloadManager();
+  const { isExporting: guardBusy, guard } = useExportGuard();
 
   // Fade animation
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -2089,6 +2099,30 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         </View>
       ) : null}
 
+      <ActiveFiltersBar
+        filters={[
+          { id: 'stage', label: examStage },
+          { id: 'paper', label: selectedPaper },
+          { id: 'range', label: selectedRange },
+          ...selSubjects.map((s) => ({ id: `sub-${s}`, label: s, onRemove: () => setSelSubjects((p) => p.filter((x) => x !== s)) })),
+          ...selSections.map((s) => ({ id: `sec-${s}`, label: s, onRemove: () => setSelSections((p) => p.filter((x) => x !== s)) })),
+          ...selMicros.map((s) => ({ id: `mic-${s}`, label: s, onRemove: () => setSelMicros((p) => p.filter((x) => x !== s)) })),
+        ] as ActiveFilter[]}
+      />
+      <SelectionSummaryBar
+        subjects={selSubjects.length}
+        sections={selSections.length}
+        micros={selMicros.length}
+        onClear={() => {
+          const prev = { selSubjects, selSections, selMicros };
+          setSelSubjects([]); setSelSections([]); setSelMicros([]);
+          setUndoSpec({
+            message: 'Selection cleared',
+            onUndo: () => { setSelSubjects(prev.selSubjects); setSelSections(prev.selSections); setSelMicros(prev.selMicros); },
+          });
+        }}
+      />
+
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {loading ? (
           <View style={[styles.loaderBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -2107,6 +2141,22 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
                 {activeHub === 'focused' && renderFocusedTrend()}
                 {activeHub === 'pilot' && renderPilot()}
+                {activeHub === 'forecast' && (
+                  <PredictiveInsightsPanel
+                    rawQuestions={rawQuestions}
+                    getYear={getAnalyticsYear}
+                    getSubject={getAnalyticsSubject}
+                    level="micro_topic"
+                  />
+                )}
+                {activeHub === 'compare' && (
+                  <CompareWindowsPanel
+                    rawQuestions={rawQuestions}
+                    getYear={getAnalyticsYear}
+                    getSubject={getAnalyticsSubject}
+                    level="subject"
+                  />
+                )}
               </>
             )}
           </Animated.View>
@@ -2130,6 +2180,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           { key: 'pilot', label: 'Deep Dive', icon: Target },
           { key: 'overview', label: 'Overview', icon: TrendingUp },
           { key: 'focused', label: 'Focused', icon: LineIcon },
+          { key: 'forecast', label: 'Forecast', icon: TrendingUp },
+          { key: 'compare', label: 'Compare', icon: Grid },
         ].map(item => {
           const Icon = item.icon;
           const active = activeHub === item.key;
@@ -2510,6 +2562,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           </View>
         </Pressable>
       </Modal>
+
+      <UndoToast spec={undoSpec} onDismiss={() => setUndoSpec(null)} />
     </View>
   );
 }

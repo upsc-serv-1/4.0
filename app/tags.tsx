@@ -1023,19 +1023,19 @@ ${answerText}` : ''}`,
           visible={unifiedExportVisible}
           onClose={() => setUnifiedExportVisible(false)}
           title="Tagged Questions"
-          initialOptions={{
+          initialOptions={useMemo(() => ({
             title: 'Tagged Questions',
             moduleName: 'Tags Library',
             showTOC: true,
             headerText: 'Dr. UPSC · Tags',
             footerText: 'Tagged Questions Export',
-          }}
-          payload={(() => {
+          }), [])}
+          payload={useMemo(() => {
             const groups = uniqueTags
               .map((tag) => ({
                 tag,
                 questions: allQuestions
-                  .filter((q) => q.normalizedReviewTags.includes(normalizeTag(tag)))
+                  .filter((q) => (q.normalizedReviewTags || []).includes(normalizeTag(tag)))
                   .map((q: any) => ({
                     id: q.id,
                     question_text: q.questionText || q.question_text || '',
@@ -1053,7 +1053,7 @@ ${answerText}` : ''}`,
               }))
               .filter((x) => x.questions.length > 0);
             return { kind: 'tags' as const, groups };
-          })()}
+          }, [uniqueTags, allQuestions])}
           renderExtraFilters={(o, setO) => (
             uniqueTags.length > 0 ? (
               <View style={{ marginTop: 6 }}>

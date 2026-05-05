@@ -1365,7 +1365,7 @@ export default function NoteEditor() {
           onClose={() => setUnifiedExportVisible(false)}
           payload={unifiedExportPayload}
           title={unifiedExportTitle}
-          initialOptions={{
+          initialOptions={useMemo(() => ({
             title: unifiedExportTitle,
             moduleName: 'Knowledge Vault',
             theme: 'sepia',
@@ -1376,7 +1376,7 @@ export default function NoteEditor() {
             footerText: unifiedExportTitle,
             notesChecklistMode: true,
             notesSubheadingColor: '#f3f4f6',
-          }}
+          }), [unifiedExportTitle])}
           hideSections={['content', 'answer', 'sort', 'filters']}
         />
 

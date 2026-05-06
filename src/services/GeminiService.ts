@@ -45,6 +45,21 @@ export const DEFAULT_GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 export const DEFAULT_MODEL = 'gemini-2.0-flash';
 
+// Filters Gemini can infer from query intent
+export type AIInferredFilters = {
+  subject?:      string;   // e.g. 'History', 'Geography', 'Polity'
+  stage?:        string;   // 'Prelims' | 'Mains'
+  pyqFilter?:    string;   // 'PYQ Only' | 'Non-PYQ'
+  examCategory?: string;   // 'UPSC' | 'Allied' | 'Others'
+  ncertFilter?:  string;   // 'NCERT Only'
+  specificYear?: string;   // e.g. '2019' or '2019,2020'
+};
+
+export type AISearchResult = {
+  keywords: string[];
+  filters: AIInferredFilters;
+};
+
 // Default prompts — used when user has not customised
 export const DEFAULT_PROMPTS = {
   explain: `You are an expert UPSC coach. A student is studying this question.
@@ -96,12 +111,20 @@ EXPLANATION:
 
 A student typed this search query: "{{query}}"
 
-Generate a list of 12-18 specific keywords and phrases that UPSC questions on this
-topic would contain. Include: related concepts, proper nouns, synonyms, associated
-geography, historical figures, acts/articles, years if relevant.
+Return a JSON object with exactly two keys: "keywords" and "filters".
 
-Return ONLY a JSON array of strings. Example: ["keyword1", "keyword2", "phrase 3"]
-No explanation, no markdown fences, just the raw JSON array.`,
+"keywords": an array of 12-18 specific keywords and phrases that UPSC questions on this topic would contain. Include related concepts, proper nouns, synonyms, associated geography, historical figures, acts/articles, years if relevant.
+
+"filters": an object with ONLY the filters you are CONFIDENT about from the query. Omit any filter you are not sure about — do NOT guess. Use exactly these values:
+  subject: one of: "History", "Geography", "Polity", "Economy", "Environment", "Science & Technology", "Art & Culture", "International Relations", "Agriculture", "Social Issues" (omit if unclear or multi-subject)
+  stage: "Prelims" or "Mains" (only if explicitly mentioned or strongly implied)
+  pyqFilter: "PYQ Only" if query mentions "pyq", "previous year", "upsc asked", or a specific year. "Non-PYQ" if query mentions "test series", "practice", "mock". Omit otherwise.
+  examCategory: "UPSC" if query mentions "upsc", "cse", "ias". "Allied" if mentions "allied", "state pcs", "capf". Omit otherwise.
+  ncertFilter: "NCERT Only" if query mentions "ncert" or "class 6" through "class 12". Omit otherwise.
+  specificYear: a year string like "2019" or comma-separated "2019,2020" if a specific year is mentioned. Omit otherwise.
+
+Return ONLY raw JSON. No explanation, no markdown fences. Example:
+{"keywords":["emergency provisions","article 352","national emergency"],"filters":{"subject":"Polity","pyqFilter":"PYQ Only","examCategory":"UPSC"}}`,
 };
 
 // Helper — reads user's saved prompt or falls back to default
@@ -310,16 +333,42 @@ export async function aiSummarizeExplanation(explanationText: string): Promise<s
   return callAI(prompt, 600);
 }
 
-export async function aiExpandSearchQuery(userQuery: string): Promise<string[]> {
+export async function aiExpandSearchQuery(userQuery: string): Promise<AISearchResult> {
   const template = await getPrompt('search');
   const prompt = template.replace('{{query}}', userQuery);
-  const raw = await callAI(prompt, 200);
+  const raw = await callAI(prompt, 300);
   try {
     const cleaned = raw.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(cleaned);
-    if (Array.isArray(parsed)) return parsed.filter((s) => typeof s === 'string');
+
+    // Handle old format gracefully (plain array) — treat as keywords only
+    if (Array.isArray(parsed)) {
+      return { keywords: parsed.filter((s: any) => typeof s === 'string'), filters: {} };
+    }
+
+    const keywords: string[] = Array.isArray(parsed.keywords)
+      ? parsed.keywords.filter((s: any) => typeof s === 'string')
+      : [];
+
+    const filters: AIInferredFilters = {};
+    const f = parsed.filters || {};
+
+    const validSubjects = ['History', 'Geography', 'Polity', 'Economy',
+      'Environment', 'Science & Technology', 'Art & Culture',
+      'International Relations', 'Agriculture', 'Social Issues'];
+
+    if (f.subject && validSubjects.includes(f.subject)) filters.subject = f.subject;
+    if (f.stage === 'Prelims' || f.stage === 'Mains') filters.stage = f.stage;
+    if (f.pyqFilter === 'PYQ Only' || f.pyqFilter === 'Non-PYQ') filters.pyqFilter = f.pyqFilter;
+    if (f.examCategory === 'UPSC' || f.examCategory === 'Allied' || f.examCategory === 'Others') filters.examCategory = f.examCategory;
+    if (f.ncertFilter === 'NCERT Only') filters.ncertFilter = f.ncertFilter;
+    if (typeof f.specificYear === 'string' && /^\d{4}(,\d{4})*$/.test(f.specificYear)) filters.specificYear = f.specificYear;
+
+    return { keywords, filters };
+
   } catch {
-    return raw.replace(/[\[\]"]/g, '').split(',').map((s) => s.trim()).filter(Boolean);
+    // Fallback: treat whole response as comma-separated keyword list
+    const keywords = raw.replace(/[\[\]"]/g, '').split(',').map((s: string) => s.trim()).filter(Boolean);
+    return { keywords, filters: {} };
   }
-  return [];
 }

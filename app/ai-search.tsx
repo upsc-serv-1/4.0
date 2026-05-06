@@ -19,7 +19,7 @@ import { supabase } from '../src/lib/supabase';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { aiExpandSearchQuery } from '../src/services/GeminiService';
+import { aiExpandSearchQuery, type AIInferredFilters } from '../src/services/GeminiService';
 import { PageWrapper } from '../src/components/PageWrapper';
 import { getPYQCategorization } from './unified/engine';
 import { AIModelSwitcher } from '../src/components/ai/AIModelSwitcher';
@@ -133,6 +133,9 @@ export default function AISearchTab() {
   // Fix #6 — collapsible keywords panel
   const [keywordsExpanded, setKeywordsExpanded] = useState(false);
 
+  // AI Smart Filters — inferred from query intent
+  const [aiInferredFilters, setAiInferredFilters] = useState<AIInferredFilters>({});
+
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
@@ -161,6 +164,8 @@ export default function AISearchTab() {
     if (!q.trim()) return;
     // Fix #2 — reset sidebar subject filter on every new search
     setSidebarSubjectFilter(null);
+    // Clear AI inferred filters on new search
+    setAiInferredFilters({});
     // Fix #4 — save to history
     const trimmed = q.trim();
     setSearchHistory(prev => {
@@ -179,6 +184,7 @@ export default function AISearchTab() {
       // ── STEP 1: Determine search conditions ────────────────────────────────
       let conditions: string[];
       let displayKeywords: string[];
+      let aiYear: string | null = null; // set in Matching mode, used in STEP 5
 
       if (activeFilters.searchMode === 'Exact') {
         // Exact mode: bypass AI expansion, single phrase match
@@ -190,24 +196,36 @@ export default function AISearchTab() {
         }
         displayKeywords = [q.trim()];
       } else {
-        // Matching mode: AI expands query, OR across keywords
-        const kws = await aiExpandSearchQuery(q.trim());
-        displayKeywords = kws;
+        // Matching mode: AI expands query + infers filters
+        const aiResult = await aiExpandSearchQuery(q.trim());
+        displayKeywords = aiResult.keywords;
 
-        if (kws.length === 0) {
+        // Auto-apply AI-inferred filters — only fill slots the user left as 'All'
+        const mergedFilters: Filters = { ...activeFilters };
+        if (aiResult.filters.subject   && activeFilters.subjects     === 'All') mergedFilters.subjects     = aiResult.filters.subject;
+        if (aiResult.filters.stage     && activeFilters.stage        === 'All') mergedFilters.stage        = aiResult.filters.stage;
+        if (aiResult.filters.pyqFilter && activeFilters.pyqFilter    === 'All') mergedFilters.pyqFilter    = aiResult.filters.pyqFilter;
+        if (aiResult.filters.examCategory && activeFilters.examCategory === 'All') mergedFilters.examCategory = aiResult.filters.examCategory;
+        if (aiResult.filters.ncertFilter  && activeFilters.ncertFilter  === 'All') mergedFilters.ncertFilter  = aiResult.filters.ncertFilter;
+
+        aiYear = aiResult.filters.specificYear || null;
+        setAiInferredFilters(aiResult.filters);
+        // Update filter state so badge count reflects AI filters
+        setFilters(mergedFilters);
+        // Swap activeFilters → mergedFilters for the DB query below
+        activeFilters = mergedFilters;
+
+        if (aiResult.keywords.length === 0) {
           setKeywords([]);
           setLoading(false);
           return;
         }
 
-        const safeKws = kws.slice(0, 12); // cap to avoid URL length errors
+        const safeKws = aiResult.keywords.slice(0, 12);
 
         if (activeFilters.searchAcross === 'Explanations') {
           conditions = safeKws.map(kw => `explanation_markdown.ilike.%${kw}%`);
-        } else if (activeFilters.searchAcross === 'Questions+Options') {
-          conditions = safeKws.map(kw => `question_text.ilike.%${kw}%`);
         } else {
-          // Questions (default)
           conditions = safeKws.map(kw => `question_text.ilike.%${kw}%`);
         }
       }
@@ -297,13 +315,22 @@ export default function AISearchTab() {
           : dbQuery.in('test_id', ['__NO_MATCH__']);
       }
 
-      // ── STEP 5: Execute ────────────────────────────────────────────────────
+      // ── STEP 5: Apply AI-inferred specific year ───────────────────────────
+      if (aiYear) {
+        if (aiYear.includes(',')) {
+          dbQuery = dbQuery.in('exam_year', aiYear.split(',').map(Number));
+        } else {
+          dbQuery = dbQuery.eq('exam_year', parseInt(aiYear, 10));
+        }
+      }
+
+      // ── STEP 6: Execute ────────────────────────────────────────────────────
       const { data, error } = await dbQuery;
       if (error) throw error;
       // Fix #8 — dedup results using mergeQuestions
       const raw = (data || []) as unknown as SearchResult[];
-      const merged = mergeQuestions(raw as any) as unknown as SearchResult[];
-      setResults(merged);
+      const { mergedQs } = mergeQuestions(raw as any);
+      setResults(mergedQs as SearchResult[]);
 
     } catch (e: any) {
       const msg: string = e?.message || 'Unknown error';
@@ -973,10 +1000,63 @@ export default function AISearchTab() {
             renderItem={renderResultCard}
             ListHeaderComponent={
               <>
+                {/* AI Smart Filters chips */}
+                {Object.keys(aiInferredFilters).length > 0 && hasSearched && (
+                  <View style={{ paddingHorizontal: 12, paddingTop: 6, paddingBottom: 2 }}>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5, alignItems: 'center' }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginRight: 2 }}>
+                        <Brain size={10} color="#7c3aed" />
+                        <Text style={{ fontSize: 9, fontWeight: '800', color: '#7c3aed', letterSpacing: 0.8 }}>AI APPLIED</Text>
+                      </View>
+                      {aiInferredFilters.subject && (
+                        <TouchableOpacity style={styles.aiChip} onPress={() => {
+                          setAiInferredFilters(prev => { const n = {...prev}; delete n.subject; return n; });
+                          const f = { ...filters, subjects: 'All' }; setFilters(f); runSearch(query, f);
+                        }}><Text style={styles.aiChipText}>{aiInferredFilters.subject}</Text><X size={8} color="#6d28d9" /></TouchableOpacity>
+                      )}
+                      {aiInferredFilters.stage && (
+                        <TouchableOpacity style={styles.aiChip} onPress={() => {
+                          setAiInferredFilters(prev => { const n = {...prev}; delete n.stage; return n; });
+                          const f = { ...filters, stage: 'All' }; setFilters(f); runSearch(query, f);
+                        }}><Text style={styles.aiChipText}>{aiInferredFilters.stage}</Text><X size={8} color="#6d28d9" /></TouchableOpacity>
+                      )}
+                      {aiInferredFilters.pyqFilter && (
+                        <TouchableOpacity style={styles.aiChip} onPress={() => {
+                          setAiInferredFilters(prev => { const n = {...prev}; delete n.pyqFilter; return n; });
+                          const f = { ...filters, pyqFilter: 'All' }; setFilters(f); runSearch(query, f);
+                        }}><Text style={styles.aiChipText}>{aiInferredFilters.pyqFilter}</Text><X size={8} color="#6d28d9" /></TouchableOpacity>
+                      )}
+                      {aiInferredFilters.examCategory && (
+                        <TouchableOpacity style={styles.aiChip} onPress={() => {
+                          setAiInferredFilters(prev => { const n = {...prev}; delete n.examCategory; return n; });
+                          const f = { ...filters, examCategory: 'All' }; setFilters(f); runSearch(query, f);
+                        }}><Text style={styles.aiChipText}>{aiInferredFilters.examCategory}</Text><X size={8} color="#6d28d9" /></TouchableOpacity>
+                      )}
+                      {aiInferredFilters.ncertFilter && (
+                        <TouchableOpacity style={styles.aiChip} onPress={() => {
+                          setAiInferredFilters(prev => { const n = {...prev}; delete n.ncertFilter; return n; });
+                          const f = { ...filters, ncertFilter: 'All' }; setFilters(f); runSearch(query, f);
+                        }}><Text style={styles.aiChipText}>{aiInferredFilters.ncertFilter}</Text><X size={8} color="#6d28d9" /></TouchableOpacity>
+                      )}
+                      {aiInferredFilters.specificYear && (
+                        <TouchableOpacity style={styles.aiChip} onPress={() => {
+                          setAiInferredFilters(prev => { const n = {...prev}; delete n.specificYear; return n; });
+                          runSearch(query, filters);
+                        }}><Text style={styles.aiChipText}>{aiInferredFilters.specificYear}</Text><X size={8} color="#6d28d9" /></TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
+                )}
+                {/* Fix #6 — collapsible keywords on phone */}
                 {keywords.length > 0 && (
-                  <View style={{ padding: 12, paddingBottom: 0 }}>
-                    <Text style={[styles.panelLabel, { color: colors.textTertiary }]}>AI EXPANDED KEYWORDS</Text>
-                    {renderKeywordPills()}
+                  <View style={{ paddingHorizontal: 14, paddingBottom: 4 }}>
+                    <TouchableOpacity onPress={() => setKeywordsExpanded(e => !e)}
+                      style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6 }}>
+                      <Sparkles size={11} color="#7c3aed" />
+                      <Text style={[styles.panelLabel, { color: '#7c3aed', marginBottom: 0, flex: 1 }]}>{keywords.length} AI KEYWORDS USED</Text>
+                      {keywordsExpanded ? <ChevronUp size={13} color={colors.textTertiary} /> : <ChevronDown size={13} color={colors.textTertiary} />}
+                    </TouchableOpacity>
+                    {keywordsExpanded && renderKeywordPills()}
                   </View>
                 )}
                 {hasSearched && ResultsHeader}
@@ -1171,4 +1251,7 @@ const styles = StyleSheet.create({
   // Fix #7 styles
   activeChip:     { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 9, paddingVertical: 4, borderRadius: 20, borderWidth: 1, borderColor: '#c4b5fd' },
   activeChipText: { fontSize: 10, fontWeight: '800', color: '#7c3aed' },
+  // AI Smart Filter chip styles
+  aiChip:         { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20, backgroundColor: '#f3f0ff', borderWidth: 1, borderColor: '#c4b5fd' },
+  aiChipText:     { fontSize: 10, fontWeight: '800', color: '#6d28d9' },
 });

@@ -69,7 +69,7 @@ export function InkBulletCard({
   const { colors } = useTheme();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(point.text);
-  const [cardH, setCardH] = useState(MIN_CARD_HEIGHT);
+  const [cardSize, setCardSize] = useState({ w: 0, h: MIN_CARD_HEIGHT });
   const [currentStroke, setCurrentStroke] = useState<StrokePoint[]>([]);
   const [selection, setSelection] = useState({ start: 0, end: 0 });
   const pointsRef = useRef<StrokePoint[]>([]);
@@ -195,9 +195,10 @@ export function InkBulletCard({
     [inkTool, inkColor, inkWidth, strokes],
   );
 
-  const onLayoutBody = (e: LayoutChangeEvent) => {
+  const onLayoutCard = (e: LayoutChangeEvent) => {
     const h = Math.max(MIN_CARD_HEIGHT, Math.round(e.nativeEvent.layout.height));
-    if (Math.abs(h - cardH) > 1) setCardH(h);
+    const w = Math.round(e.nativeEvent.layout.width);
+    setCardSize((prev) => (Math.abs(h - prev.h) > 1 || Math.abs(w - prev.w) > 1 ? { w, h } : prev));
   };
 
   // ===== render =====
@@ -211,6 +212,7 @@ export function InkBulletCard({
 
   return (
     <View
+      onLayout={onLayoutCard}
       style={[
         styles.card,
         {
@@ -240,7 +242,7 @@ export function InkBulletCard({
       )}
 
       {/* Body */}
-      <View onLayout={onLayoutBody} style={[styles.body, { backgroundColor: lockedBg }]}>
+      <View style={[styles.body, { backgroundColor: lockedBg }]}>
         {/* Checklist check */}
         {isCheck && (
           <TouchableOpacity
@@ -261,6 +263,19 @@ export function InkBulletCard({
         <View style={{ flex: 1 }}>
           {editing ? (
             <>
+              <View style={styles.editPreviewWrap}>
+                <RenderHtml
+                  source={{ html: htmlFor(draft, isHeading) }}
+                  contentWidth={Math.max(120, contentWidth - 56)}
+                  baseStyle={{ fontSize: 12, color: colors.textTertiary }}
+                  tagsStyles={{
+                    b: { fontWeight: '800' as const },
+                    i: { fontStyle: 'italic' as const },
+                    mark: { borderRadius: 3 },
+                    p: { marginVertical: 0 },
+                  }}
+                />
+              </View>
               <TextInput
                 value={draft}
                 onChangeText={setDraft}
@@ -272,7 +287,7 @@ export function InkBulletCard({
                   styles.editInput,
                   {
                     color: colors.textPrimary,
-                    minHeight: Math.max(60, cardH * EDIT_EXPAND_MULT),
+                    minHeight: Math.max(60, cardSize.h * EDIT_EXPAND_MULT),
                   },
                   headingFont,
                 ]}
@@ -305,7 +320,7 @@ export function InkBulletCard({
             >
               <RenderHtml
                 source={{ html: htmlFor(point.text, isHeading) }}
-                contentWidth={contentWidth - 56}
+                contentWidth={lens === 'focus' ? contentWidth : contentWidth - 56}
                 baseStyle={{
                   color: lens === 'focus' ? '#3f2d16' : colors.textPrimary,
                   fontSize: lens === 'focus' ? 16 : (isHeading ? 14 : 14),
@@ -342,11 +357,8 @@ export function InkBulletCard({
 
       {/* Skia overlay: visible in all lenses (read-only in glance/focus) */}
       {(strokes.length > 0 || (lens === 'ink' && currentStroke.length > 0)) && (
-        <View
-          pointerEvents="none"
-          style={[styles.canvasOverlay, { width: contentWidth - 4, height: cardH }]}
-        >
-          <Canvas style={{ width: contentWidth - 4, height: cardH }}>
+        <View pointerEvents="none" style={styles.canvasOverlay}>
+          <Canvas style={StyleSheet.absoluteFillObject}>
             {/* Hide erased strokes in-flight */}
             {strokes.map((s) => {
               if (eraseHitsRef.current.has(s.id)) return null;
@@ -387,10 +399,7 @@ export function InkBulletCard({
       {/* Ink gesture surface (only when lens = ink AND not currently text-editing) */}
       {lens === 'ink' && !editing && (
         <GestureDetector gesture={pan}>
-          <View
-            style={[styles.inkSurface, { width: contentWidth - 4, height: cardH }]}
-            data-testid={`ink-surface-${point.id}`}
-          />
+          <View style={styles.inkSurface} data-testid={`ink-surface-${point.id}`} />
         </GestureDetector>
       )}
 
@@ -472,6 +481,10 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     paddingVertical: 4,
   },
+  editPreviewWrap: {
+    marginBottom: 6,
+    opacity: 0.7,
+  },
   editToolbar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -492,8 +505,8 @@ const styles = StyleSheet.create({
   tagChip: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 5 },
   tagText: { fontSize: 9, fontWeight: '900', letterSpacing: 0.3 },
 
-  canvasOverlay: { position: 'absolute', top: 0, left: 0, zIndex: 5 },
-  inkSurface: { position: 'absolute', top: 0, left: 0, zIndex: 6, backgroundColor: 'transparent' },
+  canvasOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 5 },
+  inkSurface: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 6, backgroundColor: 'transparent' },
 
   actionsRow: {
     flexDirection: 'row',

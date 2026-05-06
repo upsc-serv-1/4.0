@@ -42,10 +42,12 @@ export default function HardnoteEditor() {
   const baseLayerRaw = Array.isArray(params.baseLayer) ? params.baseLayer[0] : params.baseLayer;
 
   const { width: winW } = useWindowDimensions();
-  const contentWidth = Math.min(winW - 8, 740);
 
   const doc = useHardnoteDoc(noteId);
   const [lens, setLens] = useState<Lens>(requestedLens || 'glance');
+  const contentWidth = lens === 'focus'
+    ? Math.max(320, winW - 48)
+    : Math.min(winW - 32, 740);
 
   // Ink toolbar state
   const [inkTool, setInkTool] = useState<ToolKind>('pen');
@@ -195,7 +197,7 @@ export default function HardnoteEditor() {
             style={{ flex: 1 }}
             contentContainerStyle={[
               { paddingBottom: lens === 'ink' ? 140 : 80 },
-              lens === 'focus' && { maxWidth: 720, alignSelf: 'center', paddingTop: 12 },
+              lens === 'focus' && { width: '100%', paddingTop: 12, paddingHorizontal: 24 },
             ]}
             keyboardDismissMode="interactive"
             automaticallyAdjustKeyboardInsets

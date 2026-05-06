@@ -98,6 +98,29 @@ function getSubjectColor(sub: string): string {
   return '#94a3b8';
 }
 
+// ── Keyword Highlighter helper ────────────────────────────────────────────────
+function highlightKeywords(text: string, keywords: string[]): React.ReactNode {
+  const kws = keywords.slice(0, 3).filter(k => k.length > 2);
+  if (!kws.length) return text;
+  const escaped = kws.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const pattern = new RegExp(`(${escaped.join('|')})`, 'gi');
+  const parts = text.split(pattern);
+  return parts.map((part, i) =>
+    pattern.test(part)
+      ? <Text key={i} style={{ fontWeight: '800', color: '#f59e0b', backgroundColor: '#fef3c720' }}>{part}</Text>
+      : <Text key={i}>{part}</Text>
+  );
+}
+
+// ── PYQ chip color by exam category ──────────────────────────────────────────
+function getPYQChipStyle(pyq: ReturnType<typeof getPYQCategorization>) {
+  if (!pyq.hasPYQData) return null;
+  if (pyq.isUPSC)    return { bg: '#dbeafe', color: '#1d4ed8' };
+  if (pyq.isAllied)  return { bg: '#dcfce7', color: '#15803d' };
+  if (pyq.isOther)   return { bg: '#ffedd5', color: '#c2410c' };
+  return { bg: '#fef3c7', color: '#b45309' }; // generic PYQ (amber)
+}
+
 // ── Main Component ───────────────────────────────────────────────────────────
 
 export default function AISearchTab() {
@@ -436,6 +459,7 @@ export default function AISearchTab() {
     const pyqLabel = pyq.hasPYQData
       ? `${pyq.groupName} ${pyq.year}`.trim()
       : '';
+    const pyqChipStyle = getPYQChipStyle(pyq);
 
     return (
       <TouchableOpacity
@@ -457,8 +481,9 @@ export default function AISearchTab() {
         </View>
 
         <View style={{ flex: 1 }}>
+          {/* Enhancement 1 — keyword highlighting in question text */}
           <Text style={[styles.cardText, { color: colors.textPrimary }]} numberOfLines={3}>
-            {item.question_text}
+            {keywords.length > 0 ? highlightKeywords(item.question_text, keywords) : item.question_text}
           </Text>
 
           <View style={styles.cardChips}>
@@ -467,11 +492,10 @@ export default function AISearchTab() {
                 <Text style={[styles.chipText, { color: subColor }]}>{item.subject}</Text>
               </View>
             )}
-            {/* PYQ chip — uses getPYQCategorization for full exam name (e.g.
-                "UPSC CSE 2025", "BPSC 2024") instead of bare "PYQ 2025". */}
-            {item.is_pyq && pyqLabel && (
-              <View style={[styles.chip, { backgroundColor: '#dcfce7' }]}>
-                <Text style={[styles.chipText, { color: '#15803d' }]}>
+            {/* Enhancement 3 — color-coded PYQ chip by exam category */}
+            {item.is_pyq && pyqLabel && pyqChipStyle && (
+              <View style={[styles.chip, { backgroundColor: pyqChipStyle.bg }]}>
+                <Text style={[styles.chipText, { color: pyqChipStyle.color }]}>
                   {pyqLabel}
                 </Text>
               </View>

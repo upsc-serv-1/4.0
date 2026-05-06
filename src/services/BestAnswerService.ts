@@ -59,8 +59,13 @@ const getUserId = async (): Promise<string | null> => {
  * Returns the saved best answer for a question, or null if none.
  * Returns null on any unexpected error so the calling UI degrades gracefully.
  */
+// In-memory cache for best answers (cleared on app restart — acceptable for session data)
+const _bestAnswerCache = new Map<string, BestAnswer | null>();
+
 export async function fetchBestAnswer(questionId: string): Promise<BestAnswer | null> {
   if (!questionId) return null;
+  // Return from in-memory cache first (avoids repeated DB round-trips)
+  if (_bestAnswerCache.has(questionId)) return _bestAnswerCache.get(questionId) ?? null;
   const userId = await getUserId();
   if (!userId) return null;
   try {
@@ -71,7 +76,9 @@ export async function fetchBestAnswer(questionId: string): Promise<BestAnswer | 
       .eq('question_id', questionId)
       .maybeSingle();
     if (error) return null;
-    return (data as BestAnswer) || null;
+    const result = (data as BestAnswer) || null;
+    _bestAnswerCache.set(questionId, result);
+    return result;
   } catch {
     return null;
   }
@@ -90,6 +97,8 @@ export async function saveBestAnswer(
   if (!questionId || !answerText) return null;
   const userId = await getUserId();
   if (!userId) throw new Error('Not signed in.');
+  // Invalidate cache so the updated version is fetched on next load
+  _bestAnswerCache.delete(questionId);
 
   const payload = {
     user_id:       userId,

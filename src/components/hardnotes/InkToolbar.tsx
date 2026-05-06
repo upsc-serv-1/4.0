@@ -64,6 +64,15 @@ export function InkToolbar({
         </ToolBtn>
       </View>
 
+      {onTextMode && (
+        <>
+          <View style={[s.divider, { backgroundColor: colors.border }]} />
+          <ToolBtn active={!!isTextMode} onPress={() => { onTextMode(); ping(); }} testID="ink-tool-text">
+            <Text style={{ fontSize: 15, fontWeight: '900', color: isTextMode ? colors.primary : colors.textTertiary }}>T</Text>
+          </ToolBtn>
+        </>
+      )}
+
       <View style={[s.divider, { backgroundColor: colors.border }]} />
 
       {/* Colors (hidden while erasing) */}
@@ -104,17 +113,6 @@ export function InkToolbar({
           </TouchableOpacity>
         ))}
       </View>
-
-      {onTextMode && (
-        <>
-          <View style={[s.divider, { backgroundColor: colors.border }]} />
-          <ToolBtn active={!!isTextMode} onPress={() => { onTextMode(); ping(); }} testID="ink-tool-text">
-            <Text style={{ fontSize: 15, fontWeight: '900', color: isTextMode ? colors.primary : colors.textTertiary }}>
-              T
-            </Text>
-          </ToolBtn>
-        </>
-      )}
 
       <View style={[s.divider, { backgroundColor: colors.border }]} />
 

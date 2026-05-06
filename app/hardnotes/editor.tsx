@@ -272,6 +272,7 @@ export default function HardnoteEditor() {
                     )
                   }
                   onToggleLock={() => doc.toggleLock(p.id)}
+                  textModeActive={lens === 'ink' && textModeActive}
                 />
               ))
             )}
@@ -288,10 +289,7 @@ export default function HardnoteEditor() {
               onToolChange={setInkTool}
               onColorChange={setInkColor}
               onWidthChange={setInkWidth}
-              onTextMode={() => {
-                setTextModeActive((prev) => !prev);
-                setLens('glance');
-              }}
+              onTextMode={() => setTextModeActive((prev) => !prev)}
               isTextMode={textModeActive}
             />
           </View>

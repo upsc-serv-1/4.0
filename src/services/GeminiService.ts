@@ -73,14 +73,16 @@ One sentence: why did UPSC ask this? What theme or syllabus area does it test?
 
 Keep the total under 400 words. Do not add any preamble or closing remarks.`,
 
-  summarize: `You are a UPSC study coach making concise revision notes.
+  summarize: `You are a UPSC study coach making detailed revision notes.
 
-Read this explanation and extract exactly 5 bullet points.
+Read this explanation and extract exactly 6 to 8 bullet points.
 Rules:
-- Each bullet must be under 18 words
+- Each bullet must be 15 to 25 words
+- Pack specific facts: names, dates, years, articles, sections, places, numbers
 - Wrap the single most important word or phrase in each bullet with **bold**
-- Return ONLY the 5 bullet points, nothing else, no preamble
-- Format each as: • **Key term** — brief explanation
+- Where useful, mark a key term with __underline__ for stronger emphasis
+- Return ONLY the bullet points, nothing else, no preamble, no closing remarks
+- Format each as: • **Key term** — concrete fact-rich explanation with at least one specific detail
 
 EXPLANATION:
 {{explanation}}`,
@@ -233,7 +235,8 @@ export async function aiExplainQuestion(
 export async function aiSummarizeExplanation(explanationText: string): Promise<string> {
   const template = await getPrompt('summarize');
   const prompt = template.replace('{{explanation}}', explanationText.slice(0, 2000));
-  return callAI(prompt, 300);
+  // Bumped from 300 → 600 to fit 6-8 detailed bullets (15-25 words each).
+  return callAI(prompt, 600);
 }
 
 export async function aiExpandSearchQuery(userQuery: string): Promise<string[]> {

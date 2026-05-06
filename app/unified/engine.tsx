@@ -93,6 +93,7 @@ import {
   aiExplainQuestion,
   aiSummarizeExplanation,
 } from '../../src/services/GeminiService';
+import { renderAIText } from '../../src/utils/renderAIText';
 
 const ThemeSwitcher = require('../../src/components/ThemeSwitcher').ThemeSwitcher;
 
@@ -346,7 +347,19 @@ export const getPYQCategorization = (item: any) => {
   const isOther = toBool(examInfo?.is_others) || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => groupNameUpper.includes(g));
 
   const rawYear = examInfo?.year ?? '';
-  const year = typeof rawYear === 'string' ? rawYear.trim() : String(rawYear).trim();
+  let year = typeof rawYear === 'string' ? rawYear.trim() : String(rawYear).trim();
+
+  // FIX 1 — strict fallback chain for the chip year:
+  //   exam_info.year  →  questions.exam_year column  →  nothing.
+  // Never read tests.launch_year, tests.exam_year, item.exam_group, or any
+  // other source. The exam_year column is the canonical denormalisation of
+  // exam_info.year written at JSON import, so it is safe to fall back to.
+  if (!year) {
+    const colYear = (item as any)?.exam_year;
+    if (colYear !== undefined && colYear !== null && String(colYear).trim()) {
+      year = String(colYear).trim();
+    }
+  }
 
   // Without a usable group/year there is nothing meaningful to show.
   if (!rawGroup && !year) {
@@ -2633,8 +2646,8 @@ export default function UnifiedQuizEngine() {
                     backgroundColor: colors.surface, borderRadius: 12,
                     borderWidth: 1, borderColor: '#7c3aed20',
                   }}>
-                    <Text style={{ fontSize: 13, color: colors.textPrimary, lineHeight: 20 }}>
-                      {aiExplanations[item.id]}
+                    <Text style={{ fontSize: 13, color: colors.textPrimary, lineHeight: 22 }}>
+                      {renderAIText(aiExplanations[item.id], { fontSize: 13, color: colors.textPrimary, lineHeight: 22 })}
                     </Text>
 
                     {!aiSummaries[item.id] && (
@@ -2668,8 +2681,8 @@ export default function UnifiedQuizEngine() {
                         <Text style={{ fontSize: 11, fontWeight: '800', color: '#f59e0b', marginBottom: 6 }}>
                           ✨ KEY POINTS
                         </Text>
-                        <Text style={{ fontSize: 12, color: colors.textPrimary, lineHeight: 20 }}>
-                          {aiSummaries[item.id]}
+                        <Text style={{ fontSize: 12, color: colors.textPrimary, lineHeight: 22 }}>
+                          {renderAIText(aiSummaries[item.id], { fontSize: 12, color: colors.textPrimary, lineHeight: 22 })}
                         </Text>
                       </View>
                     )}

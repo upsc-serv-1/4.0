@@ -20,6 +20,7 @@ import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import { aiExpandSearchQuery } from '../src/services/GeminiService';
 import { PageWrapper } from '../src/components/PageWrapper';
+import { getPYQCategorization } from './unified/engine';
 import { AIModelSwitcher } from '../src/components/ai/AIModelSwitcher';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -337,7 +338,26 @@ export default function AISearchTab() {
   const renderResultCard = ({ item, index }: { item: SearchResult; index: number }) => {
     const subColor = getSubjectColor(item.subject || '');
     const isFeatured = index === 0;
-    const year = item.exam_year;
+
+    // FIX 2 — build chip label via the same getPYQCategorization() used in
+    // engine.tsx so AI Search shows full exam name ("UPSC CSE 2025",
+    // "BPSC 2024") rather than a bare "PYQ 2025". The Supabase query for
+    // this screen only selects flat columns, so we synthesise a minimal
+    // exam_info from those flat columns before calling the helper.
+    const synthExamInfo = {
+      group:        item.exam_group,
+      year:         item.exam_year,
+      is_upsc_cse:  item.is_upsc_cse,
+      is_allied:    item.is_allied,
+      is_others:    item.is_others,
+    };
+    const pyq = getPYQCategorization({
+      ...item,
+      exam_info: synthExamInfo,
+    });
+    const pyqLabel = pyq.hasPYQData
+      ? `${pyq.groupName} ${pyq.year}`.trim()
+      : '';
 
     return (
       <TouchableOpacity
@@ -369,11 +389,12 @@ export default function AISearchTab() {
                 <Text style={[styles.chipText, { color: subColor }]}>{item.subject}</Text>
               </View>
             )}
-            {/* PYQ chip: only when is_pyq === true, year from exam_year column */}
-            {item.is_pyq && (
+            {/* PYQ chip — uses getPYQCategorization for full exam name (e.g.
+                "UPSC CSE 2025", "BPSC 2024") instead of bare "PYQ 2025". */}
+            {item.is_pyq && pyqLabel && (
               <View style={[styles.chip, { backgroundColor: '#dcfce7' }]}>
                 <Text style={[styles.chipText, { color: '#15803d' }]}>
-                  PYQ{year ? ` ${year}` : ''}
+                  {pyqLabel}
                 </Text>
               </View>
             )}

@@ -43,6 +43,7 @@ export interface HardnoteDoc {
   reorderPoints: (ids: string[]) => void;
   toggleLock: (id: string) => void;
   refresh: () => Promise<void>;
+  flushSave: () => Promise<void>;
 }
 
 const normalize = (raw: any[]): Point[] => {
@@ -165,8 +166,27 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
       inFlight.current = p as any;
       await p;
       if (mounted.current) setSaving(false);
-    }, 450);
+    }, 3000);
   }, [noteId]);
+
+  const flushSave = useCallback(async () => {
+    if (!noteId) return;
+    if (saveTimer.current) {
+      clearTimeout(saveTimer.current);
+      saveTimer.current = null;
+    }
+    setSaving(true);
+    const { error } = await supabase
+      .from('user_notes')
+      .update({
+        items: points,
+        title,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', noteId);
+    if (error) console.warn('[useHardnoteDoc] flush save failed', error);
+    if (mounted.current) setSaving(false);
+  }, [noteId, points, title]);
 
   const updatePoint = useCallback((id: string, patch: Partial<Point>) => {
     setPoints((prev) => {
@@ -258,6 +278,6 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
   return {
     loading, saving, title, subject, points,
     setTitle, updatePoint, addStroke, removeStrokes, clearStrokes,
-    insertPoint, removePoint, reorderPoints, toggleLock, refresh,
+    insertPoint, removePoint, reorderPoints, toggleLock, refresh, flushSave,
   };
 }

@@ -121,12 +121,17 @@ export default function HardnoteEditor() {
 
   const lensBg = lens === 'focus' ? '#fdf6e3' : colors.bg;
 
+  const handleBack = async () => {
+    await doc.flushSave();
+    router.back();
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: lensBg }} edges={['top']} data-testid="hn-editor-root">
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* Header */}
         <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: lensBg }]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn} data-testid="hn-editor-back">
+          <TouchableOpacity onPress={handleBack} style={styles.iconBtn} data-testid="hn-editor-back">
             <ChevronLeft size={24} color={colors.textPrimary} />
           </TouchableOpacity>
           <View style={{ flex: 1, paddingHorizontal: 4 }}>

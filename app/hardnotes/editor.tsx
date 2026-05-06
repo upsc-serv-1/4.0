@@ -320,6 +320,8 @@ export default function HardnoteEditor() {
                 onWidthChange={setInkWidth}
                 onUndo={doc.undoStroke}
                 canUndo={doc.canUndoStroke}
+                onRedo={doc.redoStroke}
+                canRedo={doc.canRedoStroke}
                 onTextMode={() => setTextModeActive((prev) => !prev)}
                 isTextMode={textModeActive}
               />

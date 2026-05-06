@@ -34,12 +34,14 @@ export interface HardnoteDoc {
   subject: string | null;
   points: Point[];
   canUndoStroke: boolean;
+  canRedoStroke: boolean;
   setTitle: (t: string) => void;
   updatePoint: (id: string, patch: Partial<Point>) => void;
   addStroke: (pointId: string, stroke: Stroke) => void;
   removeStrokes: (pointId: string, strokeIds: string[]) => void;
   clearStrokes: (pointId: string) => void;
   undoStroke: () => void;
+  redoStroke: () => void;
   insertPoint: (afterId: string | null, draft?: Partial<Point>) => string;
   removePoint: (id: string) => void;
   reorderPoints: (ids: string[]) => void;
@@ -98,7 +100,7 @@ const mkPoint = (partial: Partial<Point>): Point => ({
 
 type StrokeHistoryEntry = {
   pointId: string;
-  strokeId: string;
+  stroke: Stroke;
 };
 
 export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
@@ -108,6 +110,7 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
   const [subject, setSubject] = useState<string | null>(null);
   const [points, setPoints] = useState<Point[]>([]);
   const [strokeHistory, setStrokeHistory] = useState<StrokeHistoryEntry[]>([]);
+  const [redoHistory, setRedoHistory] = useState<StrokeHistoryEntry[]>([]);
   const saveTimer = useRef<any>(null);
   const inFlight = useRef<Promise<void> | null>(null);
   const mounted = useRef(true);
@@ -152,6 +155,7 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
     }
     setPoints(pts);
     setStrokeHistory([]);
+    setRedoHistory([]);
     setLoading(false);
   }, [noteId]);
 
@@ -215,7 +219,8 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
       scheduleSave(next);
       return next;
     });
-    setStrokeHistory((prev) => [...prev, { pointId, strokeId: stroke.id }]);
+    setStrokeHistory((prev) => [...prev, { pointId, stroke }]);
+    setRedoHistory([]);
   }, [scheduleSave]);
 
   const removeStrokes = useCallback((pointId: string, strokeIds: string[]) => {
@@ -229,7 +234,8 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
       scheduleSave(next);
       return next;
     });
-    setStrokeHistory((prev) => prev.filter((h) => !(h.pointId === pointId && idSet.has(h.strokeId))));
+    setStrokeHistory((prev) => prev.filter((h) => !(h.pointId === pointId && idSet.has(h.stroke.id))));
+    setRedoHistory([]);
   }, [scheduleSave]);
 
   const clearStrokes = useCallback((pointId: string) => {
@@ -239,6 +245,7 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
       return next;
     });
     setStrokeHistory((prev) => prev.filter((h) => h.pointId !== pointId));
+    setRedoHistory([]);
   }, [scheduleSave]);
 
   const undoStroke = useCallback(() => {
@@ -254,16 +261,51 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
           const next = prevPoints.map((p) => {
             if (p.id !== last.pointId) return p;
             const existing = p.strokes || [];
-            if (!existing.some((s) => s.id === last.strokeId)) return p;
+            if (!existing.some((s) => s.id === last.stroke.id)) return p;
             removed = true;
-            return { ...p, strokes: existing.filter((s) => s.id !== last.strokeId) };
+            return { ...p, strokes: existing.filter((s) => s.id !== last.stroke.id) };
           });
 
           if (removed) scheduleSave(next);
           return next;
         });
 
-        if (removed) return history;
+        if (removed) {
+          setRedoHistory((prevRedo) => [...prevRedo, last]);
+          return history;
+        }
+      }
+
+      return [];
+    });
+  }, [scheduleSave]);
+
+  const redoStroke = useCallback(() => {
+    setRedoHistory((prevRedo) => {
+      if (prevRedo.length === 0) return prevRedo;
+      const nextRedo = [...prevRedo];
+
+      while (nextRedo.length > 0) {
+        const last = nextRedo.pop()!;
+        let reapplied = false;
+
+        setPoints((prevPoints) => {
+          const next = prevPoints.map((p) => {
+            if (p.id !== last.pointId) return p;
+            const existing = p.strokes || [];
+            if (existing.some((s) => s.id === last.stroke.id)) return p;
+            reapplied = true;
+            return { ...p, strokes: [...existing, last.stroke] };
+          });
+
+          if (reapplied) scheduleSave(next);
+          return next;
+        });
+
+        if (reapplied) {
+          setStrokeHistory((prevHistory) => [...prevHistory, last]);
+          return nextRedo;
+        }
       }
 
       return [];
@@ -293,6 +335,7 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
       return next;
     });
     setStrokeHistory((prev) => prev.filter((h) => h.pointId !== id));
+    setRedoHistory((prev) => prev.filter((h) => h.pointId !== id));
   }, [scheduleSave]);
 
   const reorderPoints = useCallback((ids: string[]) => {
@@ -324,12 +367,14 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
     subject,
     points,
     canUndoStroke: strokeHistory.length > 0,
+    canRedoStroke: redoHistory.length > 0,
     setTitle,
     updatePoint,
     addStroke,
     removeStrokes,
     clearStrokes,
     undoStroke,
+    redoStroke,
     insertPoint,
     removePoint,
     reorderPoints,

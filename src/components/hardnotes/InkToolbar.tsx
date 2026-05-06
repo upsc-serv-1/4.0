@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { Pen, Highlighter, Eraser, Sparkles, Undo2 } from 'lucide-react-native';
+import { Pen, Highlighter, Eraser, Sparkles, Undo2, Redo2 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../../context/ThemeContext';
 import { ToolKind } from './strokes';
@@ -25,6 +25,8 @@ interface Props {
   onWidthChange: (w: number) => void;
   onUndo?: () => void;
   canUndo?: boolean;
+  onRedo?: () => void;
+  canRedo?: boolean;
   onTextMode?: () => void;
   isTextMode?: boolean;
 }
@@ -38,6 +40,8 @@ export function InkToolbar({
   onWidthChange,
   onUndo,
   canUndo,
+  onRedo,
+  canRedo,
   onTextMode,
   isTextMode,
 }: Props) {
@@ -116,7 +120,7 @@ export function InkToolbar({
 
       <View style={[s.divider, { backgroundColor: colors.border }]} />
 
-      {/* Undo */}
+      {/* Undo / Redo */}
       {onUndo && (
         <TouchableOpacity
           onPress={() => { if (canUndo) { onUndo(); ping(); } }}
@@ -125,6 +129,16 @@ export function InkToolbar({
           data-testid="ink-undo"
         >
           <Undo2 size={16} color={colors.textPrimary} />
+        </TouchableOpacity>
+      )}
+      {onRedo && (
+        <TouchableOpacity
+          onPress={() => { if (canRedo) { onRedo(); ping(); } }}
+          disabled={!canRedo}
+          style={[s.iconBtn, { opacity: canRedo ? 1 : 0.3 }]}
+          data-testid="ink-redo"
+        >
+          <Redo2 size={16} color={colors.textPrimary} />
         </TouchableOpacity>
       )}
 

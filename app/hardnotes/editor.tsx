@@ -299,6 +299,7 @@ export default function HardnoteEditor() {
                     )
                   }
                   onToggleLock={() => doc.toggleLock(p.id)}
+                  onAddBelow={() => doc.insertPoint(p.id, { type: 'point', text: '' })}
                   textModeActive={lens === 'ink' && textModeActive}
                 />
               ))

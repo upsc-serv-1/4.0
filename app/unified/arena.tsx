@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef, useDeferredValue } from 'react';
 import {
   View,
   Text,
@@ -195,6 +195,7 @@ export default function UnifiedArenaSetup() {
   const [selectedExamCategory, setSelectedExamCategory] = useState<string[]>([]);
 
   const [selectedInstitutes, setSelectedInstitutes] = useState<string[]>([]);
+  const deferredSelectedInstitutes = useDeferredValue(selectedInstitutes);
   const [selectedProgram, setSelectedProgram] = useState('All');
   const [selectedExamStage, setSelectedExamStage] = useState('All');
   const [selectedTestId, setSelectedTestId] = useState<string | null>(null);
@@ -292,7 +293,7 @@ export default function UnifiedArenaSetup() {
     selectedMicrotopic,
     pyqMaster,
     selectedExamCategory,
-    selectedInstitutes,
+    deferredSelectedInstitutes,
     selectedProgram,
     selectedExamStage,
     selectedTestId,
@@ -319,7 +320,7 @@ export default function UnifiedArenaSetup() {
     if (activeTab === 'paper') {
       setPaperVisibleCount(40);
     }
-  }, [activeTab, selectedInstitutes, selectedProgram, selectedExamStage, selectedTestId]);
+  }, [activeTab, deferredSelectedInstitutes, selectedProgram, selectedExamStage, selectedTestId]);
 
   const fetchSearchResults = async () => {
     if (!searchQuery && Object.keys(searchFilters).length === 0) {
@@ -563,7 +564,7 @@ export default function UnifiedArenaSetup() {
         selectedMicrotopic.length === 0 &&
         pyqMaster === 'All' &&
         selectedExamCategory.length === 0 &&
-        selectedInstitutes.length === 0 &&
+        deferredSelectedInstitutes.length === 0 &&
         selectedProgram === 'All' &&
         selectedTags.length === 0 &&
         ncertFilter === 'All';
@@ -595,7 +596,7 @@ export default function UnifiedArenaSetup() {
         if (selectedTestId) {
           rows = rows.filter((m: any) => m.test_id === selectedTestId);
         } else {
-          if (selectedInstitutes.length > 0) rows = rows.filter((m: any) => selectedInstitutes.includes(m.institute));
+          if (deferredSelectedInstitutes.length > 0) rows = rows.filter((m: any) => deferredSelectedInstitutes.includes(m.institute));
           if (selectedProgram !== 'All') rows = rows.filter((m: any) => m.program_name === selectedProgram);
           if (selectedExamStage !== 'All') rows = rows.filter((m: any) => m.series === selectedExamStage);
         }
@@ -665,9 +666,9 @@ export default function UnifiedArenaSetup() {
           }
         }
 
-        if (selectedInstitutes.length > 0 || selectedProgram !== 'All') {
+        if (deferredSelectedInstitutes.length > 0 || selectedProgram !== 'All') {
           let tQuery = LocalQuery.from('tests').select('id');
-          if (selectedInstitutes.length > 0) tQuery = tQuery.in('institute', selectedInstitutes);
+          if (deferredSelectedInstitutes.length > 0) tQuery = tQuery.in('institute', deferredSelectedInstitutes);
           if (selectedProgram !== 'All') tQuery = tQuery.eq('program_name', selectedProgram);
           const { data: testRows } = await tQuery;
           const testIds = (testRows || []).map(t => t.id);
@@ -727,10 +728,10 @@ export default function UnifiedArenaSetup() {
 
   const programs = useMemo(() => {
     let base = metadata;
-    if (selectedInstitutes.length > 0) base = base.filter(m => selectedInstitutes.includes(m.institute));
+    if (deferredSelectedInstitutes.length > 0) base = base.filter(m => deferredSelectedInstitutes.includes(m.institute));
     if (selectedExamStage !== 'All') base = base.filter(m => m.series === selectedExamStage);
     return Array.from(new Set(base.map(m => m.program_name).filter(Boolean))).sort();
-  }, [metadata, selectedInstitutes, selectedExamStage]);
+  }, [metadata, deferredSelectedInstitutes, selectedExamStage]);
 
   const examStages = useMemo(() => {
     return Array.from(new Set(metadata.map(m => m.series).filter(Boolean))).sort();
@@ -740,7 +741,7 @@ export default function UnifiedArenaSetup() {
     const tests = new Map();
     metadata.forEach(m => {
       if (!m.test_id) return;
-      if (selectedInstitutes.length > 0 && !selectedInstitutes.includes(m.institute)) return;
+      if (deferredSelectedInstitutes.length > 0 && !deferredSelectedInstitutes.includes(m.institute)) return;
       if (selectedProgram !== 'All' && m.program_name !== selectedProgram) return;
       if (selectedExamStage !== 'All' && m.series !== selectedExamStage) return;
 
@@ -755,7 +756,7 @@ export default function UnifiedArenaSetup() {
       }
     });
     return Array.from(tests.values()).sort((a, b) => String(a.title).localeCompare(String(b.title)));
-  }, [metadata, selectedInstitutes, selectedProgram, selectedExamStage]);
+  }, [metadata, deferredSelectedInstitutes, selectedProgram, selectedExamStage]);
 
   const visiblePaperTests = useMemo(() => testList.slice(0, paperVisibleCount), [testList, paperVisibleCount]);
 

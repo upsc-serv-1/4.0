@@ -719,6 +719,45 @@ export default function AISearchTab() {
               }]}>{opt}</Text>
             </TouchableOpacity>
           ))}
+
+          {/* Institute breakdown in results */}
+          {(() => {
+            const instInResults = results
+              .map(r => r.tests?.institute)
+              .filter(Boolean) as string[];
+            const instCounts: Record<string, number> = {};
+            instInResults.forEach(inst => { instCounts[inst] = (instCounts[inst] || 0) + 1; });
+            const instEntries = Object.entries(instCounts).sort((a, b) => b[1] - a[1]);
+            if (instEntries.length === 0) return null;
+            return (
+              <>
+                <Text style={[styles.panelLabel, { color: colors.textTertiary, marginTop: 14 }]}>BY INSTITUTE</Text>
+                {instEntries.slice(0, 6).map(([inst, count]) => {
+                  const isSelected = filters.institutes.split(',').includes(inst);
+                  return (
+                    <TouchableOpacity
+                      key={inst}
+                      style={[styles.subjectChip, {
+                        borderColor: isSelected ? '#7c3aed' : colors.border,
+                        backgroundColor: isSelected ? '#ede9fe' : colors.surface,
+                      }]}
+                      onPress={() => {
+                        const list = filters.institutes === 'All' ? [] : filters.institutes.split(',').filter(Boolean);
+                        const next = isSelected ? list.filter(i => i !== inst) : [...list, inst];
+                        const newFilters = { ...filters, institutes: next.length ? next.join(',') : 'All' };
+                        setFilters(newFilters);
+                        runSearch(query, newFilters);
+                      }}
+                    >
+                      <View style={[styles.subjectDot, { backgroundColor: '#7c3aed' }]} />
+                      <Text style={[styles.subjectChipText, { color: isSelected ? '#7c3aed' : colors.textSecondary }]}>{inst}</Text>
+                      <Text style={[styles.subjectCount, { color: colors.textTertiary }]}>{count}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </>
+            );
+          })()}
         </>
       )}
     </View>

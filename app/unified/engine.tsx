@@ -1105,6 +1105,16 @@ export default function UnifiedQuizEngine() {
 
       setQuestions(finalQs);
       
+      // Honour initialId from AI Search — scroll to the tapped question
+      if (params.initialId && !hasJumped) {
+        const targetId = idToMergedId.get(params.initialId as string) || params.initialId as string;
+        const idx = finalQs.findIndex((item: any) => item.id === targetId);
+        if (idx > 0) {
+          setCurrentIndex(idx);
+          setHasJumped(true);
+        }
+      }
+
       if (params.questionId && !hasJumped) {
         const jumpId = params.questionId;
         const targetId = idToMergedId.get(jumpId) || jumpId;

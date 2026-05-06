@@ -74,6 +74,11 @@ export default function ReviewScreen() {
   const [branchTree, setBranchTree] = useState<BranchNode[]>([]);
   const [sliderWidth, setSliderWidth] = useState(200);
 
+  // alt sources / vitamin
+  const [altSources, setAltSources] = useState<any[]>([]);
+  const [altActive, setAltActive] = useState<string>('saved'); // 'saved' | 'vitamin' | <institute_key>
+  const [altVitamin, setAltVitamin] = useState<BestAnswer | null>(null);
+
   const revealAnim = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -445,10 +450,6 @@ export default function ReviewScreen() {
   // user's saved best answer ('My Vitamin') if any. Falls back silently
   // when the card has no question_id (e.g. notebook-derived cards) — in
   // that case the chip row is hidden.
-  const [altSources, setAltSources] = useState<any[]>([]);
-  const [altActive, setAltActive]   = useState<string>('saved'); // 'saved' | 'vitamin' | <institute_key>
-  const [altVitamin, setAltVitamin] = useState<BestAnswer | null>(null);
-
   useEffect(() => {
     setAltActive('saved');
     setAltSources([]);

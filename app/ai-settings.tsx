@@ -9,6 +9,7 @@ import {
   TextInput,
   ActivityIndicator,
   Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { 
   ChevronLeft,
@@ -155,8 +156,12 @@ export default function AISettings() {
           </Text>
         </View>
       </View>
-
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
+      
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
         
         {/* ── PROVIDER TOGGLE ───────────────────────────────── */}
         <Text style={styles.sectionTitle}>AI PROVIDER</Text>
@@ -318,7 +323,8 @@ export default function AISettings() {
           ))}
         </View>
 
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       {/* Sticky Save Button */}
       <View style={[styles.stickyFooter, { backgroundColor: colors.bg, borderTopColor: colors.border }]}>

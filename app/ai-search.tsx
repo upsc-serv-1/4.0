@@ -13,15 +13,17 @@ import {
 import { useRouter } from 'expo-router';
 import {
   Brain, Search, SlidersHorizontal, X, ChevronRight,
-  Sparkles, Filter,
+  Sparkles, Filter, Clock, ChevronUp, ChevronDown, BookOpen, Target,
 } from 'lucide-react-native';
 import { supabase } from '../src/lib/supabase';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { aiExpandSearchQuery } from '../src/services/GeminiService';
 import { PageWrapper } from '../src/components/PageWrapper';
 import { getPYQCategorization } from './unified/engine';
 import { AIModelSwitcher } from '../src/components/ai/AIModelSwitcher';
+import { mergeQuestions } from '../src/utils/merger';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const IS_IPAD = SCREEN_WIDTH >= 768;
@@ -117,6 +119,20 @@ export default function AISearchTab() {
   const [subjectOptions, setSubjectOptions]     = useState<string[]>([]);
   const [instituteOptions, setInstituteOptions] = useState<string[]>([]);
 
+  // Fix #2 — sidebar subject filter (separate from filters.subjects)
+  const [sidebarSubjectFilter, setSidebarSubjectFilter] = useState<string | null>(null);
+
+  // Fix #4 — search history
+  const HISTORY_KEY = 'ai_search_history';
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Fix #5 — question preview modal
+  const [previewQuestion, setPreviewQuestion] = useState<SearchResult | null>(null);
+
+  // Fix #6 — collapsible keywords panel
+  const [keywordsExpanded, setKeywordsExpanded] = useState(false);
+
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
@@ -133,6 +149,9 @@ export default function AISearchTab() {
         const unique = [...new Set(instData.map((r: any) => r.institute).filter(Boolean))].sort() as string[];
         setInstituteOptions(unique);
       }
+      // Fix #4 — load search history
+      const raw = await AsyncStorage.getItem('ai_search_history');
+      if (raw) setSearchHistory(JSON.parse(raw));
     })();
   }, []);
 
@@ -140,6 +159,18 @@ export default function AISearchTab() {
 
   const runSearch = useCallback(async (q: string, activeFilters: Filters) => {
     if (!q.trim()) return;
+    // Fix #2 — reset sidebar subject filter on every new search
+    setSidebarSubjectFilter(null);
+    // Fix #4 — save to history
+    const trimmed = q.trim();
+    setSearchHistory(prev => {
+      const deduped = [trimmed, ...prev.filter(h => h !== trimmed)].slice(0, 10);
+      AsyncStorage.setItem('ai_search_history', JSON.stringify(deduped));
+      return deduped;
+    });
+    setShowHistory(false);
+    // Fix #6 — collapse keywords panel on new search
+    setKeywordsExpanded(false);
     setLoading(true);
     setHasSearched(true);
     setResults([]);
@@ -269,7 +300,10 @@ export default function AISearchTab() {
       // ── STEP 5: Execute ────────────────────────────────────────────────────
       const { data, error } = await dbQuery;
       if (error) throw error;
-      setResults((data || []) as unknown as SearchResult[]);
+      // Fix #8 — dedup results using mergeQuestions
+      const raw = (data || []) as unknown as SearchResult[];
+      const merged = mergeQuestions(raw as any) as unknown as SearchResult[];
+      setResults(merged);
 
     } catch (e: any) {
       const msg: string = e?.message || 'Unknown error';
@@ -294,6 +328,7 @@ export default function AISearchTab() {
 
   // ── Sorted results ────────────────────────────────────────────────────────
 
+  // Fix #3 — smart relevance sort: UPSC CSE PYQ > Allied PYQ > Others PYQ > Practice
   const sortedResults = React.useMemo(() => {
     if (sortMode === 'Year') {
       return [...results].sort((a, b) => (b.exam_year || 0) - (a.exam_year || 0));
@@ -301,7 +336,18 @@ export default function AISearchTab() {
     if (sortMode === 'Subject') {
       return [...results].sort((a, b) => (a.subject || '').localeCompare(b.subject || ''));
     }
-    return results; // Relevance = DB order
+    const tier = (r: SearchResult): number => {
+      if (r.is_pyq && r.is_upsc_cse) return 0;
+      if (r.is_pyq && r.is_allied)   return 1;
+      if (r.is_pyq && r.is_others)   return 2;
+      if (r.is_pyq)                  return 3;
+      return 4;
+    };
+    return [...results].sort((a, b) => {
+      const td = tier(a) - tier(b);
+      if (td !== 0) return td;
+      return (b.exam_year || 0) - (a.exam_year || 0);
+    });
   }, [results, sortMode]);
 
   // ── Filter popup ──────────────────────────────────────────────────────────
@@ -321,14 +367,16 @@ export default function AISearchTab() {
 
   // ── Navigate to question ──────────────────────────────────────────────────
 
-  const openQuestion = (item: SearchResult) => {
+  // Fix #1 — pass resultIds so engine loads ONLY these questions (fast path)
+  const openQuestion = (item: SearchResult, openInQuizMode?: 'learning' | 'exam') => {
+    const resultIdList = sortedResults.map(r => r.id).join(',');
     router.push({
       pathname: '/unified/engine',
       params: {
-        searchQuery: query,
-        searchMode: filters.searchMode,
-        searchAcross: filters.searchAcross,
+        resultIds: resultIdList,
         initialId: item.id,
+        mode: openInQuizMode || 'learning',
+        sourceLabel: 'AI Search',
       },
     } as any);
   };
@@ -361,7 +409,7 @@ export default function AISearchTab() {
 
     return (
       <TouchableOpacity
-        onPress={() => openQuestion(item)}
+        onPress={() => setPreviewQuestion(item)}
         testID={`ai-search-result-${item.id}`}
         style={[
           styles.card,
@@ -465,8 +513,21 @@ export default function AISearchTab() {
     ]}>
       {keywords.length > 0 && (
         <>
-          <Text style={[styles.panelLabel, { color: colors.textTertiary }]}>AI EXPANDED KEYWORDS</Text>
-          {renderKeywordPills()}
+          {/* Fix #6 — collapsible keywords */}
+          <TouchableOpacity
+            onPress={() => setKeywordsExpanded(e => !e)}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6 }}
+          >
+            <Sparkles size={11} color="#7c3aed" />
+            <Text style={[styles.panelLabel, { color: '#7c3aed', marginBottom: 0, flex: 1 }]}>
+              {keywords.length} AI KEYWORDS USED
+            </Text>
+            {keywordsExpanded
+              ? <ChevronUp size={13} color={colors.textTertiary} />
+              : <ChevronDown size={13} color={colors.textTertiary} />
+            }
+          </TouchableOpacity>
+          {keywordsExpanded && renderKeywordPills()}
         </>
       )}
 
@@ -488,21 +549,43 @@ export default function AISearchTab() {
           {[...new Set(results.map(r => r.subject).filter(Boolean))].length > 1 && (
             <>
               <Text style={[styles.panelLabel, { color: colors.textTertiary, marginTop: 14 }]}>BY SUBJECT</Text>
+              {/* Fix #2 - clear chip */}
+              {sidebarSubjectFilter && (
+                <TouchableOpacity
+                  style={[styles.subjectChip, { borderColor: '#ef4444', backgroundColor: '#fee2e2' }]}
+                  onPress={() => {
+                    setSidebarSubjectFilter(null);
+                    const newFilters = { ...filters, subjects: 'All' };
+                    setFilters(newFilters);
+                    runSearch(query, newFilters);
+                  }}
+                >
+                  <X size={10} color="#ef4444" />
+                  <Text style={[styles.subjectChipText, { color: '#ef4444' }]}>Clear: {sidebarSubjectFilter}</Text>
+                </TouchableOpacity>
+              )}
               {[...new Set(results.map(r => r.subject).filter(Boolean))].map(sub => {
                 const count = results.filter(r => r.subject === sub).length;
                 const color = getSubjectColor(sub as string);
+                const isSelected = sidebarSubjectFilter === sub;
                 return (
                   <TouchableOpacity
                     key={sub}
-                    style={[styles.subjectChip, { borderColor: colors.border }]}
+                    style={[styles.subjectChip, {
+                      borderColor: isSelected ? '#7c3aed' : colors.border,
+                      backgroundColor: isSelected ? '#ede9fe' : colors.surface,
+                    }]}
                     onPress={() => {
-                      const newFilters = { ...filters, subjects: sub as string };
+                      const isSame = sidebarSubjectFilter === sub;
+                      const newSub = isSame ? 'All' : sub as string;
+                      setSidebarSubjectFilter(isSame ? null : sub as string);
+                      const newFilters = { ...filters, subjects: newSub };
                       setFilters(newFilters);
                       runSearch(query, newFilters);
                     }}
                   >
                     <View style={[styles.subjectDot, { backgroundColor: color }]} />
-                    <Text style={[styles.subjectChipText, { color: colors.textSecondary }]}>{sub}</Text>
+                    <Text style={[styles.subjectChipText, { color: isSelected ? '#7c3aed' : colors.textSecondary }]}>{sub}</Text>
                     <Text style={[styles.subjectCount, { color: colors.textTertiary }]}>{count}</Text>
                   </TouchableOpacity>
                 );
@@ -738,6 +821,8 @@ export default function AISearchTab() {
           placeholderTextColor={colors.textTertiary}
           returnKeyType="search"
           onSubmitEditing={() => runSearch(query, filters)}
+          onFocus={() => { if (searchHistory.length > 0) setShowHistory(true); }}
+          onBlur={() => setTimeout(() => setShowHistory(false), 150)}
           testID="ai-search-input"
           style={[styles.searchInput, { color: colors.textPrimary }]}
         />
@@ -821,6 +906,42 @@ export default function AISearchTab() {
 
         {SearchBar}
 
+        {/* Fix #4 — Search History Dropdown */}
+        {showHistory && searchHistory.length > 0 && (
+          <View style={[styles.historyDropdown, {
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+          }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 8, paddingBottom: 4 }}>
+              <Text style={[styles.panelLabel, { color: colors.textTertiary, marginBottom: 0 }]}>RECENT SEARCHES</Text>
+              <TouchableOpacity onPress={() => {
+                setSearchHistory([]);
+                AsyncStorage.removeItem('ai_search_history');
+                setShowHistory(false);
+              }}>
+                <Text style={{ fontSize: 10, fontWeight: '700', color: colors.textTertiary }}>Clear</Text>
+              </TouchableOpacity>
+            </View>
+            {searchHistory.map((h, i) => (
+              <TouchableOpacity
+                key={i}
+                style={[styles.historyItem, { borderBottomColor: colors.border }]}
+                onPress={() => { setQuery(h); setShowHistory(false); runSearch(h, filters); }}
+              >
+                <Clock size={12} color={colors.textTertiary} />
+                <Text style={[styles.historyText, { color: colors.textSecondary }]} numberOfLines={1}>{h}</Text>
+                <TouchableOpacity onPress={() => {
+                  const next = searchHistory.filter((_, j) => j !== i);
+                  setSearchHistory(next);
+                  AsyncStorage.setItem('ai_search_history', JSON.stringify(next));
+                }}>
+                  <X size={11} color={colors.textTertiary} />
+                </TouchableOpacity>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         {IS_IPAD ? (
           <View style={styles.ipadBody}>
             {LeftPanel}
@@ -867,6 +988,68 @@ export default function AISearchTab() {
         )}
 
         {FilterPopup}
+
+        {/* Fix #5 — Question Preview Modal */}
+        {previewQuestion && (
+          <Modal visible animationType="slide" transparent onRequestClose={() => setPreviewQuestion(null)}>
+            <View style={{ flex: 1, backgroundColor: 'rgba(15,23,42,0.5)', justifyContent: 'flex-end' }}>
+              <View style={[styles.previewSheet, { backgroundColor: colors.surface }]}>
+                <View style={[styles.previewHeader, { borderBottomColor: colors.border }]}>
+                  <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', flex: 1 }}>
+                    {previewQuestion.subject && (
+                      <View style={[styles.chip, { backgroundColor: getSubjectColor(previewQuestion.subject) + '20' }]}>
+                        <Text style={[styles.chipText, { color: getSubjectColor(previewQuestion.subject) }]}>{previewQuestion.subject}</Text>
+                      </View>
+                    )}
+                    {previewQuestion.is_pyq && (
+                      <View style={[styles.chip, { backgroundColor: '#dcfce7' }]}>
+                        <Text style={[styles.chipText, { color: '#15803d' }]}>PYQ {previewQuestion.exam_year || ''}</Text>
+                      </View>
+                    )}
+                    {previewQuestion.is_upsc_cse && (
+                      <View style={[styles.chip, { backgroundColor: '#dbeafe' }]}>
+                        <Text style={[styles.chipText, { color: '#1d4ed8' }]}>UPSC CSE</Text>
+                      </View>
+                    )}
+                  </View>
+                  <TouchableOpacity onPress={() => setPreviewQuestion(null)}
+                    style={[styles.closeBtn, { backgroundColor: colors.surfaceStrong }]}>
+                    <X size={13} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                </View>
+                <ScrollView style={{ maxHeight: 320, padding: 16 }}>
+                  <Text style={[styles.previewQ, { color: colors.textPrimary }]}>{previewQuestion.question_text}</Text>
+                  {previewQuestion.section_group && (
+                    <Text style={[styles.previewMeta, { color: colors.textTertiary }]}>
+                      {previewQuestion.section_group}{previewQuestion.micro_topic ? ` · ${previewQuestion.micro_topic}` : ''}
+                    </Text>
+                  )}
+                </ScrollView>
+                <View style={[styles.previewFooter, { borderTopColor: colors.border }]}>
+                  <Text style={{ fontSize: 11, color: colors.textTertiary, textAlign: 'center', marginBottom: 10 }}>
+                    {sortedResults.length} questions in this search · open all in:
+                  </Text>
+                  <View style={{ flexDirection: 'row', gap: 10 }}>
+                    <TouchableOpacity
+                      style={[styles.previewBtn, { backgroundColor: colors.surfaceStrong, flex: 1 }]}
+                      onPress={() => { setPreviewQuestion(null); openQuestion(previewQuestion, 'learning'); }}
+                    >
+                      <BookOpen size={15} color={colors.textSecondary} />
+                      <Text style={[styles.previewBtnText, { color: colors.textPrimary }]}>Learn Mode</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.previewBtn, { backgroundColor: '#7c3aed', flex: 1 }]}
+                      onPress={() => { setPreviewQuestion(null); openQuestion(previewQuestion, 'exam'); }}
+                    >
+                      <Target size={15} color="#fff" />
+                      <Text style={[styles.previewBtnText, { color: '#fff' }]}>Quiz Mode</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
       </KeyboardAvoidingView>
       <AIModelSwitcher
         visible={showModelSwitcher}
@@ -973,4 +1156,19 @@ const styles = StyleSheet.create({
   fchip:          { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, borderWidth: 1, borderColor: '#e2e8f0', backgroundColor: '#f8fafc' },
   fchipSel:       { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
   fchipText:      { fontSize: 11, fontWeight: '700' },
+  // Fix #4 styles
+  historyDropdown:{ position: 'absolute', top: 68, left: 14, right: 14, zIndex: 999, borderRadius: 14, borderWidth: 1, overflow: 'hidden' },
+  historyItem:    { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: 0.5 },
+  historyText:    { flex: 1, fontSize: 13, fontWeight: '500' },
+  // Fix #5 styles
+  previewSheet:   { borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: 'hidden', maxHeight: '85%' },
+  previewHeader:  { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', padding: 14, borderBottomWidth: 0.5 },
+  previewQ:       { fontSize: 15, lineHeight: 24, fontWeight: '500', marginBottom: 10 },
+  previewMeta:    { fontSize: 11, fontWeight: '600' },
+  previewFooter:  { padding: 14, borderTopWidth: 0.5 },
+  previewBtn:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, borderRadius: 12, paddingVertical: 13 },
+  previewBtnText: { fontSize: 13, fontWeight: '800' },
+  // Fix #7 styles
+  activeChip:     { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 9, paddingVertical: 4, borderRadius: 20, borderWidth: 1, borderColor: '#c4b5fd' },
+  activeChipText: { fontSize: 10, fontWeight: '800', color: '#7c3aed' },
 });

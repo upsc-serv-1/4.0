@@ -18,9 +18,9 @@ export const GEMINI_KEY_STORAGE_KEYS = [
 export const GEMINI_ACTIVE_KEY_INDEX = 'gemini_active_key_index'; // '0' | '1' | '2' | '3'
 
 export const GEMINI_MODELS = [
-  { id: 'gemini-2.0-flash-lite',           label: 'Flash Lite', sub: 'Fastest · highest free quota' },
-  { id: 'gemini-2.0-flash',                label: 'Flash 2',    sub: 'Recommended · fast + smart' },
-  { id: 'gemini-2.5-flash-preview-04-17',  label: 'Flash 2.5',  sub: 'Smartest free model' },
+  { id: 'gemini-2.0-flash',        label: 'Flash 2.0',    sub: 'Fast · recommended' },
+  { id: 'gemini-2.0-flash-lite',   label: 'Flash 2.0 Lite', sub: 'Fastest · cheapest' },
+  { id: 'gemini-2.5-flash-preview-05-20', label: 'Flash 2.5', sub: 'Smartest · best quality' },
 ] as const;
 
 export const AI_PROVIDER_KEY = 'ai_provider'; // 'gemini' | 'groq'
@@ -43,7 +43,7 @@ export const GROQ_ACTIVE_KEY_INDEX = 'groq_active_key_index';
 export const GROQ_MODEL_KEY = 'groq_model';
 export const DEFAULT_GROQ_MODEL = 'llama-3.3-70b-versatile';
 
-export const DEFAULT_MODEL = 'gemini-2.0-flash-lite';
+export const DEFAULT_MODEL = 'gemini-2.0-flash';
 
 // Default prompts — used when user has not customised
 export const DEFAULT_PROMPTS = {

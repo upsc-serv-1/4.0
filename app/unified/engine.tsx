@@ -2860,13 +2860,55 @@ export default function UnifiedQuizEngine() {
                             <SaveIcon size={12} color={savedFlash[item.id] ? '#22c55e' : colors.textSecondary} />
                           )}
                           <Text style={{ fontSize: 11, fontWeight: '800', color: savedFlash[item.id] ? '#22c55e' : colors.textSecondary }}>
-                            {savedFlash[item.id] ? 'Saved ✓' : 'Save'}
+                            {savedFlash[item.id] ? 'Saved ✓' : '★ Save to MyVitamin'}
                           </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           onPress={() => handleOpenModify(item)}
                           activeOpacity={0.7}
                           testID={`best-modify-${item.id}`}
+                          style={{
+                            flexDirection: 'row', alignItems: 'center', gap: 5,
+                            paddingHorizontal: 11, paddingVertical: 7, borderRadius: 10,
+                            backgroundColor: colors.surfaceStrong,
+                            borderWidth: 1, borderColor: colors.border,
+                          }}
+                        >
+                          <Edit2 size={12} color={colors.textSecondary} />
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textSecondary }}>
+                            Modify & Save
+                          </Text>
+                        </TouchableOpacity>
+                      </>
+                    )}
+                    {/* When AI regenerates but MyVitamin already exists — show Update button */}
+                    {viewerKind === 'ai' && savedBest && (
+                      <>
+                        <TouchableOpacity
+                          onPress={() => handleSaveBest(item)}
+                          disabled={!!savingBest[item.id]}
+                          activeOpacity={0.7}
+                          testID={`best-update-${item.id}`}
+                          style={{
+                            flexDirection: 'row', alignItems: 'center', gap: 5,
+                            paddingHorizontal: 11, paddingVertical: 7, borderRadius: 10,
+                            backgroundColor: savedFlash[item.id] ? '#22c55e22' : '#f59e0b18',
+                            borderWidth: 1, borderColor: savedFlash[item.id] ? '#22c55e' : '#f59e0b40',
+                          }}
+                        >
+                          {savingBest[item.id] ? (
+                            <ActivityIndicator size="small" color="#f59e0b" />
+                          ) : (
+                            <RotateCcw size={12} color={savedFlash[item.id] ? '#22c55e' : '#f59e0b'} />
+                          )}
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: savedFlash[item.id] ? '#22c55e' : '#f59e0b' }}>
+                            {savedFlash[item.id] ? 'Updated ✓' : '↻ Update MyVitamin'}
+                          </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => handleOpenModify(item)}
+                          activeOpacity={0.7}
+                          testID={`best-modify-ai-${item.id}`}
                           style={{
                             flexDirection: 'row', alignItems: 'center', gap: 5,
                             paddingHorizontal: 11, paddingVertical: 7, borderRadius: 10,

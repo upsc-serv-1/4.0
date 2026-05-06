@@ -62,7 +62,10 @@ import {
   List,
   PenTool,
   Eraser,
-  ExternalLink
+  ExternalLink,
+  Brain,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -85,6 +88,10 @@ import { OfflineManager } from '../../src/services/OfflineManager';
 import { LocalQuery } from '../../src/services/LocalQuery';
 import RichNoteEditor from '../../src/components/RichNoteEditor';
 import { RichToolbar, actions } from 'react-native-pell-rich-editor';
+import {
+  aiExplainQuestion,
+  aiSummarizeExplanation,
+} from '../../src/services/GeminiService';
 
 const ThemeSwitcher = require('../../src/components/ThemeSwitcher').ThemeSwitcher;
 
@@ -413,6 +420,59 @@ export default function UnifiedQuizEngine() {
 
   // 🆕 Declare arenaMode FIRST — fixes TDZ crash
   const [arenaMode, setArenaMode] = useState<'learning' | 'exam'>((params.mode as 'learning' | 'exam') || 'learning');
+
+  // ── AI Explain / Summarize state (per-question) ───────────────
+  const [aiExplanations, setAiExplanations] = useState<Record<string, string>>({});
+  const [aiSummaries, setAiSummaries]       = useState<Record<string, string>>({});
+  const [aiLoading, setAiLoading]           = useState<Record<string, boolean>>({});
+  const [aiSumLoading, setAiSumLoading]     = useState<Record<string, boolean>>({});
+  const [aiExpanded, setAiExpanded]         = useState<Record<string, boolean>>({});
+
+  const handleAiExplain = async (item: any) => {
+    const id = item.id || item.question_id;
+    if (aiExplanations[id]) {
+      setAiExpanded(prev => ({ ...prev, [id]: !prev[id] }));
+      return;
+    }
+    setAiLoading(prev => ({ ...prev, [id]: true }));
+    setAiExpanded(prev => ({ ...prev, [id]: true }));
+    try {
+      // options is a jsonb object: { "a": "...", "b": "...", "c": "...", "d": "..." }
+      const rawOptions = item.options || {};
+      const optionsMap: Record<string, string> = {
+        A: rawOptions.a || rawOptions.A || '',
+        B: rawOptions.b || rawOptions.B || '',
+        C: rawOptions.c || rawOptions.C || '',
+        D: rawOptions.d || rawOptions.D || '',
+      };
+      const result = await aiExplainQuestion(
+        item.question_text || item.question || '',
+        optionsMap,
+        item.correct_answer || '',
+      );
+      setAiExplanations(prev => ({ ...prev, [id]: result }));
+    } catch (e: any) {
+      Alert.alert('AI Error', e?.message || 'Could not get AI explanation. Check Settings → AI Settings.');
+      setAiExpanded(prev => ({ ...prev, [id]: false }));
+    } finally {
+      setAiLoading(prev => ({ ...prev, [id]: false }));
+    }
+  };
+
+  const handleAiSummarize = async (item: any) => {
+    const id = item.id || item.question_id;
+    const explanation = aiExplanations[id];
+    if (!explanation) return;
+    setAiSumLoading(prev => ({ ...prev, [id]: true }));
+    try {
+      const result = await aiSummarizeExplanation(explanation);
+      setAiSummaries(prev => ({ ...prev, [id]: result }));
+    } catch (e: any) {
+      Alert.alert('AI Error', e?.message || 'Could not summarize.');
+    } finally {
+      setAiSumLoading(prev => ({ ...prev, [id]: false }));
+    }
+  };
 
   // Prevent accidental exit during formal exams and unsaved learning sessions
   usePreventRemove(
@@ -2522,6 +2582,82 @@ export default function UnifiedQuizEngine() {
                 <Markdown style={{ body: { color: colors.textPrimary, fontSize: fontSize, lineHeight: fontSize * 1.5, fontWeight: '500', fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' }) } }}>
                   {activeExplanationText}
                 </Markdown>
+              </View>
+
+              {/* ── AI EXPLAIN / SUMMARIZE ─────────────────────────── */}
+              <View style={{ marginTop: 4, marginBottom: 12 }}>
+                <TouchableOpacity
+                  onPress={() => handleAiExplain(item)}
+                  testID={`ai-explain-btn-${item.id}`}
+                  style={{
+                    flexDirection: 'row', alignItems: 'center', gap: 7,
+                    paddingVertical: 9, paddingHorizontal: 14, borderRadius: 12,
+                    backgroundColor: '#7c3aed18', borderWidth: 1, borderColor: '#7c3aed30',
+                  }}
+                >
+                  {aiLoading[item.id] ? (
+                    <ActivityIndicator size="small" color="#7c3aed" />
+                  ) : (
+                    <Brain size={15} color="#7c3aed" />
+                  )}
+                  <Text style={{ fontSize: 13, fontWeight: '800', color: '#7c3aed', flex: 1 }}>
+                    {aiExplanations[item.id] ? 'AI EXPLANATION' : 'AI EXPLAIN'}
+                  </Text>
+                  {aiExplanations[item.id] && (
+                    aiExpanded[item.id]
+                      ? <ChevronUp size={14} color="#7c3aed" />
+                      : <ChevronDown size={14} color="#7c3aed" />
+                  )}
+                </TouchableOpacity>
+
+                {aiExpanded[item.id] && aiExplanations[item.id] && (
+                  <View style={{
+                    marginTop: 8, padding: 14,
+                    backgroundColor: colors.surface, borderRadius: 12,
+                    borderWidth: 1, borderColor: '#7c3aed20',
+                  }}>
+                    <Text style={{ fontSize: 13, color: colors.textPrimary, lineHeight: 20 }}>
+                      {aiExplanations[item.id]}
+                    </Text>
+
+                    {!aiSummaries[item.id] && (
+                      <TouchableOpacity
+                        onPress={() => handleAiSummarize(item)}
+                        testID={`ai-summarize-btn-${item.id}`}
+                        style={{
+                          marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 6,
+                          paddingVertical: 7, paddingHorizontal: 12, borderRadius: 10,
+                          backgroundColor: '#f59e0b18', borderWidth: 1, borderColor: '#f59e0b30',
+                          alignSelf: 'flex-start',
+                        }}
+                      >
+                        {aiSumLoading[item.id] ? (
+                          <ActivityIndicator size="small" color="#f59e0b" />
+                        ) : (
+                          <Sparkles size={13} color="#f59e0b" />
+                        )}
+                        <Text style={{ fontSize: 11, fontWeight: '800', color: '#f59e0b' }}>
+                          ✨ SUMMARIZE INTO BULLETS
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+
+                    {aiSummaries[item.id] && (
+                      <View style={{
+                        marginTop: 12, padding: 12,
+                        backgroundColor: '#fef3c720', borderRadius: 10,
+                        borderWidth: 1, borderColor: '#f59e0b25',
+                      }}>
+                        <Text style={{ fontSize: 11, fontWeight: '800', color: '#f59e0b', marginBottom: 6 }}>
+                          ✨ KEY POINTS
+                        </Text>
+                        <Text style={{ fontSize: 12, color: colors.textPrimary, lineHeight: 20 }}>
+                          {aiSummaries[item.id]}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                )}
               </View>
 
               <View style={styles.actionRow}>

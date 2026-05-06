@@ -283,7 +283,7 @@ const normalizeExplText = (value: any): string =>
     .trim()
     .toLowerCase();
 
-const buildCanonicalExplanations = (item: any) => {
+export const buildCanonicalExplanations = (item: any) => {
   const list = Array.isArray(item?._explanations) ? item._explanations : [];
   const out: any[] = [];
   const seen = new Map<string, number>();

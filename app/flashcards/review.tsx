@@ -24,6 +24,9 @@ import { CardOverflowMenu, CardMenuAction } from '../../src/components/flashcard
 import { BranchSvc, BranchNode } from '../../src/services/BranchService';
 import { PremiumMoveModal } from '../../src/components/flashcards/PremiumMoveModal';
 import { OfflineManager } from '../../src/services/OfflineManager';
+import { buildCanonicalExplanations } from '../unified/engine';
+import { fetchBestAnswer, BestAnswer } from '../../src/services/BestAnswerService';
+import { renderAIText } from '../../src/utils/renderAIText';
 
 const { width, height } = Dimensions.get('window');
 
@@ -435,6 +438,59 @@ export default function ReviewScreen() {
   const currentCard = queue[currentIndex];
   const opts = (currentCard.source as any)?.options ?? {};
   const hasOptions = currentCard.card_type === 'qa' && Object.keys(opts).length > 0;
+
+  // ── FIX 8 — institute / vitamin chips on the flashcard review screen ─────
+  // When a card was created from a question, fetch that question's
+  // explanations so the reviewer can switch between sources, and pull the
+  // user's saved best answer ('My Vitamin') if any. Falls back silently
+  // when the card has no question_id (e.g. notebook-derived cards) — in
+  // that case the chip row is hidden.
+  const [altSources, setAltSources] = useState<any[]>([]);
+  const [altActive, setAltActive]   = useState<string>('saved'); // 'saved' | 'vitamin' | <institute_key>
+  const [altVitamin, setAltVitamin] = useState<BestAnswer | null>(null);
+
+  useEffect(() => {
+    setAltActive('saved');
+    setAltSources([]);
+    setAltVitamin(null);
+
+    const cardId = currentCard?.id;
+    const qId = (currentCard as any)?.question_id || (currentCard?.source as any)?.question_id;
+    if (!qId) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('questions')
+          .select('id, explanation_markdown, source, exam_year, exam_group, correct_answer, tests(*)')
+          .eq('id', qId)
+          .maybeSingle();
+        if (cancelled || !data) return;
+        const expl = buildCanonicalExplanations(data);
+        setAltSources(expl);
+        const vit = await fetchBestAnswer(qId);
+        if (!cancelled) setAltVitamin(vit);
+      } catch {
+        /* swallow — chips just don't render */
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [currentCard?.id]);
+
+  // Resolved answer text given the active alt source key.
+  const resolvedAnswerText = (() => {
+    if (altActive === 'vitamin' && altVitamin) {
+      const kp = altVitamin.key_points ? `\n\n**✨ Key Points**\n\n${altVitamin.key_points}` : '';
+      return `${altVitamin.answer_text}${kp}`;
+    }
+    if (altActive !== 'saved' && altSources.length) {
+      const hit = altSources.find((e: any) => e.sourceKey === altActive);
+      if (hit) return hit.text || '';
+    }
+    return currentCard.back_text || '';
+  })();
   
   function stripQuestionOptions(frontText: string, optionKeys: string[]) {
     if (!frontText?.trim()) return '';
@@ -571,9 +627,73 @@ export default function ReviewScreen() {
                   )}
 
                   <Text style={[styles.cardSideLabel, { color: '#34c759', textAlign: 'left', marginBottom: 12 }]}>ANSWER & EXPLANATION</Text>
-                  
+
+                  {/* ── Source / Vitamin chips (only when card has a question_id) ── */}
+                  {(altSources.length > 0 || altVitamin) && (
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={{ gap: 6, paddingBottom: 4, marginBottom: 12 }}
+                    >
+                      {/* My Vitamin first */}
+                      {altVitamin && (
+                        <TouchableOpacity
+                          onPress={() => setAltActive('vitamin')}
+                          activeOpacity={0.7}
+                          style={{
+                            flexDirection: 'row', alignItems: 'center', gap: 5,
+                            paddingHorizontal: 12, paddingVertical: 6,
+                            borderRadius: 20, borderWidth: 1.5,
+                            backgroundColor: altActive === 'vitamin' ? '#f59e0b' : '#f59e0b18',
+                            borderColor:     altActive === 'vitamin' ? '#f59e0b' : '#f59e0b40',
+                          }}
+                          testID="flash-vitamin-chip"
+                        >
+                          <Text style={{ fontSize: 10, fontWeight: '900', color: altActive === 'vitamin' ? '#fff' : '#f59e0b' }}>
+                            ⭐ MY VITAMIN
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                      {/* Saved (the actual stored back_text — what was hardwired at save time) */}
+                      <TouchableOpacity
+                        onPress={() => setAltActive('saved')}
+                        activeOpacity={0.7}
+                        style={{
+                          paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20,
+                          backgroundColor: altActive === 'saved' ? colors.primary : colors.surfaceStrong,
+                          borderWidth: 1, borderColor: colors.border,
+                        }}
+                        testID="flash-saved-chip"
+                      >
+                        <Text style={{ fontSize: 10, fontWeight: '900', color: altActive === 'saved' ? '#fff' : colors.textTertiary }}>
+                          SAVED
+                        </Text>
+                      </TouchableOpacity>
+                      {/* Each institute / source */}
+                      {altSources
+                        .filter((e: any) => e?.sourceKey && e?.text)
+                        .map((e: any) => (
+                          <TouchableOpacity
+                            key={`flash-src-${e.sourceKey}`}
+                            onPress={() => setAltActive(e.sourceKey)}
+                            activeOpacity={0.7}
+                            style={{
+                              paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20,
+                              backgroundColor: altActive === e.sourceKey ? colors.primary : colors.surfaceStrong,
+                              borderWidth: 1, borderColor: colors.border,
+                            }}
+                            testID={`flash-src-chip-${e.sourceKey}`}
+                          >
+                            <Text style={{ fontSize: 10, fontWeight: '900', color: altActive === e.sourceKey ? '#fff' : colors.textTertiary }}>
+                              {String(e.source || e.sourceKey).toUpperCase()}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                  )}
+
                   <Text style={[styles.answerText, { color: colors.textPrimary, fontSize: editorFontSize - 2, lineHeight: (editorFontSize - 2) * 1.5, textAlign: 'left' }]}>
-                    {currentCard.back_text}
+                    {renderAIText(resolvedAnswerText, { color: colors.textPrimary, fontSize: editorFontSize - 2, lineHeight: (editorFontSize - 2) * 1.5 })}
                   </Text>
 
                   {currentCard.state?.user_note ? (

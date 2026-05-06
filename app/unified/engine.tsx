@@ -112,6 +112,59 @@ const ThemeSwitcher = require('../../src/components/ThemeSwitcher').ThemeSwitche
 
 const { width, height } = Dimensions.get('window');
 
+// ── Markdown → HTML converter for Notebook editor ───────────────────────────
+// The RichNoteEditor (react-native-pell-rich-editor) renders HTML, not markdown.
+// When AI explanations (markdown) are copied to the Notebook, we must convert first.
+function markdownToHtml(text: string): string {
+  if (!text) return '';
+  // Already HTML — normalise newlines only
+  if (/<[a-zA-Z]/.test(text)) return text.replace(/\n/g, '<br/>');
+
+  // Handle GFM tables: | col | col | → <table>
+  const lines = text.split('\n');
+  const htmlLines: string[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    // Detect table: starts with |, has |, separator row is next line
+    if (line.trim().startsWith('|') && i + 1 < lines.length && /^\s*\|[\s\-|:]+\|\s*$/.test(lines[i + 1])) {
+      const headers = line.split('|').filter(c => c.trim()).map(c => `<th style="padding:4px 8px;border:1px solid #d1d5db;background:#f3f4f6">${c.trim()}</th>`);
+      htmlLines.push(`<table style="border-collapse:collapse;width:100%;margin:8px 0"><thead><tr>${headers.join('')}</tr></thead><tbody>`);
+      i += 2; // skip separator
+      while (i < lines.length && lines[i].trim().startsWith('|')) {
+        const cells = lines[i].split('|').filter(c => c.trim()).map(c => `<td style="padding:4px 8px;border:1px solid #d1d5db">${c.trim()}</td>`);
+        htmlLines.push(`<tr>${cells.join('')}</tr>`);
+        i++;
+      }
+      htmlLines.push('</tbody></table>');
+      continue;
+    }
+    htmlLines.push(line);
+    i++;
+  }
+
+  let html = htmlLines.join('\n')
+    // Headings
+    .replace(/^### (.+)$/gm, '<h3 style="margin:6px 0;font-size:15px">$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2 style="margin:8px 0;font-size:17px">$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1 style="margin:10px 0;font-size:19px">$1</h1>')
+    // Bold + underline (AI convention: __term__)
+    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+    .replace(/__(.*?)__/g, '<u>$1</u>')
+    .replace(/\*(.*?)\*/g, '<i>$1</i>')
+    // Bullet lists
+    .replace(/^[\-\*]\s+(.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>[\s\S]*?<\/li>)(\n(?!<li>)|$)/g, '<ul style="padding-left:18px;margin:4px 0">$1</ul>')
+    // Numbered lists
+    .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
+    // Paragraphs: blank lines → paragraph breaks
+    .replace(/\n\n+/g, '</p><p style="margin:4px 0">')
+    // Single newlines
+    .replace(/\n/g, '<br/>');
+
+  return `<p style="margin:4px 0">${html}</p>`;
+}
+
 // --- Types ---
 interface Question {
   id: string;
@@ -1896,7 +1949,7 @@ export default function UnifiedQuizEngine() {
   ) => {
     runAfterPaperOverlayClose(() => {
       const activeText = explanationText || q.explanation_markdown || '';
-      setNoteDraftBullets([activeText]);
+      setNoteDraftBullets([markdownToHtml(activeText)]);
       setCustomSubheading(q.micro_topic || '');
       setNotebookModalVisible(true);
       fetchHierarchy();
@@ -2531,7 +2584,7 @@ export default function UnifiedQuizEngine() {
             <TouchableOpacity 
               onPress={() => {
                 const activeText = activeExplanationText || item.explanation_markdown || '';
-                setNoteDraftBullets([activeText || '']); 
+                setNoteDraftBullets([markdownToHtml(activeText || '')]); 
                 setCustomSubheading(item.micro_topic || '');
                 setNotebookModalVisible(true);
                 fetchHierarchy();

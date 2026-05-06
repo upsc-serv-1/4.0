@@ -931,43 +931,45 @@ export default function AISearchTab() {
           </View>
         </View>
 
-        {SearchBar}
+        <View style={{ position: 'relative' }}>
+          {SearchBar}
 
-        {/* Fix #4 — Search History Dropdown */}
-        {showHistory && searchHistory.length > 0 && (
-          <View style={[styles.historyDropdown, {
-            backgroundColor: colors.surface,
-            borderColor: colors.border,
-          }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 8, paddingBottom: 4 }}>
-              <Text style={[styles.panelLabel, { color: colors.textTertiary, marginBottom: 0 }]}>RECENT SEARCHES</Text>
-              <TouchableOpacity onPress={() => {
-                setSearchHistory([]);
-                AsyncStorage.removeItem('ai_search_history');
-                setShowHistory(false);
-              }}>
-                <Text style={{ fontSize: 10, fontWeight: '700', color: colors.textTertiary }}>Clear</Text>
-              </TouchableOpacity>
-            </View>
-            {searchHistory.map((h, i) => (
-              <TouchableOpacity
-                key={i}
-                style={[styles.historyItem, { borderBottomColor: colors.border }]}
-                onPress={() => { setQuery(h); setShowHistory(false); runSearch(h, filters); }}
-              >
-                <Clock size={12} color={colors.textTertiary} />
-                <Text style={[styles.historyText, { color: colors.textSecondary }]} numberOfLines={1}>{h}</Text>
+          {/* Fix #4 — Search History Dropdown: positioned inside a relative wrapper so it sits below the search bar */}
+          {showHistory && searchHistory.length > 0 && (
+            <View style={[styles.historyDropdown, {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 8, paddingBottom: 4 }}>
+                <Text style={[styles.panelLabel, { color: colors.textTertiary, marginBottom: 0 }]}>RECENT SEARCHES</Text>
                 <TouchableOpacity onPress={() => {
-                  const next = searchHistory.filter((_, j) => j !== i);
-                  setSearchHistory(next);
-                  AsyncStorage.setItem('ai_search_history', JSON.stringify(next));
+                  setSearchHistory([]);
+                  AsyncStorage.removeItem('ai_search_history');
+                  setShowHistory(false);
                 }}>
-                  <X size={11} color={colors.textTertiary} />
+                  <Text style={{ fontSize: 10, fontWeight: '700', color: colors.textTertiary }}>Clear</Text>
                 </TouchableOpacity>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
+              </View>
+              {searchHistory.map((h, i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={[styles.historyItem, { borderBottomColor: colors.border }]}
+                  onPress={() => { setQuery(h); setShowHistory(false); runSearch(h, filters); }}
+                >
+                  <Clock size={12} color={colors.textTertiary} />
+                  <Text style={[styles.historyText, { color: colors.textSecondary }]} numberOfLines={1}>{h}</Text>
+                  <TouchableOpacity onPress={() => {
+                    const next = searchHistory.filter((_, j) => j !== i);
+                    setSearchHistory(next);
+                    AsyncStorage.setItem('ai_search_history', JSON.stringify(next));
+                  }}>
+                    <X size={11} color={colors.textTertiary} />
+                  </TouchableOpacity>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </View>
 
         {IS_IPAD ? (
           <View style={styles.ipadBody}>
@@ -1236,8 +1238,8 @@ const styles = StyleSheet.create({
   fchip:          { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, borderWidth: 1, borderColor: '#e2e8f0', backgroundColor: '#f8fafc' },
   fchipSel:       { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
   fchipText:      { fontSize: 11, fontWeight: '700' },
-  // Fix #4 styles
-  historyDropdown:{ position: 'absolute', top: 68, left: 14, right: 14, zIndex: 999, borderRadius: 14, borderWidth: 1, overflow: 'hidden' },
+  // Fix #4 styles — dropdown sits below the search row (top = searchRow full height ≈ 68px)
+  historyDropdown:{ position: 'absolute', top: 68, left: 0, right: 0, zIndex: 999, borderRadius: 14, borderWidth: 1, overflow: 'hidden' },
   historyItem:    { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: 0.5 },
   historyText:    { flex: 1, fontSize: 13, fontWeight: '500' },
   // Fix #5 styles

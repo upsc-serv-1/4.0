@@ -8,13 +8,42 @@ export const PROMPT_KEYS = {
   model:     'ai_gemini_model',
 } as const;
 
-export const GEMINI_MODELS = [
-  { id: 'gemini-1.5-flash', label: 'Flash',   sub: 'Fast · 1500 req/day free' },
-  { id: 'gemini-1.5-pro',   label: 'Pro',     sub: 'Smarter · 50 req/day free' },
-  { id: 'gemini-2.0-flash', label: 'Flash 2', sub: 'Newest · experimental' },
+export const GEMINI_KEY_STORAGE_KEYS = [
+  'gemini_api_key',    // slot 1 (existing, unchanged for backward compat)
+  'gemini_api_key_2',  // slot 2
+  'gemini_api_key_3',  // slot 3
+  'gemini_api_key_4',  // slot 4
 ] as const;
 
-export const DEFAULT_MODEL = 'gemini-1.5-flash';
+export const GEMINI_ACTIVE_KEY_INDEX = 'gemini_active_key_index'; // '0' | '1' | '2' | '3'
+
+export const GEMINI_MODELS = [
+  { id: 'gemini-2.0-flash-lite',           label: 'Flash Lite', sub: 'Fastest · highest free quota' },
+  { id: 'gemini-2.0-flash',                label: 'Flash 2',    sub: 'Recommended · fast + smart' },
+  { id: 'gemini-2.5-flash-preview-04-17',  label: 'Flash 2.5',  sub: 'Smartest free model' },
+] as const;
+
+export const AI_PROVIDER_KEY = 'ai_provider'; // 'gemini' | 'groq'
+export const GROQ_API_KEY_STORAGE = 'groq_api_key';
+
+export const GROQ_MODELS = [
+  { id: 'llama-3.3-70b-versatile',    label: 'Llama 3.3 70B',  sub: 'Best quality · 14400 req/day free' },
+  { id: 'llama-3.1-8b-instant',       label: 'Llama 3.1 8B',   sub: 'Fastest · highest limits' },
+  { id: 'mixtral-8x7b-32768',         label: 'Mixtral 8x7B',   sub: 'Good balance · free' },
+] as const;
+
+export const GROQ_KEY_STORAGE_KEYS = [
+  'groq_api_key',
+  'groq_api_key_2',
+  'groq_api_key_3',
+  'groq_api_key_4',
+] as const;
+
+export const GROQ_ACTIVE_KEY_INDEX = 'groq_active_key_index';
+export const GROQ_MODEL_KEY = 'groq_model';
+export const DEFAULT_GROQ_MODEL = 'llama-3.3-70b-versatile';
+
+export const DEFAULT_MODEL = 'gemini-2.0-flash-lite';
 
 // Default prompts — used when user has not customised
 export const DEFAULT_PROMPTS = {
@@ -81,15 +110,24 @@ async function getPrompt(key: keyof typeof PROMPT_KEYS): Promise<string> {
 // Helper — builds the Gemini Flash endpoint URL using the user's saved API key,
 // falling back to the EXPO_PUBLIC_GEMINI_API_KEY env var if no key is saved.
 async function getFlashUrl(): Promise<string> {
-  let key = '';
+  let activeIndex = 0;
   let model: string = DEFAULT_MODEL;
   try {
-    key   = (await AsyncStorage.getItem('gemini_api_key')) || '';
+    const idx = await AsyncStorage.getItem(GEMINI_ACTIVE_KEY_INDEX);
+    activeIndex = idx ? parseInt(idx, 10) : 0;
     model = (await AsyncStorage.getItem(PROMPT_KEYS.model)) || DEFAULT_MODEL;
   } catch {}
+
+  const storageKey = GEMINI_KEY_STORAGE_KEYS[activeIndex] ?? GEMINI_KEY_STORAGE_KEYS[0];
+  let key = '';
+  try {
+    key = (await AsyncStorage.getItem(storageKey)) || '';
+  } catch {}
+
   if (!key) key = process.env.EXPO_PUBLIC_GEMINI_API_KEY || '';
   if (!key) throw new Error('No Gemini API key found. Go to Settings → AI Settings and paste your key.');
-  return `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+
+  return `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${key}`;
 }
 
 async function callGemini(prompt: string, maxTokens = 600): Promise<string> {
@@ -112,6 +150,68 @@ async function callGemini(prompt: string, maxTokens = 600): Promise<string> {
   return text.trim();
 }
 
+async function callGroq(prompt: string, maxTokens = 600): Promise<string> {
+  // Get active Groq key
+  let activeIndex = 0;
+  try {
+    const idx = await AsyncStorage.getItem(GROQ_ACTIVE_KEY_INDEX);
+    activeIndex = idx ? parseInt(idx, 10) : 0;
+  } catch {}
+
+  const storageKey = GROQ_KEY_STORAGE_KEYS[activeIndex] ?? GROQ_KEY_STORAGE_KEYS[0];
+  let key = '';
+  try {
+    key = (await AsyncStorage.getItem(storageKey)) || '';
+  } catch {}
+
+  if (!key) throw new Error('No Groq API key found. Go to Settings → AI Settings and paste your Groq key.');
+
+  // Get selected Groq model
+  let model = DEFAULT_GROQ_MODEL;
+  try {
+    model = (await AsyncStorage.getItem(GROQ_MODEL_KEY)) || DEFAULT_GROQ_MODEL;
+  } catch {}
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.2,
+      max_tokens: maxTokens,
+    }),
+  });
+
+  if (res.status === 429) {
+    throw new Error('429: Groq quota exceeded. Switch to another key in Settings → AI Settings.');
+  }
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Groq API error ${res.status}: ${err}`);
+  }
+
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) throw new Error('Empty response from Groq');
+  return text.trim();
+}
+
+async function callAI(prompt: string, maxTokens = 600): Promise<string> {
+  let provider = 'gemini';
+  try {
+    provider = (await AsyncStorage.getItem(AI_PROVIDER_KEY)) || 'gemini';
+  } catch {}
+
+  if (provider === 'groq') {
+    return callGroq(prompt, maxTokens);
+  }
+  return callGemini(prompt, maxTokens);
+}
+
 export async function aiExplainQuestion(
   questionText: string,
   options: Record<string, string>,
@@ -127,19 +227,19 @@ export async function aiExplainQuestion(
     .replace('{{options}}', optionLines)
     .replace('{{correct_answer}}', correctAnswer.toUpperCase());
 
-  return callGemini(prompt, 700);
+  return callAI(prompt, 700);
 }
 
 export async function aiSummarizeExplanation(explanationText: string): Promise<string> {
   const template = await getPrompt('summarize');
   const prompt = template.replace('{{explanation}}', explanationText.slice(0, 2000));
-  return callGemini(prompt, 300);
+  return callAI(prompt, 300);
 }
 
 export async function aiExpandSearchQuery(userQuery: string): Promise<string[]> {
   const template = await getPrompt('search');
   const prompt = template.replace('{{query}}', userQuery);
-  const raw = await callGemini(prompt, 200);
+  const raw = await callAI(prompt, 200);
   try {
     const cleaned = raw.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(cleaned);

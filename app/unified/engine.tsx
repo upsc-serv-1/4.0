@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -67,6 +67,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react-native';
+import { AIModelSwitcher } from '../../src/components/ai/AIModelSwitcher';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PinchGestureHandler, State as GHState } from 'react-native-gesture-handler';
@@ -427,6 +428,7 @@ export default function UnifiedQuizEngine() {
   const [aiLoading, setAiLoading]           = useState<Record<string, boolean>>({});
   const [aiSumLoading, setAiSumLoading]     = useState<Record<string, boolean>>({});
   const [aiExpanded, setAiExpanded]         = useState<Record<string, boolean>>({});
+  const [showModelSwitcher, setShowModelSwitcher] = useState(false);
 
   const handleAiExplain = async (item: any) => {
     const id = item.id || item.question_id;
@@ -452,7 +454,21 @@ export default function UnifiedQuizEngine() {
       );
       setAiExplanations(prev => ({ ...prev, [id]: result }));
     } catch (e: any) {
-      Alert.alert('AI Error', e?.message || 'Could not get AI explanation. Check Settings → AI Settings.');
+      const msg: string = e?.message || 'Unknown error';
+      if (msg.includes('404')) {
+        Alert.alert('Model not found', 'Go to Settings → AI Settings and switch model.');
+      } else if (msg.includes('429')) {
+        Alert.alert(
+          'Quota exceeded',
+          'This key has hit its limit. Go to Settings → AI Settings and switch to another key, or switch provider.',
+        );
+      } else if (msg.includes('No Gemini API key found')) {
+        Alert.alert('Gemini key needed', 'Go to Settings → AI Settings and paste your Gemini key.');
+      } else if (msg.includes('No Groq API key found')) {
+        Alert.alert('Groq key needed', 'Go to Settings → AI Settings and paste your Groq key.\nFree at console.groq.com');
+      } else {
+        Alert.alert('AI Error', msg);
+      }
       setAiExpanded(prev => ({ ...prev, [id]: false }));
     } finally {
       setAiLoading(prev => ({ ...prev, [id]: false }));
@@ -1066,6 +1082,7 @@ export default function UnifiedQuizEngine() {
                   const wordFilters = [];
                   if (fields.includes('Questions') || fields.includes('question_text')) wordFilters.push(`question_text.ilike.%${word}%`);
                   if (fields.includes('Explanations') || fields.includes('explanation_markdown')) wordFilters.push(`explanation_markdown.ilike.%${word}%`);
+                  if (wordFilters.length > 0) wordFilters.push(`question_text.ilike.%${word}%`);
                   if (wordFilters.length > 0) query = query.or(wordFilters.join(','));
                 });
               } else {
@@ -3174,6 +3191,14 @@ export default function UnifiedQuizEngine() {
             >
               <LayoutGrid size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
             </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setShowModelSwitcher(true)}
+              style={styles.headerBtn}
+              testID="engine-ai-switcher-btn"
+            >
+              <Brain size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
+            </TouchableOpacity>
             <TouchableOpacity
               onPress={handleClockButtonPress}
               style={[styles.headerBtn, timerType !== 'none' && { flexDirection: 'row', gap: 4 }]}
@@ -3767,6 +3792,11 @@ export default function UnifiedQuizEngine() {
           })()}
         </Modal>
 
+
+        <AIModelSwitcher
+          visible={showModelSwitcher}
+          onClose={() => setShowModelSwitcher(false)}
+        />
 
         {/* Clock Control Modal */}
         <Modal visible={showClockControl} transparent animationType="fade" onRequestClose={() => setShowClockControl(false)}>

@@ -20,6 +20,7 @@ import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import { aiExpandSearchQuery } from '../src/services/GeminiService';
 import { PageWrapper } from '../src/components/PageWrapper';
+import { AIModelSwitcher } from '../src/components/ai/AIModelSwitcher';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const IS_IPAD = SCREEN_WIDTH >= 768;
@@ -103,8 +104,9 @@ export default function AISearchTab() {
 
   const [query, setQuery]               = useState('');
   const [keywords, setKeywords]         = useState<string[]>([]);
-  const [results, setResults]           = useState<SearchResult[]>([]);
-  const [loading, setLoading]           = useState(false);
+  const [results, setResults]   = useState<SearchResult[]>([]);
+  const [loading, setLoading]   = useState(false);
+  const [showModelSwitcher, setShowModelSwitcher] = useState(false);
   const [hasSearched, setHasSearched]   = useState(false);
   const [filters, setFilters]           = useState<Filters>(DEFAULT_FILTERS);
   const [sortMode, setSortMode]         = useState<SortMode>('Relevance');
@@ -269,34 +271,20 @@ export default function AISearchTab() {
       setResults((data || []) as unknown as SearchResult[]);
 
     } catch (e: any) {
-      const msg = String(e?.message || '');
-      // Only redirect to AI Settings when the key is genuinely missing.
-      // For any other failure (invalid key, API disabled, quota, network,
-      // model-not-found, etc.) surface the real message so the user can act.
+      const msg: string = e?.message || 'Unknown error';
       if (msg.includes('No Gemini API key found')) {
+        Alert.alert('Gemini key needed', 'Go to Settings → AI Settings and paste your Gemini key.');
+      } else if (msg.includes('No Groq API key found')) {
+        Alert.alert('Groq key needed', 'Go to Settings → AI Settings and paste your Groq key.\nFree at console.groq.com');
+      } else if (msg.includes('429')) {
         Alert.alert(
-          'Gemini API key needed',
-          'Go to Settings → AI Settings and paste your free Gemini API key from aistudio.google.com',
+          'Quota exceeded',
+          'This key has hit its limit. Go to Settings → AI Settings and switch to another key, or switch provider.',
         );
-      } else if (msg.includes('Gemini API error 400') && /API key not valid/i.test(msg)) {
-        Alert.alert(
-          'Invalid Gemini API key',
-          'Google rejected the saved key. Open Settings → AI Settings and paste a fresh key from aistudio.google.com.',
-        );
-      } else if (/Gemini API error 403/.test(msg)) {
-        Alert.alert(
-          'Gemini access denied (403)',
-          'Enable the "Generative Language API" for this project at console.cloud.google.com, or use a key from aistudio.google.com.\n\nDetails: ' + msg,
-        );
-      } else if (/Gemini API error 404/.test(msg)) {
-        Alert.alert(
-          'Model not available (404)',
-          'The selected Gemini model is not available for your key. Try Settings → AI Settings → switch model (Flash / Pro / Flash 2).\n\nDetails: ' + msg,
-        );
-      } else if (/Gemini API error 429/.test(msg)) {
-        Alert.alert('Rate limit hit (429)', 'Free tier quota exceeded. Try again later or switch model.\n\n' + msg);
+      } else if (msg.includes('404')) {
+        Alert.alert('Model not found', 'Go to Settings → AI Settings and switch model.');
       } else {
-        Alert.alert('Search failed', msg || 'Unknown error');
+        Alert.alert('Search failed', msg);
       }
     } finally {
       setLoading(false);
@@ -566,19 +554,19 @@ export default function AISearchTab() {
         >
           <View style={[styles.popupHeader, { borderBottomColor: colors.border }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
-              <Filter size={15} color={colors.textSecondary} />
-              <Text style={[styles.popupTitle, { color: colors.textPrimary }]}>Search Filters</Text>
-            </View>
-            <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-              <TouchableOpacity onPress={() => setPendingFilters(DEFAULT_FILTERS)} testID="ai-search-filter-clear">
-                <Text style={[styles.clearBtn, { color: colors.textTertiary }]}>Clear all</Text>
-              </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => setFilterOpen(false)}
                 testID="ai-search-filter-close"
                 style={[styles.closeBtn, { backgroundColor: colors.surfaceStrong }]}
               >
                 <X size={12} color={colors.textSecondary} />
+              </TouchableOpacity>
+              <Filter size={15} color={colors.textSecondary} />
+              <Text style={[styles.popupTitle, { color: colors.textPrimary }]}>Search Filters</Text>
+            </View>
+            <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+              <TouchableOpacity onPress={() => setPendingFilters(DEFAULT_FILTERS)} testID="ai-search-filter-clear">
+                <Text style={[styles.clearBtn, { color: colors.textTertiary }]}>Clear all</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -754,6 +742,16 @@ export default function AISearchTab() {
       </View>
 
       <TouchableOpacity
+        onPress={() => setShowModelSwitcher(true)}
+        style={[
+          styles.filterBtn,
+          { backgroundColor: colors.surface, borderColor: colors.border }
+        ]}
+      >
+        <Brain size={18} color="#7c3aed" />
+      </TouchableOpacity>
+
+      <TouchableOpacity
         onPress={openFilterPopup}
         testID="ai-search-filter-open"
         style={[
@@ -849,6 +847,10 @@ export default function AISearchTab() {
 
         {FilterPopup}
       </KeyboardAvoidingView>
+      <AIModelSwitcher
+        visible={showModelSwitcher}
+        onClose={() => setShowModelSwitcher(false)}
+      />
     </PageWrapper>
   );
 }

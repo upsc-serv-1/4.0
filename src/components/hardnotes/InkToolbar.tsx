@@ -24,9 +24,22 @@ interface Props {
   onWidthChange: (w: number) => void;
   onUndo?: () => void;
   canUndo?: boolean;
+  onTextMode?: () => void;
+  isTextMode?: boolean;
 }
 
-export function InkToolbar({ tool, color, width, onToolChange, onColorChange, onWidthChange, onUndo, canUndo }: Props) {
+export function InkToolbar({
+  tool,
+  color,
+  width,
+  onToolChange,
+  onColorChange,
+  onWidthChange,
+  onUndo,
+  canUndo,
+  onTextMode,
+  isTextMode,
+}: Props) {
   const { colors } = useTheme();
   const palette = tool === 'highlighter' ? HIGHLIGHTER_COLORS : PEN_COLORS;
 
@@ -48,6 +61,15 @@ export function InkToolbar({ tool, color, width, onToolChange, onColorChange, on
           <Eraser size={18} color={tool === 'eraser' ? '#ef4444' : colors.textTertiary} strokeWidth={tool === 'eraser' ? 2.5 : 2} />
         </ToolBtn>
       </View>
+
+      {onTextMode && (
+        <>
+          <View style={[s.divider, { backgroundColor: colors.border }]} />
+          <ToolBtn active={!!isTextMode} onPress={() => { onTextMode(); ping(); }} testID="ink-tool-text">
+            <Text style={{ fontSize: 15, fontWeight: '900', color: isTextMode ? colors.primary : colors.textTertiary }}>T</Text>
+          </ToolBtn>
+        </>
+      )}
 
       <View style={[s.divider, { backgroundColor: colors.border }]} />
 

@@ -20,13 +20,15 @@ import {
   TextInput,
   Platform,
   LayoutChangeEvent,
+  InteractionManager,
+  Pressable,
 } from 'react-native';
 import RenderHtml from 'react-native-render-html';
 import { Canvas, Path } from '@shopify/react-native-skia';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 import {
-  Pencil, Check, Lock, Unlock, Trash2, Tag as TagIcon, Sparkles, GripVertical,
+  Pencil, Check, Lock, Unlock, Trash2, Tag as TagIcon, GripVertical,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { Point } from './useHardnoteDoc';
@@ -48,6 +50,7 @@ interface Props {
   onRequestHighlight?: (selection: { start: number; end: number }) => void;
   onToggleLock: () => void;
   onOpenTagSheet?: () => void;
+  textModeActive?: boolean;
 }
 
 const COLOR_WITH_OPACITY = (hex: string, alpha: number): string => {
@@ -63,11 +66,12 @@ const EDIT_EXPAND_MULT = 1.15;
 export function InkBulletCard({
   point, lens, contentWidth, inkTool, inkColor, inkWidth,
   onUpdate, onAddStroke, onRemoveStrokes, onDelete, onRequestHighlight, onToggleLock, onOpenTagSheet,
+  textModeActive,
 }: Props) {
   const { colors } = useTheme();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(point.text);
-  const [cardH, setCardH] = useState(MIN_CARD_HEIGHT);
+  const [cardSize, setCardSize] = useState({ w: 0, h: MIN_CARD_HEIGHT });
   const [currentStroke, setCurrentStroke] = useState<StrokePoint[]>([]);
   const [selection, setSelection] = useState({ start: 0, end: 0 });
   const pointsRef = useRef<StrokePoint[]>([]);
@@ -84,8 +88,10 @@ export function InkBulletCard({
   const beginEdit = () => {
     if (lens === 'focus') return;
     if (point.locked) return;
-    setDraft(point.text);
-    setEditing(true);
+    InteractionManager.runAfterInteractions(() => {
+      setDraft(point.text);
+      setEditing(true);
+    });
   };
   const commitEdit = () => {
     if (draft !== point.text) onUpdate({ text: draft });
@@ -191,9 +197,22 @@ export function InkBulletCard({
     [inkTool, inkColor, inkWidth, strokes],
   );
 
+  const doubleTap = useMemo(
+    () =>
+      Gesture.Tap()
+        .numberOfTaps(2)
+        .maxDuration(260)
+        .onEnd((_e, success) => {
+          'worklet';
+          if (success && !textModeActive) runOnJS(beginEdit)();
+        }),
+    [textModeActive, beginEdit],
+  );
+
   const onLayoutBody = (e: LayoutChangeEvent) => {
     const h = Math.max(MIN_CARD_HEIGHT, Math.round(e.nativeEvent.layout.height));
-    if (Math.abs(h - cardH) > 1) setCardH(h);
+    const w = Math.round(e.nativeEvent.layout.width);
+    setCardSize((prev) => (Math.abs(h - prev.h) > 1 || Math.abs(w - prev.w) > 1 ? { w, h } : prev));
   };
 
   // ===== render =====
@@ -257,6 +276,25 @@ export function InkBulletCard({
         <View style={{ flex: 1 }}>
           {editing ? (
             <>
+              <View style={{ marginBottom: 6, opacity: 0.75 }}>
+                <RenderHtml
+                  source={{ html: htmlFor(draft, isHeading) }}
+                  contentWidth={Math.max(120, (lens === 'focus' ? contentWidth : contentWidth - 56))}
+                  baseStyle={{
+                    color: colors.textTertiary,
+                    fontSize: 12,
+                    lineHeight: 18,
+                  }}
+                  tagsStyles={{
+                    b: { fontWeight: '800' as const },
+                    strong: { fontWeight: '800' as const },
+                    i: { fontStyle: 'italic' as const },
+                    em: { fontStyle: 'italic' as const },
+                    mark: { borderRadius: 3, paddingHorizontal: 2 },
+                    p: { marginVertical: 0 },
+                  }}
+                />
+              </View>
               <TextInput
                 value={draft}
                 onChangeText={setDraft}
@@ -268,7 +306,7 @@ export function InkBulletCard({
                   styles.editInput,
                   {
                     color: colors.textPrimary,
-                    minHeight: Math.max(60, cardH * EDIT_EXPAND_MULT),
+                    minHeight: Math.max(60, cardSize.h * EDIT_EXPAND_MULT),
                   },
                   headingFont,
                 ]}
@@ -293,29 +331,35 @@ export function InkBulletCard({
               </View>
             </>
           ) : (
-            <TouchableOpacity onPress={beginEdit} disabled={lens === 'focus' || point.locked} activeOpacity={0.7}>
-              <RenderHtml
-                source={{ html: htmlFor(point.text, isHeading) }}
-                contentWidth={contentWidth - 56}
-                baseStyle={{
-                  color: lens === 'focus' ? '#3f2d16' : colors.textPrimary,
-                  fontSize: lens === 'focus' ? 16 : (isHeading ? 14 : 14),
-                  lineHeight: lens === 'focus' ? 26 : 21,
-                  fontFamily: lens === 'focus' ? (Platform.OS === 'ios' ? 'Georgia' : 'serif') : undefined,
-                  fontWeight: isHeading ? ('900' as const) : ('500' as const),
-                  letterSpacing: isHeading ? 0.4 : 0,
-                  textTransform: isHeading ? ('uppercase' as const) : undefined,
-                }}
-                tagsStyles={{
-                  b: { fontWeight: '800' as const, color: colors.textPrimary },
-                  strong: { fontWeight: '800' as const, color: colors.textPrimary },
-                  i: { fontStyle: 'italic' as const },
-                  em: { fontStyle: 'italic' as const },
-                  mark: { borderRadius: 3, paddingHorizontal: 2 },
-                  p: { marginVertical: 0 },
-                }}
-              />
-            </TouchableOpacity>
+            <GestureDetector gesture={doubleTap}>
+              <Pressable
+                onPress={textModeActive ? beginEdit : undefined}
+                disabled={lens === 'focus' || point.locked}
+                style={{ minHeight: 20 }}
+              >
+                <RenderHtml
+                  source={{ html: htmlFor(point.text, isHeading) }}
+                  contentWidth={lens === 'focus' ? contentWidth : contentWidth - 56}
+                  baseStyle={{
+                    color: lens === 'focus' ? '#3f2d16' : colors.textPrimary,
+                    fontSize: lens === 'focus' ? 16 : (isHeading ? 14 : 14),
+                    lineHeight: lens === 'focus' ? 26 : 21,
+                    fontFamily: lens === 'focus' ? (Platform.OS === 'ios' ? 'Georgia' : 'serif') : undefined,
+                    fontWeight: isHeading ? ('900' as const) : ('500' as const),
+                    letterSpacing: isHeading ? 0.4 : 0,
+                    textTransform: isHeading ? ('uppercase' as const) : undefined,
+                  }}
+                  tagsStyles={{
+                    b: { fontWeight: '800' as const, color: colors.textPrimary },
+                    strong: { fontWeight: '800' as const, color: colors.textPrimary },
+                    i: { fontStyle: 'italic' as const },
+                    em: { fontStyle: 'italic' as const },
+                    mark: { borderRadius: 3, paddingHorizontal: 2 },
+                    p: { marginVertical: 0 },
+                  }}
+                />
+              </Pressable>
+            </GestureDetector>
           )}
 
           {/* Tags */}
@@ -333,11 +377,8 @@ export function InkBulletCard({
 
       {/* Skia overlay: visible in all lenses (read-only in glance/focus) */}
       {(strokes.length > 0 || (lens === 'ink' && currentStroke.length > 0)) && (
-        <View
-          pointerEvents="none"
-          style={[styles.canvasOverlay, { width: contentWidth - 4, height: cardH }]}
-        >
-          <Canvas style={{ width: contentWidth - 4, height: cardH }}>
+        <View pointerEvents="none" style={[styles.canvasOverlay, { height: cardSize.h }]}>
+          <Canvas style={StyleSheet.absoluteFillObject}>
             {/* Hide erased strokes in-flight */}
             {strokes.map((s) => {
               if (eraseHitsRef.current.has(s.id)) return null;
@@ -376,12 +417,9 @@ export function InkBulletCard({
       )}
 
       {/* Ink gesture surface (only when lens = ink AND not currently text-editing) */}
-      {lens === 'ink' && !editing && (
+      {lens === 'ink' && !editing && !textModeActive && (
         <GestureDetector gesture={pan}>
-          <View
-            style={[styles.inkSurface, { width: contentWidth - 4, height: cardH }]}
-            data-testid={`ink-surface-${point.id}`}
-          />
+          <View style={[styles.inkSurface, { height: cardSize.h }]} data-testid={`ink-surface-${point.id}`} />
         </GestureDetector>
       )}
 
@@ -402,12 +440,6 @@ export function InkBulletCard({
           <TouchableOpacity onPress={onDelete} style={styles.iconBtnSm} data-testid={`ink-card-delete-${point.id}`}>
             <Trash2 size={13} color="#ef4444" />
           </TouchableOpacity>
-          {strokes.length > 0 && (
-            <View style={[styles.strokeBadge, { backgroundColor: '#0ea5e91A' }]}>
-              <Sparkles size={9} color="#0ea5e9" />
-              <Text style={styles.strokeBadgeText}>{strokes.length}</Text>
-            </View>
-          )}
           <View style={{ flex: 1 }} />
           <View style={styles.grip}><GripVertical size={14} color={colors.textTertiary} /></View>
         </View>
@@ -488,8 +520,8 @@ const styles = StyleSheet.create({
   tagChip: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 5 },
   tagText: { fontSize: 9, fontWeight: '900', letterSpacing: 0.3 },
 
-  canvasOverlay: { position: 'absolute', top: 0, left: 0, zIndex: 5 },
-  inkSurface: { position: 'absolute', top: 0, left: 0, zIndex: 6, backgroundColor: 'transparent' },
+  canvasOverlay: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 5 },
+  inkSurface: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 6, backgroundColor: 'transparent' },
 
   actionsRow: {
     flexDirection: 'row',
@@ -504,7 +536,5 @@ const styles = StyleSheet.create({
     width: 26, height: 26, borderRadius: 6,
     alignItems: 'center', justifyContent: 'center',
   },
-  strokeBadge: { flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 10, marginLeft: 4 },
-  strokeBadgeText: { fontSize: 9, fontWeight: '900', color: '#0ea5e9' },
   grip: { padding: 4 },
 });

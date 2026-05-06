@@ -42,17 +42,19 @@ export default function HardnoteEditor() {
   const baseLayerRaw = Array.isArray(params.baseLayer) ? params.baseLayer[0] : params.baseLayer;
 
   const { width: winW } = useWindowDimensions();
-  const contentWidth = Math.min(winW - 8, 740);
 
   const doc = useHardnoteDoc(noteId);
   const [lens, setLens] = useState<Lens>(requestedLens || 'glance');
+  const contentWidth = lens === 'focus' ? Math.max(320, winW - 48) : Math.min(winW - 32, 740);
 
   // Ink toolbar state
   const [inkTool, setInkTool] = useState<ToolKind>('pen');
   const [inkColor, setInkColor] = useState<string>('#0f172a');
   const [inkWidth, setInkWidth] = useState<number>(2);
+  const [textModeActive, setTextModeActive] = useState(false);
 
   const [exportOpen, setExportOpen] = useState(false);
+  const [includeHighlights, setIncludeHighlights] = useState(true);
 
   // If launched from quiz capture with a baseLayer payload AND the note is empty,
   // seed it as a locked reference so the user immediately sees their context.
@@ -66,7 +68,6 @@ export default function HardnoteEditor() {
       if (!md) return;
       doc.insertPoint(null, {
         text: String(md),
-        color: '#f59e0b',
         locked: true,
         source: parsed?.source || 'quiz_explanation',
       });
@@ -83,17 +84,18 @@ export default function HardnoteEditor() {
       if (p.type === 'heading') {
         blocks.push({ id: p.id, type: 'microTopicHeading', text: p.text || `Heading ${idx + 1}` });
       } else {
+        const canHighlight = includeHighlights && !!p.color;
         blocks.push({
           id: p.id,
-          type: 'highlight',
+          type: canHighlight ? 'highlight' : 'point',
           text: p.text,
-          color: p.color,
+          color: canHighlight ? p.color : undefined,
           sourceLabel: p.source,
         });
       }
     });
     return { kind: 'notes', blocks };
-  }, [doc.points, doc.title, noteId]);
+  }, [doc.points, doc.title, includeHighlights, noteId]);
 
   if (!noteId) {
     return (
@@ -120,11 +122,41 @@ export default function HardnoteEditor() {
     setLens('glance');
   };
 
+  useEffect(() => {
+    if (lens !== 'ink' && textModeActive) {
+      setTextModeActive(false);
+    }
+  }, [lens, textModeActive]);
+
+  const openExportPrompt = () => {
+    Alert.alert('Export Hardnote', 'Include color highlights?', [
+      {
+        text: 'Yes, with highlights',
+        onPress: () => {
+          setIncludeHighlights(true);
+          setExportOpen(true);
+        },
+      },
+      {
+        text: 'Clean (no highlights)',
+        onPress: () => {
+          setIncludeHighlights(false);
+          setExportOpen(true);
+        },
+      },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
+  };
+
   const lensBg = lens === 'focus' ? '#fdf6e3' : colors.bg;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: lensBg }} edges={['top']} data-testid="hn-editor-root">
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior="height"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
+      >
         {/* Header */}
         <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: lensBg }]}>
           <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn} data-testid="hn-editor-back">
@@ -152,7 +184,7 @@ export default function HardnoteEditor() {
               <ActivityIndicator size="small" color={colors.primary} />
             </View>
           )}
-          <TouchableOpacity onPress={() => setExportOpen(true)} style={styles.iconBtn} data-testid="hn-editor-export">
+          <TouchableOpacity onPress={openExportPrompt} style={styles.iconBtn} data-testid="hn-editor-export">
             <FileDown size={20} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
@@ -180,9 +212,11 @@ export default function HardnoteEditor() {
             style={{ flex: 1 }}
             contentContainerStyle={[
               { paddingBottom: lens === 'ink' ? 140 : 80 },
-              lens === 'focus' && { maxWidth: 720, alignSelf: 'center', paddingTop: 12 },
+              lens === 'focus' && { width: '100%', paddingTop: 12, paddingHorizontal: 24 },
             ]}
+            keyboardDismissMode="interactive"
             keyboardShouldPersistTaps="handled"
+            automaticallyAdjustKeyboardInsets
             showsVerticalScrollIndicator={false}
           >
             {/* Focus mode meta */}
@@ -227,6 +261,7 @@ export default function HardnoteEditor() {
                     )
                   }
                   onToggleLock={() => doc.toggleLock(p.id)}
+                  textModeActive={lens === 'ink' && textModeActive}
                 />
               ))
             )}
@@ -243,6 +278,8 @@ export default function HardnoteEditor() {
               onToolChange={setInkTool}
               onColorChange={setInkColor}
               onWidthChange={setInkWidth}
+              onTextMode={() => setTextModeActive((v) => !v)}
+              isTextMode={textModeActive}
             />
           </View>
         )}

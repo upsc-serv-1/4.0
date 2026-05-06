@@ -528,35 +528,83 @@ export default function AISearchTab() {
     </View>
   );
 
-  const renderEmptyState = () => (
-    <View style={styles.emptyState}>
-      <View style={styles.brainBadge}>
-        <Brain size={28} color="#fff" />
+  const renderEmptyState = () => {
+    // Build smart suggestions: recent history (top 3) + UPSC trend topics (rotate by day)
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    const trendPool = [
+      // Polity
+      'emergency provisions article 352', 'Governor discretionary powers', 'fundamental duties cases',
+      'parliamentary privilege contempt', 'CAG powers constitutional mandate',
+      // History
+      'Buddhist councils chronology', 'Bhakti movement saints contributions',
+      'revolt 1857 causes and consequences', 'Salt Satyagraha significance',
+      // Geography
+      'MSP vs FRP difference', 'rain shadow effect Western Ghats', 'ITCZ monsoon mechanism',
+      // Economy
+      'NPA classification RBI norms', 'MSME definition revised criteria', 'fiscal deficit FRBM targets',
+      // Environment
+      'Ramsar wetlands India list', 'biodiversity hotspots endemic species', 'carbon credit mechanism',
+      // S&T
+      'mRNA vaccine technology', 'quantum computing applications UPSC', 'ISRO missions achievements',
+    ];
+    const ROTATE = 4;
+    const offset = (dayOfYear * ROTATE) % trendPool.length;
+    const suggestedFromTrend = [
+      trendPool[offset % trendPool.length],
+      trendPool[(offset + 1) % trendPool.length],
+      trendPool[(offset + 2) % trendPool.length],
+      trendPool[(offset + 3) % trendPool.length],
+    ];
+    const historyItems = searchHistory.slice(0, 3);
+
+    return (
+      <View style={styles.emptyState}>
+        <View style={styles.brainBadge}>
+          <Brain size={28} color="#fff" />
+        </View>
+        <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>AI-Powered Search</Text>
+        <Text style={[styles.emptySub, { color: colors.textTertiary }]}>
+          Ask in plain language.{'\n'}Gemini maps intent → filters + keywords,{'\n'}then searches across all questions.
+        </Text>
+
+        {/* Recent searches section */}
+        {historyItems.length > 0 && (
+          <>
+            <Text style={[styles.examplesLabel, { color: colors.textTertiary }]}>CONTINUE WHERE YOU LEFT OFF</Text>
+            {historyItems.map((h) => (
+              <TouchableOpacity
+                key={`h-${h}`}
+                onPress={() => { setQuery(h); runSearch(h, filters); }}
+                testID={`ai-search-history-${h.slice(0, 12)}`}
+                style={[styles.exampleChip, { backgroundColor: colors.surface, borderColor: '#7c3aed30' }]}
+              >
+                <Clock size={12} color="#7c3aed" />
+                <Text style={[styles.exampleText, { color: colors.textSecondary }]} numberOfLines={1}>{h}</Text>
+                <ChevronRight size={12} color={colors.textTertiary} />
+              </TouchableOpacity>
+            ))}
+          </>
+        )}
+
+        {/* Smart trending suggestions */}
+        <Text style={[styles.examplesLabel, { color: colors.textTertiary, marginTop: historyItems.length > 0 ? 14 : 0 }]}>
+          SMART SUGGESTIONS
+        </Text>
+        {suggestedFromTrend.map((ex) => (
+          <TouchableOpacity
+            key={ex}
+            onPress={() => { setQuery(ex); runSearch(ex, filters); }}
+            testID={`ai-search-example-${ex.slice(0, 12)}`}
+            style={[styles.exampleChip, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          >
+            <Sparkles size={12} color="#7c3aed" />
+            <Text style={[styles.exampleText, { color: colors.textSecondary }]}>{ex}</Text>
+            <ChevronRight size={12} color={colors.textTertiary} />
+          </TouchableOpacity>
+        ))}
       </View>
-      <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>AI-Powered Search</Text>
-      <Text style={[styles.emptySub, { color: colors.textTertiary }]}>
-        Ask in plain language.{'\n'}Gemini expands your query into keywords,{'\n'}then searches across all questions.
-      </Text>
-      <Text style={[styles.examplesLabel, { color: colors.textTertiary }]}>TRY THESE</Text>
-      {[
-        'rivers flowing east to west in India',
-        'constitutional amendments after 1990',
-        'trade policy effects on agriculture',
-        'mapping rivers mountains deserts',
-      ].map((ex) => (
-        <TouchableOpacity
-          key={ex}
-          onPress={() => { setQuery(ex); runSearch(ex, filters); }}
-          testID={`ai-search-example-${ex.slice(0, 12)}`}
-          style={[styles.exampleChip, { backgroundColor: colors.surface, borderColor: colors.border }]}
-        >
-          <Sparkles size={12} color="#7c3aed" />
-          <Text style={[styles.exampleText, { color: colors.textSecondary }]}>{ex}</Text>
-          <ChevronRight size={12} color={colors.textTertiary} />
-        </TouchableOpacity>
-      ))}
-    </View>
-  );
+    );
+  };
 
   // ── Left panel (iPad sidebar / inline on phone) ───────────────────────────
 

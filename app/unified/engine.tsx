@@ -764,6 +764,10 @@ export default function UnifiedQuizEngine() {
   const [revealedExplanations, setRevealedExplanations] = useState<Record<string, boolean>>({});
   const [hasJumped, setHasJumped] = useState(false);
 
+  // ── Search context (when opened from AI Search results) ─────────
+  const isFromSearch = !!params.resultIds;
+  const [showSearchPanel, setShowSearchPanel] = useState(false);
+
   // Notebook System State
   const [notebookModalVisible, setNotebookModalVisible] = useState(false);
   // Hardnotes bridge (Phase 3) — send quiz explanation into a Skia canvas note
@@ -847,7 +851,10 @@ export default function UnifiedQuizEngine() {
   const [paperPageSize, setPaperPageSize] = useState(6); // 6 questions/page (can fall back to 4–5 visually)
   const [showFontSlider, setShowFontSlider] = useState(false);
   const [showNavigator, setShowNavigator] = useState(false);
-  const [showIndex, setShowIndex] = useState(arenaMode === 'learning');
+  const [showIndex, setShowIndex] = useState(
+    // Skip arena index when coming from search (resultIds present) — show question directly
+    arenaMode === 'learning' && !params.resultIds
+  );
   const [currentPage, setCurrentPage] = useState(0);
   const [showTimerPicker, setShowTimerPicker] = useState(false);
   const [showClockControl, setShowClockControl] = useState(false);
@@ -3677,12 +3684,29 @@ export default function UnifiedQuizEngine() {
           <TouchableOpacity onPress={handleExit} style={styles.headerBtn}>
             <ChevronLeft size={24} color={isZenMode ? '#433422' : colors.textPrimary} />
           </TouchableOpacity>
-          
+
           <View style={styles.headerTitleContainer}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
-                {showIndex ? 'Arena Index' : `Q${currentIndex + 1}/${questions.length}`}
-              </Text>
+              {/* Search context breadcrumb — only shown when opened from search results */}
+              {isFromSearch ? (
+                <TouchableOpacity
+                  onPress={() => setShowSearchPanel(true)}
+                  testID="engine-search-panel-btn"
+                  style={{
+                    flexDirection: 'row', alignItems: 'center', gap: 5,
+                    backgroundColor: colors.primary + '15', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12,
+                  }}
+                >
+                  <ListIcon size={14} color={colors.primary} />
+                  <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 11 }}>
+                    Q{currentIndex + 1}/{questions.length}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
+                  {showIndex ? 'Arena Index' : `Q${currentIndex + 1}/${questions.length}`}
+                </Text>
+              )}
 
               <TouchableOpacity 
                 onPress={() => setShowSaveNameModal(true)}
@@ -3730,6 +3754,20 @@ export default function UnifiedQuizEngine() {
             >
               <LayoutGrid size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
             </TouchableOpacity>
+
+            {/* Exit simulation mode but STAY in quiz engine (switch to list view) */}
+            {viewMode === 'paper' && (
+              <TouchableOpacity
+                onPress={() => {
+                  setViewMode('list');
+                  setArenaMode('learning');
+                }}
+                style={[styles.headerBtn, { backgroundColor: '#ef444420' }]}
+                testID="engine-exit-sim-btn"
+              >
+                <Minimize2 size={18} color="#ef4444" />
+              </TouchableOpacity>
+            )}
 
             <TouchableOpacity
               onPress={() => setShowModelSwitcher(true)}
@@ -3934,18 +3972,21 @@ export default function UnifiedQuizEngine() {
                           key={q.id} 
                           onPress={() => { 
                             setShowNavigator(false); 
+                            // Slight delay so modal close animation doesn't compete
                             setTimeout(() => {
+                              setCurrentIndex(idx);
                               if (viewMode === 'paper') {
                                 setPaperPage(Math.floor(idx / paperPageSize));
-                                setCurrentIndex(idx);
-                              } else if (viewMode === 'card') { 
-                                setCurrentIndex(idx); 
-                              } else {
-                                // List view: use robust scroll helper
-                                setCurrentIndex(idx);
-                                scrollToIndexRobust(idx);
+                              } else if (viewMode === 'list') {
+                                // scrollToIndex via getItemLayout (no onScrollToIndexFailed needed)
+                                try {
+                                  listRef.current?.scrollToIndex({ index: idx, animated: true, viewPosition: 0 });
+                                } catch {
+                                  listRef.current?.scrollToOffset({ offset: 260 * idx, animated: true });
+                                }
                               }
-                            }, 100);
+                              // card mode: setCurrentIndex already re-renders the question
+                            }, 120);
                           }}
                           style={[
                             styles.paletteItem, 
@@ -3957,6 +3998,89 @@ export default function UnifiedQuizEngine() {
                         </TouchableOpacity>
                       );
                     })}
+                  </ScrollView>
+                </View>
+              </View>
+            </Modal>
+
+            {/* ── Search Results Panel ─────────────────────────────────────────
+                Slide-in panel (60-70% of screen) showing all searched questions.
+                Available only when engine was opened from AI Search (resultIds).    */}
+            <Modal
+              visible={showSearchPanel && isFromSearch}
+              transparent
+              animationType="slide"
+              onRequestClose={() => setShowSearchPanel(false)}
+            >
+              <View style={{ flex: 1, flexDirection: 'row' }}>
+                {/* Dim overlay on the right — tap to close */}
+                <Pressable
+                  style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}
+                  onPress={() => setShowSearchPanel(false)}
+                />
+                {/* Panel — takes 65% of screen width */}
+                <View style={{
+                  width: Math.min(width * 0.65, 420),
+                  backgroundColor: colors.surface,
+                  height: '100%',
+                  paddingTop: 16,
+                  borderLeftWidth: 1,
+                  borderLeftColor: colors.border,
+                }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 12 }}>
+                    <View>
+                      <Text style={{ fontSize: 13, fontWeight: '900', color: colors.textPrimary }}>Search Results</Text>
+                      <Text style={{ fontSize: 10, fontWeight: '700', color: colors.textTertiary }}>{questions.length} questions</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => setShowSearchPanel(false)} style={{ padding: 6 }}>
+                      <X size={20} color={colors.textTertiary} />
+                    </TouchableOpacity>
+                  </View>
+                  <ScrollView showsVerticalScrollIndicator={false}>
+                    {questions.map((q, idx) => {
+                      const isActive = idx === currentIndex;
+                      const ans = store.answers[q.id];
+                      const isAnswered = !!ans?.selectedAnswer;
+                      return (
+                        <TouchableOpacity
+                          key={q.id}
+                          onPress={() => {
+                            setCurrentIndex(idx);
+                            setShowSearchPanel(false);
+                            if (viewMode === 'list') {
+                              setTimeout(() => {
+                                try { listRef.current?.scrollToIndex({ index: idx, animated: true }); }
+                                catch { listRef.current?.scrollToOffset({ offset: 260 * idx, animated: true }); }
+                              }, 150);
+                            }
+                          }}
+                          style={{
+                            paddingHorizontal: 16, paddingVertical: 12,
+                            borderBottomWidth: 1, borderBottomColor: colors.border,
+                            backgroundColor: isActive ? colors.primary + '12' : 'transparent',
+                          }}
+                        >
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                            <View style={{
+                              width: 26, height: 26, borderRadius: 8, alignItems: 'center', justifyContent: 'center',
+                              backgroundColor: isAnswered ? '#22c55e' : (isActive ? colors.primary : colors.surfaceStrong),
+                            }}>
+                              <Text style={{ fontSize: 10, fontWeight: '900', color: isAnswered || isActive ? '#fff' : colors.textTertiary }}>{idx + 1}</Text>
+                            </View>
+                            {q.subject && (
+                              <Text style={{ fontSize: 10, fontWeight: '700', color: '#7c3aed', backgroundColor: '#ede9fe', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>{q.subject}</Text>
+                            )}
+                            {q.is_pyq && (
+                              <Text style={{ fontSize: 9, fontWeight: '800', color: '#1d4ed8', backgroundColor: '#dbeafe', paddingHorizontal: 5, paddingVertical: 1, borderRadius: 4 }}>PYQ</Text>
+                            )}
+                          </View>
+                          <Text numberOfLines={2} style={{ fontSize: 12, fontWeight: isActive ? '700' : '500', color: isActive ? colors.textPrimary : colors.textSecondary }}>
+                            {q.question_text?.replace(/<[^>]*>/g, '')}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                    <View style={{ height: 40 }} />
                   </ScrollView>
                 </View>
               </View>
@@ -4053,6 +4177,9 @@ export default function UnifiedQuizEngine() {
                   renderItem={renderQuestionBlock}
                   keyExtractor={(item) => item.id}
                   initialScrollIndex={currentIndex >= 0 ? currentIndex : undefined}
+                  getItemLayout={(_data, index) => ({
+                    length: 260, offset: 260 * index, index
+                  })}
                   contentContainerStyle={styles.listContent}
                   onViewableItemsChanged={onViewableItemsChanged}
                   viewabilityConfig={viewabilityConfig}

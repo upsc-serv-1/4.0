@@ -722,16 +722,6 @@ export default function NoteEditor() {
       text: title || 'Untitled Note',
     });
 
-    if ((content || '').trim()) {
-      blocks.push({
-        id: `body-${id || 'draft'}`,
-        type: 'highlight',
-        text: content,
-        color: '#6366f1',
-        sourceLabel: subject || undefined,
-      });
-    }
-
     checklist.forEach((entry, idx) => {
       if (!entry?.text?.trim()) return;
       blocks.push({
@@ -743,6 +733,16 @@ export default function NoteEditor() {
         sourceLabel: subject || undefined,
       });
     });
+
+    if ((content || '').trim()) {
+      blocks.push({
+        id: `body-${id || 'draft'}`,
+        type: 'highlight',
+        text: content,
+        color: '#6366f1',
+        sourceLabel: subject || undefined,
+      });
+    }
 
     items.forEach((item, idx) => {
       if (item.type === 'microTopicHeading') {

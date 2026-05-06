@@ -368,7 +368,13 @@ const baseCss = (o: ExportOptions) => {
     .tag-title { color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 2mm; margin: 6mm 0 3mm 0; font-size: ${o.fontSize + 2}pt; font-weight: 900; }
 
     /* Notes */
-    .note h1, .note h2, .note h3 { color: var(--accent); }
+    .note h1, .note h2, .note h3, .note h4, .note h5, .note h6 {
+      color: var(--accent);
+      font-size: inherit !important;
+      line-height: inherit !important;
+      font-weight: 700;
+      margin: 0 0 1mm 0;
+    }
     .note { break-inside: avoid; page-break-inside: avoid; padding: 4mm; border: 1px solid var(--rule); border-left: 4px solid var(--accent); border-radius: 6px; margin-bottom: 4mm; }
     .microheading { font-weight: 900; font-size: ${o.fontSize + 1}pt; color: var(--accent); margin: 6mm 0 2mm 0; padding: 3mm 4mm; background: rgba(99,102,241,0.08); border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
 
@@ -417,6 +423,8 @@ const sanitizeRichHtml = (raw: string = ''): string => {
   };
 
   return raw
+    // Normalize legacy <font> tags so export typography remains consistent.
+    .replace(/<(\/?)font\b[^>]*>/gi, (_m, closing: string) => (closing ? '</span>' : '<span>'))
     .replace(/style="([^"]*)"/gi, (_, styles: string) => {
       const next = stripStyleProps(styles);
       return next ? `style="${next}"` : '';

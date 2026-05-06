@@ -611,6 +611,14 @@ export default function UnifiedQuizEngine() {
     if (!qid || qid in bestAnswers) return;
     fetchBestAnswer(qid).then((row) => {
       setBestAnswers(prev => ({ ...prev, [qid]: row }));
+      // Auto-select MyVitamin tab when a saved answer exists,
+      // but only if the user hasn't manually chosen a source yet this session.
+      if (row) {
+        setActiveExplSource(prev => {
+          if (prev[qid]) return prev; // user already picked a source, don't override
+          return { ...prev, [qid]: 'vitamin' };
+        });
+      }
     });
   };
 

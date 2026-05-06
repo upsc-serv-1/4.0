@@ -45,7 +45,7 @@ import {
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PROMPT_KEYS, DEFAULT_PROMPTS } from '../src/services/GeminiService';
+import { PROMPT_KEYS, DEFAULT_PROMPTS, GEMINI_MODELS, DEFAULT_MODEL } from '../src/services/GeminiService';
 import { supabase } from '../src/lib/supabase';
 import { PageWrapper } from '../src/components/PageWrapper';
 import { OPTIONAL_SUBJECTS } from '../src/data/syllabus';
@@ -107,6 +107,7 @@ export default function Profile() {
 
   // ── AI Prompt Settings State ──────────────────────────────
   const [geminiKey, setGeminiKey] = useState('');
+  const [geminiModel, setGeminiModel] = useState<string>(DEFAULT_MODEL);
   const [explainPrompt, setExplainPrompt]     = useState('');
   const [summarizePrompt, setSummarizePrompt] = useState('');
   const [searchPrompt, setSearchPrompt]       = useState('');
@@ -125,13 +126,15 @@ export default function Profile() {
   // Load AI settings
   useEffect(() => {
     (async () => {
-      const [key, ep, sp, srp] = await Promise.all([
+      const [key, model, ep, sp, srp] = await Promise.all([
         AsyncStorage.getItem('gemini_api_key'),
+        AsyncStorage.getItem(PROMPT_KEYS.model),
         AsyncStorage.getItem(PROMPT_KEYS.explain),
         AsyncStorage.getItem(PROMPT_KEYS.summarize),
         AsyncStorage.getItem(PROMPT_KEYS.search),
       ]);
       setGeminiKey(key || '');
+      setGeminiModel(model || DEFAULT_MODEL);
       setExplainPrompt(ep || DEFAULT_PROMPTS.explain);
       setSummarizePrompt(sp || DEFAULT_PROMPTS.summarize);
       setSearchPrompt(srp || DEFAULT_PROMPTS.search);
@@ -143,6 +146,7 @@ export default function Profile() {
     try {
       await Promise.all([
         AsyncStorage.setItem('gemini_api_key', geminiKey.trim()),
+        AsyncStorage.setItem(PROMPT_KEYS.model,     geminiModel),
         AsyncStorage.setItem(PROMPT_KEYS.explain,    explainPrompt.trim()   || DEFAULT_PROMPTS.explain),
         AsyncStorage.setItem(PROMPT_KEYS.summarize,  summarizePrompt.trim() || DEFAULT_PROMPTS.summarize),
         AsyncStorage.setItem(PROMPT_KEYS.search,     searchPrompt.trim()    || DEFAULT_PROMPTS.search),
@@ -378,6 +382,46 @@ export default function Profile() {
               }}
               testID="ai-settings-api-key"
             />
+          </View>
+
+          {/* ── MODEL SELECTOR ─────────────────────────────────── */}
+          <View style={{ padding: 14, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: colors.textPrimary, marginBottom: 10 }}>
+              Gemini Model
+            </Text>
+            <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+              {GEMINI_MODELS.map(m => {
+                const isSelected = geminiModel === m.id;
+                return (
+                  <TouchableOpacity
+                    key={m.id}
+                    onPress={() => setGeminiModel(m.id)}
+                    style={{
+                      flex: 1, minWidth: 90,
+                      paddingVertical: 10, paddingHorizontal: 12,
+                      borderRadius: 12, borderWidth: 1.5,
+                      borderColor: isSelected ? '#7c3aed' : colors.border,
+                      backgroundColor: isSelected ? '#ede9fe' : colors.bg,
+                      alignItems: 'center',
+                    }}
+                    testID={`ai-model-btn-${m.id}`}
+                  >
+                    <Text style={{
+                      fontSize: 13, fontWeight: '800',
+                      color: isSelected ? '#7c3aed' : colors.textPrimary,
+                    }}>
+                      {m.label}
+                    </Text>
+                    <Text style={{
+                      fontSize: 10, fontWeight: '500', marginTop: 2, textAlign: 'center',
+                      color: isSelected ? '#7c3aed' : colors.textTertiary,
+                    }}>
+                      {m.sub}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
 
           {/* Prompt rows — one for each of the 3 prompts */}

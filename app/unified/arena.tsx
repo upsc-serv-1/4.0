@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -226,6 +226,7 @@ export default function UnifiedArenaSetup() {
   const [userTags, setUserTags] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState<number | null>(null);
   const [calculatingCount, setCalculatingCount] = useState(false);
+  const countDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchUserTags = useCallback(async () => {
     if (!session?.user?.id) return;
@@ -272,7 +273,19 @@ export default function UnifiedArenaSetup() {
   }, [params]);
 
   useEffect(() => {
-    updateQuestionCount();
+    if (countDebounceRef.current) {
+      clearTimeout(countDebounceRef.current);
+    }
+
+    countDebounceRef.current = setTimeout(() => {
+      updateQuestionCount();
+    }, 120);
+
+    return () => {
+      if (countDebounceRef.current) {
+        clearTimeout(countDebounceRef.current);
+      }
+    };
   }, [
     selectedSubjects,
     selectedSection,
@@ -1307,9 +1320,12 @@ export default function UnifiedArenaSetup() {
 
         <View style={[styles.footer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
           <View style={{ flex: 1.2 }}>
-            <Text style={[styles.countText, { color: colors.textPrimary }]}>
-              {calculatingCount ? '...' : (questionCount || 0)}
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={[styles.countText, { color: colors.textPrimary }]}>
+                {questionCount || 0}
+              </Text>
+              {calculatingCount && <ActivityIndicator size="small" color={colors.textTertiary} />}
+            </View>
             <Text style={[styles.countLabel, { color: colors.textTertiary }]} numberOfLines={2}>
               Targeted Questions{"\n"}(Pre-Dedupe)
             </Text>
@@ -1319,7 +1335,7 @@ export default function UnifiedArenaSetup() {
             <TouchableOpacity
               style={[styles.launchBtn, { backgroundColor: colors.surfaceStrong, borderColor: colors.primary, borderWidth: 1 }]}
               onPress={() => { handleLaunch('learning'); }}
-              disabled={calculatingCount || questionCount === 0}
+              disabled={questionCount === 0}
             >
               <BookOpen size={16} color={colors.primary} />
               <Text style={[styles.launchBtnText, { color: colors.primary, fontSize: 14 }]}>Learn</Text>
@@ -1328,7 +1344,7 @@ export default function UnifiedArenaSetup() {
             <TouchableOpacity
               style={[styles.launchBtn, { backgroundColor: colors.primary }]}
               onPress={() => { setArenaMode('exam'); setShowExamModal(true); }}
-              disabled={calculatingCount || questionCount === 0}
+              disabled={questionCount === 0}
             >
               <Target size={16} color="#fff" />
               <Text style={[styles.launchBtnText, { color: '#fff', fontSize: 14 }]}>Exam</Text>

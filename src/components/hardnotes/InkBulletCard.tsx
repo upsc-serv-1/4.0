@@ -262,6 +262,9 @@ export function InkBulletCard({
     focus: '#fff8ec',
     ink: colors.surface,
   };
+  const htmlContentWidth = lens === 'focus'
+    ? contentWidth
+    : Math.max(120, ((cardSize.w || contentWidth) - 56));
 
   return (
     <View
@@ -318,7 +321,7 @@ export function InkBulletCard({
               <View style={{ marginBottom: 6, opacity: 0.75 }}>
                 <RenderHtml
                   source={{ html: htmlFor(draft, isHeading) }}
-                  contentWidth={Math.max(120, (lens === 'focus' ? contentWidth : contentWidth - 56))}
+                  contentWidth={htmlContentWidth}
                   baseStyle={{
                     color: colors.textTertiary,
                     fontSize: 12,
@@ -378,7 +381,7 @@ export function InkBulletCard({
               >
                 <RenderHtml
                   source={{ html: htmlFor(point.text, isHeading) }}
-                  contentWidth={lens === 'focus' ? contentWidth : contentWidth - 56}
+                  contentWidth={htmlContentWidth}
                   baseStyle={{
                     color: lens === 'focus' ? '#3f2d16' : colors.textPrimary,
                     fontSize: lens === 'focus' ? 16 : (isHeading ? 14 : 14),
@@ -426,7 +429,7 @@ export function InkBulletCard({
             },
           ]}
         >
-          <Canvas style={StyleSheet.absoluteFillObject}>
+          <Canvas style={{ width: Math.max(1, cardSize.w), height: cardSize.h }}>
             {/* Hide erased strokes in-flight */}
             {strokes.map((s) => {
               if (eraseHitsRef.current.has(s.id)) return null;

@@ -14,6 +14,7 @@ import { ToolKind } from './strokes';
 const PEN_COLORS = ['#0f172a', '#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6'];
 const HIGHLIGHTER_COLORS = ['#fde68a', '#fca5a5', '#a7f3d0', '#93c5fd', '#d8b4fe', '#fdba74'];
 const WIDTHS = [2, 4, 7];
+const HIGHLIGHTER_WIDTHS = [8, 14, 22];
 
 interface Props {
   tool: ToolKind;
@@ -24,11 +25,25 @@ interface Props {
   onWidthChange: (w: number) => void;
   onUndo?: () => void;
   canUndo?: boolean;
+  onTextMode?: () => void;
+  isTextMode?: boolean;
 }
 
-export function InkToolbar({ tool, color, width, onToolChange, onColorChange, onWidthChange, onUndo, canUndo }: Props) {
+export function InkToolbar({
+  tool,
+  color,
+  width,
+  onToolChange,
+  onColorChange,
+  onWidthChange,
+  onUndo,
+  canUndo,
+  onTextMode,
+  isTextMode,
+}: Props) {
   const { colors } = useTheme();
   const palette = tool === 'highlighter' ? HIGHLIGHTER_COLORS : PEN_COLORS;
+  const activeWidths = tool === 'highlighter' ? HIGHLIGHTER_WIDTHS : WIDTHS;
 
   const ping = () => {
     if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
@@ -72,7 +87,7 @@ export function InkToolbar({ tool, color, width, onToolChange, onColorChange, on
 
       {/* Widths */}
       <View style={s.group}>
-        {WIDTHS.map((w) => (
+        {activeWidths.map((w) => (
           <TouchableOpacity
             key={w}
             onPress={() => { onWidthChange(w); ping(); }}
@@ -89,6 +104,17 @@ export function InkToolbar({ tool, color, width, onToolChange, onColorChange, on
           </TouchableOpacity>
         ))}
       </View>
+
+      {onTextMode && (
+        <>
+          <View style={[s.divider, { backgroundColor: colors.border }]} />
+          <ToolBtn active={!!isTextMode} onPress={() => { onTextMode(); ping(); }} testID="ink-tool-text">
+            <Text style={{ fontSize: 15, fontWeight: '900', color: isTextMode ? colors.primary : colors.textTertiary }}>
+              T
+            </Text>
+          </ToolBtn>
+        </>
+      )}
 
       <View style={[s.divider, { backgroundColor: colors.border }]} />
 

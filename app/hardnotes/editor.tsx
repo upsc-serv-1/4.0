@@ -51,8 +51,15 @@ export default function HardnoteEditor() {
   const [inkTool, setInkTool] = useState<ToolKind>('pen');
   const [inkColor, setInkColor] = useState<string>('#0f172a');
   const [inkWidth, setInkWidth] = useState<number>(2);
+  const [textModeActive, setTextModeActive] = useState(false);
 
   const [exportOpen, setExportOpen] = useState(false);
+
+  useEffect(() => {
+    if (lens !== 'ink' && textModeActive) {
+      setTextModeActive(false);
+    }
+  }, [lens, textModeActive]);
 
   // If launched from quiz capture with a baseLayer payload AND the note is empty,
   // seed it as a locked reference so the user immediately sees their context.
@@ -253,6 +260,11 @@ export default function HardnoteEditor() {
               onToolChange={setInkTool}
               onColorChange={setInkColor}
               onWidthChange={setInkWidth}
+              onTextMode={() => {
+                setTextModeActive((prev) => !prev);
+                setLens('glance');
+              }}
+              isTextMode={textModeActive}
             />
           </View>
         )}

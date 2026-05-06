@@ -163,7 +163,7 @@ export interface ExportFlashcard {
 
 export interface ExportNoteBlock {
   id: string;
-  type: 'microTopicHeading' | 'highlight' | 'checklist';
+  type: 'microTopicHeading' | 'highlight' | 'point' | 'checklist';
   text: string;
   color?: string;
   sourceLabel?: string;

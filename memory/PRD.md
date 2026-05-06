@@ -1,50 +1,50 @@
-# UPSC Prep — Simulated Exam Mode (Branch 5.5)
+# UPSC Study App — Bug Fixes & Feature PRD (Branch: 5.9)
 
-## Feature: Simulated Exam Mode in Quiz Engine
+## Repository
+- **Repo**: https://github.com/upsc-serv-1/4.0
+- **Working Branch**: 5.9
+- **App Type**: React Native (Expo) — mobile app
 
-### Overview
-A new "paper view" mode (`viewMode='paper'`) added to `app/unified/engine.tsx` that presents the quiz as a printed question paper. Default-activated when student launches an Arena session with `arenaMode='exam'`. A header toggle (BookOpen icon) lets the student switch between `paper` and `list` views at any time.
+## Architecture
+- React Native + Expo Router
+- TypeScript
+- Supabase (PostgreSQL backend)
+- Gemini AI (via GeminiService.ts for search expansion, explanations)
+- Key screens: `app/ai-search.tsx`, `app/unified/engine.tsx`, `src/services/GeminiService.ts`
 
-### Layout (Section B + C)
-- **Tablet (≥ 768 logical px):** strict 2-column grid (3 stacked left, 3 right) — 6 questions per page.
-- **Phone (< 768):** auto-falls back to 1 column.
-- Each question card shows:
-  - Q-number badge, Review (flag) icon, Flashcard (zap) icon
-  - Question stem in serif font (Georgia/serif) for printed-paper feel
-  - Options
-  - Inline chip rows: **GUESS** (Confidence), **DIFFICULTY**, **TAGS** (study/revision tags)
-  - A dashed "Explanation" pill (learning mode) → opens centered modal
-- Pagination footer: Prev / page-numbers / Next.
+---
 
-### Centered Explanation Modal (Section D)
-- Triggered by tapping the "Explanation" pill on any question card.
-- Backdrop with translucent dark overlay (+ `backdrop-filter: blur(8px)` on iOS/web).
-- Header: question number + correct answer.
-- Source tabs (when multiple institutes): horizontal scroll of source pills + "ALL" combined view.
-- Scrollable body (`maxHeight: 400`): full markdown explanation, Mistake-type chips, Commit-to-Memory text input, gradient "Commit to Memory" button.
-- **Sticky Action Bar** (bottom of modal, always visible): full-text labels — Mark for Review, Add to Flashcards, Save to Notebook, Hardnote, Quick Save.
+## Session: Feb 2026 — Bug Fixes & Enhancements (10 commits pushed)
 
-### Header Wiring (Section A + E)
-- New `BookOpen` toggle icon in the engine header → switches list ↔ paper view.
-- New `LayoutGrid` palette icon promoted out of the quick menu — always one tap away in the header. Opens the existing Navigator modal which now also jumps to the right paper page when a question is tapped.
-- Timer pill remains visible in the header whenever `timerType !== 'none'` (already present).
-- Pinch-to-zoom (`PinchGestureHandler`) already wraps the entire render branch — works for paper mode too (font size 12–32 px persisted via AsyncStorage).
+### Implemented ✅
 
-### Files Changed
-- `app/unified/engine.tsx` — viewMode type expanded to `'list' | 'card' | 'paper'`, `paperPage` / `explanationModalQId` / `paperPageSize` state, `renderPaperQuestion` + `renderPaperPage` functions, header buttons, navigator wiring, explanation modal, `stylesPaper` StyleSheet appended.
+| # | Fix | File | Commit |
+|---|-----|------|--------|
+| 1 | MyVitamin auto-selects on reload — if saved answer exists, default to vitamin tab | `engine.tsx` | dc49de3 |
+| 2 | "Update MyVitamin" button when AI regenerates — shows amber "↻ Update MyVitamin" when savedBest already exists | `engine.tsx` | 3995120 |
+| 3 | Recent search dropdown no longer covers search bar — wrapped in relative container | `ai-search.tsx` | 8e16115 |
+| 4 | AI keyword prompt fix — years/exam names/subjects go in `filters`, NOT in `keywords` array | `GeminiService.ts` | 89c2b17 |
+| 5 | Subject chip stays selected after chip tap — only reset sidebarSubjectFilter on new text query | `ai-search.tsx` | 409bd3d |
+| 6 | Keyword highlighting in results — matched words highlighted amber+bold in question text | `ai-search.tsx` | ca0c3ba |
+| 7 | Color-coded PYQ chips — UPSC=blue, Allied=green, Others=orange, generic=amber | `ai-search.tsx` | ca0c3ba |
+| 8 | Notebook markdown rendering — `markdownToHtml()` converts AI markdown to HTML before loading in editor (fixes **bold** stars, tables, paragraphs) | `engine.tsx` | 552df32 |
+| 9 | Smart keyword suggestions — recent search history + rotating UPSC trend topics (30+ across all subjects) | `ai-search.tsx` | 37e6e6f |
+| 10 | Data Manager in search — institute chips in dropdown (quick filter), institute breakdown in left stats panel | `ai-search.tsx` | 5150bec + 61d9cd9 |
 
-### Sections pushed to branch `5.5`
-- **Section A** — viewMode='paper' type + header palette/toggle (commit `c448834`)
-- **Section B + C** — paper grid layout + inline chips (commit `f1d7f81`)
-- **Section D** — explanation modal + sticky action bar (commit `df68e36`)
-- **Section E** — PRD + final polish
+---
 
-### Test Plan (manual on iPad)
-1. Arena → search/topic → tap "Exam Mode" → engine opens in paper view automatically.
-2. Verify 2-column grid on iPad with 6 questions on first page; pagination shows total pages.
-3. Switch to phone (or rotate to portrait narrow) → grid collapses to 1 column.
-4. Tap "Explanation" pill on any question → centered modal opens with backdrop blur.
-5. Inside modal: scroll body, switch source tabs, edit Commit-to-Memory note, tap each sticky action button.
-6. Tap header palette icon → Navigator opens; tap any question number → paper jumps to that page.
-7. Pinch-zoom on paper → font size scales between 12–32 px; persists across reload.
-8. Verify timer (countdown/stopwatch) stays visible in header throughout paper mode.
+## Backlog / Future Enhancements
+
+### P1 — High Priority
+- Full weak area analytics integration in search suggestions (requires ReviewSection data passed to ai-search)
+- Forecast module topics surfaced as search suggestions (requires pyqPredictive.ts data)
+- Search navigation state fully preserved across deep links (validate with Expo Router back gesture)
+
+### P2 — Medium Priority  
+- Centralized institute color theme config (beyond PYQ chips — for all tabs)
+- "Top 500 smart revision keywords" AI-generated list
+- Search filter state persisted to AsyncStorage (filters survive app restart)
+
+### P3 — Low Priority
+- Better table rendering in notebook (styled with colors, not just borders)
+- Notebook editor: undo/redo support for markdown import

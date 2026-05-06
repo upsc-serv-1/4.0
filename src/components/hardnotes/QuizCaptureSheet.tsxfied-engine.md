@@ -403,7 +403,7 @@ Web node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ 93.0% (596/618)
 Web Bundled 23774ms node_modules/expo-router/entry.js (748 modules)
 λ Bundled 23882ms node_modules/expo-router/node/render.js (717 modules)
-λ  LOG  https://quiz-capture-notes.preview.emergentagent.com EXPO_PUBLIC_BACKEND_URL
+λ  LOG  https://ai-notebook-hub-6.preview.emergentagent.com EXPO_PUBLIC_BACKEND_URL
 
 
 Fetching debug logs for backend

@@ -56,6 +56,7 @@ export default function HardnoteEditor() {
   const [textModeActive, setTextModeActive] = useState(false);
 
   const [exportOpen, setExportOpen] = useState(false);
+  const [includeHighlights, setIncludeHighlights] = useState(true);
 
   useEffect(() => {
     if (lens !== 'ink' && textModeActive) {
@@ -91,17 +92,18 @@ export default function HardnoteEditor() {
       if (p.type === 'heading') {
         blocks.push({ id: p.id, type: 'microTopicHeading', text: p.text || `Heading ${idx + 1}` });
       } else {
+        const shouldHighlight = includeHighlights && !!p.color;
         blocks.push({
           id: p.id,
-          type: p.color ? 'highlight' : 'point',
+          type: shouldHighlight ? 'highlight' : 'point',
           text: p.text,
-          color: p.color,
+          color: shouldHighlight ? p.color : undefined,
           sourceLabel: p.source,
         });
       }
     });
     return { kind: 'notes', blocks };
-  }, [doc.points, doc.title, noteId]);
+  }, [doc.points, doc.title, includeHighlights, noteId]);
 
   if (!noteId) {
     return (
@@ -133,6 +135,30 @@ export default function HardnoteEditor() {
   const handleBack = async () => {
     await doc.flushSave();
     router.back();
+  };
+
+  const openExportSheet = () => {
+    Alert.alert(
+      'Export Hardnote',
+      'Include color highlights?',
+      [
+        {
+          text: 'Yes, with highlights',
+          onPress: () => {
+            setIncludeHighlights(true);
+            setExportOpen(true);
+          },
+        },
+        {
+          text: 'Clean (no highlights)',
+          onPress: () => {
+            setIncludeHighlights(false);
+            setExportOpen(true);
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ],
+    );
   };
 
   return (
@@ -169,7 +195,7 @@ export default function HardnoteEditor() {
               <ActivityIndicator size="small" color={colors.primary} />
             </View>
           )}
-          <TouchableOpacity onPress={() => setExportOpen(true)} style={styles.iconBtn} data-testid="hn-editor-export">
+          <TouchableOpacity onPress={openExportSheet} style={styles.iconBtn} data-testid="hn-editor-export">
             <FileDown size={20} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>

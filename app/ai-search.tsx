@@ -13,7 +13,7 @@ import {
 import { useRouter } from 'expo-router';
 import {
   Brain, Search, SlidersHorizontal, X, ChevronRight,
-  Sparkles, Filter, Clock, ChevronUp, ChevronDown, BookOpen, Target,
+  Sparkles, Filter, Clock, ChevronUp, ChevronDown, BookOpen, Target, Zap,
 } from 'lucide-react-native';
 import { supabase } from '../src/lib/supabase';
 import { useTheme } from '../src/context/ThemeContext';
@@ -24,39 +24,45 @@ import { PageWrapper } from '../src/components/PageWrapper';
 import { getPYQCategorization } from './unified/engine';
 import { AIModelSwitcher } from '../src/components/ai/AIModelSwitcher';
 import { mergeQuestions } from '../src/utils/merger';
+import { QuestionCache } from '../src/services/QuestionCache';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const IS_IPAD = SCREEN_WIDTH >= 768;
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
+type SearchEngineMode = 'AI' | 'Matching' | 'Exact';
+
 type SearchResult = {
   id: string;
-  question_text: string;     // flat column name from schema
+  question_text: string;
   correct_answer: string;
   subject?: string;
   section_group?: string;
   micro_topic?: string;
-  is_pyq?: boolean;          // flat boolean — canonical
+  is_pyq?: boolean;
   is_ncert?: boolean;
   is_upsc_cse?: boolean;
   is_allied?: boolean;
   is_others?: boolean;
-  exam_year?: number;        // integer in schema
+  exam_year?: number;
   exam_group?: string;
   exam_stage?: string;
   tests?: { institute?: string; series?: string; program_name?: string };
 };
 
 type Filters = {
-  searchMode:   'Matching' | 'Exact';
-  searchAcross: 'Questions' | 'Explanations' | 'Questions+Options';
-  stage:        string;   // 'All' | 'Prelims' | 'Mains'
-  institutes:   string;   // 'All' | comma-separated
-  pyqFilter:    string;   // 'All' | 'PYQ Only' | 'Non-PYQ'
-  examCategory: string;   // 'All' | 'UPSC' | 'Allied' | 'Others'
-  ncertFilter:  string;   // 'All' | 'NCERT Only' | 'Non-NCERT'
-  subjects:     string;   // 'All' | comma-separated
+  searchMode:    'Matching' | 'Exact';
+  searchAcross:  'Questions' | 'Explanations' | 'Questions+Options' | 'Notes';
+  stage:         string;   // 'All' | 'Prelims' | 'Mains'
+  institutes:    string;   // 'All' | comma-separated
+  pyqFilter:     string;   // 'All' | 'PYQ Only' | 'Non-PYQ'
+  examCategory:  string;   // 'All' | 'UPSC' | 'Allied' | 'Others'
+  ncertFilter:   string;   // 'All' | 'NCERT Only' | 'Non-NCERT'
+  subjects:      string;   // 'All' | comma-separated
+  sections:      string;   // 'All' | comma-separated (section_group)
+  microtopics:   string;   // 'All' | comma-separated
+  yearRange:     string;   // '' | 'YYYY' | 'YYYY,YYYY'
 };
 
 const DEFAULT_FILTERS: Filters = {
@@ -68,6 +74,9 @@ const DEFAULT_FILTERS: Filters = {
   examCategory: 'All',
   ncertFilter:  'All',
   subjects:     'All',
+  sections:     'All',
+  microtopics:  'All',
+  yearRange:    '',
 };
 
 type SortMode = 'Relevance' | 'Year' | 'Subject';
@@ -84,6 +93,9 @@ function countActiveFilters(f: Filters): number {
   if (f.examCategory !== 'All')       n++;
   if (f.ncertFilter !== 'All')        n++;
   if (f.subjects !== 'All')           n++;
+  if (f.sections !== 'All')           n++;
+  if (f.microtopics !== 'All')        n++;
+  if (f.yearRange)                    n++;
   return n;
 }
 
@@ -139,7 +151,12 @@ export default function AISearchTab() {
   const [filterOpen, setFilterOpen]     = useState(false);
   const [pendingFilters, setPendingFilters] = useState<Filters>(DEFAULT_FILTERS);
 
+  // ── Engine mode: AI (default) | Matching (fuzzy) | Exact ─────────────────
+  const [searchEngineMode, setSearchEngineMode] = useState<SearchEngineMode>('AI');
+
   const [subjectOptions, setSubjectOptions]     = useState<string[]>([]);
+  const [sectionOptions, setSectionOptions]     = useState<string[]>([]);
+  const [microtopicOptions, setMicrotopicOptions] = useState<string[]>([]);
   const [instituteOptions, setInstituteOptions] = useState<string[]>([]);
 
   // Fix #2 — sidebar subject filter (separate from filters.subjects)
@@ -161,6 +178,7 @@ export default function AISearchTab() {
 
   const inputRef = useRef<TextInput>(null);
 
+  // ── Fetch filter option lists ─────────────────────────────────────────────
   useEffect(() => {
     (async () => {
       const { data: subData } = await supabase
@@ -175,24 +193,43 @@ export default function AISearchTab() {
         const unique = [...new Set(instData.map((r: any) => r.institute).filter(Boolean))].sort() as string[];
         setInstituteOptions(unique);
       }
-      // Fix #4 — load search history
       const raw = await AsyncStorage.getItem('ai_search_history');
       if (raw) setSearchHistory(JSON.parse(raw));
     })();
   }, []);
 
-  // ── Core search with correct filter logic ─────────────────────────────────
+  // ── Load sections when subject changes ────────────────────────────────────
+  useEffect(() => {
+    const subs = pendingFilters.subjects !== 'All' ? pendingFilters.subjects.split(',').filter(Boolean) : [];
+    if (subs.length === 0) { setSectionOptions([]); setMicrotopicOptions([]); return; }
+    supabase.from('questions').select('section_group, micro_topic').in('subject', subs).limit(2000).then(({ data }) => {
+      if (!data) return;
+      const secs = [...new Set(data.map((r: any) => r.section_group).filter(Boolean))].sort() as string[];
+      setSectionOptions(secs);
+    });
+  }, [pendingFilters.subjects]);
 
-  const runSearch = useCallback(async (q: string, activeFilters: Filters) => {
+  // ── Load microtopics when section changes ─────────────────────────────────
+  useEffect(() => {
+    const subs = pendingFilters.subjects !== 'All' ? pendingFilters.subjects.split(',').filter(Boolean) : [];
+    const secs = pendingFilters.sections !== 'All' ? pendingFilters.sections.split(',').filter(Boolean) : [];
+    if (subs.length === 0 || secs.length === 0) { setMicrotopicOptions([]); return; }
+    supabase.from('questions').select('micro_topic').in('subject', subs).in('section_group', secs).not('micro_topic', 'is', null).limit(2000).then(({ data }) => {
+      if (!data) return;
+      const mts = [...new Set(data.map((r: any) => r.micro_topic).filter(Boolean))].sort() as string[];
+      setMicrotopicOptions(mts);
+    });
+  }, [pendingFilters.subjects, pendingFilters.sections]);
+
+  // ── Core search — handles AI / Matching / Exact modes ──────────────────────
+
+  const runSearch = useCallback(async (q: string, activeFilters: Filters, engineMode?: SearchEngineMode) => {
     if (!q.trim()) return;
-    // Fix #2 — only reset sidebar subject filter on a NEW text query, not when
-    // the same query re-runs due to a sidebar chip tap or filter change.
-    if (q.trim() !== query.trim()) {
-      setSidebarSubjectFilter(null);
-    }
-    // Clear AI inferred filters on new search
+    const mode = engineMode ?? searchEngineMode;
+    // Only reset sidebar subject filter on a NEW text query
+    if (q.trim() !== query.trim()) setSidebarSubjectFilter(null);
     setAiInferredFilters({});
-    // Fix #4 — save to history
+    // Save to history
     const trimmed = q.trim();
     setSearchHistory(prev => {
       const deduped = [trimmed, ...prev.filter(h => h !== trimmed)].slice(0, 10);
@@ -200,175 +237,187 @@ export default function AISearchTab() {
       return deduped;
     });
     setShowHistory(false);
-    // Fix #6 — collapse keywords panel on new search
     setKeywordsExpanded(false);
     setLoading(true);
     setHasSearched(true);
     setResults([]);
 
     try {
-      // ── STEP 1: Determine search conditions ────────────────────────────────
-      let conditions: string[];
-      let displayKeywords: string[];
-      let aiYear: string | null = null; // set in Matching mode, used in STEP 5
-
-      if (activeFilters.searchMode === 'Exact') {
-        // Exact mode: bypass AI expansion, single phrase match
-        if (activeFilters.searchAcross === 'Explanations') {
-          conditions = [`explanation_markdown.ilike.%${q.trim()}%`];
-        } else {
-          // Questions or Questions+Options — search question_text
-          conditions = [`question_text.ilike.%${q.trim()}%`];
+      // ── Helper: apply common hard filters to a DB query ───────────────────
+      const applyFilters = async (dbQuery: any, af: Filters, yearOverride?: string | null): Promise<any> => {
+        let q2 = dbQuery;
+        // PYQ
+        if (af.pyqFilter === 'PYQ Only')  q2 = q2.eq('is_pyq', true);
+        else if (af.pyqFilter === 'Non-PYQ') q2 = q2.eq('is_pyq', false);
+        // Exam category
+        if (af.examCategory === 'UPSC')    q2 = q2.eq('is_upsc_cse', true);
+        else if (af.examCategory === 'Allied') q2 = q2.eq('is_allied', true);
+        else if (af.examCategory === 'Others') q2 = q2.eq('is_others', true);
+        // NCERT
+        if (af.ncertFilter === 'NCERT Only') q2 = q2.eq('is_ncert', true);
+        else if (af.ncertFilter === 'Non-NCERT') q2 = q2.or('is_ncert.is.null,is_ncert.eq.false');
+        // Subject hierarchy
+        if (af.subjects !== 'All') {
+          const subs = af.subjects.split(',').filter(Boolean);
+          if (subs.length > 0) q2 = q2.in('subject', subs);
         }
-        displayKeywords = [q.trim()];
-      } else {
-        // Matching mode: AI expands query + infers filters
-        const aiResult = await aiExpandSearchQuery(q.trim());
-        displayKeywords = aiResult.keywords;
-
-        // Auto-apply AI-inferred filters — only fill slots the user left as 'All'
-        const mergedFilters: Filters = { ...activeFilters };
-        if (aiResult.filters.subject   && activeFilters.subjects     === 'All') mergedFilters.subjects     = aiResult.filters.subject;
-        if (aiResult.filters.stage     && activeFilters.stage        === 'All') mergedFilters.stage        = aiResult.filters.stage;
-        if (aiResult.filters.pyqFilter && activeFilters.pyqFilter    === 'All') mergedFilters.pyqFilter    = aiResult.filters.pyqFilter;
-        if (aiResult.filters.examCategory && activeFilters.examCategory === 'All') mergedFilters.examCategory = aiResult.filters.examCategory;
-        if (aiResult.filters.ncertFilter  && activeFilters.ncertFilter  === 'All') mergedFilters.ncertFilter  = aiResult.filters.ncertFilter;
-
-        aiYear = aiResult.filters.specificYear || null;
-        setAiInferredFilters(aiResult.filters);
-        // Update filter state so badge count reflects AI filters
-        setFilters(mergedFilters);
-        // Swap activeFilters → mergedFilters for the DB query below
-        activeFilters = mergedFilters;
-
-        if (aiResult.keywords.length === 0) {
-          setKeywords([]);
-          setLoading(false);
-          return;
+        if (af.sections !== 'All') {
+          const secs = af.sections.split(',').filter(Boolean);
+          if (secs.length > 0) q2 = q2.in('section_group', secs);
         }
-
-        const safeKws = aiResult.keywords.slice(0, 12);
-
-        if (activeFilters.searchAcross === 'Explanations') {
-          conditions = safeKws.map(kw => `explanation_markdown.ilike.%${kw}%`);
-        } else {
-          conditions = safeKws.map(kw => `question_text.ilike.%${kw}%`);
+        if (af.microtopics !== 'All') {
+          const mts = af.microtopics.split(',').filter(Boolean);
+          if (mts.length > 0) q2 = q2.in('micro_topic', mts);
         }
+        // Year range (manual or AI-inferred)
+        const yearStr = yearOverride ?? (af.yearRange || null);
+        if (yearStr) {
+          if (yearStr.includes(',')) q2 = q2.in('exam_year', yearStr.split(',').map(Number));
+          else q2 = q2.eq('exam_year', parseInt(yearStr, 10));
+        }
+        // Stage + institutes (joint subquery)
+        const stageActive = af.stage && af.stage !== 'All';
+        const instList = af.institutes !== 'All' ? af.institutes.split(',').filter(Boolean) : [];
+        if (stageActive || instList.length > 0) {
+          let testsQ = supabase.from('tests').select('id');
+          if (stageActive) testsQ = testsQ.ilike('series', `%${af.stage}%`);
+          if (instList.length > 0) testsQ = testsQ.in('institute', instList);
+          const { data: testRows } = await testsQ;
+          const testIds = (testRows || []).map((t: any) => t.id);
+          q2 = testIds.length > 0 ? q2.in('test_id', testIds) : q2.in('test_id', ['__NO_MATCH__']);
+        }
+        return q2;
+      };
+
+      const BASE_SELECT = `id,question_text,correct_answer,subject,section_group,micro_topic,
+        is_pyq,is_ncert,is_upsc_cse,is_allied,is_others,exam_year,exam_group,exam_stage,
+        test_id,tests(institute,series,program_name)`;
+
+      // ─────────────────────────────────────────────────────────────────────
+      // EXACT MODE: literal phrase match only
+      // ─────────────────────────────────────────────────────────────────────
+      if (mode === 'Exact') {
+        const term = q.trim();
+        setKeywords([term]);
+        let field = 'question_text';
+        if (activeFilters.searchAcross === 'Explanations') field = 'explanation_markdown';
+        let dbQ = supabase.from('questions').select(BASE_SELECT)
+          .ilike(field, `%${term}%`).limit(80);
+        dbQ = await applyFilters(dbQ, activeFilters);
+        const { data, error } = await dbQ;
+        if (error) throw error;
+        const raw = (data || []) as unknown as SearchResult[];
+        const { mergedQs } = mergeQuestions(raw as any);
+        setResults(mergedQs as SearchResult[]);
+        return;
       }
+
+      // ─────────────────────────────────────────────────────────────────────
+      // MATCHING MODE: cache-first + fuzzy Supabase (no AI)
+      // ─────────────────────────────────────────────────────────────────────
+      if (mode === 'Matching') {
+        setKeywords([q.trim()]);
+        const cacheMode = activeFilters.searchMode === 'Exact' ? 'Exact' : 'Matching';
+        const cacheFields = activeFilters.searchAcross === 'Explanations'
+          ? ['Explanations'] : ['Questions'];
+
+        // 1) Cache-first
+        let localResults = await QuestionCache.searchLocal(q.trim(), cacheMode, cacheFields) as any[];
+        // Apply hard filters to cache results
+        const subList = activeFilters.subjects !== 'All' ? activeFilters.subjects.split(',') : [];
+        const secList = activeFilters.sections !== 'All' ? activeFilters.sections.split(',') : [];
+        const mtList  = activeFilters.microtopics !== 'All' ? activeFilters.microtopics.split(',') : [];
+        if (subList.length) localResults = localResults.filter((r: any) => subList.includes(r.subject));
+        if (secList.length) localResults = localResults.filter((r: any) => secList.includes(r.section_group));
+        if (mtList.length)  localResults = localResults.filter((r: any) => mtList.includes(r.micro_topic));
+        if (activeFilters.pyqFilter === 'PYQ Only')  localResults = localResults.filter((r: any) => r.is_pyq);
+        if (activeFilters.pyqFilter === 'Non-PYQ')   localResults = localResults.filter((r: any) => !r.is_pyq);
+        if (activeFilters.ncertFilter === 'NCERT Only') localResults = localResults.filter((r: any) => r.is_ncert);
+
+        // 2) Remote: main + fuzzy fallback
+        const term = q.trim();
+        let conditions: string[] = [];
+        if (activeFilters.searchAcross === 'Explanations') {
+          conditions = [`explanation_markdown.ilike.%${term}%`];
+        } else {
+          conditions = [`question_text.ilike.%${term}%`];
+          // Add fuzzy patterns for 1-char tolerance
+          if (term.length > 3) {
+            for (let i = 1; i < term.length - 1; i++) {
+              const pattern = term.slice(0, i) + '%' + term.slice(i + 1);
+              conditions.push(`question_text.ilike.%${pattern}%`);
+            }
+          }
+        }
+        let dbQ = supabase.from('questions').select(BASE_SELECT)
+          .or(conditions.slice(0, 10).join(','))
+          .limit(60);
+        dbQ = await applyFilters(dbQ, activeFilters);
+        const { data: remote } = await dbQ;
+
+        // Merge
+        const localIds = new Set(localResults.map((r: any) => r.id));
+        const merged = [...localResults, ...(remote || []).filter((r: any) => !localIds.has(r.id))];
+
+        // Sort: exact match first, then PYQ rank, then year
+        const sorted = merged.sort((a: any, b: any) => {
+          const at = (a.question_text || '').toLowerCase();
+          const bt = (b.question_text || '').toLowerCase();
+          const tl = term.toLowerCase();
+          const ae = at.includes(tl), be = bt.includes(tl);
+          if (ae && !be) return -1; if (!ae && be) return 1;
+          const rank = (q: any) => q.is_upsc_cse ? 3 : q.is_allied ? 2 : q.is_pyq ? 1 : 0;
+          const rd = rank(b) - rank(a); if (rd !== 0) return rd;
+          return (b.exam_year || 0) - (a.exam_year || 0);
+        });
+        const { mergedQs } = mergeQuestions(sorted as any);
+        setResults(mergedQs as SearchResult[]);
+        return;
+      }
+
+      // ─────────────────────────────────────────────────────────────────────
+      // AI MODE: Gemini expands query → structured filters + keywords
+      // ─────────────────────────────────────────────────────────────────────
+      const aiResult = await aiExpandSearchQuery(q.trim());
+      const displayKeywords = aiResult.keywords;
+
+      // Merge AI-inferred filters with user-chosen filters (user-chosen take priority)
+      const mergedFilters: Filters = { ...activeFilters };
+      if (aiResult.filters.subject      && activeFilters.subjects     === 'All') mergedFilters.subjects     = aiResult.filters.subject;
+      if (aiResult.filters.stage        && activeFilters.stage        === 'All') mergedFilters.stage        = aiResult.filters.stage;
+      if (aiResult.filters.pyqFilter    && activeFilters.pyqFilter    === 'All') mergedFilters.pyqFilter    = aiResult.filters.pyqFilter;
+      if (aiResult.filters.examCategory && activeFilters.examCategory === 'All') mergedFilters.examCategory = aiResult.filters.examCategory;
+      if (aiResult.filters.ncertFilter  && activeFilters.ncertFilter  === 'All') mergedFilters.ncertFilter  = aiResult.filters.ncertFilter;
+
+      const aiYear = aiResult.filters.specificYear || null;
+      setAiInferredFilters(aiResult.filters);
+      setFilters(mergedFilters);
+      activeFilters = mergedFilters;
 
       setKeywords(displayKeywords);
+      if (displayKeywords.length === 0) { setLoading(false); return; }
 
-      // ── STEP 2: Base query using FLAT COLUMNS (matches Supabase schema) ────
-      let dbQuery = supabase
-        .from('questions')
-        .select(`
-          id,
-          question_text,
-          correct_answer,
-          subject,
-          section_group,
-          micro_topic,
-          is_pyq,
-          is_ncert,
-          is_upsc_cse,
-          is_allied,
-          is_others,
-          exam_year,
-          exam_group,
-          exam_stage,
-          test_id,
-          tests(institute, series, program_name)
-        `)
-        .or(conditions.join(','))
+      const safeKws = displayKeywords.slice(0, 12);
+      const aiConds = activeFilters.searchAcross === 'Explanations'
+        ? safeKws.map(kw => `explanation_markdown.ilike.%${kw}%`)
+        : safeKws.map(kw => `question_text.ilike.%${kw}%`);
+
+      let dbQ = supabase.from('questions').select(BASE_SELECT)
+        .or(aiConds.join(','))
         .limit(60);
-
-      // ── STEP 3: Apply flat-column filters (direct on questions table) ──────
-
-      // PYQ filter — uses is_pyq boolean column (NOT exam_info)
-      if (activeFilters.pyqFilter === 'PYQ Only') {
-        dbQuery = dbQuery.eq('is_pyq', true);
-      } else if (activeFilters.pyqFilter === 'Non-PYQ') {
-        dbQuery = dbQuery.eq('is_pyq', false);
-      }
-
-      // NCERT filter — NULL means "not tagged" → treat as Non-NCERT
-      if (activeFilters.ncertFilter === 'NCERT Only') {
-        dbQuery = dbQuery.eq('is_ncert', true);
-      } else if (activeFilters.ncertFilter === 'Non-NCERT') {
-        dbQuery = dbQuery.or('is_ncert.is.null,is_ncert.eq.false');
-      }
-
-      // Exam category — uses flat boolean columns (NOT exam_info jsonb)
-      if (activeFilters.examCategory === 'UPSC') {
-        dbQuery = dbQuery.eq('is_upsc_cse', true);
-      } else if (activeFilters.examCategory === 'Allied') {
-        dbQuery = dbQuery.eq('is_allied', true);
-      } else if (activeFilters.examCategory === 'Others') {
-        dbQuery = dbQuery.eq('is_others', true);
-      }
-
-      // Subject filter — exact string match (case-sensitive, use DB values as-is)
-      if (activeFilters.subjects !== 'All') {
-        const subs = activeFilters.subjects.split(',').filter(Boolean);
-        if (subs.length > 0) dbQuery = dbQuery.in('subject', subs);
-      }
-
-      // ── STEP 4: Tests-table filters (stage + institutes) ──────────────────
-      // IMPORTANT: Combine both into ONE subquery to avoid double .in('test_id')
-      // which would silently override the first.
-
-      const stageActive = activeFilters.stage && activeFilters.stage !== 'All';
-      const instList = activeFilters.institutes !== 'All'
-        ? activeFilters.institutes.split(',').filter(Boolean)
-        : [];
-      const instActive = instList.length > 0;
-
-      if (stageActive || instActive) {
-        let testsQ = supabase.from('tests').select('id');
-
-        // Stage: filter by tests.series using ilike (e.g. "Prelims (Official)" contains "Prelims")
-        if (stageActive) testsQ = testsQ.ilike('series', `%${activeFilters.stage}%`);
-
-        // Institute: filter by tests.institute exact match
-        if (instActive) testsQ = testsQ.in('institute', instList);
-
-        const { data: testRows } = await testsQ;
-        const testIds = (testRows || []).map((t: any) => t.id);
-
-        // If no matching tests found, force zero results (do NOT silently skip the filter)
-        dbQuery = testIds.length > 0
-          ? dbQuery.in('test_id', testIds)
-          : dbQuery.in('test_id', ['__NO_MATCH__']);
-      }
-
-      // ── STEP 5: Apply AI-inferred specific year ───────────────────────────
-      if (aiYear) {
-        if (aiYear.includes(',')) {
-          dbQuery = dbQuery.in('exam_year', aiYear.split(',').map(Number));
-        } else {
-          dbQuery = dbQuery.eq('exam_year', parseInt(aiYear, 10));
-        }
-      }
-
-      // ── STEP 6: Execute ────────────────────────────────────────────────────
-      const { data, error } = await dbQuery;
+      dbQ = await applyFilters(dbQ, activeFilters, aiYear);
+      const { data, error } = await dbQ;
       if (error) throw error;
-      // Fix #8 — dedup results using mergeQuestions
       const raw = (data || []) as unknown as SearchResult[];
       const { mergedQs } = mergeQuestions(raw as any);
       setResults(mergedQs as SearchResult[]);
 
     } catch (e: any) {
       const msg: string = e?.message || 'Unknown error';
-      if (msg.includes('No Gemini API key found')) {
-        Alert.alert('Gemini key needed', 'Go to Settings → AI Settings and paste your Gemini key.');
-      } else if (msg.includes('No Groq API key found')) {
-        Alert.alert('Groq key needed', 'Go to Settings → AI Settings and paste your Groq key.\nFree at console.groq.com');
+      if (msg.includes('No Gemini API key found') || msg.includes('No Groq API key found')) {
+        Alert.alert('AI key needed', 'Go to Settings → AI Settings and paste your key, or switch to Matching mode.');
       } else if (msg.includes('429')) {
-        Alert.alert(
-          'Quota exceeded',
-          'This key has hit its limit. Go to Settings → AI Settings and switch to another key, or switch provider.',
-        );
+        Alert.alert('Quota exceeded', 'This key hit its limit. Switch to another key or use Matching mode.');
       } else if (msg.includes('404')) {
         Alert.alert('Model not found', 'Go to Settings → AI Settings and switch model.');
       } else {
@@ -377,7 +426,7 @@ export default function AISearchTab() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [searchEngineMode, query]);
 
   // ── Sorted results ────────────────────────────────────────────────────────
 
@@ -910,7 +959,7 @@ export default function AISearchTab() {
                 <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>SUBJECTS</Text>
                 <View style={styles.chipsWrap}>
                   <TouchableOpacity
-                    onPress={() => setPendingFilters(p => ({ ...p, subjects: 'All' }))}
+                    onPress={() => setPendingFilters(p => ({ ...p, subjects: 'All', sections: 'All', microtopics: 'All' }))}
                     style={[styles.fchip, pendingFilters.subjects === 'All' && styles.fchipSel]}
                   >
                     <Text style={[styles.fchipText, { color: pendingFilters.subjects === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
@@ -923,11 +972,73 @@ export default function AISearchTab() {
                         onPress={() => {
                           const list = pendingFilters.subjects === 'All' ? [] : pendingFilters.subjects.split(',').filter(Boolean);
                           const next = isSelected ? list.filter(s => s !== sub) : [...list, sub];
-                          setPendingFilters(p => ({ ...p, subjects: next.length ? next.join(',') : 'All' }));
+                          setPendingFilters(p => ({ ...p, subjects: next.length ? next.join(',') : 'All', sections: 'All', microtopics: 'All' }));
                         }}
                         style={[styles.fchip, isSelected && styles.fchipSel]}
                       >
                         <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
+
+            {/* Section Groups — shown after subject chosen */}
+            {sectionOptions.length > 0 && (
+              <View style={styles.filterGroup}>
+                <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>SECTION / CHAPTER</Text>
+                <View style={styles.chipsWrap}>
+                  <TouchableOpacity
+                    onPress={() => setPendingFilters(p => ({ ...p, sections: 'All', microtopics: 'All' }))}
+                    style={[styles.fchip, pendingFilters.sections === 'All' && styles.fchipSel]}
+                  >
+                    <Text style={[styles.fchipText, { color: pendingFilters.sections === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
+                  </TouchableOpacity>
+                  {sectionOptions.map(sec => {
+                    const isSelected = pendingFilters.sections.split(',').includes(sec);
+                    return (
+                      <TouchableOpacity
+                        key={sec}
+                        onPress={() => {
+                          const list = pendingFilters.sections === 'All' ? [] : pendingFilters.sections.split(',').filter(Boolean);
+                          const next = isSelected ? list.filter(s => s !== sec) : [...list, sec];
+                          setPendingFilters(p => ({ ...p, sections: next.length ? next.join(',') : 'All', microtopics: 'All' }));
+                        }}
+                        style={[styles.fchip, isSelected && styles.fchipSel]}
+                      >
+                        <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sec}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
+
+            {/* Micro Topics — shown after section chosen */}
+            {microtopicOptions.length > 0 && (
+              <View style={styles.filterGroup}>
+                <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>MICRO TOPIC</Text>
+                <View style={styles.chipsWrap}>
+                  <TouchableOpacity
+                    onPress={() => setPendingFilters(p => ({ ...p, microtopics: 'All' }))}
+                    style={[styles.fchip, pendingFilters.microtopics === 'All' && styles.fchipSel]}
+                  >
+                    <Text style={[styles.fchipText, { color: pendingFilters.microtopics === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
+                  </TouchableOpacity>
+                  {microtopicOptions.map(mt => {
+                    const isSelected = pendingFilters.microtopics.split(',').includes(mt);
+                    return (
+                      <TouchableOpacity
+                        key={mt}
+                        onPress={() => {
+                          const list = pendingFilters.microtopics === 'All' ? [] : pendingFilters.microtopics.split(',').filter(Boolean);
+                          const next = isSelected ? list.filter(s => s !== mt) : [...list, mt];
+                          setPendingFilters(p => ({ ...p, microtopics: next.length ? next.join(',') : 'All' }));
+                        }}
+                        style={[styles.fchip, isSelected && styles.fchipSel]}
+                      >
+                        <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{mt}</Text>
                       </TouchableOpacity>
                     );
                   })}
@@ -951,71 +1062,111 @@ export default function AISearchTab() {
   // ── Search bar ────────────────────────────────────────────────────────────
 
   const SearchBar = (
-    <View style={styles.searchRow}>
-      <View style={[styles.searchWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <Search size={15} color={colors.textTertiary} />
-        <TextInput
-          ref={inputRef}
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Ask in plain language…"
-          placeholderTextColor={colors.textTertiary}
-          returnKeyType="search"
-          onSubmitEditing={() => runSearch(query, filters)}
-          onFocus={() => { if (searchHistory.length > 0) setShowHistory(true); }}
-          onBlur={() => setTimeout(() => setShowHistory(false), 150)}
-          testID="ai-search-input"
-          style={[styles.searchInput, { color: colors.textPrimary }]}
-        />
-        {query.length > 0 && (
+    <View>
+      {/* ── 3-Mode Engine Toggle ──────────────────────────────────────────── */}
+      <View style={{ flexDirection: 'row', gap: 6, paddingHorizontal: 14, paddingTop: 8, paddingBottom: 4 }}>
+        {([
+          { mode: 'AI' as SearchEngineMode, icon: <Brain size={12} color={searchEngineMode === 'AI' ? '#fff' : '#7c3aed'} />, label: 'AI' },
+          { mode: 'Matching' as SearchEngineMode, icon: <Zap size={12} color={searchEngineMode === 'Matching' ? '#fff' : colors.textSecondary} />, label: 'Fuzzy' },
+          { mode: 'Exact' as SearchEngineMode, icon: <Target size={12} color={searchEngineMode === 'Exact' ? '#fff' : colors.textSecondary} />, label: 'Exact' },
+        ]).map(({ mode, icon, label }) => (
           <TouchableOpacity
-            testID="ai-search-clear"
-            onPress={() => { setQuery(''); setResults([]); setHasSearched(false); setKeywords([]); }}
+            key={mode}
+            onPress={() => {
+              setSearchEngineMode(mode);
+              if (hasSearched && query.trim()) runSearch(query, filters, mode);
+            }}
+            testID={`search-mode-${mode.toLowerCase()}`}
+            style={{
+              flexDirection: 'row', alignItems: 'center', gap: 4,
+              paddingHorizontal: 10, paddingVertical: 5, borderRadius: 16,
+              backgroundColor: searchEngineMode === mode
+                ? (mode === 'AI' ? '#7c3aed' : (mode === 'Matching' ? '#0ea5e9' : '#f59e0b'))
+                : colors.surface,
+              borderWidth: 1,
+              borderColor: searchEngineMode === mode
+                ? 'transparent'
+                : colors.border,
+            }}
           >
-            <X size={14} color={colors.textTertiary} />
+            {icon}
+            <Text style={{ fontSize: 11, fontWeight: '800', color: searchEngineMode === mode ? '#fff' : colors.textSecondary }}>{label}</Text>
           </TouchableOpacity>
-        )}
-        <TouchableOpacity
-          onPress={() => runSearch(query, filters)}
-          disabled={loading || !query.trim()}
-          testID="ai-search-go"
-          style={styles.goBtn}
-        >
-          {loading
-            ? <ActivityIndicator size="small" color="#fff" />
-            : <Brain size={15} color="#fff" />
-          }
-        </TouchableOpacity>
+        ))}
+        <View style={{ flex: 1 }} />
+        <Text style={{ fontSize: 10, color: colors.textTertiary, alignSelf: 'center' }}>
+          {searchEngineMode === 'AI' ? 'Gemini understands your intent' : searchEngineMode === 'Matching' ? 'Fuzzy keyword match' : 'Exact phrase only'}
+        </Text>
       </View>
 
-      <TouchableOpacity
-        onPress={() => setShowModelSwitcher(true)}
-        style={[
-          styles.filterBtn,
-          { backgroundColor: colors.surface, borderColor: colors.border }
-        ]}
-      >
-        <Brain size={18} color="#7c3aed" />
-      </TouchableOpacity>
+      {/* ── Search input row ─────────────────────────────────────────────── */}
+      <View style={styles.searchRow}>
+        <View style={[styles.searchWrap, {
+          backgroundColor: colors.surface, borderColor:
+            searchEngineMode === 'AI' ? '#7c3aed60' : searchEngineMode === 'Matching' ? '#0ea5e940' : '#f59e0b40'
+        }]}>
+          <Search size={15} color={colors.textTertiary} />
+          <TextInput
+            ref={inputRef}
+            value={query}
+            onChangeText={setQuery}
+            placeholder={searchEngineMode === 'AI' ? "Ask in plain language…" : searchEngineMode === 'Matching' ? "Fuzzy keyword search…" : "Type exact phrase…"}
+            placeholderTextColor={colors.textTertiary}
+            returnKeyType="search"
+            onSubmitEditing={() => runSearch(query, filters)}
+            onFocus={() => { if (searchHistory.length > 0 || instituteOptions.length > 0) setShowHistory(true); }}
+            onBlur={() => setTimeout(() => setShowHistory(false), 150)}
+            testID="ai-search-input"
+            style={[styles.searchInput, { color: colors.textPrimary }]}
+          />
+          {query.length > 0 && (
+            <TouchableOpacity
+              testID="ai-search-clear"
+              onPress={() => { setQuery(''); setResults([]); setHasSearched(false); setKeywords([]); }}
+            >
+              <X size={14} color={colors.textTertiary} />
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity
+            onPress={() => runSearch(query, filters)}
+            disabled={loading || !query.trim()}
+            testID="ai-search-go"
+            style={[styles.goBtn, {
+              backgroundColor: searchEngineMode === 'AI' ? '#7c3aed' : searchEngineMode === 'Matching' ? '#0ea5e9' : '#f59e0b'
+            }]}
+          >
+            {loading
+              ? <ActivityIndicator size="small" color="#fff" />
+              : searchEngineMode === 'AI' ? <Brain size={15} color="#fff" />
+                : searchEngineMode === 'Matching' ? <Zap size={15} color="#fff" />
+                : <Target size={15} color="#fff" />
+            }
+          </TouchableOpacity>
+        </View>
 
-      <TouchableOpacity
-        onPress={openFilterPopup}
-        testID="ai-search-filter-open"
-        style={[
-          styles.filterBtn,
-          {
+        <TouchableOpacity
+          onPress={() => setShowModelSwitcher(true)}
+          style={[styles.filterBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        >
+          <Brain size={18} color="#7c3aed" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={openFilterPopup}
+          testID="ai-search-filter-open"
+          style={[styles.filterBtn, {
             backgroundColor: activeFilterCount > 0 ? '#ede9fe' : colors.surface,
             borderColor: activeFilterCount > 0 ? '#c4b5fd' : colors.border,
-          },
-        ]}
-      >
-        <SlidersHorizontal size={15} color={activeFilterCount > 0 ? '#7c3aed' : colors.textSecondary} />
-        {activeFilterCount > 0 && (
-          <View style={styles.filterBadge}>
-            <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
-          </View>
-        )}
-      </TouchableOpacity>
+          }]}
+        >
+          <SlidersHorizontal size={15} color={activeFilterCount > 0 ? '#7c3aed' : colors.textSecondary} />
+          {activeFilterCount > 0 && (
+            <View style={styles.filterBadge}>
+              <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
     </View>
   );
 

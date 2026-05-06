@@ -58,7 +58,7 @@ const normalize = (raw: any[]): Point[] => {
         id: String(it.id || `bl_${idx}`),
         type: 'point',
         text: String(it.markdown || it.text || ''),
-        color: '#f59e0b',
+        color: it.color || undefined,
         locked: true,
         source: it.source || 'quiz_explanation',
         strokes: Array.isArray(it.strokes) ? it.strokes : [],

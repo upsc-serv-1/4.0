@@ -66,7 +66,6 @@ export default function HardnoteEditor() {
       if (!md) return;
       doc.insertPoint(null, {
         text: String(md),
-        color: '#f59e0b',
         locked: true,
         source: parsed?.source || 'quiz_explanation',
       });
@@ -85,7 +84,7 @@ export default function HardnoteEditor() {
       } else {
         blocks.push({
           id: p.id,
-          type: 'highlight',
+          type: p.color ? 'highlight' : 'point',
           text: p.text,
           color: p.color,
           sourceLabel: p.source,

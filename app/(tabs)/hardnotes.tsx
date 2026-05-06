@@ -95,11 +95,19 @@ export default function Hardnotes() {
 
   const childNotes = useMemo(() => {
     if (selectedFolderId === null) {
-      // "All Notes" view: surface every leaf note the user owns
-      return nodes.filter(isLeaf);
+      // "All Notes" = only unfiled notes at root
+      return nodes.filter((n) => isLeaf(n) && !n.parent_id);
     }
     return (tree.get(selectedFolderId) || []).filter(isLeaf);
   }, [tree, nodes, selectedFolderId]);
+
+  const recentUnfiledNotes = useMemo(() => {
+    if (selectedFolderId !== null) return [];
+    return nodes
+      .filter((n) => isLeaf(n) && !n.parent_id)
+      .sort((a, b) => +new Date(b.updated_at) - +new Date(a.updated_at))
+      .slice(0, 5);
+  }, [nodes, selectedFolderId]);
 
   const filteredChildFolders = useMemo(() => {
     if (!globalQuery.trim()) return childFolders;
@@ -199,10 +207,6 @@ export default function Hardnotes() {
                 ))}
               </View>
               <Text style={[styles.folderTitle, { color: colors.textPrimary }]}>{currentFolderTitle}</Text>
-              <Text style={[styles.folderMeta, { color: colors.textTertiary }]}>
-                {filteredChildFolders.length} folder{filteredChildFolders.length === 1 ? '' : 's'} ·{' '}
-                {filteredChildNotes.length} note{filteredChildNotes.length === 1 ? '' : 's'}
-              </Text>
             </View>
 
             <TouchableOpacity
@@ -248,7 +252,7 @@ export default function Hardnotes() {
               <TextInput
                 value={globalQuery}
                 onChangeText={setGlobalQuery}
-                placeholder="Search in this folder…"
+                placeholder="Search in this folder..."
                 placeholderTextColor={colors.textTertiary}
                 autoFocus
                 style={[styles.globalSearchInput, { color: colors.textPrimary }]}
@@ -267,12 +271,45 @@ export default function Hardnotes() {
               <ActivityIndicator color={colors.primary} />
             </View>
           ) : (
-            <NotesGrid
-              folderNodes={filteredChildFolders}
-              noteNodes={filteredChildNotes}
-              notesById={notesById}
-              onOpenFolder={(id) => setSelectedFolderId(id)}
-            />
+            <>
+              {selectedFolderId === null && recentUnfiledNotes.length > 0 && (
+                <View style={styles.recentsWrap}>
+                  <Text style={[styles.recentsTitle, { color: colors.textPrimary }]}>Today's Notes</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.recentsRow}>
+                    {recentUnfiledNotes.map((n) => {
+                      const note = n.note_id ? notesById.get(n.note_id) : null;
+                      const pointCount = note?.items?.length || 0;
+                      return (
+                        <TouchableOpacity
+                          key={n.id}
+                          onPress={() =>
+                            router.push({
+                              pathname: '/hardnotes/editor',
+                              params: { noteId: n.note_id || '', nodeId: n.id, title: n.title },
+                            } as any)
+                          }
+                          style={[styles.recentCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                        >
+                          <Text style={[styles.recentCardTitle, { color: colors.textPrimary }]} numberOfLines={2}>
+                            {n.title}
+                          </Text>
+                          <Text style={[styles.recentCardSub, { color: colors.textTertiary }]}>
+                            {pointCount} {pointCount === 1 ? 'point' : 'points'}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              )}
+
+              <NotesGrid
+                folderNodes={filteredChildFolders}
+                noteNodes={filteredChildNotes}
+                notesById={notesById}
+                onOpenFolder={(id) => setSelectedFolderId(id)}
+              />
+            </>
           )}
         </View>
       </View>
@@ -392,7 +429,19 @@ const styles = StyleSheet.create({
   crumbItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   crumbTxt: { fontSize: 10, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase' },
   folderTitle: { fontSize: 24, fontWeight: '900', letterSpacing: -0.5 },
-  folderMeta: { fontSize: 11, fontWeight: '700' },
+
+  recentsWrap: { paddingTop: 12, paddingHorizontal: 20 },
+  recentsTitle: { fontSize: 12, fontWeight: '900', marginBottom: 10, letterSpacing: 0.4, textTransform: 'uppercase' },
+  recentsRow: { gap: 10, paddingRight: 20 },
+  recentCard: {
+    width: 170,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  recentCardTitle: { fontSize: 13, fontWeight: '800', lineHeight: 18 },
+  recentCardSub: { fontSize: 10, fontWeight: '700', marginTop: 4 },
 
   newBtn: { borderRadius: 12, overflow: 'hidden' },
   newBtnInner: {

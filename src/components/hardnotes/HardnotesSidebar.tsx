@@ -3,7 +3,7 @@
  * Collapsible tree built from user_note_nodes. Emits (nodeId | null) to parent
  * when the user taps a folder (or the Home root).
  */
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, TextInput, Alert } from 'react-native';
 import { ChevronRight, ChevronDown, Folder, FolderOpen, Home, Plus, Search } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
@@ -24,6 +24,7 @@ export function HardnotesSidebar({ userId, nodes, selectedFolderId, onSelectFold
   const [query, setQuery] = useState('');
   const [creating, setCreating] = useState<{ parentId: string | null } | null>(null);
   const [newName, setNewName] = useState('');
+  const committingRef = useRef(false);
 
   const tree = useMemo(() => HardnotesService.buildTree(nodes), [nodes]);
 
@@ -38,15 +39,27 @@ export function HardnotesSidebar({ userId, nodes, selectedFolderId, onSelectFold
     });
 
   const commitNewFolder = async () => {
+    if (committingRef.current) return;
+    committingRef.current = true;
+
     const title = newName.trim();
-    if (!title) return setCreating(null);
+    const parentId = creating?.parentId ?? null;
+
+    setCreating(null);
+    setNewName('');
+
+    if (!title) {
+      committingRef.current = false;
+      return;
+    }
+
     try {
-      await HardnotesService.createFolder(userId, title, creating?.parentId ?? null);
-      setCreating(null);
-      setNewName('');
+      await HardnotesService.createFolder(userId, title, parentId);
       onNodesChanged();
     } catch (e: any) {
       Alert.alert('Could not create folder', e?.message || '');
+    } finally {
+      committingRef.current = false;
     }
   };
 
@@ -64,7 +77,32 @@ export function HardnotesSidebar({ userId, nodes, selectedFolderId, onSelectFold
     if (!visible) return null;
 
     return (
-      <View key={n.id}>
+      <View key={n.id} style={styles.treeNodeWrap}>
+        {depth > 0 && (
+          <View
+            pointerEvents="none"
+            style={[
+              styles.treeVertical,
+              {
+                left: 12 + (depth - 1) * 16 + 7,
+                backgroundColor: colors.border,
+              },
+            ]}
+          />
+        )}
+        {depth > 0 && (
+          <View
+            pointerEvents="none"
+            style={[
+              styles.treeHorizontal,
+              {
+                left: 12 + (depth - 1) * 16 + 7,
+                backgroundColor: colors.border,
+              },
+            ]}
+          />
+        )}
+
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => {
@@ -113,15 +151,21 @@ export function HardnotesSidebar({ userId, nodes, selectedFolderId, onSelectFold
 
         {isOpen && kids.map((k) => renderFolder(k, depth + 1))}
         {isOpen && creating?.parentId === n.id && (
-          <View style={[styles.newFolderRow, { paddingLeft: 12 + (depth + 1) * 16 }]}>
+          <View style={[styles.newFolderRow, { paddingLeft: 12 + (depth + 1) * 16 }] }>
             <TextInput
               value={newName}
               onChangeText={setNewName}
               placeholder="Folder name"
               placeholderTextColor={colors.textTertiary}
               autoFocus
-              onSubmitEditing={commitNewFolder}
-              onBlur={commitNewFolder}
+              onSubmitEditing={() => {
+                void commitNewFolder();
+              }}
+              onBlur={() => {
+                setTimeout(() => {
+                  void commitNewFolder();
+                }, 150);
+              }}
               style={[styles.newFolderInput, { color: colors.textPrimary, borderColor: colors.border }]}
               data-testid="hn-sidebar-new-folder-input"
             />
@@ -134,13 +178,13 @@ export function HardnotesSidebar({ userId, nodes, selectedFolderId, onSelectFold
   const rootFolders = (tree.get(null) || []).filter((n) => isFolder(n));
 
   return (
-    <View style={[styles.container, { width, backgroundColor: colors.surface, borderRightColor: colors.border }]}>
+    <View style={[styles.container, { width, backgroundColor: colors.surface, borderRightColor: colors.border }]}> 
       <View style={styles.header}>
         <Text style={[styles.brand, { color: colors.textPrimary }]}>Hardnotes</Text>
         <Text style={[styles.brandSub, { color: colors.textTertiary }]}>UPSC Study Library</Text>
       </View>
 
-      <View style={[styles.searchBox, { backgroundColor: colors.bg, borderColor: colors.border }]}>
+      <View style={[styles.searchBox, { backgroundColor: colors.bg, borderColor: colors.border }]}> 
         <Search size={14} color={colors.textTertiary} />
         <TextInput
           value={query}
@@ -178,15 +222,21 @@ export function HardnotesSidebar({ userId, nodes, selectedFolderId, onSelectFold
         {rootFolders.map((n) => renderFolder(n, 0))}
 
         {creating?.parentId === null && (
-          <View style={[styles.newFolderRow, { paddingLeft: 24 }]}>
+          <View style={[styles.newFolderRow, { paddingLeft: 24 }]}> 
             <TextInput
               value={newName}
               onChangeText={setNewName}
               placeholder="Folder name"
               placeholderTextColor={colors.textTertiary}
               autoFocus
-              onSubmitEditing={commitNewFolder}
-              onBlur={commitNewFolder}
+              onSubmitEditing={() => {
+                void commitNewFolder();
+              }}
+              onBlur={() => {
+                setTimeout(() => {
+                  void commitNewFolder();
+                }, 150);
+              }}
               style={[styles.newFolderInput, { color: colors.textPrimary, borderColor: colors.border }]}
               data-testid="hn-sidebar-new-root-input"
             />
@@ -236,6 +286,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   searchInput: { flex: 1, fontSize: 13, fontWeight: '600' },
+  treeNodeWrap: { position: 'relative' },
+  treeVertical: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: 1,
+  },
+  treeHorizontal: {
+    position: 'absolute',
+    top: '50%',
+    width: 9,
+    height: 1,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

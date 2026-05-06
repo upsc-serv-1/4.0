@@ -33,11 +33,13 @@ export interface HardnoteDoc {
   title: string;
   subject: string | null;
   points: Point[];
+  canUndoStroke: boolean;
   setTitle: (t: string) => void;
   updatePoint: (id: string, patch: Partial<Point>) => void;
   addStroke: (pointId: string, stroke: Stroke) => void;
   removeStrokes: (pointId: string, strokeIds: string[]) => void;
   clearStrokes: (pointId: string) => void;
+  undoStroke: () => void;
   insertPoint: (afterId: string | null, draft?: Partial<Point>) => string;
   removePoint: (id: string) => void;
   reorderPoints: (ids: string[]) => void;
@@ -94,12 +96,18 @@ const mkPoint = (partial: Partial<Point>): Point => ({
   ...partial,
 });
 
+type StrokeHistoryEntry = {
+  pointId: string;
+  strokeId: string;
+};
+
 export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [title, setTitleState] = useState('');
   const [subject, setSubject] = useState<string | null>(null);
   const [points, setPoints] = useState<Point[]>([]);
+  const [strokeHistory, setStrokeHistory] = useState<StrokeHistoryEntry[]>([]);
   const saveTimer = useRef<any>(null);
   const inFlight = useRef<Promise<void> | null>(null);
   const mounted = useRef(true);
@@ -143,6 +151,7 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
       ];
     }
     setPoints(pts);
+    setStrokeHistory([]);
     setLoading(false);
   }, [noteId]);
 
@@ -206,6 +215,7 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
       scheduleSave(next);
       return next;
     });
+    setStrokeHistory((prev) => [...prev, { pointId, strokeId: stroke.id }]);
   }, [scheduleSave]);
 
   const removeStrokes = useCallback((pointId: string, strokeIds: string[]) => {
@@ -219,6 +229,7 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
       scheduleSave(next);
       return next;
     });
+    setStrokeHistory((prev) => prev.filter((h) => !(h.pointId === pointId && idSet.has(h.strokeId))));
   }, [scheduleSave]);
 
   const clearStrokes = useCallback((pointId: string) => {
@@ -226,6 +237,36 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
       const next = prev.map((p) => (p.id === pointId ? { ...p, strokes: [] } : p));
       scheduleSave(next);
       return next;
+    });
+    setStrokeHistory((prev) => prev.filter((h) => h.pointId !== pointId));
+  }, [scheduleSave]);
+
+  const undoStroke = useCallback(() => {
+    setStrokeHistory((prevHistory) => {
+      if (prevHistory.length === 0) return prevHistory;
+      const history = [...prevHistory];
+
+      while (history.length > 0) {
+        const last = history.pop()!;
+        let removed = false;
+
+        setPoints((prevPoints) => {
+          const next = prevPoints.map((p) => {
+            if (p.id !== last.pointId) return p;
+            const existing = p.strokes || [];
+            if (!existing.some((s) => s.id === last.strokeId)) return p;
+            removed = true;
+            return { ...p, strokes: existing.filter((s) => s.id !== last.strokeId) };
+          });
+
+          if (removed) scheduleSave(next);
+          return next;
+        });
+
+        if (removed) return history;
+      }
+
+      return [];
     });
   }, [scheduleSave]);
 
@@ -251,6 +292,7 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
       scheduleSave(next);
       return next;
     });
+    setStrokeHistory((prev) => prev.filter((h) => h.pointId !== id));
   }, [scheduleSave]);
 
   const reorderPoints = useCallback((ids: string[]) => {
@@ -276,8 +318,23 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
   }, [points, scheduleSave]);
 
   return {
-    loading, saving, title, subject, points,
-    setTitle, updatePoint, addStroke, removeStrokes, clearStrokes,
-    insertPoint, removePoint, reorderPoints, toggleLock, refresh, flushSave,
+    loading,
+    saving,
+    title,
+    subject,
+    points,
+    canUndoStroke: strokeHistory.length > 0,
+    setTitle,
+    updatePoint,
+    addStroke,
+    removeStrokes,
+    clearStrokes,
+    undoStroke,
+    insertPoint,
+    removePoint,
+    reorderPoints,
+    toggleLock,
+    refresh,
+    flushSave,
   };
 }

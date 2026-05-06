@@ -289,6 +289,8 @@ export default function HardnoteEditor() {
               onToolChange={setInkTool}
               onColorChange={setInkColor}
               onWidthChange={setInkWidth}
+              onUndo={doc.undoStroke}
+              canUndo={doc.canUndoStroke}
               onTextMode={() => setTextModeActive((prev) => !prev)}
               isTextMode={textModeActive}
             />

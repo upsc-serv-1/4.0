@@ -101,6 +101,8 @@ export default function Hardnotes() {
     return (tree.get(selectedFolderId) || []).filter(isLeaf);
   }, [tree, nodes, selectedFolderId]);
 
+  const allFolders = useMemo(() => nodes.filter(isFolder), [nodes]);
+
   const recentUnfiledNotes = useMemo(() => {
     if (selectedFolderId !== null) return [];
     return nodes
@@ -307,7 +309,9 @@ export default function Hardnotes() {
                 folderNodes={filteredChildFolders}
                 noteNodes={filteredChildNotes}
                 notesById={notesById}
+                allFolders={allFolders}
                 onOpenFolder={(id) => setSelectedFolderId(id)}
+                onDataChanged={refresh}
               />
             </>
           )}

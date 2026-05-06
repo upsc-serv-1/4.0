@@ -28,7 +28,7 @@ import { Canvas, Path } from '@shopify/react-native-skia';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 import {
-  Pencil, Check, Lock, Unlock, Trash2, Tag as TagIcon, GripVertical,
+  Pencil, Check, Lock, Unlock, Trash2, Tag as TagIcon, GripVertical, Plus,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { Point } from './useHardnoteDoc';
@@ -50,6 +50,7 @@ interface Props {
   onRequestHighlight?: (selection: { start: number; end: number }) => void;
   onToggleLock: () => void;
   onOpenTagSheet?: () => void;
+  onAddBelow?: () => void;
   textModeActive?: boolean;
 }
 
@@ -66,6 +67,7 @@ const EDIT_EXPAND_MULT = 1.15;
 export function InkBulletCard({
   point, lens, contentWidth, inkTool, inkColor, inkWidth,
   onUpdate, onAddStroke, onRemoveStrokes, onDelete, onRequestHighlight, onToggleLock, onOpenTagSheet,
+  onAddBelow,
   textModeActive,
 }: Props) {
   const { colors } = useTheme();
@@ -74,10 +76,13 @@ export function InkBulletCard({
   const [cardSize, setCardSize] = useState({ w: 0, h: MIN_CARD_HEIGHT });
   const [currentStroke, setCurrentStroke] = useState<StrokePoint[]>([]);
   const [selection, setSelection] = useState({ start: 0, end: 0 });
+  const [zoomScale, setZoomScale] = useState(1);
   const pointsRef = useRef<StrokePoint[]>([]);
   const strokeIdRef = useRef('');
   const lastSampleRef = useRef(0);
   const eraseHitsRef = useRef<Set<string>>(new Set());
+  const zoomRef = useRef(1);
+  const pinchBaseRef = useRef(1);
 
   const isHeading = point.type === 'heading';
   const isCheck = point.type === 'checklist';
@@ -116,21 +121,28 @@ export function InkBulletCard({
     wrapSelection(`<mark style="background:${color}">`, '</mark>');
 
   // ===== skia drawing =====
+  const toCanvasCoords = (x: number, y: number) => {
+    const scale = Math.max(1, zoomRef.current);
+    return { x: x / scale, y: y / scale };
+  };
+
   const startStroke = (x: number, y: number) => {
+    const c = toCanvasCoords(x, y);
     if (inkTool === 'eraser') {
       eraseHitsRef.current = new Set();
-      hitErase(x, y);
+      hitErase(c.x, c.y);
       return;
     }
     strokeIdRef.current = `st_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-    const pt: StrokePoint = { x, y, p: 0.5, t: 0 };
+    const pt: StrokePoint = { x: c.x, y: c.y, p: 0.5, t: 0 };
     pointsRef.current = [pt];
     setCurrentStroke([pt]);
     lastSampleRef.current = Date.now();
   };
   const addStrokePoint = (x: number, y: number, velocity: number) => {
+    const c = toCanvasCoords(x, y);
     if (inkTool === 'eraser') {
-      hitErase(x, y);
+      hitErase(c.x, c.y);
       return;
     }
     const now = Date.now();
@@ -138,7 +150,7 @@ export function InkBulletCard({
     lastSampleRef.current = now;
     const v = Math.min(1, velocity / 2500);
     const p = Math.max(0.25, 1 - v * 0.6);
-    pointsRef.current.push({ x, y, p, t: 0 });
+    pointsRef.current.push({ x: c.x, y: c.y, p, t: 0 });
     setCurrentStroke([...pointsRef.current]);
   };
   const endStroke = () => {
@@ -175,6 +187,16 @@ export function InkBulletCard({
     }
   };
 
+  const beginPinch = () => {
+    pinchBaseRef.current = zoomRef.current;
+  };
+
+  const updatePinch = (scale: number) => {
+    const next = Math.max(1, Math.min(2.8, pinchBaseRef.current * scale));
+    zoomRef.current = next;
+    setZoomScale(next);
+  };
+
   const pan = useMemo(
     () =>
       Gesture.Pan()
@@ -196,6 +218,23 @@ export function InkBulletCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [inkTool, inkColor, inkWidth, strokes],
   );
+
+  const pinch = useMemo(
+    () =>
+      Gesture.Pinch()
+        .onBegin(() => {
+          'worklet';
+          runOnJS(beginPinch)();
+        })
+        .onUpdate((e) => {
+          'worklet';
+          runOnJS(updatePinch)(e.scale);
+        }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  const inkGesture = useMemo(() => Gesture.Simultaneous(pan, pinch), [pan, pinch]);
 
   const doubleTap = useMemo(
     () =>
@@ -377,7 +416,16 @@ export function InkBulletCard({
 
       {/* Skia overlay: visible in all lenses (read-only in glance/focus) */}
       {(strokes.length > 0 || (lens === 'ink' && currentStroke.length > 0)) && (
-        <View pointerEvents="none" style={[styles.canvasOverlay, { height: cardSize.h }]}>
+        <View
+          pointerEvents="none"
+          style={[
+            styles.canvasOverlay,
+            {
+              height: cardSize.h,
+              transform: [{ scale: lens === 'ink' ? zoomScale : 1 }],
+            },
+          ]}
+        >
           <Canvas style={StyleSheet.absoluteFillObject}>
             {/* Hide erased strokes in-flight */}
             {strokes.map((s) => {
@@ -418,8 +466,17 @@ export function InkBulletCard({
 
       {/* Ink gesture surface (only when lens = ink AND not currently text-editing) */}
       {lens === 'ink' && !editing && !textModeActive && (
-        <GestureDetector gesture={pan}>
-          <View style={[styles.inkSurface, { height: cardSize.h }]} data-testid={`ink-surface-${point.id}`} />
+        <GestureDetector gesture={inkGesture}>
+          <View
+            style={[
+              styles.inkSurface,
+              {
+                height: cardSize.h,
+                transform: [{ scale: zoomScale }],
+              },
+            ]}
+            data-testid={`ink-surface-${point.id}`}
+          />
         </GestureDetector>
       )}
 
@@ -441,8 +498,24 @@ export function InkBulletCard({
             <Trash2 size={13} color="#ef4444" />
           </TouchableOpacity>
           <View style={{ flex: 1 }} />
+          {lens === 'ink' && zoomScale > 1.01 && (
+            <View style={styles.zoomChip}>
+              <Text style={styles.zoomChipText}>{Math.round(zoomScale * 100)}%</Text>
+            </View>
+          )}
           <View style={styles.grip}><GripVertical size={14} color={colors.textTertiary} /></View>
         </View>
+      )}
+
+      {lens === 'glance' && !editing && onAddBelow && (
+        <TouchableOpacity
+          onPress={onAddBelow}
+          style={[styles.addBelowBtn, { borderColor: colors.border, backgroundColor: colors.surface }]}
+          data-testid={`ink-card-add-below-${point.id}`}
+        >
+          <Plus size={12} color={colors.textSecondary} />
+          <Text style={[styles.addBelowText, { color: colors.textSecondary }]}>Add below</Text>
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -520,8 +593,8 @@ const styles = StyleSheet.create({
   tagChip: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 5 },
   tagText: { fontSize: 9, fontWeight: '900', letterSpacing: 0.3 },
 
-  canvasOverlay: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 5 },
-  inkSurface: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 6, backgroundColor: 'transparent' },
+  canvasOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 5 },
+  inkSurface: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 6, backgroundColor: 'transparent' },
 
   actionsRow: {
     flexDirection: 'row',
@@ -536,5 +609,37 @@ const styles = StyleSheet.create({
     width: 26, height: 26, borderRadius: 6,
     alignItems: 'center', justifyContent: 'center',
   },
+  zoomChip: {
+    minWidth: 44,
+    height: 20,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#0f172a12',
+    paddingHorizontal: 8,
+    marginRight: 2,
+  },
+  zoomChipText: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: '#0f172a',
+    letterSpacing: 0.2,
+  },
   grip: { padding: 4 },
+  addBelowBtn: {
+    marginTop: 8,
+    alignSelf: 'center',
+    minHeight: 28,
+    borderRadius: 999,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  addBelowText: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.1,
+  },
 });

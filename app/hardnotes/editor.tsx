@@ -16,6 +16,11 @@ import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput,
   ActivityIndicator, KeyboardAvoidingView, Platform, useWindowDimensions, Alert,
 } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -54,6 +59,28 @@ export default function HardnoteEditor() {
   const [inkColor, setInkColor] = useState<string>('#0f172a');
   const [inkWidth, setInkWidth] = useState<number>(2);
   const [textModeActive, setTextModeActive] = useState(false);
+
+  const toolbarX = useSharedValue(0);
+  const toolbarY = useSharedValue(0);
+  const toolbarStartX = useSharedValue(0);
+  const toolbarStartY = useSharedValue(0);
+
+  const toolbarDragGesture = useMemo(
+    () => Gesture.Pan()
+      .onBegin(() => {
+        toolbarStartX.value = toolbarX.value;
+        toolbarStartY.value = toolbarY.value;
+      })
+      .onUpdate((e) => {
+        toolbarX.value = toolbarStartX.value + e.translationX;
+        toolbarY.value = toolbarStartY.value + e.translationY;
+      }),
+    [toolbarStartX, toolbarStartY, toolbarX, toolbarY],
+  );
+
+  const toolbarAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: toolbarX.value }, { translateY: toolbarY.value }],
+  }));
 
   const [exportOpen, setExportOpen] = useState(false);
   const [includeHighlights, setIncludeHighlights] = useState(true);
@@ -272,6 +299,7 @@ export default function HardnoteEditor() {
                     )
                   }
                   onToggleLock={() => doc.toggleLock(p.id)}
+                  onAddBelow={() => doc.insertPoint(p.id, { type: 'point', text: '' })}
                   textModeActive={lens === 'ink' && textModeActive}
                 />
               ))
@@ -281,20 +309,22 @@ export default function HardnoteEditor() {
 
         {/* Floating ink toolbar */}
         {lens === 'ink' && (
-          <View style={styles.inkDock} pointerEvents="box-none">
-            <InkToolbar
-              tool={inkTool}
-              color={inkColor}
-              width={inkWidth}
-              onToolChange={setInkTool}
-              onColorChange={setInkColor}
-              onWidthChange={setInkWidth}
-              onUndo={doc.undoStroke}
-              canUndo={doc.canUndoStroke}
-              onTextMode={() => setTextModeActive((prev) => !prev)}
-              isTextMode={textModeActive}
-            />
-          </View>
+          <GestureDetector gesture={toolbarDragGesture}>
+            <Animated.View style={[styles.inkDock, toolbarAnimatedStyle]} pointerEvents="box-none">
+              <InkToolbar
+                tool={inkTool}
+                color={inkColor}
+                width={inkWidth}
+                onToolChange={setInkTool}
+                onColorChange={setInkColor}
+                onWidthChange={setInkWidth}
+                onUndo={doc.undoStroke}
+                canUndo={doc.canUndoStroke}
+                onTextMode={() => setTextModeActive((prev) => !prev)}
+                isTextMode={textModeActive}
+              />
+            </Animated.View>
+          </GestureDetector>
         )}
       </KeyboardAvoidingView>
 

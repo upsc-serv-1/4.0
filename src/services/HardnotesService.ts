@@ -157,6 +157,65 @@ export const HardnotesService = {
       .eq('id', node.id);
   },
 
+  async moveNode(nodeId: string, parentId: string | null): Promise<void> {
+    const { error } = await supabase
+      .from('user_note_nodes')
+      .update({ parent_id: parentId, updated_at: new Date().toISOString() })
+      .eq('id', nodeId);
+    if (error) throw error;
+  },
+
+  async duplicateNote(node: HardNode): Promise<{ node: HardNode; note: HardNote }> {
+    if (!isLeaf(node) || !node.note_id) {
+      throw new Error('Only note items can be duplicated');
+    }
+
+    const original = await this.getNote(node.note_id);
+    if (!original) throw new Error('Original note not found');
+
+    const clonedTitle = `${node.title} (Copy)`;
+    const now = new Date().toISOString();
+
+    const { data: dupNote, error: dupNoteErr } = await supabase
+      .from('user_notes')
+      .insert({
+        user_id: node.user_id,
+        subject: original.subject,
+        title: clonedTitle,
+        items: Array.isArray(original.items)
+          ? JSON.parse(JSON.stringify(original.items))
+          : [],
+        highlights: Array.isArray(original.highlights)
+          ? JSON.parse(JSON.stringify(original.highlights))
+          : [],
+        content: original.content,
+        content_html: original.content_html,
+        updated_at: now,
+      })
+      .select()
+      .single();
+
+    if (dupNoteErr || !dupNote) throw dupNoteErr || new Error('Could not clone note');
+
+    const { data: dupNode, error: dupNodeErr } = await supabase
+      .from('user_note_nodes')
+      .insert({
+        user_id: node.user_id,
+        parent_id: node.parent_id,
+        type: 'note',
+        title: clonedTitle,
+        note_id: dupNote.id,
+        is_pinned: false,
+        updated_at: now,
+      })
+      .select()
+      .single();
+
+    if (dupNodeErr || !dupNode) throw dupNodeErr || new Error('Could not clone note node');
+
+    return { node: dupNode as HardNode, note: dupNote as HardNote };
+  },
+
   /** Upsert the entire items array + highlights for a note (debounced saves from editor). */
   async saveNoteContent(
     noteId: string,

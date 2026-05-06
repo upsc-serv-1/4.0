@@ -37,9 +37,11 @@ interface Props {
   onToggleGlance?: () => void;
   /** Optional style override for the row container */
   style?: any;
+  /** Highlight the row (e.g. for selection in split view) */
+  isHighlighted?: boolean;
 }
 
-export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpanded = false, onToggleGlance, style }: Props) {
+export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpanded = false, onToggleGlance, style, isHighlighted }: Props) {
   const { colors } = useTheme();
   const swipeableRef = useRef<Swipeable>(null);
 
@@ -159,6 +161,7 @@ export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpa
           styles.row,
           { backgroundColor: colors.bg, borderBottomColor: colors.border + 'A0' },
           containerStyle,
+          isHighlighted && { borderColor: colors.primary, borderWidth: 1.5, shadowColor: colors.primary, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
           style,
         ]}
         data-testid={`vault-row-${node.id}`}

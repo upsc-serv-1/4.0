@@ -38,6 +38,7 @@ import { useNoteTagCatalog } from '../../src/hooks/useNoteTagCatalog';
 import { normalizeTag } from '../../src/utils/tagUtils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const IS_WIDE = SCREEN_WIDTH >= 768;
 
 type RawNode = {
   id: string; user_id: string; parent_id: string | null;
@@ -61,6 +62,7 @@ export default function NotesIndex() {
   const [currentFolder, setCurrentFolder] = useState<NoteNode | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [glanceOpen, setGlanceOpen] = useState<Set<string>>(new Set());
+  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [activeChip, setActiveChip] = useState<string>(ALL_TAG);
   const [hubLayout, setHubLayout] = useState<'grid' | 'list'>('grid');
 
@@ -135,6 +137,11 @@ export default function NotesIndex() {
       setCurrentFolder(null);
     }
   }, [tree]);
+
+  // Reset selectedNoteId when folder changes
+  useEffect(() => {
+    setSelectedNoteId(null);
+  }, [currentFolder]);
 
   const topLevelFolders = useMemo(() => tree.filter((n) => n.type === 'folder'), [tree]);
   const topLevelOrphans = useMemo(() => tree.filter((n) => n.type !== 'folder'), [tree]);
@@ -495,183 +502,299 @@ export default function NotesIndex() {
   return (
     <PageWrapper>
       <View style={[styles.container, { backgroundColor: colors.bg }]}>
-        <View style={[styles.header, { borderBottomColor: colors.border }]}>
-          <View style={styles.headerTop}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-              <TouchableOpacity
-                onPress={() => currentFolder ? setCurrentFolder(null) : router.back()}
-                style={styles.iconBtn}
-                data-testid="vault-back"
-              >
-                <ChevronLeft size={28} color={colors.primary} />
-              </TouchableOpacity>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.eyebrow, { color: colors.primary }]}>KNOWLEDGE VAULT</Text>
-                <Text style={[styles.headerTitle, { color: colors.textPrimary }]} numberOfLines={1}>
-                  {currentFolder ? currentFolder.title : 'My Vault'}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.headerBtns}>
-              <TouchableOpacity
-                onPress={() => { setCreateParentId(currentFolder?.id ?? null); setAddMenuOpen(true); }}
-                style={styles.iconBtn}
-                data-testid="vault-add-button"
-              >
-                <Plus size={22} color={colors.textPrimary} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setSearchVisible((v) => !v)} style={styles.iconBtn} data-testid="vault-search-toggle">
-                <SearchIcon size={22} color={colors.textPrimary} />
-              </TouchableOpacity>
-              <ThemeSwitcher />
-            </View>
-          </View>
-          {searchVisible && (
-            <View style={[styles.searchBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <SearchIcon size={16} color={colors.textTertiary} />
-              <TextInput
-                value={search}
-                onChangeText={setSearch}
-                placeholder="Search…"
-                placeholderTextColor={colors.textTertiary}
-                style={[styles.searchInput, { color: colors.textPrimary }]}
-                autoFocus
-                data-testid="vault-search-input"
-              />
-              <TouchableOpacity onPress={() => { setSearch(''); setSearchVisible(false); Keyboard.dismiss(); }}>
-                <X size={16} color={colors.textTertiary} />
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-
-        {/* Stats */}
-        <View style={styles.topActionArea}>
-          <View style={styles.statsBar}>
-            <View style={[styles.statBox, { backgroundColor: '#fef3c712' }]}>
-              <View style={[styles.statIconBox, { backgroundColor: '#fef3c712' }]}>
-                <Folder size={15} color="#f59e0b" />
-              </View>
-              <View>
-                <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.folders}</Text>
-                <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Folders</Text>
-              </View>
-            </View>
-            <View style={[styles.statBox, { backgroundColor: '#dcfce712' }]}>
-              <View style={[styles.statIconBox, { backgroundColor: '#dcfce712' }]}>
-                <BookOpen size={15} color="#10b981" />
-              </View>
-              <View>
-                <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.notebooks}</Text>
-                <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Notebooks</Text>
-              </View>
-            </View>
-            <View style={[styles.statBox, { backgroundColor: '#e0f2fe12' }]}>
-              <View style={[styles.statIconBox, { backgroundColor: '#e0f2fe12' }]}>
-                <FileText size={15} color="#0ea5e9" />
-              </View>
-              <View>
-                <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.notes}</Text>
-                <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Notes</Text>
-              </View>
-            </View>
-            <View style={[styles.statBox, { backgroundColor: '#f5f0ff12' }]}>
-              <View style={[styles.statIconBox, { backgroundColor: '#f5f0ff12' }]}>
-                <Sparkles size={15} color="#7c5fe8" />
-              </View>
-              <View>
-                <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.glances}</Text>
-                <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Glances</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        {/* Semantic chip row — only shown when inside a folder */}
-        {!showSubjectHub && (
-          <SemanticChipRow
-            tags={catalogTags}
-            selected={activeChip}
-            onChange={setActiveChip}
-            hint={activeChip !== ALL_TAG ? `Streaming "${activeChip}" across "${currentFolder?.title}"` : undefined}
-          />
-        )}
-
-        {exportPreparing && (
-          <View style={styles.preparingBar}>
-            <ActivityIndicator size="small" color={colors.primary} />
-            <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: '700', marginLeft: 8 }}>
-              Preparing export…
-            </Text>
-          </View>
-        )}
-
-        {loading && !refreshing ? (
-          <View style={styles.center}>
-            <ActivityIndicator color={colors.primary} />
-          </View>
-        ) : (
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 120 }}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
-          >
-            {showSubjectHub ? (
-              // ROOT — Subject Hub Grid
-              <>
-                <View style={styles.hubHeaderRow}>
-                  <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Your Subjects</Text>
-                  <View style={[styles.viewToggle, { backgroundColor: colors.surfaceStrong }]}>
-                    <TouchableOpacity
-                      onPress={() => setHubLayout('grid')}
-                      style={[
-                        styles.viewToggleBtn,
-                        hubLayout === 'grid' && { backgroundColor: colors.surface }
-                      ]}
-                      data-testid="vault-hub-grid"
-                    >
-                      <LayoutGrid size={11} color={hubLayout === 'grid' ? colors.textPrimary : colors.textTertiary} />
-                      <Text style={[
-                        styles.viewToggleText,
-                        { color: hubLayout === 'grid' ? colors.textPrimary : colors.textTertiary }
-                      ]}>Grid</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => setHubLayout('list')}
-                      style={[
-                        styles.viewToggleBtn,
-                        hubLayout === 'list' && { backgroundColor: colors.surface }
-                      ]}
-                      data-testid="vault-hub-list"
-                    >
-                      <ListIcon size={11} color={hubLayout === 'list' ? colors.textPrimary : colors.textTertiary} />
-                      <Text style={[
-                        styles.viewToggleText,
-                        { color: hubLayout === 'list' ? colors.textPrimary : colors.textTertiary }
-                      ]}>List</Text>
-                    </TouchableOpacity>
+        {!showSubjectHub && IS_WIDE ? (
+          <View style={{ flexDirection: 'row', flex: 1 }}>
+            {/* LEFT COLUMN: Sidebar */}
+            <View style={[styles.sidebar, { backgroundColor: colors.surface, borderRightColor: colors.border }]}>
+              <View style={[styles.sidebarHeader, { borderBottomColor: colors.border }]}>
+                <View style={styles.headerTop}>
+                  <TouchableOpacity onPress={() => setCurrentFolder(null)} style={styles.iconBtn}>
+                    <ChevronLeft size={24} color={colors.primary} />
+                  </TouchableOpacity>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.eyebrow, { color: colors.primary, fontSize: 10 }]}>KNOWLEDGE VAULT</Text>
+                    <Text style={[styles.headerTitle, { color: colors.textPrimary, fontSize: 16 }]} numberOfLines={1}>
+                      {currentFolder?.title}
+                    </Text>
                   </View>
                 </View>
+              </View>
 
-                {hubLayout === 'grid' ? (
-                  <SubjectHubGrid
-                    folders={topLevelFolders}
-                    onOpen={(n) => setCurrentFolder(n)}
-                    onAction={onHubAction}
+              <SemanticChipRow
+                tags={catalogTags}
+                selected={activeChip}
+                onChange={setActiveChip}
+              />
+
+              <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
+                <View style={{ paddingHorizontal: 4 }}>
+                  {displayRows.map((item) => (
+                    <NoteRow
+                      key={item.id}
+                      node={item}
+                      expanded={expanded.has(item.id)}
+                      onToggle={() => toggleExpand(item.id)}
+                      onOpen={() => {
+                        if ((item.type === 'note' || item.type === 'notebook') && item.note_id) {
+                          setSelectedNoteId(item.note_id);
+                        } else {
+                          openNode(item);
+                        }
+                      }}
+                      onAction={(action) => onAction(item, action)}
+                      isHighlighted={selectedNoteId === item.note_id}
+                    />
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+
+            {/* RIGHT COLUMN: Content */}
+            <View style={[styles.splitContent, { backgroundColor: colors.bg }]}>
+              {selectedNoteId ? (
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
+                  <GlancePanel
+                    noteId={selectedNoteId}
+                    contentWidth={SCREEN_WIDTH - 260 - 40}
+                    selectedTag={activeChip}
+                    onPlay={() => {
+                      const node = allNodes.find(n => n.note_id === selectedNoteId);
+                      if (node) playNode(node as any);
+                    }}
+                    onOpenEdit={() => {
+                      const node = allNodes.find(n => n.note_id === selectedNoteId);
+                      if (node) openNode(node as any);
+                    }}
                   />
-                ) : (
-                  <View style={{ paddingHorizontal: 4 }}>
-                    {topLevelFolders.map((item) => (
-                      <NoteRow
-                        key={item.id}
-                        node={item}
-                        expanded={expanded.has(item.id)}
-                        onToggle={() => toggleExpand(item.id)}
-                        onOpen={() => setCurrentFolder(item)}
-                        onAction={(action) => onAction(item, action)}
+                </ScrollView>
+              ) : (
+                <View style={styles.center}>
+                  <Text style={{ color: colors.textTertiary, fontSize: 16 }}>Select a note to preview glances</Text>
+                </View>
+              )}
+            </View>
+          </View>
+        ) : (
+          <>
+            <View style={[styles.header, { borderBottomColor: colors.border }]}>
+              <View style={styles.headerTop}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                  <TouchableOpacity
+                    onPress={() => currentFolder ? setCurrentFolder(null) : router.back()}
+                    style={styles.iconBtn}
+                    data-testid="vault-back"
+                  >
+                    <ChevronLeft size={28} color={colors.primary} />
+                  </TouchableOpacity>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.eyebrow, { color: colors.primary }]}>KNOWLEDGE VAULT</Text>
+                    <Text style={[styles.headerTitle, { color: colors.textPrimary }]} numberOfLines={1}>
+                      {currentFolder ? currentFolder.title : 'My Vault'}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.headerBtns}>
+                  <TouchableOpacity
+                    onPress={() => { setCreateParentId(currentFolder?.id ?? null); setAddMenuOpen(true); }}
+                    style={styles.iconBtn}
+                    data-testid="vault-add-button"
+                  >
+                    <Plus size={22} color={colors.textPrimary} />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setSearchVisible((v) => !v)} style={styles.iconBtn} data-testid="vault-search-toggle">
+                    <SearchIcon size={22} color={colors.textPrimary} />
+                  </TouchableOpacity>
+                  <ThemeSwitcher />
+                </View>
+              </View>
+              {searchVisible && (
+                <View style={[styles.searchBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                  <SearchIcon size={16} color={colors.textTertiary} />
+                  <TextInput
+                    value={search}
+                    onChangeText={setSearch}
+                    placeholder="Search…"
+                    placeholderTextColor={colors.textTertiary}
+                    style={[styles.searchInput, { color: colors.textPrimary }]}
+                    autoFocus
+                    data-testid="vault-search-input"
+                  />
+                  <TouchableOpacity onPress={() => { setSearch(''); setSearchVisible(false); Keyboard.dismiss(); }}>
+                    <X size={16} color={colors.textTertiary} />
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+
+            {/* Stats */}
+            <View style={styles.topActionArea}>
+              <View style={styles.statsBar}>
+                <View style={[styles.statBox, { backgroundColor: '#fef3c712' }]}>
+                  <View style={[styles.statIconBox, { backgroundColor: '#fef3c712' }]}>
+                    <Folder size={15} color="#f59e0b" />
+                  </View>
+                  <View>
+                    <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.folders}</Text>
+                    <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Folders</Text>
+                  </View>
+                </View>
+                <View style={[styles.statBox, { backgroundColor: '#dcfce712' }]}>
+                  <View style={[styles.statIconBox, { backgroundColor: '#dcfce712' }]}>
+                    <BookOpen size={15} color="#10b981" />
+                  </View>
+                  <View>
+                    <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.notebooks}</Text>
+                    <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Notebooks</Text>
+                  </View>
+                </View>
+                <View style={[styles.statBox, { backgroundColor: '#e0f2fe12' }]}>
+                  <View style={[styles.statIconBox, { backgroundColor: '#e0f2fe12' }]}>
+                    <FileText size={15} color="#0ea5e9" />
+                  </View>
+                  <View>
+                    <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.notes}</Text>
+                    <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Notes</Text>
+                  </View>
+                </View>
+                <View style={[styles.statBox, { backgroundColor: '#f5f0ff12' }]}>
+                  <View style={[styles.statIconBox, { backgroundColor: '#f5f0ff12' }]}>
+                    <Sparkles size={15} color="#7c5fe8" />
+                  </View>
+                  <View>
+                    <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.glances}</Text>
+                    <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Glances</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+
+            {/* Semantic chip row — only shown when inside a folder */}
+            {!showSubjectHub && (
+              <SemanticChipRow
+                tags={catalogTags}
+                selected={activeChip}
+                onChange={setActiveChip}
+                hint={activeChip !== ALL_TAG ? `Streaming "${activeChip}" across "${currentFolder?.title}"` : undefined}
+              />
+            )}
+
+            {exportPreparing && (
+              <View style={styles.preparingBar}>
+                <ActivityIndicator size="small" color={colors.primary} />
+                <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: '700', marginLeft: 8 }}>
+                  Preparing export…
+                </Text>
+              </View>
+            )}
+
+            {loading && !refreshing ? (
+              <View style={styles.center}>
+                <ActivityIndicator color={colors.primary} />
+              </View>
+            ) : (
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 120 }}
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
+              >
+                {showSubjectHub ? (
+                  // ROOT — Subject Hub Grid
+                  <>
+                    <View style={styles.hubHeaderRow}>
+                      <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Your Subjects</Text>
+                      <View style={[styles.viewToggle, { backgroundColor: colors.surfaceStrong }]}>
+                        <TouchableOpacity
+                          onPress={() => setHubLayout('grid')}
+                          style={[
+                            styles.viewToggleBtn,
+                            hubLayout === 'grid' && { backgroundColor: colors.surface }
+                          ]}
+                          data-testid="vault-hub-grid"
+                        >
+                          <LayoutGrid size={11} color={hubLayout === 'grid' ? colors.textPrimary : colors.textTertiary} />
+                          <Text style={[
+                            styles.viewToggleText,
+                            { color: hubLayout === 'grid' ? colors.textPrimary : colors.textTertiary }
+                          ]}>Grid</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => setHubLayout('list')}
+                          style={[
+                            styles.viewToggleBtn,
+                            hubLayout === 'list' && { backgroundColor: colors.surface }
+                          ]}
+                          data-testid="vault-hub-list"
+                        >
+                          <ListIcon size={11} color={hubLayout === 'list' ? colors.textPrimary : colors.textTertiary} />
+                          <Text style={[
+                            styles.viewToggleText,
+                            { color: hubLayout === 'list' ? colors.textPrimary : colors.textTertiary }
+                          ]}>List</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+
+                    {hubLayout === 'grid' ? (
+                      <SubjectHubGrid
+                        folders={topLevelFolders}
+                        onOpen={(n) => setCurrentFolder(n)}
+                        onAction={onHubAction}
                       />
-                    ))}
-                    {topLevelOrphans.map((item) => {
+                    ) : (
+                      <View style={{ paddingHorizontal: 4 }}>
+                        {topLevelFolders.map((item) => (
+                          <NoteRow
+                            key={item.id}
+                            node={item}
+                            expanded={expanded.has(item.id)}
+                            onToggle={() => toggleExpand(item.id)}
+                            onOpen={() => setCurrentFolder(item)}
+                            onAction={(action) => onAction(item, action)}
+                          />
+                        ))}
+                        {topLevelOrphans.map((item) => {
+                          const isNoteLike = (item.type === 'note' || item.type === 'notebook') && !!item.note_id;
+                          const isGlance = glanceOpen.has(item.id);
+                          return (
+                            <View key={item.id}>
+                              <NoteRow
+                                node={item}
+                                expanded={expanded.has(item.id)}
+                                onToggle={() => toggleExpand(item.id)}
+                                onOpen={() => openNode(item)}
+                                onAction={(action) => onAction(item, action)}
+                                glanceExpanded={isNoteLike && isGlance}
+                                onToggleGlance={isNoteLike ? () => toggleGlance(item.id) : undefined}
+                                style={{ opacity: 0.55, borderStyle: 'dashed', borderColor: colors.border, borderWidth: 0.5, borderRadius: 12, marginHorizontal: 4 }}
+                              />
+                              {isNoteLike && isGlance && item.note_id && (
+                                <GlancePanel
+                                  noteId={item.note_id}
+                                  contentWidth={SCREEN_WIDTH - 32}
+                                  selectedTag={ALL_TAG}
+                                  onPlay={() => playNode(item)}
+                                  onOpenEdit={() => openNode(item)}
+                                />
+                              )}
+                            </View>
+                          );
+                        })}
+                      </View>
+                    )}
+
+                    {topLevelFolders.length === 0 && topLevelOrphans.length === 0 && (
+                      <View style={styles.empty}>
+                        <Layers size={48} color={colors.border} />
+                        <Text style={{ color: colors.textTertiary, marginTop: 12, fontWeight: '700' }}>
+                          Tap + to create your first folder
+                        </Text>
+                      </View>
+                    )}
+                  </>
+                ) : (
+                  // INSIDE A FOLDER — Aichii Tree + Glance
+                  <View style={{ paddingHorizontal: 4 }}>
+                    {displayRows.map((item) => {
                       const isNoteLike = (item.type === 'note' || item.type === 'notebook') && !!item.note_id;
                       const isGlance = glanceOpen.has(item.id);
                       return (
@@ -684,13 +807,12 @@ export default function NotesIndex() {
                             onAction={(action) => onAction(item, action)}
                             glanceExpanded={isNoteLike && isGlance}
                             onToggleGlance={isNoteLike ? () => toggleGlance(item.id) : undefined}
-                            style={{ opacity: 0.55, borderStyle: 'dashed', borderColor: colors.border, borderWidth: 0.5, borderRadius: 12, marginHorizontal: 4 }}
                           />
                           {isNoteLike && isGlance && item.note_id && (
                             <GlancePanel
                               noteId={item.note_id}
                               contentWidth={SCREEN_WIDTH - 32}
-                              selectedTag={ALL_TAG}
+                              selectedTag={activeChip}
                               onPlay={() => playNode(item)}
                               onOpenEdit={() => openNode(item)}
                             />
@@ -698,56 +820,17 @@ export default function NotesIndex() {
                         </View>
                       );
                     })}
+                    {displayRows.length === 0 && (
+                      <View style={styles.empty}>
+                        <Layers size={48} color={colors.border} />
+                        <Text style={{ color: colors.textTertiary, marginTop: 12 }}>Empty here</Text>
+                      </View>
+                    )}
                   </View>
                 )}
-
-                {topLevelFolders.length === 0 && topLevelOrphans.length === 0 && (
-                  <View style={styles.empty}>
-                    <Layers size={48} color={colors.border} />
-                    <Text style={{ color: colors.textTertiary, marginTop: 12, fontWeight: '700' }}>
-                      Tap + to create your first folder
-                    </Text>
-                  </View>
-                )}
-              </>
-            ) : (
-              // INSIDE A FOLDER — Aichii Tree + Glance
-              <View style={{ paddingHorizontal: 4 }}>
-                {displayRows.map((item) => {
-                  const isNoteLike = (item.type === 'note' || item.type === 'notebook') && !!item.note_id;
-                  const isGlance = glanceOpen.has(item.id);
-                  return (
-                    <View key={item.id}>
-                      <NoteRow
-                        node={item}
-                        expanded={expanded.has(item.id)}
-                        onToggle={() => toggleExpand(item.id)}
-                        onOpen={() => openNode(item)}
-                        onAction={(action) => onAction(item, action)}
-                        glanceExpanded={isNoteLike && isGlance}
-                        onToggleGlance={isNoteLike ? () => toggleGlance(item.id) : undefined}
-                      />
-                      {isNoteLike && isGlance && item.note_id && (
-                        <GlancePanel
-                          noteId={item.note_id}
-                          contentWidth={SCREEN_WIDTH - 32}
-                          selectedTag={activeChip}
-                          onPlay={() => playNode(item)}
-                          onOpenEdit={() => openNode(item)}
-                        />
-                      )}
-                    </View>
-                  );
-                })}
-                {displayRows.length === 0 && (
-                  <View style={styles.empty}>
-                    <Layers size={48} color={colors.border} />
-                    <Text style={{ color: colors.textTertiary, marginTop: 12 }}>Empty here</Text>
-                  </View>
-                )}
-              </View>
+              </ScrollView>
             )}
-          </ScrollView>
+          </>
         )}
 
         <TouchableOpacity
@@ -899,6 +982,9 @@ function flattenAll(nodes: NoteNode[]): NoteNode[] {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { borderBottomWidth: 1, paddingHorizontal: 14, paddingTop: 6, paddingBottom: 8 },
+  sidebar: { width: 260, borderRightWidth: 0.5 },
+  splitContent: { flex: 1 },
+  sidebarHeader: { borderBottomWidth: 0.5, paddingHorizontal: 12, paddingTop: 10, paddingBottom: 10 },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 },
   headerTitle: { fontSize: 26, fontWeight: '900', letterSpacing: -0.5 },
   eyebrow: { fontSize: 9, fontWeight: '900', letterSpacing: 1.6, marginLeft: 2, marginBottom: 2 },
@@ -924,7 +1010,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: { fontSize: 19, fontWeight: '900', letterSpacing: -0.4 },
   sectionSubtle: { fontSize: 10, fontWeight: '900', letterSpacing: 1.2, paddingHorizontal: 16, marginBottom: 8 },
-  viewToggle: { flexDirection: 'row', backgroundColor: colors.surfaceStrong, borderRadius: 10, padding: 3, gap: 2 },
+  viewToggle: { flexDirection: 'row', borderRadius: 10, padding: 3, gap: 2 },
   viewToggleBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8 },
   viewToggleText: { fontSize: 11, fontWeight: '700' },
 

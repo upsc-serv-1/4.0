@@ -14,6 +14,7 @@ import {
   Image,
   TextInput,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { 
   Palette, 
@@ -34,10 +35,17 @@ import {
   CheckCircle,
   X,
   Wifi,
-  WifiOff
+  WifiOff,
+  Brain,
+  Sparkles,
+  Search,
+  ChevronDown,
+  ChevronUp,
+  RotateCcw,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PROMPT_KEYS, DEFAULT_PROMPTS } from '../src/services/GeminiService';
 import { supabase } from '../src/lib/supabase';
 import { PageWrapper } from '../src/components/PageWrapper';
 import { OPTIONAL_SUBJECTS } from '../src/data/syllabus';
@@ -97,6 +105,15 @@ export default function Profile() {
   const [syncDone, setSyncDone] = useState(false);
   const progressAnim = useRef(new RNAnimated.Value(0)).current;
 
+  // ── AI Prompt Settings State ──────────────────────────────
+  const [geminiKey, setGeminiKey] = useState('');
+  const [explainPrompt, setExplainPrompt]     = useState('');
+  const [summarizePrompt, setSummarizePrompt] = useState('');
+  const [searchPrompt, setSearchPrompt]       = useState('');
+  const [expandedPrompt, setExpandedPrompt]   = useState<'explain' | 'summarize' | 'search' | null>(null);
+  const [promptSaving, setPromptSaving]       = useState(false);
+  const [promptSaved, setPromptSaved]         = useState(false);
+
   useEffect(() => {
     AsyncStorage.getItem('optional_choice').then(val => {
       if (val) setOptional(val);
@@ -104,6 +121,47 @@ export default function Profile() {
     loadAnalyticsLayout().then(setAnalyticsLayout);
     OfflineManager.getMetadata().then(setOfflineMeta);
   }, []);
+
+  // Load AI settings
+  useEffect(() => {
+    (async () => {
+      const [key, ep, sp, srp] = await Promise.all([
+        AsyncStorage.getItem('gemini_api_key'),
+        AsyncStorage.getItem(PROMPT_KEYS.explain),
+        AsyncStorage.getItem(PROMPT_KEYS.summarize),
+        AsyncStorage.getItem(PROMPT_KEYS.search),
+      ]);
+      setGeminiKey(key || '');
+      setExplainPrompt(ep || DEFAULT_PROMPTS.explain);
+      setSummarizePrompt(sp || DEFAULT_PROMPTS.summarize);
+      setSearchPrompt(srp || DEFAULT_PROMPTS.search);
+    })();
+  }, []);
+
+  const saveAiSettings = async () => {
+    setPromptSaving(true);
+    try {
+      await Promise.all([
+        AsyncStorage.setItem('gemini_api_key', geminiKey.trim()),
+        AsyncStorage.setItem(PROMPT_KEYS.explain,    explainPrompt.trim()   || DEFAULT_PROMPTS.explain),
+        AsyncStorage.setItem(PROMPT_KEYS.summarize,  summarizePrompt.trim() || DEFAULT_PROMPTS.summarize),
+        AsyncStorage.setItem(PROMPT_KEYS.search,     searchPrompt.trim()    || DEFAULT_PROMPTS.search),
+      ]);
+      setPromptSaved(true);
+      setTimeout(() => setPromptSaved(false), 2500);
+    } catch (e: any) {
+      Alert.alert('Save failed', e?.message || '');
+    } finally {
+      setPromptSaving(false);
+    }
+  };
+
+  const resetPrompt = async (key: 'explain' | 'summarize' | 'search') => {
+    await AsyncStorage.removeItem(PROMPT_KEYS[key]);
+    if (key === 'explain')    setExplainPrompt(DEFAULT_PROMPTS.explain);
+    if (key === 'summarize')  setSummarizePrompt(DEFAULT_PROMPTS.summarize);
+    if (key === 'search')     setSearchPrompt(DEFAULT_PROMPTS.search);
+  };
 
   // ── Offline Handlers ──────────────────────────────────────
   const startFullDownload = async () => {
@@ -285,6 +343,162 @@ export default function Profile() {
           <Row testID="profile-reset" icon={<UserIcon color={colors.primary} size={20} />} label="Reset Password" sub="Send reset link to email" onPress={requestPasswordReset} />
           <Row testID="profile-identity" icon={<UserIcon color={colors.textPrimary} size={20} />} label="Account" sub={email} onPress={() => {}} isLast />
         </View>
+
+        {/* ── AI SETTINGS SECTION ──────────────────────────────── */}
+        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>
+          AI SETTINGS
+        </Text>
+        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
+
+          {/* Gemini API Key row */}
+          <View style={{ padding: 14, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <Brain size={18} color="#7c3aed" />
+              <Text style={{ fontSize: 14, fontWeight: '700', color: colors.textPrimary }}>
+                Gemini API Key
+              </Text>
+            </View>
+            <Text style={{ fontSize: 11, color: colors.textTertiary, marginBottom: 8 }}>
+              Free key from aistudio.google.com → Get API key
+            </Text>
+            <TextInput
+              value={geminiKey}
+              onChangeText={setGeminiKey}
+              placeholder="Paste your AIzaSy... key here"
+              placeholderTextColor={colors.textTertiary}
+              secureTextEntry={true}
+              autoCorrect={false}
+              autoCapitalize="none"
+              style={{
+                backgroundColor: colors.bg,
+                borderWidth: 1, borderColor: colors.border,
+                borderRadius: 10, padding: 10,
+                fontSize: 13, color: colors.textPrimary,
+                fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace' }),
+              }}
+              testID="ai-settings-api-key"
+            />
+          </View>
+
+          {/* Prompt rows — one for each of the 3 prompts */}
+          {(
+            [
+              {
+                key:         'explain' as const,
+                label:       'Explain Prompt',
+                sub:         'Used by AI EXPLAIN button on each question',
+                icon:        <Brain size={16} color="#7c3aed" />,
+                value:       explainPrompt,
+                setter:      setExplainPrompt,
+                placeholder: '{{question}}, {{options}}, {{correct_answer}} are the available variables',
+              },
+              {
+                key:         'summarize' as const,
+                label:       'Summarize Prompt',
+                sub:         'Used by ✨ SUMMARIZE INTO BULLETS button',
+                icon:        <Sparkles size={16} color="#f59e0b" />,
+                value:       summarizePrompt,
+                setter:      setSummarizePrompt,
+                placeholder: '{{explanation}} is the available variable',
+              },
+              {
+                key:         'search' as const,
+                label:       'Search Prompt',
+                sub:         'Used by AI Search tab to expand your query',
+                icon:        <Search size={16} color={colors.primary} />,
+                value:       searchPrompt,
+                setter:      setSearchPrompt,
+                placeholder: '{{query}} is the available variable',
+              },
+            ] as const
+          ).map((item, idx, arr) => (
+            <View
+              key={item.key}
+              style={idx < arr.length - 1 ? { borderBottomWidth: 1, borderBottomColor: colors.border } : {}}
+            >
+              {/* Collapsed header row — tap to expand */}
+              <TouchableOpacity
+                onPress={() => setExpandedPrompt(expandedPrompt === item.key ? null : item.key)}
+                style={{ flexDirection: 'row', alignItems: 'center', padding: 14, gap: 10 }}
+                testID={`ai-prompt-row-${item.key}`}
+              >
+                {item.icon}
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, fontWeight: '700', color: colors.textPrimary }}>
+                    {item.label}
+                  </Text>
+                  <Text style={{ fontSize: 11, color: colors.textTertiary, marginTop: 1 }}>
+                    {item.sub}
+                  </Text>
+                </View>
+                {expandedPrompt === item.key
+                  ? <ChevronUp size={16} color={colors.textTertiary} />
+                  : <ChevronDown size={16} color={colors.textTertiary} />
+                }
+              </TouchableOpacity>
+
+              {/* Expanded editor */}
+              {expandedPrompt === item.key && (
+                <View style={{ paddingHorizontal: 14, paddingBottom: 14 }}>
+                  <Text style={{ fontSize: 10, color: colors.textTertiary, marginBottom: 6, fontWeight: '700' }}>
+                    AVAILABLE VARIABLES: {item.placeholder}
+                  </Text>
+                  <TextInput
+                    value={item.value}
+                    onChangeText={item.setter}
+                    multiline
+                    numberOfLines={10}
+                    textAlignVertical="top"
+                    autoCorrect={false}
+                    autoCapitalize="none"
+                    style={{
+                      backgroundColor: colors.bg,
+                      borderWidth: 1, borderColor: colors.border,
+                      borderRadius: 10, padding: 12,
+                      fontSize: 12, color: colors.textPrimary,
+                      lineHeight: 18, minHeight: 180,
+                      fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace' }),
+                    }}
+                    testID={`ai-prompt-editor-${item.key}`}
+                  />
+                  {/* Reset to default button */}
+                  <TouchableOpacity
+                    onPress={() => resetPrompt(item.key)}
+                    style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 8 }}
+                    testID={`ai-prompt-reset-${item.key}`}
+                  >
+                    <RotateCcw size={12} color={colors.textTertiary} />
+                    <Text style={{ fontSize: 11, color: colors.textTertiary, fontWeight: '700' }}>
+                      Reset to default
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          ))}
+        </View>
+
+        {/* Save all AI settings button */}
+        <TouchableOpacity
+          onPress={saveAiSettings}
+          disabled={promptSaving}
+          style={{
+            marginTop: 12,
+            flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+            paddingVertical: 14, borderRadius: 14,
+            backgroundColor: promptSaved ? '#22c55e' : '#7c3aed',
+            opacity: promptSaving ? 0.6 : 1,
+          }}
+          testID="ai-settings-save"
+        >
+          {promptSaving
+            ? <ActivityIndicator size="small" color="#fff" />
+            : <Brain size={16} color="#fff" />
+          }
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff' }}>
+            {promptSaved ? '✓ Saved!' : 'Save AI Settings'}
+          </Text>
+        </TouchableOpacity>
 
         {/* ── DATA & OFFLINE SECTION ─────────────────────────── */}
         <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>DATA & OFFLINE</Text>

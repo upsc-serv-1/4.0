@@ -60,11 +60,15 @@ export default function NotesIndex() {
   const [searchVisible, setSearchVisible] = useState(false);
 
   const [currentFolder, setCurrentFolder] = useState<NoteNode | null>(null);
+  // Folder navigation stack — for back-to-parent (not back-to-root)
+  const [folderStack, setFolderStack] = useState<NoteNode[]>([]);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [glanceOpen, setGlanceOpen] = useState<Set<string>>(new Set());
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [activeChip, setActiveChip] = useState<string>(ALL_TAG);
   const [hubLayout, setHubLayout] = useState<'grid' | 'list'>('grid');
+  // Hide left navigation panel (full-screen notes mode)
+  const [leftPanelHidden, setLeftPanelHidden] = useState(false);
 
   // Modals
   const [addMenuOpen, setAddMenuOpen] = useState(false);
@@ -222,11 +226,33 @@ export default function NotesIndex() {
     });
   };
 
+  // Navigate into a folder — pushes current to stack for proper back navigation
+  const navigateToFolder = (n: NoteNode) => {
+    if (currentFolder) setFolderStack(s => [...s, currentFolder]);
+    setCurrentFolder(n);
+    setSearch('');
+    setSearchVisible(false);
+    // Auto-expand the folder in tree view
+    setExpanded(prev => { const next = new Set(prev); next.add(n.id); return next; });
+  };
+
+  // Go back — pop stack (parent folder) or back to root
+  const navigateBack = () => {
+    if (folderStack.length > 0) {
+      const parent = folderStack[folderStack.length - 1];
+      setFolderStack(s => s.slice(0, -1));
+      setCurrentFolder(parent);
+    } else {
+      setCurrentFolder(null);
+    }
+  };
+
   const openNode = (n: NoteNode) => {
     if ((n.type === 'note' || n.type === 'notebook') && n.note_id) {
       router.push({ pathname: '/notes/editor', params: { id: n.note_id, title: n.title } });
     } else if (n.type === 'folder') {
-      setCurrentFolder(n);
+      // Tree hierarchy: just expand/collapse inline, don't navigate
+      toggleExpanded(n.id);
       setSearch('');
       setSearchVisible(false);
     }
@@ -504,58 +530,74 @@ export default function NotesIndex() {
       <View style={[styles.container, { backgroundColor: colors.bg }]}>
         {!showSubjectHub && IS_WIDE ? (
           <View style={{ flexDirection: 'row', flex: 1 }}>
-            {/* LEFT COLUMN: Sidebar */}
-            <View style={[styles.sidebar, { backgroundColor: colors.surface, borderRightColor: colors.border }]}>
-              <View style={[styles.sidebarHeader, { borderBottomColor: colors.border }]}>
-                <View style={styles.headerTop}>
-                  <TouchableOpacity onPress={() => setCurrentFolder(null)} style={styles.iconBtn}>
-                    <ChevronLeft size={24} color={colors.primary} />
-                  </TouchableOpacity>
-                  <View style={{ flex: 1 }}>
-                    <Text style={[styles.eyebrow, { color: colors.primary, fontSize: 10 }]}>KNOWLEDGE VAULT</Text>
-                    <Text style={[styles.headerTitle, { color: colors.textPrimary, fontSize: 16 }]} numberOfLines={1}>
-                      {currentFolder?.title}
-                    </Text>
+            {/* LEFT COLUMN: Sidebar — hidden when leftPanelHidden */}
+            {!leftPanelHidden && (
+              <View style={[styles.sidebar, { backgroundColor: colors.surface, borderRightColor: colors.border }]}>
+                <View style={[styles.sidebarHeader, { borderBottomColor: colors.border }]}>
+                  <View style={styles.headerTop}>
+                    <TouchableOpacity onPress={navigateBack} style={styles.iconBtn}>
+                      <ChevronLeft size={24} color={colors.primary} />
+                    </TouchableOpacity>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.eyebrow, { color: colors.primary, fontSize: 10 }]}>KNOWLEDGE VAULT</Text>
+                      <Text style={[styles.headerTitle, { color: colors.textPrimary, fontSize: 16 }]} numberOfLines={1}>
+                        {/* Breadcrumb: show parent path */}
+                        {folderStack.length > 0 ? folderStack.map(f => f.title).join(' › ') + ' › ' + currentFolder?.title : currentFolder?.title}
+                      </Text>
+                    </View>
                   </View>
                 </View>
+
+                <SemanticChipRow
+                  tags={catalogTags}
+                  selected={activeChip}
+                  onChange={setActiveChip}
+                />
+
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
+                  <View style={{ paddingHorizontal: 4 }}>
+                    {displayRows.map((item) => (
+                      <NoteRow
+                        key={item.id}
+                        node={item}
+                        expanded={expanded.has(item.id)}
+                        onToggle={() => toggleExpand(item.id)}
+                        onOpen={() => {
+                          if ((item.type === 'note' || item.type === 'notebook') && item.note_id) {
+                            setSelectedNoteId(item.note_id);
+                          } else {
+                            openNode(item);
+                          }
+                        }}
+                        onAction={(action) => onAction(item, action)}
+                        isHighlighted={selectedNoteId === item.note_id}
+                      />
+                    ))}
+                  </View>
+                </ScrollView>
               </View>
-
-              <SemanticChipRow
-                tags={catalogTags}
-                selected={activeChip}
-                onChange={setActiveChip}
-              />
-
-              <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
-                <View style={{ paddingHorizontal: 4 }}>
-                  {displayRows.map((item) => (
-                    <NoteRow
-                      key={item.id}
-                      node={item}
-                      expanded={expanded.has(item.id)}
-                      onToggle={() => toggleExpand(item.id)}
-                      onOpen={() => {
-                        if ((item.type === 'note' || item.type === 'notebook') && item.note_id) {
-                          setSelectedNoteId(item.note_id);
-                        } else {
-                          openNode(item);
-                        }
-                      }}
-                      onAction={(action) => onAction(item, action)}
-                      isHighlighted={selectedNoteId === item.note_id}
-                    />
-                  ))}
-                </View>
-              </ScrollView>
-            </View>
+            )}
 
             {/* RIGHT COLUMN: Content */}
             <View style={[styles.splitContent, { backgroundColor: colors.bg }]}>
+              {/* Hide/Show left panel toggle */}
+              <TouchableOpacity
+                onPress={() => setLeftPanelHidden(h => !h)}
+                testID="notes-hide-panel-btn"
+                style={{
+                  position: 'absolute', top: 12, left: leftPanelHidden ? 12 : -1, zIndex: 10,
+                  backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+                  borderRadius: 10, padding: 6,
+                }}
+              >
+                {leftPanelHidden ? <ChevronRight size={16} color={colors.textTertiary} /> : <ChevronLeft size={16} color={colors.textTertiary} />}
+              </TouchableOpacity>
+
               {selectedNoteId ? (
-                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 20, paddingTop: 48, paddingBottom: 100 }}>
                   <GlancePanel
                     noteId={selectedNoteId}
-                    contentWidth={SCREEN_WIDTH - 260 - 40}
+                    contentWidth={leftPanelHidden ? SCREEN_WIDTH - 80 : SCREEN_WIDTH - 260 - 40}
                     selectedTag={activeChip}
                     onPlay={() => {
                       const node = allNodes.find(n => n.note_id === selectedNoteId);
@@ -580,7 +622,7 @@ export default function NotesIndex() {
               <View style={styles.headerTop}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                   <TouchableOpacity
-                    onPress={() => currentFolder ? setCurrentFolder(null) : router.back()}
+                    onPress={() => currentFolder ? navigateBack() : router.back()}
                     style={styles.iconBtn}
                     data-testid="vault-back"
                   >
@@ -737,7 +779,7 @@ export default function NotesIndex() {
                     {hubLayout === 'grid' ? (
                       <SubjectHubGrid
                         folders={topLevelFolders}
-                        onOpen={(n) => setCurrentFolder(n)}
+                        onOpen={(n) => navigateToFolder(n)}
                         onAction={onHubAction}
                       />
                     ) : (
@@ -748,7 +790,7 @@ export default function NotesIndex() {
                             node={item}
                             expanded={expanded.has(item.id)}
                             onToggle={() => toggleExpand(item.id)}
-                            onOpen={() => setCurrentFolder(item)}
+                            onOpen={() => openNode(item)}
                             onAction={(action) => onAction(item, action)}
                           />
                         ))}

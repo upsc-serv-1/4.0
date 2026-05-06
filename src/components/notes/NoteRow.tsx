@@ -232,7 +232,7 @@ function ActionBtn({ icon, label, onPress }: any) {
       style={styles.action}
     >
       <View style={[styles.actionCircle, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        {React.cloneElement(icon, { color: colors.textPrimary, size: 20 })}
+        {React.cloneElement(icon, { color: colors.textPrimary, size: 15 })}
       </View>
       <Text style={[styles.actionLabel, { color: colors.textSecondary }]}>{label}</Text>
     </RectButton>
@@ -242,9 +242,9 @@ function ActionBtn({ icon, label, onPress }: any) {
 const styles = StyleSheet.create({
   wrapper: { position: 'relative', overflow: 'hidden' },
   actionsRow: { flexDirection: 'row', alignItems: 'center' },
-  action: { alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 12, height: '100%' },
-  actionCircle: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  actionLabel: { fontSize: 8, fontWeight: '800', textTransform: 'uppercase' },
+  action: { alignItems: 'center', justifyContent: 'center', gap: 3, paddingHorizontal: 8, height: '100%', minWidth: 52, maxWidth: 60 },
+  actionCircle: { width: 34, height: 34, borderRadius: 17, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  actionLabel: { fontSize: 7, fontWeight: '800', textTransform: 'uppercase' },
   row: { paddingHorizontal: 4, borderBottomWidth: 0 },
   content: { flexDirection: 'row', alignItems: 'center', minHeight: 60 },
   iconWrap: {

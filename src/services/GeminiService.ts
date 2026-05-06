@@ -113,7 +113,12 @@ A student typed this search query: "{{query}}"
 
 Return a JSON object with exactly two keys: "keywords" and "filters".
 
-"keywords": an array of 12-18 specific keywords and phrases that UPSC questions on this topic would contain. Include related concepts, proper nouns, synonyms, associated geography, historical figures, acts/articles, years if relevant.
+"keywords": an array of 12-18 specific topic/concept words and phrases that UPSC questions on this topic would contain.
+STRICT RULES for keywords:
+- Include: related concepts, proper nouns, synonyms, associated geography, historical figures, acts/articles
+- DO NOT include: years, exam names (UPSC/CSE/IAS/SSC), exam stages (Prelims/Mains), subject names (History/Polity/Geography), or institute names
+- If the query mentions "2019 UPSC History", keywords should be ONLY the history concepts, NOT "2019", "UPSC", or "History"
+- Example: for "2019 UPSC polity emergency provisions", keywords = ["emergency provisions","article 352","president's rule","national emergency","fundamental rights suspension"] NOT ["2019","UPSC","polity","prelims"]
 
 "filters": an object with ONLY the filters you are CONFIDENT about from the query. Omit any filter you are not sure about — do NOT guess. Use exactly these values:
   subject: one of: "History", "Geography", "Polity", "Economy", "Environment", "Science & Technology", "Art & Culture", "International Relations", "Agriculture", "Social Issues" (omit if unclear or multi-subject)
@@ -123,8 +128,10 @@ Return a JSON object with exactly two keys: "keywords" and "filters".
   ncertFilter: "NCERT Only" if query mentions "ncert" or "class 6" through "class 12". Omit otherwise.
   specificYear: a year string like "2019" or comma-separated "2019,2020" if a specific year is mentioned. Omit otherwise.
 
+CRITICAL: Years, exam names, and subject names belong ONLY in "filters", NEVER in "keywords".
+
 Return ONLY raw JSON. No explanation, no markdown fences. Example:
-{"keywords":["emergency provisions","article 352","national emergency"],"filters":{"subject":"Polity","pyqFilter":"PYQ Only","examCategory":"UPSC"}}`,
+{"keywords":["emergency provisions","article 352","national emergency"],"filters":{"subject":"Polity","pyqFilter":"PYQ Only","examCategory":"UPSC","specificYear":"2019"}}`,
 };
 
 // Helper — reads user's saved prompt or falls back to default

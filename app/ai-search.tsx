@@ -162,8 +162,11 @@ export default function AISearchTab() {
 
   const runSearch = useCallback(async (q: string, activeFilters: Filters) => {
     if (!q.trim()) return;
-    // Fix #2 — reset sidebar subject filter on every new search
-    setSidebarSubjectFilter(null);
+    // Fix #2 — only reset sidebar subject filter on a NEW text query, not when
+    // the same query re-runs due to a sidebar chip tap or filter change.
+    if (q.trim() !== query.trim()) {
+      setSidebarSubjectFilter(null);
+    }
     // Clear AI inferred filters on new search
     setAiInferredFilters({});
     // Fix #4 — save to history

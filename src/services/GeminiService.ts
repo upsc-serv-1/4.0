@@ -5,7 +5,16 @@ export const PROMPT_KEYS = {
   explain:   'ai_prompt_explain',
   summarize: 'ai_prompt_summarize',
   search:    'ai_prompt_search',
+  model:     'ai_gemini_model',
 } as const;
+
+export const GEMINI_MODELS = [
+  { id: 'gemini-1.5-flash', label: 'Flash',   sub: 'Fast · 1500 req/day free' },
+  { id: 'gemini-1.5-pro',   label: 'Pro',     sub: 'Smarter · 50 req/day free' },
+  { id: 'gemini-2.0-flash', label: 'Flash 2', sub: 'Newest · experimental' },
+] as const;
+
+export const DEFAULT_MODEL = 'gemini-1.5-flash';
 
 // Default prompts — used when user has not customised
 export const DEFAULT_PROMPTS = {
@@ -73,12 +82,14 @@ async function getPrompt(key: keyof typeof PROMPT_KEYS): Promise<string> {
 // falling back to the EXPO_PUBLIC_GEMINI_API_KEY env var if no key is saved.
 async function getFlashUrl(): Promise<string> {
   let key = '';
+  let model: string = DEFAULT_MODEL;
   try {
-    key = (await AsyncStorage.getItem('gemini_api_key')) || '';
+    key   = (await AsyncStorage.getItem('gemini_api_key')) || '';
+    model = (await AsyncStorage.getItem(PROMPT_KEYS.model)) || DEFAULT_MODEL;
   } catch {}
   if (!key) key = process.env.EXPO_PUBLIC_GEMINI_API_KEY || '';
   if (!key) throw new Error('No Gemini API key found. Go to Settings → AI Settings and paste your key.');
-  return `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+  return `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
 }
 
 async function callGemini(prompt: string, maxTokens = 600): Promise<string> {

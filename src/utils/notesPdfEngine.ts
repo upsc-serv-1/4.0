@@ -123,6 +123,19 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
   const qBg = config.qaQuestionBackgroundColor || qaBg;
   const aBg = config.qaAnswerBackgroundColor || qaBg;
   const qaBorder = qaBg === 'transparent' && qBg === 'transparent' && aBg === 'transparent' ? 'transparent' : 'rgba(15, 23, 42, 0.12)';
+  const checklistSection = config.includeChecklist && checklist.length > 0
+    ? `
+      <div class="checklist-pdf checkpoint-priority">
+        <div class="section-label">Checklist / Tasks</div>
+        ${checklist.map(c => `
+          <div class="checklist-item-pdf">
+            <div class="checkbox-pdf ${c.checked ? 'checked' : ''}"></div>
+            <div style="${c.checked ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${parseMD(c.text)}</div>
+          </div>
+        `).join('')}
+      </div>
+    `
+    : '';
 
   return `
     <!DOCTYPE html>
@@ -301,7 +314,8 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
           }
           .toc-title { font-weight: 900; font-size: 14px; margin-bottom: 12px; color: inherit; }
           .toc-item { display: block; font-size: 12px; color: inherit; text-decoration: none; margin-bottom: 6px; border-bottom: 1px dashed rgba(0,0,0,0.1); }
-          .checklist-pdf { margin-top: 40px; }
+          .checklist-pdf { margin: 14px 0 26px; }
+          .checkpoint-priority { break-inside: avoid; page-break-inside: avoid; }
           .checklist-item-pdf { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }
           .checkbox-pdf { width: 14px; height: 14px; border: 1px solid #9ca3af; border-radius: 3px; flex-shrink: 0; }
           .checkbox-pdf.checked { background: #6366f1; border-color: #6366f1; }
@@ -314,6 +328,8 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
 
         <div class="subject-badge">${subject || 'General'}</div>
         <h1 class="doc-title">${title || 'Untitled Note'}</h1>
+
+        ${checklistSection}
 
         ${config.showTOC ? `
           <div class="toc-container">
@@ -360,17 +376,6 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
           })()}
         </div>
 
-        ${config.includeChecklist && checklist.length > 0 ? `
-          <div class="checklist-pdf">
-            <div class="section-label">Checklist / Tasks</div>
-            ${checklist.map(c => `
-              <div class="checklist-item-pdf">
-                <div class="checkbox-pdf ${c.checked ? 'checked' : ''}"></div>
-                <div style="${c.checked ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${parseMD(c.text)}</div>
-              </div>
-            `).join('')}
-          </div>
-        ` : ''}
       </body>
     </html>
   `;

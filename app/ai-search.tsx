@@ -14,6 +14,7 @@ import { useRouter } from 'expo-router';
 import {
   Brain, Search, SlidersHorizontal, X, ChevronRight,
   Sparkles, Filter, Clock, ChevronUp, ChevronDown, BookOpen, Target, Zap,
+  TrendingUp, BarChart2, Flame,
 } from 'lucide-react-native';
 import { supabase } from '../src/lib/supabase';
 import { useTheme } from '../src/context/ThemeContext';
@@ -25,6 +26,7 @@ import { getPYQCategorization } from './unified/engine';
 import { AIModelSwitcher } from '../src/components/ai/AIModelSwitcher';
 import { mergeQuestions } from '../src/utils/merger';
 import { QuestionCache } from '../src/services/QuestionCache';
+import { buildPredictive, probableHotsFor2026, type PredictiveRow } from '../src/lib/pyqPredictive';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const IS_IPAD = SCREEN_WIDTH >= 768;
@@ -159,6 +161,9 @@ export default function AISearchTab() {
   const [microtopicOptions, setMicrotopicOptions] = useState<string[]>([]);
   const [instituteOptions, setInstituteOptions] = useState<string[]>([]);
 
+  // PYQ Widget — hot topics from predictive analysis
+  const [pyqHotTopics, setPyqHotTopics] = useState<PredictiveRow[]>([]);
+
   // Fix #2 — sidebar subject filter (separate from filters.subjects)
   const [sidebarSubjectFilter, setSidebarSubjectFilter] = useState<string | null>(null);
 
@@ -195,6 +200,20 @@ export default function AISearchTab() {
       }
       const raw = await AsyncStorage.getItem('ai_search_history');
       if (raw) setSearchHistory(JSON.parse(raw));
+
+      // PYQ hot topics — fetch last 6 years of PYQs and run predictive analysis
+      const { data: pyqData } = await supabase
+        .from('questions')
+        .select('subject, section_group, micro_topic, exam_year, is_pyq')
+        .eq('is_pyq', true)
+        .not('exam_year', 'is', null)
+        .gte('exam_year', new Date().getFullYear() - 6)
+        .limit(3000);
+      if (pyqData && pyqData.length > 0) {
+        const predictive = buildPredictive(pyqData, (q) => q.exam_year ?? null, { level: 'micro_topic' });
+        const hots = probableHotsFor2026(predictive, 2, 8);
+        setPyqHotTopics(hots);
+      }
     })();
   }, []);
 
@@ -651,6 +670,50 @@ export default function AISearchTab() {
             <ChevronRight size={12} color={colors.textTertiary} />
           </TouchableOpacity>
         ))}
+
+        {/* PYQ Hot Topics Widget */}
+        {pyqHotTopics.length > 0 && (
+          <View style={{ width: '100%', marginTop: 20 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+              <Flame size={14} color="#ef4444" />
+              <Text style={[styles.examplesLabel, { color: colors.textTertiary, marginBottom: 0 }]}>
+                PYQ FORECAST 2026 — PROBABLE HOT TOPICS
+              </Text>
+            </View>
+            {pyqHotTopics.slice(0, 5).map((topic, i) => (
+              <TouchableOpacity
+                key={topic.key}
+                onPress={() => {
+                  const q = topic.key;
+                  setQuery(q);
+                  const newFilters = { ...filters, pyqFilter: 'PYQ Only', examCategory: 'UPSC' };
+                  setFilters(newFilters);
+                  runSearch(q, newFilters);
+                }}
+                testID={`pyq-hot-topic-${i}`}
+                style={[styles.exampleChip, {
+                  backgroundColor: i < 3 ? '#fef2f2' : colors.surface,
+                  borderColor: i < 3 ? '#fca5a5' : colors.border,
+                }]}
+              >
+                <View style={{
+                  width: 20, height: 20, borderRadius: 6, alignItems: 'center', justifyContent: 'center',
+                  backgroundColor: i < 3 ? '#ef4444' : '#94a3b8',
+                }}>
+                  <Text style={{ fontSize: 9, fontWeight: '900', color: '#fff' }}>{i + 1}</Text>
+                </View>
+                <Text style={[styles.exampleText, { flex: 1, color: i < 3 ? '#dc2626' : colors.textSecondary }]} numberOfLines={1}>{topic.key}</Text>
+                <View style={{ alignItems: 'flex-end' }}>
+                  <Text style={{ fontSize: 9, fontWeight: '700', color: '#ef4444' }}>🔥 {topic.hotScore}</Text>
+                  <Text style={{ fontSize: 9, color: colors.textTertiary }}>{topic.totalQuestions}Q</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+            <Text style={{ fontSize: 10, color: colors.textTertiary, marginTop: 6, textAlign: 'center' }}>
+              Based on frequency trends + slope over last 6 years
+            </Text>
+          </View>
+        )}
       </View>
     );
   };

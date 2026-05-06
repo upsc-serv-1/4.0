@@ -269,13 +269,34 @@ export default function AISearchTab() {
       setResults((data || []) as unknown as SearchResult[]);
 
     } catch (e: any) {
-      if (e?.message?.includes('API key') || e?.message?.includes('Gemini')) {
+      const msg = String(e?.message || '');
+      // Only redirect to AI Settings when the key is genuinely missing.
+      // For any other failure (invalid key, API disabled, quota, network,
+      // model-not-found, etc.) surface the real message so the user can act.
+      if (msg.includes('No Gemini API key found')) {
         Alert.alert(
           'Gemini API key needed',
           'Go to Settings → AI Settings and paste your free Gemini API key from aistudio.google.com',
         );
+      } else if (msg.includes('Gemini API error 400') && /API key not valid/i.test(msg)) {
+        Alert.alert(
+          'Invalid Gemini API key',
+          'Google rejected the saved key. Open Settings → AI Settings and paste a fresh key from aistudio.google.com.',
+        );
+      } else if (/Gemini API error 403/.test(msg)) {
+        Alert.alert(
+          'Gemini access denied (403)',
+          'Enable the "Generative Language API" for this project at console.cloud.google.com, or use a key from aistudio.google.com.\n\nDetails: ' + msg,
+        );
+      } else if (/Gemini API error 404/.test(msg)) {
+        Alert.alert(
+          'Model not available (404)',
+          'The selected Gemini model is not available for your key. Try Settings → AI Settings → switch model (Flash / Pro / Flash 2).\n\nDetails: ' + msg,
+        );
+      } else if (/Gemini API error 429/.test(msg)) {
+        Alert.alert('Rate limit hit (429)', 'Free tier quota exceeded. Try again later or switch model.\n\n' + msg);
       } else {
-        Alert.alert('Search failed', e?.message || 'Unknown error');
+        Alert.alert('Search failed', msg || 'Unknown error');
       }
     } finally {
       setLoading(false);

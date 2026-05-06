@@ -66,6 +66,11 @@ import {
   Brain,
   ChevronDown,
   ChevronUp,
+  Star,
+  Edit2,
+  Save as SaveIcon,
+  Send,
+  RotateCcw,
 } from 'lucide-react-native';
 import { AIModelSwitcher } from '../../src/components/ai/AIModelSwitcher';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -92,8 +97,16 @@ import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 import {
   aiExplainQuestion,
   aiSummarizeExplanation,
+  aiImproveAnswer,
+  InstituteExplanation,
 } from '../../src/services/GeminiService';
 import { renderAIText } from '../../src/utils/renderAIText';
+import {
+  fetchBestAnswer,
+  saveBestAnswer,
+  deleteBestAnswer,
+  BestAnswer,
+} from '../../src/services/BestAnswerService';
 
 const ThemeSwitcher = require('../../src/components/ThemeSwitcher').ThemeSwitcher;
 
@@ -443,16 +456,43 @@ export default function UnifiedQuizEngine() {
   const [aiExpanded, setAiExpanded]         = useState<Record<string, boolean>>({});
   const [showModelSwitcher, setShowModelSwitcher] = useState(false);
 
+  // ── Best Answer ("My Vitamin") + Modify-and-Save state ───────────
+  const [bestAnswers, setBestAnswers]       = useState<Record<string, BestAnswer | null>>({});
+  const [savingBest, setSavingBest]         = useState<Record<string, boolean>>({});
+  const [savedFlash, setSavedFlash]         = useState<Record<string, boolean>>({});
+  const [modifyOpen, setModifyOpen]         = useState<Record<string, boolean>>({});
+  const [modifyText, setModifyText]         = useState<Record<string, string>>({});
+  const [improvePromptOpen, setImprovePromptOpen] = useState<Record<string, boolean>>({});
+  const [improvePromptText, setImprovePromptText] = useState<Record<string, string>>({});
+  const [improving, setImproving]           = useState<Record<string, boolean>>({});
+
+  // Build the InstituteExplanation[] payload for AI prompts from the question's
+  // _explanations array (already built by merger.ts at fetch time).
+  const buildInstExplPayload = (item: any): InstituteExplanation[] => {
+    const list: any[] = Array.isArray(item?._explanations) ? item._explanations : [];
+    return list
+      .filter((e) => e && (e.text || '').trim())
+      .map((e) => ({
+        source:  String(e.source || '').trim(),
+        program: String(e.program || '').trim(),
+        text:    String(e.text || ''),
+        answer:  String(e.answer || '').trim().toUpperCase(),
+      }));
+  };
+
   const handleAiExplain = async (item: any) => {
     const id = item.id || item.question_id;
+    // Cached → just switch chip selection so the unified explanation
+    // viewer renders the AI text. No re-fetch.
     if (aiExplanations[id]) {
-      setAiExpanded(prev => ({ ...prev, [id]: !prev[id] }));
+      setActiveExplSource(prev => ({ ...prev, [id]: 'ai' }));
+      setActiveExplIndex(prev => ({ ...prev, [id]: -1 }));
       return;
     }
     setAiLoading(prev => ({ ...prev, [id]: true }));
-    setAiExpanded(prev => ({ ...prev, [id]: true }));
+    setActiveExplSource(prev => ({ ...prev, [id]: 'ai' }));
+    setActiveExplIndex(prev => ({ ...prev, [id]: -1 }));
     try {
-      // options is a jsonb object: { "a": "...", "b": "...", "c": "...", "d": "..." }
       const rawOptions = item.options || {};
       const optionsMap: Record<string, string> = {
         A: rawOptions.a || rawOptions.A || '',
@@ -464,6 +504,7 @@ export default function UnifiedQuizEngine() {
         item.question_text || item.question || '',
         optionsMap,
         item.correct_answer || '',
+        buildInstExplPayload(item),
       );
       setAiExplanations(prev => ({ ...prev, [id]: result }));
     } catch (e: any) {
@@ -471,10 +512,7 @@ export default function UnifiedQuizEngine() {
       if (msg.includes('404')) {
         Alert.alert('Model not found', 'Go to Settings → AI Settings and switch model.');
       } else if (msg.includes('429')) {
-        Alert.alert(
-          'Quota exceeded',
-          'This key has hit its limit. Go to Settings → AI Settings and switch to another key, or switch provider.',
-        );
+        Alert.alert('Quota exceeded', 'This key has hit its limit. Go to Settings → AI Settings and switch to another key, or switch provider.');
       } else if (msg.includes('No Gemini API key found')) {
         Alert.alert('Gemini key needed', 'Go to Settings → AI Settings and paste your Gemini key.');
       } else if (msg.includes('No Groq API key found')) {
@@ -482,7 +520,8 @@ export default function UnifiedQuizEngine() {
       } else {
         Alert.alert('AI Error', msg);
       }
-      setAiExpanded(prev => ({ ...prev, [id]: false }));
+      // Revert source so user is not stuck on a broken AI tab.
+      setActiveExplSource(prev => ({ ...prev, [id]: 'all' }));
     } finally {
       setAiLoading(prev => ({ ...prev, [id]: false }));
     }
@@ -490,7 +529,7 @@ export default function UnifiedQuizEngine() {
 
   const handleAiSummarize = async (item: any) => {
     const id = item.id || item.question_id;
-    const explanation = aiExplanations[id];
+    const explanation = aiExplanations[id] || bestAnswers[id]?.answer_text || '';
     if (!explanation) return;
     setAiSumLoading(prev => ({ ...prev, [id]: true }));
     try {
@@ -501,6 +540,78 @@ export default function UnifiedQuizEngine() {
     } finally {
       setAiSumLoading(prev => ({ ...prev, [id]: false }));
     }
+  };
+
+  // Save / Modify-and-Save / Edit / Delete handlers for the "My Vitamin" flow.
+  const handleSaveBest = async (item: any) => {
+    const id = item.id || item.question_id;
+    const text = (modifyOpen[id] && modifyText[id])
+      ? modifyText[id]
+      : (aiExplanations[id] || bestAnswers[id]?.answer_text || '');
+    if (!text) return;
+    setSavingBest(prev => ({ ...prev, [id]: true }));
+    try {
+      const saved = await saveBestAnswer(id, text, aiSummaries[id] || null, null);
+      setBestAnswers(prev => ({ ...prev, [id]: saved }));
+      setSavedFlash(prev => ({ ...prev, [id]: true }));
+      setTimeout(() => setSavedFlash(prev => ({ ...prev, [id]: false })), 1500);
+      setActiveExplSource(prev => ({ ...prev, [id]: 'vitamin' }));
+      setModifyOpen(prev => ({ ...prev, [id]: false }));
+    } catch (e: any) {
+      Alert.alert('Save failed', e?.message || 'Could not save best answer.');
+    } finally {
+      setSavingBest(prev => ({ ...prev, [id]: false }));
+    }
+  };
+
+  const handleDeleteBest = (item: any) => {
+    const id = item.id || item.question_id;
+    Alert.alert('Delete saved answer?', 'This removes your saved best answer for this question.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete', style: 'destructive', onPress: async () => {
+          await deleteBestAnswer(id);
+          setBestAnswers(prev => ({ ...prev, [id]: null }));
+          setActiveExplSource(prev => ({ ...prev, [id]: 'all' }));
+        },
+      },
+    ]);
+  };
+
+  const handleOpenModify = (item: any) => {
+    const id = item.id || item.question_id;
+    const baseText = aiExplanations[id] || bestAnswers[id]?.answer_text || '';
+    setModifyText(prev => ({ ...prev, [id]: baseText }));
+    setModifyOpen(prev => ({ ...prev, [id]: true }));
+  };
+
+  const handleImproveSubmit = async (item: any) => {
+    const id = item.id || item.question_id;
+    const inst = (improvePromptText[id] || '').trim();
+    if (!inst) return;
+    setImproving(prev => ({ ...prev, [id]: true }));
+    try {
+      const newText = await aiImproveAnswer(
+        inst,
+        modifyText[id] || aiExplanations[id] || '',
+        item.question_text || item.question || '',
+        buildInstExplPayload(item),
+      );
+      setModifyText(prev => ({ ...prev, [id]: newText }));
+      setImprovePromptText(prev => ({ ...prev, [id]: '' }));
+      setImprovePromptOpen(prev => ({ ...prev, [id]: false }));
+    } catch (e: any) {
+      Alert.alert('AI Error', e?.message || 'Could not improve answer.');
+    } finally {
+      setImproving(prev => ({ ...prev, [id]: false }));
+    }
+  };
+
+  const ensureBestAnswerLoaded = (qid: string) => {
+    if (!qid || qid in bestAnswers) return;
+    fetchBestAnswer(qid).then((row) => {
+      setBestAnswers(prev => ({ ...prev, [qid]: row }));
+    });
   };
 
   // Prevent accidental exit during formal exams and unsaved learning sessions
@@ -1687,11 +1798,11 @@ export default function UnifiedQuizEngine() {
     }
   };
 
-  const handleAddToFlashcards = async (q: Question) => {
+  const handleAddToFlashcards = async (q: Question, activeAnswerText?: string) => {
     if (!session?.user?.id) return;
     setSavingFlashcard(prev => ({ ...prev, [q.id]: true }));
     try {
-      const cardId = await FlashcardSvc.createFromQuestion(session.user.id, q);
+      const cardId = await FlashcardSvc.createFromQuestion(session.user.id, q, activeAnswerText);
       setFlashcardedIds(prev => new Set([...prev, q.id]));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       setAff({
@@ -2293,9 +2404,15 @@ export default function UnifiedQuizEngine() {
     const availableExplSources = Array.from(availableExplSourceMap.entries()).map(([key, label]) => ({ key, label }));
 
     const selectedExplSourceRaw = activeExplSource[item.id] || 'all';
-    const selectedExplSource = selectedExplSourceRaw === 'all' || availableExplSourceMap.has(selectedExplSourceRaw)
-      ? selectedExplSourceRaw
-      : 'all';
+    // Accept 'all' + the institute keys + the two virtual sources we drive
+    // from the unified chip switcher: 'ai' (Gemini-generated) and 'vitamin'
+    // (the user's saved best answer for this question).
+    const selectedExplSource = (
+      selectedExplSourceRaw === 'all'
+      || selectedExplSourceRaw === 'ai'
+      || selectedExplSourceRaw === 'vitamin'
+      || availableExplSourceMap.has(selectedExplSourceRaw)
+    ) ? selectedExplSourceRaw : 'all';
 
     const sourceFilteredExplanations = selectedExplSource === 'all'
       ? normalizedExplanations
@@ -2316,7 +2433,7 @@ export default function UnifiedQuizEngine() {
 
     const rawIdx = activeExplIndex[item.id] ?? -1;
     const safeIdx = rawIdx >= 0 && rawIdx < displayExplanations.length ? rawIdx : -1;
-    const activeExplanationText = safeIdx === -1
+    let activeExplanationText: string = safeIdx === -1
       ? (displayExplanations.length > 1
           ? displayExplanations
               .map((e: any) => `**${formatMetaLine(e) || e.source}${e.answer ? ' · Ans: ' + e.answer : ''}:**\n\n${e.text || '*No explanation provided.*'}`)
@@ -2325,6 +2442,22 @@ export default function UnifiedQuizEngine() {
       : (displayExplanations[safeIdx]
           ? (displayExplanations[safeIdx].text || '*No explanation provided by this source.*')
           : (item.explanation_markdown || 'No explanation available.'));
+
+    // Unified explanation viewer — when an AI/Vitamin chip is selected,
+    // override the text and tell the renderer to use renderAIText (inline
+    // **bold** / __underline__) instead of the Markdown component.
+    let viewerKind: 'markdown' | 'ai' | 'vitamin' = 'markdown';
+    if (selectedExplSource === 'ai') {
+      activeExplanationText = aiExplanations[item.id] || '';
+      viewerKind = 'ai';
+    } else if (selectedExplSource === 'vitamin') {
+      activeExplanationText = bestAnswers[item.id]?.answer_text || '';
+      viewerKind = 'vitamin';
+    }
+
+    // Lazy-load best answer the first time we render a question card.
+    ensureBestAnswerLoaded(item.id);
+    const savedBest = bestAnswers[item.id] || null;
 
     const activeExplanationMeta = safeIdx >= 0 && displayExplanations[safeIdx]
       ? formatMetaLine(displayExplanations[safeIdx])
@@ -2527,26 +2660,59 @@ export default function UnifiedQuizEngine() {
                    <Text style={[styles.explanationTitle, { color: colors.primary }]}>EXPLANATION</Text>
                 </View>
 
-                {availableExplSources.length > 1 && (
+                {/* ── Unified explanation chips ───────────────────────
+                    [⭐ My Vitamin] (first, only if saved)
+                    [All Institutes]
+                    [Institute 1] [Institute 2] …
+                    [+ AI Explain] / [🧠 AI] (last)
+                    Always visible whenever an AI / Vitamin chip is in play
+                    or when the question has more than one institute source. */}
+                {(availableExplSources.length > 0 || aiExplanations[item.id] || savedBest) && (
                   <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+
+                    {/* My Vitamin — only when a saved best answer exists */}
+                    {savedBest && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setActiveExplSource(prev => ({ ...prev, [item.id]: 'vitamin' }));
+                          setActiveExplIndex(prev => ({ ...prev, [item.id]: -1 }));
+                        }}
+                        activeOpacity={0.7}
+                        testID={`vitamin-chip-${item.id}`}
+                        style={{
+                          flexDirection: 'row', alignItems: 'center', gap: 5,
+                          paddingHorizontal: 14, paddingVertical: 6,
+                          borderRadius: 20, borderWidth: 1.5,
+                          backgroundColor: selectedExplSource === 'vitamin' ? '#f59e0b' : '#f59e0b18',
+                          borderColor:     selectedExplSource === 'vitamin' ? '#f59e0b' : '#f59e0b40',
+                        }}
+                      >
+                        <Star size={11} color={selectedExplSource === 'vitamin' ? '#fff' : '#f59e0b'} fill={selectedExplSource === 'vitamin' ? '#fff' : '#f59e0b'} />
+                        <Text style={{ fontSize: 10, fontWeight: '900', color: selectedExplSource === 'vitamin' ? '#fff' : '#f59e0b' }}>
+                          MY VITAMIN
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+
+                    {/* All Institutes */}
                     <TouchableOpacity
                       onPress={() => {
                         setActiveExplSource(prev => ({ ...prev, [item.id]: 'all' }));
                         setActiveExplIndex(prev => ({ ...prev, [item.id]: -1 }));
                       }}
+                      activeOpacity={0.7}
                       style={{
-                        paddingHorizontal: 12,
-                        paddingVertical: 6,
-                        borderRadius: 20,
+                        paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20,
                         backgroundColor: selectedExplSource === 'all' ? colors.primary : colors.surfaceStrong,
-                        borderWidth: 1,
-                        borderColor: colors.border
+                        borderWidth: 1, borderColor: colors.border,
                       }}
                     >
                       <Text style={{ fontSize: 10, fontWeight: '900', color: selectedExplSource === 'all' ? '#fff' : colors.textTertiary }}>
                         ALL INSTITUTES
                       </Text>
                     </TouchableOpacity>
+
+                    {/* Each institute */}
                     {availableExplSources.map(({ key, label }: any) => (
                       <TouchableOpacity
                         key={`src-${item.id}-${key}`}
@@ -2554,13 +2720,11 @@ export default function UnifiedQuizEngine() {
                           setActiveExplSource(prev => ({ ...prev, [item.id]: key }));
                           setActiveExplIndex(prev => ({ ...prev, [item.id]: -1 }));
                         }}
+                        activeOpacity={0.7}
                         style={{
-                          paddingHorizontal: 12,
-                          paddingVertical: 6,
-                          borderRadius: 20,
+                          paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20,
                           backgroundColor: selectedExplSource === key ? colors.primary : colors.surfaceStrong,
-                          borderWidth: 1,
-                          borderColor: colors.border
+                          borderWidth: 1, borderColor: colors.border,
                         }}
                       >
                         <Text style={{ fontSize: 10, fontWeight: '900', color: selectedExplSource === key ? '#fff' : colors.textTertiary }}>
@@ -2568,6 +2732,28 @@ export default function UnifiedQuizEngine() {
                         </Text>
                       </TouchableOpacity>
                     ))}
+
+                    {/* AI Explain — always last */}
+                    <TouchableOpacity
+                      onPress={() => handleAiExplain(item)}
+                      activeOpacity={0.7}
+                      testID={`ai-explain-chip-${item.id}`}
+                      style={{
+                        flexDirection: 'row', alignItems: 'center', gap: 5,
+                        paddingHorizontal: 12, paddingVertical: 6,
+                        borderRadius: 20, borderWidth: 1,
+                        backgroundColor: selectedExplSource === 'ai' ? '#7c3aed' : '#7c3aed18',
+                        borderColor:     selectedExplSource === 'ai' ? '#7c3aed' : '#7c3aed40',
+                      }}
+                    >
+                      {aiLoading[item.id]
+                        ? <ActivityIndicator size="small" color={selectedExplSource === 'ai' ? '#fff' : '#7c3aed'} />
+                        : <Sparkles size={11} color={selectedExplSource === 'ai' ? '#fff' : '#7c3aed'} />
+                      }
+                      <Text style={{ fontSize: 10, fontWeight: '900', color: selectedExplSource === 'ai' ? '#fff' : '#7c3aed' }}>
+                        {aiExplanations[item.id] ? '🧠 AI' : '+ AI EXPLAIN'}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 )}
 
@@ -2609,84 +2795,283 @@ export default function UnifiedQuizEngine() {
                   </View>
                 )}
 
-                <Markdown style={{ body: { color: colors.textPrimary, fontSize: fontSize, lineHeight: fontSize * 1.5, fontWeight: '500', fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' }) } }}>
-                  {activeExplanationText}
-                </Markdown>
-              </View>
-
-              {/* ── AI EXPLAIN / SUMMARIZE ─────────────────────────── */}
-              <View style={{ marginTop: 4, marginBottom: 12 }}>
-                <TouchableOpacity
-                  onPress={() => handleAiExplain(item)}
-                  testID={`ai-explain-btn-${item.id}`}
-                  style={{
-                    flexDirection: 'row', alignItems: 'center', gap: 7,
-                    paddingVertical: 9, paddingHorizontal: 14, borderRadius: 12,
-                    backgroundColor: '#7c3aed18', borderWidth: 1, borderColor: '#7c3aed30',
-                  }}
-                >
-                  {aiLoading[item.id] ? (
+                {/* ── Unified explanation viewer ─────────────────────
+                    Markdown renderer for institute / "all" sources.
+                    renderAIText for AI / Vitamin so **bold** and __underline__
+                    appear correctly without pulling the heavyweight Markdown
+                    component into AI output (which never has headings,
+                    fences or images — just inline emphasis). */}
+                {viewerKind === 'markdown' ? (
+                  <Markdown style={{ body: { color: colors.textPrimary, fontSize: fontSize, lineHeight: fontSize * 1.5, fontWeight: '500', fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' }) } }}>
+                    {activeExplanationText}
+                  </Markdown>
+                ) : viewerKind === 'ai' && aiLoading[item.id] && !aiExplanations[item.id] ? (
+                  <View style={{ paddingVertical: 28, alignItems: 'center', gap: 10 }}>
                     <ActivityIndicator size="small" color="#7c3aed" />
-                  ) : (
-                    <Brain size={15} color="#7c3aed" />
-                  )}
-                  <Text style={{ fontSize: 13, fontWeight: '800', color: '#7c3aed', flex: 1 }}>
-                    {aiExplanations[item.id] ? 'AI EXPLANATION' : 'AI EXPLAIN'}
-                  </Text>
-                  {aiExplanations[item.id] && (
-                    aiExpanded[item.id]
-                      ? <ChevronUp size={14} color="#7c3aed" />
-                      : <ChevronDown size={14} color="#7c3aed" />
-                  )}
-                </TouchableOpacity>
-
-                {aiExpanded[item.id] && aiExplanations[item.id] && (
-                  <View style={{
-                    marginTop: 8, padding: 14,
-                    backgroundColor: colors.surface, borderRadius: 12,
-                    borderWidth: 1, borderColor: '#7c3aed20',
-                  }}>
-                    <Text style={{ fontSize: 13, color: colors.textPrimary, lineHeight: 22 }}>
-                      {renderAIText(aiExplanations[item.id], { fontSize: 13, color: colors.textPrimary, lineHeight: 22 })}
+                    <Text style={{ fontSize: 11, color: colors.textTertiary, fontWeight: '700', letterSpacing: 0.6 }}>
+                      GEMINI IS THINKING…
                     </Text>
+                  </View>
+                ) : (
+                  <Text style={{ fontSize: fontSize, color: colors.textPrimary, lineHeight: fontSize * 1.6, fontWeight: '500' }}>
+                    {renderAIText(activeExplanationText, { fontSize: fontSize, color: colors.textPrimary, lineHeight: fontSize * 1.6, fontWeight: '500' })}
+                  </Text>
+                )}
 
-                    {!aiSummaries[item.id] && (
-                      <TouchableOpacity
-                        onPress={() => handleAiSummarize(item)}
-                        testID={`ai-summarize-btn-${item.id}`}
-                        style={{
-                          marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 6,
-                          paddingVertical: 7, paddingHorizontal: 12, borderRadius: 10,
-                          backgroundColor: '#f59e0b18', borderWidth: 1, borderColor: '#f59e0b30',
-                          alignSelf: 'flex-start',
-                        }}
-                      >
-                        {aiSumLoading[item.id] ? (
-                          <ActivityIndicator size="small" color="#f59e0b" />
-                        ) : (
-                          <Sparkles size={13} color="#f59e0b" />
-                        )}
-                        <Text style={{ fontSize: 11, fontWeight: '800', color: '#f59e0b' }}>
-                          ✨ SUMMARIZE INTO BULLETS
-                        </Text>
-                      </TouchableOpacity>
+                {/* ── Save / Modify / Edit / Delete actions ────────────
+                    Shown only when the active source is AI or My Vitamin. */}
+                {(viewerKind === 'ai' || viewerKind === 'vitamin') && !!activeExplanationText && !modifyOpen[item.id] && (
+                  <View style={{ flexDirection: 'row', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
+                    {viewerKind === 'ai' && !savedBest && (
+                      <>
+                        <TouchableOpacity
+                          onPress={() => handleSaveBest(item)}
+                          disabled={!!savingBest[item.id]}
+                          activeOpacity={0.7}
+                          testID={`best-save-${item.id}`}
+                          style={{
+                            flexDirection: 'row', alignItems: 'center', gap: 5,
+                            paddingHorizontal: 11, paddingVertical: 7, borderRadius: 10,
+                            backgroundColor: savedFlash[item.id] ? '#22c55e22' : colors.surfaceStrong,
+                            borderWidth: 1, borderColor: savedFlash[item.id] ? '#22c55e' : colors.border,
+                          }}
+                        >
+                          {savingBest[item.id] ? (
+                            <ActivityIndicator size="small" color={colors.primary} />
+                          ) : (
+                            <SaveIcon size={12} color={savedFlash[item.id] ? '#22c55e' : colors.textSecondary} />
+                          )}
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: savedFlash[item.id] ? '#22c55e' : colors.textSecondary }}>
+                            {savedFlash[item.id] ? 'Saved ✓' : 'Save'}
+                          </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => handleOpenModify(item)}
+                          activeOpacity={0.7}
+                          testID={`best-modify-${item.id}`}
+                          style={{
+                            flexDirection: 'row', alignItems: 'center', gap: 5,
+                            paddingHorizontal: 11, paddingVertical: 7, borderRadius: 10,
+                            backgroundColor: colors.surfaceStrong,
+                            borderWidth: 1, borderColor: colors.border,
+                          }}
+                        >
+                          <Edit2 size={12} color={colors.textSecondary} />
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textSecondary }}>
+                            Modify & Save
+                          </Text>
+                        </TouchableOpacity>
+                      </>
                     )}
-
-                    {aiSummaries[item.id] && (
-                      <View style={{
-                        marginTop: 12, padding: 12,
-                        backgroundColor: '#fef3c720', borderRadius: 10,
-                        borderWidth: 1, borderColor: '#f59e0b25',
-                      }}>
-                        <Text style={{ fontSize: 11, fontWeight: '800', color: '#f59e0b', marginBottom: 6 }}>
-                          ✨ KEY POINTS
-                        </Text>
-                        <Text style={{ fontSize: 12, color: colors.textPrimary, lineHeight: 22 }}>
-                          {renderAIText(aiSummaries[item.id], { fontSize: 12, color: colors.textPrimary, lineHeight: 22 })}
-                        </Text>
-                      </View>
+                    {viewerKind === 'vitamin' && savedBest && (
+                      <>
+                        <TouchableOpacity
+                          onPress={() => handleOpenModify(item)}
+                          activeOpacity={0.7}
+                          testID={`best-edit-${item.id}`}
+                          style={{
+                            flexDirection: 'row', alignItems: 'center', gap: 5,
+                            paddingHorizontal: 11, paddingVertical: 7, borderRadius: 10,
+                            backgroundColor: '#f59e0b18',
+                            borderWidth: 1, borderColor: '#f59e0b40',
+                          }}
+                        >
+                          <Edit2 size={12} color="#f59e0b" />
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: '#f59e0b' }}>Edit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => handleDeleteBest(item)}
+                          activeOpacity={0.7}
+                          testID={`best-delete-${item.id}`}
+                          style={{
+                            flexDirection: 'row', alignItems: 'center', gap: 5,
+                            paddingHorizontal: 11, paddingVertical: 7, borderRadius: 10,
+                            backgroundColor: colors.surfaceStrong,
+                            borderWidth: 1, borderColor: colors.border,
+                          }}
+                        >
+                          <Trash2 size={12} color={colors.textTertiary} />
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textTertiary }}>Delete</Text>
+                        </TouchableOpacity>
+                      </>
                     )}
                   </View>
+                )}
+
+                {/* ── Modify & Save inline edit panel ─────────────────── */}
+                {(viewerKind === 'ai' || viewerKind === 'vitamin') && modifyOpen[item.id] && (
+                  <View style={{ marginTop: 12, padding: 12, backgroundColor: colors.surface, borderRadius: 12, borderWidth: 1, borderColor: colors.border, gap: 8 }}>
+                    <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1 }}>
+                      EDIT YOUR BEST ANSWER
+                    </Text>
+                    <View style={{ position: 'relative' }}>
+                      <TextInput
+                        value={modifyText[item.id] || ''}
+                        onChangeText={(v) => setModifyText(prev => ({ ...prev, [item.id]: v }))}
+                        multiline
+                        textAlignVertical="top"
+                        editable={!improving[item.id]}
+                        style={{
+                          minHeight: 200,
+                          padding: 12,
+                          fontSize: 13, color: colors.textPrimary, lineHeight: 20,
+                          backgroundColor: colors.bg,
+                          borderRadius: 10, borderWidth: 1, borderColor: colors.border,
+                        }}
+                        testID={`best-edit-input-${item.id}`}
+                      />
+                      {improving[item.id] && (
+                        <View style={{
+                          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                          backgroundColor: '#7c3aed18',
+                          borderRadius: 10,
+                          alignItems: 'center', justifyContent: 'center', gap: 8,
+                        }}>
+                          <ActivityIndicator size="small" color="#7c3aed" />
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: '#7c3aed', letterSpacing: 0.5 }}>
+                            REWRITING…
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+
+                    {/* Improve with AI prompt strip */}
+                    {improvePromptOpen[item.id] && (
+                      <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center', backgroundColor: '#7c3aed10', borderRadius: 10, padding: 6 }}>
+                        <Sparkles size={13} color="#7c3aed" />
+                        <TextInput
+                          value={improvePromptText[item.id] || ''}
+                          onChangeText={(v) => setImprovePromptText(prev => ({ ...prev, [item.id]: v }))}
+                          placeholder="e.g. shorten to 3 lines, add more facts..."
+                          placeholderTextColor={colors.textTertiary}
+                          onSubmitEditing={() => handleImproveSubmit(item)}
+                          editable={!improving[item.id]}
+                          style={{ flex: 1, fontSize: 12, color: colors.textPrimary, paddingHorizontal: 4, paddingVertical: 6 }}
+                          testID={`improve-input-${item.id}`}
+                        />
+                        <TouchableOpacity
+                          onPress={() => handleImproveSubmit(item)}
+                          disabled={!!improving[item.id] || !(improvePromptText[item.id] || '').trim()}
+                          activeOpacity={0.7}
+                          testID={`improve-submit-${item.id}`}
+                          style={{
+                            paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8,
+                            backgroundColor: '#7c3aed',
+                            opacity: improving[item.id] || !(improvePromptText[item.id] || '').trim() ? 0.5 : 1,
+                            flexDirection: 'row', alignItems: 'center', gap: 4,
+                          }}
+                        >
+                          <Send size={11} color="#fff" />
+                          <Text style={{ fontSize: 10, fontWeight: '800', color: '#fff' }}>Send</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+
+                    {/* Bottom row — Cancel · Improve with AI · Save */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
+                      <TouchableOpacity
+                        onPress={() => setModifyOpen(prev => ({ ...prev, [item.id]: false }))}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary, paddingHorizontal: 8, paddingVertical: 6 }}>
+                          Cancel
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => setImprovePromptOpen(prev => ({ ...prev, [item.id]: !prev[item.id] }))}
+                        activeOpacity={0.7}
+                        testID={`improve-toggle-${item.id}`}
+                        style={{
+                          flexDirection: 'row', alignItems: 'center', gap: 4,
+                          paddingHorizontal: 9, paddingVertical: 6, borderRadius: 8,
+                          backgroundColor: improvePromptOpen[item.id] ? '#7c3aed' : '#7c3aed18',
+                        }}
+                      >
+                        <Text style={{ fontSize: 10, fontWeight: '800', color: improvePromptOpen[item.id] ? '#fff' : '#7c3aed' }}>
+                          🤖 Improve with AI
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => handleSaveBest(item)}
+                        disabled={!!savingBest[item.id]}
+                        activeOpacity={0.7}
+                        testID={`best-modify-save-${item.id}`}
+                        style={{
+                          flexDirection: 'row', alignItems: 'center', gap: 5,
+                          paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8,
+                          backgroundColor: '#7c3aed',
+                          opacity: savingBest[item.id] ? 0.6 : 1,
+                        }}
+                      >
+                        {savingBest[item.id]
+                          ? <ActivityIndicator size="small" color="#fff" />
+                          : <SaveIcon size={11} color="#fff" />
+                        }
+                        <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>Save</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+
+                {/* ── Key Points ─────────────────────────────────────────
+                    Shown alongside any source the user is viewing — helpful
+                    revision summary. Vitamin pulls saved key_points first;
+                    AI generates on demand. */}
+                {(viewerKind === 'ai' || viewerKind === 'vitamin') && !!activeExplanationText && (
+                  (() => {
+                    const summaryText = aiSummaries[item.id] || (viewerKind === 'vitamin' ? (savedBest?.key_points || '') : '');
+                    return (
+                      <View style={{ marginTop: 14 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                          <Text style={{ fontSize: 10, fontWeight: '800', color: '#f59e0b', letterSpacing: 1.2 }}>
+                            ✨ KEY POINTS
+                          </Text>
+                          {summaryText ? (
+                            <TouchableOpacity
+                              onPress={() => handleAiSummarize(item)}
+                              disabled={!!aiSumLoading[item.id]}
+                              activeOpacity={0.7}
+                              testID={`keypoints-regen-${item.id}`}
+                              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                            >
+                              {aiSumLoading[item.id]
+                                ? <ActivityIndicator size="small" color="#f59e0b" />
+                                : <RotateCcw size={12} color={colors.textTertiary} />
+                              }
+                            </TouchableOpacity>
+                          ) : null}
+                        </View>
+                        {summaryText ? (
+                          <View style={{ padding: 12, backgroundColor: '#fef3c720', borderRadius: 10, borderWidth: 1, borderColor: '#f59e0b25' }}>
+                            <Text style={{ fontSize: 12, color: colors.textPrimary, lineHeight: 22 }}>
+                              {renderAIText(summaryText, { fontSize: 12, color: colors.textPrimary, lineHeight: 22 })}
+                            </Text>
+                          </View>
+                        ) : (
+                          <TouchableOpacity
+                            onPress={() => handleAiSummarize(item)}
+                            disabled={!!aiSumLoading[item.id]}
+                            activeOpacity={0.7}
+                            testID={`keypoints-gen-${item.id}`}
+                            style={{
+                              alignSelf: 'flex-start',
+                              flexDirection: 'row', alignItems: 'center', gap: 6,
+                              paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8,
+                              backgroundColor: '#f59e0b18', borderWidth: 1, borderColor: '#f59e0b30',
+                            }}
+                          >
+                            {aiSumLoading[item.id]
+                              ? <ActivityIndicator size="small" color="#f59e0b" />
+                              : <Sparkles size={12} color="#f59e0b" />
+                            }
+                            <Text style={{ fontSize: 11, fontWeight: '800', color: '#f59e0b' }}>
+                              Generate Key Points
+                            </Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    );
+                  })()
                 )}
               </View>
 
@@ -2694,7 +3079,16 @@ export default function UnifiedQuizEngine() {
                  <TouchableOpacity 
                    style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
                    onPress={() => {
-                     const activeText = activeExplanationText || item.explanation_markdown || '';
+                     // FIX 7 — pre-fill from whichever chip is active.
+                     // For Vitamin we also append the saved key_points so the
+                     // notebook captures the full revision packet.
+                     const activeText = (() => {
+                       if (selectedExplSource === 'vitamin' && savedBest) {
+                         const kp = savedBest.key_points ? `\n\n**✨ Key Points**\n\n${savedBest.key_points}` : '';
+                         return `${savedBest.answer_text}${kp}`;
+                       }
+                       return activeExplanationText || item.explanation_markdown || '';
+                     })();
                      openNotebookFromQuestion(item, activeText);
                    }}
                  >
@@ -2704,7 +3098,13 @@ export default function UnifiedQuizEngine() {
                  <TouchableOpacity
                    style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
                    onPress={() => {
-                     const activeText = activeExplanationText || item.explanation_markdown || '';
+                     const activeText = (() => {
+                       if (selectedExplSource === 'vitamin' && savedBest) {
+                         const kp = savedBest.key_points ? `\n\n**✨ Key Points**\n\n${savedBest.key_points}` : '';
+                         return `${savedBest.answer_text}${kp}`;
+                       }
+                       return activeExplanationText || item.explanation_markdown || '';
+                     })();
                      openHardnoteFromQuestion(item, activeText);
                    }}
                    data-testid={`engine-hardnotes-btn-${item.id}`}
@@ -2714,7 +3114,20 @@ export default function UnifiedQuizEngine() {
                  </TouchableOpacity>
                  <TouchableOpacity 
                    style={[styles.actionBtn, { backgroundColor: colors.primary + '15' }]}
-                   onPress={() => handleAddToFlashcards(item)}
+                   onPress={() => {
+                     // FIX 8 — hardwire whatever the user is reading right
+                     // now (institute / AI / Vitamin) into the flashcard's
+                     // answer_text, so the card is permanent and survives
+                     // any future change to the source question.
+                     const activeText = (() => {
+                       if (selectedExplSource === 'vitamin' && savedBest) {
+                         const kp = savedBest.key_points ? `\n\n**✨ Key Points**\n\n${savedBest.key_points}` : '';
+                         return `${savedBest.answer_text}${kp}`;
+                       }
+                       return activeExplanationText || item.explanation_markdown || '';
+                     })();
+                     handleAddToFlashcards(item, activeText);
+                   }}
                    disabled={savingFlashcard[item.id]}
                  >
                     {savingFlashcard[item.id] ? (

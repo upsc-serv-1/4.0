@@ -353,14 +353,22 @@ export class FlashcardSvc {
     return card!.id;
   }
 
-  static async createFromQuestion(userId: string, q: any) {
+  /**
+   * Create a flashcard from a question. When `activeAnswerText` is supplied,
+   * it is hardwired into back_text (and therefore the answer_text column) so
+   * the card permanently captures whichever institute / AI / Vitamin
+   * explanation the user was viewing at save time, instead of re-deriving
+   * from the question row at review time.
+   */
+  static async createFromQuestion(userId: string, q: any, activeAnswerText?: string) {
     const opts = q.options ?? {};
     const optionLines = Object.entries(opts).map(([k, v]) => `(${k.toUpperCase()}) ${v}`).join('\n');
     const front_text = `${q.question_text || q.questionText || ''}\n\n${optionLines}`.trim();
 
     const correctKey = q.correct_answer || q.correctAnswer;
     const correctText = correctKey && opts[correctKey] ? `**Correct: (${correctKey.toUpperCase()})** ${opts[correctKey]}` : '';
-    const explanation = q.explanation_markdown || q.explanation || '';
+    const explanationFromActive = (activeAnswerText || '').trim();
+    const explanation = explanationFromActive || q.explanation_markdown || q.explanation || '';
     const back_text = [correctText, explanation].filter(Boolean).join('\n\n');
 
     return this.createCard(userId, {

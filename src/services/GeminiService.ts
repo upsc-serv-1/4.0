@@ -55,7 +55,10 @@ QUESTION:
 OPTIONS:
 {{options}}
 
-CORRECT ANSWER: {{correct_answer}}
+CORRECT ANSWER (official, must be respected): {{correct_answer}}
+
+INSTITUTE EXPLANATIONS (if any — read all and merge the strongest reasoning into one best answer; do NOT contradict the official correct answer above):
+{{institute_explanations}}
 
 Your task — write a complete study note with these exact sections:
 
@@ -66,12 +69,14 @@ State the correct option and explain WHY it is correct in 2-3 sentences with key
 For each option (A, B, C, D) — even wrong ones — write 2-3 sentences explaining what
 that concept/person/place actually is, as if writing a mini encyclopedia entry.
 A student reading this should be able to answer any future UPSC question about it.
-Wrap important names, dates, or terms in **bold**.
+Wrap important names, dates, or terms in **bold**. You may use __underline__ for the
+single most exam-critical fact in each option.
 
 🎯 EXAMINER'S ANGLE
 One sentence: why did UPSC ask this? What theme or syllabus area does it test?
 
-Keep the total under 400 words. Do not add any preamble or closing remarks.`,
+Keep the total under 450 words. Do not add any preamble or closing remarks.
+Do not mention "the institute explanations said…" — silently merge them.`,
 
   summarize: `You are a UPSC study coach making detailed revision notes.
 
@@ -214,22 +219,88 @@ async function callAI(prompt: string, maxTokens = 600): Promise<string> {
   return callGemini(prompt, maxTokens);
 }
 
+export type InstituteExplanation = {
+  source: string;
+  program?: string;
+  text: string;
+  answer?: string;
+};
+
 export async function aiExplainQuestion(
   questionText: string,
   options: Record<string, string>,
   correctAnswer: string,
+  instituteExplanations?: InstituteExplanation[],
 ): Promise<string> {
   const optionLines = Object.entries(options)
     .map(([k, v]) => `${k}) ${v}`)
     .join('\n');
 
+  // Render institute explanations as a simple labelled block. Cap each entry
+  // at 1500 chars so a single noisy source can't blow the prompt budget.
+  const explBlock = (instituteExplanations || [])
+    .filter((e) => e && (e.text || '').trim())
+    .map((e, i) => {
+      const meta = [e.source, e.program].filter(Boolean).join(' · ');
+      const ans  = e.answer ? ` (marked answer: ${e.answer})` : '';
+      const body = String(e.text).slice(0, 1500);
+      return `[${i + 1}] ${meta}${ans}\n${body}`;
+    })
+    .join('\n\n');
+
   const template = await getPrompt('explain');
   const prompt = template
     .replace('{{question}}', questionText)
     .replace('{{options}}', optionLines)
-    .replace('{{correct_answer}}', correctAnswer.toUpperCase());
+    .replace('{{correct_answer}}', correctAnswer.toUpperCase())
+    .replace(
+      '{{institute_explanations}}',
+      explBlock || '(none — write the explanation purely from your own knowledge)',
+    );
 
-  return callAI(prompt, 700);
+  return callAI(prompt, 800);
+}
+
+/**
+ * Regenerate or transform an existing AI answer based on a user instruction
+ * (e.g. "shorten to 3 lines", "add more facts about Article 370"). Used by
+ * the "🤖 Improve with AI" button inside the Modify & Save edit panel.
+ */
+export async function aiImproveAnswer(
+  customInstruction: string,
+  currentAnswerText: string,
+  questionText: string,
+  instituteExplanations?: InstituteExplanation[],
+): Promise<string> {
+  const explBlock = (instituteExplanations || [])
+    .filter((e) => e && (e.text || '').trim())
+    .map((e, i) => {
+      const meta = [e.source, e.program].filter(Boolean).join(' · ');
+      return `[${i + 1}] ${meta}\n${String(e.text).slice(0, 1200)}`;
+    })
+    .join('\n\n');
+
+  const prompt = `You are an expert UPSC coach refining a study note.
+
+ORIGINAL QUESTION:
+${questionText}
+
+INSTITUTE EXPLANATIONS (context only, may be empty):
+${explBlock || '(none)'}
+
+CURRENT ANSWER (the student's saved text — preserve correct facts, only adjust per the instruction):
+${currentAnswerText}
+
+USER INSTRUCTION:
+${customInstruction}
+
+Rewrite the answer to satisfy the instruction. Keep the same section markers
+(✅ CORRECT ANSWER, 📚 OPTION-BY-OPTION BREAKDOWN, 🎯 EXAMINER'S ANGLE) if
+they already exist. Use **bold** for key terms and __underline__ for the
+single most exam-critical fact. Return ONLY the rewritten answer text — no
+preamble, no commentary about what you changed.`;
+
+  return callAI(prompt, 900);
 }
 
 export async function aiSummarizeExplanation(explanationText: string): Promise<string> {

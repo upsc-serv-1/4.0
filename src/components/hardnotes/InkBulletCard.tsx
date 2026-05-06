@@ -17,16 +17,18 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Pressable,
   TextInput,
   Platform,
   LayoutChangeEvent,
+  InteractionManager,
 } from 'react-native';
 import RenderHtml from 'react-native-render-html';
 import { Canvas, Path } from '@shopify/react-native-skia';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 import {
-  Pencil, Check, Lock, Unlock, Trash2, Tag as TagIcon, Sparkles, GripVertical,
+  Pencil, Check, Lock, Unlock, Trash2, Tag as TagIcon, GripVertical,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { Point } from './useHardnoteDoc';
@@ -84,8 +86,10 @@ export function InkBulletCard({
   const beginEdit = () => {
     if (lens === 'focus') return;
     if (point.locked) return;
-    setDraft(point.text);
-    setEditing(true);
+    InteractionManager.runAfterInteractions(() => {
+      setDraft(point.text);
+      setEditing(true);
+    });
   };
   const commitEdit = () => {
     if (draft !== point.text) onUpdate({ text: draft });
@@ -293,7 +297,12 @@ export function InkBulletCard({
               </View>
             </>
           ) : (
-            <TouchableOpacity onPress={beginEdit} disabled={lens === 'focus' || point.locked} activeOpacity={0.7}>
+            <Pressable
+              onPress={() => {}}
+              onLongPress={beginEdit}
+              delayLongPress={200}
+              disabled={lens === 'focus' || point.locked}
+            >
               <RenderHtml
                 source={{ html: htmlFor(point.text, isHeading) }}
                 contentWidth={contentWidth - 56}
@@ -315,7 +324,7 @@ export function InkBulletCard({
                   p: { marginVertical: 0 },
                 }}
               />
-            </TouchableOpacity>
+            </Pressable>
           )}
 
           {/* Tags */}
@@ -402,12 +411,7 @@ export function InkBulletCard({
           <TouchableOpacity onPress={onDelete} style={styles.iconBtnSm} data-testid={`ink-card-delete-${point.id}`}>
             <Trash2 size={13} color="#ef4444" />
           </TouchableOpacity>
-          {strokes.length > 0 && (
-            <View style={[styles.strokeBadge, { backgroundColor: '#0ea5e91A' }]}>
-              <Sparkles size={9} color="#0ea5e9" />
-              <Text style={styles.strokeBadgeText}>{strokes.length}</Text>
-            </View>
-          )}
+
           <View style={{ flex: 1 }} />
           <View style={styles.grip}><GripVertical size={14} color={colors.textTertiary} /></View>
         </View>
@@ -504,7 +508,6 @@ const styles = StyleSheet.create({
     width: 26, height: 26, borderRadius: 6,
     alignItems: 'center', justifyContent: 'center',
   },
-  strokeBadge: { flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 10, marginLeft: 4 },
-  strokeBadgeText: { fontSize: 9, fontWeight: '900', color: '#0ea5e9' },
+
   grip: { padding: 4 },
 });

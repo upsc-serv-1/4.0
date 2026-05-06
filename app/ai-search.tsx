@@ -1010,38 +1010,75 @@ export default function AISearchTab() {
           {SearchBar}
 
           {/* Fix #4 — Search History Dropdown: positioned inside a relative wrapper so it sits below the search bar */}
-          {showHistory && searchHistory.length > 0 && (
+          {showHistory && (searchHistory.length > 0 || instituteOptions.length > 0) && (
             <View style={[styles.historyDropdown, {
               backgroundColor: colors.surface,
               borderColor: colors.border,
             }]}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 8, paddingBottom: 4 }}>
-                <Text style={[styles.panelLabel, { color: colors.textTertiary, marginBottom: 0 }]}>RECENT SEARCHES</Text>
-                <TouchableOpacity onPress={() => {
-                  setSearchHistory([]);
-                  AsyncStorage.removeItem('ai_search_history');
-                  setShowHistory(false);
-                }}>
-                  <Text style={{ fontSize: 10, fontWeight: '700', color: colors.textTertiary }}>Clear</Text>
-                </TouchableOpacity>
-              </View>
-              {searchHistory.map((h, i) => (
-                <TouchableOpacity
-                  key={i}
-                  style={[styles.historyItem, { borderBottomColor: colors.border }]}
-                  onPress={() => { setQuery(h); setShowHistory(false); runSearch(h, filters); }}
-                >
-                  <Clock size={12} color={colors.textTertiary} />
-                  <Text style={[styles.historyText, { color: colors.textSecondary }]} numberOfLines={1}>{h}</Text>
-                  <TouchableOpacity onPress={() => {
-                    const next = searchHistory.filter((_, j) => j !== i);
-                    setSearchHistory(next);
-                    AsyncStorage.setItem('ai_search_history', JSON.stringify(next));
-                  }}>
-                    <X size={11} color={colors.textTertiary} />
-                  </TouchableOpacity>
-                </TouchableOpacity>
-              ))}
+              {/* Quick institute filter chips */}
+              {instituteOptions.length > 0 && (
+                <View style={{ paddingHorizontal: 12, paddingTop: 10, paddingBottom: 6 }}>
+                  <Text style={[styles.panelLabel, { color: colors.textTertiary, marginBottom: 6 }]}>FILTER BY INSTITUTE</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexDirection: 'row' }}>
+                    {instituteOptions.slice(0, 10).map(inst => {
+                      const isActive = filters.institutes.split(',').includes(inst);
+                      return (
+                        <TouchableOpacity
+                          key={inst}
+                          onPress={() => {
+                            const list = filters.institutes === 'All' ? [] : filters.institutes.split(',').filter(Boolean);
+                            const next = isActive ? list.filter(i => i !== inst) : [...list, inst];
+                            const newFilters = { ...filters, institutes: next.length ? next.join(',') : 'All' };
+                            setFilters(newFilters);
+                            if (hasSearched && query.trim()) runSearch(query, newFilters);
+                          }}
+                          style={{
+                            marginRight: 6,
+                            paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20,
+                            backgroundColor: isActive ? '#7c3aed' : colors.surfaceStrong,
+                            borderWidth: 1, borderColor: isActive ? '#7c3aed' : colors.border,
+                          }}
+                        >
+                          <Text style={{ fontSize: 11, fontWeight: '700', color: isActive ? '#fff' : colors.textSecondary }}>{inst}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              )}
+
+              {/* Recent searches */}
+              {searchHistory.length > 0 && (
+                <>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 6, paddingBottom: 4 }}>
+                    <Text style={[styles.panelLabel, { color: colors.textTertiary, marginBottom: 0 }]}>RECENT SEARCHES</Text>
+                    <TouchableOpacity onPress={() => {
+                      setSearchHistory([]);
+                      AsyncStorage.removeItem('ai_search_history');
+                      setShowHistory(false);
+                    }}>
+                      <Text style={{ fontSize: 10, fontWeight: '700', color: colors.textTertiary }}>Clear</Text>
+                    </TouchableOpacity>
+                  </View>
+                  {searchHistory.map((h, i) => (
+                    <TouchableOpacity
+                      key={i}
+                      style={[styles.historyItem, { borderBottomColor: colors.border }]}
+                      onPress={() => { setQuery(h); setShowHistory(false); runSearch(h, filters); }}
+                    >
+                      <Clock size={12} color={colors.textTertiary} />
+                      <Text style={[styles.historyText, { color: colors.textSecondary }]} numberOfLines={1}>{h}</Text>
+                      <TouchableOpacity onPress={() => {
+                        const next = searchHistory.filter((_, j) => j !== i);
+                        setSearchHistory(next);
+                        AsyncStorage.setItem('ai_search_history', JSON.stringify(next));
+                      }}>
+                        <X size={11} color={colors.textTertiary} />
+                      </TouchableOpacity>
+                    </TouchableOpacity>
+                  ))}
+                </>
+              )}
             </View>
           )}
         </View>

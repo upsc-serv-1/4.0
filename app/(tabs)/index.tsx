@@ -5,7 +5,7 @@ import * as Haptics from 'expo-haptics';
 import {
   TrendingUp, Target, BookOpen, BarChart3, ChevronRight, Layout, Play, Clock,
   RotateCcw, Zap, History, Plus, GripVertical, Sliders, CheckCircle2, Shuffle,
-  Search as SearchIcon, FileText, Tag, Layers, Star, Award
+  Search as SearchIcon, FileText, Tag, Layers, Star, Award, Brain
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../../src/lib/supabase';
@@ -306,15 +306,21 @@ export default function Home() {
               </View>
 
               <View style={styles.searchContainer}>
-                <GlobalSearchBar
-                  placeholder="Search topics, notes, or PYQs..."
-                  onSearch={(q, f) => {
-                    router.push({
-                      pathname: '/unified/engine',
-                      params: buildArenaEngineSearchParams(q, f)
-                    } as any);
+                <TouchableOpacity
+                  onPress={() => router.push('/(tabs)/ai-search' as any)}
+                  testID="home-search-redirect-btn"
+                  style={{
+                    flexDirection: 'row', alignItems: 'center', gap: 10,
+                    backgroundColor: colors.surface, borderWidth: 1.5, borderColor: colors.border,
+                    borderRadius: 26, paddingHorizontal: 16, paddingVertical: 12,
                   }}
-                />
+                >
+                  <Brain size={16} color="#7c3aed" />
+                  <Text style={{ flex: 1, fontSize: 13, color: colors.textTertiary }}>Search topics, PYQs, notes…</Text>
+                  <View style={{ backgroundColor: '#7c3aed', borderRadius: 12, paddingHorizontal: 8, paddingVertical: 3 }}>
+                    <Text style={{ fontSize: 10, fontWeight: '900', color: '#fff' }}>AI</Text>
+                  </View>
+                </TouchableOpacity>
               </View>
             </View>
 

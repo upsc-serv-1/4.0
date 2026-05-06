@@ -30,6 +30,7 @@ import {
   ArrowRight,
   Layout,
   XCircle,
+  Brain,
 } from 'lucide-react-native';
 import { useTheme } from '../../src/context/ThemeContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
@@ -1258,35 +1259,26 @@ export default function UnifiedArenaSetup() {
           )}
 
           {activeTab === 'search' && (
-            <View style={{ padding: 20 }}>
-              <GlobalSearchBar
-                placeholder="Search for specific keywords..."
-                initialQuery={searchQuery}
-                hideDropdown={true}
-                onSearch={(q, f) => {
-                  const nextFilters = f || {};
-                  setSearchQuery(q);
-                  setSearchFilters(nextFilters);
-
-                  if (!q?.trim()) return;
-
-                  router.push({
-                    pathname: '/unified/engine',
-                    params: buildArenaEngineSearchParams(q, nextFilters, {
-                      mode: 'learning',
-                      view: viewMode,
-                      timer: timerMode,
-                      showPYQTags: 'true'
-                    })
-                  } as any);
+            <View style={{ padding: 20, alignItems: 'center' }}>
+              <TouchableOpacity
+                onPress={() => router.push('/(tabs)/ai-search' as any)}
+                testID="arena-search-redirect-btn"
+                style={{
+                  flexDirection: 'row', alignItems: 'center', gap: 12,
+                  backgroundColor: '#7c3aed15', borderWidth: 1.5, borderColor: '#c4b5fd',
+                  borderRadius: 20, paddingHorizontal: 20, paddingVertical: 16, width: '100%',
                 }}
-              />
-
-              <View style={{ marginTop: 16, padding: 14, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface }}>
-                <Text style={{ fontSize: 12, color: colors.textTertiary, lineHeight: 18 }}>
-                  Press search on the keyboard to open matching questions directly in Arena Index.
-                </Text>
-              </View>
+              >
+                <Brain size={22} color="#7c3aed" />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, fontWeight: '900', color: '#7c3aed' }}>AI Universal Search</Text>
+                  <Text style={{ fontSize: 11, color: '#7c3aed90', marginTop: 2 }}>AI · Fuzzy · Exact — all modes, all filters</Text>
+                </View>
+                <ChevronRight size={18} color="#7c3aed" />
+              </TouchableOpacity>
+              <Text style={{ marginTop: 12, fontSize: 11, color: colors.textTertiary, textAlign: 'center' }}>
+                Search from the AI Search tab for the full experience with hierarchical filters.
+              </Text>
             </View>
           )}
 

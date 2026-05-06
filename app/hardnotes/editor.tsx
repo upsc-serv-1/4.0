@@ -128,7 +128,11 @@ export default function HardnoteEditor() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: lensBg }} edges={['top']} data-testid="hn-editor-root">
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior="height"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
+      >
         {/* Header */}
         <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: lensBg }]}>
           <TouchableOpacity onPress={handleBack} style={styles.iconBtn} data-testid="hn-editor-back">
@@ -186,6 +190,8 @@ export default function HardnoteEditor() {
               { paddingBottom: lens === 'ink' ? 140 : 80 },
               lens === 'focus' && { maxWidth: 720, alignSelf: 'center', paddingTop: 12 },
             ]}
+            keyboardDismissMode="interactive"
+            automaticallyAdjustKeyboardInsets
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >

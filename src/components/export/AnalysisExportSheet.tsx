@@ -37,7 +37,7 @@ import {
   ExportOptions, ExportPayload, ExportQuestion,
   defaultExportOptions, exportToPdf,
   ExportFontFamily, ExportTheme, ExportPaperStyle, ExportContentScope,
-  ExportAnswerPlacement, ExportSortBy, ExportQaLayoutMode,
+  ExportAnswerPlacement, ExportSortBy, ExportQaLayoutMode, ExportVisualStyle,
   buildPyqAnalysisSummaryHtml, type PyqHeatmapRow,
 } from '../../lib/unifiedExportEngine';
 import { generateAnalyticsPdfHtml } from '../../utils/pdf-helpers';
@@ -168,6 +168,10 @@ const CHOICES = {
     { id: 'report_only' as AnalysisExportScope, label: 'Report only' },
     { id: 'report_with_pyqs' as AnalysisExportScope, label: 'Report + PYQs' },
     { id: 'pyqs_only' as AnalysisExportScope, label: 'Only PYQs' },
+  ],
+  visualStyles: [
+    { id: 'document' as ExportVisualStyle, label: 'Document' },
+    { id: 'flashcard' as ExportVisualStyle, label: 'Flashcard Style' },
   ],
 };
 
@@ -762,6 +766,29 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
               <Label colors={colors}>FONT SIZE</Label>
               <Row>{CHOICES.fontSizes.map(sz => <Chip key={sz} active={opts.fontSize === sz} onPress={() => set('fontSize', sz)}>{sz}</Chip>)}</Row>
             </Section>
+
+            {/* Visual Style — shown whenever PYQs are in scope */}
+            {includePyqs && (
+              <Section title="Visual Style" colors={colors}>
+                <Row>
+                  {CHOICES.visualStyles.map(v => (
+                    <Chip
+                      key={v.id}
+                      active={opts.visualStyle === v.id}
+                      onPress={() => set('visualStyle', v.id)}
+                      testID={`analysis-export-visual-${v.id}`}
+                    >
+                      {v.label}
+                    </Chip>
+                  ))}
+                </Row>
+                {opts.visualStyle === 'flashcard' && (
+                  <Text style={{ fontSize: 10, color: colors.textTertiary, fontWeight: '600', marginTop: 4 }}>
+                    Each question is printed as a two-sided card (Question | Answer &amp; Explanation)
+                  </Text>
+                )}
+              </Section>
+            )}
 
             {includePyqs && (
               <>

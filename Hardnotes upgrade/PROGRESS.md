@@ -322,7 +322,7 @@ Soft Notes lives at `/softnotes` (deep-link-able). Wiring it into the bottom-tab
 | # | Title | Status | Commit |
 |---|---|---|---|
 | B1 | Schema migration + types + service + smoothing utils | 🔄 in progress | (this commit) |
-| B2 | Notebooks Hub screen (`/softnotes`) | ⬜ todo | — |
+| B2 | Notebooks Hub screen (`/softnotes`) | ✅ done | (this commit) |
 | B3 | Notebook editor shell (`/softnotes/[notebookId]`) — page list + selected page | ⬜ todo | — |
 | B4 | SoftCanvas component — Skia render + pen + eraser drawing on selected page | ⬜ todo | — |
 | B5 | Highlighter + tape + shape tools, color/width palette | ⬜ todo | — |

@@ -327,11 +327,11 @@ Soft Notes lives at `/softnotes` (deep-link-able). Wiring it into the bottom-tab
 | B4 | SoftCanvas component — Skia render + pen + eraser drawing on selected page | ✅ done | (this commit) |
 | B5 | Highlighter + tape + shape tools, color/width palette | ✅ pen + HL + eraser + tape (shape deferred) | (this commit) |
 | B6 | Pinch-zoom + pan + double-tap reset (canvas transform hook) | ✅ done | (this commit) |
-| B7 | Lasso selection + move/copy/delete | ⬜ todo | — |
-| B8 | Text-box tool | ⬜ todo | — |
-| B9 | Undo/redo + page reorder + page delete | ⬜ todo | — |
-| B10 | Pencil-only / palm rejection | ⬜ todo | — |
-| B11 | Polish: paper styles (ruled / grid / dotted), notebook cover thumbnails, archive | ⬜ todo | — |
+| B7 | Lasso selection + move/copy/delete | ✅ delete shipped; move/copy deferred | (this commit) |
+| B8 | Text-box tool | ⬜ deferred — schema + service ready, UI to come | — |
+| B9 | Undo/redo + page reorder + page delete | ✅ undo/redo done; reorder deferred | (Batch B3-B6) |
+| B10 | Pencil-only / palm rejection | ⬜ deferred — see hooks below | — |
+| B11 | Polish: paper styles + cover thumbnails + archive | ✅ paper styles + cover + archive done | (Batches B2 + B3-B6) |
 
 ## Activity Log — Path B
 
@@ -412,3 +412,58 @@ _Next → Batch B2: Notebooks Hub at `/softnotes`._
 - Direct link: `https://<your-app>.dev/softnotes/<id>` works thanks to file-based routing.
 
 _Next → Batch B7: lasso selection + move/copy/delete._
+
+### 2026-02 · Path B Batch 7 — Lasso selection (delete shipped)
+
+**Files**
+- `src/softnotes/SoftCanvas.tsx` — lasso state, polygon capture, hit-test, selection rect, delete chip
+- `src/softnotes/SoftToolbar.tsx` — Lasso button (`Gesture` icon)
+
+**Behaviour**
+- Pick **Lasso** in the toolbar → single-finger pan now traces a selection polygon (rendered live in blue at width 1.5).
+- On finish: the polygon is closed and `strokesInPolygon(strokes, polygon)` (centre-of-bbox test from `strokes.ts`) returns the IDs that fall inside.
+- A blue selection rectangle is drawn around the union bounds, and a black floating chip "Delete N" appears just above it.
+- Tap **Delete** → calls `onRemoveStrokes(selectedIds)` which is wired to `useSoftPage.removeStrokes()` — undo-able and persisted in one step.
+
+**Move + Copy (deferred)**
+- Both need a second pan gesture in lasso-mode-with-active-selection. Concrete hook:
+  ```
+  if (selectedIds.length && tool === 'lasso') {
+    // capture pan deltas in canvas space
+    // shift each selected stroke's raw_points + bezier_points + bounding_box
+    // diff-update via Supabase (or remove + insertMany)
+  }
+  ```
+- The `SoftStrokeService` already supports the `insertMany` path used by undo/redo, so the move op is "remove + reinsert with shifted coords".
+
+### 🔭 Path B — Deferred items (concrete hooks for the next agent)
+
+| Item | Where | Effort |
+|---|---|---|
+| **Lasso move/copy** | `SoftCanvas` — second pan inside lasso mode, then `removeStrokes(ids) + insertMany(shifted)` | M |
+| **Text-box tool** | New `SoftTextBox.tsx` component + new `'text'` value in `SoftToolKind`. CRUD already exists in `SoftTextBoxService`. Render list in `SoftCanvas` next to `<Group>`. | M |
+| **Pencil-only / palm rejection** | In `SoftCanvas` drawGesture, replace `onBegin` with `onTouchesDown((e, manager) => { if (pencilOnly && !e.allTouches.some(t => (t as any).force > 0.05)) manager.fail(); })`. Add `pencilOnly?: boolean` prop on `SoftCanvas` and a toggle button in `SoftToolbar`. | S |
+| **Page reorder** | `SoftPageService.reorder` is already implemented. Add `react-native-reanimated` drag-to-reorder on `PageThumb` in `app/softnotes/[notebookId].tsx`. | M |
+| **Shape tool** (rectangle / ellipse / arrow) | New `'shape'` branch in `SoftCanvas.finish()`. Store as a `SoftStroke` with two raw_points (corners) + a `shape` field. Render via `Skia.RoundedRect` / `Skia.Oval`. | M |
+| **Realtime multi-device sync** | Subscribe in `useSoftPage`: `supabase.channel('soft_strokes:'+pageId).on('postgres_changes', { table:'soft_strokes', filter:'page_id=eq.'+pageId }, refresh)`. Same pattern as `useHardnoteDoc`. | S |
+| **Pen-only stroke virtualization** | When `strokes.length > 500`, group by Y-buckets in `useSoftPage` and pass only `[scrollY-300, scrollY+vh+300]` to `SoftCanvas`. | M |
+| **Tab-bar entry-point** | Update `src/services/TabConfigService.ts` to add `'softnotes'` as a tab key + register a `<Tabs.Screen name="softnotes" ... />` in `app/(tabs)/_layout.tsx`. Right now the route is reachable via deep link `/softnotes` only. | S |
+| **Cover thumbnails from page strokes** | Render the first page's strokes into a small Skia surface during the hub query. Store as a base64 PNG in a new `cover_thumb` column (migration update). | L |
+| **Export PDF / Markdown** | Each Page has a known `width × height`. Run all strokes through Skia → PDF or render to MD with placeholders. The Hardnotes `UnifiedExportSheet` is a good blueprint. | M-L |
+| **Apple Pencil tilt + altitude** | RNGH `onTouchesDown((e) => e.allTouches[0].properties)` exposes them on iPadOS native builds. Capture into `SoftStrokePoint.tilt / azimuth`. | S-M |
+
+### 🎯 What an end-user can do today (Path B)
+
+1. Run **`SOFTNOTES_MIGRATION.sql`** once in Supabase.
+2. Navigate to **`/softnotes`** (deep link from any browser tab or `router.push('/softnotes')`).
+3. **Create a notebook** — pick a cover colour. The first page seeds automatically.
+4. Inside the editor:
+   - Pick **Pen / Highlighter / Eraser / Tape / Lasso** in the floating dock.
+   - **Single-finger draw**, **two-finger pan**, **pinch zoom**, **double-tap to reset**.
+   - **Undo / Redo** unlimited within the session.
+   - **Lasso → drag a loop → Delete N** — bulk delete strokes.
+   - **+ Page** in the header — adds a new blank page; tap the page number rail / strip to switch.
+   - **Tap title** to rename notebook.
+5. Back to hub: **Pin / Archive / Delete** any notebook from the 3-dot menu.
+
+That covers the **core Notability product loop** end to end.

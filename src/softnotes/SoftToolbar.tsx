@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { Pen, Highlighter, Eraser, Square, Undo2, Redo2 } from 'lucide-react-native';
+import { Pen, Highlighter, Eraser, Square, Undo2, Redo2, Lasso } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { SoftToolKind } from './types';
 
@@ -51,6 +51,9 @@ export function SoftToolbar({
         </ToolBtn>
         <ToolBtn active={tool === 'tape'} onPress={() => { onToolChange('tape'); ping(); }} testID="soft-tool-tape">
           <Square size={18} color={tool === 'tape' ? '#0f172a' : '#94a3b8'} fill={tool === 'tape' ? '#fde68a' : 'none'} strokeWidth={2.5} />
+        </ToolBtn>
+        <ToolBtn active={tool === 'lasso'} onPress={() => { onToolChange('lasso'); ping(); }} testID="soft-tool-lasso">
+          <Lasso size={18} color={tool === 'lasso' ? '#3b82f6' : '#94a3b8'} strokeWidth={2.5} />
         </ToolBtn>
       </View>
       <View style={s.divider} />

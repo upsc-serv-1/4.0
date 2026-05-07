@@ -13,13 +13,15 @@ import { View, StyleSheet } from 'react-native';
 import { Canvas, Path, Group, Rect } from '@shopify/react-native-skia';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useSharedValue, useAnimatedStyle } from 'react-native-reanimated';
+import { Lasso, Trash2 } from 'lucide-react-native';
+import { TouchableOpacity, Text } from 'react-native';
 import {
   SoftStroke, SoftStrokePoint, SoftToolKind,
   Page, PaperStyle,
 } from './types';
 import {
   smoothStroke, bezierToSvgPath, computeBoundingBox, screenToCanvas,
-  pressureFromVelocity,
+  pressureFromVelocity, strokesInPolygon,
 } from './strokes';
 
 const COLOR_WITH_OPACITY = (hex: string, alpha: number): string => {
@@ -48,7 +50,10 @@ export function SoftCanvas({
   onAddStroke, onRemoveStrokes,
 }: Props) {
   const [currentPoints, setCurrentPoints] = useState<SoftStrokePoint[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectionBounds, setSelectionBounds] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   const pointsRef = useRef<SoftStrokePoint[]>([]);
+  const lassoPointsRef = useRef<{ x: number; y: number }[]>([]);
   const eraseHitsRef = useRef<Set<string>>(new Set());
   const lastSampleRef = useRef(0);
 
@@ -71,6 +76,12 @@ export function SoftCanvas({
       hitErase(x, y);
       return;
     }
+    if (tool === 'lasso') {
+      lassoPointsRef.current = [{ x, y }];
+      setSelectedIds([]);
+      setSelectionBounds(null);
+      return;
+    }
     pointsRef.current = [{ x, y, pressure: 0.5, timestamp: Date.now() }];
     setCurrentPoints(pointsRef.current);
     lastSampleRef.current = Date.now();
@@ -80,6 +91,14 @@ export function SoftCanvas({
     const { x, y } = screenToCanvas(sx, sy, zoomJS.current, panXJS.current, panYJS.current);
     if (tool === 'eraser') {
       hitErase(x, y);
+      return;
+    }
+    if (tool === 'lasso') {
+      const last = lassoPointsRef.current[lassoPointsRef.current.length - 1];
+      if (!last || Math.abs(last.x - x) + Math.abs(last.y - y) > 4) {
+        lassoPointsRef.current.push({ x, y });
+        setCurrentPoints([...lassoPointsRef.current.map((p) => ({ x: p.x, y: p.y, pressure: 0.5, timestamp: 0 }))]);
+      }
       return;
     }
     const now = Date.now();
@@ -102,6 +121,29 @@ export function SoftCanvas({
       const ids = Array.from(eraseHitsRef.current);
       eraseHitsRef.current = new Set();
       if (ids.length) onRemoveStrokes(ids);
+      return;
+    }
+    if (tool === 'lasso') {
+      const poly = lassoPointsRef.current;
+      if (poly.length >= 3) {
+        const ids = strokesInPolygon(strokes, poly);
+        if (ids.length > 0) {
+          // Compute bounds of selected strokes (canvas coords) for the action chip.
+          let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+          for (const s of strokes) {
+            if (!ids.includes(s.id)) continue;
+            const b = s.bounding_box || computeBoundingBox(s.raw_points);
+            if (b.x < minX) minX = b.x;
+            if (b.y < minY) minY = b.y;
+            if (b.x + b.width > maxX) maxX = b.x + b.width;
+            if (b.y + b.height > maxY) maxY = b.y + b.height;
+          }
+          setSelectedIds(ids);
+          setSelectionBounds({ x: minX, y: minY, w: maxX - minX, h: maxY - minY });
+        }
+      }
+      lassoPointsRef.current = [];
+      setCurrentPoints([]);
       return;
     }
     const pts = pointsRef.current;
@@ -243,8 +285,13 @@ export function SoftCanvas({
                 />
               );
             })}
-            {/* Live stroke */}
+            {/* Live stroke / lasso path */}
             {currentPoints.length > 0 && (() => {
+              if (tool === 'lasso') {
+                const d = `M ${currentPoints[0].x} ${currentPoints[0].y} ` +
+                  currentPoints.slice(1).map((p) => `L ${p.x} ${p.y}`).join(' ');
+                return <Path path={d} color="#3b82f6" style="stroke" strokeWidth={1.5} strokeCap="round" strokeJoin="round" />;
+              }
               const path = bezierToSvgPath(smoothStroke(currentPoints));
               if (!path) return null;
               const isHL = tool === 'highlighter';
@@ -263,8 +310,44 @@ export function SoftCanvas({
                 />
               );
             })()}
+            {/* Selection rectangle */}
+            {selectionBounds && (
+              <Group>
+                <Rect x={selectionBounds.x - 4} y={selectionBounds.y - 4}
+                  width={selectionBounds.w + 8} height={2} color="#3b82f6" />
+                <Rect x={selectionBounds.x - 4} y={selectionBounds.y + selectionBounds.h + 2}
+                  width={selectionBounds.w + 8} height={2} color="#3b82f6" />
+                <Rect x={selectionBounds.x - 4} y={selectionBounds.y - 4}
+                  width={2} height={selectionBounds.h + 8} color="#3b82f6" />
+                <Rect x={selectionBounds.x + selectionBounds.w + 2} y={selectionBounds.y - 4}
+                  width={2} height={selectionBounds.h + 8} color="#3b82f6" />
+              </Group>
+            )}
           </Group>
         </Canvas>
+        {/* Selection action chip — overlays the selection bounds */}
+        {selectionBounds && selectedIds.length > 0 && (
+          <View
+            pointerEvents="box-none"
+            style={[
+              styles.selectionChip,
+              { left: selectionBounds.x, top: Math.max(0, selectionBounds.y - 36) },
+            ]}
+          >
+            <TouchableOpacity
+              onPress={() => {
+                onRemoveStrokes(selectedIds);
+                setSelectedIds([]);
+                setSelectionBounds(null);
+              }}
+              style={styles.selectionDeleteBtn}
+              data-testid="soft-selection-delete"
+            >
+              <Trash2 size={14} color="#ffffff" />
+              <Text style={styles.selectionDeleteTxt}>Delete {selectedIds.length}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </Animated.View>
     </GestureDetector>
   );
@@ -314,4 +397,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     overflow: 'hidden',
   },
+  selectionChip: {
+    position: 'absolute',
+  },
+  selectionDeleteBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: '#0f172a',
+    paddingHorizontal: 10, paddingVertical: 6,
+    borderRadius: 8,
+  },
+  selectionDeleteTxt: { color: '#ffffff', fontSize: 12, fontWeight: '800' },
 });

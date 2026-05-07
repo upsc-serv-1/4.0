@@ -133,6 +133,29 @@ export default function HardnoteEditor() {
     return { kind: 'notes', blocks };
   }, [doc.points, doc.title, includeHighlights, noteId]);
 
+  // ===== Hierarchy: compute depth for each point by walking the parentId chain =====
+  const depthByPointId = useMemo(() => {
+    const byId = new Map(doc.points.map((p) => [p.id, p]));
+    const cache = new Map<string, number>();
+    const depthOf = (id: string, seen = new Set<string>()): number => {
+      if (cache.has(id)) return cache.get(id)!;
+      if (seen.has(id)) return 0; // cycle guard
+      seen.add(id);
+      const p = byId.get(id);
+      if (!p || !p.parentId) {
+        cache.set(id, 0);
+        return 0;
+      }
+      const d = depthOf(p.parentId, seen) + 1;
+      const clamped = Math.min(d, 4); // cap visual indent at 4 levels
+      cache.set(id, clamped);
+      return clamped;
+    };
+    const out: Record<string, number> = {};
+    for (const p of doc.points) out[p.id] = depthOf(p.id);
+    return out;
+  }, [doc.points]);
+
   if (!noteId) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} edges={['top']}>
@@ -297,6 +320,7 @@ export default function HardnoteEditor() {
                   point={p}
                   lens={lens}
                   contentWidth={contentWidth}
+                  depth={depthByPointId[p.id] || 0}
                   inkTool={inkTool}
                   inkColor={inkColor}
                   inkWidth={inkWidth}
@@ -314,7 +338,8 @@ export default function HardnoteEditor() {
                     )
                   }
                   onToggleLock={() => doc.toggleLock(p.id)}
-                  onAddBelow={() => doc.insertPoint(p.id, { type: 'point', text: '' })}
+                  onAddBelow={() => doc.insertPoint(p.id, { type: 'point', text: '', parentId: p.parentId ?? null })}
+                  onAddChild={() => doc.insertPoint(p.id, { type: 'point', text: '', parentId: p.id })}
                   textModeActive={lens === 'ink' && textModeActive}
                 />
               ))

@@ -29,7 +29,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 import {
   Pencil, Check, Lock, Unlock, Trash2, Tag as TagIcon, GripVertical, Plus,
-  Underline as UnderlineIcon, Strikethrough as StrikethroughIcon,
+  Underline as UnderlineIcon, Strikethrough as StrikethroughIcon, CornerDownRight,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { Point } from './useHardnoteDoc';
@@ -40,6 +40,8 @@ interface Props {
   point: Point;
   lens: Lens;
   contentWidth: number;
+  /** Indentation level (0 = top-level). Capped at 4 in the parent. */
+  depth?: number;
   /** Ink-lens tool settings (forwarded from parent). */
   inkTool: ToolKind;
   inkColor: string;
@@ -52,6 +54,7 @@ interface Props {
   onToggleLock: () => void;
   onOpenTagSheet?: () => void;
   onAddBelow?: () => void;
+  onAddChild?: () => void;
   textModeActive?: boolean;
 }
 
@@ -66,9 +69,9 @@ const MIN_CARD_HEIGHT = 72;
 const EDIT_EXPAND_MULT = 1.15;
 
 export function InkBulletCard({
-  point, lens, contentWidth, inkTool, inkColor, inkWidth,
+  point, lens, contentWidth, depth = 0, inkTool, inkColor, inkWidth,
   onUpdate, onAddStroke, onRemoveStrokes, onDelete, onRequestHighlight, onToggleLock, onOpenTagSheet,
-  onAddBelow,
+  onAddBelow, onAddChild,
   textModeActive,
 }: Props) {
   const { colors } = useTheme();
@@ -277,6 +280,7 @@ export function InkBulletCard({
           backgroundColor: cardBgByLens[lens],
           borderColor: colors.border,
           borderLeftColor: accent,
+          marginLeft: 12 + Math.min(depth, 4) * 22,
         },
         isHeading && styles.headingCard,
       ]}
@@ -525,15 +529,29 @@ export function InkBulletCard({
         </View>
       )}
 
-      {lens === 'glance' && !editing && onAddBelow && (
-        <TouchableOpacity
-          onPress={onAddBelow}
-          style={[styles.addBelowBtn, { borderColor: colors.border, backgroundColor: colors.surface }]}
-          data-testid={`ink-card-add-below-${point.id}`}
-        >
-          <Plus size={12} color={colors.textSecondary} />
-          <Text style={[styles.addBelowText, { color: colors.textSecondary }]}>Add below</Text>
-        </TouchableOpacity>
+      {lens === 'glance' && !editing && (onAddBelow || onAddChild) && (
+        <View style={styles.addRowGroup}>
+          {onAddBelow && (
+            <TouchableOpacity
+              onPress={onAddBelow}
+              style={[styles.addBelowBtn, { borderColor: colors.border, backgroundColor: colors.surface }]}
+              data-testid={`ink-card-add-below-${point.id}`}
+            >
+              <Plus size={12} color={colors.textSecondary} />
+              <Text style={[styles.addBelowText, { color: colors.textSecondary }]}>Add below</Text>
+            </TouchableOpacity>
+          )}
+          {onAddChild && depth < 4 && (
+            <TouchableOpacity
+              onPress={onAddChild}
+              style={[styles.addBelowBtn, { borderColor: colors.border, backgroundColor: colors.surface }]}
+              data-testid={`ink-card-add-child-${point.id}`}
+            >
+              <CornerDownRight size={12} color={colors.textSecondary} />
+              <Text style={[styles.addBelowText, { color: colors.textSecondary }]}>Add child</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       )}
     </View>
   );
@@ -651,6 +669,12 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   grip: { padding: 4 },
+  addRowGroup: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
   addBelowBtn: {
     marginTop: 8,
     alignSelf: 'center',

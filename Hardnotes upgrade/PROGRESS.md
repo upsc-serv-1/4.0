@@ -83,7 +83,7 @@ Out of scope for this branch:
 |---|---|---|---|
 | 0 | Branch + progress.md scaffolding | ✅ done | `83d91c4` |
 | 1 | iPad polish + Underline/Strikethrough in toolbar | ✅ done | `af0b966` |
-| 2 | Hierarchical bullets (parent/child) | ⬜ todo | — |
+| 2 | Hierarchical bullets (parent/child) | ✅ done | (this commit) |
 | 3 | Real-time Notes ↔ Hardnotes sync | ⬜ todo | — |
 | 4 | Notes-tab "Open in Hardnotes" + iPad dockable toolbar | ⬜ todo | — |
 
@@ -145,3 +145,36 @@ _Next step → Batch 1: iPad polish + Underline + Strikethrough._
 **Known follow-ups (deferred)**
 - LensSwitcher chips themselves still use ~30 px height — fine on iPad but could grow.
 - The format toolbar still wraps onto two lines on small phones with all 4 swatches + B/I/U/S/Done; intentional for now.
+
+### 2026-02 · Batch 2 — Hierarchical bullets (parent → child nesting)
+
+**Files touched**
+- `src/components/hardnotes/useHardnoteDoc.ts`
+- `src/components/hardnotes/InkBulletCard.tsx`
+- `app/hardnotes/editor.tsx`
+
+**Changes**
+- `Point` interface gains `parentId?: string | null`. Persistence stays a **flat array** in `user_notes.items`; depth is computed at render time. No DB schema change.
+- `normalize()` preserves `parentId` from any legacy item shape.
+- `removePoint()` cascade-deletes descendants (any point whose ancestor chain includes the removed id).
+- `insertPoint(afterId, draft)` is hierarchy-aware: when called against a parent, it places the new point **after** all of that parent's descendants so the subtree stays contiguous.
+- `editor.tsx` builds `depthByPointId` once per render (cycle-guarded, capped at 4) and passes `depth` to each card.
+- `editor.tsx` adds an `onAddChild` callback that creates a sibling with `parentId = parent.id`. The "Add below" button now lives next to a new "Add child" pill.
+- `InkBulletCard.tsx` accepts `depth` + `onAddChild`. Cards indent visually via `marginLeft = 12 + depth*22`. Lucide `CornerDownRight` icon used for the child pill.
+
+**Why these are safe**
+- Backwards-compatible: existing notes with no `parentId` render at depth 0, identical to today.
+- All hierarchy data lives inside the existing `items` JSONB. No migration.
+
+**Manual smoke test plan**
+1. Create a top-level point → tap "Add child" → new card appears indented one level.
+2. Add another child → both nested under same parent.
+3. Tap "Add below" on a child → new card is at the same depth, *after* its siblings.
+4. Delete the parent → confirms parent + all descendants disappear.
+5. Reload note → hierarchy persists.
+
+**Known follow-ups (deferred)**
+- No drag-to-re-parent UI yet (existing reorderPoints helper is order-only).
+- No collapse/expand toggle on parents — all subtrees always render.
+
+_Next → Batch 3 (Phase 3 of plan): real-time Notes ↔ Hardnotes sync via Supabase channel._

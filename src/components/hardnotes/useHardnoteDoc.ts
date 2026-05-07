@@ -24,6 +24,8 @@ export interface Point {
   checked?: boolean;           // for checklist
   strokes?: Stroke[];          // per-bullet ink annotations
   tags?: string[];             // review-tag catalog
+  /** Hierarchical nesting — id of the parent point (or null for top-level). */
+  parentId?: string | null;
   createdAt?: string;
 }
 
@@ -56,7 +58,7 @@ const normalize = (raw: any[]): Point[] => {
     if (!it || typeof it !== 'object') return mkPoint({ text: String(it || '') });
     // Legacy shapes → canonical point
     if (it.type === 'microTopicHeading') {
-      return { id: String(it.id || `hd_${idx}`), type: 'heading', text: String(it.text || ''), createdAt: it.addedAt };
+      return { id: String(it.id || `hd_${idx}`), type: 'heading', text: String(it.text || ''), createdAt: it.addedAt, parentId: it.parentId ?? null };
     }
     if (it.type === 'base_layer') {
       return {
@@ -67,6 +69,7 @@ const normalize = (raw: any[]): Point[] => {
         locked: true,
         source: it.source || 'quiz_explanation',
         strokes: Array.isArray(it.strokes) ? it.strokes : [],
+        parentId: it.parentId ?? null,
         createdAt: it.created_at,
       };
     }
@@ -81,6 +84,7 @@ const normalize = (raw: any[]): Point[] => {
         checked: Boolean(it.checked),
         strokes: Array.isArray(it.strokes) ? it.strokes : [],
         tags: Array.isArray(it.tags) ? it.tags : undefined,
+        parentId: it.parentId ?? null,
         createdAt: it.addedAt || it.createdAt,
       };
     }
@@ -319,8 +323,31 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
       if (afterId === null) {
         next = [...prev, newPt];
       } else {
+        // Find afterId, then skip past any descendants so a sibling/child lands at the end of the subtree.
         const idx = prev.findIndex((p) => p.id === afterId);
-        next = idx < 0 ? [...prev, newPt] : [...prev.slice(0, idx + 1), newPt, ...prev.slice(idx + 1)];
+        if (idx < 0) {
+          next = [...prev, newPt];
+        } else {
+          // Compute set of ids that descend from afterId.
+          const descendants = new Set<string>([prev[idx].id]);
+          let grew = true;
+          while (grew) {
+            grew = false;
+            for (const p of prev) {
+              if (p.parentId && descendants.has(p.parentId) && !descendants.has(p.id)) {
+                descendants.add(p.id);
+                grew = true;
+              }
+            }
+          }
+          // Find the last index in prev that belongs to the descendants set (contiguous block walking forward).
+          let endIdx = idx;
+          for (let i = idx + 1; i < prev.length; i++) {
+            if (descendants.has(prev[i].id)) endIdx = i;
+            else break;
+          }
+          next = [...prev.slice(0, endIdx + 1), newPt, ...prev.slice(endIdx + 1)];
+        }
       }
       scheduleSave(next);
       return next;
@@ -330,7 +357,19 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
 
   const removePoint = useCallback((id: string) => {
     setPoints((prev) => {
-      const next = prev.filter((p) => p.id !== id);
+      // Cascade-delete: collect this point + all descendants by walking parentId chain.
+      const toRemove = new Set<string>([id]);
+      let grew = true;
+      while (grew) {
+        grew = false;
+        for (const p of prev) {
+          if (p.parentId && toRemove.has(p.parentId) && !toRemove.has(p.id)) {
+            toRemove.add(p.id);
+            grew = true;
+          }
+        }
+      }
+      const next = prev.filter((p) => !toRemove.has(p.id));
       scheduleSave(next);
       return next;
     });

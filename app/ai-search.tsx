@@ -522,8 +522,8 @@ export default function AISearchTab() {
         cardId,
         hint: {
           subject: q.subject || 'General',
-          section_group: q.section_group || 'General',
-          microtopic: q.micro_topic || 'General',
+          section_group: (q as any).section_group || (q as any).sectionGroup || 'General',
+          microtopic: (q as any).micro_topic || (q as any).microtopic || (q as any).microTopic || 'General',
         },
       });
     } catch (err: any) {

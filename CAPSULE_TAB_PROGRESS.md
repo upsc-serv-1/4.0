@@ -64,7 +64,8 @@ After each step the agent commits with message
 | 4 | done | `Step 4: Dynamic expandable sidebar tree + breadcrumb + scoped notebook list` |
 | 5 | done | `Step 5: Glance reading workspace with block renderer + sidebar toggle` |
 | 6 | done | `Step 6: Block editor (paragraph/heading/bullet/numbered/checklist/highlight/quote with autosave)` |
-| 7 | pending | — |
+| 7 | done | `Step 7: Add-to-Notebook destination chooser + Capsule picker (Manual + Auto)` |
+| 8 | pending | — |
 
 ---
 

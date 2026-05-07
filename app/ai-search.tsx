@@ -36,6 +36,9 @@ import { StudentSync } from '../src/services/StudentSync';
 import { useQuizStore } from '../src/store/quizStore';
 import { useTagStore } from '../src/store/tagStore';
 import { NotebookLocationPicker } from '../src/components/NotebookLocationPicker';
+import { AddToNotebookSheet, SaveDestination } from '../src/components/capsule/AddToNotebookSheet';
+import { CapsuleLocationPicker } from '../src/components/capsule/CapsuleLocationPicker';
+import { appendTextToCapsule } from '../src/utils/capsuleAppend';
 import { AddToFlashcardSheet } from '../src/components/flashcards/AddToFlashcardSheet';
 import { fetchBestAnswer, type BestAnswer } from '../src/services/BestAnswerService';
 import { LocalQuery } from '../src/services/LocalQuery';
@@ -245,6 +248,8 @@ export default function AISearchTab() {
 
   // Notebook states for "Add to Notebook" parity
   const [notebookModalVisible, setNotebookModalVisible] = useState(false);
+  const [destChooserOpen, setDestChooserOpen] = useState(false);
+  const [capsulePickerOpen, setCapsulePickerOpen] = useState(false);
   const [selectedNotebook, setSelectedNotebook] = useState<{ node_id: string; note_id: string; title: string; folder_id: string | null } | null>(null);
   const [previewNotebookDraft, setPreviewNotebookDraft] = useState<string>('');
   const [isSavingToNotebook, setIsSavingToNotebook] = useState(false);
@@ -2201,7 +2206,7 @@ export default function AISearchTab() {
                       showNotebookButton={false}
                       openNotebookFromQuestion={(_: any, activeText?: string) => {
                         setPreviewNotebookDraft(activeText || '');
-                        setNotebookModalVisible(true);
+                        setDestChooserOpen(true);
                       }}
                       onCreateTag={() => setIsAddingTag(true)}
                     />
@@ -2260,6 +2265,49 @@ export default function AISearchTab() {
           onClose={() => setNotebookModalVisible(false)}
           userId={session?.user?.id || ''}
           onPickNotebook={handlePickNotebook}
+        />
+
+        <AddToNotebookSheet
+          visible={destChooserOpen}
+          onClose={() => setDestChooserOpen(false)}
+          options={['capsule', 'notes']}
+          onPick={(d: SaveDestination) => {
+            setDestChooserOpen(false);
+            if (d === 'capsule') {
+              setCapsulePickerOpen(true);
+            } else if (d === 'notes') {
+              setNotebookModalVisible(true);
+            }
+          }}
+        />
+
+        <CapsuleLocationPicker
+          visible={capsulePickerOpen}
+          userId={session?.user?.id || ''}
+          onClose={() => setCapsulePickerOpen(false)}
+          autoSeed={previewQuestion ? {
+            subject: previewQuestion.subject || null,
+            topic: (previewQuestion as any).section_group || null,
+            subtopic: previewQuestion.micro_topic || null,
+          } : undefined}
+          defaultNotebookTitle={previewQuestion?.micro_topic || previewQuestion?.subject || ''}
+          onPick={async ({ note_id, title }) => {
+            setCapsulePickerOpen(false);
+            const text = previewNotebookDraft
+              || (previewExplSource === 'ai' ? aiExplanation : null)
+              || previewQuestion?.explanation_markdown
+              || '';
+            if (!text || !previewQuestion) return;
+            const ok = await appendTextToCapsule({
+              noteId: note_id,
+              text,
+              heading: previewQuestion.micro_topic || previewQuestion.subject || undefined,
+              source: `AI Search / ${previewQuestion.subject || ''} ${previewQuestion.exam_year || ''}`.trim(),
+            });
+            setPreviewNotebookDraft('');
+            if (ok) Alert.alert('Saved to Capsule', `Appended to "${title}".`);
+            else Alert.alert('Error', 'Could not save to Capsule. Please try again.');
+          }}
         />
 
         {/* Create Tag Modal (Issue #7) */}

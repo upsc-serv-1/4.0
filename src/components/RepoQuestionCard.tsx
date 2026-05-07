@@ -5,10 +5,11 @@ import { spacing, radius } from '../theme';
 import { TaggedQuestion } from '../hooks/useTaggedQuestions';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Eye, Trash2, Zap } from 'lucide-react-native';
+import { Eye, Trash2, Zap, ExternalLink } from 'lucide-react-native';
 import { FlashcardSvc } from '../services/FlashcardService';
 import { AddToFlashcardSheet } from './flashcards/AddToFlashcardSheet';
 import { autoCleanupQuestionState } from '../utils/questionStateUtils';
+import { useRouter } from 'expo-router';
 
 interface RepoQuestionCardProps {
   question: TaggedQuestion;
@@ -19,6 +20,7 @@ interface RepoQuestionCardProps {
 export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestionCardProps) => {
   const { colors } = useTheme();
   const { session } = useAuth();
+  const router = useRouter();
   
   const [revealStage, setRevealStage] = useState(0);
   const [loadingAction, setLoadingAction] = useState<'remove' | 'flash' | null>(null);
@@ -155,6 +157,21 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestion
               {loadingAction === 'flash' ? <ActivityIndicator size="small" color={colors.primary} /> : <Zap size={10} color={colors.primary} />}
               <Text style={[styles.actionBtnText, { color: colors.primary }]}>Flashcard</Text>
             </TouchableOpacity>
+            {question.testId && (
+              <TouchableOpacity
+                onPress={() => {
+                  router.push({
+                    pathname: '/unified/engine',
+                    params: { testId: question.testId, mode: 'learning' },
+                  });
+                }}
+                style={[styles.actionBtn, { borderColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.border }]}
+                testID="view-source-btn"
+              >
+                <ExternalLink size={10} color={zenSecColor} />
+                <Text style={[styles.actionBtnText, { color: zenSecColor }]}>Source</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       )}

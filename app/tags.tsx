@@ -649,6 +649,8 @@ ${answerText}` : ''}`,
                       <TouchableOpacity
                         key={subject.name}
                         onPress={() => setActiveSubject(subject.name)}
+                        activeOpacity={0.7}
+                        testID={`subject-folder-${subject.name}`}
                         style={[viewMode === 'grid' ? styles.subjectCard : styles.subjectListRow, { backgroundColor: colors.surface }]}
                       >
                         <View style={[styles.subjectIcon, { backgroundColor: colors.primary + '10' }]}>
@@ -1127,7 +1129,7 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 20, fontWeight: '900' },
   viewToggle: { flexDirection: 'row', gap: 4 },
   grid: { gap: spacing.md },
-  list: { gap: 10 },
+  list: { gap: 10, overflow: 'visible' },
   subjectCard: { padding: 18, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.4)', flexDirection: 'row', alignItems: 'center', gap: 12 },
   subjectListRow: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.3)', gap: 16 },
   subjectIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },

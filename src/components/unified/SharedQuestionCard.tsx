@@ -81,6 +81,7 @@ export const SharedQuestionCard = ({
   savedFlash = {},
   fontSize = 15,
   showNotebookButton = true,
+  onCreateTag,
 }: any) => {
     const { colors: themeColors } = useTheme();
     const effectiveColors = colors || themeColors;
@@ -332,6 +333,15 @@ export const SharedQuestionCard = ({
                   </TouchableOpacity>
                 );
               })}
+              {onCreateTag && (
+                <TouchableOpacity
+                  onPress={onCreateTag}
+                  style={[styles.chip, { backgroundColor: effectiveColors.primary + '10', borderColor: effectiveColors.primary + '40', paddingHorizontal: 8 }]}
+                  testID="create-tag-shared-btn"
+                >
+                  <Plus size={10} color={effectiveColors.primary} />
+                </TouchableOpacity>
+              )}
             </ScrollView>
           </View>
 

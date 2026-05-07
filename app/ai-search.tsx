@@ -247,6 +247,10 @@ export default function AISearchTab() {
   const [previewNotebookDraft, setPreviewNotebookDraft] = useState<string>('');
   const [isSavingToNotebook, setIsSavingToNotebook] = useState(false);
 
+  // Create tag states (Issue #7 — universal "+ create tag" button)
+  const [isAddingTag, setIsAddingTag] = useState(false);
+  const [newTagText, setNewTagText] = useState('');
+
   // Unified Flashcard Flow
   const {
     savingFlashcard,
@@ -484,6 +488,31 @@ export default function AISearchTab() {
       useTagStore.getState().bump({ type: 'add', tag, at: Date.now() });
     } catch (err) {
       console.error("Tag Sync Error:", err);
+    }
+  };
+
+  const handleCreateTagAISearch = async () => {
+    if (!newTagText.trim()) return;
+    if (userTags.includes(newTagText.trim())) {
+      setIsAddingTag(false);
+      setNewTagText('');
+      return;
+    }
+    const createdTag = newTagText.trim();
+    const updated = [...userTags, createdTag];
+    setUserTags(updated);
+    setIsAddingTag(false);
+    setNewTagText('');
+
+    if (session?.user?.id) {
+      try {
+        const catalogKey = `review_tag_catalog_${session.user.id}`;
+        const existing = await AsyncStorage.getItem(catalogKey);
+        const parsed: string[] = existing ? JSON.parse(existing) : [];
+        const newList = Array.from(new Set([...parsed, createdTag]));
+        await AsyncStorage.setItem(catalogKey, JSON.stringify(newList));
+      } catch {}
+      useTagStore.getState().bump({ type: 'add', tag: createdTag, at: Date.now() });
     }
   };
 
@@ -2154,6 +2183,7 @@ export default function AISearchTab() {
                         setPreviewNotebookDraft(activeText || '');
                         setNotebookModalVisible(true);
                       }}
+                      onCreateTag={() => setIsAddingTag(true)}
                     />
                     
                     {previewQuestion.micro_topic && (
@@ -2211,6 +2241,37 @@ export default function AISearchTab() {
           userId={session?.user?.id || ''}
           onPickNotebook={handlePickNotebook}
         />
+
+        {/* Create Tag Modal (Issue #7) */}
+        <Modal visible={isAddingTag} transparent animationType="fade" onRequestClose={() => setIsAddingTag(false)}>
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ backgroundColor: colors.surface, borderRadius: 16, padding: 20, width: '80%', maxWidth: 340, borderWidth: 1, borderColor: colors.border }}>
+              <Text style={{ fontSize: 16, fontWeight: '800', color: colors.textPrimary, marginBottom: 12 }}>New Study Tag</Text>
+              <TextInput
+                style={{ backgroundColor: colors.bg, borderRadius: 12, padding: 14, fontSize: 14, color: colors.textPrimary, marginBottom: 16, borderWidth: 1, borderColor: colors.border }}
+                placeholder="e.g. Trap Question"
+                autoFocus
+                placeholderTextColor={colors.textTertiary}
+                value={newTagText}
+                onChangeText={setNewTagText}
+              />
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <TouchableOpacity
+                  style={{ flex: 1, padding: 14, borderRadius: 12, backgroundColor: colors.surfaceStrong, alignItems: 'center' }}
+                  onPress={() => { setIsAddingTag(false); setNewTagText(''); }}
+                >
+                  <Text style={{ fontWeight: '800', color: colors.textPrimary }}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ flex: 2, padding: 14, borderRadius: 12, backgroundColor: '#7c3aed', alignItems: 'center' }}
+                  onPress={handleCreateTagAISearch}
+                >
+                  <Text style={{ fontWeight: '800', color: '#fff' }}>Create</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
     </PageWrapper>
   );
 }

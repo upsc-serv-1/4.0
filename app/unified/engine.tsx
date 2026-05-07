@@ -2566,6 +2566,7 @@ export default function UnifiedQuizEngine() {
         fontSize={fontSize}
         mdStyles={mdStyles}
         mdRules={mdRules}
+        onCreateTag={() => setIsAddingTag(true)}
       />
     );
   };
@@ -2693,6 +2694,13 @@ export default function UnifiedQuizEngine() {
                 </TouchableOpacity>
               );
             })}
+            <TouchableOpacity
+              onPress={() => setIsAddingTag(true)}
+              style={[stylesPaper.miniChip, { borderColor: colors.primary + '40', backgroundColor: colors.primary + '10', paddingHorizontal: 8 }]}
+              testID="create-tag-inline-btn"
+            >
+              <Plus size={10} color={colors.primary} />
+            </TouchableOpacity>
           </View>
         </View>
 

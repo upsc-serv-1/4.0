@@ -2893,6 +2893,25 @@ export default function UnifiedQuizEngine() {
             </TouchableOpacity>
           )}
 
+          {/* Arena Index shortcut — main engine parity with the AI Search
+              quick-jump button. Tap to return to the Arena Index (question
+              picker). Only shown in Learning mode where the index exists. */}
+          {!isFromSearch && arenaMode === 'learning' && !showIndex && (
+            <TouchableOpacity
+              onPress={() => setShowIndex(true)}
+              testID="engine-arena-index-btn"
+              style={{
+                flexDirection: 'row', alignItems: 'center', gap: 5,
+                backgroundColor: colors.primary + '15', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12,
+              }}
+            >
+              <ListIcon size={14} color={colors.primary} />
+              <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 11 }}>
+                {currentIndex + 1}/{questions.length}
+              </Text>
+            </TouchableOpacity>
+          )}
+
           <View style={styles.headerTitleContainer}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
               {!isFromSearch && (

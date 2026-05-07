@@ -74,7 +74,7 @@ type SearchResult = {
 
 type Filters = {
   searchMode:    'Matching' | 'Exact';
-  searchAcross:  'Questions' | 'Explanations' | 'Questions+Options' | 'Notes';
+  searchAcross:  'Questions' | 'Explanations' | 'Options' | 'Notes' | 'Questions+Options' | 'All';
   stage:         string;   // 'All' | 'Prelims' | 'Mains'
   institutes:    string;   // 'All' | comma-separated
   pyqFilter:     string;   // 'All' | 'PYQ Only' | 'Non-PYQ'
@@ -1562,7 +1562,7 @@ export default function AISearchTab() {
 
             <FilterGroup
               label="SEARCH ACROSS"
-              options={['Questions', 'Explanations', 'Questions+Options']}
+              options={['Questions', 'Explanations', 'Options', 'Notes', 'Questions+Options', 'All']}
               value={pendingFilters.searchAcross}
               onSelect={(v) => setPendingFilters(p => ({ ...p, searchAcross: v as any }))}
               colors={colors}

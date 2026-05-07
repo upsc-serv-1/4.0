@@ -17,6 +17,7 @@ import {
   Alert, Pressable, ActivityIndicator, KeyboardAvoidingView, Platform, Keyboard,
   RefreshControl, Dimensions,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import {
   Folder, BookOpen, FileText, Plus, Search as SearchIcon, X, ChevronLeft, ChevronRight,
@@ -92,14 +93,41 @@ export default function NotesIndex() {
 
   const load = useCallback(async () => {
     if (!session?.user.id) return;
-    setLoading(true);
-    const { data, error } = await supabase.from('user_note_nodes')
-      .select('*').eq('user_id', session.user.id).eq('is_archived', false);
-    if (!error) {
-      setAllNodes((data || []) as RawNode[]);
+
+    const cacheKey = `user_notes_${session.user.id}`;
+    let hasCached = false;
+
+    // OFFLINE-FIRST: read cached nodes first.
+    try {
+      const cached = await AsyncStorage.getItem(cacheKey);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) {
+          setAllNodes(parsed as RawNode[]);
+          hasCached = true;
+        }
+      }
+    } catch {}
+
+    if (!hasCached) setLoading(true);
+
+    try {
+      const { data, error } = await supabase.from('user_note_nodes')
+        .select('*').eq('user_id', session.user.id).eq('is_archived', false);
+
+      if (!error && data) {
+        const rows = (data || []) as RawNode[];
+        setAllNodes(rows);
+        try {
+          await AsyncStorage.setItem(cacheKey, JSON.stringify(rows));
+        } catch {}
+      }
+    } catch {
+      // Keep cached view on network failure.
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-    setLoading(false);
-    setRefreshing(false);
   }, [session]);
 
   useEffect(() => { load(); }, [load]);

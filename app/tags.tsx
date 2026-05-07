@@ -216,6 +216,39 @@ export default function TaggedRepoScreen() {
     return allQuestions.filter((q) => q.normalizedReviewTags.some((t) => selected.has(t)));
   }, [allQuestions, exportConfig]);
 
+  const unifiedExportOptions = useMemo(() => ({
+    title: 'Tagged Questions',
+    moduleName: 'Tags Library',
+    showTOC: true,
+    headerText: 'Dr. UPSC · Tags',
+    footerText: 'Tagged Questions Export',
+  }), []);
+
+  const unifiedExportPayload = useMemo(() => {
+    const groups = uniqueTags
+      .map((tag) => ({
+        tag,
+        questions: allQuestions
+          .filter((q) => (q.normalizedReviewTags || []).includes(normalizeTag(tag)))
+          .map((q: any) => ({
+            id: q.id,
+            question_text: q.questionText || q.question_text || '',
+            options: q.options,
+            correct_answer: q.correctAnswer || q.correct_answer,
+            explanation_markdown: q.explanation || q.explanation_markdown,
+            subject: q.subject,
+            section_group: q.sectionGroup || q.section_group,
+            micro_topic: q.microTopic || q.micro_topic,
+            exam_year: q.examYear || q.exam_year,
+            is_pyq: !!(q.isPyq || q.is_pyq),
+            is_ncert: !!(q.isNcert || q.is_ncert),
+            review_tags: q.reviewTags || [],
+          })),
+      }))
+      .filter((x) => x.questions.length > 0);
+    return { kind: 'tags' as const, groups };
+  }, [uniqueTags, allQuestions]);
+
   const toggleMultiTag = (tag: string) => {
     setExportConfig((prev) => {
       const exists = prev.multiTags.some((t) => normalizeTag(t) === normalizeTag(tag));
@@ -1023,37 +1056,8 @@ ${answerText}` : ''}`,
           visible={unifiedExportVisible}
           onClose={() => setUnifiedExportVisible(false)}
           title="Tagged Questions"
-          initialOptions={useMemo(() => ({
-            title: 'Tagged Questions',
-            moduleName: 'Tags Library',
-            showTOC: true,
-            headerText: 'Dr. UPSC · Tags',
-            footerText: 'Tagged Questions Export',
-          }), [])}
-          payload={useMemo(() => {
-            const groups = uniqueTags
-              .map((tag) => ({
-                tag,
-                questions: allQuestions
-                  .filter((q) => (q.normalizedReviewTags || []).includes(normalizeTag(tag)))
-                  .map((q: any) => ({
-                    id: q.id,
-                    question_text: q.questionText || q.question_text || '',
-                    options: q.options,
-                    correct_answer: q.correctAnswer || q.correct_answer,
-                    explanation_markdown: q.explanation || q.explanation_markdown,
-                    subject: q.subject,
-                    section_group: q.sectionGroup || q.section_group,
-                    micro_topic: q.microTopic || q.micro_topic,
-                    exam_year: q.examYear || q.exam_year,
-                    is_pyq: !!(q.isPyq || q.is_pyq),
-                    is_ncert: !!(q.isNcert || q.is_ncert),
-                    review_tags: q.reviewTags || [],
-                  })),
-              }))
-              .filter((x) => x.questions.length > 0);
-            return { kind: 'tags' as const, groups };
-          }, [uniqueTags, allQuestions])}
+          initialOptions={unifiedExportOptions}
+          payload={unifiedExportPayload}
           renderExtraFilters={(o, setO) => (
             uniqueTags.length > 0 ? (
               <View style={{ marginTop: 6 }}>

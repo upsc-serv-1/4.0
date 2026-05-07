@@ -280,7 +280,7 @@ export default function NotesIndex() {
       router.push({ pathname: '/notes/editor', params: { id: n.note_id, title: n.title } });
     } else if (n.type === 'folder') {
       // Tree hierarchy: just expand/collapse inline, don't navigate
-      toggleExpanded(n.id);
+      toggleExpand(n.id);
       setSearch('');
       setSearchVisible(false);
     }

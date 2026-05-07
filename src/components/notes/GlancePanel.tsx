@@ -71,6 +71,70 @@ const parseChecklist = (raw: any): ChecklistEntry[] => {
   return [];
 };
 
+function GlanceItemCard({ item, glanceStyle, contentWidth, colors, onPress }: {
+  item: NoteItem;
+  glanceStyle: { bg: string; border: string; text: string };
+  contentWidth: number;
+  colors: any;
+  onPress: () => void;
+}) {
+  const tagList = Array.isArray(item.tags) ? item.tags : [];
+  const isTrapQuestion = tagList.some(t => normalizeTag(t) === 'trap question');
+  const [revealed, setRevealed] = useState(!isTrapQuestion);
+
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.cardWrap,
+        { opacity: pressed ? 0.85 : 1 },
+      ]}
+      data-testid={`vault-glance-item-${item.id}`}
+    >
+      <View
+        style={[
+          styles.card,
+          {
+            backgroundColor: glanceStyle.bg,
+            borderLeftColor: glanceStyle.border,
+          },
+        ]}
+      >
+        {/* Tag label */}
+        {tagList.length > 0 && (
+          <Text style={[styles.tagLabel, { color: glanceStyle.text }]}>
+            {tagList[0].toUpperCase()}
+          </Text>
+        )}
+
+        {/* Content */}
+        {revealed ? (
+          <RenderHtml
+            source={{ html: toHtml(item.text || '<i>(empty)</i>') }}
+            contentWidth={contentWidth - 64}
+            baseStyle={{ color: colors.textPrimary, fontSize: 13, lineHeight: 19 }}
+            tagsStyles={{
+              b: { fontWeight: '700' as const, color: colors.textPrimary },
+              strong: { fontWeight: '700' as const, color: colors.textPrimary },
+              i: { fontStyle: 'italic' as const },
+              em: { fontStyle: 'italic' as const },
+              mark: { backgroundColor: '#FFE066', color: '#0f172a', borderRadius: 3 },
+              p: { marginVertical: 0, color: colors.textPrimary },
+            }}
+          />
+        ) : (
+          <TouchableOpacity
+            onPress={() => setRevealed(true)}
+            style={[styles.revealBtn, { borderColor: colors.textTertiary + '60' }]}
+          >
+            <Text style={[styles.revealBtnText, { color: colors.textTertiary }]}>REVEAL</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </Pressable>
+  );
+}
+
 export function GlancePanel({ noteId, contentWidth, selectedTag, onPlay, onOpenEdit }: Props) {
   const { colors } = useTheme();
   const DEFAULT_GLANCE = { bg: colors.surfaceStrong, border: colors.border, text: colors.textSecondary };
@@ -158,6 +222,8 @@ export function GlancePanel({ noteId, contentWidth, selectedTag, onPlay, onOpenE
     });
   };
 
+  const hasAny = filteredItems.length > 0 || (isAll && checklist.length > 0);
+
   if (loading) {
     return (
       <View style={[styles.shell, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -166,8 +232,6 @@ export function GlancePanel({ noteId, contentWidth, selectedTag, onPlay, onOpenE
       </View>
     );
   }
-
-  const hasAny = filteredItems.length > 0 || (isAll && checklist.length > 0);
 
   return (
     <View style={[styles.shell, { backgroundColor: colors.surface, borderColor: colors.border }]} data-testid={`vault-glance-${noteId}`}>
@@ -261,66 +325,22 @@ export function GlancePanel({ noteId, contentWidth, selectedTag, onPlay, onOpenE
               }
             }
 
-            const isTrapQuestion = tagList.some(t => normalizeTag(t) === 'trap question');
-            const [revealed, setRevealed] = useState(!isTrapQuestion);
-
             return (
-              <Pressable
+              <GlanceItemCard
                 key={it.id || `i-${idx}`}
+                item={it}
+                glanceStyle={glanceStyle}
+                contentWidth={contentWidth}
+                colors={colors}
                 onPress={onOpenEdit}
-                style={({ pressed }) => [
-                  styles.cardWrap,
-                  { opacity: pressed ? 0.85 : 1 },
-                ]}
-                data-testid={`vault-glance-item-${it.id || idx}`}
-              >
-                <View
-                  style={[
-                    styles.card,
-                    {
-                      backgroundColor: glanceStyle.bg,
-                      borderLeftColor: glanceStyle.border,
-                    },
-                  ]}
-                >
-                  {/* Tag label */}
-                  {tagList.length > 0 && (
-                    <Text style={[styles.tagLabel, { color: glanceStyle.text }]}>
-                      {tagList[0].toUpperCase()}
-                    </Text>
-                  )}
-
-                  {/* Content */}
-                  {revealed ? (
-                    <RenderHtml
-                      source={{ html: toHtml(it.text || '<i>(empty)</i>') }}
-                      contentWidth={contentWidth - 64}
-                      baseStyle={{ color: colors.textPrimary, fontSize: 13, lineHeight: 19 }}
-                      tagsStyles={{
-                        b: { fontWeight: '700' as const, color: colors.textPrimary },
-                        strong: { fontWeight: '700' as const, color: colors.textPrimary },
-                        i: { fontStyle: 'italic' as const },
-                        em: { fontStyle: 'italic' as const },
-                        mark: { backgroundColor: '#FFE066', color: '#0f172a', borderRadius: 3 },
-                        p: { marginVertical: 0, color: colors.textPrimary },
-                      }}
-                    />
-                  ) : (
-                    <TouchableOpacity
-                      onPress={() => setRevealed(true)}
-                      style={[styles.revealBtn, { borderColor: colors.textTertiary + '60' }]}
-                    >
-                      <Text style={[styles.revealBtnText, { color: colors.textTertiary }]}>REVEAL</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </Pressable>
+              />
             );
           })}
         </View>
       )}
 
       {!hasAny && isAll && !contentHtml && (
+
         <View style={styles.emptyChip}>
           <Text style={[styles.emptyChipText, { color: colors.textTertiary }]}>
             This note has no inline blocks yet — tap FOCUS to read or EDIT to add some.

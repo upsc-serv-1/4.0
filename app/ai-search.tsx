@@ -16,6 +16,9 @@ import {
   Sparkles, Filter, Clock, ChevronUp, ChevronDown, BookOpen, Target, Zap,
   TrendingUp, BarChart2, Flame,
 } from 'lucide-react-native';
+import { PinchGestureHandler, State as GHState } from 'react-native-gesture-handler';
+import { FlashcardSvc } from '../src/services/FlashcardService';
+import * as Haptics from 'expo-haptics';
 import { supabase } from '../src/lib/supabase';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
@@ -29,6 +32,11 @@ import { getPYQCategorization, buildCanonicalExplanations } from '../src/utils/q
 import { mergeQuestions } from '../src/utils/merger';
 import { QuestionCache } from '../src/services/QuestionCache';
 import { buildPredictive, probableHotsFor2026, type PredictiveRow } from '../src/lib/pyqPredictive';
+import { StudentSync } from '../src/services/StudentSync';
+import { NotebookLocationPicker } from '../src/components/NotebookLocationPicker';
+import { LocalQuery } from '../src/services/LocalQuery';
+import { markdownToHtml } from '../src/utils/textUtils';
+import { buildMarkdownStyles, buildMarkdownRules } from '../src/utils/markdownUtils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const IS_IPAD = SCREEN_WIDTH >= 768;
@@ -150,48 +158,26 @@ export default function AISearchTab() {
   const { colors } = useTheme();
   const { session } = useAuth();
 
-  const mdStyles = React.useMemo(() => ({
-    body: { fontSize: 13, color: colors.textPrimary, lineHeight: 22 },
-    heading1: { fontSize: 18, fontWeight: 'bold' as const, color: colors.textPrimary, marginBottom: 8 },
-    heading2: { fontSize: 16, fontWeight: 'bold' as const, color: colors.textPrimary, marginBottom: 8 },
-    strong: { fontWeight: 'bold' as const },
-    em: { fontStyle: 'italic' as const },
-    list_item: { flexDirection: 'row' as const, marginBottom: 4 },
-    bullet_list: { marginBottom: 12 },
-    ordered_list: { marginBottom: 12 },
-    code_inline: { fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', backgroundColor: colors.surfaceStrong, paddingHorizontal: 4, borderRadius: 4 },
-    code_block: { fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', backgroundColor: colors.surfaceStrong, padding: 8, borderRadius: 8, marginBottom: 12 },
-    table: { borderWidth: 1, borderColor: colors.border, borderRadius: 8, overflow: 'hidden' as const, marginBottom: 12, minWidth: '100%' },
-    th: { backgroundColor: colors.surfaceStrong, padding: 8, borderWidth: 1, borderColor: colors.border },
-    td: { padding: 8, borderWidth: 1, borderColor: colors.border },
-    tr: { flexDirection: 'row' as const },
-    paragraph: { marginBottom: 12 },
-  }), [colors]);
+  // Zoom states - MOVED TO TOP for mdStyles dependency
+  const [previewFontSize, setPreviewFontSize] = useState(16);
+  const baseFontSizeRef = useRef(16);
+  const zoomTimerRef = useRef<any>(null);
+  const [showZoomIndicator, setShowZoomIndicator] = useState(false);
 
-  const mdRules = React.useMemo(() => ({
-    table: (node: any, children: any) => (
-      <ScrollView key={node.key} horizontal showsHorizontalScrollIndicator contentContainerStyle={{ minWidth: '100%' }} style={{ marginVertical: 8 }}>
-        <View style={{ borderWidth: 1, borderColor: colors.border, borderRadius: 8, overflow: 'hidden', minWidth: 280 }}>
-          {children}
-        </View>
-      </ScrollView>
-    ),
-    thead: (node: any, children: any) => (
-      <View key={node.key} style={{ backgroundColor: colors.surfaceStrong, borderBottomWidth: 1, borderBottomColor: colors.border }}>{children}</View>
-    ),
-    tbody: (node: any, children: any) => (
-      <View key={node.key}>{children}</View>
-    ),
-    tr: (node: any, children: any) => (
-      <View key={node.key} style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.border }}>{children}</View>
-    ),
-    th: (node: any, children: any) => (
-      <View key={node.key} style={{ flex: 1, padding: 8, borderRightWidth: 1, borderRightColor: colors.border, justifyContent: 'center' }}>{children}</View>
-    ),
-    td: (node: any, children: any) => (
-      <View key={node.key} style={{ flex: 1, padding: 8, borderRightWidth: 1, borderRightColor: colors.border }}>{children}</View>
-    )
-  }), [colors]);
+  const mdStyles = React.useMemo(() => buildMarkdownStyles(
+    colors.textPrimary,
+    previewFontSize,
+    colors.surfaceStrong,
+    colors.border,
+    colors.primary
+  ), [colors, previewFontSize]);
+
+  const mdRules = React.useMemo(() => buildMarkdownRules(
+    colors.border,
+    colors.primary,
+    colors.textPrimary,
+    previewFontSize
+  ), [colors, previewFontSize]);
 
   const router = useRouter();
 
@@ -240,6 +226,11 @@ export default function AISearchTab() {
   const [previewFlashcard, setPreviewFlashcard] = useState(false);
   const [savingFlashcard, setSavingFlashcard] = useState(false);
   const [userTags, setUserTags] = useState<string[]>([]);
+
+  // Notebook states for "Add to Notebook" parity
+  const [notebookModalVisible, setNotebookModalVisible] = useState(false);
+  const [folders, setFolders] = useState<any[]>([]);
+  const [isSavingToNotebook, setIsSavingToNotebook] = useState(false);
 
   // Fetch real user revision tags for the study tags section
   React.useEffect(() => {
@@ -325,7 +316,147 @@ export default function AISearchTab() {
 
     // Reset AI explain state when opening a new question
     setAiExplanation(null);
+
+    // Sync flashcard state and tags with backend
+    if (previewQuestion && session?.user?.id) {
+      // 1. Check flashcard status
+      supabase
+        .from('user_cards')
+        .select('id')
+        .eq('user_id', session.user.id)
+        .eq('card_id', previewQuestion.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          setPreviewFlashcard(!!data);
+        })
+        .catch(err => console.error("Flashcard sync check failed:", err));
+
+      // 2. Check question state (tags, confidence, etc)
+      supabase
+        .from('question_states')
+        .select('review_tags, selected_answer')
+        .eq('user_id', session.user.id)
+        .eq('question_id', previewQuestion.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) {
+            setPreviewStudyTags(data.review_tags || []);
+            if (!previewAnswer) setPreviewAnswer(data.selected_answer);
+          }
+        })
+        .catch(err => console.error("Tag sync check failed:", err));
+    }
   }, [previewQuestion?.id]);
+
+  const fetchHierarchy = async () => {
+    if (!session?.user?.id) return;
+    try {
+      const { data } = await supabase
+        .from('folders')
+        .select('id, name, notebooks(id, name, total_notes)')
+        .eq('user_id', session.user.id)
+        .order('name');
+      setFolders(data || []);
+    } catch (err) {
+      console.error("Hierarchy fetch error:", err);
+    }
+  };
+
+  const handleToggleTag = async (qid: string, currentTags: string[], tag: string) => {
+    if (!session?.user?.id) return;
+    const newTags = currentTags.includes(tag) 
+      ? currentTags.filter(t => t !== tag) 
+      : [...currentTags, tag];
+    
+    setPreviewStudyTags(newTags);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+
+    try {
+      // Sync to backend via StudentSync (consistent with Engine format)
+      await StudentSync.enqueue('question_state', {
+        userId: session.user.id,
+        questionId: qid,
+        patch: { review_tags: newTags }
+      });
+    } catch (err) {
+      console.error("Tag Sync Error:", err);
+    }
+  };
+
+  const handleAddToNotebook = async (notebookId: string) => {
+    if (!session?.user?.id || !previewQuestion) return;
+    setIsSavingToNotebook(true);
+    try {
+      const activeText = aiExplanation || previewQuestion.explanation_markdown || '';
+      const htmlContent = markdownToHtml(activeText);
+      const title = (previewQuestion.question_text || '').slice(0, 50) + '...';
+
+      const { data: note, error } = await supabase
+        .from('notes')
+        .insert({
+          user_id: session.user.id,
+          notebook_id: notebookId,
+          title: title,
+          content: htmlContent,
+          source_type: 'question',
+          source_id: previewQuestion.id,
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setNotebookModalVisible(false);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      Alert.alert("Success", "Question added to your notebook.");
+    } catch (err: any) {
+      console.error("Notebook Save Error:", err);
+      Alert.alert("Error", "Failed to save to notebook: " + err.message);
+    } finally {
+      setIsSavingToNotebook(false);
+    }
+  };
+
+  const onPinchGestureEvent = (event: any) => {
+    const scale = event.nativeEvent.scale;
+    let next = baseFontSizeRef.current * scale;
+    next = Math.max(12, Math.min(32, next));
+    setPreviewFontSize(Math.round(next));
+    setShowZoomIndicator(true);
+    if (zoomTimerRef.current) clearTimeout(zoomTimerRef.current);
+    zoomTimerRef.current = setTimeout(() => setShowZoomIndicator(false), 1200);
+  };
+
+  const onPinchHandlerStateChange = (event: any) => {
+    if (event.nativeEvent.state === GHState.END || event.nativeEvent.state === GHState.CANCELLED) {
+      baseFontSizeRef.current = previewFontSize;
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    }
+  };
+
+  const handleAddToFlashcards = async () => {
+    if (!session?.user?.id || !previewQuestion) return;
+    setSavingFlashcard(true);
+    try {
+      // Logic for activeAnswerText: AI text > Vitamin text > default explanation
+      const explanations = buildCanonicalExplanations(previewQuestion);
+      const activeExplText = previewExplSource === 'ai' 
+        ? aiExplanation 
+        : previewExplSource === 'vitamin' 
+          ? '' // Vitamin is handled by ID usually, but here we can pass text if needed
+          : explanations.find(e => e.sourceKey === previewExplSource)?.text || previewQuestion.explanation_markdown || '';
+
+      await FlashcardSvc.createFromQuestion(session.user.id, previewQuestion as any, activeExplText || undefined);
+      setPreviewFlashcard(true);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    } catch (err: any) {
+      console.error("Flashcard Error:", err);
+      Alert.alert("Error", "Failed to add to Flashcards. " + (err.message || ''));
+    } finally {
+      setSavingFlashcard(false);
+    }
+  };
 
   const handleAiExplainPopup = async () => {
     if (!previewQuestion) return;
@@ -339,19 +470,20 @@ export default function AISearchTab() {
         D: rawOptions.d || rawOptions.D || '',
       };
       
-      const payloadContext = enrichedExplanations || (previewQuestion._explanations && previewQuestion._explanations.length > 0
-        ? previewQuestion._explanations
-        : previewQuestion.explanation_markdown
-          ? [{ source: previewQuestion.tests?.institute || 'Source', program: '', text: previewQuestion.explanation_markdown }]
-          : []);
-
+      const explanations = buildCanonicalExplanations(previewQuestion);
       const result = await aiExplainQuestion(
-        previewQuestion.question_text || '',
+        previewQuestion.question_text || previewQuestion.statement || '',
         optionsMap,
         previewQuestion.correct_answer || '',
-        JSON.stringify(payloadContext)
+        explanations.map(e => ({
+          source: e.source,
+          program: e.program,
+          text: e.text,
+          answer: e.answer
+        }))
       );
       setAiExplanation(result);
+      setPreviewRevealed(true);
     } catch (e: any) {
       const msg: string = e?.message || 'Unknown error';
       if (msg.includes('404')) Alert.alert('Model not found', 'Switch model in Settings.');
@@ -1814,83 +1946,68 @@ export default function AISearchTab() {
                 </View>
 
                 {/* Independent Scrollable Content */}
-                <ScrollView 
-                  style={{ flexShrink: 1 }}
-                  contentContainerStyle={{ padding: 16 }}
-                  showsVerticalScrollIndicator={true}
-                >
-                  <SharedQuestionCard
-                    item={{
-                      ...previewQuestion,
-                      exam_info: {
-                        is_upsc_cse: previewQuestion?.is_upsc_cse,
-                        is_allied: previewQuestion?.is_allied,
-                        is_others: previewQuestion?.is_others,
-                        ...(previewQuestion?.exam_info || {})
-                      },
-                      _explanations: enrichedExplanations || previewQuestion._explanations || [],
-                      _institutes: previewQuestion._institutes || [],
-                    }}
-                    index={0}
-                    arenaMode="learning"
-                    isRevealed={previewRevealed}
-                    colors={colors}
-                    mdStyles={mdStyles}
-                    mdRules={mdRules}
-                    answerData={{
-                      selectedAnswer: previewAnswer,
-                      isReview: previewStudyTags.length > 0,
-                      studyTags: previewStudyTags
-                    }}
-                    userStudyTags={userTags}
-                    activeExplSource={previewExplSource}
-                    onExplSourceChange={setPreviewExplSource}
-                    aiExplanation={aiExplanation}
-                    isAiLoading={aiExplainLoading}
-                    isSavingFlashcard={savingFlashcard}
-                    isFlashcarded={previewFlashcard}
-                    onRevealExplanation={() => setPreviewRevealed(true)}
-                    onOptionSelect={(qid: string, opt: string) => setPreviewAnswer(opt)}
-                    onAiExplain={async () => {
-                      if (!previewQuestion || aiExplainLoading) return;
-                      setAiExplainLoading(true);
-                      setPreviewExplSource('ai');
-                      try {
-                        const rawOptions = previewQuestion.options || {};
-                        const optionsMap: Record<string, string> = {
-                          A: rawOptions.a || rawOptions.A || '',
-                          B: rawOptions.b || rawOptions.B || '',
-                          C: rawOptions.c || rawOptions.C || '',
-                          D: rawOptions.d || rawOptions.D || '',
-                        };
-                        const instExplanations = enrichedExplanations || previewQuestion._explanations || [];
-                        const text = await aiExplainQuestion(
-                          previewQuestion.question_text || previewQuestion.statement || '',
-                          optionsMap,
-                          previewQuestion.correct_answer || '',
-                          instExplanations
-                        );
-                        setAiExplanation(text);
-                        setPreviewRevealed(true);
-                      } catch (err) {
-                        console.error(err);
-                      } finally {
-                        setAiExplainLoading(false);
-                      }
-                    }}
-                    onAddFlashcard={() => setPreviewFlashcard(p => !p)}
-                    toggleStudyTag={(qid: string, tags: string[], tag: string) => {
-                      setPreviewStudyTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
-                    }}
-                  />
-                  
-                  {previewQuestion.micro_topic && (
-                    <View style={{ marginTop: 12, padding: 12, backgroundColor: colors.surfaceStrong, borderRadius: 16, borderWidth: 1, borderColor: colors.border + '50' }}>
-                      <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>SYLLABUS CONTEXT</Text>
-                      <Text style={{ fontSize: 13, color: colors.textSecondary, fontWeight: '600' }}>{previewQuestion.micro_topic}</Text>
-                    </View>
-                  )}
-                </ScrollView>
+                <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
+                  <ScrollView 
+                    style={{ flexShrink: 1 }}
+                    contentContainerStyle={{ padding: 16 }}
+                    showsVerticalScrollIndicator={true}
+                  >
+                    <SharedQuestionCard
+                      item={{
+                        ...previewQuestion,
+                        exam_info: {
+                          is_upsc_cse: previewQuestion?.is_upsc_cse,
+                          is_allied: previewQuestion?.is_allied,
+                          is_others: previewQuestion?.is_others,
+                          ...(previewQuestion?.exam_info || {})
+                        },
+                        _explanations: enrichedExplanations || previewQuestion._explanations || [],
+                        _institutes: previewQuestion._institutes || [],
+                      }}
+                      index={0}
+                      arenaMode="learning"
+                      isRevealed={previewRevealed}
+                      colors={colors}
+                      mdStyles={mdStyles}
+                      mdRules={mdRules}
+                      fontSize={previewFontSize}
+                      answerData={{
+                        selectedAnswer: previewAnswer,
+                        isReview: previewStudyTags.length > 0,
+                        studyTags: previewStudyTags
+                      }}
+                      userStudyTags={userTags}
+                      toggleStudyTag={handleToggleTag}
+                      activeExplSource={previewExplSource}
+                      onExplSourceChange={setPreviewExplSource}
+                      aiExplanation={aiExplanation}
+                      isAiLoading={aiExplainLoading}
+                      isSavingFlashcard={savingFlashcard}
+                      isFlashcarded={previewFlashcard}
+                      onRevealExplanation={() => setPreviewRevealed(true)}
+                      onOptionSelect={(qid: string, opt: string) => setPreviewAnswer(opt)}
+                      onAddFlashcard={handleAddToFlashcards}
+                      onAiExplain={handleAiExplainPopup}
+                      openNotebookFromQuestion={() => {
+                        fetchHierarchy();
+                        setNotebookModalVisible(true);
+                      }}
+                    />
+                    
+                    {previewQuestion.micro_topic && (
+                      <View style={{ marginTop: 12, padding: 12, backgroundColor: colors.surfaceStrong, borderRadius: 16, borderWidth: 1, borderColor: colors.border + '50' }}>
+                        <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>SYLLABUS CONTEXT</Text>
+                        <Text style={{ fontSize: Math.max(11, previewFontSize - 3), color: colors.textSecondary, fontWeight: '600' }}>{previewQuestion.micro_topic}</Text>
+                      </View>
+                    )}
+                  </ScrollView>
+                </PinchGestureHandler>
+
+                {showZoomIndicator && (
+                  <View style={{ position: 'absolute', top: 70, alignSelf: 'center', backgroundColor: 'rgba(0,0,0,0.7)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 }}>
+                    <Text style={{ color: '#fff', fontSize: 11, fontWeight: '800' }}>ZOOM: {Math.round((previewFontSize / 16) * 100)}%</Text>
+                  </View>
+                )}
 
                 {/* Fixed Footer */}
                 <View style={{ flexDirection: 'row', gap: 12, padding: 16, borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.surface }}>
@@ -1914,10 +2031,18 @@ export default function AISearchTab() {
           </Modal>
         )}
       </KeyboardAvoidingView>
-      <AIModelSwitcher
-        visible={showModelSwitcher}
-        onClose={() => setShowModelSwitcher(false)}
-      />
+        <AIModelSwitcher 
+          visible={showModelSwitcher} 
+          onClose={() => setShowModelSwitcher(false)}
+        />
+
+        <NotebookLocationPicker
+          visible={notebookModalVisible}
+          folders={folders}
+          onClose={() => setNotebookModalVisible(false)}
+          onSelect={handleAddToNotebook}
+          loading={isSavingToNotebook}
+        />
     </PageWrapper>
   );
 }

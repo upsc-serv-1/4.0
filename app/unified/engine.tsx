@@ -109,273 +109,18 @@ import {
   deleteBestAnswer,
   BestAnswer,
 } from '../../src/services/BestAnswerService';
+import { markdownToHtml } from '../../src/utils/textUtils';
+import { buildMarkdownStyles, buildMarkdownRules } from '../../src/utils/markdownUtils';
 
+import { OptionButton } from '../../src/components/unified/OptionButton';
 const ThemeSwitcher = require('../../src/components/ThemeSwitcher').ThemeSwitcher;
 
 const { width, height } = Dimensions.get('window');
 
-// ── Markdown → HTML converter for Notebook editor ───────────────────────────
-// The RichNoteEditor (react-native-pell-rich-editor) renders HTML, not markdown.
-// When AI explanations (markdown) are copied to the Notebook, we must convert first.
-function markdownToHtml(text: string): string {
-  if (!text) return '';
-  // Already HTML — normalise newlines only
-  if (/<[a-zA-Z]/.test(text)) return text.replace(/\n/g, '<br/>');
 
-  // Handle GFM tables: | col | col | → <table>
-  const lines = text.split('\n');
-  const htmlLines: string[] = [];
-  let i = 0;
-  while (i < lines.length) {
-    const line = lines[i];
-    // Detect table: starts with |, has |, separator row is next line
-    if (line.trim().startsWith('|') && i + 1 < lines.length && /^\s*\|[\s\-|:]+\|\s*$/.test(lines[i + 1])) {
-      const headers = line.split('|').filter(c => c.trim()).map(c => `<th style="padding:4px 8px;border:1px solid #d1d5db;background:#f3f4f6">${c.trim()}</th>`);
-      htmlLines.push(`<table style="border-collapse:collapse;width:100%;margin:8px 0"><thead><tr>${headers.join('')}</tr></thead><tbody>`);
-      i += 2; // skip separator
-      while (i < lines.length && lines[i].trim().startsWith('|')) {
-        const cells = lines[i].split('|').filter(c => c.trim()).map(c => `<td style="padding:4px 8px;border:1px solid #d1d5db">${c.trim()}</td>`);
-        htmlLines.push(`<tr>${cells.join('')}</tr>`);
-        i++;
-      }
-      htmlLines.push('</tbody></table>');
-      continue;
-    }
-    htmlLines.push(line);
-    i++;
-  }
 
-  let html = htmlLines.join('\n')
-    // Headings
-    .replace(/^### (.+)$/gm, '<h3 style="margin:6px 0;font-size:15px">$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2 style="margin:8px 0;font-size:17px">$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1 style="margin:10px 0;font-size:19px">$1</h1>')
-    // Bold + underline (AI convention: __term__)
-    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-    .replace(/__(.*?)__/g, '<u>$1</u>')
-    .replace(/\*(.*?)\*/g, '<i>$1</i>')
-    // Bullet lists
-    .replace(/^[\-\*]\s+(.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>[\s\S]*?<\/li>)(\n(?!<li>)|$)/g, '<ul style="padding-left:18px;margin:4px 0">$1</ul>')
-    // Numbered lists
-    .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
-    // Paragraphs: blank lines → paragraph breaks
-    .replace(/\n\n+/g, '</p><p style="margin:4px 0">')
-    // Single newlines
-    .replace(/\n/g, '<br/>');
+// Shared Markdown utilities are now imported from src/utils/markdownUtils.tsx
 
-  return `<p style="margin:4px 0">${html}</p>`;
-}
-
-// ── Custom Markdown table renderer ──────────────────────────────────────────
-// react-native-markdown-display v7 has table support, but it relies on the
-// default renderer which often fails to layout correctly in a flex container.
-// We override the table/thead/tbody/tr/th/td rules to produce a ScrollView-
-// wrapped layout that handles variable column widths and wide content.
-
-/**
- * Build theme-aware Markdown inline styles.
- * Call once inside the component and pass to every <Markdown> instance.
- */
-function buildMarkdownStyles(
-  textColor: string,
-  fontSize: number,
-  bgSurface: string,
-  borderColor: string,
-  primaryColor: string,
-  fontFamily: string = 'System',
-) {
-  return {
-    // Body text
-    body: {
-      color: textColor,
-      fontSize,
-      lineHeight: fontSize * 1.55,
-      fontWeight: '500' as const,
-      fontFamily,
-    },
-    // Paragraphs
-    paragraph: {
-      marginTop: 4,
-      marginBottom: 4,
-    },
-    // Headings
-    heading1: { fontSize: fontSize + 6, fontWeight: '900' as const, color: textColor, marginTop: 10, marginBottom: 4 },
-    heading2: { fontSize: fontSize + 4, fontWeight: '800' as const, color: textColor, marginTop: 8, marginBottom: 4 },
-    heading3: { fontSize: fontSize + 2, fontWeight: '700' as const, color: textColor, marginTop: 6, marginBottom: 4 },
-    heading4: { fontSize: fontSize + 1, fontWeight: '700' as const, color: textColor, marginTop: 4, marginBottom: 2 },
-    // Bold / italic / code
-    strong: { fontWeight: '800' as const },
-    em: { fontStyle: 'italic' as const },
-    code_inline: {
-      backgroundColor: primaryColor + '15',
-      color: primaryColor,
-      borderRadius: 4,
-      paddingHorizontal: 4,
-      fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }),
-      fontSize: fontSize - 1,
-    },
-    fence: {
-      backgroundColor: bgSurface,
-      borderRadius: 8,
-      padding: 12,
-      marginVertical: 6,
-    },
-    code_block: {
-      backgroundColor: bgSurface,
-      borderRadius: 8,
-      padding: 12,
-      marginVertical: 6,
-      fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }),
-    },
-    // Lists
-    bullet_list: { marginVertical: 4 },
-    ordered_list: { marginVertical: 4 },
-    list_item: { marginBottom: 2 },
-    // Blockquote
-    blockquote: {
-      backgroundColor: primaryColor + '10',
-      borderLeftColor: primaryColor,
-      borderLeftWidth: 3,
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      borderRadius: 4,
-      marginVertical: 4,
-    },
-    // hr
-    hr: { borderBottomColor: borderColor, borderBottomWidth: 1, marginVertical: 8 },
-    // Tables — handled via custom rules below; these styles ensure
-    // the rule-generated Views pick up the correct colours.
-    table: { marginVertical: 8 },
-    thead: {},
-    tbody: {},
-    th: {
-      backgroundColor: primaryColor + '18',
-      padding: 8,
-      borderWidth: 1,
-      borderColor,
-    },
-    td: {
-      padding: 8,
-      borderWidth: 1,
-      borderColor,
-    },
-    tr: {},
-  };
-}
-
-/**
- * Build custom render rules that produce properly scrollable tables.
- * Pass as the `rules` prop to every <Markdown> instance.
- */
-function buildMarkdownRules(borderColor: string, primaryColor: string, textColor: string, fontSize: number) {
-  return {
-    // Wrap the whole table in a horizontal ScrollView so wide tables don't clip
-    table: (node: any, children: any, _parent: any, styles: any) => (
-      <ScrollView
-        key={node.key}
-        horizontal
-        showsHorizontalScrollIndicator
-        style={{ marginVertical: 8 }}
-        contentContainerStyle={{ minWidth: '100%' }}
-      >
-        <View style={{
-          borderWidth: 1,
-          borderColor,
-          borderRadius: 8,
-          overflow: 'hidden',
-          minWidth: 280,
-        }}>
-          {children}
-        </View>
-      </ScrollView>
-    ),
-
-    // thead — visually distinct header block
-    thead: (node: any, children: any) => (
-      <View key={node.key} style={{ backgroundColor: primaryColor + '18' }}>
-        {children}
-      </View>
-    ),
-
-    // tbody — white/surface background
-    tbody: (node: any, children: any) => (
-      <View key={node.key}>
-        {children}
-      </View>
-    ),
-
-    // tr — horizontal row with alternating row colours
-    tr: (node: any, children: any, parent: any) => {
-      // Determine row index for zebra striping
-      const siblings = parent[0]?.children || [];
-      const rowIndex = siblings.indexOf(node);
-      const isEven = rowIndex % 2 === 0;
-      return (
-        <View key={node.key} style={{
-          flexDirection: 'row',
-          backgroundColor: isEven ? 'transparent' : primaryColor + '08',
-          borderTopWidth: rowIndex > 0 ? 1 : 0,
-          borderTopColor: borderColor,
-        }}>
-          {children}
-        </View>
-      );
-    },
-
-    // th — header cell
-    th: (node: any, children: any, parent: any) => {
-      const siblings = parent[0]?.children || [];
-      const colIndex = siblings.indexOf(node);
-      return (
-        <View key={node.key} style={{
-          flex: 1,
-          minWidth: 80,
-          padding: 8,
-          borderLeftWidth: colIndex > 0 ? 1 : 0,
-          borderLeftColor: borderColor,
-          justifyContent: 'center',
-        }}>
-          <Text style={{
-            fontSize: fontSize - 1,
-            fontWeight: '800',
-            color: textColor,
-            flexShrink: 1,
-            flexWrap: 'wrap',
-          }}>
-            {flattenChildren(node)}
-          </Text>
-        </View>
-      );
-    },
-
-    // td — data cell
-    td: (node: any, children: any, parent: any) => {
-      const siblings = parent[0]?.children || [];
-      const colIndex = siblings.indexOf(node);
-      return (
-        <View key={node.key} style={{
-          flex: 1,
-          minWidth: 80,
-          padding: 8,
-          borderLeftWidth: colIndex > 0 ? 1 : 0,
-          borderLeftColor: borderColor,
-          justifyContent: 'center',
-        }}>
-          <Text style={{
-            fontSize: fontSize - 1,
-            fontWeight: '500',
-            color: textColor,
-            flexShrink: 1,
-            flexWrap: 'wrap',
-          }}>
-            {flattenChildren(node)}
-          </Text>
-        </View>
-      );
-    },
-  };
-}
 
 /** Recursively extract plain text from a markdown-it AST node */
 function flattenChildren(node: any): string {
@@ -452,58 +197,7 @@ const DEFAULT_STUDY_TAGS = [
 
 // --- Sub-Components ---
 
-const OptionButton = ({ label, text, isSelected, isCorrect, isWrong, showResult, onSelect, disabled, fontSize = 16 }: any) => {
-  const { colors } = useTheme();
-  
-  let borderColor = colors.border;
-  let backgroundColor = colors.surface;
-  let textColor = colors.textPrimary;
-  let letterBg = colors.surfaceStrong;
-  let letterColor = colors.textSecondary;
-
-  if (isSelected) {
-    borderColor = colors.primary;
-    backgroundColor = colors.primary + '10';
-    letterBg = colors.primary;
-    letterColor = colors.buttonText;
-  }
-
-  if (showResult) {
-    if (isCorrect) {
-      borderColor = '#22c55e';
-      backgroundColor = '#dcfce7';
-      textColor = '#15803d';
-      letterBg = '#22c55e';
-      letterColor = '#fff';
-    } else if (isWrong) {
-      borderColor = '#ef4444';
-      backgroundColor = '#fee2e2';
-      textColor = '#b91c1c';
-      letterBg = '#ef4444';
-      letterColor = '#fff';
-    }
-  }
-
-  return (
-    <TouchableOpacity
-      onPress={onSelect}
-      disabled={disabled}
-      style={[
-        styles.optionBtn,
-        { backgroundColor, borderColor, borderWidth: isSelected || showResult ? 2 : 1 },
-      ]}
-    >
-      <View style={[styles.optionLabel, { backgroundColor: letterBg }]}>
-        <Text style={[styles.optionLabelText, { color: letterColor }]}>
-          {label}
-        </Text>
-      </View>
-      <Text style={[styles.optionText, { color: textColor, fontWeight: (isCorrect && showResult) || isSelected ? '700' : '500', fontSize: Math.max(12, fontSize - 1), lineHeight: Math.max(18, (fontSize - 1) * 1.35) }]}>{text}</Text>
-      {showResult && isCorrect && <Check size={18} color="#22c55e" style={{ marginLeft: 'auto' }} />}
-      {showResult && isWrong && <X size={18} color="#ef4444" style={{ marginLeft: 'auto' }} />}
-    </TouchableOpacity>
-  );
-};
+// Shared OptionButton is now imported from src/components/unified/OptionButton.tsx
 
 // --- Main Screen ---
 
@@ -1335,7 +1029,7 @@ export default function UnifiedQuizEngine() {
     const newTags = tags.includes(tag) ? tags.filter(t => t !== tag) : [...tags, tag];
     store.setMetadata(qId, { studyTags: newTags }, false);
     // Explicitly trigger sync with the *newest* data to prevent the "one step behind" race condition
-    if (arenaMode === 'exam' && session?.user?.id) {
+    if (session?.user?.id) {
       StudentSync.enqueue('question_state', {
         userId: session.user.id,
         questionId: qId,

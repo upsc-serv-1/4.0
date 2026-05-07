@@ -8,6 +8,8 @@ import {
   PenTool, Hash, Star, Info, Info as InfoIcon, Save as SaveIcon, 
   RotateCcw, Trash2, Send, Plus, Edit2
 } from 'lucide-react-native';
+import { OptionButton } from './OptionButton';
+import { renderAIText } from '../../utils/renderAIText';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { 
@@ -23,72 +25,9 @@ import {
 
 const { width, height } = Dimensions.get('window');
 
-const OptionButton = ({ label, text, isSelected, isCorrect, isWrong, showResult, onSelect, disabled, fontSize = 16 }: any) => {
-  const { colors } = useTheme();
-  
-  let borderColor = colors.border;
-  let backgroundColor = colors.surface;
-  let textColor = colors.textPrimary;
-  let letterBg = colors.surfaceStrong;
-  let letterColor = colors.textSecondary;
+// Shared OptionButton is now imported from src/components/unified/OptionButton.tsx
 
-  if (isSelected) {
-    borderColor = colors.primary;
-    backgroundColor = colors.primary + '10';
-    letterBg = colors.primary;
-    letterColor = colors.buttonText;
-  }
-
-  if (showResult) {
-    if (isCorrect) {
-      borderColor = '#22c55e';
-      backgroundColor = '#dcfce7';
-      textColor = '#15803d';
-      letterBg = '#22c55e';
-      letterColor = '#fff';
-    } else if (isWrong) {
-      borderColor = '#ef4444';
-      backgroundColor = '#fee2e2';
-      textColor = '#b91c1c';
-      letterBg = '#ef4444';
-      letterColor = '#fff';
-    }
-  }
-
-  return (
-    <TouchableOpacity
-      onPress={onSelect}
-      disabled={disabled}
-      style={[
-        styles.optionBtn,
-        { backgroundColor, borderColor, borderWidth: isSelected || showResult ? 2 : 1 },
-      ]}
-    >
-      <View style={[styles.optionLabel, { backgroundColor: letterBg }]}>
-        <Text style={[styles.optionLabelText, { color: letterColor }]}>
-          {label}
-        </Text>
-      </View>
-      <Text style={[styles.optionText, { color: textColor, fontWeight: (isCorrect && showResult) || isSelected ? '700' : '500', fontSize: Math.max(12, fontSize - 1), lineHeight: Math.max(18, (fontSize - 1) * 1.35) }]}>{text}</Text>
-      {showResult && isCorrect && <Check size={18} color="#22c55e" style={{ marginLeft: 'auto' }} />}
-      {showResult && isWrong && <X size={18} color="#ef4444" style={{ marginLeft: 'auto' }} />}
-    </TouchableOpacity>
-  );
-};
-
-const renderAIText = (text: string, style: any) => {
-  if (!text) return null;
-  const parts = text.split(/(\*\*.*?\*\*|__.*?__)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return <Text key={i} style={[style, { fontWeight: '900' }]}>{part.slice(2, -2)}</Text>;
-    }
-    if (part.startsWith('__') && part.endsWith('__')) {
-      return <Text key={i} style={[style, { textDecorationLine: 'underline' }]}>{part.slice(2, -2)}</Text>;
-    }
-    return <Text key={i} style={style}>{part}</Text>;
-  });
-};
+// Shared renderAIText is now imported from src/utils/renderAIText.tsx
 
 const CONFIDENCE_LEVELS = [
   { label: 'High', value: 'high' },
@@ -239,8 +178,8 @@ export const SharedQuestionCard = ({
         <View style={styles.qHeader}>
           <View style={{ flex: 1 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-              <View style={[styles.qNumberBadge, { backgroundColor: isZenMode ? '#433422' : effectiveColors.primary }]}>
-                <Text style={[styles.qNumberText, { color: isZenMode ? '#F4ECD8' : effectiveColors.buttonText }]}>{index + 1}</Text>
+              <View style={[styles.qNumberBadge, { backgroundColor: isZenMode ? '#433422' : effectiveColors.primary, width: Math.max(30, fontSize + 14), height: Math.max(30, fontSize + 14), borderRadius: Math.max(8, (fontSize + 14)/3.5) }]}>
+                <Text style={[styles.qNumberText, { color: isZenMode ? '#F4ECD8' : effectiveColors.buttonText, fontSize: Math.max(12, fontSize - 2) }]}>{index + 1}</Text>
               </View>
             </View>
           </View>
@@ -277,7 +216,7 @@ export const SharedQuestionCard = ({
                <Flag size={18} color={effectiveAnswerData.isReview ? (isZenMode ? '#433422' : '#eab308') : (isZenMode ? '#43342240' : effectiveColors.textTertiary)} fill={effectiveAnswerData.isReview ? (isZenMode ? '#433422' : '#eab308') : 'transparent'} />
             </TouchableOpacity>
             
-            <TouchableOpacity 
+             <TouchableOpacity 
               onPress={() => onAddFlashcard(item)}
               disabled={isSavingFlashcard}
             >
@@ -290,6 +229,15 @@ export const SharedQuestionCard = ({
                    fill={isFlashcarded ? (isZenMode ? '#433422' : effectiveColors.primary) : 'transparent'} 
                  />
                )}
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              onPress={() => openNotebookFromQuestion && openNotebookFromQuestion(item)}
+            >
+               <Plus
+                 size={20} 
+                 color={isZenMode ? '#43342240' : effectiveColors.textTertiary} 
+               />
             </TouchableOpacity>
           </View>
         </View>
@@ -467,7 +415,7 @@ export const SharedQuestionCard = ({
                         ? <ActivityIndicator size="small" color={selectedExplSource === 'ai' ? '#fff' : '#7c3aed'} />
                         : <Sparkles size={11} color={selectedExplSource === 'ai' ? '#fff' : '#7c3aed'} />
                       }
-                      <Text style={{ fontSize: 10, fontWeight: '900', color: selectedExplSource === 'ai' ? '#fff' : '#7c3aed' }}>
+                      <Text style={{ fontSize: Math.max(9, fontSize - 7), fontWeight: '900', color: selectedExplSource === 'ai' ? '#fff' : '#7c3aed' }}>
                         {aiExplanation ? '🧠 AI' : '+ AI EXPLAIN'}
                       </Text>
                     </TouchableOpacity>

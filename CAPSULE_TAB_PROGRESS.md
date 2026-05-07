@@ -43,7 +43,7 @@ No schema migration is required — the schema is flexible enough.
 * [x] **Step 2:** Register `capsule` tab key + add Capsule route to bottom tab bar
 * [x] **Step 3:** Capsule home screen — Subject Hub layout (top bar, search, sidebar, main content sections)
 * [x] **Step 4:** Dynamic expandable sidebar (Subject → Topic → Subtopic transformation, breadcrumb)
-* [ ] **Step 5:** Glance reading mode (infinite scroll, full-screen toggle)
+* [x] **Step 5:** Glance reading mode (infinite scroll, full-screen toggle)
 * [ ] **Step 6:** Capsule block editor (heading / paragraph / bullet / numbered / checklist / highlight / quote)
 * [ ] **Step 8:** Persistent highlights + annotations
 * [ ] **Step 9:** Add-to-Notebook popup integration (Manual + Auto modes, Premium Move reuse)
@@ -63,7 +63,8 @@ After each step the agent commits with message
 | 2 | done | `Step 2: Register capsule tab + bottom-tab route` |
 | 3 | done | `Step 3: Capsule home screen with Subject Hub layout` |
 | 4 | done | `Step 4: Dynamic expandable sidebar tree + breadcrumb + scoped notebook list` |
-| 5 | pending | — |
+| 5 | done | `Step 5: Glance reading workspace with block renderer + sidebar toggle` |
+| 6 | pending | — |
 
 ---
 

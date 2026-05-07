@@ -37,7 +37,6 @@ import { NotebookLocationPicker } from '../src/components/NotebookLocationPicker
 import { AddToFlashcardSheet } from '../src/components/flashcards/AddToFlashcardSheet';
 import { fetchBestAnswer, type BestAnswer } from '../src/services/BestAnswerService';
 import { LocalQuery } from '../src/services/LocalQuery';
-import { markdownToHtml } from '../src/utils/textUtils';
 import { buildMarkdownStyles, buildMarkdownRules } from '../src/utils/markdownUtils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -443,7 +442,7 @@ export default function AISearchTab() {
       newItems.push({
         id: (Date.now() + 1).toString(),
         type: 'highlight',
-        text: markdownToHtml(activeText),
+        text: activeText,
         color: '#FFB74D',
         source: `AI Search Preview / ${previewQuestion.subject || previewQuestion.exam_group || 'Practice'} ${previewQuestion.exam_year || ''}`.trim(),
         addedAt: new Date().toISOString(),

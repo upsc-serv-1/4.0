@@ -36,6 +36,8 @@ interface Props {
   inkTool: ToolKind;
   inkColor: string;
   inkWidth: number;
+  /** When true, only Apple-Pencil-like pressure inputs draw (palm rejection). */
+  pencilOnly?: boolean;
   /** Current ScrollView offset.y so we can convert touch.y → page-y. */
   scrollOffsetY: number;
   onAddStroke: (s: Stroke) => void;
@@ -44,7 +46,7 @@ interface Props {
 
 export function PageInkOverlay({
   width, contentHeight, strokes, interactive,
-  inkTool, inkColor, inkWidth, scrollOffsetY,
+  inkTool, inkColor, inkWidth, pencilOnly = false, scrollOffsetY,
   onAddStroke, onRemoveStrokes,
 }: Props) {
   const [currentStroke, setCurrentStroke] = useState<StrokePoint[]>([]);

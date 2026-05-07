@@ -88,8 +88,8 @@ Out of scope for this branch:
 | 4 | Notes-tab "Open in Hardnotes" + iPad dockable toolbar | ⬜ todo | — |
 | 5 | Notability spec — page-wide ink (file 3) | ✅ done | (this commit) |
 | 6 | Notability spec — tape mask + lasso | ✅ tape done; lasso deferred | (this commit) |
-| 7 | Notability impl-guide patterns (file 4) | ⬜ todo | — |
-| 8 | Soft notes quick-ref polish (file 5) | ⬜ todo | — |
+| 7 | Notability impl-guide patterns (file 4) | 📋 docs only — items deferred | (this commit) |
+| 8 | Soft notes quick-ref polish (file 5) | 📋 explicitly out of scope (Phase B) | — |
 
 Each batch ends with a commit + push to `origin/hardnotes-renovation`.
 
@@ -268,3 +268,36 @@ User said: *"tape like masking feature of notability"*. Done.
 - `'lasso'` is already in `ToolKind` but no UI button yet. Spec calls for a closed-path selection that moves/copies/deletes contained strokes. Worth its own batch — slated for Batch 7 alongside file 4 patterns.
 
 _Next → Read files 4 (Notability Implementation Guide) and 5 (Soft Notes Quick Ref) and apply._
+
+### 2026-02 · Batch 7 — Files 4 & 5 review + extension hooks
+
+**File 4 (Notability Implementation Guide) — what we already cover and what's deferred**
+
+Already covered by batches 5 + 6:
+- Single-page Skia canvas spanning the full scrollable note (`PageInkOverlay`)
+- Shared `Stroke` model with pen / highlighter / tape / eraser tools
+- Two-finger pan to scroll, single-finger to draw (Notability convention)
+- Realtime persistence via the existing `user_notes` row + Supabase channel
+
+Deferred (good extension points for the next agent):
+| Item | Where to hook in | Effort |
+|---|---|---|
+| Apple-Pencil-only mode (palm rejection) | `PageInkOverlay` already accepts a `pencilOnly` prop. Wire `Gesture.Pan().onTouchesDown((e, manager) => { if (pencilOnly && !e.allTouches.some(t => (t as any).force > 0.05)) manager.fail(); })`. | S |
+| Catmull-Rom stroke smoothing | `strokes.ts → strokeToSvgPath`. Replace mid-point quadratic with the Catmull-Rom-to-cubic snippet from file 4. | S |
+| Pinch-to-zoom + pan transform | Wrap the entire `<View>` that owns `PageInkOverlay` + bullet cards in an `Animated.View` driven by `useCanvasTransforms()` from file 4. Translate touch coords by `screenToCanvasCoords(zoom, panX, panY)` before storage. | M |
+| Lasso selection | `'lasso'` already in `ToolKind`. Add a button in `InkToolbar`. On end-of-pan, run point-in-polygon over `pageStrokes` and surface a selection toolbar (move/copy/delete). | M-L |
+| Stroke virtualization (perf) | When `pageStrokes.length > ~500`, group by Y-buckets and only render buckets within `[scrollY-200, scrollY+viewport+200]`. Bucket index can live in-memory (no DB). | M |
+
+**File 5 (Soft Notes Quick Ref) — explicitly Phase B / out of scope**
+
+Per the original brief: *"we will stick to file 1 and 2, as building notability clone would be phase 2 sometime later."* File 5 describes the standalone Soft Notes / Notebooks Hub product (separate Supabase schema, Redux store, multi-page notebooks). **None of it is implemented in this branch.** Pulling any of it requires:
+- New tables: `notebooks`, `pages`, `strokes`, `text_boxes`
+- A Redux store (currently the app uses bare React state + Supabase)
+- A new Notebook hub screen + per-page editor
+
+When that phase begins, fork from `main` (not from `hardnotes-renovation`), as the Hardnotes-tab work in this branch is intentionally non-disruptive to the existing `user_notes` schema.
+
+**Pencil-only prop (extension hook shipped this batch)**
+- `PageInkOverlay` accepts `pencilOnly?: boolean` (default `false`). It is currently a no-op — wiring it to `onTouchesDown(... manager.fail())` is the next concrete file-4 task.
+
+_Branch state: 8 batches recorded. Ready for review / merge._

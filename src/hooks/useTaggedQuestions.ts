@@ -119,18 +119,21 @@ export function useTaggedVault(userId: string | undefined) {
       return;
     }
 
-    // 0. Load from Cache First
+    // 0. Load from cache first (offline-first).
     try {
-      if (rawQuestions.length === 0) {
-        const cached = await AsyncStorage.getItem(cacheKey);
-        if (cached) {
-          setRawQuestions(JSON.parse(cached));
-        } else {
-          setLoading(true);
+      const cached = await AsyncStorage.getItem(cacheKey);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) {
+          setRawQuestions(parsed);
+          setLoading(false);
+          setError(null);
+          return;
         }
       }
+      setLoading(true);
     } catch {
-      if (rawQuestions.length === 0) setLoading(true);
+      setLoading(true);
     }
 
     try {
@@ -201,6 +204,20 @@ export function useTaggedVault(userId: string | undefined) {
       await AsyncStorage.setItem(cacheKey, JSON.stringify(transformed));
     } catch (err) {
       console.error('Vault Engine Error:', err);
+
+      // Network failed -> fall back to cache if present.
+      try {
+        const cached = await AsyncStorage.getItem(cacheKey);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed)) {
+            setRawQuestions(parsed);
+            setError(null);
+            return;
+          }
+        }
+      } catch {}
+
       setError(err);
     } finally {
       setLoading(false);

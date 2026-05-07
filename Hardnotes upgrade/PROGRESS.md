@@ -82,7 +82,7 @@ Out of scope for this branch:
 | Batch | Title | Status | Branch commit |
 |---|---|---|---|
 | 0 | Branch + progress.md scaffolding | ✅ done | `83d91c4` |
-| 1 | iPad polish + Underline/Strikethrough in toolbar | ✅ done | (this commit) |
+| 1 | iPad polish + Underline/Strikethrough in toolbar | ✅ done | `af0b966` |
 | 2 | Hierarchical bullets (parent/child) | ⬜ todo | — |
 | 3 | Real-time Notes ↔ Hardnotes sync | ⬜ todo | — |
 | 4 | Notes-tab "Open in Hardnotes" + iPad dockable toolbar | ⬜ todo | — |

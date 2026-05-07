@@ -5,7 +5,7 @@ import { spacing, radius } from '../theme';
 import { TaggedQuestion } from '../hooks/useTaggedQuestions';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Eye, Trash2, Zap, ExternalLink } from 'lucide-react-native';
+import { Eye, Trash2, Zap, ExternalLink, BookOpen } from 'lucide-react-native';
 import { FlashcardSvc } from '../services/FlashcardService';
 import { AddToFlashcardSheet } from './flashcards/AddToFlashcardSheet';
 import { autoCleanupQuestionState } from '../utils/questionStateUtils';
@@ -149,13 +149,32 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestion
           <Text style={[styles.explanationText, { color: zenSecColor }]}>{question.explanation}</Text>
 
           <View style={styles.actionsBar}>
+            {/* Issue #2: Full View button opens question in unified engine with all AI features */}
+            <TouchableOpacity
+              onPress={() => {
+                router.push({
+                  pathname: '/unified/engine',
+                  params: {
+                    testId: question.testId || 'manual',
+                    mode: 'learning',
+                    questionId: question.id,
+                    fromTags: 'true',
+                  },
+                });
+              }}
+              style={[styles.actionBtn, { backgroundColor: colors.primary + '15', borderColor: colors.primary + '30', flex: 1.5 }]}
+              testID="full-view-btn"
+            >
+              <BookOpen size={10} color={colors.primary} />
+              <Text style={[styles.actionBtnText, { color: colors.primary }]}>Learn</Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={handleRemoveTag} disabled={!!loadingAction} style={[styles.actionBtn, { borderColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.border }]}>
               {loadingAction === 'remove' ? <ActivityIndicator size="small" color={zenTertColor} /> : <Trash2 size={10} color={zenSecColor} />}
               <Text style={[styles.actionBtnText, { color: zenSecColor }]}>Remove</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleAddToFlashcard} disabled={!!loadingAction} style={[styles.actionBtn, { backgroundColor: colors.primary + '10', borderColor: colors.primary + '20' }]}>
               {loadingAction === 'flash' ? <ActivityIndicator size="small" color={colors.primary} /> : <Zap size={10} color={colors.primary} />}
-              <Text style={[styles.actionBtnText, { color: colors.primary }]}>Flashcard</Text>
+              <Text style={[styles.actionBtnText, { color: colors.primary }]}>Flash</Text>
             </TouchableOpacity>
             {question.testId && (
               <TouchableOpacity

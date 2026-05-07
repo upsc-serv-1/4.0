@@ -72,6 +72,20 @@ export interface QueueCard {
 }
 
 export class FlashcardSvc {
+  private static isUniqueViolation(error: any, constraintIncludes?: string): boolean {
+    const code = String(error?.code || '');
+    const message = String(error?.message || '').toLowerCase();
+    const details = String(error?.details || '').toLowerCase();
+    const hint = String(error?.hint || '').toLowerCase();
+    const constraint = String((error as any)?.constraint || '').toLowerCase();
+    if (code === '23505') {
+      if (!constraintIncludes) return true;
+      const needle = constraintIncludes.toLowerCase();
+      return message.includes(needle) || details.includes(needle) || hint.includes(needle) || constraint.includes(needle);
+    }
+    return false;
+  }
+
   // ============ READS ============
   static async getSubjects(userId: string) {
     const { data, error } = await supabase
@@ -326,9 +340,25 @@ export class FlashcardSvc {
           question_text: frontText,
           answer_text: backText,
         })
-        .select('id').single();
-      if (error) throw error;
-      card = data;
+        .select('id')
+        .single();
+
+      if (error) {
+        // Idempotent safety for rare race conditions on unique question_id.
+        if (this.isUniqueViolation(error)) {
+          const { data: existingCard, error: existingCardErr } = await supabase
+            .from('cards')
+            .select('id')
+            .eq('question_id', input.question_id || `manual_${Date.now()}`)
+            .maybeSingle();
+          if (existingCardErr || !existingCard) throw error;
+          card = existingCard as { id: string };
+        } else {
+          throw error;
+        }
+      } else {
+        card = data;
+      }
     }
 
     // Link in user_cards (idempotent).
@@ -347,7 +377,9 @@ export class FlashcardSvc {
         learning_step: 0,
         is_relearning: false,
       });
-      if (error) throw error;
+
+      // Multiple taps / stale callbacks can race here. Treat duplicate link as success.
+      if (error && !this.isUniqueViolation(error, 'uq_user_cards_user_card')) throw error;
     }
 
     return card!.id;

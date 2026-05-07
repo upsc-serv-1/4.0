@@ -194,6 +194,8 @@ export default function AISearchTab() {
   const [query, setQuery]               = useState('');
   const [keywords, setKeywords]         = useState<string[]>([]);
   const [results, setResults]   = useState<SearchResult[]>([]);
+  // Issue #11: Store master results for client-side filtering
+  const [masterResults, setMasterResults] = useState<SearchResult[]>([]);
   const [loading, setLoading]   = useState(false);
   const [showModelSwitcher, setShowModelSwitcher] = useState(false);
   const [hasSearched, setHasSearched]   = useState(false);
@@ -1029,6 +1031,7 @@ export default function AISearchTab() {
 
       // Stamp each result with its tier (used in sortedResults)
       const stamped = mergedQs.map((r: any) => ({ ...r, _searchTier: getSearchTier(r) }));
+      setMasterResults(stamped as SearchResult[]); // Issue #11: Store master for client-side filtering
       setResults(stamped as SearchResult[]);
 
       // ISSUE FIX #12: Track all unique subjects from initial search results
@@ -1399,9 +1402,8 @@ export default function AISearchTab() {
                   style={[styles.subjectChip, { borderColor: '#ef4444', backgroundColor: '#fee2e2' }]}
                   onPress={() => {
                     setSidebarSubjectFilter(null);
-                    const newFilters = { ...filters, subjects: 'All' };
-                    setFilters(newFilters);
-                    runSearch(query, newFilters);
+                    // Issue #11: Client-side — restore master results
+                    setResults(masterResults);
                   }}
                 >
                   <X size={10} color="#ef4444" />
@@ -1410,7 +1412,7 @@ export default function AISearchTab() {
               )}
               {allSearchSubjects.map(sub => {
                 // Count from current filtered results, but show all subjects from original search
-                const count = results.filter(r => r.subject === sub).length;
+                const count = masterResults.filter(r => r.subject === sub).length;
                 const color = getSubjectColor(sub as string);
                 const isSelected = sidebarSubjectFilter === sub;
                 return (
@@ -1421,12 +1423,16 @@ export default function AISearchTab() {
                       backgroundColor: isSelected ? '#ede9fe' : colors.surface,
                     }]}
                     onPress={() => {
+                      // Issue #11: Client-side filtering — no re-query needed
                       const isSame = sidebarSubjectFilter === sub;
-                      const newSub = isSame ? 'All' : sub as string;
-                      setSidebarSubjectFilter(isSame ? null : sub as string);
-                      const newFilters = { ...filters, subjects: newSub };
-                      setFilters(newFilters);
-                      runSearch(query, newFilters);
+                      const newSub = isSame ? null : sub as string;
+                      setSidebarSubjectFilter(newSub);
+                      // Filter masterResults locally instead of re-querying Supabase
+                      if (newSub) {
+                        setResults(masterResults.filter(r => r.subject === newSub));
+                      } else {
+                        setResults(masterResults);
+                      }
                     }}
                   >
                     <View style={[styles.subjectDot, { backgroundColor: color }]} />
@@ -1453,7 +1459,13 @@ export default function AISearchTab() {
               onPress={() => {
                 const newFilters = { ...filters, pyqFilter: opt };
                 setFilters(newFilters);
-                if (hasSearched) runSearch(query, newFilters);
+                // Issue #11: Client-side filtering
+                let filtered = sidebarSubjectFilter
+                  ? masterResults.filter(r => r.subject === sidebarSubjectFilter)
+                  : [...masterResults];
+                if (opt === 'PYQ Only') filtered = filtered.filter(r => r.is_pyq);
+                else if (opt === 'Non-PYQ') filtered = filtered.filter(r => !r.is_pyq);
+                setResults(filtered);
               }}
             >
               <Text style={[styles.subjectChipText, {
@@ -1489,7 +1501,15 @@ export default function AISearchTab() {
                         const next = isSelected ? list.filter(i => i !== inst) : [...list, inst];
                         const newFilters = { ...filters, institutes: next.length ? next.join(',') : 'All' };
                         setFilters(newFilters);
-                        runSearch(query, newFilters);
+                        // Issue #11: Client-side institute filtering
+                        let filtered = sidebarSubjectFilter
+                          ? masterResults.filter(r => r.subject === sidebarSubjectFilter)
+                          : [...masterResults];
+                        if (next.length > 0) {
+                          const instSet = new Set(next);
+                          filtered = filtered.filter(r => instSet.has(r.tests?.institute || ''));
+                        }
+                        setResults(filtered);
                       }}
                     >
                       <View style={[styles.subjectDot, { backgroundColor: '#7c3aed' }]} />

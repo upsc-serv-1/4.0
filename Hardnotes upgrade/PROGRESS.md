@@ -86,6 +86,10 @@ Out of scope for this branch:
 | 2 | Hierarchical bullets (parent/child) | ✅ done | (this commit) |
 | 3 | Real-time Notes ↔ Hardnotes sync | ✅ done | (this commit) |
 | 4 | Notes-tab "Open in Hardnotes" + iPad dockable toolbar | ⬜ todo | — |
+| 5 | Notability spec — page-wide ink (file 3) | ✅ done | (this commit) |
+| 6 | Notability spec — tape mask + lasso | ⬜ todo | — |
+| 7 | Notability impl-guide patterns (file 4) | ⬜ todo | — |
+| 8 | Soft notes quick-ref polish (file 5) | ⬜ todo | — |
 
 Each batch ends with a commit + push to `origin/hardnotes-renovation`.
 
@@ -204,3 +208,37 @@ _Next → Batch 3 (Phase 3 of plan): real-time Notes ↔ Hardnotes sync via Supa
 - The realtime feature must be enabled on the Supabase project for `user_notes` (Database → Replication). Owner action — not a code change.
 
 _Next → Batch 4 (Phase 5 polish + Notes-tab "Open in Hardnotes" entry-point)._
+
+### 2026-02 · Batch 5 — Page-wide ink canvas (Notability spec, file 3)
+
+User said: *"my pencil should work on whole page"*. This batch implements that.
+
+**Files**
+- `src/components/hardnotes/PageInkOverlay.tsx` (new, ~190 lines)
+- `src/components/hardnotes/useHardnoteDoc.ts`
+- `app/hardnotes/editor.tsx`
+
+**Architecture**
+- Strokes that cover the whole page are stored as `pageStrokes: Stroke[]` on the doc.
+- Persistence reuses the existing `user_notes.items` JSONB by writing a single sentinel record at index 0: `{ id: 'page_canvas', type: 'page_canvas', strokes: [...] }`. `normalize()` skips this record so `points` stays clean.
+- `extractPageStrokes()` reads it back. **No DB schema migration needed.**
+- New doc API: `pageStrokes`, `addPageStroke`, `removePageStrokes`, `clearPageStrokes`.
+- `scheduleSave` / `flushSave` now serialize via a shared `buildItemsPayload(points, pageStrokes)` helper.
+
+**Component**
+- `PageInkOverlay` renders one Skia `<Canvas>` over the whole content area (both display + interactive layers). Coordinates are in content-space — strokes anchor to the page, not the viewport.
+- Display layer is `pointerEvents="none"` so scrolling passes through. Interactive layer mounts only when `lens === 'ink'` so single-finger pan = draw, two-finger pan = scroll (Notability convention).
+- Pen / highlighter / eraser already share the existing `Stroke` model; tool/colour/width come from the same `inkTool/inkColor/inkWidth` state already used by the floating dock — no toolbar duplication.
+
+**Manual smoke test**
+1. Switch to Ink lens → draw a line crossing 3 bullets → ink renders over text & gaps.
+2. Switch to Glance lens → ink is still visible (read-only).
+3. Reload note → strokes persist via the `page_canvas` items record.
+4. Two-finger drag in Ink lens → page scrolls (gesture surface uses `maxPointers(1)`).
+
+**Known follow-ups (next batch)**
+- Tape / lasso / rectangle mask (Notability §Selection + §Tape) — Batch 6.
+- Pen-only mode toggle for palm rejection (currently every single-finger pan draws) — defer to Batch 7.
+- Page-stroke undo/redo (currently only per-bullet has undo). Defer.
+
+_Next → Batch 6: tape/mask + lasso, then files 4 & 5._

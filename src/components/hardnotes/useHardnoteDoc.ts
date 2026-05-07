@@ -35,6 +35,7 @@ export interface HardnoteDoc {
   title: string;
   subject: string | null;
   points: Point[];
+  pageStrokes: Stroke[];
   canUndoStroke: boolean;
   canRedoStroke: boolean;
   setTitle: (t: string) => void;
@@ -42,6 +43,9 @@ export interface HardnoteDoc {
   addStroke: (pointId: string, stroke: Stroke) => void;
   removeStrokes: (pointId: string, strokeIds: string[]) => void;
   clearStrokes: (pointId: string) => void;
+  addPageStroke: (stroke: Stroke) => void;
+  removePageStrokes: (strokeIds: string[]) => void;
+  clearPageStrokes: () => void;
   undoStroke: () => void;
   redoStroke: () => void;
   insertPoint: (afterId: string | null, draft?: Partial<Point>) => string;
@@ -52,10 +56,21 @@ export interface HardnoteDoc {
   flushSave: () => Promise<void>;
 }
 
+// Extract a single page-canvas record from a raw items array.
+// Stored shape: { id: 'page_canvas', type: 'page_canvas', strokes: Stroke[] }
+const extractPageStrokes = (raw: any[]): Stroke[] => {
+  if (!Array.isArray(raw)) return [];
+  const rec = raw.find((it) => it && it.type === 'page_canvas');
+  if (!rec || !Array.isArray(rec.strokes)) return [];
+  return rec.strokes as Stroke[];
+};
+
 const normalize = (raw: any[]): Point[] => {
   if (!Array.isArray(raw)) return [];
   return raw.map((it, idx): Point => {
     if (!it || typeof it !== 'object') return mkPoint({ text: String(it || '') });
+    // Page-canvas record is handled separately by extractPageStrokes — drop it here.
+    if (it.type === 'page_canvas') return null as any;
     // Legacy shapes → canonical point
     if (it.type === 'microTopicHeading') {
       return { id: String(it.id || `hd_${idx}`), type: 'heading', text: String(it.text || ''), createdAt: it.addedAt, parentId: it.parentId ?? null };
@@ -113,6 +128,7 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
   const [title, setTitleState] = useState('');
   const [subject, setSubject] = useState<string | null>(null);
   const [points, setPoints] = useState<Point[]>([]);
+  const [pageStrokes, setPageStrokes] = useState<Stroke[]>([]);
   const [strokeHistory, setStrokeHistory] = useState<StrokeHistoryEntry[]>([]);
   const [redoHistory, setRedoHistory] = useState<StrokeHistoryEntry[]>([]);
   const saveTimer = useRef<any>(null);
@@ -143,6 +159,7 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
     setTitleState(data.title || '');
     setSubject(data.subject || null);
     let pts = normalize(data.items || []);
+    setPageStrokes(extractPageStrokes(data.items || []));
     // If a user arrived from a fresh migration where only content exists,
     // surface it as a locked point so nothing is orphaned.
     if (pts.length === 0 && (data.content_html || data.content)) {
@@ -192,13 +209,23 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
     };
   }, [noteId, refresh]);
 
-  const scheduleSave = useCallback((nextPoints: Point[], nextTitle?: string) => {
+  // Build the storage payload for items: page-canvas record (if any strokes) + points.
+  const buildItemsPayload = useCallback((nextPoints: Point[], nextPageStrokes: Stroke[]) => {
+    const out: any[] = [];
+    if (nextPageStrokes.length > 0) {
+      out.push({ id: 'page_canvas', type: 'page_canvas', strokes: nextPageStrokes });
+    }
+    out.push(...nextPoints);
+    return out;
+  }, []);
+
+  const scheduleSave = useCallback((nextPoints: Point[], nextTitle?: string, nextPageStrokes?: Stroke[]) => {
     if (!noteId) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
       setSaving(true);
       const payload: any = {
-        items: nextPoints,
+        items: buildItemsPayload(nextPoints, nextPageStrokes ?? pageStrokes),
         updated_at: new Date().toISOString(),
       };
       if (nextTitle !== undefined) payload.title = nextTitle;
@@ -207,9 +234,10 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
       });
       inFlight.current = p as any;
       await p;
+      saveTimer.current = null;
       if (mounted.current) setSaving(false);
     }, 3000);
-  }, [noteId]);
+  }, [noteId, pageStrokes, buildItemsPayload]);
 
   const flushSave = useCallback(async () => {
     if (!noteId) return;
@@ -221,14 +249,14 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
     const { error } = await supabase
       .from('user_notes')
       .update({
-        items: points,
+        items: buildItemsPayload(points, pageStrokes),
         title,
         updated_at: new Date().toISOString(),
       })
       .eq('id', noteId);
     if (error) console.warn('[useHardnoteDoc] flush save failed', error);
     if (mounted.current) setSaving(false);
-  }, [noteId, points, title]);
+  }, [noteId, points, pageStrokes, title, buildItemsPayload]);
 
   const updatePoint = useCallback((id: string, patch: Partial<Point>) => {
     setPoints((prev) => {
@@ -419,6 +447,32 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
     });
   }, [scheduleSave]);
 
+  // ===== Page-canvas strokes (Notability-style) =====
+  const addPageStroke = useCallback((stroke: Stroke) => {
+    setPageStrokes((prev) => {
+      const next = [...prev, stroke];
+      scheduleSave(points, undefined, next);
+      return next;
+    });
+  }, [points, scheduleSave]);
+
+  const removePageStrokes = useCallback((strokeIds: string[]) => {
+    if (!strokeIds || strokeIds.length === 0) return;
+    const idSet = new Set(strokeIds);
+    setPageStrokes((prev) => {
+      const next = prev.filter((s) => !idSet.has(s.id));
+      scheduleSave(points, undefined, next);
+      return next;
+    });
+  }, [points, scheduleSave]);
+
+  const clearPageStrokes = useCallback(() => {
+    setPageStrokes(() => {
+      scheduleSave(points, undefined, []);
+      return [];
+    });
+  }, [points, scheduleSave]);
+
   const setTitle = useCallback((t: string) => {
     setTitleState(t);
     scheduleSave(points, t);
@@ -430,6 +484,7 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
     title,
     subject,
     points,
+    pageStrokes,
     canUndoStroke: strokeHistory.length > 0,
     canRedoStroke: redoHistory.length > 0,
     setTitle,
@@ -437,6 +492,9 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
     addStroke,
     removeStrokes,
     clearStrokes,
+    addPageStroke,
+    removePageStrokes,
+    clearPageStrokes,
     undoStroke,
     redoStroke,
     insertPoint,

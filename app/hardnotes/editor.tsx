@@ -32,6 +32,7 @@ import { useHardnoteDoc, Point } from '../../src/components/hardnotes/useHardnot
 import { LensSwitcher, Lens } from '../../src/components/hardnotes/LensSwitcher';
 import { InkToolbar } from '../../src/components/hardnotes/InkToolbar';
 import { InkBulletCard } from '../../src/components/hardnotes/InkBulletCard';
+import { PageInkOverlay } from '../../src/components/hardnotes/PageInkOverlay';
 import { ToolKind } from '../../src/components/hardnotes/strokes';
 import { UnifiedExportSheet } from '../../src/components/export/UnifiedExportSheet';
 import type { ExportPayload, ExportNoteBlock } from '../../src/lib/unifiedExportEngine';
@@ -85,6 +86,9 @@ export default function HardnoteEditor() {
 
   const [exportOpen, setExportOpen] = useState(false);
   const [includeHighlights, setIncludeHighlights] = useState(true);
+
+  // Page-canvas (Notability-style) measurements
+  const [contentLayout, setContentLayout] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     if (lens !== 'ink' && textModeActive) {
@@ -294,7 +298,29 @@ export default function HardnoteEditor() {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <View style={isTablet ? { width: '100%', maxWidth: lens === 'focus' ? 760 : 940 } : { width: '100%' }}>
+            <View
+              style={isTablet ? { width: '100%', maxWidth: lens === 'focus' ? 760 : 940 } : { width: '100%' }}
+              onLayout={(e) => {
+                const w = Math.round(e.nativeEvent.layout.width);
+                const h = Math.round(e.nativeEvent.layout.height);
+                setContentLayout((prev) => (prev.width === w && prev.height === h ? prev : { width: w, height: h }));
+              }}
+            >
+            {/* Page-wide ink layer (Notability style). Always visible; only interactive in Ink lens. */}
+            {(doc.pageStrokes.length > 0 || lens === 'ink') && contentLayout.width > 0 && (
+              <PageInkOverlay
+                width={contentLayout.width}
+                contentHeight={Math.max(contentLayout.height, 600)}
+                strokes={doc.pageStrokes}
+                interactive={lens === 'ink' && !textModeActive}
+                inkTool={inkTool}
+                inkColor={inkColor}
+                inkWidth={inkWidth}
+                scrollOffsetY={0}
+                onAddStroke={doc.addPageStroke}
+                onRemoveStrokes={doc.removePageStrokes}
+              />
+            )}
             {/* Focus mode meta */}
             {lens === 'focus' && (
               <View style={styles.focusMeta}>

@@ -24,6 +24,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { usePreventRemove, useNavigation } from '@react-navigation/native';
 import { 
   ChevronLeft, 
+  ChevronDown,
   ChevronRight, 
   Clock, 
   Target,
@@ -64,13 +65,13 @@ import {
   Eraser,
   ExternalLink,
   Brain,
-  ChevronDown,
   ChevronUp,
   Star,
   Edit2,
   Save as SaveIcon,
   Send,
   RotateCcw,
+  MessageSquare
 } from 'lucide-react-native';
 import { AIModelSwitcher } from '../../src/components/ai/AIModelSwitcher';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -98,6 +99,7 @@ import {
   aiExplainQuestion,
   aiSummarizeExplanation,
   aiImproveAnswer,
+  aiAskDoubt,
   InstituteExplanation,
 } from '../../src/services/GeminiService';
 import { renderAIText } from '../../src/utils/renderAIText';
@@ -165,7 +167,229 @@ function markdownToHtml(text: string): string {
   return `<p style="margin:4px 0">${html}</p>`;
 }
 
+// ── Custom Markdown table renderer ──────────────────────────────────────────
+// react-native-markdown-display v7 has table support, but it relies on the
+// default renderer which often fails to layout correctly in a flex container.
+// We override the table/thead/tbody/tr/th/td rules to produce a ScrollView-
+// wrapped layout that handles variable column widths and wide content.
+
+/**
+ * Build theme-aware Markdown inline styles.
+ * Call once inside the component and pass to every <Markdown> instance.
+ */
+function buildMarkdownStyles(
+  textColor: string,
+  fontSize: number,
+  bgSurface: string,
+  borderColor: string,
+  primaryColor: string,
+  fontFamily: string = 'System',
+) {
+  return {
+    // Body text
+    body: {
+      color: textColor,
+      fontSize,
+      lineHeight: fontSize * 1.55,
+      fontWeight: '500' as const,
+      fontFamily,
+    },
+    // Paragraphs
+    paragraph: {
+      marginTop: 4,
+      marginBottom: 4,
+    },
+    // Headings
+    heading1: { fontSize: fontSize + 6, fontWeight: '900' as const, color: textColor, marginTop: 10, marginBottom: 4 },
+    heading2: { fontSize: fontSize + 4, fontWeight: '800' as const, color: textColor, marginTop: 8, marginBottom: 4 },
+    heading3: { fontSize: fontSize + 2, fontWeight: '700' as const, color: textColor, marginTop: 6, marginBottom: 4 },
+    heading4: { fontSize: fontSize + 1, fontWeight: '700' as const, color: textColor, marginTop: 4, marginBottom: 2 },
+    // Bold / italic / code
+    strong: { fontWeight: '800' as const },
+    em: { fontStyle: 'italic' as const },
+    code_inline: {
+      backgroundColor: primaryColor + '15',
+      color: primaryColor,
+      borderRadius: 4,
+      paddingHorizontal: 4,
+      fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }),
+      fontSize: fontSize - 1,
+    },
+    fence: {
+      backgroundColor: bgSurface,
+      borderRadius: 8,
+      padding: 12,
+      marginVertical: 6,
+    },
+    code_block: {
+      backgroundColor: bgSurface,
+      borderRadius: 8,
+      padding: 12,
+      marginVertical: 6,
+      fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }),
+    },
+    // Lists
+    bullet_list: { marginVertical: 4 },
+    ordered_list: { marginVertical: 4 },
+    list_item: { marginBottom: 2 },
+    // Blockquote
+    blockquote: {
+      backgroundColor: primaryColor + '10',
+      borderLeftColor: primaryColor,
+      borderLeftWidth: 3,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 4,
+      marginVertical: 4,
+    },
+    // hr
+    hr: { borderBottomColor: borderColor, borderBottomWidth: 1, marginVertical: 8 },
+    // Tables — handled via custom rules below; these styles ensure
+    // the rule-generated Views pick up the correct colours.
+    table: { marginVertical: 8 },
+    thead: {},
+    tbody: {},
+    th: {
+      backgroundColor: primaryColor + '18',
+      padding: 8,
+      borderWidth: 1,
+      borderColor,
+    },
+    td: {
+      padding: 8,
+      borderWidth: 1,
+      borderColor,
+    },
+    tr: {},
+  };
+}
+
+/**
+ * Build custom render rules that produce properly scrollable tables.
+ * Pass as the `rules` prop to every <Markdown> instance.
+ */
+function buildMarkdownRules(borderColor: string, primaryColor: string, textColor: string, fontSize: number) {
+  return {
+    // Wrap the whole table in a horizontal ScrollView so wide tables don't clip
+    table: (node: any, children: any, _parent: any, styles: any) => (
+      <ScrollView
+        key={node.key}
+        horizontal
+        showsHorizontalScrollIndicator
+        style={{ marginVertical: 8 }}
+        contentContainerStyle={{ minWidth: '100%' }}
+      >
+        <View style={{
+          borderWidth: 1,
+          borderColor,
+          borderRadius: 8,
+          overflow: 'hidden',
+          minWidth: 280,
+        }}>
+          {children}
+        </View>
+      </ScrollView>
+    ),
+
+    // thead — visually distinct header block
+    thead: (node: any, children: any) => (
+      <View key={node.key} style={{ backgroundColor: primaryColor + '18' }}>
+        {children}
+      </View>
+    ),
+
+    // tbody — white/surface background
+    tbody: (node: any, children: any) => (
+      <View key={node.key}>
+        {children}
+      </View>
+    ),
+
+    // tr — horizontal row with alternating row colours
+    tr: (node: any, children: any, parent: any) => {
+      // Determine row index for zebra striping
+      const siblings = parent[0]?.children || [];
+      const rowIndex = siblings.indexOf(node);
+      const isEven = rowIndex % 2 === 0;
+      return (
+        <View key={node.key} style={{
+          flexDirection: 'row',
+          backgroundColor: isEven ? 'transparent' : primaryColor + '08',
+          borderTopWidth: rowIndex > 0 ? 1 : 0,
+          borderTopColor: borderColor,
+        }}>
+          {children}
+        </View>
+      );
+    },
+
+    // th — header cell
+    th: (node: any, children: any, parent: any) => {
+      const siblings = parent[0]?.children || [];
+      const colIndex = siblings.indexOf(node);
+      return (
+        <View key={node.key} style={{
+          flex: 1,
+          minWidth: 80,
+          padding: 8,
+          borderLeftWidth: colIndex > 0 ? 1 : 0,
+          borderLeftColor: borderColor,
+          justifyContent: 'center',
+        }}>
+          <Text style={{
+            fontSize: fontSize - 1,
+            fontWeight: '800',
+            color: textColor,
+            flexShrink: 1,
+            flexWrap: 'wrap',
+          }}>
+            {flattenChildren(node)}
+          </Text>
+        </View>
+      );
+    },
+
+    // td — data cell
+    td: (node: any, children: any, parent: any) => {
+      const siblings = parent[0]?.children || [];
+      const colIndex = siblings.indexOf(node);
+      return (
+        <View key={node.key} style={{
+          flex: 1,
+          minWidth: 80,
+          padding: 8,
+          borderLeftWidth: colIndex > 0 ? 1 : 0,
+          borderLeftColor: borderColor,
+          justifyContent: 'center',
+        }}>
+          <Text style={{
+            fontSize: fontSize - 1,
+            fontWeight: '500',
+            color: textColor,
+            flexShrink: 1,
+            flexWrap: 'wrap',
+          }}>
+            {flattenChildren(node)}
+          </Text>
+        </View>
+      );
+    },
+  };
+}
+
+/** Recursively extract plain text from a markdown-it AST node */
+function flattenChildren(node: any): string {
+  if (!node) return '';
+  if (node.type === 'softbreak' || node.type === 'hardbreak') return '\n';
+  if (node.content != null) return String(node.content);
+  if (node.children && node.children.length > 0) {
+    return node.children.map(flattenChildren).join('');
+  }
+  return '';
+}
+
 // --- Types ---
+
 interface Question {
   id: string;
   question_text: string;
@@ -767,6 +991,9 @@ export default function UnifiedQuizEngine() {
   // ── Search context (when opened from AI Search results) ─────────
   const isFromSearch = !!params.resultIds;
   const [showSearchPanel, setShowSearchPanel] = useState(false);
+  // Preserve scroll position across panel open/close
+  const searchPanelScrollRef = React.useRef<any>(null);
+  const searchPanelScrollOffset = React.useRef<number>(0);
 
   // Notebook System State
   const [notebookModalVisible, setNotebookModalVisible] = useState(false);
@@ -798,6 +1025,40 @@ export default function UnifiedQuizEngine() {
   const [savingFlashcard, setSavingFlashcard] = useState<Record<string, boolean>>({});
   const [lastNoteTap, setLastNoteTap] = useState(0);
   const [fontSize, setFontSize] = useState(16);
+
+  // ── General Doubt Clearing state (pop up) ───────────────
+  const [doubtModalVisible, setDoubtModalVisible] = useState(false);
+  const [doubtQuestion, setDoubtQuestion] = useState('');
+  const [doubtAnswer, setDoubtAnswer] = useState('');
+  const [askingDoubt, setAskingDoubt] = useState(false);
+
+  const handleAskDoubt = async () => {
+    if (!doubtQuestion.trim()) return;
+    const currentItem = questions[currentIndex];
+    if (!currentItem) return;
+
+    setAskingDoubt(true);
+    setDoubtAnswer('');
+    try {
+      const q = currentItem.question_text || currentItem.question || '';
+      const opts = JSON.stringify(currentItem.options || {});
+      
+      // Get the currently selected explanation if any
+      const id = currentItem.id;
+      const expl = aiExplanations[id] || bestAnswers[id]?.answer_text || currentItem.explanation_markdown || '';
+      
+      const result = await aiAskDoubt(doubtQuestion, {
+        question: q,
+        options: opts,
+        explanation: expl
+      });
+      setDoubtAnswer(result);
+    } catch (e: any) {
+      Alert.alert('AI Error', e?.message || 'Could not answer doubt.');
+    } finally {
+      setAskingDoubt(false);
+    }
+  };
   const baseFontSizeRef = useRef(16);
   const [showZoomIndicator, setShowZoomIndicator] = useState(false);
   const zoomTimerRef = useRef<any>(null);
@@ -877,13 +1138,33 @@ export default function UnifiedQuizEngine() {
   const [aff, setAff] = useState<{ visible: boolean; cardId: string | null; hint: { subject?: string; section_group?: string; microtopic?: string } }>({ visible: false, cardId: null, hint: {} });
   const [locationPickerVisible, setLocationPickerVisible] = useState(false);
 
+  // Track viewable items via a ref to avoid triggering re-renders during scroll.
+  // We only update currentIndex when the user has been on a question long enough
+  // (minimumViewTime) to prevent rapid index jumping during fast scrolling.
+  const pendingIndexRef = useRef<number>(-1);
+  const viewabilityTimerRef = useRef<any>(null);
+
   const viewabilityConfig = useRef({
-    itemVisiblePercentThreshold: 50
+    // Require 30% of the item to be visible – lower threshold to avoid
+    // triggering premature detection during fast scroll
+    itemVisiblePercentThreshold: 30,
+    // Wait 250ms before reporting – this prevents rapid setCurrentIndex calls
+    // that create cascading re-renders and scroll jitter.
+    minimumViewTime: 250,
   }).current;
 
   const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
     if (viewableItems.length > 0) {
-      setCurrentIndex(viewableItems[0].index);
+      const newIndex = viewableItems[0].index;
+      // Only update if actually different – avoid unnecessary re-renders
+      if (newIndex !== pendingIndexRef.current) {
+        pendingIndexRef.current = newIndex;
+        // Debounce the actual state update to after scroll momentum ends
+        if (viewabilityTimerRef.current) clearTimeout(viewabilityTimerRef.current);
+        viewabilityTimerRef.current = setTimeout(() => {
+          setCurrentIndex(newIndex);
+        }, 100);
+      }
     }
   }).current;
 
@@ -900,9 +1181,93 @@ export default function UnifiedQuizEngine() {
     }
   };
 
+  // AUTO-HIDING HEADER STATE
+  const [headerHidden, setHeaderHidden] = useState(false);
+  const headerTranslateY = useRef(new Animated.Value(0)).current;
+  const lastScrollY = useRef(0);
+
+  const toggleHeader = useCallback((hidden: boolean) => {
+    if (hidden === headerHidden) return;
+    setHeaderHidden(hidden);
+    Animated.timing(headerTranslateY, {
+      toValue: hidden ? -100 : 0, // Header height is approx 60-80px
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [headerHidden]);
+
+  // Auto-hiding header: track scroll direction via ref only (no state change during scroll).
+  // We use requestAnimationFrame to batch header animation updates and prevent
+  // any layout thrashing that contributes to scroll jitter.
+  const scrollDirectionRef = useRef<'up' | 'down' | null>(null);
+  const headerAnimPendingRef = useRef<any>(null);
+
+  const handleScroll = useCallback((event: any) => {
+    const currentY = event.nativeEvent.contentOffset.y;
+    const diff = currentY - lastScrollY.current;
+    lastScrollY.current = currentY;
+
+    // Ignore micro-movements to avoid jitter
+    if (Math.abs(diff) < 8) return;
+
+    const newDirection: 'up' | 'down' = diff > 0 ? 'down' : 'up';
+
+    // Only act when direction changes and we've scrolled past the header zone
+    if (newDirection !== scrollDirectionRef.current) {
+      scrollDirectionRef.current = newDirection;
+
+      if (headerAnimPendingRef.current) return; // Animation already queued
+
+      headerAnimPendingRef.current = requestAnimationFrame(() => {
+        headerAnimPendingRef.current = null;
+        if (newDirection === 'down' && currentY > 80) {
+          toggleHeader(true);
+        } else if (newDirection === 'up') {
+          toggleHeader(false);
+        }
+      });
+    }
+  }, [toggleHeader]);
+
   const zenBg = isZenMode ? '#F4ECD8' : colors.bg;
   const zenTextColor = isZenMode ? '#433422' : colors.textPrimary;
   const zenPaperColor = isZenMode ? '#F4ECD8' : colors.surface;
+
+  // ── Shared Markdown styles & table rules ─────────────────────────────────
+  // Memoised so they're only re-computed when theme or fontSize changes,
+  // not on every keystroke / answer selection.
+  const mdStyles = useMemo(() => buildMarkdownStyles(
+    colors.textPrimary,
+    fontSize,
+    colors.surface,
+    colors.border,
+    colors.primary,
+    Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' })
+  ), [colors.textPrimary, colors.surface, colors.border, colors.primary, fontSize]);
+
+  const mdRules = useMemo(() => buildMarkdownRules(
+    colors.border,
+    colors.primary,
+    colors.textPrimary,
+    fontSize,
+  ), [colors.border, colors.primary, colors.textPrimary, fontSize]);
+
+  // Zen-mode variant (sepia tone) for question-stem Markdown
+  const mdStylesZen = useMemo(() => buildMarkdownStyles(
+    zenTextColor,
+    fontSize - 1,
+    zenPaperColor,
+    isZenMode ? 'rgba(67,52,34,0.2)' : colors.border,
+    colors.primary,
+    Platform.select({ ios: 'Georgia', android: 'serif', default: 'serif' })
+  ), [zenTextColor, zenPaperColor, isZenMode, colors.border, colors.primary, fontSize]);
+
+  const mdRulesZen = useMemo(() => buildMarkdownRules(
+    isZenMode ? 'rgba(67,52,34,0.2)' : colors.border,
+    colors.primary,
+    zenTextColor,
+    fontSize - 1,
+  ), [isZenMode, colors.border, colors.primary, zenTextColor, fontSize]);
 
   const sessionTestId = useMemo(() => {
     return routeParams.testId || `custom_${routeParams.subject || 'all'}_${new Date().toISOString().split('T')[0]}`;
@@ -998,12 +1363,12 @@ export default function UnifiedQuizEngine() {
   const NOTE_PREFS_KEY = 'notebook_save_prefs';
   const listRef = useRef<FlatList>(null);
 
-  // Robust scroll helper for list view palette jumps
+  // Robust scroll helper for list view palette/navigator jumps.
+  // Uses scrollToIndex (which works without getItemLayout via a small delay
+  // to let the list measure items first). Falls back to offset estimate.
   const scrollToIndexRobust = useCallback((targetIndex: number) => {
     if (viewMode !== 'list') return;
-    
-    const AVERAGE_ITEM_HEIGHT = 220;
-    
+
     const attemptScroll = () => {
       try {
         listRef.current?.scrollToIndex({ 
@@ -1012,25 +1377,17 @@ export default function UnifiedQuizEngine() {
           viewPosition: 0 
         });
       } catch (e) {
-        // Fall back to offset-based scroll if index fails
+        // List hasn't measured enough items yet – use a rough offset estimate.
+        // This is intentionally NOT retried to prevent jump-back behavior.
+        const estimatedOffset = targetIndex * 280; // rough average, not exact
         listRef.current?.scrollToOffset({ 
-          offset: Math.max(0, targetIndex * AVERAGE_ITEM_HEIGHT), 
+          offset: Math.max(0, estimatedOffset), 
           animated: true 
         });
-        // Retry scrollToIndex after layout settles
-        setTimeout(() => {
-          try {
-            listRef.current?.scrollToIndex({ 
-              index: targetIndex, 
-              animated: false, 
-              viewPosition: 0 
-            });
-          } catch {}
-        }, 300);
       }
     };
-    
-    // Small delay to let modal close animation complete
+
+    // Small delay so modal close animation doesn't compete with the scroll
     setTimeout(attemptScroll, 50);
   }, [viewMode]);
 
@@ -1066,22 +1423,11 @@ export default function UnifiedQuizEngine() {
     // We only want to run this once per sessionTestId
   }, [sessionTestId, sessionAttemptId, session?.user?.id]);
 
-  useEffect(() => {
-  if (!showIndex && viewMode === 'list' && currentIndex >= 0) {
-      const scrollTimer = setTimeout(() => {
-        try {
-          listRef.current?.scrollToIndex({ 
-            index: currentIndex, 
-            animated: true,
-            viewPosition: 0 
-          });
-        } catch (e) {
-          console.warn("Scroll to index failed", e);
-        }
-      }, 300); // Increased delay for stability
-      return () => clearTimeout(scrollTimer);
-    }
-  }, [showIndex, viewMode, currentIndex]); // Added currentIndex dependency
+  // REMOVED: Auto-scroll useEffect that was causing scroll snapping.
+  // The scroll position is now only changed programmatically via:
+  //   - scrollToIndexRobust() called from the question palette/navigator
+  //   - initialScrollIndex on first mount only
+  // This ensures user's manual scroll position is NEVER overridden.
 
   useEffect(() => {
     if (!isPaperMode) {
@@ -2119,7 +2465,7 @@ export default function UnifiedQuizEngine() {
        }
     } else {
       isNavigatingAway.current = true;
-      router.replace('/(tabs)/analyse');
+      router.replace('/analyse');
     }
   };
 
@@ -2631,7 +2977,7 @@ export default function UnifiedQuizEngine() {
           </View>
         </View>
 
-        <Markdown style={{ body: { color: zenTextColor, fontSize: fontSize, lineHeight: fontSize * 1.5, fontWeight: '500', fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' }) } }}>
+        <Markdown style={mdStyles} rules={mdRules}>
           {item.statement_line || item.question_text}
         </Markdown>
 
@@ -2880,7 +3226,7 @@ export default function UnifiedQuizEngine() {
                     component into AI output (which never has headings,
                     fences or images — just inline emphasis). */}
                 {viewerKind === 'markdown' ? (
-                  <Markdown style={{ body: { color: colors.textPrimary, fontSize: fontSize, lineHeight: fontSize * 1.5, fontWeight: '500', fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' }) } }}>
+                  <Markdown style={mdStyles} rules={mdRules}>
                     {activeExplanationText}
                   </Markdown>
                 ) : viewerKind === 'ai' && aiLoading[item.id] && !aiExplanations[item.id] ? (
@@ -3403,17 +3749,7 @@ export default function UnifiedQuizEngine() {
         </View>
 
         {/* Question stem */}
-        <Markdown
-          style={{
-            body: {
-              color: zenTextColor,
-              fontSize: fontSize - 1,
-              lineHeight: (fontSize - 1) * 1.5,
-              fontWeight: '500',
-              fontFamily: Platform.select({ ios: 'Georgia', android: 'serif', default: 'serif' }),
-            },
-          }}
-        >
+        <Markdown style={mdStylesZen} rules={mdRulesZen}>
           {item.statement_line || item.question_text}
         </Markdown>
 
@@ -3680,29 +4016,41 @@ export default function UnifiedQuizEngine() {
           </TouchableOpacity>
         )}
         {!isPaperMode && (
-        <View style={[styles.header, { borderBottomColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.border }]}>
+        <Animated.View style={[
+          styles.header, 
+          { 
+            borderBottomColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.border,
+            transform: [{ translateY: headerTranslateY }],
+            position: 'absolute',
+            top: 0, left: 0, right: 0,
+            zIndex: 100,
+            backgroundColor: isZenMode ? '#F4ECD8' : colors.surface
+          }
+        ]}>
           <TouchableOpacity onPress={handleExit} style={styles.headerBtn}>
             <ChevronLeft size={24} color={isZenMode ? '#433422' : colors.textPrimary} />
           </TouchableOpacity>
 
+          {/* Search panel button — grouped with the back button for navigation clarity */}
+          {isFromSearch && (
+            <TouchableOpacity
+              onPress={() => setShowSearchPanel(true)}
+              testID="engine-search-panel-btn"
+              style={{
+                flexDirection: 'row', alignItems: 'center', gap: 5,
+                backgroundColor: colors.primary + '15', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12,
+              }}
+            >
+              <ListIcon size={14} color={colors.primary} />
+              <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 11 }}>
+                {currentIndex + 1}/{questions.length}
+              </Text>
+            </TouchableOpacity>
+          )}
+
           <View style={styles.headerTitleContainer}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              {/* Search context breadcrumb — only shown when opened from search results */}
-              {isFromSearch ? (
-                <TouchableOpacity
-                  onPress={() => setShowSearchPanel(true)}
-                  testID="engine-search-panel-btn"
-                  style={{
-                    flexDirection: 'row', alignItems: 'center', gap: 5,
-                    backgroundColor: colors.primary + '15', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12,
-                  }}
-                >
-                  <ListIcon size={14} color={colors.primary} />
-                  <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 11 }}>
-                    Q{currentIndex + 1}/{questions.length}
-                  </Text>
-                </TouchableOpacity>
-              ) : (
+              {!isFromSearch && (
                 <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
                   {showIndex ? 'Arena Index' : `Q${currentIndex + 1}/${questions.length}`}
                 </Text>
@@ -3794,11 +4142,44 @@ export default function UnifiedQuizEngine() {
                 <ListIcon size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
               </TouchableOpacity>
             )}
+            <TouchableOpacity 
+              onPress={() => setDoubtModalVisible(true)}
+              style={styles.headerBtn}
+              testID="engine-ask-doubt-btn"
+            >
+              <MessageSquare size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => setShowQuickMenu(!showQuickMenu)} style={styles.headerBtn}>
               <MoreVertical size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
             </TouchableOpacity>
           </View>
-        </View>
+        </Animated.View>
+        )}
+
+        {/* Floating "Show Header" button when hidden */}
+        {headerHidden && !isPaperMode && !showIndex && (
+          <TouchableOpacity 
+            onPress={() => toggleHeader(false)}
+            style={{
+              position: 'absolute',
+              top: Platform.OS === 'ios' ? 50 : 20,
+              right: 20,
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              backgroundColor: colors.primary,
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+              elevation: 5,
+              shadowColor: '#000',
+              shadowOpacity: 0.3,
+              shadowRadius: 5,
+              shadowOffset: { width: 0, height: 2 }
+            }}
+          >
+            <ChevronDown size={24} color="#fff" />
+          </TouchableOpacity>
         )}
 
         {isPaperMode && (
@@ -3972,20 +4353,16 @@ export default function UnifiedQuizEngine() {
                           key={q.id} 
                           onPress={() => { 
                             setShowNavigator(false); 
-                            // Slight delay so modal close animation doesn't compete
+                            // Use scrollToIndexRobust to jump to the question.
+                            // The delay matches the modal close animation.
                             setTimeout(() => {
                               setCurrentIndex(idx);
                               if (viewMode === 'paper') {
                                 setPaperPage(Math.floor(idx / paperPageSize));
                               } else if (viewMode === 'list') {
-                                // scrollToIndex via getItemLayout (no onScrollToIndexFailed needed)
-                                try {
-                                  listRef.current?.scrollToIndex({ index: idx, animated: true, viewPosition: 0 });
-                                } catch {
-                                  listRef.current?.scrollToOffset({ offset: 260 * idx, animated: true });
-                                }
+                                scrollToIndexRobust(idx);
                               }
-                              // card mode: setCurrentIndex already re-renders the question
+                              // card mode: setCurrentIndex already re-renders
                             }, 120);
                           }}
                           style={[
@@ -4009,18 +4386,18 @@ export default function UnifiedQuizEngine() {
             <Modal
               visible={showSearchPanel && isFromSearch}
               transparent
-              animationType="slide"
+              animationType="fade"
               onRequestClose={() => setShowSearchPanel(false)}
             >
               <View style={{ flex: 1, flexDirection: 'row' }}>
                 {/* Dim overlay on the right — tap to close */}
                 <Pressable
-                  style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}
+                  style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.45)' }}
                   onPress={() => setShowSearchPanel(false)}
                 />
-                {/* Panel — takes 65% of screen width */}
+                  {/* Panel — takes 75% of screen width for better readability */}
                 <View style={{
-                  width: Math.min(width * 0.65, 420),
+                  width: Math.min(width * 0.75, 500),
                   backgroundColor: colors.surface,
                   height: '100%',
                   paddingTop: 16,
@@ -4036,7 +4413,18 @@ export default function UnifiedQuizEngine() {
                       <X size={20} color={colors.textTertiary} />
                     </TouchableOpacity>
                   </View>
-                  <ScrollView showsVerticalScrollIndicator={false}>
+                  <ScrollView
+                    ref={searchPanelScrollRef}
+                    showsVerticalScrollIndicator={false}
+                    onScroll={e => { searchPanelScrollOffset.current = e.nativeEvent.contentOffset.y; }}
+                    scrollEventThrottle={100}
+                    onLayout={() => {
+                      // Restore scroll position after panel renders
+                      if (searchPanelScrollOffset.current > 0) {
+                        searchPanelScrollRef.current?.scrollTo({ y: searchPanelScrollOffset.current, animated: false });
+                      }
+                    }}
+                  >
                     {questions.map((q, idx) => {
                       const isActive = idx === currentIndex;
                       const ans = store.answers[q.id];
@@ -4048,10 +4436,8 @@ export default function UnifiedQuizEngine() {
                             setCurrentIndex(idx);
                             setShowSearchPanel(false);
                             if (viewMode === 'list') {
-                              setTimeout(() => {
-                                try { listRef.current?.scrollToIndex({ index: idx, animated: true }); }
-                                catch { listRef.current?.scrollToOffset({ offset: 260 * idx, animated: true }); }
-                              }, 150);
+                              // Use scrollToIndexRobust so we don't assume fixed item heights
+                              setTimeout(() => scrollToIndexRobust(idx), 150);
                             }
                           }}
                           style={{
@@ -4070,11 +4456,34 @@ export default function UnifiedQuizEngine() {
                             {q.subject && (
                               <Text style={{ fontSize: 10, fontWeight: '700', color: '#7c3aed', backgroundColor: '#ede9fe', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>{q.subject}</Text>
                             )}
-                            {q.is_pyq && (
-                              <Text style={{ fontSize: 9, fontWeight: '800', color: '#1d4ed8', backgroundColor: '#dbeafe', paddingHorizontal: 5, paddingVertical: 1, borderRadius: 4 }}>PYQ</Text>
-                            )}
+                          {/* Real exam label — same as search results & card chips */}
+                          {(() => {
+                            const synthInfo = {
+                              group: q.exam_group,
+                              year: q.exam_year ?? (q.exam_info?.year),
+                              is_upsc_cse: q.is_upsc_cse,
+                              is_allied: q.is_allied,
+                              is_others: q.is_others,
+                            };
+                            const pyqCat = getPYQCategorization({ ...q, exam_info: { ...q.exam_info, ...synthInfo } });
+                            if (!pyqCat.hasPYQData) return null;
+                            const chipColor =
+                              pyqCat.isUPSC   ? { bg: '#dbeafe', color: '#1d4ed8' } :
+                              pyqCat.isAllied ? { bg: '#dcfce7', color: '#15803d' } :
+                              pyqCat.isOther  ? { bg: '#ffedd5', color: '#c2410c' } :
+                                               { bg: '#fef3c7', color: '#b45309' };
+                            return (
+                              <Text style={{
+                                fontSize: 9, fontWeight: '800',
+                                color: chipColor.color, backgroundColor: chipColor.bg,
+                                paddingHorizontal: 5, paddingVertical: 1, borderRadius: 4,
+                              }}>
+                                {`${pyqCat.groupName} ${pyqCat.year ?? ''}`.trim()}
+                              </Text>
+                            );
+                          })()}
                           </View>
-                          <Text numberOfLines={2} style={{ fontSize: 12, fontWeight: isActive ? '700' : '500', color: isActive ? colors.textPrimary : colors.textSecondary }}>
+                          <Text numberOfLines={4} style={{ fontSize: 12, fontWeight: isActive ? '700' : '500', color: isActive ? colors.textPrimary : colors.textSecondary }}>
                             {q.question_text?.replace(/<[^>]*>/g, '')}
                           </Text>
                         </TouchableOpacity>
@@ -4176,27 +4585,50 @@ export default function UnifiedQuizEngine() {
                   data={questions}
                   renderItem={renderQuestionBlock}
                   keyExtractor={(item) => item.id}
-                  initialScrollIndex={currentIndex >= 0 ? currentIndex : undefined}
-                  getItemLayout={(_data, index) => ({
-                    length: 260, offset: 260 * index, index
-                  })}
-                  contentContainerStyle={styles.listContent}
+                  // initialScrollIndex only used for first mount from Navigator/Index jump.
+                  // DO NOT remove – but we rely on onScrollToIndexFailed to handle
+                  // out-of-range gracefully rather than crashing.
+                  initialScrollIndex={currentIndex > 0 ? currentIndex : undefined}
+                  // NO getItemLayout: questions have variable heights (explanations,
+                  // tables, merged blocks). A fixed height causes scroll position
+                  // miscalculations that produce the observed jump-back behavior.
+                  contentContainerStyle={[styles.listContent, { paddingTop: 80 }]}
                   onViewableItemsChanged={onViewableItemsChanged}
                   viewabilityConfig={viewabilityConfig}
-                  initialNumToRender={10}
-                  maxToRenderPerBatch={5}
-                  windowSize={5}
-                  removeClippedSubviews={Platform.OS === 'android'}
+                  // Generous render window to prevent items unmounting/remounting
+                  // during normal reading scroll (which causes flicker & jitter).
+                  initialNumToRender={12}
+                  maxToRenderPerBatch={8}
+                  windowSize={11}
+                  // Android: do NOT remove clipped subviews – it causes re-layouts
+                  // that trigger scroll position corrections.
+                  removeClippedSubviews={false}
+                  onScroll={handleScroll}
+                  scrollEventThrottle={32}
+                  // Natural deceleration – no snapping, no paging.
+                  decelerationRate="normal"
+                  // Prevent pan responder conflicts that cause the FlatList to
+                  // "steal" the scroll position from the user.
+                  disableScrollViewPanResponder={false}
                   onScrollToIndexFailed={(info) => {
-                    const wait = new Promise(resolve => setTimeout(resolve, 500));
+                    // Graceful fallback: wait for layout to settle then retry once.
+                    const wait = new Promise(resolve => setTimeout(resolve, 300));
                     wait.then(() => {
-                      listRef.current?.scrollToIndex({ index: info.index, animated: false });
+                      try {
+                        listRef.current?.scrollToIndex({ index: info.index, animated: false });
+                      } catch {
+                        // Nothing more we can do – user can scroll manually.
+                      }
                     });
                   }}
                 />
               ) : (
                 <View style={{ flex: 1 }}>
-                  <ScrollView>{renderQuestionBlock({ item: questions[currentIndex], index: currentIndex })}</ScrollView>
+                  <ScrollView 
+                    onScroll={handleScroll}
+                    scrollEventThrottle={16}
+                    contentContainerStyle={!isPaperMode && { paddingTop: 80 }}
+                  >{renderQuestionBlock({ item: questions[currentIndex], index: currentIndex })}</ScrollView>
                   <View style={[styles.cardNav, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
                     <TouchableOpacity onPress={() => setCurrentIndex(prev => Math.max(0, prev - 1))} style={[styles.navBtn, { backgroundColor: colors.surfaceStrong }]} disabled={currentIndex === 0}>
                       <ArrowLeft size={20} color={colors.textPrimary} />
@@ -4314,17 +4746,7 @@ export default function UnifiedQuizEngine() {
                     nestedScrollEnabled
                     keyboardShouldPersistTaps="handled"
                   >
-                    <Markdown
-                      style={{
-                        body: {
-                          color: colors.textPrimary,
-                          fontSize: fontSize,
-                          lineHeight: fontSize * 1.55,
-                          fontWeight: '500',
-                          fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' }),
-                        },
-                      }}
-                    >
+                    <Markdown style={mdStyles} rules={mdRules}>
                       {text}
                     </Markdown>
 
@@ -4630,7 +5052,7 @@ export default function UnifiedQuizEngine() {
                       params: { aid: summary.attemptId }
                     });
                   } else {
-                    router.replace('/(tabs)/analyse');
+                    router.replace('/analyse');
                   }
                 }}
               >
@@ -4650,6 +5072,135 @@ export default function UnifiedQuizEngine() {
         />
 
         {/* Notebook location picker (tree) */}
+        {/* Doubt Clearing Modal */}
+        <Modal
+          visible={doubtModalVisible}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setDoubtModalVisible(false)}
+        >
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
+            <KeyboardAvoidingView 
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              style={{ width: '100%' }}
+            >
+              <View style={{ 
+                backgroundColor: colors.surface, 
+                borderTopLeftRadius: 24, 
+                borderTopRightRadius: 24, 
+                padding: 20,
+                maxHeight: height * 0.8,
+                borderWidth: 1,
+                borderColor: colors.border
+              }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.primary + '15', alignItems: 'center', justifyContent: 'center' }}>
+                      <MessageSquare size={20} color={colors.primary} />
+                    </View>
+                    <View>
+                      <Text style={{ fontSize: 16, fontWeight: '900', color: colors.textPrimary }}>Ask AI Doubt</Text>
+                      <Text style={{ fontSize: 11, color: colors.textTertiary, fontWeight: '700' }}>UPSC Exam Contextual Support</Text>
+                    </View>
+                  </View>
+                  <TouchableOpacity 
+                    onPress={() => {
+                      setDoubtModalVisible(false);
+                      setDoubtQuestion('');
+                      setDoubtAnswer('');
+                    }}
+                    style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <X size={20} color={colors.textPrimary} />
+                  </TouchableOpacity>
+                </View>
+
+                <ScrollView style={{ marginBottom: 20 }} showsVerticalScrollIndicator={false}>
+                  {doubtAnswer ? (
+                    <View style={{ backgroundColor: colors.primary + '08', padding: 16, borderRadius: 16, borderWidth: 1, borderColor: colors.primary + '20', marginBottom: 16 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                        <Brain size={14} color={colors.primary} />
+                        <Text style={{ fontSize: 10, fontWeight: '900', color: colors.primary, letterSpacing: 1 }}>AI RESPONSE</Text>
+                      </View>
+                      <Markdown style={mdStyles} rules={mdRules}>
+                        {doubtAnswer}
+                      </Markdown>
+                      <TouchableOpacity 
+                        onPress={() => setDoubtAnswer('')}
+                        style={{ alignSelf: 'flex-end', marginTop: 12 }}
+                      >
+                        <Text style={{ color: colors.primary, fontSize: 11, fontWeight: '800' }}>Ask another question</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View style={{ backgroundColor: colors.surfaceStrong, padding: 12, borderRadius: 12, marginBottom: 16 }}>
+                      <Text style={{ fontSize: 11, color: colors.textSecondary, lineHeight: 16 }}>
+                        <Text style={{ fontWeight: '900' }}>TIP:</Text> You can ask about the logic, terms, or context of this specific question.
+                      </Text>
+                    </View>
+                  )}
+                  
+                  {!doubtAnswer && (
+                    <View style={{ 
+                      backgroundColor: colors.surfaceStrong, 
+                      borderRadius: 16, 
+                      padding: 12,
+                      borderWidth: 1,
+                      borderColor: colors.border
+                    }}>
+                      <TextInput
+                        placeholder="Type your doubt here..."
+                        placeholderTextColor={colors.textTertiary}
+                        style={{ 
+                          color: colors.textPrimary,
+                          fontSize: 14,
+                          minHeight: 100,
+                          textAlignVertical: 'top'
+                        }}
+                        multiline
+                        value={doubtQuestion}
+                        onChangeText={setDoubtQuestion}
+                      />
+                    </View>
+                  )}
+                </ScrollView>
+
+                {!doubtAnswer && (
+                  <TouchableOpacity 
+                    onPress={handleAskDoubt}
+                    disabled={askingDoubt || !doubtQuestion.trim()}
+                    style={{ 
+                      backgroundColor: colors.primary, 
+                      height: 54, 
+                      borderRadius: 16, 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      flexDirection: 'row',
+                      gap: 10,
+                      opacity: (askingDoubt || !doubtQuestion.trim()) ? 0.6 : 1,
+                      shadowColor: colors.primary,
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 8,
+                      elevation: 4
+                    }}
+                  >
+                    {askingDoubt ? (
+                      <ActivityIndicator color="#fff" size="small" />
+                    ) : (
+                      <>
+                        <Send size={18} color="#fff" />
+                        <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>SEND QUESTION</Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+                )}
+                
+                <View style={{ height: Platform.OS === 'ios' ? 20 : 0 }} />
+              </View>
+            </KeyboardAvoidingView>
+          </View>
+        </Modal>
         <NotebookLocationPicker
           visible={locationPickerVisible}
           onClose={() => setLocationPickerVisible(false)}

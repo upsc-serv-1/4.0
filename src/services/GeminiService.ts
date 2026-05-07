@@ -45,6 +45,17 @@ export const DEFAULT_GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 export const DEFAULT_MODEL = 'gemini-2.0-flash';
 
+export const OPENROUTER_API_KEY_STORAGE = 'openrouter_api_key';
+export const OPENROUTER_MODEL_KEY = 'openrouter_model';
+export const DEFAULT_OPENROUTER_MODEL = 'openrouter/free';
+
+export const OPENROUTER_MODELS = [
+  { id: 'openrouter/free',                    label: 'Auto (Free Router)', sub: 'Best available free model' },
+  { id: 'deepseek/deepseek-r1:free',          label: 'DeepSeek R1',        sub: 'Best reasoning · free' },
+  { id: 'qwen/qwen3-235b-a22b:free',          label: 'Qwen3 235B',         sub: 'Best quality · free preview' },
+  { id: 'meta-llama/llama-3.3-70b-instruct:free', label: 'Llama 3.3 70B', sub: 'Reliable · free' },
+] as const;
+
 // Filters Gemini can infer from query intent
 export type AIInferredFilters = {
   subject?:      string;   // e.g. 'History', 'Geography', 'Polity'
@@ -237,6 +248,39 @@ async function callGroq(prompt: string, maxTokens = 600): Promise<string> {
   return text.trim();
 }
 
+async function callOpenRouter(prompt: string, maxTokens = 600): Promise<string> {
+  let key = '';
+  try { key = (await AsyncStorage.getItem(OPENROUTER_API_KEY_STORAGE)) || ''; } catch {}
+  if (!key) throw new Error('No OpenRouter API key. Go to Settings → AI Settings.');
+
+  let model = DEFAULT_OPENROUTER_MODEL;
+  try { model = (await AsyncStorage.getItem(OPENROUTER_MODEL_KEY)) || DEFAULT_OPENROUTER_MODEL; } catch {}
+
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${key}`,
+      'HTTP-Referer': 'com.upsc.app',
+      'X-Title': 'UPSC Prep App',
+    },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.2,
+      max_tokens: maxTokens,
+    }),
+  });
+
+  if (res.status === 429) throw new Error('429: OpenRouter rate limit. Try again in a minute.');
+  if (!res.ok) { const err = await res.text(); throw new Error(`OpenRouter error ${res.status}: ${err}`); }
+
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) throw new Error('Empty response from OpenRouter');
+  return text.trim();
+}
+
 async function callAI(prompt: string, maxTokens = 600): Promise<string> {
   let provider = 'gemini';
   try {
@@ -245,6 +289,9 @@ async function callAI(prompt: string, maxTokens = 600): Promise<string> {
 
   if (provider === 'groq') {
     return callGroq(prompt, maxTokens);
+  }
+  if (provider === 'openrouter') {
+    return callOpenRouter(prompt, maxTokens);
   }
   return callGemini(prompt, maxTokens);
 }
@@ -378,4 +425,34 @@ export async function aiExpandSearchQuery(userQuery: string): Promise<AISearchRe
     const keywords = raw.replace(/[\[\]"]/g, '').split(',').map((s: string) => s.trim()).filter(Boolean);
     return { keywords, filters: {} };
   }
+}
+
+/**
+ * General doubt clearing for a question context.
+ */
+export async function aiAskDoubt(
+  userQuestion: string,
+  context: {
+    question?: string;
+    options?: string;
+    explanation?: string;
+  }
+): Promise<string> {
+  const prompt = `You are an expert UPSC mentor helping a student with a specific doubt.
+
+CONTEXT:
+${context.question ? `Question: ${context.question}` : ''}
+${context.options ? `Options: ${context.options}` : ''}
+${context.explanation ? `Current Explanation: ${context.explanation}` : ''}
+
+STUDENT'S DOUBT:
+"${userQuestion}"
+
+Your task: Answer the student's doubt precisely and accurately in the context of UPSC preparation. 
+- Be concise but fact-rich.
+- If the doubt is about a specific term in the context, explain it clearly.
+- Keep the tone encouraging and academic.
+- Return ONLY the answer text, no preamble.`;
+
+  return callAI(prompt, 800);
 }

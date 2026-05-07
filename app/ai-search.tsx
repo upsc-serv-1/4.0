@@ -20,10 +20,12 @@ import { supabase } from '../src/lib/supabase';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { aiExpandSearchQuery, type AIInferredFilters } from '../src/services/GeminiService';
+import { aiExpandSearchQuery, aiExplainQuestion, type AIInferredFilters } from '../src/services/GeminiService';
 import { PageWrapper } from '../src/components/PageWrapper';
-import { getPYQCategorization } from './unified/engine';
+import Markdown from 'react-native-markdown-display';
 import { AIModelSwitcher } from '../src/components/ai/AIModelSwitcher';
+import { SharedQuestionCard } from '../src/components/unified/SharedQuestionCard';
+import { getPYQCategorization, buildCanonicalExplanations } from '../src/utils/questionUtils';
 import { mergeQuestions } from '../src/utils/merger';
 import { QuestionCache } from '../src/services/QuestionCache';
 import { buildPredictive, probableHotsFor2026, type PredictiveRow } from '../src/lib/pyqPredictive';
@@ -39,6 +41,8 @@ type SearchResult = {
   id: string;
   question_text: string;
   correct_answer: string;
+  options?: Record<string, string>;
+  explanation_markdown?: string;
   subject?: string;
   section_group?: string;
   micro_topic?: string;
@@ -51,6 +55,11 @@ type SearchResult = {
   exam_group?: string;
   exam_stage?: string;
   tests?: { institute?: string; series?: string; program_name?: string };
+  // Merger outputs
+  _explanations?: Array<{ source: string; program: string; text: string; year: string; answer: string }>;
+  _institutes?: string[];
+  _mergedIds?: string[];
+  _searchTier?: number;
 };
 
 type Filters = {
@@ -129,10 +138,10 @@ function highlightKeywords(text: string, keywords: string[]): React.ReactNode {
 // ── PYQ chip color by exam category ──────────────────────────────────────────
 function getPYQChipStyle(pyq: ReturnType<typeof getPYQCategorization>) {
   if (!pyq.hasPYQData) return null;
-  if (pyq.isUPSC)    return { bg: '#dbeafe', color: '#1d4ed8' };
-  if (pyq.isAllied)  return { bg: '#dcfce7', color: '#15803d' };
-  if (pyq.isOther)   return { bg: '#ffedd5', color: '#c2410c' };
-  return { bg: '#fef3c7', color: '#b45309' }; // generic PYQ (amber)
+  if (pyq.isUPSC)    return { bg: '#dcfce7', color: '#15803d' };
+  if (pyq.isAllied)  return { bg: '#fef9c3', color: '#a16207' };
+  if (pyq.isOther)   return { bg: '#f1f5f9', color: '#475569' };
+  return { bg: '#ede9fe', color: '#7c3aed' }; // generic PYQ (purple)
 }
 
 // ── Main Component ───────────────────────────────────────────────────────────
@@ -140,7 +149,52 @@ function getPYQChipStyle(pyq: ReturnType<typeof getPYQCategorization>) {
 export default function AISearchTab() {
   const { colors } = useTheme();
   const { session } = useAuth();
+
+  const mdStyles = React.useMemo(() => ({
+    body: { fontSize: 13, color: colors.textPrimary, lineHeight: 22 },
+    heading1: { fontSize: 18, fontWeight: 'bold' as const, color: colors.textPrimary, marginBottom: 8 },
+    heading2: { fontSize: 16, fontWeight: 'bold' as const, color: colors.textPrimary, marginBottom: 8 },
+    strong: { fontWeight: 'bold' as const },
+    em: { fontStyle: 'italic' as const },
+    list_item: { flexDirection: 'row' as const, marginBottom: 4 },
+    bullet_list: { marginBottom: 12 },
+    ordered_list: { marginBottom: 12 },
+    code_inline: { fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', backgroundColor: colors.surfaceStrong, paddingHorizontal: 4, borderRadius: 4 },
+    code_block: { fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', backgroundColor: colors.surfaceStrong, padding: 8, borderRadius: 8, marginBottom: 12 },
+    table: { borderWidth: 1, borderColor: colors.border, borderRadius: 8, overflow: 'hidden' as const, marginBottom: 12, minWidth: '100%' },
+    th: { backgroundColor: colors.surfaceStrong, padding: 8, borderWidth: 1, borderColor: colors.border },
+    td: { padding: 8, borderWidth: 1, borderColor: colors.border },
+    tr: { flexDirection: 'row' as const },
+    paragraph: { marginBottom: 12 },
+  }), [colors]);
+
+  const mdRules = React.useMemo(() => ({
+    table: (node: any, children: any) => (
+      <ScrollView key={node.key} horizontal showsHorizontalScrollIndicator contentContainerStyle={{ minWidth: '100%' }} style={{ marginVertical: 8 }}>
+        <View style={{ borderWidth: 1, borderColor: colors.border, borderRadius: 8, overflow: 'hidden', minWidth: 280 }}>
+          {children}
+        </View>
+      </ScrollView>
+    ),
+    thead: (node: any, children: any) => (
+      <View key={node.key} style={{ backgroundColor: colors.surfaceStrong, borderBottomWidth: 1, borderBottomColor: colors.border }}>{children}</View>
+    ),
+    tbody: (node: any, children: any) => (
+      <View key={node.key}>{children}</View>
+    ),
+    tr: (node: any, children: any) => (
+      <View key={node.key} style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.border }}>{children}</View>
+    ),
+    th: (node: any, children: any) => (
+      <View key={node.key} style={{ flex: 1, padding: 8, borderRightWidth: 1, borderRightColor: colors.border, justifyContent: 'center' }}>{children}</View>
+    ),
+    td: (node: any, children: any) => (
+      <View key={node.key} style={{ flex: 1, padding: 8, borderRightWidth: 1, borderRightColor: colors.border }}>{children}</View>
+    )
+  }), [colors]);
+
   const router = useRouter();
+
 
   const [query, setQuery]               = useState('');
   const [keywords, setKeywords]         = useState<string[]>([]);
@@ -172,8 +226,141 @@ export default function AISearchTab() {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [showHistory, setShowHistory] = useState(false);
 
-  // Fix #5 — question preview modal
   const [previewQuestion, setPreviewQuestion] = useState<SearchResult | null>(null);
+  const [previewRevealed, setPreviewRevealed]  = useState(false);
+  // Enriched explanations: secondary fetch for ALL merged sibling IDs
+  // so we never miss an institute's answer even if it wasn't in search results
+  const [enrichedExplanations, setEnrichedExplanations] = useState<any[] | null>(null);
+  const [enrichLoading, setEnrichLoading] = useState(false);
+  const [aiExplainLoading, setAiExplainLoading] = useState(false);
+  const [aiExplanation, setAiExplanation] = useState<any>(null);
+  const [previewAnswer, setPreviewAnswer] = useState<string | null>(null);
+  const [previewExplSource, setPreviewExplSource] = useState<string>('all');
+  const [previewStudyTags, setPreviewStudyTags] = useState<string[]>([]);
+  const [previewFlashcard, setPreviewFlashcard] = useState(false);
+  const [savingFlashcard, setSavingFlashcard] = useState(false);
+  const [userTags, setUserTags] = useState<string[]>([]);
+
+  // Fetch real user revision tags for the study tags section
+  React.useEffect(() => {
+    if (!session?.user?.id) return;
+    supabase
+      .from('question_states')
+      .select('review_tags')
+      .eq('user_id', session.user.id)
+      .not('review_tags', 'is', null)
+      .then(({ data }) => {
+        const tags = new Set<string>();
+        data?.forEach(row => {
+          if (Array.isArray(row.review_tags)) {
+            row.review_tags.forEach(t => tags.add(t));
+          }
+        });
+        const list = Array.from(tags).sort();
+        if (list.length === 0) {
+          setUserTags(['Guessed', 'Silly Mistake', 'Must Revise', 'Time Mgmt', 'Imp. Fact']);
+        } else {
+          setUserTags(list);
+        }
+      });
+  }, [session?.user?.id]);
+
+  // When popup opens: fetch full explanation data for every _mergedId so all
+  // linked institute answers are guaranteed to appear — same as Arena pipeline
+  React.useEffect(() => {
+    if (!previewQuestion) {
+      setEnrichedExplanations(null);
+      setPreviewAnswer(null);
+      setPreviewExplSource('all');
+      setPreviewStudyTags([]);
+      setPreviewFlashcard(false);
+      setAiExplanation(null);
+      return;
+    }
+
+    const mergedIds: string[] = (previewQuestion as any)._mergedIds || [];
+
+    // If only one ID (or none), use what the merger already gave us
+    if (mergedIds.length <= 1) {
+      setEnrichedExplanations(null);
+      return;
+    }
+
+    // Fetch all sibling rows for their explanations + answers + institute data
+    setEnrichLoading(true);
+    supabase
+      .from('questions')
+      .select('id,explanation_markdown,correct_answer,test_id,tests(institute,program_name,series)')
+      .in('id', mergedIds)
+      .then(({ data }) => {
+        if (!data || data.length === 0) {
+          setEnrichedExplanations(null);
+          setEnrichLoading(false);
+          return;
+        }
+
+        // Build per-institute explanation entries, deduped by source+answer+text
+        const entries: Array<{ source: string; program: string; text: string; answer: string }> = [];
+        for (const q of data) {
+          const tests = Array.isArray(q.tests) ? q.tests[0] : q.tests;
+          const rawInst = tests?.institute || '';
+          const source = rawInst
+            ? rawInst.split(/\s+/).map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+            : 'UPSC';
+          const program = tests?.program_name || '';
+          const text = String(q.explanation_markdown || '').trim();
+          const answer = String(q.correct_answer || '').trim();
+          if (!text && !answer) continue;
+          const isDup = entries.some(
+            e => e.source.toLowerCase() === source.toLowerCase()
+              && e.answer.toUpperCase() === answer.toUpperCase()
+              && (e.text || '').slice(0, 120) === text.slice(0, 120)
+          );
+          if (!isDup) entries.push({ source, program, text, answer });
+        }
+        setEnrichedExplanations(entries.length > 0 ? entries : null);
+        setEnrichLoading(false);
+      })
+      .catch(() => { setEnrichedExplanations(null); setEnrichLoading(false); });
+
+    // Reset AI explain state when opening a new question
+    setAiExplanation(null);
+  }, [previewQuestion?.id]);
+
+  const handleAiExplainPopup = async () => {
+    if (!previewQuestion) return;
+    setAiExplainLoading(true);
+    try {
+      const rawOptions = (previewQuestion as any).options || {};
+      const optionsMap: Record<string, string> = {
+        A: rawOptions.a || rawOptions.A || '',
+        B: rawOptions.b || rawOptions.B || '',
+        C: rawOptions.c || rawOptions.C || '',
+        D: rawOptions.d || rawOptions.D || '',
+      };
+      
+      const payloadContext = enrichedExplanations || (previewQuestion._explanations && previewQuestion._explanations.length > 0
+        ? previewQuestion._explanations
+        : previewQuestion.explanation_markdown
+          ? [{ source: previewQuestion.tests?.institute || 'Source', program: '', text: previewQuestion.explanation_markdown }]
+          : []);
+
+      const result = await aiExplainQuestion(
+        previewQuestion.question_text || '',
+        optionsMap,
+        previewQuestion.correct_answer || '',
+        JSON.stringify(payloadContext)
+      );
+      setAiExplanation(result);
+    } catch (e: any) {
+      const msg: string = e?.message || 'Unknown error';
+      if (msg.includes('404')) Alert.alert('Model not found', 'Switch model in Settings.');
+      else if (msg.includes('429')) Alert.alert('Quota exceeded', 'Try another key or provider.');
+      else Alert.alert('AI Error', msg);
+    } finally {
+      setAiExplainLoading(false);
+    }
+  };
 
   // Fix #6 — collapsible keywords panel
   const [keywordsExpanded, setKeywordsExpanded] = useState(false);
@@ -308,7 +495,8 @@ export default function AISearchTab() {
         return q2;
       };
 
-      const BASE_SELECT = `id,question_text,correct_answer,subject,section_group,micro_topic,
+      const BASE_SELECT = `id,question_text,correct_answer,options,explanation_markdown,
+        subject,section_group,micro_topic,
         is_pyq,is_ncert,is_upsc_cse,is_allied,is_others,exam_year,exam_group,exam_stage,
         test_id,tests(institute,series,program_name)`;
 
@@ -395,7 +583,16 @@ export default function AISearchTab() {
       }
 
       // ─────────────────────────────────────────────────────────────────────
-      // AI MODE: Gemini expands query → structured filters + keywords
+      // AI MODE: Hybrid ranking pipeline
+      //
+      // Priority tiers (fetched in order, merged with dedup):
+      //   Tier 0 — Exact original phrase match (highest priority)
+      //   Tier 1 — All AI keywords matched together (AND-like, using multi-word)
+      //   Tier 2 — Individual AI keyword matches (OR across each keyword)
+      //   Tier 3 — Remaining fuzzy AI keyword matches (lowest priority)
+      //
+      // This guarantees the user's literal intent always surfaces first,
+      // followed by AI-expanded semantic matches as supplementary results.
       // ─────────────────────────────────────────────────────────────────────
       const aiResult = await aiExpandSearchQuery(q.trim());
       const displayKeywords = aiResult.keywords;
@@ -416,20 +613,122 @@ export default function AISearchTab() {
       setKeywords(displayKeywords);
       if (displayKeywords.length === 0) { setLoading(false); return; }
 
-      const safeKws = displayKeywords.slice(0, 12);
-      const aiConds = activeFilters.searchAcross === 'Explanations'
-        ? safeKws.map(kw => `explanation_markdown.ilike.%${kw}%`)
-        : safeKws.map(kw => `question_text.ilike.%${kw}%`);
+      // The raw query text the user typed — used for exact-phrase tier
+      const rawTerm = q.trim();
+      const field = activeFilters.searchAcross === 'Explanations'
+        ? 'explanation_markdown'
+        : 'question_text';
 
-      let dbQ = supabase.from('questions').select(BASE_SELECT)
-        .or(aiConds.join(','))
-        .limit(60);
-      dbQ = await applyFilters(dbQ, activeFilters, aiYear);
-      const { data, error } = await dbQ;
-      if (error) throw error;
-      const raw = (data || []) as unknown as SearchResult[];
-      const { mergedQs } = mergeQuestions(raw as any);
-      setResults(mergedQs as SearchResult[]);
+      // Dedup accumulator — preserves insertion order (= priority order)
+      const seenIds = new Set<string>();
+      const priorityResults: SearchResult[] = [];
+
+      // Extract user words for Exact Keyword matching (words > 2 chars)
+      const userWords = rawTerm.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2);
+
+      const addBatch = (rows: SearchResult[]) => {
+        for (const r of rows) {
+          if (!seenIds.has(r.id)) {
+            seenIds.add(r.id);
+            priorityResults.push(r);
+          }
+        }
+      };
+
+      // ── TIER 0: Exact original phrase ─────────────────────────────────────
+      // Highest confidence: the user's literal input is present verbatim.
+      {
+        let dbQ = supabase.from('questions').select(BASE_SELECT)
+          .ilike(field, `%${rawTerm}%`)
+          .limit(40);
+        dbQ = await applyFilters(dbQ, activeFilters, aiYear);
+        const { data } = await dbQ;
+        addBatch((data || []) as unknown as SearchResult[]);
+      }
+
+      // ── TIER 1: Exact keyword matches (All User Words) ─────────────────────
+      // User's own typed keywords, matched as AND
+      if (userWords.length > 1) {
+        let dbQ: any = supabase.from('questions').select(BASE_SELECT).limit(30);
+        for (const w of userWords) {
+          dbQ = dbQ.ilike(field, `%${w}%`);
+        }
+        dbQ = await applyFilters(dbQ, activeFilters, aiYear);
+        const { data } = await dbQ;
+        addBatch((data || []) as unknown as SearchResult[]);
+      }
+
+      // ── TIER 2: Fuzzy keyword matches (Any User Word) ──────────────────────
+      // User's own typed keywords, matched as OR
+      for (const w of userWords) {
+        if (priorityResults.length >= 60) break; // Cap
+        let dbQ = supabase.from('questions').select(BASE_SELECT)
+          .ilike(field, `%${w}%`)
+          .limit(10);
+        dbQ = await applyFilters(dbQ, activeFilters, aiYear);
+        const { data } = await dbQ;
+        addBatch((data || []) as unknown as SearchResult[]);
+      }
+
+      // ── TIER 3: Multi-keyword AND simulation (AI Words) ──────────────────
+      // Questions that contain ALL of the first 3 AI keywords are more
+      // relevant than those containing only some of them.
+      const safeKws = displayKeywords.slice(0, 12);
+      const topKws = safeKws.slice(0, 3);
+      if (topKws.length > 1) {
+        // Build an AND filter by chaining multiple .ilike() calls
+        let dbQ: any = supabase.from('questions').select(BASE_SELECT).limit(30);
+        for (const kw of topKws) {
+          dbQ = dbQ.ilike(field, `%${kw}%`);
+        }
+        dbQ = await applyFilters(dbQ, activeFilters, aiYear);
+        const { data } = await dbQ;
+        addBatch((data || []) as unknown as SearchResult[]);
+      }
+
+      // ── TIER 4: Individual AI keyword OR queries ──────────────────────────
+      // Each keyword searched independently and added in keyword order,
+      // so earlier (higher-confidence) AI keywords get priority.
+      for (const kw of safeKws) {
+        if (priorityResults.length >= 80) break; // cap total
+        let dbQ = supabase.from('questions').select(BASE_SELECT)
+          .ilike(field, `%${kw}%`)
+          .limit(20);
+        dbQ = await applyFilters(dbQ, activeFilters, aiYear);
+        const { data } = await dbQ;
+        addBatch((data || []) as unknown as SearchResult[]);
+      }
+
+      // Deduplicate across merged question variants
+      const { mergedQs } = mergeQuestions(priorityResults as any);
+
+      // Attach a search-rank score for the final sort step
+      const rawTermLower = rawTerm.toLowerCase();
+      const topKwsLower = topKws.map(k => k.toLowerCase());
+
+      const getSearchTier = (r: any): number => {
+        const text = ((r.question_text || '') + ' ' + (r.explanation_markdown || '')).toLowerCase();
+        
+        // Tier 0: Exact phrase
+        if (text.includes(rawTermLower)) return 0;
+        
+        // Tier 1: All user keywords (Exact keyword match)
+        if (userWords.length > 1 && userWords.every(w => text.includes(w))) return 1;
+        
+        // Tier 2: Fuzzy match (at least half of user keywords)
+        const matchCount = userWords.filter(w => text.includes(w)).length;
+        if (userWords.length > 0 && matchCount >= Math.ceil(userWords.length / 2)) return 2;
+        
+        // Tier 3: All AI keywords
+        if (topKwsLower.length > 0 && topKwsLower.every(k => text.includes(k))) return 3;
+        
+        // Tier 4: AI semantic / Any AI keyword
+        return 4;
+      };
+
+      // Stamp each result with its tier (used in sortedResults)
+      const stamped = mergedQs.map((r: any) => ({ ...r, _searchTier: getSearchTier(r) }));
+      setResults(stamped as SearchResult[]);
 
     } catch (e: any) {
       const msg: string = e?.message || 'Unknown error';
@@ -447,9 +746,16 @@ export default function AISearchTab() {
     }
   }, [searchEngineMode, query]);
 
-  // ── Sorted results ────────────────────────────────────────────────────────
-
-  // Fix #3 — smart relevance sort: UPSC CSE PYQ > Allied PYQ > Others PYQ > Practice
+  // ── Sorted results (Hybrid ranking) ──────────────────────────────────────
+  //
+  // When sortMode === 'Relevance', results are ranked by a 3-level key:
+  //   1. Search tier  (0=exact phrase, 1=all top kws, 2=any top kw, 3=AI-only)
+  //   2. PYQ tier     (UPSC CSE PYQ > Allied PYQ > Others PYQ > Practice)
+  //   3. Exam year    (newer first)
+  //
+  // This ensures the user's exact typed phrase always floats to the top,
+  // followed by questions matching all their keywords, then individual
+  // keyword matches, and finally AI-semantic-only retrievals at the bottom.
   const sortedResults = React.useMemo(() => {
     if (sortMode === 'Year') {
       return [...results].sort((a, b) => (b.exam_year || 0) - (a.exam_year || 0));
@@ -457,16 +763,25 @@ export default function AISearchTab() {
     if (sortMode === 'Subject') {
       return [...results].sort((a, b) => (a.subject || '').localeCompare(b.subject || ''));
     }
-    const tier = (r: SearchResult): number => {
+    // PYQ relevance tier (lower = more relevant)
+    const pyqTier = (r: SearchResult): number => {
       if (r.is_pyq && r.is_upsc_cse) return 0;
       if (r.is_pyq && r.is_allied)   return 1;
       if (r.is_pyq && r.is_others)   return 2;
       if (r.is_pyq)                  return 3;
       return 4;
     };
-    return [...results].sort((a, b) => {
-      const td = tier(a) - tier(b);
-      if (td !== 0) return td;
+    return [...results].sort((a: any, b: any) => {
+      // Primary: search-match tier (exact phrase first, AI-semantic last)
+      const sTierA = a._searchTier ?? 3;
+      const sTierB = b._searchTier ?? 3;
+      if (sTierA !== sTierB) return sTierA - sTierB;
+
+      // Secondary: PYQ relevance
+      const ptd = pyqTier(a) - pyqTier(b);
+      if (ptd !== 0) return ptd;
+
+      // Tertiary: exam year (newer first)
       return (b.exam_year || 0) - (a.exam_year || 0);
     });
   }, [results, sortMode]);
@@ -504,18 +819,11 @@ export default function AISearchTab() {
 
   // ── Result card ───────────────────────────────────────────────────────────
 
-  const renderResultCard = ({ item, index }: { item: SearchResult; index: number }) => {
+  const renderResultCard = ({ item, index }: { item: SearchResult & { _searchTier?: number }; index: number }) => {
+    const searchTier = (item as any)._searchTier ?? 3;
     const subColor = getSubjectColor(item.subject || '');
     const isFeatured = index === 0;
-
-    // FIX 2 — build chip label via the same getPYQCategorization() used in
-    // engine.tsx so AI Search shows full exam name ("UPSC CSE 2025",
-    // "BPSC 2024") rather than a bare "PYQ 2025". The Supabase query for
-    // this screen only selects flat columns, so we synthesise a minimal
-    // exam_info from those flat columns before calling the helper.
     const synthExamInfo = {
-      group:        item.exam_group,
-      year:         item.exam_year,
       is_upsc_cse:  item.is_upsc_cse,
       is_allied:    item.is_allied,
       is_others:    item.is_others,
@@ -531,14 +839,14 @@ export default function AISearchTab() {
 
     return (
       <TouchableOpacity
-        onPress={() => setPreviewQuestion(item)}
+        onPress={() => { setPreviewRevealed(false); setPreviewQuestion(item); }}
         testID={`ai-search-result-${item.id}`}
         style={[
           styles.card,
           {
             backgroundColor: colors.surface,
-            borderColor: isFeatured ? '#7c3aed40' : colors.border,
-            borderWidth: isFeatured ? 1.5 : 1,
+            borderColor: searchTier === 0 ? '#16a34a50' : isFeatured ? '#7c3aed40' : colors.border,
+            borderWidth: (searchTier === 0 || isFeatured) ? 1.5 : 1,
           },
         ]}
       >
@@ -556,11 +864,12 @@ export default function AISearchTab() {
 
           <View style={styles.cardChips}>
             {item.subject && (
+
               <View style={[styles.chip, { backgroundColor: subColor + '18' }]}>
                 <Text style={[styles.chipText, { color: subColor }]}>{item.subject}</Text>
               </View>
             )}
-            {/* Enhancement 3 — color-coded PYQ chip by exam category */}
+            {/* Color-coded PYQ chip by exam category */}
             {item.is_pyq && pyqLabel && pyqChipStyle && (
               <View style={[styles.chip, { backgroundColor: pyqChipStyle.bg }]}>
                 <Text style={[styles.chipText, { color: pyqChipStyle.color }]}>
@@ -573,11 +882,17 @@ export default function AISearchTab() {
                 <Text style={[styles.chipText, { color: colors.textTertiary }]}>Practice</Text>
               </View>
             )}
-            {item.tests?.institute && (
-              <View style={[styles.chip, { backgroundColor: '#dbeafe' }]}>
-                <Text style={[styles.chipText, { color: '#1d4ed8' }]}>{item.tests.institute}</Text>
-              </View>
-            )}
+            {(() => {
+              const insts = (item._institutes || []).filter((i: string) => i && i.toUpperCase() !== 'UPSC');
+              if (insts.length === 0 && item.tests?.institute && item.tests.institute.toUpperCase() !== 'UPSC') {
+                insts.push(item.tests.institute);
+              }
+              return insts.map((inst: string) => (
+                <View key={inst} style={[styles.chip, { backgroundColor: '#dbeafe' }]}>
+                  <Text style={[styles.chipText, { color: '#1d4ed8' }]}>{inst}</Text>
+                </View>
+              ));
+            })()}
           </View>
         </View>
 
@@ -875,23 +1190,57 @@ export default function AISearchTab() {
     </View>
   );
 
+  // ── Results header with Learn/Exam launch buttons ───────────────────────
   const ResultsHeader = (
     <View style={[styles.resultsHeader, { borderBottomColor: colors.border }]}>
-      <Text style={[styles.resultsCount, { color: colors.textTertiary }]}>
-        {hasSearched ? `${sortedResults.length} results` : ''}
-      </Text>
-      <View style={styles.sortRow}>
-        {(['Relevance', 'Year', 'Subject'] as SortMode[]).map(s => (
-          <TouchableOpacity
-            key={s}
-            onPress={() => setSortMode(s)}
-            testID={`ai-search-sort-${s}`}
-            style={[styles.sortBtn, { backgroundColor: sortMode === s ? '#7c3aed' : colors.surfaceStrong }]}
-          >
-            <Text style={[styles.sortBtnText, { color: sortMode === s ? '#fff' : colors.textTertiary }]}>{s}</Text>
-          </TouchableOpacity>
-        ))}
+      {/* Left: count + sort */}
+      <View style={{ flex: 1 }}>
+        <Text style={[styles.resultsCount, { color: colors.textTertiary }]}>
+          {hasSearched ? `${sortedResults.length} results` : ''}
+        </Text>
+        <View style={styles.sortRow}>
+          {(['Relevance', 'Year', 'Subject'] as SortMode[]).map(s => (
+            <TouchableOpacity
+              key={s}
+              onPress={() => setSortMode(s)}
+              testID={`ai-search-sort-${s}`}
+              style={[styles.sortBtn, { backgroundColor: sortMode === s ? '#7c3aed' : colors.surfaceStrong }]}
+            >
+              <Text style={[styles.sortBtnText, { color: sortMode === s ? '#fff' : colors.textTertiary }]}>{s}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
+
+      {/* Right: Launch full result set */}
+      {sortedResults.length > 0 && (
+        <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row', alignItems: 'center', gap: 5,
+              paddingHorizontal: 12, paddingVertical: 7, borderRadius: 12,
+              backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border,
+            }}
+            onPress={() => openQuestion(sortedResults[0], 'learning')}
+            testID="ai-search-learn-all"
+          >
+            <BookOpen size={13} color={colors.primary} />
+            <Text style={{ fontSize: 11, fontWeight: '800', color: colors.primary }}>Learn</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row', alignItems: 'center', gap: 5,
+              paddingHorizontal: 12, paddingVertical: 7, borderRadius: 12,
+              backgroundColor: '#7c3aed', borderWidth: 1, borderColor: '#7c3aed',
+            }}
+            onPress={() => openQuestion(sortedResults[0], 'exam')}
+            testID="ai-search-exam-all"
+          >
+            <Target size={13} color="#fff" />
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>Exam</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 
@@ -1262,7 +1611,7 @@ export default function AISearchTab() {
         <View style={{ position: 'relative' }}>
           {SearchBar}
 
-          {/* Fix #4 — Search History Dropdown: positioned inside a relative wrapper so it sits below the search bar */}
+          {/* Fix #4 — Search History Dropdown: positioned inside a relative wrapper so it sits below the search bar (toggle row ~33px + search row ~68px = ~101px) */}
           {showHistory && (searchHistory.length > 0 || instituteOptions.length > 0) && (
             <View style={[styles.historyDropdown, {
               backgroundColor: colors.surface,
@@ -1436,62 +1785,129 @@ export default function AISearchTab() {
 
         {FilterPopup}
 
-        {/* Fix #5 — Question Preview Modal */}
         {previewQuestion && (
-          <Modal visible animationType="slide" transparent onRequestClose={() => setPreviewQuestion(null)}>
-            <View style={{ flex: 1, backgroundColor: 'rgba(15,23,42,0.5)', justifyContent: 'flex-end' }}>
-              <View style={[styles.previewSheet, { backgroundColor: colors.surface }]}>
-                <View style={[styles.previewHeader, { borderBottomColor: colors.border }]}>
-                  <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', flex: 1 }}>
-                    {previewQuestion.subject && (
-                      <View style={[styles.chip, { backgroundColor: getSubjectColor(previewQuestion.subject) + '20' }]}>
-                        <Text style={[styles.chipText, { color: getSubjectColor(previewQuestion.subject) }]}>{previewQuestion.subject}</Text>
-                      </View>
-                    )}
-                    {previewQuestion.is_pyq && (
-                      <View style={[styles.chip, { backgroundColor: '#dcfce7' }]}>
-                        <Text style={[styles.chipText, { color: '#15803d' }]}>PYQ {previewQuestion.exam_year || ''}</Text>
-                      </View>
-                    )}
-                    {previewQuestion.is_upsc_cse && (
-                      <View style={[styles.chip, { backgroundColor: '#dbeafe' }]}>
-                        <Text style={[styles.chipText, { color: '#1d4ed8' }]}>UPSC CSE</Text>
-                      </View>
-                    )}
+          <Modal
+            visible
+            animationType="fade"
+            transparent
+            onRequestClose={() => { setPreviewQuestion(null); setPreviewRevealed(false); }}
+          >
+            <View style={{ flex: 1, backgroundColor: 'rgba(10,10,20,0.65)', justifyContent: 'center', alignItems: 'center', padding: 16 }}>
+              <View style={{ width: '100%', maxWidth: 650, maxHeight: '90%', flexShrink: 1, backgroundColor: colors.bg, borderRadius: 24, overflow: 'hidden', borderWidth: 1, borderColor: colors.border, shadowColor: '#000', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.4, shadowRadius: 32, elevation: 20 }}>
+                {/* Fixed Header */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.border, backgroundColor: colors.surface }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: colors.primary + '15', alignItems: 'center', justifyContent: 'center' }}>
+                      <BookOpen size={18} color={colors.primary} />
+                    </View>
+                    <View>
+                      <Text style={{ fontSize: 14, fontWeight: '800', color: colors.textPrimary }}>Question Preview</Text>
+                      <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textTertiary, letterSpacing: 0.5 }}>LITE QUIZ ENGINE</Text>
+                    </View>
                   </View>
-                  <TouchableOpacity onPress={() => setPreviewQuestion(null)}
-                    style={[styles.closeBtn, { backgroundColor: colors.surfaceStrong }]}>
-                    <X size={13} color={colors.textSecondary} />
+                  <TouchableOpacity
+                    onPress={() => { setPreviewQuestion(null); setPreviewRevealed(false); }}
+                    style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <X size={18} color={colors.textSecondary} />
                   </TouchableOpacity>
                 </View>
-                <ScrollView style={{ maxHeight: 320, padding: 16 }}>
-                  <Text style={[styles.previewQ, { color: colors.textPrimary }]}>{previewQuestion.question_text}</Text>
-                  {previewQuestion.section_group && (
-                    <Text style={[styles.previewMeta, { color: colors.textTertiary }]}>
-                      {previewQuestion.section_group}{previewQuestion.micro_topic ? ` · ${previewQuestion.micro_topic}` : ''}
-                    </Text>
+
+                {/* Independent Scrollable Content */}
+                <ScrollView 
+                  style={{ flexShrink: 1 }}
+                  contentContainerStyle={{ padding: 16 }}
+                  showsVerticalScrollIndicator={true}
+                >
+                  <SharedQuestionCard
+                    item={{
+                      ...previewQuestion,
+                      exam_info: {
+                        is_upsc_cse: previewQuestion?.is_upsc_cse,
+                        is_allied: previewQuestion?.is_allied,
+                        is_others: previewQuestion?.is_others,
+                        ...(previewQuestion?.exam_info || {})
+                      },
+                      _explanations: enrichedExplanations || previewQuestion._explanations || [],
+                      _institutes: previewQuestion._institutes || [],
+                    }}
+                    index={0}
+                    arenaMode="learning"
+                    isRevealed={previewRevealed}
+                    colors={colors}
+                    mdStyles={mdStyles}
+                    mdRules={mdRules}
+                    answerData={{
+                      selectedAnswer: previewAnswer,
+                      isReview: previewStudyTags.length > 0,
+                      studyTags: previewStudyTags
+                    }}
+                    userStudyTags={userTags}
+                    activeExplSource={previewExplSource}
+                    onExplSourceChange={setPreviewExplSource}
+                    aiExplanation={aiExplanation}
+                    isAiLoading={aiExplainLoading}
+                    isSavingFlashcard={savingFlashcard}
+                    isFlashcarded={previewFlashcard}
+                    onRevealExplanation={() => setPreviewRevealed(true)}
+                    onOptionSelect={(qid: string, opt: string) => setPreviewAnswer(opt)}
+                    onAiExplain={async () => {
+                      if (!previewQuestion || aiExplainLoading) return;
+                      setAiExplainLoading(true);
+                      setPreviewExplSource('ai');
+                      try {
+                        const rawOptions = previewQuestion.options || {};
+                        const optionsMap: Record<string, string> = {
+                          A: rawOptions.a || rawOptions.A || '',
+                          B: rawOptions.b || rawOptions.B || '',
+                          C: rawOptions.c || rawOptions.C || '',
+                          D: rawOptions.d || rawOptions.D || '',
+                        };
+                        const instExplanations = enrichedExplanations || previewQuestion._explanations || [];
+                        const text = await aiExplainQuestion(
+                          previewQuestion.question_text || previewQuestion.statement || '',
+                          optionsMap,
+                          previewQuestion.correct_answer || '',
+                          instExplanations
+                        );
+                        setAiExplanation(text);
+                        setPreviewRevealed(true);
+                      } catch (err) {
+                        console.error(err);
+                      } finally {
+                        setAiExplainLoading(false);
+                      }
+                    }}
+                    onAddFlashcard={() => setPreviewFlashcard(p => !p)}
+                    toggleStudyTag={(qid: string, tags: string[], tag: string) => {
+                      setPreviewStudyTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
+                    }}
+                  />
+                  
+                  {previewQuestion.micro_topic && (
+                    <View style={{ marginTop: 12, padding: 12, backgroundColor: colors.surfaceStrong, borderRadius: 16, borderWidth: 1, borderColor: colors.border + '50' }}>
+                      <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>SYLLABUS CONTEXT</Text>
+                      <Text style={{ fontSize: 13, color: colors.textSecondary, fontWeight: '600' }}>{previewQuestion.micro_topic}</Text>
+                    </View>
                   )}
                 </ScrollView>
-                <View style={[styles.previewFooter, { borderTopColor: colors.border }]}>
-                  <Text style={{ fontSize: 11, color: colors.textTertiary, textAlign: 'center', marginBottom: 10 }}>
-                    {sortedResults.length} questions in this search · open all in:
-                  </Text>
-                  <View style={{ flexDirection: 'row', gap: 10 }}>
-                    <TouchableOpacity
-                      style={[styles.previewBtn, { backgroundColor: colors.surfaceStrong, flex: 1 }]}
-                      onPress={() => { setPreviewQuestion(null); openQuestion(previewQuestion, 'learning'); }}
-                    >
-                      <BookOpen size={15} color={colors.textSecondary} />
-                      <Text style={[styles.previewBtnText, { color: colors.textPrimary }]}>Learn Mode</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.previewBtn, { backgroundColor: '#7c3aed', flex: 1 }]}
-                      onPress={() => { setPreviewQuestion(null); openQuestion(previewQuestion, 'exam'); }}
-                    >
-                      <Target size={15} color="#fff" />
-                      <Text style={[styles.previewBtnText, { color: '#fff' }]}>Quiz Mode</Text>
-                    </TouchableOpacity>
-                  </View>
+
+                {/* Fixed Footer */}
+                <View style={{ flexDirection: 'row', gap: 12, padding: 16, borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.surface }}>
+                  <TouchableOpacity
+                    style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 48, borderRadius: 14, backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border }}
+                    onPress={() => { setPreviewQuestion(null); setPreviewRevealed(false); openQuestion(previewQuestion!, 'learning'); }}
+                  >
+                    <BookOpen size={16} color={colors.primary} />
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: colors.primary }}>Learn Mode</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 48, borderRadius: 14, backgroundColor: '#7c3aed' }}
+                    onPress={() => { setPreviewQuestion(null); setPreviewRevealed(false); openQuestion(previewQuestion!, 'exam'); }}
+                  >
+                    <Target size={16} color="#fff" />
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>Practice Exam</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
@@ -1505,6 +1921,7 @@ export default function AISearchTab() {
     </PageWrapper>
   );
 }
+
 
 // ── FilterGroup sub-component ─────────────────────────────────────────────────
 
@@ -1603,8 +2020,8 @@ const styles = StyleSheet.create({
   fchip:          { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, borderWidth: 1, borderColor: '#e2e8f0', backgroundColor: '#f8fafc' },
   fchipSel:       { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
   fchipText:      { fontSize: 11, fontWeight: '700' },
-  // Fix #4 styles — dropdown sits below the search row (top = searchRow full height ≈ 68px)
-  historyDropdown:{ position: 'absolute', top: 68, left: 0, right: 0, zIndex: 999, borderRadius: 14, borderWidth: 1, overflow: 'hidden' },
+  // Fix #4 styles — dropdown sits below the search row (toggle row ~33px + search row ~68px = ~101px)
+  historyDropdown:{ position: 'absolute', top: 105, left: 14, right: 14, zIndex: 999, borderRadius: 14, borderWidth: 1, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 },
   historyItem:    { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: 0.5 },
   historyText:    { flex: 1, fontSize: 13, fontWeight: '500' },
   // Fix #5 styles

@@ -307,7 +307,7 @@ export default function Home() {
 
               <View style={styles.searchContainer}>
                 <TouchableOpacity
-                  onPress={() => router.push('/(tabs)/ai-search' as any)}
+                  onPress={() => router.push('/ai-search' as any)}
                   testID="home-search-redirect-btn"
                   style={{
                     flexDirection: 'row', alignItems: 'center', gap: 10,

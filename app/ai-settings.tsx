@@ -30,7 +30,11 @@ import {
   AI_PROVIDER_KEY,
   GROQ_MODELS,
   DEFAULT_GROQ_MODEL,
-  GROQ_MODEL_KEY
+  GROQ_MODEL_KEY,
+  OPENROUTER_API_KEY_STORAGE,
+  OPENROUTER_MODEL_KEY,
+  OPENROUTER_MODELS,
+  DEFAULT_OPENROUTER_MODEL
 } from '../src/services/GeminiService';
 import { PageWrapper } from '../src/components/PageWrapper';
 import { useTheme } from '../src/context/ThemeContext';
@@ -45,10 +49,14 @@ export default function AISettings() {
   const [geminiModel, setGeminiModel] = useState<string>(DEFAULT_MODEL);
 
   // ── Groq State ────────────────────────────────
-  const [aiProvider, setAiProvider] = useState<'gemini' | 'groq'>('gemini');
   const [groqKeys, setGroqKeys] = useState<string[]>(['', '', '', '']);
   const [activeGroqKeyIndex, setActiveGroqKeyIndex] = useState<number>(0);
   const [groqModel, setGroqModel] = useState<string>(DEFAULT_GROQ_MODEL);
+
+  // ── OpenRouter State ──────────────────────────
+  const [aiProvider, setAiProvider] = useState<'gemini' | 'groq' | 'openrouter'>('gemini');
+  const [openrouterKey, setOpenrouterKey] = useState<string>('');
+  const [openrouterModel, setOpenrouterModel] = useState<string>(DEFAULT_OPENROUTER_MODEL);
 
   // ── Prompts State ─────────────────────────────
   const [explainPrompt, setExplainPrompt]     = useState('');
@@ -65,7 +73,7 @@ export default function AISettings() {
       const [
         k1, k2, k3, k4, activeIdx, model, 
         provider, gk1, gk2, gk3, gk4, groqActiveIdx, groqMod, 
-        ep, sp, srp
+        ep, sp, srp, ork, orm
       ] = await Promise.all([
         AsyncStorage.getItem('gemini_api_key'),
         AsyncStorage.getItem('gemini_api_key_2'),
@@ -83,16 +91,21 @@ export default function AISettings() {
         AsyncStorage.getItem(PROMPT_KEYS.explain),
         AsyncStorage.getItem(PROMPT_KEYS.summarize),
         AsyncStorage.getItem(PROMPT_KEYS.search),
+        AsyncStorage.getItem(OPENROUTER_API_KEY_STORAGE),
+        AsyncStorage.getItem(OPENROUTER_MODEL_KEY),
       ]);
       
       setGeminiKeys([k1 || '', k2 || '', k3 || '', k4 || '']);
       setActiveKeyIndex(activeIdx ? parseInt(activeIdx, 10) : 0);
       setGeminiModel(model || DEFAULT_MODEL);
       
-      setAiProvider((provider as 'gemini' | 'groq') || 'gemini');
+      setAiProvider((provider as 'gemini' | 'groq' | 'openrouter') || 'gemini');
       setGroqKeys([gk1 || '', gk2 || '', gk3 || '', gk4 || '']);
       setActiveGroqKeyIndex(groqActiveIdx ? parseInt(groqActiveIdx, 10) : 0);
       setGroqModel(groqMod || DEFAULT_GROQ_MODEL);
+
+      setOpenrouterKey(ork || '');
+      setOpenrouterModel(orm || DEFAULT_OPENROUTER_MODEL);
 
       setExplainPrompt(ep || DEFAULT_PROMPTS.explain);
       setSummarizePrompt(sp || DEFAULT_PROMPTS.summarize);
@@ -117,6 +130,8 @@ export default function AISettings() {
         AsyncStorage.setItem('groq_api_key_4', groqKeys[3].trim()),
         AsyncStorage.setItem('groq_active_key_index', String(activeGroqKeyIndex)),
         AsyncStorage.setItem(GROQ_MODEL_KEY, groqModel),
+        AsyncStorage.setItem(OPENROUTER_API_KEY_STORAGE, openrouterKey.trim()),
+        AsyncStorage.setItem(OPENROUTER_MODEL_KEY, openrouterModel),
         AsyncStorage.setItem(PROMPT_KEYS.explain,    explainPrompt.trim()   || DEFAULT_PROMPTS.explain),
         AsyncStorage.setItem(PROMPT_KEYS.summarize,  summarizePrompt.trim() || DEFAULT_PROMPTS.summarize),
         AsyncStorage.setItem(PROMPT_KEYS.search,     searchPrompt.trim()    || DEFAULT_PROMPTS.search),
@@ -148,11 +163,11 @@ export default function AISettings() {
           AI Settings
         </Text>
         <View style={{
-          backgroundColor: aiProvider === 'groq' ? '#f97316' : '#7c3aed',
+          backgroundColor: aiProvider === 'groq' ? '#f97316' : aiProvider === 'openrouter' ? '#0891b2' : '#7c3aed',
           borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4,
         }}>
           <Text style={{ fontSize: 12, fontWeight: '900', color: '#fff' }}>
-            {aiProvider === 'groq' ? '⚡ Groq Active' : '✦ Gemini Active'}
+            {aiProvider === 'groq' ? '⚡ Groq Active' : aiProvider === 'openrouter' ? '🌐 OpenRouter Active' : '✦ Gemini Active'}
           </Text>
         </View>
       </View>
@@ -199,18 +214,39 @@ export default function AISettings() {
             <Text style={styles.providerSub}>Free · no billing 14400 req/day</Text>
             {aiProvider === 'groq' && <View style={[styles.activeBadge, { backgroundColor: '#f97316' }]}><Text style={styles.activeBadgeText}>ACTIVE</Text></View>}
           </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setAiProvider('openrouter')}
+            style={[
+              styles.providerCard,
+              { 
+                borderColor: aiProvider === 'openrouter' ? '#0891b2' : colors.border,
+                backgroundColor: aiProvider === 'openrouter' ? '#0891b215' : colors.surface,
+                borderWidth: aiProvider === 'openrouter' ? 2 : 1,
+              }
+            ]}
+          >
+            <Text style={{ fontSize: 15 }}>🌐</Text>
+            <Text style={[styles.providerName, { color: aiProvider === 'openrouter' ? '#0891b2' : colors.textPrimary }]}>OpenRouter</Text>
+            <Text style={styles.providerSub}>33+ free models · DeepSeek, Qwen, Llama</Text>
+            {aiProvider === 'openrouter' && <View style={[styles.activeBadge, { backgroundColor: '#0891b2' }]}><Text style={styles.activeBadgeText}>ACTIVE</Text></View>}
+          </TouchableOpacity>
         </View>
 
         {/* ── MODEL SELECTOR ─────────────────────────────────── */}
         <Text style={styles.sectionTitle}>MODEL</Text>
         <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
-          {(aiProvider === 'groq' ? GROQ_MODELS : GEMINI_MODELS).map(m => {
-            const isSelected = (aiProvider === 'groq' ? groqModel : geminiModel) === m.id;
-            const accent = aiProvider === 'groq' ? '#f97316' : '#7c3aed';
+          {(aiProvider === 'groq' ? GROQ_MODELS : aiProvider === 'openrouter' ? OPENROUTER_MODELS : GEMINI_MODELS).map(m => {
+            const isSelected = (aiProvider === 'groq' ? groqModel : aiProvider === 'openrouter' ? openrouterModel : geminiModel) === m.id;
+            const accent = aiProvider === 'groq' ? '#f97316' : aiProvider === 'openrouter' ? '#0891b2' : '#7c3aed';
             return (
               <TouchableOpacity
                 key={m.id}
-                onPress={() => aiProvider === 'groq' ? setGroqModel(m.id) : setGeminiModel(m.id)}
+                onPress={() => {
+                  if (aiProvider === 'groq') setGroqModel(m.id);
+                  else if (aiProvider === 'openrouter') setOpenrouterModel(m.id);
+                  else setGeminiModel(m.id);
+                }}
                 style={{
                   flex: 1, minWidth: 100,
                   paddingVertical: 10, paddingHorizontal: 12,
@@ -237,7 +273,7 @@ export default function AISettings() {
                 : 'Free keys from console.groq.com. 14,400 free requests/day.'}
             </Text>
 
-            {(['Key 1', 'Key 2', 'Key 3', 'Key 4'] as const).map((label, idx) => {
+            {(aiProvider !== 'openrouter') ? (['Key 1', 'Key 2', 'Key 3', 'Key 4'] as const).map((label, idx) => {
               const keys = aiProvider === 'groq' ? groqKeys : geminiKeys;
               const activeIdx = aiProvider === 'groq' ? activeGroqKeyIndex : activeKeyIndex;
               const isActive = activeIdx === idx;
@@ -281,7 +317,34 @@ export default function AISettings() {
                   />
                 </View>
               );
-            })}
+            }) : (
+              <View style={{ marginBottom: 10 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#0891b2' }}>API Key</Text>
+                </View>
+                <TextInput
+                  value={openrouterKey}
+                  onChangeText={setOpenrouterKey}
+                  placeholder="Paste your sk-or-... key here"
+                  placeholderTextColor={colors.textTertiary}
+                  secureTextEntry
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  style={[
+                    styles.keyInput,
+                    { 
+                      backgroundColor: colors.bg,
+                      borderColor: '#0891b2',
+                      borderWidth: 2,
+                      color: colors.textPrimary,
+                    }
+                  ]}
+                />
+                <Text style={{ fontSize: 11, color: colors.textTertiary, marginTop: 8 }}>
+                  Get keys from openrouter.ai → Keys. High-quality free models available.
+                </Text>
+              </View>
+            )}
           </View>
         </View>
 
@@ -333,7 +396,7 @@ export default function AISettings() {
           disabled={promptSaving}
           style={[
             styles.saveBtn, 
-            { backgroundColor: promptSaved ? '#22c55e' : aiProvider === 'groq' ? '#f97316' : '#7c3aed' }
+            { backgroundColor: promptSaved ? '#22c55e' : aiProvider === 'groq' ? '#f97316' : aiProvider === 'openrouter' ? '#0891b2' : '#7c3aed' }
           ]}
         >
           {promptSaving ? <ActivityIndicator size="small" color="#fff" /> : <Brain size={16} color="#fff" />}

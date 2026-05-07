@@ -20,7 +20,8 @@ import {
   RefreshCcw,
   Search,
   BarChart3,
-  BookOpen
+  BookOpen,
+  Sparkles
 } from 'lucide-react-native';
 import { useSingleTestAnalytics } from '../../../src/hooks/useTestAnalytics';
 import { ReviewSection } from '../../../src/components/unified/ReviewSection';
@@ -31,41 +32,50 @@ import { supabase } from '../../../src/lib/supabase';
 import { useAuth } from '../../../src/context/AuthContext';
 import { UnifiedExportSheet } from '../../../src/components/export/UnifiedExportSheet';
 import { FileDown } from 'lucide-react-native';
-
-const { width } = Dimensions.get('window');
-
-const getPYQCategorization = (item: any) => {
-  // Strict tagging contract (branch 5.8): chip only when is_pyq=true AND
-  // the exam metadata is present in exam_info. Never read launch_year /
-  // exam_year / exam_group as fallbacks.
-  const examInfo = (item?.exam_info && typeof item.exam_info === 'object' && !Array.isArray(item.exam_info))
-    ? item.exam_info
-    : (item?.source && typeof item.source === 'object' && !Array.isArray(item.source) ? item.source : {});
-
-  const isPYQ = !!item.is_pyq;
-  const groupName = String(examInfo?.group || examInfo?.exam_name || '').trim();
-  const year = String(examInfo?.year ?? '').trim();
-
-  if (!isPYQ || (!groupName && !year)) return { hasPYQData: false };
-
-  const upperGroup = groupName.toUpperCase();
-  const isUPSC = upperGroup.includes('UPSC CSE') || upperGroup === 'UPSC' || upperGroup.includes('IAS');
-  const isAllied = ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => upperGroup.includes(g));
-  const isOther = ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => upperGroup.includes(g));
-
-  return {
-    hasPYQData: true,
-    isUPSC,
-    isAllied,
-    isOther,
-    groupName: groupName || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ'),
-    year,
-  };
-};
+import Markdown from 'react-native-markdown-display';
+import { aiExplainQuestion } from '../../../src/services/GeminiService';
+import { SharedQuestionCard } from '../../../src/components/unified/SharedQuestionCard';
+import { getPYQCategorization, buildCanonicalExplanations } from '../../../src/utils/questionUtils';
 
 export default function ResultScreen() {
   const { aid } = useLocalSearchParams<{ aid: string }>();
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
+  
+  const [activeExplSources, setActiveExplSources] = useState<Record<string, string>>({});
+  const [aiExplanations, setAiExplanations] = useState<Record<string, string>>({});
+  const [aiLoading, setAiLoading] = useState<Record<string, boolean>>({});
+  const [revealedExplanations, setRevealedExplanations] = useState<Record<string, boolean>>({});
+
+  const handleAiExplain = async (question: any) => {
+    if (aiLoading[question.id]) return;
+    setAiLoading(prev => ({ ...prev, [question.id]: true }));
+    try {
+      const rawOptions = question.options || {};
+      const optionsMap: Record<string, string> = {
+        A: rawOptions.a || rawOptions.A || '',
+        B: rawOptions.b || rawOptions.B || '',
+        C: rawOptions.c || rawOptions.C || '',
+        D: rawOptions.d || rawOptions.D || '',
+      };
+      const context = question.explanation_markdown 
+        ? [{ source: 'Analysis', text: question.explanation_markdown }] 
+        : [];
+        
+      const res = await aiExplainQuestion(
+        question.question_text || '',
+        optionsMap,
+        question.correctAnswer || '',
+        JSON.stringify(context)
+      );
+      setAiExplanations(prev => ({ ...prev, [question.id]: res.text }));
+      setActiveExplSources(prev => ({ ...prev, [question.id]: 'ai' }));
+    } catch (e: any) {
+      Alert.alert('AI Error', e?.message || 'Failed to generate explanation');
+    } finally {
+      setAiLoading(prev => ({ ...prev, [question.id]: false }));
+    }
+  };
+
   const { session } = useAuth();
   const { loading, error, scoreData, questions, testId, testTitle, hierarchicalPerformance, confidenceMetrics } = useSingleTestAnalytics(aid);
   const [activeTab, setActiveTab] = useState<'review' | 'analysis'>('review');
@@ -136,6 +146,15 @@ export default function ResultScreen() {
     });
   }, [questions, filterType, localReviewTags]);
 
+  const userStudyTags = useMemo(() => {
+    const defaultTags = ['Guessed', 'Silly Mistake', 'Must Revise', 'Time Mgmt', 'Imp. Fact'];
+    const allTags = new Set(defaultTags);
+    Object.values(localReviewTags).flat().forEach(tag => {
+      if (tag) allTags.add(tag);
+    });
+    return Array.from(allTags);
+  }, [localReviewTags]);
+
   const handleShare = async () => {
     if (!scoreData) return;
     try {
@@ -183,6 +202,49 @@ export default function ResultScreen() {
       }
     });
   };
+
+  const mdStyles = React.useMemo(() => ({
+    body: { fontSize: 13, color: colors.textPrimary, lineHeight: 22 },
+    heading1: { fontSize: 18, fontWeight: 'bold' as const, color: colors.textPrimary, marginBottom: 8 },
+    heading2: { fontSize: 16, fontWeight: 'bold' as const, color: colors.textPrimary, marginBottom: 8 },
+    strong: { fontWeight: 'bold' as const },
+    em: { fontStyle: 'italic' as const },
+    list_item: { flexDirection: 'row' as const, marginBottom: 4 },
+    bullet_list: { marginBottom: 12 },
+    ordered_list: { marginBottom: 12 },
+    code_inline: { fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', backgroundColor: colors.surfaceStrong, paddingHorizontal: 4, borderRadius: 4 },
+    code_block: { fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', backgroundColor: colors.surfaceStrong, padding: 8, borderRadius: 8, marginBottom: 12 },
+    table: { borderWidth: 1, borderColor: colors.border, borderRadius: 8, overflow: 'hidden' as const, marginBottom: 12, minWidth: '100%' },
+    th: { backgroundColor: colors.surfaceStrong, padding: 8, borderWidth: 1, borderColor: colors.border },
+    td: { padding: 8, borderWidth: 1, borderColor: colors.border },
+    tr: { flexDirection: 'row' as const },
+    paragraph: { marginBottom: 12 },
+  }), [colors]);
+
+  const mdRules = React.useMemo(() => ({
+    table: (node: any, children: any) => (
+      <ScrollView key={node.key} horizontal showsHorizontalScrollIndicator contentContainerStyle={{ minWidth: '100%' }} style={{ marginVertical: 8 }}>
+        <View style={{ borderWidth: 1, borderColor: colors.border, borderRadius: 8, overflow: 'hidden', minWidth: 280 }}>
+          {children}
+        </View>
+      </ScrollView>
+    ),
+    thead: (node: any, children: any) => (
+      <View key={node.key} style={{ backgroundColor: colors.surfaceStrong, borderBottomWidth: 1, borderBottomColor: colors.border }}>{children}</View>
+    ),
+    tbody: (node: any, children: any) => (
+      <View key={node.key}>{children}</View>
+    ),
+    tr: (node: any, children: any) => (
+      <View key={node.key} style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.border }}>{children}</View>
+    ),
+    th: (node: any, children: any) => (
+      <View key={node.key} style={{ flex: 1, padding: 8, borderRightWidth: 1, borderRightColor: colors.border, justifyContent: 'center' }}>{children}</View>
+    ),
+    td: (node: any, children: any) => (
+      <View key={node.key} style={{ flex: 1, padding: 8, borderRightWidth: 1, borderRightColor: colors.border }}>{children}</View>
+    )
+  }), [colors]);
 
   const handleRetakeIncorrect = () => {
     const incorrectIds = questions
@@ -373,19 +435,38 @@ export default function ResultScreen() {
         data={activeTab === 'review' ? filteredQuestions : []}
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => (
-          <QuestionItem 
-            question={item} 
-            index={index} 
-            colors={colors} 
-            showPYQTags={showPYQTags}
-            localTag={localTags[item.id]}
-            localReviewTags={localReviewTags[item.id]}
-            onTagError={handleTagError}
-            onToggleReviewTag={toggleReviewTag}
-            onAddToFlashcard={handleAddToFlashcard}
-            isAdded={inFlashcardDeck[item.id]}
-            isSaving={savingFlashcard[item.id]}
-          />
+            <SharedQuestionCard 
+              item={{
+                ...item,
+                correct_answer: item.correctAnswer,
+                question_text: item.question_text || item.statement_line,
+                _explanations: item._explanations || []
+              }}
+              index={index} 
+              answerData={{
+                selectedAnswer: item.selectedAnswer,
+                isReview: !!localReviewTags[item.id]?.includes('Must Revise'),
+                studyTags: localReviewTags[item.id] || []
+              }}
+              arenaMode="learning"
+              isRevealed={revealedExplanations[item.id]}
+              colors={colors}
+              activeExplSource={activeExplSources[item.id] || 'all'}
+              onExplSourceChange={(src: string) => setActiveExplSources(prev => ({ ...prev, [item.id]: src }))}
+              aiExplanation={aiExplanations[item.id]}
+              isAiLoading={aiLoading[item.id]}
+              isSavingFlashcard={savingFlashcard[item.id]}
+              isFlashcarded={inFlashcardDeck[item.id]}
+              onRevealExplanation={() => setRevealedExplanations(prev => ({ ...prev, [item.id]: true }))}
+              onOptionSelect={() => {}}
+              onAddFlashcard={() => handleAddToFlashcard(item)}
+              onAiExplain={() => handleAiExplain(item)}
+              mdStyles={mdStyles}
+              mdRules={mdRules}
+              showPYQTags={showPYQTags}
+              userStudyTags={userStudyTags}
+              toggleStudyTag={(qid: string, tags: string[], tag: string) => toggleReviewTag(qid, tag)}
+            />
         )}
         ListHeaderComponent={
           <>
@@ -605,204 +686,6 @@ export default function ResultScreen() {
   );
 }
 
-const QuestionItem = ({ 
-  question, index, colors, showPYQTags, localTag, localReviewTags, 
-  onTagError, onToggleReviewTag, onAddToFlashcard, isAdded, isSaving 
-}: any) => {
-  const isCorrect = question.selectedAnswer === question.correctAnswer;
-  const isSkipped = !question.selectedAnswer;
-  const currentErrorCat = localTag || question.errorCategory;
-  const currentReviewTags = localReviewTags || question.reviewTags || [];
-
-  return (
-    <View style={[styles.questionCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-      <View style={styles.qHeader}>
-        <View style={[styles.qIndex, { backgroundColor: colors.surfaceStrong }]}>
-          <Text style={[styles.qIndexText, { color: colors.textPrimary }]}>Q{index + 1}</Text>
-        </View>
-        <View style={styles.qMeta}>
-          {(() => {
-            if (!showPYQTags) return null;
-            const pyq = getPYQCategorization(question);
-            if (!pyq.hasPYQData) return null;
-            const label = `${pyq.groupName} ${pyq.year}`.trim();
-            let bg = '#f1f5f9';
-            let fg = '#475569';
-            let border = '#94a3b8';
-
-            if (pyq.isUPSC) { bg = '#dcfce7'; fg = '#15803d'; border = '#22c55e'; }
-            else if (pyq.isAllied) { bg = '#fef9c3'; fg = '#a16207'; border = '#eab308'; }
-
-            return (
-              <View style={[styles.inlineBadge, { backgroundColor: bg, borderColor: border, borderWidth: 1, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, marginRight: 6 }]}>
-                <Text style={{ color: fg, fontWeight: '900', fontSize: 10 }}>{label}</Text>
-              </View>
-            );
-          })()}
-          {isSkipped && <View style={[styles.skippedBadge, { backgroundColor: colors.border }]}><Text style={[styles.skippedBadgeText, { color: colors.textTertiary }]}>SKIPPED</Text></View>}
-        </View>
-        <View style={styles.qStatusIcon}>
-          {isSkipped ? <HelpIcon size={18} color={colors.textTertiary} /> :
-           isCorrect ? <CheckCircle2 size={18} color={colors.success} /> :
-           <XCircle size={18} color={colors.error} />}
-        </View>
-      </View>
-      
-      <Text style={[styles.qText, { color: colors.textPrimary }]}>
-        {question.question_text?.replace(/<[^>]*>/g, '')}
-      </Text>
-
-      <View style={styles.optList}>
-        {Object.entries(question.options || {}).map(([key, text]: [string, any]) => {
-          const isCorrectOpt = String(key).trim().toUpperCase() === String(question.correctAnswer).trim().toUpperCase();
-          const isSelectedOpt = question.selectedAnswer && String(key).trim().toUpperCase() === String(question.selectedAnswer).trim().toUpperCase();
-          
-          let circleBg = colors.surface;
-          let circleBorder = colors.border;
-          let rowBg = 'transparent';
-          let StatusIcon = null;
-          let circleTxtColor = colors.textSecondary;
-          let labelText = '';
-
-          // RED / GREEN / BLUE Logic
-          if (isCorrectOpt) {
-            circleBg = isSkipped ? '#3b82f6' : '#22c55e'; // Blue for skipped-correct, Green for actual-correct
-            circleBorder = isSkipped ? '#3b82f6' : '#22c55e';
-            circleTxtColor = "#fff";
-            rowBg = isSkipped ? '#3b82f610' : '#22c55e10';
-            StatusIcon = isSkipped ? <HelpIcon size={16} color="#3b82f6" /> : <CheckCircle2 size={16} color="#22c55e" />;
-            labelText = isCorrect ? 'CORRECT ANSWER' : isSkipped ? 'SKIPPED - CORRECT' : 'CORRECT ANSWER';
-          } else if (isSelectedOpt && !isCorrectOpt) {
-            circleBg = '#ef4444'; // Vibrant Red
-            circleBorder = '#ef4444';
-            circleTxtColor = "#fff";
-            rowBg = '#ef444410';
-            StatusIcon = <XCircle size={16} color="#ef4444" />;
-            labelText = 'YOUR CHOICE';
-          }
-
-          return (
-            <View key={key} style={[styles.optRow, { backgroundColor: rowBg, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 8, marginVertical: 2 }]}>
-              <View style={[styles.optCircle, { backgroundColor: circleBg, borderColor: circleBorder, width: 28, height: 28, borderRadius: 14 }]}>
-                <Text style={[styles.optCircleText, { color: circleTxtColor, fontSize: 13 }]}>{key}</Text>
-              </View>
-              <Text style={[
-                styles.optText, 
-                { color: colors.textSecondary, fontSize: 15 }, 
-                (isCorrectOpt || isSelectedOpt) && { color: colors.textPrimary, fontWeight: '700' }
-              ]}>
-                {text}
-              </Text>
-              {labelText ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                   <Text style={{ fontSize: 9, fontWeight: '900', color: isCorrectOpt ? (isSkipped ? '#3b82f6' : '#22c55e') : '#ef4444' }}>
-                     {labelText}
-                   </Text>
-                   {StatusIcon}
-                </View>
-              ) : null}
-            </View>
-          );
-        })}
-      </View>
-
-      <Text style={[styles.lbl, { color: colors.textTertiary }]}>YOUR ANSWER</Text>
-      <Text style={[styles.ans, isSkipped ? { color: colors.textTertiary } : isCorrect ? { color: colors.success } : { color: colors.error }]}>
-        {isSkipped ? 'Not Attempted' : question.options?.[question.selectedAnswer] || question.selectedAnswer}
-      </Text>
-      
-      {!isCorrect && (
-        <>
-          <Text style={[styles.lbl, { color: colors.textTertiary }]}>CORRECT ANSWER</Text>
-          <Text style={[styles.ans, { color: colors.success }]}>
-            {question.options?.[question.correctAnswer] || question.correctAnswer}
-          </Text>
-        </>
-      )}
-
-      {question.explanation_markdown ? (
-        <>
-          <Text style={[styles.lbl, { color: colors.textTertiary }]}>EXPLANATION</Text>
-          <Text style={[styles.exp, { color: colors.textSecondary }]}>{question.explanation_markdown}</Text>
-        </>
-      ) : null}
-
-      {!isCorrect && !isSkipped && (
-        <>
-          <Text style={[styles.lbl, { color: colors.textTertiary, marginTop: 16 }]}>MISTAKE TYPE</Text>
-          <View style={styles.tagRow}>
-            {['Fact Mistake', 'Concept Gap', 'Silly Mistake', 'Overthinking', 'Skipped'].map(et => {
-              const selected = currentErrorCat === et;
-              return (
-                <TouchableOpacity
-                  key={et}
-                  onPress={() => onTagError(question.id, et)}
-                  style={[
-                    styles.tagChip,
-                    { 
-                      backgroundColor: selected ? colors.error + '20' : colors.surface,
-                      borderColor: selected ? colors.error : colors.border
-                    }
-                  ]}
-                >
-                  <Text style={[styles.tagChipText, { color: selected ? colors.error : colors.textSecondary }]}>
-                    {et}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </>
-      )}
-
-      <Text style={[styles.lbl, { color: colors.textTertiary, marginTop: 16 }]}>STUDY TAGS</Text>
-      <View style={styles.tagRow}>
-        {['Imp. Fact', 'Imp. Concept', 'Trap Question', 'Must Revise', 'Memorize'].map(tag => {
-          const selected = currentReviewTags.includes(tag);
-          return (
-            <TouchableOpacity
-              key={tag}
-              onPress={() => onToggleReviewTag(question.id, tag)}
-              style={[
-                styles.tagChip,
-                { 
-                  backgroundColor: selected ? colors.primary + '20' : colors.surface,
-                  borderColor: selected ? colors.primary : colors.border
-                }
-              ]}
-            >
-              <Text style={[styles.tagChipText, { color: selected ? colors.primary : colors.textSecondary }]}>
-                {tag}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-
-      <TouchableOpacity 
-        onPress={() => onAddToFlashcard(question)}
-        disabled={isSaving}
-        style={[
-          styles.flashBtn, 
-          { borderColor: colors.primary + '40' },
-          isAdded && { backgroundColor: colors.primary + '10', borderStyle: 'solid' }
-        ]}
-      >
-        <Zap 
-          size={14} 
-          color={isAdded ? colors.primary : colors.textTertiary} 
-          fill={isAdded ? colors.primary : 'transparent'}
-        />
-        <Text style={[
-          styles.flashBtnText, 
-          { color: isAdded ? colors.primary : colors.textTertiary }
-        ]}>
-          {isSaving ? 'ADDING...' : isAdded ? 'IN FLASHCARDS' : 'ADD TO FLASHCARD'}
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
 
 const styles = StyleSheet.create({
   container: {

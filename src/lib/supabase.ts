@@ -3,8 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { Platform } from 'react-native';
 
-const supabaseUrl = 'https://ngwsuqzkndlxfoantnlf.supabase.co';
-const supabaseAnonKey = 'sb_publishable_jvMJygEAm0GdUAiz4RvlYQ_DCTOBApa';
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://ngwsuqzkndlxfoantnlf.supabase.co';
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_jvMJygEAm0GdUAiz4RvlYQ_DCTOBApa';
 
 // AsyncStorage accesses window on web — safe-guard during SSR/static render.
 const isBrowserOrNative = Platform.OS !== 'web' || typeof window !== 'undefined';

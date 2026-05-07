@@ -8,7 +8,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { 
   X, RotateCcw, Check, MoreVertical, Snowflake, Maximize2, ChevronLeft, Search, 
-  Share2, Pencil, Plus, MoreHorizontal, Type, CheckCircle2, Minus 
+  Share2, Pencil, Plus, MoreHorizontal, Type, CheckCircle2, Minus, Sparkles,
+  Send, Trash2, Edit2, Save, MessageSquare, Brain
 } from 'lucide-react-native';
 import { GestureHandlerRootView, PinchGestureHandler, State, PanGestureHandler } from 'react-native-gesture-handler';
 import * as Haptics from 'expo-haptics';
@@ -25,7 +26,8 @@ import { BranchSvc, BranchNode } from '../../src/services/BranchService';
 import { PremiumMoveModal } from '../../src/components/flashcards/PremiumMoveModal';
 import { OfflineManager } from '../../src/services/OfflineManager';
 import { buildCanonicalExplanations } from '../unified/engine';
-import { fetchBestAnswer, BestAnswer } from '../../src/services/BestAnswerService';
+import { fetchBestAnswer, saveBestAnswer, BestAnswer } from '../../src/services/BestAnswerService';
+import { aiExplainQuestion, aiImproveAnswer, aiAskDoubt } from '../../src/services/GeminiService';
 import { renderAIText } from '../../src/utils/renderAIText';
 
 const { width, height } = Dimensions.get('window');
@@ -78,11 +80,54 @@ export default function ReviewScreen() {
   const [altSources, setAltSources] = useState<any[]>([]);
   const [altActive, setAltActive] = useState<string>('saved'); // 'saved' | 'vitamin' | <institute_key>
   const [altVitamin, setAltVitamin] = useState<BestAnswer | null>(null);
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiExplanations, setAiExplanations] = useState<Record<string, string>>({});
+  const [modifyOpen, setModifyOpen] = useState(false);
+  const [modifyText, setModifyText] = useState('');
+  const [improvePromptOpen, setImprovePromptOpen] = useState(false);
+  const [improvePromptText, setImprovePromptText] = useState('');
+  const [improving, setImproving] = useState(false);
+  const [savingBest, setSavingBest] = useState(false);
+  const [doubtModalVisible, setDoubtModalVisible] = useState(false);
+  const [doubtQuestion, setDoubtQuestion] = useState('');
+  const [doubtAnswer, setDoubtAnswer] = useState('');
+  const [askingDoubt, setAskingDoubt] = useState(false);
 
   const revealAnim = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => { if (uid) { loadQueue(); loadZoomSetting(); } }, [uid]);
+
+  // ── FIX 8 — institute / vitamin chips on the flashcard review screen ─────
+  // Must be here (before early returns) to satisfy Rules of Hooks.
+  useEffect(() => {
+    setAltActive('saved');
+    setAltSources([]);
+    setAltVitamin(null);
+
+    const qId = (queue[currentIndex] as any)?.question_id || (queue[currentIndex]?.source as any)?.question_id;
+    if (!qId) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('questions')
+          .select('id, explanation_markdown, source, exam_year, exam_group, correct_answer, tests(*)')
+          .eq('id', qId)
+          .maybeSingle();
+        if (cancelled || !data) return;
+        const expl = buildCanonicalExplanations(data);
+        setAltSources(expl);
+        const vit = await fetchBestAnswer(qId);
+        if (!cancelled) setAltVitamin(vit);
+      } catch {
+        /* swallow — chips just don't render */
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [queue[currentIndex]?.id]);
 
   const loadZoomSetting = async () => {
     try {
@@ -398,6 +443,163 @@ export default function ReviewScreen() {
     }
   };
 
+  const handleAiExplain = async () => {
+    const card = queue[currentIndex];
+    if (!card) return;
+    const qId = (card as any)?.question_id || (card?.source as any)?.question_id;
+    if (!qId) {
+      Alert.alert('Not available', 'This card is not linked to a question.');
+      return;
+    }
+
+    if (aiExplanations[qId]) {
+      setAltActive('ai');
+      return;
+    }
+
+    try {
+      setAiGenerating(true);
+      const opts = (card.source as any)?.options ?? {};
+      const optionsMap: Record<string, string> = {};
+      Object.entries(opts).forEach(([k, v]) => { optionsMap[String(k)] = String(v); });
+      const instituteExpls = altSources.map((e: any) => ({
+        source: e.source || e.sourceKey || '',
+        text: e.text || '',
+        answer: card.correct_answer || '',
+      }));
+      const explanation = await aiExplainQuestion(
+        card.front_text || '',
+        optionsMap,
+        card.correct_answer || '',
+        instituteExpls,
+      );
+      setAiExplanations(prev => ({ ...prev, [qId]: explanation }));
+      setAltActive('ai');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (e: any) {
+      Alert.alert('AI Error', e?.message || 'Could not generate explanation.');
+    } finally {
+      setAiGenerating(false);
+    }
+  };
+
+  const handleSaveBestFromAi = async () => {
+    const card = queue[currentIndex];
+    const qId = (card as any)?.question_id || (card?.source as any)?.question_id;
+    const text = qId ? aiExplanations[qId] : null;
+    if (!qId || !text) return;
+
+    setSavingBest(true);
+    try {
+      const saved = await saveBestAnswer(qId, text, null, null);
+      setAltVitamin(saved);
+      setAltActive('vitamin');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (e: any) {
+      Alert.alert('Save Failed', e.message);
+    } finally {
+      setSavingBest(false);
+    }
+  };
+
+  const handleOpenModify = () => {
+    setModifyText(resolvedAnswerText);
+    setModifyOpen(true);
+    setImprovePromptOpen(false);
+  };
+
+  const handleImproveSubmit = async () => {
+    const card = queue[currentIndex];
+    const qId = (card as any)?.question_id || (card?.source as any)?.question_id;
+    if (!qId || !improvePromptText.trim()) return;
+
+    setImproving(true);
+    try {
+      const improved = await aiImproveAnswer(
+        improvePromptText,
+        modifyText,
+        card.front_text || '',
+        altSources
+      );
+      setModifyText(improved);
+
+      if (altActive === 'ai') {
+        setAiExplanations(prev => ({ ...prev, [qId]: improved }));
+      }
+
+      setImprovePromptOpen(false);
+      setImprovePromptText('');
+    } catch (e: any) {
+      Alert.alert('AI Refinement Failed', e.message);
+    } finally {
+      setImproving(false);
+    }
+  };
+
+  const commitModification = async () => {
+    const card = queue[currentIndex];
+    const qId = (card as any)?.question_id || (card?.source as any)?.question_id;
+    if (!qId) return;
+
+    setSavingBest(true);
+    try {
+      const saved = await saveBestAnswer(qId, modifyText, null, null);
+      setAltVitamin(saved);
+      setModifyOpen(false);
+      setAltActive('vitamin');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (e: any) {
+      Alert.alert('Save Failed', e.message);
+    } finally {
+      setSavingBest(false);
+    }
+  };
+
+  const handleDeleteBest = async () => {
+    const card = queue[currentIndex];
+    const qId = (card as any)?.question_id || (card?.source as any)?.question_id;
+    if (!qId || !altVitamin?.id) return;
+
+    Alert.alert('Delete My Vitamin?', 'This will remove your custom/AI explanation.', [
+      { text: 'Cancel', style: 'cancel' },
+      { 
+        text: 'Delete', 
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await supabase.from('user_best_answers').delete().eq('id', altVitamin.id);
+            setAltVitamin(null);
+            setAltActive('saved');
+          } catch (e: any) {
+            Alert.alert('Delete Failed', e.message);
+          }
+        }
+      }
+    ]);
+  };
+
+  const handleAskDoubt = async () => {
+    if (!doubtQuestion.trim()) return;
+    setAskingDoubt(true);
+    setDoubtAnswer('');
+    try {
+      const card = queue[currentIndex];
+      const opts = (card.source as any)?.options ?? {};
+      const optionLines = Object.entries(opts).map(([k, v]) => `${k}) ${v}`).join('\n');
+      
+      const answer = await aiAskDoubt(doubtQuestion, {
+        question: card.front_text || '',
+        options: optionLines,
+        explanation: resolvedAnswerText,
+      });
+      setDoubtAnswer(answer);
+    } catch (e: any) {
+      Alert.alert('AI Error', e.message);
+    } finally {
+      setAskingDoubt(false);
+    }
+  };
+
   // ===== render states =====
 
   if (loading) {
@@ -444,53 +646,24 @@ export default function ReviewScreen() {
   const opts = (currentCard.source as any)?.options ?? {};
   const hasOptions = currentCard.card_type === 'qa' && Object.keys(opts).length > 0;
 
-  // ── FIX 8 — institute / vitamin chips on the flashcard review screen ─────
-  // When a card was created from a question, fetch that question's
-  // explanations so the reviewer can switch between sources, and pull the
-  // user's saved best answer ('My Vitamin') if any. Falls back silently
-  // when the card has no question_id (e.g. notebook-derived cards) — in
-  // that case the chip row is hidden.
-  useEffect(() => {
-    setAltActive('saved');
-    setAltSources([]);
-    setAltVitamin(null);
-
-    const cardId = currentCard?.id;
-    const qId = (currentCard as any)?.question_id || (currentCard?.source as any)?.question_id;
-    if (!qId) return;
-
-    let cancelled = false;
-    (async () => {
-      try {
-        const { data } = await supabase
-          .from('questions')
-          .select('id, explanation_markdown, source, exam_year, exam_group, correct_answer, tests(*)')
-          .eq('id', qId)
-          .maybeSingle();
-        if (cancelled || !data) return;
-        const expl = buildCanonicalExplanations(data);
-        setAltSources(expl);
-        const vit = await fetchBestAnswer(qId);
-        if (!cancelled) setAltVitamin(vit);
-      } catch {
-        /* swallow — chips just don't render */
-      }
-    })();
-
-    return () => { cancelled = true; };
-  }, [currentCard?.id]);
-
-  // Resolved answer text given the active alt source key.
+  // Resolved answer text given the active alt source key (currentCard may be undefined before queue loads).
   const resolvedAnswerText = (() => {
+    const card = queue[currentIndex];
+    if (!card) return '';
+    const qId = (card as any)?.question_id || (card?.source as any)?.question_id;
+    
     if (altActive === 'vitamin' && altVitamin) {
       const kp = altVitamin.key_points ? `\n\n**✨ Key Points**\n\n${altVitamin.key_points}` : '';
       return `${altVitamin.answer_text}${kp}`;
+    }
+    if (altActive === 'ai' && qId && aiExplanations[qId]) {
+      return aiExplanations[qId];
     }
     if (altActive !== 'saved' && altSources.length) {
       const hit = altSources.find((e: any) => e.sourceKey === altActive);
       if (hit) return hit.text || '';
     }
-    return currentCard.back_text || '';
+    return card.back_text || '';
   })();
   
   function stripQuestionOptions(frontText: string, optionKeys: string[]) {
@@ -530,6 +703,17 @@ export default function ReviewScreen() {
           </View>
 
           <View style={styles.headerRight}>
+            <TouchableOpacity 
+              style={[styles.headerBtn, { marginRight: 10 }]} 
+              onPress={() => {
+                setDoubtQuestion('');
+                setDoubtAnswer('');
+                setDoubtModalVisible(true);
+              }}
+              testID="btn-ask-ai"
+            >
+              <MessageSquare size={22} color={colors.primary} />
+            </TouchableOpacity>
             <TouchableOpacity style={styles.headerBtn} onPress={() => setMenuVisible(true)} testID="btn-more">
               <MoreHorizontal size={24} color={colors.textPrimary} />
             </TouchableOpacity>
@@ -690,7 +874,187 @@ export default function ReviewScreen() {
                             </Text>
                           </TouchableOpacity>
                         ))}
+
+                      {/* AI Explain chip — matches Quiz Engine placement */}
+                      {(() => {
+                        const qId = (currentCard as any)?.question_id || (currentCard?.source as any)?.question_id;
+                        if (!qId) return null;
+                        const hasAi = !!aiExplanations[qId];
+                        return (
+                          <TouchableOpacity
+                            onPress={handleAiExplain}
+                            activeOpacity={0.7}
+                            disabled={aiGenerating}
+                            testID="flash-ai-chip"
+                            style={{
+                              flexDirection: 'row', alignItems: 'center', gap: 5,
+                              paddingHorizontal: 12, paddingVertical: 6,
+                              borderRadius: 20, borderWidth: 1,
+                              backgroundColor: altActive === 'ai' ? '#7c3aed' : '#7c3aed18',
+                              borderColor:     altActive === 'ai' ? '#7c3aed' : '#7c3aed40',
+                            }}
+                          >
+                            {aiGenerating ? (
+                              <ActivityIndicator size="small" color={altActive === 'ai' ? '#fff' : '#7c3aed'} />
+                            ) : (
+                              <Sparkles size={11} color={altActive === 'ai' ? '#fff' : '#7c3aed'} />
+                            )}
+                            <Text style={{ fontSize: 10, fontWeight: '900', color: altActive === 'ai' ? '#fff' : '#7c3aed' }}>
+                               {aiGenerating ? 'THINKING...' : hasAi ? '🧠 AI' : '+ AI EXPLAIN'}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })()}
                     </ScrollView>
+                  )}
+
+                  {/* ── Modify / Edit Buttons (Quiz Engine Style) ── */}
+                  {(altActive === 'vitamin' || altActive === 'ai') && !modifyOpen && (
+                    <View style={{ flexDirection: 'row', gap: 10, marginBottom: 16 }}>
+                      {altActive === 'ai' && (
+                        <TouchableOpacity
+                          onPress={handleSaveBestFromAi}
+                          disabled={savingBest}
+                          activeOpacity={0.7}
+                          style={{
+                            flexDirection: 'row', alignItems: 'center', gap: 5,
+                            paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10,
+                            backgroundColor: colors.surfaceStrong,
+                            borderWidth: 1, borderColor: colors.border,
+                          }}
+                        >
+                          {savingBest ? <ActivityIndicator size="small" color={colors.primary} /> : <SaveIcon size={12} color={colors.primary} />}
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: colors.primary }}>Save to My Vitamin</Text>
+                        </TouchableOpacity>
+                      )}
+
+                      <TouchableOpacity
+                        onPress={handleOpenModify}
+                        activeOpacity={0.7}
+                        style={{
+                          flexDirection: 'row', alignItems: 'center', gap: 5,
+                          paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10,
+                          backgroundColor: colors.surfaceStrong,
+                          borderWidth: 1, borderColor: colors.border,
+                        }}
+                      >
+                        <Edit2 size={12} color={altActive === 'vitamin' ? colors.primary : colors.textSecondary} />
+                        <Text style={{ fontSize: 11, fontWeight: '800', color: altActive === 'vitamin' ? colors.primary : colors.textSecondary }}>Modify & Save</Text>
+                      </TouchableOpacity>
+
+                      {altActive === 'vitamin' && (
+                        <TouchableOpacity
+                          onPress={handleDeleteBest}
+                          activeOpacity={0.7}
+                          style={{
+                            flexDirection: 'row', alignItems: 'center', gap: 5,
+                            paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10,
+                            backgroundColor: colors.surfaceStrong,
+                            borderWidth: 1, borderColor: colors.border,
+                          }}
+                        >
+                          <Trash2 size={12} color={colors.textTertiary} />
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textTertiary }}>Delete</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  )}
+
+                  {/* ── Modification Panel ── */}
+                  {modifyOpen && (
+                    <View style={{ marginBottom: 20, padding: 12, backgroundColor: colors.surface, borderRadius: 12, borderWidth: 1, borderColor: colors.border, gap: 10 }}>
+                      <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textTertiary, letterSpacing: 1 }}>
+                        EDIT YOUR BEST ANSWER
+                      </Text>
+                      
+                      <View style={{ position: 'relative' }}>
+                        <TextInput
+                          value={modifyText}
+                          onChangeText={setModifyText}
+                          multiline
+                          textAlignVertical="top"
+                          editable={!improving}
+                          style={{
+                            minHeight: 180,
+                            padding: 12,
+                            fontSize: 14, color: colors.textPrimary, lineHeight: 22,
+                            backgroundColor: colors.bg,
+                            borderRadius: 10, borderWidth: 1, borderColor: colors.border,
+                          }}
+                        />
+                        {improving && (
+                          <View style={{
+                            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                            backgroundColor: '#7c3aed18',
+                            borderRadius: 10,
+                            alignItems: 'center', justifyContent: 'center', gap: 8,
+                          }}>
+                            <ActivityIndicator size="small" color="#7c3aed" />
+                            <Text style={{ fontSize: 11, fontWeight: '900', color: '#7c3aed' }}>REWRITING...</Text>
+                          </View>
+                        )}
+                      </View>
+
+                      {/* Improve with AI strip */}
+                      {improvePromptOpen && (
+                        <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center', backgroundColor: '#7c3aed10', borderRadius: 10, padding: 6 }}>
+                          <Sparkles size={14} color="#7c3aed" />
+                          <TextInput
+                            value={improvePromptText}
+                            onChangeText={setImprovePromptText}
+                            placeholder="Ask a doubt or give an instruction..."
+                            placeholderTextColor={colors.textTertiary}
+                            onSubmitEditing={handleImproveSubmit}
+                            editable={!improving}
+                            style={{ flex: 1, fontSize: 12, color: colors.textPrimary, paddingVertical: 4 }}
+                          />
+                          <TouchableOpacity
+                            onPress={handleImproveSubmit}
+                            disabled={improving || !improvePromptText.trim()}
+                            style={{
+                              paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8,
+                              backgroundColor: '#7c3aed',
+                              opacity: (improving || !improvePromptText.trim()) ? 0.5 : 1,
+                            }}
+                          >
+                            <Send size={12} color="#fff" />
+                          </TouchableOpacity>
+                        </View>
+                      )}
+
+                      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 10 }}>
+                        <TouchableOpacity onPress={() => setModifyOpen(false)}>
+                          <Text style={{ color: colors.textTertiary, fontWeight: '800', padding: 8 }}>Cancel</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          onPress={() => setImprovePromptOpen(!improvePromptOpen)}
+                          style={{
+                            flexDirection: 'row', alignItems: 'center', gap: 4,
+                            paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8,
+                            backgroundColor: improvePromptOpen ? '#7c3aed' : '#7c3aed18',
+                          }}
+                        >
+                          <Text style={{ fontSize: 10, fontWeight: '900', color: improvePromptOpen ? '#fff' : '#7c3aed' }}>
+                            🤖 Improve with AI
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          onPress={commitModification}
+                          disabled={savingBest}
+                          style={{
+                            flexDirection: 'row', alignItems: 'center', gap: 6,
+                            paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8,
+                            backgroundColor: colors.primary,
+                            opacity: savingBest ? 0.6 : 1,
+                          }}
+                        >
+                          {savingBest ? <ActivityIndicator size="small" color="#fff" /> : <Save size={14} color="#fff" />}
+                          <Text style={{ color: '#fff', fontWeight: '900', fontSize: 12 }}>Save</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
                   )}
 
                   <Text style={[styles.answerText, { color: colors.textPrimary, fontSize: editorFontSize - 2, lineHeight: (editorFontSize - 2) * 1.5, textAlign: 'left' }]}>
@@ -703,6 +1067,8 @@ export default function ReviewScreen() {
                       <Text style={[styles.noteText, { color: colors.textSecondary }]}>{currentCard.state.user_note}</Text>
                     </View>
                   ) : null}
+
+                  {/* AI button removed from here, now in chips above */}
                 </Animated.View>
               )}
               </Pressable>
@@ -890,6 +1256,81 @@ export default function ReviewScreen() {
           onConfirm={handleMove}
           title="Select location"
         />
+
+        {/* ── Doubt Clearing Modal ── */}
+        <Modal
+          visible={doubtModalVisible}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setDoubtModalVisible(false)}
+        >
+          <KeyboardAvoidingView 
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}
+          >
+            <View style={{ backgroundColor: colors.bg, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, maxHeight: '80%' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  <Brain size={24} color={colors.primary} />
+                  <Text style={{ fontSize: 18, fontWeight: '900', color: colors.textPrimary }}>Clear Your Doubt</Text>
+                </View>
+                <TouchableOpacity onPress={() => setDoubtModalVisible(false)}>
+                  <X size={24} color={colors.textTertiary} />
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <View style={{ marginBottom: 16 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '900', color: colors.textTertiary, marginBottom: 8, letterSpacing: 1 }}>ASK AI ANYTHING ABOUT THIS CARD</Text>
+                  <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center', backgroundColor: colors.surfaceStrong, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 4 }}>
+                    <TextInput
+                      value={doubtQuestion}
+                      onChangeText={setDoubtQuestion}
+                      placeholder="Type your question..."
+                      placeholderTextColor={colors.textTertiary}
+                      multiline
+                      style={{ flex: 1, fontSize: 14, color: colors.textPrimary, minHeight: 40, maxHeight: 100 }}
+                    />
+                    <TouchableOpacity 
+                      onPress={handleAskDoubt}
+                      disabled={askingDoubt || !doubtQuestion.trim()}
+                      style={{ 
+                        width: 36, height: 36, borderRadius: 18, 
+                        backgroundColor: colors.primary, 
+                        alignItems: 'center', justifyContent: 'center',
+                        opacity: (askingDoubt || !doubtQuestion.trim()) ? 0.6 : 1
+                      }}
+                    >
+                      {askingDoubt ? <ActivityIndicator size="small" color="#fff" /> : <Send size={18} color="#fff" />}
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                {doubtAnswer ? (
+                  <View style={{ marginTop: 10, padding: 16, backgroundColor: colors.primary + '08', borderRadius: 16, borderWidth: 1, borderColor: colors.primary + '20' }}>
+                    <Text style={{ fontSize: 11, fontWeight: '900', color: colors.primary, marginBottom: 10 }}>AI RESPONSE</Text>
+                    <Text style={{ fontSize: 14, color: colors.textPrimary, lineHeight: 24 }}>
+                      {renderAIText(doubtAnswer, { fontSize: 14, color: colors.textPrimary, lineHeight: 24 })}
+                    </Text>
+                  </View>
+                ) : askingDoubt ? (
+                  <View style={{ marginTop: 40, alignItems: 'center' }}>
+                    <ActivityIndicator size="large" color={colors.primary} />
+                    <Text style={{ marginTop: 12, fontSize: 14, color: colors.textTertiary, fontWeight: '700' }}>Consulting AI Mentor...</Text>
+                  </View>
+                ) : (
+                  <View style={{ marginTop: 40, alignItems: 'center', opacity: 0.5 }}>
+                    <MessageSquare size={48} color={colors.textTertiary} />
+                    <Text style={{ marginTop: 12, fontSize: 14, color: colors.textTertiary, textAlign: 'center' }}>
+                      Ask about specific terms, historical context, or why an option is correct.
+                    </Text>
+                  </View>
+                )}
+              </ScrollView>
+              <View style={{ height: 40 }} />
+            </View>
+          </KeyboardAvoidingView>
+        </Modal>
       </SafeAreaView>
     </PageWrapper>
   );

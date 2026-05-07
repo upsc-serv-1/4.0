@@ -1261,7 +1261,7 @@ export default function UnifiedArenaSetup() {
           {activeTab === 'search' && (
             <View style={{ padding: 20, alignItems: 'center' }}>
               <TouchableOpacity
-                onPress={() => router.push('/(tabs)/ai-search' as any)}
+                onPress={() => router.push('/ai-search' as any)}
                 testID="arena-search-redirect-btn"
                 style={{
                   flexDirection: 'row', alignItems: 'center', gap: 12,

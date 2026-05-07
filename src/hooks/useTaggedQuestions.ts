@@ -119,16 +119,15 @@ export function useTaggedVault(userId: string | undefined) {
       return;
     }
 
-    // 0. Load from cache first (offline-first).
+    // 0. Load from cache first (offline-first), but ALWAYS continue to server
+    // refresh so Tags tab does not stay stale after new tag writes.
     try {
       const cached = await AsyncStorage.getItem(cacheKey);
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed)) {
           setRawQuestions(parsed);
-          setLoading(false);
           setError(null);
-          return;
         }
       }
       setLoading(true);

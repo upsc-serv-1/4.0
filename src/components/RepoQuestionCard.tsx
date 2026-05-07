@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase';
 import { Eye, Trash2, Zap } from 'lucide-react-native';
 import { FlashcardSvc } from '../services/FlashcardService';
 import { AddToFlashcardSheet } from './flashcards/AddToFlashcardSheet';
+import { autoCleanupQuestionState } from '../utils/questionStateUtils';
 
 interface RepoQuestionCardProps {
   question: TaggedQuestion;
@@ -46,6 +47,8 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestion
         .eq('user_id', session.user.id)
         .eq('question_id', question.id);
       if (error) throw error;
+      // Auto-cleanup: if removing tags made the row fully empty, delete it
+      await autoCleanupQuestionState(session.user.id, question.id);
       if (onUpdate) onUpdate();
     } catch (err: any) {
       Alert.alert('Error', err.message);

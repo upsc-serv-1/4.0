@@ -4,6 +4,7 @@ import { safeSetItem } from '../lib/safeAsyncStorage';
 import { supabase } from '../lib/supabase';
 import { formatTagLabel, normalizeTag } from '../utils/tagUtils';
 import { useTagStore } from '../store/tagStore';
+import { autoCleanupQuestionState } from '../utils/questionStateUtils';
 
 // MASTER SUBJECT LIST (The Total Taxonomy)
 const MASTER_SUBJECTS = [
@@ -424,26 +425,31 @@ export function useTaggedVault(userId: string | undefined) {
     if (!usedRpc) {
       const { data: rows, error: loadErr } = await supabase
         .from('question_states')
-        .select('id, review_tags')
+        .select('*')
         .eq('user_id', userId)
         .not('review_tags', 'is', null);
       if (loadErr) throw loadErr;
 
-      const updates: Array<{ id: string; nextTags: string[] | null }> = [];
+      const updates: Array<{ id: string; questionId: string; nextTags: string[] | null; fullRow: any }> = [];
       (rows || []).forEach((row: any) => {
         const tags = parseReviewTags(row.review_tags);
         if (!tags.some(tag => normalizeTag(tag) === targetNorm)) return;
         const next = dedupeTags(tags.filter(tag => normalizeTag(tag) !== targetNorm));
-        updates.push({ id: row.id, nextTags: next.length ? next : null });
+        updates.push({ id: row.id, questionId: row.question_id, nextTags: next.length ? next : null, fullRow: row });
       });
       await Promise.all(
-        updates.map((row) =>
-          supabase
+        updates.map(async (row) => {
+          await supabase
             .from('question_states')
             .update({ review_tags: row.nextTags })
             .eq('id', row.id)
-            .eq('user_id', userId)
-        )
+            .eq('user_id', userId);
+          // Auto-cleanup: if removing this tag made the row fully empty, delete it
+          if (!row.nextTags) {
+            const updatedState = { ...row.fullRow, review_tags: null };
+            await autoCleanupQuestionState(userId, row.questionId, updatedState);
+          }
+        })
       );
     }
 

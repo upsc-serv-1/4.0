@@ -119,23 +119,13 @@ export function useTaggedVault(userId: string | undefined) {
       return;
     }
 
-    // 0. Load from cache first (offline-first), but ALWAYS continue to server
-    // refresh so Tags tab does not stay stale after new tag writes.
-    try {
-      const cached = await AsyncStorage.getItem(cacheKey);
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed)) {
-          setRawQuestions(parsed);
-          setError(null);
-        }
-      }
-      setLoading(true);
-    } catch {
-      setLoading(true);
-    }
+    // ISSUE FIX #8: Always fetch from server first to avoid showing stale data
+    // after external database changes (e.g., manual row deletions).
+    // We'll only fall back to cache if the network request fails.
+    setLoading(true);
 
     try {
+      // Force fresh fetch from Supabase to ensure Tags tab stays in sync
       const { data: states, error: fetchError } = await supabase
         .from('question_states')
         .select('id, question_id, test_id, selected_answer, review_tags, updated_at')
@@ -221,7 +211,7 @@ export function useTaggedVault(userId: string | undefined) {
     } finally {
       setLoading(false);
     }
-  }, [cacheKey, rawQuestions.length, userId]);
+  }, [cacheKey, userId]);
 
   useEffect(() => {
     fetchVaultData();

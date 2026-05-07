@@ -429,9 +429,21 @@ export default function AISearchTab() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
 
     try {
-      // Use the same payload shape as full quiz engine so Arena/Tags flows stay consistent.
+      // ISSUE FIX #9: Ensure test_id is properly resolved from all possible locations
+      // so tags from Light Quiz Engine appear correctly in Arena filters.
       const activeQuestion = (previewQuestion?.id === qid ? previewQuestion : results.find(r => r.id === qid)) as any;
-      const resolvedTestId = activeQuestion?.test_id || activeQuestion?.tests?.id || 'manual';
+      
+      // Try multiple sources for test_id to ensure we capture it
+      let resolvedTestId = activeQuestion?.test_id;
+      if (!resolvedTestId && activeQuestion?.tests) {
+        // Handle both object and array formats
+        const testsData = Array.isArray(activeQuestion.tests) ? activeQuestion.tests[0] : activeQuestion.tests;
+        resolvedTestId = testsData?.id;
+      }
+      // Fallback to 'manual' only if we absolutely can't find a test_id
+      if (!resolvedTestId) {
+        resolvedTestId = 'manual';
+      }
 
       await StudentSync.enqueue('question_state', {
         userId: session.user.id,

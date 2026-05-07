@@ -265,6 +265,20 @@ export default function AISearchTab() {
     AsyncStorage.setItem(FONT_SIZE_KEY, String(previewFontSize)).catch(() => {});
   }, [previewFontSize]);
 
+  // Re-sync zoom on every preview open/question switch so AI Search preview
+  // and full quiz engine stay aligned even if font was changed elsewhere.
+  React.useEffect(() => {
+    if (!previewQuestion) return;
+    AsyncStorage.getItem(FONT_SIZE_KEY).then((saved) => {
+      if (!saved) return;
+      const n = parseInt(saved, 10);
+      if (!isNaN(n) && n >= 12 && n <= 32) {
+        setPreviewFontSize(n);
+        baseFontSizeRef.current = n;
+      }
+    }).catch(() => {});
+  }, [previewQuestion?.id]);
+
   // Fetch real user revision tags for the study tags section
   React.useEffect(() => {
     if (!session?.user?.id) return;

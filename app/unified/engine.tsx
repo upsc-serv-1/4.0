@@ -1448,7 +1448,9 @@ export default function UnifiedQuizEngine() {
             // Tag filtering requires separate fetch of IDs
             const tagList = typeof tagsRaw === 'string' ? tagsRaw.split('|').filter(Boolean) : [];
             const orQuery = tagList.map(t => `review_tags.cs.["${t}"]`).join(',');
-            const { data: tagIds } = await LocalQuery.from('question_states').select('question_id').eq('user_id', session.user.id).or(orQuery);
+            // Use live server state for revision tags so deletions in Supabase
+            // are reflected immediately and no stale local snapshot leaks in.
+            const { data: tagIds } = await supabase.from('question_states').select('question_id').eq('user_id', session.user.id).or(orQuery);
             if (tagIds && tagIds.length > 0) {
                const slicedTagIds = tagIds.map((t: any) => t.question_id).slice(from, from + CHUNK);
                if (slicedTagIds.length === 0) break;

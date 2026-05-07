@@ -387,6 +387,12 @@ export default function AISearchTab() {
     // Reset AI explain state when opening a new question
     setAiExplanation(null);
 
+    // ISSUE FIX #5: Load MyVitamin (best answer) data when preview opens
+    // so it's available same as in Full Quiz Engine
+    if (previewQuestion?.id) {
+      ensureBestAnswerLoaded(previewQuestion.id);
+    }
+
     // Sync flashcard state and tags with backend
     if (previewQuestion && session?.user?.id) {
       // 1. Check flashcard status (same relation-based lookup as full engine)
@@ -417,7 +423,7 @@ export default function AISearchTab() {
         })
         .catch(err => console.error("Tag sync check failed:", err));
     }
-  }, [previewQuestion?.id]);
+  }, [previewQuestion?.id, session?.user?.id, ensureBestAnswerLoaded]);
 
   const handleToggleTag = async (qid: string, currentTags: string[], tag: string) => {
     if (!session?.user?.id) return;

@@ -44,11 +44,10 @@ No schema migration is required — the schema is flexible enough.
 * [x] **Step 3:** Capsule home screen — Subject Hub layout (top bar, search, sidebar, main content sections)
 * [x] **Step 4:** Dynamic expandable sidebar (Subject → Topic → Subtopic transformation, breadcrumb)
 * [x] **Step 5:** Glance reading mode (infinite scroll, full-screen toggle)
-* [ ] **Step 6:** Capsule block editor (heading / paragraph / bullet / numbered / checklist / highlight / quote)
-* [ ] **Step 8:** Persistent highlights + annotations
-* [ ] **Step 9:** Add-to-Notebook popup integration (Manual + Auto modes, Premium Move reuse)
-* [ ] **Step 10:** Quiz-engine append pipeline (block-preserving auto-append)
-* [ ] **Step 11:** Polish — iPad layout pass, performance/virtualization, empty states
+* [x] **Step 6:** Capsule block editor (heading / paragraph / bullet / numbered / checklist / highlight / quote)
+* [ ] **Step 7:** Add-to-Notebook popup integration (Manual + Auto modes, Premium Move reuse)
+* [ ] **Step 8:** Quiz-engine append pipeline (block-preserving auto-append)
+* [ ] **Step 9:** Polish — iPad layout pass, performance/virtualization, empty states
 
 After each step the agent commits with message
 `Step <n>: <short description>` and pushes to `origin/capsule-tab`.
@@ -64,7 +63,8 @@ After each step the agent commits with message
 | 3 | done | `Step 3: Capsule home screen with Subject Hub layout` |
 | 4 | done | `Step 4: Dynamic expandable sidebar tree + breadcrumb + scoped notebook list` |
 | 5 | done | `Step 5: Glance reading workspace with block renderer + sidebar toggle` |
-| 6 | pending | — |
+| 6 | done | `Step 6: Block editor (paragraph/heading/bullet/numbered/checklist/highlight/quote with autosave)` |
+| 7 | pending | — |
 
 ---
 

@@ -82,6 +82,7 @@ import { PageWrapper } from '../../src/components/PageWrapper';
 import { supabase } from '../../src/lib/supabase';
 import { useAuth } from '../../src/context/AuthContext';
 import { useQuizStore } from '../../src/store/quizStore';
+import { useTagStore } from '../../src/store/tagStore';
 import { mergeQuestions } from '../../src/utils/merger';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
@@ -1011,25 +1012,37 @@ export default function UnifiedQuizEngine() {
     }
   }, [notebookModalVisible]);
 
-  // Fetch unique tags from previous sessions
+  // Fetch unique tags from previous sessions + persisted catalog
   useEffect(() => {
     const fetchExistingTags = async () => {
       if (!session?.user?.id) return;
+      const allTags = new Set<string>(DEFAULT_STUDY_TAGS);
+
+      // 1. Load from persisted custom tag catalog (shared with Tags tab)
+      try {
+        const catalogKey = `review_tag_catalog_${session.user.id}`;
+        const raw = await AsyncStorage.getItem(catalogKey);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) parsed.forEach((t: string) => t && allTags.add(t));
+        }
+      } catch {}
+
+      // 2. Also pull tags from question_states (legacy / cross-device data)
       const { data } = await supabase
         .from('question_states')
         .select('review_tags')
         .eq('user_id', session.user.id)
         .not('review_tags', 'is', null);
-      
+
       if (data) {
-        const allTags = new Set(DEFAULT_STUDY_TAGS);
         data.forEach(row => {
           if (Array.isArray(row.review_tags)) {
-            row.review_tags.forEach(t => allTags.add(t));
+            row.review_tags.forEach((t: string) => allTags.add(t));
           }
         });
-        setUserStudyTags(Array.from(allTags));
       }
+      setUserStudyTags(Array.from(allTags));
     };
     fetchExistingTags();
   }, [session?.user?.id]);
@@ -1046,6 +1059,8 @@ export default function UnifiedQuizEngine() {
         testId: questions.find(q => q.id === qId)?.tests?.id || 'manual',
         patch: { review_tags: newTags }
       });
+      // Notify Tags tab to refresh when tags change
+      useTagStore.getState().bump({ type: 'add', tag, at: Date.now() });
     }
   };
 
@@ -2171,17 +2186,31 @@ export default function UnifiedQuizEngine() {
     router.back();
   };
 
-  const handleCreateTag = () => {
+  const handleCreateTag = async () => {
     if (!newTagText.trim()) return;
     if (userStudyTags.includes(newTagText.trim())) {
       setIsAddingTag(false);
       setNewTagText('');
       return;
     }
-    const updated = [...userStudyTags, newTagText.trim()];
+    const newTag = newTagText.trim();
+    const updated = [...userStudyTags, newTag];
     setUserStudyTags(updated);
     setIsAddingTag(false);
     setNewTagText('');
+
+    // Persist the updated catalog to AsyncStorage (shared with Tags tab and Light Engine)
+    if (session?.user?.id) {
+      try {
+        const catalogKey = `review_tag_catalog_${session.user.id}`;
+        const existing = await AsyncStorage.getItem(catalogKey);
+        const parsed: string[] = existing ? JSON.parse(existing) : [];
+        const newList = Array.from(new Set([...parsed, newTag]));
+        await AsyncStorage.setItem(catalogKey, JSON.stringify(newList));
+      } catch {}
+      // Notify Tags tab to refresh
+      useTagStore.getState().bump({ type: 'add', tag: newTag, at: Date.now() });
+    }
   };
 
   const handleStartCountdown = (customMins?: string) => {

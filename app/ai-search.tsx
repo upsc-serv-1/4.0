@@ -33,6 +33,8 @@ import { mergeQuestions } from '../src/utils/merger';
 import { QuestionCache } from '../src/services/QuestionCache';
 import { buildPredictive, probableHotsFor2026, type PredictiveRow } from '../src/lib/pyqPredictive';
 import { StudentSync } from '../src/services/StudentSync';
+import { useQuizStore } from '../src/store/quizStore';
+import { useTagStore } from '../src/store/tagStore';
 import { NotebookLocationPicker } from '../src/components/NotebookLocationPicker';
 import { AddToFlashcardSheet } from '../src/components/flashcards/AddToFlashcardSheet';
 import { fetchBestAnswer, type BestAnswer } from '../src/services/BestAnswerService';
@@ -159,6 +161,7 @@ function getPYQChipStyle(pyq: ReturnType<typeof getPYQCategorization>) {
 export default function AISearchTab() {
   const { colors } = useTheme();
   const { session } = useAuth();
+  const store = useQuizStore();
 
   // Zoom states - MOVED TO TOP for mdStyles dependency
   const [previewFontSize, setPreviewFontSize] = useState(16);
@@ -235,6 +238,9 @@ export default function AISearchTab() {
   const [previewStudyTags, setPreviewStudyTags] = useState<string[]>([]);
   const [userTags, setUserTags] = useState<string[]>([]);
 
+  // Subscribe to tag store so tag catalog refreshes when Full Engine adds a new tag
+  const tagStoreVersion = useTagStore(s => s.version);
+
   // Notebook states for "Add to Notebook" parity
   const [notebookModalVisible, setNotebookModalVisible] = useState(false);
   const [selectedNotebook, setSelectedNotebook] = useState<{ node_id: string; note_id: string; title: string; folder_id: string | null } | null>(null);
@@ -304,29 +310,44 @@ export default function AISearchTab() {
     setPreviewRevealed(false);
   }, []);
 
-  // Fetch real user revision tags for the study tags section
+  // Fetch user revision tags — same catalog-first approach as Full Quiz Engine
   React.useEffect(() => {
     if (!session?.user?.id) return;
-    supabase
-      .from('question_states')
-      .select('review_tags')
-      .eq('user_id', session.user.id)
-      .not('review_tags', 'is', null)
-      .then(({ data }) => {
-        const tags = new Set<string>();
-        data?.forEach(row => {
-          if (Array.isArray(row.review_tags)) {
-            row.review_tags.forEach(t => tags.add(t));
-          }
-        });
-        const list = Array.from(tags).sort();
-        if (list.length === 0) {
-          setUserTags(['Guessed', 'Silly Mistake', 'Must Revise', 'Time Mgmt', 'Imp. Fact']);
-        } else {
-          setUserTags(list);
+    const userId = session.user.id;
+    const DEFAULT_TAGS = ['Imp. Fact', 'Imp. Concept', 'Trap Question', 'Must Revise', 'Memorize'];
+
+    const loadTags = async () => {
+      const allTags = new Set<string>(DEFAULT_TAGS);
+
+      // 1. Read persisted custom tag catalog (shared with Full Engine and Tags tab)
+      try {
+        const catalogKey = `review_tag_catalog_${userId}`;
+        const raw = await AsyncStorage.getItem(catalogKey);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) parsed.forEach((t: string) => t && allTags.add(t));
+        }
+      } catch {}
+
+      // 2. Also pull tags from question_states (cross-device / legacy data)
+      const { data } = await supabase
+        .from('question_states')
+        .select('review_tags')
+        .eq('user_id', userId)
+        .not('review_tags', 'is', null);
+
+      data?.forEach(row => {
+        if (Array.isArray(row.review_tags)) {
+          row.review_tags.forEach((t: string) => t && allTags.add(t));
         }
       });
-  }, [session?.user?.id]);
+
+      const list = Array.from(allTags).sort();
+      setUserTags(list.length > 0 ? list : DEFAULT_TAGS);
+    };
+
+    loadTags();
+  }, [session?.user?.id, tagStoreVersion]);
 
   // When popup opens: fetch full explanation data for every _mergedId so all
   // linked institute answers are guaranteed to appear — same as Arena pipeline
@@ -435,32 +456,32 @@ export default function AISearchTab() {
       ? currentTags.filter(t => t !== tag)
       : [...currentTags, tag];
 
+    // Optimistic UI update
     setPreviewStudyTags(newTags);
+    // Mirror into quiz store for state consistency with Full Engine
+    store.setMetadata(qid, { studyTags: newTags }, false);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
 
     try {
-      // ISSUE FIX #9: Ensure test_id is properly resolved from all possible locations
-      // so tags from Light Quiz Engine appear correctly in Arena filters.
+      // Resolve test_id from all possible locations (same logic as Full Engine toggleStudyTag)
       const activeQuestion = (previewQuestion?.id === qid ? previewQuestion : results.find(r => r.id === qid)) as any;
-      
-      // Try multiple sources for test_id to ensure we capture it
       let resolvedTestId = activeQuestion?.test_id;
       if (!resolvedTestId && activeQuestion?.tests) {
-        // Handle both object and array formats
         const testsData = Array.isArray(activeQuestion.tests) ? activeQuestion.tests[0] : activeQuestion.tests;
         resolvedTestId = testsData?.id;
       }
-      // Fallback to 'manual' only if we absolutely can't find a test_id
-      if (!resolvedTestId) {
-        resolvedTestId = 'manual';
-      }
+      if (!resolvedTestId) resolvedTestId = 'manual';
 
+      // Persist via StudentSync — same API as Full Engine
       await StudentSync.enqueue('question_state', {
         userId: session.user.id,
         questionId: qid,
         testId: resolvedTestId,
         patch: { review_tags: newTags }
       });
+
+      // Notify Tags tab to refresh — same as Full Engine toggleStudyTag
+      useTagStore.getState().bump({ type: 'add', tag, at: Date.now() });
     } catch (err) {
       console.error("Tag Sync Error:", err);
     }

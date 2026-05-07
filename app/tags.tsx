@@ -205,16 +205,18 @@ export default function TaggedRepoScreen() {
   }, [vaultData]);
 
   const exportQuestions = useMemo(() => {
-    if (exportConfig.scope === 'all') return allQuestions;
+    // Issue #18 fix: Use filtered questions (respects active tag/subject/search filters)
+    const baseQuestions = vaultData.filteredQuestions || allQuestions;
+    if (exportConfig.scope === 'all') return baseQuestions;
 
     if (exportConfig.scope === 'single') {
       const target = normalizeTag(exportConfig.singleTag);
-      return allQuestions.filter((q) => q.normalizedReviewTags.includes(target));
+      return baseQuestions.filter((q) => q.normalizedReviewTags.includes(target));
     }
 
     const selected = new Set(exportConfig.multiTags.map((tag) => normalizeTag(tag)));
-    return allQuestions.filter((q) => q.normalizedReviewTags.some((t) => selected.has(t)));
-  }, [allQuestions, exportConfig]);
+    return baseQuestions.filter((q) => q.normalizedReviewTags.some((t) => selected.has(t)));
+  }, [allQuestions, exportConfig, vaultData.filteredQuestions]);
 
   const unifiedExportOptions = useMemo(() => ({
     title: 'Tagged Questions',
@@ -225,10 +227,12 @@ export default function TaggedRepoScreen() {
   }), []);
 
   const unifiedExportPayload = useMemo(() => {
+    // Issue #18 fix: Use filtered questions (respects active filters) not allQuestions
+    const questionsToExport = vaultData.filteredQuestions || allQuestions;
     const groups = uniqueTags
       .map((tag) => ({
         tag,
-        questions: allQuestions
+        questions: questionsToExport
           .filter((q) => (q.normalizedReviewTags || []).includes(normalizeTag(tag)))
           .map((q: any) => ({
             id: q.id,
@@ -247,7 +251,7 @@ export default function TaggedRepoScreen() {
       }))
       .filter((x) => x.questions.length > 0);
     return { kind: 'tags' as const, groups };
-  }, [uniqueTags, allQuestions]);
+  }, [uniqueTags, allQuestions, vaultData.filteredQuestions]);
 
   const toggleMultiTag = (tag: string) => {
     setExportConfig((prev) => {

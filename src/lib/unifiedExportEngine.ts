@@ -579,24 +579,13 @@ const renderQaLayoutBlock = (questionHtml: string, answerHtml: string, o: Export
 export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions): string => {
   const rows = sortQuestions(filterQuestions(rowsRaw, o), o);
 
-  // TOC groups by subject
-  const subjectsUsed: string[] = [];
-  rows.forEach(r => {
-    const s = r.subject || 'General';
-    if (!subjectsUsed.includes(s)) subjectsUsed.push(s);
-  });
-  const tocHtml = o.showTOC && subjectsUsed.length > 0 ? `
-    <div class="toc">
-      <div class="toc-title">Table of Contents</div>
-      ${subjectsUsed.map(s => `<div class="toc-item">${escapeHtml(s)}</div>`).join('')}
-    </div>` : '';
-
   const showOpts = o.contentScope !== 'q_only';
   const showExpl = o.contentScope === 'q_options_expl';
   const isFlashStyle = o.visualStyle === 'flashcard';
   const inline = isFlashStyle ? true : o.answerPlacement === 'inline';
 
-  const itemsHtml = rows.map((q, i) => {
+  // Helper to render a single question item
+  const renderQuestionItem = (q: ExportQuestion, i: number) => {
     const stem = q.question_text || q.statement || '';
     const meta = [q.subject, q.section_group, q.micro_topic, q.exam_year, q.is_pyq ? 'PYQ' : null, q.is_ncert ? 'NCERT' : null]
       .filter(Boolean).map(x => `<span class="pill">${escapeHtml(String(x))}</span>`).join('');
@@ -637,7 +626,113 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
       </div>`;
     }
     return `<div class="item">${renderQaLayoutBlock(questionBlock, answerBlock, o)}</div>`;
-  }).join('');
+  };
+
+  // ── Hierarchical grouping for subject-based sorts ──
+  const needsGrouping = ['subject', 'subject_section', 'subject_section_microtopic'].includes(o.sortBy);
+
+  if (needsGrouping) {
+    // Build grouped structure: Subject → Section Group → Microtopic → Questions
+    const groups: Map<string, Map<string, Map<string, ExportQuestion[]>>> = new Map();
+    rows.forEach(q => {
+      const sub = q.subject || 'General';
+      const sec = q.section_group || 'General';
+      const mic = q.micro_topic || 'Other';
+      if (!groups.has(sub)) groups.set(sub, new Map());
+      const secMap = groups.get(sub)!;
+      if (!secMap.has(sec)) secMap.set(sec, new Map());
+      const micMap = secMap.get(sec)!;
+      if (!micMap.has(mic)) micMap.set(mic, []);
+      micMap.get(mic)!.push(q);
+    });
+
+    // TOC with hierarchy
+    const tocItems: string[] = [];
+    groups.forEach((secMap, sub) => {
+      tocItems.push(`<div class="toc-item" style="font-weight:800">${escapeHtml(sub)}</div>`);
+      if (o.sortBy !== 'subject') {
+        secMap.forEach((micMap, sec) => {
+          tocItems.push(`<div class="toc-item" style="padding-left:12px">${escapeHtml(sec)}</div>`);
+        });
+      }
+    });
+    const tocHtml = o.showTOC && tocItems.length > 0 ? `
+      <div class="toc">
+        <div class="toc-title">Table of Contents</div>
+        ${tocItems.join('')}
+      </div>` : '';
+
+    // Render grouped HTML with headings
+    let globalIdx = 0;
+    const sectionsHtml: string[] = [];
+
+    groups.forEach((secMap, sub) => {
+      sectionsHtml.push(`<h1 style="color:var(--accent);font-size:${o.fontSize + 6}pt;font-weight:900;margin:8mm 0 4mm 0;border-bottom:2px solid var(--accent);padding-bottom:2mm">${escapeHtml(sub)}</h1>`);
+
+      if (o.sortBy === 'subject') {
+        // Flat list under subject heading
+        secMap.forEach((micMap) => {
+          micMap.forEach((questions) => {
+            questions.forEach(q => {
+              sectionsHtml.push(renderQuestionItem(q, globalIdx++));
+            });
+          });
+        });
+      } else {
+        secMap.forEach((micMap, sec) => {
+          sectionsHtml.push(`<h2 style="color:var(--fg);font-size:${o.fontSize + 3}pt;font-weight:800;margin:6mm 0 3mm 0;opacity:0.85">${escapeHtml(sec)}</h2>`);
+
+          if (o.sortBy === 'subject_section') {
+            // Flat list under section heading
+            micMap.forEach((questions) => {
+              questions.forEach(q => {
+                sectionsHtml.push(renderQuestionItem(q, globalIdx++));
+              });
+            });
+          } else {
+            // subject_section_microtopic — full 3-level hierarchy
+            micMap.forEach((questions, mic) => {
+              sectionsHtml.push(`<h3 style="color:var(--accent);font-size:${o.fontSize + 1}pt;font-weight:700;margin:4mm 0 2mm 2mm;opacity:0.75">${escapeHtml(mic)}</h3>`);
+              questions.forEach(q => {
+                sectionsHtml.push(renderQuestionItem(q, globalIdx++));
+              });
+            });
+          }
+        });
+      }
+    });
+
+    // Answer key appendix
+    const answerKey = !isFlashStyle && !inline && (o.contentScope !== 'q_only')
+      ? `<div class="answer-key">
+          <h2>Answer Key${showExpl ? ' & Explanations' : ''}</h2>
+          ${rows.map((q, i) => {
+            const a = (q.correct_answer || '').toUpperCase();
+            const e = q.explanation_markdown || q.explanation || '';
+            return `<div class="ak-row">
+              <span class="ak-num">${i + 1}.</span>${a ? `<b>Ans: ${a}</b>` : ''}
+              ${showExpl && e ? `<div class="expl" style="margin-top:1mm">${renderInline(e)}</div>` : ''}
+            </div>`;
+          }).join('')}
+        </div>`
+      : '';
+
+    return wrap(o, `${tocHtml}<div class="cols">${sectionsHtml.join('')}</div>`, answerKey);
+  }
+
+  // ── Flat rendering for non-subject sorts ──
+  const subjectsUsed: string[] = [];
+  rows.forEach(r => {
+    const s = r.subject || 'General';
+    if (!subjectsUsed.includes(s)) subjectsUsed.push(s);
+  });
+  const tocHtml = o.showTOC && subjectsUsed.length > 0 ? `
+    <div class="toc">
+      <div class="toc-title">Table of Contents</div>
+      ${subjectsUsed.map(s => `<div class="toc-item">${escapeHtml(s)}</div>`).join('')}
+    </div>` : '';
+
+  const itemsHtml = rows.map((q, i) => renderQuestionItem(q, i)).join('');
 
   // Answer key appendix if not inline
   const answerKey = !isFlashStyle && !inline && (o.contentScope !== 'q_only')

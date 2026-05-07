@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { KVStore } from '../src/lib/kvStore';
+import { OfflineManager } from '../src/services/OfflineManager';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import * as Print from 'expo-print';
@@ -451,6 +452,15 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   };
 
   const fetchQuestionsForTests = async (testIds: string[]) => {
+    // OFFLINE-FIRST: use cached questions when available.
+    const cachedQuestions = OfflineManager.getOfflineQuestionsAllSync() || [];
+    if (cachedQuestions.length > 0) {
+      const cachedRows = cachedQuestions.filter((q: any) => testIds.includes(q.test_id));
+      if (cachedRows.length > 0) {
+        return cachedRows;
+      }
+    }
+
     const rows: any[] = [];
     let from = 0;
     while (true) {
@@ -492,10 +502,17 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     }
 
     try {
-      const { data: tests, error: testError } = await supabase
-        .from('tests')
-        .select('id, title, subject, level, paper_type, section_group, exam_year, launch_year, institute, program_id, program_name, series');
-      if (testError) throw testError;
+      // OFFLINE-FIRST: use cached tests metadata first.
+      let tests: any[] = (OfflineManager as any).getOfflineTestsSync?.() || [];
+
+      if (!tests || tests.length === 0) {
+        const { data: networkTests, error: testError } = await supabase
+          .from('tests')
+          .select('id, title, subject, level, paper_type, section_group, exam_year, launch_year, institute, program_id, program_name, series');
+        if (testError) throw testError;
+        tests = networkTests || [];
+      }
+
       const relevantTests = (tests || []).filter((test: any) => {
         const institute = String(test.institute || '').trim().toLowerCase();
         const programId = String(test.program_id || '').trim().toLowerCase();

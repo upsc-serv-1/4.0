@@ -181,8 +181,7 @@ export const UnifiedExportSheet: React.FC<Props> = ({
 
   const run = async (cols: 1 | 2) => {
     if (!payload || isExporting) return;
-    let didSucceed = false;
-    const watchdog = setTimeout(() => setIsExporting(false), 22000);
+    const watchdog = setTimeout(() => setIsExporting(false), 12000);
     try {
       setIsExporting(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -197,7 +196,6 @@ export const UnifiedExportSheet: React.FC<Props> = ({
         : payload;
 
       await exportToPdf(payloadForExport, { ...opts, columns: cols }, { prependHtml });
-      didSucceed = true;
     } catch (e: any) {
       console.error('Export failed', e);
       Alert.alert('Export failed', e?.message || 'Could not generate PDF right now.');
@@ -205,10 +203,10 @@ export const UnifiedExportSheet: React.FC<Props> = ({
       clearTimeout(watchdog);
       setIsExporting(false);
     }
-
-    if (didSucceed) {
-      Alert.alert('Export ready', 'Your PDF was generated and opened in the share/download sheet.');
-    }
+    // Note: we deliberately do NOT show a follow-up "Export ready" Alert here.
+    // The OS share/print sheet is already on screen at this point; popping
+    // another modal on top of (or right after) it is what was making the
+    // app appear unresponsive when the user returned from the share sheet.
   };
 
   const Chip = ({ active, onPress, children, testID }: any) => (

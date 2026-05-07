@@ -1002,7 +1002,9 @@ async function printStandaloneReport(fragmentHtml: string, o: ExportOptions): Pr
   const info = await FileSystem.getInfoAsync(dest);
   const finalUri = info.exists ? dest : uri;
   if (await Sharing.isAvailableAsync()) {
-    await Sharing.shareAsync(finalUri, { mimeType: 'application/pdf', dialogTitle: o.title || 'Analysis Report' });
+    // Fire-and-forget: see comment in unifiedExportEngine.sharePdfWithTimeout.
+    Sharing.shareAsync(finalUri, { mimeType: 'application/pdf', dialogTitle: o.title || 'Analysis Report' }).catch(() => null);
+    await new Promise<void>((resolve) => setTimeout(resolve, 250));
   }
 }
 

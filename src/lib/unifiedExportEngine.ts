@@ -1313,11 +1313,20 @@ const injectExecutiveSummary = (html: string, prependHtml?: string): string => {
 };
 
 const sharePdfWithTimeout = async (uri: string, dialogTitle: string): Promise<void> => {
-  const timeoutMs = 20000;
-  await Promise.race([
-    Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle }).catch(() => null),
-    new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs)),
-  ]);
+  // Fire-and-forget: hand the PDF to the OS share/print sheet and resolve the
+  // promise immediately. Awaiting Sharing.shareAsync on Android keeps the
+  // calling component (UnifiedExportSheet) in an "isExporting" state for as
+  // long as the user is browsing the share/print menu, which manifests as
+  // the app being unresponsive when they return. We instead let the UI
+  // recover the moment the system sheet appears.
+  try {
+    Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle }).catch(() => null);
+  } catch {
+    // ignore — UI is already unblocked
+  }
+  // Brief settle so the system sheet has time to appear before the caller
+  // dismisses any "preparing" UI.
+  await new Promise<void>((resolve) => setTimeout(resolve, 250));
 };
 
 export async function exportToPdf(payload: ExportPayload, options: ExportOptions, extras: ExportRenderExtras = {}): Promise<string> {

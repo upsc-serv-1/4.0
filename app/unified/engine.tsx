@@ -2227,6 +2227,13 @@ export default function UnifiedQuizEngine() {
   };
 
   const handleExit = () => {
+    // Issue #8: If not showing index and in learning mode, show index first
+    // instead of navigating away. Only exit on second press or from index view.
+    if (!isFromSearch && arenaMode === 'learning' && !showIndex) {
+      setShowIndex(true);
+      return;
+    }
+
     if (arenaMode === 'exam') {
       setShowSaveSessionModal(true);
       return;

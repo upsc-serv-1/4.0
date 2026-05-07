@@ -323,10 +323,10 @@ Soft Notes lives at `/softnotes` (deep-link-able). Wiring it into the bottom-tab
 |---|---|---|---|
 | B1 | Schema migration + types + service + smoothing utils | 🔄 in progress | (this commit) |
 | B2 | Notebooks Hub screen (`/softnotes`) | ✅ done | (this commit) |
-| B3 | Notebook editor shell (`/softnotes/[notebookId]`) — page list + selected page | ⬜ todo | — |
-| B4 | SoftCanvas component — Skia render + pen + eraser drawing on selected page | ⬜ todo | — |
-| B5 | Highlighter + tape + shape tools, color/width palette | ⬜ todo | — |
-| B6 | Pinch-zoom + pan + double-tap reset (canvas transform hook) | ⬜ todo | — |
+| B3 | Notebook editor shell (`/softnotes/[notebookId]`) — page list + selected page | ✅ done | (this commit) |
+| B4 | SoftCanvas component — Skia render + pen + eraser drawing on selected page | ✅ done | (this commit) |
+| B5 | Highlighter + tape + shape tools, color/width palette | ✅ pen + HL + eraser + tape (shape deferred) | (this commit) |
+| B6 | Pinch-zoom + pan + double-tap reset (canvas transform hook) | ✅ done | (this commit) |
 | B7 | Lasso selection + move/copy/delete | ⬜ todo | — |
 | B8 | Text-box tool | ⬜ todo | — |
 | B9 | Undo/redo + page reorder + page delete | ⬜ todo | — |
@@ -362,3 +362,53 @@ Soft Notes lives at `/softnotes` (deep-link-able). Wiring it into the bottom-tab
 3. (Optional) Database → Replication → enable for `soft_strokes` if real-time multi-device sync is desired later.
 
 _Next → Batch B2: Notebooks Hub at `/softnotes`._
+
+### 2026-02 · Path B Batch 2 — Notebooks Hub
+
+**Files**
+- `app/softnotes/_layout.tsx` — Stack layout
+- `app/softnotes/index.tsx` — Hub (loads via `SoftNotebookService.list`)
+
+**Behaviour**
+- 2 / 4 / 5-column adaptive grid (phone / tablet / wide).
+- Each notebook card = colored cover + title + 3-dot menu (Pin / Archive / Delete).
+- "Active" / "Archived" toggle in header.
+- FAB → modal with name input + 8 cover swatches → `SoftNotebookService.create()` seeds first page → routes to editor.
+- Empty-state copy guides the owner toward applying the migration if creates fail.
+
+### 2026-02 · Path B Batches 3-6 — Editor + Canvas + Tools + Pinch-Zoom
+
+**Files**
+- `app/softnotes/[notebookId].tsx` — editor screen (header, page rail/strip, canvas area, docked toolbar)
+- `src/softnotes/SoftCanvas.tsx` — Skia canvas with smoothing + 3 gestures
+- `src/softnotes/SoftToolbar.tsx` — floating tool palette (pen / HL / eraser / tape + colour swatches + 3 widths + undo/redo)
+- `src/softnotes/useSoftPage.ts` — page-strokes hook with insert/remove/undo/redo
+
+**SoftCanvas details (Notability-style)**
+- Single-finger pan = **draw** — runs through `start → move → finish` with a 4 ms sample throttle.
+- Two-finger pan = **scroll/pan the canvas** (`Gesture.Pan().minPointers(2).maxPointers(2)`).
+- Pinch = **zoom** clamped to [0.25, 4].
+- Double-tap = **reset transform** (zoom 1, pan 0).
+- All three transform gestures are composed with `Gesture.Simultaneous(...)` so they can run together.
+- Touch coords are converted screen → canvas via `screenToCanvas(zoom, panX, panY)` so persisted strokes stay in **canvas coordinates** regardless of current zoom/pan.
+- Each stroke is smoothed via `smoothStroke()` (Catmull-Rom → cubic Bezier) on commit and persisted via `SoftStrokeService.insert`.
+- Eraser uses bounding-box pre-filter then per-point hit-test with tolerance scaled by 1/zoom (so it stays useful when zoomed in).
+- Highlighter renders with `blendMode: 'multiply'` and 1.8× width.
+- Tape renders as opaque, butt-cap, miter-join wide path with min width 24.
+- Live + persisted strokes share the same render branch.
+
+**Paper styles**
+- `plain` (no guides), `ruled` (28 px lines), `grid` (24 px), `dotted` (24 px), `cornell` (left margin + horizontal rule). Drawn natively via Skia `Rect` primitives — no images.
+
+**Editor screen**
+- iPad: 96 px page rail on left + canvas centre.
+- Phone: horizontal page strip on top + canvas below.
+- Header: back button, eyebrow + editable notebook title (tap to rename, blur to save), `+ Page` button.
+- Floating SoftToolbar centred at the bottom of the canvas area.
+- `useSoftPage` provides per-page undo/redo (up to current session). Both buttons appear in the toolbar with disabled states.
+
+**Open a notebook**
+- From the hub: tap a notebook card → `router.push('/softnotes/<id>')`.
+- Direct link: `https://<your-app>.dev/softnotes/<id>` works thanks to file-based routing.
+
+_Next → Batch B7: lasso selection + move/copy/delete._

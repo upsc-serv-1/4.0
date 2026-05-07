@@ -354,15 +354,14 @@ export default function AISearchTab() {
 
     // Sync flashcard state and tags with backend
     if (previewQuestion && session?.user?.id) {
-      // 1. Check flashcard status
+      // 1. Check flashcard status (same relation-based lookup as full engine)
       supabase
         .from('user_cards')
-        .select('id')
+        .select('cards!inner(question_id)')
         .eq('user_id', session.user.id)
-        .eq('card_id', previewQuestion.id)
-        .maybeSingle()
+        .in('cards.question_id', [previewQuestion.id])
         .then(({ data }) => {
-          setPreviewFlashcard(!!data);
+          setPreviewFlashcard(!!(data && data.length > 0));
         })
         .catch(err => console.error("Flashcard sync check failed:", err));
 

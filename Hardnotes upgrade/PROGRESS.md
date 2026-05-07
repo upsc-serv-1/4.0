@@ -301,3 +301,64 @@ When that phase begins, fork from `main` (not from `hardnotes-renovation`), as t
 - `PageInkOverlay` accepts `pencilOnly?: boolean` (default `false`). It is currently a no-op — wiring it to `onTouchesDown(... manager.fail())` is the next concrete file-4 task.
 
 _Branch state: 8 batches recorded. Ready for review / merge._
+
+---
+
+# 🚀 Path B — Notability Clone (Soft Notes) Implementation
+
+User requested **2026-02**: *"lets start path B now, 100% implement file 3, 4, 5 go and don't stop, also keep updating progress md file"*.
+
+**Reality check:** the spec describes a 24-week, 940+ hour, 3-4 engineer programme. A single agent session cannot 100%-implement every line of files 3-5. The strategy is therefore:
+
+1. Build the **foundational architecture** that locks in every key decision (data model, services, routes, smoothing, transforms, gestures) so subsequent feature work is incremental.
+2. Ship a **working Notebooks Hub → Notebook Editor → Canvas** end-to-end as soon as possible.
+3. Layer in tools (pen / highlighter / eraser / tape / lasso / shape / text), pinch-zoom, palm rejection, undo/redo iteratively after that.
+4. Document every deferred item with a concrete hook-in point.
+
+Soft Notes lives at `/softnotes` (deep-link-able). Wiring it into the bottom-tab bar is a one-line owner change in `TabConfigService` later.
+
+## Path B Batch Plan
+
+| # | Title | Status | Commit |
+|---|---|---|---|
+| B1 | Schema migration + types + service + smoothing utils | 🔄 in progress | (this commit) |
+| B2 | Notebooks Hub screen (`/softnotes`) | ⬜ todo | — |
+| B3 | Notebook editor shell (`/softnotes/[notebookId]`) — page list + selected page | ⬜ todo | — |
+| B4 | SoftCanvas component — Skia render + pen + eraser drawing on selected page | ⬜ todo | — |
+| B5 | Highlighter + tape + shape tools, color/width palette | ⬜ todo | — |
+| B6 | Pinch-zoom + pan + double-tap reset (canvas transform hook) | ⬜ todo | — |
+| B7 | Lasso selection + move/copy/delete | ⬜ todo | — |
+| B8 | Text-box tool | ⬜ todo | — |
+| B9 | Undo/redo + page reorder + page delete | ⬜ todo | — |
+| B10 | Pencil-only / palm rejection | ⬜ todo | — |
+| B11 | Polish: paper styles (ruled / grid / dotted), notebook cover thumbnails, archive | ⬜ todo | — |
+
+## Activity Log — Path B
+
+### 2026-02 · Path B Batch 1 — Foundation
+
+**Files**
+- `src/softnotes/types.ts` — `Notebook`, `Page`, `SoftStroke`, `SoftStrokePoint`, `BezierPoint`, `TextBox`, `SoftSelection`, `CanvasTransform`, page-size + transform defaults
+- `src/softnotes/service.ts` — `SoftNotebookService` / `SoftPageService` / `SoftStrokeService` / `SoftTextBoxService` (thin Supabase CRUD)
+- `src/softnotes/strokes.ts` — Catmull-Rom → cubic-Bezier smoothing, velocity, pressure-from-velocity, bounding box, point-in-polygon (lasso), screen↔canvas coord conversion
+- `Hardnotes upgrade/SOFTNOTES_MIGRATION.sql` — 4-table schema with RLS + updated_at triggers (owner runs once)
+
+**Schema (apply once via Supabase dashboard → SQL Editor)**
+- `soft_notebooks` — id, user_id, name, cover_color, paper_style, archived, pinned, timestamps
+- `soft_pages` — id, notebook_id, order_index, width, height, paper_style, timestamps
+- `soft_strokes` — id, page_id, tool, color, width, opacity, raw_points (jsonb), bezier_points (jsonb), bounding_box (jsonb), z_index, created_at
+- `soft_text_boxes` — id, page_id, x, y, width, height, content, font_size, font_family, color, z_index, timestamps
+- All RLS-protected via `auth.uid() = user_id` on the notebook chain. RLS is enabled, policies are owner-only.
+
+**Architecture decisions**
+- **Separate tables** from `user_notes` — Soft Notes is a distinct product per file 5. This avoids polluting the existing Hardnotes data model.
+- **Raw points are source of truth.** `bezier_points` is a *cached* projection of raw_points through `smoothStroke()`; we recompute on edit but persist to avoid recomputing on read.
+- **No Redux.** File 5 suggests Redux, but our app already uses bare React state + Supabase (matching the rest of the codebase). A custom hook (`useSoftPage`) will play that role in Batch B4.
+- **Coordinates are page-local.** Canvas-space x/y are stored, never screen-space — pinch/pan are pure visual transforms (Batch B6).
+
+**Owner action required**
+1. Open Supabase dashboard → SQL Editor → New query
+2. Paste contents of `Hardnotes upgrade/SOFTNOTES_MIGRATION.sql` → Run
+3. (Optional) Database → Replication → enable for `soft_strokes` if real-time multi-device sync is desired later.
+
+_Next → Batch B2: Notebooks Hub at `/softnotes`._

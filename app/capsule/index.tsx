@@ -1,20 +1,16 @@
 /**
- * Capsule Home (Subject Hub).
- *
- * Step 3 deliverable — replicates Screen 1 from the bible spec / screenshots:
- *   • Top bar with title, search, +New CTA
- *   • Left sidebar (Home / Pinned / Recent / Shared / Trash + Subject list)
- *   • Main content: Continue Studying / Pinned / Recent grids OR an empty
- *     state when the user has no subjects yet.
- *
- * In Step 4 the sidebar transforms into the dynamic expandable tree.
+ * Capsule Home — single-route Subject Hub with the dynamic expandable
+ * sidebar (per bible spec). Right pane swaps between:
+ *   • Dashboard (Continue Studying / Pinned / Recent)  — when no node selected
+ *   • Notebook list                                    — when subject/topic/subtopic selected
+ *   • (Glance/editor lives at /capsule/glance/[id] etc — Step 6+)
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl,
   ActivityIndicator, useWindowDimensions, Modal,
 } from 'react-native';
-import { Plus, X as CloseIcon, Sparkles } from 'lucide-react-native';
+import { Plus, X as CloseIcon, Sparkles, BookOpen } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
@@ -23,13 +19,16 @@ import { CapsuleSidebar, CapsuleSidebarSection } from '../../src/components/caps
 import { CapsuleTopBar } from '../../src/components/capsule/CapsuleTopBar';
 import { CapsuleNoteCard } from '../../src/components/capsule/CapsuleNoteCard';
 import { CapsuleCreatePrompt } from '../../src/components/capsule/CapsuleCreatePrompt';
+import { CapsuleBreadcrumb } from '../../src/components/capsule/CapsuleBreadcrumb';
 import {
   fetchAllCapsuleNodes, createCapsuleNode, pinCapsuleNode, buildCapsuleTree,
+  createNotebookRow, CapsuleTreeNode,
 } from '../../src/repositories/capsuleRepo';
-import { CapsuleNode, CAPSULE_SUBJECT_PALETTE } from '../../src/types/capsule';
+import {
+  CapsuleNode, CapsuleNodeType, CAPSULE_SUBJECT_PALETTE,
+} from '../../src/types/capsule';
 import { supabase } from '../../src/lib/supabase';
 
-const SIDEBAR_WIDTH = 280;
 const TABLET_BREAKPOINT = 900;
 
 interface NotebookSummary {
@@ -39,6 +38,20 @@ interface NotebookSummary {
   updatedAt: string;
   pageCount: number;
 }
+
+const CHILD_TYPE: Record<CapsuleNodeType, CapsuleNodeType | null> = {
+  subject:  'topic',
+  topic:    'subtopic',
+  subtopic: 'notebook',
+  notebook: null,
+};
+
+const NEW_LABEL: Record<CapsuleNodeType, string> = {
+  subject:  '+ New Topic',
+  topic:    '+ New Subtopic',
+  subtopic: '+ New Notebook',
+  notebook: '+ New Notebook',
+};
 
 export default function CapsuleHome() {
   const { colors } = useTheme();
@@ -52,10 +65,18 @@ export default function CapsuleHome() {
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
   const [layout, setLayout] = useState<'grid' | 'list'>('grid');
+
+  /* hierarchy navigation state */
   const [activeSection, setActiveSection] = useState<CapsuleSidebarSection>('home');
-  const [activeSubjectId, setActiveSubjectId] = useState<string | null>(null);
-  const [createOpen, setCreateOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [sidebarOpenMobile, setSidebarOpenMobile] = useState(false);
+
+  /* create-node prompt */
+  const [createState, setCreateState] = useState<{
+    open: boolean; type: CapsuleNodeType; parentId: string | null;
+  }>({ open: false, type: 'subject', parentId: null });
+
   const [notebookPages, setNotebookPages] = useState<Record<string, number>>({});
 
   const userId = session?.user?.id || '';
@@ -65,23 +86,16 @@ export default function CapsuleHome() {
     const list = await fetchAllCapsuleNodes(userId);
     setNodes(list);
 
-    // Pre-fetch page counts for visible notebooks (lightweight)
-    const notebookIds = list.filter((n) => n.type === 'notebook' && n.note_id).map((n) => n.note_id!) as string[];
-    if (notebookIds.length) {
-      const { data } = await supabase
-        .from('user_notes')
-        .select('id,content')
-        .in('id', notebookIds);
+    const noteIds = list.filter((n) => n.type === 'notebook' && n.note_id).map((n) => n.note_id!) as string[];
+    if (noteIds.length) {
+      const { data } = await supabase.from('user_notes').select('id,content').in('id', noteIds);
       const counts: Record<string, number> = {};
       (data || []).forEach((row: any) => {
-        try {
-          const blocks = JSON.parse(row.content || '{}')?.blocks;
-          counts[row.id] = Array.isArray(blocks) ? blocks.length : 0;
-        } catch {
-          counts[row.id] = 0;
-        }
+        try { counts[row.id] = JSON.parse(row.content || '{}')?.blocks?.length || 0; } catch { counts[row.id] = 0; }
       });
       setNotebookPages(counts);
+    } else {
+      setNotebookPages({});
     }
   }, [userId]);
 
@@ -104,83 +118,163 @@ export default function CapsuleHome() {
   /* ---------------- Derived data ---------------- */
 
   const tree = useMemo(() => buildCapsuleTree(nodes), [nodes]);
-  const subjects = useMemo(() => nodes.filter((n) => n.type === 'subject'), [nodes]);
-  const notebooks = useMemo(() => nodes.filter((n) => n.type === 'notebook'), [nodes]);
 
-  const subjectIndex = useMemo(() => {
-    const map = new Map<string, CapsuleNode>();
-    nodes.forEach((n) => map.set(n.id, n));
-    return map;
+  const nodeIndex = useMemo(() => {
+    const m = new Map<string, CapsuleNode>();
+    nodes.forEach((n) => m.set(n.id, n));
+    return m;
   }, [nodes]);
+
+  const treeIndex = useMemo(() => {
+    const m = new Map<string, CapsuleTreeNode>();
+    const walk = (arr: CapsuleTreeNode[]) => arr.forEach((n) => { m.set(n.id, n); walk(n.children); });
+    walk(tree);
+    return m;
+  }, [tree]);
+
+  const breadcrumbTrail: CapsuleNode[] = useMemo(() => {
+    if (!selectedId) return [];
+    const trail: CapsuleNode[] = [];
+    let cur = nodeIndex.get(selectedId) || null;
+    while (cur) {
+      trail.unshift(cur);
+      cur = cur.parent_id ? nodeIndex.get(cur.parent_id) || null : null;
+    }
+    return trail;
+  }, [selectedId, nodeIndex]);
 
   const resolveSubject = useCallback((node: CapsuleNode): CapsuleNode | null => {
     let cur: CapsuleNode | undefined = node;
     while (cur && cur.type !== 'subject' && cur.parent_id) {
-      cur = subjectIndex.get(cur.parent_id) as CapsuleNode | undefined;
+      cur = nodeIndex.get(cur.parent_id) as CapsuleNode | undefined;
     }
     return cur && cur.type === 'subject' ? cur : null;
-  }, [subjectIndex]);
+  }, [nodeIndex]);
 
-  const summaries: NotebookSummary[] = useMemo(() => {
-    const enriched = notebooks.map((n) => {
-      const subject = resolveSubject(n);
-      const pageCount = n.note_id ? (notebookPages[n.note_id] || 0) : 0;
-      return {
-        node: n,
-        subjectTitle: subject?.title || 'Capsule',
-        subjectColor:
-          (subject?.color as string) ||
-          CAPSULE_SUBJECT_PALETTE[subject?.title || ''] ||
-          CAPSULE_SUBJECT_PALETTE.default,
-        updatedAt: n.updated_at || n.created_at || '',
-        pageCount,
-      } as NotebookSummary;
-    });
-    enriched.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
-    return enriched;
-  }, [notebooks, notebookPages, resolveSubject]);
+  const allNotebooks = useMemo(() => nodes.filter((n) => n.type === 'notebook'), [nodes]);
+  const subjects = useMemo(() => nodes.filter((n) => n.type === 'subject'), [nodes]);
 
-  const filteredSummaries = useMemo(() => {
+  const summarize = useCallback((notebook: CapsuleNode): NotebookSummary => {
+    const subj = resolveSubject(notebook);
+    return {
+      node: notebook,
+      subjectTitle: subj?.title || 'Capsule',
+      subjectColor:
+        (subj?.color as string) ||
+        CAPSULE_SUBJECT_PALETTE[subj?.title || ''] ||
+        CAPSULE_SUBJECT_PALETTE.default,
+      updatedAt: notebook.updated_at || notebook.created_at || '',
+      pageCount: notebook.note_id ? (notebookPages[notebook.note_id] || 0) : 0,
+    };
+  }, [resolveSubject, notebookPages]);
+
+  const allSummaries = useMemo(
+    () => allNotebooks.map(summarize).sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || '')),
+    [allNotebooks, summarize]
+  );
+
+  const filteredAll = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return summaries;
-    return summaries.filter(
+    if (!q) return allSummaries;
+    return allSummaries.filter(
       (s) => s.node.title.toLowerCase().includes(q) || s.subjectTitle.toLowerCase().includes(q)
     );
-  }, [summaries, search]);
+  }, [allSummaries, search]);
 
-  const continueStudying = filteredSummaries.slice(0, 4);
-  const pinnedNotes = useMemo(
-    () => filteredSummaries.filter((s) => s.node.is_pinned).slice(0, 4),
-    [filteredSummaries]
-  );
-  const recentNotes = filteredSummaries.slice(0, 9);
+  /** Notebooks under the currently selected subtree. */
+  const scopedSummaries: NotebookSummary[] = useMemo(() => {
+    if (!selectedId) {
+      switch (activeSection) {
+        case 'pinned':  return filteredAll.filter((s) => s.node.is_pinned);
+        case 'recent':  return filteredAll;
+        case 'shared':  return [];
+        case 'trash':   return [];
+        default:        return filteredAll;
+      }
+    }
+    const root = treeIndex.get(selectedId);
+    if (!root) return [];
+    const out: NotebookSummary[] = [];
+    const walk = (n: CapsuleTreeNode) => {
+      if (n.type === 'notebook') out.push(summarize(n));
+      n.children.forEach(walk);
+    };
+    walk(root);
+    const q = search.trim().toLowerCase();
+    return q
+      ? out.filter((s) => s.node.title.toLowerCase().includes(q))
+      : out;
+  }, [selectedId, treeIndex, summarize, activeSection, filteredAll, search]);
 
   /* ---------------- Actions ---------------- */
 
-  const handleCreateSubject = async ({ title, color }: { title: string; color?: string }) => {
+  const openCreate = (type: CapsuleNodeType, parentId: string | null) =>
+    setCreateState({ open: true, type, parentId });
+
+  const handleCreate = async ({ title, color }: { title: string; color?: string }) => {
     if (!userId) return;
+    const { type, parentId } = createState;
+    let noteId: string | null = null;
+    if (type === 'notebook') {
+      const subject = parentId ? resolveSubject(nodeIndex.get(parentId)!) : null;
+      noteId = await createNotebookRow({
+        userId, subject: subject?.title || 'Capsule', title,
+      });
+    }
     const node = await createCapsuleNode({
-      userId, type: 'subject', title, color: color || null, parentId: null,
+      userId, type, title,
+      color: color || null,
+      parentId: parentId || null,
+      noteId,
     });
-    if (node) setNodes((prev) => [...prev, node]);
-    setCreateOpen(false);
+    if (node) {
+      setNodes((prev) => [...prev, node]);
+      // auto-expand the newly created parent if applicable
+      if (parentId) setExpandedIds((prev) => new Set(prev).add(parentId));
+      // auto-select the new node so user immediately sees the tree update
+      setSelectedId(node.id);
+    }
+    setCreateState((s) => ({ ...s, open: false }));
   };
 
-  const handleSelectSubject = (subjectId: string) => {
-    setActiveSubjectId(subjectId);
-    // Step 4 will navigate inside the same view; for now route to /capsule/subject/[id]
-    router.push({ pathname: '/capsule/subject/[id]', params: { id: subjectId } } as any);
+  const handleSelectNode = (n: CapsuleTreeNode) => {
+    if (n.type === 'notebook' && n.note_id) {
+      router.push({ pathname: '/capsule/glance/[id]', params: { id: n.note_id } } as any);
+      return;
+    }
+    setSelectedId(n.id);
+    setSidebarOpenMobile(false);
+  };
+
+  const handleToggleExpand = (n: CapsuleTreeNode) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(n.id)) next.delete(n.id); else next.add(n.id);
+      return next;
+    });
   };
 
   const handleSectionChange = (section: CapsuleSidebarSection) => {
     setActiveSection(section);
-    setActiveSubjectId(null);
+    setSelectedId(null);
     setSidebarOpenMobile(false);
   };
 
   const handleTogglePin = async (notebookId: string, current: boolean) => {
     setNodes((prev) => prev.map((n) => (n.id === notebookId ? { ...n, is_pinned: !current } : n)));
     await pinCapsuleNode(notebookId, !current);
+  };
+
+  const handleNewBtn = () => {
+    if (!selectedId) {
+      openCreate('subject', null);
+      return;
+    }
+    const cur = nodeIndex.get(selectedId);
+    if (!cur) return openCreate('subject', null);
+    const childType = CHILD_TYPE[cur.type];
+    if (!childType) return; // notebook leaf
+    openCreate(childType, cur.id);
   };
 
   /* ---------------- Render ---------------- */
@@ -197,14 +291,25 @@ export default function CapsuleHome() {
 
   const sidebarNode = (
     <CapsuleSidebar
-      subjects={subjects}
+      tree={tree}
+      expandedIds={expandedIds}
+      selectedId={selectedId}
       activeSection={activeSection}
-      activeSubjectId={activeSubjectId}
       onSelectSection={handleSectionChange}
-      onSelectSubject={handleSelectSubject}
-      onAddSubject={() => setCreateOpen(true)}
+      onSelectNode={handleSelectNode}
+      onToggleExpand={handleToggleExpand}
+      onAddSubject={() => openCreate('subject', null)}
+      onAddChild={(parent) => {
+        const childType = CHILD_TYPE[parent.type];
+        if (childType) openCreate(childType, parent.id);
+      }}
     />
   );
+
+  const selectedNode = selectedId ? nodeIndex.get(selectedId) : null;
+  const titleForBar = selectedNode?.title || 'Capsule';
+  const newLabel = selectedNode ? NEW_LABEL[selectedNode.type] : '+ New';
+  const canCreateChild = !selectedNode || CHILD_TYPE[selectedNode.type] !== null;
 
   return (
     <PageWrapper>
@@ -240,17 +345,32 @@ export default function CapsuleHome() {
         {/* Main content */}
         <View style={styles.main}>
           <CapsuleTopBar
-            title="Capsule"
+            title={titleForBar}
             searchValue={search}
             onSearchChange={setSearch}
-            onNew={() => setCreateOpen(true)}
-            newLabel="+ New"
+            onNew={handleNewBtn}
+            newLabel={canCreateChild ? newLabel : '+ New'}
             layout={layout}
             onToggleLayout={() => setLayout((l) => (l === 'grid' ? 'list' : 'grid'))}
             onMenuPress={() => setSidebarOpenMobile(true)}
-            onBack={() => router.back()}
+            onBack={() => {
+              if (selectedId) {
+                const cur = nodeIndex.get(selectedId);
+                setSelectedId(cur?.parent_id ?? null);
+              } else {
+                router.back();
+              }
+            }}
             showSidebarToggle={!isTablet}
           />
+
+          {selectedId && (
+            <CapsuleBreadcrumb
+              trail={breadcrumbTrail}
+              onJump={(i) => setSelectedId(breadcrumbTrail[i].id)}
+              onJumpRoot={() => setSelectedId(null)}
+            />
+          )}
 
           <ScrollView
             style={styles.scroll}
@@ -258,74 +378,139 @@ export default function CapsuleHome() {
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
           >
             {loading ? (
-              <View style={styles.center}>
-                <ActivityIndicator color={colors.primary} />
-              </View>
+              <View style={styles.center}><ActivityIndicator color={colors.primary} /></View>
+            ) : selectedId ? (
+              <NodeContent
+                summaries={scopedSummaries}
+                isTablet={isTablet}
+                onOpen={(n) => n.note_id && router.push({ pathname: '/capsule/glance/[id]', params: { id: n.note_id } } as any)}
+                onTogglePin={handleTogglePin}
+                onCreate={handleNewBtn}
+                createLabel={canCreateChild ? newLabel : ''}
+                emptyHint={selectedNode?.type === 'notebook' ? 'Open this notebook from the tree' : 'No notebooks yet — create one'}
+              />
             ) : subjects.length === 0 ? (
-              <EmptyState colors={colors} onCreate={() => setCreateOpen(true)} />
+              <EmptyState colors={colors} onCreate={() => openCreate('subject', null)} />
             ) : (
-              <>
-                <Section
-                  title="Continue Studying"
-                  items={continueStudying}
-                  columns={isTablet ? 4 : 2}
-                  emptyHint="Open a notebook to see it here"
-                  onOpen={(n) => router.push({ pathname: '/capsule/glance/[id]', params: { id: n.id } } as any)}
-                  onTogglePin={handleTogglePin}
-                />
-
-                <Section
-                  title="Pinned Notes"
-                  items={pinnedNotes}
-                  columns={isTablet ? 2 : 1}
-                  emptyHint="Pin notebooks with the ⭐ icon to keep them handy"
-                  showStar
-                  showPagesCount
-                  onOpen={(n) => router.push({ pathname: '/capsule/glance/[id]', params: { id: n.id } } as any)}
-                  onTogglePin={handleTogglePin}
-                />
-
-                <Section
-                  title="Recent Notes"
-                  items={recentNotes}
-                  columns={isTablet ? 3 : 1}
-                  emptyHint="Recently edited notebooks land here"
-                  showStar
-                  onOpen={(n) => router.push({ pathname: '/capsule/glance/[id]', params: { id: n.id } } as any)}
-                  onTogglePin={handleTogglePin}
-                />
-              </>
+              <DashboardSections
+                summaries={filteredAll}
+                isTablet={isTablet}
+                onOpen={(n) => n.note_id && router.push({ pathname: '/capsule/glance/[id]', params: { id: n.note_id } } as any)}
+                onTogglePin={handleTogglePin}
+              />
             )}
           </ScrollView>
         </View>
       </View>
 
       <CapsuleCreatePrompt
-        visible={createOpen}
-        type="subject"
-        onCancel={() => setCreateOpen(false)}
-        onCreate={handleCreateSubject}
+        visible={createState.open}
+        type={createState.type}
+        defaultColor={createState.type === 'subject' ? CAPSULE_SUBJECT_PALETTE.default : null}
+        onCancel={() => setCreateState((s) => ({ ...s, open: false }))}
+        onCreate={handleCreate}
       />
     </PageWrapper>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/* Helpers                                                                    */
+/* Sections                                                                    */
 /* -------------------------------------------------------------------------- */
 
+const DashboardSections: React.FC<{
+  summaries: NotebookSummary[];
+  isTablet: boolean;
+  onOpen: (n: CapsuleNode) => void;
+  onTogglePin: (id: string, current: boolean) => void;
+}> = ({ summaries, isTablet, onOpen, onTogglePin }) => (
+  <>
+    <Section
+      title="Continue Studying" items={summaries.slice(0, isTablet ? 4 : 4)} columns={isTablet ? 4 : 2}
+      emptyHint="Open a notebook to see it here"
+      onOpen={onOpen} onTogglePin={onTogglePin}
+    />
+    <Section
+      title="Pinned Notes" items={summaries.filter((s) => s.node.is_pinned).slice(0, 4)} columns={isTablet ? 2 : 1}
+      emptyHint="Pin notebooks with the ⭐ icon to keep them handy"
+      showStar showPagesCount onOpen={onOpen} onTogglePin={onTogglePin}
+    />
+    <Section
+      title="Recent Notes" items={summaries.slice(0, 9)} columns={isTablet ? 3 : 1}
+      emptyHint="Recently edited notebooks land here"
+      showStar onOpen={onOpen} onTogglePin={onTogglePin}
+    />
+  </>
+);
+
+const NodeContent: React.FC<{
+  summaries: NotebookSummary[];
+  isTablet: boolean;
+  onOpen: (n: CapsuleNode) => void;
+  onTogglePin: (id: string, current: boolean) => void;
+  onCreate: () => void;
+  createLabel: string;
+  emptyHint: string;
+}> = ({ summaries, isTablet, onOpen, onTogglePin, onCreate, createLabel, emptyHint }) => {
+  const { colors } = useTheme();
+  if (summaries.length === 0) {
+    return (
+      <View style={styles.emptyWrap}>
+        <View style={[styles.emptyIcon, { backgroundColor: hex(colors.primary, 0.12) }]}>
+          <BookOpen color={colors.primary} size={36} />
+        </View>
+        <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>{emptyHint}</Text>
+        {!!createLabel && (
+          <TouchableOpacity
+            testID="capsule-node-empty-create"
+            onPress={onCreate}
+            style={[styles.cta, { backgroundColor: colors.primary }]}
+          >
+            <Plus color="#fff" size={16} strokeWidth={2.5} />
+            <Text style={styles.ctaText}>{createLabel.replace(/^\+\s*/, '')}</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  }
+  return (
+    <View style={[styles.section, { paddingTop: 12 }]}>
+      <View style={[styles.grid, { gap: 12 }]}>
+        {chunkInto(summaries, isTablet ? 3 : 1).map((row, i) => (
+          <View key={i} style={[styles.gridRow, { gap: 12 }]}>
+            {row.map((s) => (
+              <CapsuleNoteCard
+                key={s.node.id}
+                testID={`capsule-card-${s.node.id}`}
+                title={s.node.title}
+                subject={s.subjectTitle}
+                color={s.subjectColor}
+                pinned={!!s.node.is_pinned}
+                pagesCount={s.pageCount}
+                subtitle={formatTimestamp(s.updatedAt)}
+                iconKey="note"
+                onPress={() => onOpen(s.node)}
+                onTogglePin={() => onTogglePin(s.node.id, !!s.node.is_pinned)}
+              />
+            ))}
+            {row.length < (isTablet ? 3 : 1) &&
+              Array.from({ length: (isTablet ? 3 : 1) - row.length }).map((_, j) => (
+                <View key={`spacer-${j}`} style={{ flex: 1 }} />
+              ))}
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
+
 const Section: React.FC<{
-  title: string;
-  items: NotebookSummary[];
-  columns: number;
-  emptyHint?: string;
-  showStar?: boolean;
-  showPagesCount?: boolean;
+  title: string; items: NotebookSummary[]; columns: number; emptyHint?: string;
+  showStar?: boolean; showPagesCount?: boolean;
   onOpen: (n: CapsuleNode) => void;
   onTogglePin: (id: string, current: boolean) => void;
 }> = ({ title, items, columns, emptyHint, showStar, showPagesCount, onOpen, onTogglePin }) => {
   const { colors } = useTheme();
-
   return (
     <View style={styles.section}>
       <View style={styles.sectionHead}>
@@ -334,9 +519,7 @@ const Section: React.FC<{
       </View>
 
       {items.length === 0 ? (
-        <Text style={[styles.emptyHint, { color: colors.textTertiary }]} testID={`capsule-empty-${title.replace(/\s/g,'-').toLowerCase()}`}>
-          {emptyHint}
-        </Text>
+        <Text style={[styles.emptyHint, { color: colors.textTertiary }]}>{emptyHint}</Text>
       ) : (
         <View style={[styles.grid, { gap: 12 }]}>
           {chunkInto(items, columns).map((row, i) => (
@@ -351,7 +534,7 @@ const Section: React.FC<{
                   pinned={showStar ? !!s.node.is_pinned : undefined}
                   pagesCount={showPagesCount ? s.pageCount : undefined}
                   subtitle={formatTimestamp(s.updatedAt)}
-                  iconKey={s.node.type === 'notebook' ? 'note' : 'folder'}
+                  iconKey="note"
                   onPress={() => onOpen(s.node)}
                   onTogglePin={() => onTogglePin(s.node.id, !!s.node.is_pinned)}
                 />
@@ -389,7 +572,12 @@ const EmptyState: React.FC<{ colors: any; onCreate: () => void }> = ({ colors, o
   </View>
 );
 
+/* -------------------------------------------------------------------------- */
+/* Helpers                                                                     */
+/* -------------------------------------------------------------------------- */
+
 function chunkInto<T>(arr: T[], n: number): T[][] {
+  if (n <= 0) return [arr];
   const out: T[][] = [];
   for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
   return out;
@@ -400,8 +588,7 @@ function formatTimestamp(iso: string): string {
   try {
     const d = new Date(iso);
     const now = new Date();
-    const diffMs = now.getTime() - d.getTime();
-    const diffH = diffMs / 3600_000;
+    const diffH = (now.getTime() - d.getTime()) / 3600_000;
     if (diffH < 24 && now.toDateString() === d.toDateString()) {
       return `Today, ${d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
     }
@@ -421,7 +608,7 @@ function hex(c: string, alpha: number): string {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Styles                                                                     */
+/* Styles                                                                      */
 /* -------------------------------------------------------------------------- */
 
 const styles = StyleSheet.create({
@@ -429,7 +616,6 @@ const styles = StyleSheet.create({
   main: { flex: 1, flexDirection: 'column' },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 80 },
-
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
 
   /* sections */
@@ -450,7 +636,7 @@ const styles = StyleSheet.create({
   /* empty */
   emptyWrap: { alignItems: 'center', paddingHorizontal: 32, paddingTop: 56 },
   emptyIcon: { width: 84, height: 84, borderRadius: 24, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
-  emptyTitle: { fontSize: 20, fontWeight: '700', marginBottom: 8, textAlign: 'center' },
+  emptyTitle: { fontSize: 18, fontWeight: '700', marginBottom: 8, textAlign: 'center' },
   emptyBody: { fontSize: 14, lineHeight: 20, textAlign: 'center', marginBottom: 24 },
   cta: {
     flexDirection: 'row', alignItems: 'center', gap: 8,

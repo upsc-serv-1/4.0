@@ -164,6 +164,8 @@ export default function AISearchTab() {
   const baseFontSizeRef = useRef(16);
   const zoomTimerRef = useRef<any>(null);
   const previewScrollRef = useRef<ScrollView>(null);
+  const flashcardOpLockRef = useRef(false);
+  const previewQuestionIdRef = useRef<string | null>(null);
   const [showZoomIndicator, setShowZoomIndicator] = useState(false);
   const FONT_SIZE_KEY = 'engine_font_size_v1';
 
@@ -279,6 +281,20 @@ export default function AISearchTab() {
       }
     }).catch(() => {});
   }, [previewQuestion?.id]);
+
+  React.useEffect(() => {
+    previewQuestionIdRef.current = previewQuestion?.id || null;
+  }, [previewQuestion?.id]);
+
+  const closePreviewModal = React.useCallback(() => {
+    flashcardOpLockRef.current = false;
+    setSavingFlashcard(false);
+    setAiExplainLoading(false);
+    setNotebookModalVisible(false);
+    setAff(prev => ({ ...prev, visible: false }));
+    setPreviewQuestion(null);
+    setPreviewRevealed(false);
+  }, []);
 
   // Fetch real user revision tags for the study tags section
   React.useEffect(() => {
@@ -508,10 +524,19 @@ export default function AISearchTab() {
     if (!session?.user?.id) return;
     const q = (qArg || previewQuestion) as SearchResult | null;
     if (!q) return;
+    if (flashcardOpLockRef.current || savingFlashcard) return;
 
+    flashcardOpLockRef.current = true;
     setSavingFlashcard(true);
+
+    const hint = {
+      subject: q.subject || 'General',
+      section_group: (q as any).section_group || (q as any).sectionGroup || 'General',
+      microtopic: (q as any).micro_topic || (q as any).microtopic || (q as any).microTopic || 'General',
+    };
+
     try {
-      // Same flow as full quiz engine: create card first, then open AddToFlashcardSheet.
+      // Same flow as full quiz engine: create/resolve card first, then open AddToFlashcardSheet.
       const explanations = buildCanonicalExplanations(q as any);
       const activeExplText = previewExplSource === 'ai'
         ? aiExplanation
@@ -519,22 +544,46 @@ export default function AISearchTab() {
           ? (bestAnswers[q.id]?.answer_text || '')
           : explanations.find((e: any) => e.sourceKey === previewExplSource)?.text || q.explanation_markdown || '';
 
+      const wasAlreadySaved = previewFlashcard;
       const cardId = await FlashcardSvc.createFromQuestion(session.user.id, q as any, activeExplText || undefined);
+
+      // If user closed preview while async work was in flight, don't mount overlays on top.
+      if (previewQuestionIdRef.current !== q.id) return;
+
       setPreviewFlashcard(true);
+      setAff({ visible: true, cardId, hint });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-      setAff({
-        visible: true,
-        cardId,
-        hint: {
-          subject: q.subject || 'General',
-          section_group: (q as any).section_group || (q as any).sectionGroup || 'General',
-          microtopic: (q as any).micro_topic || (q as any).microtopic || (q as any).microTopic || 'General',
-        },
-      });
+
+      if (wasAlreadySaved) {
+        Alert.alert('Already saved to flashcards');
+      }
     } catch (err: any) {
-      console.error('Flashcard Error:', err);
-      Alert.alert('Error', 'Failed to add to Flashcards. ' + (err.message || ''));
+      const msg = String(err?.message || err || '');
+      const duplicate = /duplicate key value|uq_user_cards_user_card|23505/i.test(msg);
+      if (duplicate) {
+        try {
+          const { data: existingCard } = await supabase
+            .from('cards')
+            .select('id')
+            .eq('question_id', q.id)
+            .maybeSingle();
+
+          if (existingCard?.id && previewQuestionIdRef.current === q.id) {
+            setPreviewFlashcard(true);
+            setAff({ visible: true, cardId: existingCard.id, hint });
+            Alert.alert('Already saved to flashcards');
+          } else {
+            Alert.alert('Already saved to flashcards');
+          }
+        } catch {
+          Alert.alert('Already saved to flashcards');
+        }
+      } else {
+        console.error('Flashcard Error:', err);
+        Alert.alert('Error', 'Failed to add to Flashcards. ' + msg);
+      }
     } finally {
+      flashcardOpLockRef.current = false;
       setSavingFlashcard(false);
     }
   };
@@ -2026,7 +2075,7 @@ export default function AISearchTab() {
             visible
             animationType="fade"
             transparent
-            onRequestClose={() => { setPreviewQuestion(null); setPreviewRevealed(false); }}
+            onRequestClose={closePreviewModal}
           >
             <View style={{ flex: 1, backgroundColor: 'rgba(10,10,20,0.65)', justifyContent: 'center', alignItems: 'center', padding: 16 }}>
               <View style={{ width: '100%', maxWidth: 650, maxHeight: '90%', flexShrink: 1, backgroundColor: colors.bg, borderRadius: 24, overflow: 'hidden', borderWidth: 1, borderColor: colors.border, shadowColor: '#000', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.4, shadowRadius: 32, elevation: 20 }}>
@@ -2042,7 +2091,7 @@ export default function AISearchTab() {
                     </View>
                   </View>
                   <TouchableOpacity
-                    onPress={() => { setPreviewQuestion(null); setPreviewRevealed(false); }}
+                    onPress={closePreviewModal}
                     style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center' }}
                   >
                     <X size={18} color={colors.textSecondary} />
@@ -2121,14 +2170,14 @@ export default function AISearchTab() {
                 <View style={{ flexDirection: 'row', gap: 12, padding: 16, borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.surface }}>
                   <TouchableOpacity
                     style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 48, borderRadius: 14, backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border }}
-                    onPress={() => { setPreviewQuestion(null); setPreviewRevealed(false); openQuestion(previewQuestion!, 'learning'); }}
+                    onPress={() => { const q = previewQuestion; closePreviewModal(); if (q) openQuestion(q, 'learning'); }}
                   >
                     <BookOpen size={16} color={colors.primary} />
                     <Text style={{ fontSize: 13, fontWeight: '800', color: colors.primary }}>Learn Mode</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 48, borderRadius: 14, backgroundColor: '#7c3aed' }}
-                    onPress={() => { setPreviewQuestion(null); setPreviewRevealed(false); openQuestion(previewQuestion!, 'exam'); }}
+                    onPress={() => { const q = previewQuestion; closePreviewModal(); if (q) openQuestion(q, 'exam'); }}
                   >
                     <Target size={16} color="#fff" />
                     <Text style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>Practice Exam</Text>

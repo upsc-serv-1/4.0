@@ -63,7 +63,8 @@ type SearchResult = {
   exam_year?: number;
   exam_group?: string;
   exam_stage?: string;
-  tests?: { institute?: string; series?: string; program_name?: string };
+  test_id?: string;
+  tests?: { id?: string; institute?: string; series?: string; program_name?: string };
   // Merger outputs
   _explanations?: Array<{ source: string; program: string; text: string; year: string; answer: string }>;
   _institutes?: string[];
@@ -415,18 +416,22 @@ export default function AISearchTab() {
 
   const handleToggleTag = async (qid: string, currentTags: string[], tag: string) => {
     if (!session?.user?.id) return;
-    const newTags = currentTags.includes(tag) 
-      ? currentTags.filter(t => t !== tag) 
+    const newTags = currentTags.includes(tag)
+      ? currentTags.filter(t => t !== tag)
       : [...currentTags, tag];
-    
+
     setPreviewStudyTags(newTags);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
 
     try {
-      // Sync to backend via StudentSync (consistent with Engine format)
+      // Use the same payload shape as full quiz engine so Arena/Tags flows stay consistent.
+      const activeQuestion = (previewQuestion?.id === qid ? previewQuestion : results.find(r => r.id === qid)) as any;
+      const resolvedTestId = activeQuestion?.test_id || activeQuestion?.tests?.id || 'manual';
+
       await StudentSync.enqueue('question_state', {
         userId: session.user.id,
         questionId: qid,
+        testId: resolvedTestId,
         patch: { review_tags: newTags }
       });
     } catch (err) {

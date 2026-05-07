@@ -10,7 +10,7 @@ import { router, useFocusEffect } from 'expo-router';
 import {
   Plus, Search as SearchIcon, X, Flame, Clock, Sparkles, Layers, ArrowUpDown,
   Folder, CheckCircle2, Minus, ChevronLeft, ArrowUpRight, Settings, MoreVertical,
-  FolderPlus, Play, ChevronRight
+  FolderPlus, Play, ChevronRight, Trash
 } from 'lucide-react-native';
 import { supabase } from '../src/lib/supabase';
 import { useAuth } from '../src/context/AuthContext';
@@ -43,6 +43,53 @@ export default function FlashcardsHub() {
   const [renameModal, setRenameModal] = useState<{ node: BranchNode } | null>(null);
   const [moveModal, setMoveModal] = useState<{ node: BranchNode } | null>(null);
   const [nameDraft, setNameDraft] = useState('');
+
+  // Bulk Delete Selection
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const handleToggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.size === 0) return;
+    Alert.alert(
+      'Delete Selected?',
+      `Are you sure you want to delete all ${selectedIds.size} selected folders/decks?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete All',
+          style: 'destructive',
+          onPress: async () => {
+            setLoading(true);
+            try {
+              const idsArray = Array.from(selectedIds);
+              for (const id of idsArray) {
+                await BranchSvc.softDelete(id);
+              }
+              setSelectedIds(new Set());
+              setIsSelectionMode(false);
+              await load();
+            } catch (e: any) {
+              Alert.alert('Delete failed', e?.message);
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ]
+    );
+  };
   
   const FOLDER_COLORS = ['#bae6fd', '#e0e7ff', '#fef3c7', '#fee2e2', '#dcfce7'];
   const [selectedColor, setSelectedColor] = useState(FOLDER_COLORS[0]);
@@ -293,25 +340,56 @@ export default function FlashcardsHub() {
     <PageWrapper>
       <View style={[styles.container, { backgroundColor: colors.bg }]}>
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
-          <View style={styles.headerTop}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <TouchableOpacity onPress={() => currentFolder ? setCurrentFolder(null) : router.back()} style={styles.iconBtn}>
-                <ChevronLeft size={28} color={colors.primary} />
-              </TouchableOpacity>
-              <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
-                {currentFolder ? currentFolder.name : 'Home'}
-              </Text>
+          {isSelectionMode ? (
+            <View style={[styles.headerTop, { justifyContent: 'space-between' }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <TouchableOpacity onPress={() => { setIsSelectionMode(false); setSelectedIds(new Set()); }} style={styles.iconBtn}>
+                  <X size={24} color={colors.textPrimary} />
+                </TouchableOpacity>
+                <Text style={{ fontSize: 18, fontWeight: '700', color: colors.textPrimary }}>
+                  {selectedIds.size} Selected
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <TouchableOpacity 
+                  onPress={() => {
+                    const allIds = displayRows.map(r => r.id);
+                    setSelectedIds(new Set(allIds));
+                  }} 
+                  style={[styles.iconBtn, { width: 'auto', paddingHorizontal: 10 }]}
+                >
+                  <Text style={{ color: colors.primary, fontWeight: '700', fontSize: 14 }}>Select All</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  onPress={handleBulkDelete} 
+                  disabled={selectedIds.size === 0}
+                  style={[styles.iconBtn, { opacity: selectedIds.size === 0 ? 0.4 : 1 }]}
+                >
+                  <Trash size={22} color="#ef4444" />
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={styles.headerBtns}>
-              <TouchableOpacity onPress={() => setCreateModal({ type: currentFolder ? 'deck' : 'folder' })} style={styles.iconBtn}>
-                <Plus size={22} color={colors.textPrimary} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setSearchVisible(v => !v)} style={styles.iconBtn}>
-                <SearchIcon size={22} color={colors.textPrimary} />
-              </TouchableOpacity>
-              <ThemeSwitcher />
+          ) : (
+            <View style={styles.headerTop}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TouchableOpacity onPress={() => currentFolder ? setCurrentFolder(null) : router.back()} style={styles.iconBtn}>
+                  <ChevronLeft size={28} color={colors.primary} />
+                </TouchableOpacity>
+                <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
+                  {currentFolder ? currentFolder.name : 'Home'}
+                </Text>
+              </View>
+              <View style={styles.headerBtns}>
+                <TouchableOpacity onPress={() => setCreateModal({ type: currentFolder ? 'deck' : 'folder' })} style={styles.iconBtn}>
+                  <Plus size={22} color={colors.textPrimary} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setSearchVisible(v => !v)} style={styles.iconBtn}>
+                  <SearchIcon size={22} color={colors.textPrimary} />
+                </TouchableOpacity>
+                <ThemeSwitcher />
+              </View>
             </View>
-          </View>
+          )}
           {searchVisible && (
             <View style={[styles.searchBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <SearchIcon size={16} color={colors.textTertiary} />
@@ -352,11 +430,42 @@ export default function FlashcardsHub() {
 
         <ScrollView showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />} contentContainerStyle={{ paddingBottom: 100 }}>
           <View style={{ paddingHorizontal: 4 }}>
-            {displayRows.map((item) => (
-              <View key={item.id}>
-                 <DeckRow node={item} expanded={expanded.has(item.id)} onToggle={() => toggleExpand(item.id)} onOpen={() => { if (item.is_folder && item.depth === 0) setCurrentFolder(item); else openDeck(item); }} onAction={(action) => onAction(item, action)} />
-              </View>
-            ))}
+            {displayRows.map((item) => {
+              const isSelected = selectedIds.has(item.id);
+              return (
+                <View key={item.id} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  {isSelectionMode && (
+                    <TouchableOpacity 
+                      onPress={() => handleToggleSelect(item.id)} 
+                      style={{ paddingLeft: 12, paddingRight: 4 }}
+                    >
+                      <CheckCircle2 
+                        size={24} 
+                        color={isSelected ? colors.primary : colors.border} 
+                        style={isSelected ? {} : { opacity: 0.5 }}
+                      />
+                    </TouchableOpacity>
+                  )}
+                  <View style={{ flex: 1 }}>
+                    <DeckRow 
+                      node={item} 
+                      expanded={expanded.has(item.id)} 
+                      onToggle={() => toggleExpand(item.id)} 
+                      onOpen={() => { 
+                        if (isSelectionMode) {
+                          handleToggleSelect(item.id);
+                        } else if (item.is_folder && item.depth === 0) {
+                          setCurrentFolder(item);
+                        } else {
+                          openDeck(item);
+                        }
+                      }} 
+                      onAction={(action) => onAction(item, action)} 
+                    />
+                  </View>
+                </View>
+              );
+            })}
           </View>
           {displayRows.length === 0 && (
             <View style={styles.empty}><Layers size={48} color={colors.border} /><Text style={{ color: colors.textTertiary, marginTop: 12 }}>Empty</Text></View>
@@ -383,6 +492,12 @@ export default function FlashcardsHub() {
                 title="Create folder" 
                 sub="Organize decks into folders" 
                 onPress={() => { setAddMenuVisible(false); setCreateModal({ type: 'folder' }); }} 
+              />
+              <AddMenuItem 
+                icon={<Trash size={22} color="#ef4444" />} 
+                title="Select & Delete" 
+                sub="Select and delete multiple folders/decks" 
+                onPress={() => { setAddMenuVisible(false); setIsSelectionMode(true); setSelectedIds(new Set()); }} 
               />
             </View>
           </Pressable>

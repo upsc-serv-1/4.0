@@ -11,17 +11,17 @@
  *   • Export: any row → UnifiedExportSheet (kind: 'notes') with all items
  *     under that subtree.
  */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Modal,
   Alert, Pressable, ActivityIndicator, KeyboardAvoidingView, Platform, Keyboard,
-  RefreshControl, Dimensions,
+  RefreshControl, Dimensions, Animated,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import {
   Folder, BookOpen, FileText, Plus, Search as SearchIcon, X, ChevronLeft, ChevronRight,
-  Layers, FolderPlus, LayoutGrid, List as ListIcon, Sparkles,
+  Layers, FolderPlus, LayoutGrid, List as ListIcon, Sparkles, Edit2, Trash2,
 } from 'lucide-react-native';
 import { supabase } from '../../src/lib/supabase';
 import { useAuth } from '../../src/context/AuthContext';
@@ -30,7 +30,7 @@ import { PremiumMoveSheet, MoveTarget } from '../../src/components/common/Premiu
 import { ThemeSwitcher } from '../../src/components/ThemeSwitcher';
 import { PageWrapper } from '../../src/components/PageWrapper';
 import { NoteRow, NoteNode, NoteRowAction } from '../../src/components/notes/NoteRow';
-import { SubjectHubGrid } from '../../src/components/notes/SubjectHubGrid';
+import { SubjectHubGrid, SUBJECT_PALETTE } from '../../src/components/notes/SubjectHubGrid';
 import { SemanticChipRow } from '../../src/components/notes/SemanticChipRow';
 import { GlancePanel, NoteItem } from '../../src/components/notes/GlancePanel';
 import { UnifiedExportSheet } from '../../src/components/export/UnifiedExportSheet';
@@ -66,6 +66,7 @@ export default function NotesIndex() {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [glanceOpen, setGlanceOpen] = useState<Set<string>>(new Set());
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [activeChip, setActiveChip] = useState<string>(ALL_TAG);
   const [hubLayout, setHubLayout] = useState<'grid' | 'list'>('grid');
   // Hide left navigation panel (full-screen notes mode)
@@ -88,6 +89,13 @@ export default function NotesIndex() {
     visible: false, node: null, payload: null, title: 'Notes Export',
   });
   const [exportPreparing, setExportPreparing] = useState(false);
+
+  // Context Menu & Edit Folder (Notability Style)
+  const [contextMenu, setContextMenu] = useState<{ visible: boolean; node: NoteNode | null; x: number; y: number }>({ visible: false, node: null, x: 0, y: 0 });
+  const [editFolderOpen, setEditFolderOpen] = useState(false);
+  const [editFolderTitle, setEditFolderTitle] = useState('');
+  const [editFolderColor, setEditFolderColor] = useState<string | null>(null);
+  const [editFolderLocked, setEditFolderLocked] = useState(false);
 
   const { tags: catalogTags } = useNoteTagCatalog(session?.user.id);
 
@@ -161,14 +169,17 @@ export default function NotesIndex() {
     if (!currentFolder) return;
     const flat = flattenAll(tree);
     const updated = flat.find((n) => n.id === currentFolder.id) || null;
-    
-    // Compare IDs to avoid infinite loops caused by new object references from flattenAll
-    if (updated && updated.id !== currentFolder.id) {
+    if (updated) {
       setCurrentFolder(updated);
-    } else if (!updated && currentFolder) {
+    } else {
       setCurrentFolder(null);
     }
   }, [tree]);
+
+  const selectedFolder = useMemo(() => {
+    if (!selectedFolderId) return null;
+    return flattenAll(tree).find(n => n.id === selectedFolderId) || null;
+  }, [selectedFolderId, tree]);
 
   // Reset selectedNoteId when folder changes
   useEffect(() => {
@@ -254,6 +265,10 @@ export default function NotesIndex() {
     });
   };
 
+  const handleScroll = (event: any) => {
+    // Scroll tracking logic removed per user request
+  };
+
   // Navigate into a folder — pushes current to stack for proper back navigation
   const navigateToFolder = (n: NoteNode) => {
     if (currentFolder) setFolderStack(s => [...s, currentFolder]);
@@ -272,6 +287,8 @@ export default function NotesIndex() {
       setCurrentFolder(parent);
     } else {
       setCurrentFolder(null);
+      setSelectedFolderId(null);
+      setSelectedNoteId(null);
     }
   };
 
@@ -374,7 +391,34 @@ export default function NotesIndex() {
           const { error } = await supabase.rpc('delete_note_node_cascade', {
             p_node_id: node.id, p_user_id: session.user.id,
           });
-          if (error) { Alert.alert('Delete failed', error.message); return; }
+          if (error) {
+            Alert.alert('Delete failed', error.message);
+            return;
+          }
+          
+          // IMMEDIATE UI UPDATE: Filter out the deleted node and all its descendants
+          const deletedIds = new Set<string>();
+          const collectIds = (id: string) => {
+            deletedIds.add(id);
+            allNodes.filter(n => n.parent_id === id).forEach(child => collectIds(child.id));
+          };
+          collectIds(node.id);
+          
+          const remainingNodes = allNodes.filter(n => !deletedIds.has(n.id));
+          setAllNodes(remainingNodes);
+          
+          // Update cache immediately
+          try {
+            const cacheKey = `user_notes_${session.user.id}`;
+            await AsyncStorage.setItem(cacheKey, JSON.stringify(remainingNodes));
+          } catch {}
+
+          // If we were inside the deleted folder, go back
+          if (currentFolder && deletedIds.has(currentFolder.id)) {
+            navigateBack();
+          }
+          
+          // Still call load() to ensure sync with server, but UI is already updated
           load();
         },
       },
@@ -593,12 +637,20 @@ export default function NotesIndex() {
                         onOpen={() => {
                           if ((item.type === 'note' || item.type === 'notebook') && item.note_id) {
                             setSelectedNoteId(item.note_id);
-                          } else {
-                            openNode(item);
+                            setSelectedFolderId(null);
+                          } else if (item.type === 'folder') {
+                            setSelectedFolderId(item.id);
+                            setSelectedNoteId(null);
+                            toggleExpand(item.id);
                           }
                         }}
                         onAction={(action) => onAction(item, action)}
-                        isHighlighted={selectedNoteId === item.note_id}
+                        isHighlighted={selectedNoteId === item.note_id || selectedFolderId === item.id}
+                        onLongPress={(x, y) => {
+                          if (item.type === 'folder') {
+                            setContextMenu({ visible: true, node: item, x, y });
+                          }
+                        }}
                       />
                     ))}
                   </View>
@@ -613,19 +665,20 @@ export default function NotesIndex() {
                 onPress={() => setLeftPanelHidden(h => !h)}
                 testID="notes-hide-panel-btn"
                 style={{
-                  position: 'absolute', top: 12, left: leftPanelHidden ? 12 : -1, zIndex: 10,
+                  position: 'absolute', top: 12, left: leftPanelHidden ? 12 : -10, zIndex: 100,
                   backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
-                  borderRadius: 10, padding: 6,
+                  borderRadius: 10, padding: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1, shadowRadius: 4, elevation: 4,
                 }}
               >
-                {leftPanelHidden ? <ChevronRight size={16} color={colors.textTertiary} /> : <ChevronLeft size={16} color={colors.textTertiary} />}
+                {leftPanelHidden ? <ChevronRight size={18} color={colors.primary} /> : <ChevronLeft size={18} color={colors.primary} />}
               </TouchableOpacity>
 
               {selectedNoteId ? (
                 <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 20, paddingTop: 48, paddingBottom: 100 }}>
                   <GlancePanel
                     noteId={selectedNoteId}
-                    contentWidth={leftPanelHidden ? SCREEN_WIDTH - 80 : SCREEN_WIDTH - 260 - 40}
+                    contentWidth={leftPanelHidden ? SCREEN_WIDTH - 80 : SCREEN_WIDTH - 286 - 40}
                     selectedTag={activeChip}
                     onPlay={() => {
                       const node = allNodes.find(n => n.note_id === selectedNoteId);
@@ -637,9 +690,43 @@ export default function NotesIndex() {
                     }}
                   />
                 </ScrollView>
+              ) : selectedFolderId ? (
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 20, paddingTop: 48, paddingBottom: 100 }}>
+                   <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                       <View style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center' }}>
+                         <Folder size={24} color={colors.primary} />
+                       </View>
+                       <View>
+                         <Text style={{ fontSize: 22, fontWeight: '900', color: colors.textPrimary }}>{selectedFolder?.title}</Text>
+                         <Text style={{ fontSize: 13, color: colors.textTertiary, fontWeight: '600' }}>{selectedFolder?.children.length || 0} items inside</Text>
+                       </View>
+                     </View>
+                     <TouchableOpacity 
+                       onPress={() => { setCreateParentId(selectedFolderId); setCreateType('notebook'); setCreateOpen(true); }}
+                       style={{ backgroundColor: colors.primary, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12 }}
+                     >
+                       <Text style={{ color: '#04223a', fontWeight: '900' }}>+ Create Inside</Text>
+                     </TouchableOpacity>
+                   </View>
+                   
+                   <SubjectHubGrid
+                     folders={selectedFolder?.children || []}
+                     onOpen={(n) => {
+                       if (n.type === 'folder') {
+                         setSelectedFolderId(n.id);
+                         setExpanded(prev => { const next = new Set(prev); next.add(n.id); return next; });
+                       } else if (n.note_id) {
+                         setSelectedNoteId(n.note_id);
+                         setSelectedFolderId(null);
+                       }
+                     }}
+                     onAction={onHubAction}
+                   />
+                </ScrollView>
               ) : (
                 <View style={styles.center}>
-                  <Text style={{ color: colors.textTertiary, fontSize: 16 }}>Select a note to preview glances</Text>
+                  <Text style={{ color: colors.textTertiary, fontSize: 16 }}>Select a note or folder to preview</Text>
                 </View>
               )}
             </View>
@@ -665,7 +752,11 @@ export default function NotesIndex() {
                 </View>
                 <View style={styles.headerBtns}>
                   <TouchableOpacity
-                    onPress={() => { setCreateParentId(currentFolder?.id ?? null); setAddMenuOpen(true); }}
+                    onPress={() => { 
+                      const pId = IS_WIDE ? (selectedFolderId || currentFolder?.id || null) : (currentFolder?.id || null);
+                      setCreateParentId(pId); 
+                      setAddMenuOpen(true); 
+                    }}
                     style={styles.iconBtn}
                     data-testid="vault-add-button"
                   >
@@ -694,59 +785,17 @@ export default function NotesIndex() {
                   </TouchableOpacity>
                 </View>
               )}
-            </View>
 
-            {/* Stats */}
-            <View style={styles.topActionArea}>
-              <View style={styles.statsBar}>
-                <View style={[styles.statBox, { backgroundColor: '#fef3c712' }]}>
-                  <View style={[styles.statIconBox, { backgroundColor: '#fef3c712' }]}>
-                    <Folder size={15} color="#f59e0b" />
-                  </View>
-                  <View>
-                    <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.folders}</Text>
-                    <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Folders</Text>
-                  </View>
-                </View>
-                <View style={[styles.statBox, { backgroundColor: '#dcfce712' }]}>
-                  <View style={[styles.statIconBox, { backgroundColor: '#dcfce712' }]}>
-                    <BookOpen size={15} color="#10b981" />
-                  </View>
-                  <View>
-                    <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.notebooks}</Text>
-                    <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Notebooks</Text>
-                  </View>
-                </View>
-                <View style={[styles.statBox, { backgroundColor: '#e0f2fe12' }]}>
-                  <View style={[styles.statIconBox, { backgroundColor: '#e0f2fe12' }]}>
-                    <FileText size={15} color="#0ea5e9" />
-                  </View>
-                  <View>
-                    <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.notes}</Text>
-                    <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Notes</Text>
-                  </View>
-                </View>
-                <View style={[styles.statBox, { backgroundColor: '#f5f0ff12' }]}>
-                  <View style={[styles.statIconBox, { backgroundColor: '#f5f0ff12' }]}>
-                    <Sparkles size={15} color="#7c5fe8" />
-                  </View>
-                  <View>
-                    <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.glances}</Text>
-                    <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Glances</Text>
-                  </View>
-                </View>
-              </View>
+              {/* Semantic chip row — only shown when inside a folder */}
+              {!showSubjectHub && (
+                <SemanticChipRow
+                  tags={catalogTags}
+                  selected={activeChip}
+                  onChange={setActiveChip}
+                  hint={activeChip !== ALL_TAG ? `Streaming "${activeChip}" across "${currentFolder?.title}"` : undefined}
+                />
+              )}
             </View>
-
-            {/* Semantic chip row — only shown when inside a folder */}
-            {!showSubjectHub && (
-              <SemanticChipRow
-                tags={catalogTags}
-                selected={activeChip}
-                onChange={setActiveChip}
-                hint={activeChip !== ALL_TAG ? `Streaming "${activeChip}" across "${currentFolder?.title}"` : undefined}
-              />
-            )}
 
             {exportPreparing && (
               <View style={styles.preparingBar}>
@@ -806,23 +855,16 @@ export default function NotesIndex() {
 
                     {hubLayout === 'grid' ? (
                       <SubjectHubGrid
-                        folders={topLevelFolders}
-                        onOpen={(n) => navigateToFolder(n)}
+                        folders={[...topLevelFolders, ...topLevelOrphans]}
+                        onOpen={(n) => {
+                          if (n.type === 'folder') navigateToFolder(n);
+                          else openNode(n);
+                        }}
                         onAction={onHubAction}
                       />
                     ) : (
                       <View style={{ paddingHorizontal: 4 }}>
-                        {topLevelFolders.map((item) => (
-                          <NoteRow
-                            key={item.id}
-                            node={item}
-                            expanded={expanded.has(item.id)}
-                            onToggle={() => toggleExpand(item.id)}
-                            onOpen={() => openNode(item)}
-                            onAction={(action) => onAction(item, action)}
-                          />
-                        ))}
-                        {topLevelOrphans.map((item) => {
+                        {[...topLevelFolders, ...topLevelOrphans].map((item) => {
                           const isNoteLike = (item.type === 'note' || item.type === 'notebook') && !!item.note_id;
                           const isGlance = glanceOpen.has(item.id);
                           return (
@@ -835,7 +877,7 @@ export default function NotesIndex() {
                                 onAction={(action) => onAction(item, action)}
                                 glanceExpanded={isNoteLike && isGlance}
                                 onToggleGlance={isNoteLike ? () => toggleGlance(item.id) : undefined}
-                                style={{ opacity: 0.55, borderStyle: 'dashed', borderColor: colors.border, borderWidth: 0.5, borderRadius: 12, marginHorizontal: 4 }}
+                                style={item.type !== 'folder' ? { opacity: 0.85, borderStyle: 'dashed', borderColor: colors.border, borderWidth: 0.5, borderRadius: 12, marginHorizontal: 4 } : undefined}
                               />
                               {isNoteLike && isGlance && item.note_id && (
                                 <GlancePanel
@@ -863,40 +905,85 @@ export default function NotesIndex() {
                   </>
                 ) : (
                   // INSIDE A FOLDER — Aichii Tree + Glance
-                  <View style={{ paddingHorizontal: 4 }}>
-                    {displayRows.map((item) => {
-                      const isNoteLike = (item.type === 'note' || item.type === 'notebook') && !!item.note_id;
-                      const isGlance = glanceOpen.has(item.id);
-                      return (
-                        <View key={item.id}>
-                          <NoteRow
-                            node={item}
-                            expanded={expanded.has(item.id)}
-                            onToggle={() => toggleExpand(item.id)}
-                            onOpen={() => openNode(item)}
-                            onAction={(action) => onAction(item, action)}
-                            glanceExpanded={isNoteLike && isGlance}
-                            onToggleGlance={isNoteLike ? () => toggleGlance(item.id) : undefined}
-                          />
-                          {isNoteLike && isGlance && item.note_id && (
-                            <GlancePanel
-                              noteId={item.note_id}
-                              contentWidth={SCREEN_WIDTH - 32}
-                              selectedTag={activeChip}
-                              onPlay={() => playNode(item)}
-                              onOpenEdit={() => openNode(item)}
-                            />
-                          )}
-                        </View>
-                      );
-                    })}
+                  <>
+                    <View style={styles.hubHeaderRow}>
+                      <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Contents</Text>
+                      <View style={[styles.viewToggle, { backgroundColor: colors.surfaceStrong }]}>
+                        <TouchableOpacity
+                          onPress={() => setHubLayout('grid')}
+                          style={[
+                            styles.viewToggleBtn,
+                            hubLayout === 'grid' && { backgroundColor: colors.surface }
+                          ]}
+                        >
+                          <LayoutGrid size={11} color={hubLayout === 'grid' ? colors.textPrimary : colors.textTertiary} />
+                          <Text style={[
+                            styles.viewToggleText,
+                            { color: hubLayout === 'grid' ? colors.textPrimary : colors.textTertiary }
+                          ]}>Grid</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => setHubLayout('list')}
+                          style={[
+                            styles.viewToggleBtn,
+                            hubLayout === 'list' && { backgroundColor: colors.surface }
+                          ]}
+                        >
+                          <ListIcon size={11} color={hubLayout === 'list' ? colors.textPrimary : colors.textTertiary} />
+                          <Text style={[
+                            styles.viewToggleText,
+                            { color: hubLayout === 'list' ? colors.textPrimary : colors.textTertiary }
+                          ]}>List</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+
+                    {hubLayout === 'grid' ? (
+                      <SubjectHubGrid
+                        folders={displayRows}
+                        onOpen={(n) => {
+                          if (n.type === 'folder') navigateToFolder(n);
+                          else openNode(n);
+                        }}
+                        onAction={onHubAction}
+                      />
+                    ) : (
+                      <View style={{ paddingHorizontal: 4 }}>
+                        {displayRows.map((item) => {
+                          const isNoteLike = (item.type === 'note' || item.type === 'notebook') && !!item.note_id;
+                          const isGlance = glanceOpen.has(item.id);
+                          return (
+                            <View key={item.id}>
+                              <NoteRow
+                                node={item}
+                                expanded={expanded.has(item.id)}
+                                onToggle={() => toggleExpand(item.id)}
+                                onOpen={() => openNode(item)}
+                                onAction={(action) => onAction(item, action)}
+                                glanceExpanded={isNoteLike && isGlance}
+                                onToggleGlance={isNoteLike ? () => toggleGlance(item.id) : undefined}
+                              />
+                              {isNoteLike && isGlance && item.note_id && (
+                                <GlancePanel
+                                  noteId={item.note_id}
+                                  contentWidth={SCREEN_WIDTH - 32}
+                                  selectedTag={activeChip}
+                                  onPlay={() => playNode(item)}
+                                  onOpenEdit={() => openNode(item)}
+                                />
+                              )}
+                            </View>
+                          );
+                        })}
+                      </View>
+                    )}
                     {displayRows.length === 0 && (
                       <View style={styles.empty}>
                         <Layers size={48} color={colors.border} />
                         <Text style={{ color: colors.textTertiary, marginTop: 12 }}>Empty here</Text>
                       </View>
                     )}
-                  </View>
+                  </>
                 )}
               </ScrollView>
             )}
@@ -1007,6 +1094,174 @@ export default function NotesIndex() {
           </KeyboardAvoidingView>
         </Modal>
 
+        {/* --- Context Menu (Notability Style) --- */}
+        <Modal
+          visible={contextMenu.visible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setContextMenu({ visible: false, node: null })}
+        >
+          <Pressable 
+            style={styles.modalOverlay} 
+            onPress={() => setContextMenu({ ...contextMenu, visible: false })}
+          >
+            <View style={[
+              styles.contextMenu, 
+              { 
+                backgroundColor: colors.surface, 
+                borderColor: colors.border,
+                position: 'absolute',
+                top: Math.min(contextMenu.y, Dimensions.get('window').height - 250),
+                left: Math.min(contextMenu.x, Dimensions.get('window').width - 240),
+              }
+            ]}>
+              <TouchableOpacity 
+                style={styles.contextItem}
+                onPress={() => {
+                  const node = contextMenu.node;
+                  setContextMenu({ visible: false, node: null });
+                  if (node) {
+                    setCreateParentId(node.id);
+                    setCreateType('folder');
+                    setCreateOpen(true);
+                  }
+                }}
+              >
+                <FolderPlus size={18} color={colors.textPrimary} />
+                <Text style={[styles.contextText, { color: colors.textPrimary }]}>Insert folder</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.contextItem}
+                onPress={() => {
+                  const node = contextMenu.node;
+                  setContextMenu({ visible: false, node: null });
+                  if (node) {
+                    setEditFolderTitle(node.title);
+                    setActionNodeId(node.id);
+                    setEditFolderOpen(true);
+                  }
+                }}
+              >
+                <Edit2 size={18} color={colors.textPrimary} />
+                <Text style={[styles.contextText, { color: colors.textPrimary }]}>Edit</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.contextItem}
+                onPress={() => {
+                  const node = contextMenu.node;
+                  setContextMenu({ visible: false, node: null });
+                  if (node) {
+                    setRenameValue(node.title);
+                    setActionNodeId(node.id);
+                    setRenameOpen(true);
+                  }
+                }}
+              >
+                <Edit2 size={18} color={colors.textPrimary} />
+                <Text style={[styles.contextText, { color: colors.textPrimary }]}>Rename</Text>
+              </TouchableOpacity>
+
+              <View style={[styles.contextDivider, { backgroundColor: colors.border }]} />
+
+              <TouchableOpacity 
+                style={styles.contextItem}
+                onPress={() => {
+                  const node = contextMenu.node;
+                  setContextMenu({ visible: false, node: null });
+                  if (node) doDelete(node);
+                }}
+              >
+                <Trash2 size={18} color="#ef4444" />
+                <Text style={[styles.contextText, { color: '#ef4444' }]}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </Pressable>
+        </Modal>
+
+        {/* --- Edit Folder Modal (Screenshot 3 Style) --- */}
+        <Modal
+          visible={editFolderOpen}
+          animationType="slide"
+          transparent={false}
+          onRequestClose={() => setEditFolderOpen(false)}
+        >
+          <PageWrapper>
+            <View style={[styles.fullModal, { backgroundColor: colors.bg }]}>
+              <View style={[styles.editModalHeader, { borderBottomColor: colors.border }]}>
+                <TouchableOpacity onPress={() => setEditFolderOpen(false)}>
+                  <Text style={{ color: colors.primary, fontSize: 16, fontWeight: '600' }}>Cancel</Text>
+                </TouchableOpacity>
+                <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>{editFolderTitle || 'Edit Folder'}</Text>
+                <TouchableOpacity onPress={async () => {
+                  // Perform Save (for now just rename)
+                  if (actionNodeId) {
+                    try {
+                      await supabase.rpc('rename_note_node', {
+                        p_node_id: actionNodeId, p_user_id: session?.user.id, p_title: editFolderTitle.trim(),
+                      });
+                      setEditFolderOpen(false);
+                      await load();
+                    } catch (err) {
+                      console.error("Save error:", err);
+                      Alert.alert("Error", "Failed to save changes.");
+                    }
+                  }
+                }}>
+                  <Text style={{ color: colors.primary, fontSize: 16, fontWeight: '700' }}>Save</Text>
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView style={{ flex: 1, padding: 20 }}>
+                <TextInput
+                  value={editFolderTitle}
+                  onChangeText={setEditFolderTitle}
+                  style={[styles.modalInput, { backgroundColor: colors.surface, color: colors.textPrimary, borderColor: colors.border }]}
+                  placeholder="Folder title"
+                />
+
+                <View style={{ marginTop: 24 }}>
+                  <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>CHOOSE COLOR</Text>
+                  <View style={styles.colorGrid}>
+                    {SUBJECT_PALETTE.map((p, i) => (
+                      <TouchableOpacity 
+                        key={i}
+                        onPress={() => setEditFolderColor(p.bg)}
+                        style={[
+                          styles.colorDot, 
+                          { backgroundColor: p.fg },
+                          editFolderColor === p.bg && { borderWidth: 3, borderColor: colors.textPrimary }
+                        ]}
+                      />
+                    ))}
+                  </View>
+                </View>
+
+                <View style={[styles.modalRow, { marginTop: 32 }]}>
+                  <Text style={{ color: colors.textPrimary, fontSize: 16, fontWeight: '600' }}>Lock folder</Text>
+                  {/* Switch would go here */}
+                  <View style={{ width: 50, height: 28, borderRadius: 14, backgroundColor: colors.border }} />
+                </View>
+
+                <TouchableOpacity 
+                  style={[styles.deleteBtn, { marginTop: 40 }]}
+                  onPress={() => {
+                    const node = allNodes.find(n => n.id === actionNodeId);
+                    if (node) {
+                      setEditFolderOpen(false);
+                      doDelete(node);
+                    }
+                  }}
+                >
+                  <Trash2 size={20} color="#ef4444" />
+                  <Text style={{ color: '#ef4444', fontSize: 16, fontWeight: '600', marginLeft: 8 }}>Delete folder</Text>
+                </TouchableOpacity>
+              </ScrollView>
+            </View>
+          </PageWrapper>
+        </Modal>
+
         <PremiumMoveSheet
           visible={moveOpen}
           title={`Move "${actionNode?.title}" to…`}
@@ -1052,7 +1307,7 @@ function flattenAll(nodes: NoteNode[]): NoteNode[] {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { borderBottomWidth: 1, paddingHorizontal: 14, paddingTop: 6, paddingBottom: 8 },
-  sidebar: { width: 260, borderRightWidth: 0.5 },
+  sidebar: { width: 286, borderRightWidth: 0.5 },
   splitContent: { flex: 1 },
   sidebarHeader: { borderBottomWidth: 0.5, paddingHorizontal: 12, paddingTop: 10, paddingBottom: 10 },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 },
@@ -1109,6 +1364,53 @@ const styles = StyleSheet.create({
   premiumInput: { height: 60, borderRadius: 18, paddingHorizontal: 20, fontSize: 17, fontWeight: '600', marginVertical: 24 },
   bigCreateBtn: { height: 60, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
   bigCreateBtnTxt: { color: '#04223a', fontSize: 17, fontWeight: '900' },
+
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.25)' },
+  contextMenu: {
+    width: 220,
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 20,
+  },
+  contextItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    gap: 12,
+    borderRadius: 12,
+  },
+  contextText: { fontSize: 15, fontWeight: '600' },
+  contextDivider: { height: 1, marginVertical: 4 },
+
+  fullModal: { flex: 1 },
+  editModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 0.5,
+  },
+  modalTitle: { fontSize: 17, fontWeight: '700' },
+  modalInput: {
+    height: 54,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  sectionLabel: { fontSize: 11, fontWeight: '800', marginBottom: 16, letterSpacing: 0.8, marginTop: 8 },
+  colorGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, justifyContent: 'center', paddingVertical: 10 },
+  colorDot: { width: 34, height: 34, borderRadius: 17 },
+  modalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 },
+  deleteBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 16, borderRadius: 14, borderWidth: 1, borderColor: '#fee2e2' },
 });
 
 function AddMenuItem({ icon, title, sub, onPress }: { icon: any, title: string, sub: string, onPress: () => void }) {

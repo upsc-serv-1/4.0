@@ -403,6 +403,18 @@ class OfflineManagerService {
         KVStore.setJson(`${USER_CARDS_PREFIX}${userId}`, Array.from(map.values()));
       }
 
+      // 5. Refresh cards
+      const { data: newCards } = await supabase
+        .from('cards')
+        .select('*')
+        .gte('updated_at', since);
+      if (newCards && newCards.length > 0) {
+        const existingCards = KVStore.getJson<any[]>(CARDS_PREFIX) ?? [];
+        const cardMap = new Map(existingCards.map((c) => [c.id, c]));
+        newCards.forEach((c) => cardMap.set(c.id, c));
+        KVStore.setJson(CARDS_PREFIX, Array.from(cardMap.values()));
+      }
+
       await this.setMetadata({ lastIncrementalSync: Date.now() });
     } catch (err) {
       console.warn('[Offline] Incremental sync failed (will retry later)', err);

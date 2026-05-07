@@ -63,19 +63,6 @@ export class BranchSvc {
       return sortRows(visible);
     };
 
-    // OFFLINE-FIRST: serve cached branches first.
-    if (!opts.includeArchived) {
-      try {
-        const cached = await AsyncStorage.getItem(cacheKey);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return filterRows(parsed as Branch[]);
-          }
-        }
-      } catch {}
-    }
-
     let q = supabase
       .from('flashcard_branches')
       .select('*')
@@ -85,9 +72,18 @@ export class BranchSvc {
       .order('name', { ascending: true });
     if (!opts.includeArchived) q = q.eq('is_archived', false);
 
-    const { data, error } = await q;
-    if (error) {
-      // Network failed -> retry from cache.
+    try {
+      const { data, error } = await q;
+      if (error) throw error;
+      const rows = (data ?? []) as Branch[];
+      if (!opts.includeArchived) {
+        try {
+          await AsyncStorage.setItem(cacheKey, JSON.stringify(rows));
+        } catch {}
+      }
+      return rows;
+    } catch (err) {
+      // Network failed -> fallback to cache.
       try {
         const cached = await AsyncStorage.getItem(cacheKey);
         if (cached) {
@@ -97,16 +93,8 @@ export class BranchSvc {
           }
         }
       } catch {}
-      throw error;
+      throw err;
     }
-
-    const rows = (data ?? []) as Branch[];
-    if (!opts.includeArchived) {
-      try {
-        await AsyncStorage.setItem(cacheKey, JSON.stringify(rows));
-      } catch {}
-    }
-    return rows;
   }
 
   static async create(userId: string, name: string, parent_id: string | null = null, is_folder: boolean = false): Promise<Branch> {
@@ -125,15 +113,24 @@ export class BranchSvc {
       .select()
       .single();
     if (error) throw error;
+    try {
+      await AsyncStorage.removeItem(`flashcard_branches_${userId}`);
+    } catch {}
     return data as Branch;
   }
 
   static async rename(branchId: string, name: string) {
+    const { data: b } = await supabase.from('flashcard_branches').select('user_id').eq('id', branchId).maybeSingle();
     const { error } = await supabase
       .from('flashcard_branches')
       .update({ name: name.trim(), updated_at: new Date().toISOString() })
       .eq('id', branchId);
     if (error) throw error;
+    if (b?.user_id) {
+      try {
+        await AsyncStorage.removeItem(`flashcard_branches_${b.user_id}`);
+      } catch {}
+    }
   }
 
   static async move(branchId: string, newParentId: string | null) {
@@ -146,36 +143,105 @@ export class BranchSvc {
       const { data } = await supabase.from('flashcard_branches').select('parent_id').eq('id', cur).maybeSingle();
       cur = (data as any)?.parent_id ?? null;
     }
+    const { data: b } = await supabase.from('flashcard_branches').select('user_id').eq('id', branchId).maybeSingle();
     const { error } = await supabase
       .from('flashcard_branches')
       .update({ parent_id: newParentId, updated_at: new Date().toISOString() })
       .eq('id', branchId);
     if (error) throw error;
+    if (b?.user_id) {
+      try {
+        await AsyncStorage.removeItem(`flashcard_branches_${b.user_id}`);
+      } catch {}
+    }
   }
 
   static async archive(branchId: string, archived = true) {
+    const { data: b } = await supabase.from('flashcard_branches').select('user_id').eq('id', branchId).maybeSingle();
     const { error } = await supabase
       .from('flashcard_branches')
       .update({ is_archived: archived, updated_at: new Date().toISOString() })
       .eq('id', branchId);
     if (error) throw error;
+    if (b?.user_id) {
+      try {
+        await AsyncStorage.removeItem(`flashcard_branches_${b.user_id}`);
+      } catch {}
+    }
+  }
+
+  /** Soft-delete (recoverable for 30 days at the UI layer). */
+  static async deleteBranch(branchId: string, userId: string): Promise<void> {
+    try {
+      // 1. Get all card IDs belonging to this branch (recursively if folder)
+      const cardIds = await this.listCardIdsInBranch(branchId, { recursive: true, userId });
+      
+      if (cardIds.length > 0) {
+        // 2. Mark all these cards as deleted in the cards table
+        const { error: cardsError } = await supabase
+          .from('cards')
+          .update({ is_deleted: true })
+          .in('id', cardIds);
+        
+        if (cardsError) {
+          console.error('[deleteBranch] Error marking cards as deleted:', cardsError);
+          throw cardsError;
+        }
+
+        // 3. Delete mappings from flashcard_branch_cards
+        await supabase
+          .from('flashcard_branch_cards')
+          .delete()
+          .in('card_id', cardIds)
+          .eq('user_id', userId);
+
+        // 4. Delete these cards from user_cards
+        await supabase
+          .from('user_cards')
+          .delete()
+          .in('card_id', cardIds)
+          .eq('user_id', userId);
+      }
+    } catch (err) {
+      console.error('[deleteBranch] Failed to soft-delete associated cards:', err);
+      throw err; // Re-throw so the caller knows deletion failed
+    }
+
+    // 5. Hard delete the branch from flashcard_branches
+    const { error } = await supabase
+      .from('flashcard_branches')
+      .delete()
+      .eq('id', branchId);
+    
+    if (error) throw error;
   }
 
   /** Soft-delete (recoverable for 30 days at the UI layer). */
   static async softDelete(branchId: string) {
-    const { error } = await supabase
-      .from('flashcard_branches')
-      .update({ is_deleted: true, updated_at: new Date().toISOString() })
-      .eq('id', branchId);
-    if (error) throw error;
+    const { data: b } = await supabase.from('flashcard_branches').select('user_id').eq('id', branchId).maybeSingle();
+    const userId = b?.user_id;
+    if (userId) {
+      await this.deleteBranch(branchId, userId);
+      try {
+        await AsyncStorage.removeItem(`flashcard_branches_${userId}`);
+        await AsyncStorage.removeItem(`flashcard_branch_cards_${userId}`);
+        await AsyncStorage.removeItem(`user_cards_${userId}`);
+      } catch {}
+    }
   }
 
   static async reorder(branchId: string, sort_order: number) {
+    const { data: b } = await supabase.from('flashcard_branches').select('user_id').eq('id', branchId).maybeSingle();
     const { error } = await supabase
       .from('flashcard_branches')
       .update({ sort_order, updated_at: new Date().toISOString() })
       .eq('id', branchId);
     if (error) throw error;
+    if (b?.user_id) {
+      try {
+        await AsyncStorage.removeItem(`flashcard_branches_${b.user_id}`);
+      } catch {}
+    }
   }
 
   // ─── CARD ↔ BRANCH MAPPING ──────────────────────────────────────────────
@@ -194,16 +260,27 @@ export class BranchSvc {
       .select('id')
       .single();
     if (error) throw error;
+    try {
+      await AsyncStorage.removeItem(`flashcard_branch_cards_${userId}`);
+      await AsyncStorage.removeItem(`user_cards_${userId}`);
+    } catch {}
     return data.id as string;
   }
 
   static async removeCardFromBranch(branchId: string, cardId: string) {
+    const { data: mapping } = await supabase.from('flashcard_branch_cards').select('user_id').eq('branch_id', branchId).eq('card_id', cardId).maybeSingle();
     const { error } = await supabase
       .from('flashcard_branch_cards')
       .delete()
       .eq('branch_id', branchId)
       .eq('card_id', cardId);
     if (error) throw error;
+    if (mapping?.user_id) {
+      try {
+        await AsyncStorage.removeItem(`flashcard_branch_cards_${mapping.user_id}`);
+        await AsyncStorage.removeItem(`user_cards_${mapping.user_id}`);
+      } catch {}
+    }
   }
 
   static async moveCardToBranch(userId: string, cardId: string, targetBranchId: string | null) {
@@ -219,6 +296,10 @@ export class BranchSvc {
     if (targetBranchId) {
       await this.addCardToBranch(userId, targetBranchId, cardId);
     }
+    try {
+      await AsyncStorage.removeItem(`flashcard_branch_cards_${userId}`);
+      await AsyncStorage.removeItem(`user_cards_${userId}`);
+    } catch {}
   }
 
   static async listCardIdsInBranch(branchId: string, opts: { recursive?: boolean; userId?: string } = {}): Promise<string[]> {
@@ -258,14 +339,6 @@ export class BranchSvc {
     let links: any[] = [];
 
     try {
-      const cached = await AsyncStorage.getItem(linksCacheKey);
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed)) links = parsed;
-      }
-    } catch {}
-
-    if (links.length === 0) {
       const { data, error: linkErr } = await supabase
         .from('flashcard_branch_cards')
         .select('branch_id, card_id')
@@ -275,6 +348,15 @@ export class BranchSvc {
       try {
         await AsyncStorage.setItem(linksCacheKey, JSON.stringify(links));
       } catch {}
+    } catch (err) {
+      try {
+        const cached = await AsyncStorage.getItem(linksCacheKey);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed)) links = parsed;
+        }
+      } catch {}
+      if (!links || links.length === 0) throw err;
     }
 
     const branchCardMap = new Map<string, Set<string>>(); // branch_id → Set<card_id>
@@ -298,14 +380,6 @@ export class BranchSvc {
       let userCardsRows: any[] = [];
 
       try {
-        const cached = await AsyncStorage.getItem(userCardsCacheKey);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed)) userCardsRows = parsed;
-        }
-      } catch {}
-
-      if (userCardsRows.length === 0) {
         // Batch in groups of 500 to avoid URL-too-long on big decks
         const CHUNK = 500;
         const fetchedRows: any[] = [];
@@ -323,6 +397,15 @@ export class BranchSvc {
         try {
           await AsyncStorage.setItem(userCardsCacheKey, JSON.stringify(userCardsRows));
         } catch {}
+      } catch (err) {
+        try {
+          const cached = await AsyncStorage.getItem(userCardsCacheKey);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed)) userCardsRows = parsed;
+          }
+        } catch {}
+        if (!userCardsRows || userCardsRows.length === 0) throw err;
       }
 
       userCardsRows

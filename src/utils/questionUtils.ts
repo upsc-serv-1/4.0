@@ -95,18 +95,21 @@ export const getPYQCategorization = (item: any) => {
     };
   }
 
-  const rawGroup = String(examInfo?.group || examInfo?.exam_name || '').trim();
+  let rawGroup = String(examInfo?.group || examInfo?.exam_name || '').trim();
+  if (!rawGroup && item?.exam_group) {
+    rawGroup = String(item.exam_group).trim();
+  }
   const groupNameUpper = rawGroup.toUpperCase();
 
-  const isUPSC = toBool(examInfo?.is_upsc_cse) || groupNameUpper === 'UPSC' || groupNameUpper.includes('UPSC CSE');
-  const isAllied = toBool(examInfo?.is_allied) || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => groupNameUpper.includes(g));
-  const isOther = toBool(examInfo?.is_others) || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => groupNameUpper.includes(g));
+  const isUPSC = toBool(examInfo?.is_upsc_cse) || toBool(item?.is_upsc_cse) || groupNameUpper === 'UPSC' || groupNameUpper.includes('UPSC CSE') || groupNameUpper.includes('IAS');
+  const isAllied = toBool(examInfo?.is_allied) || toBool(item?.is_allied) || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => groupNameUpper.includes(g));
+  const isOther = toBool(examInfo?.is_others) || toBool(item?.is_others) || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => groupNameUpper.includes(g));
 
   const rawYear = examInfo?.year ?? '';
   let year = typeof rawYear === 'string' ? rawYear.trim() : String(rawYear).trim();
 
   if (!year) {
-    const colYear = (item as any)?.exam_year;
+    const colYear = item?.exam_year;
     if (colYear !== undefined && colYear !== null && String(colYear).trim()) {
       year = String(colYear).trim();
     }

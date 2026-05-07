@@ -17,8 +17,8 @@ import {
   TrendingUp, BarChart2, Flame,
 } from 'lucide-react-native';
 import { PinchGestureHandler, State as GHState } from 'react-native-gesture-handler';
-import { FlashcardSvc } from '../src/services/FlashcardService';
 import * as Haptics from 'expo-haptics';
+import { useFlashcardAction } from '../src/hooks/useFlashcardAction';
 import { supabase } from '../src/lib/supabase';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
@@ -229,8 +229,6 @@ export default function AISearchTab() {
   const [previewAnswer, setPreviewAnswer] = useState<string | null>(null);
   const [previewExplSource, setPreviewExplSource] = useState<string>('all');
   const [previewStudyTags, setPreviewStudyTags] = useState<string[]>([]);
-  const [previewFlashcard, setPreviewFlashcard] = useState(false);
-  const [savingFlashcard, setSavingFlashcard] = useState(false);
   const [userTags, setUserTags] = useState<string[]>([]);
 
   // Notebook states for "Add to Notebook" parity
@@ -239,16 +237,16 @@ export default function AISearchTab() {
   const [previewNotebookDraft, setPreviewNotebookDraft] = useState<string>('');
   const [isSavingToNotebook, setIsSavingToNotebook] = useState(false);
 
-  // Flashcard placement sheet (same flow as full quiz engine)
-  const [aff, setAff] = useState<{
-    visible: boolean;
-    cardId: string | null;
-    hint: { subject?: string; section_group?: string; microtopic?: string };
-  }>({
-    visible: false,
-    cardId: null,
-    hint: { subject: 'General', section_group: 'General', microtopic: 'General' },
-  });
+  // Unified Flashcard Flow
+  const {
+    savingFlashcard,
+    flashcardedIds,
+    setFlashcardedIds,
+    aff,
+    setAff,
+    handleAddToFlashcards,
+    fetchFlashcardedStatus
+  } = useFlashcardAction(session?.user?.id);
 
   // MyVitamin sync (same source as full engine)
   const [bestAnswers, setBestAnswers] = useState<Record<string, BestAnswer | null>>({});
@@ -287,9 +285,14 @@ export default function AISearchTab() {
     previewQuestionIdRef.current = previewQuestion?.id || null;
   }, [previewQuestion?.id]);
 
+  React.useEffect(() => {
+    if (results.length > 0) {
+      fetchFlashcardedStatus(results.map(r => r.id));
+    }
+  }, [results]);
+
   const closePreviewModal = React.useCallback(() => {
     flashcardOpLockRef.current = false;
-    setSavingFlashcard(false);
     setAiExplainLoading(false);
     setNotebookModalVisible(false);
     setAff(prev => ({ ...prev, visible: false }));
@@ -329,7 +332,7 @@ export default function AISearchTab() {
       setPreviewAnswer(null);
       setPreviewExplSource('all');
       setPreviewStudyTags([]);
-      setPreviewFlashcard(false);
+      // Flashcard state handled via effect below
       setAiExplanation(null);
       setSelectedNotebook(null);
       setPreviewNotebookDraft('');
@@ -393,7 +396,9 @@ export default function AISearchTab() {
         .eq('user_id', session.user.id)
         .in('cards.question_id', [previewQuestion.id])
         .then(({ data }) => {
-          setPreviewFlashcard(!!(data && data.length > 0));
+          if (data && data.length > 0) {
+            setFlashcardedIds(new Set([previewQuestion.id]));
+          }
         })
         .catch(err => console.error("Flashcard sync check failed:", err));
 
@@ -525,73 +530,7 @@ export default function AISearchTab() {
     }
   };
 
-  const handleAddToFlashcards = async (qArg?: any) => {
-    if (!session?.user?.id) return;
-    const q = (qArg || previewQuestion) as SearchResult | null;
-    if (!q) return;
-    if (flashcardOpLockRef.current || savingFlashcard) return;
-
-    flashcardOpLockRef.current = true;
-    setSavingFlashcard(true);
-
-    const hint = {
-      subject: q.subject || 'General',
-      section_group: (q as any).section_group || (q as any).sectionGroup || 'General',
-      microtopic: (q as any).micro_topic || (q as any).microtopic || (q as any).microTopic || 'General',
-    };
-
-    try {
-      // Same flow as full quiz engine: create/resolve card first, then open AddToFlashcardSheet.
-      const explanations = buildCanonicalExplanations(q as any);
-      const activeExplText = previewExplSource === 'ai'
-        ? aiExplanation
-        : previewExplSource === 'vitamin'
-          ? (bestAnswers[q.id]?.answer_text || '')
-          : explanations.find((e: any) => e.sourceKey === previewExplSource)?.text || q.explanation_markdown || '';
-
-      const wasAlreadySaved = previewFlashcard;
-      const cardId = await FlashcardSvc.createFromQuestion(session.user.id, q as any, activeExplText || undefined);
-
-      // If user closed preview while async work was in flight, don't mount overlays on top.
-      if (previewQuestionIdRef.current !== q.id) return;
-
-      setPreviewFlashcard(true);
-      setAff({ visible: true, cardId, hint });
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-
-      if (wasAlreadySaved) {
-        Alert.alert('Already saved to flashcards');
-      }
-    } catch (err: any) {
-      const msg = String(err?.message || err || '');
-      const duplicate = /duplicate key value|uq_user_cards_user_card|23505/i.test(msg);
-      if (duplicate) {
-        try {
-          const { data: existingCard } = await supabase
-            .from('cards')
-            .select('id')
-            .eq('question_id', q.id)
-            .maybeSingle();
-
-          if (existingCard?.id && previewQuestionIdRef.current === q.id) {
-            setPreviewFlashcard(true);
-            setAff({ visible: true, cardId: existingCard.id, hint });
-            Alert.alert('Already saved to flashcards');
-          } else {
-            Alert.alert('Already saved to flashcards');
-          }
-        } catch {
-          Alert.alert('Already saved to flashcards');
-        }
-      } else {
-        console.error('Flashcard Error:', err);
-        Alert.alert('Error', 'Failed to add to Flashcards. ' + msg);
-      }
-    } finally {
-      flashcardOpLockRef.current = false;
-      setSavingFlashcard(false);
-    }
-  };
+  // Flashcard handler is now provided by useFlashcardAction hook
 
   const handleAiExplainPopup = async () => {
     if (!previewQuestion) return;
@@ -2141,8 +2080,8 @@ export default function AISearchTab() {
                       onExplSourceChange={setPreviewExplSource}
                       aiExplanation={aiExplanation}
                       isAiLoading={aiExplainLoading}
-                      isSavingFlashcard={savingFlashcard}
-                      isFlashcarded={previewFlashcard}
+                      isSavingFlashcard={savingFlashcard[previewQuestion.id]}
+                      isFlashcarded={flashcardedIds.has(previewQuestion.id)}
                       onRevealExplanation={() => setPreviewRevealed(true)}
                       onOptionSelect={(qid: string, opt: string) => setPreviewAnswer(opt)}
                       onAddFlashcard={handleAddToFlashcards}
@@ -2188,6 +2127,13 @@ export default function AISearchTab() {
                     <Text style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>Practice Exam</Text>
                   </TouchableOpacity>
                 </View>
+                <AddToFlashcardSheet
+                  visible={aff.visible}
+                  onClose={() => setAff((prev) => ({ ...prev, visible: false }))}
+                  userId={session?.user?.id || ''}
+                  cardId={aff.cardId}
+                  hint={aff.hint}
+                />
               </View>
             </View>
           </Modal>
@@ -2203,14 +2149,6 @@ export default function AISearchTab() {
           onClose={() => setNotebookModalVisible(false)}
           userId={session?.user?.id || ''}
           onPickNotebook={handlePickNotebook}
-        />
-
-        <AddToFlashcardSheet
-          visible={aff.visible}
-          onClose={() => setAff((prev) => ({ ...prev, visible: false }))}
-          userId={session?.user?.id || ''}
-          cardId={aff.cardId}
-          hint={aff.hint}
         />
     </PageWrapper>
   );

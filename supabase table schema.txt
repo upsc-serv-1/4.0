@@ -27,8 +27,8 @@ GROUP BY table_name
 
 
 
+xxxxxxxxxxxx
 
--------------------
 
 CREATE TABLE admin_user_performance (
   attempt_id text,
@@ -173,7 +173,8 @@ CREATE TABLE question_states (
   error_category text,
   user_tags ARRAY,
   time_spent_seconds integer DEFAULT 0,
-  attempt_id text
+  attempt_id text,
+  deleted boolean DEFAULT false
 );
 
 CREATE TABLE questions (
@@ -232,7 +233,9 @@ CREATE TABLE test_attempts (
   submitted_at timestamp with time zone DEFAULT now(),
   score numeric,
   attempt_payload jsonb DEFAULT '{}'::jsonb,
-  custom_test_name text
+  custom_test_name text,
+  updated_at timestamp with time zone DEFAULT now(),
+  deleted boolean DEFAULT false
 );
 
 CREATE TABLE tests (
@@ -255,6 +258,17 @@ CREATE TABLE tests (
   source_mode text,
   is_demo_available boolean DEFAULT false,
   exam_year integer,
+  updated_at timestamp with time zone DEFAULT now()
+);
+
+CREATE TABLE user_best_answers (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  question_id text NOT NULL,
+  answer_text text NOT NULL,
+  key_points text,
+  custom_prompt text,
+  created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now()
 );
 
@@ -281,7 +295,8 @@ CREATE TABLE user_cards (
   learning_step smallint,
   interval_minutes integer NOT NULL DEFAULT 0,
   question_id text,
-  is_relearning boolean DEFAULT false
+  is_relearning boolean DEFAULT false,
+  deleted boolean DEFAULT false
 );
 
 CREATE TABLE user_note_nodes (
@@ -311,7 +326,8 @@ CREATE TABLE user_notes (
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   content text,
-  content_html text
+  content_html text,
+  deleted boolean DEFAULT false
 );
 
 CREATE TABLE user_settings (

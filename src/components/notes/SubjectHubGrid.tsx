@@ -27,7 +27,7 @@ interface Props {
   ) => void;
 }
 
-const SUBJECT_PALETTE = [
+export const SUBJECT_PALETTE = [
   { bg: '#fff7ed', fg: '#ea580c' }, // orange
   { bg: '#ecfdf5', fg: '#10b981' }, // green
   { bg: '#eff6ff', fg: '#2563eb' }, // blue
@@ -56,7 +56,7 @@ const subjectIconFor = (name: string) => {
   return BookOpen;
 };
 
-const paletteFor = (name: string, idx: number) => {
+export const paletteFor = (name: string, idx: number) => {
   // Stable per-name palette pick using a tiny hash so colors don't flicker.
   let seed = idx;
   for (let i = 0; i < name.length; i++) seed = (seed * 31 + name.charCodeAt(i)) >>> 0;
@@ -92,17 +92,20 @@ export function SubjectHubGrid({ folders, onOpen, onAction }: Props) {
     );
   }
 
-  return (
-    <View style={styles.grid}>
+  return (    <View style={styles.grid}>
       {folders.map((node, idx) => {
         const Icon = subjectIconFor(node.title);
         const { bg, fg } = paletteFor(node.title, idx);
         const counts = countDescendants(node);
+        const isNotebook = node.type === 'notebook';
+        const isNote = node.type === 'note';
+
         return (
           <Pressable
             key={node.id}
             data-testid={`vault-subject-${node.id}`}
             onPress={() => onOpen(node)}
+            onLongPress={() => onAction(node, 'delete')}
             style={({ pressed }) => [
               styles.card,
               {
@@ -113,18 +116,19 @@ export function SubjectHubGrid({ folders, onOpen, onAction }: Props) {
               },
             ]}
           >
-            {/* More button */}
+            {/* Delete button */}
             <TouchableOpacity
-              onPress={() => onAction(node, 'rename')}
-              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-              style={[styles.moreBtn, { backgroundColor: colors.surfaceStrong }]}
+              onPress={() => onAction(node, 'delete')}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={[styles.moreBtn, { backgroundColor: '#fee2e2' }]}
             >
-              <MoreHorizontal size={11} color={colors.textTertiary} />
+              <Trash2 size={10} color="#dc2626" />
             </TouchableOpacity>
 
             <View style={[styles.iconWrap, { backgroundColor: bg }]}>
-              <Icon size={26} color={fg} strokeWidth={1.8} />
+              <Icon size={22} color={fg} strokeWidth={2} />
             </View>
+            
             <View style={styles.titleRow}>
               <Text
                 style={[styles.title, { color: colors.textPrimary }]}
@@ -133,40 +137,36 @@ export function SubjectHubGrid({ folders, onOpen, onAction }: Props) {
                 {node.title}
               </Text>
             </View>
-            <View style={[styles.countBadge, { backgroundColor: fg + '14', borderColor: fg + '33' }]}>
-              <Text style={[styles.countText, { color: fg }]}>{counts.total}</Text>
-              <Text style={[styles.countLabel, { color: fg }]}>
-                item{counts.total === 1 ? '' : 's'}
-              </Text>
-            </View>
 
-            {/* Glance-type chips */}
-            <View style={styles.chipsRow}>
-              {counts.notes > 0 && (
-                <View style={[styles.typeChip, { backgroundColor: bg + '66' }]}>
-                  <Text style={[styles.typeChipText, { color: fg }]}>Notes</Text>
-                </View>
-              )}
-              {counts.folders > 0 && (
-                <View style={[styles.typeChip, { backgroundColor: bg + '66' }]}>
-                  <Text style={[styles.typeChipText, { color: fg }]}>Folders</Text>
-                </View>
-              )}
-            </View>
+            {!isNote && (
+              <View style={[styles.countBadge, { backgroundColor: fg + '14', borderColor: fg + '33' }]}>
+                <Text style={[styles.countText, { color: fg }]}>{counts.total}</Text>
+                <Text style={[styles.countLabel, { color: fg }]}>
+                  {counts.total === 1 ? 'item' : 'items'}
+                </Text>
+              </View>
+            )}
 
-            {/* Progress bar */}
-            <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
-              <View
-                style={[
-                  styles.progressBar,
-                  { backgroundColor: fg, width: Math.min(100, counts.total * 10) + '%' },
-                ]}
-              />
-            </View>
+            {isNote && (
+               <View style={[styles.countBadge, { backgroundColor: '#e0f2fe12', borderColor: '#0ea5e933' }]}>
+                <Text style={[styles.countText, { color: '#0ea5e9' }]}>1</Text>
+                <Text style={[styles.countLabel, { color: '#0ea5e9' }]}>note</Text>
+              </View>
+            )}
+
+            {/* Type indicator for non-folders in grid */}
+            {(isNotebook || isNote) && (
+              <View style={[styles.typeIndicator, { backgroundColor: isNotebook ? '#10b98122' : '#0ea5e922' }]}>
+                <Text style={[styles.typeIndicatorText, { color: isNotebook ? '#10b981' : '#0ea5e9' }]}>
+                  {isNotebook ? 'Notebook' : 'Note'}
+                </Text>
+              </View>
+            )}
           </Pressable>
         );
       })}
     </View>
+
   );
 }
 
@@ -178,66 +178,74 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   card: {
-    width: '47.5%',
-    flexGrow: 1,
-    borderRadius: 18,
+    width: '31%',
+    borderRadius: 16,
     borderWidth: 1,
-    padding: 16,
-    minHeight: 180,
+    padding: 12,
+    minHeight: 140,
     shadowColor: '#0f172a',
-    shadowOffset: { width: 0, height: 6 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
-    shadowRadius: 14,
+    shadowRadius: 10,
     elevation: 2,
+    marginBottom: 4,
   },
   moreBtn: {
     position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 22,
-    height: 22,
-    borderRadius: 7,
+    top: 8,
+    right: 8,
+    width: 20,
+    height: 20,
+    borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,
   },
   iconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
+    width: 36,
+    height: 36,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 14,
+    marginBottom: 10,
   },
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   title: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: '800',
     letterSpacing: -0.2,
     flex: 1,
+    lineHeight: 16,
   },
   countBadge: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
     borderRadius: 999,
     borderWidth: 1,
-    marginBottom: 8,
+    marginTop: 'auto',
   },
-  countText: { fontSize: 13, fontWeight: '900', letterSpacing: -0.3 },
-  countLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase' },
-  chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 3, marginBottom: 10 },
-  typeChip: { paddingHorizontal: 7, paddingVertical: 2, borderRadius: 20 },
-  typeChipText: { fontSize: 9, fontWeight: '800' },
-  progressTrack: { height: 2.5, borderRadius: 2, marginTop: 10, overflow: 'hidden' },
-  progressBar: { height: 2.5, borderRadius: 2 },
+  countText: { fontSize: 11, fontWeight: '900', letterSpacing: -0.3 },
+  countLabel: { fontSize: 8, fontWeight: '800', letterSpacing: 0.4, textTransform: 'uppercase' },
+  typeIndicator: {
+    marginTop: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+  },
+  typeIndicatorText: {
+    fontSize: 7,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
 
   empty: {
     alignItems: 'center',

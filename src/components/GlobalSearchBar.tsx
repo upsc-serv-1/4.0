@@ -22,6 +22,7 @@ import { useTheme } from '../context/ThemeContext';
 import { supabase } from '../lib/supabase';
 import * as Haptics from 'expo-haptics';
 import { buildArenaEngineSearchParams } from '../utils/arenaSearchNavigation';
+import { getPYQCategorization } from '../utils/questionUtils';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -429,57 +430,7 @@ export const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({
     return false;
   };
 
-  const getPYQCategorization = (item: any) => {
-    // Strict tagging contract (branch 5.8):
-    //   • is_pyq must be true on the canonical column.
-    //   • Group/year must come from exam_info ONLY (never launch_year,
-    //     exam_year, exam_group). If both are missing, hide the chip.
-    const examInfo = (item?.exam_info && typeof item.exam_info === 'object' && !Array.isArray(item.exam_info))
-      ? item.exam_info
-      : (item?.source && typeof item.source === 'object' && !Array.isArray(item.source) ? item.source : {});
 
-    const isPYQ = toBool(item?.is_pyq);
-    if (!isPYQ) {
-      return {
-        hasPYQData: false,
-        isUPSC: false,
-        isAllied: false,
-        isOther: false,
-        groupName: '',
-        year: '',
-      };
-    }
-
-    const rawGroup = String(examInfo?.group || examInfo?.exam_name || '').trim();
-    const upperGroup = rawGroup.toUpperCase();
-
-    const isUPSC = toBool(examInfo?.is_upsc_cse) || upperGroup.includes('UPSC CSE') || upperGroup === 'UPSC';
-    const isAllied = toBool(examInfo?.is_allied) || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => upperGroup.includes(g));
-    const isOther = toBool(examInfo?.is_others) || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => upperGroup.includes(g));
-
-    const rawYear = examInfo?.year ?? '';
-    const year = typeof rawYear === 'string' ? rawYear.trim() : String(rawYear).trim();
-
-    if (!rawGroup && !year) {
-      return {
-        hasPYQData: false,
-        isUPSC: false,
-        isAllied: false,
-        isOther: false,
-        groupName: '',
-        year: '',
-      };
-    }
-
-    return {
-      hasPYQData: true,
-      isUPSC,
-      isAllied,
-      isOther,
-      groupName: rawGroup || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ'),
-      year
-    };
-  };
 
   const getHighlightText = (text: string, search: string) => {
     if (!search.trim()) return <Text style={{ color: colors.textPrimary }}>{text}</Text>;

@@ -1,11 +1,12 @@
 import React, { useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
 import {
   ChevronRight, Minus, Plus, Folder, BookOpen, FileText,
   Edit2, FolderPlus, Trash2, FolderInput, FileDown, Play, Sparkles,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { Swipeable, RectButton } from 'react-native-gesture-handler';
+import { paletteFor } from './SubjectHubGrid';
 
 export type NoteRowAction = 'add' | 'duplicate' | 'rename' | 'move' | 'delete' | 'play' | 'export';
 
@@ -39,9 +40,10 @@ interface Props {
   style?: any;
   /** Highlight the row (e.g. for selection in split view) */
   isHighlighted?: boolean;
+  onLongPress?: (x: number, y: number) => void;
 }
 
-export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpanded = false, onToggleGlance, style, isHighlighted }: Props) {
+export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpanded = false, onToggleGlance, style, isHighlighted, onLongPress }: Props) {
   const { colors } = useTheme();
   const swipeableRef = useRef<Swipeable>(null);
 
@@ -95,54 +97,67 @@ export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpa
   const indentWidth = 40;
 
   const getIcon = () => {
-    if (node.type === 'note') return <FileText size={18} color={colors.primary} />;
-    if (node.type === 'notebook') return <BookOpen size={18} color={colors.primary} />;
-    return <Folder size={18} color={colors.textSecondary} />;
+    const palette = paletteFor(node.title, 0);
+    if (node.type === 'note') return <FileText size={14} color={colors.primary} />;
+    if (node.type === 'notebook') return <BookOpen size={14} color={colors.primary} />;
+    return <Folder size={14} color={palette.fg} />;
   };
 
   const getIconBg = () => {
-    if (node.type === 'note') return colors.primary + '15';
-    if (node.type === 'notebook') return colors.primary + '15';
-    return colors.surfaceStrong;
+    if (node.type === 'note' || node.type === 'notebook') return colors.primary + '15';
+    return paletteFor(node.title, 0).bg;
   };
 
   // Depth-specific container styles
   const getContainerStyles = () => {
+    const palette = paletteFor(node.title, 0);
+    const isFolder = node.type === 'folder';
+    const activeBg = (isHighlighted && isFolder) ? palette.bg : 'transparent';
+    const activeBorder = (isHighlighted && isFolder) ? palette.fg : (colors.border + '60');
+
     if (node.depth === 0) {
       return {
-        backgroundColor: colors.surface,
-        borderRadius: expanded ? 14 : 14,
-        borderBottomLeftRadius: expanded ? 0 : 14,
-        borderBottomRightRadius: expanded ? 0 : 14,
+        backgroundColor: (isHighlighted && isFolder) ? palette.bg : colors.surface,
+        borderRadius: 14,
         marginHorizontal: 0,
         marginBottom: 3,
         paddingVertical: 10,
         paddingHorizontal: 12,
+        ...((isHighlighted && isFolder) && {
+          borderWidth: 1.5,
+          borderColor: palette.fg,
+        })
       };
     } else if (node.depth === 1) {
       return {
-        backgroundColor: colors.surfaceStrong,
-        borderRadius: expanded ? 10 : 10,
-        borderBottomLeftRadius: expanded ? 0 : 10,
-        borderBottomRightRadius: expanded ? 0 : 10,
+        backgroundColor: (isHighlighted && isFolder) ? palette.bg : colors.surfaceStrong,
+        borderRadius: 10,
         marginLeft: 10,
         marginBottom: 2,
         paddingVertical: 7,
         paddingHorizontal: 10,
-        borderLeftWidth: 1.5,
-        borderLeftColor: colors.border + '60',
+        borderLeftWidth: 2,
+        borderLeftColor: activeBorder,
         paddingLeft: 10,
+        ...((isHighlighted && isFolder) && {
+          borderWidth: 1.5,
+          borderColor: palette.fg,
+        })
       };
     } else {
       return {
-        backgroundColor: colors.surface,
+        backgroundColor: (isHighlighted && isFolder) ? palette.bg : colors.surface,
         borderRadius: 8,
         marginLeft: 20,
         marginBottom: 2,
         paddingVertical: 6,
         paddingHorizontal: 9,
-        borderLeftWidth: 1.5,
-        borderLeftColor: colors.border + '60',
+        borderLeftWidth: 2,
+        borderLeftColor: activeBorder,
+        ...((isHighlighted && isFolder) && {
+          borderWidth: 1.5,
+          borderColor: palette.fg,
+        })
       };
     }
   };
@@ -159,9 +174,9 @@ export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpa
       <View
         style={[
           styles.row,
-          { backgroundColor: colors.bg, borderBottomColor: colors.border + 'A0' },
+          { backgroundColor: colors.bg },
           containerStyle,
-          isHighlighted && { borderColor: colors.primary, borderWidth: 1.5, shadowColor: colors.primary, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
+          isHighlighted && { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
           style,
         ]}
         data-testid={`vault-row-${node.id}`}
@@ -175,10 +190,13 @@ export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpa
           </TouchableOpacity>
 
           {/* Text Area */}
-          <TouchableOpacity
+          <Pressable
             onPress={onOpen}
-            style={styles.textContainer}
-            activeOpacity={0.6}
+            onLongPress={(e) => onLongPress?.(e.nativeEvent.pageX, e.nativeEvent.pageY)}
+            style={({ pressed }) => [
+              styles.textContainer,
+              { opacity: pressed ? 0.6 : 1 }
+            ]}
           >
             <View style={{ flex: 1 }}>
               <Text style={[styles.name, { color: colors.textPrimary }]} numberOfLines={1}>
@@ -217,7 +235,7 @@ export function NoteRow({ node, expanded, onToggle, onOpen, onAction, glanceExpa
             )}
 
             <ChevronRight size={20} color={colors.border} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </Swipeable>
@@ -246,16 +264,16 @@ const styles = StyleSheet.create({
   actionCircle: { width: 34, height: 34, borderRadius: 17, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   actionLabel: { fontSize: 7, fontWeight: '800', textTransform: 'uppercase' },
   row: { paddingHorizontal: 4, borderBottomWidth: 0 },
-  content: { flexDirection: 'row', alignItems: 'center', minHeight: 60 },
+  content: { flexDirection: 'row', alignItems: 'center', minHeight: 44 },
   iconWrap: {
-    width: 40,
+    width: 32,
     alignItems: 'center',
     justifyContent: 'center',
   },
   iconBox: {
-    width: 30,
-    height: 30,
-    borderRadius: 9,
+    width: 24,
+    height: 24,
+    borderRadius: 7,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -267,12 +285,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   name: {
-    fontSize: 17,
-    fontWeight: '600',
-    marginBottom: 2,
+    fontSize: 11,
+    fontWeight: '700',
+    marginBottom: 1,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: 9,
     fontWeight: '500',
   },
   glancePill: {

@@ -1070,29 +1070,41 @@ export default function UnifiedQuizEngine() {
   // Robust scroll helper for list view palette/navigator jumps.
   // Uses scrollToIndex (which works without getItemLayout via a small delay
   // to let the list measure items first). Falls back to offset estimate.
+  // Tracks last requested target so onScrollToIndexFailed can use it.
+  const lastScrollTargetRef = useRef<number>(-1);
   const scrollToIndexRobust = useCallback((targetIndex: number) => {
     if (viewMode !== 'list') return;
+    lastScrollTargetRef.current = targetIndex;
+
+    // Cancel any pending viewability-driven setCurrentIndex so it doesn't
+    // race with our explicit jump and snap us back to the previous question.
+    if (viewabilityTimerRef.current) {
+      clearTimeout(viewabilityTimerRef.current);
+      viewabilityTimerRef.current = null;
+    }
+    pendingIndexRef.current = targetIndex;
 
     const attemptScroll = () => {
+      const list = listRef.current;
+      if (!list) return;
       try {
-        listRef.current?.scrollToIndex({ 
-          index: targetIndex, 
-          animated: true, 
-          viewPosition: 0 
+        list.scrollToIndex({
+          index: targetIndex,
+          animated: true,
+          viewPosition: 0,
         });
-      } catch (e) {
-        // List hasn't measured enough items yet – use a rough offset estimate.
-        // This is intentionally NOT retried to prevent jump-back behavior.
-        const estimatedOffset = targetIndex * 280; // rough average, not exact
-        listRef.current?.scrollToOffset({ 
-          offset: Math.max(0, estimatedOffset), 
-          animated: true 
+      } catch {
+        // scrollToIndex doesn't usually throw; rely on onScrollToIndexFailed.
+        const estimatedOffset = targetIndex * 280;
+        list.scrollToOffset({
+          offset: Math.max(0, estimatedOffset),
+          animated: true,
         });
       }
     };
 
     // Small delay so modal close animation doesn't compete with the scroll
-    setTimeout(attemptScroll, 50);
+    setTimeout(attemptScroll, 80);
   }, [viewMode]);
 
   // 3. Store Selectors
@@ -3193,7 +3205,9 @@ export default function UnifiedQuizEngine() {
                               if (viewMode === 'paper') {
                                 setPaperPage(Math.floor(idx / paperPageSize));
                               } else if (viewMode === 'list') {
-                                scrollToIndexRobust(idx);
+                                // Schedule scroll after the state update so the
+                                // FlatList can re-render before we ask it to jump.
+                                requestAnimationFrame(() => scrollToIndexRobust(idx));
                               }
                               // card mode: setCurrentIndex already re-renders
                             }, 120);
@@ -3270,7 +3284,7 @@ export default function UnifiedQuizEngine() {
                             setShowSearchPanel(false);
                             if (viewMode === 'list') {
                               // Use scrollToIndexRobust so we don't assume fixed item heights
-                              setTimeout(() => scrollToIndexRobust(idx), 150);
+                              setTimeout(() => requestAnimationFrame(() => scrollToIndexRobust(idx)), 150);
                             }
                           }}
                           style={{
@@ -3444,11 +3458,29 @@ export default function UnifiedQuizEngine() {
                   // "steal" the scroll position from the user.
                   disableScrollViewPanResponder={false}
                   onScrollToIndexFailed={(info) => {
-                    // Graceful fallback: wait for layout to settle then retry once.
-                    const wait = new Promise(resolve => setTimeout(resolve, 300));
+                    // First fallback: scroll to a computed offset using
+                    // averageItemLength so the list at least lands near the
+                    // target. This is essential for palette/navigator jumps
+                    // in List View, where the target index may be far outside
+                    // the currently rendered window.
+                    const approxOffset =
+                      Math.max(0, info.averageItemLength * info.index);
+                    try {
+                      listRef.current?.scrollToOffset({
+                        offset: approxOffset,
+                        animated: false,
+                      });
+                    } catch {}
+                    // Second fallback: after layout settles, retry scrollToIndex
+                    // for an exact landing on the question.
+                    const wait = new Promise(resolve => setTimeout(resolve, 350));
                     wait.then(() => {
                       try {
-                        listRef.current?.scrollToIndex({ index: info.index, animated: false });
+                        listRef.current?.scrollToIndex({
+                          index: info.index,
+                          animated: false,
+                          viewPosition: 0,
+                        });
                       } catch {
                         // Nothing more we can do – user can scroll manually.
                       }

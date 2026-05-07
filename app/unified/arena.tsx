@@ -340,6 +340,26 @@ export default function UnifiedArenaSetup() {
       let from = 0;
       let allFreshData: any[] = [];
 
+      // OFFLINE-FIRST: if cached questions already satisfy this search,
+      // render instantly and skip network.
+      const cachedQuestions = OfflineManager.getOfflineQuestionsAllSync() || [];
+      if (term.length > 0 && cachedQuestions.length > 0) {
+        const searchLower = term.toLowerCase();
+        const filtered = cachedQuestions.filter((q: any) =>
+          q?.question_text?.toLowerCase?.().includes(searchLower) ||
+          q?.explanation_markdown?.toLowerCase?.().includes(searchLower) ||
+          q?.subject?.toLowerCase?.().includes(searchLower)
+        );
+
+        if (filtered.length > 0) {
+          const { mergedQs } = mergeQuestions(filtered);
+          setSearchResults(mergedQs.slice(0, 100));
+          setQuestionCount(Math.min(mergedQs.length, 100));
+          setLoadingSearch(false);
+          return;
+        }
+      }
+
       while (allFreshData.length < MAX_TOTAL) {
         let query = supabase.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)');
 

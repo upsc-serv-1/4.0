@@ -167,6 +167,31 @@ export function useHardnoteDoc(noteId: string | undefined): HardnoteDoc {
     refresh();
   }, [refresh]);
 
+  // ===== Real-time subscription (Phase 3) =====
+  // Listen for postgres updates on this specific note. If the change came from
+  // *another* surface (e.g. the Notes tab editor on another device or even
+  // another tab on this device), pull the latest snapshot — but ONLY when no
+  // local save is in-flight, so we never overwrite a typing user.
+  useEffect(() => {
+    if (!noteId) return;
+    const channel = supabase
+      .channel(`user_notes:${noteId}`)
+      .on(
+        'postgres_changes' as any,
+        { event: '*', schema: 'public', table: 'user_notes', filter: `id=eq.${noteId}` },
+        () => {
+          if (saveTimer.current) return; // local edit pending -> our save will win soon; ignore
+          if (!mounted.current) return;
+          refresh();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [noteId, refresh]);
+
   const scheduleSave = useCallback((nextPoints: Point[], nextTitle?: string) => {
     if (!noteId) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);

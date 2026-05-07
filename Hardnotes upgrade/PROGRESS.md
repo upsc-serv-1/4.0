@@ -84,7 +84,7 @@ Out of scope for this branch:
 | 0 | Branch + progress.md scaffolding | ✅ done | `83d91c4` |
 | 1 | iPad polish + Underline/Strikethrough in toolbar | ✅ done | `af0b966` |
 | 2 | Hierarchical bullets (parent/child) | ✅ done | (this commit) |
-| 3 | Real-time Notes ↔ Hardnotes sync | ⬜ todo | — |
+| 3 | Real-time Notes ↔ Hardnotes sync | ✅ done | (this commit) |
 | 4 | Notes-tab "Open in Hardnotes" + iPad dockable toolbar | ⬜ todo | — |
 
 Each batch ends with a commit + push to `origin/hardnotes-renovation`.
@@ -178,3 +178,29 @@ _Next step → Batch 1: iPad polish + Underline + Strikethrough._
 - No collapse/expand toggle on parents — all subtrees always render.
 
 _Next → Batch 3 (Phase 3 of plan): real-time Notes ↔ Hardnotes sync via Supabase channel._
+
+### 2026-02 · Batch 3 — Real-time Notes ↔ Hardnotes sync (Phase 3 of plan)
+
+**File touched**
+- `src/components/hardnotes/useHardnoteDoc.ts`
+
+**Change**
+- Added a Supabase realtime subscription scoped to `user_notes` rows where `id = noteId`.
+- Any INSERT / UPDATE / DELETE on the row triggers a `refresh()` so the editor reflects external edits (e.g. a change saved from the Notes tab on another device).
+- Conflict-avoidance: if a local debounced save is pending (`saveTimer.current` set), the remote-change handler is a no-op — our save will land within 3 s and become the new source of truth. Prevents overwriting a typing user.
+- Channel is torn down via `supabase.removeChannel()` on unmount or noteId change.
+
+**What this enables**
+- Edit a note in the Notes tab → switch to Hardnotes tab → see the update without pull-to-refresh.
+- Open the same note on iPad + iPhone → typing on one shows on the other within ~1 s of each save.
+
+**Manual smoke test plan**
+1. Open the same note on two devices/sessions.
+2. Type & save on device A → device B's editor reflects the change (so long as B isn't actively editing).
+3. Type *simultaneously* on both → last save wins, but neither side gets clobbered mid-keystroke.
+
+**Known follow-ups (deferred)**
+- No CRDT / OT — true two-way merging of concurrent edits is Phase B (Soft Notes).
+- The realtime feature must be enabled on the Supabase project for `user_notes` (Database → Replication). Owner action — not a code change.
+
+_Next → Batch 4 (Phase 5 polish + Notes-tab "Open in Hardnotes" entry-point)._

@@ -45,8 +45,8 @@ No schema migration is required — the schema is flexible enough.
 * [x] **Step 4:** Dynamic expandable sidebar (Subject → Topic → Subtopic transformation, breadcrumb)
 * [x] **Step 5:** Glance reading mode (infinite scroll, full-screen toggle)
 * [x] **Step 6:** Capsule block editor (heading / paragraph / bullet / numbered / checklist / highlight / quote)
-* [ ] **Step 7:** Add-to-Notebook popup integration (Manual + Auto modes, Premium Move reuse)
-* [ ] **Step 8:** Quiz-engine append pipeline (block-preserving auto-append)
+* [x] **Step 7:** Add-to-Notebook popup integration (Manual + Auto modes, Premium Move reuse)
+* [x] **Step 8:** Quiz-engine append pipeline (block-preserving auto-append)
 * [ ] **Step 9:** Polish — iPad layout pass, performance/virtualization, empty states
 
 After each step the agent commits with message
@@ -65,7 +65,8 @@ After each step the agent commits with message
 | 5 | done | `Step 5: Glance reading workspace with block renderer + sidebar toggle` |
 | 6 | done | `Step 6: Block editor (paragraph/heading/bullet/numbered/checklist/highlight/quote with autosave)` |
 | 7 | done | `Step 7: Add-to-Notebook destination chooser + Capsule picker (Manual + Auto)` |
-| 8 | pending | — |
+| 8 | done | `Step 8: Wire Capsule destination into quiz engine + ai-search` |
+| 9 | pending | — |
 
 ---
 

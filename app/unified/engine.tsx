@@ -91,6 +91,9 @@ import { uuidv4 } from '../../src/utils/uuid';
 import { FlashcardSvc } from '../../src/services/FlashcardService';
 import { AddToFlashcardSheet } from '../../src/components/flashcards/AddToFlashcardSheet';
 import { NotebookLocationPicker } from '../../src/components/NotebookLocationPicker';
+import { AddToNotebookSheet, SaveDestination } from '../../src/components/capsule/AddToNotebookSheet';
+import { CapsuleLocationPicker } from '../../src/components/capsule/CapsuleLocationPicker';
+import { appendTextToCapsule } from '../../src/utils/capsuleAppend';
 import { QuizCaptureSheet } from '../../src/components/hardnotes/QuizCaptureSheet';
 import { OfflineManager } from '../../src/services/OfflineManager';
 import { LocalQuery } from '../../src/services/LocalQuery';
@@ -842,6 +845,8 @@ export default function UnifiedQuizEngine() {
   const [submitting, setSubmitting] = useState(false);
   const [lastUsedSubheading, setLastUsedSubheading] = useState('');
   const [locationPickerVisible, setLocationPickerVisible] = useState(false);
+  const [destChooserOpen, setDestChooserOpen] = useState(false);
+  const [capsulePickerOpen, setCapsulePickerOpen] = useState(false);
 
   // Track viewable items via a ref to avoid triggering re-renders during scroll.
   // We only update currentIndex when the user has been on a question long enough
@@ -2885,7 +2890,7 @@ export default function UnifiedQuizEngine() {
         setCustomSubheading={setCustomSubheading}
         microtopic={questions[currentIndex]?.micro_topic}
         applyFormatting={applyFormatting}
-        openLocationPicker={() => setLocationPickerVisible(true)}
+        openLocationPicker={() => setDestChooserOpen(true)}
         richEditorRef={notebookRichEditorRef}
       />
     );
@@ -4200,6 +4205,44 @@ export default function UnifiedQuizEngine() {
             fetchSubheadings(note_id);
           }}
         />
+
+        <AddToNotebookSheet
+          visible={destChooserOpen}
+          onClose={() => setDestChooserOpen(false)}
+          options={['capsule', 'notes']}
+          onPick={(d: SaveDestination) => {
+            setDestChooserOpen(false);
+            if (d === 'capsule') setCapsulePickerOpen(true);
+            else if (d === 'notes') setLocationPickerVisible(true);
+          }}
+        />
+
+        <CapsuleLocationPicker
+          visible={capsulePickerOpen}
+          userId={session?.user?.id || ''}
+          onClose={() => setCapsulePickerOpen(false)}
+          autoSeed={questions[currentIndex] ? {
+            subject: questions[currentIndex].subject || null,
+            topic: (questions[currentIndex] as any).section_group || null,
+            subtopic: questions[currentIndex].micro_topic || null,
+          } : undefined}
+          defaultNotebookTitle={questions[currentIndex]?.micro_topic || questions[currentIndex]?.subject || ''}
+          onPick={async ({ note_id, title }) => {
+            setCapsulePickerOpen(false);
+            const q = questions[currentIndex];
+            const text = (noteDraftBullets || []).join('\n') || q?.explanation_markdown || '';
+            if (!text || !q) return;
+            const ok = await appendTextToCapsule({
+              noteId: note_id,
+              text: text.replace(/<br\s*\/?>(?=\s*\n?)/gi, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim(),
+              heading: customSubheading || q.micro_topic || q.subject || undefined,
+              source: `Quiz / ${q.subject || ''} ${q.exam_year || ''}`.trim(),
+            });
+            if (ok) Alert.alert('Saved to Capsule', `Appended to "${title}".`);
+            else Alert.alert('Error', 'Could not save to Capsule.');
+          }}
+        />
+
         {session?.user?.id && hardnotesPayload && (
           <QuizCaptureSheet
             visible={hardnotesPickerVisible}

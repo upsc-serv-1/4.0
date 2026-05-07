@@ -305,48 +305,48 @@ export default function AISearchTab() {
 
     const mergedIds: string[] = (previewQuestion as any)._mergedIds || [];
 
-    // If only one ID (or none), use what the merger already gave us
+    // If only one ID (or none), use what the merger already gave us.
+    // IMPORTANT: do not return early — we still need to sync tags/flashcard/MyVitamin state.
     if (mergedIds.length <= 1) {
       setEnrichedExplanations(null);
-      return;
-    }
+    } else {
+      // Fetch all sibling rows for their explanations + answers + institute data
+      setEnrichLoading(true);
+      supabase
+        .from('questions')
+        .select('id,explanation_markdown,correct_answer,test_id,tests(institute,program_name,series)')
+        .in('id', mergedIds)
+        .then(({ data }) => {
+          if (!data || data.length === 0) {
+            setEnrichedExplanations(null);
+            setEnrichLoading(false);
+            return;
+          }
 
-    // Fetch all sibling rows for their explanations + answers + institute data
-    setEnrichLoading(true);
-    supabase
-      .from('questions')
-      .select('id,explanation_markdown,correct_answer,test_id,tests(institute,program_name,series)')
-      .in('id', mergedIds)
-      .then(({ data }) => {
-        if (!data || data.length === 0) {
-          setEnrichedExplanations(null);
+          // Build per-institute explanation entries, deduped by source+answer+text
+          const entries: Array<{ source: string; program: string; text: string; answer: string }> = [];
+          for (const q of data) {
+            const tests = Array.isArray(q.tests) ? q.tests[0] : q.tests;
+            const rawInst = tests?.institute || '';
+            const source = rawInst
+              ? rawInst.split(/\s+/).map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+              : 'UPSC';
+            const program = tests?.program_name || '';
+            const text = String(q.explanation_markdown || '').trim();
+            const answer = String(q.correct_answer || '').trim();
+            if (!text && !answer) continue;
+            const isDup = entries.some(
+              e => e.source.toLowerCase() === source.toLowerCase()
+                && e.answer.toUpperCase() === answer.toUpperCase()
+                && (e.text || '').slice(0, 120) === text.slice(0, 120)
+            );
+            if (!isDup) entries.push({ source, program, text, answer });
+          }
+          setEnrichedExplanations(entries.length > 0 ? entries : null);
           setEnrichLoading(false);
-          return;
-        }
-
-        // Build per-institute explanation entries, deduped by source+answer+text
-        const entries: Array<{ source: string; program: string; text: string; answer: string }> = [];
-        for (const q of data) {
-          const tests = Array.isArray(q.tests) ? q.tests[0] : q.tests;
-          const rawInst = tests?.institute || '';
-          const source = rawInst
-            ? rawInst.split(/\s+/).map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
-            : 'UPSC';
-          const program = tests?.program_name || '';
-          const text = String(q.explanation_markdown || '').trim();
-          const answer = String(q.correct_answer || '').trim();
-          if (!text && !answer) continue;
-          const isDup = entries.some(
-            e => e.source.toLowerCase() === source.toLowerCase()
-              && e.answer.toUpperCase() === answer.toUpperCase()
-              && (e.text || '').slice(0, 120) === text.slice(0, 120)
-          );
-          if (!isDup) entries.push({ source, program, text, answer });
-        }
-        setEnrichedExplanations(entries.length > 0 ? entries : null);
-        setEnrichLoading(false);
-      })
-      .catch(() => { setEnrichedExplanations(null); setEnrichLoading(false); });
+        })
+        .catch(() => { setEnrichedExplanations(null); setEnrichLoading(false); });
+    }
 
     // Reset AI explain state when opening a new question
     setAiExplanation(null);

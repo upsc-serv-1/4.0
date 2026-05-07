@@ -233,6 +233,7 @@ export default function AISearchTab() {
   // Notebook states for "Add to Notebook" parity
   const [notebookModalVisible, setNotebookModalVisible] = useState(false);
   const [selectedNotebook, setSelectedNotebook] = useState<{ node_id: string; note_id: string; title: string; folder_id: string | null } | null>(null);
+  const [previewNotebookDraft, setPreviewNotebookDraft] = useState<string>('');
   const [isSavingToNotebook, setIsSavingToNotebook] = useState(false);
 
   // Flashcard placement sheet (same flow as full quiz engine)
@@ -314,6 +315,7 @@ export default function AISearchTab() {
       setPreviewFlashcard(false);
       setAiExplanation(null);
       setSelectedNotebook(null);
+      setPreviewNotebookDraft('');
       return;
     }
 
@@ -424,8 +426,10 @@ export default function AISearchTab() {
 
     setIsSavingToNotebook(true);
     try {
-      const activeText = (previewExplSource === 'ai' ? aiExplanation : null)
+      const activeText = previewNotebookDraft
+        || (previewExplSource === 'ai' ? aiExplanation : null)
         || (previewExplSource === 'vitamin' ? (bestAnswers[previewQuestion.id]?.answer_text || '') : null)
+        || buildCanonicalExplanations(previewQuestion as any).find((e: any) => e.sourceKey === previewExplSource)?.text
         || previewQuestion.explanation_markdown
         || '';
 
@@ -473,6 +477,7 @@ export default function AISearchTab() {
       if (updateError) throw updateError;
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      setPreviewNotebookDraft('');
       Alert.alert('Success', 'Study text saved to Text Section.');
     } catch (err: any) {
       console.error('Notebook Save Error:', err);
@@ -2091,7 +2096,8 @@ export default function AISearchTab() {
                       bestAnswers={bestAnswers}
                       ensureBestAnswerLoaded={ensureBestAnswerLoaded}
                       showNotebookButton={false}
-                      openNotebookFromQuestion={() => {
+                      openNotebookFromQuestion={(_: any, activeText?: string) => {
+                        setPreviewNotebookDraft(activeText || '');
                         setNotebookModalVisible(true);
                       }}
                     />

@@ -3066,9 +3066,56 @@ export default function UnifiedQuizEngine() {
         >
           <Pressable style={StyleSheet.absoluteFill} onPress={() => setShowPaperQuickMenu(false)}>
             <View style={[stylesPaper.paperQuickMenu, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
+              {/* Exit Simulation — toggles paper view off and returns to List
+                  view inside the same engine session. From there, the regular
+                  header Back button (with save/cancel prompt) is reachable. */}
               <TouchableOpacity
                 style={stylesPaper.paperQuickMenuItem}
-                onPress={() => { setShowPaperQuickMenu(false); handleExit(); }}
+                onPress={() => {
+                  setShowPaperQuickMenu(false);
+                  setViewMode('list');
+                }}
+                testID="paper-quick-exit-sim"
+              >
+                <Minimize2 size={16} color="#ef4444" />
+                <Text style={{ color: '#ef4444', fontWeight: '800', fontSize: 12 }}>Exit Sim</Text>
+              </TouchableOpacity>
+
+              {/* Back — always prompts the save/cancel/exit dialog so the user
+                  never loses progress accidentally. */}
+              <TouchableOpacity
+                style={stylesPaper.paperQuickMenuItem}
+                onPress={() => {
+                  setShowPaperQuickMenu(false);
+                  // Force a confirmation prompt regardless of arena mode by
+                  // routing through the same modal used for exam saves when
+                  // there is any answered question, otherwise fall back to
+                  // the standard exit handler (which itself prompts on
+                  // unsaved learning progress).
+                  if (arenaMode === 'exam') {
+                    setShowSaveSessionModal(true);
+                  } else if (hasUnsavedLearningProgress) {
+                    handleExit();
+                  } else {
+                    Alert.alert(
+                      'Leave Quiz Engine?',
+                      'You are about to exit the current quiz session.',
+                      [
+                        { text: 'Cancel', style: 'cancel' },
+                        {
+                          text: 'Exit',
+                          style: 'destructive',
+                          onPress: () => {
+                            isNavigatingAway.current = true;
+                            router.back();
+                          },
+                        },
+                      ],
+                      { cancelable: true }
+                    );
+                  }
+                }}
+                testID="paper-quick-back"
               >
                 <ChevronLeft size={16} color={colors.textPrimary} />
                 <Text style={{ color: colors.textPrimary, fontWeight: '800', fontSize: 12 }}>Back</Text>

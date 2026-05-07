@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { safeSetItem } from '../lib/safeAsyncStorage';
 import { supabase } from '../lib/supabase';
 
 export interface PilotNoteNode {
@@ -78,8 +79,8 @@ export function useNotesPilotVault(userId: string | undefined) {
       const nodes = data || [];
       setRawNodes(nodes);
       
-      // Save to cache
-      await AsyncStorage.setItem(cacheKey, JSON.stringify(nodes));
+      // Save to cache (best-effort; survives Android SQLITE_FULL)
+      await safeSetItem(cacheKey, JSON.stringify(nodes));
 
     } catch (err) {
       console.error('Notes Pilot Vault Error:', err);

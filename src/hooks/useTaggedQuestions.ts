@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { safeSetItem } from '../lib/safeAsyncStorage';
 import { supabase } from '../lib/supabase';
 import { formatTagLabel, normalizeTag } from '../utils/tagUtils';
 import { useTagStore } from '../store/tagStore';
@@ -94,7 +95,7 @@ export function useTaggedVault(userId: string | undefined) {
   const persistCatalog = useCallback(async (nextTags: string[]) => {
     const clean = dedupeTags(nextTags).sort((a, b) => a.localeCompare(b));
     setCustomReviewTags(clean);
-    await AsyncStorage.setItem(tagCatalogKey, JSON.stringify(clean));
+    await safeSetItem(tagCatalogKey, JSON.stringify(clean));
     return clean;
   }, [tagCatalogKey]);
 
@@ -138,7 +139,7 @@ export function useTaggedVault(userId: string | undefined) {
 
       if (filteredStates.length === 0) {
         setRawQuestions([]);
-        await AsyncStorage.setItem(cacheKey, JSON.stringify([]));
+        await safeSetItem(cacheKey, JSON.stringify([]));
         setLoading(false);
         return;
       }
@@ -189,8 +190,19 @@ export function useTaggedVault(userId: string | undefined) {
 
       setRawQuestions(transformed);
 
-      // Save to cache
-      await AsyncStorage.setItem(cacheKey, JSON.stringify(transformed));
+      // Save to cache. Use safeSetItem so an Android SQLITE_FULL doesn't
+      // crash the Vault. Cap the cached payload at ~3 MB worth of JSON so
+      // a single very large session can't push the AsyncStorage backing
+      // database past its on-device ceiling.
+      const cachePayload = JSON.stringify(transformed);
+      const MAX_CACHE_BYTES = 3 * 1024 * 1024;
+      if (cachePayload.length > MAX_CACHE_BYTES) {
+        // Cache only the most recent slice to stay under the ceiling.
+        const truncated = transformed.slice(0, Math.max(50, Math.floor(transformed.length / 2)));
+        await safeSetItem(cacheKey, JSON.stringify(truncated));
+      } else {
+        await safeSetItem(cacheKey, cachePayload);
+      }
     } catch (err) {
       console.error('Vault Engine Error:', err);
 
@@ -286,7 +298,14 @@ export function useTaggedVault(userId: string | undefined) {
 
   const syncCacheFromQuestions = useCallback(async (nextQuestions: TaggedQuestion[]) => {
     setRawQuestions(nextQuestions);
-    await AsyncStorage.setItem(cacheKey, JSON.stringify(nextQuestions));
+    const payload = JSON.stringify(nextQuestions);
+    const MAX_CACHE_BYTES = 3 * 1024 * 1024;
+    if (payload.length > MAX_CACHE_BYTES) {
+      const truncated = nextQuestions.slice(0, Math.max(50, Math.floor(nextQuestions.length / 2)));
+      await safeSetItem(cacheKey, JSON.stringify(truncated));
+    } else {
+      await safeSetItem(cacheKey, payload);
+    }
   }, [cacheKey]);
 
   const addTagToReview = useCallback(async (tagName: string) => {

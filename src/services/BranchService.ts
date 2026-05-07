@@ -12,6 +12,7 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { safeSetItem } from '../lib/safeAsyncStorage';
 import { supabase } from '../lib/supabase';
 
 export interface Branch {
@@ -78,7 +79,7 @@ export class BranchSvc {
       const rows = (data ?? []) as Branch[];
       if (!opts.includeArchived) {
         try {
-          await AsyncStorage.setItem(cacheKey, JSON.stringify(rows));
+          await safeSetItem(cacheKey, JSON.stringify(rows));
         } catch {}
       }
       return rows;
@@ -346,7 +347,7 @@ export class BranchSvc {
       if (linkErr) throw linkErr;
       links = data ?? [];
       try {
-        await AsyncStorage.setItem(linksCacheKey, JSON.stringify(links));
+        await safeSetItem(linksCacheKey, JSON.stringify(links));
       } catch {}
     } catch (err) {
       try {
@@ -395,7 +396,7 @@ export class BranchSvc {
         }
         userCardsRows = fetchedRows;
         try {
-          await AsyncStorage.setItem(userCardsCacheKey, JSON.stringify(userCardsRows));
+          await safeSetItem(userCardsCacheKey, JSON.stringify(userCardsRows));
         } catch {}
       } catch (err) {
         try {

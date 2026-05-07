@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { safeSetItem } from '../lib/safeAsyncStorage';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import { buildDecisionMetrics, computeScore, QuestionAttempt } from '../lib/analytics-utils';
@@ -350,8 +351,8 @@ export function useAggregateTestAnalytics(userId: string | null) {
         setRawAllQuestions(allQuestions);
         setRawAttemptsForTrend(attemptRowsForTrend);
 
-        // Save to cache
-        await AsyncStorage.setItem(cacheKey, JSON.stringify({
+        // Save to cache (best-effort; survives Android SQLITE_FULL)
+        await safeSetItem(cacheKey, JSON.stringify({
           trends: newTrends,
           cumulativeHierarchy: cumulative,
           repeatedWeaknesses: newRepeated,

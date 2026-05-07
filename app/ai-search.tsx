@@ -1070,10 +1070,15 @@ export default function AISearchTab() {
     const searchTier = (item as any)._searchTier ?? 3;
     const subColor = getSubjectColor(item.subject || '');
     const isFeatured = index === 0;
+    // ISSUE FIX #10: Pass complete exam_info including exam_group/exam_name
+    // so chips display specific exam names instead of generic categories
     const synthExamInfo = {
       is_upsc_cse:  item.is_upsc_cse,
       is_allied:    item.is_allied,
       is_others:    item.is_others,
+      group:        item.exam_group,
+      exam_name:    item.exam_group,
+      year:         item.exam_year,
     };
     const pyq = getPYQCategorization({
       ...item,
@@ -2075,6 +2080,9 @@ export default function AISearchTab() {
                           is_upsc_cse: previewQuestion?.is_upsc_cse,
                           is_allied: previewQuestion?.is_allied,
                           is_others: previewQuestion?.is_others,
+                          group: previewQuestion?.exam_group,
+                          exam_name: previewQuestion?.exam_group,
+                          year: previewQuestion?.exam_year,
                           ...(previewQuestion?.exam_info || {})
                         },
                         _explanations: enrichedExplanations || previewQuestion._explanations || [],

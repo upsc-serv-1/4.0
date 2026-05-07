@@ -11,6 +11,7 @@
  *   - Full tree fetch via a single RPC so the deck hub renders in one round-trip.
  */
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
 
 export interface Branch {
@@ -51,6 +52,30 @@ export interface BranchCounts {
 export class BranchSvc {
   // ─── CRUD ───────────────────────────────────────────────────────────────
   static async listAll(userId: string, opts: { includeArchived?: boolean } = {}): Promise<Branch[]> {
+    const cacheKey = `flashcard_branches_${userId}`;
+
+    const sortRows = (rows: Branch[]) =>
+      [...rows].sort((a, b) => (a.sort_order - b.sort_order) || a.name.localeCompare(b.name));
+
+    const filterRows = (rows: Branch[]) => {
+      const base = rows.filter((r) => !r.is_deleted);
+      const visible = opts.includeArchived ? base : base.filter((r) => !r.is_archived);
+      return sortRows(visible);
+    };
+
+    // OFFLINE-FIRST: serve cached branches first.
+    if (!opts.includeArchived) {
+      try {
+        const cached = await AsyncStorage.getItem(cacheKey);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return filterRows(parsed as Branch[]);
+          }
+        }
+      } catch {}
+    }
+
     let q = supabase
       .from('flashcard_branches')
       .select('*')
@@ -59,9 +84,29 @@ export class BranchSvc {
       .order('sort_order', { ascending: true })
       .order('name', { ascending: true });
     if (!opts.includeArchived) q = q.eq('is_archived', false);
+
     const { data, error } = await q;
-    if (error) throw error;
-    return (data ?? []) as Branch[];
+    if (error) {
+      // Network failed -> retry from cache.
+      try {
+        const cached = await AsyncStorage.getItem(cacheKey);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return filterRows(parsed as Branch[]);
+          }
+        }
+      } catch {}
+      throw error;
+    }
+
+    const rows = (data ?? []) as Branch[];
+    if (!opts.includeArchived) {
+      try {
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(rows));
+      } catch {}
+    }
+    return rows;
   }
 
   static async create(userId: string, name: string, parent_id: string | null = null, is_folder: boolean = false): Promise<Branch> {
@@ -209,11 +254,28 @@ export class BranchSvc {
     const branches = await this.listAll(userId);
 
     // 2. All branch<->card links for this user (RLS keeps this scoped)
-    const { data: links, error: linkErr } = await supabase
-      .from('flashcard_branch_cards')
-      .select('branch_id, card_id')
-      .eq('user_id', userId);
-    if (linkErr) throw linkErr;
+    const linksCacheKey = `flashcard_branch_cards_${userId}`;
+    let links: any[] = [];
+
+    try {
+      const cached = await AsyncStorage.getItem(linksCacheKey);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) links = parsed;
+      }
+    } catch {}
+
+    if (links.length === 0) {
+      const { data, error: linkErr } = await supabase
+        .from('flashcard_branch_cards')
+        .select('branch_id, card_id')
+        .eq('user_id', userId);
+      if (linkErr) throw linkErr;
+      links = data ?? [];
+      try {
+        await AsyncStorage.setItem(linksCacheKey, JSON.stringify(links));
+      } catch {}
+    }
 
     const branchCardMap = new Map<string, Set<string>>(); // branch_id → Set<card_id>
     const allCardIds = new Set<string>();
@@ -231,18 +293,41 @@ export class BranchSvc {
     const cardStateMap = new Map<string, MiniCard>();
 
     if (cardIds.length > 0) {
-      // Batch in groups of 500 to avoid URL-too-long on big decks
-      const CHUNK = 500;
-      for (let i = 0; i < cardIds.length; i += CHUNK) {
-        const slice = cardIds.slice(i, i + CHUNK);
-        const { data, error } = await supabase
-          .from('user_cards')
-          .select('card_id, learning_status, status, next_review')
-          .eq('user_id', userId)
-          .in('card_id', slice);
-        if (error) throw error;
-        (data ?? []).forEach((r: any) => cardStateMap.set(r.card_id, r));
+      const userCardsCacheKey = `user_cards_${userId}`;
+      const cardIdSet = new Set(cardIds);
+      let userCardsRows: any[] = [];
+
+      try {
+        const cached = await AsyncStorage.getItem(userCardsCacheKey);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed)) userCardsRows = parsed;
+        }
+      } catch {}
+
+      if (userCardsRows.length === 0) {
+        // Batch in groups of 500 to avoid URL-too-long on big decks
+        const CHUNK = 500;
+        const fetchedRows: any[] = [];
+        for (let i = 0; i < cardIds.length; i += CHUNK) {
+          const slice = cardIds.slice(i, i + CHUNK);
+          const { data, error } = await supabase
+            .from('user_cards')
+            .select('card_id, learning_status, status, next_review')
+            .eq('user_id', userId)
+            .in('card_id', slice);
+          if (error) throw error;
+          fetchedRows.push(...(data ?? []));
+        }
+        userCardsRows = fetchedRows;
+        try {
+          await AsyncStorage.setItem(userCardsCacheKey, JSON.stringify(userCardsRows));
+        } catch {}
       }
+
+      userCardsRows
+        .filter((r: any) => cardIdSet.has(r.card_id))
+        .forEach((r: any) => cardStateMap.set(r.card_id, r));
     }
 
     // Helper: counters for a direct branch (not yet rolled up)

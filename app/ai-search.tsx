@@ -207,6 +207,10 @@ export default function AISearchTab() {
   const [microtopicOptions, setMicrotopicOptions] = useState<string[]>([]);
   const [instituteOptions, setInstituteOptions] = useState<string[]>([]);
 
+  // ISSUE FIX #12: Track all subjects from search results for sidebar
+  // so filter options remain visible even after selection
+  const [allSearchSubjects, setAllSearchSubjects] = useState<string[]>([]);
+
   // PYQ Widget — hot topics from predictive analysis
   const [pyqHotTopics, setPyqHotTopics] = useState<PredictiveRow[]>([]);
 
@@ -977,6 +981,14 @@ export default function AISearchTab() {
       const stamped = mergedQs.map((r: any) => ({ ...r, _searchTier: getSearchTier(r) }));
       setResults(stamped as SearchResult[]);
 
+      // ISSUE FIX #12: Track all unique subjects from initial search results
+      // so sidebar filters remain visible even after filtering
+      if (!sidebarSubjectFilter) {
+        const uniqueSubjects = [...new Set(stamped.map((r: any) => r.subject).filter(Boolean))];
+        setAllSearchSubjects(uniqueSubjects as string[]);
+      }
+
+
     } catch (e: any) {
       const msg: string = e?.message || 'Unknown error';
       if (msg.includes('No Gemini API key found') || msg.includes('No Groq API key found')) {
@@ -1327,7 +1339,8 @@ export default function AISearchTab() {
           </View>
 
           {/* Subject drill-down: tapping a subject re-runs search with that subject filter. */}
-          {[...new Set(results.map(r => r.subject).filter(Boolean))].length > 1 && (
+          {/* ISSUE FIX #12: Use allSearchSubjects so filter options remain visible after selection */}
+          {allSearchSubjects.length > 1 && (
             <>
               <Text style={[styles.panelLabel, { color: colors.textTertiary, marginTop: 14 }]}>BY SUBJECT</Text>
               {/* Fix #2 - clear chip */}
@@ -1345,7 +1358,8 @@ export default function AISearchTab() {
                   <Text style={[styles.subjectChipText, { color: '#ef4444' }]}>Clear: {sidebarSubjectFilter}</Text>
                 </TouchableOpacity>
               )}
-              {[...new Set(results.map(r => r.subject).filter(Boolean))].map(sub => {
+              {allSearchSubjects.map(sub => {
+                // Count from current filtered results, but show all subjects from original search
                 const count = results.filter(r => r.subject === sub).length;
                 const color = getSubjectColor(sub as string);
                 const isSelected = sidebarSubjectFilter === sub;

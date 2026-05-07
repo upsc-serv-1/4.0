@@ -318,7 +318,8 @@ export const SharedQuestionCard = ({
 
           <View style={styles.controlRow}>
             <Text style={[styles.controlLabel, { color: effectiveColors.textTertiary }]}>STUDY TAGS</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
+            {/* ISSUE FIX #14: Enable scroll indicator so users know there are more tags */}
+            <ScrollView horizontal showsHorizontalScrollIndicator={true} contentContainerStyle={styles.chipScroll}>
               {[...userStudyTags].map(tag => {
                 const selected = (effectiveAnswerData.studyTags || []).includes(tag);
                 return (

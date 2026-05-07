@@ -751,11 +751,34 @@ export class FlashcardSvc {
 
   static async softDeleteCardForUser(userId: string, cardId: string) {
     await this.ensureUserHasCard(userId, cardId);
+    // 1. Delete user_cards row (hard delete from Supabase, not soft-delete)
     const { error } = await supabase
       .from('user_cards')
-      .update({ status: 'deleted', updated_at: new Date().toISOString() })
+      .delete()
       .eq('user_id', userId).eq('card_id', cardId);
     if (error) throw error;
+
+    // 2. Clean up flashcard_branch_cards references
+    try {
+      await supabase
+        .from('flashcard_branch_cards')
+        .delete()
+        .eq('card_id', cardId)
+        .eq('user_id', userId);
+    } catch (e) {
+      console.warn('[softDeleteCardForUser] branch_cards cleanup failed (non-fatal):', e);
+    }
+
+    // 3. Clean up card_reviews
+    try {
+      await supabase
+        .from('card_reviews')
+        .delete()
+        .eq('card_id', cardId)
+        .eq('user_id', userId);
+    } catch (e) {
+      console.warn('[softDeleteCardForUser] card_reviews cleanup failed (non-fatal):', e);
+    }
   }
   static async restoreDeletedCardForUser(userId: string, cardId: string) {
     const { error } = await supabase

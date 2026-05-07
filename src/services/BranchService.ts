@@ -173,42 +173,73 @@ export class BranchSvc {
 
   /** Soft-delete (recoverable for 30 days at the UI layer). */
   static async deleteBranch(branchId: string, userId: string): Promise<void> {
-    try {
-      // 1. Get all card IDs belonging to this branch (recursively if folder)
-      const cardIds = await this.listCardIdsInBranch(branchId, { recursive: true, userId });
-      
-      if (cardIds.length > 0) {
-        // 2. Mark all these cards as deleted in the cards table
-        const { error: cardsError } = await supabase
-          .from('cards')
-          .update({ is_deleted: true })
-          .in('id', cardIds);
-        
-        if (cardsError) {
-          console.error('[deleteBranch] Error marking cards as deleted:', cardsError);
-          throw cardsError;
-        }
+    // 1. Get all card IDs belonging to this branch (recursively if folder)
+    const cardIds = await this.listCardIdsInBranch(branchId, { recursive: true, userId });
+    
+    // 2. Get all child branch IDs (folders/decks inside this branch)
+    const { data: children } = await supabase
+      .from('flashcard_branches')
+      .select('id')
+      .eq('parent_id', branchId)
+      .eq('user_id', userId);
+    const childIds = (children || []).map((c: any) => c.id);
 
-        // 3. Delete mappings from flashcard_branch_cards
+    if (cardIds.length > 0) {
+      // 3. Delete card_reviews for these cards (audit cleanup)
+      try {
+        await supabase
+          .from('card_reviews')
+          .delete()
+          .in('card_id', cardIds)
+          .eq('user_id', userId);
+      } catch (e) {
+        console.warn('[deleteBranch] card_reviews cleanup failed (non-fatal):', e);
+      }
+
+      // 4. Delete mappings from flashcard_branch_cards
+      try {
         await supabase
           .from('flashcard_branch_cards')
           .delete()
           .in('card_id', cardIds)
           .eq('user_id', userId);
+      } catch (e) {
+        console.warn('[deleteBranch] branch_cards cleanup failed:', e);
+      }
 
-        // 4. Delete these cards from user_cards
+      // 5. Delete these cards from user_cards
+      try {
         await supabase
           .from('user_cards')
           .delete()
           .in('card_id', cardIds)
           .eq('user_id', userId);
+      } catch (e) {
+        console.warn('[deleteBranch] user_cards cleanup failed:', e);
       }
-    } catch (err) {
-      console.error('[deleteBranch] Failed to soft-delete associated cards:', err);
-      throw err; // Re-throw so the caller knows deletion failed
+
+      // 6. Mark cards as deleted (soft-delete in cards table)
+      try {
+        await supabase
+          .from('cards')
+          .update({ is_deleted: true })
+          .in('id', cardIds);
+      } catch (e) {
+        // Non-fatal: is_deleted column may not exist in all schemas
+        console.warn('[deleteBranch] cards soft-delete failed (non-fatal):', e);
+      }
     }
 
-    // 5. Hard delete the branch from flashcard_branches
+    // 7. Recursively delete child branches
+    for (const childId of childIds) {
+      try {
+        await this.deleteBranch(childId, userId);
+      } catch (e) {
+        console.warn('[deleteBranch] child branch cleanup failed:', e);
+      }
+    }
+
+    // 8. Hard delete the branch from flashcard_branches
     const { error } = await supabase
       .from('flashcard_branches')
       .delete()

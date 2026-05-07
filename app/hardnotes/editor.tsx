@@ -11,7 +11,7 @@
  *   lens      string  optional  — start in this lens ('glance' | 'focus' | 'ink')
  *   baseLayer JSON    optional  — { markdown, source } pushed from quiz capture
  */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput,
   ActivityIndicator, KeyboardAvoidingView, Platform, useWindowDimensions, Alert,
@@ -61,6 +61,22 @@ export default function HardnoteEditor() {
   const [inkColor, setInkColor] = useState<string>('#0f172a');
   const [inkWidth, setInkWidth] = useState<number>(2);
   const [textModeActive, setTextModeActive] = useState(false);
+
+  // Sensible defaults when switching tool — keeps Notability-like ergonomics.
+  const handleToolChange = useCallback((next: ToolKind) => {
+    setInkTool(next);
+    if (next === 'tape') {
+      // Always start with paper white + wide stroke so the first tape-stroke is a clear mask.
+      setInkColor('#ffffff');
+      setInkWidth(28);
+    } else if (next === 'pen') {
+      setInkColor('#0f172a');
+      setInkWidth(2);
+    } else if (next === 'highlighter') {
+      setInkColor('#fde68a');
+      setInkWidth(14);
+    }
+  }, []);
 
   const toolbarX = useSharedValue(0);
   const toolbarY = useSharedValue(0);
@@ -382,7 +398,7 @@ export default function HardnoteEditor() {
                 tool={inkTool}
                 color={inkColor}
                 width={inkWidth}
-                onToolChange={setInkTool}
+                onToolChange={handleToolChange}
                 onColorChange={setInkColor}
                 onWidthChange={setInkWidth}
                 onUndo={doc.undoStroke}

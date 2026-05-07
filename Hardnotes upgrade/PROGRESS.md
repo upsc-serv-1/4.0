@@ -87,7 +87,7 @@ Out of scope for this branch:
 | 3 | Real-time Notes ↔ Hardnotes sync | ✅ done | (this commit) |
 | 4 | Notes-tab "Open in Hardnotes" + iPad dockable toolbar | ⬜ todo | — |
 | 5 | Notability spec — page-wide ink (file 3) | ✅ done | (this commit) |
-| 6 | Notability spec — tape mask + lasso | ⬜ todo | — |
+| 6 | Notability spec — tape mask + lasso | ✅ tape done; lasso deferred | (this commit) |
 | 7 | Notability impl-guide patterns (file 4) | ⬜ todo | — |
 | 8 | Soft notes quick-ref polish (file 5) | ⬜ todo | — |
 
@@ -242,3 +242,29 @@ User said: *"my pencil should work on whole page"*. This batch implements that.
 - Page-stroke undo/redo (currently only per-bullet has undo). Defer.
 
 _Next → Batch 6: tape/mask + lasso, then files 4 & 5._
+
+### 2026-02 · Batch 6 — Tape / mask tool (Notability spec, file 3)
+
+User said: *"tape like masking feature of notability"*. Done.
+
+**Files**
+- `src/components/hardnotes/strokes.ts` — `'tape'` added to `ToolKind`
+- `src/components/hardnotes/InkToolbar.tsx` — Tape button, `TAPE_COLORS`, `TAPE_WIDTHS`
+- `src/components/hardnotes/PageInkOverlay.tsx` — opaque-fill render branch for `tool === 'tape'`
+- `app/hardnotes/editor.tsx` — `handleToolChange()` smart defaults
+
+**How tape behaves**
+- Pick **Tape** in the floating ink dock → palette swaps to mask-friendly colours: `#ffffff`, `#fffbeb`, `#f1f5f9`, `#fef3c7`, `#fee2e2`, `#0f172a`. Widths jump to 16/28/44 px.
+- Drag with single finger / pencil → the stroke renders as a **fully opaque, square-cap, miter-joined wide path**, painting OVER existing pen/highlighter ink. That gives the "correction tape" effect — the underlying ink is masked but not deleted.
+- Stored as a normal `Stroke` with `tool: 'tape'` inside the same `pageStrokes` array, so it round-trips through the existing persistence + realtime sync.
+- `handleToolChange('tape')` resets colour to white and width to 28 — so the very first stroke after switching makes a clean visible mask.
+- `handleToolChange('pen' | 'highlighter')` resets to their conventional defaults too — prevents the user being stuck with white pen after switching back.
+
+**Why we did NOT make tape a separate "mask record"**
+- Re-using `Stroke` keeps undo/redo/eraser/realtime behaviour unchanged.
+- Eraser already deletes any stroke type — so tapping eraser on a tape stroke removes it, exactly like Notability.
+
+**Lasso (deferred)**
+- `'lasso'` is already in `ToolKind` but no UI button yet. Spec calls for a closed-path selection that moves/copies/deletes contained strokes. Worth its own batch — slated for Batch 7 alongside file 4 patterns.
+
+_Next → Read files 4 (Notability Implementation Guide) and 5 (Soft Notes Quick Ref) and apply._

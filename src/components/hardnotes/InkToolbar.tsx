@@ -6,15 +6,17 @@
  */
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { Pen, Highlighter, Eraser, Sparkles, Undo2, Redo2 } from 'lucide-react-native';
+import { Pen, Highlighter, Eraser, Sparkles, Undo2, Redo2, Square } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../../context/ThemeContext';
 import { ToolKind } from './strokes';
 
 const PEN_COLORS = ['#0f172a', '#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6'];
 const HIGHLIGHTER_COLORS = ['#fde68a', '#fca5a5', '#a7f3d0', '#93c5fd', '#d8b4fe', '#fdba74'];
+const TAPE_COLORS = ['#ffffff', '#fffbeb', '#f1f5f9', '#fef3c7', '#fee2e2', '#0f172a'];
 const WIDTHS = [2, 4, 7];
 const HIGHLIGHTER_WIDTHS = [8, 14, 22];
+const TAPE_WIDTHS = [16, 28, 44];
 
 interface Props {
   tool: ToolKind;
@@ -46,8 +48,8 @@ export function InkToolbar({
   isTextMode,
 }: Props) {
   const { colors } = useTheme();
-  const palette = tool === 'highlighter' ? HIGHLIGHTER_COLORS : PEN_COLORS;
-  const activeWidths = tool === 'highlighter' ? HIGHLIGHTER_WIDTHS : WIDTHS;
+  const palette = tool === 'highlighter' ? HIGHLIGHTER_COLORS : tool === 'tape' ? TAPE_COLORS : PEN_COLORS;
+  const activeWidths = tool === 'highlighter' ? HIGHLIGHTER_WIDTHS : tool === 'tape' ? TAPE_WIDTHS : WIDTHS;
 
   const ping = () => {
     if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
@@ -65,6 +67,9 @@ export function InkToolbar({
         </ToolBtn>
         <ToolBtn active={tool === 'eraser'} onPress={() => { onToolChange('eraser'); ping(); }} testID="ink-tool-eraser">
           <Eraser size={18} color={tool === 'eraser' ? '#ef4444' : colors.textTertiary} strokeWidth={tool === 'eraser' ? 2.5 : 2} />
+        </ToolBtn>
+        <ToolBtn active={tool === 'tape'} onPress={() => { onToolChange('tape'); ping(); }} testID="ink-tool-tape">
+          <Square size={18} color={tool === 'tape' ? '#0f172a' : colors.textTertiary} strokeWidth={tool === 'tape' ? 2.5 : 2} fill={tool === 'tape' ? '#fde68a' : 'none'} />
         </ToolBtn>
       </View>
 

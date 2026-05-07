@@ -2,7 +2,7 @@
  * Stroke model — a single pen/highlighter stroke stored as vector data.
  * Serialized into user_notes.items as { type: 'stroke', ...data }.
  */
-export type ToolKind = 'pen' | 'highlighter' | 'eraser' | 'lasso';
+export type ToolKind = 'pen' | 'highlighter' | 'eraser' | 'lasso' | 'tape';
 
 export interface StrokePoint {
   x: number;

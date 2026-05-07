@@ -97,7 +97,7 @@ export function PageInkOverlay({
         id: strokeIdRef.current,
         tool: inkTool,
         color: inkColor,
-        width: inkWidth,
+        width: inkTool === 'tape' ? Math.max(inkWidth, 30) : inkWidth,
         opacity: inkTool === 'highlighter' ? 0.35 : 1,
         points: pts,
         created_at: new Date().toISOString(),
@@ -148,7 +148,21 @@ export function PageInkOverlay({
         const d = strokeToSvgPath(s.points);
         if (!d) return null;
         const isHL = s.tool === 'highlighter';
+        const isTape = s.tool === 'tape';
         const strokeColor = isHL ? COLOR_WITH_OPACITY(s.color, s.opacity) : s.color;
+        if (isTape) {
+          return (
+            <Path
+              key={s.id}
+              path={d}
+              color={s.color}
+              style="stroke"
+              strokeWidth={Math.max(s.width, 24)}
+              strokeCap="butt"
+              strokeJoin="miter"
+            />
+          );
+        }
         const avgP = s.points.reduce((a, p) => a + p.p, 0) / Math.max(1, s.points.length);
         const dynW = s.width * (0.5 + 0.5 * avgP);
         return (
@@ -167,11 +181,23 @@ export function PageInkOverlay({
       {currentStroke.length > 0 && (
         <Path
           path={strokeToSvgPath(currentStroke)}
-          color={inkTool === 'highlighter' ? COLOR_WITH_OPACITY(inkColor, 0.35) : inkColor}
+          color={
+            inkTool === 'highlighter'
+              ? COLOR_WITH_OPACITY(inkColor, 0.35)
+              : inkTool === 'tape'
+                ? inkColor
+                : inkColor
+          }
           style="stroke"
-          strokeWidth={inkTool === 'highlighter' ? inkWidth * 1.8 : inkWidth}
-          strokeCap="round"
-          strokeJoin="round"
+          strokeWidth={
+            inkTool === 'highlighter'
+              ? inkWidth * 1.8
+              : inkTool === 'tape'
+                ? Math.max(inkWidth, 24)
+                : inkWidth
+          }
+          strokeCap={inkTool === 'tape' ? 'butt' : 'round'}
+          strokeJoin={inkTool === 'tape' ? 'miter' : 'round'}
           blendMode={inkTool === 'highlighter' ? 'multiply' : undefined}
         />
       )}

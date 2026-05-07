@@ -34,6 +34,8 @@ import { QuestionCache } from '../src/services/QuestionCache';
 import { buildPredictive, probableHotsFor2026, type PredictiveRow } from '../src/lib/pyqPredictive';
 import { StudentSync } from '../src/services/StudentSync';
 import { NotebookLocationPicker } from '../src/components/NotebookLocationPicker';
+import { AddToFlashcardSheet } from '../src/components/flashcards/AddToFlashcardSheet';
+import { fetchBestAnswer, type BestAnswer } from '../src/services/BestAnswerService';
 import { LocalQuery } from '../src/services/LocalQuery';
 import { markdownToHtml } from '../src/utils/textUtils';
 import { buildMarkdownStyles, buildMarkdownRules } from '../src/utils/markdownUtils';
@@ -162,7 +164,9 @@ export default function AISearchTab() {
   const [previewFontSize, setPreviewFontSize] = useState(16);
   const baseFontSizeRef = useRef(16);
   const zoomTimerRef = useRef<any>(null);
+  const previewScrollRef = useRef<ScrollView>(null);
   const [showZoomIndicator, setShowZoomIndicator] = useState(false);
+  const FONT_SIZE_KEY = 'engine_font_size_v1';
 
   const mdStyles = React.useMemo(() => buildMarkdownStyles(
     colors.textPrimary,
@@ -229,8 +233,38 @@ export default function AISearchTab() {
 
   // Notebook states for "Add to Notebook" parity
   const [notebookModalVisible, setNotebookModalVisible] = useState(false);
-  const [folders, setFolders] = useState<any[]>([]);
+  const [selectedNotebook, setSelectedNotebook] = useState<{ node_id: string; note_id: string; title: string; folder_id: string | null } | null>(null);
   const [isSavingToNotebook, setIsSavingToNotebook] = useState(false);
+
+  // Flashcard placement sheet (same flow as full quiz engine)
+  const [aff, setAff] = useState<{
+    visible: boolean;
+    cardId: string | null;
+    hint: { subject?: string; section_group?: string; microtopic?: string };
+  }>({
+    visible: false,
+    cardId: null,
+    hint: { subject: 'General', section_group: 'General', microtopic: 'General' },
+  });
+
+  // MyVitamin sync (same source as full engine)
+  const [bestAnswers, setBestAnswers] = useState<Record<string, BestAnswer | null>>({});
+
+  // Keep preview zoom in sync with full quiz engine and persist globally
+  React.useEffect(() => {
+    AsyncStorage.getItem(FONT_SIZE_KEY).then((saved) => {
+      if (!saved) return;
+      const n = parseInt(saved, 10);
+      if (!isNaN(n) && n >= 12 && n <= 32) {
+        setPreviewFontSize(n);
+        baseFontSizeRef.current = n;
+      }
+    }).catch(() => {});
+  }, []);
+
+  React.useEffect(() => {
+    AsyncStorage.setItem(FONT_SIZE_KEY, String(previewFontSize)).catch(() => {});
+  }, [previewFontSize]);
 
   // Fetch real user revision tags for the study tags section
   React.useEffect(() => {
@@ -266,6 +300,7 @@ export default function AISearchTab() {
       setPreviewStudyTags([]);
       setPreviewFlashcard(false);
       setAiExplanation(null);
+      setSelectedNotebook(null);
       return;
     }
 
@@ -348,20 +383,6 @@ export default function AISearchTab() {
     }
   }, [previewQuestion?.id]);
 
-  const fetchHierarchy = async () => {
-    if (!session?.user?.id) return;
-    try {
-      const { data } = await supabase
-        .from('folders')
-        .select('id, name, notebooks(id, name, total_notes)')
-        .eq('user_id', session.user.id)
-        .order('name');
-      setFolders(data || []);
-    } catch (err) {
-      console.error("Hierarchy fetch error:", err);
-    }
-  };
-
   const handleToggleTag = async (qid: string, currentTags: string[], tag: string) => {
     if (!session?.user?.id) return;
     const newTags = currentTags.includes(tag) 
@@ -383,36 +404,67 @@ export default function AISearchTab() {
     }
   };
 
-  const handleAddToNotebook = async (notebookId: string) => {
-    if (!session?.user?.id || !previewQuestion) return;
+  const handlePickNotebook = async (notebook: { node_id: string; note_id: string; title: string; folder_id: string | null }) => {
+    setSelectedNotebook(notebook);
+    setNotebookModalVisible(false);
+
+    if (!previewQuestion) return;
+
     setIsSavingToNotebook(true);
     try {
-      const activeText = aiExplanation || previewQuestion.explanation_markdown || '';
-      const htmlContent = markdownToHtml(activeText);
-      const title = (previewQuestion.question_text || '').slice(0, 50) + '...';
+      const activeText = (previewExplSource === 'ai' ? aiExplanation : null)
+        || (previewExplSource === 'vitamin' ? (bestAnswers[previewQuestion.id]?.answer_text || '') : null)
+        || previewQuestion.explanation_markdown
+        || '';
 
-      const { data: note, error } = await supabase
-        .from('notes')
-        .insert({
-          user_id: session.user.id,
-          notebook_id: notebookId,
-          title: title,
-          content: htmlContent,
-          source_type: 'question',
-          source_id: previewQuestion.id,
-          updated_at: new Date().toISOString()
-        })
-        .select()
+      const { data: noteData, error: fetchError } = await LocalQuery
+        .from('user_notes')
+        .select('items')
+        .eq('id', notebook.note_id)
         .single();
 
-      if (error) throw error;
-      
-      setNotebookModalVisible(false);
+      if (fetchError) throw fetchError;
+
+      const currentItems = Array.isArray(noteData?.items) ? noteData.items : [];
+      const newItems = [...currentItems];
+      const heading = previewQuestion.micro_topic || 'General';
+
+      if (heading && heading !== 'General') {
+        const headingExists = newItems.some((i: any) => i.type === 'microTopicHeading' && i.text === heading);
+        if (!headingExists) {
+          newItems.push({
+            id: Date.now().toString() + '-h',
+            type: 'microTopicHeading',
+            text: heading,
+            addedAt: new Date().toISOString(),
+          });
+        }
+      }
+
+      newItems.push({
+        id: (Date.now() + 1).toString(),
+        type: 'highlight',
+        text: markdownToHtml(activeText),
+        color: '#FFB74D',
+        source: `AI Search Preview / ${previewQuestion.subject || previewQuestion.exam_group || 'Practice'} ${previewQuestion.exam_year || ''}`.trim(),
+        addedAt: new Date().toISOString(),
+      });
+
+      const { error: updateError } = await supabase
+        .from('user_notes')
+        .update({
+          items: newItems,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', notebook.note_id);
+
+      if (updateError) throw updateError;
+
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-      Alert.alert("Success", "Question added to your notebook.");
+      Alert.alert('Success', 'Study text saved to Text Section.');
     } catch (err: any) {
-      console.error("Notebook Save Error:", err);
-      Alert.alert("Error", "Failed to save to notebook: " + err.message);
+      console.error('Notebook Save Error:', err);
+      Alert.alert('Error', 'Failed to save to Text Section: ' + (err?.message || 'Unknown error'));
     } finally {
       setIsSavingToNotebook(false);
     }
@@ -435,24 +487,36 @@ export default function AISearchTab() {
     }
   };
 
-  const handleAddToFlashcards = async () => {
-    if (!session?.user?.id || !previewQuestion) return;
+  const handleAddToFlashcards = async (qArg?: any) => {
+    if (!session?.user?.id) return;
+    const q = (qArg || previewQuestion) as SearchResult | null;
+    if (!q) return;
+
     setSavingFlashcard(true);
     try {
-      // Logic for activeAnswerText: AI text > Vitamin text > default explanation
-      const explanations = buildCanonicalExplanations(previewQuestion);
-      const activeExplText = previewExplSource === 'ai' 
-        ? aiExplanation 
-        : previewExplSource === 'vitamin' 
-          ? '' // Vitamin is handled by ID usually, but here we can pass text if needed
-          : explanations.find(e => e.sourceKey === previewExplSource)?.text || previewQuestion.explanation_markdown || '';
+      // Same flow as full quiz engine: create card first, then open AddToFlashcardSheet.
+      const explanations = buildCanonicalExplanations(q as any);
+      const activeExplText = previewExplSource === 'ai'
+        ? aiExplanation
+        : previewExplSource === 'vitamin'
+          ? (bestAnswers[q.id]?.answer_text || '')
+          : explanations.find((e: any) => e.sourceKey === previewExplSource)?.text || q.explanation_markdown || '';
 
-      await FlashcardSvc.createFromQuestion(session.user.id, previewQuestion as any, activeExplText || undefined);
+      const cardId = await FlashcardSvc.createFromQuestion(session.user.id, q as any, activeExplText || undefined);
       setPreviewFlashcard(true);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      setAff({
+        visible: true,
+        cardId,
+        hint: {
+          subject: q.subject || 'General',
+          section_group: q.section_group || 'General',
+          microtopic: q.micro_topic || 'General',
+        },
+      });
     } catch (err: any) {
-      console.error("Flashcard Error:", err);
-      Alert.alert("Error", "Failed to add to Flashcards. " + (err.message || ''));
+      console.error('Flashcard Error:', err);
+      Alert.alert('Error', 'Failed to add to Flashcards. ' + (err.message || ''));
     } finally {
       setSavingFlashcard(false);
     }
@@ -460,6 +524,17 @@ export default function AISearchTab() {
 
   const handleAiExplainPopup = async () => {
     if (!previewQuestion) return;
+
+    // Match full engine behavior: switch source first so the AI container is visible immediately.
+    setPreviewRevealed(true);
+    setPreviewExplSource('ai');
+
+    // Cached AI explanation → just reveal and render without re-requesting.
+    if (aiExplanation) {
+      requestAnimationFrame(() => previewScrollRef.current?.scrollToEnd?.({ animated: true }));
+      return;
+    }
+
     setAiExplainLoading(true);
     try {
       const rawOptions = (previewQuestion as any).options || {};
@@ -469,29 +544,41 @@ export default function AISearchTab() {
         C: rawOptions.c || rawOptions.C || '',
         D: rawOptions.d || rawOptions.D || '',
       };
-      
+
       const explanations = buildCanonicalExplanations(previewQuestion);
       const result = await aiExplainQuestion(
-        previewQuestion.question_text || previewQuestion.statement || '',
+        previewQuestion.question_text || (previewQuestion as any).statement || '',
         optionsMap,
         previewQuestion.correct_answer || '',
-        explanations.map(e => ({
+        explanations.map((e: any) => ({
           source: e.source,
           program: e.program,
           text: e.text,
-          answer: e.answer
+          answer: e.answer,
         }))
       );
+
       setAiExplanation(result);
-      setPreviewRevealed(true);
+      requestAnimationFrame(() => previewScrollRef.current?.scrollToEnd?.({ animated: true }));
     } catch (e: any) {
       const msg: string = e?.message || 'Unknown error';
       if (msg.includes('404')) Alert.alert('Model not found', 'Switch model in Settings.');
       else if (msg.includes('429')) Alert.alert('Quota exceeded', 'Try another key or provider.');
       else Alert.alert('AI Error', msg);
+      setPreviewExplSource('all');
     } finally {
       setAiExplainLoading(false);
     }
+  };
+
+  const ensureBestAnswerLoaded = (qid: string) => {
+    if (!qid || qid in bestAnswers) return;
+    fetchBestAnswer(qid).then((row) => {
+      setBestAnswers(prev => ({ ...prev, [qid]: row }));
+      if (row && previewQuestion?.id === qid) {
+        setPreviewExplSource(prev => (prev === 'all' ? 'vitamin' : prev));
+      }
+    });
   };
 
   // Fix #6 — collapsible keywords panel
@@ -1948,6 +2035,7 @@ export default function AISearchTab() {
                 {/* Independent Scrollable Content */}
                 <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
                   <ScrollView 
+                    ref={previewScrollRef}
                     style={{ flexShrink: 1 }}
                     contentContainerStyle={{ padding: 16 }}
                     showsVerticalScrollIndicator={true}
@@ -1988,8 +2076,10 @@ export default function AISearchTab() {
                       onOptionSelect={(qid: string, opt: string) => setPreviewAnswer(opt)}
                       onAddFlashcard={handleAddToFlashcards}
                       onAiExplain={handleAiExplainPopup}
+                      bestAnswers={bestAnswers}
+                      ensureBestAnswerLoaded={ensureBestAnswerLoaded}
+                      showNotebookButton={false}
                       openNotebookFromQuestion={() => {
-                        fetchHierarchy();
                         setNotebookModalVisible(true);
                       }}
                     />
@@ -2038,10 +2128,17 @@ export default function AISearchTab() {
 
         <NotebookLocationPicker
           visible={notebookModalVisible}
-          folders={folders}
           onClose={() => setNotebookModalVisible(false)}
-          onSelect={handleAddToNotebook}
-          loading={isSavingToNotebook}
+          userId={session?.user?.id || ''}
+          onPickNotebook={handlePickNotebook}
+        />
+
+        <AddToFlashcardSheet
+          visible={aff.visible}
+          onClose={() => setAff((prev) => ({ ...prev, visible: false }))}
+          userId={session?.user?.id || ''}
+          cardId={aff.cardId}
+          hint={aff.hint}
         />
     </PageWrapper>
   );

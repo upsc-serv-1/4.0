@@ -80,6 +80,7 @@ export const SharedQuestionCard = ({
   openHardnoteFromQuestion,
   savedFlash = {},
   fontSize = 15,
+  showNotebookButton = true,
 }: any) => {
     const { colors: themeColors } = useTheme();
     const effectiveColors = colors || themeColors;
@@ -231,14 +232,16 @@ export const SharedQuestionCard = ({
                )}
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              onPress={() => openNotebookFromQuestion && openNotebookFromQuestion(item)}
-            >
-               <Plus
-                 size={20} 
-                 color={isZenMode ? '#43342240' : effectiveColors.textTertiary} 
-               />
-            </TouchableOpacity>
+            {showNotebookButton && (
+              <TouchableOpacity 
+                onPress={() => openNotebookFromQuestion && openNotebookFromQuestion(item)}
+              >
+                 <Plus
+                   size={20} 
+                   color={isZenMode ? '#43342240' : effectiveColors.textTertiary} 
+                 />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 

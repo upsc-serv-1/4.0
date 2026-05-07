@@ -47,12 +47,13 @@ export default function HardnoteEditor() {
   const baseLayerRaw = Array.isArray(params.baseLayer) ? params.baseLayer[0] : params.baseLayer;
 
   const { width: winW } = useWindowDimensions();
+  const isTablet = winW >= 760;
 
   const doc = useHardnoteDoc(noteId);
   const [lens, setLens] = useState<Lens>(requestedLens || 'glance');
   const contentWidth = lens === 'focus'
-    ? Math.max(320, winW - 48)
-    : Math.min(winW - 32, 740);
+    ? Math.min(720, winW - (isTablet ? 96 : 48))
+    : Math.min(winW - (isTablet ? 64 : 32), isTablet ? 920 : 740);
 
   // Ink toolbar state
   const [inkTool, setInkTool] = useState<ToolKind>('pen');
@@ -196,12 +197,20 @@ export default function HardnoteEditor() {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
       >
         {/* Header */}
-        <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: lensBg }]}>
+        <View style={[
+          styles.header,
+          {
+            borderBottomColor: colors.border,
+            backgroundColor: lensBg,
+            paddingHorizontal: isTablet ? 24 : 12,
+            paddingVertical: isTablet ? 14 : 8,
+          },
+        ]}>
           <TouchableOpacity onPress={handleBack} style={styles.iconBtn} data-testid="hn-editor-back">
-            <ChevronLeft size={24} color={colors.textPrimary} />
+            <ChevronLeft size={isTablet ? 28 : 24} color={colors.textPrimary} />
           </TouchableOpacity>
-          <View style={{ flex: 1, paddingHorizontal: 4 }}>
-            <Text style={[styles.eyebrow, { color: colors.primary }]}>HARDNOTE</Text>
+          <View style={{ flex: 1, paddingHorizontal: isTablet ? 8 : 4 }}>
+            <Text style={[styles.eyebrow, { color: colors.primary, fontSize: isTablet ? 10 : 9 }]}>HARDNOTE</Text>
             <TextInput
               value={doc.title}
               onChangeText={doc.setTitle}
@@ -212,6 +221,7 @@ export default function HardnoteEditor() {
                 {
                   color: lens === 'focus' ? '#3f2d16' : colors.textPrimary,
                   fontFamily: lens === 'focus' ? (Platform.OS === 'ios' ? 'Georgia' : 'serif') : undefined,
+                  fontSize: isTablet ? 26 : 20,
                 },
               ]}
               data-testid="hn-editor-title"
@@ -228,14 +238,17 @@ export default function HardnoteEditor() {
         </View>
 
         {/* Lens switcher */}
-        <View style={[styles.lensRow, { backgroundColor: lensBg }]}>
+        <View style={[
+          styles.lensRow,
+          { backgroundColor: lensBg, paddingHorizontal: isTablet ? 24 : 12, paddingVertical: isTablet ? 12 : 8 },
+        ]}>
           <LensSwitcher value={lens} onChange={setLens} />
           <View style={{ flex: 1 }} />
           {lens === 'glance' && (
             <View style={styles.glanceQuickAdd}>
-              <QuickAdd icon={<Heading1 size={13} color={colors.textSecondary} />} label="H" onPress={insertHeading} testID="hn-add-heading" />
-              <QuickAdd icon={<ListChecks size={13} color={colors.textSecondary} />} label="✓" onPress={insertChecklist} testID="hn-add-checklist" />
-              <QuickAdd icon={<Plus size={13} color={colors.textSecondary} />} label="•" onPress={insertPoint} testID="hn-add-point" />
+              <QuickAdd icon={<Heading1 size={isTablet ? 15 : 13} color={colors.textSecondary} />} label="H" onPress={insertHeading} testID="hn-add-heading" isTablet={isTablet} />
+              <QuickAdd icon={<ListChecks size={isTablet ? 15 : 13} color={colors.textSecondary} />} label="✓" onPress={insertChecklist} testID="hn-add-checklist" isTablet={isTablet} />
+              <QuickAdd icon={<Plus size={isTablet ? 15 : 13} color={colors.textSecondary} />} label="•" onPress={insertPoint} testID="hn-add-point" isTablet={isTablet} />
             </View>
           )}
         </View>
@@ -250,13 +263,15 @@ export default function HardnoteEditor() {
             style={{ flex: 1 }}
             contentContainerStyle={[
               { paddingBottom: lens === 'ink' ? 140 : 80 },
-              lens === 'focus' && { width: '100%', paddingTop: 12, paddingHorizontal: 24 },
+              isTablet && { alignItems: 'center' },
+              lens === 'focus' && { width: '100%', paddingTop: 12, paddingHorizontal: isTablet ? 32 : 24 },
             ]}
             keyboardDismissMode="interactive"
             automaticallyAdjustKeyboardInsets
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
+            <View style={isTablet ? { width: '100%', maxWidth: lens === 'focus' ? 760 : 940 } : { width: '100%' }}>
             {/* Focus mode meta */}
             {lens === 'focus' && (
               <View style={styles.focusMeta}>
@@ -304,6 +319,7 @@ export default function HardnoteEditor() {
                 />
               ))
             )}
+            </View>
           </ScrollView>
         )}
 
@@ -352,16 +368,25 @@ export default function HardnoteEditor() {
   );
 }
 
-function QuickAdd({ icon, label, onPress, testID }: any) {
+function QuickAdd({ icon, label, onPress, testID, isTablet }: any) {
   const { colors } = useTheme();
   return (
     <TouchableOpacity
       onPress={onPress}
       data-testid={testID}
-      style={[styles.quickAdd, { backgroundColor: colors.surface, borderColor: colors.border }]}
+      style={[
+        styles.quickAdd,
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          height: isTablet ? 36 : 30,
+          paddingHorizontal: isTablet ? 12 : 8,
+          gap: isTablet ? 6 : 4,
+        },
+      ]}
     >
       {icon}
-      <Text style={[styles.quickAddText, { color: colors.textSecondary }]}>{label}</Text>
+      <Text style={[styles.quickAddText, { color: colors.textSecondary, fontSize: isTablet ? 12 : 11 }]}>{label}</Text>
     </TouchableOpacity>
   );
 }

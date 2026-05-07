@@ -81,8 +81,8 @@ Out of scope for this branch:
 
 | Batch | Title | Status | Branch commit |
 |---|---|---|---|
-| 0 | Branch + progress.md scaffolding | 🔄 in progress | — |
-| 1 | iPad polish + Underline/Strikethrough in toolbar | ⬜ todo | — |
+| 0 | Branch + progress.md scaffolding | ✅ done | `83d91c4` |
+| 1 | iPad polish + Underline/Strikethrough in toolbar | ✅ done | (this commit) |
 | 2 | Hierarchical bullets (parent/child) | ⬜ todo | — |
 | 3 | Real-time Notes ↔ Hardnotes sync | ⬜ todo | — |
 | 4 | Notes-tab "Open in Hardnotes" + iPad dockable toolbar | ⬜ todo | — |
@@ -113,3 +113,35 @@ Each batch ends with a commit + push to `origin/hardnotes-renovation`.
 - Created this `PROGRESS.md`
 
 _Next step → Batch 1: iPad polish + Underline + Strikethrough._
+
+### 2026-02 · Batch 1 — Underline / Strikethrough + iPad polish
+
+**Files touched**
+- `src/components/hardnotes/InkBulletCard.tsx`
+- `app/hardnotes/editor.tsx`
+
+**Changes**
+- **Inline format toolbar (every bullet card)** now has `B`, `I`, `U`, `S`, four highlight swatches, `Done`. Underline / Strikethrough use Lucide icons inside the same `FormatBtn` component (extended to accept `children` so we can render an icon instead of a letter).
+- `wrapSelection` is reused — Underline wraps in `<u>…</u>`, Strikethrough in `<s>…</s>`. Both legacy `<del>` and `<s>` are styled in `tagsStyles` for backwards compatibility.
+- `RenderHtml` `tagsStyles` updated in **both** the editing-preview block and the read block — so the formatting renders correctly whether the user is editing or just viewing.
+- **iPad polish in `editor.tsx`**:
+  - Added `isTablet = winW >= 760` derived state.
+  - `contentWidth` now scales: focus mode caps at **720 px** (optimal reading width), glance/ink caps at **920 px** on iPad (vs. 740 px on phone).
+  - Header padding → 24/14 on iPad (was 12/8). Title font → 26 px. Eyebrow 10 px. Back chevron 28 px.
+  - Lens row gets matching 24/12 padding on iPad.
+  - Quick-add chips (`H` `✓` `•`) grow to 36 × 12 on iPad with bigger icons, easier finger-tap.
+  - ScrollView content-container now centers on iPad and the inner `<View>` enforces the max-width — long lines stop sprawling across the whole screen.
+
+**Why these are safe**
+- Pure styling / new optional props. Backwards-compatible.
+- No DB-schema or `useHardnoteDoc` changes, so saved notes load identically.
+- Phone (< 760 px) layout is unchanged — the conditional only kicks in on tablets.
+
+**Manual smoke test plan (cannot run code from this sandbox)**
+1. Select text in a bullet → tap `U` → text becomes underlined; tap `S` → strikethrough.
+2. Save & re-open the note → formatting persists (it's stored as HTML in `point.text`).
+3. Resize to ≥ 760 px → header & lens row expand, cards stay max 920 px and sit centred.
+
+**Known follow-ups (deferred)**
+- LensSwitcher chips themselves still use ~30 px height — fine on iPad but could grow.
+- The format toolbar still wraps onto two lines on small phones with all 4 swatches + B/I/U/S/Done; intentional for now.

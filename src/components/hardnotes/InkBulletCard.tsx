@@ -29,6 +29,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 import {
   Pencil, Check, Lock, Unlock, Trash2, Tag as TagIcon, GripVertical, Plus,
+  Underline as UnderlineIcon, Strikethrough as StrikethroughIcon,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { Point } from './useHardnoteDoc';
@@ -117,6 +118,8 @@ export function InkBulletCard({
 
   const applyBold = () => wrapSelection('<b>', '</b>');
   const applyItalic = () => wrapSelection('<i>', '</i>');
+  const applyUnderline = () => wrapSelection('<u>', '</u>');
+  const applyStrikethrough = () => wrapSelection('<s>', '</s>');
   const applyHighlight = (color: string) =>
     wrapSelection(`<mark style="background:${color}">`, '</mark>');
 
@@ -332,6 +335,9 @@ export function InkBulletCard({
                     strong: { fontWeight: '800' as const },
                     i: { fontStyle: 'italic' as const },
                     em: { fontStyle: 'italic' as const },
+                    u: { textDecorationLine: 'underline' as const },
+                    s: { textDecorationLine: 'line-through' as const },
+                    del: { textDecorationLine: 'line-through' as const },
                     mark: { borderRadius: 3, paddingHorizontal: 2 },
                     p: { marginVertical: 0 },
                   }}
@@ -357,8 +363,14 @@ export function InkBulletCard({
                 data-testid={`ink-card-input-${point.id}`}
               />
               <View style={styles.editToolbar}>
-                <FormatBtn label="B" bold onPress={applyBold} />
-                <FormatBtn label="I" italic onPress={applyItalic} />
+                <FormatBtn label="B" bold onPress={applyBold} testID={`ink-card-bold-${point.id}`} />
+                <FormatBtn label="I" italic onPress={applyItalic} testID={`ink-card-italic-${point.id}`} />
+                <FormatBtn underline onPress={applyUnderline} testID={`ink-card-underline-${point.id}`}>
+                  <UnderlineIcon size={13} color="#0f172a" strokeWidth={2.5} />
+                </FormatBtn>
+                <FormatBtn strike onPress={applyStrikethrough} testID={`ink-card-strike-${point.id}`}>
+                  <StrikethroughIcon size={13} color="#0f172a" strokeWidth={2.5} />
+                </FormatBtn>
                 {['#fde68a', '#a7f3d0', '#fca5a5', '#93c5fd'].map((c) => (
                   <TouchableOpacity
                     key={c}
@@ -396,6 +408,9 @@ export function InkBulletCard({
                     strong: { fontWeight: '800' as const, color: colors.textPrimary },
                     i: { fontStyle: 'italic' as const },
                     em: { fontStyle: 'italic' as const },
+                    u: { textDecorationLine: 'underline' as const },
+                    s: { textDecorationLine: 'line-through' as const },
+                    del: { textDecorationLine: 'line-through' as const },
                     mark: { borderRadius: 3, paddingHorizontal: 2 },
                     p: { marginVertical: 0 },
                   }}
@@ -524,19 +539,26 @@ export function InkBulletCard({
   );
 }
 
-function FormatBtn({ label, bold, italic, onPress }: any) {
+function FormatBtn({ label, bold, italic, underline, strike, onPress, children, testID }: any) {
   return (
-    <TouchableOpacity onPress={onPress} style={styles.formatBtn}>
-      <Text
-        style={{
-          fontWeight: bold ? '900' : '700',
-          fontStyle: italic ? 'italic' : 'normal',
-          fontSize: 13,
-          color: '#0f172a',
-        }}
-      >
-        {label}
-      </Text>
+    <TouchableOpacity onPress={onPress} style={styles.formatBtn} data-testid={testID}>
+      {children ? children : (
+        <Text
+          style={{
+            fontWeight: bold ? '900' : '700',
+            fontStyle: italic ? 'italic' : 'normal',
+            textDecorationLine: underline
+              ? 'underline'
+              : strike
+                ? 'line-through'
+                : 'none',
+            fontSize: 13,
+            color: '#0f172a',
+          }}
+        >
+          {label}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 }

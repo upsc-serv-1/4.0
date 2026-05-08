@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
 import { router } from 'expo-router';
-import { ChevronLeft, Home, BarChart2, RotateCcw, LayoutList, Tag, Target, FileText, BarChart3, Layers, ArrowUp, ArrowDown, Save, PenTool, BookOpen, Compass } from 'lucide-react-native';
+import { ChevronLeft, Home, BarChart2, RotateCcw, LayoutList, Tag, Target, FileText, BarChart3, Layers, ArrowUp, ArrowDown, Save, PenTool, BookOpen } from 'lucide-react-native';
 import { useTheme } from '../src/context/ThemeContext';
 import { PageWrapper } from '../src/components/PageWrapper';
 import { TabConfigService, TabKey } from '../src/services/TabConfigService';
@@ -16,7 +16,6 @@ const ALL_TABS: { key: TabKey; title: string; icon: any }[] = [
   { key: 'notes', title: 'Notes', icon: FileText },
   { key: 'hardnotes', title: 'Hardnotes', icon: PenTool },
   { key: 'softnotes', title: 'Softnotes', icon: BookOpen },
-  { key: 'pilot-v2', title: 'Pilot V2', icon: Compass },
   { key: 'revise', title: 'Revise', icon: RotateCcw },
   { key: 'tracker', title: 'Tracker', icon: LayoutList },
 ];

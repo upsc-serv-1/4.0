@@ -1,0 +1,15 @@
+In this Make project, look in the guidelines/ folder:
+
+    📄 QUICK_START.md - Start here
+    📄 INTEGRATION_GUIDE.md - Detailed steps
+    📄 complete-design-specification.md - Full design specs (3,826 lines!)
+    🔧 migrate-to-repo.sh - Automation script
+
+✅ After Integration, Test These:
+
+    Navigate to /notes in your app
+    Click through all 7 screens:
+        Dashboard → Subject (Polity) → Expand (Fundamental Rights) → Subtopic (Right to Equality) → Note List → Glance View → Editor
+    Test sidebar collapse/expand
+    Test scrolling in Glance view (should have 2000+ words)
+    Test editor toolbar and outline panel

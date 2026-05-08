@@ -78,6 +78,8 @@ import RenderHtml from 'react-native-render-html';
 import { buildNotesPdfHtml } from '@/src/utils/notesPdfEngine';
 import { UnifiedExportSheet } from '@/src/components/export/UnifiedExportSheet';
 import type { ExportPayload, ExportNoteBlock } from '@/src/lib/unifiedExportEngine';
+import { AIQuickActionButton } from '@/src/components/AIQuickActionButton';
+import { DEFAULT_NOTES_TEMPLATES } from '@/src/services/AIPromptManager';
 
 const { width, height } = Dimensions.get('window');
 
@@ -1593,6 +1595,21 @@ export default function NoteEditor() {
         </Modal>
       </View>
         </PinchGestureHandler>
+
+      {/* ── FLOATING AI BUTTON ────────────────── */}
+      {!isZenMode && (
+        <View style={{
+          position: 'absolute', bottom: 90, right: 16, zIndex: 100,
+          shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3, shadowRadius: 8, elevation: 8,
+        }}>
+          <AIQuickActionButton
+            context={{ type: 'note', content: mainContent?.slice(0, 2000) || '', title: title || 'Untitled Note' }}
+            templates={DEFAULT_NOTES_TEMPLATES}
+            buttonLabel="✨ AI"
+          />
+        </View>
+      )}
       </PageWrapper>
     </GestureHandlerRootView>
   );

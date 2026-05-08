@@ -42,6 +42,8 @@ import { spacing, radius } from '../src/theme';
 import { MICRO_SYLLABUS, MAINS_SYLLABUS, ANTHROPOLOGY_SYLLABUS } from '../src/data/syllabus';
 import { SyllabusService, SyllabusProgress } from '../src/services/SyllabusService';
 import { useAuth } from '../src/context/AuthContext';
+import { AIQuickActionButton } from '../src/components/AIQuickActionButton';
+import { DEFAULT_SYLLABUS_TEMPLATES } from '../src/services/AIPromptManager';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -426,9 +428,28 @@ export default function SyllabusTracker() {
                                 <Circle size={24} color={colors.textTertiary} />
                               )}
                            </TouchableOpacity>
-                           <Text style={[s.topicText, { color: itemProgress.mastered ? colors.textSecondary : colors.textPrimary, textDecorationLine: itemProgress.mastered ? 'line-through' : 'none' }]}>
-                             {topic}
-                           </Text>
+                           <View style={{ flex: 1 }}>
+                             <Text style={[s.topicText, { color: itemProgress.mastered ? colors.textSecondary : colors.textPrimary, textDecorationLine: itemProgress.mastered ? 'line-through' : 'none' }]}>
+                               {topic}
+                             </Text>
+                             <AIQuickActionButton
+                               context={{
+                                 type: 'syllabus',
+                                 title: topic,
+                                 metadata: {
+                                   progress: String(
+                                     Math.round(
+                                       (Object.values(itemProgress).filter(Boolean).length /
+                                         Object.values(itemProgress).length) * 100
+                                     )
+                                   ),
+                                 },
+                               }}
+                               templates={DEFAULT_SYLLABUS_TEMPLATES}
+                               buttonLabel="📅 AI Plan"
+                               buttonStyle={{ marginTop: 6, paddingHorizontal: 10, paddingVertical: 5 }}
+                             />
+                           </View>
                         </View>
                         
                         {trackingMethod === 'multi' && (

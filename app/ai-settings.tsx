@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Platform,
   KeyboardAvoidingView,
+  Modal,
 } from 'react-native';
 import { 
   ChevronLeft,
@@ -19,6 +20,11 @@ import {
   ChevronDown,
   ChevronUp,
   RotateCcw,
+  Plus,
+  Edit2,
+  Trash2,
+  X,
+  Check,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -36,12 +42,25 @@ import {
   OPENROUTER_MODELS,
   DEFAULT_OPENROUTER_MODEL
 } from '../src/services/GeminiService';
+import {
+  AIPromptManager,
+  PromptTemplate,
+  PromptCategory,
+  DEFAULT_QUIZ_TEMPLATES,
+  DEFAULT_NOTES_TEMPLATES,
+  DEFAULT_TAGS_TEMPLATES,
+  DEFAULT_ANALYSIS_TEMPLATES,
+  DEFAULT_SYLLABUS_TEMPLATES,
+} from '../src/services/AIPromptManager';
+import { useAuth } from '../src/context/AuthContext';
 import { PageWrapper } from '../src/components/PageWrapper';
 import { useTheme } from '../src/context/ThemeContext';
 
 export default function AISettings() {
   const { colors } = useTheme();
   const router = useRouter();
+  const { session } = useAuth();
+  const promptManager = AIPromptManager.getInstance();
 
   // ── Gemini State ──────────────────────────────
   const [geminiKeys, setGeminiKeys] = useState<string[]>(['', '', '', '']);
@@ -63,9 +82,27 @@ export default function AISettings() {
   const [summarizePrompt, setSummarizePrompt] = useState('');
   const [searchPrompt, setSearchPrompt]       = useState('');
   const [expandedPrompt, setExpandedPrompt]   = useState<'explain' | 'summarize' | 'search' | null>(null);
-
   const [promptSaving, setPromptSaving]       = useState(false);
   const [promptSaved, setPromptSaved]         = useState(false);
+
+  // ── Prompt Templates State ────────────────────
+  const [activeTemplateCategory, setActiveTemplateCategory] = useState<PromptCategory>('quiz');
+  const [templatesList, setTemplatesList] = useState<PromptTemplate[]>([]);
+  const [templatesLoading, setTemplatesLoading] = useState(false);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<PromptTemplate | null>(null);
+  const [templateForm, setTemplateForm] = useState<Partial<PromptTemplate>>({
+    template_name: '', template_key: '', button_label: '', button_emoji: '🤖',
+    prompt_text: '', category: 'quiz', is_active: true, display_order: 0,
+  });
+
+  const TEMPLATE_CATEGORIES: { key: PromptCategory; label: string; emoji: string }[] = [
+    { key: 'quiz', label: 'Quiz', emoji: '📝' },
+    { key: 'notes', label: 'Notes', emoji: '📔' },
+    { key: 'tags', label: 'Tags', emoji: '🏷️' },
+    { key: 'analysis', label: 'Analysis', emoji: '📊' },
+    { key: 'syllabus', label: 'Syllabus', emoji: '📅' },
+  ];
 
   // Load AI settings
   useEffect(() => {
@@ -150,6 +187,92 @@ export default function AISettings() {
     if (key === 'explain')    setExplainPrompt(DEFAULT_PROMPTS.explain);
     if (key === 'summarize')  setSummarizePrompt(DEFAULT_PROMPTS.summarize);
     if (key === 'search')     setSearchPrompt(DEFAULT_PROMPTS.search);
+  };
+
+  // ── Template Helpers ──────────────────────────
+  const loadTemplatesForCategory = async (cat: PromptCategory) => {
+    setTemplatesLoading(true);
+    try {
+      const userId = session?.user?.id;
+      const tmplts = userId
+        ? await promptManager.fetchPromptTemplates(userId, cat)
+        : getDefaultsForCat(cat);
+      setTemplatesList(tmplts);
+    } catch {
+      setTemplatesList(getDefaultsForCat(cat));
+    } finally {
+      setTemplatesLoading(false);
+    }
+  };
+
+  const getDefaultsForCat = (cat: PromptCategory): PromptTemplate[] => {
+    const map: Record<string, PromptTemplate[]> = {
+      quiz: DEFAULT_QUIZ_TEMPLATES,
+      notes: DEFAULT_NOTES_TEMPLATES,
+      tags: DEFAULT_TAGS_TEMPLATES,
+      analysis: DEFAULT_ANALYSIS_TEMPLATES,
+      syllabus: DEFAULT_SYLLABUS_TEMPLATES,
+    };
+    return map[cat] || [];
+  };
+
+  useEffect(() => { loadTemplatesForCategory(activeTemplateCategory); }, [activeTemplateCategory]);
+
+  const openCreateTemplate = () => {
+    setEditingTemplate(null);
+    setTemplateForm({
+      template_name: '', template_key: '', button_label: '', button_emoji: '🤖',
+      prompt_text: '', category: activeTemplateCategory, is_active: true, display_order: templatesList.length,
+    });
+    setShowTemplateModal(true);
+  };
+
+  const openEditTemplate = (tmpl: PromptTemplate) => {
+    setEditingTemplate(tmpl);
+    setTemplateForm({ ...tmpl });
+    setShowTemplateModal(true);
+  };
+
+  const handleSaveTemplate = async () => {
+    if (!templateForm.template_name || !templateForm.prompt_text || !templateForm.button_label) {
+      Alert.alert('Missing fields', 'Name, button label and prompt text are required');
+      return;
+    }
+    const userId = session?.user?.id;
+    if (!userId) { Alert.alert('Login required', 'Please log in to save custom templates'); return; }
+
+    const key = templateForm.template_key || (templateForm.template_name || '').toLowerCase().replace(/\s+/g, '_');
+    const full: PromptTemplate = {
+      ...(templateForm as PromptTemplate),
+      template_key: key,
+      category: activeTemplateCategory,
+    };
+
+    if (editingTemplate?.id) {
+      await promptManager.updatePromptTemplate(userId, editingTemplate.id, full);
+    } else {
+      await promptManager.createPromptTemplate(userId, full);
+    }
+
+    setShowTemplateModal(false);
+    loadTemplatesForCategory(activeTemplateCategory);
+  };
+
+  const handleDeleteTemplate = (tmpl: PromptTemplate) => {
+    if (!tmpl.id) { Alert.alert('Info', 'Default templates cannot be deleted'); return; }
+    Alert.alert('Delete Template', `Delete "${tmpl.template_name}"?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          const userId = session?.user?.id;
+          if (!userId) return;
+          await promptManager.deletePromptTemplate(userId, tmpl.id!, activeTemplateCategory);
+          loadTemplatesForCategory(activeTemplateCategory);
+        },
+      },
+    ]);
   };
 
   return (
@@ -386,8 +509,156 @@ export default function AISettings() {
           ))}
         </View>
 
+        {/* ══════════════════════════════════════════════════════════ */}
+        {/* PROMPT TEMPLATES SECTION */}
+        {/* ══════════════════════════════════════════════════════════ */}
+        <View style={{ marginTop: 28, marginBottom: 80 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <Text style={styles.sectionTitle}>AI PROMPT TEMPLATES</Text>
+            <TouchableOpacity
+              testID="add-template-btn"
+              onPress={openCreateTemplate}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#7c3aed', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}
+            >
+              <Plus size={14} color="#fff" />
+              <Text style={{ fontSize: 12, fontWeight: '900', color: '#fff' }}>Add</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={{ fontSize: 11, color: '#888', marginBottom: 12 }}>
+            Customize AI buttons shown when reviewing questions (ELI5, Why Wrong, etc.)
+          </Text>
+
+          {/* Category tabs */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              {TEMPLATE_CATEGORIES.map(cat => (
+                <TouchableOpacity
+                  key={cat.key}
+                  testID={`template-cat-${cat.key}`}
+                  onPress={() => setActiveTemplateCategory(cat.key)}
+                  style={{
+                    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1,
+                    backgroundColor: activeTemplateCategory === cat.key ? '#7c3aed' : 'transparent',
+                    borderColor: activeTemplateCategory === cat.key ? '#7c3aed' : '#ccc',
+                  }}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: '800', color: activeTemplateCategory === cat.key ? '#fff' : '#888' }}>
+                    {cat.emoji} {cat.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+
+          {/* Templates list */}
+          {templatesLoading ? (
+            <ActivityIndicator color="#7c3aed" style={{ marginVertical: 20 }} />
+          ) : templatesList.length === 0 ? (
+            <Text style={{ color: '#888', fontSize: 13, textAlign: 'center', paddingVertical: 16 }}>
+              No templates yet. Tap Add to create one.
+            </Text>
+          ) : (
+            <View style={{ gap: 8 }}>
+              {templatesList.map((tmpl, idx) => (
+                <View
+                  key={tmpl.id || tmpl.template_key || idx}
+                  style={{
+                    borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb',
+                    padding: 12, flexDirection: 'row', alignItems: 'center', gap: 10,
+                  }}
+                >
+                  <Text style={{ fontSize: 20 }}>{tmpl.button_emoji || '🤖'}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '800' }}>{tmpl.template_name}</Text>
+                    <Text style={{ fontSize: 11, color: '#888', marginTop: 2 }} numberOfLines={2}>
+                      {tmpl.prompt_text.slice(0, 80)}…
+                    </Text>
+                  </View>
+                  <TouchableOpacity testID={`edit-template-${idx}`} onPress={() => openEditTemplate(tmpl)} style={{ padding: 6 }}>
+                    <Edit2 size={15} color="#888" />
+                  </TouchableOpacity>
+                  <TouchableOpacity testID={`delete-template-${idx}`} onPress={() => handleDeleteTemplate(tmpl)} style={{ padding: 6 }}>
+                    <Trash2 size={15} color="#ef4444" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Template Create/Edit Modal */}
+      <Modal visible={showTemplateModal} transparent animationType="slide" onRequestClose={() => setShowTemplateModal(false)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, maxHeight: '85%' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                <Text style={{ fontSize: 18, fontWeight: '900' }}>
+                  {editingTemplate ? 'Edit Template' : 'New Template'}
+                </Text>
+                <TouchableOpacity onPress={() => setShowTemplateModal(false)}>
+                  <X size={22} color="#000" />
+                </TouchableOpacity>
+              </View>
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#888', marginBottom: 4 }}>NAME *</Text>
+                <TextInput
+                  testID="template-name-input"
+                  style={[styles.keyInput, { backgroundColor: '#f5f5f5', borderColor: '#e5e7eb', borderWidth: 1, marginBottom: 12 }]}
+                  value={templateForm.template_name}
+                  onChangeText={v => setTemplateForm(f => ({ ...f, template_name: v }))}
+                  placeholder="e.g. ELI5 Explanation"
+                />
+                <View style={{ flexDirection: 'row', gap: 10, marginBottom: 12 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: '#888', marginBottom: 4 }}>BUTTON LABEL *</Text>
+                    <TextInput
+                      testID="template-button-label-input"
+                      style={[styles.keyInput, { backgroundColor: '#f5f5f5', borderColor: '#e5e7eb', borderWidth: 1 }]}
+                      value={templateForm.button_label}
+                      onChangeText={v => setTemplateForm(f => ({ ...f, button_label: v }))}
+                      placeholder="ELI5"
+                    />
+                  </View>
+                  <View style={{ width: 70 }}>
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: '#888', marginBottom: 4 }}>EMOJI</Text>
+                    <TextInput
+                      testID="template-emoji-input"
+                      style={[styles.keyInput, { backgroundColor: '#f5f5f5', borderColor: '#e5e7eb', borderWidth: 1, textAlign: 'center', fontSize: 20 }]}
+                      value={templateForm.button_emoji}
+                      onChangeText={v => setTemplateForm(f => ({ ...f, button_emoji: v }))}
+                      maxLength={4}
+                    />
+                  </View>
+                </View>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#888', marginBottom: 4 }}>
+                  PROMPT TEXT * (use {'{{question}}'}, {'{{correct_answer}}'}, {'{{options}}'})
+                </Text>
+                <TextInput
+                  testID="template-prompt-input"
+                  style={[styles.promptInput, { backgroundColor: '#f5f5f5', borderColor: '#e5e7eb', minHeight: 180, marginBottom: 16 }]}
+                  value={templateForm.prompt_text}
+                  onChangeText={v => setTemplateForm(f => ({ ...f, prompt_text: v }))}
+                  placeholder="Write your AI prompt. Use {{question}}, {{correct_answer}}, {{options}} as variables."
+                  multiline
+                  textAlignVertical="top"
+                />
+                <TouchableOpacity
+                  testID="template-save-btn"
+                  onPress={handleSaveTemplate}
+                  style={{ backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginBottom: 24 }}
+                >
+                  <Text style={{ fontSize: 15, fontWeight: '900', color: '#fff' }}>
+                    {editingTemplate ? '✓ Update Template' : '+ Save Template'}
+                  </Text>
+                </TouchableOpacity>
+              </ScrollView>
+            </View>
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
 
       {/* Sticky Save Button */}
       <View style={[styles.stickyFooter, { backgroundColor: colors.bg, borderTopColor: colors.border }]}>

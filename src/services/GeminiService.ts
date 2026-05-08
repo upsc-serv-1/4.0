@@ -427,6 +427,163 @@ export async function aiExpandSearchQuery(userQuery: string): Promise<AISearchRe
   }
 }
 
+// ══════════════════════════════════════════════════════════════════
+// PHASE 2 ADDITION: Multi-turn conversation history support
+// ══════════════════════════════════════════════════════════════════
+
+/**
+ * Generate AI response with full conversation history (multi-turn chat).
+ * Used by AIExplanationChat component.
+ */
+export async function generateWithHistory(
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>,
+  questionContext?: {
+    question: string;
+    options: string[];
+    correct_answer: string;
+    institute_explanations?: string;
+  }
+): Promise<string> {
+  let provider = 'gemini';
+  try {
+    provider = (await AsyncStorage.getItem(AI_PROVIDER_KEY)) || 'gemini';
+  } catch {}
+
+  const systemPrompt = `You are an expert UPSC coach helping a student understand exam questions.
+${questionContext ? `
+QUESTION: ${questionContext.question}
+OPTIONS: ${questionContext.options.join(', ')}
+CORRECT ANSWER: ${questionContext.correct_answer}
+${questionContext.institute_explanations ? `CONTEXT: ${questionContext.institute_explanations.slice(0, 800)}` : ''}
+` : ''}
+Be concise, accurate, and helpful. Always relate answers to UPSC preparation.`;
+
+  try {
+    if (provider === 'groq') {
+      return await generateGroqWithHistory(messages, systemPrompt);
+    }
+    if (provider === 'openrouter') {
+      return await generateOpenRouterWithHistory(messages, systemPrompt);
+    }
+    return await generateGeminiWithHistory(messages, systemPrompt);
+  } catch (error) {
+    console.error('Error generating with history:', error);
+    throw error;
+  }
+}
+
+async function generateGeminiWithHistory(
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>,
+  systemPrompt: string
+): Promise<string> {
+  const url = await getFlashUrl();
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: systemPrompt }] },
+      contents: messages.map(msg => ({
+        role: msg.role === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.content }],
+      })),
+      generationConfig: { temperature: 0.4, maxOutputTokens: 800, topP: 0.85 },
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Gemini API error ${res.status}: ${err}`);
+  }
+  const data = await res.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error('Empty response from Gemini');
+  return text.trim();
+}
+
+async function generateGroqWithHistory(
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>,
+  systemPrompt: string
+): Promise<string> {
+  let activeIndex = 0;
+  try {
+    const idx = await AsyncStorage.getItem(GROQ_ACTIVE_KEY_INDEX);
+    activeIndex = idx ? parseInt(idx, 10) : 0;
+  } catch {}
+
+  const storageKey = GROQ_KEY_STORAGE_KEYS[activeIndex] ?? GROQ_KEY_STORAGE_KEYS[0];
+  let key = '';
+  try { key = (await AsyncStorage.getItem(storageKey)) || ''; } catch {}
+  if (!key) throw new Error('No Groq API key found. Go to Settings → AI Settings.');
+
+  let model = DEFAULT_GROQ_MODEL;
+  try { model = (await AsyncStorage.getItem(GROQ_MODEL_KEY)) || DEFAULT_GROQ_MODEL; } catch {}
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages,
+      ],
+      temperature: 0.4,
+      max_tokens: 800,
+    }),
+  });
+
+  if (res.status === 429) throw new Error('429: Groq rate limit. Switch key in AI Settings.');
+  if (!res.ok) { const err = await res.text(); throw new Error(`Groq error ${res.status}: ${err}`); }
+
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) throw new Error('Empty response from Groq');
+  return text.trim();
+}
+
+async function generateOpenRouterWithHistory(
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>,
+  systemPrompt: string
+): Promise<string> {
+  let key = '';
+  try { key = (await AsyncStorage.getItem(OPENROUTER_API_KEY_STORAGE)) || ''; } catch {}
+  if (!key) throw new Error('No OpenRouter API key. Go to Settings → AI Settings.');
+
+  let model = DEFAULT_OPENROUTER_MODEL;
+  try { model = (await AsyncStorage.getItem(OPENROUTER_MODEL_KEY)) || DEFAULT_OPENROUTER_MODEL; } catch {}
+
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${key}`,
+      'HTTP-Referer': 'com.upsc.app',
+      'X-Title': 'UPSC Prep App',
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages,
+      ],
+      temperature: 0.4,
+      max_tokens: 800,
+    }),
+  });
+
+  if (res.status === 429) throw new Error('429: OpenRouter rate limit.');
+  if (!res.ok) { const err = await res.text(); throw new Error(`OpenRouter error ${res.status}: ${err}`); }
+
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) throw new Error('Empty response from OpenRouter');
+  return text.trim();
+}
+
+// ══════════════════════════════════════════════════════════════════
+
 /**
  * General doubt clearing for a question context.
  */

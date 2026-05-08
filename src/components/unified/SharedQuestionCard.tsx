@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Platform, ActivityIndicator, StyleSheet, Animated, TextInput, Dimensions } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
@@ -6,7 +6,7 @@ import {
   ChevronRight, ExternalLink, Zap, BookOpen, Flag, Check, X, Sparkles, 
   AlertCircle, Copy, ThumbsDown, Bookmark, BookmarkCheck, Lightbulb, 
   PenTool, Hash, Star, Info, Info as InfoIcon, Save as SaveIcon, 
-  RotateCcw, Trash2, Send, Plus, Edit2
+  RotateCcw, Trash2, Send, Plus, Edit2, MessageCircle
 } from 'lucide-react-native';
 import { OptionButton } from './OptionButton';
 import { renderAIText } from '../../utils/renderAIText';
@@ -23,6 +23,7 @@ import {
   toBool, 
   getExamInfo 
 } from '../../utils/questionUtils';
+import { AIExplanationChat } from './AIExplanationChat';
 
 const { width, height } = Dimensions.get('window');
 
@@ -98,6 +99,8 @@ export const SharedQuestionCard = ({
 }: any) => {
     const { colors: themeColors } = useTheme();
     const effectiveColors = colors || themeColors;
+    // AI Chat toggle state
+    const [showAiChat, setShowAiChat] = useState(false);
     
     if (!item) return null;
     const effectiveAnswerData = answerData || { selectedAnswer: null, confidence: null, difficulty: null, isReview: false, studyTags: [] };
@@ -531,6 +534,46 @@ export const SharedQuestionCard = ({
                   </View>
                 )}
               </View>
+
+              {/* AI Chat Section - toggles open below explanation */}
+              {isRevealed && (
+                <View style={{ marginTop: 8 }}>
+                  {showAiChat ? (
+                    <AIExplanationChat
+                      questionId={item.id || item._id || `q_${index}`}
+                      questionText={item.statement_line || item.question_text || ''}
+                      options={Object.entries(item.options || {}).map(([k, v]) => `${k}) ${v}`)}
+                      correctAnswer={item.correct_answer || ''}
+                      instituteExplanations={effectiveExplanationText}
+                      initialExplanation={aiExplanation}
+                      collapsed={false}
+                    />
+                  ) : (
+                    <TouchableOpacity
+                      testID={`open-ai-chat-${item.id}`}
+                      onPress={() => setShowAiChat(true)}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 6,
+                        paddingHorizontal: 14,
+                        paddingVertical: 8,
+                        borderRadius: 20,
+                        borderWidth: 1,
+                        borderColor: '#7c3aed40',
+                        backgroundColor: '#7c3aed08',
+                        alignSelf: 'flex-start',
+                        marginBottom: 8,
+                      }}
+                    >
+                      <MessageCircle size={14} color="#7c3aed" />
+                      <Text style={{ fontSize: 12, fontWeight: '800', color: '#7c3aed' }}>
+                        💬 Ask AI (ELI5 / Chat)
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
 
               {/* Action Buttons Row */}
               <View style={styles.actionRow}>

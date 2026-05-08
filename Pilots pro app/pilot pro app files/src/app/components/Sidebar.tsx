@@ -15,7 +15,7 @@ interface Subject {
   topics?: Topic[];
 }
 
-const defaultSubjects: Subject[] = [
+const subjects: Subject[] = [
   {
     id: 'polity',
     label: 'Polity',
@@ -77,8 +77,7 @@ export function Sidebar({
   onSelectSubject,
   onSelectTopic,
   onSelectSubtopic,
-  subjects = defaultSubjects,
-}: SidebarProps & { subjects?: Subject[] }) {
+}: SidebarProps) {
   const [expandedTopics, setExpandedTopics] = useState<string[]>(['fundamental-rights']);
 
   const toggleTopic = (topicId: string) => {

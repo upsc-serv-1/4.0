@@ -51,6 +51,7 @@ export default function TabsLayout() {
     notes: { title: 'Notes', icon: FileText },
     hardnotes: { title: 'Hardnotes', icon: PenTool },
     capsule: { title: 'Capsule', icon: Sparkles },
+    pilot: { title: 'Pilot', icon: Sparkles },
     softnotes: { title: 'Softnotes', icon: BookOpen },
     revise: { title: 'Revise', icon: RotateCcw },
     tracker: { title: 'Tracker', icon: LayoutList },

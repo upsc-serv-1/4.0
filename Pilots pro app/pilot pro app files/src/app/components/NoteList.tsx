@@ -15,24 +15,13 @@ const notes: Note[] = [
   { id: '5', title: 'Important Provisions - Women, Children, SCs, STs', timestamp: '3 days ago' },
 ];
 
-interface Note {
-  id: string;
-  title: string;
-  timestamp: string;
-  isPinned?: boolean;
-  note_id?: string | null;
-}
-
 interface NoteListProps {
   topicName: string;
   onBack?: () => void;
-  onSelectNote: (noteId: string, noteDbId?: string | null) => void;
-  notes?: Note[];
-  onCreateNote?: () => void;
+  onSelectNote: (noteId: string) => void;
 }
 
-export function NoteList({ topicName, onBack, onSelectNote, notes: passedNotes, onCreateNote }: NoteListProps) {
-  const activeNotes = passedNotes || notes;
+export function NoteList({ topicName, onBack, onSelectNote }: NoteListProps) {
   return (
     <div className="flex-1 bg-background overflow-y-auto flex flex-col">
       <div className="bg-white border-b border-border px-6 py-4 shrink-0">
@@ -52,10 +41,7 @@ export function NoteList({ topicName, onBack, onSelectNote, notes: passedNotes, 
               className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
-          <button
-            onClick={onCreateNote}
-            className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors"
-          >
+          <button className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors">
             <Plus className="w-5 h-5" />
             <span>New Note</span>
           </button>
@@ -64,10 +50,10 @@ export function NoteList({ topicName, onBack, onSelectNote, notes: passedNotes, 
 
       <div className="flex-1 px-6 py-4">
         <div className="space-y-2">
-          {activeNotes.map((note) => (
+          {notes.map((note) => (
             <button
               key={note.id}
-              onClick={() => onSelectNote(note.id, note.note_id)}
+              onClick={() => onSelectNote(note.id)}
               className="w-full flex items-center gap-4 px-5 py-4 bg-white border border-border rounded-xl hover:shadow-md transition-all text-left group"
             >
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">

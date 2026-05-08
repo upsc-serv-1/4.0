@@ -1,281 +1,257 @@
-import { Save, RotateCcw, RotateCw, Type, Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, ListTodo, Link as LinkIcon, Image as ImageIcon, Table, Code, Calendar, Paperclip, ChevronDown, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { Save, ChevronLeft, Heading1, Heading2, AlignLeft, List, Code as CodeIcon, Sparkles, Trash2, Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { fetchNotebookContent, saveNotebookContent, CapsuleBlock, CapsuleNotebookContent } from '../../repositories/capsuleRepo';
 
 interface EditorViewProps {
   onClose?: () => void;
+  noteId?: string;
+  noteDbId?: string | null;
+  noteTitle?: string;
+  onRefresh?: () => void;
 }
 
-export function EditorView({ onClose }: EditorViewProps) {
-  const [showHighlightPicker, setShowHighlightPicker] = useState(false);
-  const [activeTab, setActiveTab] = useState<'blocks' | 'outline'>('blocks');
+export function EditorView({ onClose, noteId, noteDbId, noteTitle, onRefresh }: EditorViewProps) {
+  const [blocks, setBlocks] = useState<CapsuleBlock[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  const highlightColors = [
-    { name: 'Yellow', color: 'bg-yellow-300', active: true },
-    { name: 'Lime', color: 'bg-lime-300' },
-    { name: 'Green', color: 'bg-green-300' },
-    { name: 'Pink', color: 'bg-pink-300' },
-    { name: 'Purple', color: 'bg-purple-300' },
-    { name: 'Blue', color: 'bg-blue-300' },
-  ];
+  useEffect(() => {
+    if (noteDbId) {
+      setLoading(true);
+      fetchNotebookContent(noteDbId)
+        .then(res => {
+          setBlocks(res.blocks || []);
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    } else {
+      setBlocks([]);
+    }
+  }, [noteDbId]);
+
+  const handleSave = async () => {
+    if (!noteDbId) return;
+    setSaving(true);
+    const content: CapsuleNotebookContent = {
+      blocks,
+      highlights: [],
+      version: 1
+    };
+    const success = await saveNotebookContent(noteDbId, content);
+    if (success) {
+      setHasUnsavedChanges(false);
+      if (onRefresh) onRefresh();
+    }
+    setSaving(false);
+  };
+
+  const handleBlockChange = (id: string, newText: string) => {
+    setBlocks(prev => prev.map(b => b.id === id ? { ...b, text: newText } : b));
+    setHasUnsavedChanges(true);
+  };
+
+  const handleBlockMetadataChange = (id: string, backText: string) => {
+    setBlocks(prev => prev.map(b => b.id === id ? { ...b, metadata: { ...b.metadata, back: backText } } : b));
+    setHasUnsavedChanges(true);
+  };
+
+  const addBlock = (type: 'paragraph' | 'heading' | 'bullet' | 'code' | 'flashcard') => {
+    const newBlock: CapsuleBlock = {
+      id: `block_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      type,
+      text: '',
+      metadata: type === 'flashcard' ? { back: '' } : undefined
+    };
+    setBlocks(prev => [...prev, newBlock]);
+    setHasUnsavedChanges(true);
+  };
+
+  const deleteBlock = (id: string) => {
+    setBlocks(prev => prev.filter(b => b.id !== id));
+    setHasUnsavedChanges(true);
+  };
+
+  const activeTitle = noteTitle || "Untitled Notebook";
 
   return (
-    <div className="flex-1 bg-white overflow-hidden flex flex-col">
+    <div className="flex-1 bg-gray-50 overflow-hidden flex flex-col h-full">
       {/* Top Bar */}
-      <div className="bg-white border-b border-border px-6 py-3 flex items-center justify-between shrink-0">
+      <div className="bg-white border-b border-border px-6 py-4 flex items-center justify-between shrink-0 shadow-sm z-10">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm">Article 21</h3>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <ChevronLeft className="w-5 h-5 text-gray-700" />
+          </button>
+          <div className="flex flex-col">
+            <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Editing Note</span>
+            <h3 className="text-base font-extrabold text-gray-900 truncate max-w-sm">{activeTitle}</h3>
           </div>
-          <button className="p-1 hover:bg-gray-100 rounded transition-colors">
-            <RotateCcw className="w-4 h-4 text-gray-500" />
-          </button>
-          <button className="p-1 hover:bg-gray-100 rounded transition-colors">
-            <RotateCw className="w-4 h-4 text-gray-500" />
-          </button>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="flex items-center gap-2 text-sm text-green-600">
-            <Save className="w-4 h-4" />
-            Saved
-          </span>
-          {onClose && (
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <X className="w-5 h-5" />
+        <div className="flex items-center gap-3">
+          {hasUnsavedChanges ? (
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90 transition-all text-sm font-bold shadow-sm"
+            >
+              <Save className="w-4 h-4" />
+              <span>{saving ? 'Saving...' : 'Save Changes'}</span>
             </button>
+          ) : (
+            <span className="flex items-center gap-2 text-sm text-green-600 font-bold bg-green-50 px-3 py-1.5 rounded-xl border border-green-100">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              <span>Saved to Supabase</span>
+            </span>
           )}
         </div>
       </div>
 
-      {/* Document Title & Toolbar */}
-      <div className="bg-white border-b border-border px-8 py-4 shrink-0">
-        <h1 className="mb-4">Article 14 — Equality Before Law</h1>
+      {/* Editor Content Area */}
+      <div className="flex-1 overflow-y-auto px-8 py-8 flex flex-col justify-start">
+        <div className="max-w-4xl w-full mx-auto bg-white rounded-2xl shadow-sm border border-border p-8 min-h-[500px] flex flex-col">
+          
+          {loading ? (
+            <div className="flex-1 flex flex-col items-center justify-center py-24">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+              <p className="text-gray-500 mt-4 text-sm font-semibold">Loading editor...</p>
+            </div>
+          ) : (
+            <div className="flex-1 flex flex-col">
+              <h1 className="text-2xl font-black text-gray-900 mb-8 pb-4 border-b border-gray-100">{activeTitle}</h1>
 
-        {/* Toolbar */}
-        <div className="flex items-center gap-1 flex-wrap">
-          <button className="px-3 py-1.5 hover:bg-gray-100 rounded transition-colors text-sm">
-            <span className="font-medium">H1</span>
-          </button>
-          <button className="px-3 py-1.5 hover:bg-gray-100 rounded transition-colors text-sm">
-            <span className="font-medium">H2</span>
-          </button>
-          <button className="p-1.5 hover:bg-gray-100 rounded transition-colors">
-            <Bold className="w-5 h-5" />
-          </button>
-          <button className="p-1.5 hover:bg-gray-100 rounded transition-colors">
-            <Italic className="w-5 h-5" />
-          </button>
-          <button className="p-1.5 hover:bg-gray-100 rounded transition-colors">
-            <UnderlineIcon className="w-5 h-5" />
-          </button>
+              {blocks.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-gray-100 rounded-2xl bg-gray-50/50 mb-8">
+                  <p className="text-gray-400 font-medium">Your notebook is empty.</p>
+                  <p className="text-gray-400 text-xs mt-1">Use the quick buttons below to add your first block of notes!</p>
+                </div>
+              ) : (
+                <div className="space-y-6 mb-12">
+                  {blocks.map((block) => (
+                    <div key={block.id} className="group relative flex items-start gap-4 p-2 -mx-2 rounded-xl hover:bg-gray-50/50 transition-colors">
+                      <div className="flex-1">
+                        {block.type === 'heading' && (
+                          <input
+                            type="text"
+                            value={block.text}
+                            onChange={(e) => handleBlockChange(block.id, e.target.value)}
+                            placeholder="Enter heading text..."
+                            className="w-full text-lg font-extrabold text-gray-900 bg-transparent border-b border-transparent hover:border-gray-100 focus:border-primary focus:outline-none pb-1"
+                          />
+                        )}
 
-          <div className="w-px h-6 bg-border mx-1" />
+                        {block.type === 'paragraph' && (
+                          <textarea
+                            value={block.text}
+                            onChange={(e) => handleBlockChange(block.id, e.target.value)}
+                            placeholder="Type a paragraph..."
+                            rows={2}
+                            className="w-full text-base text-gray-700 bg-transparent border border-transparent hover:border-gray-100 focus:border-primary focus:outline-none rounded-lg p-2 resize-none leading-relaxed"
+                          />
+                        )}
 
-          <button className="p-1.5 hover:bg-gray-100 rounded transition-colors">
-            <ListOrdered className="w-5 h-5" />
-          </button>
-          <button className="p-1.5 hover:bg-gray-100 rounded transition-colors">
-            <List className="w-5 h-5" />
-          </button>
-          <button className="p-1.5 hover:bg-gray-100 rounded transition-colors">
-            <ListTodo className="w-5 h-5" />
-          </button>
+                        {block.type === 'bullet' && (
+                          <div className="flex items-center gap-3">
+                            <span className="text-gray-400">•</span>
+                            <input
+                              type="text"
+                              value={block.text}
+                              onChange={(e) => handleBlockChange(block.id, e.target.value)}
+                              placeholder="List item..."
+                              className="w-full text-base text-gray-700 bg-transparent border-b border-transparent hover:border-gray-100 focus:border-primary focus:outline-none pb-1"
+                            />
+                          </div>
+                        )}
 
-          <div className="w-px h-6 bg-border mx-1" />
+                        {block.type === 'code' && (
+                          <textarea
+                            value={block.text}
+                            onChange={(e) => handleBlockChange(block.id, e.target.value)}
+                            placeholder="Paste your code block..."
+                            rows={3}
+                            className="w-full font-mono text-sm text-gray-800 bg-gray-50 border border-border hover:border-gray-300 focus:border-primary focus:outline-none rounded-xl p-3 resize-none"
+                          />
+                        )}
 
-          <div className="relative">
-            <button
-              onClick={() => setShowHighlightPicker(!showHighlightPicker)}
-              className="p-1.5 hover:bg-gray-100 rounded transition-colors"
-            >
-              <div className="w-5 h-5 bg-yellow-300 rounded"></div>
-            </button>
+                        {block.type === 'flashcard' && (
+                          <div className="bg-blue-50/40 border border-blue-100 rounded-2xl p-4 space-y-3">
+                            <div>
+                              <label className="block text-xs font-bold text-blue-700 uppercase tracking-wide mb-1">Flashcard Question (Front)</label>
+                              <input
+                                type="text"
+                                value={block.text}
+                                onChange={(e) => handleBlockChange(block.id, e.target.value)}
+                                placeholder="Enter flashcard front..."
+                                className="w-full text-sm font-semibold text-gray-800 bg-white border border-blue-100 focus:border-blue-300 focus:outline-none rounded-lg px-3 py-2"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-bold text-blue-700 uppercase tracking-wide mb-1">Answer (Back)</label>
+                              <input
+                                type="text"
+                                value={block.metadata?.back || ''}
+                                onChange={(e) => handleBlockMetadataChange(block.id, e.target.value)}
+                                placeholder="Enter flashcard answer..."
+                                className="w-full text-sm text-gray-600 bg-white border border-blue-100 focus:border-blue-300 focus:outline-none rounded-lg px-3 py-2 italic"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
 
-            {showHighlightPicker && (
-              <div className="absolute top-full mt-2 left-0 bg-white border border-border rounded-lg shadow-lg p-3 z-10">
-                <div className="flex gap-2">
-                  {highlightColors.map((color) => (
-                    <button
-                      key={color.name}
-                      className={`w-7 h-7 ${color.color} rounded hover:ring-2 hover:ring-primary transition-all ${
-                        color.active ? 'ring-2 ring-primary' : ''
-                      }`}
-                      title={color.name}
-                    />
+                      <button
+                        onClick={() => deleteBlock(block.id)}
+                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all shrink-0 self-center"
+                        title="Delete Block"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   ))}
                 </div>
+              )}
+
+              {/* Quick Toolbar (Sticky at bottom of container) */}
+              <div className="mt-auto pt-6 border-t border-gray-100 flex items-center justify-center gap-2 flex-wrap shrink-0">
+                <button
+                  onClick={() => addBlock('heading')}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-gray-50 text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-xs font-bold"
+                >
+                  <Heading1 className="w-4 h-4 text-gray-500" />
+                  <span>+ Heading</span>
+                </button>
+                <button
+                  onClick={() => addBlock('paragraph')}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-gray-50 text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-xs font-bold"
+                >
+                  <AlignLeft className="w-4 h-4 text-gray-500" />
+                  <span>+ Paragraph</span>
+                </button>
+                <button
+                  onClick={() => addBlock('bullet')}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-gray-50 text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-xs font-bold"
+                >
+                  <List className="w-4 h-4 text-gray-500" />
+                  <span>+ Bullet List</span>
+                </button>
+                <button
+                  onClick={() => addBlock('code')}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-gray-50 text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-xs font-bold"
+                >
+                  <CodeIcon className="w-4 h-4 text-gray-500" />
+                  <span>+ Code</span>
+                </button>
+                <button
+                  onClick={() => addBlock('flashcard')}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-blue-50/60 text-blue-700 border border-blue-100 rounded-xl hover:bg-blue-100/50 transition-colors text-xs font-extrabold"
+                >
+                  <Sparkles className="w-4 h-4 text-blue-500" />
+                  <span>+ Flashcard</span>
+                </button>
               </div>
-            )}
-          </div>
-
-          <button className="p-1.5 hover:bg-gray-100 rounded transition-colors">
-            <LinkIcon className="w-5 h-5" />
-          </button>
-          <button className="p-1.5 hover:bg-gray-100 rounded transition-colors">
-            <ImageIcon className="w-5 h-5" />
-          </button>
-          <button className="p-1.5 hover:bg-gray-100 rounded transition-colors">
-            <Calendar className="w-5 h-5" />
-          </button>
-          <button className="p-1.5 hover:bg-gray-100 rounded transition-colors">
-            <Paperclip className="w-5 h-5" />
-          </button>
-          <button className="p-1.5 hover:bg-gray-100 rounded transition-colors">
-            <Table className="w-5 h-5" />
-          </button>
-          <button className="p-1.5 hover:bg-gray-100 rounded transition-colors">
-            <Code className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
-      {/* Main Content Area */}
-      <div className="flex-1 overflow-hidden flex">
-        {/* Editor */}
-        <div className="flex-1 overflow-y-auto px-8 py-8 bg-background">
-          <div className="max-w-4xl mx-auto bg-white rounded-lg p-8 min-h-full">
-            <div className="space-y-6">
-              <section>
-                <h2 className="mb-4">Key Points</h2>
-                <ul className="space-y-3 list-disc list-inside text-gray-700">
-                  <li>
-                    No person shall be deprived{' '}
-                    <span className="bg-yellow-200">of his life or personal liberty except according to procedure established by law.</span>
-                  </li>
-                  <li>Interpreted widely by the judiciary.</li>
-                  <li>
-                    Includes <span className="bg-green-200">right to live with dignity.</span>
-                  </li>
-                </ul>
-              </section>
-
-              <section>
-                <h2 className="mb-4">Important Cases</h2>
-                <ul className="space-y-3 list-disc list-inside text-gray-700">
-                  <li>Maneka Gandhi v. Union of India</li>
-                  <li>Olga Tellis v. Bombay Municipal Corp.</li>
-                  <li>Puttaswamy Judgment (Privacy)</li>
-                </ul>
-              </section>
-
-              <section>
-                <h2 className="mb-4">Checklist</h2>
-                <div className="space-y-2">
-                  <label className="flex items-center gap-3 text-gray-700 cursor-pointer">
-                    <input type="checkbox" className="w-4 h-4 rounded border-gray-300" />
-                    <span>Read Article 14 text</span>
-                  </label>
-                  <label className="flex items-center gap-3 text-gray-700 cursor-pointer">
-                    <input type="checkbox" className="w-4 h-4 rounded border-gray-300" checked readOnly />
-                    <span>Review key cases</span>
-                  </label>
-                  <label className="flex items-center gap-3 text-gray-700 cursor-pointer">
-                    <input type="checkbox" className="w-4 h-4 rounded border-gray-300" />
-                    <span>Practice previous year questions</span>
-                  </label>
-                </div>
-              </section>
             </div>
-          </div>
-        </div>
+          )}
 
-        {/* Outline Sidebar */}
-        <div className="w-80 bg-white border-l border-border shrink-0 flex flex-col">
-          <div className="border-b border-border flex">
-            <button
-              onClick={() => setActiveTab('blocks')}
-              className={`flex-1 px-4 py-3 text-sm transition-colors ${
-                activeTab === 'blocks'
-                  ? 'border-b-2 border-primary text-primary'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              Blocks
-            </button>
-            <button
-              onClick={() => setActiveTab('outline')}
-              className={`flex-1 px-4 py-3 text-sm transition-colors ${
-                activeTab === 'outline'
-                  ? 'border-b-2 border-primary text-primary'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              Outline
-            </button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-4 space-y-2">
-            {activeTab === 'blocks' && (
-              <>
-                <div className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 rounded-lg cursor-pointer">
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <span className="text-gray-400 text-xs">H1</span>
-                    <span className="text-sm truncate">Protection of Life and...</span>
-                  </div>
-                  <Menu className="w-4 h-4 text-gray-400 shrink-0" />
-                </div>
-                <div className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 rounded-lg cursor-pointer">
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <span className="text-gray-400 text-xs">H2</span>
-                    <span className="text-sm">Key Points</span>
-                  </div>
-                  <Menu className="w-4 h-4 text-gray-400 shrink-0" />
-                </div>
-                <div className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 rounded-lg cursor-pointer">
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <span className="text-gray-400 text-xs">H2</span>
-                    <span className="text-sm">Important Cases</span>
-                  </div>
-                  <Menu className="w-4 h-4 text-gray-400 shrink-0" />
-                </div>
-                <div className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 rounded-lg cursor-pointer">
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <span className="text-gray-400 text-xs">H2</span>
-                    <span className="text-sm">Checklist</span>
-                  </div>
-                  <Menu className="w-4 h-4 text-gray-400 shrink-0" />
-                </div>
-              </>
-            )}
-            {activeTab === 'outline' && (
-              <>
-                <div className="px-3 py-2 hover:bg-gray-50 rounded-lg cursor-pointer">
-                  <div className="text-sm">Article 14 — Equality...</div>
-                  <div className="text-xs text-gray-400 mt-1">H1</div>
-                </div>
-                <div className="pl-6 px-3 py-2 hover:bg-gray-50 rounded-lg cursor-pointer">
-                  <div className="text-sm">Key Points</div>
-                  <div className="text-xs text-gray-400 mt-1">H2</div>
-                </div>
-                <div className="pl-6 px-3 py-2 hover:bg-gray-50 rounded-lg cursor-pointer">
-                  <div className="text-sm">Important Cases</div>
-                  <div className="text-xs text-gray-400 mt-1">H2</div>
-                </div>
-                <div className="pl-6 px-3 py-2 hover:bg-gray-50 rounded-lg cursor-pointer">
-                  <div className="text-sm">Checklist</div>
-                  <div className="text-xs text-gray-400 mt-1">H2</div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Toolbar */}
-      <div className="bg-white border-t border-border px-6 py-3 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-4">
-          <button className="flex items-center gap-2 px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-            <Type className="w-4 h-4" />
-            <span>Aa</span>
-          </button>
-          <button className="flex items-center gap-2 px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-            <span>100%</span>
-            <ChevronDown className="w-3 h-3" />
-          </button>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600">Words: 1234</span>
         </div>
       </div>
     </div>

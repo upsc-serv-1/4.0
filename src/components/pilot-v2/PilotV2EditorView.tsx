@@ -80,7 +80,18 @@ export function PilotV2EditorView() {
   const [savingState, setSavingState] = useState<'idle' | 'saving' | 'saved'>('saved');
   const saveTimer = useRef<any>(null);
 
-  /* ---------------- Undo / Redo history stacks ---------------- */
+  /* --------------- Bottom bar — font scale & zoom --------------- */
+  // Each step is a distinct "Aa" preset that scales every block's font, plus a
+  // zoom multiplier for the whole canvas. Both persist for the editor session.
+  const FONT_SCALES = [0.85, 1.0, 1.15, 1.3];
+  const ZOOM_LEVELS = [0.75, 1.0, 1.25, 1.5];
+  const [fontScaleIdx, setFontScaleIdx] = useState(1); // default 1.0
+  const [zoomIdx, setZoomIdx] = useState(1);            // default 1.0
+  const fontScale = FONT_SCALES[fontScaleIdx];
+  const zoom = ZOOM_LEVELS[zoomIdx];
+
+  const cycleFontScale = () => setFontScaleIdx((i) => (i + 1) % FONT_SCALES.length);
+  const cycleZoom      = () => setZoomIdx((i) => (i + 1) % ZOOM_LEVELS.length);
   // We snapshot { blocks, title } whenever the user mutates state. Undo pops
   // the last snapshot and pushes the current state to the redo stack.
   const undoStack = useRef<Array<{ blocks: PilotV2Block[]; title: string }>>([]);
@@ -432,12 +443,13 @@ export function PilotV2EditorView() {
           contentContainerStyle={styles.canvas}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={[styles.paper, { backgroundColor: '#fff', borderColor: colors.border }]}>
+          <View style={[styles.paper, { backgroundColor: '#fff', borderColor: colors.border, transform: [{ scale: zoom }] }]}>
             {blocks.map(b => (
               <BlockRow
                 key={b.id}
                 block={b}
                 colors={colors}
+                fontScale={fontScale}
                 isActive={activeBlockId === b.id}
                 onFocus={() => setActiveBlockId(b.id)}
                 onChange={(text) => updateBlock(b.id, { text })}
@@ -487,12 +499,12 @@ export function PilotV2EditorView() {
       {/* Bottom bar */}
       <View style={[styles.bottomBar, { borderTopColor: colors.border }]}>
         <View style={{ flexDirection: 'row', gap: 12 }}>
-          <TouchableOpacity style={styles.bottomItem}>
+          <TouchableOpacity testID="pilot-v2-bottom-fontscale" onPress={cycleFontScale} style={styles.bottomItem}>
             <Type size={14} color={colors.textSecondary} />
-            <Text style={{ color: colors.textSecondary, fontSize: 12 }}>Aa</Text>
+            <Text style={{ color: colors.textSecondary, fontSize: 12 }}>Aa · {Math.round(fontScale * 100)}%</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.bottomItem}>
-            <Text style={{ color: colors.textSecondary, fontSize: 12 }}>100%</Text>
+          <TouchableOpacity testID="pilot-v2-bottom-zoom" onPress={cycleZoom} style={styles.bottomItem}>
+            <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{Math.round(zoom * 100)}%</Text>
             <ChevronDown size={12} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
@@ -581,6 +593,7 @@ export function PilotV2EditorView() {
 interface BlockRowProps {
   block: PilotV2Block;
   colors: any;
+  fontScale: number;
   isActive: boolean;
   onFocus: () => void;
   onChange: (text: string) => void;
@@ -588,10 +601,11 @@ interface BlockRowProps {
   onDelete: () => void;
 }
 
-function BlockRow({ block, colors, isActive, onFocus, onChange, onToggleCheck, onDelete }: BlockRowProps) {
-  const fontSize = block.type === 'heading'
+function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onToggleCheck, onDelete }: BlockRowProps) {
+  const baseFs = block.type === 'heading'
     ? block.level === 1 ? 24 : 18
     : 16;
+  const fontSize = Math.round(baseFs * fontScale);
   const fontWeight: any = (block.type === 'heading' || block.bold) ? '700' : '400';
   const fontStyle: any = block.italic ? 'italic' : 'normal';
 

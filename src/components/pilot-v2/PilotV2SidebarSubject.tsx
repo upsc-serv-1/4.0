@@ -85,7 +85,12 @@ export function PilotV2SidebarSubject() {
 
   const handleSelectTopic = (topicId: string, hasSubtopics: boolean) => {
     if (hasSubtopics) { toggleTopic(topicId); return; }
+    // Topics without subtopics are routed straight to the note list so the
+    // user lands on a usable surface (no dead end). The Note List uses
+    // `selectedTopic` as its seeded subject when `selectedSubtopic` is null.
     dispatch({ type: 'SET_SELECTED_TOPIC', payload: topicId });
+    dispatch({ type: 'SET_SELECTED_SUBTOPIC', payload: topicId });
+    dispatch({ type: 'SET_VIEW_MODE', payload: 'noteList' });
   };
 
   const handleSelectSubtopic = (subtopicId: string) => {

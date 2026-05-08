@@ -10,15 +10,18 @@
  * The cards are seeded from existing notes in the PilotV2Context, with a
  * graceful demo fallback so the screen still looks complete on first run.
  */
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity,
+  View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert,
 } from 'react-native';
 import {
   Search, Plus, ChevronRight, FileText, Star, Scale, TrendingUp,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
+import { findOrCreatePilotV2Note, fetchPilotV2NotesForUser } from '../../repositories/pilotV2Repo';
+import { PilotV2Note, PILOT_V2_SUBJECT_PALETTE } from './types';
 
 const greetingFor = (d: Date) => {
   const h = d.getHours();
@@ -45,20 +48,86 @@ const formatRelative = (iso?: string) => {
 export function PilotV2Dashboard() {
   const { colors } = useTheme();
   const { state, dispatch } = usePilotV2();
+  const { session } = useAuth();
+  const userId = session?.user?.id;
+  const [creating, setCreating] = useState(false);
+  const [search, setSearch] = useState('');
+  const quickFilter = state.view.quickFilter;
+
+  const filterPredicate = (n: PilotV2Note): boolean => {
+    if (search && !n.title.toLowerCase().includes(search.toLowerCase())) return false;
+    if (quickFilter === 'pinned')  return Boolean(n.is_pinned);
+    if (quickFilter === 'shared')  return Boolean((n as any).shared);
+    if (quickFilter === 'trash')   return Boolean((n as any).is_archived);
+    return true;
+  };
+
+  const visibleNotes = useMemo(
+    () => state.notes.filter(filterPredicate),
+    [state.notes, search, quickFilter]
+  );
 
   const recents = useMemo(() => {
-    const sorted = [...state.notes].sort((a, b) =>
+    const sorted = [...visibleNotes].sort((a, b) =>
       new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime()
     );
     return sorted.slice(0, 6);
-  }, [state.notes]);
+  }, [visibleNotes]);
 
-  const pinned = useMemo(() => state.notes.filter(n => n.is_pinned).slice(0, 4), [state.notes]);
+  const pinned = useMemo(
+    () => visibleNotes.filter(n => n.is_pinned).slice(0, 4),
+    [visibleNotes]
+  );
 
   const openGlance = (noteId: string) => {
     dispatch({ type: 'SET_CURRENT_NOTE_ID', payload: noteId });
     dispatch({ type: 'SET_VIEW_MODE', payload: 'glance' });
   };
+
+  const handleNew = async () => {
+    if (creating) return;
+    const title = `Untitled note · ${new Date().toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
+    if (!userId) {
+      const transient: PilotV2Note = {
+        id: `transient_${Date.now()}`,
+        title,
+        content: { blocks: [], version: 1 },
+        is_pinned: false,
+      };
+      dispatch({ type: 'UPSERT_NOTE', payload: transient });
+      dispatch({ type: 'SET_CURRENT_NOTE_ID', payload: transient.id });
+      dispatch({ type: 'SET_VIEW_MODE', payload: 'editor' });
+      return;
+    }
+    setCreating(true);
+    try {
+      const result = await findOrCreatePilotV2Note({ userId, subject: 'General', title });
+      const fresh = await fetchPilotV2NotesForUser(userId);
+      dispatch({ type: 'SET_NOTES', payload: fresh });
+      dispatch({ type: 'SET_CURRENT_NOTE_ID', payload: result.noteId });
+      dispatch({ type: 'SET_VIEW_MODE', payload: 'editor' });
+    } catch (e) {
+      Alert.alert('Could not create note', (e as Error).message);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const seeAllRecent = () => {
+    dispatch({ type: 'SET_QUICK_FILTER', payload: 'recent' });
+    dispatch({ type: 'SET_VIEW_MODE', payload: 'dashboard' });
+  };
+  const seeAllPinned = () => {
+    dispatch({ type: 'SET_QUICK_FILTER', payload: 'pinned' });
+    dispatch({ type: 'SET_VIEW_MODE', payload: 'dashboard' });
+  };
+
+  const filterBadge =
+    quickFilter === 'home'   ? null :
+    quickFilter === 'pinned' ? 'Showing pinned only' :
+    quickFilter === 'recent' ? 'Showing recently edited' :
+    quickFilter === 'shared' ? 'Showing shared notes' :
+    'Showing trash';
 
   return (
     <View testID="pilot-v2-dashboard" style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
@@ -79,6 +148,8 @@ export function PilotV2Dashboard() {
             <Search size={16} color={colors.textTertiary} />
             <TextInput
               testID="pilot-v2-dashboard-search"
+              value={search}
+              onChangeText={setSearch}
               style={[styles.searchInput, { color: colors.textPrimary }]}
               placeholder="Search notes, topics, keywords..."
               placeholderTextColor={colors.textTertiary}
@@ -87,12 +158,27 @@ export function PilotV2Dashboard() {
           <TouchableOpacity
             testID="pilot-v2-dashboard-new"
             activeOpacity={0.85}
-            style={[styles.newBtn, { backgroundColor: '#5B4EFA' }]}
+            onPress={handleNew}
+            disabled={creating}
+            style={[styles.newBtn, { backgroundColor: '#5B4EFA', opacity: creating ? 0.7 : 1 }]}
           >
             <Plus size={16} color="#fff" />
-            <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>New</Text>
+            <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>{creating ? 'Creating…' : 'New'}</Text>
           </TouchableOpacity>
         </View>
+
+        {filterBadge ? (
+          <View style={styles.filterBadge}>
+            <Text style={{ fontSize: 11, color: '#5B4EFA', fontWeight: '600' }}>{filterBadge}</Text>
+            <TouchableOpacity
+              testID="pilot-v2-clear-filter"
+              onPress={() => dispatch({ type: 'SET_QUICK_FILTER', payload: 'home' })}
+              hitSlop={6}
+            >
+              <Text style={{ fontSize: 11, color: '#5B4EFA', fontWeight: '700' }}>Clear ✕</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
       </View>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
@@ -110,7 +196,9 @@ export function PilotV2Dashboard() {
         <View style={{ marginBottom: 40 }}>
           <View style={styles.sectionHead}>
             <Text style={[styles.h2, { color: colors.textPrimary }]}>Continue Studying</Text>
-            <TouchableOpacity><Text style={{ color: '#5B4EFA', fontSize: 13, fontWeight: '600' }}>See All</Text></TouchableOpacity>
+            <TouchableOpacity testID="pilot-v2-dashboard-seeall-recent" onPress={seeAllRecent}>
+              <Text style={{ color: '#5B4EFA', fontSize: 13, fontWeight: '600' }}>See All</Text>
+            </TouchableOpacity>
           </View>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 16 }}>
@@ -145,7 +233,9 @@ export function PilotV2Dashboard() {
         <View>
           <View style={styles.sectionHead}>
             <Text style={[styles.h2, { color: colors.textPrimary }]}>Pinned Notes</Text>
-            <TouchableOpacity><Text style={{ color: '#5B4EFA', fontSize: 13, fontWeight: '600' }}>See All</Text></TouchableOpacity>
+            <TouchableOpacity testID="pilot-v2-dashboard-seeall-pinned" onPress={seeAllPinned}>
+              <Text style={{ color: '#5B4EFA', fontSize: 13, fontWeight: '600' }}>See All</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.pinnedGrid}>
@@ -228,4 +318,9 @@ const styles = StyleSheet.create({
   },
   pinnedTop: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
   pinnedIcon: { width: 32, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  filterBadge: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    marginTop: 8, paddingHorizontal: 12, paddingVertical: 6,
+    backgroundColor: '#EEECFF', borderRadius: 8,
+  },
 });

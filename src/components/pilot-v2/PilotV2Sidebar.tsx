@@ -14,17 +14,18 @@
  * UI tokens follow the Figma spec colours from `theme.css` of the Knowledge
  * Management app (#5B4EFA primary, #F9FAFB canvas, #FFFFFF surface, etc.).
  */
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, TextInput, Platform } from 'react-native';
 import {
   Home as HomeIcon, Pin, Clock, Share2, Trash2, Plus, Settings, ChevronRight,
-  Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical, Book,
+  Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical, Book, X,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
 import { PILOT_V2_SUBJECT_PALETTE, PilotV2QuickFilter } from './types';
 import { PilotV2SidebarSubject } from './PilotV2SidebarSubject';
+import { createPilotV2Node } from '../../repositories/pilotV2Repo';
 
 const SUBJECT_ICONS: Record<string, any> = {
   Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical,
@@ -44,6 +45,9 @@ function PilotV2SidebarHome() {
   const { state, dispatch } = usePilotV2();
   const { signOut, session } = useAuth();
   const activeFilter = state.view.quickFilter;
+  const [newSubjectModal, setNewSubjectModal] = useState(false);
+  const [newSubjectName, setNewSubjectName] = useState('');
+  const [creating, setCreating] = useState(false);
 
   const handleSelectSubject = (subjectId: string) => {
     dispatch({ type: 'SET_SELECTED_SUBJECT', payload: subjectId });
@@ -56,11 +60,36 @@ function PilotV2SidebarHome() {
   };
 
   const handleNewSubject = () => {
-    Alert.alert(
-      'New subject',
-      'Custom subjects ship in the next milestone — for now you can use any of the seven UPSC presets in the list above. Need a custom subject? Drop us a note in the Settings → Feedback panel.',
-      [{ text: 'OK' }],
-    );
+    setNewSubjectName('');
+    setNewSubjectModal(true);
+  };
+
+  const submitNewSubject = async () => {
+    const title = newSubjectName.trim();
+    if (!title) return;
+    if (!session?.user?.id) {
+      Alert.alert('Sign in required', 'Please sign in to create subjects.');
+      return;
+    }
+    setCreating(true);
+    try {
+      const created = await createPilotV2Node({
+        userId: session.user.id,
+        type: 'subject',
+        title,
+        parentId: null,
+      });
+      if (!created) {
+        Alert.alert('Could not create', 'Subject could not be created. Please try again.');
+        return;
+      }
+      // Surface the new subject immediately by switching to its detail view.
+      dispatch({ type: 'SET_SELECTED_SUBJECT', payload: created.id });
+      dispatch({ type: 'SET_VIEW_MODE', payload: 'subject' });
+      setNewSubjectModal(false);
+    } finally {
+      setCreating(false);
+    }
   };
 
   const handleSettings = () => {
@@ -144,6 +173,56 @@ function PilotV2SidebarHome() {
         <Settings size={18} color={colors.textSecondary} />
         <Text style={{ color: colors.textPrimary, fontSize: 14, fontWeight: '500' }}>Settings</Text>
       </TouchableOpacity>
+
+      {/* New Subject modal — Step 24 */}
+      <Modal
+        visible={newSubjectModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setNewSubjectModal(false)}
+      >
+        <View style={styles.nsBackdrop}>
+          <TouchableOpacity activeOpacity={1} onPress={() => setNewSubjectModal(false)} style={StyleSheet.absoluteFill} />
+          <View style={[styles.nsCard, { backgroundColor: colors.surface, borderColor: colors.border }]} testID="pilot-v2-new-subject-modal">
+            <View style={styles.nsHeader}>
+              <Text style={[styles.nsTitle, { color: colors.textPrimary }]}>New Subject</Text>
+              <TouchableOpacity onPress={() => setNewSubjectModal(false)} testID="pilot-v2-new-subject-close">
+                <X size={20} color={colors.textPrimary} />
+              </TouchableOpacity>
+            </View>
+            <Text style={[styles.nsHint, { color: colors.textTertiary }]}>
+              Add a custom subject to your Pilot V2 workspace. You can create topics and notes inside it afterwards.
+            </Text>
+            <TextInput
+              testID="pilot-v2-new-subject-input"
+              value={newSubjectName}
+              onChangeText={setNewSubjectName}
+              placeholder="e.g. International Relations"
+              placeholderTextColor={colors.textTertiary}
+              autoFocus
+              style={[styles.nsInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}
+              onSubmitEditing={submitNewSubject}
+            />
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+              <TouchableOpacity
+                onPress={() => setNewSubjectModal(false)}
+                style={[styles.nsBtnGhost, { borderColor: colors.border }]}
+              >
+                <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                testID="pilot-v2-new-subject-submit"
+                onPress={submitNewSubject}
+                disabled={!newSubjectName.trim() || creating}
+                style={[styles.nsBtnPrimary, { backgroundColor: '#5B4EFA', opacity: newSubjectName.trim() && !creating ? 1 : 0.5 }]}
+              >
+                <Plus size={14} color="#fff" />
+                <Text style={{ color: '#fff', fontWeight: '700' }}>{creating ? 'Creating…' : 'Create'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -242,4 +321,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
+  /* New Subject modal — Step 24 */
+  nsBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  nsCard: { width: '100%', maxWidth: 420, borderRadius: 18, borderWidth: 1, padding: 18 },
+  nsHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  nsTitle: { fontSize: 17, fontWeight: '900' },
+  nsHint: { fontSize: 12, lineHeight: 18, marginBottom: 12 },
+  nsInput: {
+    height: 44, borderRadius: 12, borderWidth: 1, paddingHorizontal: 14, fontSize: 15,
+    ...(Platform.OS === 'web' ? { outlineStyle: 'none' as any } : null),
+  },
+  nsBtnGhost: { flex: 1, height: 44, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  nsBtnPrimary: { flex: 1, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6 },
 });

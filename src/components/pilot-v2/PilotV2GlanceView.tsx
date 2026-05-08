@@ -255,6 +255,11 @@ export function PilotV2GlanceView() {
 interface BlockRendererProps { block: PilotV2Block; colors: any }
 
 function BlockRenderer({ block, colors }: BlockRendererProps) {
+  const markStyle = {
+    fontWeight: block.bold ? '700' as const : undefined,
+    fontStyle: block.italic ? 'italic' as const : undefined,
+    textDecorationLine: block.underline ? ('underline' as const) : undefined,
+  };
   switch (block.type) {
     case 'heading': {
       const fs = block.level === 1 ? 24 : block.level === 3 ? 16 : 18;
@@ -269,21 +274,21 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
       return (
         <View style={styles.bulletRow}>
           <Text style={[styles.bulletDot, { color: colors.textPrimary }]}>•</Text>
-          <Text style={[styles.text, { color: colors.textPrimary }]}>{block.text}</Text>
+          <Text style={[styles.text, { color: colors.textPrimary }, markStyle]}>{block.text}</Text>
         </View>
       );
     case 'numbered':
       return (
         <View style={styles.bulletRow}>
           <Text style={[styles.bulletDot, { color: colors.textPrimary, fontWeight: '600' }]}>1.</Text>
-          <Text style={[styles.text, { color: colors.textPrimary }]}>{block.text}</Text>
+          <Text style={[styles.text, { color: colors.textPrimary }, markStyle]}>{block.text}</Text>
         </View>
       );
     case 'checklist':
       return (
         <View style={styles.bulletRow}>
           <View style={[styles.checkbox, { borderColor: colors.border, backgroundColor: block.checked ? '#5B4EFA' : 'transparent' }]} />
-          <Text style={[styles.text, { color: colors.textPrimary, textDecorationLine: block.checked ? 'line-through' : 'none' }]}>
+          <Text style={[styles.text, { color: colors.textPrimary, textDecorationLine: block.checked ? 'line-through' : 'none' }, markStyle]}>
             {block.text}
           </Text>
         </View>
@@ -297,7 +302,7 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
     case 'highlight':
       return (
         <View style={[styles.highlight, { backgroundColor: highlightBg(block.highlightColor) }]}>
-          <Text style={[styles.text, { color: '#1F2937' }]}>{block.text}</Text>
+          <Text style={[styles.text, { color: '#1F2937' }, markStyle]}>{block.text}</Text>
         </View>
       );
     case 'code':
@@ -307,7 +312,7 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
         </View>
       );
     default:
-      return <Text style={[styles.text, { color: colors.textPrimary }]}>{block.text}</Text>;
+      return <Text style={[styles.text, { color: colors.textPrimary }, markStyle]}>{block.text}</Text>;
   }
 }
 

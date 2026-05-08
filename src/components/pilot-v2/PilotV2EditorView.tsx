@@ -107,6 +107,16 @@ export function PilotV2EditorView() {
     updateBlock(activeBlockId, { type, level });
   };
 
+  const toggleMark = (mark: 'bold' | 'italic' | 'underline') => {
+    if (!activeBlockId) return;
+    const target = blocks.find(b => b.id === activeBlockId);
+    if (!target) return;
+    updateBlock(activeBlockId, { [mark]: !target[mark] } as Partial<PilotV2Block>);
+  };
+
+  const activeBlock = blocks.find(b => b.id === activeBlockId);
+  const isMarkActive = (mark: 'bold' | 'italic' | 'underline') => Boolean(activeBlock?.[mark]);
+
   const insertBlockAfterActive = (type: PilotV2BlockType = 'paragraph') => {
     const newBlock: PilotV2Block = { id: newId(), type, text: '' };
     const idx = blocks.findIndex(b => b.id === activeBlockId);
@@ -186,9 +196,9 @@ export function PilotV2EditorView() {
         <View style={styles.toolbar}>
           <ToolbarTextBtn label="H1" onPress={() => setActiveBlockType('heading', 1)} colors={colors} />
           <ToolbarTextBtn label="H2" onPress={() => setActiveBlockType('heading', 2)} colors={colors} />
-          <ToolbarIconBtn Icon={Bold}          onPress={() => {}} colors={colors} testID="pilot-v2-tool-bold" />
-          <ToolbarIconBtn Icon={Italic}        onPress={() => {}} colors={colors} testID="pilot-v2-tool-italic" />
-          <ToolbarIconBtn Icon={UnderlineIcon} onPress={() => {}} colors={colors} testID="pilot-v2-tool-underline" />
+          <ToolbarIconBtn Icon={Bold}          onPress={() => toggleMark('bold')}      colors={colors} active={isMarkActive('bold')}      testID="pilot-v2-tool-bold" />
+          <ToolbarIconBtn Icon={Italic}        onPress={() => toggleMark('italic')}    colors={colors} active={isMarkActive('italic')}    testID="pilot-v2-tool-italic" />
+          <ToolbarIconBtn Icon={UnderlineIcon} onPress={() => toggleMark('underline')} colors={colors} active={isMarkActive('underline')} testID="pilot-v2-tool-underline" />
           <Divider colors={colors} />
           <ToolbarIconBtn Icon={ListOrdered} onPress={() => setActiveBlockType('numbered')}  colors={colors} testID="pilot-v2-tool-ol" />
           <ToolbarIconBtn Icon={List}        onPress={() => setActiveBlockType('bullet')}    colors={colors} testID="pilot-v2-tool-ul" />
@@ -323,7 +333,15 @@ function BlockRow({ block, colors, isActive, onFocus, onChange, onToggleCheck, o
   const fontSize = block.type === 'heading'
     ? block.level === 1 ? 24 : 18
     : 16;
-  const fontWeight: any = block.type === 'heading' ? '700' : '400';
+  const fontWeight: any = (block.type === 'heading' || block.bold) ? '700' : '400';
+  const fontStyle: any = block.italic ? 'italic' : 'normal';
+
+  const decorations: string[] = [];
+  if (block.type === 'checklist' && block.checked) decorations.push('line-through');
+  if (block.underline) decorations.push('underline');
+  const textDecorationLine: any = decorations.length === 2
+    ? 'underline line-through'
+    : (decorations[0] ?? 'none');
 
   const highlightBg = block.type === 'highlight'
     ? PILOT_V2_HIGHLIGHT_PALETTE.find(c => c.name === block.highlightColor)?.bg ?? '#FDE68A'
@@ -360,10 +378,11 @@ function BlockRow({ block, colors, isActive, onFocus, onChange, onToggleCheck, o
           style={{
             fontSize,
             fontWeight,
+            fontStyle,
             color: colors.textPrimary,
             lineHeight: fontSize === 24 ? 32 : fontSize === 18 ? 26 : 24,
             paddingVertical: 4,
-            textDecorationLine: block.type === 'checklist' && block.checked ? 'line-through' : 'none',
+            textDecorationLine,
           }}
         />
       </View>
@@ -383,9 +402,9 @@ const ToolbarTextBtn = ({ label, onPress, colors }: any) => (
     <Text style={{ fontSize: 12, fontWeight: '700', color: colors.textPrimary }}>{label}</Text>
   </TouchableOpacity>
 );
-const ToolbarIconBtn = ({ Icon, onPress, colors, testID }: any) => (
-  <TouchableOpacity testID={testID} onPress={onPress} style={styles.toolBtn}>
-    <Icon size={16} color={colors.textSecondary} />
+const ToolbarIconBtn = ({ Icon, onPress, colors, testID, active }: any) => (
+  <TouchableOpacity testID={testID} onPress={onPress} style={[styles.toolBtn, active && { backgroundColor: '#EEECFF' }]}>
+    <Icon size={16} color={active ? '#5B4EFA' : colors.textSecondary} />
   </TouchableOpacity>
 );
 const Divider = ({ colors }: any) => <View style={[styles.toolDivider, { backgroundColor: colors.border }]} />;

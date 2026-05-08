@@ -63,6 +63,21 @@ export interface PilotV2Block {
   checked?: boolean;
   /** Highlight color name (one of PILOT_V2_HIGHLIGHT_PALETTE.name). */
   highlightColor?: string;
+  /** Inline marks — applied to the whole block (RN TextInput limitation). */
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  /** Hyperlink URL — when set, the block renders as a tappable link. */
+  link?: string;
+  /** Image data — base64 (`imageBase64`) or remote URL (`imageUri`). */
+  imageBase64?: string;
+  imageUri?: string;
+  /** Attachment metadata for paperclip blocks. */
+  attachment?: { name: string; uri?: string; mime?: string; size?: number };
+  /** Reminder timestamp (ISO string) for calendar blocks. */
+  remindAt?: string;
+  /** Tabular data for table blocks (rows × cols). */
+  tableRows?: string[][];
   /** Free-form metadata: source attribution, AI prompt, etc. */
   meta?: Record<string, any>;
   created_at?: string;

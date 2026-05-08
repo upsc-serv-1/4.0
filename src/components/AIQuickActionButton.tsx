@@ -25,10 +25,10 @@ import {
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { Sparkles, X, Copy, Send } from 'lucide-react-native';
-import { useTheme } from '../../context/ThemeContext';
-import { useAuth } from '../../context/AuthContext';
-import { AIPromptManager, PromptTemplate } from '../../services/AIPromptManager';
-import { generateWithHistory } from '../../services/GeminiService';
+import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
+import { AIPromptManager, PromptTemplate } from '../services/AIPromptManager';
+import { generateWithHistory } from '../services/GeminiService';
 
 export type AIContext = {
   type: 'note' | 'tag' | 'analysis' | 'syllabus' | 'quiz';

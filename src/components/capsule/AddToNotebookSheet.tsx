@@ -8,7 +8,7 @@ import {
   ActivityIndicator, ScrollView, TextInput, Alert,
 } from 'react-native';
 import {
-  Sparkles, Layers, FileText, X, ChevronDown, ChevronRight, Plus, Wand2, ListTree, ArrowLeft, BookOpen,
+  Sparkles, Layers, FileText, X, ChevronDown, ChevronRight, Plus, Wand2, ListTree, ArrowLeft, BookOpen, Rocket,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import {
@@ -19,7 +19,7 @@ import {
   CapsuleNode, CapsuleNodeType, CAPSULE_SUBJECT_PALETTE,
 } from '../../types/capsule';
 
-export type SaveDestination = 'flashcard' | 'capsule' | 'notes';
+export type SaveDestination = 'flashcard' | 'capsule' | 'notes' | 'pilot-v2';
 
 interface AutoSeed {
   subject?: string | null;
@@ -45,6 +45,7 @@ const META: Record<SaveDestination, { Icon: any; title: string; subtitle: string
   flashcard: { Icon: Layers,    title: 'Flashcards',    subtitle: 'Convert into a spaced-repetition card', tint: '#5B7ADB' },
   capsule:   { Icon: Sparkles,  title: 'Capsule',       subtitle: 'Append structured block to Capsule notebook', tint: '#FF6A88' },
   notes:     { Icon: FileText,  title: 'Notes',         subtitle: 'Save to your classic Notes tab',         tint: '#10b981' },
+  'pilot-v2':{ Icon: Rocket,    title: 'Pilot V2',      subtitle: 'Auto-routed by subject → topic → microtopic', tint: '#5B4EFA' },
 };
 
 type Step = 'choose' | 'capsule';

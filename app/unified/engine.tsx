@@ -847,6 +847,8 @@ export default function UnifiedQuizEngine() {
   const [locationPickerVisible, setLocationPickerVisible] = useState(false);
   const [destChooserOpen, setDestChooserOpen] = useState(false);
   const [capsulePickerOpen, setCapsulePickerOpen] = useState(false);
+  const [isSavingToCapsule, setIsSavingToCapsule] = useState(false);
+  const [selectedCapsuleNotebook, setSelectedCapsuleNotebook] = useState<any>(null);
 
   // Track viewable items via a ref to avoid triggering re-renders during scroll.
   // We only update currentIndex when the user has been on a question long enough
@@ -1815,6 +1817,39 @@ export default function UnifiedQuizEngine() {
   };
 
   const commitToNotebook = async () => {
+    if (isSavingToCapsule) {
+      if (!selectedCapsuleNotebook || !selectedCapsuleNotebook.id || isSavingToNotebook) return;
+      setIsSavingToNotebook(true);
+      try {
+        const q = questions[currentIndex];
+        const text = (noteDraftBullets || []).join('\n') || q?.explanation_markdown || '';
+        if (!text || !q) return;
+        const cleanText = text
+          .replace(/<br\s*\/?>(?=\s*\n?)/gi, '\n')
+          .replace(/<[^>]+>/g, '')
+          .replace(/&nbsp;/g, ' ')
+          .trim();
+        const ok = await appendTextToCapsule({
+          noteId: selectedCapsuleNotebook.id,
+          text: cleanText,
+          heading: customSubheading || q.micro_topic || q.subject || undefined,
+          source: `Quiz / ${q.subject || ''} ${q.exam_year || ''}`.trim(),
+        });
+        if (ok) {
+          Alert.alert('Saved to Capsule', `Appended to "${selectedCapsuleNotebook.title}".`);
+          setNotebookModalVisible(false);
+          setNoteDraftBullets(['']);
+          setIsSavingToCapsule(false);
+          setSelectedCapsuleNotebook(null);
+        } else {
+          Alert.alert('Error', 'Could not save to Capsule.');
+        }
+      } finally {
+        setIsSavingToNotebook(false);
+      }
+      return;
+    }
+
     if (!selectedNotebook || !selectedNotebook.note_id || isSavingToNotebook) return;
     setIsSavingToNotebook(true);
     try {
@@ -2014,15 +2049,30 @@ export default function UnifiedQuizEngine() {
   const openNotebookFromQuestion = (
     q: Question,
     explanationText?: string,
-    opts?: { closeExplanation?: boolean }
+    optsOrMode?: { closeExplanation?: boolean } | string
   ) => {
+    const isCapsule = optsOrMode === 'capsule';
+    const isChoose = optsOrMode === 'choose';
+    const closeOpts = typeof optsOrMode === 'object' ? optsOrMode : undefined;
+
     runAfterPaperOverlayClose(() => {
       const activeText = explanationText || q.explanation_markdown || '';
-      setNoteDraftBullets([markdownToHtml(activeText)]);
-      setCustomSubheading(q.micro_topic || '');
-      setNotebookModalVisible(true);
-      fetchHierarchy();
-    }, opts);
+      if (isCapsule) {
+        setIsSavingToCapsule(true);
+        setNoteDraftBullets([markdownToHtml(activeText)]);
+        setCapsulePickerOpen(true);
+      } else if (isChoose) {
+        setIsSavingToCapsule(false);
+        setNoteDraftBullets([markdownToHtml(activeText)]);
+        setDestChooserOpen(true);
+      } else {
+        setIsSavingToCapsule(false);
+        setNoteDraftBullets([markdownToHtml(activeText)]);
+        setCustomSubheading(q.micro_topic || '');
+        setNotebookModalVisible(true);
+        fetchHierarchy();
+      }
+    }, closeOpts);
   };
 
   const openHardnoteFromQuestion = (
@@ -2892,6 +2942,8 @@ export default function UnifiedQuizEngine() {
         applyFormatting={applyFormatting}
         openLocationPicker={() => setDestChooserOpen(true)}
         richEditorRef={notebookRichEditorRef}
+        isSavingToCapsule={isSavingToCapsule}
+        selectedCapsuleNotebook={selectedCapsuleNotebook}
       />
     );
   };
@@ -4229,17 +4281,22 @@ export default function UnifiedQuizEngine() {
           defaultNotebookTitle={questions[currentIndex]?.micro_topic || questions[currentIndex]?.subject || ''}
           onPick={async ({ note_id, title }) => {
             setCapsulePickerOpen(false);
-            const q = questions[currentIndex];
-            const text = (noteDraftBullets || []).join('\n') || q?.explanation_markdown || '';
-            if (!text || !q) return;
-            const ok = await appendTextToCapsule({
-              noteId: note_id,
-              text: text.replace(/<br\s*\/?>(?=\s*\n?)/gi, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim(),
-              heading: customSubheading || q.micro_topic || q.subject || undefined,
-              source: `Quiz / ${q.subject || ''} ${q.exam_year || ''}`.trim(),
-            });
-            if (ok) Alert.alert('Saved to Capsule', `Appended to "${title}".`);
-            else Alert.alert('Error', 'Could not save to Capsule.');
+            if (isSavingToCapsule) {
+              setSelectedCapsuleNotebook({ id: note_id, title });
+              setNotebookModalVisible(true);
+            } else {
+              const q = questions[currentIndex];
+              const text = (noteDraftBullets || []).join('\n') || q?.explanation_markdown || '';
+              if (!text || !q) return;
+              const ok = await appendTextToCapsule({
+                noteId: note_id,
+                text: text.replace(/<br\s*\/?>(?=\s*\n?)/gi, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim(),
+                heading: customSubheading || q.micro_topic || q.subject || undefined,
+                source: `Quiz / ${q.subject || ''} ${q.exam_year || ''}`.trim(),
+              });
+              if (ok) Alert.alert('Saved to Capsule', `Appended to "${title}".`);
+              else Alert.alert('Error', 'Could not save to Capsule.');
+            }
           }}
         />
 
@@ -4281,7 +4338,7 @@ const NotebookModal = (props: any) => {
         
         <SafeAreaView style={{ flex: 1 }} pointerEvents="box-none">
           <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
             style={{ flex: 1 }}
             pointerEvents="box-none"
@@ -4294,7 +4351,9 @@ const NotebookModal = (props: any) => {
                 </TouchableOpacity>
                 
                 <View style={{ flex: 1, marginLeft: 8 }}>
-                  <Text style={{ fontSize: 16, fontWeight: '900', color: colors.textPrimary }}>Notebook Editor</Text>
+                  <Text style={{ fontSize: 16, fontWeight: '900', color: colors.textPrimary }}>
+                    {props.isSavingToCapsule ? 'Capsule Editor' : 'Notebook Editor'}
+                  </Text>
                   <Text style={{ fontSize: 10, color: colors.textTertiary }}>Drafting insights...</Text>
                 </View>
 
@@ -4302,83 +4361,109 @@ const NotebookModal = (props: any) => {
                    <TouchableOpacity 
                      onPress={() => props.openLocationPicker?.()}
                      style={{ height: 36, paddingHorizontal: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary + '15', borderRadius: 12, flexDirection: 'row', gap: 4 }}
+                     disabled={props.isSavingToCapsule}
                    >
                       <BookOpen size={14} color={colors.primary} />
                       <Text style={{ color: colors.primary, fontWeight: '900', fontSize: 11 }} numberOfLines={1}>
-                        {props.selectedNotebook?.title ? props.selectedNotebook.title.slice(0, 10) : 'LOCATION'}
+                        {props.isSavingToCapsule ? (props.selectedCapsuleNotebook?.title ? props.selectedCapsuleNotebook.title.slice(0, 10) : 'CAPSULE') : (props.selectedNotebook?.title ? props.selectedNotebook.title.slice(0, 10) : 'LOCATION')}
                       </Text>
                    </TouchableOpacity>
                 </View>
               </View>
 
             <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 80 }}>
-            <View style={{ backgroundColor: colors.surface, borderRadius: 16, margin: 12, marginBottom: 0, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' }}>
-              <RichToolbar
-                editor={props.richEditorRef}
-                getEditor={() => props.richEditorRef?.current}
-                selectedIconTint={colors.primary}
-                iconTint={colors.textPrimary}
-                style={{ backgroundColor: colors.surface }}
-                actions={[
-                  actions.setBold,
-                  actions.setItalic,
-                  actions.setUnderline,
-                  actions.setStrikethrough,
-                  actions.heading1,
-                  actions.heading2,
-                  actions.insertBulletsList,
-                  actions.insertOrderedList,
-                  actions.checkboxList,
-                  actions.blockquote,
-                  'highlight',
-                  actions.undo,
-                  actions.redo,
-                ]}
-                iconMap={{
-                  [actions.heading1]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '900', fontSize: 14 }}>H1</Text>,
-                  [actions.heading2]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '800', fontSize: 12 }}>H2</Text>,
-                  highlight: ({ tintColor }: any) => (
-                    <View style={{ padding: 4, borderRadius: 4, backgroundColor: highlightColor === 'transparent' ? 'transparent' : highlightColor }}>
-                      <Highlighter size={16} color={tintColor} />
-                    </View>
-                  ),
-                }}
-                highlight={() => {
-                  setShowPicker(v => !v);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }}
-              />
-              {showPicker && (
-                <View style={{ flexDirection: 'row', gap: 12, padding: 12, borderTopWidth: 1, borderTopColor: colors.border, justifyContent: 'center', backgroundColor: colors.surface, flexWrap: 'wrap' }}>
-                  {HIGHLIGHT_COLORS.map(c => (
-                    <TouchableOpacity 
-                      key={c} 
-                      onPress={async () => {
-                        setHighlightColor(c);
-                        await AsyncStorage.setItem('notes_editor_highlight_color', c);
-                        setShowPicker(false);
-                        props.richEditorRef?.current?.focusContentEditor?.();
-                        setTimeout(() => {
-                          if (c === 'transparent') {
-                            props.richEditorRef?.current?.commandDOM?.("document.execCommand('hiliteColor', false, 'transparent'); document.execCommand('backColor', false, 'transparent')");
-                          } else {
-                            props.richEditorRef?.current?.commandDOM?.(`document.execCommand('hiliteColor', false, '${c}')`);
-                          }
-                        }, 50);
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      }} 
-                      style={{ 
-                        width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center',
-                        borderWidth: 2, backgroundColor: c === 'transparent' ? colors.surfaceStrong : c, 
-                        borderColor: c === highlightColor ? colors.primary : 'transparent' 
-                      }} 
-                    >
-                      {c === 'transparent' && <Eraser size={14} color={colors.textSecondary} />}
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
+            {/* Premium Floating Pill-Style Toolbar Container */}
+            <View style={{ marginHorizontal: 16, marginTop: 14, marginBottom: 10, alignItems: 'center' }}>
+              <View style={{ 
+                backgroundColor: colors.surface, 
+                borderRadius: 28, 
+                borderWidth: 1, 
+                borderColor: colors.border, 
+                paddingHorizontal: 8, 
+                paddingVertical: 4,
+                shadowColor: '#000', 
+                shadowOffset: { width: 0, height: 4 }, 
+                shadowOpacity: 0.08, 
+                shadowRadius: 6, 
+                elevation: 4,
+                width: '100%',
+                overflow: 'hidden'
+              }}>
+                <RichToolbar
+                  getEditor={() => props.richEditorRef?.current}
+                  selectedIconTint={colors.primary}
+                  iconTint={colors.textPrimary}
+                  style={{ backgroundColor: 'transparent', height: 44 }}
+                  actions={[
+                    actions.setBold,
+                    actions.setItalic,
+                    actions.setUnderline,
+                    actions.setStrikethrough,
+                    actions.heading1,
+                    actions.heading2,
+                    actions.insertBulletsList,
+                    actions.insertOrderedList,
+                    actions.checkboxList,
+                    actions.blockquote,
+                    'highlight',
+                  ]}
+                  iconMap={{
+                    [actions.heading1]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '900', fontSize: 13 }}>H1</Text>,
+                    [actions.heading2]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '800', fontSize: 11 }}>H2</Text>,
+                    highlight: ({ tintColor }: any) => (
+                      <View style={{ padding: 4, borderRadius: 4, backgroundColor: highlightColor === 'transparent' ? 'transparent' : highlightColor }}>
+                        <Highlighter size={15} color={tintColor} />
+                      </View>
+                    ),
+                  }}
+                  onPress={(action) => {
+                    if (action === 'highlight') {
+                      setShowPicker(v => !v);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      return;
+                    }
+                    props.richEditorRef?.current?.focusContentEditor?.();
+                    setTimeout(() => {
+                      props.richEditorRef?.current?.sendAction?.(action as any);
+                    }, 50);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                />
+                {showPicker && (
+                  <View style={{ flexDirection: 'row', gap: 12, padding: 12, borderTopWidth: 1, borderTopColor: colors.border, justifyContent: 'center', backgroundColor: colors.surface, flexWrap: 'wrap' }}>
+                    {HIGHLIGHT_COLORS.map(c => (
+                      <TouchableOpacity 
+                        key={c} 
+                        onPress={async () => {
+                          setHighlightColor(c);
+                          await AsyncStorage.setItem('notes_editor_highlight_color', c);
+                          setShowPicker(false);
+                          props.richEditorRef?.current?.focusContentEditor?.();
+                          setTimeout(() => {
+                            if (c === 'transparent') {
+                              props.richEditorRef?.current?.commandDOM?.("document.execCommand('hiliteColor', false, 'transparent'); document.execCommand('backColor', false, 'transparent')");
+                            } else {
+                              props.richEditorRef?.current?.commandDOM?.(`document.execCommand('hiliteColor', false, '${c}')`);
+                            }
+                          }, 50);
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        }} 
+                        style={{ 
+                          width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center',
+                          borderWidth: 2, backgroundColor: c === 'transparent' ? colors.surfaceStrong : c, 
+                          borderColor: c === highlightColor ? colors.primary : 'transparent' 
+                        }} 
+                      >
+                        {c === 'transparent' && <Eraser size={14} color={colors.textSecondary} />}
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </View>
             </View>
+
+            {/* Editor Content Box inside elegant container */}
+            <View style={{ backgroundColor: colors.surface, borderRadius: 18, marginHorizontal: 16, marginBottom: 12, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' }}>
 
             <View style={{ padding: 16, minHeight: 300 }}>
               <RichNoteEditor
@@ -4395,7 +4480,10 @@ const NotebookModal = (props: any) => {
                 placeholder="Capture your insight... Use the toolbar above for formatting."
               />
             </View>
+          </View>
 
+          {!props.isSavingToCapsule && (
+            <>
               <View style={{ height: 24 }} />
               <Text style={[styles.modalLabel, { color: colors.textTertiary, letterSpacing: 1 }]}>SAVE LOCATION</Text>
               <Text style={{ fontSize: 11, color: colors.textTertiary, marginBottom: 10 }}>
@@ -4509,6 +4597,8 @@ const NotebookModal = (props: any) => {
                   )}
                 </>
               )}
+            </>
+          )}
 
               <TouchableOpacity onPress={props.onSave} style={[styles.launchBtn, { backgroundColor: colors.primary }]}>
                 {props.isSaving ? <ActivityIndicator color="#fff" /> : <Text style={{ color: '#fff', fontWeight: '900' }}>SAVE</Text>}

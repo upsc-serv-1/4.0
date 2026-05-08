@@ -364,6 +364,7 @@ export default function Home() {
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.resumeScroll}>
                 <ResumeAction icon={<Layout size={20} color="#007AFF" />} title="Tracker" sub="Daily Syllabus" onPress={() => router.push('/tracker')} colors={colors} />
                 <ResumeAction icon={<Layers size={20} color="#AF52DE" />} title="Flashcards" sub="Smart Review" onPress={() => router.push('/flashcards')} colors={colors} />
+                <ResumeAction icon={<BookOpen size={20} color="#EC4899" />} title="Softnotes" sub="Handwritten" onPress={() => router.push('/softnotes')} colors={colors} />
                 <ResumeAction icon={<BarChart3 size={20} color="#34C759" />} title="Analyse" sub="Performance" onPress={() => router.push('/analyse')} colors={colors} />
                 <ResumeAction icon={<History size={20} color="#FF9500" />} title="Archive" sub="Review PYQs" onPress={() => router.push('/pyq')} colors={colors} />
               </ScrollView>

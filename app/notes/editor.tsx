@@ -1058,8 +1058,16 @@ export default function NoteEditor() {
                                   </View>
                                 ),
                               }}
-                              highlight={() => {
-                                setShowPicker(v => !v);
+                              onPress={(action) => {
+                                if (action === 'highlight') {
+                                  setShowPicker(v => !v);
+                                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                  return;
+                                }
+                                editorRef.current?.focusContentEditor?.();
+                                setTimeout(() => {
+                                  editorRef.current?.sendAction?.(action as any);
+                                }, 50);
                                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                               }}
                             />
@@ -1445,8 +1453,16 @@ export default function NoteEditor() {
                         </View>
                       ),
                     }}
-                    highlight={() => {
-                      setShowPicker(v => !v);
+                    onPress={(action) => {
+                      if (action === 'highlight') {
+                        setShowPicker(v => !v);
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        return;
+                      }
+                      modalEditorRef.current?.focusContentEditor?.();
+                      setTimeout(() => {
+                        modalEditorRef.current?.sendAction?.(action as any);
+                      }, 50);
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }}
                   />

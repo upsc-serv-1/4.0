@@ -166,8 +166,8 @@ export const CapsuleLocationPicker: React.FC<Props> = ({
             <BookOpen color={colors.primary} size={20} />
             <Text style={[styles.title, { color: colors.textPrimary }]}>Save to Capsule</Text>
             <View style={{ flex: 1 }} />
-            <TouchableOpacity onPress={onClose} style={styles.closeBtn} testID="capsule-picker-close">
-              <X color={colors.textTertiary} size={20} />
+            <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { backgroundColor: colors.border + '40' }]} testID="capsule-picker-close">
+              <X color={colors.textPrimary} size={20} />
             </TouchableOpacity>
           </View>
 
@@ -246,7 +246,7 @@ const ManualMode: React.FC<{
 
     return (
       <View key={n.id}>
-        <View style={[styles.row, { paddingLeft: 12 + depth * 14 }, isParentChosen && { backgroundColor: hex(colors.primary, 0.10) }]}>
+        <View style={[styles.row, { paddingLeft: 12 + depth * 14, borderBottomColor: colors.border + '20' }, isParentChosen && { backgroundColor: colors.primary + '15' }]}>
           {n.type !== 'notebook' ? (
             <TouchableOpacity onPress={() => onToggleExpand(n.id)} style={styles.chev} hitSlop={4}>
               {isExpanded ? <ChevronDown color={colors.textTertiary} size={14} /> : <ChevronRight color={colors.textTertiary} size={14} />}
@@ -377,7 +377,7 @@ const Field: React.FC<{ label: string; value: string; onChange: (s: string) => v
         testID={testID}
         value={value}
         onChangeText={onChange}
-        style={[styles.input, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}
+        style={[styles.input, { flex: undefined, width: '100%', color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}
         placeholder="—"
         placeholderTextColor={colors.textTertiary}
       />
@@ -476,17 +476,17 @@ function hex(c: string, alpha: number): string {
 /* -------------------------------------------------------------------------- */
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 20 },
   sheet: {
-    width: '100%', maxHeight: '90%', borderTopLeftRadius: 20, borderTopRightRadius: 20,
-    paddingTop: 12, paddingBottom: 16, flexDirection: 'column',
+    width: '94%', maxWidth: 500, height: '82%', borderRadius: 40,
+    padding: 20, paddingBottom: 30, flexDirection: 'column', overflow: 'hidden',
   },
-  head: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12, gap: 10 },
-  title: { fontSize: 16, fontWeight: '700' },
-  closeBtn: { padding: 6 },
+  head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, gap: 10 },
+  title: { fontSize: 18, fontWeight: '900' },
+  closeBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
 
   modeRow: {
-    flexDirection: 'row', gap: 8, paddingHorizontal: 16, paddingBottom: 10,
+    flexDirection: 'row', gap: 8, paddingBottom: 14,
     borderBottomWidth: 1,
   },
   modeBtn: {
@@ -498,17 +498,17 @@ const styles = StyleSheet.create({
   loaderWrap: { padding: 24, alignItems: 'center' },
 
   /* manual */
-  tree: { flexGrow: 0, maxHeight: 320 },
-  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, paddingRight: 12, gap: 8 },
+  tree: { flex: 1 },
+  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingRight: 12, gap: 8, borderBottomWidth: 1, borderRadius: 12 },
   chev: { width: 16, alignItems: 'center', justifyContent: 'center' },
   chip: { width: 18, height: 18, borderRadius: 5, alignItems: 'center', justifyContent: 'center' },
   chipTxt: { color: '#fff', fontSize: 10, fontWeight: '700' },
-  rowTxt: { fontSize: 13 },
+  rowTxt: { fontSize: 15, fontWeight: '600', flex: 1 },
   count: { fontSize: 11 },
 
   createRow: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
-    paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: 1,
+    paddingVertical: 12, borderTopWidth: 1,
   },
   input: {
     flex: 1, height: 40, borderRadius: 10, borderWidth: 1, paddingHorizontal: 12, fontSize: 14,
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
   empty: { padding: 24, fontSize: 13, textAlign: 'center' },
 
   /* auto */
-  autoWrap: { padding: 16 },
+  autoWrap: { paddingVertical: 16 },
   autoHint: { fontSize: 12, lineHeight: 18, marginBottom: 12 },
   fieldWrap: { marginBottom: 10 },
   fieldLabel: { fontSize: 11, fontWeight: '600', letterSpacing: 0.4, marginBottom: 4 },

@@ -1,12 +1,10 @@
-import { Tabs, useSegments, useRouter } from 'expo-router';
-import { Home, BarChart2, RotateCcw, LayoutList, Tag, Target, FileText, TrendingUp, BarChart3, Layers, Database, PenTool, Brain, Sparkles } from 'lucide-react-native';
+import { Tabs, useSegments, useRouter, Redirect, useFocusEffect } from 'expo-router';
+import { Home, BarChart2, RotateCcw, LayoutList, Tag, Target, FileText, TrendingUp, BarChart3, Layers, Database, PenTool, Brain, Sparkles, BookOpen } from 'lucide-react-native';
 import { useAuth } from '../../src/context/AuthContext';
-import { Redirect } from 'expo-router';
 import { View, ActivityIndicator, ScrollView, TouchableOpacity, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import { useTheme } from '../../src/context/ThemeContext';
 import { useState, useEffect, useCallback } from 'react';
 import { TabConfigService, TabKey } from '../../src/services/TabConfigService';
-import { useFocusEffect } from 'expo-router';
 
 export default function TabsLayout() {
   const { colors } = useTheme();
@@ -53,6 +51,7 @@ export default function TabsLayout() {
     notes: { title: 'Notes', icon: FileText },
     hardnotes: { title: 'Hardnotes', icon: PenTool },
     capsule: { title: 'Capsule', icon: Sparkles },
+    softnotes: { title: 'Softnotes', icon: BookOpen },
     revise: { title: 'Revise', icon: RotateCcw },
     tracker: { title: 'Tracker', icon: LayoutList },
     'ai-search': { title: 'AI Search', icon: Brain },

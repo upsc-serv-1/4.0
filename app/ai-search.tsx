@@ -14,7 +14,7 @@ import { useRouter } from 'expo-router';
 import {
   Brain, Search, SlidersHorizontal, X, ChevronRight,
   Sparkles, Filter, Clock, ChevronUp, ChevronDown, BookOpen, Target, Zap,
-  TrendingUp, BarChart2, Flame,
+  TrendingUp, BarChart2, Flame, Bold, Italic, Underline, Highlighter,
 } from 'lucide-react-native';
 import { PinchGestureHandler, State as GHState } from 'react-native-gesture-handler';
 import * as Haptics from 'expo-haptics';
@@ -23,7 +23,7 @@ import { supabase } from '../src/lib/supabase';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { aiExpandSearchQuery, aiExplainQuestion, type AIInferredFilters } from '../src/services/GeminiService';
+import { aiExpandSearchQuery, aiExplainQuestion, aiImproveAnswer, type AIInferredFilters } from '../src/services/GeminiService';
 import { PageWrapper } from '../src/components/PageWrapper';
 import Markdown from 'react-native-markdown-display';
 import { AIModelSwitcher } from '../src/components/ai/AIModelSwitcher';
@@ -250,6 +250,8 @@ export default function AISearchTab() {
   const [notebookModalVisible, setNotebookModalVisible] = useState(false);
   const [destChooserOpen, setDestChooserOpen] = useState(false);
   const [capsulePickerOpen, setCapsulePickerOpen] = useState(false);
+  const [isSavingToCapsule, setIsSavingToCapsule] = useState(false);
+  const [selectedCapsuleNotebook, setSelectedCapsuleNotebook] = useState<{ id: string; title: string } | null>(null);
   const [selectedNotebook, setSelectedNotebook] = useState<{ node_id: string; note_id: string; title: string; folder_id: string | null } | null>(null);
   const [previewNotebookDraft, setPreviewNotebookDraft] = useState<string>('');
   const [isSavingToNotebook, setIsSavingToNotebook] = useState(false);
@@ -2204,9 +2206,15 @@ export default function AISearchTab() {
                       bestAnswers={bestAnswers}
                       ensureBestAnswerLoaded={ensureBestAnswerLoaded}
                       showNotebookButton={false}
-                      openNotebookFromQuestion={(_: any, activeText?: string) => {
+                      openNotebookFromQuestion={(_: any, activeText?: string, mode?: string) => {
                         setPreviewNotebookDraft(activeText || '');
-                        setDestChooserOpen(true);
+                        if (mode === 'capsule') {
+                          setIsSavingToCapsule(true);
+                          setCapsulePickerOpen(true);
+                        } else {
+                          setIsSavingToCapsule(false);
+                          setDestChooserOpen(true);
+                        }
                       }}
                       onCreateTag={() => setIsAddingTag(true)}
                     />
@@ -2274,8 +2282,10 @@ export default function AISearchTab() {
           onPick={(d: SaveDestination) => {
             setDestChooserOpen(false);
             if (d === 'capsule') {
+              setIsSavingToCapsule(true);
               setCapsulePickerOpen(true);
             } else if (d === 'notes') {
+              setIsSavingToCapsule(false);
               setNotebookModalVisible(true);
             }
           }}

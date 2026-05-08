@@ -256,3 +256,41 @@ export function buildCapsuleTree(nodes: CapsuleNode[]): CapsuleTreeNode[] {
   sortRec(roots);
   return roots;
 }
+
+export async function findOrCreateNotebook({
+  userId,
+  title,
+  parentId,
+  subject,
+}: {
+  userId: string;
+  title: string;
+  parentId: string;
+  subject: string;
+}): Promise<{ noteId: string; nodeId: string; isNew: boolean }> {
+  // 1. Check if a capsule node with this title already exists under this parentId
+  const { data: existingNode } = await supabase
+    .from('user_note_nodes')
+    .select('id, note_id')
+    .eq('user_id', userId)
+    .eq('parent_id', parentId)
+    .eq('type', 'notebook')
+    .eq('title', title)
+    .maybeSingle();
+
+  if (existingNode && existingNode.note_id) {
+    // Notebook already exists — return its IDs, don't create anything new
+    return { noteId: existingNode.note_id, nodeId: existingNode.id, isNew: false };
+  }
+
+  // 2. Not found — create fresh note row and node
+  const noteId = await createNotebookRow({ userId, subject, title });
+  if (!noteId) throw new Error('Failed to create notebook row');
+  const node = await createCapsuleNode({
+    userId, type: 'notebook', title,
+    color: null, parentId, noteId,
+  });
+
+  if (!node) throw new Error('Failed to create capsule node');
+  return { noteId, nodeId: node.id, isNew: true };
+}

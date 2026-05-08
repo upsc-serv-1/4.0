@@ -10,7 +10,10 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl,
   ActivityIndicator, useWindowDimensions, Modal,
 } from 'react-native';
-import { Plus, X as CloseIcon, Sparkles, BookOpen } from 'lucide-react-native';
+import {
+  Plus, X as CloseIcon, Sparkles, BookOpen, FileText, Star, MoreHorizontal,
+  ChevronLeft, PanelLeftOpen, PanelLeftClose, Bell, Share2, Edit3,
+} from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
@@ -22,7 +25,7 @@ import { CapsuleCreatePrompt } from '../../src/components/capsule/CapsuleCreateP
 import { CapsuleBreadcrumb } from '../../src/components/capsule/CapsuleBreadcrumb';
 import {
   fetchAllCapsuleNodes, createCapsuleNode, pinCapsuleNode, buildCapsuleTree,
-  createNotebookRow, CapsuleTreeNode,
+  createNotebookRow, fetchNotebookContent, CapsuleTreeNode,
 } from '../../src/repositories/capsuleRepo';
 import {
   CapsuleNode, CapsuleNodeType, CAPSULE_SUBJECT_PALETTE,
@@ -78,6 +81,8 @@ export default function CapsuleHome() {
   }>({ open: false, type: 'subject', parentId: null });
 
   const [notebookPages, setNotebookPages] = useState<Record<string, number>>({});
+  const [glanceNoteId, setGlanceNoteId] = useState<string | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const userId = session?.user?.id || '';
 
@@ -239,9 +244,10 @@ export default function CapsuleHome() {
 
   const handleSelectNode = (n: CapsuleTreeNode) => {
     if (n.type === 'notebook' && n.note_id) {
-      router.push({ pathname: '/capsule/glance/[id]', params: { id: n.note_id } } as any);
+      setGlanceNoteId(n.note_id);
       return;
     }
+    setGlanceNoteId(null);
     setSelectedId(n.id);
     setSidebarOpenMobile(false);
   };
@@ -257,6 +263,7 @@ export default function CapsuleHome() {
   const handleSectionChange = (section: CapsuleSidebarSection) => {
     setActiveSection(section);
     setSelectedId(null);
+    setGlanceNoteId(null);
     setSidebarOpenMobile(false);
   };
 
@@ -316,7 +323,7 @@ export default function CapsuleHome() {
       <View style={styles.root}>
         {/* Sidebar — inline on tablet, drawer on phone */}
         {isTablet ? (
-          sidebarNode
+          !sidebarCollapsed && sidebarNode
         ) : (
           <Modal
             visible={sidebarOpenMobile}
@@ -344,62 +351,74 @@ export default function CapsuleHome() {
 
         {/* Main content */}
         <View style={styles.main}>
-          <CapsuleTopBar
-            title={titleForBar}
-            searchValue={search}
-            onSearchChange={setSearch}
-            onNew={handleNewBtn}
-            newLabel={canCreateChild ? newLabel : '+ New'}
-            layout={layout}
-            onToggleLayout={() => setLayout((l) => (l === 'grid' ? 'list' : 'grid'))}
-            onMenuPress={() => setSidebarOpenMobile(true)}
-            onBack={() => {
-              if (selectedId) {
-                const cur = nodeIndex.get(selectedId);
-                setSelectedId(cur?.parent_id ?? null);
-              } else {
-                router.back();
-              }
-            }}
-            showSidebarToggle={!isTablet}
-          />
-
-          {selectedId && (
-            <CapsuleBreadcrumb
-              trail={breadcrumbTrail}
-              onJump={(i) => setSelectedId(breadcrumbTrail[i].id)}
-              onJumpRoot={() => setSelectedId(null)}
+          {glanceNoteId ? (
+            <InlineGlance
+              noteId={glanceNoteId}
+              sidebarCollapsed={sidebarCollapsed}
+              onToggleSidebar={() => setSidebarCollapsed((s) => !s)}
+              onClose={() => setGlanceNoteId(null)}
+              onEdit={() => router.push({ pathname: '/capsule/editor/[id]', params: { id: glanceNoteId } } as any)}
             />
-          )}
+          ) : (
+            <>
+              <CapsuleTopBar
+                title={titleForBar}
+                searchValue={search}
+                onSearchChange={setSearch}
+                onNew={handleNewBtn}
+                newLabel={canCreateChild ? newLabel : '+ New'}
+                layout={layout}
+                onToggleLayout={() => setLayout((l) => (l === 'grid' ? 'list' : 'grid'))}
+                onMenuPress={() => setSidebarOpenMobile(true)}
+                onBack={() => {
+                  if (selectedId) {
+                    const cur = nodeIndex.get(selectedId);
+                    setSelectedId(cur?.parent_id ?? null);
+                  } else {
+                    router.back();
+                  }
+                }}
+                showSidebarToggle={!isTablet}
+              />
 
-          <ScrollView
-            style={styles.scroll}
-            contentContainerStyle={styles.scrollContent}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
-          >
-            {loading ? (
-              <View style={styles.center}><ActivityIndicator color={colors.primary} /></View>
-            ) : selectedId ? (
-              <NodeContent
-                summaries={scopedSummaries}
-                isTablet={isTablet}
-                onOpen={(n) => n.note_id && router.push({ pathname: '/capsule/glance/[id]', params: { id: n.note_id } } as any)}
-                onTogglePin={handleTogglePin}
-                onCreate={handleNewBtn}
-                createLabel={canCreateChild ? newLabel : ''}
-                emptyHint={selectedNode?.type === 'notebook' ? 'Open this notebook from the tree' : 'No notebooks yet — create one'}
-              />
-            ) : subjects.length === 0 ? (
-              <EmptyState colors={colors} onCreate={() => openCreate('subject', null)} />
-            ) : (
-              <DashboardSections
-                summaries={filteredAll}
-                isTablet={isTablet}
-                onOpen={(n) => n.note_id && router.push({ pathname: '/capsule/glance/[id]', params: { id: n.note_id } } as any)}
-                onTogglePin={handleTogglePin}
-              />
-            )}
-          </ScrollView>
+              {selectedId && (
+                <CapsuleBreadcrumb
+                  trail={breadcrumbTrail}
+                  onJump={(i) => setSelectedId(breadcrumbTrail[i].id)}
+                  onJumpRoot={() => setSelectedId(null)}
+                />
+              )}
+
+              <ScrollView
+                style={styles.scroll}
+                contentContainerStyle={styles.scrollContent}
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
+              >
+                {loading ? (
+                  <View style={styles.center}><ActivityIndicator color={colors.primary} /></View>
+                ) : selectedId ? (
+                  <NodeContent
+                    summaries={scopedSummaries}
+                    isTablet={isTablet}
+                    onOpen={(n) => n.note_id && setGlanceNoteId(n.note_id)}
+                    onTogglePin={handleTogglePin}
+                    onCreate={handleNewBtn}
+                    createLabel={canCreateChild ? newLabel : ''}
+                    emptyHint={selectedNode?.type === 'notebook' ? 'Open this notebook from the tree' : 'No notebooks yet — create one'}
+                  />
+                ) : subjects.length === 0 ? (
+                  <EmptyState colors={colors} onCreate={() => openCreate('subject', null)} />
+                ) : (
+                  <DashboardSections
+                    summaries={filteredAll}
+                    isTablet={isTablet}
+                    onOpen={(n) => n.note_id && setGlanceNoteId(n.note_id)}
+                    onTogglePin={handleTogglePin}
+                  />
+                )}
+              </ScrollView>
+            </>
+          )}
         </View>
       </View>
 
@@ -443,6 +462,51 @@ const DashboardSections: React.FC<{
   </>
 );
 
+const NotebookListRow: React.FC<{
+  title: string;
+  subject: string;
+  color: string;
+  pinned?: boolean;
+  updatedAt: string;
+  onPress: () => void;
+  onTogglePin: () => void;
+}> = ({ title, subject, color, pinned, updatedAt, onPress, onTogglePin }) => {
+  const { colors } = useTheme();
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[listRowStyles.row, { borderBottomColor: colors.border }]}
+    >
+      <View style={[listRowStyles.iconBox, { backgroundColor: color + '22' }]}>
+        <FileText size={20} color={color} />
+      </View>
+
+      <View style={listRowStyles.textCol}>
+        <Text style={[listRowStyles.title, { color: colors.textPrimary }]} numberOfLines={1}>
+          {title}
+        </Text>
+        <Text style={[listRowStyles.sub, { color: colors.textTertiary }]}>
+          {subject} · {formatTimestamp(updatedAt)}
+        </Text>
+      </View>
+
+      {pinned !== undefined && (
+        <TouchableOpacity onPress={onTogglePin} style={listRowStyles.starBtn}>
+          <Star
+            size={16}
+            color={pinned ? '#FFB800' : colors.border}
+            fill={pinned ? '#FFB800' : 'transparent'}
+          />
+        </TouchableOpacity>
+      )}
+
+      <TouchableOpacity style={listRowStyles.moreBtn}>
+        <MoreHorizontal size={18} color={colors.textTertiary} />
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
+};
+
 const NodeContent: React.FC<{
   summaries: NotebookSummary[];
   isTablet: boolean;
@@ -475,29 +539,18 @@ const NodeContent: React.FC<{
   }
   return (
     <View style={[styles.section, { paddingTop: 12 }]}>
-      <View style={[styles.grid, { gap: 12 }]}>
-        {chunkInto(summaries, isTablet ? 3 : 1).map((row, i) => (
-          <View key={i} style={[styles.gridRow, { gap: 12 }]}>
-            {row.map((s) => (
-              <CapsuleNoteCard
-                key={s.node.id}
-                testID={`capsule-card-${s.node.id}`}
-                title={s.node.title}
-                subject={s.subjectTitle}
-                color={s.subjectColor}
-                pinned={!!s.node.is_pinned}
-                pagesCount={s.pageCount}
-                subtitle={formatTimestamp(s.updatedAt)}
-                iconKey="note"
-                onPress={() => onOpen(s.node)}
-                onTogglePin={() => onTogglePin(s.node.id, !!s.node.is_pinned)}
-              />
-            ))}
-            {row.length < (isTablet ? 3 : 1) &&
-              Array.from({ length: (isTablet ? 3 : 1) - row.length }).map((_, j) => (
-                <View key={`spacer-${j}`} style={{ flex: 1 }} />
-              ))}
-          </View>
+      <View style={{ flex: 1 }}>
+        {summaries.map((s) => (
+          <NotebookListRow
+            key={s.node.id}
+            title={s.node.title}
+            subject={s.subjectTitle}
+            color={s.subjectColor}
+            pinned={!!s.node.is_pinned}
+            updatedAt={s.updatedAt}
+            onPress={() => onOpen(s.node)}
+            onTogglePin={() => onTogglePin(s.node.id, !!s.node.is_pinned)}
+          />
         ))}
       </View>
     </View>
@@ -643,4 +696,163 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, height: 44, borderRadius: 12,
   },
   ctaText: { color: '#fff', fontSize: 14, fontWeight: '600' },
+});
+
+const listRowStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: 20, paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    minHeight: 68,
+  },
+  iconBox: {
+    width: 40, height: 40, borderRadius: 10,
+    alignItems: 'center', justifyContent: 'center',
+    marginRight: 14,
+  },
+  textCol: { flex: 1, gap: 3 },
+  title: { fontSize: 15, fontWeight: '600' },
+  sub: { fontSize: 12 },
+  starBtn: { padding: 8 },
+  moreBtn: { padding: 8 },
+});
+
+const BlockView: React.FC<{ block: any }> = ({ block }) => {
+  const { colors } = useTheme();
+  if (block.type === 'heading') {
+    const fontSize = block.level === 1 ? 22 : 18;
+    const marginTop = block.level === 1 ? 24 : 16;
+    return (
+      <Text style={{ fontSize, fontWeight: '700', color: colors.textPrimary, marginTop, marginBottom: 8 }}>
+        {block.text}
+      </Text>
+    );
+  }
+  if (block.type === 'bullet') {
+    return (
+      <View style={{ flexDirection: 'row', gap: 8, marginVertical: 4 }}>
+        <Text style={{ color: colors.textPrimary, fontSize: 15 }}>•</Text>
+        <Text style={{ color: colors.textSecondary, fontSize: 15, flex: 1 }}>{block.text}</Text>
+      </View>
+    );
+  }
+  if (block.type === 'numbered') {
+    return (
+      <View style={{ flexDirection: 'row', gap: 8, marginVertical: 4 }}>
+        <Text style={{ color: colors.textPrimary, fontSize: 15, fontWeight: '600' }}>1.</Text>
+        <Text style={{ color: colors.textSecondary, fontSize: 15, flex: 1 }}>{block.text}</Text>
+      </View>
+    );
+  }
+  if (block.type === 'checklist') {
+    return (
+      <View style={{ flexDirection: 'row', gap: 8, marginVertical: 4, alignItems: 'center' }}>
+        <View style={{ width: 16, height: 16, borderRadius: 4, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' }}>
+          {block.checked && <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: colors.primary }} />}
+        </View>
+        <Text style={{ color: colors.textSecondary, fontSize: 15, flex: 1 }}>{block.text}</Text>
+      </View>
+    );
+  }
+  return (
+    <Text style={{ color: colors.textSecondary, fontSize: 15, lineHeight: 22, marginVertical: 6 }}>
+      {block.text}
+    </Text>
+  );
+};
+
+const InlineGlance: React.FC<{
+  noteId: string;
+  sidebarCollapsed: boolean;
+  onToggleSidebar: () => void;
+  onClose: () => void;
+  onEdit: () => void;
+}> = ({ noteId, sidebarCollapsed, onToggleSidebar, onClose, onEdit }) => {
+  const { colors } = useTheme();
+  const [content, setContent] = useState<any>(null);
+  const [meta, setMeta] = useState<{ title: string; subject: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      setLoading(true);
+      const [c, { data: noteRow }] = await Promise.all([
+        fetchNotebookContent(noteId),
+        supabase.from('user_notes').select('title,subject').eq('id', noteId).maybeSingle(),
+      ]);
+      if (!active) return;
+      setContent(c);
+      setMeta({ title: noteRow?.title || 'Untitled', subject: noteRow?.subject || '' });
+      setLoading(false);
+    })();
+    return () => { active = false; };
+  }, [noteId]);
+
+  return (
+    <View style={{ flex: 1 }}>
+      <View style={[glanceStyles.bar, { borderBottomColor: colors.border }]}>
+        <TouchableOpacity onPress={onClose} style={glanceStyles.iconBtn}>
+          <ChevronLeft color={colors.textPrimary} size={22} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onToggleSidebar} style={glanceStyles.iconBtn}>
+          {sidebarCollapsed ? <PanelLeftOpen color={colors.textPrimary} size={20} /> : <PanelLeftClose color={colors.textPrimary} size={20} />}
+        </TouchableOpacity>
+        <Text style={[glanceStyles.crumbText, { color: colors.textPrimary }]} numberOfLines={1}>
+          {meta?.subject} › {meta?.title}
+        </Text>
+        <TouchableOpacity style={glanceStyles.iconBtn}><Bell size={18} color={colors.textTertiary} /></TouchableOpacity>
+        <TouchableOpacity style={glanceStyles.iconBtn}><Share2 size={18} color={colors.textTertiary} /></TouchableOpacity>
+        <TouchableOpacity
+          onPress={onEdit}
+          style={[glanceStyles.editBtn, { backgroundColor: colors.primary }]}
+        >
+          <Edit3 color="#fff" size={14} />
+          <Text style={glanceStyles.editBtnText}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={glanceStyles.iconBtn}><MoreHorizontal size={18} color={colors.textTertiary} /></TouchableOpacity>
+      </View>
+
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={glanceStyles.scrollContent}
+      >
+        {loading ? (
+          <ActivityIndicator color={colors.primary} style={{ marginTop: 64 }} />
+        ) : (
+          <>
+            <Text style={[glanceStyles.title, { color: colors.textPrimary }]}>
+              {meta?.title}
+            </Text>
+            {(content?.blocks || []).map((b: any, idx: number) => <BlockView key={b.id || idx} block={b} />)}
+            <Text style={[glanceStyles.eog, { color: colors.textTertiary }]}>
+              — End of Glance —
+            </Text>
+          </>
+        )}
+      </ScrollView>
+    </View>
+  );
+};
+
+const glanceStyles = StyleSheet.create({
+  bar: {
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: 16, paddingVertical: 10, gap: 6,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    minHeight: 52,
+  },
+  iconBtn: { padding: 8, borderRadius: 8 },
+  crumbText: { flex: 1, fontSize: 13, fontWeight: '500', paddingHorizontal: 8 },
+  editBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 14, height: 34, borderRadius: 8,
+  },
+  editBtnText: { color: '#fff', fontSize: 13, fontWeight: '600' },
+  scrollContent: {
+    paddingHorizontal: 40, paddingTop: 32, paddingBottom: 80,
+    maxWidth: 760, alignSelf: 'center', width: '100%',
+  },
+  title: { fontSize: 26, fontWeight: '700', marginBottom: 24 },
+  eog: { textAlign: 'center', marginTop: 48, fontSize: 13, fontStyle: 'italic' },
 });

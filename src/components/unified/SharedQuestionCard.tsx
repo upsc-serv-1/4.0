@@ -12,6 +12,7 @@ import { OptionButton } from './OptionButton';
 import { renderAIText } from '../../utils/renderAIText';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
+import { LinearGradient } from 'expo-linear-gradient';
 import { 
   buildCanonicalExplanations, 
   getPYQCategorization, 
@@ -40,6 +41,14 @@ const DIFFICULTIES = [
   { label: 'Easy', value: 'easy', color: '#22c55e' },
   { label: 'Medium', value: 'medium', color: '#eab308' },
   { label: 'Hard', value: 'hard', color: '#ef4444' }
+];
+
+const ERROR_TYPES = [
+  'Fact Mistake',
+  'Concept Gap',
+  'Silly Mistake',
+  'Overthinking',
+  'Skipped'
 ];
 
 export const SharedQuestionCard = ({
@@ -82,6 +91,10 @@ export const SharedQuestionCard = ({
   fontSize = 15,
   showNotebookButton = true,
   onCreateTag,
+  onQuickSave,
+  toggleMistakeType,
+  onNoteChange,
+  onCommitToMemory,
 }: any) => {
     const { colors: themeColors } = useTheme();
     const effectiveColors = colors || themeColors;
@@ -233,7 +246,26 @@ export const SharedQuestionCard = ({
                )}
             </TouchableOpacity>
 
-            {showNotebookButton && (
+                         <TouchableOpacity 
+               onPress={() => {
+                 const activeText = (() => {
+                   if (selectedExplSource === 'vitamin' && savedBest) {
+                     const kp = savedBest.key_points ? `\n\n**✨ Key Points**\n\n${savedBest.key_points}` : '';
+                     return `${savedBest.answer_text}${kp}`;
+                   }
+                   return effectiveExplanationText || item.explanation_markdown || '';
+                 })();
+                 openNotebookFromQuestion && openNotebookFromQuestion(item, activeText, 'capsule');
+               }}
+               style={{ padding: 4, marginRight: 4 }}
+             >
+                <Sparkles
+                  size={19} 
+                  color="#5B4FE8" 
+                />
+             </TouchableOpacity>
+
+             {showNotebookButton && (
               <TouchableOpacity 
                 onPress={() => openNotebookFromQuestion && openNotebookFromQuestion(item)}
               >
@@ -499,6 +531,155 @@ export const SharedQuestionCard = ({
                   </View>
                 )}
               </View>
+
+              {/* Action Buttons Row */}
+              <View style={styles.actionRow}>
+                 <TouchableOpacity 
+                   style={[styles.actionBtn, { backgroundColor: effectiveColors.primary + '15', borderColor: effectiveColors.primary + '30' }]}
+                   onPress={() => {
+                     const activeText = (() => {
+                       if (selectedExplSource === 'vitamin' && savedBest) {
+                         const kp = savedBest.key_points ? `\n\n**✨ Key Points**\n\n${savedBest.key_points}` : '';
+                         return `${savedBest.answer_text}${kp}`;
+                       }
+                       return effectiveExplanationText || item.explanation_markdown || '';
+                     })();
+                     openNotebookFromQuestion && openNotebookFromQuestion(item, activeText, 'choose');
+                   }}
+                 >
+                    <BookOpen size={16} color={effectiveColors.primary} />
+                    <Text style={[styles.actionBtnText, { color: effectiveColors.primary }]}>Notebook</Text>
+                 </TouchableOpacity>
+
+                 <TouchableOpacity
+                   style={[styles.actionBtn, { backgroundColor: effectiveColors.primary + '15', borderColor: effectiveColors.primary + '30' }]}
+                   onPress={() => {
+                     const activeText = (() => {
+                       if (selectedExplSource === 'vitamin' && savedBest) {
+                         const kp = savedBest.key_points ? `\n\n**✨ Key Points**\n\n${savedBest.key_points}` : '';
+                         return `${savedBest.answer_text}${kp}`;
+                       }
+                       return effectiveExplanationText || item.explanation_markdown || '';
+                     })();
+                     openHardnoteFromQuestion && openHardnoteFromQuestion(item, activeText);
+                   }}
+                 >
+                    <PenTool size={16} color={effectiveColors.primary} />
+                    <Text style={[styles.actionBtnText, { color: effectiveColors.primary }]}>Hardnotes</Text>
+                 </TouchableOpacity>
+
+                 <TouchableOpacity 
+                   style={[styles.actionBtn, { backgroundColor: effectiveColors.primary + '15', borderColor: effectiveColors.primary + '30' }]}
+                   onPress={() => {
+                     const activeText = (() => {
+                       if (selectedExplSource === 'vitamin' && savedBest) {
+                         const kp = savedBest.key_points ? `\n\n**✨ Key Points**\n\n${savedBest.key_points}` : '';
+                         return `${savedBest.answer_text}${kp}`;
+                       }
+                       return effectiveExplanationText || item.explanation_markdown || '';
+                     })();
+                     onAddFlashcard && onAddFlashcard(item, activeText);
+                   }}
+                   disabled={isSavingFlashcard}
+                 >
+                    {isSavingFlashcard ? (
+                      <ActivityIndicator size="small" color={effectiveColors.primary} />
+                    ) : (
+                      <>
+                        <Zap size={16} color={isFlashcarded ? effectiveColors.primary : effectiveColors.textPrimary} fill={isFlashcarded ? effectiveColors.primary : 'transparent'} />
+                        <Text style={[styles.actionBtnText, { color: isFlashcarded ? effectiveColors.primary : effectiveColors.textPrimary }]}>Flashcard</Text>
+                      </>
+                    )}
+                 </TouchableOpacity>
+
+                 <TouchableOpacity 
+                   style={[styles.actionBtn, { backgroundColor: '#5B4FE815', borderColor: '#5B4FE830' }]}
+                   onPress={() => {
+                     const activeText = (() => {
+                       if (selectedExplSource === 'vitamin' && savedBest) {
+                         const kp = savedBest.key_points ? `\n\n**✨ Key Points**\n\n${savedBest.key_points}` : '';
+                         return `${savedBest.answer_text}${kp}`;
+                       }
+                       return effectiveExplanationText || item.explanation_markdown || '';
+                     })();
+                     openNotebookFromQuestion && openNotebookFromQuestion(item, activeText, 'capsule');
+                   }}
+                 >
+                    <Sparkles size={16} color="#5B4FE8" />
+                    <Text style={[styles.actionBtnText, { color: '#5B4FE8', fontWeight: '800' }]}>Capsule</Text>
+                 </TouchableOpacity>
+
+                 {onQuickSave && (
+                   <TouchableOpacity 
+                     style={[styles.actionBtn, { backgroundColor: effectiveColors.surfaceStrong, borderColor: effectiveColors.border }]}
+                     onPress={() => onQuickSave(item)}
+                   >
+                      <SaveIcon size={16} color={effectiveColors.textPrimary} />
+                      <Text style={[styles.actionBtnText, { color: effectiveColors.textPrimary }]}>Save</Text>
+                   </TouchableOpacity>
+                 )}
+
+                 {!!item.test_id && onViewSource && (
+                   <TouchableOpacity
+                     style={[styles.actionBtn, { backgroundColor: effectiveColors.surfaceStrong, borderColor: effectiveColors.border }]}
+                     onPress={() => onViewSource(item)}
+                   >
+                      <ExternalLink size={16} color={effectiveColors.textPrimary} />
+                      <Text style={[styles.actionBtnText, { color: effectiveColors.textPrimary }]}>View Source</Text>
+                   </TouchableOpacity>
+                 )}
+              </View>
+
+              {/* Your Insights Section */}
+              <View style={[styles.noteSection, { backgroundColor: effectiveColors.surfaceStrong + '50', borderColor: effectiveColors.border }]}>
+                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                     <View style={{ width: 3, height: 16, backgroundColor: effectiveColors.primary, marginRight: 8, borderRadius: 2 }} />
+                     <Text style={{ fontSize: 11, fontWeight: '900', color: effectiveColors.primary, letterSpacing: 1 }}>YOUR INSIGHTS</Text>
+                   </View>
+
+                   <View style={[styles.controlRow, { marginBottom: 16 }]}>
+                     <Text style={[styles.controlLabel, { color: effectiveColors.textTertiary }]}>MISTAKE TYPE</Text>
+                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
+                       {ERROR_TYPES.map(type => (
+                         <TouchableOpacity
+                           key={type}
+                           onPress={() => toggleMistakeType && toggleMistakeType(item.id, type)}
+                           style={[styles.chip, { backgroundColor: effectiveColors.surface, borderColor: effectiveColors.border }, effectiveAnswerData.errorCategory === type && { backgroundColor: effectiveColors.primary + '20', borderColor: effectiveColors.primary }]}
+                         >
+                           <Text style={[styles.chipText, { color: effectiveAnswerData.errorCategory === type ? effectiveColors.primary : effectiveColors.textSecondary }]}>{type}</Text>
+                         </TouchableOpacity>
+                       ))}
+                     </ScrollView>
+                   </View>
+
+                   <View style={[styles.noteInputWrapper, { backgroundColor: effectiveColors.surface, borderColor: effectiveColors.border }]}>
+                       <TextInput
+                         style={[styles.noteInput, { color: effectiveColors.textPrimary }]}
+                         placeholder="Double-tap to record your strategy..."
+                         multiline
+                         placeholderTextColor={effectiveColors.textSecondary || '#6B7280'}
+                         value={effectiveAnswerData.note || ''}
+                         onChangeText={(val) => onNoteChange && onNoteChange(item.id, val)}
+                       />
+                   </View>
+                   {onCommitToMemory && (
+                     <TouchableOpacity 
+                       onPress={() => onCommitToMemory(item.id)}
+                       style={{ marginTop: 16 }}
+                     >
+                       <LinearGradient 
+                         colors={['#FF6B6B', '#7B2CBF']} 
+                         locations={[0, 1]}
+                         start={{ x: 0, y: 0 }} 
+                         end={{ x: 1, y: 0 }} 
+                         style={{ height: 54, borderRadius: 18, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 10 }}
+                       >
+                          <SaveIcon size={20} color="#fff" />
+                          <Text style={{ color: '#fff', fontSize: 16, fontWeight: '900' }}>Commit to Memory</Text>
+                       </LinearGradient>
+                     </TouchableOpacity>
+                   )}
+              </View>
             </>
           )}
         </View>
@@ -532,4 +713,10 @@ const styles = StyleSheet.create({
   explanationBox: { padding: 16, borderRadius: 16, gap: 8 },
   explanationHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   explanationTitle: { fontSize: 11, fontWeight: '900' },
+  actionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12, marginBottom: 16 },
+  actionBtn: { flex: 1, minWidth: 90, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12, borderWidth: 1 },
+  actionBtnText: { fontSize: 10, fontWeight: '800' },
+  noteSection: { marginTop: 20, padding: 16, borderRadius: 16, borderWidth: 1 },
+  noteInputWrapper: { borderStyle: 'dashed', borderWidth: 1, borderRadius: 12, marginTop: 8 },
+  noteInput: { minHeight: 80, fontSize: 13, padding: 12, textAlignVertical: 'top' },
 });

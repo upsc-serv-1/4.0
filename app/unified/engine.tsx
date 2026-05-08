@@ -93,6 +93,7 @@ import { AddToFlashcardSheet } from '../../src/components/flashcards/AddToFlashc
 import { NotebookLocationPicker } from '../../src/components/NotebookLocationPicker';
 import { AddToNotebookSheet, SaveDestination } from '../../src/components/capsule/AddToNotebookSheet';
 import { CapsuleLocationPicker } from '../../src/components/capsule/CapsuleLocationPicker';
+import { PilotV2SaveSheet } from '../../src/components/pilot-v2/PilotV2SaveSheet';
 import { appendTextToCapsule } from '../../src/utils/capsuleAppend';
 import { QuizCaptureSheet } from '../../src/components/hardnotes/QuizCaptureSheet';
 import { OfflineManager } from '../../src/services/OfflineManager';
@@ -845,6 +846,7 @@ export default function UnifiedQuizEngine() {
   const [submitting, setSubmitting] = useState(false);
   const [lastUsedSubheading, setLastUsedSubheading] = useState('');
   const [locationPickerVisible, setLocationPickerVisible] = useState(false);
+  const [pilotV2SaveOpen, setPilotV2SaveOpen] = useState(false);
   const [destChooserOpen, setDestChooserOpen] = useState(false);
   const [capsulePickerOpen, setCapsulePickerOpen] = useState(false);
   const [isSavingToCapsule, setIsSavingToCapsule] = useState(false);
@@ -4261,10 +4263,11 @@ export default function UnifiedQuizEngine() {
         <AddToNotebookSheet
           visible={destChooserOpen}
           onClose={() => setDestChooserOpen(false)}
-          options={['capsule', 'notes']}
+          options={['capsule', 'pilot-v2', 'notes']}
           onPick={(d: SaveDestination) => {
             setDestChooserOpen(false);
             if (d === 'capsule') setCapsulePickerOpen(true);
+            else if (d === 'pilot-v2') setPilotV2SaveOpen(true);
             else if (d === 'notes') setLocationPickerVisible(true);
           }}
         />
@@ -4298,6 +4301,20 @@ export default function UnifiedQuizEngine() {
               else Alert.alert('Error', 'Could not save to Capsule.');
             }
           }}
+        />
+
+        <PilotV2SaveSheet
+          visible={pilotV2SaveOpen}
+          userId={session?.user?.id || ''}
+          onClose={() => setPilotV2SaveOpen(false)}
+          autoSeed={questions[currentIndex] ? {
+            subject: questions[currentIndex].subject || null,
+            topic: (questions[currentIndex] as any).section_group || null,
+            subtopic: questions[currentIndex].micro_topic || null,
+            notebookTitle: questions[currentIndex].micro_topic || questions[currentIndex].subject || null,
+          } : { subject: null, topic: null, subtopic: null, notebookTitle: null }}
+          initialBody={(noteDraftBullets || []).join('\n') || questions[currentIndex]?.explanation_markdown || ''}
+          source={questions[currentIndex] ? `Quiz / ${questions[currentIndex].subject || ''} ${questions[currentIndex].exam_year || ''}`.trim() : 'Quiz'}
         />
 
         {session?.user?.id && hardnotesPayload && (

@@ -17,9 +17,9 @@
  */
 import React, { useMemo, useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert,
+  View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert, Modal, Platform,
 } from 'react-native';
-import { ChevronLeft, Search, Plus, FileText, Star, MoreVertical } from 'lucide-react-native';
+import { ChevronLeft, Search, Plus, FileText, Star, MoreVertical, X } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
@@ -28,6 +28,7 @@ import {
   renamePilotV2Note,
   archivePilotV2Node,
   pinPilotV2Node,
+  fetchAllPilotV2Nodes,
   fetchPilotV2NotesForUser,
 } from '../../repositories/pilotV2Repo';
 import { PILOT_V2_SUBJECT_PALETTE, PilotV2Note } from './types';
@@ -71,6 +72,10 @@ export function PilotV2NoteList() {
   const { state, dispatch } = usePilotV2();
   const [query, setQuery] = useState('');
   const [creating, setCreating] = useState(false);
+  const [renameModal, setRenameModal] = useState<{ visible: boolean; noteId: string | null; title: string }>({
+    visible: false, noteId: null, title: '',
+  });
+  const [savingRename, setSavingRename] = useState(false);
 
   const subtopicId = state.view.selectedSubtopic;
   const topicName = subtopicId ? (SUBTOPIC_LABELS[subtopicId] ?? subtopicId.replace(/-/g, ' ')) : 'Notes';
@@ -159,27 +164,22 @@ export function PilotV2NoteList() {
         text: n.is_pinned ? 'Unpin' : 'Pin',
         onPress: async () => {
           if (!userId) return;
+          // Map note_id -> node_id (pinPilotV2Node mutates the node row).
+          const nodes = await fetchAllPilotV2Nodes(userId);
+          const node = nodes.find(nd => nd.note_id === n.id);
+          if (!node) {
+            Alert.alert('Could not pin', 'Note row not linked to a Pilot V2 node.');
+            return;
+          }
+          await pinPilotV2Node(node.id, !n.is_pinned).catch(() => null);
           const fresh = await fetchPilotV2NotesForUser(userId);
-          // Find node id linked to this note
-          // We need the node, not the note row — pinPilotV2Node mutates the node.
-          // Reload notes after operation so the star reflects.
-          const target = fresh.find(x => x.id === n.id);
-          if (!target) return;
-          // Best-effort: pinning toggles via the node lookup inside repo.
-          await pinPilotV2Node(target.id, !n.is_pinned).catch(() => null);
-          const fresh2 = await fetchPilotV2NotesForUser(userId);
-          dispatch({ type: 'SET_NOTES', payload: fresh2 });
+          dispatch({ type: 'SET_NOTES', payload: fresh });
         },
       },
       {
         text: 'Rename',
         onPress: () => {
-          // Simple inline rename via prompt fallback: use Alert with input on
-          // platforms that support it; otherwise auto-rename with timestamp.
-          // React Native Alert.prompt is iOS-only — keep it cross-platform
-          // by toggling into the editor where the title is editable.
-          dispatch({ type: 'SET_CURRENT_NOTE_ID', payload: n.id });
-          dispatch({ type: 'SET_VIEW_MODE', payload: 'editor' });
+          setRenameModal({ visible: true, noteId: n.id, title: n.title || '' });
         },
       },
       {
@@ -187,17 +187,6 @@ export function PilotV2NoteList() {
         style: 'destructive',
         onPress: async () => {
           if (!userId) return;
-          // archivePilotV2Node expects a node id. Look it up through fresh fetch.
-          // The note list maps note ids → we approximate by archiving by node link.
-          // Here we do a tolerant lookup: re-fetch nodes & archive any node
-          // whose note_id matches.
-          try {
-            const { default: dummy } = await import('../../lib/supabase').then(() => ({ default: null }));
-            // No-op import to keep tree-shaker happy; actual call below.
-            void dummy;
-          } catch {}
-          // Use direct repository call.
-          const { fetchAllPilotV2Nodes } = await import('../../repositories/pilotV2Repo');
           const nodes = await fetchAllPilotV2Nodes(userId);
           const node = nodes.find(nd => nd.note_id === n.id);
           if (!node) {
@@ -211,6 +200,28 @@ export function PilotV2NoteList() {
       },
       { text: 'Cancel', style: 'cancel' },
     ]);
+  };
+
+  const submitRename = async () => {
+    const { noteId, title } = renameModal;
+    if (!noteId || !title.trim() || !userId) return;
+    setSavingRename(true);
+    try {
+      // Rename both the note row and its linked node title so Sidebar/Note
+      // List / Glance / Editor all reflect the change.
+      await renamePilotV2Note(noteId, title.trim());
+      const nodes = await fetchAllPilotV2Nodes(userId);
+      const node = nodes.find(nd => nd.note_id === noteId);
+      if (node) {
+        const { renamePilotV2Node: renameNode } = await import('../../repositories/pilotV2Repo');
+        await renameNode(node.id, title.trim()).catch(() => null);
+      }
+      const fresh = await fetchPilotV2NotesForUser(userId);
+      dispatch({ type: 'SET_NOTES', payload: fresh });
+      setRenameModal({ visible: false, noteId: null, title: '' });
+    } finally {
+      setSavingRename(false);
+    }
   };
 
   /* ------------------------------------------------------------------ */
@@ -290,6 +301,52 @@ export function PilotV2NoteList() {
           ))
         )}
       </ScrollView>
+
+      {/* Rename modal — Step 25 button audit */}
+      <Modal
+        visible={renameModal.visible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setRenameModal({ visible: false, noteId: null, title: '' })}
+      >
+        <View style={styles.rmBackdrop}>
+          <TouchableOpacity activeOpacity={1} onPress={() => setRenameModal({ visible: false, noteId: null, title: '' })} style={StyleSheet.absoluteFill} />
+          <View style={[styles.rmCard, { backgroundColor: colors.surface, borderColor: colors.border }]} testID="pilot-v2-rename-modal">
+            <View style={styles.rmHeader}>
+              <Text style={[styles.rmTitle, { color: colors.textPrimary }]}>Rename note</Text>
+              <TouchableOpacity onPress={() => setRenameModal({ visible: false, noteId: null, title: '' })}>
+                <X size={20} color={colors.textPrimary} />
+              </TouchableOpacity>
+            </View>
+            <TextInput
+              testID="pilot-v2-rename-input"
+              value={renameModal.title}
+              onChangeText={(t) => setRenameModal(s => ({ ...s, title: t }))}
+              placeholder="New title"
+              placeholderTextColor={colors.textTertiary}
+              autoFocus
+              style={[styles.rmInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}
+              onSubmitEditing={submitRename}
+            />
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+              <TouchableOpacity
+                onPress={() => setRenameModal({ visible: false, noteId: null, title: '' })}
+                style={[styles.rmBtnGhost, { borderColor: colors.border }]}
+              >
+                <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                testID="pilot-v2-rename-submit"
+                onPress={submitRename}
+                disabled={!renameModal.title.trim() || savingRename}
+                style={[styles.rmBtnPrimary, { backgroundColor: '#5B4EFA', opacity: renameModal.title.trim() && !savingRename ? 1 : 0.5 }]}
+              >
+                <Text style={{ color: '#fff', fontWeight: '700' }}>{savingRename ? 'Saving…' : 'Save'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -318,4 +375,15 @@ const styles = StyleSheet.create({
   rowIcon: { width: 40, height: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   rowTitle: { fontSize: 15, fontWeight: '600', marginBottom: 2 },
   rowMeta: { fontSize: 12 },
+  /* Rename modal — Step 25 */
+  rmBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  rmCard: { width: '100%', maxWidth: 420, borderRadius: 18, borderWidth: 1, padding: 18 },
+  rmHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  rmTitle: { fontSize: 17, fontWeight: '900' },
+  rmInput: {
+    height: 44, borderRadius: 12, borderWidth: 1, paddingHorizontal: 14, fontSize: 15,
+    ...(Platform.OS === 'web' ? { outlineStyle: 'none' as any } : null),
+  },
+  rmBtnGhost: { flex: 1, height: 44, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  rmBtnPrimary: { flex: 1, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 });

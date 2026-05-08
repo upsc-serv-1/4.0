@@ -14,6 +14,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform, Share,
+  Image, Linking,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { ChevronLeft, Bell, Share2, Upload, MoreVertical } from 'lucide-react-native';
@@ -260,6 +261,55 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
     fontStyle: block.italic ? 'italic' as const : undefined,
     textDecorationLine: block.underline ? ('underline' as const) : undefined,
   };
+
+  // Image takes precedence
+  if (block.imageBase64 || block.imageUri) {
+    return (
+      <Image
+        source={{ uri: (block.imageBase64 ?? block.imageUri) as string }}
+        style={glanceStyles.blockImage}
+      />
+    );
+  }
+
+  // Table block
+  if (block.tableRows?.length) {
+    return (
+      <View style={glanceStyles.tableWrap}>
+        {block.tableRows.map((row, ri) => (
+          <View key={ri} style={glanceStyles.tableRow}>
+            {row.map((cell, ci) => (
+              <Text
+                key={ci}
+                style={[
+                  glanceStyles.tableCell,
+                  ri === 0 && { fontWeight: '700', backgroundColor: '#F9FAFB' },
+                ]}
+                numberOfLines={3}
+              >
+                {cell || ' '}
+              </Text>
+            ))}
+          </View>
+        ))}
+      </View>
+    );
+  }
+
+  // Link block (rendered as tappable link, regardless of type)
+  if (block.link) {
+    return (
+      <TouchableOpacity
+        onPress={() => Linking.openURL(block.link as string).catch(() => Alert.alert('Could not open', block.link as string))}
+        style={{ marginVertical: 6 }}
+      >
+        <Text style={[styles.text, { color: '#5B4EFA', textDecorationLine: 'underline' }, markStyle]}>
+          {block.text || block.link}
+        </Text>
+      </TouchableOpacity>
+    );
+  }
+
   switch (block.type) {
     case 'heading': {
       const fs = block.level === 1 ? 24 : block.level === 3 ? 16 : 18;
@@ -341,4 +391,17 @@ const styles = StyleSheet.create({
   eog: { fontSize: 12, textAlign: 'center', fontStyle: 'italic', marginBottom: 8 },
   footer: { paddingHorizontal: 24, paddingVertical: 12, borderTopWidth: 1, alignItems: 'center' },
   openBtn: { paddingHorizontal: 28, paddingVertical: 10, borderRadius: 10 },
+});
+
+const glanceStyles = StyleSheet.create({
+  blockImage: {
+    width: '100%', minHeight: 220, borderRadius: 10,
+    marginVertical: 12, resizeMode: 'cover', backgroundColor: '#0F172A',
+  },
+  tableWrap: { borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 8, overflow: 'hidden', marginVertical: 12 },
+  tableRow:  { flexDirection: 'row' },
+  tableCell: {
+    flex: 1, padding: 10, fontSize: 13, color: '#0F172A',
+    borderRightWidth: 1, borderBottomWidth: 1, borderColor: '#E5E7EB',
+  },
 });

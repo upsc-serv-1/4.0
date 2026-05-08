@@ -33,7 +33,7 @@ StyleSheet rules; the design tokens from `theme.css` become the colors object.
 | Step | Title | Status | Commit |
 |------|-------|--------|--------|
 | 1 | Bootstrap Pilot V2 — types, context, repository skeleton, folder structure | ✅ | TBD |
-| 2 | Register `pilot-v2` in TabConfigService + tabs layout | ⏳ | |
+| 2 | Register `pilot-v2` in TabConfigService + tabs layout | ✅ | TBD |
 | 3 | Pilot V2 entry route + view-mode router (`/pilot-v2`) | ⏳ | |
 | 4 | Sidebar — Home mode (subjects list + quick actions) | ⏳ | |
 | 5 | Sidebar — Subject mode (dynamic topic/subtopic tree, expand/collapse) | ⏳ | |

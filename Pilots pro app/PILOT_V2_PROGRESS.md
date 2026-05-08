@@ -47,6 +47,33 @@ StyleSheet rules; the design tokens from `theme.css` become the colors object.
 | 13 | Final polish — full button audit + handoff docs (this file + checklist closure) | ⏳ | |
 | 14 | Pushing explanation from quiz engine gives popup like flashcard for auto save or manually save and multiple new point from same subject,topic and subtopic and micro topc come and get saved to same notes, and are fully editable at quiz enbgine bedore saving and inside pilot pro after saving. highligher anda ll oter tools used inside pilot pro are refelcted same to as in glance view , outside editor. Ensure all logical and common sense butons, gestures are wred up and are oresent. 
 
+
+other steps --
+
+1  | Bootstrap Pilot V2 — types, context, repository skeleton, folder structure | |
+| 2  | Register `pilot-v2` in TabConfigService + tabs layout | 
+| 3  | Pilot V2 entry route + view-mode router (`/pilot-v2`) |\ |
+| 4  | Sidebar — Home mode (subjects list + quick actions) | 
+| 5  | Sidebar — Subject mode (dynamic topic/subtopic tree, expand/collapse) |  |
+| 6  | Dashboard — greeting, breadcrumb, search, Continue Studying carousel, Pinned grid |
+| 7  | NoteList — sticky header, search, new note CTA, pinned & per-note rows |
+| 7b | NoteList — wire New Note creation + 3-dot menu (Pin/Rename/Delete) | 
+| 8  | GlanceView — block renderer with highlights, sticky header, infinite scroll | 
+| 8b | GlanceView — wire Bell/Share/Upload/More header buttons (reminder, share, copy export, action menu) | 
+| 9  | EditorView — block-based editor, full toolbar (H1/H2/B/I/U/lists/highlight/link/image), outline, autosave | 
+| 14 | Bootstrap Pilot V2 dev env on Emergent (add `@expo/ngrok` devDep for tunnel preview) | 
+| 15 | Editor — wire Bold / Italic / Underline as block-level inline marks | 
+| 16 | Editor — wire Undo / Redo with 100-step history stack |
+| 17 | Editor — wire Link / Image / Calendar / Paperclip / Table / Code |
+| 18 | Editor — wire bottom-bar font scale (Aa) + zoom controls | 
+| 19 | Sidebar — wire Pinned/Recent/Shared/Trash quick filters, New Subject hint, Settings sheet (sign-out) |
+| 20 | Dashboard — wire + New, See All (Recent/Pinned), search input + quick-filter badge | 
+| 21 | Sync progress markdown with actual completed steps (this file resurrected after main-branch deletion) | / current |
+| 22 | Quiz Engine integration — add `pilot-v2` destination chip to AddToNotebookSheet (auto-hierarchy picker) 
+| 23 | Quiz Engine integration — wire `pilot-v2` save flow in `engine.tsx` and `ai-search.tsx` (uses `appendBlocksToPilotV2Note` via auto-hierarchy) |  |
+| 24 | Sidebar — wire \"New Subject\" CTA to actually create a subject node (modal prompt + `createPilotV2Node`) | |
+| 25 | Final polish + handoff documentation (this checklist closure) |
+
 ---
 
 ## Where the team should resume if credits expire

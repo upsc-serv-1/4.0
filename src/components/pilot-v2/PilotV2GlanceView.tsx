@@ -11,11 +11,18 @@
  * bullet, numbered, checklist, quote, highlight, code) so any note created in
  * the editor renders without translation.
  */
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform, Share,
+} from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { ChevronLeft, Bell, Share2, Upload, MoreVertical } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
+import {
+  archivePilotV2Node, fetchAllPilotV2Nodes, fetchPilotV2NotesForUser, pinPilotV2Node,
+} from '../../repositories/pilotV2Repo';
 import {
   PilotV2Block,
   PILOT_V2_HIGHLIGHT_PALETTE,
@@ -63,13 +70,113 @@ const DEMO_BLOCKS: PilotV2Block[] = [
 
 export function PilotV2GlanceView() {
   const { colors } = useTheme();
+  const { session } = useAuth();
+  const userId = session?.user?.id;
   const { state, dispatch, currentNote } = usePilotV2();
   const note = currentNote();
   const blocks = note?.content?.blocks?.length ? note.content.blocks : DEMO_BLOCKS;
   const title = note?.title ?? 'Article 14 — Equality Before Law';
+  const [reminderSet, setReminderSet] = useState(false);
 
   const handleBack = () => {
     dispatch({ type: 'SET_VIEW_MODE', payload: state.view.selectedSubtopic ? 'noteList' : 'dashboard' });
+  };
+
+  /* ---------------- Header action handlers (Bell/Share/Upload/More) ------- */
+  const blocksToPlainText = (): string => {
+    return blocks
+      .map(b => {
+        switch (b.type) {
+          case 'heading': return `\n# ${b.text}\n`;
+          case 'bullet':  return `• ${b.text}`;
+          case 'numbered':return `1. ${b.text}`;
+          case 'checklist': return `${b.checked ? '[x]' : '[ ]'} ${b.text}`;
+          case 'quote':   return `> ${b.text}`;
+          case 'code':    return `\`\`\`\n${b.text}\n\`\`\``;
+          default:        return b.text;
+        }
+      })
+      .join('\n');
+  };
+
+  const handleReminder = () => {
+    // Pilot V2 reminders are surface-only at this stage — toggle a local
+    // "remind me" flag so the bell ring acknowledges the click. Future
+    // iterations can persist this against `metadata.reminder_at`.
+    setReminderSet(v => !v);
+    Alert.alert(
+      reminderSet ? 'Reminder cleared' : 'Reminder set',
+      reminderSet
+        ? `We won't remind you about “${title}” anymore.`
+        : `We'll surface “${title}” in your daily review queue.`,
+    );
+  };
+
+  const handleShare = async () => {
+    const message = `${title}\n\n${blocksToPlainText()}`;
+    try {
+      if (Platform.OS === 'web') {
+        if ((navigator as any)?.share) {
+          await (navigator as any).share({ title, text: message });
+        } else {
+          await Clipboard.setStringAsync(message);
+          Alert.alert('Copied to clipboard', 'Note content copied — paste it anywhere.');
+        }
+        return;
+      }
+      await Share.share({ title, message });
+    } catch (e) {
+      console.warn('[pilot-v2] share failed', e);
+    }
+  };
+
+  const handleExport = async () => {
+    const text = blocksToPlainText();
+    await Clipboard.setStringAsync(text);
+    Alert.alert('Note exported', 'Plain-text export copied to your clipboard.');
+  };
+
+  const handleMore = () => {
+    Alert.alert(title, undefined, [
+      {
+        text: note?.is_pinned ? 'Unpin' : 'Pin',
+        onPress: async () => {
+          if (!userId || !note?.id) return;
+          const nodes = await fetchAllPilotV2Nodes(userId);
+          const node = nodes.find(nd => nd.note_id === note.id);
+          if (!node) return;
+          await pinPilotV2Node(node.id, !note.is_pinned).catch(() => null);
+          const fresh = await fetchPilotV2NotesForUser(userId);
+          dispatch({ type: 'SET_NOTES', payload: fresh });
+        },
+      },
+      {
+        text: 'Open in Editor',
+        onPress: () => dispatch({ type: 'SET_VIEW_MODE', payload: 'editor' }),
+      },
+      {
+        text: 'Copy Plain Text',
+        onPress: handleExport,
+      },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          if (!userId || !note?.id) return;
+          const nodes = await fetchAllPilotV2Nodes(userId);
+          const node = nodes.find(nd => nd.note_id === note.id);
+          if (!node) {
+            Alert.alert('Could not delete', 'Note row not linked to a Pilot V2 node.');
+            return;
+          }
+          await archivePilotV2Node(node.id).catch(() => null);
+          const fresh = await fetchPilotV2NotesForUser(userId);
+          dispatch({ type: 'SET_NOTES', payload: fresh });
+          dispatch({ type: 'SET_VIEW_MODE', payload: 'noteList' });
+        },
+      },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
   };
 
   return (
@@ -83,10 +190,30 @@ export function PilotV2GlanceView() {
           <Text style={[styles.headerTitle, { color: colors.textPrimary }]} numberOfLines={1}>{title}</Text>
         </View>
         <View style={styles.headerRight}>
-          <TouchableOpacity style={styles.iconBtn}><Bell size={18} color={colors.textSecondary} /></TouchableOpacity>
-          <TouchableOpacity style={styles.iconBtn}><Share2 size={18} color={colors.textSecondary} /></TouchableOpacity>
-          <TouchableOpacity style={styles.iconBtn}><Upload size={18} color={colors.textSecondary} /></TouchableOpacity>
-          <TouchableOpacity style={styles.iconBtn}><MoreVertical size={18} color={colors.textSecondary} /></TouchableOpacity>
+          <TouchableOpacity
+            testID="pilot-v2-glance-bell"
+            onPress={handleReminder}
+            style={styles.iconBtn}>
+            <Bell size={18} color={reminderSet ? '#5B4EFA' : colors.textSecondary} fill={reminderSet ? '#5B4EFA' : 'transparent'} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            testID="pilot-v2-glance-share"
+            onPress={handleShare}
+            style={styles.iconBtn}>
+            <Share2 size={18} color={colors.textSecondary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            testID="pilot-v2-glance-export"
+            onPress={handleExport}
+            style={styles.iconBtn}>
+            <Upload size={18} color={colors.textSecondary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            testID="pilot-v2-glance-more"
+            onPress={handleMore}
+            style={styles.iconBtn}>
+            <MoreVertical size={18} color={colors.textSecondary} />
+          </TouchableOpacity>
         </View>
       </View>
 

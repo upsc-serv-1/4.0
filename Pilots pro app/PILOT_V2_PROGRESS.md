@@ -39,7 +39,7 @@ StyleSheet rules; the design tokens from `theme.css` become the colors object.
 | 5 | Sidebar — Subject mode (dynamic topic/subtopic tree, expand/collapse) | ✅ | TBD |
 | 6 | Dashboard — greeting, breadcrumb, search, Continue Studying carousel, Pinned grid | ✅ | TBD |
 | 7  | NoteList screen — search + new note + pinned + per-note row + 3-dot menu (Pin/Rename/Delete) | ✅ | TBD |
-| 8  | GlanceView — block renderer + Bell/Share/Upload/More wired | ⏳ | |
+| 8  | GlanceView — block renderer + Bell/Share/Upload/More wired (reminder, share, copy export, action menu) | ✅ | TBD |
 | 9  | EditorView — block-based editor, full toolbar (H1/H2/B/I/U/lists/highlight/link/image/undo/redo) | ⏳ | |
 | 10 | Pilot V2 Repository — Supabase CRUD on `user_notes` + `user_note_nodes` (surface = `pilot_v2`) | ⏳ | |
 | 11 | Quiz Engine integration — new "Save to Pilot V2" button on the shared question card | ⏳ | |

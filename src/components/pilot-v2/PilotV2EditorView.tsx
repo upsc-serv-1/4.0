@@ -71,6 +71,48 @@ export function PilotV2EditorView() {
   const [savingState, setSavingState] = useState<'idle' | 'saving' | 'saved'>('saved');
   const saveTimer = useRef<any>(null);
 
+  /* ---------------- Undo / Redo history stacks ---------------- */
+  // We snapshot { blocks, title } whenever the user mutates state. Undo pops
+  // the last snapshot and pushes the current state to the redo stack.
+  const undoStack = useRef<Array<{ blocks: PilotV2Block[]; title: string }>>([]);
+  const redoStack = useRef<Array<{ blocks: PilotV2Block[]; title: string }>>([]);
+  const skipHistoryRef = useRef(false);
+  const [historyTick, setHistoryTick] = useState(0);
+
+  const pushHistory = (prevBlocks: PilotV2Block[], prevTitle: string) => {
+    if (skipHistoryRef.current) return;
+    undoStack.current.push({ blocks: prevBlocks, title: prevTitle });
+    if (undoStack.current.length > 100) undoStack.current.shift();
+    redoStack.current = [];
+    setHistoryTick(t => t + 1);
+  };
+
+  const handleUndo = () => {
+    const last = undoStack.current.pop();
+    if (!last) return;
+    redoStack.current.push({ blocks, title });
+    skipHistoryRef.current = true;
+    setBlocks(last.blocks);
+    setTitle(last.title);
+    scheduleSave(last.blocks, last.title);
+    skipHistoryRef.current = false;
+    setHistoryTick(t => t + 1);
+  };
+
+  const handleRedo = () => {
+    const next = redoStack.current.pop();
+    if (!next) return;
+    undoStack.current.push({ blocks, title });
+    skipHistoryRef.current = true;
+    setBlocks(next.blocks);
+    setTitle(next.title);
+    scheduleSave(next.blocks, next.title);
+    skipHistoryRef.current = false;
+    setHistoryTick(t => t + 1);
+  };
+  // historyTick is referenced so the lint catcher knows the state is consumed
+  void historyTick;
+
   const wordCount = useMemo(
     () => blocks.reduce((acc, b) => acc + (b.text?.trim().split(/\s+/).filter(Boolean).length ?? 0), 0),
     [blocks]
@@ -97,6 +139,7 @@ export function PilotV2EditorView() {
   useEffect(() => () => { if (saveTimer.current) clearTimeout(saveTimer.current); }, []);
 
   const updateBlock = (id: string, patch: Partial<PilotV2Block>) => {
+    pushHistory(blocks, title);
     const next = blocks.map(b => (b.id === id ? { ...b, ...patch } : b));
     setBlocks(next);
     scheduleSave(next, title);
@@ -117,8 +160,9 @@ export function PilotV2EditorView() {
   const activeBlock = blocks.find(b => b.id === activeBlockId);
   const isMarkActive = (mark: 'bold' | 'italic' | 'underline') => Boolean(activeBlock?.[mark]);
 
-  const insertBlockAfterActive = (type: PilotV2BlockType = 'paragraph') => {
-    const newBlock: PilotV2Block = { id: newId(), type, text: '' };
+  const insertBlockAfterActive = (type: PilotV2BlockType = 'paragraph', extra?: Partial<PilotV2Block>) => {
+    pushHistory(blocks, title);
+    const newBlock: PilotV2Block = { id: newId(), type, text: '', ...extra };
     const idx = blocks.findIndex(b => b.id === activeBlockId);
     const next = [...blocks];
     if (idx === -1) next.push(newBlock);
@@ -126,9 +170,11 @@ export function PilotV2EditorView() {
     setBlocks(next);
     setActiveBlockId(newBlock.id);
     scheduleSave(next, title);
+    return newBlock;
   };
 
   const deleteBlock = (id: string) => {
+    pushHistory(blocks, title);
     if (blocks.length === 1) {
       const reset: PilotV2Block[] = [{ id: newId(), type: 'paragraph', text: '' }];
       setBlocks(reset); scheduleSave(reset, title); return;
@@ -162,8 +208,22 @@ export function PilotV2EditorView() {
           <Text style={{ color: colors.textPrimary, fontSize: 13, fontWeight: '600' }} numberOfLines={1}>
             {title || 'Untitled'}
           </Text>
-          <TouchableOpacity style={styles.iconBtn}><RotateCcw size={16} color={colors.textTertiary} /></TouchableOpacity>
-          <TouchableOpacity style={styles.iconBtn}><RotateCw size={16} color={colors.textTertiary} /></TouchableOpacity>
+          <TouchableOpacity
+            testID="pilot-v2-tool-undo"
+            onPress={handleUndo}
+            disabled={undoStack.current.length === 0}
+            style={[styles.iconBtn, { opacity: undoStack.current.length === 0 ? 0.35 : 1 }]}
+          >
+            <RotateCcw size={16} color={colors.textTertiary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            testID="pilot-v2-tool-redo"
+            onPress={handleRedo}
+            disabled={redoStack.current.length === 0}
+            style={[styles.iconBtn, { opacity: redoStack.current.length === 0 ? 0.35 : 1 }]}
+          >
+            <RotateCw size={16} color={colors.textTertiary} />
+          </TouchableOpacity>
         </View>
         <View style={styles.topRight}>
           <View style={[styles.savedPill, { borderColor: colors.border }]}>

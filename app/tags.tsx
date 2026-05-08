@@ -58,6 +58,8 @@ import {
   ChevronLeft,
 } from 'lucide-react-native';
 import { normalizeTag } from '../src/utils/tagUtils';
+import { AIQuickActionButton } from '../src/components/AIQuickActionButton';
+import { DEFAULT_TAGS_TEMPLATES } from '../src/services/AIPromptManager';
 import { buildNotesPdfHtml } from '../src/utils/notesPdfEngine';
 import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet';
 
@@ -483,6 +485,15 @@ ${answerText}` : ''}`,
           </TouchableOpacity>
         </View>
         {!isZenMode && renderTagFilters(true)}
+        {!isZenMode && (
+          <View style={{ paddingHorizontal: 16, paddingVertical: 8, alignItems: 'flex-end' }}>
+            <AIQuickActionButton
+              context={{ type: 'tag', title: activeSubject }}
+              templates={DEFAULT_TAGS_TEMPLATES}
+              buttonLabel="✨ Ask AI about this subject"
+            />
+          </View>
+        )}
         <ScrollView contentContainerStyle={styles.detailScroll} showsVerticalScrollIndicator={false}>
           {subjectData &&
             Object.values(subjectData.sectionGroups).map((section) => (

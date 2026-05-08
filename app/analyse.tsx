@@ -11,6 +11,8 @@ import { PageWrapper } from '../src/components/PageWrapper';
 import { AnalyseSection } from '../src/components/unified/AnalyseSection';
 import { spacing, radius } from '../src/theme';
 import { supabase } from '../src/lib/supabase';
+import { AIQuickActionButton } from '../src/components/AIQuickActionButton';
+import { DEFAULT_ANALYSIS_TEMPLATES } from '../src/services/AIPromptManager';
 import {
   TrendingUp, ChevronRight, Trash2, BarChart2,
   CheckCircle2, XCircle, MinusCircle, Clock, Target, Zap, ChevronLeft
@@ -263,6 +265,26 @@ export default function AnalyseTab() {
             </View>
             <Text style={[styles.summaryLabel, { color: colors.textTertiary }]}>XP Earned</Text>
           </View>
+        </View>
+      )}
+
+      {/* ── AI Performance Insights ── */}
+      {summaryStats && summaryStats.tests > 0 && (
+        <View style={{ paddingHorizontal: 16, paddingVertical: 10 }}>
+          <AIQuickActionButton
+            context={{
+              type: 'analysis',
+              title: 'Performance Analysis',
+              metadata: {
+                accuracy: String(summaryStats.accuracy),
+                total_count: String(summaryStats.tests),
+                weak_topics: 'Review your recent quiz attempts to identify weak areas',
+              },
+            }}
+            templates={DEFAULT_ANALYSIS_TEMPLATES}
+            buttonLabel="📊 AI Performance Insights"
+            buttonStyle={{ alignSelf: 'flex-start' }}
+          />
         </View>
       )}
 

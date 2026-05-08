@@ -45,6 +45,7 @@ StyleSheet rules; the design tokens from `theme.css` become the colors object.
 | 11 | Quiz Engine integration — new "Save to Pilot V2" button on the shared question card | ⏳ | |
 | 12 | Auto-hierarchy `findOrCreateNotebook` for Pilot V2 (no duplicate notebooks) | ⏳ | |
 | 13 | Final polish — full button audit + handoff docs (this file + checklist closure) | ⏳ | |
+| 14 | Pushing explanation from quiz engine gives popup like flashcard for auto save or manually save and multiple new point from same subject,topic and subtopic and micro topc come and get saved to same notes, and are fully editable at quiz enbgine bedore saving and inside pilot pro after saving. highligher anda ll oter tools used inside pilot pro are refelcted same to as in glance view , outside editor. Ensure all logical and common sense butons, gestures are wred up and are oresent. 
 
 ---
 

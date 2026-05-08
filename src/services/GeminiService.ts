@@ -251,7 +251,9 @@ async function callGroq(prompt: string, maxTokens = 600): Promise<string> {
 async function callOpenRouter(prompt: string, maxTokens = 600): Promise<string> {
   let key = '';
   try { key = (await AsyncStorage.getItem(OPENROUTER_API_KEY_STORAGE)) || ''; } catch {}
-  if (!key) throw new Error('No OpenRouter API key. Go to Settings → AI Settings.');
+  // Fallback to Emergent LLM key from env
+  if (!key) key = process.env.EXPO_PUBLIC_EMERGENT_LLM_KEY || '';
+  if (!key) throw new Error('No OpenRouter/Emergent API key. Go to Settings → AI Settings.');
 
   let model = DEFAULT_OPENROUTER_MODEL;
   try { model = (await AsyncStorage.getItem(OPENROUTER_MODEL_KEY)) || DEFAULT_OPENROUTER_MODEL; } catch {}
@@ -434,6 +436,7 @@ export async function aiExpandSearchQuery(userQuery: string): Promise<AISearchRe
 /**
  * Generate AI response with full conversation history (multi-turn chat).
  * Used by AIExplanationChat component.
+ * Tries backend /api/ai/chat first (uses Emergent LLM key), then falls back to direct API calls.
  */
 export async function generateWithHistory(
   messages: Array<{ role: 'user' | 'assistant'; content: string }>,
@@ -444,11 +447,6 @@ export async function generateWithHistory(
     institute_explanations?: string;
   }
 ): Promise<string> {
-  let provider = 'gemini';
-  try {
-    provider = (await AsyncStorage.getItem(AI_PROVIDER_KEY)) || 'gemini';
-  } catch {}
-
   const systemPrompt = `You are an expert UPSC coach helping a student understand exam questions.
 ${questionContext ? `
 QUESTION: ${questionContext.question}
@@ -457,6 +455,33 @@ CORRECT ANSWER: ${questionContext.correct_answer}
 ${questionContext.institute_explanations ? `CONTEXT: ${questionContext.institute_explanations.slice(0, 800)}` : ''}
 ` : ''}
 Be concise, accurate, and helpful. Always relate answers to UPSC preparation.`;
+
+  // Try backend proxy first (uses Emergent LLM key)
+  try {
+    const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+    if (backendUrl) {
+      const res = await fetch(`${backendUrl}/api/ai/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages,
+          system_prompt: systemPrompt,
+          model: 'gemini-2.0-flash',
+          max_tokens: 800,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.content) return data.content;
+      }
+    }
+  } catch {}
+
+  // Fallback to direct API call using user's saved keys
+  let provider = 'gemini';
+  try {
+    provider = (await AsyncStorage.getItem(AI_PROVIDER_KEY)) || 'gemini';
+  } catch {}
 
   try {
     if (provider === 'groq') {

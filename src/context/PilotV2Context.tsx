@@ -14,6 +14,7 @@ import {
   PILOT_V2_INITIAL_VIEW,
   PilotV2ViewState,
   PilotV2ViewMode,
+  PilotV2QuickFilter,
 } from '../components/pilot-v2/types';
 
 interface PilotV2State {
@@ -32,6 +33,7 @@ type PilotV2Action =
   | { type: 'SET_SELECTED_SUBJECT'; payload: string | null }
   | { type: 'SET_SELECTED_TOPIC'; payload: string | null }
   | { type: 'SET_SELECTED_SUBTOPIC'; payload: string | null }
+  | { type: 'SET_QUICK_FILTER'; payload: PilotV2QuickFilter }
   | { type: 'TOGGLE_SIDEBAR' }
   | { type: 'SET_SIDEBAR_COLLAPSED'; payload: boolean }
   | { type: 'NAVIGATE_HOME' }
@@ -88,6 +90,9 @@ function reducer(state: PilotV2State, action: PilotV2Action): PilotV2State {
 
     case 'SET_SELECTED_SUBTOPIC':
       return { ...state, view: { ...state.view, selectedSubtopic: action.payload } };
+
+    case 'SET_QUICK_FILTER':
+      return { ...state, view: { ...state.view, quickFilter: action.payload } };
 
     case 'TOGGLE_SIDEBAR':
       return {

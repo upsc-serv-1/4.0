@@ -15,14 +15,15 @@
  * Management app (#5B4EFA primary, #F9FAFB canvas, #FFFFFF surface, etc.).
  */
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import {
   Home as HomeIcon, Pin, Clock, Share2, Trash2, Plus, Settings, ChevronRight,
   Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical, Book,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
-import { PILOT_V2_SUBJECT_PALETTE } from './types';
+import { PILOT_V2_SUBJECT_PALETTE, PilotV2QuickFilter } from './types';
 import { PilotV2SidebarSubject } from './PilotV2SidebarSubject';
 
 const SUBJECT_ICONS: Record<string, any> = {
@@ -40,11 +41,45 @@ export function PilotV2Sidebar({ mode }: PilotV2SidebarProps) {
 
 function PilotV2SidebarHome() {
   const { colors } = useTheme();
-  const { dispatch } = usePilotV2();
+  const { state, dispatch } = usePilotV2();
+  const { signOut, session } = useAuth();
+  const activeFilter = state.view.quickFilter;
 
   const handleSelectSubject = (subjectId: string) => {
     dispatch({ type: 'SET_SELECTED_SUBJECT', payload: subjectId });
     dispatch({ type: 'SET_VIEW_MODE', payload: 'subject' });
+  };
+
+  const handleQuickNav = (filter: PilotV2QuickFilter) => {
+    dispatch({ type: 'SET_QUICK_FILTER', payload: filter });
+    dispatch({ type: 'SET_VIEW_MODE', payload: 'dashboard' });
+  };
+
+  const handleNewSubject = () => {
+    Alert.alert(
+      'New subject',
+      'Custom subjects ship in the next milestone — for now you can use any of the seven UPSC presets in the list above. Need a custom subject? Drop us a note in the Settings → Feedback panel.',
+      [{ text: 'OK' }],
+    );
+  };
+
+  const handleSettings = () => {
+    Alert.alert(
+      'Settings',
+      session?.user?.email ? `Signed in as ${session.user.email}` : 'Signed out',
+      [
+        {
+          text: 'Toggle sidebar',
+          onPress: () => dispatch({ type: 'TOGGLE_SIDEBAR' }),
+        },
+        ...(session ? [{
+          text: 'Sign out',
+          style: 'destructive' as const,
+          onPress: () => { signOut().catch(() => null); },
+        }] : []),
+        { text: 'Cancel', style: 'cancel' as const },
+      ],
+    );
   };
 
   return (
@@ -62,11 +97,11 @@ function PilotV2SidebarHome() {
 
       {/* Quick nav */}
       <View style={{ paddingHorizontal: 12, paddingBottom: 8 }}>
-        <NavRow active label="Home" Icon={HomeIcon} colors={colors} testID="pilot-v2-nav-home" />
-        <NavRow label="Pinned" Icon={Pin} colors={colors} testID="pilot-v2-nav-pinned" />
-        <NavRow label="Recent" Icon={Clock} colors={colors} testID="pilot-v2-nav-recent" />
-        <NavRow label="Shared with me" Icon={Share2} colors={colors} testID="pilot-v2-nav-shared" />
-        <NavRow label="Trash" Icon={Trash2} colors={colors} testID="pilot-v2-nav-trash" />
+        <NavRow active={activeFilter === 'home'}    label="Home"           Icon={HomeIcon} colors={colors} testID="pilot-v2-nav-home"    onPress={() => handleQuickNav('home')} />
+        <NavRow active={activeFilter === 'pinned'}  label="Pinned"         Icon={Pin}      colors={colors} testID="pilot-v2-nav-pinned"  onPress={() => handleQuickNav('pinned')} />
+        <NavRow active={activeFilter === 'recent'}  label="Recent"         Icon={Clock}    colors={colors} testID="pilot-v2-nav-recent"  onPress={() => handleQuickNav('recent')} />
+        <NavRow active={activeFilter === 'shared'}  label="Shared with me" Icon={Share2}   colors={colors} testID="pilot-v2-nav-shared"  onPress={() => handleQuickNav('shared')} />
+        <NavRow active={activeFilter === 'trash'}   label="Trash"          Icon={Trash2}   colors={colors} testID="pilot-v2-nav-trash"   onPress={() => handleQuickNav('trash')} />
       </View>
 
       <View style={[styles.divider, { backgroundColor: colors.border }]} />
@@ -96,6 +131,7 @@ function PilotV2SidebarHome() {
         <TouchableOpacity
           testID="pilot-v2-new-subject"
           activeOpacity={0.7}
+          onPress={handleNewSubject}
           style={[styles.newSubjectRow]}
         >
           <Plus size={18} color="#5B4EFA" />
@@ -104,7 +140,7 @@ function PilotV2SidebarHome() {
       </ScrollView>
 
       <View style={[styles.divider, { backgroundColor: colors.border }]} />
-      <TouchableOpacity testID="pilot-v2-settings" style={styles.settingsRow}>
+      <TouchableOpacity testID="pilot-v2-settings" onPress={handleSettings} style={styles.settingsRow}>
         <Settings size={18} color={colors.textSecondary} />
         <Text style={{ color: colors.textPrimary, fontSize: 14, fontWeight: '500' }}>Settings</Text>
       </TouchableOpacity>
@@ -118,13 +154,15 @@ interface NavRowProps {
   colors: any;
   active?: boolean;
   testID?: string;
+  onPress?: () => void;
 }
 
-function NavRow({ label, Icon, colors, active, testID }: NavRowProps) {
+function NavRow({ label, Icon, colors, active, testID, onPress }: NavRowProps) {
   return (
     <TouchableOpacity
       testID={testID}
       activeOpacity={0.7}
+      onPress={onPress}
       style={[
         styles.navRow,
         active ? { backgroundColor: '#EEECFF' } : null,

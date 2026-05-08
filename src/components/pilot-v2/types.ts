@@ -127,6 +127,8 @@ export const PILOT_V2_SUBJECT_PALETTE: PilotV2SubjectMeta[] = [
 
 export type PilotV2ViewMode = 'dashboard' | 'subject' | 'noteList' | 'glance' | 'editor';
 
+export type PilotV2QuickFilter = 'home' | 'pinned' | 'recent' | 'shared' | 'trash';
+
 export interface PilotV2ViewState {
   mode: PilotV2ViewMode;
   selectedSubject: string | null;
@@ -134,6 +136,8 @@ export interface PilotV2ViewState {
   selectedSubtopic: string | null;
   currentNoteId: string | null;
   sidebarCollapsed: boolean;
+  /** Quick-nav filter applied on Dashboard / NoteList screens. */
+  quickFilter: PilotV2QuickFilter;
 }
 
 export const PILOT_V2_INITIAL_VIEW: PilotV2ViewState = {
@@ -143,4 +147,5 @@ export const PILOT_V2_INITIAL_VIEW: PilotV2ViewState = {
   selectedSubtopic: null,
   currentNoteId: null,
   sidebarCollapsed: false,
+  quickFilter: 'home',
 };

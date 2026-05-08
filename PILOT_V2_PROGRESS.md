@@ -37,7 +37,7 @@ StyleSheet rules; the design tokens from `theme.css` become the colors object.
 | 3 | Pilot V2 entry route + view-mode router (`/pilot-v2`) | ✅ | TBD |
 | 4 | Sidebar — Home mode (subjects list + quick actions) | ✅ | TBD |
 | 5 | Sidebar — Subject mode (dynamic topic/subtopic tree, expand/collapse) | ✅ | TBD |
-| 6 | Dashboard — greeting, breadcrumb, search, Continue Studying carousel, Pinned grid | ⏳ | |
+| 6 | Dashboard — greeting, breadcrumb, search, Continue Studying carousel, Pinned grid | ✅ | TBD |
 | 7 | NoteList screen — search + new note + pinned + per-note row | ⏳ | |
 | 8 | GlanceView — block renderer with highlights, tags, sticky header, infinite scroll | ⏳ | |
 | 9 | EditorView — block-based editor, full toolbar (H1/H2/B/I/U/lists/highlight/link/image), outline panel | ⏳ | |

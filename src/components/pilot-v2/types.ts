@@ -98,6 +98,7 @@ export interface PilotV2Note {
   subtopic?: string | null;
   content: PilotV2NoteContent;
   is_pinned?: boolean;
+  is_archived?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -111,15 +112,7 @@ export interface PilotV2SubjectMeta {
   text: string;
 }
 
-export const PILOT_V2_SUBJECT_PALETTE: PilotV2SubjectMeta[] = [
-  { id: 'polity',        label: 'Polity',        icon: 'Landmark',     bg: '#E9D5FF', text: '#7C3AED' },
-  { id: 'economy',       label: 'Economy',       icon: 'TrendingUp',   bg: '#FCE7F3', text: '#DB2777' },
-  { id: 'history',       label: 'History',       icon: 'ScrollText',   bg: '#FED7AA', text: '#EA580C' },
-  { id: 'geography',     label: 'Geography',     icon: 'Globe2',       bg: '#D1FAE5', text: '#059669' },
-  { id: 'ethics',        label: 'Ethics',        icon: 'Scale',        bg: '#DBEAFE', text: '#2563EB' },
-  { id: 'environment',   label: 'Environment',   icon: 'Leaf',         bg: '#CCFBF1', text: '#0D9488' },
-  { id: 'science-tech',  label: 'Science & Tech', icon: 'FlaskConical', bg: '#FEF3C7', text: '#D97706' },
-];
+export const PILOT_V2_SUBJECT_PALETTE: PilotV2SubjectMeta[] = [];
 
 /* ------------------------------------------------------------------------- */
 /* View state                                                                 */
@@ -138,6 +131,7 @@ export interface PilotV2ViewState {
   sidebarCollapsed: boolean;
   /** Quick-nav filter applied on Dashboard / NoteList screens. */
   quickFilter: PilotV2QuickFilter;
+  search: string;
 }
 
 export const PILOT_V2_INITIAL_VIEW: PilotV2ViewState = {
@@ -148,4 +142,5 @@ export const PILOT_V2_INITIAL_VIEW: PilotV2ViewState = {
   currentNoteId: null,
   sidebarCollapsed: false,
   quickFilter: 'home',
+  search: '',
 };

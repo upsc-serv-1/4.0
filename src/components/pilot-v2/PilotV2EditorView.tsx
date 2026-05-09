@@ -26,7 +26,7 @@ import * as ImagePicker from 'expo-image-picker';
 import {
   X, RotateCcw, RotateCw, Save, Bold, Italic, Underline as UnderlineIcon,
   List, ListOrdered, ListTodo, Link as LinkIcon, Image as ImageIcon, Calendar,
-  Paperclip, Table as TableIcon, Code, Type, ChevronDown, Highlighter, Plus, Trash2,
+  Paperclip, Table as TableIcon, Code, Type, ChevronDown, Highlighter, Plus, Trash2, ArrowUp, ArrowDown, Edit3,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
@@ -70,15 +70,27 @@ export function PilotV2EditorView() {
   const isTablet = width >= 900;
 
   const [title, setTitle] = useState(note?.title ?? 'Untitled note');
-  const [blocks, setBlocks] = useState<PilotV2Block[]>(
-    note?.content?.blocks?.length ? note.content.blocks : DEFAULT_BLOCKS
-  );
+  const [blocks, setBlocks] = useState<PilotV2Block[]>(() => {
+    if (note?.content?.blocks?.length) {
+      return note.content.blocks;
+    }
+    if (note?.id && note.id.startsWith('n') && note.id.length === 2) {
+      return DEFAULT_BLOCKS;
+    }
+    return [{ id: newId(), type: 'paragraph', text: '' }];
+  });
   const [activeBlockId, setActiveBlockId] = useState<string | null>(blocks[0]?.id ?? null);
   const [showHighlightPicker, setShowHighlightPicker] = useState(false);
   const [activeHighlight, setActiveHighlight] = useState('Yellow');
   const [outlineTab, setOutlineTab] = useState<'blocks' | 'outline'>('blocks');
   const [savingState, setSavingState] = useState<'idle' | 'saving' | 'saved'>('saved');
   const saveTimer = useRef<any>(null);
+  const [slashPicker, setSlashPicker] = useState<{ visible: boolean; blockId: string | null }>({ visible: false, blockId: null });
+  const [tableEditor, setTableEditor] = useState<{ visible: boolean; blockId: string | null; rows: string[][] }>({
+    visible: false,
+    blockId: null,
+    rows: [],
+  });
 
   /* --------------- Bottom bar — font scale & zoom --------------- */
   // Each step is a distinct "Aa" preset that scales every block's font, plus a
@@ -165,6 +177,20 @@ export function PilotV2EditorView() {
     scheduleSave(next, title);
   };
 
+  const moveBlock = (id: string, dir: 'up' | 'down') => {
+    pushHistory(blocks, title);
+    const idx = blocks.findIndex(b => b.id === id);
+    if (idx < 0) return;
+    const target = dir === 'up' ? idx - 1 : idx + 1;
+    if (target < 0 || target >= blocks.length) return;
+    const next = [...blocks];
+    const tmp = next[idx];
+    next[idx] = next[target];
+    next[target] = tmp;
+    setBlocks(next);
+    scheduleSave(next, title);
+  };
+
   const setActiveBlockType = (type: PilotV2BlockType, level?: 1 | 2 | 3) => {
     if (!activeBlockId) return;
     updateBlock(activeBlockId, { type, level });
@@ -214,6 +240,20 @@ export function PilotV2EditorView() {
 
   const handleClose = () => {
     dispatch({ type: 'SET_VIEW_MODE', payload: 'glance' });
+  };
+
+  const openTableEditor = (blockId: string, rows: string[][]) => {
+    setTableEditor({ visible: true, blockId, rows: rows.map(r => [...r]) });
+  };
+
+  const commitTableEditor = () => {
+    if (!tableEditor.blockId) return;
+    const rows = tableEditor.rows.map(r => r.map(c => c ?? ''));
+    updateBlock(tableEditor.blockId, {
+      tableRows: rows,
+      text: rows.map(r => r.join(' | ')).join('\n'),
+    });
+    setTableEditor({ visible: false, blockId: null, rows: [] });
   };
 
   /* --------------- Link / Image / Calendar / Attachment / Table / Code --------------- */
@@ -452,9 +492,21 @@ export function PilotV2EditorView() {
                 fontScale={fontScale}
                 isActive={activeBlockId === b.id}
                 onFocus={() => setActiveBlockId(b.id)}
-                onChange={(text) => updateBlock(b.id, { text })}
+                onChange={(text) => {
+                  if ((text === '/' || text === '/ ') && (b.type === 'paragraph' || b.type === 'bullet' || b.type === 'numbered')) {
+                    // Slash command: open picker and don't persist the slash.
+                    setActiveBlockId(b.id);
+                    setSlashPicker({ visible: true, blockId: b.id });
+                    updateBlock(b.id, { text: '' });
+                    return;
+                  }
+                  updateBlock(b.id, { text });
+                }}
                 onToggleCheck={() => updateBlock(b.id, { checked: !b.checked })}
                 onDelete={() => deleteBlock(b.id)}
+                onMoveUp={() => moveBlock(b.id, 'up')}
+                onMoveDown={() => moveBlock(b.id, 'down')}
+                onEditTable={() => (b.tableRows?.length ? openTableEditor(b.id, b.tableRows) : null)}
               />
             ))}
 
@@ -585,6 +637,122 @@ export function PilotV2EditorView() {
           </View>
         </View>
       </Modal>
+
+      {/* Slash command picker */}
+      <Modal
+        visible={slashPicker.visible}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setSlashPicker({ visible: false, blockId: null })}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalCard, { borderColor: colors.border }]} testID="pilot-v2-slash-modal">
+            <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Insert…</Text>
+            {[
+              { label: 'Heading 1', action: () => setActiveBlockType('heading', 1) },
+              { label: 'Heading 2', action: () => setActiveBlockType('heading', 2) },
+              { label: 'Bullet', action: () => setActiveBlockType('bullet') },
+              { label: 'Numbered', action: () => setActiveBlockType('numbered') },
+              { label: 'Checklist', action: () => setActiveBlockType('checklist') },
+              { label: 'Quote', action: () => setActiveBlockType('quote') },
+              { label: 'Highlight', action: () => setActiveBlockType('highlight') },
+              { label: 'Code', action: () => setActiveBlockType('code') },
+              { label: 'Table (2×2)', action: () => addTableBlock(2, 2) },
+            ].map(opt => (
+              <TouchableOpacity
+                key={opt.label}
+                onPress={() => {
+                  opt.action();
+                  setSlashPicker({ visible: false, blockId: null });
+                }}
+                style={styles.modalListBtn}
+              >
+                <Text style={{ color: colors.textPrimary, fontSize: 14, fontWeight: '600' }}>{opt.label}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity
+              onPress={() => setSlashPicker({ visible: false, blockId: null })}
+              style={[styles.modalBtnGhost, { alignSelf: 'flex-end', marginTop: 8 }]}
+            >
+              <Text style={{ color: colors.textSecondary, fontWeight: '600' }}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Table editor */}
+      <Modal
+        visible={tableEditor.visible}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setTableEditor({ visible: false, blockId: null, rows: [] })}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalCard, { borderColor: colors.border, maxWidth: 560 }]} testID="pilot-v2-table-modal">
+            <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Edit table</Text>
+            <ScrollView style={{ maxHeight: 320 }} contentContainerStyle={{ gap: 10 }}>
+              {tableEditor.rows.map((row, ri) => (
+                <View key={ri} style={{ flexDirection: 'row', gap: 8 }}>
+                  {row.map((cell, ci) => (
+                    <TextInput
+                      key={`${ri}_${ci}`}
+                      value={cell}
+                      onChangeText={(t) => {
+                        setTableEditor(s => {
+                          const next = s.rows.map(r => [...r]);
+                          next[ri][ci] = t;
+                          return { ...s, rows: next };
+                        });
+                      }}
+                      placeholder={ri === 0 ? `Header ${ci + 1}` : `Cell`}
+                      placeholderTextColor={colors.textTertiary}
+                      style={[
+                        styles.modalInput,
+                        { flex: 1, minWidth: 0, color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                      ]}
+                    />
+                  ))}
+                </View>
+              ))}
+            </ScrollView>
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setTableEditor(s => {
+                    const cols = s.rows[0]?.length ?? 2;
+                    const next = [...s.rows, Array.from({ length: cols }, () => '')];
+                    return { ...s, rows: next };
+                  });
+                }}
+                style={[styles.modalBtnGhost, { borderWidth: 1, borderColor: colors.border }]}
+              >
+                <Text style={{ color: colors.textPrimary, fontWeight: '700' }}>+ Row</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setTableEditor(s => {
+                    const next = s.rows.map(r => [...r, '']);
+                    return { ...s, rows: next };
+                  });
+                }}
+                style={[styles.modalBtnGhost, { borderWidth: 1, borderColor: colors.border }]}
+              >
+                <Text style={{ color: colors.textPrimary, fontWeight: '700' }}>+ Col</Text>
+              </TouchableOpacity>
+              <View style={{ flex: 1 }} />
+              <TouchableOpacity
+                onPress={() => setTableEditor({ visible: false, blockId: null, rows: [] })}
+                style={styles.modalBtnGhost}
+              >
+                <Text style={{ color: colors.textSecondary, fontWeight: '700' }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={commitTableEditor} style={[styles.modalBtnPrimary, { backgroundColor: '#5B4EFA' }]}>
+                <Text style={{ color: '#fff', fontWeight: '800' }}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -599,9 +767,12 @@ interface BlockRowProps {
   onChange: (text: string) => void;
   onToggleCheck: () => void;
   onDelete: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onEditTable: () => void;
 }
 
-function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onToggleCheck, onDelete }: BlockRowProps) {
+function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onToggleCheck, onDelete, onMoveUp, onMoveDown, onEditTable }: BlockRowProps) {
   const baseFs = block.type === 'heading'
     ? block.level === 1 ? 24 : 18
     : 16;
@@ -624,7 +795,12 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
     <View
       style={[
         styles.blockRow,
-        isActive ? { backgroundColor: '#F3F4F6' } : null,
+        isActive ? {
+          backgroundColor: '#F9FAFB',
+          borderLeftWidth: 4,
+          borderLeftColor: '#5B4EFA',
+          paddingLeft: 4,
+        } : null,
       ]}
     >
       {block.type === 'bullet' && <Text style={[styles.lead, { color: colors.textPrimary }]}>•</Text>}
@@ -649,7 +825,12 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
         ) : null}
 
         {block.tableRows?.length ? (
-          <View style={[styles.blockTableWrap, { borderColor: '#E5E7EB' }]} testID={`pilot-v2-block-table-${block.id}`}>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => { onFocus(); onEditTable(); }}
+            style={[styles.blockTableWrap, { borderColor: '#E5E7EB' }]}
+            testID={`pilot-v2-block-table-${block.id}`}
+          >
             {block.tableRows.map((row, ri) => (
               <View key={ri} style={styles.blockTableRow}>
                 {row.map((cell, ci) => (
@@ -663,7 +844,14 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
                 ))}
               </View>
             ))}
-          </View>
+            {isActive ? (
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', padding: 8, gap: 8 }}>
+                <View style={{ flex: 1 }} />
+                <Edit3 size={14} color={colors.textTertiary} />
+                <Text style={{ fontSize: 12, color: colors.textTertiary, fontWeight: '600' }}>Tap to edit</Text>
+              </View>
+            ) : null}
+          </TouchableOpacity>
         ) : null}
 
         {!block.tableRows?.length && !(block.imageBase64 || block.imageUri) ? (
@@ -699,9 +887,17 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
       </View>
 
       {isActive && (
-        <TouchableOpacity testID={`pilot-v2-block-delete-${block.id}`} onPress={onDelete} hitSlop={6} style={styles.iconBtn}>
-          <Trash2 size={14} color={colors.textTertiary} />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', gap: 2 }}>
+          <TouchableOpacity testID={`pilot-v2-block-moveup-${block.id}`} onPress={onMoveUp} hitSlop={6} style={styles.iconBtn}>
+            <ArrowUp size={14} color={colors.textTertiary} />
+          </TouchableOpacity>
+          <TouchableOpacity testID={`pilot-v2-block-movedown-${block.id}`} onPress={onMoveDown} hitSlop={6} style={styles.iconBtn}>
+            <ArrowDown size={14} color={colors.textTertiary} />
+          </TouchableOpacity>
+          <TouchableOpacity testID={`pilot-v2-block-delete-${block.id}`} onPress={onDelete} hitSlop={6} style={styles.iconBtn}>
+            <Trash2 size={14} color={colors.textTertiary} />
+          </TouchableOpacity>
+        </View>
       )}
     </View>
   );
@@ -745,7 +941,12 @@ const styles = StyleSheet.create({
   },
 
   canvas: { padding: 24, paddingBottom: 80 },
-  paper: { padding: 32, borderRadius: 12, borderWidth: 1, gap: 6, maxWidth: 880, alignSelf: 'center', width: '100%' },
+  paper: {
+    padding: 32, borderRadius: 20, borderWidth: 1, gap: 6, maxWidth: 880, alignSelf: 'center', width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    borderColor: 'rgba(255, 255, 255, 0.65)',
+    shadowColor: '#5B4EFA', shadowOpacity: 0.04, shadowRadius: 16, shadowOffset: { width: 0, height: 8 },
+  },
   blockRow: {
     flexDirection: 'row', alignItems: 'flex-start', gap: 8,
     paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8,

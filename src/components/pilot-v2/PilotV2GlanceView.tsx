@@ -22,7 +22,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
 import {
-  archivePilotV2Node, fetchAllPilotV2Nodes, fetchPilotV2NotesForUser, pinPilotV2Node,
+  archivePilotV2Node, fetchAllPilotV2Nodes, fetchPilotV2NotesForUser, pinPilotV2Node, restorePilotV2Node, purgePilotV2NoteNode,
 } from '../../repositories/pilotV2Repo';
 import {
   PilotV2Block,
@@ -151,6 +151,19 @@ export function PilotV2GlanceView() {
           dispatch({ type: 'SET_NOTES', payload: fresh });
         },
       },
+      ...(note?.is_archived ? [{
+        text: 'Restore',
+        onPress: async () => {
+          if (!userId || !note?.id) return;
+          const nodes = await fetchAllPilotV2Nodes(userId, true);
+          const node = nodes.find(nd => nd.note_id === note.id);
+          if (!node) return;
+          await restorePilotV2Node(node.id).catch(() => null);
+          const fresh = await fetchPilotV2NotesForUser(userId);
+          dispatch({ type: 'SET_NOTES', payload: fresh });
+          dispatch({ type: 'SET_VIEW_MODE', payload: 'noteList' });
+        },
+      }] : []),
       {
         text: 'Open in Editor',
         onPress: () => dispatch({ type: 'SET_VIEW_MODE', payload: 'editor' }),
@@ -159,9 +172,22 @@ export function PilotV2GlanceView() {
         text: 'Copy Plain Text',
         onPress: handleExport,
       },
-      {
-        text: 'Delete',
-        style: 'destructive',
+      ...(note?.is_archived ? [{
+        text: 'Delete permanently',
+        style: 'destructive' as const,
+        onPress: async () => {
+          if (!userId || !note?.id) return;
+          const nodes = await fetchAllPilotV2Nodes(userId, true);
+          const node = nodes.find(nd => nd.note_id === note.id);
+          if (!node) return;
+          await purgePilotV2NoteNode({ nodeId: node.id, noteId: node.note_id }).catch(() => null);
+          const fresh = await fetchPilotV2NotesForUser(userId);
+          dispatch({ type: 'SET_NOTES', payload: fresh });
+          dispatch({ type: 'SET_VIEW_MODE', payload: 'noteList' });
+        },
+      }] : [{
+        text: 'Move to Trash',
+        style: 'destructive' as const,
         onPress: async () => {
           if (!userId || !note?.id) return;
           const nodes = await fetchAllPilotV2Nodes(userId);
@@ -175,7 +201,7 @@ export function PilotV2GlanceView() {
           dispatch({ type: 'SET_NOTES', payload: fresh });
           dispatch({ type: 'SET_VIEW_MODE', payload: 'noteList' });
         },
-      },
+      }]),
       { text: 'Cancel', style: 'cancel' },
     ]);
   };

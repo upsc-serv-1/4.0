@@ -18,9 +18,9 @@ export const GEMINI_KEY_STORAGE_KEYS = [
 export const GEMINI_ACTIVE_KEY_INDEX = 'gemini_active_key_index'; // '0' | '1' | '2' | '3'
 
 export const GEMINI_MODELS = [
-  { id: 'gemini-2.0-flash',        label: 'Flash 2.0',    sub: 'Fast · recommended' },
-  { id: 'gemini-2.0-flash-lite',   label: 'Flash 2.0 Lite', sub: 'Fastest · cheapest' },
-  { id: 'gemini-2.5-flash-preview-05-20', label: 'Flash 2.5', sub: 'Smartest · best quality' },
+  { id: 'gemini-1.5-flash',        label: 'Flash 1.5',    sub: 'Fastest · universally supported' },
+  { id: 'gemini-1.5-pro',          label: 'Pro 1.5',      sub: 'Smartest · best quality' },
+  { id: 'gemini-2.0-flash',        label: 'Flash 2.0',    sub: 'Fast · next-gen standard' },
 ] as const;
 
 export const AI_PROVIDER_KEY = 'ai_provider'; // 'gemini' | 'groq'
@@ -43,7 +43,7 @@ export const GROQ_ACTIVE_KEY_INDEX = 'groq_active_key_index';
 export const GROQ_MODEL_KEY = 'groq_model';
 export const DEFAULT_GROQ_MODEL = 'llama-3.3-70b-versatile';
 
-export const DEFAULT_MODEL = 'gemini-2.0-flash';
+export const DEFAULT_MODEL = 'gemini-1.5-flash';
 
 export const OPENROUTER_API_KEY_STORAGE = 'openrouter_api_key';
 export const OPENROUTER_MODEL_KEY = 'openrouter_model';
@@ -163,7 +163,9 @@ async function getFlashUrl(): Promise<string> {
   try {
     const idx = await AsyncStorage.getItem(GEMINI_ACTIVE_KEY_INDEX);
     activeIndex = idx ? parseInt(idx, 10) : 0;
-    model = (await AsyncStorage.getItem(PROMPT_KEYS.model)) || DEFAULT_MODEL;
+    const savedModel = await AsyncStorage.getItem(PROMPT_KEYS.model);
+    const isValid = GEMINI_MODELS.some(m => m.id === savedModel);
+    model = isValid ? savedModel! : DEFAULT_MODEL;
   } catch {}
 
   const storageKey = GEMINI_KEY_STORAGE_KEYS[activeIndex] ?? GEMINI_KEY_STORAGE_KEYS[0];
@@ -466,7 +468,7 @@ Be concise, accurate, and helpful. Always relate answers to UPSC preparation.`;
         body: JSON.stringify({
           messages,
           system_prompt: systemPrompt,
-          model: 'gemini-2.0-flash',
+          model: 'gemini-1.5-flash',
           max_tokens: 800,
         }),
       });

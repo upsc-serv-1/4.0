@@ -324,11 +324,27 @@ export class AIPromptManager {
 
       if (error) throw error;
 
-      const templates = data && data.length > 0 ? data : ALL_DEFAULTS[category] || [];
+      const customTemplates = data || [];
+      const defaultTemplates = ALL_DEFAULTS[category] || [];
+
+      // Merge defaults with custom templates. Custom templates with matching keys override defaults.
+      const merged: PromptTemplate[] = [...defaultTemplates];
+
+      customTemplates.forEach(custom => {
+        const existingIdx = merged.findIndex(d => d.template_key === custom.template_key);
+        if (existingIdx > -1) {
+          // Override the default template with the user's custom one
+          merged[existingIdx] = custom;
+        } else {
+          // Append new custom templates
+          merged.push(custom);
+        }
+      });
+
       try {
-        await AsyncStorage.setItem(cacheKey, JSON.stringify(templates));
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(merged));
       } catch {}
-      return templates;
+      return merged;
     } catch {
       return ALL_DEFAULTS[category] || [];
     }
@@ -388,6 +404,25 @@ export class AIPromptManager {
         .delete()
         .eq('id', templateId)
         .eq('user_id', userId);
+
+      if (error) throw error;
+      await this.invalidateCategoryCache(userId, category as PromptCategory);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async deleteCustomTemplatesForCategory(
+    userId: string,
+    category: string
+  ): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('prompt_templates')
+        .delete()
+        .eq('user_id', userId)
+        .eq('category', category);
 
       if (error) throw error;
       await this.invalidateCategoryCache(userId, category as PromptCategory);

@@ -40,6 +40,7 @@ type PilotV2Action =
   | { type: 'PATCH_CURRENT_NOTE'; payload: { id: string; patch: Partial<PilotV2Note> } }
   | { type: 'PATCH_BLOCKS'; payload: { id: string; blocks: PilotV2Block[] } }
   | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_SEARCH'; payload: string }
   | { type: 'SET_ERROR'; payload: string | null };
 
 const initialState: PilotV2State = {
@@ -93,6 +94,9 @@ function reducer(state: PilotV2State, action: PilotV2Action): PilotV2State {
 
     case 'SET_QUICK_FILTER':
       return { ...state, view: { ...state.view, quickFilter: action.payload } };
+
+    case 'SET_SEARCH':
+      return { ...state, view: { ...state.view, search: action.payload } };
 
     case 'TOGGLE_SIDEBAR':
       return {

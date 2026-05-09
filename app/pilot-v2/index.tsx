@@ -9,10 +9,10 @@
  * For now the route resolves so the bottom-tab bar can navigate here.
  */
 import React, { useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft } from 'lucide-react-native';
+import { ChevronLeft, Menu, ChevronRight } from 'lucide-react-native';
 import { useTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
 import { PilotV2Provider, usePilotV2 } from '../../src/context/PilotV2Context';
@@ -23,6 +23,7 @@ import { PilotV2GlanceView } from '../../src/components/pilot-v2/PilotV2GlanceVi
 import { PilotV2EditorView } from '../../src/components/pilot-v2/PilotV2EditorView';
 import { PilotV2EmptyState } from '../../src/components/pilot-v2/PilotV2EmptyState';
 import { fetchPilotV2NotesForUser } from '../../src/repositories/pilotV2Repo';
+import { PilotV2AIChat } from '../../src/components/pilot-v2/PilotV2AIChat';
 
 function PilotV2Inner() {
   const { colors } = useTheme();
@@ -55,7 +56,7 @@ function PilotV2Inner() {
   }, [userId, dispatch]);
 
   const sidebarMode = state.view.mode === 'dashboard' ? 'home' : 'subject';
-  const showSidebar = isTablet && state.view.mode !== 'editor' && !state.view.sidebarCollapsed;
+  const showSidebar = state.view.mode !== 'editor' && !state.view.sidebarCollapsed;
 
   const main = useMemo(() => {
     if (state.loading) {
@@ -69,7 +70,7 @@ function PilotV2Inner() {
       case 'dashboard':
         return <PilotV2Dashboard />;
       case 'subject':
-        return state.view.selectedSubtopic ? <PilotV2NoteList /> : <PilotV2EmptyState />;
+        return state.view.selectedSubtopic ? <PilotV2NoteList /> : <PilotV2Dashboard />;
       case 'noteList':
         return <PilotV2NoteList />;
       case 'glance':
@@ -83,25 +84,42 @@ function PilotV2Inner() {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
-      <View style={[styles.topRow, { borderBottomColor: colors.border, backgroundColor: colors.surface }]}
-            testID="pilot-v2-topbar">
-        <Text
-          accessibilityRole="button"
-          onPress={() => router.back()}
-          style={[styles.backLink, { color: colors.primary }]}
-          testID="pilot-v2-back">
-          <ChevronLeft size={16} color={colors.primary} />  Back
-        </Text>
-        <Text style={[styles.brand, { color: colors.textPrimary }]}>Pilot V2 · Knowledge Vault</Text>
-        <View style={{ width: 60 }} />
-      </View>
-
       <View style={styles.workspace}>
         {showSidebar && (
           <PilotV2Sidebar mode={sidebarMode} />
         )}
-        <View style={{ flex: 1 }} testID="pilot-v2-main">{main}</View>
+        <View style={{ flex: 1 }} testID="pilot-v2-main">
+          {main}
+          {!showSidebar && (
+            <TouchableOpacity
+              testID="pilot-v2-show-sidebar"
+              onPress={() => dispatch({ type: 'TOGGLE_SIDEBAR' })}
+              style={{
+                position: 'absolute',
+                bottom: 24,
+                left: 24,
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: '#5B4EFA',
+                alignItems: 'center',
+                justifyContent: 'center',
+                shadowColor: '#5B4EFA',
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                shadowOffset: { width: 0, height: 4 },
+                elevation: 5,
+                zIndex: 9999,
+              }}
+            >
+              <ChevronRight size={20} color="#fff" />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
+
+      {/* Floating Context-Aware AI Chat Card overlay */}
+      <PilotV2AIChat />
     </SafeAreaView>
   );
 }

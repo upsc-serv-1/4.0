@@ -275,6 +275,36 @@ export default function AISettings() {
     ]);
   };
 
+  const handleResetTemplatesToDefault = () => {
+    const userId = session?.user?.id;
+    if (!userId) { Alert.alert('Login required', 'Please log in to reset templates'); return; }
+
+    const categoryLabel = TEMPLATE_CATEGORIES.find(c => c.key === activeTemplateCategory)?.label || activeTemplateCategory;
+
+    Alert.alert(
+      'Reset Templates',
+      `Are you sure you want to delete all custom templates in the "${categoryLabel}" category and restore the default ones?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: async () => {
+            setTemplatesLoading(true);
+            const success = await promptManager.deleteCustomTemplatesForCategory(userId, activeTemplateCategory);
+            setTemplatesLoading(false);
+            if (success) {
+              loadTemplatesForCategory(activeTemplateCategory);
+              Alert.alert('Reset complete', `Default templates restored for "${categoryLabel}".`);
+            } else {
+              Alert.alert('Reset failed', 'Could not restore default templates.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <PageWrapper>
       {/* Header */}
@@ -515,14 +545,24 @@ export default function AISettings() {
         <View style={{ marginTop: 28, marginBottom: 80 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <Text style={styles.sectionTitle}>AI PROMPT TEMPLATES</Text>
-            <TouchableOpacity
-              testID="add-template-btn"
-              onPress={openCreateTemplate}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#7c3aed', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}
-            >
-              <Plus size={14} color="#fff" />
-              <Text style={{ fontSize: 12, fontWeight: '900', color: '#fff' }}>Add</Text>
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <TouchableOpacity
+                testID="reset-templates-btn"
+                onPress={handleResetTemplatesToDefault}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'transparent', borderWidth: 1, borderColor: '#ef4444', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}
+              >
+                <RotateCcw size={14} color="#ef4444" />
+                <Text style={{ fontSize: 12, fontWeight: '900', color: '#ef4444' }}>Reset</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                testID="add-template-btn"
+                onPress={openCreateTemplate}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#7c3aed', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}
+              >
+                <Plus size={14} color="#fff" />
+                <Text style={{ fontSize: 12, fontWeight: '900', color: '#fff' }}>Add</Text>
+              </TouchableOpacity>
+            </View>
           </View>
           <Text style={{ fontSize: 11, color: '#888', marginBottom: 12 }}>
             Customize AI buttons shown when reviewing questions (ELI5, Why Wrong, etc.)

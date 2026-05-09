@@ -31,13 +31,16 @@ const newId = (): string => {
 /* Hierarchy                                                                  */
 /* -------------------------------------------------------------------------- */
 
-export async function fetchAllPilotV2Nodes(userId: string): Promise<PilotV2Node[]> {
-  const { data, error } = await supabase
+export async function fetchAllPilotV2Nodes(userId: string, includeArchived = false): Promise<PilotV2Node[]> {
+  let query = supabase
     .from('user_note_nodes')
     .select('*')
     .eq('user_id', userId)
-    .in('type', PILOT_V2_TYPES)
-    .eq('is_archived', false);
+    .in('type', PILOT_V2_TYPES);
+  if (!includeArchived) {
+    query = query.eq('is_archived', false);
+  }
+  const { data, error } = await query;
 
   if (error) {
     console.warn('[pilot-v2] fetch nodes error', error.message);
@@ -94,12 +97,37 @@ export async function archivePilotV2Node(id: string): Promise<boolean> {
   return !error;
 }
 
+export async function restorePilotV2Node(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('user_note_nodes')
+    .update({ is_archived: false, updated_at: new Date().toISOString() })
+    .eq('id', id);
+  return !error;
+}
+
 export async function pinPilotV2Node(id: string, pinned: boolean): Promise<boolean> {
   const { error } = await supabase
     .from('user_note_nodes')
     .update({ is_pinned: pinned, updated_at: new Date().toISOString() })
     .eq('id', id);
   return !error;
+}
+
+export async function purgePilotV2NoteNode(input: { nodeId: string; noteId?: string | null }): Promise<boolean> {
+  // Best-effort: remove node, then remove the linked note row if present.
+  const { error: nodeErr } = await supabase
+    .from('user_note_nodes')
+    .delete()
+    .eq('id', input.nodeId);
+  if (nodeErr) return false;
+
+  if (input.noteId) {
+    await supabase
+      .from('user_notes')
+      .delete()
+      .eq('id', input.noteId);
+  }
+  return true;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -145,7 +173,7 @@ export async function fetchPilotV2Note(noteId: string): Promise<PilotV2Note | nu
 
 export async function fetchPilotV2NotesForUser(userId: string): Promise<PilotV2Note[]> {
   // Fetch notes referenced by Pilot V2 nodes (note_id is set for type === 'note').
-  const nodes = await fetchAllPilotV2Nodes(userId);
+  const nodes = await fetchAllPilotV2Nodes(userId, true);
   const noteIds = nodes.filter(n => n.type === 'note' && n.note_id).map(n => n.note_id as string);
   if (noteIds.length === 0) return [];
 
@@ -191,6 +219,7 @@ export async function fetchPilotV2NotesForUser(userId: string): Promise<PilotV2N
       subtopic: chain.subtopic ?? null,
       content: parseContent(row.content),
       is_pinned: !!node?.is_pinned,
+      is_archived: !!node?.is_archived,
       created_at: row.created_at,
       updated_at: row.updated_at,
     } as PilotV2Note;
@@ -393,4 +422,68 @@ export async function findOrCreatePilotV2Note(input: {
   });
   if (!created) throw new Error('[pilot-v2] failed to create note');
   return { ...created, isNew: true };
+}
+
+/**
+ * Get all notebooks under a specific hierarchy level
+ */
+export async function fetchNotebooksAtLevel(
+  userId: string,
+  subject: string,
+  topic?: string | null,
+  subtopic?: string | null
+): Promise<string[]> {
+  const ensureNode = async (
+    type: PilotV2NodeType,
+    title: string,
+    parentId: string | null
+  ): Promise<PilotV2Node | null> => {
+    let query = supabase
+      .from('user_note_nodes')
+      .select('id, title')
+      .eq('user_id', userId)
+      .eq('type', type)
+      .eq('title', title)
+      .eq('is_archived', false)
+      .eq('metadata->>surface', PILOT_V2_SURFACE);
+
+    if (parentId === null) {
+      query = query.is('parent_id', null);
+    } else {
+      query = query.eq('parent_id', parentId);
+    }
+
+    const { data } = await query.maybeSingle();
+    return data as PilotV2Node | null;
+  };
+
+  try {
+    let parent: PilotV2Node | null = await ensureNode('subject', subject, null);
+    if (!parent) return [];
+
+    if (topic) {
+      parent = await ensureNode('topic', topic, parent.id);
+      if (!parent) return [];
+    }
+
+    if (subtopic) {
+      parent = await ensureNode('subtopic', subtopic, parent.id);
+      if (!parent) return [];
+    }
+
+    const { data: notebooks } = await supabase
+      .from('user_note_nodes')
+      .select('title')
+      .eq('user_id', userId)
+      .eq('parent_id', parent.id)
+      .eq('type', 'note')
+      .eq('is_archived', false)
+      .eq('metadata->>surface', PILOT_V2_SURFACE)
+      .order('updated_at', { ascending: false });
+
+    return notebooks?.map(n => n.title) || [];
+  } catch (error) {
+    console.error('[pilot-v2] Failed to fetch notebooks:', error);
+    return [];
+  }
 }

@@ -65,6 +65,11 @@ export const AddToNotebookSheet: React.FC<Props> = ({
   const [nodes, setNodes] = useState<CapsuleNode[]>([]);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
+  const [showSubjectDropdown, setShowSubjectDropdown] = useState(false);
+  const [showTopicDropdown, setShowTopicDropdown] = useState(false);
+  const [showSubtopicDropdown, setShowSubtopicDropdown] = useState(false);
+  const [showNotebookDropdown, setShowNotebookDropdown] = useState(false);
+
   /* manual selection */
   const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
   const [newNotebookTitle, setNewNotebookTitle] = useState('');
@@ -165,6 +170,68 @@ export const AddToNotebookSheet: React.FC<Props> = ({
       setCreating(false);
     }
   };
+
+  // Get unique subject titles from nodes
+  const getUniqueSubjects = useCallback((nodeList: CapsuleNode[]): string[] => {
+    return Array.from(
+      new Set(
+        nodeList
+          .filter(n => n.type === 'subject')
+          .map(n => n.title)
+      )
+    ).sort();
+  }, []);
+
+  // Get topics under a subject
+  const getTopicsUnderSubject = useCallback((nodeList: CapsuleNode[], subject: string): string[] => {
+    const subjectNode = nodeList.find(n => n.type === 'subject' && n.title === subject);
+    if (!subjectNode) return [];
+    
+    return Array.from(
+      new Set(
+        nodeList
+          .filter(n => n.type === 'topic' && n.parent_id === subjectNode.id)
+          .map(n => n.title)
+      )
+    ).sort();
+  }, []);
+
+  // Get subtopics under a topic
+  const getSubtopicsUnderTopic = useCallback((nodeList: CapsuleNode[], subject: string, topic: string): string[] => {
+    const subjectNode = nodeList.find(n => n.type === 'subject' && n.title === subject);
+    if (!subjectNode) return [];
+    
+    const topicNode = nodeList.find(n => n.type === 'topic' && n.parent_id === subjectNode.id && n.title === topic);
+    if (!topicNode) return [];
+    
+    return Array.from(
+      new Set(
+        nodeList
+          .filter(n => n.type === 'subtopic' && n.parent_id === topicNode.id)
+          .map(n => n.title)
+      )
+    ).sort();
+  }, []);
+
+  // Get notebooks under a subtopic
+  const getNotebooksUnderSubtopic = useCallback((nodeList: CapsuleNode[], subject: string, topic: string, subtopic: string): string[] => {
+    const subjectNode = nodeList.find(n => n.type === 'subject' && n.title === subject);
+    if (!subjectNode) return [];
+    
+    const topicNode = nodeList.find(n => n.type === 'topic' && n.parent_id === subjectNode.id && n.title === topic);
+    if (!topicNode) return [];
+    
+    const subtopicNode = nodeList.find(n => n.type === 'subtopic' && n.parent_id === topicNode.id && n.title === subtopic);
+    if (!subtopicNode) return [];
+    
+    return Array.from(
+      new Set(
+        nodeList
+          .filter(n => n.type === 'notebook' && n.parent_id === subtopicNode.id)
+          .map(n => n.title)
+      )
+    ).sort();
+  }, []);
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -268,10 +335,170 @@ export const AddToNotebookSheet: React.FC<Props> = ({
                       Pre-filled from the question (Subject → Section Group → Microtopic). Adjust and save — any missing levels will be created automatically.
                     </Text>
 
-                    <Field label="Subject" value={autoSubject} onChange={setAutoSubject} testID="capsule-auto-subject" />
-                    <Field label="Topic" value={autoTopic} onChange={setAutoTopic} testID="capsule-auto-topic" />
-                    <Field label="Subtopic" value={autoSubtopic} onChange={setAutoSubtopic} testID="capsule-auto-subtopic" />
-                    <Field label="Notebook name" value={autoNotebook} onChange={setAutoNotebook} testID="capsule-auto-nb" />
+                    {/* Subject Dropdown - Get existing subjects from real nodes */}
+                    <View style={s.formGroup}>
+                      <Text style={[s.fieldLabel, { color: colors.textTertiary }]}>Subject</Text>
+                      <TouchableOpacity
+                        style={[s.dropdownButton, { borderColor: colors.border }]}
+                        onPress={() => setShowSubjectDropdown(!showSubjectDropdown)}
+                      >
+                        <Text style={[s.dropdownButtonText, { color: colors.textPrimary }]}>
+                          {autoSubject || 'Select subject...'}
+                        </Text>
+                        <ChevronDown size={16} color={colors.textSecondary} />
+                      </TouchableOpacity>
+                      {showSubjectDropdown && (
+                        <View style={[s.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                          {getUniqueSubjects(nodes).map((subject, idx) => (
+                            <TouchableOpacity
+                              key={`${subject}-${idx}`}
+                              style={[
+                                s.dropdownItem,
+                                autoSubject === subject && s.dropdownItemSelected,
+                                { borderBottomColor: colors.border }
+                              ]}
+                              onPress={() => {
+                                setAutoSubject(subject);
+                                setAutoTopic('');
+                                setAutoSubtopic('');
+                                setShowSubjectDropdown(false);
+                              }}
+                            >
+                              <Text style={[s.dropdownItemText, { color: autoSubject === subject ? '#5B4EFA' : colors.textPrimary }]}>
+                                {subject}
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      )}
+                    </View>
+
+                    {/* Topic Dropdown */}
+                    <View style={s.formGroup}>
+                      <Text style={[s.fieldLabel, { color: colors.textTertiary }]}>Topic</Text>
+                      <TouchableOpacity
+                        style={[s.dropdownButton, { borderColor: colors.border }]}
+                        onPress={() => setShowTopicDropdown(!showTopicDropdown)}
+                        disabled={!autoSubject}
+                      >
+                        <Text style={[s.dropdownButtonText, { color: autoSubject ? colors.textPrimary : colors.textTertiary }]}>
+                          {autoTopic || (autoSubject ? 'Select topic...' : '(Select subject first)')}
+                        </Text>
+                        <ChevronDown size={16} color={colors.textSecondary} />
+                      </TouchableOpacity>
+                      {showTopicDropdown && autoSubject && (
+                        <View style={[s.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                          {getTopicsUnderSubject(nodes, autoSubject).map((topic, idx) => (
+                            <TouchableOpacity
+                              key={`${topic}-${idx}`}
+                              style={[
+                                s.dropdownItem,
+                                autoTopic === topic && s.dropdownItemSelected,
+                                { borderBottomColor: colors.border }
+                              ]}
+                              onPress={() => {
+                                setAutoTopic(topic);
+                                setAutoSubtopic('');
+                                setShowTopicDropdown(false);
+                              }}
+                            >
+                              <Text style={[s.dropdownItemText, { color: autoTopic === topic ? '#5B4EFA' : colors.textPrimary }]}>
+                                {topic}
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      )}
+                    </View>
+
+                    {/* Subtopic Dropdown */}
+                    <View style={s.formGroup}>
+                      <Text style={[s.fieldLabel, { color: colors.textTertiary }]}>Subtopic</Text>
+                      <TouchableOpacity
+                        style={[s.dropdownButton, { borderColor: colors.border }]}
+                        onPress={() => setShowSubtopicDropdown(!showSubtopicDropdown)}
+                        disabled={!autoTopic}
+                      >
+                        <Text style={[s.dropdownButtonText, { color: autoTopic ? colors.textPrimary : colors.textTertiary }]}>
+                          {autoSubtopic || (autoTopic ? 'Select subtopic...' : '(Select topic first)')}
+                        </Text>
+                        <ChevronDown size={16} color={colors.textSecondary} />
+                      </TouchableOpacity>
+                      {showSubtopicDropdown && autoTopic && (
+                        <View style={[s.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                          {getSubtopicsUnderTopic(nodes, autoSubject, autoTopic).map((subtopic, idx) => (
+                            <TouchableOpacity
+                              key={`${subtopic}-${idx}`}
+                              style={[
+                                s.dropdownItem,
+                                autoSubtopic === subtopic && s.dropdownItemSelected,
+                                { borderBottomColor: colors.border }
+                              ]}
+                              onPress={() => {
+                                setAutoSubtopic(subtopic);
+                                setShowSubtopicDropdown(false);
+                              }}
+                            >
+                              <Text style={[s.dropdownItemText, { color: autoSubtopic === subtopic ? '#5B4EFA' : colors.textPrimary }]}>
+                                {subtopic}
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      )}
+                    </View>
+
+                    {/* Notebook Dropdown */}
+                    <View style={s.formGroup}>
+                      <Text style={[s.fieldLabel, { color: colors.textTertiary }]}>Notebook</Text>
+                      <TouchableOpacity
+                        style={[s.dropdownButton, { borderColor: colors.border }]}
+                        onPress={() => setShowNotebookDropdown(!showNotebookDropdown)}
+                        disabled={!autoSubtopic}
+                      >
+                        <Text style={[s.dropdownButtonText, { color: autoSubtopic ? colors.textPrimary : colors.textTertiary }]}>
+                          {autoNotebook || (autoSubtopic ? 'Select or create...' : '(Select subtopic first)')}
+                        </Text>
+                        <ChevronDown size={16} color={colors.textSecondary} />
+                      </TouchableOpacity>
+                      {showNotebookDropdown && autoSubtopic && (
+                        <View style={[s.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                          {/* Show existing notebooks */}
+                          {getNotebooksUnderSubtopic(nodes, autoSubject, autoTopic, autoSubtopic).map((notebook, idx) => (
+                            <TouchableOpacity
+                              key={`${notebook}-${idx}`}
+                              style={[
+                                s.dropdownItem,
+                                autoNotebook === notebook && s.dropdownItemSelected,
+                                { borderBottomColor: colors.border }
+                              ]}
+                              onPress={() => {
+                                setAutoNotebook(notebook);
+                                setShowNotebookDropdown(false);
+                              }}
+                            >
+                              <Text style={[s.dropdownItemText, { color: autoNotebook === notebook ? '#5B4EFA' : colors.textPrimary }]}>
+                                📌 {notebook}
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                          {/* Divider */}
+                          {getNotebooksUnderSubtopic(nodes, autoSubject, autoTopic, autoSubtopic).length > 0 && (
+                            <View style={[s.divider, { borderBottomColor: colors.border }]} />
+                          )}
+                          {/* Or create new */}
+                          <View style={s.createNewSection}>
+                            <TextInput
+                              style={[s.createNewInput, { color: colors.textPrimary, borderColor: colors.border }]}
+                              placeholder="Create new notebook..."
+                              placeholderTextColor={colors.textTertiary}
+                              value={autoNotebook}
+                              onChangeText={setAutoNotebook}
+                            />
+                          </View>
+                        </View>
+                      )}
+                    </View>
 
                     <TouchableOpacity
                       testID="capsule-auto-save"
@@ -490,4 +717,57 @@ const s = StyleSheet.create({
   autoHint: { fontSize: 12, lineHeight: 18, marginBottom: 12 },
   fieldWrap: { marginBottom: 10 },
   fieldLabel: { fontSize: 11, fontWeight: '600', letterSpacing: 0.4, marginBottom: 4 },
+
+  formGroup: {
+    marginBottom: 14,
+  },
+  dropdownButton: {
+    height: 46,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  dropdownButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderRadius: 8,
+    maxHeight: 200,
+    marginTop: 4,
+    overflow: 'hidden',
+  },
+  dropdownItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+  },
+  dropdownItemSelected: {
+    backgroundColor: '#F5F3FF',
+  },
+  dropdownItemText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  createNewSection: {
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderTopWidth: 1,
+  },
+  createNewInput: {
+    height: 40,
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    fontSize: 14,
+  },
+  divider: {
+    height: 1,
+    borderBottomWidth: 1,
+  },
 });

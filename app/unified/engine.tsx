@@ -74,6 +74,7 @@ import {
   MessageSquare
 } from 'lucide-react-native';
 import { AIModelSwitcher } from '../../src/components/ai/AIModelSwitcher';
+import { PilotV2AIChat } from '../../src/components/pilot-v2/PilotV2AIChat';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PinchGestureHandler, State as GHState } from 'react-native-gesture-handler';
@@ -4333,6 +4334,9 @@ export default function UnifiedQuizEngine() {
           cardId={aff.cardId}
           hint={aff.hint}
         />
+
+        {/* Floating Context-Aware AI Chat Card overlay */}
+        <PilotV2AIChat activeQuestion={questions[currentIndex]} />
       </SafeAreaView>
     </PageWrapper>
   );

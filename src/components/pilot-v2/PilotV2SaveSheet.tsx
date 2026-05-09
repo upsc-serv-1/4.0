@@ -18,13 +18,18 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity, TextInput,
   ScrollView, Platform, KeyboardAvoidingView, Alert, ActivityIndicator,
+  useWindowDimensions, FlatList,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Rocket, X, Plus, Wand2 } from 'lucide-react-native';
+import { Rocket, X, Plus, Wand2, ChevronDown } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
+import { supabase } from '../../lib/supabase';
+import { SUBJECT_TOPICS } from './PilotV2SidebarSubject';
+import { PILOT_V2_SUBJECT_PALETTE } from './types';
 import {
   findOrCreatePilotV2Note,
   appendBlocksToPilotV2Note,
+  fetchNotebooksAtLevel,
 } from '../../repositories/pilotV2Repo';
 import { PilotV2Block } from './types';
 
@@ -82,6 +87,8 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
 }) => {
   const { colors } = useTheme();
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
 
   const [subject, setSubject]     = useState(autoSeed.subject || '');
   const [topic, setTopic]         = useState(autoSeed.topic || '');
@@ -91,6 +98,16 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const [saving, setSaving]       = useState(false);
   const [savedNoteId, setSavedNoteId] = useState<string | null>(null);
   const [appendCount, setAppendCount] = useState(0);
+  // Dropdowns state
+  const [showSubjectDropdown, setShowSubjectDropdown] = useState(false);
+  const [showTopicDropdown, setShowTopicDropdown] = useState(false);
+  const [showSubtopicDropdown, setShowSubtopicDropdown] = useState(false);
+  const [showNotebookDropdown, setShowNotebookDropdown] = useState(false);
+
+  // Notebooks
+  const [existingNotebooks, setExistingNotebooks] = useState<string[]>([]);
+  const [loadingNotebooks, setLoadingNotebooks] = useState(false);
+  const [mode, setMode] = useState<'select' | 'create'>('select');
 
   useEffect(() => {
     if (!visible) return;
@@ -103,6 +120,49 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     setAppendCount(0);
   }, [visible, autoSeed, initialBody]);
 
+  // Helper: Get all subjects
+  const allSubjects = useMemo(() => PILOT_V2_SUBJECT_PALETTE.map(s => s.label), []);
+
+  // Helper: Get topics for selected subject
+  const allTopics = useMemo(() => {
+    const subjectData = PILOT_V2_SUBJECT_PALETTE.find(s => s.label === subject);
+    if (!subjectData) return [];
+    const topicsList = SUBJECT_TOPICS[subjectData.id] || [];
+    return topicsList.map(t => t.label);
+  }, [subject]);
+
+  // Helper: Get subtopics for selected topic
+  const allSubtopics = useMemo(() => {
+    const subjectData = PILOT_V2_SUBJECT_PALETTE.find(s => s.label === subject);
+    if (!subjectData) return [];
+    const topicsList = SUBJECT_TOPICS[subjectData.id] || [];
+    const selectedTopic = topicsList.find(t => t.label === topic);
+    return selectedTopic?.subtopics?.map(st => st.label) || [];
+  }, [subject, topic]);
+
+  // Fetch notebooks when hierarchy changes
+  useEffect(() => {
+    if (!visible || !subject) return;
+
+    (async () => {
+      setLoadingNotebooks(true);
+      const notebooks = await fetchNotebooksAtLevel(
+        userId,
+        subject,
+        topic || null,
+        subtopic || null
+      );
+      setExistingNotebooks(notebooks);
+      setLoadingNotebooks(false);
+
+      // Auto-select first if exists
+      if (notebooks.length > 0) {
+        setNotebook(notebooks[0]);
+        setMode('select');
+      }
+    })();
+  }, [subject, topic, subtopic, visible, userId]);
+
   const blocksPreview = useMemo(() => textToPilotV2Blocks(body), [body]);
 
   const canSave = !!userId && subject.trim().length > 0 && notebook.trim().length > 0 && body.trim().length > 0;
@@ -111,12 +171,13 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     if (!canSave) return;
     setSaving(true);
     try {
+      const notebookTitle = notebook.trim();
       const result = await findOrCreatePilotV2Note({
         userId,
         subject: subject.trim(),
         topic: topic.trim() || null,
         subtopic: subtopic.trim() || null,
-        title: notebook.trim(),
+        title: notebookTitle,
       });
       const blocks: PilotV2Block[] = [
         // Soft separator heading carries the source attribution so multiple
@@ -128,6 +189,14 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
       if (!ok) throw new Error('append failed');
       setSavedNoteId(result.noteId);
       setAppendCount(c => c + 1);
+      
+      // Show confirmation
+      Alert.alert(
+        'Saved!',
+        result.isNew 
+          ? `Created new notebook: "${notebookTitle}"`
+          : `Appended to: "${notebookTitle}"`
+      );
     } catch (e) {
       Alert.alert('Could not save', (e as Error).message || 'Please try again.');
     } finally {
@@ -147,14 +216,38 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     setSavedNoteId(null);
   };
 
+  const backdropStyle = [
+    styles.backdrop,
+    isTablet ? { justifyContent: 'flex-end', alignItems: 'flex-end' } : null,
+  ];
+
+  const sheetStyle = [
+    styles.sheet,
+    isTablet ? {
+      width: 480,
+      maxWidth: 480,
+      height: '100%',
+      borderRadius: 0,
+      borderTopLeftRadius: 28,
+      borderBottomLeftRadius: 28,
+      paddingTop: 40,
+      paddingHorizontal: 24,
+    } : null,
+  ];
+
+  const scrollViewStyle = {
+    flex: 1,
+    maxHeight: isTablet ? undefined : 460,
+  };
+
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <View style={styles.backdrop}>
+      <View style={backdropStyle}>
         <TouchableOpacity activeOpacity={1} onPress={onClose} style={StyleSheet.absoluteFill} />
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ width: '100%' }}>
           <View
             testID="pilot-v2-save-sheet"
-            style={[styles.sheet, { backgroundColor: colors.surface }]}
+            style={[sheetStyle, { backgroundColor: colors.surface }]}
           >
             {/* Header */}
             <View style={styles.header}>
@@ -172,11 +265,217 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
               </TouchableOpacity>
             </View>
 
-            <ScrollView style={{ maxHeight: 460 }} keyboardShouldPersistTaps="handled">
-              <Field label="Subject" value={subject} onChange={setSubject} testID="pilot-v2-save-subject" />
-              <Field label="Topic" value={topic} onChange={setTopic} testID="pilot-v2-save-topic" />
-              <Field label="Subtopic / Microtopic" value={subtopic} onChange={setSubtopic} testID="pilot-v2-save-subtopic" />
-              <Field label="Notebook title" value={notebook} onChange={setNotebook} testID="pilot-v2-save-notebook" />
+            <ScrollView style={scrollViewStyle} keyboardShouldPersistTaps="handled">
+              {/* Subject Dropdown */}
+              <View style={styles.formGroup}>
+                <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>Subject</Text>
+                <TouchableOpacity
+                  style={[styles.dropdownButton, { borderColor: colors.border }]}
+                  onPress={() => setShowSubjectDropdown(!showSubjectDropdown)}
+                >
+                  <Text style={[styles.dropdownButtonText, { color: colors.textPrimary }]}>
+                    {subject || 'Select subject...'}
+                  </Text>
+                  <ChevronDown size={16} color={colors.textSecondary} />
+                </TouchableOpacity>
+                {showSubjectDropdown && (
+                  <View style={[styles.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                    {allSubjects.map((s, idx) => (
+                      <TouchableOpacity
+                        key={`${s}-${idx}`}
+                        style={[
+                          styles.dropdownItem,
+                          subject === s && styles.dropdownItemSelected,
+                          { borderBottomColor: colors.border }
+                        ]}
+                        onPress={() => {
+                          setSubject(s);
+                          setTopic('');
+                          setSubtopic('');
+                          setShowSubjectDropdown(false);
+                        }}
+                      >
+                        <Text style={[styles.dropdownItemText, { color: subject === s ? '#5B4EFA' : colors.textPrimary }]}>
+                          {s}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </View>
+
+              {/* Topic Dropdown */}
+              <View style={styles.formGroup}>
+                <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>Topic</Text>
+                <TouchableOpacity
+                  style={[styles.dropdownButton, { borderColor: colors.border }]}
+                  onPress={() => setShowTopicDropdown(!showTopicDropdown)}
+                  disabled={!subject}
+                >
+                  <Text style={[styles.dropdownButtonText, { color: subject ? colors.textPrimary : colors.textTertiary }]}>
+                    {topic || (subject ? 'Select topic...' : '(Select subject first)')}
+                  </Text>
+                  <ChevronDown size={16} color={colors.textSecondary} />
+                </TouchableOpacity>
+                {showTopicDropdown && subject && (
+                  <View style={[styles.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                    {allTopics.map((t, idx) => (
+                      <TouchableOpacity
+                        key={`${t}-${idx}`}
+                        style={[
+                          styles.dropdownItem,
+                          topic === t && styles.dropdownItemSelected,
+                          { borderBottomColor: colors.border }
+                        ]}
+                        onPress={() => {
+                          setTopic(t);
+                          setSubtopic('');
+                          setShowTopicDropdown(false);
+                        }}
+                      >
+                        <Text style={[styles.dropdownItemText, { color: topic === t ? '#5B4EFA' : colors.textPrimary }]}>
+                          {t}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </View>
+
+              {/* Subtopic Dropdown */}
+              <View style={styles.formGroup}>
+                <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>Microtopic</Text>
+                <TouchableOpacity
+                  style={[styles.dropdownButton, { borderColor: colors.border }]}
+                  onPress={() => setShowSubtopicDropdown(!showSubtopicDropdown)}
+                  disabled={!topic}
+                >
+                  <Text style={[styles.dropdownButtonText, { color: topic ? colors.textPrimary : colors.textTertiary }]}>
+                    {subtopic || (topic ? 'Select microtopic...' : '(Select topic first)')}
+                  </Text>
+                  <ChevronDown size={16} color={colors.textSecondary} />
+                </TouchableOpacity>
+                {showSubtopicDropdown && topic && (
+                  <View style={[styles.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                    {allSubtopics.length > 0 ? (
+                      allSubtopics.map((st, idx) => (
+                        <TouchableOpacity
+                          key={`${st}-${idx}`}
+                          style={[
+                            styles.dropdownItem,
+                            subtopic === st && styles.dropdownItemSelected,
+                            { borderBottomColor: colors.border }
+                          ]}
+                          onPress={() => {
+                            setSubtopic(st);
+                            setShowSubtopicDropdown(false);
+                          }}
+                        >
+                          <Text style={[styles.dropdownItemText, { color: subtopic === st ? '#5B4EFA' : colors.textPrimary }]}>
+                            {st}
+                          </Text>
+                        </TouchableOpacity>
+                      ))
+                    ) : (
+                      <Text style={[styles.dropdownItem, { color: colors.textTertiary }]}>
+                        No subtopics available
+                      </Text>
+                    )}
+                  </View>
+                )}
+              </View>
+
+              {/* Notebook Selector */}
+              <View style={styles.formGroup}>
+                <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>Notebook</Text>
+                {loadingNotebooks ? (
+                  <ActivityIndicator color={colors.textTertiary} />
+                ) : existingNotebooks.length > 0 ? (
+                  <>
+                    <View style={styles.modeToggle}>
+                      <TouchableOpacity
+                        style={[
+                          styles.modeButton,
+                          mode === 'select' && styles.modeButtonActive
+                        ]}
+                        onPress={() => {
+                          setMode('select');
+                          setNotebook(existingNotebooks[0]);
+                        }}
+                      >
+                        <Text style={styles.modeButtonText}>📌 Use Existing</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[
+                          styles.modeButton,
+                          mode === 'create' && styles.modeButtonActive
+                        ]}
+                        onPress={() => setMode('create')}
+                      >
+                        <Text style={styles.modeButtonText}>✨ Create New</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    {mode === 'select' ? (
+                      <View style={[styles.notebookList, { borderColor: colors.border }]}>
+                        <FlatList
+                          scrollEnabled={existingNotebooks.length > 5}
+                          data={existingNotebooks}
+                          keyExtractor={(item, idx) => `${item}-${idx}`}
+                          renderItem={({ item }) => (
+                            <TouchableOpacity
+                              style={[
+                                styles.notebookItem,
+                                notebook === item && styles.notebookItemSelected,
+                                { borderBottomColor: colors.border }
+                              ]}
+                              onPress={() => setNotebook(item)}
+                            >
+                              <Text
+                                style={[
+                                  styles.notebookItemText,
+                                  notebook === item && styles.notebookItemTextSelected,
+                                  { color: notebook === item ? '#5B4EFA' : colors.textPrimary }
+                                ]}
+                              >
+                                {item}
+                              </Text>
+                            </TouchableOpacity>
+                          )}
+                        />
+                      </View>
+                    ) : (
+                      <TextInput
+                        style={[
+                          styles.input,
+                          { color: colors.textPrimary, borderColor: colors.border }
+                        ]}
+                        placeholder="Enter notebook name"
+                        placeholderTextColor={colors.textTertiary}
+                        value={notebook}
+                        onChangeText={setNotebook}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <View>
+                    <Text style={[styles.emptyText, { color: colors.textTertiary }]}>
+                      No notebooks yet. Create one:
+                    </Text>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        { color: colors.textPrimary, borderColor: colors.border, marginTop: 8 }
+                      ]}
+                      placeholder="Notebook name"
+                      placeholderTextColor={colors.textTertiary}
+                      value={notebook}
+                      onChangeText={setNotebook}
+                    />
+                  </View>
+                )}
+              </View>
 
               <Text style={[styles.fieldLabel, { color: colors.textTertiary, marginTop: 12 }]}>Content</Text>
               <TextInput
@@ -190,6 +489,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                   color: colors.textPrimary,
                   borderColor: colors.border,
                   backgroundColor: colors.surfaceStrong,
+                  minHeight: isTablet ? 320 : 120,
                 }]}
               />
 
@@ -304,6 +604,92 @@ const styles = StyleSheet.create({
   btnPrimaryText: { color: '#fff', fontSize: 14, fontWeight: '800' },
   btnGhost: {
     height: 46, paddingHorizontal: 14, borderRadius: 12, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 6,
+  },
+  // Dropdown styles
+  dropdownButton: {
+    height: 46,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  dropdownButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderRadius: 8,
+    maxHeight: 200,
+    marginTop: 4,
+    overflow: 'hidden',
+  },
+  dropdownItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+  },
+  dropdownItemSelected: {
+    backgroundColor: '#F5F3FF',
+  },
+  dropdownItemText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  // Notebook mode toggle
+  modeToggle: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 12,
+    marginTop: 8,
+  },
+  modeButton: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1.5,
+    borderColor: '#E0E0E0',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modeButtonActive: {
+    borderColor: '#5B4EFA',
+    backgroundColor: '#F5F3FF',
+  },
+  modeButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#333',
+  },
+  notebookList: {
+    borderWidth: 1,
+    borderRadius: 8,
+    maxHeight: 250,
+    marginTop: 8,
+    overflow: 'hidden',
+  },
+  notebookItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+  },
+  notebookItemSelected: {
+    backgroundColor: '#F5F3FF',
+  },
+  notebookItemText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  notebookItemTextSelected: {
+    fontWeight: '700',
+    color: '#5B4EFA',
+  },
+  emptyText: {
+    fontSize: 13,
+    marginBottom: 8,
   },
 });
 

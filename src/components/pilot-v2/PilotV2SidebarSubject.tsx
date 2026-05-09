@@ -1,18 +1,22 @@
 /**
  * Pilot V2 — Sidebar (Subject mode)
  *
- * Renders the subject-scoped sidebar:
- *   • Back-to-Home button
- *   • Subject header tile
- *   • Numbered topic list (auto-expanding subtopics)
- *   • "Other subjects" footer for fast subject switching
- *
- * Topic data comes from a static seed mirroring the Figma comp
- * (Polity → Fundamental Rights → Right to Equality, etc.). Future iterations
- * can swap this for a live feed off `user_note_nodes`.
+ * Renders the subject-scoped sidebar with Notability-style smoothly expandable left navigation tree.
  */
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useMemo, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring, 
+  interpolate, 
+  Extrapolate,
+  FadeInUp,
+  FadeOutUp,
+  Layout,
+  useDerivedValue,
+  withTiming
+} from 'react-native-reanimated';
 import {
   ChevronLeft, ChevronDown, ChevronRight,
   Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical, Book,
@@ -31,41 +35,158 @@ interface Topic {
   subtopics?: { id: string; label: string }[];
 }
 
-const SUBJECT_TOPICS: Record<string, Topic[]> = {
-  polity: [
-    { id: 'constitution', label: 'Constitution' },
-    {
-      id: 'fundamental-rights',
-      label: 'Fundamental Rights',
-      subtopics: [
-        { id: 'preamble', label: 'Preamble' },
-        { id: 'right-to-equality', label: 'Right to Equality' },
-        { id: 'right-to-freedom', label: 'Right to Freedom' },
-        { id: 'exploitation', label: 'Right against Exploitation' },
-        { id: 'religious-freedom', label: 'Right to Freedom of Religion' },
-        { id: 'cultural-rights', label: 'Cultural & Educational Rights' },
-        { id: 'constitutional-remedies', label: 'Right to Constitutional Remedies' },
+export const SUBJECT_TOPICS: Record<string, Topic[]> = {};
+
+// Sub-component for smooth, masked collapsible topic-to-subtopics expand animations
+function CollapsibleTopicItem({ 
+  t, 
+  idx, 
+  isExpanded, 
+  state, 
+  colors, 
+  handleSelectTopic, 
+  handleSelectSubtopic 
+}: {
+  t: Topic;
+  idx: number;
+  isExpanded: boolean;
+  state: any;
+  colors: any;
+  handleSelectTopic: (topicId: string, hasSubtopics: boolean) => void;
+  handleSelectSubtopic: (subtopicId: string) => void;
+}) {
+  const hasSub = !!t.subtopics?.length;
+  const isSelectedTopic = state.view.selectedTopic === t.id;
+  const [childrenHeight, setChildrenHeight] = useState(0);
+
+  // Shared progress value
+  const animationProgress = useSharedValue(isExpanded ? 1 : 0);
+
+  useEffect(() => {
+    animationProgress.value = withSpring(isExpanded ? 1 : 0, { 
+      damping: 22, 
+      stiffness: 160,
+      mass: 0.75,
+      overshootClamping: false
+    });
+  }, [isExpanded]);
+
+  // Height progress for smooth expansion/collapse
+  const heightProgress = useDerivedValue(() => {
+    return withTiming(animationProgress.value, {
+      duration: 350,
+    });
+  });
+
+  // Chevron rotation animation
+  const chevronStyle = useAnimatedStyle(() => {
+    const rotate = interpolate(animationProgress.value, [0, 1], [-90, 0]);
+    return {
+      transform: [{ rotate: `${rotate}deg` }],
+    };
+  });
+
+  // Container style with smooth height expansion and opacity fade
+  const containerStyle = useAnimatedStyle(() => {
+    const height = interpolate(
+      heightProgress.value,
+      [0, 1],
+      [0, childrenHeight || 1000] // Fallback to large value initially
+    );
+
+    return {
+      height: isExpanded ? (childrenHeight ? height : undefined) : 0,
+      opacity: interpolate(heightProgress.value, [0, 0.2, 1], [0, 0.6, 1]),
+      overflow: 'hidden',
+    };
+  });
+
+  // Individual child item animation - scale, slide-in, and fade
+  const childItemStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(heightProgress.value, [0, 0.3, 1], [0, 0.7, 1]),
+      transform: [
+        {
+          translateY: interpolate(heightProgress.value, [0, 1], [-10, 0]),
+        },
+        {
+          scale: interpolate(heightProgress.value, [0, 0.5, 1], [0.96, 0.98, 1]),
+        },
       ],
-    },
-    { id: 'directive-principles', label: 'Directive Principles' },
-    { id: 'fundamental-duties', label: 'Fundamental Duties' },
-    { id: 'executive', label: 'Executive' },
-    { id: 'legislature', label: 'Legislature' },
-    { id: 'judiciary', label: 'Judiciary' },
-    { id: 'federalism', label: 'Federalism' },
-    { id: 'local-government', label: 'Local Government' },
-    { id: 'election-commission', label: 'Election Commission' },
-    { id: 'constitutional-bodies', label: 'Constitutional Bodies' },
-    { id: 'amendments', label: 'Amendments' },
-    { id: 'important-articles', label: 'Important Articles' },
-  ],
-  economy:      [{ id: 'overview', label: 'Indian Economy Overview' }, { id: 'budget', label: 'Budget 2025-26' }],
-  history:      [{ id: 'ancient', label: 'Ancient India' }, { id: 'medieval', label: 'Medieval India' }, { id: 'modern', label: 'Modern India' }],
-  geography:    [{ id: 'physical', label: 'Physical Geography' }, { id: 'human', label: 'Human Geography' }],
-  ethics:       [{ id: 'theories', label: 'Ethical Theories' }, { id: 'case-studies', label: 'Case Studies' }],
-  environment:  [{ id: 'biodiversity', label: 'Biodiversity' }, { id: 'climate', label: 'Climate Change' }],
-  'science-tech': [{ id: 'space', label: 'Space' }, { id: 'biotech', label: 'Biotechnology' }],
-};
+    };
+  });
+
+  return (
+    <Animated.View layout={Layout.springify().damping(22).stiffness(130)} style={{ marginBottom: 4 }}>
+      <TouchableOpacity
+        testID={`pilot-v2-topic-${t.id}`}
+        activeOpacity={0.7}
+        onPress={() => handleSelectTopic(t.id, hasSub)}
+        style={[
+          styles.topicRow,
+          isSelectedTopic ? { backgroundColor: '#EEECFF' } : null,
+        ]}
+      >
+        <Text style={{ color: colors.textTertiary, fontSize: 11, width: 22 }}>{idx + 1}.</Text>
+        <Text
+          style={{
+            flex: 1,
+            fontSize: 14,
+            fontWeight: '500',
+            color: isSelectedTopic ? '#5B4EFA' : colors.textPrimary,
+          }}
+        >
+          {t.label}
+        </Text>
+        {hasSub && (
+          <Animated.View style={chevronStyle}>
+            <ChevronDown size={14} color={colors.textTertiary} />
+          </Animated.View>
+        )}
+      </TouchableOpacity>
+
+      {hasSub && (
+        <Animated.View style={containerStyle}>
+          <Animated.View 
+            style={[childItemStyle, { marginLeft: 32, gap: 4 }]}
+            onLayout={(event) => {
+              if (isExpanded) {
+                setChildrenHeight(event.nativeEvent.layout.height);
+              }
+            }}
+          >
+            {t.subtopics!.map(st => {
+              const isSelected = state.view.selectedSubtopic === st.id;
+              return (
+                <TouchableOpacity
+                  key={st.id}
+                  testID={`pilot-v2-subtopic-${st.id}`}
+                  activeOpacity={0.7}
+                  onPress={() => handleSelectSubtopic(st.id)}
+                  style={[
+                    styles.subtopicRow,
+                    isSelected ? { backgroundColor: '#EEECFF' } : null,
+                    { height: 32, justifyContent: 'center' }
+                  ]}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      color: isSelected ? '#5B4EFA' : colors.textSecondary,
+                      fontWeight: isSelected ? '600' : '400',
+                    }}
+                  >
+                    {st.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </Animated.View>
+        </Animated.View>
+      )}
+    </Animated.View>
+  );
+}
 
 export function PilotV2SidebarSubject() {
   const { colors } = useTheme();
@@ -77,7 +198,42 @@ export function PilotV2SidebarSubject() {
   if (!subject) return null;
 
   const Icon = SUBJECT_ICONS[subject.icon] ?? Book;
-  const topics = SUBJECT_TOPICS[subject.id] ?? [];
+  const staticTopics = SUBJECT_TOPICS[subject.id] ?? [];
+
+  const topics = useMemo(() => {
+    const list = [...staticTopics.map(t => ({ ...t, subtopics: t.subtopics ? [...t.subtopics] : [] }))];
+
+    const activeNotes = state.notes.filter(n =>
+      n.subject && n.subject.toLowerCase() === subject.label.toLowerCase()
+    );
+
+    activeNotes.forEach(note => {
+      if (!note.subtopic) return;
+
+      const subtopicLabel = note.subtopic;
+      const topicLabel = note.topic || 'General Notes';
+
+      let topicObj = list.find(t => t.label.toLowerCase() === topicLabel.toLowerCase());
+      if (!topicObj) {
+        topicObj = {
+          id: topicLabel.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+          label: topicLabel,
+          subtopics: []
+        };
+        list.push(topicObj);
+      }
+
+      const hasSub = topicObj.subtopics?.some(st => st.label.toLowerCase() === subtopicLabel.toLowerCase());
+      if (!hasSub) {
+        topicObj.subtopics?.push({
+          id: subtopicLabel,
+          label: subtopicLabel
+        });
+      }
+    });
+
+    return list;
+  }, [staticTopics, state.notes, subject.label]);
 
   const toggleTopic = (id: string) => {
     setExpanded(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
@@ -85,9 +241,6 @@ export function PilotV2SidebarSubject() {
 
   const handleSelectTopic = (topicId: string, hasSubtopics: boolean) => {
     if (hasSubtopics) { toggleTopic(topicId); return; }
-    // Topics without subtopics are routed straight to the note list so the
-    // user lands on a usable surface (no dead end). The Note List uses
-    // `selectedTopic` as its seeded subject when `selectedSubtopic` is null.
     dispatch({ type: 'SET_SELECTED_TOPIC', payload: topicId });
     dispatch({ type: 'SET_SELECTED_SUBTOPIC', payload: topicId });
     dispatch({ type: 'SET_VIEW_MODE', payload: 'noteList' });
@@ -104,17 +257,7 @@ export function PilotV2SidebarSubject() {
       style={[styles.root, { backgroundColor: colors.surface, borderRightColor: colors.border }]}
     >
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity
-          testID="pilot-v2-sidebar-back-home"
-          onPress={() => dispatch({ type: 'NAVIGATE_HOME' })}
-          style={styles.backRow}
-          activeOpacity={0.7}
-        >
-          <ChevronLeft size={18} color={colors.textSecondary} />
-          <Text style={{ color: colors.textSecondary, fontSize: 13, fontWeight: '500' }}>Back</Text>
-        </TouchableOpacity>
-
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 12 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <View style={[styles.subjectIcon, { backgroundColor: subject.bg }]}>
             <Icon size={18} color={subject.text} />
           </View>
@@ -128,69 +271,17 @@ export function PilotV2SidebarSubject() {
         ) : (
           topics.map((t, idx) => {
             const isExpanded = expanded.includes(t.id);
-            const isSelectedTopic = state.view.selectedTopic === t.id;
-            const hasSub = !!t.subtopics?.length;
             return (
-              <View key={t.id}>
-                <TouchableOpacity
-                  testID={`pilot-v2-topic-${t.id}`}
-                  activeOpacity={0.7}
-                  onPress={() => handleSelectTopic(t.id, hasSub)}
-                  style={[
-                    styles.topicRow,
-                    isSelectedTopic ? { backgroundColor: '#EEECFF' } : null,
-                  ]}
-                >
-                  <Text style={{ color: colors.textTertiary, fontSize: 11, width: 22 }}>{idx + 1}.</Text>
-                  <Text
-                    style={{
-                      flex: 1,
-                      fontSize: 14,
-                      fontWeight: '500',
-                      color: isSelectedTopic ? '#5B4EFA' : colors.textPrimary,
-                    }}
-                  >
-                    {t.label}
-                  </Text>
-                  {hasSub && (
-                    <ChevronDown
-                      size={14}
-                      color={colors.textTertiary}
-                      style={{ transform: [{ rotate: isExpanded ? '0deg' : '-90deg' }] }}
-                    />
-                  )}
-                </TouchableOpacity>
-
-                {hasSub && isExpanded && (
-                  <View style={{ marginLeft: 32, marginTop: 4, gap: 4 }}>
-                    {t.subtopics!.map(st => {
-                      const isSelected = state.view.selectedSubtopic === st.id;
-                      return (
-                        <TouchableOpacity
-                          key={st.id}
-                          testID={`pilot-v2-subtopic-${st.id}`}
-                          activeOpacity={0.7}
-                          onPress={() => handleSelectSubtopic(st.id)}
-                          style={[
-                            styles.subtopicRow,
-                            isSelected ? { backgroundColor: '#EEECFF' } : null,
-                          ]}
-                        >
-                          <Text
-                            style={{
-                              fontSize: 13,
-                              color: isSelected ? '#5B4EFA' : colors.textSecondary,
-                              fontWeight: isSelected ? '600' : '400',
-                            }}
-                          >
-                            {st.label}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                )}
-              </View>
+              <CollapsibleTopicItem
+                key={t.id}
+                t={t}
+                idx={idx}
+                isExpanded={isExpanded}
+                state={state}
+                colors={colors}
+                handleSelectTopic={handleSelectTopic}
+                handleSelectSubtopic={handleSelectSubtopic}
+              />
             );
           })
         )}

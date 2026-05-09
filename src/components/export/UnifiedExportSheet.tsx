@@ -10,6 +10,7 @@ import {
   ExportOptions, ExportPayload, defaultExportOptions, exportToPdf,
   ExportFontFamily, ExportTheme, ExportPaperStyle, ExportContentScope,
   ExportAnswerPlacement, ExportSortBy, ExportQaLayoutMode, ExportVisualStyle,
+  ExportGroupingLevel,
 } from '../../lib/unifiedExportEngine';
 
 export interface AnalysisReportOption {
@@ -90,13 +91,14 @@ const CHOICES = {
   ],
   sortBys: [
     { id: 'default' as ExportSortBy, label: 'Default' },
-    { id: 'subject' as ExportSortBy, label: 'Subject' },
-    { id: 'subject_section' as ExportSortBy, label: 'Subject + Section Group' },
-    { id: 'subject_section_microtopic' as ExportSortBy, label: 'Subject + Section Group + Micro Topic' },
     { id: 'year' as ExportSortBy, label: 'Year' },
     { id: 'difficulty' as ExportSortBy, label: 'Difficulty' },
-    { id: 'microtopic' as ExportSortBy, label: 'Microtopic' },
-    { id: 'date' as ExportSortBy, label: 'Date' },
+    { id: 'date' as ExportSortBy, label: 'Latest Modified' },
+  ],
+  groupingLevels: [
+    { id: 'subject' as const, label: 'Subject' },
+    { id: 'section_group' as const, label: 'Section Group' },
+    { id: 'microtopic' as const, label: 'Microtopic' },
   ],
   visualStyles: [
     { id: 'document' as ExportVisualStyle, label: 'Document' },
@@ -412,7 +414,27 @@ export const UnifiedExportSheet: React.FC<Props> = ({
 
             {!hideSections.includes('sort') && (payload?.kind === 'questions' || payload?.kind === 'tags') && (
               <Section title="Sort By" colors={colors}>
-                <Row>{CHOICES.sortBys.map(s => <Chip key={s.id} active={opts.sortBy === s.id} onPress={() => set('sortBy', s.id)}>{s.label}</Chip>)}</Row>
+                <Label colors={colors}>GROUP BY (multi-select hierarchy)</Label>
+                <Row>{CHOICES.groupingLevels.map(g => {
+                  const active = (opts.groupingLevels || []).includes(g.id);
+                  return (
+                    <Chip
+                      key={g.id}
+                      active={active}
+                      onPress={() => {
+                        const cur = opts.groupingLevels || [];
+                        const next = active ? cur.filter(x => x !== g.id) : [...cur, g.id];
+                        // Preserve canonical hierarchy order
+                        const order: ExportGroupingLevel[] = ['subject','section_group','microtopic'];
+                        next.sort((a,b) => order.indexOf(a) - order.indexOf(b));
+                        set('groupingLevels', next);
+                      }}
+                      testID={`export-group-${g.id}`}
+                    >{g.label}</Chip>
+                  );
+                })}</Row>
+                <Label colors={colors}>SORT WITHIN GROUPS</Label>
+                <Row>{CHOICES.sortBys.map(s => <Chip key={s.id} active={opts.sortBy === s.id} onPress={() => set('sortBy', s.id)} testID={`export-sort-${s.id}`}>{s.label}</Chip>)}</Row>
               </Section>
             )}
 

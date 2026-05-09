@@ -36,6 +36,7 @@ export type ExportColumns = 1 | 2;
 export type ExportContentScope = 'q_only' | 'q_options' | 'q_options_expl';
 export type ExportAnswerPlacement = 'inline' | 'end';
 export type ExportSortBy = 'default' | 'subject' | 'microtopic' | 'difficulty' | 'date' | 'year' | 'subject_section' | 'subject_section_microtopic';
+export type ExportGroupingLevel = 'subject' | 'section_group' | 'microtopic';
 export type ExportQaLayoutMode = 'unified' | 'split';
 export type ExportVisualStyle = 'document' | 'flashcard';
 
@@ -49,6 +50,9 @@ export interface ExportOptions {
   contentScope: ExportContentScope;
   answerPlacement: ExportAnswerPlacement;
   sortBy: ExportSortBy;
+  /** Multi-select grouping levels — composes hierarchical export structure
+   *  independently of filters. e.g. ['subject','section_group'] groups by both. */
+  groupingLevels?: ExportGroupingLevel[];
 
   // Page setup (cm)
   pageMarginTopCm: number;
@@ -519,6 +523,28 @@ export const filterQuestions = (rows: ExportQuestion[], o: ExportOptions): Expor
 
 export const sortQuestions = (rows: ExportQuestion[], o: ExportOptions): ExportQuestion[] => {
   const out = [...rows];
+  // Composable grouping levels take precedence (independent multi-select).
+  // The presence of ANY grouping levels triggers hierarchical sort, regardless
+  // of legacy o.sortBy. Filtering remains entirely separate.
+  const lvls = o.groupingLevels || [];
+  if (lvls.length > 0) {
+    out.sort((a, b) => {
+      for (const lvl of lvls) {
+        const av =
+          lvl === 'subject' ? (a.subject || '')
+          : lvl === 'section_group' ? (a.section_group || '')
+          : (a.micro_topic || '');
+        const bv =
+          lvl === 'subject' ? (b.subject || '')
+          : lvl === 'section_group' ? (b.section_group || '')
+          : (b.micro_topic || '');
+        const cmp = av.localeCompare(bv);
+        if (cmp !== 0) return cmp;
+      }
+      return String(a.exam_year || '').localeCompare(String(b.exam_year || ''));
+    });
+    return out;
+  }
   switch (o.sortBy) {
     case 'subject':
       out.sort((a, b) => (a.subject || '').localeCompare(b.subject || '') || (a.micro_topic || '').localeCompare(b.micro_topic || ''));
@@ -629,7 +655,23 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
   };
 
   // ── Hierarchical grouping for subject-based sorts ──
-  const needsGrouping = ['subject', 'subject_section', 'subject_section_microtopic'].includes(o.sortBy);
+  // Composable grouping levels (multi-select, independent of sortBy) take
+  // precedence and drive the hierarchy. Falls back to legacy o.sortBy.
+  const lvls = o.groupingLevels || [];
+  const hasSubject = lvls.includes('subject');
+  const hasSection = lvls.includes('section_group');
+  const hasMicro = lvls.includes('microtopic');
+  const needsGrouping =
+    lvls.length > 0
+      ? hasSubject || hasSection || hasMicro
+      : ['subject', 'subject_section', 'subject_section_microtopic'].includes(o.sortBy);
+  // Legacy mapping for the rendering paths below
+  const renderLevel: 'subject' | 'subject_section' | 'subject_section_microtopic' =
+    lvls.length > 0
+      ? (hasMicro ? 'subject_section_microtopic' : hasSection ? 'subject_section' : 'subject')
+      : (o.sortBy === 'subject_section' ? 'subject_section'
+        : o.sortBy === 'subject_section_microtopic' ? 'subject_section_microtopic'
+        : 'subject');
 
   if (needsGrouping) {
     // Build grouped structure: Subject → Section Group → Microtopic → Questions
@@ -650,7 +692,7 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
     const tocItems: string[] = [];
     groups.forEach((secMap, sub) => {
       tocItems.push(`<div class="toc-item" style="font-weight:800">${escapeHtml(sub)}</div>`);
-      if (o.sortBy !== 'subject') {
+      if (renderLevel !== 'subject') {
         secMap.forEach((micMap, sec) => {
           tocItems.push(`<div class="toc-item" style="padding-left:12px">${escapeHtml(sec)}</div>`);
         });
@@ -669,7 +711,7 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
     groups.forEach((secMap, sub) => {
       sectionsHtml.push(`<h1 style="color:var(--accent);font-size:${o.fontSize + 6}pt;font-weight:900;margin:8mm 0 4mm 0;border-bottom:2px solid var(--accent);padding-bottom:2mm">${escapeHtml(sub)}</h1>`);
 
-      if (o.sortBy === 'subject') {
+      if (renderLevel === 'subject') {
         // Flat list under subject heading
         secMap.forEach((micMap) => {
           micMap.forEach((questions) => {
@@ -682,7 +724,7 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
         secMap.forEach((micMap, sec) => {
           sectionsHtml.push(`<h2 style="color:var(--fg);font-size:${o.fontSize + 3}pt;font-weight:800;margin:6mm 0 3mm 0;opacity:0.85">${escapeHtml(sec)}</h2>`);
 
-          if (o.sortBy === 'subject_section') {
+          if (renderLevel === 'subject_section') {
             // Flat list under section heading
             micMap.forEach((questions) => {
               questions.forEach(q => {

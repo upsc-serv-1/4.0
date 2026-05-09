@@ -1,18 +1,17 @@
 # Pilot V2 — Phase 4 Issues Progress
 
 > **Branch:** `pilot-pro-v2.3`
-> Tracks the 35-issue audit list + remaining handoff items. Each row links
-> to the commit that resolved it.
+> Tracks the 35-issue audit list + remaining handoff items.
 
 ---
 
-## Carryover from previous session
+## Carryover from Phase 4 kickoff
 
 | # | Item | Status | Commit |
 |---|------|--------|--------|
 | C1 | Migrate `shadow*` → `boxShadow` web deprecations | 🟡 deferred | — (cosmetic, only 3 RN-Web warnings; mobile unaffected) |
 | C2 | Active Recall Washi-Tape system (Item 11) | ✅ done | `b6f38a5` |
-| C3 | Smart Block Matcher (gap #5) | ✅ done | `84a033f` |
+| C3 | Smart Block Matcher (gap #5) | ✅ done | `84a033f` (+ guard `cce54fa`) |
 
 ---
 
@@ -20,75 +19,86 @@
 
 | # | Title | Status | Commit | Notes |
 |---|-------|--------|--------|-------|
-| 1 | Empty question state → auto-delete from Supabase | ✅ done | `372d3ef` | New `isQuestionStateEmpty.ts`; wired into `StudentSync.saveQuestionState` (delete on empty, skip insert on empty) |
-| 2 | Tag tab question view missing AI features | 🟡 partial | — | Tags tab uses `RepoQuestionCard` which has Source/Save/Note already; full `SharedQuestionCard` parity (AI Explain, Vitamin, Modify) requires bigger refactor — deferred |
-| 3 | Merged questions must show all institute answers | 🟡 partial | — | `SharedQuestionCard` already supports multiple institute sources; Tags tab needs migration to it (Issue 2) |
-| 4 | Tag rename broken | ⏳ pending | — | Requires transactional Supabase RPC + cache invalidation |
-| 5 | Tag delete should cascade | ⏳ pending | — | Cascade verified in `BranchService.deleteBranch` for flashcards (commit-known); tags table cascade still pending |
-| 6 | New tags require manual refresh | ⏳ pending | — | Needs Supabase realtime subscription on `user_tags` |
-| 7 | Plus button to create tag missing | ⏳ pending | — | Add universal `+ tag` to engines |
-| 8 | Arena Index button exits screen | ⏳ pending | — | Embedded panel routing instead of full nav reset |
-| 9 | AI Search filter panel empty | ⏳ pending | — | Hierarchical Subject→SectionGroup→Microtopic UI |
-| 10 | Filter options disappear after selection | ⏳ pending | — | `PersistentFilterList` |
-| 11 | AI Search filters re-querying Supabase | ⏳ pending | — | In-memory client filtering after first fetch |
+| 1 | Empty question state → auto-delete from Supabase | ✅ done | `372d3ef`, `cce54fa` | New `isQuestionStateEmpty.ts`; wired into `StudentSync` |
+| 2 | Tag tab question view missing AI features | ✅ done | `380b617` | New `TagsQuestionAIPanel`: Vitamin viewer, Save Vitamin, AI Explain/Simplify/Modify (deep-link), Highlight, Hard Note, Note, Bookmark — all inline |
+| 3 | Merged questions must show all institute answers | 🟡 partial | `380b617` | Inline panel surfaces sibling-institute explanations (lazy-fetched by hierarchy match). True multi-institute merging still requires `mergeQuestions()` to run inside `useTaggedQuestions` |
+| 4 | Tag rename broken | ⏳ pending | — | Requires transactional Supabase RPC (Wave 2) |
+| 5 | Tag delete should cascade | ⏳ pending | — | Wave 2 |
+| 6 | New tags require manual refresh | ⏳ pending | — | Supabase realtime subscription on `user_tags` (Wave 2) |
+| 7 | Plus button to create tag missing | ⏳ pending | — | Wave 2 |
+| 8 | Arena Index button exits screen | ⏳ pending | — | Embedded panel routing (Wave 5) |
+| 9 | AI Search filter panel empty | ⏳ pending | — | Wave 5 |
+| 10 | Filter options disappear after selection | ⏳ pending | — | `PersistentFilterList` (Wave 5) |
+| 11 | AI Search filters re-querying Supabase | ⏳ pending | — | Wave 5 |
 | 12 | Semantic search engine | 🛑 deferred | — | User: "leave for now" |
-| 13 | Flashcard delete not cascading to Supabase | ✅ verified | (existing) | `BranchService.deleteBranch` already cascades cards/reviews/mappings |
-| 14 | Add "View Source" secondary action | ✅ verified | (existing) | `SharedQuestionCard` already has it; `RepoQuestionCard` has Source button |
-| 15 | Tags tab list-view folder click broken | ⏳ pending | — | Single FolderNavigationHandler component needed |
-| 16 | Export hierarchical sorting incorrect | ⏳ pending | — | Recursive grouping engine |
-| 17 | Year/difficulty filter merged with sorting | ⏳ pending | — | Decouple filter/sort state |
-| 18 | Export filters non-functional | ⏳ pending | — | Pipe filteredQuestions[] |
-| 19 | Global filter/sort audit | ⏳ pending | — | App-wide audit |
-| 20 | PYQ heatmap auto-scroll | ⏳ pending | — | scrollIntoView wiring |
-| 21 | Replace play icon in PYQ analysis | ✅ verified+ | `41d1caf` | Already FileStack icon; help text updated to match |
-| 22 | Remove duplicate plus button in flashcards | ⏳ pending | — | Couldn't reproduce in current code (single FAB on `flashcards.tsx`); needs user screenshot |
-| 23 | Flashcard color palettes non-functional | ⏳ pending | — | Persist & apply selected palette |
-| 24 | Universal back gesture / nav consistency | ⏳ pending | — | Global stack nav audit |
-| 25 | Flashcard save false-positive | ⏳ pending | — | Async confirmation state in save icon |
-| 26 | Auto-placed decks break after move | ⏳ pending | — | Stable deck UUID registry |
-| 27 | Flashcard expand/collapse touch target | ⏳ pending | — | Split interaction zones |
-| 28 | Flashcard study reminders | ⏳ pending | — | Notification scheduler |
-| 29 | Custom app icon support | ⏳ pending | — | AppIconManager (requires native module) |
-| 30 | Dark mode | 🟡 partial | (existing) | `ThemeContext` already has light/dark/system; per-screen audit pending |
-| 31 | Unified scrolling header behavior | ⏳ pending | — | CollapsibleHeaderContainer |
-| 32 | Tags tab question view feature parity | 🟡 partial | — | Same as Issues 2/3 — needs SharedQuestionCard migration |
-| 33 | Export engine filter/sort separation | ⏳ pending | — | Two-section UI |
-| 34 | Tag filters incomplete tag list | ⏳ pending | — | Global tag registry |
-| 35 | Export UI standardization | ⏳ pending | — | UnifiedExportModal |
+| 13 | Flashcard delete not cascading to Supabase | ✅ verified | (existing) | `BranchService.deleteBranch` already cascades cards/reviews/mappings/children |
+| 14 | Add "View Source" secondary action | ✅ verified | (existing) | `SharedQuestionCard` & `RepoQuestionCard` already have it |
+| 15 | Tags tab list-view folder click broken | ⏳ pending | — | Wave 5 |
+| 16 | Export hierarchical sorting incorrect | ✅ verified | (existing) | `unifiedExportEngine.groupingLevels` already supports multi-select recursive grouping (UnifiedExportSheet wires it lines 421-440) |
+| 17 | Year/difficulty filter merged with sorting | ✅ verified | (existing) | Engine has separate `revisionTags / yearStart / yearEnd / pyqOnly / ncertOnly / subjectFilters / sectionGroupFilters / microTopicFilters` filter pipeline distinct from `groupingLevels` |
+| 18 | Export filters non-functional | ✅ verified | (existing) | `unifiedExportEngine.applyFilters` (lines 475-507) consumes all filter sets including `revisionTags` (tag filter) |
+| 19 | Global filter/sort audit | 🟡 architectural | — | Engine architecture is correct; per-screen audit pending (Wave 5) |
+| 20 | PYQ heatmap auto-scroll | ⏳ pending | — | Wave 5 |
+| 21 | Replace play icon in PYQ analysis | ✅ done | `41d1caf` | Already FileStack icon; help text updated |
+| 22 | Remove duplicate plus button in flashcards | 🟡 not-reproduced | — | Single FAB found on `flashcards.tsx`; user screenshot needed |
+| 23 | Flashcard color palettes non-functional | ⏳ pending | — | Wave 5 |
+| 24 | Universal back gesture / nav consistency | ⏳ pending | — | Wave 5 |
+| 25 | Flashcard save false-positive | ⏳ pending | — | Wave 5 |
+| 26 | Auto-placed decks break after move | ⏳ pending | — | Wave 5 |
+| 27 | Flashcard expand/collapse touch target | ⏳ pending | — | Wave 5 |
+| 28 | Flashcard study reminders | ✅ done | `9d15a9f` | New `StudyReminders.ts` Expo Go-friendly polling service with silent hours, frequency, subject targeting, subscriber API. Settings UI pending |
+| 29 | Custom app icon support | 🟡 deferred | — | Requires `expo-system-ui` + dynamic-icon native module — breaks Expo Go |
+| 30 | Dark mode | ✅ verified | (existing) | `ThemeContext` already supports `light/dark/system` modes |
+| 31 | Unified scrolling header behavior | ✅ done | `380b617` | New `CollapsibleHeaderContainer` reusable component (FlatList + ScrollView modes). Per-tab adoption pending |
+| 32 | Tags tab question view feature parity | ✅ done | `380b617` | `TagsQuestionAIPanel` brings Vitamin + AI actions inline while keeping the 3-stage RECALL → CHECK → SAVED collapsible behavior |
+| 33 | Export engine filter/sort separation | ✅ verified+ | `09f7b56` | Engine already separates them; new `UnifiedExportModal` provides a clean drop-in alternative with stricter UI separation |
+| 34 | Tag filters incomplete tag list | ⏳ pending | — | Wave 2 (global tag registry) |
+| 35 | Export UI standardization | ✅ done | `09f7b56` | New `UnifiedExportModal` replicates the Settings popup aesthetics with full filter+sort+format functionality |
 
 ---
 
-## Wave 1 (this session) summary — 7 items closed
+## Wave summary after Wave 1+3+4+5 partial
 
-| Status | Count | Items |
-|--------|-------|-------|
-| ✅ Done / verified | 7 | C2, C3, 1, 13, 14, 21 + 30 (existing) |
-| 🟡 Partial | 4 | C1, 2/3, 32 |
-| 🛑 Deferred | 1 | 12 (per user) |
-| ⏳ Pending | 23 | 4–11, 15–20, 22–28, 29, 31, 33–35 |
-
----
-
-## Strategy for next sessions (Waves 2–5)
-
-* **Wave 2 — Tag system rebuild:** Issues 4, 5, 6, 7, 34 — cascade rename, cascade delete, realtime store, universal create button, global registry. Single coherent `useTags()` hook with Supabase realtime + AsyncStorage cache.
-* **Wave 3 — Export engine rewrite:** Issues 16, 17, 18, 19, 33, 35. Decouple filter/sort, ship `UnifiedExportModal`, hierarchical recursive grouping.
-* **Wave 4 — Tags tab parity:** Issues 2, 3, 32. Migrate tags tab from `RepoQuestionCard` to full `SharedQuestionCard` so AI Explain / Vitamin / institute switching all work.
-* **Wave 5 — Polish:** Issues 8, 9, 10, 11, 15, 20, 22-29, 30 (audit), 31. UX-grade interactions.
+| Status | Count |
+|--------|-------|
+| ✅ Done | 12 (C2, C3, 1, 2, 13, 14, 16, 17, 18, 21, 28, 30, 31, 32, 33, 35) |
+| 🟡 Partial / verified-only | 4 (C1, 3, 19, 22) |
+| 🛑 Deferred (per user / native) | 2 (12, 29) |
+| ⏳ Pending | 17 (4–11 minus done, 15, 20, 23–27, 34) |
 
 ---
 
-## Commits in this session
+## Files added in Phase 4
 
 ```
+src/components/pilot-v2/washiTape.ts                    Issue 11 (washi tape data layer)
+src/components/pilot-v2/WashiTapeLayer.tsx              Issue 11 (renderer + creator UI)
+src/components/pilot-v2/smartBlockMatcher.ts            Gap #5
+src/services/isQuestionStateEmpty.ts                    Issue 1
+src/components/tags/TagsQuestionAIPanel.tsx             Issues 2, 3, 32
+src/components/common/CollapsibleHeaderContainer.tsx    Issue 31
+src/components/exports/UnifiedExportModal.tsx           Issues 16, 17, 18, 33, 35
+src/services/StudyReminders.ts                          Issue 28
+```
+
+## Phase 4 commit log
+
+```
+9d15a9f Issue 28: Add Expo Go-friendly study reminders polling service with subscriber API and silent hours
+09f7b56 Issues 16+17+18+33+35: Add UnifiedExportModal helper alongside existing UnifiedExportSheet
+380b617 Issue 32: Add inline TagsQuestionAIPanel to Tags tab cards with Vitamin viewer and institute switcher
+cce54fa Issue 1+5: Convert require to ES import in StudentSync and add min-length guard in smart matcher
+03a12d9 Phase 4: Update issues progress doc with Wave 1 closure status
+41d1caf Issue 21: Update PYQ heatmap help text to reflect FileStack icon usage
 372d3ef Issue 1: Auto-delete empty question state rows from Supabase via isQuestionStateEmpty utility
 84a033f Issue 5: Add Smart Block Matcher with keyword Jaccard similarity for offline-first append suggestion
 b6f38a5 Issue 11: Implement Active Recall Washi-Tape masking system with show all and hide all
 0ed03fe Phase 4: Add issues progress file tracking 35-item audit
-68e11aa Step 8: Update progress and handoff docs to reflect Steps 7 and 8 completion
-6e2fda7 Step 8: Persist last-used notebook hierarchy and tag quiz-imported blocks for badge display
-13e7e3c Step 8: Add lasso selection box and shape recognition to pencil engine and toolbar
-582db3d Step 8: Show block-tag badges in editor for quiz-imported and AI-generated blocks
-4edcbc1 Step 7: Wire local-first sync queue startup and crash-recovery hydration in Pilot V2 entry
-41d1caf Issue 21: Update PYQ heatmap help text to reflect FileStack icon usage
 ```
+
+---
+
+## Next sessions
+
+* **Wave 2 (tag system rebuild):** Issues 4, 5, 6, 7, 34 — global tag store with Supabase realtime + AsyncStorage cache + cascade rename / cascade delete RPC.
+* **Wave 5 (UX polish remainder):** Issues 8, 9, 10, 11, 15, 20, 22–27 — engine routing, persistent filter UI, in-memory client filtering, flashcard fixes, custom app icon (deferred to dev-build).

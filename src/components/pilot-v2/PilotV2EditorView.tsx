@@ -1188,10 +1188,9 @@ const styles = StyleSheet.create({
 
   canvas: { padding: 24, paddingBottom: 80 },
   paper: {
-    padding: 32, borderRadius: 20, borderWidth: 1, gap: 6, maxWidth: 880, alignSelf: 'center', width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
-    borderColor: 'rgba(255, 255, 255, 0.65)',
-    shadowColor: '#5B4EFA', shadowOpacity: 0.04, shadowRadius: 16, shadowOffset: { width: 0, height: 8 },
+    padding: 28, borderRadius: 12, borderWidth: 0, gap: 8, maxWidth: 1100, alignSelf: 'center', width: '100%',
+    backgroundColor: '#ffffff',
+    shadowColor: '#0F172A', shadowOpacity: 0.04, shadowRadius: 20, shadowOffset: { width: 0, height: 8 },
   },
   blockRow: {
     flexDirection: 'row', alignItems: 'flex-start', gap: 8,

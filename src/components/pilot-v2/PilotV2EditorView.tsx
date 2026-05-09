@@ -1177,7 +1177,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6, paddingVertical: 6, borderRadius: 16, borderWidth: 1,
     shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 6,
   },
-  floatBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
+  floatBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 10, marginHorizontal: 1 },
   dragHandle: { width: 36, height: 22, alignItems: 'center', justifyContent: 'center' },
   moreMenu: {
     position: 'absolute', top: 64, right: 16, minWidth: 240,

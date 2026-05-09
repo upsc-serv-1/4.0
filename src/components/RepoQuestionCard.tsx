@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Pressable } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { spacing, radius } from '../theme';
 import { TaggedQuestion } from '../hooks/useTaggedQuestions';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Eye, Trash2, Zap, ExternalLink, BookOpen } from 'lucide-react-native';
+import { Eye, Trash2, Zap, ExternalLink, BookOpen, ChevronDown, ChevronUp } from 'lucide-react-native';
 import { FlashcardSvc } from '../services/FlashcardService';
 import { AddToFlashcardSheet } from './flashcards/AddToFlashcardSheet';
 import { autoCleanupQuestionState } from '../utils/questionStateUtils';
+import { TagsQuestionAIPanel } from './tags/TagsQuestionAIPanel';
 import { useRouter } from 'expo-router';
 
 interface RepoQuestionCardProps {
@@ -23,6 +24,7 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestion
   const router = useRouter();
   
   const [revealStage, setRevealStage] = useState(0);
+  const [aiPanelOpen, setAiPanelOpen] = useState(false);
   const [loadingAction, setLoadingAction] = useState<'remove' | 'flash' | null>(null);
   const [aff, setAff] = useState<{ visible: boolean; cardId: string | null; hint: any }>({ visible: false, cardId: null, hint: {} });
   
@@ -149,6 +151,16 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestion
           <Text style={[styles.explanationText, { color: zenSecColor }]}>{question.explanation}</Text>
 
           <View style={styles.actionsBar}>
+            {/* Issue 32: Inline AI Panel toggle — keeps user in Tags tab. */}
+            <TouchableOpacity
+              onPress={() => setAiPanelOpen((o) => !o)}
+              style={[styles.actionBtn, { backgroundColor: '#a855f715', borderColor: '#a855f733', flex: 1.4 }]}
+              testID="ai-panel-toggle"
+            >
+              <Zap size={10} color="#a855f7" />
+              <Text style={[styles.actionBtnText, { color: '#a855f7' }]}>AI Panel</Text>
+              {aiPanelOpen ? <ChevronUp size={10} color="#a855f7" /> : <ChevronDown size={10} color="#a855f7" />}
+            </TouchableOpacity>
             {/* Issue #2: Full View button opens question in unified engine with all AI features */}
             <TouchableOpacity
               onPress={() => {
@@ -215,6 +227,22 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestion
               </TouchableOpacity>
             )}
           </View>
+
+          {/* Issues 2/3/32 — inline AI Vitamin / institute-explanation panel */}
+          {aiPanelOpen ? (
+            <Pressable onPress={(e) => e.stopPropagation()}>
+              <TagsQuestionAIPanel
+                questionId={question.id}
+                testId={question.testId || 'manual'}
+                questionText={question.questionText}
+                defaultExplanation={question.explanation}
+                subject={question.subject}
+                sectionGroup={question.sectionGroup}
+                microTopic={question.microTopic}
+                isZenMode={isZenMode}
+              />
+            </Pressable>
+          ) : null}
         </View>
       )}
     </TouchableOpacity>

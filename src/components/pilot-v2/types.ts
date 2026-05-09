@@ -210,3 +210,321 @@ export const PILOT_V2_INITIAL_VIEW: PilotV2ViewState = {
   quickFilter: 'home',
   search: '',
 };
+
+/* ========================================================================= */
+/* STEP 1 (v2.2) — Nested-block architecture (foundation)                     */
+/* ========================================================================= */
+
+/** Inline rich-text run inside a `ContentElement`. */
+export interface TextSpan {
+  text: string;
+  marks?: {
+    bold?: boolean;
+    italic?: boolean;
+    strikethrough?: boolean;
+    underline?: boolean;
+  };
+  highlightColor?: string;
+  link?: { url: string; title?: string };
+}
+
+export type ContentElementType =
+  | 'heading'
+  | 'paragraph'
+  | 'bullet'
+  | 'numbered'
+  | 'checklist'
+  | 'quote'
+  | 'code'
+  | 'divider'
+  | 'table';
+
+/** Atomic content node inside a nested block. */
+export interface ContentElement {
+  id: string;
+  type: ContentElementType;
+  spans?: TextSpan[];
+  checked?: boolean;
+  level?: 1 | 2 | 3;
+  tableRows?: string[][];
+  /** Source attribution + provenance (quiz import, timestamp, badge label). */
+  meta?: {
+    addedAt?: string;
+    source?: string;
+    sourceQuizId?: string;
+    sourceQuestion?: string;
+    /** Optional badge label, e.g. "Added by quiz import". */
+    badge?: string;
+    [key: string]: any;
+  };
+}
+
+/** Single pencil/Apple-Pencil stroke recorded on top of a nested block. */
+export interface PencilStroke {
+  id: string;
+  type: 'drawing' | 'highlight' | 'underline' | 'circle' | 'arrow' | 'text';
+  points: Array<{ x: number; y: number; pressure?: number; timestamp: number }>;
+  color: string;
+  width: number;
+  opacity?: number;
+  bounds: { x: number; y: number; width: number; height: number };
+  createdAt: string;
+}
+
+/** Nested block — container for a heading + ordered list of content elements. */
+export interface PilotV2NestedBlock {
+  id: string;
+  /** Logical name surfaced in the block selector (e.g. "GDP Implications"). */
+  blockName: string;
+  /** User-edited override for `blockName` (rename without losing the auto label). */
+  customName?: string;
+  /** The block's own heading element (rendered as the section title). */
+  heading?: ContentElement;
+  /** Bullets, paragraphs, dividers, tables — the renderable body of the block. */
+  children: ContentElement[];
+
+  /** Pencil annotations layered on top of this block (Step 5+). */
+  pencilStrokes?: PencilStroke[];
+
+  /** Tags for filtering / search-within-blocks (Step 8). */
+  tags?: string[];
+
+  /** Provenance — set when the block (or its content) came from a quiz import. */
+  sourceQuizId?: string;
+
+  /** Local-first dirty flag — true means "needs sync to server". */
+  isDirty?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PilotV2UserPreferences {
+  userId: string;
+  lastUsedNotebook?: {
+    noteId: string;
+    title: string;
+    subject: string;
+    topic?: string | null;
+    microtopic?: string | null;
+  };
+  lastUsedBlockId?: string;
+  /** Insert a divider between consecutive imports. */
+  autoSeparators: boolean;
+  /** Auto-continue numbered-list numbering when appending. */
+  continueNumbering: boolean;
+  /** Default export format chosen in the export sheet. */
+  defaultExportFormat?: 'pdf' | 'markdown' | 'plain' | 'image';
+  /** Updated whenever preferences are written. */
+  updatedAt?: string;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Backward-compatibility converters                                          */
+/*                                                                            */
+/*   Legacy notes are stored as PilotV2Block[] (flat list of headings, bullets*/
+/*   paragraphs, etc). The new export sheet + smart-append code consumes      */
+/*   PilotV2NestedBlock[] (heading + children groups). These helpers convert  */
+/*   safely between both shapes so an old note never crashes the new UI.      */
+/* ------------------------------------------------------------------------- */
+
+const newConvId = (): string => {
+  if (typeof crypto !== 'undefined' && (crypto as any).randomUUID) {
+    return (crypto as any).randomUUID();
+  }
+  return `pv2_b_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+};
+
+const nowIso = (): string => new Date().toISOString();
+
+/** Map a flat block's textual content to a single ContentElement. */
+function flatBlockToContentElement(block: PilotV2Block): ContentElement {
+  const baseSpans: TextSpan[] = block.text
+    ? [{
+        text: block.text,
+        marks: {
+          bold: block.bold,
+          italic: block.italic,
+          underline: block.underline,
+        },
+        highlightColor: block.highlightColor,
+        link: block.link ? { url: block.link } : undefined,
+      }]
+    : [];
+
+  switch (block.type) {
+    case 'heading':
+      return {
+        id: block.id,
+        type: 'heading',
+        level: block.level ?? 2,
+        spans: baseSpans,
+      };
+    case 'bullet':
+      return { id: block.id, type: 'bullet', spans: baseSpans };
+    case 'numbered':
+      return { id: block.id, type: 'numbered', spans: baseSpans };
+    case 'checklist':
+      return { id: block.id, type: 'checklist', checked: !!block.checked, spans: baseSpans };
+    case 'quote':
+      return { id: block.id, type: 'quote', spans: baseSpans };
+    case 'code':
+      return { id: block.id, type: 'code', spans: baseSpans };
+    case 'highlight':
+      return { id: block.id, type: 'paragraph', spans: baseSpans };
+    case 'paragraph':
+    default:
+      if (block.tableRows?.length) {
+        return { id: block.id, type: 'table', tableRows: block.tableRows };
+      }
+      return { id: block.id, type: 'paragraph', spans: baseSpans };
+  }
+}
+
+/** Flatten a single ContentElement back into a legacy PilotV2Block. */
+function contentElementToFlatBlock(el: ContentElement): PilotV2Block {
+  const text = (el.spans || []).map(s => s.text).join('');
+  const firstSpan = el.spans?.[0];
+  const base: PilotV2Block = {
+    id: el.id,
+    type: 'paragraph',
+    text,
+    bold: firstSpan?.marks?.bold,
+    italic: firstSpan?.marks?.italic,
+    underline: firstSpan?.marks?.underline,
+    highlightColor: firstSpan?.highlightColor,
+    link: firstSpan?.link?.url,
+    meta: el.meta,
+  };
+  switch (el.type) {
+    case 'heading':
+      return { ...base, type: 'heading', level: el.level ?? 2 };
+    case 'bullet':
+      return { ...base, type: 'bullet' };
+    case 'numbered':
+      return { ...base, type: 'numbered' };
+    case 'checklist':
+      return { ...base, type: 'checklist', checked: !!el.checked };
+    case 'quote':
+      return { ...base, type: 'quote' };
+    case 'code':
+      return { ...base, type: 'code' };
+    case 'table':
+      return { ...base, type: 'paragraph', tableRows: el.tableRows };
+    case 'divider':
+      // Legacy schema has no divider — represent as a thin-rule paragraph.
+      return { ...base, type: 'paragraph', text: text || '———' };
+    case 'paragraph':
+    default:
+      return { ...base, type: 'paragraph' };
+  }
+}
+
+/**
+ * Convert a legacy flat block list into nested heading-grouped blocks.
+ *
+ * Rules:
+ *  • Each `heading` starts a new nested block. The heading element becomes the
+ *    block's `heading`; its `text` becomes `blockName`.
+ *  • Non-heading elements before the first heading are placed in an implicit
+ *    "Notes" block so no content is lost.
+ *  • If the input is empty, a single empty block is returned (so the UI never
+ *    sees `blocks.length === 0` after migration).
+ */
+export function flatBlocksToNested(flat: PilotV2Block[] | undefined | null): PilotV2NestedBlock[] {
+  const safe = Array.isArray(flat) ? flat : [];
+  if (safe.length === 0) {
+    return [{
+      id: newConvId(),
+      blockName: 'Notes',
+      children: [],
+      isDirty: false,
+      createdAt: nowIso(),
+      updatedAt: nowIso(),
+    }];
+  }
+
+  const result: PilotV2NestedBlock[] = [];
+  let current: PilotV2NestedBlock | null = null;
+
+  const startBlock = (heading?: ContentElement, name?: string): PilotV2NestedBlock => ({
+    id: newConvId(),
+    blockName: (name ?? 'Notes').trim() || 'Notes',
+    heading,
+    children: [],
+    isDirty: false,
+    createdAt: nowIso(),
+    updatedAt: nowIso(),
+  });
+
+  for (const flatBlock of safe) {
+    if (flatBlock.type === 'heading') {
+      // Push previous block (if any) and open a new one keyed by the heading text.
+      if (current) result.push(current);
+      const headingEl = flatBlockToContentElement(flatBlock);
+      current = startBlock(headingEl, flatBlock.text);
+    } else {
+      if (!current) current = startBlock(undefined, 'Notes');
+      current.children.push(flatBlockToContentElement(flatBlock));
+    }
+  }
+  if (current) result.push(current);
+  return result;
+}
+
+/**
+ * Inverse of `flatBlocksToNested` — used when the new UI saves a nested note
+ * back into the legacy `PilotV2NoteContent.blocks` field so the existing editor
+ * (Samsung-Notes-style) and any other consumer keeps rendering correctly.
+ */
+export function nestedToFlatBlocks(nested: PilotV2NestedBlock[] | undefined | null): PilotV2Block[] {
+  const safe = Array.isArray(nested) ? nested : [];
+  const out: PilotV2Block[] = [];
+  for (const block of safe) {
+    if (block.heading) {
+      out.push(contentElementToFlatBlock(block.heading));
+    } else if ((block.blockName || '').trim()) {
+      // No explicit heading element — synthesize one from blockName so the flat
+      // editor still shows the section break.
+      out.push({
+        id: block.id,
+        type: 'heading',
+        level: 2,
+        text: (block.customName || block.blockName || '').trim(),
+      });
+    }
+    for (const child of block.children) {
+      out.push(contentElementToFlatBlock(child));
+    }
+  }
+  return out;
+}
+
+/**
+ * Best-effort detector that accepts either shape and returns a normalised
+ * nested block list. Used by note-loader paths to be crash-proof against
+ * notes saved before the v2.2 schema change.
+ */
+export function ensureNestedBlocks(
+  raw: PilotV2Block[] | PilotV2NestedBlock[] | undefined | null
+): PilotV2NestedBlock[] {
+  const arr = Array.isArray(raw) ? raw : [];
+  if (arr.length === 0) return flatBlocksToNested([]);
+  const looksNested = (arr as any[]).every(
+    b => b && typeof b === 'object' && 'children' in b && Array.isArray((b as any).children)
+  );
+  if (looksNested) return arr as PilotV2NestedBlock[];
+  return flatBlocksToNested(arr as PilotV2Block[]);
+}
+
+/** Plain-text projection of a nested block (used by the smart-block matcher). */
+export function nestedBlockPlainText(block: PilotV2NestedBlock): string {
+  const headingText = (block.heading?.spans || []).map(s => s.text).join(' ');
+  const childText = block.children
+    .map(c => (c.spans || []).map(s => s.text).join(' '))
+    .filter(Boolean)
+    .join(' \n ');
+  return [block.customName || block.blockName, headingText, childText]
+    .filter(Boolean)
+    .join('\n')
+    .trim();
+}

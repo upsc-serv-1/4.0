@@ -1604,7 +1604,7 @@ export default function NoteEditor() {
           shadowOpacity: 0.3, shadowRadius: 8, elevation: 8,
         }}>
           <AIQuickActionButton
-            context={{ type: 'note', content: mainContent?.slice(0, 2000) || '', title: title || 'Untitled Note' }}
+            context={{ type: 'note', content: content?.slice(0, 2000) || '', title: title || 'Untitled Note' }}
             templates={DEFAULT_NOTES_TEMPLATES}
             buttonLabel="✨ AI"
           />

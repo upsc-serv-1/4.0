@@ -258,6 +258,18 @@ class StudentSyncService {
     };
 
     if (existing?.id) {
+      // Issue 1 — if the merged state would be empty, delete the row instead of updating.
+      const merged = { ...updateData };
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { isQuestionStateEmpty } = require('./isQuestionStateEmpty');
+      if (isQuestionStateEmpty(merged)) {
+        const { error } = await supabase
+          .from('question_states')
+          .delete()
+          .eq('id', existing.id);
+        if (error) throw error;
+        return;
+      }
       // 2a. Update by ID
       const { error } = await supabase
         .from('question_states')
@@ -265,11 +277,15 @@ class StudentSyncService {
         .eq('id', existing.id);
       if (error) throw error;
     } else {
+      // Issue 1 — never insert an entirely-empty row.
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { isQuestionStateEmpty: ise } = require('./isQuestionStateEmpty');
+      if (ise(updateData)) return;
       // 2b. Insert new
       const { error } = await supabase
         .from('question_states')
         .insert(updateData);
-      
+
       // Handle race condition: if someone inserted it between our select and insert
       if (error && error.code === '23505') {
         return this.saveQuestionState(payload); // Retry

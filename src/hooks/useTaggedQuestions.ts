@@ -297,6 +297,13 @@ export function useTaggedVault(userId: string | undefined) {
     return Array.from(tagsSet).sort((a, b) => a.localeCompare(b));
   }, [rawQuestions, customReviewTags]);
 
+  // Keep the global tag registry in sync so every screen (export filters,
+  // AI search, quiz engine, flashcards, notes, analytics, review modes) can
+  // read the COMPLETE list rather than partial local snapshots.
+  useEffect(() => {
+    useTagStore.getState().setAllTags(uniqueTags);
+  }, [uniqueTags]);
+
   const syncCacheFromQuestions = useCallback(async (nextQuestions: TaggedQuestion[]) => {
     setRawQuestions(nextQuestions);
     const payload = JSON.stringify(nextQuestions);

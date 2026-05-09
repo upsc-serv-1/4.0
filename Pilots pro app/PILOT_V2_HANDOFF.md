@@ -8,9 +8,9 @@
 
 ## 🚀 EXECUTION PRIORITY TASKS (IN ORDER)
 
-- [ ] **Task 1: Update Block Types** (foundation, backward compatibility converter)
-- [ ] **Task 2: Build Smart Block Matcher** (AI similarity & offline keyword fallback)
-- [ ] **Task 3: Build Export Sheet UI** (UX selection panel, lazy loading, PDF/Markdown selective export)
+- [x] **Task 1: Update Block Types** (foundation, backward compatibility converter)
+- [x] **Task 2: Build Smart Block Matcher** (AI similarity & offline keyword fallback)
+- [x] **Task 3: Build Export Sheet UI** (UX selection panel, lazy loading, PDF/Markdown selective export)
 - [ ] **Task 4: Implement Smart Append** (auto-numbering, separator, "Undo Save" toast)
 - [ ] **Task 5: Add Pencil Annotation Engine** (stroke tracking, palm rejection, scale drift, Undo/Redo)
 - [ ] **Task 6: Build Pencil Canvas** (Shopify Skia page-level continuous layered canvas)
@@ -22,21 +22,21 @@
 ## 🎯 IMPLEMENTATION CHECKLISTS
 
 ### 📦 Core Block Structure Tasks (Step 1)
-- [ ] Convert flat blocks to nested blocks (`heading + children`)
-- [ ] Implement `ContentElement` union type
+- [x] Convert flat blocks to nested blocks (`heading + children`)
+- [x] Implement `ContentElement` union type
 - [ ] Run migration to convert old blocks to new nested blocks
-- [ ] Update note content schema
-- [ ] Implement backward-compatibility converter to prevent crashes on old note formats during load
+- [x] Update note content schema
+- [x] Implement backward-compatibility converter to prevent crashes on old note formats during load
 
 ### 🧠 Smart Export Tasks (Step 2 & Step 3)
-- [ ] Implement AI similarity matching
-- [ ] Build visual block selector list
-- [ ] Implement last-used notebook remembering
-- [ ] Implement block suggestion logic
-- [ ] Implement user preferences storage
-- [ ] Implement instant local keyword-search fallback for offline mode
-- [ ] Implement lag-free rendering (lazy loading or search filter) for large notebooks
-- [ ] Implement advanced export formats settings (PDF, Markdown, Selective block-export)
+- [x] Implement AI similarity matching
+- [x] Build visual block selector list
+- [x] Implement last-used notebook remembering
+- [x] Implement block suggestion logic
+- [x] Implement user preferences storage
+- [x] Implement instant local keyword-search fallback for offline mode
+- [x] Implement lag-free rendering (lazy loading or search filter) for large notebooks
+- [x] Implement advanced export formats settings (PDF, Markdown, Selective block-export)
 
 ### 📤 Append Logic Tasks (Step 4)
 - [ ] Implement optional separator divider insertion

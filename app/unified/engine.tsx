@@ -2260,6 +2260,9 @@ export default function UnifiedQuizEngine() {
     // Persist the updated catalog to AsyncStorage (shared with Tags tab and Light Engine)
     if (session?.user?.id) {
       try {
+        await supabase.rpc('add_user_tag', { p_tag: newTag }).then(({ error }) => {
+          if (error) console.warn('[tags] add_user_tag RPC failed', error.message);
+        });
         const catalogKey = `review_tag_catalog_${session.user.id}`;
         const existing = await AsyncStorage.getItem(catalogKey);
         const parsed: string[] = existing ? JSON.parse(existing) : [];
@@ -2976,8 +2979,20 @@ export default function UnifiedQuizEngine() {
             backgroundColor: isZenMode ? '#F4ECD8' : colors.surface
           }
         ]}>
-          <TouchableOpacity onPress={handleExit} style={styles.headerBtn}>
-            <ChevronLeft size={24} color={isZenMode ? '#433422' : colors.textPrimary} />
+          <TouchableOpacity
+            onPress={() => {
+              if (!isFromSearch && arenaMode === 'learning') {
+                setShowIndex((visible) => !visible);
+                return;
+              }
+              handleExit();
+            }}
+            style={styles.headerBtn}
+            testID="engine-top-left-nav-btn"
+          >
+            {(!isFromSearch && arenaMode === 'learning')
+              ? <ListIcon size={22} color={isZenMode ? '#433422' : colors.textPrimary} />
+              : <ChevronLeft size={24} color={isZenMode ? '#433422' : colors.textPrimary} />}
           </TouchableOpacity>
 
           {/* Search panel button — grouped with the back button for navigation clarity */}

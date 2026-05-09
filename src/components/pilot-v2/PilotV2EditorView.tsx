@@ -17,6 +17,9 @@
  * note via `PATCH_BLOCKS`. Step 10 wires this to Supabase via pilotV2Repo.
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import AnimatedReanimated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import RenderHtml from 'react-native-render-html';
 import {
   View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity,
   KeyboardAvoidingView, Platform, useWindowDimensions, Modal, Alert, Linking,
@@ -26,7 +29,7 @@ import * as ImagePicker from 'expo-image-picker';
 import {
   X, RotateCcw, RotateCw, Save, Bold, Italic, Underline as UnderlineIcon,
   List, ListOrdered, ListTodo, Link as LinkIcon, Image as ImageIcon, Calendar,
-  Paperclip, Table as TableIcon, Code, Type, ChevronDown, Highlighter, Plus, Trash2, ArrowUp, ArrowDown, Edit3, Quote, MoreHorizontal,
+  Paperclip, Table as TableIcon, Code, Type, ChevronDown, ChevronLeft, ChevronRight, Highlighter, Plus, Trash2, ArrowUp, ArrowDown, Edit3, Quote, MoreHorizontal,
   Pen,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
@@ -47,6 +50,22 @@ import {
   removeWashiTape, setAllRevealed,
 } from './washiTape';
 import { WashiTapeLayer, WashiTapeColorPicker } from './WashiTapeLayer';
+
+let globalToolbarVisible = false;
+let globalToolbarPos = { x: 80, y: 150 };
+
+const stripHtml = (html: string) => html ? html.replace(/<[^>]*>/g, '') : '';
+
+const preserveHtmlWrap = (originalHtml: string, newPlainText: string): string => {
+  if (!originalHtml) return newPlainText;
+  const match = originalHtml.trim().match(/^<([a-zA-Z0-9]+)([^>]*)>(.*)<\/\1>$/);
+  if (match) {
+    const tagName = match[1];
+    const attributes = match[2];
+    return `<${tagName}${attributes}>${newPlainText}</${tagName}>`;
+  }
+  return newPlainText;
+};
 
 const newId = () =>
   (typeof crypto !== 'undefined' && (crypto as any).randomUUID)
@@ -396,9 +415,67 @@ export function PilotV2EditorView() {
 
   // Floating control panel menu
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [outlinePanelOpen, setOutlinePanelOpen] = useState(false);
+  const [showToolbar, setShowToolbar] = useState(false);
 
   /* --------------- Pencil annotation overlay (Step 5+6) --------------- */
   const [paperSize, setPaperSize] = useState({ w: 1, h: 1 });
+
+  /* ── Editor Zoom & Pan (GlanceView-style Pinch & Drag) ────────────────── */
+  const editorScale = useSharedValue(1);
+  const editorOffsetX = useSharedValue(0);
+  const editorOffsetY = useSharedValue(0);
+  const savedEditorScale = useSharedValue(1);
+  const savedEditorOffsetX = useSharedValue(0);
+  const savedEditorOffsetY = useSharedValue(0);
+  
+  const outlineWidth = useSharedValue(0);
+  useEffect(() => {
+    outlineWidth.value = withSpring(outlinePanelOpen ? 340 : 0, { damping: 15, stiffness: 100 });
+  }, [outlinePanelOpen]);
+
+  const animatedOutlineStyle = useAnimatedStyle(() => ({
+    width: outlineWidth.value,
+    opacity: outlineWidth.value > 20 ? 1 : 0,
+    overflow: 'hidden',
+  }));
+
+  const editorPinchGesture = Gesture.Pinch()
+    .onUpdate(e => {
+      'worklet';
+      editorScale.value = Math.max(0.25, Math.min(4, savedEditorScale.value * e.scale));
+    })
+    .onEnd(() => {
+      'worklet';
+      savedEditorScale.value = editorScale.value;
+    });
+
+  const editorPanGesture = Gesture.Pan()
+    .onUpdate(e => {
+      'worklet';
+      editorOffsetX.value = savedEditorOffsetX.value + e.translationX;
+      editorOffsetY.value = savedEditorOffsetY.value + e.translationY;
+    })
+    .onEnd(() => {
+      'worklet';
+      savedEditorOffsetX.value = editorOffsetX.value;
+      savedEditorOffsetY.value = editorOffsetY.value;
+    });
+
+  const editorComposedGesture = Gesture.Simultaneous(editorPinchGesture, editorPanGesture);
+
+  const animatedEditorStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: editorOffsetX.value },
+      { translateY: editorOffsetY.value },
+      { scale: editorScale.value },
+    ],
+  }));
+
+  useEffect(() => {
+    editorScale.value = zoom;
+    savedEditorScale.value = zoom;
+  }, [zoom]);
   const initialStrokes = (note?.content?.pencilStrokes ?? []) as PilotV2PencilStroke[];
   const persistStrokes = (next: PilotV2PencilStroke[]) => {
     if (!note?.id) return;
@@ -408,6 +485,7 @@ export function PilotV2EditorView() {
       try {
         await savePilotV2NoteOfflineFirst(note.id, content);
         dispatch({ type: 'PATCH_BLOCKS', payload: { id: note.id, blocks } });
+        dispatch({ type: 'PATCH_PENCIL_STROKES', payload: { id: note.id, strokes: next } });
         setSavingState('saved');
       } catch { setSavingState('idle'); }
     }, 600);
@@ -512,8 +590,34 @@ export function PilotV2EditorView() {
         </TouchableOpacity>
       </View>
 
+      {/* Collapsible Outline Panel Toggle Button (Tablet only) */}
+      {isTablet && (
+        <TouchableOpacity
+          onPress={() => setOutlinePanelOpen(prev => !prev)}
+          activeOpacity={0.85}
+          style={[
+            styles.floatingControls,
+            {
+              top: 78,
+              right: 18,
+              paddingHorizontal: 12,
+              paddingVertical: 12,
+              borderRadius: 24,
+              backgroundColor: 'rgba(255,255,255,0.92)',
+              borderColor: colors.border,
+            }
+          ]}
+        >
+          {outlinePanelOpen ? (
+            <ChevronRight size={18} color={colors.textPrimary} />
+          ) : (
+            <ChevronLeft size={18} color={colors.textPrimary} />
+          )}
+        </TouchableOpacity>
+      )}
+
       {/* Title + toolbar (fades on scroll) */}
-      <Animated.View style={[styles.titleSection, { borderBottomColor: 'transparent', opacity: titleOpacity, transform: [{ translateY: titleTranslate }] }]} pointerEvents="box-none">
+      <Animated.View style={[styles.titleSection, activeBlockId ? { height: 0, paddingTop: 0, paddingBottom: 0, opacity: 0, overflow: 'hidden' } : null, { borderBottomColor: 'transparent', opacity: titleOpacity, transform: [{ translateY: titleTranslate }] }]} pointerEvents="box-none">
         <TextInput
           testID="pilot-v2-editor-title"
           value={title}
@@ -528,28 +632,30 @@ export function PilotV2EditorView() {
       </Animated.View>
 
       {/* Floating draggable formatting toolbar */}
-      <FloatingToolbar
-        colors={colors}
-        onH1={() => setActiveBlockType('heading', 1)}
-        onH2={() => setActiveBlockType('heading', 2)}
-        onBold={() => toggleMark('bold')}
-        onItalic={() => toggleMark('italic')}
-        onUnderline={() => toggleMark('underline')}
-        onOL={() => setActiveBlockType('numbered')}
-        onUL={() => setActiveBlockType('bullet')}
-        onCheck={() => setActiveBlockType('checklist')}
-        onQuote={() => setActiveBlockType('quote')}
-        onHighlight={() => setShowHighlightPicker(v => !v)}
-        showHighlightPicker={showHighlightPicker}
-        activeHighlight={activeHighlight}
-        onApplyHighlight={applyHighlight}
-        onLink={insertLink}
-        onImage={insertImageFromLibrary}
-        onAttach={insertAttachment}
-        onTable={insertTable}
-        onCode={insertCode}
-        isMarkActive={isMarkActive}
-      />
+      {showToolbar && (
+        <FloatingToolbar
+          colors={colors}
+          onH1={() => setActiveBlockType('heading', 1)}
+          onH2={() => setActiveBlockType('heading', 2)}
+          onBold={() => toggleMark('bold')}
+          onItalic={() => toggleMark('italic')}
+          onUnderline={() => toggleMark('underline')}
+          onOL={() => setActiveBlockType('numbered')}
+          onUL={() => setActiveBlockType('bullet')}
+          onCheck={() => setActiveBlockType('checklist')}
+          onQuote={() => setActiveBlockType('quote')}
+          onHighlight={() => setShowHighlightPicker(v => !v)}
+          showHighlightPicker={showHighlightPicker}
+          activeHighlight={activeHighlight}
+          onApplyHighlight={applyHighlight}
+          onLink={insertLink}
+          onImage={insertImageFromLibrary}
+          onAttach={insertAttachment}
+          onTable={insertTable}
+          onCode={insertCode}
+          isMarkActive={isMarkActive}
+        />
+      )}
 
       <View style={{ flex: 1, flexDirection: 'row' }}>
         <Animated.ScrollView
@@ -560,10 +666,11 @@ export function PilotV2EditorView() {
           scrollEventThrottle={16}
           onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
         >
-          <View
-            style={[styles.paper, { backgroundColor: '#fff', borderColor: colors.border, transform: [{ scale: zoom }] }]}
-            onLayout={(e) => setPaperSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
-          >
+          <GestureDetector gesture={editorComposedGesture}>
+            <AnimatedReanimated.View
+              style={[styles.paper, { backgroundColor: '#fff', borderColor: colors.border }, animatedEditorStyle]}
+              onLayout={(e) => setPaperSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
+            >
             {blocks.map(b => (
               <BlockRow
                 key={b.id}
@@ -623,11 +730,12 @@ export function PilotV2EditorView() {
                 onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
               />
             )}
-          </View>
+            </AnimatedReanimated.View>
+          </GestureDetector>
         </Animated.ScrollView>
 
         {isTablet && (
-          <View style={[styles.outlinePanel, { borderLeftColor: colors.border }]}>
+          <AnimatedReanimated.View style={[styles.outlinePanel, { borderLeftColor: colors.border, paddingTop: 130 }, animatedOutlineStyle]}>
             <View style={[styles.outlineTabs, { borderBottomColor: colors.border }]}>
               <OutlineTab label="Blocks"  active={outlineTab === 'blocks'}  onPress={() => setOutlineTab('blocks')} />
               <OutlineTab label="Outline" active={outlineTab === 'outline'} onPress={() => setOutlineTab('outline')} />
@@ -648,24 +756,11 @@ export function PilotV2EditorView() {
                 </TouchableOpacity>
               ))}
             </ScrollView>
-          </View>
+          </AnimatedReanimated.View>
         )}
       </View>
 
-      {/* Bottom bar */}
-      <View style={[styles.bottomBar, { borderTopColor: colors.border }]}>
-        <View style={{ flexDirection: 'row', gap: 12 }}>
-          <TouchableOpacity testID="pilot-v2-bottom-fontscale" onPress={cycleFontScale} style={styles.bottomItem}>
-            <Type size={14} color={colors.textSecondary} />
-            <Text style={{ color: colors.textSecondary, fontSize: 12 }}>Aa · {Math.round(fontScale * 100)}%</Text>
-          </TouchableOpacity>
-          <TouchableOpacity testID="pilot-v2-bottom-zoom" onPress={cycleZoom} style={styles.bottomItem}>
-            <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{Math.round(zoom * 100)}%</Text>
-            <ChevronDown size={12} color={colors.textSecondary} />
-          </TouchableOpacity>
-        </View>
-        <Text style={{ color: colors.textSecondary, fontSize: 12 }}>Words: {wordCount}</Text>
-      </View>
+
 
       {/* Link prompt modal */}
       <Modal
@@ -953,6 +1048,9 @@ export function PilotV2EditorView() {
               { label: 'Export as PDF', sub: 'With pencil annotations', testID: 'pilot-v2-more-export-pdf', onPress: () => { setMoreMenuOpen(false); handleExportPdf(); } },
               { label: 'Export as Image', sub: 'PDF with strokes', testID: 'pilot-v2-more-export-image', onPress: () => { setMoreMenuOpen(false); handleExportImage(); } },
               { label: 'Export as Markdown', sub: 'Plain text + metadata', testID: 'pilot-v2-more-export-md', onPress: () => { setMoreMenuOpen(false); handleExportMarkdown(); } },
+              { label: `Text Size: ${Math.round(fontScale * 100)}%`, sub: 'Tap to increase text scale (cycles)', testID: 'pilot-v2-more-fontscale', onPress: () => { cycleFontScale(); } },
+              { label: `Zoom Level: ${Math.round(zoom * 100)}%`, sub: 'Tap to change canvas zoom (cycles)', testID: 'pilot-v2-more-zoom', onPress: () => { cycleZoom(); } },
+              { label: showToolbar ? 'Hide Formatting Toolbar' : 'Show Formatting Toolbar', sub: 'Draggable rich formatting bar', testID: 'pilot-v2-more-toolbar', onPress: () => { setShowToolbar(v => { globalToolbarVisible = !v; return !v; }); } },
             ].map(item => (
               <TouchableOpacity key={item.label} testID={item.testID} onPress={item.onPress} style={styles.moreItem}>
                 <Text style={{ color: colors.textPrimary, fontSize: 14, fontWeight: '600' }}>{item.label}</Text>
@@ -982,6 +1080,7 @@ interface BlockRowProps {
 }
 
 function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onToggleCheck, onDelete, onMoveUp, onMoveDown, onEditTable }: BlockRowProps) {
+  const { width } = useWindowDimensions();
   const baseFs = block.type === 'heading'
     ? block.level === 1 ? 24 : 18
     : 16;
@@ -1013,6 +1112,7 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
           borderLeftColor: '#5B4EFA',
           paddingLeft: 4,
         } : null,
+        { flexDirection: 'column' }
       ]}
     >
       {tag ? (
@@ -1034,7 +1134,8 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
           </Text>
         </View>
       ) : null}
-      {block.type === 'bullet' && <Text style={[styles.lead, { color: colors.textPrimary }]}>•</Text>}
+      <View style={{ flexDirection: 'row', width: '100%', alignItems: 'flex-start', gap: 8 }}>
+        {block.type === 'bullet' && <Text style={[styles.lead, { color: colors.textPrimary }]}>•</Text>}
       {block.type === 'numbered' && <Text style={[styles.lead, { color: colors.textPrimary, fontWeight: '600' }]}>1.</Text>}
       {block.type === 'checklist' && (
         <TouchableOpacity onPress={onToggleCheck} hitSlop={6} style={[
@@ -1086,24 +1187,52 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
         ) : null}
 
         {!block.tableRows?.length && !(block.imageBase64 || block.imageUri) ? (
-          <TextInput
-            testID={`pilot-v2-block-${block.id}`}
-            multiline
-            value={block.text}
-            onChangeText={onChange}
-            onFocus={onFocus}
-            placeholder={block.type === 'heading' ? 'Heading…' : 'Type something…'}
-            placeholderTextColor={colors.textTertiary}
-            style={{
-              fontSize,
-              fontWeight,
-              fontStyle,
-              color: block.link ? '#5B4EFA' : colors.textPrimary,
-              lineHeight: fontSize === 24 ? 32 : fontSize === 18 ? 26 : 24,
-              paddingVertical: 4,
-              textDecorationLine: block.link ? 'underline' : textDecorationLine,
-            }}
-          />
+          isActive ? (
+            <TextInput
+              testID={`pilot-v2-block-${block.id}`}
+              multiline
+              value={stripHtml(block.text)}
+              onChangeText={(text) => onChange(preserveHtmlWrap(block.text, text))}
+              onFocus={onFocus}
+              placeholder={block.type === 'heading' ? 'Heading…' : 'Type something…'}
+              placeholderTextColor={colors.textTertiary}
+              style={{
+                fontSize,
+                fontWeight,
+                fontStyle,
+                color: block.link ? '#5B4EFA' : colors.textPrimary,
+                lineHeight: fontSize === 24 ? 32 : fontSize === 18 ? 26 : 24,
+                paddingVertical: 4,
+                textDecorationLine: block.link ? 'underline' : textDecorationLine,
+              }}
+            />
+          ) : (
+            <TouchableOpacity
+              onPress={() => { onFocus(); }}
+              activeOpacity={0.8}
+              style={{ paddingVertical: 4 }}
+            >
+              <RenderHtml
+                source={{ html: block.text || '<i>Type something…</i>' }}
+                contentWidth={width - 80}
+                baseStyle={{
+                  color: block.link ? '#5B4EFA' : colors.textPrimary,
+                  fontSize,
+                  fontWeight,
+                  fontStyle,
+                  lineHeight: fontSize === 24 ? 32 : fontSize === 18 ? 26 : 24,
+                }}
+                tagsStyles={{
+                  b: { fontWeight: 'bold' as const, color: colors.textPrimary },
+                  strong: { fontWeight: 'bold' as const, color: colors.textPrimary },
+                  i: { fontStyle: 'italic' as const },
+                  em: { fontStyle: 'italic' as const },
+                  p: { color: colors.textPrimary, marginVertical: 0 },
+                  mark: { backgroundColor: '#FFE066', color: '#000', paddingHorizontal: 2, borderRadius: 3 },
+                }}
+              />
+            </TouchableOpacity>
+          )
         ) : null}
 
         {block.link ? (
@@ -1116,20 +1245,19 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
           </TouchableOpacity>
         ) : null}
       </View>
+      </View>
 
-      {isActive && (
-        <View style={{ flexDirection: 'row', gap: 2 }}>
-          <TouchableOpacity testID={`pilot-v2-block-moveup-${block.id}`} onPress={onMoveUp} hitSlop={6} style={styles.iconBtn}>
-            <ArrowUp size={14} color={colors.textTertiary} />
-          </TouchableOpacity>
-          <TouchableOpacity testID={`pilot-v2-block-movedown-${block.id}`} onPress={onMoveDown} hitSlop={6} style={styles.iconBtn}>
-            <ArrowDown size={14} color={colors.textTertiary} />
-          </TouchableOpacity>
-          <TouchableOpacity testID={`pilot-v2-block-delete-${block.id}`} onPress={onDelete} hitSlop={6} style={styles.iconBtn}>
-            <Trash2 size={14} color={colors.textTertiary} />
-          </TouchableOpacity>
-        </View>
-      )}
+      <View style={{ flexDirection: 'row', gap: 2, alignSelf: 'flex-end', marginTop: 4, marginRight: 8, opacity: isActive ? 1 : 0.35 }}>
+        <TouchableOpacity testID={`pilot-v2-block-moveup-${block.id}`} onPress={onMoveUp} hitSlop={6} style={styles.iconBtn}>
+          <ArrowUp size={14} color={colors.textTertiary} />
+        </TouchableOpacity>
+        <TouchableOpacity testID={`pilot-v2-block-movedown-${block.id}`} onPress={onMoveDown} hitSlop={6} style={styles.iconBtn}>
+          <ArrowDown size={14} color={colors.textTertiary} />
+        </TouchableOpacity>
+        <TouchableOpacity testID={`pilot-v2-block-delete-${block.id}`} onPress={onDelete} hitSlop={6} style={styles.iconBtn}>
+          <Trash2 size={14} color={colors.textTertiary} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -1139,7 +1267,7 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
 function FloatingToolbar(props: any) {
   const { colors, showHighlightPicker, activeHighlight, onApplyHighlight, isMarkActive } = props;
   const { width, height } = useWindowDimensions();
-  const pos = useRef(new Animated.ValueXY({ x: Math.max(80, width / 2 - 200), y: 60 })).current;
+  const pos = useRef(new Animated.ValueXY(globalToolbarPos)).current;
   const [collapsed, setCollapsed] = useState(false);
   const [vertical, setVertical] = useState(false);
 
@@ -1169,6 +1297,7 @@ function FloatingToolbar(props: any) {
       else if (min === distRight)  { nextX = width - 68; isVert = true; }
       else if (min === distTop)    { nextY = 64; isVert = false; }
       else                          { nextY = height - 96; isVert = false; }
+      globalToolbarPos = { x: nextX, y: nextY };
       Animated.spring(pos, {
         toValue: { x: nextX, y: nextY },
         useNativeDriver: false,

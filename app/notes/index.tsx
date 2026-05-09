@@ -18,6 +18,13 @@ import {
   RefreshControl, Dimensions, Animated,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AnimatedReanimated, {
+  useSharedValue,
+  useAnimatedStyle,
+  useAnimatedScrollHandler,
+  interpolate,
+  Extrapolation,
+} from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import {
   Folder, BookOpen, FileText, Plus, Search as SearchIcon, X, ChevronLeft, ChevronRight,
@@ -71,6 +78,38 @@ export default function NotesIndex() {
   const [hubLayout, setHubLayout] = useState<'grid' | 'list'>('grid');
   // Hide left navigation panel (full-screen notes mode)
   const [leftPanelHidden, setLeftPanelHidden] = useState(false);
+
+  const scrollY = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const headerAnimatedStyle = useAnimatedStyle(() => {
+    const translateY = interpolate(
+      scrollY.value,
+      [0, 100],
+      [0, -100],
+      Extrapolation.CLAMP
+    );
+    const opacity = interpolate(
+      scrollY.value,
+      [0, 80],
+      [1, 0],
+      Extrapolation.CLAMP
+    );
+    return {
+      transform: [{ translateY }],
+      opacity,
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 100,
+      backgroundColor: colors.bg,
+    };
+  });
 
   // Modals
   const [addMenuOpen, setAddMenuOpen] = useState(false);
@@ -733,7 +772,7 @@ export default function NotesIndex() {
           </View>
         ) : (
           <>
-            <View style={[styles.header, { borderBottomColor: colors.border }]}>
+            <AnimatedReanimated.View style={[styles.header, headerAnimatedStyle, { borderBottomColor: colors.border }]}>
               <View style={styles.headerTop}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                   <TouchableOpacity
@@ -795,10 +834,10 @@ export default function NotesIndex() {
                   hint={activeChip !== ALL_TAG ? `Streaming "${activeChip}" across "${currentFolder?.title}"` : undefined}
                 />
               )}
-            </View>
+            </AnimatedReanimated.View>
 
             {exportPreparing && (
-              <View style={styles.preparingBar}>
+              <View style={[styles.preparingBar, { marginTop: 140 }]}>
                 <ActivityIndicator size="small" color={colors.primary} />
                 <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: '700', marginLeft: 8 }}>
                   Preparing export…
@@ -807,13 +846,15 @@ export default function NotesIndex() {
             )}
 
             {loading && !refreshing ? (
-              <View style={styles.center}>
+              <View style={[styles.center, { paddingTop: 140 }]}>
                 <ActivityIndicator color={colors.primary} />
               </View>
             ) : (
-              <ScrollView
+              <AnimatedReanimated.ScrollView
+                onScroll={scrollHandler}
+                scrollEventThrottle={16}
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 120 }}
+                contentContainerStyle={{ paddingTop: 140, paddingBottom: 120 }}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
               >
                 {showSubjectHub ? (
@@ -985,7 +1026,7 @@ export default function NotesIndex() {
                     )}
                   </>
                 )}
-              </ScrollView>
+              </AnimatedReanimated.ScrollView>
             )}
           </>
         )}

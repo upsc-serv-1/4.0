@@ -14,7 +14,7 @@
  * UI tokens follow the Figma spec colours from `theme.css` of the Knowledge
  * Management app (#5B4EFA primary, #F9FAFB canvas, #FFFFFF surface, etc.).
  */
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, TextInput, Platform, LayoutAnimation, Animated } from 'react-native';
 import {
   Home as HomeIcon, Pin, Clock, Share2, Trash2, Plus, Settings, ChevronRight, ChevronDown, ChevronLeft,
@@ -27,10 +27,316 @@ import { PILOT_V2_SUBJECT_PALETTE, PilotV2QuickFilter } from './types';
 import { PilotV2SidebarSubject, SUBJECT_TOPICS } from './PilotV2SidebarSubject';
 import { createPilotV2Node, archivePilotV2Node, fetchAllPilotV2Nodes, fetchPilotV2NotesForUser } from '../../repositories/pilotV2Repo';
 import { Swipeable } from 'react-native-gesture-handler';
+import AnimatedReanimated, { useSharedValue, useAnimatedStyle, withSpring, interpolate, FadeInUp } from 'react-native-reanimated';
 
 const SUBJECT_ICONS: Record<string, any> = {
   Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical,
 };
+
+function CollapsibleTopicItem({
+  t,
+  idx,
+  subjectLabel,
+  isExpanded,
+  state,
+  colors,
+  handleSelectTopic,
+  handleSelectSubtopic,
+  handleTopicLongPress,
+  handleSubtopicLongPress,
+}: {
+  t: any;
+  idx: number;
+  subjectLabel: string;
+  isExpanded: boolean;
+  state: any;
+  colors: any;
+  handleSelectTopic: (topicId: string, hasSub: boolean) => void;
+  handleSelectSubtopic: (subtopicId: string) => void;
+  handleTopicLongPress: (topic: any, label: string) => void;
+  handleSubtopicLongPress: (st: any, t: any, label: string) => void;
+}) {
+  const hasSub = !!t.subtopics?.length;
+  const isSelectedTopic = state.view.selectedTopic === t.id && state.view.mode === 'noteList';
+  const subtopicsCount = t.subtopics?.length ?? 0;
+  const containerHeight = subtopicsCount * 44; // Give plenty of height per subtopic
+
+  const animationProgress = useSharedValue(isExpanded ? 1 : 0);
+
+  useEffect(() => {
+    animationProgress.value = withSpring(isExpanded ? 1 : 0, {
+      damping: 24,
+      stiffness: 170,
+      mass: 0.8,
+      overshootClamping: true,
+    });
+  }, [isExpanded]);
+
+  const chevronStyle = useAnimatedStyle(() => {
+    const rotate = interpolate(animationProgress.value, [0, 1], [-90, 0]);
+    return {
+      transform: [{ rotate: `${rotate}deg` }],
+    };
+  });
+
+  const collapsibleStyle = useAnimatedStyle(() => {
+    const height = interpolate(animationProgress.value, [0, 1], [0, containerHeight]);
+    const opacity = interpolate(animationProgress.value, [0, 0.2, 1], [0, 0.4, 1]);
+    return {
+      height,
+      opacity,
+      overflow: 'hidden',
+    };
+  });
+
+  return (
+    <View style={{ marginBottom: 4 }}>
+      <Swipeable
+        renderRightActions={(progress, dragX) => {
+          const trans = dragX.interpolate({
+            inputRange: [-60, 0],
+            outputRange: [0, 60],
+            extrapolate: 'clamp',
+          });
+          return (
+            <Animated.View style={{ transform: [{ translateX: trans }], width: 60 }}>
+              <TouchableOpacity
+                onPress={() => handleTopicLongPress(t, subjectLabel)}
+                style={{
+                  backgroundColor: '#ef4444',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: 8,
+                }}
+              >
+                <Trash2 size={16} color="#fff" />
+              </TouchableOpacity>
+            </Animated.View>
+          );
+        }}
+        friction={1.5}
+        rightThreshold={30}
+      >
+        <TouchableOpacity
+          onPress={() => handleSelectTopic(t.id, hasSub)}
+          onLongPress={() => handleTopicLongPress(t, subjectLabel)}
+          style={[
+            styles.topicRow,
+            isSelectedTopic ? { backgroundColor: '#EEECFF' } : null,
+          ]}
+        >
+          <Text style={{ color: colors.textTertiary, fontSize: 11, width: 22 }}>{idx + 1}.</Text>
+          <Text style={{ flex: 1, fontSize: 13, fontWeight: '500', color: isSelectedTopic ? '#5B4EFA' : colors.textPrimary }}>
+            {t.label}
+          </Text>
+          {hasSub && (
+            <AnimatedReanimated.View style={chevronStyle}>
+              <ChevronDown size={12} color={colors.textTertiary} />
+            </AnimatedReanimated.View>
+          )}
+        </TouchableOpacity>
+      </Swipeable>
+
+      {hasSub && (
+        <AnimatedReanimated.View style={[collapsibleStyle, { paddingLeft: 22, marginTop: 2, gap: 2 }]}>
+          {t.subtopics!.map((st: any, stIdx: number) => {
+            const isSelectedSub = state.view.selectedSubtopic === st.id && state.view.mode === 'noteList';
+            return (
+              <Swipeable
+                key={`${t.id}-${st.id}-${stIdx}`}
+                renderRightActions={(progress, dragX) => {
+                  const trans = dragX.interpolate({
+                    inputRange: [-50, 0],
+                    outputRange: [0, 50],
+                    extrapolate: 'clamp',
+                  });
+                  return (
+                    <Animated.View style={{ transform: [{ translateX: trans }], width: 50 }}>
+                      <TouchableOpacity
+                        onPress={() => handleSubtopicLongPress(st, t, subjectLabel)}
+                        style={{
+                          backgroundColor: '#ef4444',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          width: '100%',
+                          height: '100%',
+                          borderRadius: 6,
+                        }}
+                      >
+                        <Trash2 size={14} color="#fff" />
+                      </TouchableOpacity>
+                    </Animated.View>
+                  );
+                }}
+                friction={1.5}
+                rightThreshold={30}
+              >
+                <TouchableOpacity
+                  onPress={() => handleSelectSubtopic(st.id)}
+                  onLongPress={() => handleSubtopicLongPress(st, t, subjectLabel)}
+                  style={[
+                    styles.subtopicRow,
+                    isSelectedSub ? { backgroundColor: '#EEECFF' } : null,
+                  ]}
+                >
+                  <Text style={{ fontSize: 12, color: isSelectedSub ? '#5B4EFA' : colors.textSecondary, fontWeight: isSelectedSub ? '600' : '400' }}>
+                    {st.label}
+                  </Text>
+                </TouchableOpacity>
+              </Swipeable>
+            );
+          })}
+        </AnimatedReanimated.View>
+      )}
+    </View>
+  );
+}
+
+function CollapsibleSubjectItem({
+  s,
+  state,
+  colors,
+  isExpanded,
+  toggleSubjectExpanded,
+  handleSelectSubject,
+  handleSubjectLongPress,
+  getTopicsForSubject,
+  expanded,
+  handleTopicLongPress,
+  handleSelectTopic,
+  handleSubtopicLongPress,
+  handleSelectSubtopic,
+}: {
+  s: any;
+  state: any;
+  colors: any;
+  isExpanded: boolean;
+  toggleSubjectExpanded: (subjId: string) => void;
+  handleSelectSubject: (subjId: string) => void;
+  handleSubjectLongPress: (subject: any) => void;
+  getTopicsForSubject: (subjId: string) => any[];
+  expanded: string[];
+  handleTopicLongPress: (topic: any, label: string) => void;
+  handleSelectTopic: (topicId: string, hasSub: boolean) => void;
+  handleSubtopicLongPress: (st: any, t: any, label: string) => void;
+  handleSelectSubtopic: (subtopicId: string) => void;
+}) {
+  const Icon = SUBJECT_ICONS[s.icon] || SUBJECT_ICONS.Landmark;
+  const isSelectedSubject = state.view.selectedSubject === s.id && (state.view.mode === 'subject' || (state.view.mode === 'noteList' && !state.view.selectedSubtopic));
+  const topics = getTopicsForSubject(s.id);
+  const topicsCount = topics.length;
+
+  const animationProgress = useSharedValue(isExpanded ? 1 : 0);
+
+  useEffect(() => {
+    animationProgress.value = withSpring(isExpanded ? 1 : 0, {
+      damping: 24,
+      stiffness: 170,
+      mass: 0.8,
+      overshootClamping: true,
+    });
+  }, [isExpanded]);
+
+  const chevronStyle = useAnimatedStyle(() => {
+    const rotate = interpolate(animationProgress.value, [0, 1], [-90, 0]);
+    return {
+      transform: [{ rotate: `${rotate}deg` }],
+    };
+  });
+
+  const collapsibleStyle = useAnimatedStyle(() => {
+    const height = interpolate(animationProgress.value, [0, 1], [0, topicsCount * 44 + 300]);
+    const opacity = interpolate(animationProgress.value, [0, 0.15, 1], [0, 0.3, 1]);
+    return {
+      maxHeight: height,
+      opacity,
+      overflow: 'hidden',
+    };
+  });
+
+  return (
+    <View style={{ marginBottom: 4 }}>
+      <Swipeable
+        renderRightActions={(progress, dragX) => {
+          const trans = dragX.interpolate({
+            inputRange: [-70, 0],
+            outputRange: [0, 70],
+            extrapolate: 'clamp',
+          });
+          return (
+            <Animated.View style={{ transform: [{ translateX: trans }], width: 70 }}>
+              <TouchableOpacity
+                onPress={() => handleSubjectLongPress(s)}
+                style={{
+                  backgroundColor: '#ef4444',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: 12,
+                  marginVertical: 1,
+                }}
+              >
+                <Trash2 size={20} color="#fff" />
+              </TouchableOpacity>
+            </Animated.View>
+          );
+        }}
+        friction={1.5}
+        rightThreshold={30}
+      >
+        <TouchableOpacity
+          testID={`pilot-v2-subject-${s.id}`}
+          activeOpacity={0.7}
+          onPress={() => handleSelectSubject(s.id)}
+          onLongPress={() => handleSubjectLongPress(s)}
+          style={[
+            styles.subjectRow,
+            isSelectedSubject ? { backgroundColor: '#F3F4F6' } : null,
+          ]}
+        >
+          <View style={[styles.subjectIcon, { backgroundColor: s.bg }]}>
+            <Icon size={16} color={s.text} />
+          </View>
+          <Text style={[styles.subjectText, { color: colors.textPrimary, fontWeight: isSelectedSubject ? '600' : '500' }]}>
+            {s.label}
+          </Text>
+          <TouchableOpacity
+            onPress={(e) => {
+              e.stopPropagation();
+              toggleSubjectExpanded(s.id);
+            }}
+            style={{ padding: 6 }}
+          >
+            <AnimatedReanimated.View style={chevronStyle}>
+              <ChevronDown size={16} color={colors.textTertiary} />
+            </AnimatedReanimated.View>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Swipeable>
+
+      <AnimatedReanimated.View style={[collapsibleStyle, { paddingLeft: 16, marginTop: 4, marginBottom: 4 }]}>
+        {topics.map((t, idx) => (
+          <CollapsibleTopicItem
+            key={t.id}
+            t={t}
+            idx={idx}
+            subjectLabel={s.label}
+            isExpanded={expanded.includes(t.id)}
+            state={state}
+            colors={colors}
+            handleSelectTopic={handleSelectTopic}
+            handleSelectSubtopic={handleSelectSubtopic}
+            handleTopicLongPress={handleTopicLongPress}
+            handleSubtopicLongPress={handleSubtopicLongPress}
+          />
+        ))}
+      </AnimatedReanimated.View>
+    </View>
+  );
+}
 
 interface PilotV2SidebarProps {
   mode: 'home' | 'subject';
@@ -115,9 +421,6 @@ function PilotV2SidebarHome() {
   }, [state.notes, subjectsList]);
 
   const toggleTopic = (id: string) => {
-    if (Platform.OS !== 'web') {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    }
     setExpanded(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
@@ -146,19 +449,12 @@ function PilotV2SidebarHome() {
   };
 
   const toggleSubjectExpanded = (subjId: string) => {
-    if (Platform.OS !== 'web') {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    }
     setExpandedSubjects(prev =>
       prev.includes(subjId) ? prev.filter(id => id !== subjId) : [...prev, subjId]
     );
   };
 
   const handleSelectSubject = (subjectId: string) => {
-    if (Platform.OS !== 'web') {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    }
-
     if (state.view.selectedSubject === subjectId) {
       toggleSubjectExpanded(subjectId);
     } else {
@@ -484,190 +780,24 @@ function PilotV2SidebarHome() {
         {/* Subjects */}
         <View style={{ paddingHorizontal: 12, paddingVertical: 16 }}>
           <Text style={[styles.sectionLabel, { color: colors.textTertiary, paddingHorizontal: 16 }]}>SUBJECTS</Text>
-          {subjectsList.map((s, idx) => {
-            const Icon = SUBJECT_ICONS[s.icon] ?? Book;
-            const isSelectedSubject = state.view.selectedSubject === s.id && (state.view.mode === 'subject' || (state.view.mode === 'noteList' && !state.view.selectedSubtopic));
-
-            return (
-              <View key={`subject-${s.id}-${idx}`}>
-                <Swipeable
-                  renderRightActions={(progress, dragX) => {
-                    const trans = dragX.interpolate({
-                      inputRange: [-70, 0],
-                      outputRange: [0, 70],
-                      extrapolate: 'clamp',
-                    });
-                    return (
-                      <Animated.View style={{ transform: [{ translateX: trans }], width: 70 }}>
-                        <TouchableOpacity
-                          onPress={() => handleSubjectLongPress(s)}
-                          style={{
-                            backgroundColor: '#ef4444',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            width: '100%',
-                            height: '100%',
-                            borderRadius: 12,
-                            marginVertical: 1,
-                          }}
-                        >
-                          <Trash2 size={20} color="#fff" />
-                        </TouchableOpacity>
-                      </Animated.View>
-                    );
-                  }}
-                  friction={1.5}
-                  rightThreshold={30}
-                >
-                  <TouchableOpacity
-                    testID={`pilot-v2-subject-${s.id}`}
-                    activeOpacity={0.7}
-                    onPress={() => handleSelectSubject(s.id)}
-                    onLongPress={() => handleSubjectLongPress(s)}
-                    style={[
-                      styles.subjectRow,
-                      isSelectedSubject ? { backgroundColor: '#F3F4F6' } : null,
-                    ]}
-                  >
-                    <View style={[styles.subjectIcon, { backgroundColor: s.bg }]}>
-                      <Icon size={16} color={s.text} />
-                    </View>
-                    <Text style={[styles.subjectText, { color: colors.textPrimary, fontWeight: isSelectedSubject ? '600' : '500' }]}>{s.label}</Text>
-                    <TouchableOpacity
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        toggleSubjectExpanded(s.id);
-                      }}
-                      style={{ padding: 6 }}
-                    >
-                      <ChevronDown
-                        size={16}
-                        color={colors.textTertiary}
-                        style={{ transform: [{ rotate: expandedSubjects.includes(s.id) ? '0deg' : '-90deg' }] }}
-                      />
-                    </TouchableOpacity>
-                  </TouchableOpacity>
-                </Swipeable>
-
-                {expandedSubjects.includes(s.id) && (
-                  <View style={{ paddingLeft: 16, marginTop: 4, marginBottom: 8 }}>
-                    {getTopicsForSubject(s.id).map((t, idx) => {
-                      const isExpanded = expanded.includes(t.id);
-                      const isSelectedTopic = state.view.selectedTopic === t.id && state.view.mode === 'noteList';
-                      const hasSub = !!t.subtopics?.length;
-
-                      return (
-                        <View key={`${s.id}-${t.id}-${idx}`}>
-                          <Swipeable
-                            renderRightActions={(progress, dragX) => {
-                              const trans = dragX.interpolate({
-                                inputRange: [-60, 0],
-                                outputRange: [0, 60],
-                                extrapolate: 'clamp',
-                              });
-                              return (
-                                <Animated.View style={{ transform: [{ translateX: trans }], width: 60 }}>
-                                  <TouchableOpacity
-                                    onPress={() => handleTopicLongPress(t, s.label)}
-                                    style={{
-                                      backgroundColor: '#ef4444',
-                                      justifyContent: 'center',
-                                      alignItems: 'center',
-                                      width: '100%',
-                                      height: '100%',
-                                      borderRadius: 8,
-                                    }}
-                                  >
-                                    <Trash2 size={16} color="#fff" />
-                                  </TouchableOpacity>
-                                </Animated.View>
-                              );
-                            }}
-                            friction={1.5}
-                            rightThreshold={30}
-                          >
-                            <TouchableOpacity
-                              onPress={() => handleSelectTopic(t.id, hasSub)}
-                              onLongPress={() => handleTopicLongPress(t, s.label)}
-                              style={[
-                                styles.topicRow,
-                                isSelectedTopic ? { backgroundColor: '#EEECFF' } : null,
-                              ]}
-                            >
-                              <Text style={{ color: colors.textTertiary, fontSize: 11, width: 22 }}>{idx + 1}.</Text>
-                              <Text style={{ flex: 1, fontSize: 13, fontWeight: '500', color: isSelectedTopic ? '#5B4EFA' : colors.textPrimary }}>
-                                {t.label}
-                              </Text>
-                              {hasSub && (
-                                <ChevronDown
-                                  size={12}
-                                  color={colors.textTertiary}
-                                  style={{ transform: [{ rotate: isExpanded ? '0deg' : '-90deg' }] }}
-                                />
-                              )}
-                            </TouchableOpacity>
-                          </Swipeable>
-
-                          {hasSub && isExpanded && (
-                            <View style={{ paddingLeft: 22, marginTop: 2, gap: 2 }}>
-                              {t.subtopics!.map((st, stIdx) => {
-                                const isSelectedSub = state.view.selectedSubtopic === st.id && state.view.mode === 'noteList';
-                                return (
-                                  <View key={`${t.id}-${st.id}-${stIdx}`}>
-                                    <Swipeable
-                                      renderRightActions={(progress, dragX) => {
-                                        const trans = dragX.interpolate({
-                                          inputRange: [-50, 0],
-                                          outputRange: [0, 50],
-                                          extrapolate: 'clamp',
-                                        });
-                                        return (
-                                          <Animated.View style={{ transform: [{ translateX: trans }], width: 50 }}>
-                                            <TouchableOpacity
-                                              onPress={() => handleSubtopicLongPress(st, t, s.label)}
-                                              style={{
-                                                backgroundColor: '#ef4444',
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                                width: '100%',
-                                                height: '100%',
-                                                borderRadius: 6,
-                                              }}
-                                            >
-                                              <Trash2 size={14} color="#fff" />
-                                            </TouchableOpacity>
-                                          </Animated.View>
-                                        );
-                                      }}
-                                      friction={1.5}
-                                      rightThreshold={30}
-                                    >
-                                      <TouchableOpacity
-                                        onPress={() => handleSelectSubtopic(st.id)}
-                                        onLongPress={() => handleSubtopicLongPress(st, t, s.label)}
-                                        style={[
-                                          styles.subtopicRow,
-                                          isSelectedSub ? { backgroundColor: '#EEECFF' } : null,
-                                        ]}
-                                      >
-                                        <Text style={{ fontSize: 12, color: isSelectedSub ? '#5B4EFA' : colors.textSecondary, fontWeight: isSelectedSub ? '600' : '400' }}>
-                                          {st.label}
-                                        </Text>
-                                      </TouchableOpacity>
-                                    </Swipeable>
-                                  </View>
-                                );
-                              })}
-                            </View>
-                          )}
-                        </View>
-                      );
-                    })}
-                  </View>
-                )}
-              </View>
-            );
-          })}
+          {subjectsList.map((s, idx) => (
+            <CollapsibleSubjectItem
+              key={s.id}
+              s={s}
+              state={state}
+              colors={colors}
+              isExpanded={expandedSubjects.includes(s.id)}
+              toggleSubjectExpanded={toggleSubjectExpanded}
+              handleSelectSubject={handleSelectSubject}
+              handleSubjectLongPress={handleSubjectLongPress}
+              getTopicsForSubject={getTopicsForSubject}
+              expanded={expanded}
+              handleTopicLongPress={handleTopicLongPress}
+              handleSelectTopic={handleSelectTopic}
+              handleSubtopicLongPress={handleSubtopicLongPress}
+              handleSelectSubtopic={handleSelectSubtopic}
+            />
+          ))}
 
           <TouchableOpacity
             testID="pilot-v2-new-subject"
@@ -888,7 +1018,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     paddingVertical: 0,
     paddingHorizontal: 4,
-    height: 34,
+    height: '100%',
     textAlignVertical: 'center',
     ...(Platform.OS === 'web' ? { outlineStyle: 'none' as any } : null),
   },

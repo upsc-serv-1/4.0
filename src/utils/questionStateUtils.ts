@@ -15,19 +15,28 @@ const USER_STATE_FIELDS: Array<{
   isEmpty: (v: any) => boolean;
 }> = [
   { key: 'selected_answer',         isEmpty: (v) => !v || v === '' },
+  { key: 'confidence',              isEmpty: (v) => v == null || v === '' || v === 0 },
   { key: 'confidence_level',        isEmpty: (v) => v == null || v === '' || v === 0 },
+  { key: 'highlight_text',          isEmpty: (v) => !v || v === '' || v === '[]' || (Array.isArray(v) && v.length === 0) },
   { key: 'highlighted_text',        isEmpty: (v) => !v || v === '' || v === '[]' || (Array.isArray(v) && v.length === 0) },
   { key: 'saved_folder',            isEmpty: (v) => !v || v === '' },
   { key: 'review_tags',             isEmpty: (v) => !v || (Array.isArray(v) && v.length === 0) || v === '[]' || v === 'null' },
+  { key: 'user_tags',               isEmpty: (v) => !v || (Array.isArray(v) && v.length === 0) || v === '[]' || v === 'null' },
   { key: 'question_type',           isEmpty: (v) => !v || v === '' },
   { key: 'review_difficulty',       isEmpty: (v) => !v || v === '' },
+  { key: 'difficulty_level',        isEmpty: (v) => !v || v === '' },
   { key: 'attempt_history',         isEmpty: (v) => !v || (Array.isArray(v) && v.length === 0) || v === '[]' },
   { key: 'spaced_revision',         isEmpty: (v) => !v || v === '' || v === '{}' || (typeof v === 'object' && Object.keys(v).length === 0) },
   { key: 'attempt_difficulty_level', isEmpty: (v) => !v || v === '' },
   { key: 'error_category',          isEmpty: (v) => !v || v === '' },
+  { key: 'note',                    isEmpty: (v) => !v || v === '' },
   { key: 'notes',                   isEmpty: (v) => !v || v === '' },
+  { key: 'personal_note',           isEmpty: (v) => !v || v === '' },
   { key: 'bookmarks',               isEmpty: (v) => !v || v === false || v === 0 },
   { key: 'is_bookmarked',           isEmpty: (v) => !v || v === false || v === 0 },
+  { key: 'marked_must_revise',      isEmpty: (v) => !v || v === false || v === 0 },
+  { key: 'is_incorrect_last_attempt', isEmpty: (v) => !v || v === false || v === 0 },
+  { key: 'time_spent_seconds',      isEmpty: (v) => !v || v === 0 },
   { key: 'revision_metadata',       isEmpty: (v) => !v || v === '{}' || (typeof v === 'object' && Object.keys(v).length === 0) },
   { key: 'user_note',               isEmpty: (v) => !v || v === '' },
   { key: 'flagged',                 isEmpty: (v) => !v || v === false || v === 0 },
@@ -72,7 +81,7 @@ export async function autoCleanupQuestionState(
     state = data;
   }
 
-  if (isQuestionStateEmpty(state)) {
+  if (state && isQuestionStateEmpty(state)) {
     const { error } = await supabase
       .from('question_states')
       .delete()

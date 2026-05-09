@@ -31,7 +31,7 @@ export function usePilotV2Pencil({
   const [tool, setToolState] = useState<PilotV2PencilTool>('pen');
   const [color, setColor] = useState<string>('#0F172A');
   const [width, setWidth] = useState<number>(PILOT_V2_PEN_WIDTHS[1]);
-  const [pencilOnly, setPencilOnly] = useState(false);
+  const [pencilOnly, setPencilOnly] = useState(true);
   const [shapeRecognition, setShapeRecognition] = useState(false);
   const [favorites, setFavorites] = useState<string[]>(DEFAULT_FAVS);
   const [drawingMode, setDrawingMode] = useState(false);
@@ -91,6 +91,12 @@ export function usePilotV2Pencil({
   useEffect(() => {
     AsyncStorage.setItem(STORAGE_SHAPE_KEY, shapeRecognition ? '1' : '0').catch(() => null);
   }, [shapeRecognition]);
+
+  useEffect(() => {
+    if (initialStrokes.length > 0 && engine.getPersisted().length === 0) {
+      engine.replaceAll(initialStrokes);
+    }
+  }, [engine, initialStrokes]);
 
   useEffect(() => {
     engine.replaceAll(initialStrokes);

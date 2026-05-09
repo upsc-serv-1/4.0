@@ -240,6 +240,9 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestion
                 sectionGroup={question.sectionGroup}
                 microTopic={question.microTopic}
                 isZenMode={isZenMode}
+                instituteExplanations={question.instituteExplanations}
+                institutes={question.institutes}
+                mergedIds={question.mergedIds}
               />
             </Pressable>
           ) : null}

@@ -4,7 +4,8 @@ import { safeSetItem } from '../lib/safeAsyncStorage';
 import { supabase } from '../lib/supabase';
 import { formatTagLabel, normalizeTag } from '../utils/tagUtils';
 import { useTagStore } from '../store/tagStore';
-import { autoCleanupQuestionState } from '../utils/questionStateUtils';
+import { autoCleanupQuestionState, batchCleanupEmptyStates } from '../utils/questionStateUtils';
+import { mergeQuestions } from '../utils/merger';
 
 // MASTER SUBJECT LIST (The Total Taxonomy)
 const MASTER_SUBJECTS = [
@@ -25,6 +26,9 @@ export interface TaggedQuestion {
   correctAnswer: string;
   selectedAnswer: string;
   options?: any;
+  instituteExplanations?: any[];
+  institutes?: string[];
+  mergedIds?: string[];
   reviewTags: string[];
   normalizedReviewTags: string[];
   difficultyLevel?: string;
@@ -97,23 +101,41 @@ export function useTaggedVault(userId: string | undefined) {
     const clean = dedupeTags(nextTags).sort((a, b) => a.localeCompare(b));
     setCustomReviewTags(clean);
     await safeSetItem(tagCatalogKey, JSON.stringify(clean));
+    if (userId) {
+      await supabase
+        .from('user_settings')
+        .upsert({ user_id: userId, custom_tags: clean }, { onConflict: 'user_id' })
+        .then(({ error }) => {
+          if (error) console.warn('[tags] user_settings custom_tags sync failed', error.message);
+        });
+    }
     return clean;
-  }, [tagCatalogKey]);
+  }, [tagCatalogKey, userId]);
 
   const loadTagCatalog = useCallback(async () => {
     try {
       const raw = await AsyncStorage.getItem(tagCatalogKey);
-      if (!raw) {
+      const cached = raw ? JSON.parse(raw) : [];
+      let serverTags: string[] = [];
+      if (userId) {
+        const { data } = await supabase
+          .from('user_settings')
+          .select('custom_tags')
+          .eq('user_id', userId)
+          .maybeSingle();
+        const serverRaw = (data as any)?.custom_tags;
+        serverTags = Array.isArray(serverRaw) ? serverRaw.map(String) : [];
+      }
+      if (!raw && serverTags.length === 0) {
         setCustomReviewTags([]);
         return;
       }
-      const parsed = JSON.parse(raw);
-      const list = Array.isArray(parsed) ? dedupeTags(parsed.map(String)) : [];
+      const list = dedupeTags([...(Array.isArray(cached) ? cached.map(String) : []), ...serverTags]);
       setCustomReviewTags(list.sort((a, b) => a.localeCompare(b)));
     } catch {
       setCustomReviewTags([]);
     }
-  }, [tagCatalogKey]);
+  }, [tagCatalogKey, userId]);
 
   const fetchVaultData = useCallback(async () => {
     if (!userId) {
@@ -148,12 +170,15 @@ export function useTaggedVault(userId: string | undefined) {
       const questionIds = Array.from(new Set(filteredStates.map(row => row.question_id).filter(Boolean)));
       const { data: questions, error: questionsError } = await supabase
         .from('questions')
-        .select('id, test_id, subject, section_group, micro_topic, question_text, explanation_markdown, correct_answer, options')
+        .select('id, test_id, subject, section_group, micro_topic, question_text, explanation_markdown, correct_answer, options, is_pyq, is_upsc_cse, exam_year, exam_group, tests(institute,program_name,series)')
         .in('id', questionIds as string[]);
 
       if (questionsError) throw questionsError;
 
-      const questionsById = new Map((questions || []).map(q => [q.id, q]));
+      const { mergedQs, idToMergedId } = mergeQuestions((questions || []) as any[]);
+      const questionsById = new Map<string, any>();
+      (questions || []).forEach((q: any) => questionsById.set(q.id, q));
+      mergedQs.forEach((q: any) => questionsById.set(q.id, q));
       const testIds = Array.from(new Set((questions || []).map(q => q.test_id).filter(Boolean)));
 
       let testsById = new Map<string, string>();
@@ -167,7 +192,8 @@ export function useTaggedVault(userId: string | undefined) {
 
       const transformed: TaggedQuestion[] = filteredStates
         .map(row => {
-          const qData = questionsById.get(row.question_id);
+          const mergedId = idToMergedId.get(row.question_id) || row.question_id;
+          const qData = questionsById.get(mergedId) || questionsById.get(row.question_id);
           const tags = parseReviewTags(row.review_tags);
 
           return {
@@ -182,6 +208,9 @@ export function useTaggedVault(userId: string | undefined) {
             correctAnswer: qData?.correct_answer || '',
             selectedAnswer: row.selected_answer || '',
             options: qData?.options,
+            instituteExplanations: qData?._explanations || [],
+            institutes: qData?._institutes || [],
+            mergedIds: qData?._mergedIds || [row.question_id],
             reviewTags: tags.map((tag: string) => formatTagLabel(tag)),
             normalizedReviewTags: tags.map((tag: string) => normalizeTag(tag)),
             createdAt: row.updated_at || new Date().toISOString(),
@@ -230,6 +259,22 @@ export function useTaggedVault(userId: string | undefined) {
     fetchVaultData();
     loadTagCatalog();
   }, [userId, fetchVaultData, loadTagCatalog]);
+
+  useEffect(() => {
+    if (!userId) return;
+    const channel = supabase
+      .channel(`tag-sync-${userId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'question_states', filter: `user_id=eq.${userId}` }, () => {
+        fetchVaultData();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_settings', filter: `user_id=eq.${userId}` }, () => {
+        loadTagCatalog();
+      })
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchVaultData, loadTagCatalog, userId]);
 
   // Auto-refresh whenever another screen renames/adds/removes a tag.
   const tagStoreVersion = useTagStore((s) => s.version);
@@ -380,6 +425,8 @@ export function useTaggedVault(userId: string | undefined) {
             .eq('user_id', userId)
         )
       );
+    } else {
+      await batchCleanupEmptyStates(userId);
     }
 
     // 3. Update the local in-memory cache so the current screen re-renders immediately.
@@ -458,6 +505,9 @@ export function useTaggedVault(userId: string | undefined) {
           }
         })
       );
+    }
+    if (usedRpc) {
+      await batchCleanupEmptyStates(userId);
     }
 
     // 3. Local cache update.

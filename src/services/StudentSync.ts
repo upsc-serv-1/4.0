@@ -27,6 +27,12 @@ export interface PendingWrite {
 class StudentSyncService {
   private processing = false;
 
+  private withoutUndefined<T extends Record<string, any>>(value: T): T {
+    return Object.fromEntries(
+      Object.entries(value).filter(([, entryValue]) => entryValue !== undefined)
+    ) as T;
+  }
+
   async enqueue(kind: WriteKind, payload: any) {
     const newWrite: PendingWrite = {
       id: Math.random().toString(36).substring(7),
@@ -65,7 +71,12 @@ class StudentSyncService {
         // Merge patch into existing or create new
         const qid = payload.questionId;
         const current = map.get(qid) || { user_id: userId, question_id: qid };
-        map.set(qid, { ...current, ...payload.patch, updated_at: new Date().toISOString() });
+        const nextState = { ...current, ...payload.patch, updated_at: new Date().toISOString() };
+        if (isQuestionStateEmpty(nextState)) {
+          map.delete(qid);
+        } else {
+          map.set(qid, nextState);
+        }
         
         await AsyncStorage.setItem(key, JSON.stringify(Array.from(map.values())));
       } 
@@ -179,7 +190,7 @@ class StudentSyncService {
     }
   }
 
-  private async saveQuestionState(payload: any) {
+  private async saveQuestionState(payload: any): Promise<void> {
     const { userId, questionId, testId, attemptId, patch } = payload;
     if (!questionId) {
       console.warn('[Sync] Skipping question_state because questionId is missing');
@@ -233,20 +244,22 @@ class StudentSyncService {
     // 1. Try to find existing record
     const { data: existing } = await supabase
       .from('question_states')
-      .select('id')
+      .select('*')
       .eq('user_id', userId)
       .eq('question_id', questionId)
       .maybeSingle();
 
-    const updateData: any = {
+    const updateData: any = this.withoutUndefined({
       user_id: userId,
       question_id: questionId,
       test_id: testId,
       attempt_id: attemptId,
       selected_answer: sanitizedPatch.selected_answer,
       confidence: sanitizedPatch.confidence,
-      review_tags: sanitizedPatch.review_tags,
-      user_tags: Array.isArray(sanitizedPatch.review_tags) ? sanitizedPatch.review_tags : null,
+      review_tags: sanitizedPatch.hasOwnProperty('review_tags') ? sanitizedPatch.review_tags : undefined,
+      user_tags: sanitizedPatch.hasOwnProperty('review_tags')
+        ? (Array.isArray(sanitizedPatch.review_tags) ? sanitizedPatch.review_tags : null)
+        : undefined,
       highlight_text: sanitizedPatch.note,
       note: sanitizedPatch.note,
       is_incorrect_last_attempt: sanitizedPatch.is_incorrect_last_attempt,
@@ -256,11 +269,12 @@ class StudentSyncService {
       difficulty_level: sanitizedPatch.difficulty_level,
       error_category: sanitizedPatch.error_category,
       updated_at: new Date().toISOString()
-    };
+    });
+    const mergedState = existing?.id ? { ...existing, ...updateData } : updateData;
 
     if (existing?.id) {
       // Issue 1 — if the merged state would be empty, delete the row instead of updating.
-      if (isQuestionStateEmpty(updateData)) {
+      if (isQuestionStateEmpty(mergedState)) {
         const { error } = await supabase
           .from('question_states')
           .delete()
@@ -290,7 +304,7 @@ class StudentSyncService {
     }
   }
 
-  private async saveUserNote(payload: any) {
+  private async saveUserNote(payload: any): Promise<void> {
     const { userId, questionId, content } = payload;
     if (!questionId) {
       console.warn('[Sync] Skipping user_note because questionId is missing');
@@ -331,7 +345,7 @@ class StudentSyncService {
     }
   }
 
-  private async saveTagUpdate(payload: any) {
+  private async saveTagUpdate(payload: any): Promise<void> {
     const { userId, questionId, tags } = payload;
     if (!questionId) {
       console.warn('[Sync] Skipping tag_update because questionId is missing');
@@ -342,7 +356,7 @@ class StudentSyncService {
     // WORKAROUND for missing unique constraint
     const { data: existing } = await supabase
       .from('question_states')
-      .select('id')
+      .select('*')
       .eq('user_id', userId)
       .eq('question_id', questionId)
       .maybeSingle();
@@ -357,12 +371,22 @@ class StudentSyncService {
     };
 
     if (existing?.id) {
-      const { error } = await supabase
-        .from('question_states')
-        .update(updateData)
-        .eq('id', existing.id);
-      if (error) throw error;
+      const mergedState = { ...existing, ...updateData };
+      if (isQuestionStateEmpty(mergedState)) {
+        const { error } = await supabase
+          .from('question_states')
+          .delete()
+          .eq('id', existing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('question_states')
+          .update(updateData)
+          .eq('id', existing.id);
+        if (error) throw error;
+      }
     } else {
+      if (isQuestionStateEmpty(updateData)) return;
       const { error } = await supabase
         .from('question_states')
         .insert(updateData);

@@ -251,16 +251,17 @@ export function PilotV2SidebarSubject() {
           topics.map((t, idx) => {
             const isExpanded = expanded.includes(t.id);
             return (
-              <CollapsibleTopicItem
-                key={t.id}
-                t={t}
-                idx={idx}
-                isExpanded={isExpanded}
-                state={state}
-                colors={colors}
-                handleSelectTopic={handleSelectTopic}
-                handleSelectSubtopic={handleSelectSubtopic}
-              />
+              <Animated.View key={t.id} entering={FadeInUp.springify().damping(16).stiffness(140)}>
+                <CollapsibleTopicItem
+                  t={t}
+                  idx={idx}
+                  isExpanded={isExpanded}
+                  state={state}
+                  colors={colors}
+                  handleSelectTopic={handleSelectTopic}
+                  handleSelectSubtopic={handleSelectSubtopic}
+                />
+              </Animated.View>
             );
           })
         )}

@@ -39,6 +39,7 @@ type PilotV2Action =
   | { type: 'NAVIGATE_HOME' }
   | { type: 'PATCH_CURRENT_NOTE'; payload: { id: string; patch: Partial<PilotV2Note> } }
   | { type: 'PATCH_BLOCKS'; payload: { id: string; blocks: PilotV2Block[] } }
+  | { type: 'PATCH_PENCIL_STROKES'; payload: { id: string; strokes: PilotV2PencilStroke[] } }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_SEARCH'; payload: string }
   | { type: 'SET_ERROR'; payload: string | null };
@@ -131,6 +132,18 @@ function reducer(state: PilotV2State, action: PilotV2Action): PilotV2State {
         notes: state.notes.map(n =>
           n.id === id
             ? { ...n, content: { ...n.content, blocks }, updated_at: new Date().toISOString() }
+            : n
+        ),
+      };
+    }
+
+    case 'PATCH_PENCIL_STROKES': {
+      const { id, strokes } = action.payload;
+      return {
+        ...state,
+        notes: state.notes.map(n =>
+          n.id === id
+            ? { ...n, content: { ...n.content, pencilStrokes: strokes }, updated_at: new Date().toISOString() }
             : n
         ),
       };

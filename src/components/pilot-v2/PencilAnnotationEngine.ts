@@ -446,25 +446,34 @@ export class PencilAnnotationEngine {
 /** Convert relative-space points → absolute-pixel SVG path with quadratic
  *  midpoint smoothing. The result mirrors the on-device Skia render so the
  *  unified export (PDF/Image) stays pixel-perfect. */
+const pathCache = new WeakMap<PilotV2PencilStroke, { d: string; w: number; h: number }>();
+
 export function pencilStrokeToSvgPath(
   stroke: PilotV2PencilStroke,
   pageWidth: number,
   pageHeight: number,
 ): string {
+  const cached = pathCache.get(stroke);
+  if (cached && cached.w === pageWidth && cached.h === pageHeight) {
+    return cached.d;
+  }
+
   if (!stroke.points.length) return '';
   const pts = stroke.points;
   const x0 = pts[0].x * pageWidth;
   const y0 = pts[0].y * pageHeight;
-  let d = `M ${x0.toFixed(2)} ${y0.toFixed(2)}`;
+  let d = `M ${x0} ${y0}`;
   for (let i = 1; i < pts.length; i++) {
     const prev = pts[i - 1];
     const cur = pts[i];
     const px = prev.x * pageWidth, py = prev.y * pageHeight;
     const cx = cur.x * pageWidth,  cy = cur.y * pageHeight;
     const mx = (px + cx) / 2, my = (py + cy) / 2;
-    d += ` Q ${px.toFixed(2)} ${py.toFixed(2)} ${mx.toFixed(2)} ${my.toFixed(2)}`;
+    d += ` Q ${px} ${py} ${mx} ${my}`;
   }
   const last = pts[pts.length - 1];
-  d += ` L ${(last.x * pageWidth).toFixed(2)} ${(last.y * pageHeight).toFixed(2)}`;
+  d += ` L ${last.x * pageWidth} ${last.y * pageHeight}`;
+
+  pathCache.set(stroke, { d, w: pageWidth, h: pageHeight });
   return d;
 }

@@ -4,6 +4,13 @@ import {
   Modal, Alert, FlatList, ActivityIndicator, Pressable,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  useAnimatedScrollHandler,
+  interpolate,
+  Extrapolation,
+} from 'react-native-reanimated';
 import { Swipeable } from 'react-native-gesture-handler';
 import { useAuth } from '../src/context/AuthContext';
 import { useTheme } from '../src/context/ThemeContext';
@@ -150,6 +157,38 @@ export default function AnalyseTab() {
   const [loading, setLoading] = useState(false);
   const [showTrends, setShowTrends] = useState(false);
 
+  const scrollY = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const headerAnimatedStyle = useAnimatedStyle(() => {
+    const translateY = interpolate(
+      scrollY.value,
+      [0, 100],
+      [0, -100],
+      Extrapolation.CLAMP
+    );
+    const opacity = interpolate(
+      scrollY.value,
+      [0, 80],
+      [1, 0],
+      Extrapolation.CLAMP
+    );
+    return {
+      transform: [{ translateY }],
+      opacity,
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 100,
+      backgroundColor: colors.bg,
+    };
+  });
+
   useFocusEffect(
     useCallback(() => {
       if (session?.user?.id) {
@@ -220,7 +259,7 @@ export default function AnalyseTab() {
   return (
     <PageWrapper>
       {/* ── Header ── */}
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+      <Animated.View style={[styles.header, headerAnimatedStyle, { borderBottomColor: colors.border }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity 
             onPress={() => router.back()} 
@@ -241,61 +280,16 @@ export default function AnalyseTab() {
           <BarChart2 size={16} color={colors.primary} />
           <Text style={[styles.trendsBtnText, { color: colors.primary }]}>Trends</Text>
         </TouchableOpacity>
-      </View>
-
-      {/* ── Summary strip ── */}
-      {summaryStats && (
-        <View style={[styles.summaryStrip, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-          <View style={styles.summaryItem}>
-            <Text style={[styles.summaryNum, { color: colors.textPrimary }]}>{summaryStats.tests}</Text>
-            <Text style={[styles.summaryLabel, { color: colors.textTertiary }]}>Tests</Text>
-          </View>
-          <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
-          <View style={styles.summaryItem}>
-            <Text style={[styles.summaryNum, { color: accuracyColor(summaryStats.accuracy, colors) }]}>
-              {summaryStats.accuracy}%
-            </Text>
-            <Text style={[styles.summaryLabel, { color: colors.textTertiary }]}>Accuracy</Text>
-          </View>
-          <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
-          <View style={styles.summaryItem}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              <Zap size={14} color={colors.primary} />
-              <Text style={[styles.summaryNum, { color: colors.primary }]}>{summaryStats.xp}</Text>
-            </View>
-            <Text style={[styles.summaryLabel, { color: colors.textTertiary }]}>XP Earned</Text>
-          </View>
-        </View>
-      )}
-
-      {/* ── AI Performance Insights ── */}
-      {summaryStats && summaryStats.tests > 0 && (
-        <View style={{ paddingHorizontal: 16, paddingVertical: 10 }}>
-          <AIQuickActionButton
-            context={{
-              type: 'analysis',
-              title: 'Performance Analysis',
-              metadata: {
-                accuracy: String(summaryStats.accuracy),
-                total_count: String(summaryStats.tests),
-                weak_topics: 'Review your recent quiz attempts to identify weak areas',
-              },
-            }}
-            templates={DEFAULT_ANALYSIS_TEMPLATES}
-            buttonLabel="📊 AI Performance Insights"
-            buttonStyle={{ alignSelf: 'flex-start' }}
-          />
-        </View>
-      )}
+      </Animated.View>
 
       {/* ── Attempt Feed ── */}
       {loading && attempts.length === 0 ? (
-        <View style={styles.center}>
+        <View style={[styles.center, { paddingTop: 110 }]}>
           <ActivityIndicator color={colors.primary} size="large" />
           <Text style={{ color: colors.textSecondary, marginTop: spacing.md }}>Loading attempts...</Text>
         </View>
       ) : attempts.length === 0 ? (
-        <View style={styles.center}>
+        <View style={[styles.center, { paddingTop: 110 }]}>
           <BarChart2 size={48} color={colors.primary} style={{ opacity: 0.4 }} />
           <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>No Attempts Yet</Text>
           <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
@@ -303,11 +297,61 @@ export default function AnalyseTab() {
           </Text>
         </View>
       ) : (
-        <FlatList
+        <Animated.FlatList
           data={attempts}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContent}
+          onScroll={scrollHandler}
+          scrollEventThrottle={16}
+          contentContainerStyle={[styles.listContent, { paddingTop: 110 }]}
           showsVerticalScrollIndicator={false}
+          ListHeaderComponent={
+            <>
+              {/* ── Summary strip ── */}
+              {summaryStats && (
+                <View style={[styles.summaryStrip, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 10, marginHorizontal: 16, borderRadius: 12, borderWidth: 1, borderColor: colors.border }]}>
+                  <View style={styles.summaryItem}>
+                    <Text style={[styles.summaryNum, { color: colors.textPrimary }]}>{summaryStats.tests}</Text>
+                    <Text style={[styles.summaryLabel, { color: colors.textTertiary }]}>Tests</Text>
+                  </View>
+                  <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
+                  <View style={styles.summaryItem}>
+                    <Text style={[styles.summaryNum, { color: accuracyColor(summaryStats.accuracy, colors) }]}>
+                      {summaryStats.accuracy}%
+                    </Text>
+                    <Text style={[styles.summaryLabel, { color: colors.textTertiary }]}>Accuracy</Text>
+                  </View>
+                  <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
+                  <View style={styles.summaryItem}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                      <Zap size={14} color={colors.primary} />
+                      <Text style={[styles.summaryNum, { color: colors.primary }]}>{summaryStats.xp}</Text>
+                    </View>
+                    <Text style={[styles.summaryLabel, { color: colors.textTertiary }]}>XP Earned</Text>
+                  </View>
+                </View>
+              )}
+
+              {/* ── AI Performance Insights ── */}
+              {summaryStats && summaryStats.tests > 0 && (
+                <View style={{ paddingHorizontal: 16, paddingVertical: 10 }}>
+                  <AIQuickActionButton
+                    context={{
+                      type: 'analysis',
+                      title: 'Performance Analysis',
+                      metadata: {
+                        accuracy: String(summaryStats.accuracy),
+                        total_count: String(summaryStats.tests),
+                        weak_topics: 'Review your recent quiz attempts to identify weak areas',
+                      },
+                    }}
+                    templates={DEFAULT_ANALYSIS_TEMPLATES}
+                    buttonLabel="📊 AI Performance Insights"
+                    buttonStyle={{ alignSelf: 'flex-start' }}
+                  />
+                </View>
+              )}
+            </>
+          }
           renderItem={({ item }) => (
             <AttemptCard
               item={item}

@@ -141,7 +141,11 @@ const parseContent = (raw: string | null | undefined): PilotV2NoteContent => {
   try {
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed?.blocks)) {
-      return { blocks: parsed.blocks, version: parsed.version ?? 1 };
+      return {
+        blocks: parsed.blocks,
+        version: parsed.version ?? 1,
+        pencilStrokes: parsed.pencilStrokes || [],
+      };
     }
   } catch {
     /* legacy plain text — wrap into a single paragraph block. */

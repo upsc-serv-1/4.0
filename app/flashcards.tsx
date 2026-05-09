@@ -7,6 +7,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { router, useFocusEffect } from 'expo-router';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  useAnimatedScrollHandler,
+  interpolate,
+  Extrapolation,
+} from 'react-native-reanimated';
 import {
   Plus, Search as SearchIcon, X, Flame, Clock, Sparkles, Layers, ArrowUpDown,
   Folder, CheckCircle2, Minus, ChevronLeft, ArrowUpRight, Settings, MoreVertical,
@@ -48,6 +55,38 @@ export default function FlashcardsHub() {
   // Bulk Delete Selection
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const scrollY = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const headerAnimatedStyle = useAnimatedStyle(() => {
+    const translateY = interpolate(
+      scrollY.value,
+      [0, 100],
+      [0, -100],
+      Extrapolation.CLAMP
+    );
+    const opacity = interpolate(
+      scrollY.value,
+      [0, 80],
+      [1, 0],
+      Extrapolation.CLAMP
+    );
+    return {
+      transform: [{ translateY }],
+      opacity,
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 100,
+      backgroundColor: colors.bg,
+    };
+  });
 
   const handleToggleSelect = (id: string) => {
     setSelectedIds(prev => {
@@ -358,7 +397,7 @@ export default function FlashcardsHub() {
   return (
     <PageWrapper>
       <View style={[styles.container, { backgroundColor: colors.bg }]}>
-        <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <Animated.View style={[styles.header, headerAnimatedStyle, { borderBottomColor: colors.border }]}>
           {isSelectionMode ? (
             <View style={[styles.headerTop, { justifyContent: 'space-between' }]}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -413,38 +452,43 @@ export default function FlashcardsHub() {
               <TouchableOpacity onPress={() => { setSearch(''); setSearchVisible(false); Keyboard.dismiss(); }}><X size={16} color={colors.textTertiary} /></TouchableOpacity>
             </View>
           )}
-        </View>
+        </Animated.View>
 
-        <View style={styles.topActionArea}>
-          <View style={[styles.statsBar, { marginHorizontal: 0, width: '100%' }]}>
-            <TouchableOpacity onPress={() => startStudy('due')} style={[styles.statBox, { backgroundColor: '#ef444412', borderColor: '#ef444430' }]}>
-              <Clock size={14} color="#ef4444" />
-              <Text style={[styles.statNum, { color: '#ef4444' }]}>{aggregateStats.due}</Text>
-              <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Due</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => startStudy('new')} style={[styles.statBox, { backgroundColor: '#3b82f612', borderColor: '#3b82f630' }]}>
-              <Sparkles size={14} color="#3b82f6" />
-              <Text style={[styles.statNum, { color: '#3b82f6' }]}>{aggregateStats.new}</Text>
-              <Text style={[styles.statLabel, { color: colors.textTertiary }]}>New</Text>
-            </TouchableOpacity>
-            <View style={[styles.statBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <Layers size={14} color={colors.textSecondary} />
-              <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.total}</Text>
-              <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Total</Text>
+        <Animated.ScrollView 
+          onScroll={scrollHandler} 
+          scrollEventThrottle={16} 
+          showsVerticalScrollIndicator={false} 
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />} 
+          contentContainerStyle={{ paddingTop: 110, paddingBottom: 100 }}
+        >
+          <View style={styles.topActionArea}>
+            <View style={[styles.statsBar, { marginHorizontal: 0, width: '100%' }]}>
+              <TouchableOpacity onPress={() => startStudy('due')} style={[styles.statBox, { backgroundColor: '#ef444412', borderColor: '#ef444430' }]}>
+                <Clock size={14} color="#ef4444" />
+                <Text style={[styles.statNum, { color: '#ef4444' }]}>{aggregateStats.due}</Text>
+                <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Due</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => startStudy('new')} style={[styles.statBox, { backgroundColor: '#3b82f612', borderColor: '#3b82f630' }]}>
+                <Sparkles size={14} color="#3b82f6" />
+                <Text style={[styles.statNum, { color: '#3b82f6' }]}>{aggregateStats.new}</Text>
+                <Text style={[styles.statLabel, { color: colors.textTertiary }]}>New</Text>
+              </TouchableOpacity>
+              <View style={[styles.statBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <Layers size={14} color={colors.textSecondary} />
+                <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.total}</Text>
+                <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Total</Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        {preparingExportId && (
-          <View style={{ paddingHorizontal: 20, paddingBottom: 8 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <ActivityIndicator size="small" color={colors.primary} />
-              <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: '600' }}>Preparing PDF export...</Text>
+          {preparingExportId && (
+            <View style={{ paddingHorizontal: 20, paddingBottom: 8 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <ActivityIndicator size="small" color={colors.primary} />
+                <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: '600' }}>Preparing PDF export...</Text>
+              </View>
             </View>
-          </View>
-        )}
-
-        <ScrollView showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />} contentContainerStyle={{ paddingBottom: 100 }}>
+          )}
           <View style={{ paddingHorizontal: 4 }}>
             {displayRows.map((item) => {
               const isSelected = selectedIds.has(item.id);
@@ -487,7 +531,7 @@ export default function FlashcardsHub() {
           {displayRows.length === 0 && (
             <View style={styles.empty}><Layers size={48} color={colors.border} /><Text style={{ color: colors.textTertiary, marginTop: 12 }}>Empty</Text></View>
           )}
-        </ScrollView>
+        </Animated.ScrollView>
 
         <TouchableOpacity style={[styles.fab, { backgroundColor: colors.primary }]} onPress={() => setAddMenuVisible(true)}>
           <Plus size={28} color="#04223a" />

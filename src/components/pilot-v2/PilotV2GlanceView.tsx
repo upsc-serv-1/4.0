@@ -44,6 +44,7 @@ import { savePilotV2NoteContent } from '../../repositories/pilotV2Repo';
 import { savePilotV2NoteOfflineFirst } from './pilotV2OfflineSave';
 import { PilotV2WashiTape, setAllRevealed } from './washiTape';
 import { WashiTapeLayer } from './WashiTapeLayer';
+import RenderHtml from 'react-native-render-html';
 
 /* ─── helpers ────────────────────────────────────────────────────────────── */
 
@@ -113,6 +114,7 @@ export function PilotV2GlanceView() {
   const title = note?.title ?? 'Article 14 — Equality Before Law';
 
   const [reminderSet, setReminderSet] = useState(false);
+  const [headerCollapsed, setHeaderCollapsed] = useState(false);
   const scrollRef = useRef<any>(null);
   const scrollKey = note?.id || '__demo__';
   const lastScrollY = useRef<number>(glanceScrollMemory.current[scrollKey] || 0);
@@ -128,7 +130,8 @@ export function PilotV2GlanceView() {
       pencilStrokes: next,
     };
     savePilotV2NoteOfflineFirst(note.id, content).catch(() => null);
-  }, [note]);
+    dispatch({ type: 'PATCH_CURRENT_NOTE', payload: { id: note.id, patch: { content } } });
+  }, [note, dispatch]);
   const pencil = usePilotV2Pencil({
     noteId: note?.id ?? null,
     initialStrokes,
@@ -184,6 +187,32 @@ export function PilotV2GlanceView() {
       { translateY: pencilFabY.value },
     ],
   }));
+
+  /* ── Draggable Pencil Toolbar ─────────────────────────────────────────── */
+  const toolbarX = useSharedValue(0);
+  const toolbarY = useSharedValue(0);
+  const savedToolbarX = useSharedValue(0);
+  const savedToolbarY = useSharedValue(0);
+
+  const toolbarGesture = Gesture.Pan()
+    .onUpdate((e) => {
+      'worklet';
+      toolbarX.value = savedToolbarX.value + e.translationX;
+      toolbarY.value = savedToolbarY.value + e.translationY;
+    })
+    .onEnd(() => {
+      'worklet';
+      savedToolbarX.value = toolbarX.value;
+      savedToolbarY.value = toolbarY.value;
+    });
+
+  const animatedToolbarStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: toolbarX.value },
+      { translateY: toolbarY.value },
+    ],
+  }));
+
   const [isZoomed, setIsZoomed]           = useState(false);
   const [displayScale, setDisplayScale]   = useState(1);
 
@@ -208,7 +237,7 @@ export function PilotV2GlanceView() {
     })
     .onUpdate(e => {
       'worklet';
-      const newScale = clamp(savedScale.value * e.scale, 1, 4);
+      const newScale = clamp(savedScale.value * e.scale, 0.25, 4);
       scale.value = newScale;
       // Zoom toward the focal point (center-relative shift)
       const midX = screenWidthSV.value / 2;
@@ -224,8 +253,9 @@ export function PilotV2GlanceView() {
       savedOffX.value  = offsetX.value;
       savedOffY.value  = offsetY.value;
 
-      if (scale.value < 1.12) {
-        // Snap back to normal
+      if (Math.abs(scale.value - 1) > 0.05) {
+        runOnJS(setIsZoomed)(true);
+      } else {
         scale.value   = withSpring(1, { damping: 22, stiffness: 180 });
         offsetX.value = withSpring(0, { damping: 22, stiffness: 180 });
         offsetY.value = withSpring(0, { damping: 22, stiffness: 180 });
@@ -235,8 +265,6 @@ export function PilotV2GlanceView() {
         runOnJS(setScrollEnabled)(true);
         runOnJS(setIsZoomed)(false);
         runOnJS(setDisplayScale)(1);
-      } else {
-        runOnJS(setIsZoomed)(true);
       }
     });
 
@@ -244,14 +272,14 @@ export function PilotV2GlanceView() {
   const panGesture = Gesture.Pan()
     .onUpdate(e => {
       'worklet';
-      if (scale.value > 1.08) {
+      if (Math.abs(scale.value - 1) > 0.02) {
         offsetX.value = savedOffX.value + e.translationX;
         offsetY.value = savedOffY.value + e.translationY;
       }
     })
     .onEnd(e => {
       'worklet';
-      if (scale.value > 1.08) {
+      if (Math.abs(scale.value - 1) > 0.02) {
         // Add light inertia / momentum
         offsetX.value = offsetX.value + e.velocityX * 0.06;
         offsetY.value = offsetY.value + e.velocityY * 0.06;
@@ -265,7 +293,7 @@ export function PilotV2GlanceView() {
     .numberOfTaps(2)
     .onEnd(() => {
       'worklet';
-      if (scale.value > 1.05) {
+      if (Math.abs(scale.value - 1) > 0.05) {
         runOnJS(resetZoom)();
       }
     });
@@ -298,8 +326,14 @@ export function PilotV2GlanceView() {
   }, [scrollKey, glanceScrollMemory]);
 
   const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    lastScrollY.current = e.nativeEvent.contentOffset.y;
+    const y = e.nativeEvent.contentOffset.y;
+    lastScrollY.current = y;
     glanceScrollMemory.current[scrollKey] = lastScrollY.current;
+    if (y > 40) {
+      setHeaderCollapsed(true);
+    } else {
+      setHeaderCollapsed(false);
+    }
   }, [scrollKey, glanceScrollMemory]);
 
   /* ── navigation ─────────────────────────────────────────────────────────── */
@@ -442,7 +476,18 @@ export function PilotV2GlanceView() {
       style={[styles.root, { backgroundColor: colors.bg }]}
     >
       {/* ── Sticky header ────────────────────────────────────────────────── */}
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+      <View style={[
+        styles.header,
+        {
+          backgroundColor: colors.surface,
+          borderBottomColor: colors.border,
+          height: headerCollapsed ? 0 : 56,
+          paddingVertical: headerCollapsed ? 0 : 14,
+          opacity: headerCollapsed ? 0 : 1,
+          overflow: 'hidden',
+          borderBottomWidth: headerCollapsed ? 0 : 1,
+        }
+      ]}>
         <View style={styles.headerLeft}>
           <TouchableOpacity
             testID="pilot-v2-glance-back"
@@ -628,27 +673,29 @@ export function PilotV2GlanceView() {
       </GestureDetector>
 
       {pencil.drawingMode && (
-        <View style={glanceStyles.pencilToolbarFloat} pointerEvents="box-none">
-          <PencilToolbar
-            tool={pencil.tool}
-            color={pencil.color}
-            width={pencil.width}
-            pencilOnly={pencil.pencilOnly}
-            shapeRecognition={pencil.shapeRecognition}
-            favoriteColors={pencil.favorites}
-            canUndo={pencil.canUndo}
-            canRedo={pencil.canRedo}
-            onToolChange={pencil.setTool}
-            onColorChange={pencil.setColor}
-            onWidthChange={pencil.setWidth}
-            onPencilOnlyChange={pencil.setPencilOnly}
-            onShapeRecognitionChange={pencil.setShapeRecognition}
-            onFavoritesChange={pencil.setFavorites}
-            onUndo={pencil.undo}
-            onRedo={pencil.redo}
-            onClose={() => pencil.setDrawingMode(false)}
-          />
-        </View>
+        <GestureDetector gesture={toolbarGesture}>
+          <Animated.View style={[glanceStyles.pencilToolbarFloat, animatedToolbarStyle]} pointerEvents="box-none">
+            <PencilToolbar
+              tool={pencil.tool}
+              color={pencil.color}
+              width={pencil.width}
+              pencilOnly={pencil.pencilOnly}
+              shapeRecognition={pencil.shapeRecognition}
+              favoriteColors={pencil.favorites}
+              canUndo={pencil.canUndo}
+              canRedo={pencil.canRedo}
+              onToolChange={pencil.setTool}
+              onColorChange={pencil.setColor}
+              onWidthChange={pencil.setWidth}
+              onPencilOnlyChange={pencil.setPencilOnly}
+              onShapeRecognitionChange={pencil.setShapeRecognition}
+              onFavoritesChange={pencil.setFavorites}
+              onUndo={pencil.undo}
+              onRedo={pencil.redo}
+              onClose={() => pencil.setDrawingMode(false)}
+            />
+          </Animated.View>
+        </GestureDetector>
       )}
     </View>
   );
@@ -728,14 +775,38 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
       return (
         <View style={bStyles.bulletRow}>
           <Text style={[bStyles.bulletDot, { color: colors.textPrimary }]}>•</Text>
-          <Text style={[bStyles.text, { color: colors.textPrimary }, markStyle]}>{block.text}</Text>
+          <View style={{ flex: 1 }}>
+            <RenderHtml
+              source={{ html: block.text || '' }}
+              contentWidth={800}
+              baseStyle={{ color: colors.textPrimary, fontSize: 16, lineHeight: 24 }}
+              tagsStyles={{
+                b: { fontWeight: 'bold' as const, color: colors.textPrimary },
+                strong: { fontWeight: 'bold' as const, color: colors.textPrimary },
+                i: { fontStyle: 'italic' as const },
+                em: { fontStyle: 'italic' as const },
+              }}
+            />
+          </View>
         </View>
       );
     case 'numbered':
       return (
         <View style={bStyles.bulletRow}>
           <Text style={[bStyles.bulletDot, { color: colors.textPrimary, fontWeight: '600' }]}>1.</Text>
-          <Text style={[bStyles.text, { color: colors.textPrimary }, markStyle]}>{block.text}</Text>
+          <View style={{ flex: 1 }}>
+            <RenderHtml
+              source={{ html: block.text || '' }}
+              contentWidth={800}
+              baseStyle={{ color: colors.textPrimary, fontSize: 16, lineHeight: 24 }}
+              tagsStyles={{
+                b: { fontWeight: 'bold' as const, color: colors.textPrimary },
+                strong: { fontWeight: 'bold' as const, color: colors.textPrimary },
+                i: { fontStyle: 'italic' as const },
+                em: { fontStyle: 'italic' as const },
+              }}
+            />
+          </View>
         </View>
       );
     case 'checklist':
@@ -745,26 +816,56 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
             borderColor: colors.border,
             backgroundColor: block.checked ? '#5B4EFA' : 'transparent',
           }]} />
-          <Text style={[bStyles.text, {
-            color: colors.textPrimary,
-            textDecorationLine: block.checked ? 'line-through' : 'none',
-          }, markStyle]}>
-            {block.text}
-          </Text>
+          <View style={{ flex: 1 }}>
+            <RenderHtml
+              source={{ html: block.text || '' }}
+              contentWidth={800}
+              baseStyle={{
+                color: colors.textPrimary,
+                fontSize: 16,
+                lineHeight: 24,
+                textDecorationLine: block.checked ? 'line-through' : 'none',
+              }}
+              tagsStyles={{
+                b: { fontWeight: 'bold' as const, color: colors.textPrimary },
+                strong: { fontWeight: 'bold' as const, color: colors.textPrimary },
+                i: { fontStyle: 'italic' as const },
+                em: { fontStyle: 'italic' as const },
+              }}
+            />
+          </View>
         </View>
       );
     case 'quote':
       return (
         <View style={[bStyles.quote, { borderLeftColor: '#5B4EFA' }]}>
-          <Text style={[bStyles.text, { color: colors.textSecondary, fontStyle: 'italic' }]}>
-            {block.text}
-          </Text>
+          <View style={{ flex: 1 }}>
+            <RenderHtml
+              source={{ html: block.text || '' }}
+              contentWidth={800}
+              baseStyle={{ color: colors.textSecondary, fontSize: 16, lineHeight: 24, fontStyle: 'italic' }}
+              tagsStyles={{
+                b: { fontWeight: 'bold' as const },
+                strong: { fontWeight: 'bold' as const },
+              }}
+            />
+          </View>
         </View>
       );
     case 'highlight':
       return (
         <View style={[bStyles.highlight, { backgroundColor: highlightBg(block.highlightColor) }]}>
-          <Text style={[bStyles.text, { color: '#1F2937' }, markStyle]}>{block.text}</Text>
+          <View style={{ flex: 1 }}>
+            <RenderHtml
+              source={{ html: block.text || '' }}
+              contentWidth={800}
+              baseStyle={{ color: '#1F2937', fontSize: 16, lineHeight: 24 }}
+              tagsStyles={{
+                b: { fontWeight: 'bold' as const },
+                strong: { fontWeight: 'bold' as const },
+              }}
+            />
+          </View>
         </View>
       );
     case 'code':
@@ -777,9 +878,17 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
       );
     default:
       return (
-        <Text style={[bStyles.text, { color: colors.textPrimary }, markStyle]}>
-          {block.text}
-        </Text>
+        <RenderHtml
+          source={{ html: block.text || '' }}
+          contentWidth={800}
+          baseStyle={{ color: colors.textPrimary, fontSize: 16, lineHeight: 24 }}
+          tagsStyles={{
+            b: { fontWeight: 'bold' as const, color: colors.textPrimary },
+            strong: { fontWeight: 'bold' as const, color: colors.textPrimary },
+            i: { fontStyle: 'italic' as const },
+            em: { fontStyle: 'italic' as const },
+          }}
+        />
       );
   }
 }

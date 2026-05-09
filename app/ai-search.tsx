@@ -89,6 +89,7 @@ type Filters = {
   subjects:      string;   // 'All' | comma-separated
   sections:      string;   // 'All' | comma-separated (section_group)
   microtopics:   string;   // 'All' | comma-separated
+  revisionTags:  string;   // 'All' | comma-separated
   yearRange:     string;   // '' | 'YYYY' | 'YYYY,YYYY'
 };
 
@@ -103,6 +104,7 @@ const DEFAULT_FILTERS: Filters = {
   subjects:     'All',
   sections:     'All',
   microtopics:  'All',
+  revisionTags: 'All',
   yearRange:    '',
 };
 
@@ -122,6 +124,7 @@ function countActiveFilters(f: Filters): number {
   if (f.subjects !== 'All')           n++;
   if (f.sections !== 'All')           n++;
   if (f.microtopics !== 'All')        n++;
+  if (f.revisionTags !== 'All')       n++;
   if (f.yearRange)                    n++;
   return n;
 }
@@ -517,6 +520,9 @@ export default function AISearchTab() {
 
     if (session?.user?.id) {
       try {
+        await supabase.rpc('add_user_tag', { p_tag: createdTag }).then(({ error }) => {
+          if (error) console.warn('[tags] add_user_tag RPC failed', error.message);
+        });
         const catalogKey = `review_tag_catalog_${session.user.id}`;
         const existing = await AsyncStorage.getItem(catalogKey);
         const parsed: string[] = existing ? JSON.parse(existing) : [];
@@ -787,6 +793,19 @@ export default function AISearchTab() {
           const mts = af.microtopics.split(',').filter(Boolean);
           if (mts.length > 0) q2 = q2.in('micro_topic', mts);
         }
+        if (af.revisionTags !== 'All' && session?.user?.id) {
+          const tags = af.revisionTags.split(',').filter(Boolean);
+          if (tags.length > 0) {
+            const orQuery = tags.map(tag => `review_tags.cs.["${tag.replace(/"/g, '\\"')}"]`).join(',');
+            const { data: taggedRows } = await supabase
+              .from('question_states')
+              .select('question_id')
+              .eq('user_id', session.user.id)
+              .or(orQuery);
+            const taggedIds = Array.from(new Set((taggedRows || []).map((row: any) => row.question_id).filter(Boolean)));
+            q2 = taggedIds.length > 0 ? q2.in('id', taggedIds) : q2.in('id', ['__no_tag_matches__']);
+          }
+        }
         // Year range (manual or AI-inferred)
         const yearStr = yearOverride ?? (af.yearRange || null);
         if (yearStr) {
@@ -846,9 +865,20 @@ export default function AISearchTab() {
         const subList = activeFilters.subjects !== 'All' ? activeFilters.subjects.split(',') : [];
         const secList = activeFilters.sections !== 'All' ? activeFilters.sections.split(',') : [];
         const mtList  = activeFilters.microtopics !== 'All' ? activeFilters.microtopics.split(',') : [];
+        const revTagList = activeFilters.revisionTags !== 'All' ? activeFilters.revisionTags.split(',').filter(Boolean) : [];
         if (subList.length) localResults = localResults.filter((r: any) => subList.includes(r.subject));
         if (secList.length) localResults = localResults.filter((r: any) => secList.includes(r.section_group));
         if (mtList.length)  localResults = localResults.filter((r: any) => mtList.includes(r.micro_topic));
+        if (revTagList.length && session?.user?.id) {
+          const orQuery = revTagList.map(tag => `review_tags.cs.["${tag.replace(/"/g, '\\"')}"]`).join(',');
+          const { data: taggedRows } = await supabase
+            .from('question_states')
+            .select('question_id')
+            .eq('user_id', session.user.id)
+            .or(orQuery);
+          const taggedIds = new Set((taggedRows || []).map((row: any) => row.question_id));
+          localResults = localResults.filter((r: any) => taggedIds.has(r.id));
+        }
         if (activeFilters.pyqFilter === 'PYQ Only')  localResults = localResults.filter((r: any) => r.is_pyq);
         if (activeFilters.pyqFilter === 'Non-PYQ')   localResults = localResults.filter((r: any) => !r.is_pyq);
         if (activeFilters.ncertFilter === 'NCERT Only') localResults = localResults.filter((r: any) => r.is_ncert);
@@ -1680,6 +1710,36 @@ export default function AISearchTab() {
             />
 
             {/* Institutes — dynamically loaded from tests table */}
+            {userTags.length > 0 && (
+              <View style={styles.filterGroup}>
+                <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>REVISION TAGS</Text>
+                <View style={styles.chipsWrap}>
+                  <TouchableOpacity
+                    onPress={() => setPendingFilters(p => ({ ...p, revisionTags: 'All' }))}
+                    style={[styles.fchip, pendingFilters.revisionTags === 'All' && styles.fchipSel]}
+                  >
+                    <Text style={[styles.fchipText, { color: pendingFilters.revisionTags === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
+                  </TouchableOpacity>
+                  {userTags.map(tag => {
+                    const isSelected = pendingFilters.revisionTags.split(',').includes(tag);
+                    return (
+                      <TouchableOpacity
+                        key={tag}
+                        onPress={() => {
+                          const list = pendingFilters.revisionTags === 'All' ? [] : pendingFilters.revisionTags.split(',').filter(Boolean);
+                          const next = isSelected ? list.filter(t => t !== tag) : [...list, tag];
+                          setPendingFilters(p => ({ ...p, revisionTags: next.length ? next.join(',') : 'All' }));
+                        }}
+                        style={[styles.fchip, isSelected && styles.fchipSel]}
+                      >
+                        <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{tag}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
+
             {instituteOptions.length > 0 && (
               <View style={styles.filterGroup}>
                 <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>INSTITUTES</Text>

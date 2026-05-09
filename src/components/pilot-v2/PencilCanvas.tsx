@@ -14,7 +14,7 @@
  * selection.
  */
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Canvas, Path, Group, Skia } from '@shopify/react-native-skia';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -53,8 +53,8 @@ const withAlpha = (hex: string, alpha: number): string => {
 export function PencilCanvas({
   engine, tool = 'pen', width, height, drawingMode, onCommit, testID,
 }: Props) {
-  const [strokes, setStrokes] = useState<PilotV2PencilStroke[]>(engine.getAll());
-  const [, setTick] = useState(0);
+  const [committedStrokes, setCommittedStrokes] = useState<PilotV2PencilStroke[]>(engine.getPersisted());
+  const [activeStroke, setActiveStroke] = useState<PilotV2PencilStroke | null>(engine.getCurrent());
 
   // Lasso state — polygon being drawn + active selection.
   const [lassoPolygon, setLassoPolygon] = useState<{ x: number; y: number }[]>([]);
@@ -62,14 +62,43 @@ export function PencilCanvas({
   const [selectionBounds, setSelectionBounds] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   const moveOriginRef = useRef<{ x: number; y: number } | null>(null);
 
+  // Skia path cache to avoid recreating path on every render
+  const strokePathMap = useRef<Map<string, { path: any; strokeRef: PilotV2PencilStroke; w: number; h: number }>>(new Map());
+
+  // Clean up cache for deleted strokes
+  useEffect(() => {
+    const currentIds = new Set(committedStrokes.map(s => s.id));
+    for (const id of strokePathMap.current.keys()) {
+      if (!currentIds.has(id)) {
+        strokePathMap.current.delete(id);
+      }
+    }
+  }, [committedStrokes]);
+
+  const getCachedPath = useCallback((stroke: PilotV2PencilStroke) => {
+    const cached = strokePathMap.current.get(stroke.id);
+    if (cached && cached.strokeRef === stroke && cached.w === width && cached.h === height) {
+      return cached.path;
+    }
+    const d = pencilStrokeToSvgPath(stroke, width, height);
+    if (!d) return null;
+    const skiaPath = Skia.Path.MakeFromSVGString(d);
+    if (!skiaPath) return null;
+    strokePathMap.current.set(stroke.id, { path: skiaPath, strokeRef: stroke, w: width, h: height });
+    return skiaPath;
+  }, [width, height]);
+
   useEffect(() => {
     engine.setConfig({ pageWidth: width, pageHeight: height });
   }, [engine, width, height]);
 
   useEffect(() => {
-    const unsub = engine.subscribe((next) => {
-      setStrokes(next);
-      setTick(t => t + 1);
+    const unsub = engine.subscribe(() => {
+      const current = engine.getCurrent();
+      setActiveStroke(current);
+      if (!current) {
+        setCommittedStrokes(engine.getPersisted());
+      }
     });
     return unsub;
   }, [engine]);
@@ -83,8 +112,9 @@ export function PencilCanvas({
     }
   }, [tool]);
 
-  function handleStart(x: number, y: number) {
+  function handleStart(x: number, y: number, pointerType?: string) {
     if (!drawingMode) return;
+    if (engine.getConfig().pencilOnly && pointerType !== 'stylus') return;
     if (tool === 'lasso') {
       const rel = engine.toRelative(x, y);
       setLassoPolygon([rel]);
@@ -94,8 +124,9 @@ export function PencilCanvas({
     }
     engine.startStroke(x, y);
   }
-  function handleMove(x: number, y: number) {
+  function handleMove(x: number, y: number, pointerType?: string) {
     if (!drawingMode) return;
+    if (engine.getConfig().pencilOnly && pointerType !== 'stylus') return;
     if (tool === 'lasso') {
       const rel = engine.toRelative(x, y);
       setLassoPolygon((prev) => [...prev, rel]);
@@ -139,11 +170,11 @@ export function PencilCanvas({
       .enabled(drawingMode)
       .onBegin((e) => {
         'worklet';
-        runOnJS(handleStart)(e.x, e.y);
+        runOnJS(handleStart)(e.x, e.y, e.pointerType);
       })
       .onUpdate((e) => {
         'worklet';
-        runOnJS(handleMove)(e.x, e.y);
+        runOnJS(handleMove)(e.x, e.y, e.pointerType);
       })
       .onEnd(() => {
         'worklet';
@@ -187,10 +218,8 @@ export function PencilCanvas({
         <Animated.View style={{ width, height }}>
           <Canvas style={{ width, height }}>
             <Group>
-              {strokes.map((s) => {
-                const d = pencilStrokeToSvgPath(s, width, height);
-                if (!d) return null;
-                const path = Skia.Path.MakeFromSVGString(d);
+              {committedStrokes.map((s) => {
+                const path = getCachedPath(s);
                 if (!path) return null;
                 const isHL = s.tool === 'highlighter';
                 const colorHex = withAlpha(s.color, isHL ? s.opacity : 1);
@@ -207,6 +236,26 @@ export function PencilCanvas({
                   />
                 );
               })}
+
+              {/* Render active stroke separately */}
+              {activeStroke && (() => {
+                const path = getCachedPath(activeStroke);
+                if (!path) return null;
+                const isHL = activeStroke.tool === 'highlighter';
+                const colorHex = withAlpha(activeStroke.color, isHL ? activeStroke.opacity : 1);
+                return (
+                  <Path
+                    key={activeStroke.id}
+                    path={path}
+                    color={colorHex}
+                    style="stroke"
+                    strokeWidth={isHL ? activeStroke.width * 1.6 : activeStroke.width}
+                    strokeCap="round"
+                    strokeJoin="round"
+                    blendMode={isHL ? 'multiply' : undefined}
+                  />
+                );
+              })()}
 
               {/* Active lasso polygon */}
               {lassoPolygon.length > 1 ? (() => {
@@ -262,10 +311,21 @@ function SelectionPill({ bounds, width, height, count, onMove, onDelete, onDismi
   const top = Math.max(8, bounds.y * height - 40);
 
   const dragGesture = useMemo(() => {
+    let lastX = 0;
+    let lastY = 0;
     return Gesture.Pan()
+      .onBegin(() => {
+        'worklet';
+        lastX = 0;
+        lastY = 0;
+      })
       .onUpdate((e) => {
         'worklet';
-        runOnJS(onMove)(e.changeX, e.changeY);
+        const dx = e.translationX - lastX;
+        const dy = e.translationY - lastY;
+        lastX = e.translationX;
+        lastY = e.translationY;
+        runOnJS(onMove)(dx, dy);
       });
   }, [onMove]);
 

@@ -14,8 +14,8 @@
 - [ ] **Task 4: Implement Smart Append** (auto-numbering, separator, "Undo Save" toast)
 - [x] **Task 5: Add Pencil Annotation Engine** (stroke tracking, palm rejection, scale drift, Undo/Redo)
 - [x] **Task 6: Build Pencil Canvas** (Shopify Skia page-level continuous layered canvas)
-- [ ] **Task 7: Implement Sync Manager** (MMKV local-first cache, sync failure retry queue)
-- [ ] **Task 8: Migration & Testing** (data conversion, block tagging, search block contents)
+- [x] **Task 7: Implement Sync Manager** (MMKV local-first cache, sync failure retry queue)
+- [x] **Task 8: Migration & Testing** (data conversion, block tagging, search block contents)
 
 ---
 
@@ -50,7 +50,7 @@
 - [x] Implement stroke detection
 - [x] Implement Skia rendering
 - [x] Implement Apple Pencil pressure detection
-- [ ] Implement shape recognition
+- [x] Implement shape recognition
 - [x] Implement auto-saving of pencil strokes
 - [x] Implement Palm Rejection
 - [x] Implement relatively-scaled drawing vectors (no zoom/scale drift)
@@ -58,16 +58,16 @@
 - [x] Implement single high-performance page-level continuous drawing layer (Notability-style independent overlay)
 
 ### 💾 Local-First Sync Tasks (Step 7)
-- [ ] Implement fast local storage caching (MMKV)
-- [ ] Implement local-saving on edit
-- [ ] Implement debounced batch syncing on close
-- [ ] Implement crash recovery system
-- [ ] Implement rolling backup management
-- [ ] Implement local queue with automatic background retry sync on network restoration
+- [x] Implement fast local storage caching (MMKV)
+- [x] Implement local-saving on edit
+- [x] Implement debounced batch syncing on close
+- [x] Implement crash recovery system
+- [x] Implement rolling backup management
+- [x] Implement local queue with automatic background retry sync on network restoration
 
 ### 🎨 UI Components Tasks (Step 8)
 - [ ] Update editor view to render nested content with outline sidebars
 - [ ] Implement flexible content element renderer
-- [ ] Implement drawing annotation modes toolbar
+- [x] Implement drawing annotation modes toolbar
 - [ ] Implement enhanced export panel sheet
-- [ ] Implement block tagging system and search filtering across block contents
+- [x] Implement block tagging system and search filtering across block contents

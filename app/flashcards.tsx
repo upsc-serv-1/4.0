@@ -380,9 +380,6 @@ export default function FlashcardsHub() {
                 </Text>
               </View>
               <View style={styles.headerBtns}>
-                <TouchableOpacity onPress={() => setCreateModal({ type: currentFolder ? 'deck' : 'folder' })} style={styles.iconBtn}>
-                  <Plus size={22} color={colors.textPrimary} />
-                </TouchableOpacity>
                 <TouchableOpacity onPress={() => setSearchVisible(v => !v)} style={styles.iconBtn}>
                   <SearchIcon size={22} color={colors.textPrimary} />
                 </TouchableOpacity>

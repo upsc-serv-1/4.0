@@ -24,6 +24,10 @@ import { PilotV2EditorView } from '../../src/components/pilot-v2/PilotV2EditorVi
 import { PilotV2EmptyState } from '../../src/components/pilot-v2/PilotV2EmptyState';
 import { fetchPilotV2NotesForUser } from '../../src/repositories/pilotV2Repo';
 import { PilotV2AIChat } from '../../src/components/pilot-v2/PilotV2AIChat';
+import { startPilotV2SyncQueue } from '../../src/components/pilot-v2/pilotV2SyncQueue';
+import { PilotV2LocalStore } from '../../src/components/pilot-v2/pilotV2LocalStore';
+import { hydratePilotV2Note } from '../../src/components/pilot-v2/pilotV2OfflineSave';
+import { migratePilotV2Notes } from '../../src/components/pilot-v2/pilotV2Migration';
 
 function PilotV2Inner() {
   const { colors } = useTheme();
@@ -34,6 +38,12 @@ function PilotV2Inner() {
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
 
+  // Start the local-first sync queue once on mount.
+  useEffect(() => {
+    const stop = startPilotV2SyncQueue();
+    return stop;
+  }, []);
+
   // Initial load — fetch real notes from Supabase if a user is signed in.
   useEffect(() => {
     let cancelled = false;
@@ -42,7 +52,32 @@ function PilotV2Inner() {
       dispatch({ type: 'SET_LOADING', payload: true });
       try {
         const notes = await fetchPilotV2NotesForUser(userId);
-        if (!cancelled) dispatch({ type: 'SET_NOTES', payload: notes });
+        // Crash recovery: hydrate every note from local cache (newer-wins) and
+        // run the backward-compat migrator before exposing them to the UI.
+        const hydrated = notes.map((n) => {
+          const result = hydratePilotV2Note(n.id, {
+            content: n.content,
+            updatedAt: (n as any).updated_at || new Date().toISOString(),
+          });
+          return { ...n, content: result.content };
+        });
+        const migrated = migratePilotV2Notes(hydrated);
+        // Also rehydrate notes that exist locally but not in the server response
+        // (possible when the user was offline when they were created).
+        const knownIds = new Set(migrated.map(n => n.id));
+        for (const localId of PilotV2LocalStore.listAll()) {
+          if (!knownIds.has(localId)) {
+            const cached = PilotV2LocalStore.get(localId);
+            if (cached) {
+              migrated.push({
+                id: localId,
+                title: 'Untitled note',
+                content: cached.content,
+              } as any);
+            }
+          }
+        }
+        if (!cancelled) dispatch({ type: 'SET_NOTES', payload: migrated });
       } catch (e) {
         if (!cancelled) {
           dispatch({ type: 'SET_ERROR', payload: (e as Error).message });

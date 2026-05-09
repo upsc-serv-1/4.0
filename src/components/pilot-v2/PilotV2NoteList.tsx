@@ -198,10 +198,20 @@ export function PilotV2NoteList() {
   }, [state.notes, state.view.selectedSubtopic, topicName, isTrashMode, subjectMeta, selectedTopicId, state.view.selectedSubject]);
 
   const filtered = useMemo(() => {
-    return notes.filter(n =>
-      (!query || n.title.toLowerCase().includes(query.toLowerCase())) &&
-      (!globalSearch || n.title.toLowerCase().includes(globalSearch.toLowerCase()))
-    );
+    const q = (query || '').toLowerCase();
+    const gs = (globalSearch || '').toLowerCase();
+    if (!q && !gs) return notes;
+    // Step 8 — search across note titles AND block contents.
+    const matchesNote = (n: any, term: string): boolean => {
+      if (!term) return true;
+      if ((n.title || '').toLowerCase().includes(term)) return true;
+      const blocks = n?.content?.blocks || [];
+      for (const b of blocks) {
+        if (typeof b?.text === 'string' && b.text.toLowerCase().includes(term)) return true;
+      }
+      return false;
+    };
+    return notes.filter(n => matchesNote(n, q) && matchesNote(n, gs));
   }, [notes, query, globalSearch]);
 
   const handleSelectNote = (id: string) => {

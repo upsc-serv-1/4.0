@@ -41,6 +41,7 @@ import { PencilCanvas } from './PencilCanvas';
 import { PencilToolbar } from './PencilToolbar';
 import { usePilotV2Pencil } from './usePilotV2Pencil';
 import { exportPilotV2Note } from './pilotV2Export';
+import { getBlockTag } from './pilotV2Migration';
 
 const newId = () =>
   (typeof crypto !== 'undefined' && (crypto as any).randomUUID)
@@ -910,6 +911,9 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
     ? PILOT_V2_HIGHLIGHT_PALETTE.find(c => c.name === block.highlightColor)?.bg ?? '#FDE68A'
     : 'transparent';
 
+  // Step 8 — block-tag badge ("Added by quiz import" etc.)
+  const tag = getBlockTag(block);
+
   return (
     <View
       style={[
@@ -922,6 +926,25 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
         } : null,
       ]}
     >
+      {tag ? (
+        <View
+          testID={`pilot-v2-block-tag-${block.id}`}
+          style={{
+            position: 'absolute',
+            top: -8,
+            left: 8,
+            paddingHorizontal: 6,
+            paddingVertical: 2,
+            borderRadius: 8,
+            backgroundColor: tag.color,
+            zIndex: 5,
+          }}
+        >
+          <Text style={{ fontSize: 9, color: '#fff', fontWeight: '700', letterSpacing: 0.4 }}>
+            {tag.label.toUpperCase()}
+          </Text>
+        </View>
+      ) : null}
       {block.type === 'bullet' && <Text style={[styles.lead, { color: colors.textPrimary }]}>•</Text>}
       {block.type === 'numbered' && <Text style={[styles.lead, { color: colors.textPrimary, fontWeight: '600' }]}>1.</Text>}
       {block.type === 'checklist' && (

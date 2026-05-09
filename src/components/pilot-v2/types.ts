@@ -87,7 +87,73 @@ export interface PilotV2NoteContent {
   blocks: PilotV2Block[];
   /** Schema version — bump when block shape changes incompatibly. */
   version?: number;
+  /** Pencil annotation strokes — page-level continuous overlay (Step 5/6). */
+  pencilStrokes?: PilotV2PencilStroke[];
 }
+
+/* ========================================================================== */
+/* Pencil annotations (Step 5 + Step 6)                                       */
+/* ========================================================================== */
+
+/** Notability-style tool kinds. */
+export type PilotV2PencilTool =
+  | 'pen'
+  | 'highlighter'
+  | 'eraser'
+  | 'lasso';
+
+/** A single point captured during a stroke. Coordinates are stored in
+ *  RELATIVE canvas-space (0..1 per axis on the document page) to avoid
+ *  scale drift at any zoom level. */
+export interface PilotV2PencilPoint {
+  /** Relative X (0..1) inside the page bounds. */
+  x: number;
+  /** Relative Y (0..1) inside the page bounds. */
+  y: number;
+  /** Apple Pencil force / pressure 0..1 (0.5 fallback for finger / mouse). */
+  pressure: number;
+  /** ms epoch — used for velocity smoothing. */
+  t: number;
+}
+
+/** A persisted ink stroke. */
+export interface PilotV2PencilStroke {
+  id: string;
+  tool: PilotV2PencilTool;
+  color: string;
+  /** Width in absolute px (rendered relative to current canvas height). */
+  width: number;
+  opacity: number;
+  points: PilotV2PencilPoint[];
+  /** Z-order for proper rendering (later strokes on top). */
+  zIndex: number;
+  createdAt: string;
+  /** Optional bounds in relative coords (for fast eraser hit-test). */
+  bounds?: { x: number; y: number; w: number; h: number };
+}
+
+export interface PilotV2PencilToolState {
+  tool: PilotV2PencilTool;
+  color: string;
+  width: number;
+  /** 0..1 — only used by highlighter (35% by default). */
+  opacity: number;
+  /** When true, the canvas only accepts stylus / pencil input (palm rejection). */
+  pencilOnly: boolean;
+  /** Most recent tool used before the current one (for double-tap switch). */
+  previousTool?: PilotV2PencilTool;
+}
+
+/** Default tool palette presets (Notability-style). */
+export const PILOT_V2_PEN_COLORS = [
+  '#0F172A', '#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#FFFFFF',
+] as const;
+export const PILOT_V2_HIGHLIGHTER_COLORS = [
+  '#FDE68A', '#FCA5A5', '#A7F3D0', '#93C5FD', '#D8B4FE', '#FDBA74',
+] as const;
+/** 6 stroke widths (px) — matches user spec ("highlighter en 6 width"). */
+export const PILOT_V2_PEN_WIDTHS = [1, 2, 3, 5, 8, 12] as const;
+export const PILOT_V2_HIGHLIGHTER_WIDTHS = [8, 12, 18, 24, 32, 44] as const;
 
 export interface PilotV2Note {
   id: string;

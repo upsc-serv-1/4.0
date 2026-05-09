@@ -218,24 +218,38 @@ export function PencilCanvas({
   }
 
   const drawGesture = useMemo(() => {
+    // UI-thread throttle — drop sub-frame events before incurring the
+    // runOnJS bridge cost. 4 ms ≈ 240 Hz, plenty for ProMotion 120 Hz
+    // pencil input but cheap to filter on the UI thread.
+    const lastUI = { t: 0 };
+    const ended = { v: false };
     return Gesture.Pan()
       .minDistance(0)
       .maxPointers(1)
       .enabled(drawingMode)
       .onBegin((e) => {
         'worklet';
+        ended.v = false;
+        lastUI.t = 0;
         runOnJS(handleStart)(e.x, e.y, e.pointerType);
       })
       .onUpdate((e) => {
         'worklet';
+        const now = Date.now();
+        if (now - lastUI.t < 4) return;
+        lastUI.t = now;
         runOnJS(handleMove)(e.x, e.y, e.pointerType);
       })
       .onEnd(() => {
         'worklet';
+        if (ended.v) return;
+        ended.v = true;
         runOnJS(handleEnd)();
       })
       .onFinalize(() => {
         'worklet';
+        if (ended.v) return;
+        ended.v = true;
         runOnJS(handleEnd)();
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps

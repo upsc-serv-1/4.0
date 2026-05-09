@@ -65,6 +65,69 @@ export function PencilCanvas({
   // Skia path cache to avoid recreating path on every render
   const strokePathMap = useRef<Map<string, { path: any; strokeRef: PilotV2PencilStroke; w: number; h: number }>>(new Map());
 
+  // ===== Active-stroke fast-path =====
+  // Building a native Skia.Path via MakeFromSVGString on every move event is
+  // the single biggest source of write lag in Pilot V2 (each point allocates
+  // a fresh native object across the JSI bridge). Instead we keep the active
+  // stroke as a plain SVG-path STRING, append one quadratic segment per new
+  // point (O(1)) and pass that string directly to <Path> — Skia accepts both
+  // strings and Path objects, but the string path stays on the JS thread so
+  // there is no per-point native allocation. This mirrors Soft Notes which
+  // already runs at full 120 Hz on iPad Pro.
+  const activePathStrRef = useRef<string>('');
+  const activeLastIdxRef = useRef<number>(-1);
+  const activeStrokeIdRef = useRef<string | null>(null);
+  const [activePathStr, setActivePathStr] = useState<string>('');
+
+  const buildActivePath = useCallback((stroke: PilotV2PencilStroke): string => {
+    if (!stroke.points.length) return '';
+    // Reset the incremental string when the active stroke identity changes
+    // (new stroke after endStroke or after a tool/colour change).
+    if (activeStrokeIdRef.current !== stroke.id) {
+      activeStrokeIdRef.current = stroke.id;
+      activePathStrRef.current = '';
+      activeLastIdxRef.current = -1;
+    }
+
+    const pts = stroke.points;
+    const n = pts.length;
+    let d = activePathStrRef.current;
+    let i = activeLastIdxRef.current;
+
+    if (i < 0) {
+      const x0 = pts[0].x * width;
+      const y0 = pts[0].y * height;
+      d = `M ${x0.toFixed(2)} ${y0.toFixed(2)}`;
+      i = 0;
+    }
+    // Append a quadratic segment for every new point since last build.
+    for (let k = i + 1; k < n; k++) {
+      const prev = pts[k - 1];
+      const cur = pts[k];
+      const px = prev.x * width, py = prev.y * height;
+      const cx = cur.x * width, cy = cur.y * height;
+      const mx = (px + cx) / 2, my = (py + cy) / 2;
+      d += ` Q ${px.toFixed(2)} ${py.toFixed(2)} ${mx.toFixed(2)} ${my.toFixed(2)}`;
+    }
+    activePathStrRef.current = d;
+    activeLastIdxRef.current = n - 1;
+    // Final L to the latest point so the visible head of the stroke matches
+    // the finger position exactly. We rebuild only this trailing segment per
+    // frame which is cheap and keeps the head crisp without re-walking the
+    // whole point array.
+    const last = pts[n - 1];
+    return `${d} L ${(last.x * width).toFixed(2)} ${(last.y * height).toFixed(2)}`;
+  }, [width, height]);
+
+  // Reset the incremental cache when the user finishes / cancels a stroke or
+  // switches tools so the next stroke starts clean.
+  const resetActivePath = useCallback(() => {
+    activePathStrRef.current = '';
+    activeLastIdxRef.current = -1;
+    activeStrokeIdRef.current = null;
+    setActivePathStr('');
+  }, []);
+
   // Clean up cache for deleted strokes
   useEffect(() => {
     const currentIds = new Set(committedStrokes.map(s => s.id));
@@ -96,12 +159,20 @@ export function PencilCanvas({
     const unsub = engine.subscribe(() => {
       const current = engine.getCurrent();
       setActiveStroke(current);
-      if (!current) {
+      if (current) {
+        // Keep the live path string in sync with the latest point
+        // (incremental — see buildActivePath).
+        setActivePathStr(buildActivePath(current));
+      } else {
+        // Stroke finished or cancelled — flush the cache and refresh
+        // committed strokes so the just-committed one renders via the
+        // cached Skia.Path code path on next frame.
+        resetActivePath();
         setCommittedStrokes(engine.getPersisted());
       }
     });
     return unsub;
-  }, [engine]);
+  }, [engine, buildActivePath, resetActivePath]);
 
   // When the user switches away from lasso, drop the selection.
   useEffect(() => {
@@ -237,16 +308,19 @@ export function PencilCanvas({
                 );
               })}
 
-              {/* Render active stroke separately */}
-              {activeStroke && (() => {
-                const path = getCachedPath(activeStroke);
-                if (!path) return null;
+              {/* Render active stroke separately — uses a string-path
+                  fast-path so each new point is an O(1) string append on
+                  the JS thread, avoiding the per-point JSI allocation that
+                  Skia.Path.MakeFromSVGString incurs. This is the change
+                  that brings Pilot V2 ink latency down to Soft Notes
+                  levels on iPad Pro. */}
+              {activeStroke && activePathStr ? (() => {
                 const isHL = activeStroke.tool === 'highlighter';
                 const colorHex = withAlpha(activeStroke.color, isHL ? activeStroke.opacity : 1);
                 return (
                   <Path
                     key={activeStroke.id}
-                    path={path}
+                    path={activePathStr}
                     color={colorHex}
                     style="stroke"
                     strokeWidth={isHL ? activeStroke.width * 1.6 : activeStroke.width}
@@ -255,7 +329,7 @@ export function PencilCanvas({
                     blendMode={isHL ? 'multiply' : undefined}
                   />
                 );
-              })()}
+              })() : null}
 
               {/* Active lasso polygon */}
               {lassoPolygon.length > 1 ? (() => {

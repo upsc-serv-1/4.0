@@ -98,24 +98,34 @@ export function DeckRow({ node, expanded, onToggle, onOpen, onAction, color }: P
             />
           ))}
 
-          {/* Toggle / Icon Area */}
+          {/* Toggle / Icon Area — left interaction zone (expand/collapse) */}
           <View style={[styles.iconArea, { marginLeft: node.depth * indentWidth }]}>
             {node.is_folder && node.depth === 0 ? (
-              <TouchableOpacity onPress={onOpen} style={styles.folderIconWrap}>
+              <TouchableOpacity
+                onPress={onOpen}
+                style={styles.folderIconWrap}
+                hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+              >
                  <View style={[styles.officialFolderIcon, { backgroundColor: color || '#e0f2fe' }]}>
                     <Folder size={18} color={color ? darken(color) : '#0ea5e9'} />
                  </View>
               </TouchableOpacity>
             ) : hasChildren ? (
-              <TouchableOpacity 
-                onPress={onToggle} 
-                style={[styles.circleIcon, { backgroundColor: color || colors.surface, borderColor: color ? darken(color, 0.2) : colors.border }]}
+              <TouchableOpacity
+                onPress={onToggle}
+                style={styles.toggleHitArea}
+                hitSlop={{ top: 18, bottom: 18, left: 18, right: 18 }}
+                accessibilityRole="button"
+                accessibilityLabel={expanded ? 'Collapse deck' : 'Expand deck'}
+                testID={`deck-toggle-${node.id}`}
               >
-                {expanded ? (
-                  <Minus size={14} color={color ? darken(color) : colors.textTertiary} strokeWidth={3} />
-                ) : (
-                  <Plus size={14} color={color ? darken(color) : colors.textTertiary} strokeWidth={3} />
-                )}
+                <View style={[styles.circleIcon, { backgroundColor: color || colors.surface, borderColor: color ? darken(color, 0.2) : colors.border }]}>
+                  {expanded ? (
+                    <Minus size={16} color={color ? darken(color) : colors.textTertiary} strokeWidth={3} />
+                  ) : (
+                    <Plus size={16} color={color ? darken(color) : colors.textTertiary} strokeWidth={3} />
+                  )}
+                </View>
               </TouchableOpacity>
             ) : (
               color && !node.is_folder ? (
@@ -188,15 +198,22 @@ const styles = StyleSheet.create({
     width: 1,
   },
   iconArea: {
-    width: 40,
+    width: 56,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,
   },
+  toggleHitArea: {
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 24,
+  },
   circleIcon: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',

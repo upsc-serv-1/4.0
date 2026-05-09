@@ -159,14 +159,37 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestion
                     mode: 'learning',
                     questionId: question.id,
                     fromTags: 'true',
+                    revealAll: '1',
                   },
                 });
               }}
-              style={[styles.actionBtn, { backgroundColor: colors.primary + '15', borderColor: colors.primary + '30', flex: 1.5 }]}
+              style={[styles.actionBtn, { backgroundColor: colors.primary + '15', borderColor: colors.primary + '30', flex: 1.4 }]}
               testID="full-view-btn"
             >
               <BookOpen size={10} color={colors.primary} />
               <Text style={[styles.actionBtnText, { color: colors.primary }]}>Learn</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                router.push({
+                  pathname: '/unified/engine',
+                  params: {
+                    testId: question.testId || 'manual',
+                    mode: 'learning',
+                    questionId: question.id,
+                    fromTags: 'true',
+                    revealAll: '1',
+                    aiExpand: '1',
+                    explSource: 'ai',
+                  },
+                });
+              }}
+              style={[styles.actionBtn, { backgroundColor: colors.primary + '22', borderColor: colors.primary + '44', flex: 1.6 }]}
+              testID="ai-explain-btn"
+              accessibilityLabel="Open AI Explain & My Vitamin"
+            >
+              <Zap size={10} color={colors.primary} />
+              <Text style={[styles.actionBtnText, { color: colors.primary }]}>AI Explain</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleRemoveTag} disabled={!!loadingAction} style={[styles.actionBtn, { borderColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.border }]}>
               {loadingAction === 'remove' ? <ActivityIndicator size="small" color={zenTertColor} /> : <Trash2 size={10} color={zenSecColor} />}

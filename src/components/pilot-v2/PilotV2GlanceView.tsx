@@ -35,7 +35,12 @@ import {
   archivePilotV2Node, fetchAllPilotV2Nodes, fetchPilotV2NotesForUser,
   pinPilotV2Node, restorePilotV2Node, purgePilotV2NoteNode,
 } from '../../repositories/pilotV2Repo';
-import { PilotV2Block, PILOT_V2_HIGHLIGHT_PALETTE } from './types';
+import { PilotV2Block, PilotV2PencilStroke, PILOT_V2_HIGHLIGHT_PALETTE } from './types';
+import { PencilCanvas } from './PencilCanvas';
+import { PencilToolbar } from './PencilToolbar';
+import { usePilotV2Pencil } from './usePilotV2Pencil';
+import { exportPilotV2Note } from './pilotV2Export';
+import { savePilotV2NoteContent } from '../../repositories/pilotV2Repo';
 
 /* ─── helpers ────────────────────────────────────────────────────────────── */
 
@@ -108,6 +113,26 @@ export function PilotV2GlanceView() {
   const scrollRef = useRef<any>(null);
   const scrollKey = note?.id || '__demo__';
   const lastScrollY = useRef<number>(glanceScrollMemory.current[scrollKey] || 0);
+
+  /* ── Pencil overlay (Step 6) — drawable EVERYWHERE in glance view ─── */
+  const [paperSize, setPaperSize] = useState({ w: 1, h: 1 });
+  const initialStrokes = (note?.content?.pencilStrokes ?? []) as PilotV2PencilStroke[];
+  const persistGlanceStrokes = useCallback((next: PilotV2PencilStroke[]) => {
+    if (!note?.id) return;
+    const content = {
+      blocks: note.content?.blocks ?? [],
+      version: note.content?.version ?? 1,
+      pencilStrokes: next,
+    };
+    savePilotV2NoteContent(note.id, content).catch(() => null);
+  }, [note]);
+  const pencil = usePilotV2Pencil({
+    noteId: note?.id ?? null,
+    initialStrokes,
+    pageWidth: paperSize.w,
+    pageHeight: paperSize.h,
+    onChange: persistGlanceStrokes,
+  });
 
   /* ── zoom state ─────────────────────────────────────────────────────────── */
   const scale      = useSharedValue(1);
@@ -291,9 +316,20 @@ export function PilotV2GlanceView() {
   };
 
   const handleExport = async () => {
-    const text = blocksToPlainText();
-    await Clipboard.setStringAsync(text);
-    Alert.alert('Note exported', 'Plain-text export copied to your clipboard.');
+    try {
+      await exportPilotV2Note({
+        title,
+        blocks,
+        strokes: pencil.engine.getPersisted(),
+        pageWidth: paperSize.w || 800,
+        pageHeight: paperSize.h || 1131,
+        format: 'pdf',
+      });
+    } catch (e) {
+      const text = blocksToPlainText();
+      await Clipboard.setStringAsync(text);
+      Alert.alert('Note exported', `Plain-text fallback (${(e as Error).message}).`);
+    }
   };
 
   const handleMore = () => {
@@ -466,7 +502,7 @@ export function PilotV2GlanceView() {
               style={[styles.scroll, { backgroundColor: colors.bg }]}
               contentContainerStyle={[styles.body, { paddingBottom: 100 }]}
               showsVerticalScrollIndicator
-              scrollEnabled={scrollEnabled}
+              scrollEnabled={scrollEnabled && !pencil.drawingMode}
               onScroll={onScroll}
               scrollEventThrottle={32}
               bounces={!isZoomed}
@@ -479,14 +515,24 @@ export function PilotV2GlanceView() {
                 </View>
               </View>
 
-              {/* Blocks */}
-              {blocks.map(b => (
-                <BlockRenderer key={b.id} block={b} colors={colors} />
-              ))}
-
-              {/* End of glance */}
-              <View style={[styles.divider, { backgroundColor: colors.border }]} />
-              <Text style={[styles.eog, { color: colors.textTertiary }]}>— End of Glance —</Text>
+              <View
+                onLayout={(e) => setPaperSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
+              >
+                {blocks.map(b => (
+                  <BlockRenderer key={b.id} block={b} colors={colors} />
+                ))}
+                <View style={[styles.divider, { backgroundColor: colors.border }]} />
+                <Text style={[styles.eog, { color: colors.textTertiary }]}>— End of Glance —</Text>
+                {paperSize.w > 1 && paperSize.h > 1 && (
+                  <PencilCanvas
+                    engine={pencil.engine}
+                    width={paperSize.w}
+                    height={paperSize.h}
+                    drawingMode={pencil.drawingMode}
+                    onCommit={persistGlanceStrokes}
+                  />
+                )}
+              </View>
             </ScrollView>
           </Animated.View>
         </GestureDetector>
@@ -507,6 +553,41 @@ export function PilotV2GlanceView() {
           >
             <Text style={{ color: colors.primary, fontSize: 12, fontWeight: '700' }}>Reset</Text>
           </TouchableOpacity>
+        </View>
+      )}
+
+      {/* ── Pencil FAB (Step 6) ─────────────────────────────────── */}
+      <TouchableOpacity
+        testID="pilot-v2-glance-pencil-fab"
+        onPress={() => pencil.setDrawingMode(!pencil.drawingMode)}
+        activeOpacity={0.85}
+        style={[
+          glanceStyles.pencilFab,
+          { backgroundColor: pencil.drawingMode ? '#0F172A' : '#5B4EFA' },
+        ]}
+      >
+        <Pencil size={22} color="#ffffff" strokeWidth={2.5} />
+      </TouchableOpacity>
+
+      {pencil.drawingMode && (
+        <View style={glanceStyles.pencilToolbarFloat} pointerEvents="box-none">
+          <PencilToolbar
+            tool={pencil.tool}
+            color={pencil.color}
+            width={pencil.width}
+            pencilOnly={pencil.pencilOnly}
+            favoriteColors={pencil.favorites}
+            canUndo={pencil.canUndo}
+            canRedo={pencil.canRedo}
+            onToolChange={pencil.setTool}
+            onColorChange={pencil.setColor}
+            onWidthChange={pencil.setWidth}
+            onPencilOnlyChange={pencil.setPencilOnly}
+            onFavoritesChange={pencil.setFavorites}
+            onUndo={pencil.undo}
+            onRedo={pencil.redo}
+            onClose={() => pencil.setDrawingMode(false)}
+          />
         </View>
       )}
     </View>
@@ -746,4 +827,19 @@ const bStyles = StyleSheet.create({
   quote: { borderLeftWidth: 3, paddingLeft: 14, paddingVertical: 4, marginVertical: 8 },
   highlight: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 6, marginVertical: 6 },
   code: { padding: 14, borderRadius: 8, marginVertical: 8 },
+});
+
+const glanceStyles = StyleSheet.create({
+  pencilFab: {
+    position: 'absolute', right: 18, bottom: 24,
+    width: 56, height: 56, borderRadius: 28,
+    alignItems: 'center', justifyContent: 'center',
+    zIndex: 1100,
+    shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 }, elevation: 8,
+  },
+  pencilToolbarFloat: {
+    position: 'absolute', left: 12, right: 12, bottom: 90,
+    alignItems: 'center', zIndex: 1200,
+  },
 });

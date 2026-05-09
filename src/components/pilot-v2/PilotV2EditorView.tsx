@@ -27,13 +27,19 @@ import {
   X, RotateCcw, RotateCw, Save, Bold, Italic, Underline as UnderlineIcon,
   List, ListOrdered, ListTodo, Link as LinkIcon, Image as ImageIcon, Calendar,
   Paperclip, Table as TableIcon, Code, Type, ChevronDown, Highlighter, Plus, Trash2, ArrowUp, ArrowDown, Edit3, Quote, MoreHorizontal,
+  Pen,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
 import {
   PilotV2Block, PilotV2BlockType, PILOT_V2_HIGHLIGHT_PALETTE,
+  PilotV2PencilStroke,
 } from './types';
 import { savePilotV2NoteContent, renamePilotV2Note } from '../../repositories/pilotV2Repo';
+import { PencilCanvas } from './PencilCanvas';
+import { PencilToolbar } from './PencilToolbar';
+import { usePilotV2Pencil } from './usePilotV2Pencil';
+import { exportPilotV2Note } from './pilotV2Export';
 
 const newId = () =>
   (typeof crypto !== 'undefined' && (crypto as any).randomUUID)
@@ -384,6 +390,59 @@ export function PilotV2EditorView() {
   // Floating control panel menu
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
+  /* --------------- Pencil annotation overlay (Step 5+6) --------------- */
+  const [paperSize, setPaperSize] = useState({ w: 1, h: 1 });
+  const initialStrokes = (note?.content?.pencilStrokes ?? []) as PilotV2PencilStroke[];
+  const persistStrokes = (next: PilotV2PencilStroke[]) => {
+    if (!note?.id) return;
+    const content = { blocks, version: 1, pencilStrokes: next };
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(async () => {
+      try {
+        await savePilotV2NoteContent(note.id, content);
+        dispatch({ type: 'PATCH_BLOCKS', payload: { id: note.id, blocks } });
+        setSavingState('saved');
+      } catch { setSavingState('idle'); }
+    }, 600);
+  };
+  const pencil = usePilotV2Pencil({
+    noteId: note?.id ?? null,
+    initialStrokes,
+    pageWidth: paperSize.w,
+    pageHeight: paperSize.h,
+    onChange: persistStrokes,
+  });
+  const handleExportPdf = async () => {
+    try {
+      await exportPilotV2Note({
+        title, blocks,
+        strokes: pencil.engine.getPersisted(),
+        pageWidth: paperSize.w || 800, pageHeight: paperSize.h || 1131,
+        format: 'pdf',
+      });
+    } catch (e) { Alert.alert('Export failed', (e as Error).message || 'Unknown'); }
+  };
+  const handleExportImage = async () => {
+    try {
+      await exportPilotV2Note({
+        title, blocks,
+        strokes: pencil.engine.getPersisted(),
+        pageWidth: paperSize.w || 800, pageHeight: paperSize.h || 1131,
+        format: 'image',
+      });
+    } catch (e) { Alert.alert('Export failed', (e as Error).message || 'Unknown'); }
+  };
+  const handleExportMarkdown = async () => {
+    try {
+      await exportPilotV2Note({
+        title, blocks,
+        strokes: pencil.engine.getPersisted(),
+        pageWidth: paperSize.w || 800, pageHeight: paperSize.h || 1131,
+        format: 'markdown',
+      });
+    } catch (e) { Alert.alert('Export failed', (e as Error).message || 'Unknown'); }
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -478,7 +537,10 @@ export function PilotV2EditorView() {
           scrollEventThrottle={16}
           onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
         >
-          <View style={[styles.paper, { backgroundColor: '#fff', borderColor: colors.border, transform: [{ scale: zoom }] }]}>
+          <View
+            style={[styles.paper, { backgroundColor: '#fff', borderColor: colors.border, transform: [{ scale: zoom }] }]}
+            onLayout={(e) => setPaperSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
+          >
             {blocks.map(b => (
               <BlockRow
                 key={b.id}
@@ -514,6 +576,16 @@ export function PilotV2EditorView() {
               <Plus size={14} color={colors.textTertiary} />
               <Text style={{ color: colors.textTertiary, fontSize: 13 }}>Add block</Text>
             </TouchableOpacity>
+
+            {paperSize.w > 1 && paperSize.h > 1 && (
+              <PencilCanvas
+                engine={pencil.engine}
+                width={paperSize.w}
+                height={paperSize.h}
+                drawingMode={pencil.drawingMode}
+                onCommit={(strokes) => persistStrokes(strokes)}
+              />
+            )}
           </View>
         </Animated.ScrollView>
 
@@ -748,6 +820,57 @@ export function PilotV2EditorView() {
           </View>
         </View>
       </Modal>
+
+      {/* ── Pencil mode FAB ─────────────────────────────────────────── */}
+      <TouchableOpacity
+        testID="pilot-v2-pencil-fab"
+        onPress={() => pencil.setDrawingMode(!pencil.drawingMode)}
+        activeOpacity={0.85}
+        style={[styles.pencilFab, pencil.drawingMode && { backgroundColor: '#0F172A' }]}
+      >
+        <Pen size={22} color="#ffffff" strokeWidth={2.5} />
+      </TouchableOpacity>
+
+      {/* ── Notability-style pencil toolbar (only when drawing) ─── */}
+      {pencil.drawingMode && (
+        <View style={styles.pencilToolbarFloat} pointerEvents="box-none">
+          <PencilToolbar
+            tool={pencil.tool}
+            color={pencil.color}
+            width={pencil.width}
+            pencilOnly={pencil.pencilOnly}
+            favoriteColors={pencil.favorites}
+            canUndo={pencil.canUndo}
+            canRedo={pencil.canRedo}
+            onToolChange={pencil.setTool}
+            onColorChange={pencil.setColor}
+            onWidthChange={pencil.setWidth}
+            onPencilOnlyChange={pencil.setPencilOnly}
+            onFavoritesChange={pencil.setFavorites}
+            onUndo={pencil.undo}
+            onRedo={pencil.redo}
+            onClose={() => pencil.setDrawingMode(false)}
+          />
+        </View>
+      )}
+
+      {/* ── More menu w/ working Export ────────────────────────────── */}
+      <Modal visible={moreMenuOpen} animationType="fade" transparent onRequestClose={() => setMoreMenuOpen(false)}>
+        <TouchableOpacity activeOpacity={1} onPress={() => setMoreMenuOpen(false)} style={{ flex: 1, backgroundColor: 'rgba(15,23,42,0.35)' }}>
+          <View style={[styles.moreMenu, { borderColor: colors.border, backgroundColor: '#fff' }]} testID="pilot-v2-more-menu">
+            {[
+              { label: 'Export as PDF', sub: 'With pencil annotations', testID: 'pilot-v2-more-export-pdf', onPress: () => { setMoreMenuOpen(false); handleExportPdf(); } },
+              { label: 'Export as Image', sub: 'PDF with strokes', testID: 'pilot-v2-more-export-image', onPress: () => { setMoreMenuOpen(false); handleExportImage(); } },
+              { label: 'Export as Markdown', sub: 'Plain text + metadata', testID: 'pilot-v2-more-export-md', onPress: () => { setMoreMenuOpen(false); handleExportMarkdown(); } },
+            ].map(item => (
+              <TouchableOpacity key={item.label} testID={item.testID} onPress={item.onPress} style={styles.moreItem}>
+                <Text style={{ color: colors.textPrimary, fontSize: 14, fontWeight: '600' }}>{item.label}</Text>
+                {item.sub ? <Text style={{ color: colors.textTertiary, fontSize: 11, marginTop: 2 }}>{item.sub}</Text> : null}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -898,105 +1021,6 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
   );
 }
 
-      {/* More menu — Export / Settings / Templates / Theme / Share / Print / Page settings */}
-      <Modal visible={moreMenuOpen} animationType="fade" transparent onRequestClose={() => setMoreMenuOpen(false)}>
-        <TouchableOpacity activeOpacity={1} onPress={() => setMoreMenuOpen(false)} style={{ flex: 1, backgroundColor: 'rgba(15,23,42,0.35)' }}>
-          <View style={[styles.moreMenu, { borderColor: colors.border, backgroundColor: '#fff' }]} testID="pilot-v2-more-menu">
-            {[
-              { label: 'Quick export', sub: 'PDF, All Pages', testID: 'pilot-v2-more-quick-export', onPress: () => { setMoreMenuOpen(false); setExportSheetOpen(true); } },
-              { label: 'Export options', testID: 'pilot-v2-more-export-options', onPress: () => { setMoreMenuOpen(false); setExportSheetOpen(true); } },
-              { label: 'Share', testID: 'pilot-v2-more-share', onPress: async () => { setMoreMenuOpen(false); try { const text = blocks.map(b => b.text).filter(Boolean).join('\n'); if (Platform.OS === 'web') { await (navigator as any)?.share?.({ title, text }); } else { const { Share: RNShare } = require('react-native'); await RNShare.share({ title, message: `${title}\n\n${text}` }); } } catch {} } },
-              { label: 'Print', testID: 'pilot-v2-more-print', onPress: () => { setMoreMenuOpen(false); setExportSheetOpen(true); } },
-              { label: 'Templates', testID: 'pilot-v2-more-templates', onPress: () => { setMoreMenuOpen(false); Alert.alert('Templates', 'Note templates coming soon.'); } },
-              { label: 'Theme', testID: 'pilot-v2-more-theme', onPress: () => { setMoreMenuOpen(false); Alert.alert('Theme', 'Editor theme switcher coming soon.'); } },
-              { label: 'Page settings', testID: 'pilot-v2-more-page', onPress: () => { setMoreMenuOpen(false); Alert.alert('Page settings', 'Margins / paper size coming soon.'); } },
-              { label: 'Settings', testID: 'pilot-v2-more-settings', onPress: () => { setMoreMenuOpen(false); Alert.alert('Settings', 'Editor preferences coming soon.'); } },
-            ].map(item => (
-              <TouchableOpacity key={item.label} testID={item.testID} onPress={item.onPress} style={styles.moreItem}>
-                <Text style={{ color: colors.textPrimary, fontSize: 14, fontWeight: '600' }}>{item.label}</Text>
-                {item.sub ? <Text style={{ color: colors.textTertiary, fontSize: 11, marginTop: 2 }}>{item.sub}</Text> : null}
-              </TouchableOpacity>
-            ))}
-          </View>
-        </TouchableOpacity>
-      </Modal>
-
-      {/* Heading-selection export sheet */}
-      <Modal visible={exportSheetOpen} animationType="slide" transparent onRequestClose={() => setExportSheetOpen(false)}>
-        <View style={styles.modalBackdrop}>
-          <View style={[styles.modalCard, { borderColor: colors.border, maxWidth: 520 }]} testID="pilot-v2-export-sheet">
-            <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Export</Text>
-            <Text style={[styles.modalLabel, { marginBottom: 8 }]}>
-              {(() => {
-                const total = blocks.filter(b => b.type === 'heading').length;
-                const excluded = Object.values(excludedHeadings).filter(Boolean).length;
-                const selected = total - excluded;
-                return total === 0 ? 'No headings detected. All content will be exported.' : `${selected} of ${total} sections selected. Tap to toggle.`;
-              })()}
-            </Text>
-            <ScrollView style={{ maxHeight: 260 }}>
-              {blocks.filter(b => b.type === 'heading').map(h => (
-                <TouchableOpacity
-                  key={h.id}
-                  testID={`pilot-v2-export-heading-${h.id}`}
-                  onPress={() => setExcludedHeadings(s => ({ ...s, [h.id]: !s[h.id] }))}
-                  style={[styles.modalListBtn, { flexDirection: 'row', alignItems: 'center', gap: 10 }]}
-                >
-                  <View style={[styles.check, { width: 16, height: 16, marginTop: 0, backgroundColor: !excludedHeadings[h.id] ? '#5B4EFA' : 'transparent', borderColor: '#5B4EFA' }]} />
-                  <Text style={{ color: colors.textPrimary, fontWeight: '600', flex: 1 }} numberOfLines={2}>
-                    {`H${h.level ?? 2}  ${h.text || 'Untitled'}`}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-              {blocks.filter(b => b.type === 'heading').length === 0 ? (
-                <Text style={{ color: colors.textTertiary, fontSize: 13, paddingVertical: 12 }}>No headings detected. Full note will be exported.</Text>
-              ) : null}
-            </ScrollView>
-            <View style={{ flexDirection: 'row', gap: 10, marginTop: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-              <TouchableOpacity testID="pilot-v2-export-toggle-margins" onPress={() => setIncludeMargins(v => !v)} style={[styles.modalBtnGhost, { borderWidth: 1, borderColor: colors.border }]}>
-                <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>{includeMargins ? '✓ Include margins' : 'Exclude margins'}</Text>
-              </TouchableOpacity>
-              <View style={{ flex: 1 }} />
-              <TouchableOpacity onPress={() => setExportSheetOpen(false)} style={styles.modalBtnGhost}>
-                <Text style={{ color: colors.textSecondary, fontWeight: '600' }}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                testID="pilot-v2-export-pdf"
-                onPress={async () => {
-                  setExportSheetOpen(false);
-                  try {
-                    const filtered = filterBlocksByHeadings(blocks, excludedHeadings);
-                    await unifiedExportSelected({ title, blocks: filtered, format: 'pdf', includeMargins });
-                  } catch (e) {
-                    Alert.alert('Export failed', (e as Error).message);
-                  }
-                }}
-                style={[styles.modalBtnPrimary, { backgroundColor: '#5B4EFA' }]}
-              >
-                <Text style={{ color: '#fff', fontWeight: '700' }}>Export PDF</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                testID="pilot-v2-export-image"
-                onPress={async () => {
-                  setExportSheetOpen(false);
-                  try {
-                    const filtered = filterBlocksByHeadings(blocks, excludedHeadings);
-                    await unifiedExportSelected({ title, blocks: filtered, format: 'image', includeMargins });
-                  } catch (e) {
-                    Alert.alert('Export failed', (e as Error).message);
-                  }
-                }}
-                style={[styles.modalBtnPrimary, { backgroundColor: '#0F172A' }]}
-              >
-                <Text style={{ color: '#fff', fontWeight: '700' }}>Export Image</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-    </KeyboardAvoidingView>
-  );
-}
 
 /* ---------- Floating draggable formatting toolbar ---------- */
 function FloatingToolbar(props: any) {
@@ -1260,6 +1284,15 @@ const styles = StyleSheet.create({
     flex: 1, padding: 8, fontSize: 13, color: '#0F172A',
     borderRightWidth: 1, borderBottomWidth: 1, borderColor: '#E5E7EB',
   },
-});
-,
+  pencilFab: {
+    position: 'absolute', right: 18, bottom: 80,
+    width: 56, height: 56, borderRadius: 28,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#5B4EFA', zIndex: 1100,
+    shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 }, elevation: 8,
+  },
+  pencilToolbarFloat: {
+    position: 'absolute', bottom: 80, alignSelf: 'center', zIndex: 1200,
+  },
 });

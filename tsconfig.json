@@ -5,5 +5,13 @@
     "paths": {
       "@/*": ["./*"]
     }
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "scratch",
+    "scratch.txt",
+    "scratch2.txt",
+    "scratch_extract.js",
+    "scratch_utf8.tsx"
+  ]
 }

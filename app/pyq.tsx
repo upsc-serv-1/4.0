@@ -353,6 +353,45 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const [exportSubject, setExportSubject] = useState('');
 
   const [heatmapPalette, setHeatmapPalette] = useState<'spectral' | 'ocean'>('spectral');
+
+  // Auto-scroll refs/coords for PYQ analysis heatmap (Issue #20)
+  const mainScrollRef = useRef<ScrollView | null>(null);
+  const deepDivePanelYRef = useRef<number>(0);
+  const microTopicsYRef = useRef<number>(0);
+  const lastScrolledForSubjectRef = useRef<string | null>(null);
+  const lastScrolledForSectionRef = useRef<string | null>(null);
+
+  // When user clicks a subject, smoothly scroll to its deep-dive panel.
+  useEffect(() => {
+    if (!pilotSubject) {
+      lastScrolledForSubjectRef.current = null;
+      return;
+    }
+    if (lastScrolledForSubjectRef.current === pilotSubject) return;
+    lastScrolledForSubjectRef.current = pilotSubject;
+    // Wait for layout to settle before scrolling
+    const t = setTimeout(() => {
+      const y = Math.max(0, deepDivePanelYRef.current - 8);
+      mainScrollRef.current?.scrollTo({ y, animated: true });
+    }, 240);
+    return () => clearTimeout(t);
+  }, [pilotSubject]);
+
+  // When user clicks a section group, smoothly scroll to the micro-topic heatmap.
+  useEffect(() => {
+    if (!pilotSection) {
+      lastScrolledForSectionRef.current = null;
+      return;
+    }
+    const key = `${pilotSubject}::${pilotSection}`;
+    if (lastScrolledForSectionRef.current === key) return;
+    lastScrolledForSectionRef.current = key;
+    const t = setTimeout(() => {
+      const y = Math.max(0, microTopicsYRef.current - 8);
+      mainScrollRef.current?.scrollTo({ y, animated: true });
+    }, 280);
+    return () => clearTimeout(t);
+  }, [pilotSection, pilotSubject]);
   const [undoSpec, setUndoSpec] = useState<UndoSpec | null>(null);
   const downloads = useDownloadManager();
   const { isExporting: guardBusy, guard } = useExportGuard();
@@ -2048,7 +2087,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
         {/* BOTTOM HALF: Dynamic Deep Dive */}
         {pilotSubject ? (
-          <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border, marginTop: 10 }]}>
+          <View
+            onLayout={(e) => { deepDivePanelYRef.current = e.nativeEvent.layout.y; }}
+            style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border, marginTop: 10 }]}
+          >
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <View>
                 <Text style={[styles.panelTitle, { color: colors.textPrimary }]}>2. {pilotSubject} Deep-Dive</Text>
@@ -2084,6 +2126,12 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                 onCellPress={(sec, year) => handleHeatmapPress(sec, { subject: pilotSubject, section: sec }, year)}
               />
 
+              <View
+                onLayout={(e) => {
+                  // y is relative to the inner gap:24 View; add panel y to compute absolute scroll target
+                  microTopicsYRef.current = deepDivePanelYRef.current + e.nativeEvent.layout.y + 60;
+                }}
+              >
               <StickyHeatmapTable
                 title={`3. ${pilotSection || 'All'} Micro-Topics`}
                 labelHeader="Topic"
@@ -2104,6 +2152,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                 }}
                 onCellPress={(m, year) => handleHeatmapPress(m, { subject: pilotSubject, section: pilotSection || undefined, micro: m }, year)}
               />
+              </View>
             </View>
           </View>
         ) : (
@@ -2204,7 +2253,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     <View style={[styles.container, { backgroundColor: isEmbedded ? 'transparent' : colors.bg }]}>
       {renderHeader()}
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={mainScrollRef} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* Filter chips scroll away with content */}
         <View style={[styles.filterWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           {[

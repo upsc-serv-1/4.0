@@ -57,7 +57,6 @@ function CollapsibleTopicItem({
 }) {
   const hasSub = !!t.subtopics?.length;
   const isSelectedTopic = state.view.selectedTopic === t.id;
-  const [childrenHeight, setChildrenHeight] = useState(0);
 
   // Shared progress value
   const animationProgress = useSharedValue(isExpanded ? 1 : 0);
@@ -71,48 +70,11 @@ function CollapsibleTopicItem({
     });
   }, [isExpanded]);
 
-  // Height progress for smooth expansion/collapse
-  const heightProgress = useDerivedValue(() => {
-    return withTiming(animationProgress.value, {
-      duration: 350,
-    });
-  });
-
   // Chevron rotation animation
   const chevronStyle = useAnimatedStyle(() => {
     const rotate = interpolate(animationProgress.value, [0, 1], [-90, 0]);
     return {
       transform: [{ rotate: `${rotate}deg` }],
-    };
-  });
-
-  // Container style with smooth height expansion and opacity fade
-  const containerStyle = useAnimatedStyle(() => {
-    const height = interpolate(
-      heightProgress.value,
-      [0, 1],
-      [0, childrenHeight || 1000] // Fallback to large value initially
-    );
-
-    return {
-      height: isExpanded ? (childrenHeight ? height : undefined) : 0,
-      opacity: interpolate(heightProgress.value, [0, 0.2, 1], [0, 0.6, 1]),
-      overflow: 'hidden',
-    };
-  });
-
-  // Individual child item animation - scale, slide-in, and fade
-  const childItemStyle = useAnimatedStyle(() => {
-    return {
-      opacity: interpolate(heightProgress.value, [0, 0.3, 1], [0, 0.7, 1]),
-      transform: [
-        {
-          translateY: interpolate(heightProgress.value, [0, 1], [-10, 0]),
-        },
-        {
-          scale: interpolate(heightProgress.value, [0, 0.5, 1], [0.96, 0.98, 1]),
-        },
-      ],
     };
   });
 
@@ -145,43 +107,39 @@ function CollapsibleTopicItem({
         )}
       </TouchableOpacity>
 
-      {hasSub && (
-        <Animated.View style={containerStyle}>
-          <Animated.View 
-            style={[childItemStyle, { marginLeft: 32, gap: 4 }]}
-            onLayout={(event) => {
-              if (isExpanded) {
-                setChildrenHeight(event.nativeEvent.layout.height);
-              }
-            }}
-          >
-            {t.subtopics!.map(st => {
-              const isSelected = state.view.selectedSubtopic === st.id;
-              return (
-                <TouchableOpacity
-                  key={st.id}
-                  testID={`pilot-v2-subtopic-${st.id}`}
-                  activeOpacity={0.7}
-                  onPress={() => handleSelectSubtopic(st.id)}
-                  style={[
-                    styles.subtopicRow,
-                    isSelected ? { backgroundColor: '#EEECFF' } : null,
-                    { height: 32, justifyContent: 'center' }
-                  ]}
+      {hasSub && isExpanded && (
+        <Animated.View 
+          entering={FadeInUp.springify().damping(22).stiffness(130)}
+          exiting={FadeOutUp.springify().damping(22).stiffness(130)}
+          layout={Layout.springify().damping(22).stiffness(130)}
+          style={{ marginLeft: 32, gap: 4, overflow: 'hidden' }}
+        >
+          {t.subtopics!.map(st => {
+            const isSelected = state.view.selectedSubtopic === st.id;
+            return (
+              <TouchableOpacity
+                key={st.id}
+                testID={`pilot-v2-subtopic-${st.id}`}
+                activeOpacity={0.7}
+                onPress={() => handleSelectSubtopic(st.id)}
+                style={[
+                  styles.subtopicRow,
+                  isSelected ? { backgroundColor: '#EEECFF' } : null,
+                  { height: 32, justifyContent: 'center' }
+                ]}
+              >
+                <Text
+                  style={{
+                    fontSize: 13,
+                    color: isSelected ? '#5B4EFA' : colors.textSecondary,
+                    fontWeight: isSelected ? '600' : '400',
+                  }}
                 >
-                  <Text
-                    style={{
-                      fontSize: 13,
-                      color: isSelected ? '#5B4EFA' : colors.textSecondary,
-                      fontWeight: isSelected ? '600' : '400',
-                    }}
-                  >
-                    {st.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </Animated.View>
+                  {st.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </Animated.View>
       )}
     </Animated.View>

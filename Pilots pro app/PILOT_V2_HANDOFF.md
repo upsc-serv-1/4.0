@@ -1,83 +1,102 @@
-# 🚀 EMERGEN.SH AI - PILOT V2 IMPLEMENTATION BLUEPRINT & HANDOFF
+# 🚀 EMERGEN.SH AI - PILOT V2 PROGRESS PROGRESSION & STEP-BY-STEP HANDOFF
 
 > [!IMPORTANT]
 > **CRITICAL DIRECTIVE FOR THE AGENT:**
-> This document is your canonical source of truth and progress ledger. You are expected to deliver **100% production-ready, deployment-grade code** with absolute coverage and zero placeholders. This handoff system is designed for continuity, but **under no circumstances should you leave work incomplete or deferred for a future agent.** Put in 100% effort to complete every single task in this list flawlessly.
+> This document is your canonical progress ledger and implementation sequence. You must follow **exactly** the hierarchy, specifications, and execution steps defined in the architectural blueprint: [PILOT_V2_COMPLETE_ARCHITECTURE (1).md](file:///c:/Users/Dr.%20Yogesh/Videos/APP%20FOLDER%20-%20V1%20-%20Copy/app/frontend-noji-2.6.2/3/pilot-v2-pro-final/Pilots%20pro%20app/PILOT_V2_COMPLETE_ARCHITECTURE%20%281%29.md).
+> 
+> You are expected to deliver **100% production-ready, deployment-grade code** with complete type safety and zero placeholders. Under no circumstances should you leave work unfinished for a future agent. Maximize effort on every step!
 
 ---
 
-## 📊 PROGRESS TRACKER (Update after every completed step)
+## 🚀 EXECUTION PRIORITY (8 STEP SEQUENTIAL CHECKLIST)
 
-- [ ] **PHASE 1: Core Schema & Types**
-  - [ ] Update `src/components/pilot-v2/types.ts` with structured element and nested container types
-  - [ ] Write a safe migration function to convert flat blocks to nested blocks (`heading` + `children[]`)
-  - [ ] Update `src/repositories/pilotV2Repo.ts` database queries for nested structure compatibility
-- [ ] **PHASE 2: Smart Block Matching & Preferences**
-  - [ ] Implement `src/services/SmartBlockMatcher.ts` with semantic similarity and keyword detection
-  - [ ] Implement `PilotV2UserPreferences` storage for last-used notebook and block memory
-- [ ] **PHASE 3: Smart Append & Import Pipeline**
-  - [ ] Create `src/services/PilotV2SmartAppend.ts` with separator and re-numbering support
-  - [ ] Build content converter parser from quiz text selection to structured `ContentElement[]`
-- [ ] **PHASE 4: Pencil Annotations Canvas**
-  - [ ] Implement `src/services/PencilAnnotationEngine.ts` with stroke smoothing and shape detection
-  - [ ] Implement `src/components/pilot-v2/PencilCanvas.tsx` using Shopify Skia
-  - [ ] Add Apple Pencil pressure force and coalesced touch tracking
-- [ ] **PHASE 5: Local-First Synchronization**
-  - [ ] Create `src/services/PilotV2SyncManager.ts` using MMKV for instant local saving
-  - [ ] Implement debounced batch syncing on editor close, app backgrounding, or milestone edits
-  - [ ] Implement automatic rolling backup management and app-launch crash recovery
-- [ ] **PHASE 6: UI & Advanced Polish**
-  - [ ] Update `PilotV2EditorView.tsx` to support collapsible nested blocks with outlines
-  - [ ] Build `PilotV2BlockRenderer.tsx` for inline element editing
-  - [ ] Build `PencilToolbar.tsx` with high-fidelity drawing controls
-  - [ ] Upgrade `PilotV2ExportSheet.tsx` with premium directory cards and preview options
+Please complete the following steps in strict chronological order. Do not skip any step. Update the progress checks (`- [x]`) as you make progress.
+
+### 📍 Step 1: Update types.ts (Foundation)
+- [ ] Update `PilotV2Block` to support `heading + children`
+- [ ] Update `ContentElement` union type
+- [ ] Update `PilotV2NoteContent` schema
+*   **Target File:** [src/components/pilot-v2/types.ts](file:///c:/Users/Dr.%20Yogesh/Videos/APP%20FOLDER%20-%20V1%20-%20Copy/app/frontend-noji-2.6.2/3/pilot-v2-pro-final/src/components/pilot-v2/types.ts)
+
+### 📍 Step 2: Create SmartBlockMatcher.ts (AI Logic)
+- [ ] Create `SmartBlockMatcher.ts` supporting cosine similarity with AI embeddings and keyword fallback
+*   **Target File:** `src/services/SmartBlockMatcher.ts`
+
+### 📍 Step 3: Build PilotV2ExportSheet.tsx (UX Critical)
+- [ ] Create `PilotV2ExportSheet.tsx` with a premium visual block listing, suggestion banners, and last-used notebook preferences
+*   **Target File:** `src/components/pilot-v2/PilotV2ExportSheet.tsx`
+
+### 📍 Step 4: Implement SmartAppend Logic (Core Feature)
+- [ ] Create `PilotV2SmartAppend.ts` handling separator divider injection, auto-continue numbering, timestamping, and conversion of quiz text selections to element lists
+*   **Target File:** `src/services/PilotV2SmartAppend.ts`
+
+### 📍 Step 5: Add PencilAnnotationEngine (Enhancement)
+- [ ] Create `PencilAnnotationEngine.ts` to manage stroke smoothing (Catmull-Rom spline), Apple Pencil pressure force, shape detection, and auto-saving of strokes
+*   **Target File:** `src/services/PencilAnnotationEngine.ts`
+
+### 📍 Step 6: Build PencilCanvas & Rendering (UX Polish)
+- [ ] Create `PencilCanvas.tsx` for drawing rendering using Shopify Skia
+- [ ] Create `PencilToolbar.tsx` for drawing style, stroke, and mode selection
+*   **Target Files:** `src/components/pilot-v2/PencilCanvas.tsx` & `PencilToolbar.tsx`
+
+### 📍 Step 7: Implement SyncManager (Reliability)
+- [ ] Create `PilotV2SyncManager.ts` using fast MMKV cache for instant local saving, debounced batch syncing, crash recovery, and backup management
+*   **Target File:** `src/services/PilotV2SyncManager.ts`
+
+### 📍 Step 8: Migration & Testing (Stability)
+- [ ] Write migration script to safely convert existing flat blocks to the new nested block schema
+- [ ] Update `PilotV2EditorView.tsx` and `PilotV2BlockRenderer.tsx` to render and edit nested blocks seamlessly
+- [ ] Run full build verification tests to confirm zero regressions
+*   **Target Files:** `src/components/pilot-v2/PilotV2EditorView.tsx` & `PilotV2BlockRenderer.tsx`
 
 ---
 
-## 🛠️ MODULE ARCHITECTURE & SPECIFICATIONS
+## 🎯 BLUEPRINT CHECKLIST REFERENCE (Grounded to complete architecture)
 
-### 1. Core Block Schema
-**Target File:** [src/components/pilot-v2/types.ts](file:///c:/Users/Dr.%20Yogesh/Videos/APP%20FOLDER%20-%20V1%20-%20Copy/app/frontend-noji-2.6.2/3/pilot-v2-pro-final/src/components/pilot-v2/types.ts)
-*   Convert blocks from simple flat text items to nested block containers:
-    ```typescript
-    export interface PilotV2Block {
-      id: string;
-      blockName: string;
-      heading?: ContentElement;
-      children: ContentElement[]; // paragraphs, lists, checklists, tables
-      pencilStrokes?: PencilStroke[];
-      isDirty: boolean;
-    }
-    ```
+These are the sub-requirements categorized exactly as defined in the master blueprint:
 
-### 2. Smart Block Matching
-**Target File:** `src/services/SmartBlockMatcher.ts`
-*   Input: User's highlighted quiz text selection.
-*   Action: Process cosine similarity against existing notebook blocks using Gemini embeddings, fallback to keyword matching, and reference the user's `lastUsedBlockId`.
-*   Output: Suggest the single best-matching block container with a confidence score.
+### 📦 Core Block Structure
+- [ ] Update `PilotV2Block` to have `heading + children`
+- [ ] Update `ContentElement` union type
+- [ ] Migration: Convert flat blocks → nested blocks
+- [ ] Update `PilotV2NoteContent` schema
 
-### 3. Smart Append & Import Pipeline
-**Target File:** `src/services/PilotV2SmartAppend.ts`
-*   Take text selection, convert it to standard elements, and append to the selected block.
-*   If `addSeparator: true` is enabled, prepend a visual divider element.
-*   If `continueNumbering: true` is enabled, read the last numbered element's index and increment the imported indices continuously (e.g., continuing from `3.` to `4.`, `5.`).
+### 🧠 Smart Export
+- [ ] `SmartBlockMatcher.ts` with AI similarity
+- [ ] `PilotV2ExportSheet.tsx` with visual block list
+- [ ] Last-used notebook remembering
+- [ ] Block suggestion logic
+- [ ] User preferences storage
 
-### 4. Pencil Annotations Canvas
-**Target Files:** `src/components/pilot-v2/PencilCanvas.tsx` & `src/services/PencilAnnotationEngine.ts`
-*   Provide a smooth drawing layer using `@shopify/react-native-skia` over the notes canvas.
-*   Listen for iOS touch events, detect Apple Pencil specifically using `force > 0`, and apply Catmull-Rom spline smoothing to drawing paths.
-*   Recognize shapes (underlines, circles) and save stroke data directly inside the active block's `pencilStrokes` array.
+### 📤 Append Logic
+- [ ] `PilotV2SmartAppend.ts` with separator option
+- [ ] Auto-continue numbering
+- [ ] Timestamp marking for imports
+- [ ] Conversion of quiz text → `ContentElement[]`
 
-### 5. Local-First Sync Manager
-**Target File:** `src/services/PilotV2SyncManager.ts`
-*   Ensure every edit is written instantly (<1ms) to local MMKV storage first.
-*   Debounce server writes: batch update modified blocks to Supabase only when the user exits the editor, backgrounds the app, or after 10 edits.
-*   Keep up to 5 rolling backups locally to prevent data loss on unexpected crashes.
+### ✏️ Pencil Annotations
+- [ ] `PencilAnnotationEngine.ts` with stroke detection
+- [ ] `PencilCanvas.tsx` with Skia rendering
+- [ ] Apple Pencil pressure detection
+- [ ] Shape recognition (circles, underlines)
+- [ ] Auto-save pencil strokes
+
+### 💾 Local-First Sync
+- [ ] `PilotV2SyncManager.ts` with MMKV
+- [ ] Save to local on edit
+- [ ] Batch sync on close
+- [ ] Crash recovery system
+- [ ] Backup management
+
+### 🎨 UI Components
+- [ ] Update `PilotV2EditorView.tsx` to render nested content
+- [ ] `PilotV2BlockRenderer.tsx` for flexible content
+- [ ] `PencilToolbar.tsx` for annotation modes
+- [ ] Enhanced `PilotV2ExportSheet.tsx`
 
 ---
 
 ## 🚦 RESUMPTION INSTRUCTIONS FOR AGENTS
-1. **Locate Current Progress**: Read this file (`PILOT_V2_HANDOFF.md`) first. Check which items under the **Progress Tracker** are ticked.
-2. **Resume Work**: Start with the first unchecked item in the tracker.
-3. **Verify Compliance**: Ensure all code written is fully typed, compiles with `tsc --noEmit`, has no placeholder mock data, and handles network failure cases gracefully.
-4. **Update Tracker**: When completing a task, check it off (`- [x]`) and commit your changes with a descriptive message before moving to the next task.
+1. Read this `PILOT_V2_HANDOFF.md` to see which **Execution Priority Steps** are checked.
+2. Cross-reference the detailed code structures in `PILOT_V2_COMPLETE_ARCHITECTURE (1).md` to understand variables and types.
+3. Update the checklist checkpoints as soon as you complete each step so the next agent can follow seamlessly.

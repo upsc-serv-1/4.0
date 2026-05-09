@@ -416,10 +416,10 @@ export const UnifiedExportSheet: React.FC<Props> = ({
               </Section>
             )}
 
-            {!hideSections.includes('filters') && payload?.kind === 'questions' && (
+            {!hideSections.includes('filters') && (payload?.kind === 'questions' || payload?.kind === 'tags') && (
               <Section title="Filters" colors={colors}>
                 <Label colors={colors}>STATUS</Label>
-                <Row>{CHOICES.statusFilters.map(s => <Chip key={s.id} active={opts.statusFilter === (s.id as any)} onPress={() => set('statusFilter', s.id as any)} testID={`export-status-${s.id}`}>{s.label}</Chip>)}</Row>
+                <Row>{CHOICES.statusFilters.map(s => <Chip key={s.id} active={(opts.statusFilter || 'all') === (s.id as any)} onPress={() => set('statusFilter', s.id as any)} testID={`export-status-${s.id}`}>{s.label}</Chip>)}</Row>
                 <ToggleRow label="PYQ only" value={!!opts.pyqOnly} onChange={v => set('pyqOnly', v)} colors={colors} />
                 <ToggleRow label="NCERT only" value={!!opts.ncertOnly} onChange={v => set('ncertOnly', v)} colors={colors} />
                 {renderExtraFilters && renderExtraFilters(opts, setOpts)}
@@ -427,7 +427,7 @@ export const UnifiedExportSheet: React.FC<Props> = ({
               </Section>
             )}
 
-            {!hideSections.includes('filters') && payload?.kind !== 'questions' && renderExtraFilters && (
+            {!hideSections.includes('filters') && payload?.kind !== 'questions' && payload?.kind !== 'tags' && renderExtraFilters && (
               <Section title="Filters" colors={colors}>
                 {renderExtraFilters(opts, setOpts)}
               </Section>

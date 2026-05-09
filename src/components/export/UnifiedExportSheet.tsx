@@ -218,9 +218,14 @@ export const UnifiedExportSheet: React.FC<Props> = ({
       style={[styles.chip, {
         backgroundColor: active ? colors.primary : colors.surfaceStrong,
         borderColor: active ? colors.primary : colors.border,
+        shadowColor: active ? colors.primary : 'transparent',
+        shadowOpacity: active ? 0.18 : 0,
+        shadowRadius: active ? 6 : 0,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: active ? 2 : 0,
       }]}
     >
-      <Text style={{ color: active ? '#fff' : colors.textPrimary, fontWeight: active ? '900' : '700', fontSize: 12 }}>{children}</Text>
+      <Text style={{ color: active ? '#fff' : colors.textPrimary, fontWeight: active ? '900' : '700', fontSize: 12.5, letterSpacing: 0.2 }}>{children}</Text>
     </TouchableOpacity>
   );
 
@@ -259,11 +264,11 @@ export const UnifiedExportSheet: React.FC<Props> = ({
         <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
           <View style={styles.sheetHandle} />
           <View style={styles.header}>
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={[styles.title, { color: colors.textPrimary }]}>{title || 'Export'}</Text>
-              <Text style={{ fontSize: 11, color: colors.textTertiary, fontWeight: '600' }}>Customize and export to PDF</Text>
+              <Text style={{ fontSize: 12, color: colors.textTertiary, fontWeight: '700', marginTop: 2 }}>Customize and export to PDF</Text>
             </View>
-            <TouchableOpacity onPress={onClose} style={{ padding: 8 }}><X size={22} color={colors.textSecondary} /></TouchableOpacity>
+            <TouchableOpacity onPress={onClose} style={{ padding: 8, borderRadius: 20, backgroundColor: colors.surfaceStrong }}><X size={20} color={colors.textSecondary} /></TouchableOpacity>
           </View>
 
           <ScrollView style={{ maxHeight: 520 }} showsVerticalScrollIndicator={false}>
@@ -620,18 +625,23 @@ export const UnifiedExportSheet: React.FC<Props> = ({
 };
 
 const Section = ({ title, children, colors }: any) => (
-  <View style={{ marginTop: 16 }}>
-    {!!title && <Text style={{ fontSize: 12, fontWeight: '900', color: colors.textPrimary, letterSpacing: 0.5, marginBottom: 8 }}>{title}</Text>}
+  <View style={{ marginTop: 22, paddingTop: 4 }}>
+    {!!title && (
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+        <View style={{ width: 3, height: 16, borderRadius: 2, backgroundColor: colors.primary, marginRight: 10 }} />
+        <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary, letterSpacing: 0.3 }}>{title}</Text>
+      </View>
+    )}
     {children}
   </View>
 );
 
 const Row = ({ children }: any) => (
-  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>{children}</View>
+  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>{children}</View>
 );
 
 const Label = ({ children, colors }: any) => (
-  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginTop: 4, marginBottom: 6 }}>{children}</Text>
+  <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textTertiary, letterSpacing: 1.2, marginTop: 6, marginBottom: 8, textTransform: 'uppercase' }}>{children}</Text>
 );
 
 const ToggleRow = ({ label, value, onChange, colors }: any) => (

@@ -82,8 +82,9 @@ function PilotV2Inner() {
     }
   }, [state.loading, state.view, colors]);
 
+  const isEditor = state.view.mode === 'editor';
   return (
-    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
+    <SafeAreaView edges={isEditor ? [] : ['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
       <View style={styles.workspace}>
         {showSidebar && (
           <PilotV2Sidebar mode={sidebarMode} />

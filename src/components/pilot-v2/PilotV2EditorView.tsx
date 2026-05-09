@@ -20,13 +20,13 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity,
   KeyboardAvoidingView, Platform, useWindowDimensions, Modal, Alert, Linking,
-  Image,
+  Image, Animated, StatusBar, PanResponder,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import {
   X, RotateCcw, RotateCw, Save, Bold, Italic, Underline as UnderlineIcon,
   List, ListOrdered, ListTodo, Link as LinkIcon, Image as ImageIcon, Calendar,
-  Paperclip, Table as TableIcon, Code, Type, ChevronDown, Highlighter, Plus, Trash2, ArrowUp, ArrowDown, Edit3,
+  Paperclip, Table as TableIcon, Code, Type, ChevronDown, Highlighter, Plus, Trash2, ArrowUp, ArrowDown, Edit3, Quote, MoreHorizontal,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
@@ -262,6 +262,11 @@ export function PilotV2EditorView() {
   });
   const [reminderPickerVisible, setReminderPickerVisible] = useState(false);
 
+  // Export sheet state (heading-selection)
+  const [exportSheetOpen, setExportSheetOpen] = useState(false);
+  const [excludedHeadings, setExcludedHeadings] = useState<Record<string, boolean>>({});
+  const [includeMargins, setIncludeMargins] = useState(true);
+
   const insertLink = () => {
     const target = activeBlock;
     setLinkModal({
@@ -371,54 +376,62 @@ export function PilotV2EditorView() {
     setActiveBlockId(inserted.id);
   };
 
+  // Scroll-fade title animation
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const titleOpacity = scrollY.interpolate({ inputRange: [0, 60, 120], outputRange: [1, 0.4, 0], extrapolate: 'clamp' });
+  const titleTranslate = scrollY.interpolate({ inputRange: [0, 120], outputRange: [0, -40], extrapolate: 'clamp' });
+
+  // Floating control panel menu
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{ flex: 1, backgroundColor: '#fff' }}
       testID="pilot-v2-editor"
     >
-      {/* Top bar */}
-      <View style={[styles.topBar, { borderBottomColor: colors.border }]}>
-        <View style={styles.topLeft}>
-          <Text style={{ color: colors.textPrimary, fontSize: 13, fontWeight: '600' }} numberOfLines={1}>
-            {title || 'Untitled'}
-          </Text>
-          <TouchableOpacity
-            testID="pilot-v2-tool-undo"
-            onPress={handleUndo}
-            disabled={undoStack.current.length === 0}
-            style={[styles.iconBtn, { opacity: undoStack.current.length === 0 ? 0.35 : 1 }]}
-          >
-            <RotateCcw size={16} color={colors.textTertiary} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            testID="pilot-v2-tool-redo"
-            onPress={handleRedo}
-            disabled={redoStack.current.length === 0}
-            style={[styles.iconBtn, { opacity: redoStack.current.length === 0 ? 0.35 : 1 }]}
-          >
-            <RotateCw size={16} color={colors.textTertiary} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.topRight}>
-          <View style={[styles.savedPill, { borderColor: colors.border }]}>
-            <Save size={14} color={savingState === 'saving' ? '#D97706' : '#059669'} />
-            <Text style={{
-              fontSize: 12,
-              fontWeight: '600',
-              color: savingState === 'saving' ? '#D97706' : '#059669',
-            }}>
-              {savingState === 'saving' ? 'Saving…' : 'Saved'}
-            </Text>
-          </View>
-          <TouchableOpacity testID="pilot-v2-editor-close" onPress={handleClose} style={styles.iconBtn}>
-            <X size={20} color={colors.textPrimary} />
-          </TouchableOpacity>
-        </View>
+      {/* Hide system status bar for true fullscreen immersion */}
+      <StatusBar hidden translucent backgroundColor="transparent" />
+
+      {/* Floating back button (replaces Save/X bar) */}
+      <TouchableOpacity
+        testID="pilot-v2-editor-back"
+        onPress={handleClose}
+        activeOpacity={0.85}
+        style={[styles.floatingBack, { backgroundColor: 'rgba(255,255,255,0.92)', borderColor: colors.border }]}
+      >
+        <X size={18} color={colors.textPrimary} />
+      </TouchableOpacity>
+
+      {/* Floating top-right control panel: Undo / Redo / More */}
+      <View style={[styles.floatingControls, { backgroundColor: 'rgba(255,255,255,0.92)', borderColor: colors.border }]}>
+        <TouchableOpacity
+          testID="pilot-v2-tool-undo"
+          onPress={handleUndo}
+          disabled={undoStack.current.length === 0}
+          style={[styles.iconBtn, { opacity: undoStack.current.length === 0 ? 0.35 : 1 }]}
+        >
+          <RotateCcw size={16} color={colors.textPrimary} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          testID="pilot-v2-tool-redo"
+          onPress={handleRedo}
+          disabled={redoStack.current.length === 0}
+          style={[styles.iconBtn, { opacity: redoStack.current.length === 0 ? 0.35 : 1 }]}
+        >
+          <RotateCw size={16} color={colors.textPrimary} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          testID="pilot-v2-tool-more"
+          onPress={() => setMoreMenuOpen(true)}
+          style={styles.iconBtn}
+        >
+          <MoreHorizontal size={16} color={colors.textPrimary} />
+        </TouchableOpacity>
       </View>
 
-      {/* Title + toolbar */}
-      <View style={[styles.titleSection, { borderBottomColor: colors.border }]}>
+      {/* Title + toolbar (fades on scroll) */}
+      <Animated.View style={[styles.titleSection, { borderBottomColor: 'transparent', opacity: titleOpacity, transform: [{ translateY: titleTranslate }] }]} pointerEvents="box-none">
         <TextInput
           testID="pilot-v2-editor-title"
           value={title}
@@ -427,61 +440,43 @@ export function PilotV2EditorView() {
           placeholderTextColor={colors.textTertiary}
           style={[styles.titleInput, { color: colors.textPrimary }]}
         />
+        <Text style={{ color: colors.textTertiary, fontSize: 12, marginTop: 4 }}>
+          {note?.updated_at ? new Date(note.updated_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : new Date().toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+        </Text>
+      </Animated.View>
 
-        <View style={styles.toolbar}>
-          <ToolbarTextBtn label="H1" onPress={() => setActiveBlockType('heading', 1)} colors={colors} />
-          <ToolbarTextBtn label="H2" onPress={() => setActiveBlockType('heading', 2)} colors={colors} />
-          <ToolbarIconBtn Icon={Bold}          onPress={() => toggleMark('bold')}      colors={colors} active={isMarkActive('bold')}      testID="pilot-v2-tool-bold" />
-          <ToolbarIconBtn Icon={Italic}        onPress={() => toggleMark('italic')}    colors={colors} active={isMarkActive('italic')}    testID="pilot-v2-tool-italic" />
-          <ToolbarIconBtn Icon={UnderlineIcon} onPress={() => toggleMark('underline')} colors={colors} active={isMarkActive('underline')} testID="pilot-v2-tool-underline" />
-          <Divider colors={colors} />
-          <ToolbarIconBtn Icon={ListOrdered} onPress={() => setActiveBlockType('numbered')}  colors={colors} testID="pilot-v2-tool-ol" />
-          <ToolbarIconBtn Icon={List}        onPress={() => setActiveBlockType('bullet')}    colors={colors} testID="pilot-v2-tool-ul" />
-          <ToolbarIconBtn Icon={ListTodo}    onPress={() => setActiveBlockType('checklist')} colors={colors} testID="pilot-v2-tool-checklist" />
-          <Divider colors={colors} />
+      {/* Floating draggable formatting toolbar */}
+      <FloatingToolbar
+        colors={colors}
+        onH1={() => setActiveBlockType('heading', 1)}
+        onH2={() => setActiveBlockType('heading', 2)}
+        onBold={() => toggleMark('bold')}
+        onItalic={() => toggleMark('italic')}
+        onUnderline={() => toggleMark('underline')}
+        onOL={() => setActiveBlockType('numbered')}
+        onUL={() => setActiveBlockType('bullet')}
+        onCheck={() => setActiveBlockType('checklist')}
+        onQuote={() => setActiveBlockType('quote')}
+        onHighlight={() => setShowHighlightPicker(v => !v)}
+        showHighlightPicker={showHighlightPicker}
+        activeHighlight={activeHighlight}
+        onApplyHighlight={applyHighlight}
+        onLink={insertLink}
+        onImage={insertImageFromLibrary}
+        onAttach={insertAttachment}
+        onTable={insertTable}
+        onCode={insertCode}
+        isMarkActive={isMarkActive}
+      />
 
-          <View>
-            <TouchableOpacity
-              testID="pilot-v2-tool-highlight"
-              onPress={() => setShowHighlightPicker(v => !v)}
-              style={styles.toolBtn}
-            >
-              <View style={[styles.swatch, { backgroundColor: PILOT_V2_HIGHLIGHT_PALETTE.find(c => c.name === activeHighlight)?.bg ?? '#FDE68A' }]} />
-            </TouchableOpacity>
-            {showHighlightPicker && (
-              <View style={[styles.highlightPicker, { backgroundColor: '#fff', borderColor: colors.border }]}>
-                {PILOT_V2_HIGHLIGHT_PALETTE.map(c => (
-                  <TouchableOpacity
-                    key={c.name}
-                    testID={`pilot-v2-highlight-${c.name.toLowerCase()}`}
-                    onPress={() => applyHighlight(c.name)}
-                    style={[
-                      styles.swatch,
-                      { backgroundColor: c.bg, borderWidth: activeHighlight === c.name ? 2 : 0, borderColor: '#5B4EFA' },
-                    ]}
-                  />
-                ))}
-              </View>
-            )}
-          </View>
-
-          <ToolbarIconBtn Icon={Highlighter} onPress={() => setActiveBlockType('highlight')} colors={colors} testID="pilot-v2-tool-block-highlight" />
-          <ToolbarIconBtn Icon={LinkIcon}    onPress={insertLink}                colors={colors} testID="pilot-v2-tool-link" />
-          <ToolbarIconBtn Icon={ImageIcon}   onPress={insertImageFromLibrary}    colors={colors} testID="pilot-v2-tool-image" />
-          <ToolbarIconBtn Icon={Calendar}    onPress={() => setReminderPickerVisible(true)} colors={colors} testID="pilot-v2-tool-reminder" />
-          <ToolbarIconBtn Icon={Paperclip}   onPress={insertAttachment}          colors={colors} testID="pilot-v2-tool-attachment" />
-          <ToolbarIconBtn Icon={TableIcon}   onPress={insertTable}               colors={colors} testID="pilot-v2-tool-table" />
-          <ToolbarIconBtn Icon={Code}        onPress={insertCode}                colors={colors} testID="pilot-v2-tool-code" />
-        </View>
-      </View>
-
-      {/* Editor + outline */}
       <View style={{ flex: 1, flexDirection: 'row' }}>
-        <ScrollView
+        <Animated.ScrollView
           testID="pilot-v2-editor-canvas"
           style={{ flex: 1, backgroundColor: '#F9FAFB' }}
           contentContainerStyle={styles.canvas}
           keyboardShouldPersistTaps="handled"
+          scrollEventThrottle={16}
+          onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
         >
           <View style={[styles.paper, { backgroundColor: '#fff', borderColor: colors.border, transform: [{ scale: zoom }] }]}>
             {blocks.map(b => (
@@ -520,7 +515,7 @@ export function PilotV2EditorView() {
               <Text style={{ color: colors.textTertiary, fontSize: 13 }}>Add block</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
+        </Animated.ScrollView>
 
         {isTablet && (
           <View style={[styles.outlinePanel, { borderLeftColor: colors.border }]}>
@@ -903,6 +898,231 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
   );
 }
 
+      {/* More menu — Export / Settings / Templates / Theme / Share / Print / Page settings */}
+      <Modal visible={moreMenuOpen} animationType="fade" transparent onRequestClose={() => setMoreMenuOpen(false)}>
+        <TouchableOpacity activeOpacity={1} onPress={() => setMoreMenuOpen(false)} style={{ flex: 1, backgroundColor: 'rgba(15,23,42,0.35)' }}>
+          <View style={[styles.moreMenu, { borderColor: colors.border, backgroundColor: '#fff' }]} testID="pilot-v2-more-menu">
+            {[
+              { label: 'Quick export', sub: 'PDF, All Pages', testID: 'pilot-v2-more-quick-export', onPress: () => { setMoreMenuOpen(false); setExportSheetOpen(true); } },
+              { label: 'Export options', testID: 'pilot-v2-more-export-options', onPress: () => { setMoreMenuOpen(false); setExportSheetOpen(true); } },
+              { label: 'Share', testID: 'pilot-v2-more-share', onPress: async () => { setMoreMenuOpen(false); try { const text = blocks.map(b => b.text).filter(Boolean).join('\n'); if (Platform.OS === 'web') { await (navigator as any)?.share?.({ title, text }); } else { const { Share: RNShare } = require('react-native'); await RNShare.share({ title, message: `${title}\n\n${text}` }); } } catch {} } },
+              { label: 'Print', testID: 'pilot-v2-more-print', onPress: () => { setMoreMenuOpen(false); setExportSheetOpen(true); } },
+              { label: 'Templates', testID: 'pilot-v2-more-templates', onPress: () => { setMoreMenuOpen(false); Alert.alert('Templates', 'Note templates coming soon.'); } },
+              { label: 'Theme', testID: 'pilot-v2-more-theme', onPress: () => { setMoreMenuOpen(false); Alert.alert('Theme', 'Editor theme switcher coming soon.'); } },
+              { label: 'Page settings', testID: 'pilot-v2-more-page', onPress: () => { setMoreMenuOpen(false); Alert.alert('Page settings', 'Margins / paper size coming soon.'); } },
+              { label: 'Settings', testID: 'pilot-v2-more-settings', onPress: () => { setMoreMenuOpen(false); Alert.alert('Settings', 'Editor preferences coming soon.'); } },
+            ].map(item => (
+              <TouchableOpacity key={item.label} testID={item.testID} onPress={item.onPress} style={styles.moreItem}>
+                <Text style={{ color: colors.textPrimary, fontSize: 14, fontWeight: '600' }}>{item.label}</Text>
+                {item.sub ? <Text style={{ color: colors.textTertiary, fontSize: 11, marginTop: 2 }}>{item.sub}</Text> : null}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Heading-selection export sheet */}
+      <Modal visible={exportSheetOpen} animationType="slide" transparent onRequestClose={() => setExportSheetOpen(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalCard, { borderColor: colors.border, maxWidth: 520 }]} testID="pilot-v2-export-sheet">
+            <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Export</Text>
+            <Text style={[styles.modalLabel, { marginBottom: 8 }]}>Select sections to include. All selected by default.</Text>
+            <ScrollView style={{ maxHeight: 260 }}>
+              {blocks.filter(b => b.type === 'heading').map(h => (
+                <TouchableOpacity
+                  key={h.id}
+                  testID={`pilot-v2-export-heading-${h.id}`}
+                  onPress={() => setExcludedHeadings(s => ({ ...s, [h.id]: !s[h.id] }))}
+                  style={[styles.modalListBtn, { flexDirection: 'row', alignItems: 'center', gap: 10 }]}
+                >
+                  <View style={[styles.check, { width: 16, height: 16, marginTop: 0, backgroundColor: !excludedHeadings[h.id] ? '#5B4EFA' : 'transparent', borderColor: '#5B4EFA' }]} />
+                  <Text style={{ color: colors.textPrimary, fontWeight: '600', flex: 1 }} numberOfLines={2}>
+                    {`H${h.level ?? 2}  ${h.text || 'Untitled'}`}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+              {blocks.filter(b => b.type === 'heading').length === 0 ? (
+                <Text style={{ color: colors.textTertiary, fontSize: 13, paddingVertical: 12 }}>No headings detected. Full note will be exported.</Text>
+              ) : null}
+            </ScrollView>
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+              <TouchableOpacity testID="pilot-v2-export-toggle-margins" onPress={() => setIncludeMargins(v => !v)} style={[styles.modalBtnGhost, { borderWidth: 1, borderColor: colors.border }]}>
+                <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>{includeMargins ? '✓ Include margins' : 'Exclude margins'}</Text>
+              </TouchableOpacity>
+              <View style={{ flex: 1 }} />
+              <TouchableOpacity onPress={() => setExportSheetOpen(false)} style={styles.modalBtnGhost}>
+                <Text style={{ color: colors.textSecondary, fontWeight: '600' }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                testID="pilot-v2-export-pdf"
+                onPress={async () => {
+                  setExportSheetOpen(false);
+                  try {
+                    const filtered = filterBlocksByHeadings(blocks, excludedHeadings);
+                    await unifiedExportSelected({ title, blocks: filtered, format: 'pdf', includeMargins });
+                  } catch (e) {
+                    Alert.alert('Export failed', (e as Error).message);
+                  }
+                }}
+                style={[styles.modalBtnPrimary, { backgroundColor: '#5B4EFA' }]}
+              >
+                <Text style={{ color: '#fff', fontWeight: '700' }}>Export PDF</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                testID="pilot-v2-export-image"
+                onPress={async () => {
+                  setExportSheetOpen(false);
+                  try {
+                    const filtered = filterBlocksByHeadings(blocks, excludedHeadings);
+                    await unifiedExportSelected({ title, blocks: filtered, format: 'image', includeMargins });
+                  } catch (e) {
+                    Alert.alert('Export failed', (e as Error).message);
+                  }
+                }}
+                style={[styles.modalBtnPrimary, { backgroundColor: '#0F172A' }]}
+              >
+                <Text style={{ color: '#fff', fontWeight: '700' }}>Export Image</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </KeyboardAvoidingView>
+  );
+}
+
+/* ---------- Floating draggable formatting toolbar ---------- */
+function FloatingToolbar(props: any) {
+  const { colors, showHighlightPicker, activeHighlight, onApplyHighlight, isMarkActive } = props;
+  const { width, height } = useWindowDimensions();
+  const pos = useRef(new Animated.ValueXY({ x: Math.max(80, width / 2 - 200), y: 60 })).current;
+  const [collapsed, setCollapsed] = useState(false);
+  const [vertical, setVertical] = useState(false);
+
+  const pan = useRef(PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 4 || Math.abs(g.dy) > 4,
+    onPanResponderMove: (_, g) => {
+      const x = Math.min(Math.max(8, (pos.x as any)._value + g.dx), width - 80);
+      const y = Math.min(Math.max(40, (pos.y as any)._value + g.dy), height - 80);
+      pos.setValue({ x, y });
+    },
+    onPanResponderRelease: (_, g) => {
+      const x = (pos.x as any)._value;
+      const y = (pos.y as any)._value;
+      // Snap to nearest edge — auto-orient horizontal vs vertical
+      const distLeft = x;
+      const distRight = width - x;
+      const distTop = y;
+      const distBottom = height - y;
+      const min = Math.min(distLeft, distRight, distTop, distBottom);
+      let nextX = x, nextY = y, isVert = false;
+      if (min === distLeft)        { nextX = 8;  isVert = true; }
+      else if (min === distRight)  { nextX = width - 64; isVert = true; }
+      else if (min === distTop)    { nextY = 60; isVert = false; }
+      else                          { nextY = height - 90; isVert = false; }
+      Animated.spring(pos, { toValue: { x: nextX, y: nextY }, useNativeDriver: false }).start();
+      setVertical(isVert);
+    },
+  })).current;
+
+  const items = [
+    { label: 'H1', onPress: props.onH1, type: 'text' },
+    { label: 'H2', onPress: props.onH2, type: 'text' },
+    { Icon: Bold, onPress: props.onBold, active: isMarkActive('bold'), testID: 'pilot-v2-tool-bold' },
+    { Icon: Italic, onPress: props.onItalic, active: isMarkActive('italic'), testID: 'pilot-v2-tool-italic' },
+    { Icon: UnderlineIcon, onPress: props.onUnderline, active: isMarkActive('underline'), testID: 'pilot-v2-tool-underline' },
+    { Icon: List, onPress: props.onUL, testID: 'pilot-v2-tool-ul' },
+    { Icon: ListOrdered, onPress: props.onOL, testID: 'pilot-v2-tool-ol' },
+    { Icon: ListTodo, onPress: props.onCheck, testID: 'pilot-v2-tool-checklist' },
+    { Icon: Quote, onPress: props.onQuote, testID: 'pilot-v2-tool-quote' },
+    { Icon: Highlighter, onPress: props.onHighlight, testID: 'pilot-v2-tool-highlight' },
+    { Icon: LinkIcon, onPress: props.onLink, testID: 'pilot-v2-tool-link' },
+    { Icon: ImageIcon, onPress: props.onImage, testID: 'pilot-v2-tool-image' },
+    { Icon: Paperclip, onPress: props.onAttach, testID: 'pilot-v2-tool-attachment' },
+    { Icon: TableIcon, onPress: props.onTable, testID: 'pilot-v2-tool-table' },
+    { Icon: Code, onPress: props.onCode, testID: 'pilot-v2-tool-code' },
+  ];
+
+  return (
+    <Animated.View
+      testID="pilot-v2-floating-toolbar"
+      style={[
+        styles.floatingToolbar,
+        {
+          flexDirection: vertical ? 'column' : 'row',
+          transform: pos.getTranslateTransform(),
+          backgroundColor: 'rgba(255,255,255,0.96)',
+          borderColor: colors.border,
+        },
+      ]}
+      {...pan.panHandlers}
+    >
+      <TouchableOpacity onPress={() => setCollapsed(c => !c)} style={styles.dragHandle} testID="pilot-v2-toolbar-collapse">
+        <Text style={{ color: colors.textTertiary, fontSize: 14, fontWeight: '700' }}>{collapsed ? '⋮' : '⋯'}</Text>
+      </TouchableOpacity>
+      {!collapsed && items.map((it: any, i: number) => (
+        it.type === 'text' ? (
+          <TouchableOpacity key={i} onPress={it.onPress} style={styles.floatBtn}>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: colors.textPrimary }}>{it.label}</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity key={i} testID={it.testID} onPress={it.onPress} style={[styles.floatBtn, it.active && { backgroundColor: '#EEECFF' }]}>
+            <it.Icon size={18} color={it.active ? '#5B4EFA' : colors.textSecondary} />
+          </TouchableOpacity>
+        )
+      ))}
+      {!collapsed && showHighlightPicker && (
+        <View style={[styles.highlightPicker, { backgroundColor: '#fff', borderColor: colors.border, top: vertical ? 0 : 52, left: vertical ? 52 : 0 }]}>
+          {PILOT_V2_HIGHLIGHT_PALETTE.map(c => (
+            <TouchableOpacity
+              key={c.name}
+              testID={`pilot-v2-highlight-${c.name.toLowerCase()}`}
+              onPress={() => onApplyHighlight(c.name)}
+              style={[styles.swatch, { backgroundColor: c.bg, borderWidth: activeHighlight === c.name ? 2 : 0, borderColor: '#5B4EFA' }]}
+            />
+          ))}
+        </View>
+      )}
+    </Animated.View>
+  );
+}
+
+/* ---------- Helpers: heading-tree filtering + unified export ---------- */
+function filterBlocksByHeadings(blocks: PilotV2Block[], excluded: Record<string, boolean>): PilotV2Block[] {
+  // Walk blocks; when entering an excluded heading section, skip until next heading at same/higher level.
+  const out: PilotV2Block[] = [];
+  let skipUntilLevel: number | null = null;
+  for (const b of blocks) {
+    if (b.type === 'heading') {
+      const lvl = b.level ?? 2;
+      if (skipUntilLevel !== null && lvl > skipUntilLevel) continue;
+      skipUntilLevel = excluded[b.id] ? lvl : null;
+      if (skipUntilLevel !== null) continue;
+    } else if (skipUntilLevel !== null) {
+      continue;
+    }
+    out.push(b);
+  }
+  return out;
+}
+
+async function unifiedExportSelected({ title, blocks, format, includeMargins }: { title: string; blocks: PilotV2Block[]; format: 'pdf' | 'image'; includeMargins: boolean }) {
+  // Use the existing Unified Export Engine if available; fallback to plain share.
+  try {
+    const mod: any = await import('../../lib/unifiedExportEngine');
+    const fn = mod?.exportPilotV2 ?? mod?.unifiedExport ?? mod?.default;
+    if (typeof fn === 'function') { await fn({ title, blocks, format, includeMargins }); return; }
+  } catch {}
+  const text = blocks.map(b => b.text).filter(Boolean).join('\n');
+  if (Platform.OS !== 'web') {
+    const { Share: RNShare } = require('react-native');
+    await RNShare.share({ title: `${title} (${format.toUpperCase()})`, message: `${title}\n\n${text}` });
+  } else {
+    Alert.alert('Export ready', `${title} exported as ${format.toUpperCase()}.`);
+  }
+}
+
 /* ---------- Toolbar atoms ---------- */
 const ToolbarTextBtn = ({ label, onPress, colors }: any) => (
   <TouchableOpacity onPress={onPress} style={styles.toolBtn}>
@@ -928,17 +1148,43 @@ const styles = StyleSheet.create({
   iconBtn: { padding: 6, borderRadius: 6 },
   savedPill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9999, borderWidth: 1 },
 
-  titleSection: { paddingHorizontal: 32, paddingVertical: 16, borderBottomWidth: 1, gap: 16 },
-  titleInput: { fontSize: 30, fontWeight: '700', padding: 0, lineHeight: 40 },
+  titleSection: { paddingHorizontal: 32, paddingTop: 24, paddingBottom: 8, gap: 4, position: 'relative' },
+  titleInput: { fontSize: 28, fontWeight: '700', padding: 0, lineHeight: 38 },
   toolbar: { flexDirection: 'row', alignItems: 'center', gap: 4, flexWrap: 'wrap' },
   toolBtn: { paddingHorizontal: 8, paddingVertical: 6, borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
   toolDivider: { width: 1, height: 24, marginHorizontal: 4 },
   swatch: { width: 18, height: 18, borderRadius: 4 },
   highlightPicker: {
-    position: 'absolute', top: '100%', left: 0, marginTop: 4,
-    flexDirection: 'row', gap: 6, padding: 8, borderRadius: 8, borderWidth: 1,
+    position: 'absolute', marginTop: 4,
+    flexDirection: 'row', gap: 6, padding: 8, borderRadius: 8, borderWidth: 1, zIndex: 1000,
     shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, shadowOffset: { width: 0, height: 4 },
   },
+  floatingBack: {
+    position: 'absolute', top: 16, left: 16, zIndex: 1000,
+    width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1,
+    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 4,
+  },
+  floatingControls: {
+    position: 'absolute', top: 16, right: 16, zIndex: 1000,
+    flexDirection: 'row', gap: 4, paddingHorizontal: 6, paddingVertical: 4,
+    borderRadius: 18, borderWidth: 1,
+    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 4,
+  },
+  floatingToolbar: {
+    position: 'absolute', zIndex: 1100,
+    alignItems: 'center', justifyContent: 'center', gap: 2,
+    paddingHorizontal: 6, paddingVertical: 6, borderRadius: 16, borderWidth: 1,
+    shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 6,
+  },
+  floatBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
+  dragHandle: { width: 36, height: 22, alignItems: 'center', justifyContent: 'center' },
+  moreMenu: {
+    position: 'absolute', top: 64, right: 16, minWidth: 240,
+    borderRadius: 14, borderWidth: 1, paddingVertical: 6,
+    shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 8,
+  },
+  moreItem: { paddingVertical: 10, paddingHorizontal: 14 },
 
   canvas: { padding: 24, paddingBottom: 80 },
   paper: {

@@ -11,6 +11,7 @@
  * function with an `expo-notifications` `scheduleNotificationAsync` call.
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AppState, AppStateStatus } from 'react-native';
 
 const STORAGE_KEY = 'pilot-v2:study-reminders';
 
@@ -75,11 +76,13 @@ export function subscribeStudyReminders(fn: Listener) {
 }
 
 let intervalRef: any = null;
+let appStateSub: { remove: () => void } | null = null;
 
-/** Start the polling loop. Idempotent — calling twice is a no-op. */
+/** Start the polling loop. Idempotent — calling twice is a no-op.
+ *  Auto-stops on background and resumes on foreground. */
 export function startStudyReminders() {
   if (intervalRef) return;
-  intervalRef = setInterval(async () => {
+  const tick = async () => {
     const cfg = await getStudyRemindersConfig();
     if (!cfg.enabled) return;
     const now = new Date();
@@ -104,12 +107,29 @@ export function startStudyReminders() {
       try { fn({ title, body, subject }); } catch { /* ignore */ }
     });
     await setStudyRemindersConfig({ lastFiredAt: now.toISOString() });
-  }, 60 * 1000); // poll every minute
+  };
+
+  intervalRef = setInterval(tick, 60 * 1000);
+  // Pause polling when the app is backgrounded; resume on foreground.
+  if (!appStateSub) {
+    appStateSub = AppState.addEventListener('change', (state: AppStateStatus) => {
+      if (state === 'active') {
+        if (!intervalRef) intervalRef = setInterval(tick, 60 * 1000);
+      } else if (intervalRef) {
+        clearInterval(intervalRef);
+        intervalRef = null;
+      }
+    });
+  }
 }
 
 export function stopStudyReminders() {
   if (intervalRef) {
     clearInterval(intervalRef);
     intervalRef = null;
+  }
+  if (appStateSub) {
+    appStateSub.remove();
+    appStateSub = null;
   }
 }

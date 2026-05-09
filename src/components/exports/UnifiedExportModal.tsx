@@ -24,7 +24,7 @@
  */
 import React, { useMemo, useState } from 'react';
 import {
-  Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch, Pressable,
+  Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView,
 } from 'react-native';
 import { X, FileText, Image as ImageIcon, FileDown, Check } from 'lucide-react-native';
 

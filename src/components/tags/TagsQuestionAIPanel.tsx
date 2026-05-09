@@ -94,8 +94,7 @@ export function TagsQuestionAIPanel({
   }, [userId, questionId]);
 
   // Issue 3 — lazy fetch sibling questions that share the same hierarchy
-  // and (loose) text signature. Cheaper than a full merger; good enough
-  // to surface alternate institute answers inline.
+  // and surface their explanations as alternate institute answers.
   useEffect(() => {
     let cancelled = false;
     if (!subject || !microTopic || !questionText) return;
@@ -103,7 +102,7 @@ export function TagsQuestionAIPanel({
       try {
         const { data } = await supabase
           .from('questions')
-          .select('id, test_id, explanation_markdown, tests(institute)')
+          .select('id, test_id, question_text, explanation_markdown, tests(institute)')
           .eq('subject', subject)
           .eq('micro_topic', microTopic)
           .neq('id', questionId)
@@ -112,16 +111,15 @@ export function TagsQuestionAIPanel({
         const targetLen = questionText.length;
         const matches: InstituteExplanation[] = [];
         for (const row of data as any[]) {
-          // Loose match: explanation_markdown exists and length within ±25%.
           if (!row.explanation_markdown) continue;
-          // We can't compare full question_text without fetching it; rely on
-          // the hierarchy filter + presence of explanation as a relevance
-          // signal (good enough for a hint-level UI).
+          // Loose ±35% length match on question_text — good-enough heuristic
+          // for surfacing same-question alternate institute answers without
+          // doing a full server-side merger.
+          const rowLen = String(row.question_text || '').length;
+          if (rowLen && (rowLen < targetLen * 0.65 || rowLen > targetLen * 1.35)) continue;
           const inst = row?.tests?.institute || 'Other Institute';
           matches.push({ source: inst, text: row.explanation_markdown });
           if (matches.length >= 4) break;
-          // Avoid lint warnings.
-          if (targetLen < 0) break;
         }
         if (!cancelled) setOtherExplanations(matches);
       } catch {
@@ -135,7 +133,7 @@ export function TagsQuestionAIPanel({
     if (!userId || !defaultExplanation) return;
     setSavingVitamin(true);
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('vitamin_versions')
         .insert({
           user_id: userId,
@@ -144,7 +142,12 @@ export function TagsQuestionAIPanel({
         })
         .select()
         .single();
+      if (error) throw error;
       if (data) setVitamins((prev) => [data as VitaminVersion, ...prev]);
+    } catch (e: any) {
+      // Surface the failure so the user knows the save didn't land.
+      // eslint-disable-next-line no-alert
+      alert(`Could not save Vitamin: ${e?.message || 'unknown error'}`);
     } finally {
       setSavingVitamin(false);
     }

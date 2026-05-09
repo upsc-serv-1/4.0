@@ -41,6 +41,7 @@ import { PencilToolbar } from './PencilToolbar';
 import { usePilotV2Pencil } from './usePilotV2Pencil';
 import { exportPilotV2Note } from './pilotV2Export';
 import { savePilotV2NoteContent } from '../../repositories/pilotV2Repo';
+import { savePilotV2NoteOfflineFirst } from './pilotV2OfflineSave';
 
 /* ─── helpers ────────────────────────────────────────────────────────────── */
 
@@ -124,7 +125,7 @@ export function PilotV2GlanceView() {
       version: note.content?.version ?? 1,
       pencilStrokes: next,
     };
-    savePilotV2NoteContent(note.id, content).catch(() => null);
+    savePilotV2NoteOfflineFirst(note.id, content).catch(() => null);
   }, [note]);
   const pencil = usePilotV2Pencil({
     noteId: note?.id ?? null,

@@ -36,6 +36,7 @@ import {
   PilotV2PencilStroke,
 } from './types';
 import { savePilotV2NoteContent, renamePilotV2Note } from '../../repositories/pilotV2Repo';
+import { savePilotV2NoteOfflineFirst } from './pilotV2OfflineSave';
 import { PencilCanvas } from './PencilCanvas';
 import { PencilToolbar } from './PencilToolbar';
 import { usePilotV2Pencil } from './usePilotV2Pencil';
@@ -163,7 +164,7 @@ export function PilotV2EditorView() {
       try {
         if (note?.id) {
           if (nextTitle !== note.title) await renamePilotV2Note(note.id, nextTitle);
-          await savePilotV2NoteContent(note.id, { blocks: nextBlocks, version: 1 });
+          await savePilotV2NoteOfflineFirst(note.id, { blocks: nextBlocks, version: 1 });
           dispatch({ type: 'PATCH_BLOCKS', payload: { id: note.id, blocks: nextBlocks } });
           dispatch({ type: 'PATCH_CURRENT_NOTE', payload: { id: note.id, patch: { title: nextTitle } } });
         }
@@ -399,7 +400,7 @@ export function PilotV2EditorView() {
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
       try {
-        await savePilotV2NoteContent(note.id, content);
+        await savePilotV2NoteOfflineFirst(note.id, content);
         dispatch({ type: 'PATCH_BLOCKS', payload: { id: note.id, blocks } });
         setSavingState('saved');
       } catch { setSavingState('idle'); }

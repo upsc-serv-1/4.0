@@ -8,10 +8,16 @@
  */
 import { Stack } from 'expo-router';
 import { View } from 'react-native';
+import { useEffect } from 'react';
 import { useTheme } from '../../src/context/ThemeContext';
+import { startPilotV2SyncQueue } from '../../src/components/pilot-v2/pilotV2SyncQueue';
 
 export default function PilotV2Layout() {
   const { colors } = useTheme();
+  useEffect(() => {
+    const stop = startPilotV2SyncQueue();
+    return stop;
+  }, []);
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <Stack

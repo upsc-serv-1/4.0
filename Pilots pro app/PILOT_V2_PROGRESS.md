@@ -1,113 +1,125 @@
-# Pilot V2 Tab — Implementation Progress
+# Pilot V2 — Implementation Progress
 
-**Branch:** `pilot-pro-v2.1` (continuation of `Pilot-Pro-1.0`/`pilot-v2-pro`)
-**Source design:** `Pilots pro app/Knowledge management app (pilot pro app files)`
-**Bible / reference docs:**
-- `Pilots pro app/complete-design-specification.md`
-- `Pilots pro app/PILOT_INTEGRATION_GUIDE.md`
-- `Pilots pro app/QUICK_START_IMPLEMENTATION.md`
-- `Pilots pro app/INTEGRATION_SUMMARY.md`
+> **Branch:** `pilot-pro-v2.3` (push target). Push as `emergent bot`.
+> **Last updated:** see `git log`.
+> This file is a continuous handoff so any agent (or human) can pick up where
+> the previous session stopped.
 
 ---
 
-## Why a NEW tab (Pilot V2) instead of editing Capsule?
+## ✅ Completed
 
-From the bible files: Capsule has integration & ingestion problems (fragmented blocks, non-functional toolbar, plain glance, duplicate notebooks). A clean parallel "Pilot V2" tab is being introduced so:
-- Existing Capsule data and flows stay intact (no breaking changes).
-- The Knowledge Management app design (Samsung Notes-style) ships unmodified.
-- Quiz Engine gets a NEW "Save to Pilot V2" button alongside existing destinations.
-- Migration path from Capsule → Pilot V2 stays open for later.
+### Step 5 — PencilAnnotationEngine (commit `bcde702`)
+- File: `src/components/pilot-v2/PencilAnnotationEngine.ts`
+- Stroke tracker, palm rejection, **relative 0..1 coords** (no scale drift),
+  undo/redo (200 deep), velocity pressure, eraser hit-test.
+- Types added: `PilotV2PencilStroke`, `PilotV2PencilTool`, palette constants
+  (Pen/Highlighter colors + 6 widths each).
 
----
-
-## Approach (Option B: Deep Dive)
-
-Drop-in port of every screen from the KM Vite/React app to React Native (Expo)
-**without deviating from the Figma UI/UX**. Tailwind classes map 1-to-1 to
-StyleSheet rules; the design tokens from `theme.css` become the colors object.
-
----
-
-## Step Checklist (canonical)
-
-| Step | Title / Description | Status | Commit |
-|------|---------------------|:------:|--------|
-| 1  | Bootstrap Pilot V2 — types, context, repository skeleton, folder structure | ✅ | (initial) |
-| 2  | Register `pilot-v2` in TabConfigService + tabs layout | ✅ | (initial) |
-| 3  | Pilot V2 entry route + view-mode router (`/pilot-v2`) | ✅ | (initial) |
-| 4  | Sidebar — Home mode (subjects list + quick actions) | ✅ | (initial) |
-| 5  | Sidebar — Subject mode (dynamic topic/subtopic tree, expand/collapse) | ✅ | (initial) |
-| 6  | Dashboard — greeting, breadcrumb, search, Continue Studying carousel, Pinned grid | ✅ | (initial) |
-| 7  | NoteList — sticky header, search, new note CTA, pinned & per-note rows | ✅ | b63ea03 |
-| 8  | GlanceView — block renderer with highlights, sticky header, infinite scroll | ✅ | e958c15 |
-| 8b | GlanceView — wire Bell/Share/Upload/More header buttons | ✅ | 2023dcd |
-| 9  | EditorView — block-based editor, full toolbar (H1/H2/B/I/U/lists/highlight/link/image), outline, autosave | ✅ | e958c15 |
-| 10 | Pilot V2 Repository — Supabase CRUD on `user_notes` + `user_note_nodes` (surface = `pilot_v2`) | ✅ | (skeleton + Step 12) |
-| 11 | Quiz Engine integration — new "Save to Pilot V2" button on the shared question card (popup like flashcards, auto-or-manual save) | ✅ | Step 23 |
-| 12 | Auto-hierarchy `findOrCreatePilotV2Note` for Pilot V2 (no duplicate notebooks; same subject/topic/subtopic/microtopic appends to same note) | ✅ | (in pilotV2Repo.ts) |
-| 13 | Final polish — full button audit + handoff docs | ✅ | Step 25 |
-| 14 | Bootstrap Pilot V2 dev env on Emergent (add `@expo/ngrok` devDep for tunnel preview) | ✅ | a320f59 |
-| 15 | Editor — wire Bold / Italic / Underline as block-level inline marks | ✅ | 7a4d290 |
-| 16 | Editor — wire Undo / Redo with 100-step history stack | ✅ | 01a14a2 |
-| 17 | Editor — wire Link / Image / Calendar / Paperclip / Table / Code (modals, pickers, render in Editor + Glance) | ✅ | f16c61f |
-| 18 | Editor — wire bottom-bar font scale (Aa) + zoom controls | ✅ | 6d2ec2d |
-| 19 | Sidebar — wire Pinned/Recent/Shared/Trash quick filters, New Subject hint, Settings sheet (sign-out) | ✅ | 374477e |
-| 20 | Dashboard — wire + New, See All (Recent/Pinned), search input + quick-filter badge | ✅ | 8862bd7 |
-| 21 | Sync progress markdown with actual completed steps | ✅ | this commit |
-| 22 | Quiz Engine integration — add `pilot-v2` destination chip to AddToNotebookSheet | ✅ | Step 22 |
-| 23 | Quiz Engine integration — wire `pilot-v2` save flow in `engine.tsx` and `ai-search.tsx` (`appendBlocksToPilotV2Note` via auto-hierarchy) | ✅ | Step 23 |
-| 24 | Sidebar — wire "New Subject" CTA to actually create a subject node | ✅ | Step 24 |
-| 25 | Final polish + handoff documentation (this checklist closure) | ✅ | Step 25 |
+### Step 6 — PencilCanvas + Toolbar + Export (commit `79af826`, `ada1682`)
+- `PencilCanvas.tsx` — Skia page-level continuous overlay.
+- `PencilToolbar.tsx` — Notability-style: Pen / Highlighter / Eraser / Lasso,
+  6 widths, color palette + favorites, custom hex picker, undo/redo,
+  pencil-only toggle, spring animations on tool & color selection.
+- `usePilotV2Pencil.ts` — hook with AsyncStorage persistence of
+  tool/color/favorites + engine lifecycle per noteId.
+- Wired into both `PilotV2EditorView.tsx` and `PilotV2GlanceView.tsx`
+  (drawable everywhere — pencil FAB toggles drawing mode).
+- `pilotV2Export.ts` — bridges to existing `unifiedExportEngine` so PDF /
+  Image / Markdown exports include flattened pencil strokes.
+- Editor More-menu Export options now functional (PDF / Image / Markdown).
+- Glance share button now exports via the unified engine.
+- **Bug fix:** removed orphan Modal block + trailing `,});` syntax error in
+  `PilotV2EditorView.tsx` (file now compiles).
+- HANDOFF.md marked Steps 5 & 6 `[x]`.
+- `PILOT_V2_SOFTNOTES_BORROWED.md` created with smart-borrow list.
 
 ---
 
-## Step 11/14 — Quiz → Pilot V2 UX (the "flashcard-like popup")
+## 🚧 In progress (current session)
 
-The user's bigger requirement (originally numbered Step 14 in the open list)
-is now satisfied by the Quiz integration:
+### Step 7 — Local-First Sync (Notability-style)
+**Goal**: every keystroke saves to the device first; cross-device sync via
+Supabase; Google Drive backup option. Uses existing `KVStore` (MMKV →
+AsyncStorage fallback) so it works in **Expo Go now** and upgrades
+automatically when the user installs a dev build.
 
-1. From the quiz engine / ai-search question card the user taps **Save to
-   Pilot V2** (new chip in the destination sheet alongside Capsule / Notes /
-   Flashcards).
-2. A popup mirroring the flashcard popup appears with the question's
-   `subject → section_group (topic) → micro_topic (subtopic) → notebook title`
-   pre-filled. The user can:
-   * **Auto-save** with one tap (uses `findOrCreatePilotV2Note`).
-   * **Manually adjust** any of the four fields before saving.
-3. When the same subject/topic/subtopic/microtopic is saved again, the new
-   blocks are **appended** to the existing Pilot V2 note (no duplicate
-   notebooks). This is delivered by `appendBlocksToPilotV2Note`.
-4. The block payload is editable in the popup *before* saving and stays fully
-   editable inside the Pilot V2 editor *after* saving.
-5. Highlights, lists, code, links, images and tables created inside the
-   Pilot V2 editor are rendered with the same colours/typography in the
-   GlanceView (the block renderer is shared).
+| Sub-task | Status |
+|---|---|
+| `pilotV2LocalStore.ts` (KV-backed cache for notes + strokes) | ⏳ pending |
+| Crash-recovery hydrate-on-launch | ⏳ pending |
+| Background retry queue (network-restored re-sync) | ⏳ pending |
+| Supabase server sync hook for cross-device | ⏳ pending |
+| Google Drive backup integration (manual + auto on close) | ⏳ pending |
+| Wire into `savePilotV2NoteContent` | ⏳ pending |
 
----
+### Step 8 — Migration & UI
+| Sub-task | Status |
+|---|---|
+| Backward-compat converter (old flat blocks → new schema) | ⏳ pending |
+| Outline sidebar (heading hierarchy) inside editor | ⏳ pending |
+| Block-tag badges ("Added by quiz import" etc.) | ⏳ pending |
 
-## Where the team should resume if credits expire
+### Step 5/6 polish
+| Sub-task | Status |
+|---|---|
+| Lasso selection box (move/scale grouped strokes) | ⏳ pending |
+| Shape recognition (square / circle / arrow snap) | ⏳ pending |
 
-1. Read this file top-to-bottom — every commit on the `pilot-pro-v2.1`
-   branch is prefixed `Step N:` so progress is visible from `git log`.
-2. The exact UI/UX source-of-truth is the seven-screen spec in
-   `Pilots pro app/complete-design-specification.md` (sections 12 & 13).
-3. The React Native ports live under `src/components/pilot-v2/` and the
-   routes live under `app/pilot-v2/`. Both are isolated from Capsule and
-   Notes.
-4. Repository functions: `src/repositories/pilotV2Repo.ts`. They reuse the
-   existing `user_notes` + `user_note_nodes` tables with
-   `metadata.surface = 'pilot_v2'` for full isolation.
-5. Quiz engine button: `src/components/capsule/AddToNotebookSheet.tsx` (new
-   destination type `pilot-v2`) and the call sites in
-   `app/unified/engine.tsx` and `app/ai-search.tsx`.
+### Validation
+- [ ] `npx tsc --noEmit` → only pre-existing errors should remain
+- [ ] `testing_agent_v3_expo` end-to-end run
+- [ ] Final push to `pilot-pro-v2.3`
 
 ---
 
-## Open items (parked for follow-up)
+## ⏭️ Deferred (out-of-scope for this session)
 
-- Migration of Capsule data into Pilot V2 (one-time importer).
-- Supabase realtime sync (auto-refresh dashboards across devices).
-- AI suggestions / summarisation (will reuse the existing Groq + Gemini keys
-  already configured in `app/ai-settings.tsx`).
-- Cross-device push for note-level reminders (currently insertable but not
-  notified outside the app).
+* 253 pre-existing TypeScript errors in `services/`, `softnotes/`, `utils/`,
+  `supabase/functions/`, plus `PilotV2NoteList`, `PilotV2SaveSheet`,
+  `PilotV2Sidebar`. **Per user request — not fixing now.** Keep app on
+  Expo Go.
+* Apple Pencil 2 hardware double-tap (would require a native module,
+  breaks Expo Go).
+
+---
+
+## File map (current)
+
+```
+src/components/pilot-v2/
+  PencilAnnotationEngine.ts   ✅ Step 5
+  PencilCanvas.tsx             ✅ Step 6
+  PencilToolbar.tsx            ✅ Step 6
+  usePilotV2Pencil.ts          ✅ Step 6
+  pilotV2Export.ts             ✅ Step 6
+  PilotV2EditorView.tsx        ✅ wired (pencil + export)
+  PilotV2GlanceView.tsx        ✅ wired (pencil + export)
+  types.ts                     ✅ extended w/ pencil types
+  pilotV2LocalStore.ts         ⏳ Step 7
+  pilotV2SyncQueue.ts          ⏳ Step 7
+  pilotV2DriveBackup.ts        ⏳ Step 7 (Google Drive)
+  pilotV2Migration.ts          ⏳ Step 8
+  PilotV2OutlineSidebar.tsx    ⏳ Step 8
+src/lib/
+  kvStore.ts                   ✅ pre-existing (MMKV / AsyncStorage)
+```
+
+---
+
+## Commit log so far on `pilot-pro-v2.3`
+```
+ada1682 Step 6: Mark steps 5 and 6 as completed in handoff and add softnotes borrow plan
+79af826 Step 6: Add Notability-style pencil canvas, toolbar and unified export
+bcde702 Step 5: Add pencil annotation engine with palm rejection and undo redo
+```
+
+## Push command (for any continuation agent)
+```bash
+cd /root/work/pilot-repo
+git add -A
+git commit -m "Step N: short description"
+git push origin pilot-pro-v2.3
+```
+PAT used: `github_pat_11CCGLRGQ0L5nrITIwONXh_…` (already in remote URL).
+Author: emergent bot <emergent-bot@users.noreply.github.com>.

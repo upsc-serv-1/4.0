@@ -30,7 +30,7 @@ import {
   Target,
   TrendingUp,
   X,
-  Play,
+  FileStack,
 } from 'lucide-react-native';
 import { supabase } from '../src/lib/supabase';
 import { PieChart, LineChart } from '../src/components/Charts';
@@ -219,7 +219,7 @@ function StickyHeatmapTable({
                           onPress={() => onLabelActionPress(row.label)}
                           style={styles.labelActionBtn}
                         >
-                          <Play size={14} color={colors.primary || '#7c3aed'} />
+                          <FileStack size={14} color={colors.primary || '#7c3aed'} />
                         </TouchableOpacity>
                       )}
                     </View>

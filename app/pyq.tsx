@@ -2053,7 +2053,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         <View style={{ backgroundColor: colors.primary + '08', borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: colors.primary + '20' }}>
           <Text style={{ color: colors.primary, fontSize: 11, fontWeight: '800', letterSpacing: 0.5, marginBottom: 4 }}>HOW TO USE THIS HEATMAP</Text>
           <Text style={{ color: colors.textSecondary, fontSize: 11, fontWeight: '600', lineHeight: 17 }}>
-            {'• Tap a row label (left) to open deep-dive sections & micro-topics.\n• Tap any cell number to directly open those questions in Learn Mode.\n• Tap the ▶ icon on a row to open all questions for that topic.'}
+            {'• Tap a row label (left) to open deep-dive sections & micro-topics.\n• Tap any cell number to directly open those questions in Learn Mode.\n• Tap the 📚 question-bank icon on a row to open all questions for that topic.'}
           </Text>
         </View>
 

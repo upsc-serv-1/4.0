@@ -1167,9 +1167,9 @@ const styles = StyleSheet.create({
   },
   floatingControls: {
     position: 'absolute', top: 16, right: 16, zIndex: 1000,
-    flexDirection: 'row', gap: 4, paddingHorizontal: 6, paddingVertical: 4,
-    borderRadius: 18, borderWidth: 1,
-    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 4,
+    flexDirection: 'row', gap: 4, paddingHorizontal: 8, paddingVertical: 6,
+    borderRadius: 22, borderWidth: 1,
+    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 10, shadowOffset: { width: 0, height: 3 }, elevation: 5,
   },
   floatingToolbar: {
     position: 'absolute', zIndex: 1100,

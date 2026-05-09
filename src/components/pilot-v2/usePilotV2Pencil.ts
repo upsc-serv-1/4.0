@@ -53,7 +53,12 @@ export function usePilotV2Pencil({
   }, [engine, tool, color, width, pencilOnly, shapeRecognition, pageWidth, pageHeight]);
 
   useEffect(() => {
-    const unsub = engine.subscribe(() => forceTick(t => t + 1));
+    // CRITICAL: subscribe ONLY to persisted-stroke changes here. The active
+    // stroke fires its OWN listener directly inside <PencilCanvas>, so the
+    // host editor (and every block inside it) does NOT re-render on every
+    // pen point. This is the single change that brings ink latency from
+    // sluggish (forceTick on every move event) down to Soft Notes-grade.
+    const unsub = engine.subscribePersisted(() => forceTick(t => t + 1));
     return unsub;
   }, [engine]);
 

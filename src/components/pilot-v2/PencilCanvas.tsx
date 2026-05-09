@@ -62,8 +62,7 @@ export function PencilCanvas({
   const [selectionBounds, setSelectionBounds] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   const moveOriginRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Skia path cache to avoid recreating path on every render
-  const strokePathMap = useRef<Map<string, { path: any; strokeRef: PilotV2PencilStroke; w: number; h: number }>>(new Map());
+  // Skia path cache moved into <CommittedStrokesLayer> — see bottom of file.
 
   // ===== Active-stroke fast-path =====
   // Building a native Skia.Path via MakeFromSVGString on every move event is
@@ -128,50 +127,34 @@ export function PencilCanvas({
     setActivePathStr('');
   }, []);
 
-  // Clean up cache for deleted strokes
-  useEffect(() => {
-    const currentIds = new Set(committedStrokes.map(s => s.id));
-    for (const id of strokePathMap.current.keys()) {
-      if (!currentIds.has(id)) {
-        strokePathMap.current.delete(id);
-      }
-    }
-  }, [committedStrokes]);
-
-  const getCachedPath = useCallback((stroke: PilotV2PencilStroke) => {
-    const cached = strokePathMap.current.get(stroke.id);
-    if (cached && cached.strokeRef === stroke && cached.w === width && cached.h === height) {
-      return cached.path;
-    }
-    const d = pencilStrokeToSvgPath(stroke, width, height);
-    if (!d) return null;
-    const skiaPath = Skia.Path.MakeFromSVGString(d);
-    if (!skiaPath) return null;
-    strokePathMap.current.set(stroke.id, { path: skiaPath, strokeRef: stroke, w: width, h: height });
-    return skiaPath;
-  }, [width, height]);
-
   useEffect(() => {
     engine.setConfig({ pageWidth: width, pageHeight: height });
   }, [engine, width, height]);
 
   useEffect(() => {
-    const unsub = engine.subscribe(() => {
-      const current = engine.getCurrent();
+    // PERSISTED listener — refresh the committed-strokes layer ONLY when a
+    // stroke is added/removed/undone/redone/replaced. This subscription
+    // never fires during the live move loop (see PencilAnnotationEngine),
+    // so the committed <Path> tree stays mounted untouched while drawing.
+    const unsubPersisted = engine.subscribePersisted((persisted) => {
+      setCommittedStrokes(persisted);
+    });
+    // ACTIVE listener — fires on EVERY move event. We rebuild the live SVG
+    // path string incrementally and feed it to a tiny <ActivePathLayer>
+    // that is the ONLY component re-rendering during the drag. All other
+    // committed strokes + the editor blocks stay perfectly still.
+    const unsubActive = engine.subscribeActive((current) => {
       setActiveStroke(current);
       if (current) {
-        // Keep the live path string in sync with the latest point
-        // (incremental — see buildActivePath).
         setActivePathStr(buildActivePath(current));
       } else {
-        // Stroke finished or cancelled — flush the cache and refresh
-        // committed strokes so the just-committed one renders via the
-        // cached Skia.Path code path on next frame.
         resetActivePath();
-        setCommittedStrokes(engine.getPersisted());
       }
     });
-    return unsub;
+    return () => {
+      unsubPersisted();
+      unsubActive();
+    };
   }, [engine, buildActivePath, resetActivePath]);
 
   // When the user switches away from lasso, drop the selection.
@@ -289,24 +272,9 @@ export function PencilCanvas({
         <Animated.View style={{ width, height }}>
           <Canvas style={{ width, height }}>
             <Group>
-              {committedStrokes.map((s) => {
-                const path = getCachedPath(s);
-                if (!path) return null;
-                const isHL = s.tool === 'highlighter';
-                const colorHex = withAlpha(s.color, isHL ? s.opacity : 1);
-                return (
-                  <Path
-                    key={s.id}
-                    path={path}
-                    color={colorHex}
-                    style="stroke"
-                    strokeWidth={isHL ? s.width * 1.6 : s.width}
-                    strokeCap="round"
-                    strokeJoin="round"
-                    blendMode={isHL ? 'multiply' : undefined}
-                  />
-                );
-              })}
+              {/* Committed strokes — memoised so they DO NOT re-render when
+                  the active path string updates on every move event. */}
+              <CommittedStrokesLayer strokes={committedStrokes} width={width} height={height} />
 
               {/* Render active stroke separately — uses a string-path
                   fast-path so each new point is an O(1) string append on
@@ -463,6 +431,69 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
 });
+
+/* -------------------------------------------------------------------------- */
+/* CommittedStrokesLayer                                                       */
+/*                                                                             */
+/*   Renders the persisted-strokes <Path> tree. Wrapped in React.memo so it    */
+/*   reconciles ONLY when the strokes array itself (or page dimensions) is    */
+/*   replaced — never on every active-stroke point update. This is what       */
+/*   keeps the committed ink layer perfectly still while a new stroke is in   */
+/*   progress, eliminating frame drops on long notes.                          */
+/* -------------------------------------------------------------------------- */
+interface CommittedLayerProps {
+  strokes: PilotV2PencilStroke[];
+  width: number;
+  height: number;
+}
+const CommittedStrokesLayer = React.memo(function CommittedStrokesLayer({
+  strokes, width, height,
+}: CommittedLayerProps) {
+  // Per-instance Skia path cache — rebuilt only when this layer re-renders,
+  // i.e. when the persisted-strokes array reference changes.
+  const cache = useRef<Map<string, { path: any; w: number; h: number }>>(new Map());
+  const getPath = (s: PilotV2PencilStroke) => {
+    const cached = cache.current.get(s.id);
+    if (cached && cached.w === width && cached.h === height) return cached.path;
+    const d = pencilStrokeToSvgPath(s, width, height);
+    if (!d) return null;
+    const skiaPath = Skia.Path.MakeFromSVGString(d);
+    if (!skiaPath) return null;
+    cache.current.set(s.id, { path: skiaPath, w: width, h: height });
+    return skiaPath;
+  };
+  // Drop cache entries for strokes that no longer exist.
+  const liveIds = new Set(strokes.map((s) => s.id));
+  for (const id of cache.current.keys()) {
+    if (!liveIds.has(id)) cache.current.delete(id);
+  }
+  return (
+    <Group>
+      {strokes.map((s) => {
+        const path = getPath(s);
+        if (!path) return null;
+        const isHL = s.tool === 'highlighter';
+        const colorHex = withAlpha(s.color, isHL ? s.opacity : 1);
+        return (
+          <Path
+            key={s.id}
+            path={path}
+            color={colorHex}
+            style="stroke"
+            strokeWidth={isHL ? s.width * 1.6 : s.width}
+            strokeCap="round"
+            strokeJoin="round"
+            blendMode={isHL ? 'multiply' : undefined}
+          />
+        );
+      })}
+    </Group>
+  );
+}, (prev, next) => (
+  prev.strokes === next.strokes &&
+  prev.width === next.width &&
+  prev.height === next.height
+));
 
 const engineRegistry = new Map<string, PencilAnnotationEngine>();
 

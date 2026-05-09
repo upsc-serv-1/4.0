@@ -26,6 +26,13 @@ import { recogniseShape } from './pilotV2ShapeRecognition';
 
 /** Listener fired whenever the visible stroke list changes. */
 type ChangeListener = (strokes: PilotV2PencilStroke[]) => void;
+/** Listener fired ONLY when persisted strokes change (commit/delete/undo/redo).
+ *  Used by hosts that need to react to durable changes WITHOUT re-rendering
+ *  on every active-stroke point — critical for ink latency. */
+type PersistedListener = (strokes: PilotV2PencilStroke[]) => void;
+/** Listener fired ONLY during the in-progress stroke. Used by the Skia
+ *  canvas to repaint the active path without touching parent React tree. */
+type ActiveListener = (active: PilotV2PencilStroke | null) => void;
 
 /** A single undoable operation. */
 type EngineOp =
@@ -90,6 +97,8 @@ export class PencilAnnotationEngine {
   private currentStroke: PilotV2PencilStroke | null = null;
   private currentPoints: PilotV2PencilPoint[] = [];
   private listeners: ChangeListener[] = [];
+  private persistedListeners: PersistedListener[] = [];
+  private activeListeners: ActiveListener[] = [];
 
   private undoStack: EngineOp[] = [];
   private redoStack: EngineOp[] = [];
@@ -151,13 +160,32 @@ export class PencilAnnotationEngine {
     this.strokes = [...strokes];
     this.undoStack = [];
     this.redoStack = [];
-    this.notify();
+    this.notifyPersisted();
   }
 
   subscribe(fn: ChangeListener): () => void {
     this.listeners.push(fn);
     return () => {
       this.listeners = this.listeners.filter(l => l !== fn);
+    };
+  }
+
+  /** Subscribe to PERSISTED stroke changes only (commit / delete / undo / redo
+   *  / replaceAll). Active-stroke updates DO NOT fire this listener — that is
+   *  the whole point: parents stay still while the user draws. */
+  subscribePersisted(fn: PersistedListener): () => void {
+    this.persistedListeners.push(fn);
+    return () => {
+      this.persistedListeners = this.persistedListeners.filter(l => l !== fn);
+    };
+  }
+
+  /** Subscribe to ACTIVE stroke updates (every point). Fires very frequently
+   *  during drawing — only the Skia canvas should listen here. */
+  subscribeActive(fn: ActiveListener): () => void {
+    this.activeListeners.push(fn);
+    return () => {
+      this.activeListeners = this.activeListeners.filter(l => l !== fn);
     };
   }
 
@@ -178,6 +206,8 @@ export class PencilAnnotationEngine {
       return;
     }
     const point = this.toRelativePoint(screenX, screenY, pressure);
+    // Fresh array — DO NOT share references with the stroke object so we can
+    // push into it on every move without allocating a new points array.
     this.currentPoints = [point];
     this.currentStroke = {
       id: newStrokeId(),
@@ -185,12 +215,14 @@ export class PencilAnnotationEngine {
       color: this.color,
       width: this.width,
       opacity: this.tool === 'highlighter' ? 0.35 : this.opacity,
-      points: [point],
+      // Reference the SAME array so addPoint stays O(1).
+      points: this.currentPoints,
       zIndex: this.strokes.length,
       createdAt: nowIso(),
     };
     this.lastSampleAt = Date.now();
-    this.notify();
+    // Active-only notify — parents do not re-render here.
+    this.notifyActive();
   }
 
   /** Add a point to the active stroke. */
@@ -214,12 +246,14 @@ export class PencilAnnotationEngine {
       point.pressure = pressureFromVelocity(v);
     }
 
+    // Push into the SAME array referenced by currentStroke.points to avoid
+    // O(n) array clone + O(n) object spread on every single move event. This
+    // is the single biggest cause of write lag on long strokes — eliminating
+    // it brings Pilot V2 ink to Soft Notes-grade latency.
     this.currentPoints.push(point);
-    this.currentStroke = {
-      ...this.currentStroke,
-      points: [...this.currentPoints],
-    };
-    this.notify();
+    // No object spread, no new object — the canvas reads the same reference
+    // and rebuilds only the last quadratic segment of the SVG path.
+    this.notifyActive();
   }
 
   /** Finish the current stroke and commit it to history. */
@@ -231,13 +265,14 @@ export class PencilAnnotationEngine {
       const removed = this.strokes.filter(s => ids.includes(s.id));
       this.strokes = this.strokes.filter(s => !ids.includes(s.id));
       this.pushOp({ kind: 'remove', strokes: removed });
-      this.notify();
+      this.notifyPersisted();
       return null;
     }
 
     if (!this.currentStroke || this.currentPoints.length === 0) {
       this.currentStroke = null;
       this.currentPoints = [];
+      this.notifyActive();
       return null;
     }
 
@@ -257,14 +292,19 @@ export class PencilAnnotationEngine {
 
     const finished: PilotV2PencilStroke = {
       ...this.currentStroke,
-      points: [...finalPoints],
+      // Snapshot — break the shared reference so future strokes can mutate
+      // currentPoints without corrupting the just-committed stroke.
+      points: finalPoints === this.currentPoints ? [...finalPoints] : [...finalPoints],
       bounds: computeBounds(finalPoints),
     };
     this.strokes.push(finished);
     this.pushOp({ kind: 'add', strokes: [finished] });
     this.currentStroke = null;
     this.currentPoints = [];
-    this.notify();
+    // Persisted listeners run AFTER active listeners are cleared so the
+    // canvas refreshes its committed-strokes layer in one render.
+    this.notifyActive();
+    this.notifyPersisted();
     return finished;
   }
 
@@ -273,7 +313,7 @@ export class PencilAnnotationEngine {
     this.currentStroke = null;
     this.currentPoints = [];
     this.eraseHits = new Set();
-    this.notify();
+    this.notifyActive();
   }
 
   /* -------------------- erase hit-test -------------------- */
@@ -321,7 +361,7 @@ export class PencilAnnotationEngine {
       this.strokes = [...this.strokes, ...op.strokes].sort((a, b) => a.zIndex - b.zIndex);
     }
     this.redoStack.push(op);
-    this.notify();
+    this.notifyPersisted();
     return op;
   }
 
@@ -335,7 +375,7 @@ export class PencilAnnotationEngine {
       this.strokes = this.strokes.filter(s => !ids.has(s.id));
     }
     this.undoStack.push(op);
-    this.notify();
+    this.notifyPersisted();
     return op;
   }
 
@@ -344,7 +384,7 @@ export class PencilAnnotationEngine {
     const removed = [...this.strokes];
     this.strokes = [];
     this.pushOp({ kind: 'remove', strokes: removed });
-    this.notify();
+    this.notifyPersisted();
   }
 
   /* -------------------- lasso selection -------------------- */
@@ -377,7 +417,7 @@ export class PencilAnnotationEngine {
       }));
       return { ...s, points, bounds: computeBounds(points) };
     });
-    this.notify();
+    this.notifyPersisted();
   }
 
   /** Remove the strokes in `ids`. Used by lasso "delete selection". */
@@ -388,7 +428,7 @@ export class PencilAnnotationEngine {
     if (!removed.length) return;
     this.strokes = this.strokes.filter((s) => !set.has(s.id));
     this.pushOp({ kind: 'remove', strokes: removed });
-    this.notify();
+    this.notifyPersisted();
   }
 
   private pointInPolygon(x: number, y: number, poly: { x: number; y: number }[]): boolean {
@@ -432,9 +472,34 @@ export class PencilAnnotationEngine {
   }
 
   private notify() {
+    // Legacy listener — fire all three so existing callers stay correct.
+    // Active listeners get the current stroke; persisted listeners get the
+    // committed list; legacy listeners get the union.
     const snapshot = this.getAll();
     for (const fn of this.listeners) {
       try { fn(snapshot); } catch { /* ignore listener errors */ }
+    }
+  }
+
+  /** Fire ONLY active-stroke listeners. Cheap — used on every move event. */
+  private notifyActive() {
+    const cur = this.currentStroke;
+    for (const fn of this.activeListeners) {
+      try { fn(cur); } catch { /* ignore */ }
+    }
+  }
+
+  /** Fire ONLY persisted-stroke listeners. Used on commit / delete / undo /
+   *  redo / replaceAll — never during the live move loop. */
+  private notifyPersisted() {
+    const snapshot = this.strokes;
+    for (const fn of this.persistedListeners) {
+      try { fn(snapshot); } catch { /* ignore */ }
+    }
+    // Also fire legacy listeners so non-migrated callers keep working.
+    const all = this.getAll();
+    for (const fn of this.listeners) {
+      try { fn(all); } catch { /* ignore */ }
     }
   }
 }

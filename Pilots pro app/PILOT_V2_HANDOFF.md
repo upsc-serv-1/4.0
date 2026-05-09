@@ -12,8 +12,8 @@
 - [ ] **Task 2: Build Smart Block Matcher** (AI similarity & offline keyword fallback)
 - [ ] **Task 3: Build Export Sheet UI** (UX selection panel, lazy loading, PDF/Markdown selective export)
 - [ ] **Task 4: Implement Smart Append** (auto-numbering, separator, "Undo Save" toast)
-- [ ] **Task 5: Add Pencil Annotation Engine** (stroke tracking, palm rejection, scale drift, Undo/Redo)
-- [ ] **Task 6: Build Pencil Canvas** (Shopify Skia page-level continuous layered canvas)
+- [x] **Task 5: Add Pencil Annotation Engine** (stroke tracking, palm rejection, scale drift, Undo/Redo)
+- [x] **Task 6: Build Pencil Canvas** (Shopify Skia page-level continuous layered canvas)
 - [ ] **Task 7: Implement Sync Manager** (MMKV local-first cache, sync failure retry queue)
 - [ ] **Task 8: Migration & Testing** (data conversion, block tagging, search block contents)
 
@@ -47,15 +47,15 @@
 - [ ] Implement block-level metadata tracking ("Added by quiz import" visual badge)
 
 ### ✏️ Pencil Annotations Tasks (Step 5 & Step 6)
-- [ ] Implement stroke detection
-- [ ] Implement Skia rendering
-- [ ] Implement Apple Pencil pressure detection
+- [x] Implement stroke detection
+- [x] Implement Skia rendering
+- [x] Implement Apple Pencil pressure detection
 - [ ] Implement shape recognition
-- [ ] Implement auto-saving of pencil strokes
-- [ ] Implement Palm Rejection
-- [ ] Implement relatively-scaled drawing vectors (no zoom/scale drift)
-- [ ] Implement Undo & Redo actions on the pencil toolbar
-- [ ] Implement single high-performance page-level continuous drawing layer (Notability-style independent overlay)
+- [x] Implement auto-saving of pencil strokes
+- [x] Implement Palm Rejection
+- [x] Implement relatively-scaled drawing vectors (no zoom/scale drift)
+- [x] Implement Undo & Redo actions on the pencil toolbar
+- [x] Implement single high-performance page-level continuous drawing layer (Notability-style independent overlay)
 
 ### 💾 Local-First Sync Tasks (Step 7)
 - [ ] Implement fast local storage caching (MMKV)

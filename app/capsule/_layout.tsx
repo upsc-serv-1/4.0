@@ -11,6 +11,9 @@ export default function CapsuleLayout() {
           headerShown: false,
           contentStyle: { backgroundColor: colors.bg },
           animation: 'slide_from_right',
+          animationDuration: 320,
+          gestureEnabled: true,
+          fullScreenGestureEnabled: false,
         }}
       />
     </View>

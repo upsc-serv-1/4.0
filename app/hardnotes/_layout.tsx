@@ -8,6 +8,7 @@ export default function HardnotesStackLayout() {
         animation: 'slide_from_right',
         animationDuration: 320,
         gestureEnabled: true,
+        fullScreenGestureEnabled: false,
       }}
     >
       <Stack.Screen

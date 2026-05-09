@@ -65,12 +65,16 @@ export function suggestBlockMatches(
     const tokens = new Set(tokenise(text));
     let score = jaccard(importTokens, tokens);
 
-    // Boost: exact substring match of any 2+ word phrase.
+    // Boost: exact substring match of any 2+ word phrase (min 8 chars to
+    // avoid over-matching common heading prefixes like "The Indian").
     const importedLc = importedText.toLowerCase();
     const headingLc = text.toLowerCase();
     if (importedLc.includes(headingLc)) score = Math.max(score, 0.95);
-    else if (headingLc.split(/\s+/).length >= 2 && importedLc.includes(headingLc.split(/\s+/).slice(0, 2).join(' '))) {
-      score = Math.max(score, 0.6);
+    else {
+      const firstTwo = headingLc.split(/\s+/).slice(0, 2).join(' ');
+      if (firstTwo.length >= 8 && importedLc.includes(firstTwo)) {
+        score = Math.max(score, 0.6);
+      }
     }
 
     return {

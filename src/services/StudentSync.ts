@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
+import { isQuestionStateEmpty } from './isQuestionStateEmpty';
 
 const PENDING_WRITES_KEY = '@pending_writes';
 const USER_STATES_PREFIX = '@user_states_';
@@ -259,10 +260,7 @@ class StudentSyncService {
 
     if (existing?.id) {
       // Issue 1 — if the merged state would be empty, delete the row instead of updating.
-      const merged = { ...updateData };
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { isQuestionStateEmpty } = require('./isQuestionStateEmpty');
-      if (isQuestionStateEmpty(merged)) {
+      if (isQuestionStateEmpty(updateData)) {
         const { error } = await supabase
           .from('question_states')
           .delete()
@@ -278,9 +276,7 @@ class StudentSyncService {
       if (error) throw error;
     } else {
       // Issue 1 — never insert an entirely-empty row.
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { isQuestionStateEmpty: ise } = require('./isQuestionStateEmpty');
-      if (ise(updateData)) return;
+      if (isQuestionStateEmpty(updateData)) return;
       // 2b. Insert new
       const { error } = await supabase
         .from('question_states')

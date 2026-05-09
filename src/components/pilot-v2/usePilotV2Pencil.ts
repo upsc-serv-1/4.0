@@ -13,6 +13,7 @@ import {
 
 const STORAGE_FAV_KEY = 'pilot-v2:pencil:favorites';
 const STORAGE_TOOL_KEY = 'pilot-v2:pencil:last';
+const STORAGE_SHAPE_KEY = 'pilot-v2:pencil:shape';
 
 const DEFAULT_FAVS = ['#0F172A', '#EF4444', '#3B82F6'];
 
@@ -31,6 +32,7 @@ export function usePilotV2Pencil({
   const [color, setColor] = useState<string>('#0F172A');
   const [width, setWidth] = useState<number>(PILOT_V2_PEN_WIDTHS[1]);
   const [pencilOnly, setPencilOnly] = useState(false);
+  const [shapeRecognition, setShapeRecognition] = useState(false);
   const [favorites, setFavorites] = useState<string[]>(DEFAULT_FAVS);
   const [drawingMode, setDrawingMode] = useState(false);
   const [, forceTick] = useState(0);
@@ -46,8 +48,9 @@ export function usePilotV2Pencil({
     engine.setTool(tool);
     engine.setColor(color);
     engine.setWidth(width);
+    engine.setShapeRecognition(shapeRecognition);
     engine.setConfig({ pencilOnly, pageWidth, pageHeight });
-  }, [engine, tool, color, width, pencilOnly, pageWidth, pageHeight]);
+  }, [engine, tool, color, width, pencilOnly, shapeRecognition, pageWidth, pageHeight]);
 
   useEffect(() => {
     const unsub = engine.subscribe(() => forceTick(t => t + 1));
@@ -71,6 +74,10 @@ export function usePilotV2Pencil({
         if (typeof obj?.pencilOnly === 'boolean') setPencilOnly(obj.pencilOnly);
       } catch { /* ignore */ }
     });
+    AsyncStorage.getItem(STORAGE_SHAPE_KEY).then((raw: string | null) => {
+      if (!alive || !raw) return;
+      setShapeRecognition(raw === '1');
+    });
     return () => { alive = false; };
   }, []);
 
@@ -81,6 +88,9 @@ export function usePilotV2Pencil({
     AsyncStorage.setItem(STORAGE_TOOL_KEY, JSON.stringify({ tool, color, width, pencilOnly }))
       .catch(() => null);
   }, [tool, color, width, pencilOnly]);
+  useEffect(() => {
+    AsyncStorage.setItem(STORAGE_SHAPE_KEY, shapeRecognition ? '1' : '0').catch(() => null);
+  }, [shapeRecognition]);
 
   useEffect(() => {
     engine.replaceAll(initialStrokes);
@@ -130,6 +140,7 @@ export function usePilotV2Pencil({
     color, setColor,
     width, setWidth,
     pencilOnly, setPencilOnly,
+    shapeRecognition, setShapeRecognition,
     favorites, setFavorites,
     drawingMode, setDrawingMode,
     canUndo: engine.canUndo(),

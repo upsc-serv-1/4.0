@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import {
   Pen, Highlighter, Eraser, Lasso, Undo2, Redo2,
-  Hand, Star, Plus, X,
+  Hand, Star, Plus, X, Sparkles,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import Animated, {
@@ -36,6 +36,7 @@ interface Props {
   color: string;
   width: number;
   pencilOnly: boolean;
+  shapeRecognition?: boolean;
   favoriteColors: string[];
   canUndo: boolean;
   canRedo: boolean;
@@ -43,6 +44,7 @@ interface Props {
   onColorChange: (c: string) => void;
   onWidthChange: (w: number) => void;
   onPencilOnlyChange: (v: boolean) => void;
+  onShapeRecognitionChange?: (v: boolean) => void;
   onFavoritesChange: (next: string[]) => void;
   onUndo: () => void;
   onRedo: () => void;
@@ -56,9 +58,10 @@ const ping = () => {
 };
 
 export function PencilToolbar({
-  tool, color, width, pencilOnly, favoriteColors,
+  tool, color, width, pencilOnly, shapeRecognition, favoriteColors,
   canUndo, canRedo,
   onToolChange, onColorChange, onWidthChange, onPencilOnlyChange,
+  onShapeRecognitionChange,
   onFavoritesChange, onUndo, onRedo, onClose,
 }: Props) {
   const [showCustom, setShowCustom] = useState(false);
@@ -211,6 +214,16 @@ export function PencilToolbar({
       >
         <Hand size={15} color={pencilOnly ? '#b91c1c' : '#94a3b8'} strokeWidth={2.5} />
       </TouchableOpacity>
+
+      {onShapeRecognitionChange ? (
+        <TouchableOpacity
+          onPress={() => { onShapeRecognitionChange(!shapeRecognition); ping(); }}
+          style={[s.iconBtn, shapeRecognition && { backgroundColor: '#ede9fe' }]}
+          testID="pilot-v2-pencil-shape"
+        >
+          <Sparkles size={15} color={shapeRecognition ? '#7c3aed' : '#94a3b8'} strokeWidth={2.5} />
+        </TouchableOpacity>
+      ) : null}
 
       {onClose && (
         <>

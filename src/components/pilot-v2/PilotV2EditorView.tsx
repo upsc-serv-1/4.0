@@ -582,6 +582,7 @@ export function PilotV2EditorView() {
             {paperSize.w > 1 && paperSize.h > 1 && (
               <PencilCanvas
                 engine={pencil.engine}
+                tool={pencil.tool}
                 width={paperSize.w}
                 height={paperSize.h}
                 drawingMode={pencil.drawingMode}
@@ -841,6 +842,7 @@ export function PilotV2EditorView() {
             color={pencil.color}
             width={pencil.width}
             pencilOnly={pencil.pencilOnly}
+            shapeRecognition={pencil.shapeRecognition}
             favoriteColors={pencil.favorites}
             canUndo={pencil.canUndo}
             canRedo={pencil.canRedo}
@@ -848,6 +850,7 @@ export function PilotV2EditorView() {
             onColorChange={pencil.setColor}
             onWidthChange={pencil.setWidth}
             onPencilOnlyChange={pencil.setPencilOnly}
+            onShapeRecognitionChange={pencil.setShapeRecognition}
             onFavoritesChange={pencil.setFavorites}
             onUndo={pencil.undo}
             onRedo={pencil.redo}

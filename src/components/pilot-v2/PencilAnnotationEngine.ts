@@ -22,6 +22,7 @@ import {
   PilotV2PencilPoint,
   PilotV2PencilTool,
 } from './types';
+import { recogniseShape } from './pilotV2ShapeRecognition';
 
 /** Listener fired whenever the visible stroke list changes. */
 type ChangeListener = (strokes: PilotV2PencilStroke[]) => void;
@@ -103,6 +104,8 @@ export class PencilAnnotationEngine {
   private opacity = 1;
   /** Set of strokes flagged for deletion in the active eraser drag. */
   private eraseHits: Set<string> = new Set();
+  /** When true, freehand strokes are auto-snapped to recognised shapes. */
+  private shapeRecognition = false;
 
   constructor(initial: PilotV2PencilStroke[] = [], config: EngineConfig) {
     this.strokes = [...initial];
@@ -123,6 +126,10 @@ export class PencilAnnotationEngine {
   setColor(c: string)              { this.color = c; }
   setWidth(w: number)               { this.width = w; }
   setOpacity(o: number)             { this.opacity = Math.max(0, Math.min(1, o)); }
+
+  /** When true, freehand strokes are auto-snapped to circle/rectangle/arrow. */
+  setShapeRecognition(on: boolean) { this.shapeRecognition = on; }
+  isShapeRecognition(): boolean { return this.shapeRecognition; }
 
   /** All strokes (already-persisted + the live one being drawn). */
   getAll(): PilotV2PencilStroke[] {
@@ -234,10 +241,24 @@ export class PencilAnnotationEngine {
       return null;
     }
 
+    let finalPoints = this.currentPoints;
+    // Optional shape recognition — pen tool only, only when feature is on.
+    if (this.shapeRecognition && this.tool === 'pen') {
+      try {
+        const result = recogniseShape({
+          ...this.currentStroke,
+          points: this.currentPoints,
+        });
+        if (result.points) finalPoints = result.points;
+      } catch {
+        /* fall through to raw stroke */
+      }
+    }
+
     const finished: PilotV2PencilStroke = {
       ...this.currentStroke,
-      points: [...this.currentPoints],
-      bounds: computeBounds(this.currentPoints),
+      points: [...finalPoints],
+      bounds: computeBounds(finalPoints),
     };
     this.strokes.push(finished);
     this.pushOp({ kind: 'add', strokes: [finished] });
@@ -324,6 +345,73 @@ export class PencilAnnotationEngine {
     this.strokes = [];
     this.pushOp({ kind: 'remove', strokes: removed });
     this.notify();
+  }
+
+  /* -------------------- lasso selection -------------------- */
+
+  /** Return the IDs of every stroke whose centroid lies inside the polygon.
+   *  Polygon points must be in RELATIVE (0..1) coordinates. */
+  selectInsidePolygon(poly: { x: number; y: number }[]): string[] {
+    if (poly.length < 3) return [];
+    const ids: string[] = [];
+    for (const s of this.strokes) {
+      let cx = 0, cy = 0;
+      for (const p of s.points) { cx += p.x; cy += p.y; }
+      cx /= s.points.length || 1;
+      cy /= s.points.length || 1;
+      if (this.pointInPolygon(cx, cy, poly)) ids.push(s.id);
+    }
+    return ids;
+  }
+
+  /** Translate every stroke in `ids` by (dx, dy) in relative units. */
+  moveStrokes(ids: Set<string> | string[], dx: number, dy: number): void {
+    const set = ids instanceof Set ? ids : new Set(ids);
+    if (set.size === 0 || (dx === 0 && dy === 0)) return;
+    this.strokes = this.strokes.map((s) => {
+      if (!set.has(s.id)) return s;
+      const points = s.points.map((p) => ({
+        ...p,
+        x: Math.max(0, Math.min(1, p.x + dx)),
+        y: Math.max(0, Math.min(1, p.y + dy)),
+      }));
+      return { ...s, points, bounds: computeBounds(points) };
+    });
+    this.notify();
+  }
+
+  /** Remove the strokes in `ids`. Used by lasso "delete selection". */
+  removeStrokes(ids: Set<string> | string[]): void {
+    const set = ids instanceof Set ? ids : new Set(ids);
+    if (set.size === 0) return;
+    const removed = this.strokes.filter((s) => set.has(s.id));
+    if (!removed.length) return;
+    this.strokes = this.strokes.filter((s) => !set.has(s.id));
+    this.pushOp({ kind: 'remove', strokes: removed });
+    this.notify();
+  }
+
+  private pointInPolygon(x: number, y: number, poly: { x: number; y: number }[]): boolean {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const xi = poly[i].x, yi = poly[i].y;
+      const xj = poly[j].x, yj = poly[j].y;
+      const intersect = ((yi > y) !== (yj > y)) &&
+        (x < ((xj - xi) * (y - yi)) / ((yj - yi) || 1e-9) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  }
+
+  /* -------------------- coordinate helper (public for lasso) -------------------- */
+
+  toRelative(screenX: number, screenY: number): { x: number; y: number } {
+    const w = Math.max(1, this.config.pageWidth);
+    const h = Math.max(1, this.config.pageHeight);
+    return {
+      x: Math.max(0, Math.min(1, screenX / w)),
+      y: Math.max(0, Math.min(1, screenY / h)),
+    };
   }
 
   /* -------------------- internals -------------------- */

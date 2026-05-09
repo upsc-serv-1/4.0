@@ -926,7 +926,14 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
         <View style={styles.modalBackdrop}>
           <View style={[styles.modalCard, { borderColor: colors.border, maxWidth: 520 }]} testID="pilot-v2-export-sheet">
             <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Export</Text>
-            <Text style={[styles.modalLabel, { marginBottom: 8 }]}>Select sections to include. All selected by default.</Text>
+            <Text style={[styles.modalLabel, { marginBottom: 8 }]}>
+              {(() => {
+                const total = blocks.filter(b => b.type === 'heading').length;
+                const excluded = Object.values(excludedHeadings).filter(Boolean).length;
+                const selected = total - excluded;
+                return total === 0 ? 'No headings detected. All content will be exported.' : `${selected} of ${total} sections selected. Tap to toggle.`;
+              })()}
+            </Text>
             <ScrollView style={{ maxHeight: 260 }}>
               {blocks.filter(b => b.type === 'heading').map(h => (
                 <TouchableOpacity

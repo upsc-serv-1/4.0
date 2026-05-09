@@ -208,8 +208,8 @@ export function PilotV2GlanceView() {
 
   return (
     <View testID="pilot-v2-glance" style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
-      {/* Sticky header */}
-      <View style={[styles.header, { backgroundColor: '#fff', borderBottomColor: colors.border }]}>
+      {/* Sticky header — minimal Apple-grade */}
+      <View style={[styles.header, { backgroundColor: 'rgba(255,255,255,0.96)', borderBottomColor: 'transparent' }]}>
         <View style={styles.headerLeft}>
           <TouchableOpacity testID="pilot-v2-glance-back" onPress={handleBack} style={styles.iconBtn}>
             <ChevronLeft size={20} color={colors.textPrimary} />

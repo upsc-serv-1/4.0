@@ -1,6 +1,6 @@
 # ⚠️ PILOT V2 - CLAUDE MISSING FEATURES & USER ANNOTATION GAPS
 
-This document contains the exact ditto missing features and gaps identified by Claude, followed by the specific Phase 3 Pencil Annotation requirements. The builder agent must resolve these items during implementation.
+This document contains the exact ditto missing features and gaps identified by Claude, followed by the specific Phase 3 Pencil Annotation and Active Recall Washi Tape requirements. The builder agent must resolve these items during implementation.
 
 ---
 
@@ -201,3 +201,26 @@ meta?: Record<string, any>;  // Exists but unused
 ### 4. Continuous Overlay Canvas (Notability-Style)
 *   Creating multiple canvases per block causes severe lag.
 *   **Requirement**: A single continuous drawing layer must cover the entire page (top-to-bottom, left-to-right). Drawing on top of text must remain on an independent overlay layer—allowing users to edit or select the underlying text at any time while drawings stay perfectly in place.
+
+---
+
+## 🎨 PREMIUM "WASHI TAPE" ACTIVE RECALL SYSTEM
+
+Create a premium "Washi Tape" system for the notes editor inspired by Notability, Goodnotes, and Japanese stationery aesthetics.
+
+### 1. Style Goal
+*   Soft matte academic feel, handmade paper texture, subtle grain, slightly translucent, elegant and minimal. Realistic paper tape, NOT glossy stickers or flat CSS rectangles.
+
+### 2. Color Palette (Soft Pastel Matte Only)
+*   **Yellow**: `#FFE88A`, `#F7E27C`
+*   **Green**: `#BEECC4`, `#C8F2D0`
+*   **Blue**: `#B7DCFF`, `#C8E6FF`
+*   **Pink**: `#FFD1DC`, `#FFC7D1`
+*   **Gray**: `#D9D9D9`, `#E6E6E6`
+
+### 3. Functional Requirements
+*   **Tape Masking Tool**: Add a dedicated "Tape" tool inside the pencil/annotations toolbar to place masking tape over text, lines, keywords, headings, diagrams, and answers.
+*   **Interactive Hide/Reveal**: Applying tape hides the underlying content. Tapping the tape reveals the content with a softly blurred, faded, slightly translucent readable state. Tapping again re-hides it. Transitions must animate smoothly without abrupt flashing.
+*   **Global Controls**: Add "Show All Tapes" and "Hide All Tapes" controls in the notebook toolbar/menu.
+*   **Glance View Integration**: Include a tape toggle UI inside Glance Mode to reveal/hide all tapes with smooth fluid transitions.
+*   **Persistence**: Tape coordinates, dimensions, placements, and reveal states must persist on reopen and database save.

@@ -13,7 +13,7 @@
 - [ ] **Task 3: Build Export Sheet UI** (UX selection panel, lazy loading, PDF/Markdown selective export)
 - [ ] **Task 4: Implement Smart Append** (auto-numbering, separator, "Undo Save" toast)
 - [ ] **Task 5: Add Pencil Annotation Engine** (stroke tracking, palm rejection, scale drift, Undo/Redo)
-- [ ] **Task 6: Build Pencil Canvas** (Shopify Skia page-level continuous layered canvas)
+- [ ] **Task 6: Build Pencil Canvas** (Shopify Skia page-level continuous layered canvas, premium Washi Tape Active Recall system)
 - [ ] **Task 7: Implement Sync Manager** (MMKV local-first cache, sync failure retry queue)
 - [ ] **Task 8: Migration & Testing** (data conversion, block tagging, search block contents)
 
@@ -46,7 +46,7 @@
 - [ ] Implement "Undo Save" popup toast immediately after appending text
 - [ ] Implement block-level metadata tracking ("Added by quiz import" visual badge)
 
-### ✏️ Pencil Annotations Tasks (Step 5 & Step 6)
+### ✏️ Pencil Annotations & Active Recall Tasks (Step 5 & Step 6)
 - [ ] Implement stroke detection
 - [ ] Implement Skia rendering
 - [ ] Implement Apple Pencil pressure detection
@@ -56,6 +56,11 @@
 - [ ] Implement relatively-scaled drawing vectors (no zoom/scale drift)
 - [ ] Implement Undo & Redo actions on the pencil toolbar
 - [ ] Implement single high-performance page-level continuous drawing layer (Notability-style independent overlay)
+- [ ] Implement premium "Washi Tape" active recall masking system (soft matte, slightly translucent, grain texture paper style)
+- [ ] Implement interactive hide/reveal tap behavior (soft blurred/faded revealed state)
+- [ ] Implement "Show All" and "Hide All" global tape controls on the toolbar
+- [ ] Integrate tape toggle UI inside Glance Mode
+- [ ] Ensure tape coordinates, dimensions, placements, and reveal states persist on note reopen
 
 ### 💾 Local-First Sync Tasks (Step 7)
 - [ ] Implement fast local storage caching (MMKV)

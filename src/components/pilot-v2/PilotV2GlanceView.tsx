@@ -42,6 +42,8 @@ import { usePilotV2Pencil } from './usePilotV2Pencil';
 import { exportPilotV2Note } from './pilotV2Export';
 import { savePilotV2NoteContent } from '../../repositories/pilotV2Repo';
 import { savePilotV2NoteOfflineFirst } from './pilotV2OfflineSave';
+import { PilotV2WashiTape, setAllRevealed } from './washiTape';
+import { WashiTapeLayer } from './WashiTapeLayer';
 
 /* ─── helpers ────────────────────────────────────────────────────────────── */
 
@@ -534,6 +536,24 @@ export function PilotV2GlanceView() {
                     onCommit={persistGlanceStrokes}
                   />
                 )}
+
+                {paperSize.w > 1 && paperSize.h > 1 ? (
+                  <WashiTapeLayer
+                    tapes={(note?.content as any)?.washiTapes || []}
+                    width={paperSize.w}
+                    height={paperSize.h}
+                    drawingMode={false}
+                    activeColor={'Yellow' as any}
+                    onAdd={() => undefined}
+                    onToggle={(id) => {
+                      const cur: PilotV2WashiTape[] = (note?.content as any)?.washiTapes || [];
+                      const next = cur.map(t => t.id === id ? { ...t, revealed: !t.revealed } : t);
+                      const content: any = { ...(note?.content || { blocks: [] }), washiTapes: next };
+                      if (note?.id) savePilotV2NoteOfflineFirst(note.id, content).catch(() => null);
+                    }}
+                    onRemove={() => undefined}
+                  />
+                ) : null}
               </View>
             </ScrollView>
           </Animated.View>

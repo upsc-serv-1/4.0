@@ -42,6 +42,11 @@ import { PencilToolbar } from './PencilToolbar';
 import { usePilotV2Pencil } from './usePilotV2Pencil';
 import { exportPilotV2Note } from './pilotV2Export';
 import { getBlockTag } from './pilotV2Migration';
+import {
+  PilotV2WashiTape, WashiTapeColor, toggleWashiReveal,
+  removeWashiTape, setAllRevealed,
+} from './washiTape';
+import { WashiTapeLayer, WashiTapeColorPicker } from './WashiTapeLayer';
 
 const newId = () =>
   (typeof crypto !== 'undefined' && (crypto as any).randomUUID)
@@ -414,6 +419,22 @@ export function PilotV2EditorView() {
     pageHeight: paperSize.h,
     onChange: persistStrokes,
   });
+
+  // ── Washi-Tape state ─────────────────────────────────────────────────
+  const [washiTapes, setWashiTapes] = useState<PilotV2WashiTape[]>(
+    () => (note?.content as any)?.washiTapes || []
+  );
+  const [washiMode, setWashiMode] = useState(false);
+  const [washiColor, setWashiColor] = useState<WashiTapeColor>('Yellow');
+  const persistWashi = (next: PilotV2WashiTape[]) => {
+    if (!note?.id) return;
+    setWashiTapes(next);
+    const content: any = { blocks, version: 1, pencilStrokes: pencil.engine.getPersisted(), washiTapes: next };
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(async () => {
+      try { await savePilotV2NoteOfflineFirst(note.id, content); } catch { /* ignore */ }
+    }, 600);
+  };
   const handleExportPdf = async () => {
     try {
       await exportPilotV2Note({
@@ -587,6 +608,19 @@ export function PilotV2EditorView() {
                 height={paperSize.h}
                 drawingMode={pencil.drawingMode}
                 onCommit={(strokes) => persistStrokes(strokes)}
+              />
+            )}
+
+            {paperSize.w > 1 && paperSize.h > 1 && (
+              <WashiTapeLayer
+                tapes={washiTapes}
+                width={paperSize.w}
+                height={paperSize.h}
+                drawingMode={washiMode}
+                activeColor={washiColor}
+                onAdd={(t) => persistWashi([...washiTapes, t])}
+                onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
+                onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
               />
             )}
           </View>
@@ -833,6 +867,58 @@ export function PilotV2EditorView() {
       >
         <Pen size={22} color="#ffffff" strokeWidth={2.5} />
       </TouchableOpacity>
+
+      {/* ── Washi-Tape FAB (active recall masking) ──────────────────── */}
+      <TouchableOpacity
+        testID="pilot-v2-washi-fab"
+        onPress={() => setWashiMode((m) => !m)}
+        activeOpacity={0.85}
+        style={[
+          styles.pencilFab,
+          { right: 88, backgroundColor: washiMode ? '#0F172A' : '#FFE88A' },
+        ]}
+      >
+        <Text style={{ fontSize: 20 }}>{washiMode ? '🛑' : '🩹'}</Text>
+      </TouchableOpacity>
+
+      {/* Washi-Tape control panel (only while in tape mode) */}
+      {washiMode ? (
+        <View
+          testID="pilot-v2-washi-controls"
+          style={{
+            position: 'absolute', bottom: 88, right: 16,
+            backgroundColor: '#fff', borderRadius: 14, padding: 10,
+            borderWidth: 1, borderColor: '#E5E7EB',
+            shadowColor: '#000', shadowOpacity: 0.08,
+            shadowOffset: { width: 0, height: 4 }, shadowRadius: 10,
+            elevation: 4, gap: 6,
+          }}
+        >
+          <Text style={{ fontSize: 11, color: '#475569', fontWeight: '700' }}>
+            TAPE COLOR
+          </Text>
+          <WashiTapeColorPicker active={washiColor} onChange={setWashiColor} />
+          <View style={{ flexDirection: 'row', gap: 6, marginTop: 4 }}>
+            <TouchableOpacity
+              testID="pilot-v2-washi-show-all"
+              onPress={() => persistWashi(setAllRevealed(washiTapes, true))}
+              style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, backgroundColor: '#0F172A' }}
+            >
+              <Text style={{ fontSize: 11, color: '#fff', fontWeight: '700' }}>Show all</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              testID="pilot-v2-washi-hide-all"
+              onPress={() => persistWashi(setAllRevealed(washiTapes, false))}
+              style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, backgroundColor: '#5B4EFA' }}
+            >
+              <Text style={{ fontSize: 11, color: '#fff', fontWeight: '700' }}>Hide all</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={{ fontSize: 10, color: '#94A3B8', marginTop: 4 }}>
+            Drag to place tape · Tap to reveal · Long-press to remove
+          </Text>
+        </View>
+      ) : null}
 
       {/* ── Notability-style pencil toolbar (only when drawing) ─── */}
       {pencil.drawingMode && (

@@ -44,13 +44,15 @@ export function migratePilotV2NoteContent(
   const pencilStrokes = Array.isArray(raw.pencilStrokes)
     ? normaliseStrokes(raw.pencilStrokes)
     : [];
+  const washiTapes = Array.isArray(raw.washiTapes) ? raw.washiTapes : [];
   const version = typeof raw.version === 'number' ? raw.version : TARGET_VERSION;
 
   return {
     blocks,
     version: Math.max(version, TARGET_VERSION),
     pencilStrokes,
-  };
+    washiTapes,
+  } as PilotV2NoteContent;
 }
 
 /** Apply the migrator to every note in a fetched list. */

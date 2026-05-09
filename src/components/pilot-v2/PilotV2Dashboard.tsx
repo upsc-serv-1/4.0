@@ -110,13 +110,23 @@ export function PilotV2Dashboard() {
     const sorted = [...visibleNotes].sort((a, b) =>
       new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime()
     );
-    return sorted.slice(0, 6);
-  }, [visibleNotes]);
+    // Recent tab shows the full recent list; Home/other tabs show a compact carousel.
+    return quickFilter === 'recent' ? sorted : sorted.slice(0, 6);
+  }, [visibleNotes, quickFilter]);
 
+  // Pinned tab → full grid (no slice). Home/other → compact preview (top 6).
   const pinned = useMemo(
-    () => visibleNotes.filter(n => n.is_pinned).slice(0, 4),
-    [visibleNotes]
+    () => {
+      const all = visibleNotes.filter(n => n.is_pinned);
+      return quickFilter === 'pinned' ? all : all.slice(0, 6);
+    },
+    [visibleNotes, quickFilter]
   );
+
+  // Section visibility per sidebar filter
+  const showContinueStudying = quickFilter === 'home';
+  const showPinnedSection = quickFilter === 'home' || quickFilter === 'pinned';
+  const showRecentSection = quickFilter === 'recent';
 
   const openGlance = (noteId: string) => {
     dispatch({ type: 'SET_CURRENT_NOTE_ID', payload: noteId });
@@ -353,6 +363,7 @@ export function PilotV2Dashboard() {
             </View>
 
             {/* Continue Studying */}
+            {showContinueStudying && (
             <View style={{ marginBottom: 40 }}>
               <View style={styles.sectionHead}>
                 <Text style={[styles.h2, { color: colors.textPrimary }]}>Continue Studying</Text>
@@ -364,7 +375,7 @@ export function PilotV2Dashboard() {
               {recents.length === 0 ? (
                 <Text style={{ color: colors.textTertiary, fontSize: 13, paddingVertical: 8 }}>No study sessions yet. Create a note to begin!</Text>
               ) : (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 16 }}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
                   {recents.map((c: any) => {
                     const meta = resolveSubjectMeta(c.subject, state.notes);
                     const IconComponent = SUBJECT_ICONS[meta.icon] ?? Scale;
@@ -378,14 +389,14 @@ export function PilotV2Dashboard() {
                         style={[styles.studyCard, { borderColor: colors.border }]}
                       >
                         <View style={[styles.studyIcon, { backgroundColor: c.iconBg ?? meta.bg }]}>
-                          <IconComponent size={20} color={c.iconColor ?? meta.text} />
+                          <IconComponent size={16} color={c.iconColor ?? meta.text} />
                         </View>
-                        <Text style={[styles.cardTitle, { color: colors.textPrimary }]} numberOfLines={1}>
+                        <Text style={[styles.cardTitle, { color: colors.textPrimary }]} numberOfLines={1} ellipsizeMode="tail">
                           {c.title}
                         </Text>
                         <View style={styles.cardFoot}>
-                          <Text style={{ color: colors.textTertiary, fontSize: 12 }}>{c.subject || 'General'}</Text>
-                          <Text style={{ color: colors.textTertiary, fontSize: 12 }}>
+                          <Text style={{ color: colors.textTertiary, fontSize: 11 }} numberOfLines={1}>{c.subject || 'General'}</Text>
+                          <Text style={{ color: colors.textTertiary, fontSize: 11 }} numberOfLines={1}>
                             {formatRelative(c.updated_at)}
                           </Text>
                         </View>
@@ -395,14 +406,59 @@ export function PilotV2Dashboard() {
                 </ScrollView>
               )}
             </View>
+            )}
+
+            {/* Recent Notes (only on Recent tab) */}
+            {showRecentSection && (
+              <View style={{ marginBottom: 40 }}>
+                <View style={styles.sectionHead}>
+                  <Text style={[styles.h2, { color: colors.textPrimary }]}>Recent Notes</Text>
+                </View>
+                {recents.length === 0 ? (
+                  <Text style={{ color: colors.textTertiary, fontSize: 13, paddingVertical: 8 }}>No recent notes yet.</Text>
+                ) : (
+                  <View style={styles.pinnedGrid}>
+                    {recents.map((p: any) => {
+                      const meta = resolveSubjectMeta(p.subject, state.notes);
+                      const IconComponent = SUBJECT_ICONS[meta.icon] ?? Scale;
+                      return (
+                        <TouchableOpacity
+                          key={p.id}
+                          testID={`pilot-v2-dashboard-recent-${p.id}`}
+                          activeOpacity={0.9}
+                          onPress={() => openGlance(p.id)}
+                          style={[styles.pinnedCard, { borderColor: colors.border }]}
+                        >
+                          <View style={styles.pinnedTop}>
+                            <View style={[styles.pinnedIcon, { backgroundColor: meta.bg }]}>
+                              <IconComponent size={14} color={meta.text} />
+                            </View>
+                          </View>
+                          <Text style={[styles.cardTitle, { color: colors.textPrimary }]} numberOfLines={1} ellipsizeMode="tail">
+                            {p.title}
+                          </Text>
+                          <View style={styles.cardFoot}>
+                            <Text style={{ color: colors.textTertiary, fontSize: 11 }} numberOfLines={1}>{p.subject || 'General'}</Text>
+                            <Text style={{ color: colors.textTertiary, fontSize: 11 }} numberOfLines={1}>{formatRelative(p.updated_at)}</Text>
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+            )}
 
             {/* Pinned Notes */}
+            {showPinnedSection && (
             <View>
               <View style={styles.sectionHead}>
                 <Text style={[styles.h2, { color: colors.textPrimary }]}>Pinned Notes</Text>
-                <TouchableOpacity testID="pilot-v2-dashboard-seeall-pinned" onPress={seeAllPinned}>
-                  <Text style={{ color: '#5B4EFA', fontSize: 13, fontWeight: '600' }}>See All</Text>
-                </TouchableOpacity>
+                {quickFilter === 'home' && (
+                  <TouchableOpacity testID="pilot-v2-dashboard-seeall-pinned" onPress={seeAllPinned}>
+                    <Text style={{ color: '#5B4EFA', fontSize: 13, fontWeight: '600' }}>See All</Text>
+                  </TouchableOpacity>
+                )}
               </View>
 
               {pinned.length === 0 ? (
@@ -442,6 +498,7 @@ export function PilotV2Dashboard() {
                 </View>
               )}
             </View>
+            )}
           </>
         )}
       </ScrollView>
@@ -473,19 +530,20 @@ const styles = StyleSheet.create({
   sectionHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
   h2: { fontSize: 18, fontWeight: '700' },
   studyCard: {
-    minWidth: 280, padding: 20, borderRadius: 16, borderWidth: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    width: 168, padding: 12, borderRadius: 14, borderWidth: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
     borderColor: 'rgba(255, 255, 255, 0.6)',
-    shadowColor: '#5B4EFA', shadowOpacity: 0.06, shadowRadius: 12, shadowOffset: { width: 0, height: 6 },
+    shadowColor: '#5B4EFA', shadowOpacity: 0.05, shadowRadius: 10, shadowOffset: { width: 0, height: 4 },
   },
-  studyIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
-  cardTitle: { fontSize: 16, fontWeight: '600', marginBottom: 8 },
-  cardFoot: { flexDirection: 'row', justifyContent: 'space-between' },
-  pinnedGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16 },
+  studyIcon: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
+  cardTitle: { fontSize: 14, fontWeight: '600', marginBottom: 6 },
+  cardFoot: { flexDirection: 'row', justifyContent: 'space-between', gap: 6 },
+  pinnedGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   pinnedCard: {
-    flexBasis: '48%', flexGrow: 1,
-    padding: 16, borderRadius: 16, borderWidth: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    width: '31.5%',
+    minWidth: 180,
+    padding: 14, borderRadius: 14, borderWidth: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
     borderColor: 'rgba(255, 255, 255, 0.6)',
     shadowColor: '#3B82F6', shadowOpacity: 0.05, shadowRadius: 10, shadowOffset: { width: 0, height: 4 },
   },

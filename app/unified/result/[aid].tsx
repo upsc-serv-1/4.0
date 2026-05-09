@@ -84,7 +84,7 @@ export default function ResultScreen() {
   const [localReviewTags, setLocalReviewTags] = useState<Record<string, string[]>>({});
   const [savingFlashcard, setSavingFlashcard] = useState<Record<string, boolean>>({});
   const [inFlashcardDeck, setInFlashcardDeck] = useState<Record<string, boolean>>({});
-  const [aff, setAff] = useState<{ visible: boolean; cardId: string | null; hint: { subject?: string; section_group?: string; microtopic?: string } }>({ visible: false, cardId: null, hint: {} });
+  const [aff, setAff] = useState<{ visible: boolean; cardId: string | null; hint: { subject?: string; section_group?: string; microtopic?: string }; questionId?: string | null }>({ visible: false, cardId: null, hint: {}, questionId: null });
   
   const scrollY = React.useRef(new Animated.Value(0)).current;
   const [showPYQTags] = useState(true); // Always follow rule from search bar
@@ -359,7 +359,8 @@ export default function ResultScreen() {
         card_type: 'qa',
         source: { kind: 'question', question_id: q.id, options: q.options }
       } as any);
-      setInFlashcardDeck(prev => ({ ...prev, [q.id]: true }));
+      // NOTE: Do NOT mark as in-deck yet. Icon should activate only AFTER
+      // the user picks a destination AND placement succeeds (onPlaced).
       setAff({
         visible: true,
         cardId,
@@ -368,6 +369,7 @@ export default function ResultScreen() {
           section_group: q.sectionGroup || 'General',
           microtopic: q.microTopic || (q as any).micro_topic || 'General',
         },
+        questionId: q.id,
       });
     } catch (err) {
       console.error('Flashcard error:', err);
@@ -645,6 +647,12 @@ export default function ResultScreen() {
         userId={session?.user?.id || ''}
         cardId={aff.cardId}
         hint={aff.hint}
+        onPlaced={() => {
+          // Only mark as in-deck after successful placement (server-confirmed)
+          if (aff.questionId) {
+            setInFlashcardDeck(prev => ({ ...prev, [aff.questionId as string]: true }));
+          }
+        }}
       />
 
       <UnifiedExportSheet

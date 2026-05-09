@@ -116,6 +116,9 @@ export function PilotV2GlanceView() {
   const offsetY    = useSharedValue(0);
   const savedOffX  = useSharedValue(0);
   const savedOffY  = useSharedValue(0);
+  // Shared value for screenWidth so worklets can access it safely
+  const screenWidthSV = useSharedValue(screenWidth);
+  useEffect(() => { screenWidthSV.value = screenWidth; }, [screenWidth, screenWidthSV]);
 
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const [isZoomed, setIsZoomed]           = useState(false);
@@ -144,11 +147,12 @@ export function PilotV2GlanceView() {
       'worklet';
       const newScale = clamp(savedScale.value * e.scale, 1, 4);
       scale.value = newScale;
-      // Shift toward pinch focal point for natural feel
-      const fx = e.focalX - screenWidth / 2;
-      const fy = e.focalY / 2;
-      offsetX.value = savedOffX.value + fx * (1 - e.scale) * 0.5;
-      offsetY.value = savedOffY.value + fy * (1 - e.scale) * 0.3;
+      // Zoom toward the focal point (center-relative shift)
+      const midX = screenWidthSV.value / 2;
+      const focalOffX = (e.focalX - midX) * (1 - e.scale) * 0.5;
+      const focalOffY = e.focalY * (1 - e.scale) * 0.3;
+      offsetX.value = savedOffX.value + focalOffX;
+      offsetY.value = savedOffY.value + focalOffY;
       runOnJS(setDisplayScale)(Math.round(newScale * 10) / 10);
     })
     .onEnd(() => {

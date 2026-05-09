@@ -22,6 +22,7 @@ import { DeckRow, type DeckRowAction } from '../src/components/flashcards/DeckRo
 import { PremiumMoveModal } from '../src/components/flashcards/PremiumMoveModal';
 import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet';
 import type { ExportPayload, ExportFlashcard } from '../src/lib/unifiedExportEngine';
+import { BranchColors, DEFAULT_BRANCH_COLORS } from '../src/lib/branchColors';
 
 export default function FlashcardsHub() {
   const { colors } = useTheme();
@@ -91,8 +92,19 @@ export default function FlashcardsHub() {
     );
   };
   
-  const FOLDER_COLORS = ['#bae6fd', '#e0e7ff', '#fef3c7', '#fee2e2', '#dcfce7'];
+  const FOLDER_COLORS = DEFAULT_BRANCH_COLORS;
   const [selectedColor, setSelectedColor] = useState(FOLDER_COLORS[0]);
+  const [branchColorMap, setBranchColorMap] = useState<Record<string, string>>({});
+
+  // Load saved branch colors and subscribe to changes
+  useEffect(() => {
+    let mounted = true;
+    BranchColors.loadAll().then((m) => { if (mounted) setBranchColorMap(m); });
+    const unsub = BranchColors.subscribe(() => {
+      BranchColors.loadAll().then((m) => { if (mounted) setBranchColorMap(m); });
+    });
+    return () => { mounted = false; unsub(); };
+  }, []);
 
   const [exportSheetVisible, setExportSheetVisible] = useState(false);
   const [exportPayload, setExportPayload] = useState<ExportPayload | null>(null);
@@ -174,7 +186,13 @@ export default function FlashcardsHub() {
     try {
       const isFolder = createModal.type === 'folder';
       const pid = createModal.parentId !== undefined ? createModal.parentId : (currentFolder?.id ?? null);
-      await BranchSvc.create(uid, nameDraft.trim(), pid, isFolder);
+      const created = await BranchSvc.create(uid, nameDraft.trim(), pid, isFolder);
+      // Persist selected color for this branch (folder or deck)
+      try {
+        if (selectedColor) {
+          await BranchColors.setColor(created.id, selectedColor);
+        }
+      } catch {}
       if (pid) {
         setExpanded(prev => {
           const next = new Set(prev);
@@ -184,6 +202,7 @@ export default function FlashcardsHub() {
       }
       setCreateModal(null);
       setNameDraft('');
+      setSelectedColor(FOLDER_COLORS[0]);
       await load();
     } catch (e: any) { Alert.alert('Error', e?.message); }
   };
@@ -447,6 +466,7 @@ export default function FlashcardsHub() {
                     <DeckRow 
                       node={item} 
                       expanded={expanded.has(item.id)} 
+                      color={branchColorMap[item.id]}
                       onToggle={() => toggleExpand(item.id)} 
                       onOpen={() => { 
                         if (isSelectionMode) {
@@ -524,12 +544,18 @@ export default function FlashcardsHub() {
                   autoFocus 
                 />
 
-                {createModal?.type === 'folder' && (
+                {createModal && (
                   <View style={styles.iconColorSection}>
-                    <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>Icon and color</Text>
+                    <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>
+                      {createModal?.type === 'folder' ? 'Folder color' : 'Deck color'}
+                    </Text>
                     <View style={styles.colorRow}>
                       <View style={[styles.iconBox, { backgroundColor: colors.surfaceStrong }]}>
-                        <Folder size={20} color={selectedColor} />
+                        {createModal?.type === 'folder' ? (
+                          <Folder size={20} color={selectedColor} />
+                        ) : (
+                          <Layers size={20} color={selectedColor} />
+                        )}
                       </View>
                       <View style={styles.colorsList}>
                         {FOLDER_COLORS.map(c => (

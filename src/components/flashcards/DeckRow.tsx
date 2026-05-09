@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { ChevronRight, Minus, Plus } from 'lucide-react-native';
+import { ChevronRight, Minus, Plus, Layers } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { BranchNode } from '../../services/BranchService';
 import { Settings as SettingsIcon, Edit2, FolderPlus, Trash2, FolderInput, Folder, FileDown } from 'lucide-react-native';
@@ -14,9 +14,24 @@ interface Props {
   onToggle: () => void;
   onOpen: () => void;
   onAction: (action: DeckRowAction) => void;
+  color?: string;
 }
 
-export function DeckRow({ node, expanded, onToggle, onOpen, onAction }: Props) {
+// Convert a hex pastel into a darker readable accent for the icon stroke
+function darken(hex: string, amount = 0.55): string {
+  const m = /^#?([a-f\d]{6})$/i.exec(hex || '');
+  if (!m) return '#0ea5e9';
+  const num = parseInt(m[1], 16);
+  let r = (num >> 16) & 0xff;
+  let g = (num >> 8) & 0xff;
+  let b = num & 0xff;
+  r = Math.max(0, Math.floor(r * (1 - amount)));
+  g = Math.max(0, Math.floor(g * (1 - amount)));
+  b = Math.max(0, Math.floor(b * (1 - amount)));
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+export function DeckRow({ node, expanded, onToggle, onOpen, onAction, color }: Props) {
   const { colors } = useTheme();
   const swipeableRef = useRef<Swipeable>(null);
 
@@ -68,6 +83,12 @@ export function DeckRow({ node, expanded, onToggle, onOpen, onAction }: Props) {
       rightThreshold={40}
     >
       <View style={[styles.row, { backgroundColor: colors.bg, borderBottomColor: colors.border + 'A0' }]}>
+        {color ? (
+          <View
+            pointerEvents="none"
+            style={[styles.colorAccent, { backgroundColor: color }]}
+          />
+        ) : null}
         <View style={styles.content}>
           {/* Hierarchy Lines */}
           {Array.from({ length: node.depth }).map((_, i) => (
@@ -81,23 +102,29 @@ export function DeckRow({ node, expanded, onToggle, onOpen, onAction }: Props) {
           <View style={[styles.iconArea, { marginLeft: node.depth * indentWidth }]}>
             {node.is_folder && node.depth === 0 ? (
               <TouchableOpacity onPress={onOpen} style={styles.folderIconWrap}>
-                 <View style={[styles.officialFolderIcon, { backgroundColor: '#e0f2fe' }]}>
-                    <Folder size={18} color="#0ea5e9" />
+                 <View style={[styles.officialFolderIcon, { backgroundColor: color || '#e0f2fe' }]}>
+                    <Folder size={18} color={color ? darken(color) : '#0ea5e9'} />
                  </View>
               </TouchableOpacity>
             ) : hasChildren ? (
               <TouchableOpacity 
                 onPress={onToggle} 
-                style={[styles.circleIcon, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                style={[styles.circleIcon, { backgroundColor: color || colors.surface, borderColor: color ? darken(color, 0.2) : colors.border }]}
               >
                 {expanded ? (
-                  <Minus size={14} color={colors.textTertiary} strokeWidth={3} />
+                  <Minus size={14} color={color ? darken(color) : colors.textTertiary} strokeWidth={3} />
                 ) : (
-                  <Plus size={14} color={colors.textTertiary} strokeWidth={3} />
+                  <Plus size={14} color={color ? darken(color) : colors.textTertiary} strokeWidth={3} />
                 )}
               </TouchableOpacity>
             ) : (
-              <View style={styles.circlePlaceholder} />
+              color && !node.is_folder ? (
+                <View style={[styles.circleIcon, { backgroundColor: color, borderColor: darken(color, 0.2) }]}>
+                  <Layers size={12} color={darken(color)} />
+                </View>
+              ) : (
+                <View style={styles.circlePlaceholder} />
+              )
             )}
           </View>
 
@@ -144,7 +171,15 @@ const styles = StyleSheet.create({
   action: { alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 12, height: '100%' },
   actionCircle: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   actionLabel: { fontSize: 8, fontWeight: '800', textTransform: 'uppercase' },
-  row: { paddingHorizontal: 4, borderBottomWidth: 1 },
+  row: { paddingHorizontal: 4, borderBottomWidth: 1, position: 'relative' },
+  colorAccent: {
+    position: 'absolute',
+    left: 0,
+    top: 4,
+    bottom: 4,
+    width: 3,
+    borderRadius: 2,
+  },
   content: { flexDirection: 'row', alignItems: 'center', minHeight: 70 },
   verticalLine: {
     position: 'absolute',

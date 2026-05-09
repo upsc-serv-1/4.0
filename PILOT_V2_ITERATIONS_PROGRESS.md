@@ -43,7 +43,7 @@ Files: `src/repositories/pilotV2Repo.ts`, `src/components/pilot-v2/PilotV2SaveSh
 ---
 
 ## Iteration 1 — Pencil smoothness  ✅ (code shipped)
-**Commit:** `514fba3`
+**Commit:** `d748e0c`
 
 ### Root cause (verified by reading both pipelines side-by-side)
 Soft Notes already runs at full 120 Hz on iPad Pro because its `<Path>`

@@ -11,10 +11,11 @@
  * bullet, numbered, checklist, quote, highlight, code) so any note created in
  * the editor renders without translation.
  */
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform, Share,
   Image, Linking,
+  type NativeSyntheticEvent, type NativeScrollEvent,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { ChevronLeft, Bell, Share2, Upload, MoreVertical, Pencil } from 'lucide-react-native';
@@ -73,11 +74,32 @@ export function PilotV2GlanceView() {
   const { colors } = useTheme();
   const { session } = useAuth();
   const userId = session?.user?.id;
-  const { state, dispatch, currentNote } = usePilotV2();
+  const { state, dispatch, currentNote, glanceScrollMemory } = usePilotV2();
   const note = currentNote();
   const blocks = note?.content?.blocks?.length ? note.content.blocks : DEMO_BLOCKS;
   const title = note?.title ?? 'Article 14 — Equality Before Law';
   const [reminderSet, setReminderSet] = useState(false);
+  const scrollRef = useRef<ScrollView | null>(null);
+  const scrollKey = note?.id || '__demo__';
+  const lastScrollY = useRef<number>(glanceScrollMemory.current[scrollKey] || 0);
+
+  // Restore scroll position when re-entering glance for the same note.
+  useEffect(() => {
+    const saved = glanceScrollMemory.current[scrollKey] || 0;
+    if (saved > 0 && scrollRef.current) {
+      // Wait for content to lay out before scrolling.
+      const handle = setTimeout(() => {
+        scrollRef.current?.scrollTo({ y: saved, animated: false });
+      }, 50);
+      return () => clearTimeout(handle);
+    }
+    return undefined;
+  }, [scrollKey, glanceScrollMemory]);
+
+  const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    lastScrollY.current = e.nativeEvent.contentOffset.y;
+    glanceScrollMemory.current[scrollKey] = lastScrollY.current;
+  }, [scrollKey, glanceScrollMemory]);
 
   const handleBack = () => {
     dispatch({ type: 'SET_VIEW_MODE', payload: state.view.selectedSubtopic ? 'noteList' : 'dashboard' });
@@ -252,10 +274,13 @@ export function PilotV2GlanceView() {
 
       {/* Scrollable content */}
       <ScrollView
+        ref={scrollRef}
         testID="pilot-v2-glance-scroll"
         style={{ flex: 1 }}
         contentContainerStyle={styles.body}
         showsVerticalScrollIndicator
+        onScroll={onScroll}
+        scrollEventThrottle={64}
       >
         <View style={styles.titleRow}>
           <Text style={[styles.h1, { color: colors.textPrimary }]}>{title}</Text>

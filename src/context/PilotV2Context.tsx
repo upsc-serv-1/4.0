@@ -7,7 +7,7 @@
  * / Dashboard / Note List / Glance / Editor / Empty) share one cohesive
  * navigation model.
  */
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, ReactNode, useRef } from 'react';
 import {
   PilotV2Note,
   PilotV2Block,
@@ -152,19 +152,22 @@ interface PilotV2ContextValue {
   dispatch: React.Dispatch<PilotV2Action>;
   /** Convenience selector: returns the currently focused note or null. */
   currentNote: () => PilotV2Note | null;
+  /** Per-note glance scroll Y memory — preserves position on editor → glance return. */
+  glanceScrollMemory: React.MutableRefObject<Record<string, number>>;
 }
 
 const PilotV2Context = createContext<PilotV2ContextValue | null>(null);
 
 export function PilotV2Provider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const glanceScrollMemory = useRef<Record<string, number>>({});
   const currentNote = () =>
     state.view.currentNoteId
       ? state.notes.find(n => n.id === state.view.currentNoteId) || null
       : null;
 
   return (
-    <PilotV2Context.Provider value={{ state, dispatch, currentNote }}>
+    <PilotV2Context.Provider value={{ state, dispatch, currentNote, glanceScrollMemory }}>
       {children}
     </PilotV2Context.Provider>
   );

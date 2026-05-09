@@ -855,7 +855,7 @@ const bStyles = StyleSheet.create({
 
 const glanceStyles = StyleSheet.create({
   pencilFab: {
-    position: 'absolute', right: 18, bottom: 24,
+    position: 'absolute', right: 100, bottom: 24,
     width: 56, height: 56, borderRadius: 28,
     alignItems: 'center', justifyContent: 'center',
     zIndex: 1100,

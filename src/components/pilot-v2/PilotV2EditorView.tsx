@@ -1006,15 +1006,19 @@ function FloatingToolbar(props: any) {
   const [collapsed, setCollapsed] = useState(false);
   const [vertical, setVertical] = useState(false);
 
+  const lastPos = useRef({ x: 0, y: 0 });
   const pan = useRef(PanResponder.create({
     onStartShouldSetPanResponder: () => true,
-    onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 4 || Math.abs(g.dy) > 4,
+    onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 6 || Math.abs(g.dy) > 6,
+    onPanResponderGrant: () => {
+      lastPos.current = { x: (pos.x as any)._value, y: (pos.y as any)._value };
+    },
     onPanResponderMove: (_, g) => {
-      const x = Math.min(Math.max(8, (pos.x as any)._value + g.dx), width - 80);
-      const y = Math.min(Math.max(40, (pos.y as any)._value + g.dy), height - 80);
+      const x = Math.min(Math.max(8, lastPos.current.x + g.dx), width - 80);
+      const y = Math.min(Math.max(44, lastPos.current.y + g.dy), height - 80);
       pos.setValue({ x, y });
     },
-    onPanResponderRelease: (_, g) => {
+    onPanResponderRelease: () => {
       const x = (pos.x as any)._value;
       const y = (pos.y as any)._value;
       // Snap to nearest edge — auto-orient horizontal vs vertical
@@ -1025,10 +1029,15 @@ function FloatingToolbar(props: any) {
       const min = Math.min(distLeft, distRight, distTop, distBottom);
       let nextX = x, nextY = y, isVert = false;
       if (min === distLeft)        { nextX = 8;  isVert = true; }
-      else if (min === distRight)  { nextX = width - 64; isVert = true; }
-      else if (min === distTop)    { nextY = 60; isVert = false; }
-      else                          { nextY = height - 90; isVert = false; }
-      Animated.spring(pos, { toValue: { x: nextX, y: nextY }, useNativeDriver: false }).start();
+      else if (min === distRight)  { nextX = width - 68; isVert = true; }
+      else if (min === distTop)    { nextY = 64; isVert = false; }
+      else                          { nextY = height - 96; isVert = false; }
+      Animated.spring(pos, {
+        toValue: { x: nextX, y: nextY },
+        useNativeDriver: false,
+        tension: 60,
+        friction: 8,
+      }).start();
       setVertical(isVert);
     },
   })).current;
@@ -1152,7 +1161,7 @@ const styles = StyleSheet.create({
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 12, borderBottomWidth: 1 },
   topLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 },
   topRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  iconBtn: { padding: 6, borderRadius: 6 },
+  iconBtn: { padding: 8, borderRadius: 8 },
   savedPill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9999, borderWidth: 1 },
 
   titleSection: { paddingHorizontal: 32, paddingTop: 24, paddingBottom: 8, gap: 4, position: 'relative' },
@@ -1167,25 +1176,25 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, shadowOffset: { width: 0, height: 4 },
   },
   floatingBack: {
-    position: 'absolute', top: 16, left: 16, zIndex: 1000,
-    width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center',
+    position: 'absolute', top: 18, left: 18, zIndex: 1000,
+    width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center',
     borderWidth: 1,
-    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 4,
+    shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 12, shadowOffset: { width: 0, height: 3 }, elevation: 4,
   },
   floatingControls: {
-    position: 'absolute', top: 16, right: 16, zIndex: 1000,
-    flexDirection: 'row', gap: 4, paddingHorizontal: 8, paddingVertical: 6,
-    borderRadius: 22, borderWidth: 1,
-    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 10, shadowOffset: { width: 0, height: 3 }, elevation: 5,
+    position: 'absolute', top: 18, right: 18, zIndex: 1000,
+    flexDirection: 'row', gap: 6, paddingHorizontal: 10, paddingVertical: 8,
+    borderRadius: 26, borderWidth: 1,
+    shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 14, shadowOffset: { width: 0, height: 4 }, elevation: 5,
   },
   floatingToolbar: {
     position: 'absolute', zIndex: 1100,
     alignItems: 'center', justifyContent: 'center', gap: 2,
-    paddingHorizontal: 6, paddingVertical: 6, borderRadius: 16, borderWidth: 1,
-    shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 6,
+    paddingHorizontal: 8, paddingVertical: 8, borderRadius: 18, borderWidth: 1,
+    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 6,
   },
-  floatBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 10, marginHorizontal: 1 },
-  dragHandle: { width: 36, height: 22, alignItems: 'center', justifyContent: 'center' },
+  floatBtn: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 12, marginHorizontal: 1 },
+  dragHandle: { width: 40, height: 26, alignItems: 'center', justifyContent: 'center' },
   moreMenu: {
     position: 'absolute', top: 64, right: 16, minWidth: 240,
     borderRadius: 14, borderWidth: 1, paddingVertical: 6,
@@ -1207,17 +1216,17 @@ const styles = StyleSheet.create({
   check: { width: 18, height: 18, borderWidth: 1.5, borderRadius: 4, marginTop: 6 },
   quoteBar: { width: 3, alignSelf: 'stretch', borderRadius: 2 },
   addBlockRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    paddingVertical: 12, marginTop: 8, borderRadius: 8, borderWidth: 1, borderStyle: 'dashed', justifyContent: 'center',
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    paddingVertical: 14, marginTop: 10, borderRadius: 10, borderWidth: 1, borderStyle: 'dashed', justifyContent: 'center',
   },
 
-  outlinePanel: { width: 320, borderLeftWidth: 1, flexDirection: 'column', backgroundColor: '#fff' },
+  outlinePanel: { width: 340, borderLeftWidth: 1, flexDirection: 'column', backgroundColor: '#fff' },
   outlineTabs: { flexDirection: 'row', borderBottomWidth: 1 },
   outlineTab: { flex: 1, paddingVertical: 12, borderBottomWidth: 2, borderBottomColor: 'transparent', alignItems: 'center' },
   outlineRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
 
-  bottomBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 12, borderTopWidth: 1 },
-  bottomItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  bottomBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 28, paddingVertical: 14, borderTopWidth: 1 },
+  bottomItem: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 48 },
 
   modalBackdrop: {
     flex: 1, backgroundColor: 'rgba(15, 23, 42, 0.45)',
@@ -1251,4 +1260,6 @@ const styles = StyleSheet.create({
     flex: 1, padding: 8, fontSize: 13, color: '#0F172A',
     borderRightWidth: 1, borderBottomWidth: 1, borderColor: '#E5E7EB',
   },
+});
+,
 });

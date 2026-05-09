@@ -413,14 +413,14 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
 
 const styles = StyleSheet.create({
   header: {
-    paddingHorizontal: 24, paddingVertical: 16,
+    paddingHorizontal: 28, paddingVertical: 18,
     borderBottomWidth: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
   },
-  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 },
-  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  headerTitle: { fontSize: 16, fontWeight: '700', flexShrink: 1 },
-  iconBtn: { padding: 8, borderRadius: 8 },
-  body: { paddingHorizontal: 32, paddingVertical: 32, paddingBottom: 100, maxWidth: 880, alignSelf: 'center', width: '100%' },
+  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 14, flex: 1, minWidth: 0 },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  headerTitle: { fontSize: 17, fontWeight: '700', flexShrink: 1 },
+  iconBtn: { padding: 10, borderRadius: 10 },
+  body: { paddingHorizontal: 24, paddingVertical: 32, paddingBottom: 100, maxWidth: 960, alignSelf: 'center', width: '100%' },
   titleRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24, gap: 16 },
   h1: { flex: 1, fontSize: 28, fontWeight: '700', lineHeight: 38 },
   tagChip: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 9999 },

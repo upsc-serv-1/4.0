@@ -31,7 +31,24 @@ import {
   appendBlocksToPilotV2Note,
   fetchNotebooksAtLevel,
 } from '../../repositories/pilotV2Repo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PilotV2Block } from './types';
+
+const STORAGE_LAST_USED = 'pilot-v2:save-sheet:last-used';
+type LastUsed = {
+  subject?: string; topic?: string; subtopic?: string; notebook?: string;
+};
+const readLastUsed = async (): Promise<LastUsed> => {
+  try {
+    const raw = await AsyncStorage.getItem(STORAGE_LAST_USED);
+    return raw ? (JSON.parse(raw) as LastUsed) : {};
+  } catch {
+    return {};
+  }
+};
+const writeLastUsed = (next: LastUsed) => {
+  AsyncStorage.setItem(STORAGE_LAST_USED, JSON.stringify(next)).catch(() => null);
+};
 
 const newId = () =>
   (typeof crypto !== 'undefined' && (crypto as any).randomUUID)
@@ -111,13 +128,27 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
 
   useEffect(() => {
     if (!visible) return;
-    setSubject(autoSeed.subject || '');
-    setTopic(autoSeed.topic || '');
-    setSubtopic(autoSeed.subtopic || '');
-    setNotebook(autoSeed.notebookTitle || autoSeed.subtopic || autoSeed.topic || autoSeed.subject || '');
+    // Read last-used preferences and merge with autoSeed (autoSeed wins).
+    let cancelled = false;
+    (async () => {
+      const last = await readLastUsed();
+      if (cancelled) return;
+      setSubject(autoSeed.subject || last.subject || '');
+      setTopic(autoSeed.topic || last.topic || '');
+      setSubtopic(autoSeed.subtopic || last.subtopic || '');
+      setNotebook(
+        autoSeed.notebookTitle ||
+        last.notebook ||
+        autoSeed.subtopic ||
+        autoSeed.topic ||
+        autoSeed.subject ||
+        ''
+      );
+    })();
     setBody(initialBody || '');
     setSavedNoteId(null);
     setAppendCount(0);
+    return () => { cancelled = true; };
   }, [visible, autoSeed, initialBody]);
 
   // Helper: Get all subjects
@@ -182,14 +213,23 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
       const blocks: PilotV2Block[] = [
         // Soft separator heading carries the source attribution so multiple
         // saves to the same note remain distinguishable.
-        { id: newId(), type: 'heading', level: 3, text: source ? `📌 ${source}` : '📌 Saved from Quiz' },
-        ...blocksPreview,
+        { id: newId(), type: 'heading', level: 3, text: source ? `📌 ${source}` : '📌 Saved from Quiz', meta: { tag: 'quiz_import', sourceQuizId: source } },
+        ...blocksPreview.map(b => ({ ...b, meta: { ...(b.meta || {}), tag: 'quiz_import', importedAt: new Date().toISOString() } })),
       ];
       const ok = await appendBlocksToPilotV2Note(result.noteId, blocks);
       if (!ok) throw new Error('append failed');
       setSavedNoteId(result.noteId);
       setAppendCount(c => c + 1);
-      
+
+      // Persist the chosen hierarchy as last-used so future Save Sheet opens
+      // pre-fill the same selections (Step 8 — last-used preferences gap).
+      writeLastUsed({
+        subject: subject.trim(),
+        topic: topic.trim(),
+        subtopic: subtopic.trim(),
+        notebook: notebookTitle,
+      });
+
       // Show confirmation
       Alert.alert(
         'Saved!',

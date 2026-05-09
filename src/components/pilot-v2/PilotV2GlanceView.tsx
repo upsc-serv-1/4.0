@@ -149,6 +149,41 @@ export function PilotV2GlanceView() {
   useEffect(() => { screenWidthSV.value = screenWidth; }, [screenWidth, screenWidthSV]);
 
   const [scrollEnabled, setScrollEnabled] = useState(true);
+
+  /* ── Draggable Pencil FAB ─────────────────────────────────────────────── */
+  const pencilFabX = useSharedValue(0);
+  const pencilFabY = useSharedValue(0);
+  const savedFabX = useSharedValue(0);
+  const savedFabY = useSharedValue(0);
+
+  const togglePencilMode = () => {
+    pencil.setDrawingMode(!pencil.drawingMode);
+  };
+
+  const fabGesture = Gesture.Race(
+    Gesture.Pan()
+      .onUpdate((e) => {
+        'worklet';
+        pencilFabX.value = savedFabX.value + e.translationX;
+        pencilFabY.value = savedFabY.value + e.translationY;
+      })
+      .onEnd(() => {
+        'worklet';
+        savedFabX.value = pencilFabX.value;
+        savedFabY.value = pencilFabY.value;
+      }),
+    Gesture.Tap().onEnd(() => {
+      'worklet';
+      runOnJS(togglePencilMode)();
+    })
+  );
+
+  const animatedFabStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: pencilFabX.value },
+      { translateY: pencilFabY.value },
+    ],
+  }));
   const [isZoomed, setIsZoomed]           = useState(false);
   const [displayScale, setDisplayScale]   = useState(1);
 
@@ -579,17 +614,18 @@ export function PilotV2GlanceView() {
       )}
 
       {/* ── Pencil FAB (Step 6) ─────────────────────────────────── */}
-      <TouchableOpacity
-        testID="pilot-v2-glance-pencil-fab"
-        onPress={() => pencil.setDrawingMode(!pencil.drawingMode)}
-        activeOpacity={0.85}
-        style={[
-          glanceStyles.pencilFab,
-          { backgroundColor: pencil.drawingMode ? '#0F172A' : '#5B4EFA' },
-        ]}
-      >
-        <Pencil size={22} color="#ffffff" strokeWidth={2.5} />
-      </TouchableOpacity>
+      <GestureDetector gesture={fabGesture}>
+        <Animated.View
+          style={[
+            glanceStyles.pencilFab,
+            animatedFabStyle,
+            { backgroundColor: pencil.drawingMode ? '#0F172A' : '#5B4EFA' },
+          ]}
+          testID="pilot-v2-glance-pencil-fab"
+        >
+          <Pencil size={22} color="#ffffff" strokeWidth={2.5} />
+        </Animated.View>
+      </GestureDetector>
 
       {pencil.drawingMode && (
         <View style={glanceStyles.pencilToolbarFloat} pointerEvents="box-none">

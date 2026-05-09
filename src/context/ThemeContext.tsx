@@ -1,7 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { Appearance } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type ThemeType = 'default' | 'nature' | 'modern' | 'sand' | 'cute' | 'medical' | 'sage' | 'lavender' | 'ivory' | 'midnight_nebula' | 'golden_night' | 'emerald_dream' | 'royal_purple' | 'fitness_navy' | 'child_of_light' | 'aruba_aqua' | 'zinnia' | 'fuchsia_blue' | 'original_dark' | 'yogesh_1' | 'yogesh_2' | 'yogesh_3' | 'yogesh_4';
+export type ThemeMode = 'light' | 'dark' | 'system';
+
+/** Curated default light & dark theme keys used when ThemeMode is 'light'/'dark'/'system'. */
+const DEFAULT_LIGHT_THEME: ThemeType = 'default';
+const DEFAULT_DARK_THEME: ThemeType = 'original_dark';
 
 export interface ThemeColors {
   bg: string;
@@ -352,17 +358,39 @@ interface ThemeContextType {
   theme: ThemeType;
   colors: ThemeColors;
   setTheme: (t: ThemeType) => void;
+  themeMode: ThemeMode;
+  setThemeMode: (m: ThemeMode) => void;
+  isDark: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+const DARK_THEMES: Set<ThemeType> = new Set([
+  'midnight_nebula','golden_night','emerald_dream','royal_purple',
+  'fitness_navy','fuchsia_blue','original_dark',
+]);
+
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setThemeState] = useState<ThemeType>('default');
+  const [themeMode, setThemeModeState] = useState<ThemeMode>('light');
+  const [systemScheme, setSystemScheme] = useState<'light' | 'dark'>(
+    (Appearance.getColorScheme() === 'dark' ? 'dark' : 'light'),
+  );
 
   useEffect(() => {
-    AsyncStorage.getItem('user-theme').then(t => {
-      if (t) setThemeState(t as ThemeType);
+    const sub = Appearance.addChangeListener(({ colorScheme }) => {
+      setSystemScheme(colorScheme === 'dark' ? 'dark' : 'light');
     });
+    return () => sub.remove();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const t = await AsyncStorage.getItem('user-theme');
+      if (t) setThemeState(t as ThemeType);
+      const m = await AsyncStorage.getItem('user-theme-mode');
+      if (m === 'light' || m === 'dark' || m === 'system') setThemeModeState(m);
+    })();
   }, []);
 
   const setTheme = async (t: ThemeType) => {
@@ -370,8 +398,30 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     await AsyncStorage.setItem('user-theme', t);
   };
 
+  const setThemeMode = async (m: ThemeMode) => {
+    setThemeModeState(m);
+    await AsyncStorage.setItem('user-theme-mode', m);
+  };
+
+  // Resolve effective theme key: explicit user theme respected; mode acts as
+  // override when user has not picked a custom palette.
+  const effectiveTheme: ThemeType = (() => {
+    if (themeMode === 'system') {
+      return systemScheme === 'dark'
+        ? (DARK_THEMES.has(theme) ? theme : DEFAULT_DARK_THEME)
+        : (DARK_THEMES.has(theme) ? DEFAULT_LIGHT_THEME : theme);
+    }
+    if (themeMode === 'dark') {
+      return DARK_THEMES.has(theme) ? theme : DEFAULT_DARK_THEME;
+    }
+    // light mode
+    return DARK_THEMES.has(theme) ? DEFAULT_LIGHT_THEME : theme;
+  })();
+
+  const isDark = DARK_THEMES.has(effectiveTheme);
+
   return (
-    <ThemeContext.Provider value={{ theme, colors: themes[theme], setTheme }}>
+    <ThemeContext.Provider value={{ theme: effectiveTheme, colors: themes[effectiveTheme], setTheme, themeMode, setThemeMode, isDark }}>
       {children}
     </ThemeContext.Provider>
   );

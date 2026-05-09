@@ -17,7 +17,7 @@ import {
   Image, Linking,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { ChevronLeft, Bell, Share2, Upload, MoreVertical } from 'lucide-react-native';
+import { ChevronLeft, Bell, Share2, Upload, MoreVertical, Pencil } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
@@ -224,6 +224,12 @@ export function PilotV2GlanceView() {
             <Bell size={18} color={reminderSet ? '#5B4EFA' : colors.textSecondary} fill={reminderSet ? '#5B4EFA' : 'transparent'} />
           </TouchableOpacity>
           <TouchableOpacity
+            testID="pilot-v2-glance-edit"
+            onPress={() => dispatch({ type: 'SET_VIEW_MODE', payload: 'editor' })}
+            style={[styles.iconBtn, { backgroundColor: '#EEECFF' }]}>
+            <Pencil size={18} color="#5B4EFA" />
+          </TouchableOpacity>
+          <TouchableOpacity
             testID="pilot-v2-glance-share"
             onPress={handleShare}
             style={styles.iconBtn}>
@@ -263,18 +269,6 @@ export function PilotV2GlanceView() {
         <View style={[styles.divider, { backgroundColor: colors.border }]} />
         <Text style={[styles.eog, { color: colors.textTertiary }]}>— End of Glance —</Text>
       </ScrollView>
-
-      {/* Bottom action */}
-      <View style={[styles.footer, { backgroundColor: '#fff', borderTopColor: colors.border }]}>
-        <TouchableOpacity
-          testID="pilot-v2-glance-open-editor"
-          activeOpacity={0.85}
-          onPress={() => dispatch({ type: 'SET_VIEW_MODE', payload: 'editor' })}
-          style={[styles.openBtn, { backgroundColor: '#5B4EFA' }]}
-        >
-          <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>Open in Editor</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }

@@ -178,30 +178,32 @@ export function PilotV2Dashboard() {
   const handleNew = async () => {
     if (creating) return;
     const title = `Untitled note · ${new Date().toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
-    if (!userId) {
-      const transient: PilotV2Note = {
-        id: `transient_${Date.now()}`,
-        title,
-        content: { blocks: [], version: 1 },
-        is_pinned: false,
-      };
-      dispatch({ type: 'UPSERT_NOTE', payload: transient });
-      dispatch({ type: 'SET_CURRENT_NOTE_ID', payload: transient.id });
-      dispatch({ type: 'SET_VIEW_MODE', payload: 'editor' });
-      return;
-    }
+    // Optimistic: create local draft and open editor instantly. Background sync to Supabase if signed-in.
+    const transientId = `transient_${Date.now()}`;
+    const transient: PilotV2Note = {
+      id: transientId,
+      title,
+      content: { blocks: [], version: 1 },
+      is_pinned: false,
+    };
+    dispatch({ type: 'UPSERT_NOTE', payload: transient });
+    dispatch({ type: 'SET_CURRENT_NOTE_ID', payload: transient.id });
+    dispatch({ type: 'SET_VIEW_MODE', payload: 'editor' });
+
+    if (!userId) return;
     setCreating(true);
-    try {
-      const result = await findOrCreatePilotV2Note({ userId, subject: 'General', title });
-      const fresh = await fetchPilotV2NotesForUser(userId);
-      dispatch({ type: 'SET_NOTES', payload: fresh });
-      dispatch({ type: 'SET_CURRENT_NOTE_ID', payload: result.noteId });
-      dispatch({ type: 'SET_VIEW_MODE', payload: 'editor' });
-    } catch (e) {
-      Alert.alert('Could not create note', (e as Error).message);
-    } finally {
-      setCreating(false);
-    }
+    (async () => {
+      try {
+        const result = await findOrCreatePilotV2Note({ userId, subject: 'General', title });
+        const fresh = await fetchPilotV2NotesForUser(userId);
+        dispatch({ type: 'SET_NOTES', payload: fresh });
+        dispatch({ type: 'SET_CURRENT_NOTE_ID', payload: result.noteId });
+      } catch (e) {
+        console.warn('[pilot-v2] background create failed', (e as Error).message);
+      } finally {
+        setCreating(false);
+      }
+    })();
   };
 
   const seeAllRecent = () => {
@@ -242,7 +244,7 @@ export function PilotV2Dashboard() {
           style={[styles.newBtn, { backgroundColor: '#5B4EFA', opacity: creating ? 0.7 : 1 }]}
         >
           <Plus size={16} color="#fff" />
-          <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>{creating ? 'Creating…' : 'New'}</Text>
+          <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>New</Text>
         </TouchableOpacity>
 
         {filterBadge ? (

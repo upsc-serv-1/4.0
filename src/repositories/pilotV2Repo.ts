@@ -368,6 +368,13 @@ export async function findOrCreatePilotV2Note(input: {
   subtopic?: string | null;
   title: string;
 }): Promise<{ noteId: string; nodeId: string; isNew: boolean }> {
+  // Find-or-create a node strictly within the Pilot V2 surface. Filtering by
+  // `metadata->>surface` AND using a list-with-limit (instead of maybeSingle)
+  // makes this resilient to legacy duplicate rows that might exist in the
+  // table — without this guard `maybeSingle()` errors on duplicates and we
+  // silently fell through to creating yet another node every time, which is
+  // exactly what produced the duplicate "Bhakti and Sufi" notebooks reported
+  // by the user.
   const ensureNode = async (
     type: PilotV2NodeType,
     title: string,
@@ -379,14 +386,18 @@ export async function findOrCreatePilotV2Note(input: {
       .eq('user_id', input.userId)
       .eq('type', type)
       .eq('title', title)
-      .eq('is_archived', false);
+      .eq('is_archived', false)
+      .eq('metadata->>surface', PILOT_V2_SURFACE)
+      .order('created_at', { ascending: true })
+      .limit(1);
     if (parentId === null) {
       query = query.is('parent_id', null);
     } else {
       query = query.eq('parent_id', parentId);
     }
-    const { data } = await query.maybeSingle();
-    if (data && data.metadata?.surface === PILOT_V2_SURFACE) return data as PilotV2Node;
+    const { data } = await query;
+    const existing = Array.isArray(data) && data.length > 0 ? (data[0] as PilotV2Node) : null;
+    if (existing) return existing;
     const created = await createPilotV2Node({
       userId: input.userId, type, title, parentId,
     });
@@ -403,8 +414,11 @@ export async function findOrCreatePilotV2Note(input: {
     parent = await ensureNode('subtopic', input.subtopic, parent.id);
   }
 
-  // Look for an existing note with the same title under this parent.
-  const { data: existing } = await supabase
+  // Look for an existing note with the same title under this parent. We
+  // restrict to the Pilot V2 surface and take the oldest match so repeat
+  // saves consistently append to the same notebook rather than spawning a
+  // duplicate every time.
+  const { data: existingList } = await supabase
     .from('user_note_nodes')
     .select('id, note_id, metadata')
     .eq('user_id', input.userId)
@@ -412,9 +426,12 @@ export async function findOrCreatePilotV2Note(input: {
     .eq('type', 'note')
     .eq('title', input.title)
     .eq('is_archived', false)
-    .maybeSingle();
+    .eq('metadata->>surface', PILOT_V2_SURFACE)
+    .order('created_at', { ascending: true })
+    .limit(1);
 
-  if (existing && existing.note_id && existing.metadata?.surface === PILOT_V2_SURFACE) {
+  const existing = Array.isArray(existingList) && existingList.length > 0 ? existingList[0] : null;
+  if (existing && existing.note_id) {
     return { noteId: existing.note_id as string, nodeId: existing.id as string, isNew: false };
   }
 
@@ -426,6 +443,67 @@ export async function findOrCreatePilotV2Note(input: {
   });
   if (!created) throw new Error('[pilot-v2] failed to create note');
   return { ...created, isNew: true };
+}
+
+/**
+ * Build the user's actual Pilot V2 hierarchy as plain-string option lists for
+ * Subject / Topic / Microtopic dropdowns. Lets the Save Sheet show every
+ * subject/topic/subtopic the user has *already* created — not just the static
+ * palette — so users can re-route a quiz save into any branch they own.
+ */
+export async function fetchPilotV2HierarchyOptions(userId: string): Promise<{
+  subjects: string[];
+  topicsBySubject: Record<string, string[]>;
+  subtopicsByTopic: Record<string, string[]>;
+}> {
+  const nodes = await fetchAllPilotV2Nodes(userId, false);
+  const byId = new Map<string, PilotV2Node>();
+  nodes.forEach(n => byId.set(n.id, n));
+
+  const subjects = new Set<string>();
+  const topicsBySubject: Record<string, Set<string>> = {};
+  // Microtopics are keyed by `${subject}::${topic}` so that two different
+  // subjects can have a topic of the same name without leaking subtopics
+  // across subjects.
+  const subtopicsByTopic: Record<string, Set<string>> = {};
+
+  const subjectTitleOf = (n: PilotV2Node): string | null => {
+    let cur: PilotV2Node | undefined = n;
+    while (cur && cur.type !== 'subject') {
+      cur = cur.parent_id ? byId.get(cur.parent_id) : undefined;
+    }
+    return cur?.type === 'subject' ? cur.title : null;
+  };
+
+  nodes.forEach(n => {
+    if (n.type === 'subject') {
+      subjects.add(n.title);
+      topicsBySubject[n.title] ??= new Set();
+    } else if (n.type === 'topic') {
+      const subj = subjectTitleOf(n);
+      if (!subj) return;
+      topicsBySubject[subj] ??= new Set();
+      topicsBySubject[subj].add(n.title);
+    } else if (n.type === 'subtopic') {
+      const subj = subjectTitleOf(n);
+      const topicNode = n.parent_id ? byId.get(n.parent_id) : null;
+      if (!subj || !topicNode || topicNode.type !== 'topic') return;
+      const key = `${subj}::${topicNode.title}`;
+      subtopicsByTopic[key] ??= new Set();
+      subtopicsByTopic[key].add(n.title);
+    }
+  });
+
+  const toSorted = (s: Set<string>) => Array.from(s).sort((a, b) => a.localeCompare(b));
+  return {
+    subjects: toSorted(subjects),
+    topicsBySubject: Object.fromEntries(
+      Object.entries(topicsBySubject).map(([k, v]) => [k, toSorted(v)])
+    ),
+    subtopicsByTopic: Object.fromEntries(
+      Object.entries(subtopicsByTopic).map(([k, v]) => [k, toSorted(v)])
+    ),
+  };
 }
 
 /**

@@ -30,6 +30,7 @@ import {
   findOrCreatePilotV2Note,
   appendBlocksToPilotV2Note,
   fetchNotebooksAtLevel,
+  fetchPilotV2HierarchyOptions,
 } from '../../repositories/pilotV2Repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PilotV2Block } from './types';
@@ -126,6 +127,26 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const [loadingNotebooks, setLoadingNotebooks] = useState(false);
   const [mode, setMode] = useState<'select' | 'create'>('select');
 
+  // User's actual Pilot V2 hierarchy (loaded once when sheet becomes visible)
+  // — merged with the static palette so the Subject / Topic / Microtopic
+  // dropdowns expose every branch the user has already created, not just the
+  // hard-coded palette. This was the "only History showing" complaint.
+  const [userHierarchy, setUserHierarchy] = useState<{
+    subjects: string[];
+    topicsBySubject: Record<string, string[]>;
+    subtopicsByTopic: Record<string, string[]>;
+  }>({ subjects: [], topicsBySubject: {}, subtopicsByTopic: {} });
+
+  useEffect(() => {
+    if (!visible || !userId) return;
+    let cancelled = false;
+    (async () => {
+      const opts = await fetchPilotV2HierarchyOptions(userId);
+      if (!cancelled) setUserHierarchy(opts);
+    })();
+    return () => { cancelled = true; };
+  }, [visible, userId]);
+
   useEffect(() => {
     if (!visible) return;
     // Read last-used preferences and merge with autoSeed (autoSeed wins).
@@ -151,25 +172,40 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     return () => { cancelled = true; };
   }, [visible, autoSeed, initialBody]);
 
-  // Helper: Get all subjects
-  const allSubjects = useMemo(() => PILOT_V2_SUBJECT_PALETTE.map(s => s.label), []);
+  // Helper: merged subject list — user's actual Pilot V2 subjects first, then
+  // any palette subjects the user hasn't seeded yet, deduped.
+  const allSubjects = useMemo(() => {
+    const palette = PILOT_V2_SUBJECT_PALETTE.map(s => s.label);
+    const merged = [...userHierarchy.subjects];
+    palette.forEach(p => { if (!merged.includes(p)) merged.push(p); });
+    return merged;
+  }, [userHierarchy.subjects]);
 
-  // Helper: Get topics for selected subject
+  // Helper: merged topic list for the selected subject. Combines the user's
+  // own topics under that subject with the static palette topics, deduped.
   const allTopics = useMemo(() => {
+    const userTopics = subject ? (userHierarchy.topicsBySubject[subject] || []) : [];
     const subjectData = PILOT_V2_SUBJECT_PALETTE.find(s => s.label === subject);
-    if (!subjectData) return [];
-    const topicsList = SUBJECT_TOPICS[subjectData.id] || [];
-    return topicsList.map(t => t.label);
-  }, [subject]);
+    const paletteTopics = subjectData
+      ? (SUBJECT_TOPICS[subjectData.id] || []).map(t => t.label)
+      : [];
+    const merged = [...userTopics];
+    paletteTopics.forEach(p => { if (!merged.includes(p)) merged.push(p); });
+    return merged;
+  }, [subject, userHierarchy.topicsBySubject]);
 
-  // Helper: Get subtopics for selected topic
+  // Helper: merged microtopic list for the selected subject + topic.
   const allSubtopics = useMemo(() => {
+    const key = `${subject}::${topic}`;
+    const userSubs = (subject && topic) ? (userHierarchy.subtopicsByTopic[key] || []) : [];
     const subjectData = PILOT_V2_SUBJECT_PALETTE.find(s => s.label === subject);
-    if (!subjectData) return [];
-    const topicsList = SUBJECT_TOPICS[subjectData.id] || [];
+    const topicsList = subjectData ? (SUBJECT_TOPICS[subjectData.id] || []) : [];
     const selectedTopic = topicsList.find(t => t.label === topic);
-    return selectedTopic?.subtopics?.map(st => st.label) || [];
-  }, [subject, topic]);
+    const paletteSubs = selectedTopic?.subtopics?.map(st => st.label) || [];
+    const merged = [...userSubs];
+    paletteSubs.forEach(p => { if (!merged.includes(p)) merged.push(p); });
+    return merged;
+  }, [subject, topic, userHierarchy.subtopicsByTopic]);
 
   // Fetch notebooks when hierarchy changes
   useEffect(() => {

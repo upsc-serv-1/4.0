@@ -477,19 +477,38 @@ export function PilotV2EditorView() {
     savedEditorScale.value = zoom;
   }, [zoom]);
   const initialStrokes = (note?.content?.pencilStrokes ?? []) as PilotV2PencilStroke[];
+  // Pending content ref — captures the latest blocks + strokes payload that
+  // hasn't been flushed yet. We flush this ref on unmount so a debounced
+  // save in flight is never lost when the user navigates away mid-stroke
+  // (which previously caused 'drawings disappear after navigation').
+  const pendingSaveRef = useRef<{ noteId: string; content: any } | null>(null);
   const persistStrokes = (next: PilotV2PencilStroke[]) => {
     if (!note?.id) return;
     const content = { blocks, version: 1, pencilStrokes: next };
+    pendingSaveRef.current = { noteId: note.id, content };
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
       try {
         await savePilotV2NoteOfflineFirst(note.id, content);
         dispatch({ type: 'PATCH_BLOCKS', payload: { id: note.id, blocks } });
         dispatch({ type: 'PATCH_PENCIL_STROKES', payload: { id: note.id, strokes: next } });
+        pendingSaveRef.current = null;
         setSavingState('saved');
       } catch { setSavingState('idle'); }
     }, 600);
   };
+  // Flush any pending stroke save on unmount so navigation never drops a
+  // commit. Persistence is offline-first (MMKV) so this is fire-and-forget.
+  useEffect(() => {
+    return () => {
+      const pending = pendingSaveRef.current;
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+      if (pending) {
+        savePilotV2NoteOfflineFirst(pending.noteId, pending.content).catch(() => null);
+        pendingSaveRef.current = null;
+      }
+    };
+  }, []);
   const pencil = usePilotV2Pencil({
     noteId: note?.id ?? null,
     initialStrokes,

@@ -52,6 +52,7 @@ import {
   removeWashiTape, setAllRevealed,
 } from './washiTape';
 import { WashiTapeLayer, WashiTapeColorPicker } from './WashiTapeLayer';
+import { PilotV2BlockRichEditModal } from './PilotV2BlockRichEditModal';
 
 let globalToolbarVisible = false;
 let globalToolbarPos = { x: 80, y: 150 };
@@ -127,11 +128,15 @@ export function PilotV2EditorView() {
    *  block-reorder or text height change).  Passed to <PencilCanvas> so the
    *  CommittedStrokesLayer knows to re-derive stroke display positions. */
   const [blockLayoutVersion, setBlockLayoutVersion] = useState(0);
-  const [slashPicker, setSlashPicker] = useState<{ visible: boolean; blockId: string | null }>({ visible: false, blockId: null });
   const [tableEditor, setTableEditor] = useState<{ visible: boolean; blockId: string | null; rows: string[][] }>({
     visible: false,
     blockId: null,
     rows: [],
+  });
+  const [richBlockEdit, setRichBlockEdit] = useState<{ visible: boolean; blockId: string | null; html: string }>({
+    visible: false,
+    blockId: null,
+    html: '',
   });
 
   /* --------------- Bottom bar — font scale & zoom --------------- */
@@ -826,7 +831,10 @@ export function PilotV2EditorView() {
                 onMoveUp={() => moveBlock(b.id, 'up')}
                 onMoveDown={() => moveBlock(b.id, 'down')}
                 onEditTable={() => (b.tableRows?.length ? openTableEditor(b.id, b.tableRows) : null)}
-                onOpenAdvancedEdit={() => openBlockEditSheet(b.id)}
+                onOpenRichEdit={() => {
+                  setActiveBlockId(b.id);
+                  setRichBlockEdit({ visible: true, blockId: b.id, html: b.text || '' });
+                }}
                 onBlockLayout={(id, x, y, w, h) => {
                   const cur = blockLayoutsRef.current.get(id);
                   blockLayoutsRef.current.set(id, { x, y, w, h });
@@ -1277,6 +1285,19 @@ export function PilotV2EditorView() {
         pageWidth={paperSize.w}
         pageHeight={paperSize.h}
       />
+
+      {/* ── Per-block rich-text edit modal (full formatting toolbar) ── */}
+      <PilotV2BlockRichEditModal
+        visible={richBlockEdit.visible}
+        initialHtml={richBlockEdit.html}
+        onClose={() => setRichBlockEdit({ visible: false, blockId: null, html: '' })}
+        onSave={(html) => {
+          if (richBlockEdit.blockId) {
+            updateBlock(richBlockEdit.blockId, { text: html });
+          }
+          setRichBlockEdit({ visible: false, blockId: null, html: '' });
+        }}
+      />
     </KeyboardAvoidingView>
   );
 }
@@ -1294,12 +1315,13 @@ interface BlockRowProps {
   onMoveUp: () => void;
   onMoveDown: () => void;
   onEditTable: () => void;
-  onOpenAdvancedEdit: () => void;
+  /** Opens the rich-editor modal for this block (full formatting toolbar). */
+  onOpenRichEdit: () => void;
   /** Called when the block's layout changes — used for block-level anchoring. */
   onBlockLayout: (id: string, x: number, y: number, w: number, h: number) => void;
 }
 
-function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onToggleCheck, onDelete, onMoveUp, onMoveDown, onEditTable, onOpenAdvancedEdit, onBlockLayout }: BlockRowProps) {
+function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onToggleCheck, onDelete, onMoveUp, onMoveDown, onEditTable, onOpenRichEdit, onBlockLayout }: BlockRowProps) {
   const { width } = useWindowDimensions();
   const baseFs = block.type === 'heading'
     ? block.level === 1 ? 24 : 18
@@ -1472,7 +1494,7 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
       </View>
 
       <View style={{ flexDirection: 'row', gap: 2, alignSelf: 'flex-end', marginTop: 4, marginRight: 8, opacity: isActive ? 1 : 0.35 }}>
-        <TouchableOpacity testID={`pilot-v2-block-advanced-edit-${block.id}`} onPress={onOpenAdvancedEdit} hitSlop={6} style={styles.iconBtn}>
+        <TouchableOpacity testID={`pilot-v2-block-richedit-${block.id}`} onPress={onOpenRichEdit} hitSlop={6} style={styles.iconBtn}>
           <Edit3 size={14} color={colors.textTertiary} />
         </TouchableOpacity>
         <TouchableOpacity testID={`pilot-v2-block-moveup-${block.id}`} onPress={onMoveUp} hitSlop={6} style={styles.iconBtn}>

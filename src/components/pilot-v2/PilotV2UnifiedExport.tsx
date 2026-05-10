@@ -36,6 +36,11 @@ import {
 import { PilotV2Block, PilotV2BlockType, PilotV2PencilStroke } from './types';
 import { useTheme } from '../../context/ThemeContext';
 import { assignLegacyAnchors } from './pilotV2Migration';
+import { blocksToBaseLayerMarkdown } from './pilotV2BlocksToMarkdown';
+import {
+  estimateExportBlockLayouts,
+  remapStrokesForExport,
+} from '../../lib/pilotV2StrokeRemap';
 
 // ---------- Block-type chip catalogue ------------------------------------
 
@@ -182,15 +187,16 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
     });
   }, [includeAnnotations, strokes, blocks, filteredBlocks]);
 
-  // Page dims are consumed by the hardnote payload path in Step 21.
-  void pageWidth; void pageHeight; void survivingStrokes;
+  // Page dims used for hardnote canvas (Step 21).  Fall back to A4 @ 96dpi
+  // when the parent did not pass paperSize (e.g., very early mount).
+  const exportCanvasWidth  = pageWidth  > 1 ? pageWidth  : 794;
+  const exportCanvasHeight = pageHeight > 1 ? pageHeight : 1123;
+  const editorCanvasWidth  = pageWidth  > 1 ? pageWidth  : exportCanvasWidth;
+  const editorCanvasHeight = pageHeight > 1 ? pageHeight : exportCanvasHeight;
 
-  const payload: ExportPayload = useMemo(() => ({
-    kind: 'notes',
-    blocks: adaptToExportNoteBlocks(filteredBlocks),
-  }), [filteredBlocks]);
-
-  // Pilot V2 sensible defaults — pastel cyan headings, plain paper, PDF
+  // Pilot V2 sensible defaults — pastel cyan headings, plain paper, PDF.
+  // Declared BEFORE the payload memo so the layout estimator can read the
+  // engine-default font-size + columns without TDZ issues.
   const initialOptions: Partial<ExportOptions> = useMemo(() => ({
     title,
     moduleName: 'Pilot V2',
@@ -204,6 +210,50 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
     notesChecklistMode: false,
     showTOC: false,
   }), [title]);
+
+  // Step 21 — hybrid payload.  When the toggle is ON and at least one
+  // surviving stroke exists, switch to the engine's `hardnote` path so the
+  // strokes are pre-rendered as SVG vectors anchored to their host block's
+  // re-projected bounding box.  Otherwise, keep the simple `notes` path.
+  const payload: ExportPayload = useMemo(() => {
+    if (includeAnnotations && survivingStrokes.length > 0) {
+      // Estimate where each surviving block lands inside the export canvas
+      // using the engine defaults (see `defaultExportOptions`).  Anchored
+      // strokes then re-project onto these layouts so font / theme / paper
+      // changes never desync them from their host word/line.
+      const layouts = estimateExportBlockLayouts(filteredBlocks, {
+        canvasWidth:  exportCanvasWidth,
+        canvasHeight: exportCanvasHeight,
+        fontSize:     initialOptions.fontSize ?? 11,
+        columns:      initialOptions.columns  ?? 1,
+      });
+      const exportStrokes = remapStrokesForExport(survivingStrokes, {
+        layouts,
+        exportCanvasWidth,
+        exportCanvasHeight,
+        editorCanvasWidth,
+        editorCanvasHeight,
+      });
+      return {
+        kind: 'hardnote',
+        note: {
+          title,
+          baseLayerMarkdown: blocksToBaseLayerMarkdown(filteredBlocks),
+          strokes: exportStrokes,
+          canvasWidth:  exportCanvasWidth,
+          canvasHeight: exportCanvasHeight,
+        },
+      };
+    }
+    return {
+      kind: 'notes',
+      blocks: adaptToExportNoteBlocks(filteredBlocks),
+    };
+  }, [
+    includeAnnotations, survivingStrokes, filteredBlocks, title,
+    exportCanvasWidth, exportCanvasHeight, editorCanvasWidth, editorCanvasHeight,
+    initialOptions,
+  ]);
 
   return (
     <UnifiedExportSheet

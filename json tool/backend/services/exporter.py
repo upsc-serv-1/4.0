@@ -3,6 +3,15 @@ from __future__ import annotations
 from typing import Dict, List, Any
 
 
+def _compute_pyq_flags(group: str) -> Dict[str, bool]:
+    g = (group or "").strip().upper()
+    return {
+        "is_upsc_cse": g == "UPSC CSE",
+        "is_allied": g.startswith("UPSC") and g != "UPSC CSE",
+        "is_others": bool(g) and not g.startswith("UPSC"),
+    }
+
+
 def build_schema2_json(job: Dict, questions: List[Dict]) -> Dict[str, Any]:
     """Build the schema 2.0 JSON given a job document and its questions."""
     md = job.get("metadata") or {}
@@ -22,22 +31,33 @@ def build_schema2_json(job: Dict, questions: List[Dict]) -> Dict[str, Any]:
             statement_lines = [q["question_text"]]
         question_text = q.get("question_text") or " ".join(statement_lines)
         opts = q.get("options") or {}
-        is_pyq = bool(q.get("pyq_source"))
+
+        is_pyq = bool(q.get("is_pyq") or q.get("pyq_source"))
+        pyq_group = q.get("pyq_group") or ""
+        pyq_flags = _compute_pyq_flags(pyq_group)
+
+        # Build source_attribution_label if not set
+        sal = q.get("source_attribution_label") or ""
+        if not sal and is_pyq and pyq_group and q.get("pyq_year"):
+            exam_label = q.get("pyq_exam_label") or "Prelims"
+            sal = f"{pyq_group} {exam_label} {q['pyq_year']}"
+
         exam_info = {
             "isPyq": is_pyq,
-            "is_ncert": False,
-            "exam": q.get("pyq_source") or None,
-            "group": None,
+            "is_ncert": bool(q.get("is_ncert")),
+            "exam": q.get("pyq_exam_label") or (q.get("pyq_source") if is_pyq else None),
+            "group": pyq_group or None,
             "year": q.get("pyq_year") or None,
-            "is_upsc_cse": (q.get("pyq_source") or "").upper() == "UPSC",
-            "is_allied": False,
-            "is_others": False,
+            "is_upsc_cse": pyq_flags["is_upsc_cse"],
+            "is_allied": pyq_flags["is_allied"],
+            "is_others": pyq_flags["is_others"],
             "exam_category": exam_frame.get("exam_category"),
             "specific_exam": exam_frame.get("specific_exam"),
             "stage": exam_frame.get("stage"),
             "paper": exam_frame.get("paper"),
         }
-        out_questions.append({
+
+        q_out: Dict[str, Any] = {
             "id": f"{test_id}-q{n:02d}",
             "questionNumber": n,
             "subject": q.get("subject") or "",
@@ -54,7 +74,10 @@ def build_schema2_json(job: Dict, questions: List[Dict]) -> Dict[str, Any]:
             "correctAnswer": q.get("correct_answer") or "",
             "explanationMarkdown": q.get("explanation_markdown") or "",
             "exam_info": exam_info,
-        })
+        }
+        if sal:
+            q_out["source_attribution_label"] = sal
+        out_questions.append(q_out)
 
     final = {
         "id": test_id,
@@ -86,7 +109,8 @@ def build_markdown(job: Dict, questions: List[Dict]) -> str:
     out.append("")
     for q in sorted(questions, key=lambda x: x.get("question_number", 0)):
         n = q.get("question_number")
-        out.append(f"## Q{n}. ({q.get('subject','?')} → {q.get('section_group','?')} → {q.get('microtopic','?')})")
+        pyq_tag = f" [PYQ: {q.get('source_attribution_label') or q.get('pyq_group','')}]" if q.get("is_pyq") else ""
+        out.append(f"## Q{n}. ({q.get('subject','?')} → {q.get('section_group','?')} → {q.get('microtopic','?')}){pyq_tag}")
         for line in q.get("statement_lines") or []:
             out.append(line)
         out.append("")

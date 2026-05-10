@@ -20,6 +20,7 @@ export const api = {
   base: BASE,
   health: () => jsonFetch("/api/"),
   taxonomy: () => jsonFetch<{ entries: Array<{ subject: string; sectionGroup: string; microTopic: string }> }>("/api/taxonomy"),
+  filenameHints: (filename: string) => jsonFetch<any>(`/api/filename-hints?filename=${encodeURIComponent(filename)}`),
   listJobs: () => jsonFetch<{ items: any[] }>("/api/jobs"),
   getJob: (id: string) => jsonFetch<{ job: any; questions: any[]; batches: any[] }>(`/api/jobs/${id}`),
   deleteJob: (id: string) => jsonFetch(`/api/jobs/${id}`, { method: "DELETE" }),
@@ -34,6 +35,8 @@ export const api = {
     jsonFetch<any>(`/api/jobs/${id}/questions/${qNum}`, { method: "PATCH", body: JSON.stringify(body) }),
   exportJsonUrl: (id: string) => `${BASE}/api/jobs/${id}/export?format=json`,
   exportMdUrl: (id: string) => `${BASE}/api/jobs/${id}/export?format=md`,
+  exportDocxUrl: (id: string) => `${BASE}/api/jobs/${id}/export?format=docx`,
+  exportPdf: (id: string, opts: any) => fetch(`${BASE}/api/jobs/${id}/export/pdf`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(opts) }),
   pageImageUrl: (id: string, page: number, source: "qp" | "sol" = "qp") =>
     `${BASE}/api/jobs/${id}/page-image/${page}?source=${source}`,
   reverifyPrompt: (id: string, threshold: number) =>

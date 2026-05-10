@@ -533,6 +533,18 @@ function Field({ label, w, children }: any) {
 
 // ─────────────── EXPORT TAB ──────────────────
 function ExportTab({ jobId, job, questions }: any) {
+  const [pdfOpts, setPdfOpts] = useState({
+    theme: "modern",
+    visual_style: "document",
+    content_scope: "q_options",
+    answer_placement: "inline",
+    font_family: "sans",
+    font_size: 12,
+    show_toc: true,
+  });
+  const [pdfExporting, setPdfExporting] = useState(false);
+  const [expandPdfOpts, setExpandPdfOpts] = useState(false);
+
   const open = (url: string) => { if (Platform.OS === "web") window.open(url, "_blank"); else Linking.openURL(url); };
   const counts = useMemo(() => {
     let valid = 0, low = 0, flagged = 0;
@@ -543,6 +555,29 @@ function ExportTab({ jobId, job, questions }: any) {
     }
     return { valid, low, flagged, total: questions.length };
   }, [questions]);
+
+  const exportPdf = async () => {
+    setPdfExporting(true);
+    try {
+      const res = await api.exportPdf(jobId, pdfOpts);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      if (Platform.OS === "web") {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `export-${jobId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        Linking.openURL(url);
+      }
+    } catch (e: any) {
+      alert("PDF export failed: " + e.message);
+    } finally {
+      setPdfExporting(false);
+    }
+  };
 
   return (
     <View style={{ gap: 16 }}>
@@ -556,15 +591,145 @@ function ExportTab({ jobId, job, questions }: any) {
           <Stat label="Confidence <60" value={counts.low} />
           <Stat label="Inconsistencies" value={counts.flagged} />
         </View>
-        <View style={[S.row, { gap: 12, marginTop: 18 }]}>
+        <View style={[S.row, { gap: 12, marginTop: 18, flexWrap: "wrap" }]}>
           <Pressable testID="export-json-btn" style={S.button} onPress={() => open(api.exportJsonUrl(jobId))}>
-            <Text style={S.buttonText}>Download JSON</Text>
+            <Text style={S.buttonText}>📄 JSON</Text>
           </Pressable>
           <Pressable testID="export-md-btn" style={S.buttonGhost} onPress={() => open(api.exportMdUrl(jobId))}>
-            <Text style={S.buttonGhostText}>Download Markdown</Text>
+            <Text style={S.buttonGhostText}>📝 Markdown</Text>
+          </Pressable>
+          <Pressable testID="export-docx-btn" style={S.buttonGhost} onPress={() => open(api.exportDocxUrl(jobId))}>
+            <Text style={S.buttonGhostText}>📋 DOCX</Text>
+          </Pressable>
+          <Pressable testID="export-pdf-toggle" style={[S.buttonGhost, expandPdfOpts && { borderColor: T.accent }]} onPress={() => setExpandPdfOpts(!expandPdfOpts)}>
+            <Text style={S.buttonGhostText}>📕 PDF {expandPdfOpts ? "▲" : "▼"}</Text>
           </Pressable>
         </View>
       </View>
+
+      {expandPdfOpts && (
+        <View style={S.card}>
+          <Text style={S.h3}>PDF Export Options</Text>
+          <View style={[S.divider, { marginTop: 8, marginBottom: 12 }]} />
+          
+          <Field label="Theme" w={160}>
+            <View style={[S.row, { flexWrap: "wrap", gap: 6 }]}>
+              {["modern", "classic", "sepia", "historical", "dark"].map((t) => (
+                <Pressable
+                  key={t}
+                  onPress={() => setPdfOpts({ ...pdfOpts, theme: t })}
+                  style={[
+                    { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, borderWidth: 1 },
+                    pdfOpts.theme === t
+                      ? { backgroundColor: T.accent, borderColor: T.accent }
+                      : { backgroundColor: T.surface, borderColor: T.border }
+                  ]}
+                >
+                  <Text style={[S.pSm, { color: pdfOpts.theme === t ? T.bg : T.text }]}>{t}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </Field>
+
+          <View style={[S.rowGap, { marginTop: 12 }]}>
+            <Field label="Visual Style" w={150}>
+              <View style={[S.row, { gap: 6 }]}>
+                {["document", "flashcard"].map((v) => (
+                  <Pressable
+                    key={v}
+                    onPress={() => setPdfOpts({ ...pdfOpts, visual_style: v })}
+                    style={[
+                      { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, borderWidth: 1, flex: 1 },
+                      pdfOpts.visual_style === v
+                        ? { backgroundColor: T.accent, borderColor: T.accent }
+                        : { backgroundColor: T.surface, borderColor: T.border }
+                    ]}
+                  >
+                    <Text style={[S.pSm, { color: pdfOpts.visual_style === v ? T.bg : T.text, textAlign: "center" }]}>{v}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </Field>
+
+            <Field label="Content Scope" w={160}>
+              <View style={[S.row, { gap: 6 }]}>
+                {["q_only", "q_options", "q_options_expl"].map((c) => (
+                  <Pressable
+                    key={c}
+                    onPress={() => setPdfOpts({ ...pdfOpts, content_scope: c })}
+                    style={[
+                      { paddingHorizontal: 8, paddingVertical: 6, borderRadius: 6, borderWidth: 1, flex: 1 },
+                      pdfOpts.content_scope === c
+                        ? { backgroundColor: T.accent, borderColor: T.accent }
+                        : { backgroundColor: T.surface, borderColor: T.border }
+                    ]}
+                  >
+                    <Text style={[S.pSm, { color: pdfOpts.content_scope === c ? T.bg : T.text, textAlign: "center", fontSize: 11 }]}>{c.replace(/_/g, "+")}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </Field>
+          </View>
+
+          <View style={[S.rowGap, { marginTop: 12 }]}>
+            <Field label="Answers" w={140}>
+              <View style={[S.row, { gap: 6 }]}>
+                {["inline", "end"].map((a) => (
+                  <Pressable
+                    key={a}
+                    onPress={() => setPdfOpts({ ...pdfOpts, answer_placement: a })}
+                    style={[
+                      { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, borderWidth: 1, flex: 1 },
+                      pdfOpts.answer_placement === a
+                        ? { backgroundColor: T.accent, borderColor: T.accent }
+                        : { backgroundColor: T.surface, borderColor: T.border }
+                    ]}
+                  >
+                    <Text style={[S.pSm, { color: pdfOpts.answer_placement === a ? T.bg : T.text, textAlign: "center" }]}>{a}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </Field>
+
+            <Field label="Font" w={130}>
+              <View style={[S.row, { gap: 6 }]}>
+                {["sans", "serif", "mono"].map((f) => (
+                  <Pressable
+                    key={f}
+                    onPress={() => setPdfOpts({ ...pdfOpts, font_family: f })}
+                    style={[
+                      { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, borderWidth: 1, flex: 1 },
+                      pdfOpts.font_family === f
+                        ? { backgroundColor: T.accent, borderColor: T.accent }
+                        : { backgroundColor: T.surface, borderColor: T.border }
+                    ]}
+                  >
+                    <Text style={[S.pSm, { color: pdfOpts.font_family === f ? T.bg : T.text, textAlign: "center" }]}>{f}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </Field>
+
+            <Field label="Font Size" w={100}>
+              <TextInput
+                value={String(pdfOpts.font_size)}
+                onChangeText={(v) => setPdfOpts({ ...pdfOpts, font_size: parseInt(v) || 12 })}
+                keyboardType="number-pad"
+                style={S.input}
+              />
+            </Field>
+          </View>
+
+          <Pressable
+            testID="export-pdf-btn"
+            style={[S.button, pdfExporting && { opacity: 0.6 }]}
+            onPress={exportPdf}
+            disabled={pdfExporting}
+          >
+            <Text style={S.buttonText}>{pdfExporting ? "Generating PDF..." : "Generate & Download PDF"}</Text>
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 }

@@ -40,6 +40,13 @@ interface Props {
   onCommit?: (strokes: PilotV2PencilStroke[]) => void;
   /** Optional testID for end-to-end tests. */
   testID?: string;
+  /** Current block layout map keyed by blockId (pixels within the page).
+   *  Passed through to CommittedStrokesLayer so anchored strokes can be
+   *  shifted when blocks are reordered — the core Step-7 transform. */
+  blockLayouts?: Map<string, { y: number; h: number }>;
+  /** Opaque counter that increments whenever blockLayouts changes.
+   *  Forces CommittedStrokesLayer to re-render and recompute offsets. */
+  blockLayoutVersion?: number;
 }
 
 /** Compose hex color + 0..1 alpha into an 8-digit hex Skia accepts. */
@@ -52,6 +59,7 @@ const withAlpha = (hex: string, alpha: number): string => {
 
 export function PencilCanvas({
   engine, tool = 'pen', width, height, drawingMode, onCommit, testID,
+  blockLayouts, blockLayoutVersion = 0,
 }: Props) {
   const [committedStrokes, setCommittedStrokes] = useState<PilotV2PencilStroke[]>(engine.getPersisted());
   const [activeStroke, setActiveStroke] = useState<PilotV2PencilStroke | null>(engine.getCurrent());
@@ -288,7 +296,7 @@ export function PencilCanvas({
             <Group>
               {/* Committed strokes — memoised so they DO NOT re-render when
                   the active path string updates on every move event. */}
-              <CommittedStrokesLayer strokes={committedStrokes} width={width} height={height} />
+              <CommittedStrokesLayer strokes={committedStrokes} width={width} height={height} blockLayouts={blockLayouts} blockLayoutVersion={blockLayoutVersion} />
 
               {/* Render active stroke separately — uses a string-path
                   fast-path so each new point is an O(1) string append on
@@ -456,17 +464,47 @@ interface CommittedLayerProps {
   strokes: PilotV2PencilStroke[];
   width: number;
   height: number;
+  /** Current block y-positions in pixels within the page.  When present,
+   *  anchored strokes are shifted by (currentBlockY / height − blockOriginY)
+   *  so they follow their host block after a reorder. */
+  blockLayouts?: Map<string, { y: number; h: number }>;
+  /** Increments when blockLayouts changes, forcing the memo to re-run. */
+  blockLayoutVersion: number;
 }
 const CommittedStrokesLayer = React.memo(function CommittedStrokesLayer({
-  strokes, width, height,
+  strokes, width, height, blockLayouts, blockLayoutVersion,
 }: CommittedLayerProps) {
   // Per-instance Skia path cache — rebuilt only when this layer re-renders,
-  // i.e. when the persisted-strokes array reference changes.
+  // i.e. when the persisted-strokes array reference or blockLayoutVersion changes.
   const cache = useRef<Map<string, { path: any; w: number; h: number }>>(new Map());
+  const prevVersionRef = useRef(0);
+  // Invalidate the whole path cache when block layouts change so anchored
+  // strokes get new Skia paths with the correct reorder offsets applied.
+  if (prevVersionRef.current !== blockLayoutVersion) {
+    cache.current.clear();
+    prevVersionRef.current = blockLayoutVersion;
+  }
+
+  /** Apply block-reorder Y-offset to an anchored stroke.
+   *  Returns the original stroke unchanged when no anchor / no offset. */
+  const applyBlockOffset = (s: PilotV2PencilStroke): PilotV2PencilStroke => {
+    if (!s.anchor || !blockLayouts?.size || height <= 0) return s;
+    const currentY = blockLayouts.get(s.anchor.blockId)?.y;
+    if (currentY === undefined) return s;
+    const dy = currentY / height - s.anchor.blockOriginY;
+    if (Math.abs(dy) < 0.002) return s; // < 0.2 % of page — negligible
+    const points = s.points.map(p => ({
+      ...p,
+      y: Math.max(0, Math.min(1, p.y + dy)),
+    }));
+    return { ...s, points };
+  };
+
   const getPath = (s: PilotV2PencilStroke) => {
     const cached = cache.current.get(s.id);
     if (cached && cached.w === width && cached.h === height) return cached.path;
-    const d = pencilStrokeToSvgPath(s, width, height);
+    const display = applyBlockOffset(s);
+    const d = pencilStrokeToSvgPath(display, width, height);
     if (!d) return null;
     const skiaPath = Skia.Path.MakeFromSVGString(d);
     if (!skiaPath) return null;
@@ -503,7 +541,8 @@ const CommittedStrokesLayer = React.memo(function CommittedStrokesLayer({
 }, (prev, next) => (
   prev.strokes === next.strokes &&
   prev.width === next.width &&
-  prev.height === next.height
+  prev.height === next.height &&
+  prev.blockLayoutVersion === next.blockLayoutVersion
 ));
 
 const engineRegistry = new Map<string, PencilAnnotationEngine>();

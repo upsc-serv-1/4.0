@@ -39,7 +39,7 @@ import { PilotV2Block, PilotV2PencilStroke, PILOT_V2_HIGHLIGHT_PALETTE } from '.
 import { PencilCanvas } from './PencilCanvas';
 import { PencilToolbar } from './PencilToolbar';
 import { usePilotV2Pencil } from './usePilotV2Pencil';
-import { exportPilotV2Note } from './pilotV2Export';
+import { PilotV2UnifiedExport } from './PilotV2UnifiedExport';
 import { savePilotV2NoteContent } from '../../repositories/pilotV2Repo';
 import { savePilotV2NoteOfflineFirst } from './pilotV2OfflineSave';
 import { PilotV2WashiTape, setAllRevealed } from './washiTape';
@@ -115,6 +115,7 @@ export function PilotV2GlanceView() {
 
   const [reminderSet, setReminderSet] = useState(false);
   const [headerCollapsed, setHeaderCollapsed] = useState(false);
+  const [exportSheetOpen, setExportSheetOpen] = useState(false);
   const scrollRef = useRef<any>(null);
   const scrollKey = note?.id || '__demo__';
   const lastScrollY = useRef<number>(glanceScrollMemory.current[scrollKey] || 0);
@@ -392,21 +393,8 @@ export function PilotV2GlanceView() {
     }
   };
 
-  const handleExport = async () => {
-    try {
-      await exportPilotV2Note({
-        title,
-        blocks,
-        strokes: pencil.engine.getPersisted(),
-        pageWidth: paperSize.w || 800,
-        pageHeight: paperSize.h || 1131,
-        format: 'pdf',
-      });
-    } catch (e) {
-      const text = blocksToPlainText();
-      await Clipboard.setStringAsync(text);
-      Alert.alert('Note exported', `Plain-text fallback (${(e as Error).message}).`);
-    }
+  const handleExport = () => {
+    setExportSheetOpen(true);
   };
 
   const handleMore = () => {
@@ -718,6 +706,14 @@ export function PilotV2GlanceView() {
           </Animated.View>
         </GestureDetector>
       )}
+
+      {/* ── Unified Export sheet (single, replaces Upload-icon legacy export) ── */}
+      <PilotV2UnifiedExport
+        visible={exportSheetOpen}
+        onClose={() => setExportSheetOpen(false)}
+        title={title || 'Pilot V2 Note'}
+        blocks={blocks}
+      />
     </View>
   );
 }

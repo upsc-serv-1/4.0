@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Platform } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Platform, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { VpnStatus, timezoneMismatch } from "../lib/vpn";
 
 export type ResetMode = "per-click" | "per-tab" | "per-session" | "manual";
 
@@ -15,6 +16,13 @@ type Props = {
   onNewTab: () => void;
   onClearAll: () => void;
   tabCount: number;
+  vpnStatus: VpnStatus | null;
+  vpnLoading: boolean;
+  onRefreshVpn: () => void;
+  spoofedTimezone: string;
+  currentHost: string | null;
+  hostLocked: boolean;
+  onToggleHostLock: () => void;
 };
 
 const RESET_MODES: { id: ResetMode; label: string; desc: string }[] = [
@@ -36,8 +44,11 @@ const LEAK_TESTS = [
 export default function MenuSheet({
   visible, onClose, resetMode, setResetMode, onOpenIdentity, onOpenTabs,
   onOpenLeakTest, onNewTab, onClearAll, tabCount,
+  vpnStatus, vpnLoading, onRefreshVpn, spoofedTimezone,
+  currentHost, hostLocked, onToggleHostLock,
 }: Props) {
   if (!visible) return null;
+  const tzMismatch = vpnStatus ? timezoneMismatch(vpnStatus.timezone, spoofedTimezone) : false;
   return (
     <View style={styles.overlay} testID="menu-sheet">
       <TouchableOpacity style={styles.backdrop} onPress={onClose} activeOpacity={1} />
@@ -65,6 +76,80 @@ export default function MenuSheet({
               <Text style={styles.quickText}>IDENTITY</Text>
             </TouchableOpacity>
           </View>
+
+          {/* VPN / IP status */}
+          <View style={styles.vpnHeader}>
+            <Text style={styles.sectionLabel}>VPN · NETWORK STATUS</Text>
+            <TouchableOpacity onPress={onRefreshVpn} testID="vpn-refresh-btn">
+              <Ionicons name="refresh" size={14} color="#22C55E" />
+            </TouchableOpacity>
+          </View>
+          <View style={[styles.vpnCard, tzMismatch && styles.vpnCardWarn]}>
+            {vpnLoading ? (
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <ActivityIndicator size="small" color="#22C55E" />
+                <Text style={styles.vpnLoading}>{"> checking exit node…"}</Text>
+              </View>
+            ) : vpnStatus ? (
+              <>
+                <View style={styles.vpnRow}>
+                  <Text style={styles.vpnKey}>IP</Text>
+                  <Text style={styles.vpnVal} testID="vpn-ip">{vpnStatus.ip}</Text>
+                </View>
+                <View style={styles.vpnRow}>
+                  <Text style={styles.vpnKey}>LOCATION</Text>
+                  <Text style={styles.vpnVal}>{vpnStatus.city}, {vpnStatus.country} ({vpnStatus.countryCode})</Text>
+                </View>
+                <View style={styles.vpnRow}>
+                  <Text style={styles.vpnKey}>ISP</Text>
+                  <Text style={styles.vpnVal} numberOfLines={1}>{vpnStatus.isp}</Text>
+                </View>
+                <View style={styles.vpnRow}>
+                  <Text style={styles.vpnKey}>REAL TZ</Text>
+                  <Text style={styles.vpnVal}>{vpnStatus.timezone}</Text>
+                </View>
+                <View style={styles.vpnRow}>
+                  <Text style={styles.vpnKey}>SPOOF TZ</Text>
+                  <Text style={[styles.vpnVal, tzMismatch && { color: "#EF4444" }]}>{spoofedTimezone}</Text>
+                </View>
+                {tzMismatch ? (
+                  <Text style={styles.warnText}>{"⚠ MISMATCH — websites may flag this. Match VPN region to spoofed TZ."}</Text>
+                ) : (
+                  <Text style={styles.okText}>{"✓ continent match"}</Text>
+                )}
+              </>
+            ) : (
+              <Text style={styles.vpnLoading}>{"> tap refresh to check"}</Text>
+            )}
+          </View>
+
+          {/* Per-site identity lock */}
+          {currentHost && (
+            <>
+              <Text style={styles.sectionLabel}>PER-SITE IDENTITY LOCK</Text>
+              <TouchableOpacity
+                style={[styles.lockRow, hostLocked && styles.lockRowActive]}
+                onPress={onToggleHostLock}
+                testID="toggle-host-lock-btn"
+              >
+                <Ionicons
+                  name={hostLocked ? "lock-closed" : "lock-open"}
+                  size={16}
+                  color={hostLocked ? "#22C55E" : "#808A93"}
+                />
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.lockLabel, hostLocked && { color: "#22C55E" }]}>
+                    {hostLocked ? "LOCKED" : "UNLOCKED"} · {currentHost}
+                  </Text>
+                  <Text style={styles.lockDesc}>
+                    {hostLocked
+                      ? "Same identity will be reused for this site"
+                      : "Tap to pin current identity to this site"}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </>
+          )}
 
           {/* Reset mode */}
           <Text style={styles.sectionLabel}>RESET MODE</Text>
@@ -243,5 +328,69 @@ const styles = StyleSheet.create({
     fontSize: 9,
     marginTop: 8,
     lineHeight: 14,
+  },
+  vpnHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 14, marginBottom: 6 },
+  vpnCard: {
+    borderWidth: 1,
+    borderColor: "#22C55E40",
+    padding: 10,
+    marginBottom: 4,
+  },
+  vpnCardWarn: { borderColor: "#EF4444" },
+  vpnRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 3 },
+  vpnKey: {
+    color: "#808A93",
+    fontFamily: Platform.select({ ios: "Menlo", android: "monospace" }),
+    fontSize: 10,
+    letterSpacing: 1.5,
+    width: 80,
+  },
+  vpnVal: {
+    color: "#F5F5F5",
+    fontFamily: Platform.select({ ios: "Menlo", android: "monospace" }),
+    fontSize: 11,
+    flex: 1,
+    textAlign: "right",
+  },
+  vpnLoading: {
+    color: "#808A93",
+    fontFamily: Platform.select({ ios: "Menlo", android: "monospace" }),
+    fontSize: 11,
+  },
+  warnText: {
+    color: "#EF4444",
+    fontFamily: Platform.select({ ios: "Menlo", android: "monospace" }),
+    fontSize: 9,
+    marginTop: 8,
+    lineHeight: 13,
+  },
+  okText: {
+    color: "#22C55E",
+    fontFamily: Platform.select({ ios: "Menlo", android: "monospace" }),
+    fontSize: 10,
+    marginTop: 6,
+  },
+  lockRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderWidth: 1,
+    borderColor: "#FFFFFF10",
+    marginBottom: 4,
+  },
+  lockRowActive: { borderColor: "#22C55E", backgroundColor: "#22C55E10" },
+  lockLabel: {
+    color: "#F5F5F5",
+    fontFamily: Platform.select({ ios: "Menlo", android: "monospace" }),
+    fontSize: 11,
+    letterSpacing: 1,
+  },
+  lockDesc: {
+    color: "#808A93",
+    fontFamily: Platform.select({ ios: "Menlo", android: "monospace" }),
+    fontSize: 9,
+    marginTop: 2,
   },
 });

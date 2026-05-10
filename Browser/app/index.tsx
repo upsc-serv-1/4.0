@@ -19,6 +19,7 @@ import MenuSheet, { ResetMode } from "../src/components/MenuSheet";
 import TabSwitcher, { Tab } from "../src/components/TabSwitcher";
 import { generateIdentity, Identity } from "../src/lib/fingerprint";
 import { buildInjectionScript } from "../src/lib/injection";
+import { fetchVpnStatus, VpnStatus } from "../src/lib/vpn";
 
 const NEW_TAB_URL = "ghost://newtab";
 const HOMEPAGE = "https://duckduckgo.com";
@@ -43,10 +44,52 @@ export default function Index() {
   const [loading, setLoading] = React.useState(false);
   const [canGoBack, setCanGoBack] = React.useState(false);
   const [canGoForward, setCanGoForward] = React.useState(false);
+  const [vpnStatus, setVpnStatus] = React.useState<VpnStatus | null>(null);
+  const [vpnLoading, setVpnLoading] = React.useState(false);
+  // Per-site identity lock: hostname -> Identity
+  const [lockedHosts, setLockedHosts] = React.useState<Record<string, Identity>>({});
+
+  const refreshVpn = React.useCallback(async () => {
+    setVpnLoading(true);
+    try {
+      const s = await fetchVpnStatus();
+      setVpnStatus(s);
+    } catch (e) {
+      // swallow
+    } finally {
+      setVpnLoading(false);
+    }
+  }, []);
+
+  React.useEffect(() => { refreshVpn(); }, [refreshVpn]);
 
   const webviewRefs = React.useRef<Record<string, WebView | null>>({});
 
   const active = tabs.find((t) => t.id === activeId) || tabs[0];
+
+  // Extract hostname from current URL
+  const currentHost = React.useMemo(() => {
+    try {
+      if (!active.url || active.url === NEW_TAB_URL) return null;
+      const u = new URL(active.url);
+      return u.hostname;
+    } catch { return null; }
+  }, [active.url]);
+
+  const hostLocked = !!(currentHost && lockedHosts[currentHost]);
+
+  const toggleHostLock = () => {
+    if (!currentHost) return;
+    setLockedHosts((prev) => {
+      const next = { ...prev };
+      if (next[currentHost]) {
+        delete next[currentHost];
+      } else {
+        next[currentHost] = active.identity;
+      }
+      return next;
+    });
+  };
 
   const updateTab = (id: string, patch: Partial<Tab>) => {
     setTabs((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
@@ -58,10 +101,21 @@ export default function Index() {
   };
 
   const handleNavigate = (url: string) => {
-    if (resetMode === "per-click") {
+    // Check if target host has a locked identity → reuse it
+    let lockedId: Identity | null = null;
+    try {
+      const host = new URL(url).hostname;
+      if (lockedHosts[host]) lockedId = lockedHosts[host];
+    } catch {}
+
+    if (lockedId) {
+      updateTab(active.id, { identity: lockedId, url });
+    } else if (resetMode === "per-click") {
       rotateIdentity(active.id);
+      updateTab(active.id, { url });
+    } else {
+      updateTab(active.id, { url });
     }
-    updateTab(active.id, { url });
   };
 
   const handleNewTab = () => {

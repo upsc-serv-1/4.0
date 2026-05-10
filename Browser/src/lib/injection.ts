@@ -273,13 +273,17 @@ export function buildInjectionScript(id: Identity): string {
     Object.defineProperty(window, 'indexedDB', { value: undefined, configurable: true });
   } catch(e){}
 
+  // ---------- WebAuthn / Passkeys: EXPLICITLY KEPT ENABLED ----------
+  // We do NOT touch navigator.credentials, PublicKeyCredential, or
+  // CredentialsContainer — passkeys work natively in WebView on iOS 16+/Android 9+.
+
   // ---------- Battery / Bluetooth / Sensors ----------
   try { delete window.BluetoothDevice; } catch(e){}
   try { delete window.DeviceMotionEvent; } catch(e){}
   try { delete window.DeviceOrientationEvent; } catch(e){}
 
   // Mark identity active
-  console.log('[GhostBrowse] Identity ' + ID.id + ' active');
+  console.log('[GhostBrowse] Identity ' + ID.id + ' active. WebAuthn=' + (typeof PublicKeyCredential !== 'undefined' ? 'YES' : 'NO'));
   true;
 })();
 true;

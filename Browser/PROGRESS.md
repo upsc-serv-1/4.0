@@ -44,3 +44,14 @@
 GhostBrowse is fully functional in Expo Go / on-device builds. On web preview the WebView area shows "WebView not supported on this platform" — expected; everything else (identity engine, UI, tab management, panels, leak test launchers) is verified working.
 
 Note: This is for Expo Go / real device builds. Web preview cannot render `react-native-webview`.
+## Step 5 — v2 features ✅
+- ✅ **WebAuthn / Passkey support**: Confirmed navigator.credentials NOT spoofed; passkeys work natively in WebView (iOS 16+/Android 9+). Injection now logs WebAuthn availability.
+- ✅ **Per-site identity lock**: hostname → Identity map in memory. Toggle from menu sheet pins the current spoofed identity to that domain — re-visits reuse the same persona (e.g., keeps you logged in to a specific account). Lock indicator + per-site row in MenuSheet.
+- ✅ **VPN / network status checker**: Live fetch of public IP / city / country / ISP / real timezone from ipapi.co (with ipwho.is fallback). Compared against spoofed timezone — red warning card if continent mismatch. Refresh button + auto-fetch on mount.
+
+## Commit summary
+- new `src/lib/vpn.ts`
+- `injection.ts` — explicit WebAuthn preservation
+- `MenuSheet.tsx` — VPN status card + per-site lock UI
+- `index.tsx` — VPN state, lockedHosts state, hostname extraction, identity lookup on navigate
+

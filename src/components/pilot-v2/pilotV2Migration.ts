@@ -12,6 +12,8 @@
  *   • Missing `version` (defaults to 1)
  *   • Missing `pencilStrokes` (defaults to [])
  *   • Block `meta.tag` values (used by Step 8 block-tag badges)
+ *   • Stroke `anchor` fields (Step 6+) — assigned retroactively for legacy
+ *     notes using estimated block layout heights so strokes track reorders.
  */
 import {
   PilotV2Block,
@@ -41,9 +43,11 @@ export function migratePilotV2NoteContent(
 
   // Case 2: pre-pencil shape — `{ blocks, version }` only.
   const blocks = Array.isArray(raw.blocks) ? normaliseBlocks(raw.blocks) : [];
-  const pencilStrokes = Array.isArray(raw.pencilStrokes)
+  const rawStrokes = Array.isArray(raw.pencilStrokes)
     ? normaliseStrokes(raw.pencilStrokes)
     : [];
+  // Assign block-level anchors to any legacy strokes that lack them.
+  const pencilStrokes = assignLegacyAnchors(rawStrokes, blocks);
   const washiTapes = Array.isArray(raw.washiTapes) ? raw.washiTapes : [];
   const version = typeof raw.version === 'number' ? raw.version : TARGET_VERSION;
 
@@ -111,7 +115,73 @@ function normaliseStrokes(raw: any[]): PilotV2PencilStroke[] {
       zIndex: typeof s.zIndex === 'number' ? s.zIndex : idx,
       createdAt: typeof s.createdAt === 'string' ? s.createdAt : new Date().toISOString(),
       bounds: s.bounds && typeof s.bounds === 'object' ? s.bounds : undefined,
+      // Preserve existing anchor if already present (idempotent migration).
+      anchor: s.anchor && typeof s.anchor.blockId === 'string' ? s.anchor : undefined,
     }));
+}
+
+/* ------------------------------------------------------------------ */
+/* Step 6 migration — assign anchor.blockId to legacy unanchored strokes */
+/* ------------------------------------------------------------------ */
+
+/** Estimate block y-positions from text content alone (no rendering).
+ *  Used only at migration time; real positions come from onLayout in the editor. */
+function estimateBlockLayouts(blocks: PilotV2Block[]): Map<string, { y: number; h: number }> {
+  const map = new Map<string, { y: number; h: number }>();
+  const AVG_CHARS_PER_LINE = 60;
+  const LINE_PX = 26;   // average line height in px (rough)
+  const HEADING_PX = 42; // heading row height
+  const GAP_PX = 8;      // gap between blocks
+  let y = 0;
+  for (const b of blocks) {
+    const textLen = (b.text || '').length;
+    const lines = Math.max(1, Math.ceil(textLen / AVG_CHARS_PER_LINE));
+    const h = b.type === 'heading' ? HEADING_PX : lines * LINE_PX;
+    map.set(b.id, { y, h });
+    y += h + GAP_PX;
+  }
+  return map;
+}
+
+/** Assign `anchor.blockId` + `anchor.blockOriginY` to strokes that do not
+ *  already carry an anchor.  Uses estimated block positions — accurate
+ *  enough for the migration heuristic. */
+function assignLegacyAnchors(
+  strokes: PilotV2PencilStroke[],
+  blocks: PilotV2Block[],
+): PilotV2PencilStroke[] {
+  if (!blocks.length || !strokes.length) return strokes;
+  // Quick check: if all strokes already have anchors, skip the work.
+  if (strokes.every(s => s.anchor)) return strokes;
+
+  const layout = estimateBlockLayouts(blocks);
+  const totalH = Array.from(layout.values()).reduce(
+    (acc, r) => Math.max(acc, r.y + r.h), 0,
+  );
+  if (totalH <= 0) return strokes;
+
+  return strokes.map((s) => {
+    if (s.anchor) return s; // already anchored — leave untouched
+    const pts = s.points;
+    if (!pts.length) return s;
+    // Centroid y in estimated page pixels.
+    let cy = 0;
+    for (const p of pts) cy += p.y;
+    cy = (cy / pts.length) * totalH;
+
+    let bestId: string | null = null;
+    let bestDist = Infinity;
+    for (const [id, rect] of layout.entries()) {
+      if (cy >= rect.y && cy <= rect.y + rect.h) {
+        bestId = id; bestDist = 0; break;
+      }
+      const d = Math.min(Math.abs(cy - rect.y), Math.abs(cy - (rect.y + rect.h)));
+      if (d < bestDist) { bestDist = d; bestId = id; }
+    }
+    if (!bestId) return s;
+    const blockOriginY = (layout.get(bestId)?.y ?? 0) / totalH;
+    return { ...s, anchor: { blockId: bestId, blockOriginY } };
+  });
 }
 
 /**

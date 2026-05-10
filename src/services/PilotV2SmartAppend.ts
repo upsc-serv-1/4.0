@@ -3,7 +3,7 @@
  * notebook block" semantics.
  *
  * Used by:
- *   • PilotV2ExportSheet.tsx (Step 3) — when the user picks a target block.
+ *   • PilotV2UnifiedExport.tsx (Step 13+) — single unified export entry-point.
  *   • PilotV2SaveSheet.tsx   (legacy Quiz save) — Step 4 wires the existing
  *     basic appendBlocksToPilotV2Note flow through this richer helper so the
  *     "Undo Save" toast and metadata badge land everywhere consistently.

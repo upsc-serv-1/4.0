@@ -59,65 +59,107 @@ Fix: track the latest pending payload in a ref, flush it from the
 component unmount cleanup. Persistence is offline-first (MMKV) so the
 fire-and-forget call lands before the screen actually swaps.
 
+### Step 5 — `9450625` PILOT_PENCIL_PROGRESS.md handoff doc
+
 ---
 
-## 🟡 Still OPEN (Priority #2 — anchoring)
+## ✅ Completed in this iteration (continued — anchoring)
 
-The deeper anchoring work was deliberately scoped out of this iteration
-because it's a multi-file refactor and the user asked to ship the
-smoothness fix first. Below is what the next agent must do.
+### Step 6 — `03212a3` Block-level anchor assignment
+**Priority #2 (anchoring — freehand).** Extended `PilotV2PencilStroke`
+with an `anchor?: { blockId, blockOriginY }` field.
 
-### What is broken
-Strokes / underlines / highlights live at PAGE level with relative
-coords (`0..1` of `paperSize`). They do NOT know which block or which
-text run they belong to. Therefore:
+Key changes:
+- `types.ts`: `anchor` field added to `PilotV2PencilStroke`.
+  `blockOriginY` is the block's top-edge Y as a fraction (0..1) of the
+  page height at stroke-commit time. This scalar is all that is needed
+  to derive the reorder delta later.
+- `PencilAnnotationEngine.ts`: new `setStrokeAnchor(id, anchor)` method
+  that silently patches the in-memory stroke without firing listeners
+  (callers persist after).
+- `PilotV2EditorView.tsx`:
+  - `blockLayoutsRef` (`Map<blockId, {y,h}>`) populated by `onLayout`
+    callbacks wired into each `<BlockRow>`.
+  - `blockLayoutVersion` state counter incremented whenever a block's
+    y or h changes by more than 2 px.
+  - `assignAnchorToStrokes` callback: after each `onCommit`, finds the
+    block whose y-range contains the stroke centroid and writes
+    `anchor.blockId` + `anchor.blockOriginY`.
+  - `persistStrokes` now calls `assignAnchorToStrokes` before saving.
+  - `<PencilCanvas>` receives `blockLayouts` ref + `blockLayoutVersion`.
 
-- Block reorder → strokes stay in old visual position (detach).
-- Block text edit → underline shifts to a different word.
-- Editor / Glance transition → coordinates may re-evaluate against
-  different `paperSize`, causing visible drift.
-- Reopening note may show strokes against a now-shorter document where
-  their `y` is past the last block.
+### Step 7 — `af8c736` Per-block display transform
+Strokes now follow their host block when blocks are reordered.
+
+Key changes:
+- `PencilCanvas.tsx`: `Props` gains `blockLayouts` and
+  `blockLayoutVersion`.
+- `CommittedLayerProps` extended with the same two fields.
+- `CommittedStrokesLayer` memo comparator now checks
+  `blockLayoutVersion` so it re-runs on any block-position change.
+- `applyBlockOffset(stroke)`: when a stroke has `anchor.blockId`,
+  computes `dy = currentBlockY/height − anchor.blockOriginY` and
+  shifts all path points vertically by `dy`. The Skia path cache is
+  cleared on every `blockLayoutVersion` bump so stale paths never
+  appear.
+- Offset threshold: `|dy| < 0.002` (0.2 % of page) is treated as zero
+  to avoid churn from sub-pixel measurement noise.
+
+### Step 8 — `3b5d376` Migration script for legacy unanchored strokes
+**Priority #2 (anchoring — migration).** Old notes that were saved
+before Step 6 have no `anchor` on their strokes. On first open the
+migrator now retroactively assigns `anchor.blockId`.
+
+Key changes (all in `pilotV2Migration.ts`):
+- `estimateBlockLayouts(blocks)`: approximates block y/h from text
+  length + block type (heading 42 px, paragraph 26 px/line). Used only
+  during migration — real positions come from `onLayout` in the editor.
+- `assignLegacyAnchors(strokes, blocks)`: for each stroke without an
+  `anchor`, finds the block whose estimated rect contains the stroke's
+  centroid (or is nearest). Idempotent — strokes that already carry an
+  anchor are left untouched.
+- `normaliseStrokes`: preserves existing `anchor` fields when
+  normalising persisted data so re-migration never clobbers real anchors.
+- `migratePilotV2NoteContent`: calls `assignLegacyAnchors` in Case 2
+  (the standard persisted shape), so every note is upgraded on load.
+
+---
+
+## 🟡 Still OPEN — span-offset underline/highlight anchoring
+
+Freehand-stroke anchoring is complete (Steps 6–8). The remaining
+anchoring work is for underlines and highlights that need to track
+specific text runs, not just block Y-positions.
+
+### What is still broken
+
+- Underlines / highlights shift when the user edits the text they cover
+  (the stroke stays at the old pixel Y, but the text moves under it).
+- No per-span anchor is stored yet (`elementId`, `spanIndex`,
+  `startOffset`, `endOffset` are all absent from `anchor`).
 
 ### Recommended fix path (text-range anchoring)
-1. Extend `PilotV2PencilStroke` with optional anchor fields:
-   ```ts
-   anchor?: {
-     blockId: string;             // ID of the nested block this stroke belongs to
-     // For underlines / highlights — exact text range:
-     elementId?: string;          // ID of the ContentElement inside the block
-     spanIndex?: number;          // index into ContentElement.spans
-     startOffset?: number;        // char offset from span start
-     endOffset?: number;          // char offset (exclusive)
-     // For freehand drawing — relative coords WITHIN the block:
-     relX?: number;               // 0..1 of block width
-     relY?: number;               // 0..1 of block height
-   }
-   ```
-2. On `startStroke`, ask the editor for the block under the touch
-   point (`PilotV2EditorView` already measures block layouts via
-   `onLayout` callbacks — wire those into a ref map keyed by `blockId`
-   and translate screen coords to block-relative coords there).
-3. Persist strokes inside `PilotV2NestedBlock.pencilStrokes` (this
-   array already exists in `types.ts` line 287) instead of
-   `PilotV2NoteContent.pencilStrokes`. The flat-page array becomes a
-   fallback for legacy notes only.
-4. On render, walk blocks in their CURRENT order and ask each block's
-   `<PencilCanvas>` (or a per-block layer) to render its own strokes
-   relative to the block's measured rect. This automatically follows
-   block reorder and text edits.
-5. For underline / highlight specifically: store the anchor as
-   `(elementId, spanIndex, startOffset, endOffset)`. Re-derive screen
-   rect at render time from the rendered text's measure data.
 
-### Risk areas to watch when implementing the above
-- `PilotV2EditorView.persistStrokes` and `PilotV2GlanceView.persistGlanceStrokes`
-  both write to `note.content.pencilStrokes`. Migration must tolerate
-  both shapes.
+1. Extend `anchor` in `PilotV2PencilStroke` with the optional span
+   fields from the original spec:
+   ```ts
+   elementId?: string;    // ContentElement id
+   spanIndex?: number;
+   startOffset?: number;
+   endOffset?: number;
+   ```
+2. At `startStroke`, if the touch point lands within a rendered text
+   run, record the span offset from the text layout measurement.
+3. At render time, re-derive the screen rect from the current text
+   layout and apply the offset — replacing the simple Y-shift used today.
+
+### Risk areas
+
 - `pilotV2Export.ts` consumes the page-level array for PDF/Image export.
-- `pilotV2Migration.ts` already migrates older shapes — extend it.
-- `engine.replaceAll(initialStrokes)` in `usePilotV2Pencil` line ~95
-  needs to know which engine instance belongs to which block.
+- `PilotV2GlanceView` reads strokes via `note.content.pencilStrokes`
+  without block-layout callbacks — glance rendering still uses raw page
+  coords and will benefit from the same `blockLayouts` wiring done for
+  the editor.
 
 ---
 
@@ -125,12 +167,13 @@ text run they belong to. Therefore:
 
 | File | What it does |
 | --- | --- |
-| `src/components/pilot-v2/PencilAnnotationEngine.ts` | In-memory stroke model, smoothing, undo/redo. **Modified in Step 1.** |
-| `src/components/pilot-v2/PencilCanvas.tsx` | Skia drawing surface + lasso selection pill. **Modified in Steps 1–3.** |
+| `src/components/pilot-v2/PencilAnnotationEngine.ts` | In-memory stroke model, smoothing, undo/redo. **Modified in Steps 1, 6.** |
+| `src/components/pilot-v2/PencilCanvas.tsx` | Skia drawing surface + lasso selection pill. **Modified in Steps 1–3, 7.** |
 | `src/components/pilot-v2/usePilotV2Pencil.ts` | Hook owning the engine + persistence callback. **Modified in Step 1.** |
-| `src/components/pilot-v2/PilotV2EditorView.tsx` | Editor host with blocks + canvas. **Modified in Step 4.** |
+| `src/components/pilot-v2/PilotV2EditorView.tsx` | Editor host with blocks + canvas. **Modified in Steps 4, 6.** |
 | `src/components/pilot-v2/PilotV2GlanceView.tsx` | Read-only glance host with same canvas. |
-| `src/components/pilot-v2/types.ts` | Type definitions — `PilotV2PencilStroke`, `PilotV2NestedBlock`. |
+| `src/components/pilot-v2/pilotV2Migration.ts` | Content normaliser. **Modified in Step 8.** |
+| `src/components/pilot-v2/types.ts` | Type definitions — `PilotV2PencilStroke`. **Modified in Step 6.** |
 | `src/softnotes/SoftCanvas.tsx` | Reference implementation that already has the smooth feel. |
 
 ---
@@ -149,15 +192,14 @@ text run they belong to. Therefore:
 
 ## 🎯 Suggested next steps (ordered)
 
-1. **Implement block-level anchoring** as outlined above. Start with
-   freehand drawing (easier — only block-relative coords). Defer the
-   span-offset underline anchoring to a follow-up step.
-2. **Add a per-block PencilCanvas wrapper** so each block owns its own
-   Skia layer; rendering follows block layout automatically.
-3. **Migration script** in `pilotV2Migration.ts` that walks the
-   page-level strokes, checks which block their bounding box overlaps
-   most, and assigns `anchor.blockId` accordingly — converts old notes
-   to the new model on first open.
-4. **Stress test**: open a note with 200+ strokes on a 10-block page,
+1. **Span-offset anchoring for underlines/highlights** — extend `anchor`
+   with `elementId / spanIndex / startOffset / endOffset` and wire up
+   text-layout measurement in the editor (see "Still OPEN" section).
+2. **Glance view block-layout wiring** — `PilotV2GlanceView` renders the
+   same strokes but currently has no `blockLayouts` ref. Add `onLayout`
+   callbacks to `BlockRenderer` rows and pass `blockLayouts` /
+   `blockLayoutVersion` to its `<PencilCanvas>` so anchored strokes
+   follow reorders in the read-only view as well.
+3. **Stress test**: open a note with 200+ strokes on a 10-block page,
    reorder blocks, edit headings, close + reopen, verify strokes
    remain attached to the correct blocks.

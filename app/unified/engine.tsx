@@ -3926,7 +3926,16 @@ export default function UnifiedQuizEngine() {
         />
 
         {/* Floating Context-Aware AI Chat Card overlay */}
-        <PilotV2AIChat activeQuestion={questions[currentIndex]} />
+        <PilotV2AIChat
+          activeQuestion={questions[currentIndex]}
+          onSaveResponse={(text: string) => {
+            const q = questions[currentIndex];
+            if (!q) return;
+            setPilotSaveTargetQuestion(q);
+            setPilotSaveHtml(markdownToHtml(text || ''));
+            setPilotV2SaveOpen(true);
+          }}
+        />
       </SafeAreaView>
     </PageWrapper>
   );

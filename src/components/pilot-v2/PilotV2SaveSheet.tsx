@@ -16,28 +16,27 @@
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Modal, View, Text, StyleSheet, TouchableOpacity, TextInput,
+  Modal, View, Text, StyleSheet, TouchableOpacity,
   ScrollView, Platform, KeyboardAvoidingView, Alert, ActivityIndicator,
-  useWindowDimensions, FlatList,
+  useWindowDimensions, Keyboard,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Rocket, X, Plus, Wand2, ChevronDown, Highlighter, Eraser } from 'lucide-react-native';
+import { Rocket, X, Plus, Wand2, Highlighter, Eraser } from 'lucide-react-native';
 import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 import RichNoteEditor from '../RichNoteEditor';
 import { useTheme } from '../../context/ThemeContext';
-import { supabase } from '../../lib/supabase';
+import { PremiumMoveSheet, MoveTarget } from '../common/PremiumMoveSheet';
 import { SUBJECT_TOPICS } from './PilotV2SidebarSubject';
-import { PILOT_V2_SUBJECT_PALETTE } from './types';
+import { PILOT_V2_SUBJECT_PALETTE, PilotV2Node } from './types';
 import {
   findOrCreatePilotV2Note,
   appendBlocksToPilotV2Note,
   fetchNotebooksAtLevel,
   fetchPilotV2HierarchyOptions,
-  ensurePilotV2TopicNode,
-  ensurePilotV2SubtopicNode,
+  fetchCanonicalPilotV2Nodes,
+  createPilotV2Node,
 } from '../../repositories/pilotV2Repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PilotV2Block } from './types';
 
 const STORAGE_LAST_USED = 'pilot-v2:save-sheet:last-used';
 type LastUsed = {
@@ -130,24 +129,19 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const richRef = useRef<any>(null);
   const [showHlPicker, setShowHlPicker] = useState(false);
   const [hlColor, setHlColor] = useState('#FFF59D');
-  const [newTopicDraft, setNewTopicDraft] = useState('');
-  const [newSubtopicDraft, setNewSubtopicDraft] = useState('');
-  const [folderBusy, setFolderBusy] = useState(false);
   const [editorKey, setEditorKey] = useState(0);
   const [saving, setSaving]       = useState(false);
   const [savedNoteId, setSavedNoteId] = useState<string | null>(null);
   const [appendCount, setAppendCount] = useState(0);
   // Dropdowns state
-  const [showSubjectDropdown, setShowSubjectDropdown] = useState(false);
-  const [showTopicDropdown, setShowTopicDropdown] = useState(false);
-  const [showSubtopicDropdown, setShowSubtopicDropdown] = useState(false);
-  const [showNotebookDropdown, setShowNotebookDropdown] = useState(false);
+  const [activeLevel, setActiveLevel] = useState<'subject' | 'topic' | 'subtopic' | 'notebook' | null>(null);
+  const [moveOpen, setMoveOpen] = useState(false);
+  const [allNodes, setAllNodes] = useState<PilotV2Node[]>([]);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
 
   // Notebooks
   const [existingNotebooks, setExistingNotebooks] = useState<string[]>([]);
-  const [loadingNotebooks, setLoadingNotebooks] = useState(false);
-  const [mode, setMode] = useState<'select' | 'create'>('select');
-
   // User's actual Pilot V2 hierarchy (loaded once when sheet becomes visible)
   // — merged with the static palette so the Subject / Topic / Microtopic
   // dropdowns expose every branch the user has already created, not just the
@@ -163,7 +157,9 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     let cancelled = false;
     (async () => {
       const opts = await fetchPilotV2HierarchyOptions(userId);
+      const nodes = await fetchCanonicalPilotV2Nodes(userId, false);
       if (!cancelled) setUserHierarchy(opts);
+      if (!cancelled) setAllNodes(nodes);
     })();
     return () => { cancelled = true; };
   }, [visible, userId]);
@@ -194,10 +190,53 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     return () => { cancelled = true; };
   }, [visible, autoSeed, initialBody]);
 
+  useEffect(() => {
+    const showEvt = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvt = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const s = Keyboard.addListener(showEvt, () => setKeyboardOpen(true));
+    const h = Keyboard.addListener(hideEvt, () => setKeyboardOpen(false));
+    return () => { s.remove(); h.remove(); };
+  }, []);
+
   const refreshHierarchy = async () => {
     if (!userId) return;
     const opts = await fetchPilotV2HierarchyOptions(userId);
+    const nodes = await fetchCanonicalPilotV2Nodes(userId, false);
     setUserHierarchy(opts);
+    setAllNodes(nodes);
+  };
+
+  const moveTargets: MoveTarget[] = useMemo(
+    () =>
+      allNodes.map((n) => ({
+        id: n.id,
+        name: n.title,
+        type: n.type === 'note' ? 'notebook' : 'folder',
+        parent_id: n.parent_id || null,
+      })),
+    [allNodes]
+  );
+
+  const applySelectionFromNode = (nodeId: string | null) => {
+    if (!nodeId) return;
+    const byId = new Map(allNodes.map((n) => [n.id, n]));
+    let cur = byId.get(nodeId);
+    let noteTitle = '';
+    let subjectTitle = '';
+    let topicTitle = '';
+    let subtopicTitle = '';
+    if (!cur) return;
+    if (cur.type === 'note') noteTitle = cur.title;
+    while (cur) {
+      if (cur.type === 'subject') subjectTitle = cur.title;
+      else if (cur.type === 'topic') topicTitle = cur.title;
+      else if (cur.type === 'subtopic') subtopicTitle = cur.title;
+      cur = cur.parent_id ? byId.get(cur.parent_id) : undefined;
+    }
+    if (subjectTitle) setSubject(subjectTitle);
+    setTopic(topicTitle);
+    setSubtopic(subtopicTitle);
+    if (noteTitle) setNotebook(noteTitle);
   };
 
   const briefBlockTitle = useMemo(() => {
@@ -250,7 +289,6 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     if (!visible || !subject) return;
 
     (async () => {
-      setLoadingNotebooks(true);
       const notebooks = await fetchNotebooksAtLevel(
         userId,
         subject,
@@ -258,10 +296,8 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
         subtopic || null
       );
       setExistingNotebooks(notebooks);
-      setLoadingNotebooks(false);
 
       if (notebooks.length > 0) {
-        setMode('select');
         setNotebook(prev => {
           if (prev.trim() && notebooks.includes(prev.trim())) return prev;
           return notebooks[0];
@@ -365,77 +401,31 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     setEditorKey(k => k + 1);
   };
 
-  const handleAddTopicFolder = async () => {
-    const t = newTopicDraft.trim();
-    if (!t || !subject.trim()) {
-      Alert.alert('Subject required', 'Pick a subject and enter a section group name.');
-      return;
-    }
-    setFolderBusy(true);
-    try {
-      const ok = await ensurePilotV2TopicNode(userId, subject.trim(), t);
-      if (!ok) throw new Error('create topic');
-      setTopic(t);
-      setNewTopicDraft('');
-      await refreshHierarchy();
-      Alert.alert('Created', `Section group “${t}” is ready under ${subject}.`);
-    } catch {
-      Alert.alert('Error', 'Could not create section group.');
-    } finally {
-      setFolderBusy(false);
-    }
-  };
 
-  const handleAddSubtopicFolder = async () => {
-    const st = newSubtopicDraft.trim();
-    if (!st || !subject.trim() || !topic.trim()) {
-      Alert.alert('Pick topic', 'Select or create a section group first, then add a micro-topic name.');
-      return;
-    }
-    setFolderBusy(true);
-    try {
-      const ok = await ensurePilotV2SubtopicNode(userId, subject.trim(), topic.trim(), st);
-      if (!ok) throw new Error('create subtopic');
-      setSubtopic(st);
-      setNewSubtopicDraft('');
-      await refreshHierarchy();
-      Alert.alert('Created', `Micro-topic “${st}” is ready under ${topic}.`);
-    } catch {
-      Alert.alert('Error', 'Could not create micro-topic.');
-    } finally {
-      setFolderBusy(false);
-    }
-  };
-
-  const backdropStyle = [
-    styles.backdrop,
-    isTablet ? { justifyContent: 'flex-end', alignItems: 'flex-end' } : null,
-  ];
+  const backdropStyle = [styles.backdrop];
 
   const sheetStyle = [
     styles.sheet,
-    isTablet ? {
-      width: 480,
-      maxWidth: 480,
-      height: '100%',
-      borderRadius: 0,
-      borderTopLeftRadius: 28,
-      borderBottomLeftRadius: 28,
-      paddingTop: 40,
-      paddingHorizontal: 24,
-    } : null,
+    {
+      width: isTablet ? '80%' : '92%',
+      height: keyboardOpen ? (isTablet ? '64%' : '60%') : (isTablet ? '82%' : '86%'),
+      maxWidth: 980,
+      maxHeight: keyboardOpen ? 700 : 920,
+      borderRadius: 28,
+      paddingTop: 18,
+      paddingHorizontal: 18,
+    },
   ];
-
-  const scrollViewStyle = {
-    flex: 1,
-    maxHeight: isTablet ? undefined : 460,
-  };
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={backdropStyle}>
         <TouchableOpacity activeOpacity={1} onPress={onClose} style={StyleSheet.absoluteFill} />
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ width: '100%' }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 8 : 0}
+          style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: keyboardOpen ? 'flex-start' : 'center', paddingTop: keyboardOpen ? 12 : 0 }}
+        >
           <View
             testID="pilot-v2-save-sheet"
             style={[sheetStyle, { backgroundColor: colors.surface }]}
@@ -456,257 +446,58 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
               </TouchableOpacity>
             </View>
 
-            <ScrollView style={scrollViewStyle} keyboardShouldPersistTaps="handled">
-              {/* Subject Dropdown */}
+            <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled">
+              {/* Cascade chips + directory controls */}
               <View style={styles.formGroup}>
-                <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>Subject</Text>
-                <TouchableOpacity
-                  style={[styles.dropdownButton, { borderColor: colors.border }]}
-                  onPress={() => setShowSubjectDropdown(!showSubjectDropdown)}
-                >
-                  <Text style={[styles.dropdownButtonText, { color: colors.textPrimary }]}>
-                    {subject || 'Select subject...'}
-                  </Text>
-                  <ChevronDown size={16} color={colors.textSecondary} />
-                </TouchableOpacity>
-                {showSubjectDropdown && (
-                  <View style={[styles.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                    {allSubjects.map((s, idx) => (
-                      <TouchableOpacity
-                        key={`${s}-${idx}`}
-                        style={[
-                          styles.dropdownItem,
-                          subject === s && styles.dropdownItemSelected,
-                          { borderBottomColor: colors.border }
-                        ]}
-                        onPress={() => {
-                          setSubject(s);
-                          setTopic('');
-                          setSubtopic('');
-                          setShowSubjectDropdown(false);
-                        }}
-                      >
-                        <Text style={[styles.dropdownItemText, { color: subject === s ? '#5B4EFA' : colors.textPrimary }]}>
-                          {s}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                )}
-              </View>
-
-              {/* Topic Dropdown */}
-              <View style={styles.formGroup}>
-                <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>Topic</Text>
-                <TouchableOpacity
-                  style={[styles.dropdownButton, { borderColor: colors.border }]}
-                  onPress={() => setShowTopicDropdown(!showTopicDropdown)}
-                  disabled={!subject}
-                >
-                  <Text style={[styles.dropdownButtonText, { color: subject ? colors.textPrimary : colors.textTertiary }]}>
-                    {topic || (subject ? 'Select topic...' : '(Select subject first)')}
-                  </Text>
-                  <ChevronDown size={16} color={colors.textSecondary} />
-                </TouchableOpacity>
-                {showTopicDropdown && subject && (
-                  <View style={[styles.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                    {allTopics.map((t, idx) => (
-                      <TouchableOpacity
-                        key={`${t}-${idx}`}
-                        style={[
-                          styles.dropdownItem,
-                          topic === t && styles.dropdownItemSelected,
-                          { borderBottomColor: colors.border }
-                        ]}
-                        onPress={() => {
-                          setTopic(t);
-                          setSubtopic('');
-                          setShowTopicDropdown(false);
-                        }}
-                      >
-                        <Text style={[styles.dropdownItemText, { color: topic === t ? '#5B4EFA' : colors.textPrimary }]}>
-                          {t}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                )}
-              </View>
-
-              {/* Subtopic Dropdown */}
-              <View style={styles.formGroup}>
-                <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>Microtopic</Text>
-                <TouchableOpacity
-                  style={[styles.dropdownButton, { borderColor: colors.border }]}
-                  onPress={() => setShowSubtopicDropdown(!showSubtopicDropdown)}
-                  disabled={!topic}
-                >
-                  <Text style={[styles.dropdownButtonText, { color: topic ? colors.textPrimary : colors.textTertiary }]}>
-                    {subtopic || (topic ? 'Select microtopic...' : '(Select topic first)')}
-                  </Text>
-                  <ChevronDown size={16} color={colors.textSecondary} />
-                </TouchableOpacity>
-                {showSubtopicDropdown && topic && (
-                  <View style={[styles.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                    {allSubtopics.length > 0 ? (
-                      allSubtopics.map((st, idx) => (
+                <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>Save path</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
+                  <TouchableOpacity onPress={() => setActiveLevel('subject')} style={[styles.pathChip, { borderColor: '#8B5CF6', backgroundColor: '#EDE9FE' }]}><Text style={{ color: '#5B21B6', fontWeight: '800' }}>{subject || 'Subject'}</Text></TouchableOpacity>
+                  <Text style={{ color: colors.textTertiary }}>→</Text>
+                  <TouchableOpacity onPress={() => subject && setActiveLevel('topic')} style={[styles.pathChip, { borderColor: '#3B82F6', backgroundColor: '#DBEAFE', opacity: subject ? 1 : 0.5 }]}><Text style={{ color: '#1D4ED8', fontWeight: '800' }}>{topic || 'Section Group'}</Text></TouchableOpacity>
+                  <Text style={{ color: colors.textTertiary }}>→</Text>
+                  <TouchableOpacity onPress={() => topic && setActiveLevel('subtopic')} style={[styles.pathChip, { borderColor: '#10B981', backgroundColor: '#D1FAE5', opacity: topic ? 1 : 0.5 }]}><Text style={{ color: '#047857', fontWeight: '800' }}>{subtopic || 'Micro Topic'}</Text></TouchableOpacity>
+                  <Text style={{ color: colors.textTertiary }}>→</Text>
+                  <TouchableOpacity onPress={() => subject && setActiveLevel('notebook')} style={[styles.pathChip, { borderColor: '#F59E0B', backgroundColor: '#FEF3C7', opacity: subject ? 1 : 0.5 }]}><Text style={{ color: '#92400E', fontWeight: '800' }}>{notebook || 'Notebook'}</Text></TouchableOpacity>
+                </View>
+                <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+                  <TouchableOpacity style={[styles.modeButton, { flex: 1 }]} onPress={() => setMoveOpen(true)}>
+                    <Text style={styles.modeButtonText}>Change Directory</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modeButton, { flex: 1 }]} onPress={() => setMoveOpen(true)}>
+                    <Text style={styles.modeButtonText}>New Directory</Text>
+                  </TouchableOpacity>
+                </View>
+                {activeLevel && (
+                  <View style={[styles.selectorCard, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}>
+                    <Text style={{ color: colors.textTertiary, fontSize: 11, fontWeight: '800', marginBottom: 8 }}>
+                      {activeLevel === 'subject' ? 'Choose Subject' : activeLevel === 'topic' ? 'Choose Section Group' : activeLevel === 'subtopic' ? 'Choose Micro Topic' : 'Choose Notebook'}
+                    </Text>
+                    <ScrollView style={{ maxHeight: 170 }}>
+                      {(activeLevel === 'subject' ? allSubjects : activeLevel === 'topic' ? allTopics : activeLevel === 'subtopic' ? allSubtopics : existingNotebooks).map((item, idx) => (
                         <TouchableOpacity
-                          key={`${st}-${idx}`}
-                          style={[
-                            styles.dropdownItem,
-                            subtopic === st && styles.dropdownItemSelected,
-                            { borderBottomColor: colors.border }
-                          ]}
+                          key={`${activeLevel}-${idx}-${item}`}
+                          style={[styles.selectorItem, { borderBottomColor: colors.border }]}
                           onPress={() => {
-                            setSubtopic(st);
-                            setShowSubtopicDropdown(false);
+                            if (activeLevel === 'subject') {
+                              setSubject(item); setTopic(''); setSubtopic(''); setNotebook('');
+                              setActiveLevel('topic');
+                            } else if (activeLevel === 'topic') {
+                              setTopic(item); setSubtopic(''); setNotebook('');
+                              setActiveLevel('subtopic');
+                            } else if (activeLevel === 'subtopic') {
+                              setSubtopic(item); setNotebook('');
+                              setActiveLevel('notebook');
+                            } else {
+                              setNotebook(item); setActiveLevel(null);
+                            }
                           }}
                         >
-                          <Text style={[styles.dropdownItemText, { color: subtopic === st ? '#5B4EFA' : colors.textPrimary }]}>
-                            {st}
-                          </Text>
+                          <Text style={{ color: colors.textPrimary, fontWeight: '700' }}>{item}</Text>
                         </TouchableOpacity>
-                      ))
-                    ) : (
-                      <Text style={[styles.dropdownItem, { color: colors.textTertiary }]}>
-                        No subtopics available
-                      </Text>
-                    )}
+                      ))}
+                    </ScrollView>
                   </View>
                 )}
-              </View>
-
-              {/* Notebook Selector */}
-              <View style={styles.formGroup}>
-                <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>Notebook</Text>
-                {loadingNotebooks ? (
-                  <ActivityIndicator color={colors.textTertiary} />
-                ) : existingNotebooks.length > 0 ? (
-                  <>
-                    <View style={styles.modeToggle}>
-                      <TouchableOpacity
-                        style={[
-                          styles.modeButton,
-                          mode === 'select' && styles.modeButtonActive
-                        ]}
-                        onPress={() => {
-                          setMode('select');
-                          setNotebook(existingNotebooks[0]);
-                        }}
-                      >
-                        <Text style={styles.modeButtonText}>📌 Use Existing</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={[
-                          styles.modeButton,
-                          mode === 'create' && styles.modeButtonActive
-                        ]}
-                        onPress={() => setMode('create')}
-                      >
-                        <Text style={styles.modeButtonText}>✨ Create New</Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    {mode === 'select' ? (
-                      <View style={[styles.notebookList, { borderColor: colors.border }]}>
-                        <FlatList
-                          scrollEnabled={existingNotebooks.length > 5}
-                          data={existingNotebooks}
-                          keyExtractor={(item, idx) => `${item}-${idx}`}
-                          renderItem={({ item }) => (
-                            <TouchableOpacity
-                              style={[
-                                styles.notebookItem,
-                                notebook === item && styles.notebookItemSelected,
-                                { borderBottomColor: colors.border }
-                              ]}
-                              onPress={() => setNotebook(item)}
-                            >
-                              <Text
-                                style={[
-                                  styles.notebookItemText,
-                                  notebook === item && styles.notebookItemTextSelected,
-                                  { color: notebook === item ? '#5B4EFA' : colors.textPrimary }
-                                ]}
-                              >
-                                {item}
-                              </Text>
-                            </TouchableOpacity>
-                          )}
-                        />
-                      </View>
-                    ) : (
-                      <TextInput
-                        style={[
-                          styles.input,
-                          { color: colors.textPrimary, borderColor: colors.border }
-                        ]}
-                        placeholder="Enter notebook name"
-                        placeholderTextColor={colors.textTertiary}
-                        value={notebook}
-                        onChangeText={setNotebook}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <View>
-                    <Text style={[styles.emptyText, { color: colors.textTertiary }]}>
-                      No notebooks yet. Create one:
-                    </Text>
-                    <TextInput
-                      style={[
-                        styles.input,
-                        { color: colors.textPrimary, borderColor: colors.border, marginTop: 8 }
-                      ]}
-                      placeholder="Notebook name"
-                      placeholderTextColor={colors.textTertiary}
-                      value={notebook}
-                      onChangeText={setNotebook}
-                    />
-                  </View>
-                )}
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>New folders (optional)</Text>
-                <Text style={[styles.emptyText, { color: colors.textTertiary, marginBottom: 6 }]}>
-                  Add a section group or micro-topic under the current subject without leaving this sheet.
-                </Text>
-                <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center', marginBottom: 8 }}>
-                  <TextInput
-                    style={[styles.input, { flex: 1, color: colors.textPrimary, borderColor: colors.border }]}
-                    placeholder="New section group name"
-                    placeholderTextColor={colors.textTertiary}
-                    value={newTopicDraft}
-                    onChangeText={setNewTopicDraft}
-                    editable={!folderBusy}
-                  />
-                  <TouchableOpacity
-                    onPress={handleAddTopicFolder}
-                    disabled={folderBusy}
-                    style={[styles.miniBtn, { backgroundColor: '#5B4EFA', opacity: folderBusy ? 0.6 : 1 }]}
-                  >
-                    <Text style={{ color: '#fff', fontWeight: '800', fontSize: 12 }}>Add</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-                  <TextInput
-                    style={[styles.input, { flex: 1, color: colors.textPrimary, borderColor: colors.border }]}
-                    placeholder="New micro-topic name"
-                    placeholderTextColor={colors.textTertiary}
-                    value={newSubtopicDraft}
-                    onChangeText={setNewSubtopicDraft}
-                    editable={!folderBusy}
-                  />
-                  <TouchableOpacity
-                    onPress={handleAddSubtopicFolder}
-                    disabled={folderBusy || !topic}
-                    style={[styles.miniBtn, { backgroundColor: '#5B4EFA', opacity: folderBusy || !topic ? 0.5 : 1 }]}
-                  >
-                    <Text style={{ color: '#fff', fontWeight: '800', fontSize: 12 }}>Add</Text>
-                  </TouchableOpacity>
-                </View>
               </View>
 
               <Text style={[styles.fieldLabel, { color: colors.textTertiary, marginTop: 12 }]}>Content</Text>
@@ -743,6 +534,25 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                         setShowHlPicker(v => !v);
                         return;
                       }
+                      if (action === actions.heading1) {
+                        richRef.current?.focusContentEditor?.();
+                        setTimeout(() => {
+                          richRef.current?.commandDOM?.(`
+                            (function(){
+                              const sel = window.getSelection();
+                              if (!sel || !sel.anchorNode) return;
+                              let n = sel.anchorNode.nodeType===3 ? sel.anchorNode.parentElement : sel.anchorNode;
+                              while (n && n.tagName && n.tagName.toLowerCase() !== 'h1' && n.tagName.toLowerCase() !== 'div') n = n.parentElement;
+                              if (n && n.tagName && n.tagName.toLowerCase() === 'h1') {
+                                document.execCommand('formatBlock', false, 'p');
+                              } else {
+                                document.execCommand('formatBlock', false, 'h1');
+                              }
+                            })();
+                          `);
+                        }, 40);
+                        return;
+                      }
                       richRef.current?.focusContentEditor?.();
                       setTimeout(() => richRef.current?.sendAction?.(action as any), 50);
                     }}
@@ -750,7 +560,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                 </View>
                 {showHlPicker && (
                   <View style={styles.hlRow}>
-                    {['transparent', '#FF6A88', '#6A5BFF', '#4FC3F7', '#81C784', '#FFB74D', '#BA68C8', '#FFF59D'].map(c => (
+                    {['transparent', '#FBCFE8', '#DDD6FE', '#BFDBFE', '#BBF7D0', '#FDE68A', '#FED7AA', '#CFFAFE', '#E9D5FF', '#FFF59D'].map(c => (
                       <TouchableOpacity
                         key={c}
                         onPress={() => {
@@ -758,10 +568,11 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                           setShowHlPicker(false);
                           richRef.current?.focusContentEditor?.();
                           setTimeout(() => {
+                            richRef.current?.commandDOM?.("document.execCommand('styleWithCSS', false, true)");
                             if (c === 'transparent') {
                               richRef.current?.commandDOM?.("document.execCommand('hiliteColor', false, 'transparent'); document.execCommand('backColor', false, 'transparent')");
                             } else {
-                              richRef.current?.commandDOM?.(`document.execCommand('hiliteColor', false, '${c}')`);
+                              richRef.current?.commandDOM?.(`document.execCommand('hiliteColor', false, '${c}'); document.execCommand('backColor', false, '${c}')`);
                             }
                           }, 50);
                         }}
@@ -784,6 +595,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     border: colors.border,
                     primary: '#5B4EFA',
                   }}
+                  editorStyle={{ minHeight: keyboardOpen ? 180 : 320 }}
                   placeholder="Edit explanation — bold, lists, and highlights match Pilot notes."
                 />
                 <TouchableOpacity onPress={addSectionBreak} style={styles.splitBtn}>
@@ -841,6 +653,39 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                 </TouchableOpacity>
               )}
             </View>
+            <PremiumMoveSheet
+              visible={moveOpen}
+              title="Change Directory"
+              targets={moveTargets}
+              currentSelectedId={selectedNodeId}
+              allowCreate
+              onCreate={async (name, parentId) => {
+                if (!userId) return;
+                const parent = parentId ? allNodes.find((n) => n.id === parentId) : null;
+                const type: PilotV2Node['type'] =
+                  !parent ? 'subject' :
+                  parent.type === 'subject' ? 'topic' :
+                  parent.type === 'topic' ? 'subtopic' :
+                  parent.type === 'subtopic' ? 'subtopic' : 'subtopic';
+                const created = await createPilotV2Node({
+                  userId,
+                  type,
+                  title: name,
+                  parentId: parentId || null,
+                });
+                if (created) {
+                  await refreshHierarchy();
+                  setSelectedNodeId(created.id);
+                  applySelectionFromNode(created.id);
+                }
+              }}
+              onClose={() => setMoveOpen(false)}
+              onConfirm={(targetId) => {
+                setSelectedNodeId(targetId);
+                applySelectionFromNode(targetId);
+                setMoveOpen(false);
+              }}
+            />
           </View>
         </KeyboardAvoidingView>
       </View>
@@ -848,31 +693,11 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   );
 };
 
-const Field: React.FC<{ label: string; value: string; onChange: (v: string) => void; testID?: string }> = ({
-  label, value, onChange, testID,
-}) => {
-  const { colors } = useTheme();
-  return (
-    <View style={{ marginBottom: 10 }}>
-      <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>{label}</Text>
-      <TextInput
-        testID={testID}
-        value={value}
-        onChangeText={onChange}
-        placeholder="—"
-        placeholderTextColor={colors.textTertiary}
-        style={[styles.input, {
-          color: colors.textPrimary,
-          borderColor: colors.border,
-          backgroundColor: colors.surfaceStrong,
-        }]}
-      />
-    </View>
-  );
-};
-
 const styles = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 20 },
+  pathChip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1 },
+  selectorCard: { borderWidth: 1, borderRadius: 12, padding: 10, marginTop: 10 },
+  selectorItem: { paddingVertical: 10, borderBottomWidth: 1 },
   sheet: { width: '94%', maxWidth: 520, borderRadius: 28, padding: 18, paddingBottom: 22 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
   brand: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },

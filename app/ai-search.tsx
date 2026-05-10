@@ -2188,7 +2188,10 @@ export default function AISearchTab() {
                       showNotebookButton={false}
                       openNotebookFromQuestion={(_: any, activeText?: string) => {
                         setPreviewNotebookDraft(activeText || '');
-                        setPilotV2SaveOpen(true);
+                        // Close light-preview modal first; then open Pilot sheet
+                        // so it always appears on top (prevents hidden modal bug).
+                        closePreviewModal();
+                        setTimeout(() => setPilotV2SaveOpen(true), 120);
                       }}
                       onCreateTag={() => setIsAddingTag(true)}
                     />

@@ -36,7 +36,7 @@ interface Message {
 // Global session-level cache to guarantee conversation histories are 100% persistent across question swaps
 const globalHistoryCache: Record<string, Message[]> = {};
 
-export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion }: PilotV2AIChatProps) {
+export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse }: PilotV2AIChatProps) {
   const { colors } = useTheme();
   const { session } = useAuth();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -416,6 +416,17 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion }: PilotV2AICha
                         {copiedId === idx ? "Copied!" : "Copy"}
                       </Text>
                     </TouchableOpacity>
+                    {!!onSaveResponse && (
+                      <TouchableOpacity
+                        onPress={() => onSaveResponse(m.content)}
+                        style={[styles.copyBtn, { borderColor: '#5B4EFA55', backgroundColor: '#5B4EFA14' }]}
+                        activeOpacity={0.8}
+                      >
+                        <Text style={{ fontSize: 10, color: '#5B4EFA', fontWeight: '800' }}>
+                          Save to Pilot
+                        </Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
                 )}
               </View>
@@ -436,6 +447,7 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion }: PilotV2AICha
 interface PilotV2AIChatProps {
   isOtherPopupOpen?: boolean;
   activeQuestion?: any;
+  onSaveResponse?: (text: string) => void;
 }
 
 const styles = StyleSheet.create({

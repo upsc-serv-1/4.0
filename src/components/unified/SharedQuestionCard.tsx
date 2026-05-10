@@ -537,15 +537,41 @@ export const SharedQuestionCard = ({
               {isRevealed && (
                 <View style={{ marginTop: 8 }}>
                   {showAiChat ? (
-                    <AIExplanationChat
-                      questionId={item.id || item._id || `q_${index}`}
-                      questionText={item.statement_line || item.question_text || ''}
-                      options={Object.entries(item.options || {}).map(([k, v]) => `${k}) ${v}`)}
-                      correctAnswer={item.correct_answer || ''}
-                      instituteExplanations={effectiveExplanationText}
-                      initialExplanation={aiExplanation}
-                      collapsed={false}
-                    />
+                    <>
+                      <AIExplanationChat
+                        questionId={item.id || item._id || `q_${index}`}
+                        questionText={item.statement_line || item.question_text || ''}
+                        options={Object.entries(item.options || {}).map(([k, v]) => `${k}) ${v}`)}
+                        correctAnswer={item.correct_answer || ''}
+                        instituteExplanations={effectiveExplanationText}
+                        initialExplanation={aiExplanation}
+                        collapsed={false}
+                      />
+                      <TouchableOpacity
+                        testID={`save-ai-to-pilot-${item.id}`}
+                        onPress={() => {
+                          const activeText = aiExplanation || effectiveExplanationText || item.explanation_markdown || '';
+                          openNotebookFromQuestion && openNotebookFromQuestion(item, activeText, 'pilot-v2');
+                        }}
+                        style={{
+                          marginTop: 8,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 6,
+                          borderRadius: 14,
+                          borderWidth: 1,
+                          borderColor: '#5B4EFA50',
+                          backgroundColor: '#5B4EFA12',
+                          paddingVertical: 10,
+                        }}
+                      >
+                        <Rocket size={14} color="#5B4EFA" />
+                        <Text style={{ fontSize: 12, fontWeight: '800', color: '#5B4EFA' }}>
+                          Save This AI Response to Pilot
+                        </Text>
+                      </TouchableOpacity>
+                    </>
                   ) : (
                     <TouchableOpacity
                       testID={`open-ai-chat-${item.id}`}

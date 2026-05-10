@@ -49,6 +49,29 @@ export async function fetchAllPilotV2Nodes(userId: string, includeArchived = fal
   return (data || []).filter((row: any) => row?.metadata?.surface === PILOT_V2_SURFACE) as PilotV2Node[];
 }
 
+/**
+ * Canonicalize hierarchy rows in-memory (UI/read path only).
+ * Keeps the oldest row for an identical logical node key, without mutating DB.
+ */
+export function canonicalizePilotV2Nodes(nodes: PilotV2Node[]): PilotV2Node[] {
+  const best = new Map<string, PilotV2Node>();
+  const toTs = (n: PilotV2Node) => {
+    const raw = (n as any)?.created_at ? Date.parse((n as any).created_at) : NaN;
+    return Number.isFinite(raw) ? raw : Number.MAX_SAFE_INTEGER;
+  };
+  for (const n of nodes) {
+    const key = `${n.type}::${n.parent_id || 'root'}::${(n.title || '').trim().toLowerCase()}::${n.type === 'note' ? (n.note_id || '') : ''}`;
+    const prev = best.get(key);
+    if (!prev || toTs(n) < toTs(prev)) best.set(key, n);
+  }
+  return Array.from(best.values());
+}
+
+export async function fetchCanonicalPilotV2Nodes(userId: string, includeArchived = false): Promise<PilotV2Node[]> {
+  const rows = await fetchAllPilotV2Nodes(userId, includeArchived);
+  return canonicalizePilotV2Nodes(rows);
+}
+
 export async function createPilotV2Node(input: {
   userId: string;
   type: PilotV2NodeType;

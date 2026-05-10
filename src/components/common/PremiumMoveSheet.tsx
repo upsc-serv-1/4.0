@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal
+  View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput
 } from 'react-native';
 import { X, CheckCircle2, Folder, FileText, Home, ChevronRight, ChevronDown } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
@@ -21,12 +21,15 @@ interface PremiumMoveSheetProps {
   onClose: () => void;
   onConfirm: (targetId: string | null) => void;
   currentSelectedId?: string | null;
+  allowCreate?: boolean;
+  onCreate?: (name: string, parentId: string | null) => Promise<void> | void;
 }
 
-export function PremiumMoveSheet({ visible, title, targets, onClose, onConfirm, currentSelectedId }: PremiumMoveSheetProps) {
+export function PremiumMoveSheet({ visible, title, targets, onClose, onConfirm, currentSelectedId, allowCreate, onCreate }: PremiumMoveSheetProps) {
   const { colors } = useTheme();
   const [selectedId, setSelectedId] = useState<string | null>(currentSelectedId ?? null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [newName, setNewName] = useState('');
 
   // Build tree and flatten with visibility
   const visibleNodes = useMemo(() => {
@@ -137,6 +140,28 @@ export function PremiumMoveSheet({ visible, title, targets, onClose, onConfirm, 
 
           {/* Action Button */}
           <View style={styles.moveFooter}>
+            {allowCreate && (
+              <View style={{ flexDirection: 'row', gap: 8, marginBottom: 10 }}>
+                <TextInput
+                  value={newName}
+                  onChangeText={setNewName}
+                  placeholder="New Directory Name"
+                  placeholderTextColor={colors.textTertiary}
+                  style={[styles.createInput, { color: colors.textPrimary, borderColor: colors.border }]}
+                />
+                <TouchableOpacity
+                  onPress={async () => {
+                    const name = newName.trim();
+                    if (!name || !onCreate) return;
+                    await onCreate(name, selectedId);
+                    setNewName('');
+                  }}
+                  style={[styles.createBtn, { backgroundColor: colors.primary }]}
+                >
+                  <Text style={{ color: '#fff', fontWeight: '900' }}>Create</Text>
+                </TouchableOpacity>
+              </View>
+            )}
             <TouchableOpacity 
               onPress={() => onConfirm(selectedId)} 
               style={[styles.bigMoveBtn, { backgroundColor: colors.primary }]}
@@ -161,6 +186,21 @@ const styles = StyleSheet.create({
   moveIconWrap: { width: 32, height: 36, alignItems: 'center', justifyContent: 'center', marginRight: 8 },
   moveRowText: { fontSize: 16, fontWeight: '700', flex: 1 },
   moveFooter: { marginTop: 24, paddingHorizontal: 10 },
+  createInput: {
+    flex: 1,
+    height: 46,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    fontSize: 14,
+  },
+  createBtn: {
+    height: 46,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   bigMoveBtn: { height: 60, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
   bigMoveBtnText: { fontSize: 17, fontWeight: '900' },
 });

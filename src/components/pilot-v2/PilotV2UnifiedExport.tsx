@@ -25,7 +25,7 @@
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { Check } from 'lucide-react-native';
 import { UnifiedExportSheet } from '../export/UnifiedExportSheet';
 import {
@@ -33,7 +33,7 @@ import {
   ExportPayload,
   ExportOptions,
 } from '../../lib/unifiedExportEngine';
-import { PilotV2Block, PilotV2BlockType } from './types';
+import { PilotV2Block, PilotV2BlockType, PilotV2PencilStroke } from './types';
 import { useTheme } from '../../context/ThemeContext';
 
 // ---------- Block-type chip catalogue ------------------------------------
@@ -116,6 +116,12 @@ interface Props {
   title: string;
   /** Pilot V2 source blocks (will be adapted + filtered by chips/selection). */
   blocks: PilotV2Block[];
+  /** Pilot V2 pencil strokes captured on top of the page (Step 18). */
+  strokes?: PilotV2PencilStroke[];
+  /** Editor page width in CSS pixels (used for stroke remap). */
+  pageWidth?: number;
+  /** Editor page height in CSS pixels (used for stroke remap). */
+  pageHeight?: number;
 }
 
 export const PilotV2UnifiedExport: React.FC<Props> = ({
@@ -123,6 +129,9 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
   onClose,
   title,
   blocks,
+  strokes = [],
+  pageWidth = 0,
+  pageHeight = 0,
 }) => {
   // Block-type filter — all on by default
   const [activeTypes, setActiveTypes] = useState<Record<PilotV2BlockType, boolean>>(
@@ -135,19 +144,29 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
     () => new Set(blocks.map((b) => b.id)),
   );
 
+  // Step 18 — toggle for "Include pencil annotations". Default ON when there
+  // is at least one stroke captured on this page.
+  const hasStrokes = strokes.length > 0;
+  const [includeAnnotations, setIncludeAnnotations] = useState<boolean>(hasStrokes);
+
   // Re-seed when sheet opens or blocks change
   useEffect(() => {
     if (!visible) return;
     setActiveTypes(BLOCK_TYPE_CHIPS.reduce((acc, c) => { acc[c.id] = true; return acc; },
       {} as Record<PilotV2BlockType, boolean>));
     setSelectedBlockIds(new Set(blocks.map((b) => b.id)));
-  }, [visible, blocks]);
+    setIncludeAnnotations(hasStrokes);
+  }, [visible, blocks, hasStrokes]);
 
   // Filter blocks → adapted ExportNoteBlock[] for the engine
   const filteredBlocks = useMemo(
     () => blocks.filter((b) => activeTypes[b.type] && selectedBlockIds.has(b.id)),
     [blocks, activeTypes, selectedBlockIds],
   );
+
+  // Step 18 — strokes / page dims are accepted now and consumed by the
+  // hardnote payload path in Step 21. Reference them so the linter is happy.
+  void strokes; void pageWidth; void pageHeight; void includeAnnotations;
 
   const payload: ExportPayload = useMemo(() => ({
     kind: 'notes',
@@ -184,6 +203,9 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
           setActiveTypes={setActiveTypes}
           selectedBlockIds={selectedBlockIds}
           setSelectedBlockIds={setSelectedBlockIds}
+          hasStrokes={hasStrokes}
+          includeAnnotations={includeAnnotations}
+          setIncludeAnnotations={setIncludeAnnotations}
         />
       )}
     />
@@ -198,6 +220,9 @@ interface ExtraProps {
   setActiveTypes: React.Dispatch<React.SetStateAction<Record<PilotV2BlockType, boolean>>>;
   selectedBlockIds: Set<string>;
   setSelectedBlockIds: React.Dispatch<React.SetStateAction<Set<string>>>;
+  hasStrokes: boolean;
+  includeAnnotations: boolean;
+  setIncludeAnnotations: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const PilotV2ExtraFilters: React.FC<ExtraProps> = ({
@@ -206,6 +231,9 @@ const PilotV2ExtraFilters: React.FC<ExtraProps> = ({
   setActiveTypes,
   selectedBlockIds,
   setSelectedBlockIds,
+  hasStrokes,
+  includeAnnotations,
+  setIncludeAnnotations,
 }) => {
   const { colors } = useTheme();
 
@@ -223,6 +251,35 @@ const PilotV2ExtraFilters: React.FC<ExtraProps> = ({
 
   return (
     <View style={{ marginTop: 6 }}>
+      {/* ── Pencil annotations toggle (Step 18) ──────────────────────── */}
+      {hasStrokes ? (
+        <View
+          testID="pilot-v2-export-include-strokes-row"
+          style={{
+            flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+            paddingVertical: 10, paddingHorizontal: 12, borderRadius: 12, borderWidth: 1,
+            backgroundColor: colors.surfaceStrong, borderColor: colors.border,
+            marginBottom: 12,
+          }}
+        >
+          <View style={{ flex: 1, paddingRight: 12 }}>
+            <Text style={{ color: colors.textPrimary, fontSize: 13, fontWeight: '800' }}>
+              Include pencil annotations
+            </Text>
+            <Text style={{ color: colors.textTertiary, fontSize: 11, marginTop: 2 }}>
+              Underlines, highlights & free strokes follow the words they were drawn on.
+            </Text>
+          </View>
+          <Switch
+            testID="pilot-v2-export-include-strokes"
+            value={includeAnnotations}
+            onValueChange={setIncludeAnnotations}
+            trackColor={{ false: colors.border, true: colors.primary + '88' }}
+            thumbColor={includeAnnotations ? colors.primary : '#fff'}
+          />
+        </View>
+      ) : null}
+
       {/* ── Block-type chips ─────────────────────────────────────────── */}
       <Text
         style={{

@@ -713,6 +713,9 @@ export function PilotV2GlanceView() {
         onClose={() => setExportSheetOpen(false)}
         title={title || 'Pilot V2 Note'}
         blocks={blocks}
+        strokes={pencil.engine.getPersisted()}
+        pageWidth={paperSize.w}
+        pageHeight={paperSize.h}
       />
     </View>
   );

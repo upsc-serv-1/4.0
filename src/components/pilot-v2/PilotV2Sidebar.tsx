@@ -14,7 +14,7 @@
  * UI tokens follow the Figma spec colours from `theme.css` of the Knowledge
  * Management app (#5B4EFA primary, #F9FAFB canvas, #FFFFFF surface, etc.).
  */
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, TextInput, Platform, LayoutAnimation, Animated } from 'react-native';
 import {
   Home as HomeIcon, Pin, Clock, Share2, Trash2, Plus, Settings, ChevronRight, ChevronDown, ChevronLeft,
@@ -356,6 +356,8 @@ function PilotV2SidebarHome() {
   const [creating, setCreating] = useState(false);
   const [expanded, setExpanded] = useState<string[]>(['fundamental-rights']);
   const [expandedSubjects, setExpandedSubjects] = useState<string[]>([]);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const [subjectPositions, setSubjectPositions] = useState<Record<string, number>>({});
 
   const selectedSubjectId = state.view.selectedSubject;
   const subjectsList = useMemo(() => {
@@ -449,9 +451,22 @@ function PilotV2SidebarHome() {
   };
 
   const toggleSubjectExpanded = (subjId: string) => {
-    setExpandedSubjects(prev =>
-      prev.includes(subjId) ? prev.filter(id => id !== subjId) : [...prev, subjId]
-    );
+    setExpandedSubjects(prev => {
+      const isCurrentlyExpanded = prev.includes(subjId);
+      const newExpanded = isCurrentlyExpanded ? prev.filter(id => id !== subjId) : [...prev, subjId];
+      
+      // Auto-scroll to expanded subject (only on expand, not collapse)
+      if (!isCurrentlyExpanded && subjectPositions[subjId] !== undefined) {
+        setTimeout(() => {
+          scrollViewRef.current?.scrollTo({
+            y: Math.max(0, subjectPositions[subjId] - 60),
+            animated: true,
+          });
+        }, 100);
+      }
+      
+      return newExpanded;
+    });
   };
 
   const handleSelectSubject = (subjectId: string) => {
@@ -745,7 +760,7 @@ function PilotV2SidebarHome() {
       style={[styles.root, { backgroundColor: colors.surface, borderRightColor: colors.border }]}
     >
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32, paddingTop: 16 }}>
+      <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32, paddingTop: 16 }}>
         {/* Small search bar like in Notability */}
         <View style={styles.sbContainer}>
           <View style={[styles.sbBox, { backgroundColor: '#F3F4F6', borderColor: colors.border }]}>
@@ -781,22 +796,32 @@ function PilotV2SidebarHome() {
         <View style={{ paddingHorizontal: 12, paddingVertical: 16 }}>
           <Text style={[styles.sectionLabel, { color: colors.textTertiary, paddingHorizontal: 16 }]}>SUBJECTS</Text>
           {subjectsList.map((s, idx) => (
-            <CollapsibleSubjectItem
+            <View
               key={s.id}
-              s={s}
-              state={state}
-              colors={colors}
-              isExpanded={expandedSubjects.includes(s.id)}
-              toggleSubjectExpanded={toggleSubjectExpanded}
-              handleSelectSubject={handleSelectSubject}
-              handleSubjectLongPress={handleSubjectLongPress}
-              getTopicsForSubject={getTopicsForSubject}
-              expanded={expanded}
-              handleTopicLongPress={handleTopicLongPress}
-              handleSelectTopic={handleSelectTopic}
-              handleSubtopicLongPress={handleSubtopicLongPress}
-              handleSelectSubtopic={handleSelectSubtopic}
-            />
+              onLayout={(e) => {
+                const y = e.nativeEvent.layout.y;
+                setSubjectPositions(prev => ({
+                  ...prev,
+                  [s.id]: y,
+                }));
+              }}
+            >
+              <CollapsibleSubjectItem
+                s={s}
+                state={state}
+                colors={colors}
+                isExpanded={expandedSubjects.includes(s.id)}
+                toggleSubjectExpanded={toggleSubjectExpanded}
+                handleSelectSubject={handleSelectSubject}
+                handleSubjectLongPress={handleSubjectLongPress}
+                getTopicsForSubject={getTopicsForSubject}
+                expanded={expanded}
+                handleTopicLongPress={handleTopicLongPress}
+                handleSelectTopic={handleSelectTopic}
+                handleSubtopicLongPress={handleSubtopicLongPress}
+                handleSelectSubtopic={handleSelectSubtopic}
+              />
+            </View>
           ))}
 
           <TouchableOpacity

@@ -468,6 +468,23 @@ export function PilotV2GlanceView() {
       testID="pilot-v2-glance"
       style={[styles.root, { backgroundColor: colors.bg }]}
     >
+      {/* ── Cute Floating back button ──────────────────────────────────── */}
+      <TouchableOpacity
+        testID="pilot-v2-glance-back"
+        onPress={handleBack}
+        activeOpacity={0.85}
+        style={[
+          styles.floatingBack,
+          { 
+            backgroundColor: colors.surface + 'E6', 
+            borderColor: colors.border,
+            shadowColor: colors.textPrimary,
+          }
+        ]}
+      >
+        <ChevronLeft size={26} color={colors.textPrimary} strokeWidth={2.5} />
+      </TouchableOpacity>
+
       {/* ── Sticky header ────────────────────────────────────────────────── */}
       <View style={[
         styles.header,
@@ -482,15 +499,8 @@ export function PilotV2GlanceView() {
         }
       ]}>
         <View style={styles.headerLeft}>
-          <TouchableOpacity
-            testID="pilot-v2-glance-back"
-            onPress={handleBack}
-            style={styles.iconBtn}
-          >
-            <ChevronLeft size={20} color={colors.textPrimary} />
-          </TouchableOpacity>
           <Text
-            style={[styles.headerTitle, { color: colors.textPrimary }]}
+            style={[styles.headerTitle, { color: colors.textPrimary, marginLeft: 52 }]}
             numberOfLines={1}
           >
             {title}
@@ -991,6 +1001,24 @@ const styles = StyleSheet.create({
   zoomBarBtn: {
     paddingHorizontal: 14, paddingVertical: 6, borderRadius: 8, borderWidth: 1,
     marginLeft: 12,
+  },
+
+  /* Floating back button */
+  floatingBack: {
+    position: 'absolute',
+    top: 18,
+    left: 18,
+    zIndex: 1500,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
   },
 });
 

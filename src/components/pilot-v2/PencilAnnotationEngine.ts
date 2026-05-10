@@ -485,7 +485,7 @@ export class PencilAnnotationEngine {
     // Legacy listener — fire all three so existing callers stay correct.
     // Active listeners get the current stroke; persisted listeners get the
     // committed list; legacy listeners get the union.
-    const snapshot = this.getAll();
+    const snapshot = [...this.getAll()];
     for (const fn of this.listeners) {
       try { fn(snapshot); } catch { /* ignore listener errors */ }
     }
@@ -502,12 +502,12 @@ export class PencilAnnotationEngine {
   /** Fire ONLY persisted-stroke listeners. Used on commit / delete / undo /
    *  redo / replaceAll — never during the live move loop. */
   private notifyPersisted() {
-    const snapshot = this.strokes;
+    const snapshot = [...this.strokes];
     for (const fn of this.persistedListeners) {
       try { fn(snapshot); } catch { /* ignore */ }
     }
     // Also fire legacy listeners so non-migrated callers keep working.
-    const all = this.getAll();
+    const all = [...this.getAll()];
     for (const fn of this.listeners) {
       try { fn(all); } catch { /* ignore */ }
     }

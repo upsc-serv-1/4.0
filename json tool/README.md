@@ -19,4 +19,5 @@ This folder will host a self-contained web tool that:
 ## Tech Stack
 - Backend: FastAPI + PyMuPDF + Tesseract
 - Frontend: React + Tailwind + shadcn/ui
-- DB: MongoDB
+- DB: **Supabase (PostgreSQL)** — tables prefixed `jt_`
+- Storage: **Supabase Storage** bucket `json-tool-pdfs`

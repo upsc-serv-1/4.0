@@ -42,8 +42,11 @@ User has **Gemini 3 Pro web subscription only** (no API key). So the tool must b
 │  • PDF page → PNG renderer for review pane                  │
 └─────────────────────────────────────────────────────────────┘
                             ↕
-                       MongoDB
+                  Supabase (Postgres)
         (jobs, questions, edit history, low-confidence queue)
+                            ↕
+                  Supabase Storage
+              (uploaded PDFs, page renders)
 ```
 
 **No third-party API calls from server.** All AI happens in user's Gemini web session.
@@ -261,8 +264,8 @@ Final downloaded JSON exactly matches sample format. Tool maps parsed Gemini out
 |-------|------|
 | Frontend | React 18, Tailwind, shadcn/ui, react-dropzone, react-markdown, axios |
 | Backend | FastAPI, PyMuPDF (`fitz`), Tesseract via `pytesseract`, `python-docx` |
-| DB | MongoDB (jobs, questions, history, taxonomy cache) |
-| Storage | Local `/tmp` for PDF page renders (cleaned on job delete) |
+| DB | **Supabase (PostgreSQL)** via `supabase-py` client |
+| Storage | **Supabase Storage** bucket `json-tool-pdfs` for PDFs + page renders |
 | Infra | Supervisor-managed, hot-reload enabled, internal ports 8001/3000, ingress via REACT_APP_BACKEND_URL |
 | AI | Gemini 3 Pro (user's web subscription, **no API integration**) |
 
@@ -295,23 +298,108 @@ All routes prefixed `/api`.
 
 ---
 
-## 8. MongoDB Collections
+## 8. Supabase Schema (PostgreSQL)
 
+All tables in `public` schema. Prefixed `jt_` to avoid clashing with existing Pilot Pro tables (cards, attempts, etc.).
+
+```sql
+-- 1. JOBS
+CREATE TABLE jt_jobs (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title           text NOT NULL,
+  status          text NOT NULL DEFAULT 'created',
+                  -- created | extracted | prompts_generated | partially_parsed | reviewed | exported
+  qp_pdf_path     text,             -- Supabase Storage object path
+  sol_pdf_path    text,
+  metadata        jsonb NOT NULL,   -- full test-level metadata (id, title, exam_frame, etc.)
+  total_questions int  DEFAULT 0,
+  batch_size      int  DEFAULT 35,
+  subject_filter  text[] DEFAULT '{}',  -- empty = all subjects
+  created_at      timestamptz DEFAULT now(),
+  updated_at      timestamptz DEFAULT now()
+);
+
+-- 2. QUESTIONS
+CREATE TABLE jt_questions (
+  id                    uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  job_id                uuid NOT NULL REFERENCES jt_jobs(id) ON DELETE CASCADE,
+  question_number       int  NOT NULL,
+  raw_qp_text           text,
+  raw_sol_text          text,
+  subject               text,
+  section_group         text,
+  microtopic            text,
+  statement_lines       jsonb DEFAULT '[]'::jsonb,
+  question_text         text,
+  options               jsonb DEFAULT '{}'::jsonb,   -- {a, b, c, d}
+  correct_answer        text,
+  explanation_markdown  text,
+  pyq_source            text,
+  pyq_year              int,
+  is_pyq                boolean DEFAULT false,
+  confidence            int,
+  inconsistency_flag    text DEFAULT 'none',
+  inconsistency_reason  text,
+  edited                boolean DEFAULT false,
+  parsed_from_gemini    boolean DEFAULT false,
+  created_at            timestamptz DEFAULT now(),
+  updated_at            timestamptz DEFAULT now(),
+  UNIQUE (job_id, question_number)
+);
+CREATE INDEX ON jt_questions (job_id, question_number);
+CREATE INDEX ON jt_questions (job_id, confidence);
+CREATE INDEX ON jt_questions (job_id, inconsistency_flag);
+
+-- 3. PROMPT BATCHES
+CREATE TABLE jt_prompt_batches (
+  id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  job_id            uuid NOT NULL REFERENCES jt_jobs(id) ON DELETE CASCADE,
+  batch_index       int  NOT NULL,
+  question_numbers  int[] NOT NULL,
+  prompt_text       text NOT NULL,
+  docx_path         text,
+  parsed            boolean DEFAULT false,
+  parsed_at         timestamptz,
+  created_at        timestamptz DEFAULT now()
+);
+CREATE INDEX ON jt_prompt_batches (job_id, batch_index);
+
+-- 4. EDIT HISTORY
+CREATE TABLE jt_revisions (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  job_id          uuid NOT NULL REFERENCES jt_jobs(id) ON DELETE CASCADE,
+  question_number int  NOT NULL,
+  snapshot        jsonb NOT NULL,
+  source          text NOT NULL,    -- gemini | manual | reverify
+  created_at      timestamptz DEFAULT now()
+);
+CREATE INDEX ON jt_revisions (job_id, question_number);
+
+-- 5. TAXONOMY (240 entries seeded once)
+CREATE TABLE jt_taxonomy (
+  id            serial PRIMARY KEY,
+  subject       text NOT NULL,
+  section_group text NOT NULL,
+  microtopic    text NOT NULL,
+  UNIQUE (subject, section_group, microtopic)
+);
+
+-- 6. METADATA DROPDOWN OPTIONS (user-editable)
+CREATE TABLE jt_dropdown_options (
+  id          serial PRIMARY KEY,
+  field_name  text NOT NULL,    -- exam_category | stage | paper | level | paperType
+  value       text NOT NULL,
+  label       text,
+  sort_order  int DEFAULT 0,
+  UNIQUE (field_name, value)
+);
 ```
-jobs               { _id, title, status, qpPdfPath, solPdfPath, metadata, 
-                     totalQuestions, createdAt, updatedAt }
 
-questions          { _id, jobId, questionNumber, rawQpText, rawSolText,
-                     subject, sectionGroup, microTopic, statementLines,
-                     questionText, options, correctAnswer, explanationMarkdown,
-                     pyqSource, pyqYear, confidence, inconsistencyFlag, 
-                     inconsistencyReason, edited }
+**Storage bucket:** `json-tool-pdfs` (private)
+- Path format: `{job_id}/qp.pdf`, `{job_id}/sol.pdf`, `{job_id}/pages/page_{n}.png`
+- Signed URLs generated on demand for frontend display
 
-revisions          { _id, jobId, questionNumber, snapshot, timestamp, source }
-                   // source: "gemini" | "manual" | "reverify"
-
-job_prompts        { _id, jobId, batchIdx, promptText, questionNumbers[] }
-```
+**RLS:** Disabled for MVP (no auth). Will enable when auth added in Phase 3.
 
 ---
 
@@ -390,10 +478,12 @@ Color coding in UI:
 ## 13. Security & Storage
 
 - No auth in MVP (user said "simple tool, no login")
-- Uploaded PDFs stored in `/app/uploads/{jobId}/` (gitignored)
-- MongoDB indexed on `jobId` + `questionNumber`
+- PDFs stored in **Supabase Storage bucket `json-tool-pdfs`** (private bucket, signed URLs for frontend)
+- Postgres tables prefixed `jt_` (won't clash with existing Pilot Pro app tables)
+- RLS disabled in MVP (no auth) → enable in Phase 3 with user auth
+- Service role key kept server-side only (`SUPABASE_SERVICE_ROLE_KEY`); frontend uses anon key only for read-only public flows
 - No data sent to external services
-- User's PAT and credentials never stored in tool
+- User's GitHub PAT and Gemini credentials never stored in tool
 
 ---
 
@@ -414,6 +504,28 @@ Color coding in UI:
 - Sample QP PDF: `Pilots pro app/pdf and json files/Test 1 QP GS Simulator Test 2026.pdf`
 - Sample SOL PDF: `Pilots pro app/pdf and json files/Test 1 SOL GS Simulator Test 2026.pdf`
 - Taxonomy: `Pilots pro app/pdf and json files/new New syllabus hierarchy json with csat.txt` (240 entries)
+
+---
+
+## 16. Required Environment Variables
+
+```
+# Backend (.env)
+SUPABASE_URL=https://<your-project>.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=<service role key, server-only>
+SUPABASE_BUCKET=json-tool-pdfs
+
+# Frontend (.env)
+REACT_APP_BACKEND_URL=<existing>
+REACT_APP_SUPABASE_URL=<same as above>
+REACT_APP_SUPABASE_ANON_KEY=<anon key>
+```
+
+User must provide:
+- Supabase project URL
+- Supabase service role key (for backend writes)
+- Supabase anon key (for frontend if needed for direct file downloads)
+- Confirmation that bucket `json-tool-pdfs` is created (or tool creates it on first run)
 
 ---
 

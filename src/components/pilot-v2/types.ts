@@ -140,6 +140,29 @@ export interface PilotV2PencilStroke {
      *  at the moment the stroke was committed.  Used to compute the delta
      *  when the block moves: dy = (currentBlockY / pageH) − blockOriginY. */
     blockOriginY: number;
+
+    /* ── Span-offset fields (Step 9) — underlines & highlights only ────── */
+    /** ContentElement id.  For current single-span blocks this equals
+     *  blockId; reserved for future multi-element blocks. */
+    elementId?: string;
+    /** Span index inside the ContentElement (0 for single-span blocks). */
+    spanIndex?: number;
+    /** Estimated character offset of the stroke's LEFT edge within the
+     *  block text.  Derived at commit time as
+     *  `Math.round(startRelX * blockText.length)`. */
+    startOffset?: number;
+    /** Estimated character offset of the stroke's RIGHT edge (exclusive).
+     *  Derived as `Math.round(endRelX * blockText.length)`. */
+    endOffset?: number;
+    /** Stroke's left X as a fraction (0..1) of the block width at commit
+     *  time.  Preserved so the corrective X can be re-derived later even
+     *  when character-level text metrics are not available. */
+    startRelX?: number;
+    /** Stroke's right X as a fraction (0..1) of the block width. */
+    endRelX?: number;
+    /** Stroke centroid Y as a fraction (0..1) of the block HEIGHT at
+     *  commit time.  Identifies which line the annotation sits on. */
+    relY?: number;
   };
 }
 

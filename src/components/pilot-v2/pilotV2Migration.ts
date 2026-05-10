@@ -116,7 +116,18 @@ function normaliseStrokes(raw: any[]): PilotV2PencilStroke[] {
       createdAt: typeof s.createdAt === 'string' ? s.createdAt : new Date().toISOString(),
       bounds: s.bounds && typeof s.bounds === 'object' ? s.bounds : undefined,
       // Preserve existing anchor if already present (idempotent migration).
-      anchor: s.anchor && typeof s.anchor.blockId === 'string' ? s.anchor : undefined,
+      // Step 9: also preserve all span-offset fields.
+      anchor: s.anchor && typeof s.anchor.blockId === 'string' ? {
+        blockId: s.anchor.blockId,
+        blockOriginY: typeof s.anchor.blockOriginY === 'number' ? s.anchor.blockOriginY : 0,
+        ...(typeof s.anchor.elementId === 'string'   ? { elementId:   s.anchor.elementId }   : {}),
+        ...(typeof s.anchor.spanIndex === 'number'   ? { spanIndex:   s.anchor.spanIndex }   : {}),
+        ...(typeof s.anchor.startOffset === 'number' ? { startOffset: s.anchor.startOffset } : {}),
+        ...(typeof s.anchor.endOffset === 'number'   ? { endOffset:   s.anchor.endOffset }   : {}),
+        ...(typeof s.anchor.startRelX === 'number'   ? { startRelX:   s.anchor.startRelX }   : {}),
+        ...(typeof s.anchor.endRelX === 'number'     ? { endRelX:     s.anchor.endRelX }     : {}),
+        ...(typeof s.anchor.relY === 'number'        ? { relY:        s.anchor.relY }        : {}),
+      } : undefined,
     }));
 }
 
@@ -144,8 +155,9 @@ function estimateBlockLayouts(blocks: PilotV2Block[]): Map<string, { y: number; 
 }
 
 /** Assign `anchor.blockId` + `anchor.blockOriginY` to strokes that do not
- *  already carry an anchor.  Uses estimated block positions — accurate
- *  enough for the migration heuristic. */
+ *  already carry an anchor.  Also detects horizontal annotation strokes and
+ *  populates span-offset fields (Step 9).  Uses estimated block positions —
+ *  accurate enough for the migration heuristic. */
 function assignLegacyAnchors(
   strokes: PilotV2PencilStroke[],
   blocks: PilotV2Block[],
@@ -180,7 +192,39 @@ function assignLegacyAnchors(
     }
     if (!bestId) return s;
     const blockOriginY = (layout.get(bestId)?.y ?? 0) / totalH;
-    return { ...s, anchor: { blockId: bestId, blockOriginY } };
+
+    // ── Step 9: span-offset for horizontal / highlighter strokes ─────
+    let spanAnchor: Partial<typeof s.anchor> = {};
+    const isHighlighter = s.tool === 'highlighter';
+    if (isHighlighter || s.tool === 'pen') {
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      for (const p of pts) {
+        if (p.x < minX) minX = p.x;
+        if (p.x > maxX) maxX = p.x;
+        if (p.y < minY) minY = p.y;
+        if (p.y > maxY) maxY = p.y;
+      }
+      const dX = maxX - minX;
+      const dY = maxY - minY;
+      if (isHighlighter || (dX > 0.05 && dY < dX * 0.25)) {
+        const blockRect = layout.get(bestId)!;
+        const blockH = Math.max(1, blockRect.h);
+        const relY = Math.max(0, Math.min(1, (cy - blockRect.y) / blockH));
+        const blockText = blocks.find(b => b.id === bestId)?.text ?? '';
+        const textLen = Math.max(1, blockText.length);
+        spanAnchor = {
+          elementId:   bestId,
+          spanIndex:   0,
+          startOffset: Math.round(minX * textLen),
+          endOffset:   Math.min(textLen, Math.round(maxX * textLen)),
+          startRelX:   minX,
+          endRelX:     maxX,
+          relY,
+        };
+      }
+    }
+
+    return { ...s, anchor: { blockId: bestId, blockOriginY, ...spanAnchor } };
   });
 }
 

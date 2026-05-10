@@ -493,20 +493,23 @@ export function PilotV2EditorView() {
 
   /** After a stroke is committed, find which block's y-range the stroke
    *  centroid falls in and tag the stroke with anchor.blockId +
-   *  anchor.blockOriginY.  Strokes that already carry an anchor are left
-   *  untouched (idempotent).  O(n_strokes × n_blocks). */
+   *  anchor.blockOriginY.  Also detects underline / highlight strokes and
+   *  populates span-offset fields (Step 9) for future text-edit tracking.
+   *  Strokes that already carry an anchor are left untouched (idempotent).
+   *  O(n_strokes × n_blocks). */
   const assignAnchorToStrokes = useCallback(
     (strokes: PilotV2PencilStroke[]): PilotV2PencilStroke[] => {
       const ph = Math.max(1, paperSize.h);
+      const pw = Math.max(1, paperSize.w);
       return strokes.map((s) => {
         if (s.anchor) return s;
         const pts = s.points;
         if (!pts.length) return s;
-        // Centroid y in page coords (relative → pixels).
+
+        // ── 1. Find host block (centroid Y) ──────────────────────────────
         let cy = 0;
         for (const p of pts) cy += p.y;
         cy = (cy / pts.length) * ph;
-        // Find the block whose rect contains (or is nearest to) the centroid.
         let bestId: string | null = null;
         let bestDist = Infinity;
         for (const [id, rect] of blockLayoutsRef.current.entries()) {
@@ -517,11 +520,62 @@ export function PilotV2EditorView() {
           if (d < bestDist) { bestDist = d; bestId = id; }
         }
         if (!bestId) return s;
-        const blockY = (blockLayoutsRef.current.get(bestId)?.y ?? 0) / ph;
-        return { ...s, anchor: { blockId: bestId, blockOriginY: blockY } };
+        const blockRect = blockLayoutsRef.current.get(bestId)!;
+        const blockOriginY = blockRect.y / ph;
+
+        // ── 2. Span-offset detection for underlines / highlights ─────────
+        // A stroke is treated as a text annotation when:
+        //   a) tool is 'highlighter', OR
+        //   b) tool is 'pen' and the stroke is nearly horizontal:
+        //      vertical spread < 20 % of horizontal spread AND
+        //      horizontal span > 5 % of page width.
+        let spanAnchor: Partial<typeof s.anchor> = {};
+        const isHighlighter = s.tool === 'highlighter';
+        if (isHighlighter || s.tool === 'pen') {
+          let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+          for (const p of pts) {
+            if (p.x < minX) minX = p.x;
+            if (p.x > maxX) maxX = p.x;
+            if (p.y < minY) minY = p.y;
+            if (p.y > maxY) maxY = p.y;
+          }
+          const dX = maxX - minX; // horizontal spread (0..1)
+          const dY = maxY - minY; // vertical spread (0..1)
+          const isHorizontal = dX > 0.05 && dY < dX * 0.25; // flat stroke
+          if (isHighlighter || isHorizontal) {
+            // Block-relative coordinates
+            const blockH = Math.max(1, blockRect.h);
+            const startRelX = minX;           // already 0..1 of page w
+            const endRelX   = maxX;
+            const relY = Math.max(0, Math.min(1,
+              (cy - blockRect.y) / blockH,
+            ));
+            // Estimate char offsets using the block's text length.
+            // charPos = fraction_of_page_width × block_text_length.
+            // This is a heuristic; precise measurement requires text-layout.
+            const blockText = blocks.find(b => b.id === bestId)?.text ?? '';
+            const textLen = Math.max(1, blockText.length);
+            const startOffset = Math.round(startRelX * textLen);
+            const endOffset   = Math.min(textLen, Math.round(endRelX * textLen));
+            spanAnchor = {
+              elementId:   bestId, // = blockId for single-span blocks
+              spanIndex:   0,
+              startOffset,
+              endOffset,
+              startRelX,
+              endRelX,
+              relY,
+            };
+          }
+        }
+
+        return {
+          ...s,
+          anchor: { blockId: bestId, blockOriginY, ...spanAnchor },
+        };
       });
     },
-    [paperSize.h],
+    [paperSize.h, paperSize.w, blocks],
   );
 
   const persistStrokes = (next: PilotV2PencilStroke[]) => {

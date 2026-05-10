@@ -35,6 +35,7 @@ import {
 } from '../../lib/unifiedExportEngine';
 import { PilotV2Block, PilotV2BlockType, PilotV2PencilStroke } from './types';
 import { useTheme } from '../../context/ThemeContext';
+import { assignLegacyAnchors } from './pilotV2Migration';
 
 // ---------- Block-type chip catalogue ------------------------------------
 
@@ -164,9 +165,25 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
     [blocks, activeTypes, selectedBlockIds],
   );
 
-  // Step 18 — strokes / page dims are accepted now and consumed by the
-  // hardnote payload path in Step 21. Reference them so the linter is happy.
-  void strokes; void pageWidth; void pageHeight; void includeAnnotations;
+  // Step 19 — re-anchor any legacy unanchored strokes against the CURRENT
+  // (full) block list (not the filtered one — we need the original order +
+  // ids to back-fill correctly), then drop strokes whose anchor block was
+  // filtered out by chip / per-block selection.
+  const survivingStrokes = useMemo(() => {
+    if (!includeAnnotations || !strokes.length) return [];
+    const reAnchored = assignLegacyAnchors(strokes, blocks);
+    const survivingIds = new Set(filteredBlocks.map((b) => b.id));
+    return reAnchored.filter((s) => {
+      const anchorId = s.anchor?.elementId ?? s.anchor?.blockId;
+      // Strokes WITHOUT an anchor (e.g., free washi-tape canvas drawings) are
+      // page-level — they have no host block, so they survive unconditionally.
+      if (!anchorId) return true;
+      return survivingIds.has(anchorId);
+    });
+  }, [includeAnnotations, strokes, blocks, filteredBlocks]);
+
+  // Page dims are consumed by the hardnote payload path in Step 21.
+  void pageWidth; void pageHeight; void survivingStrokes;
 
   const payload: ExportPayload = useMemo(() => ({
     kind: 'notes',

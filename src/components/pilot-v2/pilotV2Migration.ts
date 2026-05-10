@@ -157,8 +157,11 @@ function estimateBlockLayouts(blocks: PilotV2Block[]): Map<string, { y: number; 
 /** Assign `anchor.blockId` + `anchor.blockOriginY` to strokes that do not
  *  already carry an anchor.  Also detects horizontal annotation strokes and
  *  populates span-offset fields (Step 9).  Uses estimated block positions —
- *  accurate enough for the migration heuristic. */
-function assignLegacyAnchors(
+ *  accurate enough for the migration heuristic.
+ *
+ *  Exported (Step 19) so the unified export pipeline can re-run the back-fill
+ *  on every export — it is idempotent for already-anchored strokes. */
+export function assignLegacyAnchors(
   strokes: PilotV2PencilStroke[],
   blocks: PilotV2Block[],
 ): PilotV2PencilStroke[] {

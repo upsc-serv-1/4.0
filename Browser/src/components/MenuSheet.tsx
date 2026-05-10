@@ -95,7 +95,7 @@ export default function MenuSheet({
               key={t.url}
               style={styles.linkRow}
               onPress={() => onOpenLeakTest(t.url)}
-              testID={`leak-test-${t.name.toLowerCase().replace(/[^a-z]/g, "-")}`}
+              testID={`leak-test-${t.name.toLowerCase().replace(/[^a-z]+/g, "-").replace(/^-|-$/g, "")}`}
             >
               <Ionicons name="bug" size={14} color="#EAB308" />
               <Text style={styles.linkText}>{t.name}</Text>

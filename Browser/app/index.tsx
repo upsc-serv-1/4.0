@@ -315,7 +315,7 @@ function NewTabScreen({
               key={q.url}
               style={styles.gridItem}
               onPress={() => onOpen(q.url)}
-              testID={`quick-${q.name.toLowerCase().replace(/[^a-z]/g, "-")}`}
+              testID={`quick-${q.name.toLowerCase().replace(/[^a-z]+/g, "-").replace(/^-|-$/g, "")}`}
             >
               <Text style={styles.gridText}>{q.name}</Text>
               <Ionicons name="arrow-forward" size={12} color="#22C55E" />

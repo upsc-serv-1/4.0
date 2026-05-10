@@ -120,3 +120,40 @@ Planned scope:
 (_Each iteration's section will be filled in the same shape as
 Iteration 1 above — root cause, fix, files, acceptance checklist — at the
 time it's worked on._)
+
+---
+
+## Iteration: Single Unified Export (Steps 13–16)  ✅
+
+**Problem:** Pilot V2 had three disjoint export entry-points:
+1. Editor → More menu → "Export as PDF" (with pencil annotations).
+2. Editor → More menu → "Export as Image" (PDF + strokes).
+3. Editor → More menu → "Export as Markdown".
+4. GlanceView → Upload icon → silent direct-PDF.
+5. An unused `PilotV2ExportSheet.tsx` (smart-append draft).
+
+Each path used a different code-route and skipped the rich Unified Export
+Engine features (pastel backgrounds, sort-by, font scale, paper themes,
+TOC, headings filter, etc.) that the rest of the app already enjoys.
+
+**Fix — Single unified export:**
+| Step | File | Change |
+| --- | --- | --- |
+| 13 | `src/components/pilot-v2/PilotV2UnifiedExport.tsx` (new) | Wraps `UnifiedExportSheet`. Adapter maps `PilotV2Block → ExportNoteBlock`. Adds Pilot-V2 specific injections: **block-type chips** (Headings / Paragraph / Bullets / Numbered / Checklist / Quote / Highlights / Code) and **per-block tag-chip selector** with Select/Deselect-All. Defaults: PDF · plain paper · pastel cyan headings. |
+| 14 | `src/components/pilot-v2/PilotV2EditorView.tsx` | Removed three handlers (`handleExportPdf/Image/Markdown`) + dead helpers (`filterBlocksByHeadings`, `unifiedExportSelected`, unused state). The More menu now has a single `Export…` entry that opens the unified sheet. |
+| 15 | `src/components/pilot-v2/PilotV2GlanceView.tsx` | Upload icon now opens the unified sheet instead of the silent direct PDF. |
+| 16 | (deleted) `src/components/pilot-v2/pilotV2Export.ts` and `src/components/pilot-v2/PilotV2ExportSheet.tsx` | Removed entirely — no longer reachable. ~1.4k LOC removed. |
+
+**Test IDs added:**
+- `pilot-v2-more-export` (single More-menu entry)
+- `pilot-v2-export-types-label`, `pilot-v2-export-type-{type}`
+- `pilot-v2-export-blocks-label`, `pilot-v2-export-blocks-toggle-all`
+- `pilot-v2-export-block-{blockId}` (per-block chip)
+
+**Acceptance:**
+- One export button per surface (Editor More menu, GlanceView header) — done.
+- Block-type chip filter works as quick "type-level" toggle — done.
+- Per-block tag chips allow fine-grained selection (default: all on) — done.
+- Inherits all UnifiedExportSheet features (theme, paper, font, font size,
+  pastel backgrounds, TOC, columns, advanced margins/header/footer/watermark)
+  — done.

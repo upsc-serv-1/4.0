@@ -51,6 +51,11 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
     { role: 'assistant', content: 'Hello! I am Dr. UPSC Assistant, your personal GS and Polity tutor. Ask me anything or choose a preset mode below!' }
   ]);
 
+  // When `true`, tapping a preset combines the user-typed prompt + the preset
+  // template using a newline before sending — per user spec.
+  const inputTextRef = React.useRef(inputText);
+  React.useEffect(() => { inputTextRef.current = inputText; }, [inputText]);
+
   const progress = useSharedValue(0);
   const keyboardHeight = useSharedValue(0);
   const promptManager = AIPromptManager.getInstance();
@@ -218,7 +223,14 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
       wrong_options: wrongOptions,
     });
 
-    handleSend(promptText, true);
+    // Per user spec: when the user has typed a custom command in the input
+    // bar AND taps a preset, both run together joined with a newline so the
+    // preset acts as additional context on top of the user's instruction.
+    const userTyped = (inputTextRef.current || '').trim();
+    const finalPrompt = userTyped ? `${userTyped}\n\n${promptText}` : promptText;
+    if (userTyped) setInputText('');
+
+    handleSend(finalPrompt, true);
   };
 
   const handleCopy = (content: string, idx: number) => {
@@ -228,33 +240,36 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
   };
 
   // GPU-interpolated morphing and positioning animation
+  // NOTE: previously the height used `interpolate(progress, ...)` AND a
+  // dynamic keyboard offset which together produced a visible jump (the
+  // panel collapsed → expanded → settled).  We removed the keyboard term
+  // from the interpolation so the *open* height stays rock-stable as soon
+  // as progress reaches 1.  Default is now ~88% of screen (was 72%) so the
+  // AI output box has plenty of room for long replies.
   const containerAnimatedStyle = useAnimatedStyle(() => {
     const isTablet = screenWidth >= 768;
-    
-    // Expand to full screen (with 16px safety margins) if isFullscreen is active
-    const cardWidth = isFullscreen 
-      ? (screenWidth - 32)
-      : (isTablet ? screenWidth * 0.4 : screenWidth * 0.9);
-    
+
+    const cardWidth = isFullscreen
+      ? (screenWidth - 24)
+      : (isTablet ? screenWidth * 0.45 : screenWidth * 0.94);
+
     const baseHeight = isFullscreen
-      ? (screenHeight - keyboardHeight.value - 40)
-      : (isTablet ? screenHeight * 0.82 : screenHeight * 0.72);
-      
-    const maxHeight = screenHeight - keyboardHeight.value - 50;
-    const activeHeight = Math.min(baseHeight, maxHeight);
+      ? (screenHeight - 60)
+      : (isTablet ? screenHeight * 0.88 : screenHeight * 0.88);
 
     const finalWidth = interpolate(progress.value, [0, 1], [64, cardWidth]);
-    const finalHeight = interpolate(progress.value, [0, 1], [64, activeHeight]);
-    const borderRadius = interpolate(progress.value, [0, 1], [32, isFullscreen ? 16 : 24]);
-    
-    const finalBottom = interpolate(progress.value, [0, 1], [24, 24 + keyboardHeight.value]);
+    const finalHeight = interpolate(progress.value, [0, 1], [64, baseHeight]);
+    const borderRadius = interpolate(progress.value, [0, 1], [32, isFullscreen ? 16 : 20]);
+
+    // Bottom only lifts when the keyboard is up — never collapses height.
+    const finalBottom = interpolate(progress.value, [0, 1], [24, 24 + keyboardHeight.value * 0.5]);
 
     return {
       width: finalWidth,
       height: finalHeight,
       borderRadius,
       bottom: finalBottom,
-      right: isFullscreen ? 16 : 24,
+      right: isFullscreen ? 12 : 12,
     };
   });
 
@@ -353,7 +368,7 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
           </TouchableOpacity>
         </View>
 
-        {/* Repositioned Preset study pills with premium styling right under search bar */}
+        {/* Compact preset icon chips — replaces the old large "running AI" pills */}
         <View style={[styles.presetsBar, { borderBottomColor: colors.border }]}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.actionsGrid}>
             {templates.map((template) => (
@@ -361,9 +376,11 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
                 key={template.template_key}
                 onPress={() => handleActionPill(template)}
                 style={[styles.pill, { backgroundColor: colors.surfaceStrong, borderColor: colors.border, borderWidth: 1 }]}
+                testID={`pilot-v2-ai-preset-${template.template_key}`}
               >
-                <Text style={{ color: colors.textPrimary, fontSize: 11, fontWeight: '700' }}>
-                  {template.button_emoji || '🤖'} {template.button_label}
+                <Text style={{ fontSize: 14 }}>{template.button_emoji || '🤖'}</Text>
+                <Text style={{ color: colors.textPrimary, fontSize: 10, fontWeight: '700', marginLeft: 4 }} numberOfLines={1}>
+                  {template.button_label}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -573,10 +590,11 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   pill: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 16,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    maxWidth: 130,
   },
 });

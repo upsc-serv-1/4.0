@@ -71,7 +71,8 @@ import {
   Save as SaveIcon,
   Send,
   RotateCcw,
-  MessageSquare
+  MessageSquare,
+  Rocket
 } from 'lucide-react-native';
 import { AIModelSwitcher } from '../../src/components/ai/AIModelSwitcher';
 import { PilotV2AIChat } from '../../src/components/pilot-v2/PilotV2AIChat';
@@ -91,16 +92,10 @@ import { StudentSync } from '../../src/services/StudentSync';
 import { uuidv4 } from '../../src/utils/uuid';
 import { FlashcardSvc } from '../../src/services/FlashcardService';
 import { AddToFlashcardSheet } from '../../src/components/flashcards/AddToFlashcardSheet';
-import { NotebookLocationPicker } from '../../src/components/NotebookLocationPicker';
-import { AddToNotebookSheet, SaveDestination } from '../../src/components/capsule/AddToNotebookSheet';
-import { CapsuleLocationPicker } from '../../src/components/capsule/CapsuleLocationPicker';
 import { PilotV2SaveSheet } from '../../src/components/pilot-v2/PilotV2SaveSheet';
-import { appendTextToCapsule } from '../../src/utils/capsuleAppend';
 import { QuizCaptureSheet } from '../../src/components/hardnotes/QuizCaptureSheet';
 import { OfflineManager } from '../../src/services/OfflineManager';
 import { LocalQuery } from '../../src/services/LocalQuery';
-import RichNoteEditor from '../../src/components/RichNoteEditor';
-import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 import { useFlashcardAction } from '../../src/hooks/useFlashcardAction';
 import { SharedQuestionCard } from '../../src/components/unified/SharedQuestionCard';
 import {
@@ -700,31 +695,12 @@ export default function UnifiedQuizEngine() {
   const searchPanelScrollRef = React.useRef<any>(null);
   const searchPanelScrollOffset = React.useRef<number>(0);
 
-  // Notebook System State
-  const [notebookModalVisible, setNotebookModalVisible] = useState(false);
   // Hardnotes bridge (Phase 3) — send quiz explanation into a Skia canvas note
   const [hardnotesPickerVisible, setHardnotesPickerVisible] = useState(false);
-  const [hardnotesPayload, setHardnotesPayload] = useState<{ markdown: string; title: string } | null>(null);  const notebookRichEditorRef = useRef<any>(null);
-  const [noteDraftBullets, setNoteDraftBullets] = useState(['']);
-  const [activeInputIndex, setActiveInputIndex] = useState(0);
-  const [selection, setSelection] = useState({ start: 0, end: 0 });
-  const [folders, setFolders] = useState<any[]>([]);
-  const [notebooks, setNotebooks] = useState<any[]>([]);
-  const [subheadings, setSubheadings] = useState<string[]>([]);
-  const [selectedFolder, setSelectedFolder] = useState<any>(null);
-  const [selectedNotebook, setSelectedNotebook] = useState<any>(null);
-  const [selectedSubheading, setSelectedSubheading] = useState('');
-  const [isSavingToNotebook, setIsSavingToNotebook] = useState(false);
-  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
-  const [newFolderName, setNewFolderName] = useState('');
-  const [showNewNotebookInput, setShowNewNotebookInput] = useState(false);
-  const [newNotebookName, setNewNotebookName] = useState('');
-  const [showCustomSubheadingInput, setShowCustomSubheadingInput] = useState(false);
-  const [customSubheading, setCustomSubheading] = useState('');
+  const [hardnotesPayload, setHardnotesPayload] = useState<{ markdown: string; title: string } | null>(null);
   const [showPYQTags, setShowPYQTags] = useState(showPYQTagsParam);
   const [activeExplIndex, setActiveExplIndex] = useState<Record<string, number>>({});
   const [activeExplSource, setActiveExplSource] = useState<Record<string, string>>({});
-  const [isEditingNote, setIsEditingNote] = useState(false);
   const [showSaveNameModal, setShowSaveNameModal] = useState(false);
   const [isSavingAttempt, setIsSavingAttempt] = useState(false);
   const {
@@ -845,13 +821,9 @@ export default function UnifiedQuizEngine() {
     attemptId?: string;
   }>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [lastUsedSubheading, setLastUsedSubheading] = useState('');
-  const [locationPickerVisible, setLocationPickerVisible] = useState(false);
   const [pilotV2SaveOpen, setPilotV2SaveOpen] = useState(false);
-  const [destChooserOpen, setDestChooserOpen] = useState(false);
-  const [capsulePickerOpen, setCapsulePickerOpen] = useState(false);
-  const [isSavingToCapsule, setIsSavingToCapsule] = useState(false);
-  const [selectedCapsuleNotebook, setSelectedCapsuleNotebook] = useState<any>(null);
+  const [pilotSaveTargetQuestion, setPilotSaveTargetQuestion] = useState<Question | null>(null);
+  const [pilotSaveHtml, setPilotSaveHtml] = useState('');
 
   // Track viewable items via a ref to avoid triggering re-renders during scroll.
   // We only update currentIndex when the user has been on a question long enough
@@ -1014,13 +986,6 @@ export default function UnifiedQuizEngine() {
       AsyncStorage.setItem(INDEX_PERSIST_KEY, currentIndex.toString());
     }
   }, [currentIndex, isReady, INDEX_PERSIST_KEY]);
-
-  // Notebook Subheading Initialization
-  useEffect(() => {
-    if (notebookModalVisible) {
-      fetchHierarchy();
-    }
-  }, [notebookModalVisible]);
 
   // Fetch unique tags from previous sessions + persisted catalog
   useEffect(() => {
@@ -1646,267 +1611,7 @@ export default function UnifiedQuizEngine() {
     return `${hrs > 0 ? hrs + ':' : ''}${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // 6. Notebook Hierarchy Logic
-  const fetchFolders = async () => {
-    if (!session?.user?.id) return;
-    const { data } = await LocalQuery.from('user_note_nodes').select('*').eq('user_id', session.user.id).eq('type', 'folder');
-    setFolders(data || []);
-  };
-
-  const createNewFolder = async () => {
-    if (!newFolderName.trim() || !session?.user?.id) return;
-    const { data, error } = await supabase.from('user_note_nodes').insert({
-      user_id: session.user.id,
-      title: newFolderName.trim(),
-      type: 'folder'
-    }).select().single();
-    if (!error && data) {
-      setFolders(prev => [...prev, data]);
-      setNewFolderName('');
-      setShowNewFolderInput(false);
-      setSelectedFolder(data);
-    }
-  };
-
-  const createNewNotebook = async () => {
-    if (!newNotebookName.trim() || !selectedFolder || !session?.user?.id) return;
-    
-    // First, create the actual note document
-    const { data: noteData, error: noteError } = await supabase.from('user_notes').insert({
-      user_id: session.user.id,
-      title: newNotebookName.trim(),
-      subject: selectedFolder.title || "General",
-      items: []
-    }).select().single();
-
-    if (noteError || !noteData) return;
-
-    // Then create the node reference
-    const { data, error } = await supabase.from('user_note_nodes').insert({
-      user_id: session.user.id,
-      title: newNotebookName.trim(),
-      type: 'note',
-      parent_id: selectedFolder.id,
-      note_id: noteData.id
-    }).select().single();
-
-    if (!error && data) {
-      setNotebooks(prev => [...prev, data]);
-      setNewNotebookName('');
-      setShowNewNotebookInput(false);
-      setSelectedNotebook(data);
-    }
-  };
-
-  const fetchHierarchy = async () => {
-    if (!session?.user?.id) return;
-    
-    // 1. Load Folders
-    const { data: folderData } = await LocalQuery.from('user_note_nodes').select('*').eq('user_id', session.user.id).eq('type', 'folder');
-    setFolders(folderData || []);
-
-    // 2. Load Prefs
-    const rawPrefs = await AsyncStorage.getItem(NOTE_PREFS_KEY);
-    const prefs = rawPrefs ? JSON.parse(rawPrefs) : null;
-
-    if (prefs) {
-      // 3. Restore Folder
-      if (prefs.folderId) {
-        const lastFolder = folderData?.find((f: any) => f.id === prefs.folderId);
-        if (lastFolder) {
-          setSelectedFolder(lastFolder);
-          
-          // 4. Load Notebooks for this folder
-          const { data: notebookData } = await LocalQuery.from('user_note_nodes').select('*').eq('parent_id', lastFolder.id).eq('type', 'note');
-          setNotebooks(notebookData || []);
-
-          // 5. Restore Notebook
-          if (prefs.notebookId) {
-            const lastNotebook = notebookData?.find((n: any) => n.id === prefs.notebookId || n.note_id === prefs.notebookId);
-            if (lastNotebook) {
-              setSelectedNotebook(lastNotebook);
-              // 6. Fetch existing subheadings in this notebook
-              fetchSubheadings(lastNotebook.note_id);
-            }
-          }
-        }
-      }
-
-      // 7. Restore Subheading
-      if (prefs.subheading) {
-        setLastUsedSubheading(prefs.subheading);
-        setSelectedSubheading(prefs.subheading);
-        setCustomSubheading('');
-      } else {
-        setSelectedSubheading('');
-        setCustomSubheading(questions[currentIndex]?.micro_topic || '');
-      }
-    } else {
-      // Default to microtopic if no prefs
-      setSelectedSubheading('');
-      setCustomSubheading(questions[currentIndex]?.micro_topic || '');
-    }
-  };
-
-  const fetchSubheadings = async (noteId: string) => {
-    if (!noteId) return;
-    const { data } = await LocalQuery.from('user_notes').select('items').eq('id', noteId).single();
-    if (data?.items && Array.isArray(data.items)) {
-      const headings = data.items.filter((i: any) => i.type === 'microTopicHeading').map((i: any) => i.text);
-      const unique = Array.from(new Set(headings));
-      setSubheadings(unique as string[]);
-    } else {
-      setSubheadings([]);
-    }
-  };
-
-  const updateBullet = (idx: number, text: string) => {
-    const next = [...noteDraftBullets];
-    next[idx] = text;
-    setNoteDraftBullets(next);
-  };
-
-  const addBullet = (idx: number) => {
-    const next = [...noteDraftBullets];
-    next.splice(idx + 1, 0, '');
-    setNoteDraftBullets(next);
-  };
-
-  const removeBullet = (idx: number) => {
-    if (noteDraftBullets.length === 1) return;
-    const next = [...noteDraftBullets];
-    next.splice(idx, 1);
-    setNoteDraftBullets(next);
-  };
-
-  const splitBullet = (idx: number) => {
-    const content = noteDraftBullets[idx];
-    const before = content.slice(0, selection.start);
-    const after = content.slice(selection.start);
-    const next = [...noteDraftBullets];
-    next[idx] = before;
-    next.splice(idx + 1, 0, after);
-    setNoteDraftBullets(next);
-  };
-
-  const applyFormatting = (type: 'bold' | 'italic' | 'underline' | 'bullet' | 'number' | 'highlight') => {
-    const idx = activeInputIndex;
-    const content = noteDraftBullets[idx] || '';
-    const { start, end } = selection;
-    
-    const before = content.substring(0, start);
-    const selected = content.substring(start, end);
-    const after = content.substring(end);
-    
-    let formatted = selected;
-    switch(type) {
-      case 'bold': formatted = `<b>${selected}</b>`; break;
-      case 'italic': formatted = `<i>${selected}</i>`; break;
-      case 'underline': formatted = `<u>${selected}</u>`; break;
-      case 'bullet': formatted = `<ul><li>${selected}</li></ul>`; break;
-      case 'number': formatted = `<ol><li>${selected}</li></ol>`; break;
-      case 'highlight': formatted = `<mark>${selected}</mark>`; break;
-    }
-    
-    const next = [...noteDraftBullets];
-    next[idx] = before + formatted + after;
-    setNoteDraftBullets(next);
-    
-    // Update selection to be inside the tags if it was empty, or after if it was selection
-    const newPos = start + formatted.length;
-    setSelection({ start: newPos, end: newPos });
-    
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  };
-
-  const commitToNotebook = async () => {
-    if (isSavingToCapsule) {
-      if (!selectedCapsuleNotebook || !selectedCapsuleNotebook.id || isSavingToNotebook) return;
-      setIsSavingToNotebook(true);
-      try {
-        const q = questions[currentIndex];
-        const text = (noteDraftBullets || []).join('\n') || q?.explanation_markdown || '';
-        if (!text || !q) return;
-        const cleanText = text
-          .replace(/<br\s*\/?>(?=\s*\n?)/gi, '\n')
-          .replace(/<[^>]+>/g, '')
-          .replace(/&nbsp;/g, ' ')
-          .trim();
-        const ok = await appendTextToCapsule({
-          noteId: selectedCapsuleNotebook.id,
-          text: cleanText,
-          heading: customSubheading || q.micro_topic || q.subject || undefined,
-          source: `Quiz / ${q.subject || ''} ${q.exam_year || ''}`.trim(),
-        });
-        if (ok) {
-          Alert.alert('Saved to Capsule', `Appended to "${selectedCapsuleNotebook.title}".`);
-          setNotebookModalVisible(false);
-          setNoteDraftBullets(['']);
-          setIsSavingToCapsule(false);
-          setSelectedCapsuleNotebook(null);
-        } else {
-          Alert.alert('Error', 'Could not save to Capsule.');
-        }
-      } finally {
-        setIsSavingToNotebook(false);
-      }
-      return;
-    }
-
-    if (!selectedNotebook || !selectedNotebook.note_id || isSavingToNotebook) return;
-    setIsSavingToNotebook(true);
-    try {
-      const finalSub = showCustomSubheadingInput ? customSubheading : selectedSubheading;
-      
-      const { data: noteData, error: fetchError } = await LocalQuery.from('user_notes').select('items').eq('id', selectedNotebook.note_id).single();
-      if (fetchError) throw fetchError;
-      
-      const currentItems = Array.isArray(noteData?.items) ? noteData.items : [];
-      const newItemsToAdd = [];
-      
-      if (finalSub && finalSub !== 'General') {
-        const headingExists = currentItems.some((i: any) => i.type === 'microTopicHeading' && i.text === finalSub);
-        if (!headingExists) {
-           newItemsToAdd.push({
-             id: Date.now().toString() + '-h',
-             type: 'microTopicHeading',
-             text: finalSub,
-             addedAt: new Date().toISOString()
-           });
-        }
-      }
-      
-      const bullets = noteDraftBullets.filter(b => b.trim()).map((b, i) => ({
-        id: (Date.now() + i).toString(),
-        type: 'highlight',
-        text: b.trim(),
-        color: '#FFB74D',
-        source: `Q${currentIndex + 1} / ${questions[currentIndex]?.source?.group || questions[currentIndex]?.exam_group || (questions[currentIndex]?.is_pyq ? 'PYQ' : 'Practice')} ${questions[currentIndex]?.source?.year || questions[currentIndex]?.exam_year || ''}`.trim(),
-        addedAt: new Date().toISOString()
-      }));
-
-      newItemsToAdd.push(...bullets);
-      
-      const { error } = await supabase.from('user_notes').update({
-        items: [...currentItems, ...newItemsToAdd],
-        updated_at: new Date().toISOString()
-      }).eq('id', selectedNotebook.note_id);
-
-      if (!error) {
-        await AsyncStorage.setItem(NOTE_PREFS_KEY, JSON.stringify({
-          folderId: selectedFolder?.id,
-          notebookId: selectedNotebook?.note_id, // Save the real UUID for Quick Save compatibility
-          subheading: finalSub
-        }));
-        setNotebookModalVisible(false);
-        setNoteDraftBullets(['']);
-      }
-    } finally {
-      setIsSavingToNotebook(false);
-    }
-  };
-
-  // 7. Action Handlers
+  // 6. Action Handlers
   const handleOptionSelect = (qId: string, label: string) => {
     store.setAnswer(qId, label, undefined, arenaMode === 'exam');
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -2054,27 +1759,13 @@ export default function UnifiedQuizEngine() {
     explanationText?: string,
     optsOrMode?: { closeExplanation?: boolean } | string
   ) => {
-    const isCapsule = optsOrMode === 'capsule';
-    const isChoose = optsOrMode === 'choose';
     const closeOpts = typeof optsOrMode === 'object' ? optsOrMode : undefined;
 
     runAfterPaperOverlayClose(() => {
       const activeText = explanationText || q.explanation_markdown || '';
-      if (isCapsule) {
-        setIsSavingToCapsule(true);
-        setNoteDraftBullets([markdownToHtml(activeText)]);
-        setCapsulePickerOpen(true);
-      } else if (isChoose) {
-        setIsSavingToCapsule(false);
-        setNoteDraftBullets([markdownToHtml(activeText)]);
-        setDestChooserOpen(true);
-      } else {
-        setIsSavingToCapsule(false);
-        setNoteDraftBullets([markdownToHtml(activeText)]);
-        setCustomSubheading(q.micro_topic || '');
-        setNotebookModalVisible(true);
-        fetchHierarchy();
-      }
+      setPilotSaveTargetQuestion(q);
+      setPilotSaveHtml(markdownToHtml(activeText));
+      setPilotV2SaveOpen(true);
     }, closeOpts);
   };
 
@@ -2688,6 +2379,17 @@ export default function UnifiedQuizEngine() {
                 <Zap size={16} color={flashcardedIds.has(item.id) ? colors.primary : colors.textTertiary} fill={flashcardedIds.has(item.id) ? colors.primary : 'transparent'} />
               )}
             </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                openNotebookFromQuestion(
+                  item,
+                  item.explanation_markdown || ''
+                )
+              }
+              testID={`paper-pilot-save-${item.id}`}
+            >
+              <Rocket size={16} color={colors.primary} />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -2896,63 +2598,6 @@ export default function UnifiedQuizEngine() {
     );
   };
 
-
-
-  const renderNotebookModal = () => {
-    return (
-      <NotebookModal
-        visible={notebookModalVisible}
-        onClose={() => setNotebookModalVisible(false)}
-        onSave={commitToNotebook}
-        folders={folders}
-        notebooks={notebooks}
-        subheadings={subheadings}
-        selectedFolder={selectedFolder}
-        setSelectedFolder={(f: any) => {
-          setSelectedFolder(f);
-          LocalQuery.from('user_note_nodes').select('*').eq('parent_id', f.id).eq('type', 'note').then(({ data }) => setNotebooks(data || []));
-        }}
-        selectedNotebook={selectedNotebook}
-        setSelectedNotebook={(n: any) => {
-          setSelectedNotebook(n);
-          fetchSubheadings(n.note_id);
-        }}
-        selectedSubheading={selectedSubheading}
-        setSelectedSubheading={setSelectedSubheading}
-        isSaving={isSavingToNotebook}
-        colors={colors}
-        noteDraftBullets={noteDraftBullets}
-        updateBullet={updateBullet}
-        splitBullet={splitBullet}
-        addBullet={addBullet}
-        removeBullet={removeBullet}
-        setSelection={setSelection}
-        selection={selection}
-        setActiveInputIndex={setActiveInputIndex}
-        activeInputIndex={activeInputIndex}
-        showNewFolderInput={showNewFolderInput}
-        setShowNewFolderInput={setShowNewFolderInput}
-        newFolderName={newFolderName}
-        setNewFolderName={setNewFolderName}
-        createNewFolder={createNewFolder}
-        showNewNotebookInput={showNewNotebookInput}
-        setShowNewNotebookInput={setShowNewNotebookInput}
-        newNotebookName={newNotebookName}
-        setNewNotebookName={setNewNotebookName}
-        createNewNotebook={createNewNotebook}
-        showCustomSubheadingInput={showCustomSubheadingInput}
-        setShowCustomSubheadingInput={setShowCustomSubheadingInput}
-        customSubheading={customSubheading}
-        setCustomSubheading={setCustomSubheading}
-        microtopic={questions[currentIndex]?.micro_topic}
-        applyFormatting={applyFormatting}
-        openLocationPicker={() => setDestChooserOpen(true)}
-        richEditorRef={notebookRichEditorRef}
-        isSavingToCapsule={isSavingToCapsule}
-        selectedCapsuleNotebook={selectedCapsuleNotebook}
-      />
-    );
-  };
 
   return (
     <PageWrapper>
@@ -3883,21 +3528,6 @@ export default function UnifiedQuizEngine() {
 
                     <TouchableOpacity
                       onPress={() => {
-                        openNotebookFromQuestion(
-                          q,
-                          text,
-                          { closeExplanation: true }
-                        );
-                      }}
-                      style={[stylesPaper.stickyBtn, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}
-                      testID="paper-modal-notebook"
-                    >
-                      <BookOpen size={14} color={colors.textPrimary} />
-                      <Text style={[stylesPaper.stickyBtnText, { color: colors.textPrimary }]}>Save to Notebook</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      onPress={() => {
                         openHardnoteFromQuestion(
                           q,
                           text,
@@ -4052,7 +3682,6 @@ export default function UnifiedQuizEngine() {
           </View>
         </Modal>
 
-        {renderNotebookModal()}
         <SaveNameModal 
           visible={showSaveNameModal}
           onClose={() => setShowSaveNameModal(false)}
@@ -4251,86 +3880,32 @@ export default function UnifiedQuizEngine() {
             </KeyboardAvoidingView>
           </View>
         </Modal>
-        <NotebookLocationPicker
-          visible={locationPickerVisible}
-          onClose={() => setLocationPickerVisible(false)}
-          userId={session?.user?.id || ''}
-          onPickNotebook={async ({ node_id, note_id, title, folder_id }) => {
-            // Resolve folder node (or null) for the existing chip-driven flow
-            let folderNode: any = null;
-            if (folder_id) {
-              const { data } = await LocalQuery.from('user_note_nodes').select('*').eq('id', folder_id).maybeSingle();
-              folderNode = data;
-            }
-            if (folderNode) {
-              setSelectedFolder(folderNode);
-              const { data: nbList } = await LocalQuery.from('user_note_nodes').select('*').eq('parent_id', folderNode.id).eq('type', 'note');
-              setNotebooks(nbList || []);
-            } else {
-              setSelectedFolder(null);
-              setNotebooks([]);
-            }
-            const notebookNode = { id: node_id, title, note_id };
-            setSelectedNotebook(notebookNode as any);
-            fetchSubheadings(note_id);
-          }}
-        />
-
-        <AddToNotebookSheet
-          visible={destChooserOpen}
-          onClose={() => setDestChooserOpen(false)}
-          options={['capsule', 'pilot-v2', 'notes']}
-          onPick={(d: SaveDestination) => {
-            setDestChooserOpen(false);
-            if (d === 'capsule') setCapsulePickerOpen(true);
-            else if (d === 'pilot-v2') setPilotV2SaveOpen(true);
-            else if (d === 'notes') setLocationPickerVisible(true);
-          }}
-        />
-
-        <CapsuleLocationPicker
-          visible={capsulePickerOpen}
-          userId={session?.user?.id || ''}
-          onClose={() => setCapsulePickerOpen(false)}
-          autoSeed={questions[currentIndex] ? {
-            subject: questions[currentIndex].subject || null,
-            topic: (questions[currentIndex] as any).section_group || null,
-            subtopic: questions[currentIndex].micro_topic || null,
-          } : undefined}
-          defaultNotebookTitle={questions[currentIndex]?.micro_topic || questions[currentIndex]?.subject || ''}
-          onPick={async ({ note_id, title }) => {
-            setCapsulePickerOpen(false);
-            if (isSavingToCapsule) {
-              setSelectedCapsuleNotebook({ id: note_id, title });
-              setNotebookModalVisible(true);
-            } else {
-              const q = questions[currentIndex];
-              const text = (noteDraftBullets || []).join('\n') || q?.explanation_markdown || '';
-              if (!text || !q) return;
-              const ok = await appendTextToCapsule({
-                noteId: note_id,
-                text: text.replace(/<br\s*\/?>(?=\s*\n?)/gi, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim(),
-                heading: customSubheading || q.micro_topic || q.subject || undefined,
-                source: `Quiz / ${q.subject || ''} ${q.exam_year || ''}`.trim(),
-              });
-              if (ok) Alert.alert('Saved to Capsule', `Appended to "${title}".`);
-              else Alert.alert('Error', 'Could not save to Capsule.');
-            }
-          }}
-        />
-
         <PilotV2SaveSheet
           visible={pilotV2SaveOpen}
           userId={session?.user?.id || ''}
-          onClose={() => setPilotV2SaveOpen(false)}
-          autoSeed={questions[currentIndex] ? {
-            subject: questions[currentIndex].subject || null,
-            topic: (questions[currentIndex] as any).section_group || null,
-            subtopic: questions[currentIndex].micro_topic || null,
-            notebookTitle: questions[currentIndex].micro_topic || questions[currentIndex].subject || null,
+          onClose={() => {
+            setPilotV2SaveOpen(false);
+            setPilotSaveTargetQuestion(null);
+            setPilotSaveHtml('');
+          }}
+          autoSeed={(pilotSaveTargetQuestion || questions[currentIndex]) ? {
+            subject: (pilotSaveTargetQuestion || questions[currentIndex])!.subject || null,
+            topic: ((pilotSaveTargetQuestion || questions[currentIndex]) as any).section_group || null,
+            subtopic: (pilotSaveTargetQuestion || questions[currentIndex])!.micro_topic || null,
+            notebookTitle: (pilotSaveTargetQuestion || questions[currentIndex])!.micro_topic || (pilotSaveTargetQuestion || questions[currentIndex])!.subject || null,
           } : { subject: null, topic: null, subtopic: null, notebookTitle: null }}
-          initialBody={(noteDraftBullets || []).join('\n') || questions[currentIndex]?.explanation_markdown || ''}
-          source={questions[currentIndex] ? `Quiz / ${questions[currentIndex].subject || ''} ${questions[currentIndex].exam_year || ''}`.trim() : 'Quiz'}
+          seedQuestion={pilotSaveTargetQuestion || questions[currentIndex] || null}
+          initialBody={
+            pilotSaveHtml ||
+            markdownToHtml(
+              (pilotSaveTargetQuestion || questions[currentIndex])?.explanation_markdown || ''
+            )
+          }
+          source={
+            (pilotSaveTargetQuestion || questions[currentIndex])
+              ? `Quiz / ${(pilotSaveTargetQuestion || questions[currentIndex])!.subject || ''} ${(pilotSaveTargetQuestion || questions[currentIndex])!.exam_year || ''}`.trim()
+              : 'Quiz'
+          }
         />
 
         {session?.user?.id && hardnotesPayload && (
@@ -4356,297 +3931,6 @@ export default function UnifiedQuizEngine() {
     </PageWrapper>
   );
 }
-
-const NotebookModal = (props: any) => {
-  const { colors } = props;
-  const [showPicker, setShowPicker] = React.useState(false);
-  const HIGHLIGHT_COLORS = ['transparent', '#FF6A88', '#6A5BFF', '#4FC3F7', '#81C784', '#FFB74D', '#BA68C8'];
-  const [highlightColor, setHighlightColor] = React.useState('#FFF59D');
-
-  React.useEffect(() => {
-    AsyncStorage.getItem('notes_editor_highlight_color').then(v => { if (v) setHighlightColor(v); });
-  }, []);
-
-  return (
-    <Modal visible={props.visible} transparent animationType="fade" onRequestClose={props.onClose}>
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={props.onClose} />
-        
-        <SafeAreaView style={{ flex: 1 }} pointerEvents="box-none">
-          <KeyboardAvoidingView
-behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-            style={{ flex: 1 }}
-            pointerEvents="box-none"
-          >
-            <View style={{ flex: 1, backgroundColor: colors.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, marginTop: 60, overflow: 'hidden' }}>
-              
-              <View style={{ flexDirection: 'row', alignItems: 'center', padding: 12, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-                <TouchableOpacity onPress={props.onClose} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
-                  <X size={24} color={colors.textPrimary} />
-                </TouchableOpacity>
-                
-                <View style={{ flex: 1, marginLeft: 8 }}>
-                  <Text style={{ fontSize: 16, fontWeight: '900', color: colors.textPrimary }}>
-                    {props.isSavingToCapsule ? 'Capsule Editor' : 'Notebook Editor'}
-                  </Text>
-                  <Text style={{ fontSize: 10, color: colors.textTertiary }}>Drafting insights...</Text>
-                </View>
-
-                <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-                   <TouchableOpacity 
-                     onPress={() => props.openLocationPicker?.()}
-                     style={{ height: 36, paddingHorizontal: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary + '15', borderRadius: 12, flexDirection: 'row', gap: 4 }}
-                     disabled={props.isSavingToCapsule}
-                   >
-                      <BookOpen size={14} color={colors.primary} />
-                      <Text style={{ color: colors.primary, fontWeight: '900', fontSize: 11 }} numberOfLines={1}>
-                        {props.isSavingToCapsule ? (props.selectedCapsuleNotebook?.title ? props.selectedCapsuleNotebook.title.slice(0, 10) : 'CAPSULE') : (props.selectedNotebook?.title ? props.selectedNotebook.title.slice(0, 10) : 'LOCATION')}
-                      </Text>
-                   </TouchableOpacity>
-                </View>
-              </View>
-
-            <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 80 }}>
-            {/* Premium Floating Pill-Style Toolbar Container */}
-            <View style={{ marginHorizontal: 16, marginTop: 14, marginBottom: 10, alignItems: 'center' }}>
-              <View style={{ 
-                backgroundColor: colors.surface, 
-                borderRadius: 28, 
-                borderWidth: 1, 
-                borderColor: colors.border, 
-                paddingHorizontal: 8, 
-                paddingVertical: 4,
-                shadowColor: '#000', 
-                shadowOffset: { width: 0, height: 4 }, 
-                shadowOpacity: 0.08, 
-                shadowRadius: 6, 
-                elevation: 4,
-                width: '100%',
-                overflow: 'hidden'
-              }}>
-                <RichToolbar
-                  getEditor={() => props.richEditorRef?.current}
-                  selectedIconTint={colors.primary}
-                  iconTint={colors.textPrimary}
-                  style={{ backgroundColor: 'transparent', height: 44 }}
-                  actions={[
-                    actions.setBold,
-                    actions.setItalic,
-                    actions.setUnderline,
-                    actions.setStrikethrough,
-                    actions.heading1,
-                    actions.heading2,
-                    actions.insertBulletsList,
-                    actions.insertOrderedList,
-                    actions.checkboxList,
-                    actions.blockquote,
-                    'highlight',
-                  ]}
-                  iconMap={{
-                    [actions.heading1]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '900', fontSize: 13 }}>H1</Text>,
-                    [actions.heading2]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '800', fontSize: 11 }}>H2</Text>,
-                    highlight: ({ tintColor }: any) => (
-                      <View style={{ padding: 4, borderRadius: 4, backgroundColor: highlightColor === 'transparent' ? 'transparent' : highlightColor }}>
-                        <Highlighter size={15} color={tintColor} />
-                      </View>
-                    ),
-                  }}
-                  onPress={(action) => {
-                    if (action === 'highlight') {
-                      setShowPicker(v => !v);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      return;
-                    }
-                    props.richEditorRef?.current?.focusContentEditor?.();
-                    setTimeout(() => {
-                      props.richEditorRef?.current?.sendAction?.(action as any);
-                    }, 50);
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  }}
-                />
-                {showPicker && (
-                  <View style={{ flexDirection: 'row', gap: 12, padding: 12, borderTopWidth: 1, borderTopColor: colors.border, justifyContent: 'center', backgroundColor: colors.surface, flexWrap: 'wrap' }}>
-                    {HIGHLIGHT_COLORS.map(c => (
-                      <TouchableOpacity 
-                        key={c} 
-                        onPress={async () => {
-                          setHighlightColor(c);
-                          await AsyncStorage.setItem('notes_editor_highlight_color', c);
-                          setShowPicker(false);
-                          props.richEditorRef?.current?.focusContentEditor?.();
-                          setTimeout(() => {
-                            if (c === 'transparent') {
-                              props.richEditorRef?.current?.commandDOM?.("document.execCommand('hiliteColor', false, 'transparent'); document.execCommand('backColor', false, 'transparent')");
-                            } else {
-                              props.richEditorRef?.current?.commandDOM?.(`document.execCommand('hiliteColor', false, '${c}')`);
-                            }
-                          }, 50);
-                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        }} 
-                        style={{ 
-                          width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center',
-                          borderWidth: 2, backgroundColor: c === 'transparent' ? colors.surfaceStrong : c, 
-                          borderColor: c === highlightColor ? colors.primary : 'transparent' 
-                        }} 
-                      >
-                        {c === 'transparent' && <Eraser size={14} color={colors.textSecondary} />}
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                )}
-              </View>
-            </View>
-
-            {/* Editor Content Box inside elegant container */}
-            <View style={{ backgroundColor: colors.surface, borderRadius: 18, marginHorizontal: 16, marginBottom: 12, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' }}>
-
-            <View style={{ padding: 16, minHeight: 300 }}>
-              <RichNoteEditor
-                ref={props.richEditorRef}
-                html={props.noteDraftBullets?.[0] || ''}
-                onChange={(html: string) => props.updateBullet(0, html)}
-                themeColors={{
-                  bg: colors.bg,
-                  surface: colors.surface,
-                  textPrimary: colors.textPrimary,
-                  border: colors.border,
-                  primary: colors.primary,
-                }}
-                placeholder="Capture your insight... Use the toolbar above for formatting."
-              />
-            </View>
-          </View>
-
-          {!props.isSavingToCapsule && (
-            <>
-              <View style={{ height: 24 }} />
-              <Text style={[styles.modalLabel, { color: colors.textTertiary, letterSpacing: 1 }]}>SAVE LOCATION</Text>
-              <Text style={{ fontSize: 11, color: colors.textTertiary, marginBottom: 10 }}>
-                {props.selectedNotebook?.title
-                  ? `Selected: ${props.selectedFolder?.title ? props.selectedFolder.title + ' / ' : ''}${props.selectedNotebook.title}`
-                  : 'Tap LOCATION at top, or pick below'}
-              </Text>
-              <ScrollView horizontal style={{ marginBottom: 16 }}>
-                {props.folders.map((f: any) => (
-                  <TouchableOpacity key={f.id} onPress={() => props.setSelectedFolder(f)} style={[styles.modalChip, { borderColor: colors.border }, props.selectedFolder?.id === f.id && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
-                    <Text style={{ color: props.selectedFolder?.id === f.id ? '#fff' : colors.textPrimary }}>{f.title}</Text>
-                  </TouchableOpacity>
-                ))}
-                <TouchableOpacity onPress={() => props.setShowNewFolderInput(true)} style={[styles.modalChip, { borderColor: colors.border, borderStyle: 'dashed', paddingHorizontal: 12, justifyContent: 'center' }]}>
-                  <Text style={{ color: colors.textTertiary, fontWeight: '700' }}>+ New Folder</Text>
-                </TouchableOpacity>
-              </ScrollView>
-
-              {props.showNewFolderInput && (
-                <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
-                  <TextInput 
-                    style={{ flex: 1, height: 40, borderWidth: 1, borderColor: colors.border, borderRadius: 8, paddingHorizontal: 12, color: colors.textPrimary }}
-                    placeholder="Folder Name"
-                    placeholderTextColor={colors.textTertiary}
-                    value={props.newFolderName}
-                    onChangeText={props.setNewFolderName}
-                  />
-                  <TouchableOpacity onPress={props.createNewFolder} style={{ width: 40, height: 40, backgroundColor: colors.primary, borderRadius: 8, alignItems: 'center', justifyContent: 'center' }}>
-                    <Check size={16} color="#fff" />
-                  </TouchableOpacity>
-                </View>
-              )}
-
-              {props.selectedFolder && (
-                <>
-                  <Text style={[styles.modalLabel, { color: colors.textTertiary }]}>NOTEBOOK</Text>
-                  <ScrollView horizontal style={{ marginBottom: 16 }}>
-                    {props.notebooks.map((n: any) => (
-                      <TouchableOpacity key={n.id} onPress={() => props.setSelectedNotebook(n)} style={[styles.modalChip, { borderColor: colors.border }, props.selectedNotebook?.id === n.id && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
-                        <Text style={{ color: props.selectedNotebook?.id === n.id ? '#fff' : colors.textPrimary }}>{n.title}</Text>
-                      </TouchableOpacity>
-                    ))}
-                    <TouchableOpacity onPress={() => props.setShowNewNotebookInput(true)} style={[styles.modalChip, { borderColor: colors.border, borderStyle: 'dashed', paddingHorizontal: 12, justifyContent: 'center' }]}>
-                      <Text style={{ color: colors.textTertiary, fontWeight: '700' }}>+ New Notebook</Text>
-                    </TouchableOpacity>
-                  </ScrollView>
-
-                  {props.showNewNotebookInput && (
-                    <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
-                      <TextInput 
-                        style={{ flex: 1, height: 40, borderWidth: 1, borderColor: colors.border, borderRadius: 8, paddingHorizontal: 12, color: colors.textPrimary }}
-                        placeholder="Notebook Name"
-                        placeholderTextColor={colors.textTertiary}
-                        value={props.newNotebookName}
-                        onChangeText={props.setNewNotebookName}
-                      />
-                      <TouchableOpacity onPress={props.createNewNotebook} style={{ width: 40, height: 40, backgroundColor: colors.primary, borderRadius: 8, alignItems: 'center', justifyContent: 'center' }}>
-                        <Check size={16} color="#fff" />
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                </>
-              )}
-
-              {props.selectedNotebook && (
-                <>
-                  <Text style={[styles.modalLabel, { color: colors.textTertiary }]}>SUBHEADING</Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
-                    {(() => {
-                      const micro = props.microtopic;
-                      const last = props.selectedSubheading;
-                      const others = (props.subheadings || []).filter((s: string) => s !== micro && s !== last);
-                      
-                      const list = [];
-                      if (micro) list.push(micro);
-                      if (last && last !== micro) list.push(last);
-                      list.push(...others);
-                      
-                      return list.map((s: string) => (
-                        <TouchableOpacity 
-                          key={s} 
-                          onPress={() => { props.setSelectedSubheading(s); props.setCustomSubheading(''); }} 
-                          style={[
-                            styles.modalChip, 
-                            { borderColor: colors.border }, 
-                            props.selectedSubheading === s && { backgroundColor: colors.primary, borderColor: colors.primary },
-                            s === props.microtopic && props.selectedSubheading !== s && { borderColor: colors.primary + '50', borderStyle: 'dashed' }
-                          ]}
-                        >
-                          <Text style={{ color: props.selectedSubheading === s ? '#fff' : colors.textPrimary, fontWeight: s === props.microtopic ? '900' : '500' }}>
-                            {s} {s === props.microtopic ? '(Topic)' : ''}
-                          </Text>
-                        </TouchableOpacity>
-                      ));
-                    })()}
-                    <TouchableOpacity onPress={() => props.setShowCustomSubheadingInput(true)} style={[styles.modalChip, { borderColor: colors.border, borderStyle: 'dashed', paddingHorizontal: 12, justifyContent: 'center' }]}>
-                      <Text style={{ color: colors.textTertiary, fontWeight: '700' }}>+ Custom</Text>
-                    </TouchableOpacity>
-                  </ScrollView>
-
-                  {(props.showCustomSubheadingInput || props.customSubheading || props.subheadings.length === 0) && (
-                    <View style={{ marginBottom: 16 }}>
-                      <TextInput 
-                        style={{ flex: 1, height: 40, borderWidth: 1, borderColor: colors.border, borderRadius: 8, paddingHorizontal: 12, color: colors.textPrimary }}
-                        placeholder="Custom Subheading (e.g. Microtopic)"
-                        placeholderTextColor={colors.textTertiary}
-                        value={props.customSubheading}
-                        onChangeText={(t) => { props.setCustomSubheading(t); props.setSelectedSubheading(''); }}
-                      />
-                    </View>
-                  )}
-                </>
-              )}
-            </>
-          )}
-
-              <TouchableOpacity onPress={props.onSave} style={[styles.launchBtn, { backgroundColor: colors.primary }]}>
-                {props.isSaving ? <ActivityIndicator color="#fff" /> : <Text style={{ color: '#fff', fontWeight: '900' }}>SAVE</Text>}
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
-      </View>
-    </Modal>
-  );
-};
 
 const styles = StyleSheet.create({
   container: { flex: 1 },

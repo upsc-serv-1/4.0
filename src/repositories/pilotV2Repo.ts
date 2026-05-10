@@ -569,3 +569,70 @@ export async function fetchNotebooksAtLevel(
     return [];
   }
 }
+
+/** Ensure a Pilot V2 subject row exists (creates when missing). */
+export async function ensurePilotV2SubjectNode(userId: string, title: string): Promise<PilotV2Node | null> {
+  const { data } = await supabase
+    .from('user_note_nodes')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('type', 'subject')
+    .eq('title', title)
+    .eq('is_archived', false)
+    .eq('metadata->>surface', PILOT_V2_SURFACE)
+    .is('parent_id', null)
+    .order('created_at', { ascending: true })
+    .limit(1);
+  const existing = Array.isArray(data) && data[0] ? (data[0] as PilotV2Node) : null;
+  if (existing) return existing;
+  return createPilotV2Node({ userId, type: 'subject', title, parentId: null });
+}
+
+/** Create a section-group (topic) folder under a subject if it does not already exist. */
+export async function ensurePilotV2TopicNode(
+  userId: string,
+  subjectTitle: string,
+  topicTitle: string
+): Promise<PilotV2Node | null> {
+  const subj = await ensurePilotV2SubjectNode(userId, subjectTitle);
+  if (!subj) return null;
+  const { data } = await supabase
+    .from('user_note_nodes')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('type', 'topic')
+    .eq('title', topicTitle)
+    .eq('parent_id', subj.id)
+    .eq('is_archived', false)
+    .eq('metadata->>surface', PILOT_V2_SURFACE)
+    .order('created_at', { ascending: true })
+    .limit(1);
+  const existing = Array.isArray(data) && data[0] ? (data[0] as PilotV2Node) : null;
+  if (existing) return existing;
+  return createPilotV2Node({ userId, type: 'topic', title: topicTitle, parentId: subj.id });
+}
+
+/** Create a micro-topic (subtopic) folder under subject → topic if missing. */
+export async function ensurePilotV2SubtopicNode(
+  userId: string,
+  subjectTitle: string,
+  topicTitle: string,
+  subtopicTitle: string
+): Promise<PilotV2Node | null> {
+  const topic = await ensurePilotV2TopicNode(userId, subjectTitle, topicTitle);
+  if (!topic) return null;
+  const { data } = await supabase
+    .from('user_note_nodes')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('type', 'subtopic')
+    .eq('title', subtopicTitle)
+    .eq('parent_id', topic.id)
+    .eq('is_archived', false)
+    .eq('metadata->>surface', PILOT_V2_SURFACE)
+    .order('created_at', { ascending: true })
+    .limit(1);
+  const existing = Array.isArray(data) && data[0] ? (data[0] as PilotV2Node) : null;
+  if (existing) return existing;
+  return createPilotV2Node({ userId, type: 'subtopic', title: subtopicTitle, parentId: topic.id });
+}

@@ -84,10 +84,26 @@ export function PilotV2Dashboard() {
   const quickFilter = state.view.quickFilter;
 
   const selectedSubjectId = state.view.selectedSubject;
-  const activeSubject = useMemo(
-    () => PILOT_V2_SUBJECT_PALETTE.find(s => s.id === selectedSubjectId),
-    [selectedSubjectId]
-  );
+  const activeSubject = useMemo(() => {
+    const fromPalette = PILOT_V2_SUBJECT_PALETTE.find(s => s.id === selectedSubjectId);
+    if (fromPalette) return fromPalette;
+    const slug = (selectedSubjectId || '').toLowerCase();
+    const fromNotes = state.notes.find(
+      n =>
+        n.subject &&
+        n.subject.toLowerCase().replace(/[^a-z0-9]/g, '-') === slug
+    );
+    if (fromNotes?.subject) {
+      return {
+        id: selectedSubjectId || slug,
+        label: fromNotes.subject,
+        icon: 'Book',
+        bg: '#E9D5FF',
+        text: '#7C3AED',
+      };
+    }
+    return PILOT_V2_SUBJECT_PALETTE.find(s => s.id === selectedSubjectId) || null;
+  }, [selectedSubjectId, state.notes]);
   const isSubjectMode = state.view.mode === 'subject' && !state.view.selectedSubtopic;
 
   const filterPredicate = (n: PilotV2Note): boolean => {

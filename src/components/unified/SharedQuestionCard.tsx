@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, Platform, ActivityIndicator, 
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
 import { 
-  ChevronRight, ExternalLink, Zap, BookOpen, Flag, Check, X, Sparkles, 
+  ChevronRight, ExternalLink, Zap, BookOpen, Flag, Check, X, Rocket, Sparkles, 
   AlertCircle, Copy, ThumbsDown, Bookmark, BookmarkCheck, Lightbulb, 
   PenTool, Hash, Star, Info, Info as InfoIcon, Save as SaveIcon, 
   RotateCcw, Trash2, Send, Plus, Edit2, MessageCircle
@@ -90,7 +90,7 @@ export const SharedQuestionCard = ({
   openHardnoteFromQuestion,
   savedFlash = {},
   fontSize = 15,
-  showNotebookButton = true,
+  showNotebookButton = false,
   onCreateTag,
   onQuickSave,
   toggleMistakeType,
@@ -249,28 +249,26 @@ export const SharedQuestionCard = ({
                )}
             </TouchableOpacity>
 
-                         <TouchableOpacity 
-               onPress={() => {
-                 const activeText = (() => {
-                   if (selectedExplSource === 'vitamin' && savedBest) {
-                     const kp = savedBest.key_points ? `\n\n**✨ Key Points**\n\n${savedBest.key_points}` : '';
-                     return `${savedBest.answer_text}${kp}`;
-                   }
-                   return effectiveExplanationText || item.explanation_markdown || '';
-                 })();
-                 openNotebookFromQuestion && openNotebookFromQuestion(item, activeText, 'capsule');
-               }}
-               style={{ padding: 4, marginRight: 4 }}
-             >
-                <Sparkles
-                  size={19} 
-                  color="#5B4FE8" 
-                />
-             </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                const activeText = (() => {
+                  if (selectedExplSource === 'vitamin' && savedBest) {
+                    const kp = savedBest.key_points ? `\n\n**✨ Key Points**\n\n${savedBest.key_points}` : '';
+                    return `${savedBest.answer_text}${kp}`;
+                  }
+                  return effectiveExplanationText || item.explanation_markdown || '';
+                })();
+                openNotebookFromQuestion && openNotebookFromQuestion(item, activeText, 'pilot-v2');
+              }}
+              style={{ padding: 4, marginRight: 4 }}
+              testID={`pilot-save-shortcut-${item.id}`}
+            >
+              <Rocket size={19} color={isZenMode ? '#433422' : '#5B4EFA'} />
+            </TouchableOpacity>
 
              {showNotebookButton && (
               <TouchableOpacity 
-                onPress={() => openNotebookFromQuestion && openNotebookFromQuestion(item)}
+                onPress={() => openNotebookFromQuestion && openNotebookFromQuestion(item, undefined, 'pilot-v2')}
               >
                  <Plus
                    size={20} 
@@ -587,11 +585,11 @@ export const SharedQuestionCard = ({
                        }
                        return effectiveExplanationText || item.explanation_markdown || '';
                      })();
-                     openNotebookFromQuestion && openNotebookFromQuestion(item, activeText, 'choose');
+                     openNotebookFromQuestion && openNotebookFromQuestion(item, activeText, 'pilot-v2');
                    }}
                  >
-                    <BookOpen size={16} color={effectiveColors.primary} />
-                    <Text style={[styles.actionBtnText, { color: effectiveColors.primary }]}>Notebook</Text>
+                    <Rocket size={16} color={effectiveColors.primary} />
+                    <Text style={[styles.actionBtnText, { color: effectiveColors.primary }]}>Save to Pilot</Text>
                  </TouchableOpacity>
 
                  <TouchableOpacity
@@ -633,23 +631,6 @@ export const SharedQuestionCard = ({
                         <Text style={[styles.actionBtnText, { color: isFlashcarded ? effectiveColors.primary : effectiveColors.textPrimary }]}>Flashcard</Text>
                       </>
                     )}
-                 </TouchableOpacity>
-
-                 <TouchableOpacity 
-                   style={[styles.actionBtn, { backgroundColor: '#5B4FE815', borderColor: '#5B4FE830' }]}
-                   onPress={() => {
-                     const activeText = (() => {
-                       if (selectedExplSource === 'vitamin' && savedBest) {
-                         const kp = savedBest.key_points ? `\n\n**✨ Key Points**\n\n${savedBest.key_points}` : '';
-                         return `${savedBest.answer_text}${kp}`;
-                       }
-                       return effectiveExplanationText || item.explanation_markdown || '';
-                     })();
-                     openNotebookFromQuestion && openNotebookFromQuestion(item, activeText, 'capsule');
-                   }}
-                 >
-                    <Sparkles size={16} color="#5B4FE8" />
-                    <Text style={[styles.actionBtnText, { color: '#5B4FE8', fontWeight: '800' }]}>Capsule</Text>
                  </TouchableOpacity>
 
                  {onQuickSave && (
@@ -763,3 +744,4 @@ const styles = StyleSheet.create({
   noteInputWrapper: { borderStyle: 'dashed', borderWidth: 1, borderRadius: 12, marginTop: 8 },
   noteInput: { minHeight: 80, fontSize: 13, padding: 12, textAlignVertical: 'top' },
 });
+

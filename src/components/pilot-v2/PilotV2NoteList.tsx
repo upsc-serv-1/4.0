@@ -70,6 +70,7 @@ export function PilotV2NoteList() {
 
   const [query, setQuery] = useState('');
   const [creating, setCreating] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Record<string, boolean>>({});
@@ -82,11 +83,27 @@ export function PilotV2NoteList() {
   const [savingRename, setSavingRename] = useState(false);
 
   const subtopicId = state.view.selectedSubtopic;
-  const topicName = useMemo(() => {
-    if (!subtopicId) return 'Notes';
-    return SUBTOPIC_LABELS[subtopicId] ?? (typeof subtopicId === 'string' ? subtopicId.replace(/-/g, ' ') : 'Notes');
-  }, [subtopicId]);
   const subjectId = state.view.selectedSubject;
+  const selectedTopicId = state.view.selectedTopic;
+  /** True when sidebar stored the topic id in both fields (leaf topic with no subtopics). */
+  const subtopicIsTopicLeaf =
+    !!state.view.selectedSubtopic &&
+    !!selectedTopicId &&
+    state.view.selectedSubtopic === selectedTopicId;
+  const hasRealSubtopic = !!state.view.selectedSubtopic && !subtopicIsTopicLeaf;
+
+  const topicName = useMemo(() => {
+    if (subtopicIsTopicLeaf && selectedTopicId) {
+      const staticTopics = SUBJECT_TOPICS[subjectId ?? ''] ?? [];
+      const topicObj = staticTopics.find(t => t.id === selectedTopicId);
+      return topicObj?.label || selectedTopicId.replace(/-/g, ' ');
+    }
+    if (!subtopicId) return 'Notes';
+    return (
+      SUBTOPIC_LABELS[subtopicId] ??
+      (typeof subtopicId === 'string' ? (subtopicId.includes(' ') ? subtopicId : subtopicId.replace(/-/g, ' ')) : 'Notes')
+    );
+  }, [subtopicId, subtopicIsTopicLeaf, selectedTopicId, subjectId]);
   const subjectMeta = useMemo(() => {
     if (!subjectId) return null;
     const matchedNote = state.notes.find(
@@ -171,8 +188,6 @@ export function PilotV2NoteList() {
     clearSelection();
   };
 
-  const selectedTopicId = state.view.selectedTopic;
-
   const notes = useMemo(() => {
     let filteredList = [...state.notes];
 
@@ -180,22 +195,41 @@ export function PilotV2NoteList() {
       filteredList = filteredList.filter(n => n.subject && n.subject.toLowerCase() === subjectMeta.label.toLowerCase());
     }
 
-    if (selectedTopicId && !state.view.selectedSubtopic) {
+    if (selectedTopicId && !hasRealSubtopic) {
       const subjId = state.view.selectedSubject;
       const staticTopics = SUBJECT_TOPICS[subjId ?? ''] ?? [];
       const topicObj = staticTopics.find(t => t.id === selectedTopicId);
       const activeTopicLabel = topicObj?.label || selectedTopicId.replace(/-/g, ' ');
 
-      filteredList = filteredList.filter(n => n.topic && n.topic.toLowerCase() === activeTopicLabel.toLowerCase());
+      filteredList = filteredList.filter(
+        n => n.topic && n.topic.toLowerCase() === activeTopicLabel.toLowerCase()
+      );
     }
 
-    if (state.view.selectedSubtopic) {
-      filteredList = filteredList.filter(n => n.subtopic && n.subtopic === topicName);
+    if (hasRealSubtopic) {
+      const sid = state.view.selectedSubtopic!;
+      const subtopicTitle =
+        SUBTOPIC_LABELS[sid] ??
+        (sid.includes(' ') ? sid : sid.replace(/-/g, ' '));
+      filteredList = filteredList.filter(
+        n =>
+          n.subtopic &&
+          n.subtopic.toLowerCase() === String(subtopicTitle).toLowerCase()
+      );
     }
 
     filteredList = filteredList.filter(n => (isTrashMode ? !!n.is_archived : !n.is_archived));
     return filteredList;
-  }, [state.notes, state.view.selectedSubtopic, topicName, isTrashMode, subjectMeta, selectedTopicId, state.view.selectedSubject]);
+  }, [
+    state.notes,
+    state.view.selectedSubtopic,
+    hasRealSubtopic,
+    subtopicIsTopicLeaf,
+    isTrashMode,
+    subjectMeta,
+    selectedTopicId,
+    state.view.selectedSubject,
+  ]);
 
   const filtered = useMemo(() => {
     const q = (query || '').toLowerCase();
@@ -422,9 +456,88 @@ export function PilotV2NoteList() {
     };
   };
 
+  const renderGridView = () => (
+    <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 8, padding: 12 }}>
+      {filtered.map((n: any) => {
+        const selected = !!selectedIds[n.id];
+        return (
+          <TouchableOpacity
+            key={n.id}
+            testID={`pilot-v2-note-grid-${n.id}`}
+            activeOpacity={0.85}
+            onPress={() => handleSelectNote(n.id)}
+            style={[
+              {
+                width: '48%',
+                backgroundColor: '#fff',
+                borderRadius: 12,
+                borderWidth: 2,
+                borderColor: colors.border,
+                padding: 12,
+                alignItems: 'center',
+              },
+              selected ? { borderColor: '#5B4EFA', backgroundColor: '#EEF2FF' } : null,
+            ]}
+          >
+            <View style={[{ backgroundColor: '#DBEAFE', borderRadius: 8, padding: 8, marginBottom: 8 }]}>
+              <FileText size={24} color="#2563EB" />
+            </View>
+            <Text style={[styles.rowTitle, { color: colors.textPrimary, textAlign: 'center' }]} numberOfLines={2}>
+              {n.title}
+            </Text>
+            <Text style={[styles.rowMeta, { color: colors.textTertiary, fontSize: 11 }]}>
+              {n.timestamp ?? formatTime(n.updated_at)}
+            </Text>
+            <View style={{ position: 'absolute', top: 12, right: 12 }}>
+              {n.is_pinned && !isTrashMode ? <Star size={14} color="#FACC15" fill="#FACC15" /> : null}
+            </View>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+
   return (
     <View testID="pilot-v2-notelist" style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
       <View style={[styles.header, { backgroundColor: '#fff', borderBottomColor: colors.border }]}>
+        {/* Breadcrumb Trail */}
+        {(state.view.selectedTopic || state.view.selectedSubtopic) && !isTrashMode && (
+          <View style={{ paddingHorizontal: 12, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            {subjectMeta && (
+              <TouchableOpacity
+                onPress={() => {
+                  dispatch({ type: 'SET_SELECTED_TOPIC', payload: null });
+                  dispatch({ type: 'SET_SELECTED_SUBTOPIC', payload: null });
+                }}
+              >
+                <Text style={{ color: '#5B4EFA', fontSize: 12, fontWeight: '500' }}>
+                  {subjectMeta.label}
+                </Text>
+              </TouchableOpacity>
+            )}
+            {state.view.selectedTopic && (
+              <>
+                <Text style={{ color: colors.textTertiary, fontSize: 12 }}>/</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    dispatch({ type: 'SET_SELECTED_SUBTOPIC', payload: null });
+                  }}
+                >
+                  <Text style={{ color: '#5B4EFA', fontSize: 12, fontWeight: '500' }}>
+                    {state.view.selectedTopic.replace(/-/g, ' ')}
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
+            {state.view.selectedSubtopic && (
+              <>
+                <Text style={{ color: colors.textTertiary, fontSize: 12 }}>/</Text>
+                <Text style={{ color: colors.textTertiary, fontSize: 12 }}>{topicName}</Text>
+              </>
+            )}
+          </View>
+        )}
+        
         <View style={styles.headerTop}>
           <TouchableOpacity testID="pilot-v2-notelist-back" onPress={handleBack} style={styles.backBtn}>
             <ChevronLeft size={20} color={colors.textPrimary} />
@@ -432,49 +545,71 @@ export function PilotV2NoteList() {
           <Text style={[styles.title, { color: colors.textPrimary }]}>{isTrashMode ? 'Trash' : topicName}</Text>
           <View style={{ flex: 1 }} />
           {!selectMode ? (
-            <TouchableOpacity
-              testID="pilot-v2-notelist-select"
-              onPress={() => setSelectMode(true)}
-              style={[styles.selectBtn, { borderColor: colors.border }]}
-            >
-              <CheckSquare size={16} color={colors.textSecondary} />
-              <Text style={{ color: colors.textSecondary, fontWeight: '800', fontSize: 12 }}>Select</Text>
-            </TouchableOpacity>
+            <>
+              <TouchableOpacity
+                testID="pilot-v2-notelist-new"
+                activeOpacity={0.85}
+                onPress={handleNewNote}
+                disabled={creating}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 8 }}
+              >
+                <Plus size={18} color="#5B4EFA" />
+                <Text style={{ color: '#5B4EFA', fontSize: 14, fontWeight: '600' }}>New</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                testID="pilot-v2-notelist-menu"
+                onPress={() => {
+                  Alert.alert('View Options', undefined, [
+                    {
+                      text: viewMode === 'list' ? '✓ View as List' : 'View as List',
+                      onPress: () => setViewMode('list'),
+                    },
+                    {
+                      text: viewMode === 'grid' ? '✓ View as Grid' : 'View as Grid',
+                      onPress: () => setViewMode('grid'),
+                    },
+                    {
+                      text: 'Select Notes',
+                      onPress: () => setSelectMode(true),
+                    },
+                    { text: 'Cancel', style: 'cancel' },
+                  ]);
+                }}
+                style={{ paddingHorizontal: 12, paddingVertical: 8 }}
+              >
+                <MoreVertical size={18} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </>
           ) : (
-            <TouchableOpacity
-              testID="pilot-v2-notelist-cancel-select"
-              onPress={clearSelection}
-              style={[styles.selectBtn, { borderColor: colors.border }]}
-            >
-              <Text style={{ color: colors.textSecondary, fontWeight: '800', fontSize: 12 }}>Done</Text>
-            </TouchableOpacity>
+            <>
+              <TouchableOpacity
+                testID="pilot-v2-notelist-select-all"
+                onPress={() => {
+                  const allSelected = filtered.length > 0 && filtered.length === Object.keys(selectedIds).filter(k => selectedIds[k]).length;
+                  if (allSelected) {
+                    setSelectedIds({});
+                  } else {
+                    const newIds: Record<string, boolean> = {};
+                    filtered.forEach((n: any) => {
+                      newIds[n.id] = true;
+                    });
+                    setSelectedIds(newIds);
+                  }
+                }}
+                style={{ marginRight: 12 }}
+              >
+                <CheckSquare size={16} color={colors.textSecondary} />
+                <Text style={{ color: colors.textSecondary, fontWeight: '800', fontSize: 12 }}>All</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                testID="pilot-v2-notelist-cancel-select"
+                onPress={clearSelection}
+                style={[styles.selectBtn, { borderColor: colors.border }]}
+              >
+                <Text style={{ color: colors.textSecondary, fontWeight: '800', fontSize: 12 }}>Done</Text>
+              </TouchableOpacity>
+            </>
           )}
-        </View>
-
-        <View style={styles.searchRow}>
-          <View style={[styles.searchBox, { backgroundColor: '#F3F3F5', borderColor: colors.border }]}>
-            <Search size={18} color={colors.textTertiary} />
-            <TextInput
-              testID="pilot-v2-notelist-search"
-              value={query}
-              onChangeText={setQuery}
-              style={[styles.searchInput, { color: colors.textPrimary }]}
-              placeholder={isTrashMode ? 'Search trash…' : `Search in ${topicName}...`}
-              placeholderTextColor={colors.textTertiary}
-            />
-          </View>
-          {!isTrashMode ? (
-            <TouchableOpacity
-              testID="pilot-v2-notelist-new"
-              activeOpacity={0.85}
-              onPress={handleNewNote}
-              disabled={creating}
-              style={[styles.newBtn, { backgroundColor: '#5B4EFA', opacity: creating ? 0.7 : 1 }]}
-            >
-              <Plus size={18} color="#fff" />
-              <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>{creating ? 'Creating…' : 'New Note'}</Text>
-            </TouchableOpacity>
-          ) : null}
         </View>
       </View>
 
@@ -483,6 +618,8 @@ export function PilotV2NoteList() {
           <Text style={{ color: colors.textTertiary, textAlign: 'center', marginTop: 40 }}>
             {isTrashMode ? 'Trash is empty' : 'No matching notes'}
           </Text>
+        ) : viewMode === 'grid' ? (
+          renderGridView()
         ) : (
           filtered.map((n: any) => {
             const selected = !!selectedIds[n.id];

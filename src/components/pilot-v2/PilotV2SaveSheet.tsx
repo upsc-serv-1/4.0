@@ -14,14 +14,16 @@
  *     just appended to (so the content stays fully editable).
  *   • "Save another" — keep the popup open with cleared body for chaining.
  */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity, TextInput,
   ScrollView, Platform, KeyboardAvoidingView, Alert, ActivityIndicator,
   useWindowDimensions, FlatList,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Rocket, X, Plus, Wand2, ChevronDown } from 'lucide-react-native';
+import { Rocket, X, Plus, Wand2, ChevronDown, Highlighter, Eraser } from 'lucide-react-native';
+import { RichToolbar, actions } from 'react-native-pell-rich-editor';
+import RichNoteEditor from '../RichNoteEditor';
 import { useTheme } from '../../context/ThemeContext';
 import { supabase } from '../../lib/supabase';
 import { SUBJECT_TOPICS } from './PilotV2SidebarSubject';
@@ -31,6 +33,8 @@ import {
   appendBlocksToPilotV2Note,
   fetchNotebooksAtLevel,
   fetchPilotV2HierarchyOptions,
+  ensurePilotV2TopicNode,
+  ensurePilotV2SubtopicNode,
 } from '../../repositories/pilotV2Repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PilotV2Block } from './types';
@@ -83,6 +87,14 @@ export function textToPilotV2Blocks(text: string): PilotV2Block[] {
   return blocks;
 }
 
+export type PilotSaveSeedQuestion = {
+  subject?: string | null;
+  section_group?: string | null;
+  micro_topic?: string | null;
+  statement_line?: string | null;
+  question_text?: string | null;
+};
+
 interface Props {
   visible: boolean;
   userId: string;
@@ -94,14 +106,16 @@ interface Props {
     subtopic?: string | null;
     notebookTitle?: string | null;
   };
-  /** Editable explanation/answer text. */
+  /** Full question context for title + chips (optional). */
+  seedQuestion?: PilotSaveSeedQuestion | null;
+  /** Editable explanation/answer text (HTML preferred; markdown-ish ok). */
   initialBody: string;
   /** Source attribution (e.g. "Quiz / Polity 2024"). */
   source?: string;
 }
 
 export const PilotV2SaveSheet: React.FC<Props> = ({
-  visible, userId, onClose, autoSeed, initialBody, source,
+  visible, userId, onClose, autoSeed, seedQuestion, initialBody, source,
 }) => {
   const { colors } = useTheme();
   const router = useRouter();
@@ -113,6 +127,13 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const [subtopic, setSubtopic]   = useState(autoSeed.subtopic || '');
   const [notebook, setNotebook]   = useState(autoSeed.notebookTitle || autoSeed.subtopic || autoSeed.topic || autoSeed.subject || '');
   const [body, setBody]           = useState(initialBody || '');
+  const richRef = useRef<any>(null);
+  const [showHlPicker, setShowHlPicker] = useState(false);
+  const [hlColor, setHlColor] = useState('#FFF59D');
+  const [newTopicDraft, setNewTopicDraft] = useState('');
+  const [newSubtopicDraft, setNewSubtopicDraft] = useState('');
+  const [folderBusy, setFolderBusy] = useState(false);
+  const [editorKey, setEditorKey] = useState(0);
   const [saving, setSaving]       = useState(false);
   const [savedNoteId, setSavedNoteId] = useState<string | null>(null);
   const [appendCount, setAppendCount] = useState(0);
@@ -169,8 +190,25 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     setBody(initialBody || '');
     setSavedNoteId(null);
     setAppendCount(0);
+    setEditorKey(k => k + 1);
     return () => { cancelled = true; };
   }, [visible, autoSeed, initialBody]);
+
+  const refreshHierarchy = async () => {
+    if (!userId) return;
+    const opts = await fetchPilotV2HierarchyOptions(userId);
+    setUserHierarchy(opts);
+  };
+
+  const briefBlockTitle = useMemo(() => {
+    const stem = (
+      (seedQuestion?.statement_line || seedQuestion?.question_text || '') as string
+    ).trim();
+    const short = stem.length > 100 ? `${stem.slice(0, 97)}…` : stem;
+    if (short) return short;
+    if (seedQuestion?.micro_topic?.trim()) return seedQuestion.micro_topic.trim();
+    return '';
+  }, [seedQuestion]);
 
   // Helper: merged subject list — user's actual Pilot V2 subjects first, then
   // any palette subjects the user hasn't seeded yet, deduped.
@@ -222,22 +260,35 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
       setExistingNotebooks(notebooks);
       setLoadingNotebooks(false);
 
-      // Auto-select first if exists
       if (notebooks.length > 0) {
-        setNotebook(notebooks[0]);
         setMode('select');
+        setNotebook(prev => {
+          if (prev.trim() && notebooks.includes(prev.trim())) return prev;
+          return notebooks[0];
+        });
       }
     })();
   }, [subject, topic, subtopic, visible, userId]);
 
-  const blocksPreview = useMemo(() => textToPilotV2Blocks(body), [body]);
+  const plainTextLen = (html: string) =>
+    html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').trim().length;
 
-  const canSave = !!userId && subject.trim().length > 0 && notebook.trim().length > 0 && body.trim().length > 0;
+  const canSave =
+    !!userId &&
+    subject.trim().length > 0 &&
+    notebook.trim().length > 0 &&
+    plainTextLen(body) > 0;
 
   const handleSave = async () => {
     if (!canSave) return;
     setSaving(true);
     try {
+      let html = body;
+      try {
+        const fromEditor = await richRef.current?.getContentHtml?.();
+        if (typeof fromEditor === 'string' && fromEditor.trim()) html = fromEditor;
+      } catch { /* use body */ }
+
       const notebookTitle = notebook.trim();
       const result = await findOrCreatePilotV2Note({
         userId,
@@ -246,11 +297,25 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
         subtopic: subtopic.trim() || null,
         title: notebookTitle,
       });
+      const headingText =
+        briefBlockTitle ||
+        notebookTitle ||
+        (source ? source.replace(/^Quiz\s*\/?\s*/i, '').trim() : '') ||
+        'Explanation';
       const blocks: PilotV2Block[] = [
-        // Soft separator heading carries the source attribution so multiple
-        // saves to the same note remain distinguishable.
-        { id: newId(), type: 'heading', level: 3, text: source ? `📌 ${source}` : '📌 Saved from Quiz', meta: { tag: 'quiz_import', sourceQuizId: source } },
-        ...blocksPreview.map(b => ({ ...b, meta: { ...(b.meta || {}), tag: 'quiz_import', importedAt: new Date().toISOString() } })),
+        {
+          id: newId(),
+          type: 'heading',
+          level: 2,
+          text: headingText,
+          meta: { tag: 'quiz_import', source: source || 'quiz' },
+        },
+        {
+          id: newId(),
+          type: 'paragraph',
+          text: html.trim(),
+          meta: { tag: 'quiz_import', importedAt: new Date().toISOString(), source: source || 'quiz' },
+        },
       ];
       const ok = await appendBlocksToPilotV2Note(result.noteId, blocks);
       if (!ok) throw new Error('append failed');
@@ -290,6 +355,56 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const handleSaveAnother = () => {
     setBody('');
     setSavedNoteId(null);
+    setEditorKey(k => k + 1);
+  };
+
+  const addSectionBreak = () => {
+    const extra =
+      '<p><br></p><p style="text-align:center;color:#94a3b8;">———</p><p><br></p>';
+    setBody(prev => `${prev || ''}${extra}`);
+    setEditorKey(k => k + 1);
+  };
+
+  const handleAddTopicFolder = async () => {
+    const t = newTopicDraft.trim();
+    if (!t || !subject.trim()) {
+      Alert.alert('Subject required', 'Pick a subject and enter a section group name.');
+      return;
+    }
+    setFolderBusy(true);
+    try {
+      const ok = await ensurePilotV2TopicNode(userId, subject.trim(), t);
+      if (!ok) throw new Error('create topic');
+      setTopic(t);
+      setNewTopicDraft('');
+      await refreshHierarchy();
+      Alert.alert('Created', `Section group “${t}” is ready under ${subject}.`);
+    } catch {
+      Alert.alert('Error', 'Could not create section group.');
+    } finally {
+      setFolderBusy(false);
+    }
+  };
+
+  const handleAddSubtopicFolder = async () => {
+    const st = newSubtopicDraft.trim();
+    if (!st || !subject.trim() || !topic.trim()) {
+      Alert.alert('Pick topic', 'Select or create a section group first, then add a micro-topic name.');
+      return;
+    }
+    setFolderBusy(true);
+    try {
+      const ok = await ensurePilotV2SubtopicNode(userId, subject.trim(), topic.trim(), st);
+      if (!ok) throw new Error('create subtopic');
+      setSubtopic(st);
+      setNewSubtopicDraft('');
+      await refreshHierarchy();
+      Alert.alert('Created', `Micro-topic “${st}” is ready under ${topic}.`);
+    } catch {
+      Alert.alert('Error', 'Could not create micro-topic.');
+    } finally {
+      setFolderBusy(false);
+    }
   };
 
   const backdropStyle = [
@@ -553,25 +668,129 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                 )}
               </View>
 
-              <Text style={[styles.fieldLabel, { color: colors.textTertiary, marginTop: 12 }]}>Content</Text>
-              <TextInput
-                testID="pilot-v2-save-body"
-                value={body}
-                onChangeText={setBody}
-                multiline
-                placeholder="The explanation, bullets or answer text. Edit freely before saving."
-                placeholderTextColor={colors.textTertiary}
-                style={[styles.bodyInput, {
-                  color: colors.textPrimary,
-                  borderColor: colors.border,
-                  backgroundColor: colors.surfaceStrong,
-                  minHeight: isTablet ? 320 : 120,
-                }]}
-              />
+              <View style={styles.formGroup}>
+                <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>New folders (optional)</Text>
+                <Text style={[styles.emptyText, { color: colors.textTertiary, marginBottom: 6 }]}>
+                  Add a section group or micro-topic under the current subject without leaving this sheet.
+                </Text>
+                <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center', marginBottom: 8 }}>
+                  <TextInput
+                    style={[styles.input, { flex: 1, color: colors.textPrimary, borderColor: colors.border }]}
+                    placeholder="New section group name"
+                    placeholderTextColor={colors.textTertiary}
+                    value={newTopicDraft}
+                    onChangeText={setNewTopicDraft}
+                    editable={!folderBusy}
+                  />
+                  <TouchableOpacity
+                    onPress={handleAddTopicFolder}
+                    disabled={folderBusy}
+                    style={[styles.miniBtn, { backgroundColor: '#5B4EFA', opacity: folderBusy ? 0.6 : 1 }]}
+                  >
+                    <Text style={{ color: '#fff', fontWeight: '800', fontSize: 12 }}>Add</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+                  <TextInput
+                    style={[styles.input, { flex: 1, color: colors.textPrimary, borderColor: colors.border }]}
+                    placeholder="New micro-topic name"
+                    placeholderTextColor={colors.textTertiary}
+                    value={newSubtopicDraft}
+                    onChangeText={setNewSubtopicDraft}
+                    editable={!folderBusy}
+                  />
+                  <TouchableOpacity
+                    onPress={handleAddSubtopicFolder}
+                    disabled={folderBusy || !topic}
+                    style={[styles.miniBtn, { backgroundColor: '#5B4EFA', opacity: folderBusy || !topic ? 0.5 : 1 }]}
+                  >
+                    <Text style={{ color: '#fff', fontWeight: '800', fontSize: 12 }}>Add</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-              <Text style={[styles.preview, { color: colors.textTertiary }]}>
-                Will create {blocksPreview.length} block{blocksPreview.length === 1 ? '' : 's'} (paragraphs, bullets &amp; headings).
-              </Text>
+              <Text style={[styles.fieldLabel, { color: colors.textTertiary, marginTop: 12 }]}>Content</Text>
+              <View style={[styles.richShell, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}>
+                <View style={styles.toolbarWrap}>
+                  <RichToolbar
+                    getEditor={() => richRef.current}
+                    selectedIconTint="#5B4EFA"
+                    iconTint={colors.textPrimary}
+                    style={{ backgroundColor: 'transparent', height: 44 }}
+                    actions={[
+                      actions.setBold,
+                      actions.setItalic,
+                      actions.setUnderline,
+                      actions.setStrikethrough,
+                      actions.heading1,
+                      actions.heading2,
+                      actions.insertBulletsList,
+                      actions.insertOrderedList,
+                      actions.blockquote,
+                      'highlight',
+                    ]}
+                    iconMap={{
+                      [actions.heading1]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '900', fontSize: 13 }}>H1</Text>,
+                      [actions.heading2]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '800', fontSize: 11 }}>H2</Text>,
+                      highlight: ({ tintColor }: any) => (
+                        <View style={{ padding: 4, borderRadius: 4, backgroundColor: hlColor === 'transparent' ? 'transparent' : hlColor }}>
+                          <Highlighter size={15} color={tintColor} />
+                        </View>
+                      ),
+                    }}
+                    onPress={(action) => {
+                      if (action === 'highlight') {
+                        setShowHlPicker(v => !v);
+                        return;
+                      }
+                      richRef.current?.focusContentEditor?.();
+                      setTimeout(() => richRef.current?.sendAction?.(action as any), 50);
+                    }}
+                  />
+                </View>
+                {showHlPicker && (
+                  <View style={styles.hlRow}>
+                    {['transparent', '#FF6A88', '#6A5BFF', '#4FC3F7', '#81C784', '#FFB74D', '#BA68C8', '#FFF59D'].map(c => (
+                      <TouchableOpacity
+                        key={c}
+                        onPress={() => {
+                          setHlColor(c);
+                          setShowHlPicker(false);
+                          richRef.current?.focusContentEditor?.();
+                          setTimeout(() => {
+                            if (c === 'transparent') {
+                              richRef.current?.commandDOM?.("document.execCommand('hiliteColor', false, 'transparent'); document.execCommand('backColor', false, 'transparent')");
+                            } else {
+                              richRef.current?.commandDOM?.(`document.execCommand('hiliteColor', false, '${c}')`);
+                            }
+                          }, 50);
+                        }}
+                        style={[styles.hlSwatch, { backgroundColor: c === 'transparent' ? colors.surface : c, borderColor: hlColor === c ? '#5B4EFA' : colors.border }]}
+                      >
+                        {c === 'transparent' && <Eraser size={12} color={colors.textSecondary} />}
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+                <RichNoteEditor
+                  key={editorKey}
+                  ref={richRef}
+                  html={body}
+                  onChange={setBody}
+                  themeColors={{
+                    bg: colors.surfaceStrong,
+                    surface: colors.surface,
+                    textPrimary: colors.textPrimary,
+                    border: colors.border,
+                    primary: '#5B4EFA',
+                  }}
+                  placeholder="Edit explanation — bold, lists, and highlights match Pilot notes."
+                />
+                <TouchableOpacity onPress={addSectionBreak} style={styles.splitBtn}>
+                  <Plus size={14} color="#5B4EFA" />
+                  <Text style={{ color: '#5B4EFA', fontWeight: '800', fontSize: 12 }}>Add block break in editor</Text>
+                </TouchableOpacity>
+              </View>
 
               {savedNoteId && (
                 <View style={[styles.savedRow, { backgroundColor: '#ECFDF5', borderColor: '#A7F3D0' }]}>
@@ -766,6 +985,49 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 13,
     marginBottom: 8,
+  },
+  richShell: {
+    borderRadius: 12,
+    borderWidth: 1,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  toolbarWrap: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.06)',
+    paddingHorizontal: 4,
+  },
+  hlRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.06)',
+  },
+  hlSwatch: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  splitBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.06)',
+  },
+  miniBtn: {
+    paddingHorizontal: 14,
+    height: 40,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

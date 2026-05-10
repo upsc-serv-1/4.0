@@ -43,7 +43,7 @@ import { savePilotV2NoteOfflineFirst } from './pilotV2OfflineSave';
 import { PencilCanvas } from './PencilCanvas';
 import { PencilToolbar } from './PencilToolbar';
 import { usePilotV2Pencil } from './usePilotV2Pencil';
-import { exportPilotV2Note } from './pilotV2Export';
+import { PilotV2UnifiedExport } from './PilotV2UnifiedExport';
 import { getBlockTag } from './pilotV2Migration';
 import {
   PilotV2WashiTape, WashiTapeColor, toggleWashiReveal,
@@ -302,10 +302,8 @@ export function PilotV2EditorView() {
   });
   const [reminderPickerVisible, setReminderPickerVisible] = useState(false);
 
-  // Export sheet state (heading-selection)
+  // Export sheet state — single unified export (replaces 3 legacy buttons)
   const [exportSheetOpen, setExportSheetOpen] = useState(false);
-  const [excludedHeadings, setExcludedHeadings] = useState<Record<string, boolean>>({});
-  const [includeMargins, setIncludeMargins] = useState(true);
 
   const insertLink = () => {
     const target = activeBlock;
@@ -635,37 +633,6 @@ export function PilotV2EditorView() {
       try { await savePilotV2NoteOfflineFirst(note.id, content); } catch { /* ignore */ }
     }, 600);
   };
-  const handleExportPdf = async () => {
-    try {
-      await exportPilotV2Note({
-        title, blocks,
-        strokes: pencil.engine.getPersisted(),
-        pageWidth: paperSize.w || 800, pageHeight: paperSize.h || 1131,
-        format: 'pdf',
-      });
-    } catch (e) { Alert.alert('Export failed', (e as Error).message || 'Unknown'); }
-  };
-  const handleExportImage = async () => {
-    try {
-      await exportPilotV2Note({
-        title, blocks,
-        strokes: pencil.engine.getPersisted(),
-        pageWidth: paperSize.w || 800, pageHeight: paperSize.h || 1131,
-        format: 'image',
-      });
-    } catch (e) { Alert.alert('Export failed', (e as Error).message || 'Unknown'); }
-  };
-  const handleExportMarkdown = async () => {
-    try {
-      await exportPilotV2Note({
-        title, blocks,
-        strokes: pencil.engine.getPersisted(),
-        pageWidth: paperSize.w || 800, pageHeight: paperSize.h || 1131,
-        format: 'markdown',
-      });
-    } catch (e) { Alert.alert('Export failed', (e as Error).message || 'Unknown'); }
-  };
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -1178,9 +1145,7 @@ export function PilotV2EditorView() {
         <TouchableOpacity activeOpacity={1} onPress={() => setMoreMenuOpen(false)} style={{ flex: 1, backgroundColor: 'rgba(15,23,42,0.35)' }}>
           <View style={[styles.moreMenu, { borderColor: colors.border, backgroundColor: '#fff' }]} testID="pilot-v2-more-menu">
             {[
-              { label: 'Export as PDF', sub: 'With pencil annotations', testID: 'pilot-v2-more-export-pdf', onPress: () => { setMoreMenuOpen(false); handleExportPdf(); } },
-              { label: 'Export as Image', sub: 'PDF with strokes', testID: 'pilot-v2-more-export-image', onPress: () => { setMoreMenuOpen(false); handleExportImage(); } },
-              { label: 'Export as Markdown', sub: 'Plain text + metadata', testID: 'pilot-v2-more-export-md', onPress: () => { setMoreMenuOpen(false); handleExportMarkdown(); } },
+              { label: 'Export…', sub: 'PDF · pastel themes · choose blocks', testID: 'pilot-v2-more-export', onPress: () => { setMoreMenuOpen(false); setExportSheetOpen(true); } },
               { label: `Text Size: ${Math.round(fontScale * 100)}%`, sub: 'Tap to increase text scale (cycles)', testID: 'pilot-v2-more-fontscale', onPress: () => { cycleFontScale(); } },
               { label: `Zoom Level: ${Math.round(zoom * 100)}%`, sub: 'Tap to change canvas zoom (cycles)', testID: 'pilot-v2-more-zoom', onPress: () => { cycleZoom(); } },
               { label: showToolbar ? 'Hide Formatting Toolbar' : 'Show Formatting Toolbar', sub: 'Draggable rich formatting bar', testID: 'pilot-v2-more-toolbar', onPress: () => { setShowToolbar(v => { globalToolbarVisible = !v; return !v; }); } },
@@ -1193,6 +1158,13 @@ export function PilotV2EditorView() {
           </View>
         </TouchableOpacity>
       </Modal>
+      {/* ── Unified Export sheet (single, replaces all legacy export entry-points) ── */}
+      <PilotV2UnifiedExport
+        visible={exportSheetOpen}
+        onClose={() => setExportSheetOpen(false)}
+        title={title || 'Pilot V2 Note'}
+        blocks={blocks}
+      />
     </KeyboardAvoidingView>
   );
 }
@@ -1507,41 +1479,6 @@ function FloatingToolbar(props: any) {
       )}
     </Animated.View>
   );
-}
-
-/* ---------- Helpers: heading-tree filtering + unified export ---------- */
-function filterBlocksByHeadings(blocks: PilotV2Block[], excluded: Record<string, boolean>): PilotV2Block[] {
-  // Walk blocks; when entering an excluded heading section, skip until next heading at same/higher level.
-  const out: PilotV2Block[] = [];
-  let skipUntilLevel: number | null = null;
-  for (const b of blocks) {
-    if (b.type === 'heading') {
-      const lvl = b.level ?? 2;
-      if (skipUntilLevel !== null && lvl > skipUntilLevel) continue;
-      skipUntilLevel = excluded[b.id] ? lvl : null;
-      if (skipUntilLevel !== null) continue;
-    } else if (skipUntilLevel !== null) {
-      continue;
-    }
-    out.push(b);
-  }
-  return out;
-}
-
-async function unifiedExportSelected({ title, blocks, format, includeMargins }: { title: string; blocks: PilotV2Block[]; format: 'pdf' | 'image'; includeMargins: boolean }) {
-  // Use the existing Unified Export Engine if available; fallback to plain share.
-  try {
-    const mod: any = await import('../../lib/unifiedExportEngine');
-    const fn = mod?.exportPilotV2 ?? mod?.unifiedExport ?? mod?.default;
-    if (typeof fn === 'function') { await fn({ title, blocks, format, includeMargins }); return; }
-  } catch {}
-  const text = blocks.map(b => b.text).filter(Boolean).join('\n');
-  if (Platform.OS !== 'web') {
-    const { Share: RNShare } = require('react-native');
-    await RNShare.share({ title: `${title} (${format.toUpperCase()})`, message: `${title}\n\n${text}` });
-  } else {
-    Alert.alert('Export ready', `${title} exported as ${format.toUpperCase()}.`);
-  }
 }
 
 /* ---------- Toolbar atoms ---------- */

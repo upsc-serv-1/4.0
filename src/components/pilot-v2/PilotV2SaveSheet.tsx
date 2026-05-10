@@ -146,31 +146,6 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const topTranslate = useRef(new Animated.Value(0)).current;
   const sheetTranslate = useRef(new Animated.Value(0)).current;
 
-  const historyRef = useRef<{ stack: string[]; idx: number }>({ stack: [], idx: -1 });
-  const lastSnapshotAt = useRef<number>(0);
-  const applyingHistory = useRef(false);
-
-  const pushHistory = (html: string) => {
-    const next = html || '';
-    const h = historyRef.current;
-    const cur = h.idx >= 0 ? h.stack[h.idx] : '';
-    if (cur === next) return;
-    // Drop redo branch
-    h.stack = h.idx >= 0 ? h.stack.slice(0, h.idx + 1) : [];
-    h.stack.push(next);
-    if (h.stack.length > 50) h.stack.shift();
-    h.idx = h.stack.length - 1;
-  };
-
-  const snapshotFromEditor = async () => {
-    try {
-      const html = await richRef.current?.getContentHtml?.();
-      if (typeof html === 'string') pushHistory(html);
-    } catch {
-      // ignore
-    }
-  };
-
   // Notebooks
   const [existingNotebooks, setExistingNotebooks] = useState<string[]>([]);
   // User's actual Pilot V2 hierarchy (loaded once when sheet becomes visible)
@@ -215,8 +190,6 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
       );
     })();
     setBody(initialBody || '');
-    // Initialize history with the opening body so undo works immediately
-    historyRef.current = { stack: [(initialBody || '')], idx: 0 };
     setSavedNoteId(null);
     setAppendCount(0);
     setEditorKey(k => k + 1);
@@ -578,8 +551,8 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                   iconTint={colors.textPrimary}
                   style={{ backgroundColor: 'transparent', height: 44 }}
                   actions={[
-                    'undoLocal',
-                    'redoLocal',
+                    actions.undo,
+                    actions.redo,
                     actions.setBold,
                     actions.setItalic,
                     actions.setUnderline,
@@ -592,8 +565,8 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     'highlight',
                   ]}
                   iconMap={{
-                    undoLocal: ({ tintColor }: any) => <Undo2 size={16} color={tintColor} />,
-                    redoLocal: ({ tintColor }: any) => <Redo2 size={16} color={tintColor} />,
+                    [actions.undo]: ({ tintColor }: any) => <Undo2 size={16} color={tintColor} />,
+                    [actions.redo]: ({ tintColor }: any) => <Redo2 size={16} color={tintColor} />,
                     [actions.heading1]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '900', fontSize: 13 }}>H1</Text>,
                     [actions.heading2]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '800', fontSize: 11 }}>H2</Text>,
                     highlight: ({ tintColor }: any) => (
@@ -603,52 +576,11 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     ),
                   }}
                   onPress={(action) => {
-                    const h = historyRef.current;
-                    if (action === 'undoLocal') {
-                      // Prefer editor-native undo (captures formatting operations reliably)
-                      richRef.current?.focusContentEditor?.();
-                      richRef.current?.sendAction?.(actions.undo);
-                      setTimeout(() => { snapshotFromEditor(); }, 180);
-                      // Fallback to local history if editor-native undo had no effect
-                      if (h.idx > 0) {
-                        const nextIdx = h.idx - 1;
-                        applyingHistory.current = true;
-                        h.idx = nextIdx;
-                        setBody(h.stack[nextIdx] || '');
-                        setEditorKey(k => k + 1);
-                        setTimeout(() => { applyingHistory.current = false; }, 60);
-                      }
-                      return;
-                    }
-                    if (action === 'redoLocal') {
-                      richRef.current?.focusContentEditor?.();
-                      richRef.current?.sendAction?.(actions.redo);
-                      setTimeout(() => { snapshotFromEditor(); }, 180);
-                      if (h.idx >= 0 && h.idx < h.stack.length - 1) {
-                        const nextIdx = h.idx + 1;
-                        applyingHistory.current = true;
-                        h.idx = nextIdx;
-                        setBody(h.stack[nextIdx] || '');
-                        setEditorKey(k => k + 1);
-                        setTimeout(() => { applyingHistory.current = false; }, 60);
-                      }
-                      return;
-                    }
                     if (action === 'highlight') {
-                      richRef.current?.commandDOM?.(`
-                        (function(){
-                          try {
-                            const s = window.getSelection && window.getSelection();
-                            if (s && s.rangeCount) { window.__pv2_savedRange = s.getRangeAt(0); }
-                          } catch(e) {}
-                        })();
-                      `);
                       setShowHlPicker(v => !v);
                       return;
                     }
 
-                    // Snapshot before applying formatting (so undo can revert immediately)
-                    pushHistory(body || '');
                     richRef.current?.focusContentEditor?.();
                     if (action === actions.heading1) {
                       richRef.current?.commandDOM?.(`
@@ -686,8 +618,9 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                       return;
                     }
 
-                    richRef.current?.sendAction?.(action as any);
-                    setTimeout(() => { snapshotFromEditor(); }, 120);
+                    setTimeout(() => {
+                      richRef.current?.sendAction?.(action as any);
+                    }, 50);
                   }}
                 />
                 {showHlPicker && (
@@ -698,69 +631,13 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                         onPress={() => {
                           setHlColor(c);
                           setShowHlPicker(false);
-                          pushHistory(body || '');
                           richRef.current?.focusContentEditor?.();
                           setTimeout(() => {
-                            richRef.current?.commandDOM?.(`
-                              (function(){
-                                try {
-                                  const s = window.getSelection && window.getSelection();
-                                  if (window.__pv2_savedRange && s) { s.removeAllRanges(); s.addRange(window.__pv2_savedRange); }
-                                } catch(e) {}
-                              })();
-                            `);
-                            richRef.current?.commandDOM?.(`
-                              (function(){
-                                const color = '${c === 'transparent' ? 'transparent' : c}';
-                                try {
-                                  const sel0 = window.getSelection && window.getSelection();
-                                  if (sel0 && sel0.rangeCount) {
-                                    const r0 = sel0.getRangeAt(0);
-                                    if (r0.collapsed && r0.startContainer && r0.startContainer.nodeType === 3) {
-                                      const text = r0.startContainer.textContent || '';
-                                      let s = r0.startOffset;
-                                      let e = r0.startOffset;
-                                      while (s > 0 && /[A-Za-z0-9_]/.test(text[s - 1])) s--;
-                                      while (e < text.length && /[A-Za-z0-9_]/.test(text[e])) e++;
-                                      if (e > s) {
-                                        const rr = document.createRange();
-                                        rr.setStart(r0.startContainer, s);
-                                        rr.setEnd(r0.startContainer, e);
-                                        sel0.removeAllRanges();
-                                        sel0.addRange(rr);
-                                      }
-                                    }
-                                  }
-                                } catch(e) {}
-                                try {
-                                  document.execCommand('styleWithCSS', false, true);
-                                  if (color === 'transparent') {
-                                    document.execCommand('hiliteColor', false, 'transparent');
-                                    document.execCommand('backColor', false, 'transparent');
-                                  } else {
-                                    document.execCommand('hiliteColor', false, color);
-                                    document.execCommand('backColor', false, color);
-                                  }
-                                } catch(e) {}
-                                try {
-                                  const sel = window.getSelection && window.getSelection();
-                                  if (!sel || sel.rangeCount === 0) return;
-                                  const range = sel.getRangeAt(0);
-                                  if (range.collapsed) return;
-                                  const span = document.createElement('span');
-                                  span.style.backgroundColor = color;
-                                  span.style.borderRadius = '2px';
-                                  span.style.padding = '0 2px';
-                                  try { range.surroundContents(span); }
-                                  catch(e) {
-                                    const frag = range.extractContents();
-                                    span.appendChild(frag);
-                                    range.insertNode(span);
-                                  }
-                                } catch(e) {}
-                              })();
-                            `);
-                            setTimeout(() => { snapshotFromEditor(); }, 120);
+                            if (c === 'transparent') {
+                              richRef.current?.commandDOM?.("document.execCommand('hiliteColor', false, 'transparent'); document.execCommand('backColor', false, 'transparent')");
+                            } else {
+                              richRef.current?.commandDOM?.(`document.execCommand('hiliteColor', false, '${c}')`);
+                            }
                           }, 60);
                         }}
                         style={[styles.hlSwatch, { backgroundColor: c === 'transparent' ? colors.surface : c, borderColor: hlColor === c ? '#5B4EFA' : colors.border }]}
@@ -779,14 +656,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                   key={editorKey}
                   ref={richRef}
                   html={body}
-                  onChange={(next) => {
-                    setBody(next);
-                    if (applyingHistory.current) return;
-                    const now = Date.now();
-                    if (now - lastSnapshotAt.current < 600) return;
-                    lastSnapshotAt.current = now;
-                    pushHistory(next || '');
-                  }}
+                  onChange={setBody}
                   onFocus={() => {
                     setActiveLevel(null);
                     if (scrollRef.current && toolbarY > 0) {

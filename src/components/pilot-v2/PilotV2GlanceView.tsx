@@ -25,8 +25,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Clipboard from 'expo-clipboard';
 import {
-  ChevronLeft, Bell, Share2, Upload, MoreVertical, Pencil,
-  ZoomIn, RotateCcw,
+  ChevronLeft, MoreVertical, Pencil,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
@@ -113,8 +112,6 @@ export function PilotV2GlanceView() {
   const blocks = note?.content?.blocks?.length ? note.content.blocks : DEMO_BLOCKS;
   const title = note?.title ?? 'Article 14 — Equality Before Law';
 
-  const [reminderSet, setReminderSet] = useState(false);
-  const [headerCollapsed, setHeaderCollapsed] = useState(false);
   const [exportSheetOpen, setExportSheetOpen] = useState(false);
   const scrollRef = useRef<any>(null);
   const scrollKey = note?.id || '__demo__';
@@ -125,19 +122,86 @@ export function PilotV2GlanceView() {
   /** Block layout map — keyed by block.id, same shape as EditorView.
    *  Populated by per-block onLayout wrappers; feeds PencilCanvas so
    *  anchored strokes follow block reorders in the read-only view (Step 10). */
-  const blockLayoutsRef = useRef<Map<string, { y: number; h: number }>>(new Map());
+  const blockLayoutsRef = useRef<Map<string, { x: number; y: number; w: number; h: number }>>(new Map());
   const [blockLayoutVersion, setBlockLayoutVersion] = useState(0);
   const initialStrokes = (note?.content?.pencilStrokes ?? []) as PilotV2PencilStroke[];
+  const assignAnchorToStrokes = useCallback((strokes: PilotV2PencilStroke[]): PilotV2PencilStroke[] => {
+    const ph = Math.max(1, paperSize.h);
+    const pw = Math.max(1, paperSize.w);
+    return strokes.map((s) => {
+      if (s.anchor) return s;
+      const pts = s.points || [];
+      if (!pts.length) return s;
+
+      // Host block by centroid Y (same heuristic as EditorView)
+      let cy = 0;
+      for (const p of pts) cy += p.y;
+      cy = (cy / pts.length) * ph;
+      let bestId: string | null = null;
+      let bestDist = Infinity;
+      for (const [id, rect] of blockLayoutsRef.current.entries()) {
+        if (cy >= rect.y && cy <= rect.y + rect.h) {
+          bestId = id; bestDist = 0; break;
+        }
+        const d = Math.min(Math.abs(cy - rect.y), Math.abs(cy - (rect.y + rect.h)));
+        if (d < bestDist) { bestDist = d; bestId = id; }
+      }
+      if (!bestId) return s;
+      const blockRect = blockLayoutsRef.current.get(bestId)!;
+      const blockOriginY = blockRect.y / ph;
+
+      let spanAnchor: Partial<NonNullable<PilotV2PencilStroke['anchor']>> = {};
+      const isHighlighter = s.tool === 'highlighter';
+      if (isHighlighter || s.tool === 'pen') {
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        for (const p of pts) {
+          if (p.x < minX) minX = p.x;
+          if (p.x > maxX) maxX = p.x;
+          if (p.y < minY) minY = p.y;
+          if (p.y > maxY) maxY = p.y;
+        }
+        const dX = maxX - minX;
+        const dY = maxY - minY;
+        const isHorizontal = dX > 0.05 && dY < dX * 0.25;
+        if (isHighlighter || isHorizontal) {
+          const blockH = Math.max(1, blockRect.h);
+          const blockW = Math.max(1, blockRect.w);
+          const minXpx = minX * pw;
+          const maxXpx = maxX * pw;
+          const startRelX = Math.max(0, Math.min(1, (minXpx - blockRect.x) / blockW));
+          const endRelX = Math.max(startRelX, Math.max(0, Math.min(1, (maxXpx - blockRect.x) / blockW)));
+          const relY = Math.max(0, Math.min(1, (cy - blockRect.y) / blockH));
+          const blockText = blocks.find(b => b.id === bestId)?.text ?? '';
+          const textLen = Math.max(1, blockText.length);
+          const startOffset = Math.round(startRelX * textLen);
+          const endOffset = Math.min(textLen, Math.round(endRelX * textLen));
+          spanAnchor = {
+            elementId: bestId,
+            spanIndex: 0,
+            startOffset,
+            endOffset,
+            startRelX,
+            endRelX,
+            relY,
+          };
+        }
+      }
+
+      return { ...s, anchor: { blockId: bestId, blockOriginY, ...spanAnchor } };
+    });
+  }, [paperSize.h, paperSize.w, blocks]);
+
   const persistGlanceStrokes = useCallback((next: PilotV2PencilStroke[]) => {
     if (!note?.id) return;
+    const anchored = assignAnchorToStrokes(next);
     const content = {
       blocks: note.content?.blocks ?? [],
       version: note.content?.version ?? 1,
-      pencilStrokes: next,
+      pencilStrokes: anchored,
     };
     savePilotV2NoteOfflineFirst(note.id, content).catch(() => null);
     dispatch({ type: 'PATCH_CURRENT_NOTE', payload: { id: note.id, patch: { content } } });
-  }, [note, dispatch]);
+  }, [note, dispatch, assignAnchorToStrokes]);
   const pencil = usePilotV2Pencil({
     noteId: note?.id ?? null,
     initialStrokes,
@@ -259,8 +323,23 @@ export function PilotV2GlanceView() {
       savedOffX.value  = offsetX.value;
       savedOffY.value  = offsetY.value;
 
+      // If user zoomed OUT (scale < 1), keep vertical scrolling enabled and
+      // neutralize pan offsets so the entire note remains scrollable.
+      if (scale.value < 0.99) {
+        offsetX.value = withSpring(0, { damping: 22, stiffness: 180 });
+        offsetY.value = withSpring(0, { damping: 22, stiffness: 180 });
+        savedOffX.value = 0;
+        savedOffY.value = 0;
+        runOnJS(setScrollEnabled)(true);
+        runOnJS(setIsZoomed)(true);
+        return;
+      }
+
       if (Math.abs(scale.value - 1) > 0.05) {
         runOnJS(setIsZoomed)(true);
+        // When zoomed IN, we pan in 2D so we keep scroll disabled.
+        // When very close to 1, restore normal scroll behavior.
+        if (scale.value <= 1.01) runOnJS(setScrollEnabled)(true);
       } else {
         scale.value   = withSpring(1, { damping: 22, stiffness: 180 });
         offsetX.value = withSpring(0, { damping: 22, stiffness: 180 });
@@ -335,11 +414,6 @@ export function PilotV2GlanceView() {
     const y = e.nativeEvent.contentOffset.y;
     lastScrollY.current = y;
     glanceScrollMemory.current[scrollKey] = lastScrollY.current;
-    if (y > 40) {
-      setHeaderCollapsed(true);
-    } else {
-      setHeaderCollapsed(false);
-    }
   }, [scrollKey, glanceScrollMemory]);
 
   /* ── navigation ─────────────────────────────────────────────────────────── */
@@ -363,16 +437,6 @@ export function PilotV2GlanceView() {
         }
       })
       .join('\n');
-  };
-
-  const handleReminder = () => {
-    setReminderSet(v => !v);
-    Alert.alert(
-      reminderSet ? 'Reminder cleared' : 'Reminder set',
-      reminderSet
-        ? `We won't remind you about "${title}" anymore.`
-        : `We'll surface "${title}" in your daily review queue.`,
-    );
   };
 
   const handleShare = async () => {
@@ -425,7 +489,16 @@ export function PilotV2GlanceView() {
         },
       }] : []),
       { text: 'Open in Editor', onPress: () => dispatch({ type: 'SET_VIEW_MODE', payload: 'editor' }) },
-      { text: 'Copy Plain Text', onPress: handleExport },
+      { text: 'Share', onPress: handleShare },
+      {
+        text: 'Copy Plain Text',
+        onPress: async () => {
+          const message = blocksToPlainText();
+          await Clipboard.setStringAsync(message);
+          Alert.alert('Copied', 'Plain text copied to clipboard.');
+        },
+      },
+      { text: 'Export', onPress: handleExport },
       ...(note?.is_archived ? [{
         text: 'Delete permanently',
         style: 'destructive' as const,
@@ -485,92 +558,47 @@ export function PilotV2GlanceView() {
         <ChevronLeft size={26} color={colors.textPrimary} strokeWidth={2.5} />
       </TouchableOpacity>
 
-      {/* ── Sticky header ────────────────────────────────────────────────── */}
-      <View style={[
-        styles.header,
-        {
-          backgroundColor: colors.surface,
-          borderBottomColor: colors.border,
-          height: headerCollapsed ? 0 : 56,
-          paddingVertical: headerCollapsed ? 0 : 14,
-          opacity: headerCollapsed ? 0 : 1,
-          overflow: 'hidden',
-          borderBottomWidth: headerCollapsed ? 0 : 1,
-        }
-      ]}>
-        <View style={styles.headerLeft}>
-          <Text
-            style={[styles.headerTitle, { color: colors.textPrimary, marginLeft: 52 }]}
-            numberOfLines={1}
-          >
-            {title}
+      {/* ── Minimal floating controls (no header band) ───────────────────── */}
+      <View
+        pointerEvents="box-none"
+        style={{ position: 'absolute', top: 18, left: 0, right: 0, zIndex: 1600, alignItems: 'center' }}
+      >
+        <View
+          testID="pilot-v2-glance-zoom-chip"
+          style={[
+            styles.zoomPill,
+            {
+              backgroundColor: colors.surface + 'E6',
+              borderColor: colors.border,
+              paddingVertical: 6,
+            },
+          ]}
+        >
+          <Text style={[styles.zoomPillText, { color: colors.textPrimary }]}>
+            {displayScale.toFixed(1)}×
           </Text>
         </View>
-
-        <View style={styles.headerRight}>
-          {/* Zoom level + reset — only visible when zoomed */}
-          {isZoomed && (
-            <TouchableOpacity
-              testID="pilot-v2-glance-zoom-reset"
-              onPress={resetZoom}
-              style={[styles.zoomPill, { backgroundColor: colors.primary + '18', borderColor: colors.primary + '40' }]}
-            >
-              <RotateCcw size={12} color={colors.primary} />
-              <Text style={[styles.zoomPillText, { color: colors.primary }]}>
-                {displayScale.toFixed(1)}×
-              </Text>
-            </TouchableOpacity>
-          )}
-
-          {/* Zoom hint when not zoomed */}
-          {!isZoomed && (
-            <View style={[styles.zoomHint, { borderColor: colors.border }]}>
-              <ZoomIn size={12} color={colors.textTertiary} />
-              <Text style={[styles.zoomHintText, { color: colors.textTertiary }]}>Pinch to zoom</Text>
-            </View>
-          )}
-
-          <TouchableOpacity
-            testID="pilot-v2-glance-bell"
-            onPress={handleReminder}
-            style={styles.iconBtn}
-          >
-            <Bell
-              size={18}
-              color={reminderSet ? '#5B4EFA' : colors.textSecondary}
-              fill={reminderSet ? '#5B4EFA' : 'transparent'}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            testID="pilot-v2-glance-edit"
-            onPress={() => dispatch({ type: 'SET_VIEW_MODE', payload: 'editor' })}
-            style={[styles.iconBtn, { backgroundColor: '#EEECFF' }]}
-          >
-            <Pencil size={18} color="#5B4EFA" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            testID="pilot-v2-glance-share"
-            onPress={handleShare}
-            style={styles.iconBtn}
-          >
-            <Share2 size={18} color={colors.textSecondary} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            testID="pilot-v2-glance-export"
-            onPress={handleExport}
-            style={styles.iconBtn}
-          >
-            <Upload size={18} color={colors.textSecondary} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            testID="pilot-v2-glance-more"
-            onPress={handleMore}
-            style={styles.iconBtn}
-          >
-            <MoreVertical size={18} color={colors.textSecondary} />
-          </TouchableOpacity>
-        </View>
       </View>
+
+      <TouchableOpacity
+        testID="pilot-v2-glance-menu"
+        onPress={handleMore}
+        activeOpacity={0.85}
+        style={[
+          styles.floatingBack,
+          {
+            left: undefined as any,
+            right: 18,
+            width: 52,
+            height: 52,
+            backgroundColor: colors.surface + 'E6',
+            borderColor: colors.border,
+            shadowColor: colors.textPrimary,
+          } as any,
+        ]}
+      >
+        <MoreVertical size={22} color={colors.textPrimary} strokeWidth={2.5} />
+      </TouchableOpacity>
 
       {/* ── Scalable page canvas ─────────────────────────────────────────── */}
       {/*
@@ -608,12 +636,18 @@ export function PilotV2GlanceView() {
                   <View
                     key={b.id}
                     onLayout={(e) => {
-                      const { y, height: h } = e.nativeEvent.layout;
+                      const { x, y, width: w, height: h } = e.nativeEvent.layout;
                       const cur = blockLayoutsRef.current.get(b.id);
-                      blockLayoutsRef.current.set(b.id, { y, h });
+                      blockLayoutsRef.current.set(b.id, { x, y, w, h });
                       // Only bump version when position changes noticeably to
                       // avoid spurious CommittedStrokesLayer invalidations.
-                      if (!cur || Math.abs(cur.y - y) > 2 || Math.abs(cur.h - h) > 2) {
+                      if (
+                        !cur ||
+                        Math.abs(cur.x - x) > 2 ||
+                        Math.abs(cur.y - y) > 2 ||
+                        Math.abs(cur.w - w) > 2 ||
+                        Math.abs(cur.h - h) > 2
+                      ) {
                         setBlockLayoutVersion(v => v + 1);
                       }
                     }}

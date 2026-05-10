@@ -120,7 +120,7 @@ export function PilotV2EditorView() {
   /** Maps blockId → {y, h} in pixels within the paper view.  Updated by
    *  each BlockRow's onLayout callback.  Used to assign anchor.blockOriginY
    *  when a stroke is committed (Step 6 — block-level anchoring). */
-  const blockLayoutsRef = useRef<Map<string, { y: number; h: number }>>(new Map());
+  const blockLayoutsRef = useRef<Map<string, { x: number; y: number; w: number; h: number }>>(new Map());
   /** Incremented whenever a block's y/h changes significantly (e.g. after a
    *  block-reorder or text height change).  Passed to <PencilCanvas> so the
    *  CommittedStrokesLayer knows to re-derive stroke display positions. */
@@ -541,15 +541,18 @@ export function PilotV2EditorView() {
           const dY = maxY - minY; // vertical spread (0..1)
           const isHorizontal = dX > 0.05 && dY < dX * 0.25; // flat stroke
           if (isHighlighter || isHorizontal) {
-            // Block-relative coordinates
+            // Block-relative coordinates (critical for reflow-safe underlines)
             const blockH = Math.max(1, blockRect.h);
-            const startRelX = minX;           // already 0..1 of page w
-            const endRelX   = maxX;
+            const blockW = Math.max(1, blockRect.w);
+            const minXpx = minX * pw;
+            const maxXpx = maxX * pw;
+            const startRelX = Math.max(0, Math.min(1, (minXpx - blockRect.x) / blockW));
+            const endRelX   = Math.max(startRelX, Math.max(0, Math.min(1, (maxXpx - blockRect.x) / blockW)));
             const relY = Math.max(0, Math.min(1,
               (cy - blockRect.y) / blockH,
             ));
             // Estimate char offsets using the block's text length.
-            // charPos = fraction_of_page_width × block_text_length.
+            // charPos = fraction_of_block_width × block_text_length.
             // This is a heuristic; precise measurement requires text-layout.
             const blockText = blocks.find(b => b.id === bestId)?.text ?? '';
             const textLen = Math.max(1, blockText.length);
@@ -783,12 +786,18 @@ export function PilotV2EditorView() {
                 onMoveUp={() => moveBlock(b.id, 'up')}
                 onMoveDown={() => moveBlock(b.id, 'down')}
                 onEditTable={() => (b.tableRows?.length ? openTableEditor(b.id, b.tableRows) : null)}
-                onBlockLayout={(id, y, h) => {
+                onBlockLayout={(id, x, y, w, h) => {
                   const cur = blockLayoutsRef.current.get(id);
-                  blockLayoutsRef.current.set(id, { y, h });
+                  blockLayoutsRef.current.set(id, { x, y, w, h });
                   // Bump version only when position changed noticeably so the
                   // CommittedStrokesLayer knows to recompute display offsets.
-                  if (!cur || Math.abs(cur.y - y) > 2 || Math.abs(cur.h - h) > 2) {
+                  if (
+                    !cur ||
+                    Math.abs(cur.x - x) > 2 ||
+                    Math.abs(cur.y - y) > 2 ||
+                    Math.abs(cur.w - w) > 2 ||
+                    Math.abs(cur.h - h) > 2
+                  ) {
                     setBlockLayoutVersion(v => v + 1);
                   }
                 }}
@@ -1186,7 +1195,7 @@ interface BlockRowProps {
   onMoveDown: () => void;
   onEditTable: () => void;
   /** Called when the block's layout changes — used for block-level anchoring. */
-  onBlockLayout: (id: string, y: number, h: number) => void;
+  onBlockLayout: (id: string, x: number, y: number, w: number, h: number) => void;
 }
 
 function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onToggleCheck, onDelete, onMoveUp, onMoveDown, onEditTable, onBlockLayout }: BlockRowProps) {
@@ -1215,8 +1224,8 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
   return (
     <View
       onLayout={(e) => {
-        const { y, height } = e.nativeEvent.layout;
-        onBlockLayout(block.id, y, height);
+        const { x, y, width: w, height: h } = e.nativeEvent.layout;
+        onBlockLayout(block.id, x, y, w, h);
       }}
       style={[
         styles.blockRow,

@@ -24,6 +24,7 @@ import { useRouter } from 'expo-router';
 import { Rocket, X, Plus, Wand2, Highlighter, Eraser, Undo2, Redo2, Brain, Copy } from 'lucide-react-native';
 import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 import RichNoteEditor from '../RichNoteEditor';
+import PilotV2SaveAIPanel from './PilotV2SaveAIPanel';
 import { useTheme } from '../../context/ThemeContext';
 import { PremiumMoveSheet, MoveTarget } from '../common/PremiumMoveSheet';
 import { SUBJECT_TOPICS } from './PilotV2SidebarSubject';
@@ -147,6 +148,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [aiPanelOpen, setAiPanelOpen] = useState(false);
   const scrollRef = useRef<ScrollView | null>(null);
   const [toolbarY, setToolbarY] = useState<number>(0);
   const [topAreaH, setTopAreaH] = useState(0);
@@ -518,6 +520,13 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     Auto-routed by subject → topic → microtopic. Same path = same note.
                   </Text>
                 </View>
+                <TouchableOpacity
+                  testID="pilot-v2-save-ai-toggle"
+                  onPress={() => setAiPanelOpen(v => !v)}
+                  style={[styles.closeBtn, { marginRight: 4, backgroundColor: aiPanelOpen ? '#EEECFF' : 'transparent', borderRadius: 8 }]}
+                >
+                  <Brain size={20} color={aiPanelOpen ? '#5B4EFA' : colors.textPrimary} />
+                </TouchableOpacity>
                 <TouchableOpacity onPress={onClose} testID="pilot-v2-save-close" style={styles.closeBtn}>
                   <X size={20} color={colors.textPrimary} />
                 </TouchableOpacity>
@@ -577,6 +586,27 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
               </View>
             </Animated.View>
 
+            {aiPanelOpen ? (
+              <PilotV2SaveAIPanel
+                visible={aiPanelOpen}
+                onClose={() => setAiPanelOpen(false)}
+                onInsert={(html) => {
+                  const next = (body || '').trim()
+                    ? `${body}<p><br></p>${html}`
+                    : html;
+                  setBody(next);
+                  pushHistory(next);
+                  setEditorKey(k => k + 1);
+                  setAiPanelOpen(false);
+                }}
+                seedContext={{
+                  subject,
+                  topic,
+                  question: seedQuestion?.statement_line || seedQuestion?.question_text || null,
+                  body,
+                }}
+              />
+            ) : (
             <ScrollView
               ref={(r) => { scrollRef.current = r as any; }}
               style={{ flex: 1 }}
@@ -777,6 +807,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                 </View>
               )}
             </ScrollView>
+            )}
 
             {/* Footer actions */}
             <View style={[styles.footer, { borderTopColor: colors.border }]}>

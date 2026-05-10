@@ -157,3 +157,47 @@ TOC, headings filter, etc.) that the rest of the app already enjoys.
 - Inherits all UnifiedExportSheet features (theme, paper, font, font size,
   pastel backgrounds, TOC, columns, advanced margins/header/footer/watermark)
   — done.
+
+---
+
+## Iteration: Anchored pencil-annotation export (Steps 18–22)  ✅
+
+**Problem:** The unified export entry-point dropped pencil strokes — only
+`kind: 'notes'` payloads were sent, so underlines / highlights / free
+strokes never made it into the exported PDF. Even when the engine's
+`hardnote` path was used, strokes were rendered as raw absolute-pixel SVG
+which drifted sideways the moment font size, paper style, theme, or
+column count changed at export time.
+
+**Fix — Anchor strokes to the word/line, not the pixel:**
+
+| Step | File | Change |
+| --- | --- | --- |
+| 18 | `src/components/pilot-v2/PilotV2UnifiedExport.tsx` · `PilotV2EditorView.tsx` · `PilotV2GlanceView.tsx` | New props `strokes`, `pageWidth`, `pageHeight`. Added a Switch row labelled **"Include pencil annotations"** (default ON when there is at least one stroke) with `testID="pilot-v2-export-include-strokes"`. |
+| 19 | `pilotV2Migration.ts` · `PilotV2UnifiedExport.tsx` | Exported `assignLegacyAnchors`. The unified export pipeline now back-fills span-offset anchors on legacy strokes before payload build, then drops every stroke whose host block was filtered out by chip / per-block selection. |
+| 20 | `src/lib/pilotV2StrokeRemap.ts` (new) | Helper that estimates each surviving block's bounding box inside the export canvas (parameterised by font size + columns) and re-projects anchored stroke points onto that box (`y = blockY + relY * blockH`, `x ∈ [startRelX, endRelX] * blockW`). Unanchored strokes are scaled by `exportCanvas / editorCanvas` ratio. |
+| 21 | `src/components/pilot-v2/pilotV2BlocksToMarkdown.ts` (new) · `PilotV2UnifiedExport.tsx` | When the toggle is ON the payload switches to `kind: 'hardnote'` with `baseLayerMarkdown` pre-rendered from the filtered blocks plus the remapped strokes. When OFF the payload stays `kind: 'notes'` and the SVG is omitted entirely. |
+| 22 | `__tests__/pilotV2StrokeRemap.test.ts` (new) · this doc | 7 specs covering anchored remap math (with curve preservation), excluded-block drop, unanchored fallback scaling, and font-size stability invariant. All pass under `npx tsx __tests__/pilotV2StrokeRemap.test.ts`. |
+
+**Test IDs added:**
+- `pilot-v2-export-include-strokes-row` (toggle row container)
+- `pilot-v2-export-include-strokes` (the Switch itself)
+
+**Acceptance — verified in unit tests + manual checklist:**
+
+Automated (`npx tsx __tests__/pilotV2StrokeRemap.test.ts`):
+- [x] anchored stroke re-projects onto host block (start/mid/end x match expected; y constant on the relY line)
+- [x] curves preserved (mid-points keep their fractional position along the stroke)
+- [x] anchored stroke whose host block is missing returns `null` (dropped)
+- [x] surviving strokes pass through `remapStrokesForExport` unchanged in count
+- [x] unanchored strokes scale 0..1 → exportCanvas
+- [x] unanchored stroke uses export dims independently of editor dims
+- [x] anchored stroke stays inside host block rect at fontSize ∈ {8, 11, 16, 18}
+
+Manual (please verify on iPad Pro before declaring 100% complete):
+- [ ] Toggle "Include pencil annotations" off → exported PDF has zero `<svg>` strokes.
+- [ ] Toggle on, change font size 11 → 18 → re-export → underline still ends at the same word it started on (no horizontal drift > 1 char).
+- [ ] Switch theme `modern → sepia → dark` → strokes still anchored.
+- [ ] Switch paper `plain → lined → grid` → strokes still on the right line.
+- [ ] Deselect a block via chip → strokes attached to that block disappear; strokes on surviving blocks remain anchored.
+- [ ] Switch column count `1 → 2` → strokes reflow with the text and stay anchored to their word.

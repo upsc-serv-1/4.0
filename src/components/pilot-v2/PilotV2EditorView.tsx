@@ -16,7 +16,7 @@
  * Auto-save on every change is debounced and mirrored to the in-memory
  * note via `PATCH_BLOCKS`. Step 10 wires this to Supabase via pilotV2Repo.
  */
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AnimatedReanimated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import RenderHtml from 'react-native-render-html';
@@ -117,6 +117,14 @@ export function PilotV2EditorView() {
   const [outlineTab, setOutlineTab] = useState<'blocks' | 'outline'>('blocks');
   const [savingState, setSavingState] = useState<'idle' | 'saving' | 'saved'>('saved');
   const saveTimer = useRef<any>(null);
+  /** Maps blockId → {y, h} in pixels within the paper view.  Updated by
+   *  each BlockRow's onLayout callback.  Used to assign anchor.blockOriginY
+   *  when a stroke is committed (Step 6 — block-level anchoring). */
+  const blockLayoutsRef = useRef<Map<string, { y: number; h: number }>>(new Map());
+  /** Incremented whenever a block's y/h changes significantly (e.g. after a
+   *  block-reorder or text height change).  Passed to <PencilCanvas> so the
+   *  CommittedStrokesLayer knows to re-derive stroke display positions. */
+  const [blockLayoutVersion, setBlockLayoutVersion] = useState(0);
   const [slashPicker, setSlashPicker] = useState<{ visible: boolean; blockId: string | null }>({ visible: false, blockId: null });
   const [tableEditor, setTableEditor] = useState<{ visible: boolean; blockId: string | null; rows: string[][] }>({
     visible: false,
@@ -482,16 +490,57 @@ export function PilotV2EditorView() {
   // save in flight is never lost when the user navigates away mid-stroke
   // (which previously caused 'drawings disappear after navigation').
   const pendingSaveRef = useRef<{ noteId: string; content: any } | null>(null);
+
+  /** After a stroke is committed, find which block's y-range the stroke
+   *  centroid falls in and tag the stroke with anchor.blockId +
+   *  anchor.blockOriginY.  Strokes that already carry an anchor are left
+   *  untouched (idempotent).  O(n_strokes × n_blocks). */
+  const assignAnchorToStrokes = useCallback(
+    (strokes: PilotV2PencilStroke[]): PilotV2PencilStroke[] => {
+      const ph = Math.max(1, paperSize.h);
+      return strokes.map((s) => {
+        if (s.anchor) return s;
+        const pts = s.points;
+        if (!pts.length) return s;
+        // Centroid y in page coords (relative → pixels).
+        let cy = 0;
+        for (const p of pts) cy += p.y;
+        cy = (cy / pts.length) * ph;
+        // Find the block whose rect contains (or is nearest to) the centroid.
+        let bestId: string | null = null;
+        let bestDist = Infinity;
+        for (const [id, rect] of blockLayoutsRef.current.entries()) {
+          if (cy >= rect.y && cy <= rect.y + rect.h) {
+            bestId = id; bestDist = 0; break;
+          }
+          const d = Math.min(Math.abs(cy - rect.y), Math.abs(cy - (rect.y + rect.h)));
+          if (d < bestDist) { bestDist = d; bestId = id; }
+        }
+        if (!bestId) return s;
+        const blockY = (blockLayoutsRef.current.get(bestId)?.y ?? 0) / ph;
+        return { ...s, anchor: { blockId: bestId, blockOriginY: blockY } };
+      });
+    },
+    [paperSize.h],
+  );
+
   const persistStrokes = (next: PilotV2PencilStroke[]) => {
+    // Tag any new strokes with their block anchor before persisting.
+    const anchored = assignAnchorToStrokes(next);
+    // Silently update engine's in-memory anchor metadata so the display
+    // transform in CommittedStrokesLayer always sees fresh values.
+    anchored.forEach((s) => {
+      if (s.anchor) pencil.engine.setStrokeAnchor(s.id, s.anchor);
+    });
     if (!note?.id) return;
-    const content = { blocks, version: 1, pencilStrokes: next };
+    const content = { blocks, version: 1, pencilStrokes: anchored };
     pendingSaveRef.current = { noteId: note.id, content };
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
       try {
         await savePilotV2NoteOfflineFirst(note.id, content);
         dispatch({ type: 'PATCH_BLOCKS', payload: { id: note.id, blocks } });
-        dispatch({ type: 'PATCH_PENCIL_STROKES', payload: { id: note.id, strokes: next } });
+        dispatch({ type: 'PATCH_PENCIL_STROKES', payload: { id: note.id, strokes: anchored } });
         pendingSaveRef.current = null;
         setSavingState('saved');
       } catch { setSavingState('idle'); }
@@ -713,6 +762,15 @@ export function PilotV2EditorView() {
                 onMoveUp={() => moveBlock(b.id, 'up')}
                 onMoveDown={() => moveBlock(b.id, 'down')}
                 onEditTable={() => (b.tableRows?.length ? openTableEditor(b.id, b.tableRows) : null)}
+                onBlockLayout={(id, y, h) => {
+                  const cur = blockLayoutsRef.current.get(id);
+                  blockLayoutsRef.current.set(id, { y, h });
+                  // Bump version only when position changed noticeably so the
+                  // CommittedStrokesLayer knows to recompute display offsets.
+                  if (!cur || Math.abs(cur.y - y) > 2 || Math.abs(cur.h - h) > 2) {
+                    setBlockLayoutVersion(v => v + 1);
+                  }
+                }}
               />
             ))}
 
@@ -734,6 +792,8 @@ export function PilotV2EditorView() {
                 height={paperSize.h}
                 drawingMode={pencil.drawingMode}
                 onCommit={(strokes) => persistStrokes(strokes)}
+                blockLayouts={blockLayoutsRef.current}
+                blockLayoutVersion={blockLayoutVersion}
               />
             )}
 
@@ -1096,9 +1156,11 @@ interface BlockRowProps {
   onMoveUp: () => void;
   onMoveDown: () => void;
   onEditTable: () => void;
+  /** Called when the block's layout changes — used for block-level anchoring. */
+  onBlockLayout: (id: string, y: number, h: number) => void;
 }
 
-function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onToggleCheck, onDelete, onMoveUp, onMoveDown, onEditTable }: BlockRowProps) {
+function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onToggleCheck, onDelete, onMoveUp, onMoveDown, onEditTable, onBlockLayout }: BlockRowProps) {
   const { width } = useWindowDimensions();
   const baseFs = block.type === 'heading'
     ? block.level === 1 ? 24 : 18
@@ -1123,6 +1185,10 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
 
   return (
     <View
+      onLayout={(e) => {
+        const { y, height } = e.nativeEvent.layout;
+        onBlockLayout(block.id, y, height);
+      }}
       style={[
         styles.blockRow,
         isActive ? {

@@ -130,6 +130,17 @@ export interface PilotV2PencilStroke {
   createdAt: string;
   /** Optional bounds in relative coords (for fast eraser hit-test). */
   bounds?: { x: number; y: number; w: number; h: number };
+  /** Block-level anchor — assigned after the stroke is committed.
+   *  Lets the stroke follow its host block when blocks are reordered,
+   *  edited, or when the editor/glance transition changes page dimensions. */
+  anchor?: {
+    /** ID of the PilotV2Block this stroke is drawn on. */
+    blockId: string;
+    /** Y of the block's top edge as a fraction (0..1) of the page height
+     *  at the moment the stroke was committed.  Used to compute the delta
+     *  when the block moves: dy = (currentBlockY / pageH) − blockOriginY. */
+    blockOriginY: number;
+  };
 }
 
 export interface PilotV2PencilToolState {

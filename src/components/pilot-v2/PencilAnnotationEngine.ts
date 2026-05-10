@@ -163,6 +163,16 @@ export class PencilAnnotationEngine {
     this.notifyPersisted();
   }
 
+  /** Silently attach block-level anchor metadata to an already-committed
+   *  stroke.  Does NOT fire listeners — the caller is responsible for
+   *  persisting after calling this (typically inside persistStrokes). */
+  setStrokeAnchor(id: string, anchor: PilotV2PencilStroke['anchor']): void {
+    const idx = this.strokes.findIndex(s => s.id === id);
+    if (idx >= 0 && anchor !== undefined) {
+      this.strokes[idx] = { ...this.strokes[idx], anchor };
+    }
+  }
+
   subscribe(fn: ChangeListener): () => void {
     this.listeners.push(fn);
     return () => {

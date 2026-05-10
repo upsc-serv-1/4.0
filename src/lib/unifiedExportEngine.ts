@@ -931,10 +931,6 @@ export const buildHardnoteHtml = (note: ExportHardnote, o: ExportOptions): strin
   const W = note.canvasWidth || 800;
   const H = note.canvasHeight || 1200;
 
-  const rules = Array.from({ length: Math.floor(H / 32) })
-    .map((_, i) => `<line x1="0" y1="${(i + 1) * 32}" x2="${W}" y2="${(i + 1) * 32}" stroke="#e5e7eb" stroke-width="1"/>`)
-    .join('');
-
   const strokesSvg = (note.strokes || [])
     .filter((s) => s && s.tool !== 'eraser' && s.points?.length > 0)
     .map((s) => {
@@ -955,30 +951,36 @@ export const buildHardnoteHtml = (note: ExportHardnote, o: ExportOptions): strin
     : '';
 
   const updated = note.updatedAt ? new Date(note.updatedAt).toLocaleString() : '';
+  const strokeCount = (note.strokes || []).filter((s) => s.tool !== 'eraser').length;
 
-  const baseLayerBlock = note.baseLayerMarkdown
-    ? `<div class="hn-base-layer">
-         <div class="hn-base-label">QUIZ EXPLANATION · LOCKED BASE LAYER</div>
-         <div class="hn-base-body">${renderInline(note.baseLayerMarkdown)}</div>
+  const hasMeta = Boolean(crumbLine || updated || note.subject || strokeCount);
+  const meta = hasMeta
+    ? `<div class="hn-meta">
+         ${crumbLine}
+         <div class="hn-stats">
+           ${strokeCount > 0 ? `<span class="hn-pill-soft">${strokeCount} strokes</span>` : ''}
+           ${note.subject ? `<span class="hn-pill-soft">${escapeHtml(note.subject)}</span>` : ''}
+           ${updated ? `<span class="hn-pill-soft">Updated ${escapeHtml(updated)}</span>` : ''}
+         </div>
        </div>`
     : '';
 
+  // Plain markdown body — no yellow "QUIZ EXPLANATION" wrapper.
+  const baseLayerBody = note.baseLayerMarkdown
+    ? `<div class="hn-base-body">${renderInline(note.baseLayerMarkdown)}</div>`
+    : '<div class="hn-base-body"></div>';
+
+  // Pencil strokes are rendered as an absolutely-positioned SVG OVERLAY
+  // on top of the markdown, so each stroke sits over the words it was
+  // drawn on (instead of in a separate canvas below the text).  The SVG
+  // uses the same W×H viewBox as the editor canvas; with
+  // preserveAspectRatio="none" it stretches to fit the natural height of
+  // the rendered markdown so vertical alignment follows the text reflow.
   const body = `
-    <div class="hn-meta">
-      ${crumbLine}
-      <div class="hn-stats">
-        <span class="hn-pill">${(note.strokes || []).filter((s) => s.tool !== 'eraser').length} strokes</span>
-        ${note.subject ? `<span class="hn-pill">${escapeHtml(note.subject)}</span>` : ''}
-        ${updated ? `<span class="hn-pill-soft">Updated ${escapeHtml(updated)}</span>` : ''}
-      </div>
-    </div>
-    ${baseLayerBlock}
-    <div class="hn-canvas-wrap">
-      <svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="0" width="${W}" height="${H}" fill="#ffffff"/>
-        ${rules}
-        ${strokesSvg}
-      </svg>
+    ${meta}
+    <div class="hn-stack">
+      ${baseLayerBody}
+      ${strokesSvg ? `<svg class="hn-strokes-overlay" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${strokesSvg}</svg>` : ''}
     </div>
   `;
 
@@ -986,13 +988,14 @@ export const buildHardnoteHtml = (note: ExportHardnote, o: ExportOptions): strin
     .hn-meta { display:flex; flex-direction:column; gap:2mm; margin-bottom:4mm; }
     .hn-crumb { font-size:9pt; font-weight:800; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
     .hn-stats { display:flex; gap:3mm; flex-wrap:wrap; }
-    .hn-pill { font-size:8pt; font-weight:800; padding:1mm 3mm; border-radius:4mm; background:var(--accent); color:#ffffff; }
     .hn-pill-soft { font-size:8pt; font-weight:700; padding:1mm 3mm; border-radius:4mm; background:var(--rule); color:var(--fg); }
-    .hn-base-layer { border-left:4px solid #f59e0b; background:#fef3c7; padding:3mm 4mm; margin-bottom:5mm; color:#713f12; border-radius:2mm; }
-    .hn-base-label { font-size:8pt; font-weight:900; letter-spacing:1px; color:#b45309; margin-bottom:2mm; }
-    .hn-base-body { font-size:${o.fontSize}pt; line-height:1.45; }
-    .hn-canvas-wrap { border:1px solid var(--rule); border-radius:2mm; overflow:hidden; background:#ffffff; }
-    .hn-canvas-wrap svg { display:block; width:100%; height:auto; }
+    .hn-stack { position:relative; width:100%; background:transparent; }
+    .hn-base-body { font-size:${o.fontSize}pt; line-height:1.45; color:var(--fg); background:transparent; }
+    .hn-strokes-overlay {
+      position:absolute; top:0; left:0; right:0; bottom:0;
+      width:100%; height:100%;
+      pointer-events:none; overflow:visible;
+    }
   `;
 
   return wrap(

@@ -965,22 +965,33 @@ export const buildHardnoteHtml = (note: ExportHardnote, o: ExportOptions): strin
        </div>`
     : '';
 
-  // Plain markdown body — no yellow "QUIZ EXPLANATION" wrapper.
-  const baseLayerBody = note.baseLayerMarkdown
-    ? `<div class="hn-base-body">${renderInline(note.baseLayerMarkdown)}</div>`
-    : '<div class="hn-base-body"></div>';
+  // Pencil strokes and the markdown body are rendered INSIDE the same
+  // SVG via <foreignObject>, so both share the W×H coordinate space the
+  // stroke remap was computed in — strokes paint pixel-accurately on top
+  // of the words they were drawn on (instead of being stretched into a
+  // separate canvas).  We grow the viewBox height beyond `canvasHeight`
+  // when a stroke endpoint extends below it, so the auto-flowing markdown
+  // is never clipped above its host stroke.
+  let strokeMaxY = 0;
+  for (const s of note.strokes || []) {
+    if (!s || s.tool === 'eraser' || !s.points?.length) continue;
+    for (const p of s.points) if (p.y > strokeMaxY) strokeMaxY = p.y;
+  }
+  const Hgrow = Math.max(H, Math.ceil(strokeMaxY + 80));
 
-  // Pencil strokes are rendered as an absolutely-positioned SVG OVERLAY
-  // on top of the markdown, so each stroke sits over the words it was
-  // drawn on (instead of in a separate canvas below the text).  The SVG
-  // uses the same W×H viewBox as the editor canvas; with
-  // preserveAspectRatio="none" it stretches to fit the natural height of
-  // the rendered markdown so vertical alignment follows the text reflow.
+  const baseLayerInner = note.baseLayerMarkdown
+    ? renderInline(note.baseLayerMarkdown)
+    : '';
+
   const body = `
     ${meta}
     <div class="hn-stack">
-      ${baseLayerBody}
-      ${strokesSvg ? `<svg class="hn-strokes-overlay" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${strokesSvg}</svg>` : ''}
+      <svg class="hn-stack-svg" viewBox="0 0 ${W} ${Hgrow}" width="100%" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+        <foreignObject x="0" y="0" width="${W}" height="${Hgrow}">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="hn-base-body">${baseLayerInner}</div>
+        </foreignObject>
+        ${strokesSvg}
+      </svg>
     </div>
   `;
 
@@ -990,12 +1001,16 @@ export const buildHardnoteHtml = (note: ExportHardnote, o: ExportOptions): strin
     .hn-stats { display:flex; gap:3mm; flex-wrap:wrap; }
     .hn-pill-soft { font-size:8pt; font-weight:700; padding:1mm 3mm; border-radius:4mm; background:var(--rule); color:var(--fg); }
     .hn-stack { position:relative; width:100%; background:transparent; }
-    .hn-base-body { font-size:${o.fontSize}pt; line-height:1.45; color:var(--fg); background:transparent; }
-    .hn-strokes-overlay {
-      position:absolute; top:0; left:0; right:0; bottom:0;
-      width:100%; height:100%;
-      pointer-events:none; overflow:visible;
+    .hn-stack-svg { display:block; width:100%; height:auto; overflow:visible; background:transparent; }
+    .hn-base-body {
+      width:100%; box-sizing:border-box;
+      font-size:${o.fontSize}pt; line-height:1.45;
+      color:var(--fg); background:transparent;
+      font-family:${fontFamilyCss[o.fontFamily]};
+      margin:0; padding:0;
     }
+    .hn-base-body p, .hn-base-body div, .hn-base-body ul, .hn-base-body ol, .hn-base-body blockquote { margin:0 0 4px 0; }
+    .hn-base-body h1, .hn-base-body h2, .hn-base-body h3, .hn-base-body h4, .hn-base-body h5, .hn-base-body h6 { margin:8px 0 4px 0; }
   `;
 
   return wrap(

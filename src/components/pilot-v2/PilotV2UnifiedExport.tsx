@@ -68,6 +68,8 @@ const BLOCK_PASTEL_BY_TYPE: Record<PilotV2BlockType, string> = {
   code:      '#0b0f1710',
 };
 
+type PilotExportBgMode = 'none' | 'heading_quote';
+
 const blockToText = (b: PilotV2Block): string => {
   if (b.type === 'checklist') return `${b.checked ? '☑' : '☐'}  ${b.text || ''}`.trim();
   if (b.type === 'numbered')  return `1. ${b.text || ''}`.trim();
@@ -77,9 +79,26 @@ const blockToText = (b: PilotV2Block): string => {
   return (b.text || '').trim();
 };
 
-const adaptToExportNoteBlocks = (blocks: PilotV2Block[]): ExportNoteBlock[] => {
+const stripInlineBackground = (html: string): string => {
+  if (!html) return '';
+  return html
+    .replace(/<mark\b[^>]*>/gi, '')
+    .replace(/<\/mark>/gi, '')
+    .replace(/style="([^"]*)"/gi, (_m, s: string) => {
+      const next = s
+        .split(';')
+        .map((p) => p.trim())
+        .filter(Boolean)
+        .filter((p) => !/^background(-color)?\s*:/i.test(p))
+        .join('; ');
+      return next ? `style="${next}"` : '';
+    });
+};
+
+const adaptToExportNoteBlocks = (blocks: PilotV2Block[], bgMode: PilotExportBgMode): ExportNoteBlock[] => {
   return blocks.map((b) => {
-    const baseText = blockToText(b);
+    const rawText = blockToText(b);
+    const baseText = bgMode === 'none' ? stripInlineBackground(rawText) : rawText;
     if (b.type === 'heading') {
       return {
         id: b.id,
@@ -101,14 +120,15 @@ const adaptToExportNoteBlocks = (blocks: PilotV2Block[]): ExportNoteBlock[] => {
         id: b.id,
         type: 'highlight',
         text: baseText,
-        color: b.highlightColor || BLOCK_PASTEL_BY_TYPE.highlight,
+        color: bgMode === 'none' ? 'transparent' : (b.highlightColor || BLOCK_PASTEL_BY_TYPE.highlight),
       };
     }
+    const showBg = bgMode === 'heading_quote' && (b.type === 'quote' || b.type === 'heading');
     return {
       id: b.id,
       type: 'point',
       text: baseText,
-      color: BLOCK_PASTEL_BY_TYPE[b.type] ?? '#f3f4f6',
+      color: showBg ? (BLOCK_PASTEL_BY_TYPE[b.type] ?? '#f3f4f6') : 'transparent',
     };
   });
 };
@@ -154,6 +174,7 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
   // is at least one stroke captured on this page.
   const hasStrokes = strokes.length > 0;
   const [includeAnnotations, setIncludeAnnotations] = useState<boolean>(hasStrokes);
+  const [bgMode, setBgMode] = useState<PilotExportBgMode>('heading_quote');
 
   // Re-seed when sheet opens or blocks change
   useEffect(() => {
@@ -162,6 +183,7 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
       {} as Record<PilotV2BlockType, boolean>));
     setSelectedBlockIds(new Set(blocks.map((b) => b.id)));
     setIncludeAnnotations(hasStrokes);
+    setBgMode('heading_quote');
   }, [visible, blocks, hasStrokes]);
 
   // Filter blocks → adapted ExportNoteBlock[] for the engine
@@ -247,12 +269,12 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
     }
     return {
       kind: 'notes',
-      blocks: adaptToExportNoteBlocks(filteredBlocks),
+      blocks: adaptToExportNoteBlocks(filteredBlocks, bgMode),
     };
   }, [
     includeAnnotations, survivingStrokes, filteredBlocks, title,
     exportCanvasWidth, exportCanvasHeight, editorCanvasWidth, editorCanvasHeight,
-    initialOptions,
+    initialOptions, bgMode,
   ]);
 
   return (
@@ -273,6 +295,8 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
           hasStrokes={hasStrokes}
           includeAnnotations={includeAnnotations}
           setIncludeAnnotations={setIncludeAnnotations}
+          bgMode={bgMode}
+          setBgMode={setBgMode}
         />
       )}
     />
@@ -290,6 +314,8 @@ interface ExtraProps {
   hasStrokes: boolean;
   includeAnnotations: boolean;
   setIncludeAnnotations: React.Dispatch<React.SetStateAction<boolean>>;
+  bgMode: PilotExportBgMode;
+  setBgMode: React.Dispatch<React.SetStateAction<PilotExportBgMode>>;
 }
 
 const PilotV2ExtraFilters: React.FC<ExtraProps> = ({
@@ -301,6 +327,8 @@ const PilotV2ExtraFilters: React.FC<ExtraProps> = ({
   hasStrokes,
   includeAnnotations,
   setIncludeAnnotations,
+  bgMode,
+  setBgMode,
 }) => {
   const { colors } = useTheme();
 
@@ -348,6 +376,41 @@ const PilotV2ExtraFilters: React.FC<ExtraProps> = ({
       ) : null}
 
       {/* ── Block-type chips ─────────────────────────────────────────── */}
+      <Text
+        style={{
+          fontSize: 10, fontWeight: '900', color: colors.textTertiary,
+          letterSpacing: 1.2, marginTop: 2, marginBottom: 8, textTransform: 'uppercase',
+        }}
+      >
+        Background Mode
+      </Text>
+      <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+        <TouchableOpacity
+          onPress={() => setBgMode('none')}
+          style={{
+            paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, borderWidth: 1,
+            backgroundColor: bgMode === 'none' ? colors.primary : colors.surfaceStrong,
+            borderColor: bgMode === 'none' ? colors.primary : colors.border,
+          }}
+        >
+          <Text style={{ color: bgMode === 'none' ? '#fff' : colors.textPrimary, fontWeight: '800', fontSize: 12 }}>
+            A · No background
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setBgMode('heading_quote')}
+          style={{
+            paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, borderWidth: 1,
+            backgroundColor: bgMode === 'heading_quote' ? colors.primary : colors.surfaceStrong,
+            borderColor: bgMode === 'heading_quote' ? colors.primary : colors.border,
+          }}
+        >
+          <Text style={{ color: bgMode === 'heading_quote' ? '#fff' : colors.textPrimary, fontWeight: '800', fontSize: 12 }}>
+            B · Heading/Quote only
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <Text
         style={{
           fontSize: 10, fontWeight: '900', color: colors.textTertiary,

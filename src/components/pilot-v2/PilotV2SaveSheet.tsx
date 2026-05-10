@@ -17,11 +17,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity,
-  ScrollView, Platform, KeyboardAvoidingView, Alert, ActivityIndicator,
+  ScrollView, Platform, Alert, ActivityIndicator, Animated,
   useWindowDimensions, Keyboard,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Rocket, X, Plus, Wand2, Highlighter, Eraser } from 'lucide-react-native';
+import { Rocket, X, Plus, Wand2, Highlighter, Eraser, Undo2, Redo2 } from 'lucide-react-native';
 import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 import RichNoteEditor from '../RichNoteEditor';
 import { useTheme } from '../../context/ThemeContext';
@@ -139,6 +139,37 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const [allNodes, setAllNodes] = useState<PilotV2Node[]>([]);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const scrollRef = useRef<ScrollView | null>(null);
+  const [toolbarY, setToolbarY] = useState<number>(0);
+  const [topAreaH, setTopAreaH] = useState(0);
+  const topTranslate = useRef(new Animated.Value(0)).current;
+  const sheetTranslate = useRef(new Animated.Value(0)).current;
+
+  const historyRef = useRef<{ stack: string[]; idx: number }>({ stack: [], idx: -1 });
+  const lastSnapshotAt = useRef<number>(0);
+  const applyingHistory = useRef(false);
+
+  const pushHistory = (html: string) => {
+    const next = html || '';
+    const h = historyRef.current;
+    const cur = h.idx >= 0 ? h.stack[h.idx] : '';
+    if (cur === next) return;
+    // Drop redo branch
+    h.stack = h.idx >= 0 ? h.stack.slice(0, h.idx + 1) : [];
+    h.stack.push(next);
+    if (h.stack.length > 50) h.stack.shift();
+    h.idx = h.stack.length - 1;
+  };
+
+  const snapshotFromEditor = async () => {
+    try {
+      const html = await richRef.current?.getContentHtml?.();
+      if (typeof html === 'string') pushHistory(html);
+    } catch {
+      // ignore
+    }
+  };
 
   // Notebooks
   const [existingNotebooks, setExistingNotebooks] = useState<string[]>([]);
@@ -184,6 +215,8 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
       );
     })();
     setBody(initialBody || '');
+    // Initialize history with the opening body so undo works immediately
+    historyRef.current = { stack: [(initialBody || '')], idx: 0 };
     setSavedNoteId(null);
     setAppendCount(0);
     setEditorKey(k => k + 1);
@@ -193,10 +226,42 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   useEffect(() => {
     const showEvt = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
     const hideEvt = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-    const s = Keyboard.addListener(showEvt, () => setKeyboardOpen(true));
-    const h = Keyboard.addListener(hideEvt, () => setKeyboardOpen(false));
+    const s = Keyboard.addListener(showEvt, (e: any) => {
+      setKeyboardOpen(true);
+      const h = e?.endCoordinates?.height;
+      setKeyboardHeight(typeof h === 'number' ? h : 0);
+      // Smoothly roll header+chips into top edge (like Syllabus tracker)
+      Animated.timing(topTranslate, {
+        toValue: -Math.max(0, topAreaH + 14),
+        duration: 260,
+        useNativeDriver: true,
+      }).start(() => {
+        if (scrollRef.current && toolbarY > 0) {
+          (scrollRef.current as any).scrollTo({ y: Math.max(toolbarY - 12, 0), animated: true });
+        }
+      });
+      Animated.timing(sheetTranslate, {
+        toValue: -Math.min(160, (typeof h === 'number' ? h : 0) * 0.35),
+        duration: 260,
+        useNativeDriver: true,
+      }).start();
+    });
+    const h = Keyboard.addListener(hideEvt, () => {
+      setKeyboardOpen(false);
+      setKeyboardHeight(0);
+      Animated.timing(topTranslate, {
+        toValue: 0,
+        duration: 260,
+        useNativeDriver: true,
+      }).start();
+      Animated.timing(sheetTranslate, {
+        toValue: 0,
+        duration: 260,
+        useNativeDriver: true,
+      }).start();
+    });
     return () => { s.remove(); h.remove(); };
-  }, []);
+  }, [toolbarY, topAreaH, topTranslate, sheetTranslate]);
 
   const refreshHierarchy = async () => {
     if (!userId) return;
@@ -408,9 +473,9 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     styles.sheet,
     {
       width: isTablet ? '80%' : '92%',
-      height: keyboardOpen ? (isTablet ? '64%' : '60%') : (isTablet ? '82%' : '86%'),
+      height: isTablet ? '82%' : '86%',
       maxWidth: 980,
-      maxHeight: keyboardOpen ? 700 : 920,
+      maxHeight: 920,
       borderRadius: 28,
       paddingTop: 18,
       paddingHorizontal: 18,
@@ -421,34 +486,31 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={backdropStyle}>
         <TouchableOpacity activeOpacity={1} onPress={onClose} style={StyleSheet.absoluteFill} />
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 8 : 0}
-          style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: keyboardOpen ? 'flex-start' : 'center', paddingTop: keyboardOpen ? 12 : 0 }}
-        >
-          <View
-            testID="pilot-v2-save-sheet"
-            style={[sheetStyle, { backgroundColor: colors.surface }]}
-          >
-            {/* Header */}
-            <View style={styles.header}>
-              <View style={[styles.brand, { backgroundColor: '#5B4EFA' }]}>
-                <Rocket size={18} color="#fff" />
+        <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: keyboardOpen ? 'flex-start' : 'center', paddingTop: keyboardOpen ? 10 : 0 }}>
+          <Animated.View style={{ transform: [{ translateY: sheetTranslate }], width: '100%', alignItems: 'center' }}>
+            <View testID="pilot-v2-save-sheet" style={[sheetStyle, { backgroundColor: colors.surface }]}>
+            <Animated.View
+              style={{ transform: [{ translateY: topTranslate }], zIndex: 4 }}
+              onLayout={(e) => setTopAreaH(e.nativeEvent.layout.height)}
+            >
+              {/* Header */}
+              <View style={styles.header}>
+                <View style={[styles.brand, { backgroundColor: '#5B4EFA' }]}>
+                  <Rocket size={18} color="#fff" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.title, { color: colors.textPrimary }]}>Save to Pilot V2</Text>
+                  <Text style={[styles.subtitle, { color: colors.textTertiary }]}>
+                    Auto-routed by subject → topic → microtopic. Same path = same note.
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={onClose} testID="pilot-v2-save-close" style={styles.closeBtn}>
+                  <X size={20} color={colors.textPrimary} />
+                </TouchableOpacity>
               </View>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.title, { color: colors.textPrimary }]}>Save to Pilot V2</Text>
-                <Text style={[styles.subtitle, { color: colors.textTertiary }]}>
-                  Auto-routed by subject → topic → microtopic. Same path = same note.
-                </Text>
-              </View>
-              <TouchableOpacity onPress={onClose} testID="pilot-v2-save-close" style={styles.closeBtn}>
-                <X size={20} color={colors.textPrimary} />
-              </TouchableOpacity>
-            </View>
 
-            <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled">
-              {/* Cascade chips + directory controls */}
-              <View style={styles.formGroup}>
+              {/* Save path + directory controls */}
+              <View style={[styles.formGroup, { backgroundColor: colors.surface, paddingBottom: 10 }]}>
                 <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>Save path</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
                   <TouchableOpacity onPress={() => setActiveLevel('subject')} style={[styles.pathChip, { borderColor: '#8B5CF6', backgroundColor: '#EDE9FE' }]}><Text style={{ color: '#5B21B6', fontWeight: '800' }}>{subject || 'Subject'}</Text></TouchableOpacity>
@@ -499,65 +561,135 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                   </View>
                 )}
               </View>
+            </Animated.View>
 
-              <Text style={[styles.fieldLabel, { color: colors.textTertiary, marginTop: 12 }]}>Content</Text>
-              <View style={[styles.richShell, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}>
-                <View style={styles.toolbarWrap}>
-                  <RichToolbar
-                    getEditor={() => richRef.current}
-                    selectedIconTint="#5B4EFA"
-                    iconTint={colors.textPrimary}
-                    style={{ backgroundColor: 'transparent', height: 44 }}
-                    actions={[
-                      actions.setBold,
-                      actions.setItalic,
-                      actions.setUnderline,
-                      actions.setStrikethrough,
-                      actions.heading1,
-                      actions.heading2,
-                      actions.insertBulletsList,
-                      actions.insertOrderedList,
-                      actions.blockquote,
-                      'highlight',
-                    ]}
-                    iconMap={{
-                      [actions.heading1]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '900', fontSize: 13 }}>H1</Text>,
-                      [actions.heading2]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '800', fontSize: 11 }}>H2</Text>,
-                      highlight: ({ tintColor }: any) => (
-                        <View style={{ padding: 4, borderRadius: 4, backgroundColor: hlColor === 'transparent' ? 'transparent' : hlColor }}>
-                          <Highlighter size={15} color={tintColor} />
-                        </View>
-                      ),
-                    }}
-                    onPress={(action) => {
-                      if (action === 'highlight') {
-                        setShowHlPicker(v => !v);
-                        return;
+            <ScrollView
+              ref={(r) => { scrollRef.current = r as any; }}
+              style={{ flex: 1 }}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{ paddingBottom: Math.max(24, keyboardHeight ? keyboardHeight * 0.4 : 24) }}
+              stickyHeaderIndices={[0]}
+            >
+              {/* Sticky formatting toolbar */}
+              <View style={[styles.toolbarSticky, { backgroundColor: colors.surfaceStrong, borderBottomColor: colors.border }]}>
+                <RichToolbar
+                  getEditor={() => richRef.current}
+                  selectedIconTint="#5B4EFA"
+                  iconTint={colors.textPrimary}
+                  style={{ backgroundColor: 'transparent', height: 44 }}
+                  actions={[
+                    'undoLocal',
+                    'redoLocal',
+                    actions.setBold,
+                    actions.setItalic,
+                    actions.setUnderline,
+                    actions.setStrikethrough,
+                    actions.heading1,
+                    actions.heading2,
+                    actions.insertBulletsList,
+                    actions.insertOrderedList,
+                    actions.blockquote,
+                    'highlight',
+                  ]}
+                  iconMap={{
+                    undoLocal: ({ tintColor }: any) => <Undo2 size={16} color={tintColor} />,
+                    redoLocal: ({ tintColor }: any) => <Redo2 size={16} color={tintColor} />,
+                    [actions.heading1]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '900', fontSize: 13 }}>H1</Text>,
+                    [actions.heading2]: ({ tintColor }: any) => <Text style={{ color: tintColor, fontWeight: '800', fontSize: 11 }}>H2</Text>,
+                    highlight: ({ tintColor }: any) => (
+                      <View style={{ padding: 4, borderRadius: 4, backgroundColor: hlColor === 'transparent' ? 'transparent' : hlColor }}>
+                        <Highlighter size={15} color={tintColor} />
+                      </View>
+                    ),
+                  }}
+                  onPress={(action) => {
+                    const h = historyRef.current;
+                    if (action === 'undoLocal') {
+                      // Prefer editor-native undo (captures formatting operations reliably)
+                      richRef.current?.focusContentEditor?.();
+                      richRef.current?.sendAction?.(actions.undo);
+                      setTimeout(() => { snapshotFromEditor(); }, 180);
+                      // Fallback to local history if editor-native undo had no effect
+                      if (h.idx > 0) {
+                        const nextIdx = h.idx - 1;
+                        applyingHistory.current = true;
+                        h.idx = nextIdx;
+                        setBody(h.stack[nextIdx] || '');
+                        setEditorKey(k => k + 1);
+                        setTimeout(() => { applyingHistory.current = false; }, 60);
                       }
-                      if (action === actions.heading1) {
-                        richRef.current?.focusContentEditor?.();
-                        setTimeout(() => {
-                          richRef.current?.commandDOM?.(`
-                            (function(){
-                              const sel = window.getSelection();
+                      return;
+                    }
+                    if (action === 'redoLocal') {
+                      richRef.current?.focusContentEditor?.();
+                      richRef.current?.sendAction?.(actions.redo);
+                      setTimeout(() => { snapshotFromEditor(); }, 180);
+                      if (h.idx >= 0 && h.idx < h.stack.length - 1) {
+                        const nextIdx = h.idx + 1;
+                        applyingHistory.current = true;
+                        h.idx = nextIdx;
+                        setBody(h.stack[nextIdx] || '');
+                        setEditorKey(k => k + 1);
+                        setTimeout(() => { applyingHistory.current = false; }, 60);
+                      }
+                      return;
+                    }
+                    if (action === 'highlight') {
+                      richRef.current?.commandDOM?.(`
+                        (function(){
+                          try {
+                            const s = window.getSelection && window.getSelection();
+                            if (s && s.rangeCount) { window.__pv2_savedRange = s.getRangeAt(0); }
+                          } catch(e) {}
+                        })();
+                      `);
+                      setShowHlPicker(v => !v);
+                      return;
+                    }
+
+                    // Snapshot before applying formatting (so undo can revert immediately)
+                    pushHistory(body || '');
+                    richRef.current?.focusContentEditor?.();
+                    if (action === actions.heading1) {
+                      richRef.current?.commandDOM?.(`
+                        (function(){
+                          try {
+                            const s = window.getSelection && window.getSelection();
+                            if (s && s.rangeCount) { window.__pv2_savedRange = s.getRangeAt(0); }
+                          } catch(e) {}
+                        })();
+                      `);
+                      setTimeout(() => {
+                        richRef.current?.commandDOM?.(`
+                          (function(){
+                            try {
+                              const s = window.getSelection && window.getSelection();
+                              if (window.__pv2_savedRange && s) { s.removeAllRanges(); s.addRange(window.__pv2_savedRange); }
+                            } catch(e) {}
+                            try {
+                              const sel = window.getSelection && window.getSelection();
                               if (!sel || !sel.anchorNode) return;
                               let n = sel.anchorNode.nodeType===3 ? sel.anchorNode.parentElement : sel.anchorNode;
-                              while (n && n.tagName && n.tagName.toLowerCase() !== 'h1' && n.tagName.toLowerCase() !== 'div') n = n.parentElement;
+                              while (n && n.tagName && !['h1','p','div'].includes(n.tagName.toLowerCase())) n = n.parentElement;
                               if (n && n.tagName && n.tagName.toLowerCase() === 'h1') {
-                                document.execCommand('formatBlock', false, 'p');
+                                const p = document.createElement('p');
+                                p.innerHTML = n.innerHTML;
+                                n.parentNode && n.parentNode.replaceChild(p, n);
                               } else {
                                 document.execCommand('formatBlock', false, 'h1');
                               }
-                            })();
-                          `);
-                        }, 40);
-                        return;
-                      }
-                      richRef.current?.focusContentEditor?.();
-                      setTimeout(() => richRef.current?.sendAction?.(action as any), 50);
-                    }}
-                  />
-                </View>
+                            } catch(e) {}
+                          })();
+                        `);
+                        setTimeout(() => { snapshotFromEditor(); }, 120);
+                      }, 40);
+                      return;
+                    }
+
+                    richRef.current?.sendAction?.(action as any);
+                    setTimeout(() => { snapshotFromEditor(); }, 120);
+                  }}
+                />
                 {showHlPicker && (
                   <View style={styles.hlRow}>
                     {['transparent', '#FBCFE8', '#DDD6FE', '#BFDBFE', '#BBF7D0', '#FDE68A', '#FED7AA', '#CFFAFE', '#E9D5FF', '#FFF59D'].map(c => (
@@ -566,15 +698,70 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                         onPress={() => {
                           setHlColor(c);
                           setShowHlPicker(false);
+                          pushHistory(body || '');
                           richRef.current?.focusContentEditor?.();
                           setTimeout(() => {
-                            richRef.current?.commandDOM?.("document.execCommand('styleWithCSS', false, true)");
-                            if (c === 'transparent') {
-                              richRef.current?.commandDOM?.("document.execCommand('hiliteColor', false, 'transparent'); document.execCommand('backColor', false, 'transparent')");
-                            } else {
-                              richRef.current?.commandDOM?.(`document.execCommand('hiliteColor', false, '${c}'); document.execCommand('backColor', false, '${c}')`);
-                            }
-                          }, 50);
+                            richRef.current?.commandDOM?.(`
+                              (function(){
+                                try {
+                                  const s = window.getSelection && window.getSelection();
+                                  if (window.__pv2_savedRange && s) { s.removeAllRanges(); s.addRange(window.__pv2_savedRange); }
+                                } catch(e) {}
+                              })();
+                            `);
+                            richRef.current?.commandDOM?.(`
+                              (function(){
+                                const color = '${c === 'transparent' ? 'transparent' : c}';
+                                try {
+                                  const sel0 = window.getSelection && window.getSelection();
+                                  if (sel0 && sel0.rangeCount) {
+                                    const r0 = sel0.getRangeAt(0);
+                                    if (r0.collapsed && r0.startContainer && r0.startContainer.nodeType === 3) {
+                                      const text = r0.startContainer.textContent || '';
+                                      let s = r0.startOffset;
+                                      let e = r0.startOffset;
+                                      while (s > 0 && /[A-Za-z0-9_]/.test(text[s - 1])) s--;
+                                      while (e < text.length && /[A-Za-z0-9_]/.test(text[e])) e++;
+                                      if (e > s) {
+                                        const rr = document.createRange();
+                                        rr.setStart(r0.startContainer, s);
+                                        rr.setEnd(r0.startContainer, e);
+                                        sel0.removeAllRanges();
+                                        sel0.addRange(rr);
+                                      }
+                                    }
+                                  }
+                                } catch(e) {}
+                                try {
+                                  document.execCommand('styleWithCSS', false, true);
+                                  if (color === 'transparent') {
+                                    document.execCommand('hiliteColor', false, 'transparent');
+                                    document.execCommand('backColor', false, 'transparent');
+                                  } else {
+                                    document.execCommand('hiliteColor', false, color);
+                                    document.execCommand('backColor', false, color);
+                                  }
+                                } catch(e) {}
+                                try {
+                                  const sel = window.getSelection && window.getSelection();
+                                  if (!sel || sel.rangeCount === 0) return;
+                                  const range = sel.getRangeAt(0);
+                                  if (range.collapsed) return;
+                                  const span = document.createElement('span');
+                                  span.style.backgroundColor = color;
+                                  span.style.borderRadius = '2px';
+                                  span.style.padding = '0 2px';
+                                  try { range.surroundContents(span); }
+                                  catch(e) {
+                                    const frag = range.extractContents();
+                                    span.appendChild(frag);
+                                    range.insertNode(span);
+                                  }
+                                } catch(e) {}
+                              })();
+                            `);
+                            setTimeout(() => { snapshotFromEditor(); }, 120);
+                          }, 60);
                         }}
                         style={[styles.hlSwatch, { backgroundColor: c === 'transparent' ? colors.surface : c, borderColor: hlColor === c ? '#5B4EFA' : colors.border }]}
                       >
@@ -583,11 +770,29 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     ))}
                   </View>
                 )}
+              </View>
+
+              <Text style={[styles.fieldLabel, { color: colors.textTertiary, marginTop: 12 }]}>Content</Text>
+              <View style={[styles.richShell, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}>
+                <View onLayout={(e) => setToolbarY(e.nativeEvent.layout.y)} />
                 <RichNoteEditor
                   key={editorKey}
                   ref={richRef}
                   html={body}
-                  onChange={setBody}
+                  onChange={(next) => {
+                    setBody(next);
+                    if (applyingHistory.current) return;
+                    const now = Date.now();
+                    if (now - lastSnapshotAt.current < 600) return;
+                    lastSnapshotAt.current = now;
+                    pushHistory(next || '');
+                  }}
+                  onFocus={() => {
+                    setActiveLevel(null);
+                    if (scrollRef.current && toolbarY > 0) {
+                      (scrollRef.current as any).scrollTo({ y: Math.max(toolbarY - 10, 0), animated: true });
+                    }
+                  }}
                   themeColors={{
                     bg: colors.surfaceStrong,
                     surface: colors.surface,
@@ -595,7 +800,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     border: colors.border,
                     primary: '#5B4EFA',
                   }}
-                  editorStyle={{ minHeight: keyboardOpen ? 180 : 320 }}
+                  editorStyle={{ minHeight: keyboardOpen ? 260 : 320 }}
                   placeholder="Edit explanation — bold, lists, and highlights match Pilot notes."
                 />
                 <TouchableOpacity onPress={addSectionBreak} style={styles.splitBtn}>
@@ -686,8 +891,9 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                 setMoveOpen(false);
               }}
             />
-          </View>
-        </KeyboardAvoidingView>
+            </View>
+          </Animated.View>
+        </View>
       </View>
     </Modal>
   );
@@ -698,7 +904,13 @@ const styles = StyleSheet.create({
   pathChip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1 },
   selectorCard: { borderWidth: 1, borderRadius: 12, padding: 10, marginTop: 10 },
   selectorItem: { paddingVertical: 10, borderBottomWidth: 1 },
-  sheet: { width: '94%', maxWidth: 520, borderRadius: 28, padding: 18, paddingBottom: 22 },
+  sheet: { width: '94%', maxWidth: 520, borderRadius: 28, padding: 18, paddingBottom: 22, overflow: 'hidden' },
+  toolbarSticky: {
+    borderBottomWidth: 1,
+    paddingTop: 2,
+    paddingBottom: 2,
+    marginBottom: 8,
+  },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
   brand: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 16, fontWeight: '900' },

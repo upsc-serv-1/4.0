@@ -121,6 +121,11 @@ export function PilotV2GlanceView() {
 
   /* ── Pencil overlay (Step 6) — drawable EVERYWHERE in glance view ─── */
   const [paperSize, setPaperSize] = useState({ w: 1, h: 1 });
+  /** Block layout map — keyed by block.id, same shape as EditorView.
+   *  Populated by per-block onLayout wrappers; feeds PencilCanvas so
+   *  anchored strokes follow block reorders in the read-only view (Step 10). */
+  const blockLayoutsRef = useRef<Map<string, { y: number; h: number }>>(new Map());
+  const [blockLayoutVersion, setBlockLayoutVersion] = useState(0);
   const initialStrokes = (note?.content?.pencilStrokes ?? []) as PilotV2PencilStroke[];
   const persistGlanceStrokes = useCallback((next: PilotV2PencilStroke[]) => {
     if (!note?.id) return;
@@ -602,7 +607,21 @@ export function PilotV2GlanceView() {
                 onLayout={(e) => setPaperSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
               >
                 {blocks.map(b => (
-                  <BlockRenderer key={b.id} block={b} colors={colors} />
+                  <View
+                    key={b.id}
+                    onLayout={(e) => {
+                      const { y, height: h } = e.nativeEvent.layout;
+                      const cur = blockLayoutsRef.current.get(b.id);
+                      blockLayoutsRef.current.set(b.id, { y, h });
+                      // Only bump version when position changes noticeably to
+                      // avoid spurious CommittedStrokesLayer invalidations.
+                      if (!cur || Math.abs(cur.y - y) > 2 || Math.abs(cur.h - h) > 2) {
+                        setBlockLayoutVersion(v => v + 1);
+                      }
+                    }}
+                  >
+                    <BlockRenderer block={b} colors={colors} />
+                  </View>
                 ))}
                 <View style={[styles.divider, { backgroundColor: colors.border }]} />
                 <Text style={[styles.eog, { color: colors.textTertiary }]}>— End of Glance —</Text>
@@ -614,6 +633,8 @@ export function PilotV2GlanceView() {
                     height={paperSize.h}
                     drawingMode={pencil.drawingMode}
                     onCommit={persistGlanceStrokes}
+                    blockLayouts={blockLayoutsRef.current}
+                    blockLayoutVersion={blockLayoutVersion}
                   />
                 )}
 

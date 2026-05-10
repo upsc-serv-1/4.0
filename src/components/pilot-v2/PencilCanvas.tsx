@@ -367,21 +367,18 @@ function SelectionPill({ bounds, width, height, count, onMove, onDelete, onDismi
   const top = Math.max(8, bounds.y * height - 40);
 
   const dragGesture = useMemo(() => {
-    let lastX = 0;
-    let lastY = 0;
     return Gesture.Pan()
-      .onBegin(() => {
-        'worklet';
-        lastX = 0;
-        lastY = 0;
-      })
       .onUpdate((e) => {
         'worklet';
-        const dx = e.translationX - lastX;
-        const dy = e.translationY - lastY;
-        lastX = e.translationX;
-        lastY = e.translationY;
-        runOnJS(onMove)(dx, dy);
+        // Use RNGH's incremental delta (changeX/changeY) — this is the
+        // distance since the previous update event, perfect for translating
+        // the selection by exactly what the finger moved on this frame.
+        // The previous implementation used mutable closure vars (let lastX)
+        // which DO NOT persist reliably across worklet invocations — each
+        // update saw lastX=0 and applied the cumulative translationX as a
+        // delta, causing strokes to teleport / clamp to the canvas corner
+        // (visually appearing to "delete themselves").
+        runOnJS(onMove)(e.changeX, e.changeY);
       });
   }, [onMove]);
 

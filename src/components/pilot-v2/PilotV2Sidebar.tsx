@@ -423,6 +423,7 @@ function PilotV2SidebarHome() {
   }, [state.notes, subjectsList]);
 
   const toggleTopic = (id: string) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpanded(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
@@ -451,6 +452,7 @@ function PilotV2SidebarHome() {
   };
 
   const toggleSubjectExpanded = (subjId: string) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpandedSubjects(prev => {
       const isCurrentlyExpanded = prev.includes(subjId);
       const newExpanded = isCurrentlyExpanded ? prev.filter(id => id !== subjId) : [...prev, subjId];

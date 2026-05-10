@@ -23,7 +23,7 @@ import RenderHtml from 'react-native-render-html';
 import {
   View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity,
   KeyboardAvoidingView, Platform, useWindowDimensions, Modal, Alert, Linking,
-  Image, Animated, StatusBar, PanResponder,
+  Image, Animated, StatusBar, PanResponder, ActivityIndicator,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import {
@@ -32,6 +32,8 @@ import {
   Paperclip, Table as TableIcon, Code, Type, ChevronDown, ChevronLeft, ChevronRight, Highlighter, Plus, Trash2, ArrowUp, ArrowDown, Edit3, Quote, MoreHorizontal,
   Pen,
 } from 'lucide-react-native';
+import { RichToolbar, actions } from 'react-native-pell-rich-editor';
+import RichNoteEditor from '../RichNoteEditor';
 import { useTheme } from '../../context/ThemeContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
 import {
@@ -296,6 +298,36 @@ export function PilotV2EditorView() {
     setTableEditor({ visible: false, blockId: null, rows: [] });
   };
 
+  const openBlockEditSheet = (blockId: string) => {
+    const target = blocks.find((b) => b.id === blockId);
+    if (!target) return;
+    const normalizedBody = (target.text || '').trim().startsWith('<')
+      ? (target.text || '')
+      : `<p>${(target.text || '').replace(/\n/g, '<br/>')}</p>`;
+    setBlockEditSheet({
+      visible: true,
+      blockId,
+      body: normalizedBody,
+    });
+    setBlockEditKey((k) => k + 1);
+  };
+
+  const applyBlockEditSheet = async () => {
+    if (!blockEditSheet.blockId) return;
+    setBlockEditSaving(true);
+    try {
+      let html = blockEditSheet.body || '';
+      try {
+        const fromEditor = await blockEditRef.current?.getContentHtml?.();
+        if (typeof fromEditor === 'string') html = fromEditor;
+      } catch {}
+      updateBlock(blockEditSheet.blockId, { text: html });
+      setBlockEditSheet({ visible: false, blockId: null, body: '' });
+    } finally {
+      setBlockEditSaving(false);
+    }
+  };
+
   /* --------------- Link / Image / Calendar / Attachment / Table / Code --------------- */
   const [linkModal, setLinkModal] = useState<{ visible: boolean; text: string; url: string }>({
     visible: false, text: '', url: '',
@@ -423,6 +455,14 @@ export function PilotV2EditorView() {
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [outlinePanelOpen, setOutlinePanelOpen] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
+  const [blockEditSheet, setBlockEditSheet] = useState<{ visible: boolean; blockId: string | null; body: string }>({
+    visible: false,
+    blockId: null,
+    body: '',
+  });
+  const [blockEditSaving, setBlockEditSaving] = useState(false);
+  const [blockEditKey, setBlockEditKey] = useState(0);
+  const blockEditRef = useRef<any>(null);
 
   /* --------------- Pencil annotation overlay (Step 5+6) --------------- */
   const [paperSize, setPaperSize] = useState({ w: 1, h: 1 });
@@ -786,6 +826,7 @@ export function PilotV2EditorView() {
                 onMoveUp={() => moveBlock(b.id, 'up')}
                 onMoveDown={() => moveBlock(b.id, 'down')}
                 onEditTable={() => (b.tableRows?.length ? openTableEditor(b.id, b.tableRows) : null)}
+                onOpenAdvancedEdit={() => openBlockEditSheet(b.id)}
                 onBlockLayout={(id, x, y, w, h) => {
                   const cur = blockLayoutsRef.current.get(id);
                   blockLayoutsRef.current.set(id, { x, y, w, h });
@@ -1062,6 +1103,65 @@ export function PilotV2EditorView() {
         </View>
       </Modal>
 
+      {/* Block edit sheet (rich editor for selected block only) */}
+      <Modal
+        visible={blockEditSheet.visible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setBlockEditSheet({ visible: false, blockId: null, body: '' })}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalCard, { borderColor: colors.border, maxWidth: 760, maxHeight: '86%' }]}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Edit block</Text>
+              <TouchableOpacity onPress={() => setBlockEditSheet({ visible: false, blockId: null, body: '' })}>
+                <X size={18} color={colors.textPrimary} />
+              </TouchableOpacity>
+            </View>
+            <View style={{ borderWidth: 1, borderColor: colors.border, borderRadius: 10, overflow: 'hidden' }}>
+              <RichToolbar
+                getEditor={() => blockEditRef.current}
+                selectedIconTint="#5B4EFA"
+                iconTint={colors.textPrimary}
+                style={{ backgroundColor: colors.surfaceStrong, height: 42 }}
+                actions={[
+                  actions.setBold,
+                  actions.setItalic,
+                  actions.setUnderline,
+                  actions.heading1,
+                  actions.heading2,
+                  actions.insertBulletsList,
+                  actions.insertOrderedList,
+                ]}
+              />
+              <RichNoteEditor
+                key={`block-edit-${blockEditKey}`}
+                ref={blockEditRef}
+                html={blockEditSheet.body}
+                onChange={(v) => setBlockEditSheet((s) => ({ ...s, body: v }))}
+                themeColors={{
+                  bg: colors.surfaceStrong,
+                  surface: colors.surface,
+                  textPrimary: colors.textPrimary,
+                  border: colors.border,
+                  primary: '#5B4EFA',
+                }}
+                editorStyle={{ minHeight: 280 }}
+                placeholder="Edit this block with full formatting."
+              />
+            </View>
+            <View style={styles.modalActions}>
+              <TouchableOpacity onPress={() => setBlockEditSheet({ visible: false, blockId: null, body: '' })} style={styles.modalBtnGhost}>
+                <Text style={{ color: colors.textSecondary, fontWeight: '700' }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={applyBlockEditSheet} style={[styles.modalBtnPrimary, { backgroundColor: '#5B4EFA' }]} disabled={blockEditSaving}>
+                {blockEditSaving ? <ActivityIndicator size="small" color="#fff" /> : <Text style={{ color: '#fff', fontWeight: '800' }}>Apply to Block</Text>}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       {/* ── Pencil mode FAB ─────────────────────────────────────────── */}
       <TouchableOpacity
         testID="pilot-v2-pencil-fab"
@@ -1194,11 +1294,12 @@ interface BlockRowProps {
   onMoveUp: () => void;
   onMoveDown: () => void;
   onEditTable: () => void;
+  onOpenAdvancedEdit: () => void;
   /** Called when the block's layout changes — used for block-level anchoring. */
   onBlockLayout: (id: string, x: number, y: number, w: number, h: number) => void;
 }
 
-function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onToggleCheck, onDelete, onMoveUp, onMoveDown, onEditTable, onBlockLayout }: BlockRowProps) {
+function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onToggleCheck, onDelete, onMoveUp, onMoveDown, onEditTable, onOpenAdvancedEdit, onBlockLayout }: BlockRowProps) {
   const { width } = useWindowDimensions();
   const baseFs = block.type === 'heading'
     ? block.level === 1 ? 24 : 18
@@ -1371,6 +1472,9 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
       </View>
 
       <View style={{ flexDirection: 'row', gap: 2, alignSelf: 'flex-end', marginTop: 4, marginRight: 8, opacity: isActive ? 1 : 0.35 }}>
+        <TouchableOpacity testID={`pilot-v2-block-advanced-edit-${block.id}`} onPress={onOpenAdvancedEdit} hitSlop={6} style={styles.iconBtn}>
+          <Edit3 size={14} color={colors.textTertiary} />
+        </TouchableOpacity>
         <TouchableOpacity testID={`pilot-v2-block-moveup-${block.id}`} onPress={onMoveUp} hitSlop={6} style={styles.iconBtn}>
           <ArrowUp size={14} color={colors.textTertiary} />
         </TouchableOpacity>

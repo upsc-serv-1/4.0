@@ -10,7 +10,7 @@
  */
 import React, { useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, useWindowDimensions, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, Menu, ChevronRight } from 'lucide-react-native';
 import { useTheme } from '../../src/context/ThemeContext';
@@ -35,6 +35,7 @@ function PilotV2Inner() {
   const router = useRouter();
   const userId = session?.user?.id;
   const { state, dispatch } = usePilotV2();
+  const params = useLocalSearchParams<{ noteId?: string }>();
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
 
@@ -89,6 +90,17 @@ function PilotV2Inner() {
     load();
     return () => { cancelled = true; };
   }, [userId, dispatch]);
+
+  // Deep-link support: open a specific Pilot V2 note when coming from Home
+  // recent-notes cards.
+  useEffect(() => {
+    const targetId = params.noteId;
+    if (!targetId || !state.notes?.length) return;
+    const exists = state.notes.some((n) => n.id === targetId);
+    if (!exists) return;
+    dispatch({ type: 'SET_CURRENT_NOTE_ID', payload: targetId });
+    dispatch({ type: 'SET_VIEW_MODE', payload: 'glance' });
+  }, [params.noteId, state.notes, dispatch]);
 
   const sidebarMode = state.view.mode === 'dashboard' ? 'home' : 'subject';
   const showSidebar = state.view.mode !== 'editor' && !state.view.sidebarCollapsed;

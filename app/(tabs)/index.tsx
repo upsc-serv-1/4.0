@@ -1,29 +1,26 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Modal, Pressable, FlatList, Vibration, useWindowDimensions, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Modal, Pressable, FlatList, Vibration, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform, useWindowDimensions } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import {
-  TrendingUp, Target, BookOpen, BarChart3, ChevronRight, Layout, Play, Clock,
-  RotateCcw, Zap, History, Plus, GripVertical, Sliders, CheckCircle2, Shuffle,
-  Search as SearchIcon, FileText, Tag, Layers, Star, Award, Brain
+  BookOpen, BarChart3, Play, Clock,
+  RotateCcw, Zap, Sliders, FileText, Tag, Award, Brain
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../../src/lib/supabase';
 import { useAuth } from '../../src/context/AuthContext';
-import { radius, spacing } from '../../src/theme';
 import { cacheGet, cacheSet } from '../../src/lib/cache';
 import { useTheme } from '../../src/context/ThemeContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
 import { SyllabusService } from '../../src/services/SyllabusService';
-import { MICRO_SYLLABUS, OPTIONAL_SUBJECTS } from '../../src/data/syllabus';
+import { MICRO_SYLLABUS } from '../../src/data/syllabus';
+import { fetchPilotV2NotesForUser } from '../../src/repositories/pilotV2Repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Check, X, Settings } from 'lucide-react-native';
+import { Check, X } from 'lucide-react-native';
 import { Alert } from 'react-native';
 import { WidgetService, Widget } from '../../src/services/WidgetService';
 import { useWidgetData } from '../../src/hooks/useWidgetData';
 import { WidgetRenderer } from '../../src/components/widgets/WidgetRenderer';
-import { GlobalSearchBar } from '../../src/components/GlobalSearchBar';
-import { buildArenaEngineSearchParams } from '../../src/utils/arenaSearchNavigation';
 import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
 
 type Stats = {
@@ -53,10 +50,13 @@ export default function Home() {
   const { session } = useAuth();
   const { width: windowWidth } = useWindowDimensions();
   const userId = session?.user.id;
-  const name = (session?.user.user_metadata as any)?.display_name || session?.user.email?.split('@')[0] || 'Aspirant';
-
-  const CARD_GAP = 12;
-  const CARD_WIDTH = (windowWidth - spacing.lg * 2 - CARD_GAP) / 2;
+  const [displayName, setDisplayName] = useState(
+    (session?.user.user_metadata as any)?.display_name || session?.user.email?.split('@')[0] || 'Aspirant'
+  );
+  const name = displayName;
+  const pulseCardGap = 12;
+  const pulseColumns = windowWidth >= 900 ? 4 : 2;
+  const pulseTileWidth = (windowWidth - 40 - pulseCardGap * (pulseColumns - 1)) / pulseColumns;
 
   const [stats, setStats] = useState<Stats>({
     attempts: 0, accuracy: 0, dueCards: 0, totalNotes: 0, streak: 5, syllabusPercent: 0, subjectProgress: []
@@ -101,6 +101,13 @@ export default function Home() {
     if (userId) WidgetService.list(userId).then(setWidgets);
   }, [userId]);
 
+  useFocusEffect(useCallback(() => {
+    AsyncStorage.getItem('profile_display_name').then((v) => {
+      if (v && v.trim()) setDisplayName(v.trim());
+      else setDisplayName((session?.user.user_metadata as any)?.display_name || session?.user.email?.split('@')[0] || 'Aspirant');
+    });
+  }, [session]));
+
   const load = useCallback(async () => {
     if (!userId) return;
     const cached = await cacheGet<Stats>(`home:${userId}`);
@@ -111,7 +118,6 @@ export default function Home() {
         { data: qs },
         { count: notesCount },
         { count: cardsCount },
-        { data: notesData },
         { data: tagsData }
       ] = await Promise.all([
         supabase.from('question_states').select('is_incorrect_last_attempt').eq('user_id', userId),
@@ -121,12 +127,6 @@ export default function Home() {
           .eq('status', 'active')
           .not('next_review', 'is', null)
           .lte('next_review', new Date().toISOString()),
-        supabase.from('user_note_nodes')
-          .select('id, title, type, updated_at, note_id')
-          .eq('user_id', userId)
-          .in('type', ['note', 'notebook'])
-          .order('updated_at', { ascending: false })
-          .limit(6),
         supabase.from('user_tags')
           .select('name, usage_count')
           .eq('user_id', userId)
@@ -134,7 +134,16 @@ export default function Home() {
           .limit(8)
       ]);
 
-      if (notesData) setRecentNotes(notesData as NoteNode[]);
+      // Recent notes on Home should come from Pilot V2 notebooks only.
+      const pilotNotes = await fetchPilotV2NotesForUser(userId);
+      const mapped: NoteNode[] = (pilotNotes || []).slice(0, 8).map((n: any) => ({
+        id: n.id,
+        title: n.title || 'Untitled',
+        type: 'note',
+        updated_at: n.updated_at,
+        note_id: n.id,
+      }));
+      setRecentNotes(mapped);
       if (tagsData) setTopTags(tagsData.map(t => ({ name: t.name, count: t.usage_count || 0 })));
 
       const total = qs?.length || 0;
@@ -258,7 +267,7 @@ export default function Home() {
   const renderNoteCard = ({ item }: { item: NoteNode }) => (
     <TouchableOpacity
       style={[styles.noteCard, { borderColor: colors.border, backgroundColor: colors.surface }]}
-      onPress={() => router.push({ pathname: '/notes/editor', params: { id: item.note_id } })}
+      onPress={() => router.push({ pathname: '/pilot-v2', params: { noteId: item.note_id || item.id } } as any)}
     >
       <LinearGradient colors={[colors.primary + '10', 'transparent']} style={styles.cardGlow} />
       <View style={styles.glassFill}>
@@ -332,45 +341,41 @@ export default function Home() {
               </View>
 
               <View style={styles.pulseGrid}>
-                <TouchableOpacity style={[styles.pulseCard, { width: CARD_WIDTH, borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => router.push('/flashcards/review')}>
-                  <LinearGradient colors={['rgba(255,149,0,0.15)', 'transparent']} style={styles.cardGlow} />
-                  <View style={[styles.iconCircle, { backgroundColor: '#FF950020' }]}>
-                    <RotateCcw size={20} color="#FF9500" />
+                <TouchableOpacity style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => router.push('/pilot-v2')}>
+                  <View style={[styles.resumeIconWrap, { backgroundColor: '#EC489920' }]}>
+                    <BookOpen size={20} color="#EC4899" />
                   </View>
-                  <View style={styles.pulseInfo}>
-                    <Text style={[styles.pulseVal, { color: colors.textPrimary }]}>{stats.dueCards}</Text>
-                    <Text style={[styles.pulseLab, { color: colors.textSecondary }]}>Due Cards</Text>
-                  </View>
-                  <ChevronRight size={14} color={colors.textTertiary} />
+                  <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>Pilot V2</Text>
+                  <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Structured Notes</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.pulseCard, { width: CARD_WIDTH, borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => router.push('/tracker')}>
-                  <LinearGradient colors={['rgba(52,199,89,0.15)', 'transparent']} style={styles.cardGlow} />
-                  <View style={[styles.iconCircle, { backgroundColor: '#34C75920' }]}>
-                    <Target size={20} color="#34C759" />
+                <TouchableOpacity style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => router.push('/analyse')}>
+                  <View style={[styles.resumeIconWrap, { backgroundColor: '#34C75920' }]}>
+                    <BarChart3 size={20} color="#34C759" />
                   </View>
-                  <View style={styles.pulseInfo}>
-                    <Text style={[styles.pulseVal, { color: colors.textPrimary }]}>{stats.syllabusPercent}%</Text>
-                    <Text style={[styles.pulseLab, { color: colors.textSecondary }]}>Syllabus</Text>
+                  <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>Analyse</Text>
+                  <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Performance</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => router.push('/flashcards/review')}>
+                  <View style={[styles.resumeIconWrap, { backgroundColor: '#F59E0B20' }]}>
+                    <RotateCcw size={20} color="#F59E0B" />
                   </View>
-                  <ChevronRight size={14} color={colors.textTertiary} />
+                  <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>{stats.dueCards}</Text>
+                  <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Due Cards</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => setPyqPickerVisible(true)}>
+                  <View style={[styles.resumeIconWrap, { backgroundColor: '#6366F120' }]}>
+                    <Play size={20} color="#4F46E5" />
+                  </View>
+                  <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>{pyqQuestionCount}</Text>
+                  <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Random PYQ</Text>
                 </TouchableOpacity>
               </View>
             </View>
 
-            {/* 3. Resume Study Section */}
-            <View style={styles.resumeContainer}>
-              <Text style={[styles.sectionLabel, { color: colors.textTertiary, marginLeft: 20 }]}>RESUME STUDY</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.resumeScroll}>
-                <ResumeAction icon={<Layout size={20} color="#007AFF" />} title="Tracker" sub="Daily Syllabus" onPress={() => router.push('/tracker')} colors={colors} />
-                <ResumeAction icon={<Layers size={20} color="#AF52DE" />} title="Flashcards" sub="Smart Review" onPress={() => router.push('/flashcards')} colors={colors} />
-                <ResumeAction icon={<BookOpen size={20} color="#EC4899" />} title="Softnotes" sub="Handwritten" onPress={() => router.push('/softnotes')} colors={colors} />
-                <ResumeAction icon={<BarChart3 size={20} color="#34C759" />} title="Analyse" sub="Performance" onPress={() => router.push('/analyse')} colors={colors} />
-                <ResumeAction icon={<History size={20} color="#FF9500" />} title="Archive" sub="Review PYQs" onPress={() => router.push('/pyq')} colors={colors} />
-              </ScrollView>
-            </View>
-
-            {/* 4. Syllabus Tracker Widget */}
+            {/* 3. Syllabus Tracker Widget */}
             <TouchableOpacity
               style={[styles.trackerWidget, { backgroundColor: colors.surface, borderColor: colors.border }]}
               onLongPress={() => setConfigVisible(true)}
@@ -384,7 +389,7 @@ export default function Home() {
                 <View style={{ flex: 1, marginLeft: 16 }}>
                   <Text style={[styles.trackerTitle, { color: colors.textPrimary }]}>Syllabus Mastery</Text>
                   <View style={[styles.catBadge, { backgroundColor: colors.primary + '15' }]}>
-                    <Text style={[styles.catText, { color: colors.primary }]}>{widgetCategory.toUpperCase()}</Text>
+                    <Text style={[styles.badgeCatText, { color: colors.primary }]}>{widgetCategory.toUpperCase()}</Text>
                   </View>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
@@ -393,29 +398,31 @@ export default function Home() {
                 </View>
               </View>
               <View style={styles.subjectList}>
-                {stats.subjectProgress.slice(0, 3).map(sp => (
-                  <View key={sp.label} style={styles.subItemRow}>
-                    <View style={styles.subTextRow}>
-                      <Text style={[styles.subName, { color: colors.textSecondary }]} numberOfLines={1}>{sp.label}</Text>
-                      <Text style={[styles.subPer, { color: colors.textTertiary }]}>{Math.round(sp.progress * 100)}%</Text>
+                <View style={styles.subjectGrid}>
+                  {stats.subjectProgress.slice(0, 8).map(sp => (
+                    <View key={sp.label} style={styles.subItemRow}>
+                      <View style={styles.subTextRow}>
+                        <Text style={[styles.subName, { color: colors.textSecondary }]} numberOfLines={1}>{sp.label}</Text>
+                        <Text style={[styles.subPer, { color: colors.textTertiary }]}>{Math.round(sp.progress * 100)}%</Text>
+                      </View>
+                      <View style={[styles.barBase, { backgroundColor: colors.border + '50' }]}>
+                        <LinearGradient
+                          colors={[sp.color, sp.color + '90']}
+                          start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                          style={[styles.barInner, { width: `${Math.max(sp.progress * 100, 5)}%` }]}
+                        />
+                      </View>
                     </View>
-                    <View style={[styles.barBase, { backgroundColor: colors.border + '50' }]}>
-                      <LinearGradient
-                        colors={[sp.color, sp.color + '90']}
-                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                        style={[styles.barInner, { width: `${Math.max(sp.progress * 100, 5)}%` }]}
-                      />
-                    </View>
-                  </View>
-                ))}
+                  ))}
+                </View>
               </View>
             </TouchableOpacity>
 
-            {/* 5. Recent Notes Carousel */}
+            {/* 4. Recent Notes Carousel */}
             <View style={styles.notesSection}>
               <View style={styles.sectionHeaderWide}>
-                <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>RECENT NOTES</Text>
-                <TouchableOpacity onPress={() => router.push('/notes')}><Text style={{ color: colors.primary, fontSize: 12, fontWeight: '700' }}>View All</Text></TouchableOpacity>
+                <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>RECENT NOTES (PILOT V2)</Text>
+                <TouchableOpacity onPress={() => router.push('/pilot-v2')}><Text style={{ color: colors.primary, fontSize: 12, fontWeight: '700' }}>Open Pilot V2</Text></TouchableOpacity>
               </View>
               <FlatList
                 horizontal
@@ -427,7 +434,7 @@ export default function Home() {
               />
             </View>
 
-            {/* 6. Quick Tags Chips */}
+            {/* 5. Quick Tags Chips */}
             <View style={styles.tagsSection}>
               <Text style={[styles.sectionLabel, { color: colors.textTertiary, marginLeft: 20 }]}>TOP TAGS</Text>
               <View style={styles.tagCloud}>
@@ -435,7 +442,7 @@ export default function Home() {
                   const tagColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
                   const tagColor = tagColors[idx % tagColors.length];
                   return (
-                    <TouchableOpacity key={tag.name} style={[styles.tagChip, { backgroundColor: colors.surface, borderColor: tagColor + '30' }]} onPress={() => router.push({ pathname: '/unified/arena', params: { tab: 'search', query: tag.name } } as any)}>
+                    <TouchableOpacity key={tag.name} style={[styles.tagChip, { backgroundColor: colors.surface, borderColor: tagColor + '30' }]} onPress={() => router.push({ pathname: '/unified/arena', params: { tab: 'topic', tags: tag.name, autorun: 'learn' } } as any)}>
                       <Tag size={12} color={tagColor} />
                       <Text style={[styles.tagName, { color: colors.textPrimary }]}>{tag.name}</Text>
                       <View style={{ backgroundColor: tagColor + '15', paddingHorizontal: 5, paddingVertical: 1, borderRadius: 6 }}>
@@ -444,38 +451,15 @@ export default function Home() {
                     </TouchableOpacity>
                   );
                 })}
-                <TouchableOpacity style={[styles.tagChip, { backgroundColor: colors.primary + '05', borderColor: colors.primary + '40', borderStyle: 'dashed' }]} onPress={() => router.push('/tags')}>
-                  <Plus size={14} color={colors.primary} />
-                  <Text style={[styles.tagName, { color: colors.primary }]}>View All Tags</Text>
-                </TouchableOpacity>
               </View>
             </View>
-
-            {/* 7. Random PYQ Test Widget */}
-            <TouchableOpacity style={styles.pyqBanner} onPress={() => setPyqPickerVisible(true)}>
-              <LinearGradient colors={['#0f172a', '#1e293b']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.pyqBannerInner}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.pyqBannerTitle}>Random PYQ Test</Text>
-                  <Text style={styles.pyqBannerSub}>UPSC CSE 2013-2024</Text>
-                  <View style={styles.pyqMeta}>
-                    <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' }}>
-                      <Clock size={12} color="#fff" />
-                    </View>
-                    <Text style={styles.pyqMetaText}>Timed Exam Mode</Text>
-                  </View>
-                </View>
-                <View style={styles.pyqActionBtn}>
-                  <Play size={24} color="#04223a" fill="#04223a" />
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
 
             <Text style={[styles.sectionLabel, { color: colors.textTertiary, marginLeft: 20, marginTop: 32 }]}>MY CUSTOM WIDGETS</Text>
           </>
         )}
-        renderItem={({ item, drag, isActive }) => (
+        renderItem={({ item, drag }) => (
           <ScaleDecorator>
-            <TouchableOpacity onLongPress={drag} style={{ paddingHorizontal: 20, marginBottom: 12 }}>
+            <TouchableOpacity onLongPress={drag} style={styles.customWidgetItem}>
               <WidgetRenderer widgetKey={item.widget_key} data={widgetData} onArchive={() => WidgetService.archive(userId!, item.id).then(load)} />
             </TouchableOpacity>
           </ScaleDecorator>
@@ -551,18 +535,6 @@ export default function Home() {
   );
 }
 
-function ResumeAction({ icon, title, sub, onPress, colors }: any) {
-  return (
-    <TouchableOpacity style={[styles.resumeBtn, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={onPress}>
-      <View style={styles.resumeIconWrap}>{icon}</View>
-      <View>
-        <Text style={[styles.resumeTitle, { color: colors.textPrimary }]}>{title}</Text>
-        <Text style={[styles.resumeSub, { color: colors.textTertiary }]}>{sub}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-}
-
 function WidgetConfigModal({ visible, onClose, onSave, category, setCategory, selectedSubjects, setSelectedSubjects, optionalChoice, colors }: any) {
   const categories = ['Prelims', 'Mains', 'Optional'];
   const subjects = useMemo(() => {
@@ -589,7 +561,7 @@ function WidgetConfigModal({ visible, onClose, onSave, category, setCategory, se
           <View style={styles.catRow}>
             {categories.map(c => (
               <TouchableOpacity key={c} style={[styles.catBtn, { backgroundColor: category === c ? colors.primary : colors.surfaceStrong }]} onPress={() => setCategory(c)}>
-                <Text style={[styles.catText, { color: category === c ? '#fff' : colors.textPrimary }]}>{c}</Text>
+                <Text style={[styles.configCatText, { color: category === c ? '#fff' : colors.textPrimary }]}>{c}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -641,20 +613,12 @@ const styles = StyleSheet.create({
 
   // Pulse Cards
   pulseContainer: { marginBottom: 32 },
-  pulseGrid: { flexDirection: 'row', paddingHorizontal: 20, gap: 16 },
-  pulseCard: { height: 110, borderRadius: 28, borderWidth: 1, padding: 20, flexDirection: 'row', alignItems: 'center', overflow: 'hidden', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 12 },
+  pulseGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 20, gap: 12 },
+  pulseActionCard: { minHeight: 118, borderRadius: 24, borderWidth: 1, padding: 16, justifyContent: 'flex-start', elevation: 1 },
+  pulseActionTitle: { fontSize: 16, fontWeight: '900', letterSpacing: -0.3, marginTop: 10 },
+  pulseActionSub: { fontSize: 11, fontWeight: '700', marginTop: 2, opacity: 0.7 },
   cardGlow: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
-  pulseInfo: { flex: 1, marginLeft: 16 },
-  pulseVal: { fontSize: 24, fontWeight: '900', letterSpacing: -1 },
-  pulseLab: { fontSize: 12, fontWeight: '800', marginTop: 2, opacity: 0.7 },
-
-  // Resume Action
-  resumeContainer: { marginBottom: 32 },
-  resumeScroll: { paddingHorizontal: 20, gap: 16 },
-  resumeBtn: { width: 160, padding: 20, borderRadius: 24, borderWidth: 1, gap: 16, elevation: 1 },
   resumeIconWrap: { width: 44, height: 44, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.04)', alignItems: 'center', justifyContent: 'center' },
-  resumeTitle: { fontSize: 16, fontWeight: '900', letterSpacing: -0.5 },
-  resumeSub: { fontSize: 11, fontWeight: '700', opacity: 0.6 },
 
   // Syllabus Tracker Widget
   trackerWidget: { marginHorizontal: 20, borderRadius: 32, borderWidth: 1, padding: 24, marginBottom: 32, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 15 },
@@ -662,10 +626,11 @@ const styles = StyleSheet.create({
   trackerIcon: { width: 48, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   trackerTitle: { fontSize: 20, fontWeight: '900', letterSpacing: -0.5 },
   catBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, alignSelf: 'flex-start', marginTop: 6 },
-  catText: { fontSize: 9, fontWeight: '900', letterSpacing: 0.5 },
+  badgeCatText: { fontSize: 9, fontWeight: '900', letterSpacing: 0.5 },
   masteryText: { fontSize: 28, fontWeight: '900', letterSpacing: -1 },
   subjectList: { gap: 16 },
-  subItemRow: { gap: 8 },
+  subjectGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 12 },
+  subItemRow: { gap: 8, width: '48%' },
   subTextRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   subName: { fontSize: 16, fontWeight: '800', flex: 1 },
   subPer: { fontSize: 12, fontWeight: '700', opacity: 0.6 },
@@ -687,17 +652,9 @@ const styles = StyleSheet.create({
   tagName: { fontSize: 14, fontWeight: '800' },
   tagCount: { fontSize: 10, fontWeight: '900', opacity: 0.4 },
 
-  // PYQ Banner
-  pyqBanner: { marginHorizontal: 20, height: 120, borderRadius: 32, overflow: 'hidden', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 20 },
-  pyqBannerInner: { flex: 1, flexDirection: 'row', alignItems: 'center', padding: 24 },
-  pyqBannerTitle: { color: '#FFF', fontSize: 22, fontWeight: '900', letterSpacing: -0.5 },
-  pyqBannerSub: { color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: '800', marginTop: 4 },
-  pyqMeta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 12 },
-  pyqMetaText: { color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: '700' },
-  pyqActionBtn: { width: 52, height: 52, borderRadius: 18, backgroundColor: '#34d399', alignItems: 'center', justifyContent: 'center', elevation: 4 },
-
   // Footer
   footerBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 20, marginBottom: 40 },
+  customWidgetItem: { marginHorizontal: 20, marginBottom: 12 },
 
   // Modals
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
@@ -711,10 +668,11 @@ const styles = StyleSheet.create({
   countInput: { height: 50, borderRadius: 14, borderWidth: 1, paddingHorizontal: 16, fontSize: 16, fontWeight: '700' },
   launchBtn: { height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginTop: 10 },
   launchBtnTxt: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  modalLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 1 },
 
   catRow: { flexDirection: 'row', gap: 10 },
   catBtn: { flex: 1, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  catText: { fontSize: 14, fontWeight: '700' },
+  configCatText: { fontSize: 14, fontWeight: '700' },
   subGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, maxHeight: 300, marginBottom: 20 },
   subItem: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
   subText: { fontSize: 13, fontWeight: '600' },

@@ -62,6 +62,8 @@ const SUBTOPIC_LABELS: Record<string, string> = {
   'constitutional-remedies': 'Right to Constitutional Remedies',
 };
 
+const normalize = (v: string) => String(v || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
 export function PilotV2NoteList() {
   const { colors } = useTheme();
   const { session } = useAuth();
@@ -200,9 +202,14 @@ export function PilotV2NoteList() {
       const staticTopics = SUBJECT_TOPICS[subjId ?? ''] ?? [];
       const topicObj = staticTopics.find(t => t.id === selectedTopicId);
       const activeTopicLabel = topicObj?.label || selectedTopicId.replace(/-/g, ' ');
+      const activeTopicNorm = normalize(activeTopicLabel);
+      const selectedTopicNorm = normalize(selectedTopicId);
 
       filteredList = filteredList.filter(
-        n => n.topic && n.topic.toLowerCase() === activeTopicLabel.toLowerCase()
+        n => {
+          const topicNorm = normalize(n.topic || '');
+          return topicNorm === activeTopicNorm || topicNorm === selectedTopicNorm;
+        }
       );
     }
 

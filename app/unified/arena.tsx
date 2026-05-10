@@ -220,6 +220,7 @@ export default function UnifiedArenaSetup() {
   const [showTopicModal, setShowTopicModal] = useState(false);
   const [topicSearch, setTopicSearch] = useState('');
   const [paperVisibleCount, setPaperVisibleCount] = useState(40);
+  const hasAutoLaunchedRef = useRef(false);
 
   // 3. Dynamic Data State
   const [metadata, setMetadata] = useState<any[]>(() => arenaMetadataCache || []);
@@ -262,6 +263,7 @@ export default function UnifiedArenaSetup() {
   useEffect(() => {
     if (params.subjects) setSelectedSubjects(String(params.subjects).split(',').filter(Boolean));
     else if (params.subject && params.subject !== 'All') setSelectedSubjects([params.subject as string]);
+    if (params.tab === 'topic') setActiveTab('topic');
     if (params.section) {
       const sList = (params.section as string).split('|').filter(Boolean);
       setSelectedSection(sList);
@@ -270,9 +272,23 @@ export default function UnifiedArenaSetup() {
       const mList = (params.microtopic as string).split('|').filter(Boolean);
       setSelectedMicrotopic(mList);
     }
+    if (params.tags) {
+      const incomingTags = String(params.tags).split('|').filter(Boolean);
+      setSelectedTags(incomingTags);
+    }
     if (params.pyqFilter) setPyqMaster(params.pyqFilter as string);
     if (params.ncertFilter) setNcertFilter(params.ncertFilter as string);
   }, [params]);
+
+  useEffect(() => {
+    if (params.autorun !== 'learn') return;
+    if (activeTab !== 'topic') return;
+    if (hasAutoLaunchedRef.current) return;
+    if (calculatingCount) return;
+    if (!questionCount || questionCount <= 0) return;
+    hasAutoLaunchedRef.current = true;
+    handleLaunch('learning');
+  }, [params.autorun, activeTab, calculatingCount, questionCount]);
 
   useEffect(() => {
     if (countDebounceRef.current) {

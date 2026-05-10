@@ -18,16 +18,16 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity,
   ScrollView, Platform, Alert, ActivityIndicator, Animated,
-  useWindowDimensions, Keyboard,
+  useWindowDimensions, Keyboard, TextInput,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Rocket, X, Plus, Wand2, Highlighter, Eraser, Undo2, Redo2 } from 'lucide-react-native';
+import { Rocket, X, Plus, Wand2, Highlighter, Eraser, Undo2, Redo2, Brain, Copy } from 'lucide-react-native';
 import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 import RichNoteEditor from '../RichNoteEditor';
 import { useTheme } from '../../context/ThemeContext';
 import { PremiumMoveSheet, MoveTarget } from '../common/PremiumMoveSheet';
 import { SUBJECT_TOPICS } from './PilotV2SidebarSubject';
-import { PILOT_V2_SUBJECT_PALETTE, PilotV2Node } from './types';
+import { PILOT_V2_SUBJECT_PALETTE, PilotV2Node, PilotV2Block } from './types';
 import {
   findOrCreatePilotV2Note,
   appendBlocksToPilotV2Note,
@@ -37,8 +37,11 @@ import {
   createPilotV2Node,
 } from '../../repositories/pilotV2Repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Clipboard from 'expo-clipboard';
+import { aiTransformNoteContent } from '../../services/GeminiService';
 
 const STORAGE_LAST_USED = 'pilot-v2:save-sheet:last-used';
+const STORAGE_SAVE_SHEET_AI_PROMPT = 'pilot-v2:save-sheet:ai-preset-prompt';
 type LastUsed = {
   subject?: string; topic?: string; subtopic?: string; notebook?: string;
 };
@@ -128,6 +131,10 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const [body, setBody]           = useState(initialBody || '');
   const richRef = useRef<any>(null);
   const [showHlPicker, setShowHlPicker] = useState(false);
+  const [showAiPanel, setShowAiPanel] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiOutput, setAiOutput] = useState('');
+  const [aiBusy, setAiBusy] = useState(false);
   const [hlColor, setHlColor] = useState('#FFF59D');
   const [editorKey, setEditorKey] = useState(0);
   const [saving, setSaving]       = useState(false);
@@ -145,6 +152,15 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const [topAreaH, setTopAreaH] = useState(0);
   const topTranslate = useRef(new Animated.Value(0)).current;
   const sheetTranslate = useRef(new Animated.Value(0)).current;
+
+  const snapshotFromEditor = async () => {
+    try {
+      const html = await richRef.current?.getContentHtml?.();
+      if (typeof html === 'string') setBody(html);
+    } catch {
+      // keep existing body if editor snapshot fails
+    }
+  };
 
   // Notebooks
   const [existingNotebooks, setExistingNotebooks] = useState<string[]>([]);
@@ -193,6 +209,10 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     setSavedNoteId(null);
     setAppendCount(0);
     setEditorKey(k => k + 1);
+    AsyncStorage.getItem(STORAGE_SAVE_SHEET_AI_PROMPT).then((preset) => {
+      if (preset && preset.trim()) setAiPrompt(preset.trim());
+      else setAiPrompt('');
+    });
     return () => { cancelled = true; };
   }, [visible, autoSeed, initialBody]);
 
@@ -439,6 +459,27 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     setEditorKey(k => k + 1);
   };
 
+  const handleAiTransform = async () => {
+    const plain = body.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').trim();
+    if (!plain) {
+      Alert.alert('No content', 'Please add content before using AI transform.');
+      return;
+    }
+    if (!aiPrompt.trim()) {
+      Alert.alert('Command required', 'Please enter an AI command.');
+      return;
+    }
+    setAiBusy(true);
+    try {
+      const transformed = await aiTransformNoteContent(plain, aiPrompt.trim());
+      setAiOutput(transformed);
+    } catch (e: any) {
+      Alert.alert('AI failed', e?.message || 'Could not process AI command.');
+    } finally {
+      setAiBusy(false);
+    }
+  };
+
 
   const backdropStyle = [styles.backdrop];
 
@@ -459,7 +500,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={backdropStyle}>
         <TouchableOpacity activeOpacity={1} onPress={onClose} style={StyleSheet.absoluteFill} />
-        <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: keyboardOpen ? 'flex-start' : 'center', paddingTop: keyboardOpen ? 10 : 0 }}>
+        <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: keyboardOpen ? 'flex-start' : 'center', paddingTop: keyboardOpen ? 12 : 16, paddingBottom: 16 }}>
           <Animated.View style={{ transform: [{ translateY: sheetTranslate }], width: '100%', alignItems: 'center' }}>
             <View testID="pilot-v2-save-sheet" style={[sheetStyle, { backgroundColor: colors.surface }]}>
             <Animated.View
@@ -539,7 +580,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
             <ScrollView
               ref={(r) => { scrollRef.current = r as any; }}
               style={{ flex: 1 }}
-              keyboardShouldPersistTaps="handled"
+              keyboardShouldPersistTaps="always"
               contentContainerStyle={{ paddingBottom: Math.max(24, keyboardHeight ? keyboardHeight * 0.4 : 24) }}
               stickyHeaderIndices={[0]}
             >
@@ -563,6 +604,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     actions.insertOrderedList,
                     actions.blockquote,
                     'highlight',
+                    'aiAssist',
                   ]}
                   iconMap={{
                     [actions.undo]: ({ tintColor }: any) => <Undo2 size={16} color={tintColor} />,
@@ -574,10 +616,15 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                         <Highlighter size={15} color={tintColor} />
                       </View>
                     ),
+                    aiAssist: ({ tintColor }: any) => <Brain size={16} color={tintColor} />,
                   }}
                   onPress={(action) => {
                     if (action === 'highlight') {
                       setShowHlPicker(v => !v);
+                      return;
+                    }
+                    if (action === 'aiAssist') {
+                      setShowAiPanel(v => !v);
                       return;
                     }
 
@@ -678,6 +725,48 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                   <Text style={{ color: '#5B4EFA', fontWeight: '800', fontSize: 12 }}>Add block break in editor</Text>
                 </TouchableOpacity>
               </View>
+              {showAiPanel && (
+                <View style={[styles.aiPanel, { borderColor: colors.border, backgroundColor: colors.surface }]}>
+                  <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>AI command</Text>
+                  <TextInput
+                    value={aiPrompt}
+                    onChangeText={setAiPrompt}
+                    placeholder="Example: Convert to bullet points in Hindi"
+                    placeholderTextColor={colors.textTertiary}
+                    multiline
+                    editable={!aiBusy}
+                    style={[styles.aiInput, { borderColor: colors.border, color: colors.textPrimary, backgroundColor: colors.surfaceStrong }]}
+                  />
+                  <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                    <TouchableOpacity
+                      onPress={handleAiTransform}
+                      disabled={aiBusy}
+                      style={[styles.miniBtn, { backgroundColor: '#5B4EFA', flex: 1, opacity: aiBusy ? 0.6 : 1 }]}
+                    >
+                      {aiBusy ? <ActivityIndicator size="small" color="#fff" /> : <Text style={{ color: '#fff', fontWeight: '800' }}>Run AI</Text>}
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={async () => {
+                        if (!aiOutput.trim()) return;
+                        await Clipboard.setStringAsync(aiOutput);
+                        Alert.alert('Copied', 'AI output copied. Paste it where you want.');
+                      }}
+                      style={[styles.miniBtn, { borderColor: colors.border, borderWidth: 1, flexDirection: 'row', gap: 6 }]}
+                    >
+                      <Copy size={14} color={colors.textPrimary} />
+                      <Text style={{ color: colors.textPrimary, fontWeight: '700' }}>Copy</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={[styles.fieldLabel, { color: colors.textTertiary, marginTop: 10 }]}>AI output</Text>
+                  <View style={[styles.aiOutputBox, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}>
+                    <ScrollView style={{ maxHeight: 180 }}>
+                      <Text style={{ color: colors.textPrimary, fontSize: 13, lineHeight: 20 }}>
+                        {aiOutput || 'AI output will appear here. Your existing content remains unchanged.'}
+                      </Text>
+                    </ScrollView>
+                  </View>
+                </View>
+              )}
 
               {savedNoteId && (
                 <View style={[styles.savedRow, { backgroundColor: '#ECFDF5', borderColor: '#A7F3D0' }]}>
@@ -770,7 +859,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
 };
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 20 },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', paddingVertical: 16 },
   pathChip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1 },
   selectorCard: { borderWidth: 1, borderRadius: 12, padding: 10, marginTop: 10 },
   selectorItem: { paddingVertical: 10, borderBottomWidth: 1 },
@@ -780,6 +869,9 @@ const styles = StyleSheet.create({
     paddingTop: 2,
     paddingBottom: 2,
     marginBottom: 8,
+  },
+  formGroup: {
+    marginBottom: 6,
   },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
   brand: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
@@ -935,6 +1027,26 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  aiPanel: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 10,
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  aiInput: {
+    borderWidth: 1,
+    borderRadius: 10,
+    minHeight: 40,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    fontSize: 13,
+  },
+  aiOutputBox: {
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
   },
 });
 

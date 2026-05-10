@@ -640,3 +640,29 @@ Your task: Answer the student's doubt precisely and accurately in the context of
 
   return callAI(prompt, 800);
 }
+
+/**
+ * Transform arbitrary note content using a direct user command.
+ * Used by Save Sheet "AI Assist" panel where the user gives instant
+ * commands such as "shorten", "convert to bullets", "translate to Hindi".
+ */
+export async function aiTransformNoteContent(
+  content: string,
+  command: string
+): Promise<string> {
+  const prompt = `You are an expert study-note editor for UPSC aspirants.
+
+ORIGINAL CONTENT:
+${(content || '').slice(0, 12000)}
+
+USER COMMAND:
+${command}
+
+Instructions:
+- Apply ONLY the requested transformation.
+- Preserve key facts unless the command explicitly asks to remove detail.
+- Keep output easy to paste in a rich-text note editor.
+- Return only the transformed content (no explanation, no preface).`;
+
+  return callAI(prompt, 1000);
+}

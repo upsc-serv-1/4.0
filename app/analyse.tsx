@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
   Modal, Alert, FlatList, ActivityIndicator, Pressable,
+  useWindowDimensions,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import Animated, {
@@ -156,6 +157,9 @@ export default function AnalyseTab() {
   const [attempts, setAttempts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [showTrends, setShowTrends] = useState(false);
+  const { width } = useWindowDimensions();
+  const isWideGrid = width >= 1024;
+  const cardWidth = isWideGrid ? `${(100 / 3) - 1.5}%` : '100%';
 
   const scrollY = useSharedValue(0);
   const scrollHandler = useAnimatedScrollHandler({
@@ -303,6 +307,9 @@ export default function AnalyseTab() {
           onScroll={scrollHandler}
           scrollEventThrottle={16}
           contentContainerStyle={[styles.listContent, { paddingTop: 110 }]}
+          numColumns={isWideGrid ? 3 : 1}
+          key={isWideGrid ? 'analyse-grid-3' : 'analyse-grid-1'}
+          columnWrapperStyle={isWideGrid ? styles.gridRow : undefined}
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={
             <>
@@ -353,14 +360,16 @@ export default function AnalyseTab() {
             </>
           }
           renderItem={({ item }) => (
-            <AttemptCard
-              item={item}
-              colors={colors}
-              onDelete={deleteAttempt}
-              onReport={(id: string) =>
-                router.push({ pathname: '/unified/result/[aid]', params: { aid: id } })
-              }
-            />
+            <View style={{ width: cardWidth }}>
+              <AttemptCard
+                item={item}
+                colors={colors}
+                onDelete={deleteAttempt}
+                onReport={(id: string) =>
+                  router.push({ pathname: '/unified/result/[aid]', params: { aid: id } })
+                }
+              />
+            </View>
           )}
         />
       )}
@@ -425,6 +434,7 @@ const styles = StyleSheet.create({
   summaryDivider: { width: 1, height: 32, marginHorizontal: 8 },
 
   listContent: { padding: spacing.md, paddingBottom: 100, gap: 12 },
+  gridRow: { justifyContent: 'space-between', gap: 10, marginBottom: 10 },
 
   card: {
     borderRadius: 20,

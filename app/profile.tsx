@@ -48,6 +48,7 @@ import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import { DEFAULT_ANALYTICS_LAYOUT, loadAnalyticsLayout, moveLayoutItem, saveAnalyticsLayout } from '../src/utils/analyticsLayout';
 import { OfflineManager, SyncProgress, OfflineMetadata } from '../src/services/OfflineManager';
+import { ThemeSwitcher } from '../src/components/ThemeSwitcher';
 
 const AVATARS = [
   { id: 'boy1', uri: require('../assets/avatars/boy1.png') },
@@ -62,7 +63,7 @@ const AVATARS = [
   { id: 'girl5', uri: require('../assets/avatars/girl5.png') },
 ];
 
-const ThemeSwitcher = require('../src/components/ThemeSwitcher').ThemeSwitcher;
+
 
 const { width } = Dimensions.get('window');
 
@@ -193,6 +194,7 @@ export default function Profile() {
         data: { display_name: newName, avatar_id: selectedAvatar }
       });
       if (error) throw error;
+      await AsyncStorage.setItem('profile_display_name', newName.trim());
       Alert.alert("Success", "Profile updated successfully!");
     } catch (err: any) {
       Alert.alert("Error", err.message);
@@ -288,7 +290,7 @@ export default function Profile() {
 
         <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>SETTINGS</Text>
         <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
-          <Row testID="profile-theme" icon={<Palette color={colors.primary} size={20} />} label="Zen Theme" sub="Change global appearance" right={<ThemeSwitcher />} />
+          <Row testID="profile-theme" icon={<Palette color={colors.primary} size={20} />} label="Zen Theme" sub="Change global appearance" onPress={() => router.push('/theme-preview')} />
           <Row testID="profile-tabs" icon={<LayoutList color={colors.primary} size={20} />} label="Customize Tabs" sub="Reorder bottom bar" onPress={() => router.push('/customize_tabs')} />
           <Row testID="profile-dedup" icon={<Layers color={colors.primary} size={20} />} label="Dedup Manager" sub="Smart-merge UPSC PYQs across institutes" onPress={() => router.push('/dedup-manager')} />
           <Row testID="profile-widgets" icon={<BarChart3 color={colors.primary} size={20} />} label="Manage Widgets" sub="Long-press dashboard header for 4s to edit" onPress={() => Alert.alert('Widget Editor', 'Go to Dashboard and long-press the header area for 4 seconds to enter widget edit mode. You can add, remove, and rearrange widgets.')} />

@@ -57,6 +57,7 @@ import { PageWrapper } from '../src/components/PageWrapper';
 import { useTheme } from '../src/context/ThemeContext';
 
 export default function AISettings() {
+  const SAVE_SHEET_AI_PROMPT_KEY = 'pilot-v2:save-sheet:ai-preset-prompt';
   const { colors } = useTheme();
   const router = useRouter();
   const { session } = useAuth();
@@ -82,6 +83,7 @@ export default function AISettings() {
   const [summarizePrompt, setSummarizePrompt] = useState('');
   const [searchPrompt, setSearchPrompt]       = useState('');
   const [expandedPrompt, setExpandedPrompt]   = useState<'explain' | 'summarize' | 'search' | null>(null);
+  const [saveSheetPrompt, setSaveSheetPrompt] = useState('');
   const [promptSaving, setPromptSaving]       = useState(false);
   const [promptSaved, setPromptSaved]         = useState(false);
 
@@ -110,7 +112,7 @@ export default function AISettings() {
       const [
         k1, k2, k3, k4, activeIdx, model, 
         provider, gk1, gk2, gk3, gk4, groqActiveIdx, groqMod, 
-        ep, sp, srp, ork, orm
+        ep, sp, srp, ork, orm, saveSheetAiPrompt
       ] = await Promise.all([
         AsyncStorage.getItem('gemini_api_key'),
         AsyncStorage.getItem('gemini_api_key_2'),
@@ -130,6 +132,7 @@ export default function AISettings() {
         AsyncStorage.getItem(PROMPT_KEYS.search),
         AsyncStorage.getItem(OPENROUTER_API_KEY_STORAGE),
         AsyncStorage.getItem(OPENROUTER_MODEL_KEY),
+        AsyncStorage.getItem(SAVE_SHEET_AI_PROMPT_KEY),
       ]);
       
       setGeminiKeys([k1 || '', k2 || '', k3 || '', k4 || '']);
@@ -147,6 +150,7 @@ export default function AISettings() {
       setExplainPrompt(ep || DEFAULT_PROMPTS.explain);
       setSummarizePrompt(sp || DEFAULT_PROMPTS.summarize);
       setSearchPrompt(srp || DEFAULT_PROMPTS.search);
+      setSaveSheetPrompt(saveSheetAiPrompt || '');
     })();
   }, []);
 
@@ -172,6 +176,7 @@ export default function AISettings() {
         AsyncStorage.setItem(PROMPT_KEYS.explain,    explainPrompt.trim()   || DEFAULT_PROMPTS.explain),
         AsyncStorage.setItem(PROMPT_KEYS.summarize,  summarizePrompt.trim() || DEFAULT_PROMPTS.summarize),
         AsyncStorage.setItem(PROMPT_KEYS.search,     searchPrompt.trim()    || DEFAULT_PROMPTS.search),
+        AsyncStorage.setItem(SAVE_SHEET_AI_PROMPT_KEY, saveSheetPrompt.trim()),
       ]);
       setPromptSaved(true);
       setTimeout(() => setPromptSaved(false), 2500);
@@ -537,6 +542,22 @@ export default function AISettings() {
               )}
             </View>
           ))}
+        </View>
+
+        <Text style={[styles.sectionTitle, { marginTop: 16 }]}>SAVE SHEET AI PRESET</Text>
+        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border, padding: 14 }]}>
+          <Text style={[styles.promptSub, { color: colors.textTertiary, marginBottom: 8 }]}>
+            This prompt pre-fills in "Save to Pilot V2" AI panel, so you do not type it every time.
+          </Text>
+          <TextInput
+            value={saveSheetPrompt}
+            onChangeText={setSaveSheetPrompt}
+            multiline
+            textAlignVertical="top"
+            placeholder="Example: Convert into bullet points, bold key terms, and shorten to 50 words."
+            placeholderTextColor={colors.textTertiary}
+            style={[styles.promptInput, { backgroundColor: colors.bg, borderColor: colors.border, color: colors.textPrimary, minHeight: 120 }]}
+          />
         </View>
 
         {/* ══════════════════════════════════════════════════════════ */}

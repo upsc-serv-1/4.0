@@ -995,26 +995,19 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
  * Convert a stroke's point series to an SVG path `d` attribute using the
  * same midpoint-quadratic smoothing used by the on-device Skia canvas.
  * Keeps the exported PDF visually identical to what the user sees.
- * 
- * NOTE: Stroke coordinates might need adjustment if they shift vertically
- * in PDF due to line-height or baseline differences between canvas and PDF.
  */
-const hardnoteStrokeToSvgPath = (pts: ExportHardnoteStrokePoint[], adjustYBy: number = 0): string => {
+const hardnoteStrokeToSvgPath = (pts: ExportHardnoteStrokePoint[]): string => {
   if (!pts.length) return '';
-  const firstY = pts[0].y + adjustYBy;
-  let d = `M ${pts[0].x.toFixed(2)} ${firstY.toFixed(2)}`;
+  let d = `M ${pts[0].x.toFixed(2)} ${pts[0].y.toFixed(2)}`;
   for (let i = 1; i < pts.length; i++) {
     const prev = pts[i - 1];
     const p = pts[i];
-    const prevY = prev.y + adjustYBy;
-    const pY = p.y + adjustYBy;
     const mx = (prev.x + p.x) / 2;
-    const my = (prevY + pY) / 2;
-    d += ` Q ${prev.x.toFixed(2)} ${prevY.toFixed(2)} ${mx.toFixed(2)} ${my.toFixed(2)}`;
+    const my = (prev.y + p.y) / 2;
+    d += ` Q ${prev.x.toFixed(2)} ${prev.y.toFixed(2)} ${mx.toFixed(2)} ${my.toFixed(2)}`;
   }
   const last = pts[pts.length - 1];
-  const lastY = last.y + adjustYBy;
-  d += ` L ${last.x.toFixed(2)} ${lastY.toFixed(2)}`;
+  d += ` L ${last.x.toFixed(2)} ${last.y.toFixed(2)}`;
   return d;
 };
 
@@ -1025,10 +1018,11 @@ export const buildHardnoteHtml = (note: ExportHardnote, o: ExportOptions): strin
   const strokesSvg = (note.strokes || [])
     .filter((s) => s && s.tool !== 'eraser' && s.points?.length > 0)
     .map((s) => {
-      // Apply Y-axis adjustment proportional to font size to account for PDF rendering baseline differences
-      // This fixes strokes shifting 2-3 lines up/down. The adjustment scales with fontSize automatically.
-      const yAdjustment = -o.fontSize * 6.5;
-      const d = hardnoteStrokeToSvgPath(s.points, yAdjustment);
+      // No Y-axis adjustment — strokes are rendered at their exact
+      // coordinates which already match the SVG viewBox / foreignObject
+      // coordinate system.  The previous -fontSize*6.5 hack was causing
+      // strokes to shift vertically in every exported PDF.
+      const d = hardnoteStrokeToSvgPath(s.points);
       if (!d) return '';
       const avgP = s.points.reduce((a, p) => a + (p.p ?? 0.5), 0) / s.points.length;
       const isHL = s.tool === 'highlighter';
@@ -1060,18 +1054,10 @@ export const buildHardnoteHtml = (note: ExportHardnote, o: ExportOptions): strin
     : '';
 
   // Pencil strokes and the markdown body are rendered INSIDE the same
-  // SVG via <foreignObject>, so both share the W×H coordinate space the
-  // stroke remap was computed in — strokes paint pixel-accurately on top
-  // of the words they were drawn on (instead of being stretched into a
-  // separate canvas).  We grow the viewBox height beyond `canvasHeight`
-  // when a stroke endpoint extends below it, so the auto-flowing markdown
-  // is never clipped above its host stroke.
-  //
-  // CRITICAL: To prevent strokes from shifting 2-3 lines vertically in PDF:
-  // - foreignObject must be exactly positioned at x="0" y="0"
-  // - SVG viewBox must match the original canvas coordinate space
-  // - CSS margins/padding on elements inside foreignObject must be minimized
-  // - line-height must be consistent between canvas and PDF rendering
+  // SVG via <foreignObject>, so both share the W×H coordinate space.
+  // Strokes paint pixel-accurately on top of the words they were drawn on.
+  // We grow the viewBox height beyond `canvasHeight` when a stroke endpoint
+  // extends below it, so the auto-flowing markdown is never clipped.
   let strokeMaxY = 0;
   for (const s of note.strokes || []) {
     if (!s || s.tool === 'eraser' || !s.points?.length) continue;
@@ -1082,11 +1068,6 @@ export const buildHardnoteHtml = (note: ExportHardnote, o: ExportOptions): strin
   const baseLayerInner = note.baseLayerMarkdown
     ? renderInline(note.baseLayerMarkdown)
     : '';
-
-  // Calculate CSS baseline shift - account for margin + line-height differences
-  // that might cause strokes to shift visually
-  const baseFontSize = o.fontSize;
-  const baselineShift = 0; // No shift needed if we normalize margins below
 
   const body = `
     ${meta}

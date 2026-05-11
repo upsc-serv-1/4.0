@@ -1598,17 +1598,38 @@ const sharePdfWithTimeout = async (uri: string, dialogTitle: string): Promise<vo
 };
 
 export async function exportToPdf(payload: ExportPayload, options: ExportOptions, extras: ExportRenderExtras = {}): Promise<string> {
-  const html = injectExecutiveSummary(renderHtml(payload, options), extras.prependHtml);
-  const { uri } = await Print.printToFileAsync({ html, base64: false });
-  const safe = options.title.replace(/[^a-z0-9-_ ]/gi, '_').slice(0, 48) || 'export';
-  const dest = `${FileSystem.cacheDirectory}${safe}.pdf`;
-  try { await FileSystem.moveAsync({ from: uri, to: dest }); } catch { }
-  const info = await FileSystem.getInfoAsync(dest);
-  const finalUri = info.exists ? dest : uri;
-  if (await Sharing.isAvailableAsync()) {
-    await sharePdfWithTimeout(finalUri, options.title);
-  } else {
-    await Linking.openURL(finalUri).catch(() => null);
+  try {
+    const html = injectExecutiveSummary(renderHtml(payload, options), extras.prependHtml);
+    
+    // Log HTML size for debugging crashes with large PDFs
+    console.log(`[exportToPdf] HTML size: ${(html.length / 1024).toFixed(2)}KB`);
+    
+    // Set timeout for print rendering - prevents hanging on large PDFs
+    let uri: string;
+    try {
+      const printResult = await Promise.race<any>([
+        Print.printToFileAsync({ html, base64: false }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Print timeout after 30s')), 30000))
+      ]);
+      uri = printResult.uri;
+    } catch (printError) {
+      console.error('[exportToPdf] Print failed:', printError);
+      throw new Error(`PDF rendering failed: ${printError instanceof Error ? printError.message : 'Unknown error'}`);
+    }
+    
+    const safe = options.title.replace(/[^a-z0-9-_ ]/gi, '_').slice(0, 48) || 'export';
+    const dest = `${FileSystem.cacheDirectory}${safe}.pdf`;
+    try { await FileSystem.moveAsync({ from: uri, to: dest }); } catch { }
+    const info = await FileSystem.getInfoAsync(dest);
+    const finalUri = info.exists ? dest : uri;
+    if (await Sharing.isAvailableAsync()) {
+      await sharePdfWithTimeout(finalUri, options.title);
+    } else {
+      await Linking.openURL(finalUri).catch(() => null);
+    }
+    return finalUri;
+  } catch (err) {
+    console.error('[exportToPdf] Fatal error:', err);
+    throw err;
   }
-  return finalUri;
 }

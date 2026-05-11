@@ -87,6 +87,10 @@ export interface EstimateLayoutOptions {
  * (not a real text engine) but it is deterministic and stable across
  * multiple invocations with the same inputs — which is what the anchored
  * stroke remap needs.
+ *
+ * The gap between blocks defaults to ~2× line height to match the
+ * `\n\n` → `<br/><br/>` spacing produced by `blocksToBaseLayerMarkdown`
+ * + `renderInline` inside the foreignObject.
  */
 export function estimateExportBlockLayouts(
   blocks: PilotV2Block[],
@@ -94,8 +98,6 @@ export function estimateExportBlockLayouts(
 ): Map<string, ExportBlockRect> {
   const out = new Map<string, ExportBlockRect>();
   const cols = Math.max(1, Math.min(2, Math.round(opts.columns || 1)));
-  const gap = opts.blockGap ?? 8;
-  const topPad = opts.topPadding ?? 0;
   const colGutter = cols === 2 ? 24 : 0;
   const colWidth = (opts.canvasWidth - colGutter * (cols - 1)) / cols;
 
@@ -107,6 +109,12 @@ export function estimateExportBlockLayouts(
   const lineHeight = fontPx * 1.45;
   const headingScale = 1.45; // approximate H2 multiplier
   const codePad = 4;
+
+  // Block gap: the markdown converter joins blocks with `\n\n`, which
+  // `renderInline` turns into `<br/><br/>` (2× line height).  When an
+  // explicit blockGap is provided (e.g., for non-markdown paths), honour it.
+  const gap = opts.blockGap ?? Math.round(lineHeight * 2);
+  const topPad = opts.topPadding ?? 0;
 
   // Distribute blocks across columns round-robin: simplest model that
   // matches the engine's CSS column-count flow (close enough for the
@@ -136,11 +144,6 @@ export function estimateExportBlockLayouts(
     out.set(b.id, { x, y, w: colWidth, h });
     colCursors[colIdx] = y + h + gap;
   });
-
-  // Optional: clamp final block y inside the canvas.
-  const maxY = Math.max(...colCursors, topPad);
-  void maxY; // intentionally not used to clamp — exported PDF auto-grows
-  void opts.canvasHeight;
 
   return out;
 }

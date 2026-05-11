@@ -145,7 +145,8 @@ export default function ReviewScreen() {
         // Single-card mode — study that specific card regardless of due state
         const userCards = ((OfflineManager as any).getCollectionSync('user_cards', uid) ?? [])
           .filter((u: any) => u.user_id === uid);
-        const allCards = ((OfflineManager as any).getCollectionSync('cards') ?? []);
+        const allCards = ((OfflineManager as any).getCollectionSync('cards') ?? [])
+          .filter((c: any) => !c.deleted && !c.is_deleted);
         let row: any = userCards.find((u: any) => u.card_id === cardId);
         let c: any = allCards.find((card: any) => card.id === cardId);
 

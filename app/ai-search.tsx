@@ -1689,17 +1689,17 @@ export default function AISearchTab() {
             )}
 
             {/* Subjects — dynamically loaded from questions table */}
-            {subjectOptions.length > 0 && (
-              <View style={styles.filterGroup}>
-                <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>SUBJECTS</Text>
-                <View style={styles.chipsWrap}>
-                  <TouchableOpacity
-                    onPress={() => setPendingFilters(p => ({ ...p, subjects: 'All', sections: 'All', microtopics: 'All' }))}
-                    style={[styles.fchip, pendingFilters.subjects === 'All' && styles.fchipSel]}
-                  >
-                    <Text style={[styles.fchipText, { color: pendingFilters.subjects === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
-                  </TouchableOpacity>
-                  {subjectOptions.map(sub => {
+            <View style={styles.filterGroup}>
+              <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>SUBJECTS</Text>
+              <View style={styles.chipsWrap}>
+                <TouchableOpacity
+                  onPress={() => setPendingFilters(p => ({ ...p, subjects: 'All', sections: 'All', microtopics: 'All' }))}
+                  style={[styles.fchip, pendingFilters.subjects === 'All' && styles.fchipSel]}
+                >
+                  <Text style={[styles.fchipText, { color: pendingFilters.subjects === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
+                </TouchableOpacity>
+                {subjectOptions.length > 0 ? (
+                  subjectOptions.map(sub => {
                     const isSelected = pendingFilters.subjects.split(',').includes(sub);
                     return (
                       <TouchableOpacity
@@ -1714,13 +1714,17 @@ export default function AISearchTab() {
                         <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
                       </TouchableOpacity>
                     );
-                  })}
-                </View>
+                  })
+                ) : (
+                  <View style={{ paddingVertical: 8 }}>
+                    <ActivityIndicator size="small" color={colors.primary} />
+                  </View>
+                )}
               </View>
-            )}
+            </View>
 
-            {/* Section Groups — shown after subject chosen */}
-            {sectionOptions.length > 0 && (
+            {/* Section Groups — shown after subject chosen or while loading */}
+            {sectionOptions.length > 0 || (pendingFilters.subjects !== 'All' && pendingFilters.subjects) ? (
               <View style={styles.filterGroup}>
                 <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>SECTION / CHAPTER</Text>
                 <View style={styles.chipsWrap}>
@@ -1730,28 +1734,34 @@ export default function AISearchTab() {
                   >
                     <Text style={[styles.fchipText, { color: pendingFilters.sections === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
                   </TouchableOpacity>
-                  {sectionOptions.map(sec => {
-                    const isSelected = pendingFilters.sections.split(',').includes(sec);
-                    return (
-                      <TouchableOpacity
-                        key={sec}
-                        onPress={() => {
-                          const list = pendingFilters.sections === 'All' ? [] : pendingFilters.sections.split(',').filter(Boolean);
-                          const next = isSelected ? list.filter(s => s !== sec) : [...list, sec];
-                          setPendingFilters(p => ({ ...p, sections: next.length ? next.join(',') : 'All', microtopics: 'All' }));
-                        }}
-                        style={[styles.fchip, isSelected && styles.fchipSel]}
-                      >
-                        <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sec}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
+                  {sectionOptions.length > 0 ? (
+                    sectionOptions.map(sec => {
+                      const isSelected = pendingFilters.sections.split(',').includes(sec);
+                      return (
+                        <TouchableOpacity
+                          key={sec}
+                          onPress={() => {
+                            const list = pendingFilters.sections === 'All' ? [] : pendingFilters.sections.split(',').filter(Boolean);
+                            const next = isSelected ? list.filter(s => s !== sec) : [...list, sec];
+                            setPendingFilters(p => ({ ...p, sections: next.length ? next.join(',') : 'All', microtopics: 'All' }));
+                          }}
+                          style={[styles.fchip, isSelected && styles.fchipSel]}
+                        >
+                          <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sec}</Text>
+                        </TouchableOpacity>
+                      );
+                    })
+                  ) : (
+                    <View style={{ paddingVertical: 8 }}>
+                      <ActivityIndicator size="small" color={colors.primary} />
+                    </View>
+                  )}
                 </View>
               </View>
-            )}
+            ) : null}
 
             {/* Micro Topics — shown after section chosen */}
-            {microtopicOptions.length > 0 && (
+            {microtopicOptions.length > 0 || (pendingFilters.sections !== 'All' && pendingFilters.sections) ? (
               <View style={styles.filterGroup}>
                 <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>MICRO TOPIC</Text>
                 <View style={styles.chipsWrap}>
@@ -1761,25 +1771,31 @@ export default function AISearchTab() {
                   >
                     <Text style={[styles.fchipText, { color: pendingFilters.microtopics === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
                   </TouchableOpacity>
-                  {microtopicOptions.map(mt => {
-                    const isSelected = pendingFilters.microtopics.split(',').includes(mt);
-                    return (
-                      <TouchableOpacity
-                        key={mt}
-                        onPress={() => {
-                          const list = pendingFilters.microtopics === 'All' ? [] : pendingFilters.microtopics.split(',').filter(Boolean);
-                          const next = isSelected ? list.filter(s => s !== mt) : [...list, mt];
-                          setPendingFilters(p => ({ ...p, microtopics: next.length ? next.join(',') : 'All' }));
-                        }}
-                        style={[styles.fchip, isSelected && styles.fchipSel]}
-                      >
-                        <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{mt}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
+                  {microtopicOptions.length > 0 ? (
+                    microtopicOptions.map(mt => {
+                      const isSelected = pendingFilters.microtopics.split(',').includes(mt);
+                      return (
+                        <TouchableOpacity
+                          key={mt}
+                          onPress={() => {
+                            const list = pendingFilters.microtopics === 'All' ? [] : pendingFilters.microtopics.split(',').filter(Boolean);
+                            const next = isSelected ? list.filter(s => s !== mt) : [...list, mt];
+                            setPendingFilters(p => ({ ...p, microtopics: next.length ? next.join(',') : 'All' }));
+                          }}
+                          style={[styles.fchip, isSelected && styles.fchipSel]}
+                        >
+                          <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{mt}</Text>
+                        </TouchableOpacity>
+                      );
+                    })
+                  ) : (
+                    <View style={{ paddingVertical: 8 }}>
+                      <ActivityIndicator size="small" color={colors.primary} />
+                    </View>
+                  )}
                 </View>
               </View>
-            )}
+            ) : null}
 
           </ScrollView>
 

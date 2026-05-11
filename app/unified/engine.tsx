@@ -72,8 +72,15 @@ import {
   Send,
   RotateCcw,
   MessageSquare,
-  Rocket
+  Rocket,
+  Copy,
+  Wand2,
+  Undo2,
+  Redo2
 } from 'lucide-react-native';
+import { RichToolbar, actions } from 'react-native-pell-rich-editor';
+import RichNoteEditor from '../../src/components/RichNoteEditor';
+import { aiTransformNoteContent } from '../../src/services/GeminiService';
 import { AIModelSwitcher } from '../../src/components/ai/AIModelSwitcher';
 import { PilotV2AIChat } from '../../src/components/pilot-v2/PilotV2AIChat';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -420,10 +427,15 @@ export default function UnifiedQuizEngine() {
   const store = useQuizStore();
   const navigation = useNavigation();
   const isNavigatingAway = useRef(false);
+  const richNoteRef = useRef<any>(null);
   const sessionStartRef = useRef<number>(Date.now()); // Wall-clock start for accurate duration
 
   // 🆕 Declare arenaMode FIRST — fixes TDZ crash
   const [arenaMode, setArenaMode] = useState<'learning' | 'exam'>((params.mode as 'learning' | 'exam') || 'learning');
+
+  // 3. Store Selectors — must be before hasUnsavedLearningProgress
+  const currentAnswers = store.answers;
+  const clearStoredAnswers = store.clearAnswers;
 
   // ── AI Explain / Summarize state (per-question) ───────────────
   const [aiExplanations, setAiExplanations] = useState<Record<string, string>>({});
@@ -529,12 +541,19 @@ export default function UnifiedQuizEngine() {
     setSavingBest(prev => ({ ...prev, [id]: true }));
     try {
       const saved = await saveBestAnswer(id, text, aiSummaries[id] || null, null);
-      setBestAnswers(prev => ({ ...prev, [id]: saved }));
-      setSavedFlash(prev => ({ ...prev, [id]: true }));
-      setTimeout(() => setSavedFlash(prev => ({ ...prev, [id]: false })), 1500);
-      setActiveExplSource(prev => ({ ...prev, [id]: 'vitamin' }));
-      setModifyOpen(prev => ({ ...prev, [id]: false }));
+      if (saved) {
+        setBestAnswers(prev => ({ ...prev, [id]: saved }));
+        setSavedFlash(prev => ({ ...prev, [id]: true }));
+        setTimeout(() => setSavedFlash(prev => ({ ...prev, [id]: false })), 1500);
+        // Critical: Set activeExplSource to 'vitamin' so SharedQuestionCard updates viewerKind
+        setActiveExplSource(prev => ({ ...prev, [id]: 'vitamin' }));
+        setModifyOpen(prev => ({ ...prev, [id]: false }));
+        console.log('[Engine] MyVitamin saved successfully:', id);
+      } else {
+        Alert.alert('Save failed', 'Could not save answer. Please try again.');
+      }
     } catch (e: any) {
+      console.error('[Engine] Save error:', e);
       Alert.alert('Save failed', e?.message || 'Could not save best answer.');
     } finally {
       setSavingBest(prev => ({ ...prev, [id]: false }));
@@ -598,6 +617,26 @@ export default function UnifiedQuizEngine() {
       }
     });
   };
+
+  // Moved earlier to fix declaration order error
+  const hasUnsavedLearningProgress = useMemo(() => {
+    if (arenaMode !== 'learning') return false;
+    const values = Object.values(currentAnswers || {});
+    return values.some((entry: any) => {
+      if (!entry) return false;
+      return Boolean(
+        entry.selectedAnswer ||
+        entry.confidence ||
+        entry.difficulty ||
+        entry.errorCategory ||
+        (Array.isArray(entry.studyTags) && entry.studyTags.length > 0) ||
+        (entry.note && String(entry.note).trim().length > 0) ||
+        (entry.timeSpentSeconds || 0) > 0 ||
+        entry.isReview ||
+        entry.isBookmarked
+      );
+    });
+  }, [arenaMode, currentAnswers]);
 
   // Prevent accidental exit during formal exams and unsaved learning sessions
   usePreventRemove(
@@ -728,7 +767,7 @@ export default function UnifiedQuizEngine() {
     setAskingDoubt(true);
     setDoubtAnswer('');
     try {
-      const q = currentItem.question_text || currentItem.question || '';
+      const q = currentItem.question_text || (currentItem as any).question || '';
       const opts = JSON.stringify(currentItem.options || {});
       
       // Get the currently selected explanation if any
@@ -824,6 +863,11 @@ export default function UnifiedQuizEngine() {
   const [pilotV2SaveOpen, setPilotV2SaveOpen] = useState(false);
   const [pilotSaveTargetQuestion, setPilotSaveTargetQuestion] = useState<Question | null>(null);
   const [pilotSaveHtml, setPilotSaveHtml] = useState('');
+  
+  // Personalized Notes (Quiz Engine)
+  const [editNoteQId, setEditNoteQId] = useState<string | null>(null);
+  const [noteEditorText, setNoteEditorText] = useState('');
+  const [isAiRefiningNote, setIsAiRefiningNote] = useState(false);
 
   // Track viewable items via a ref to avoid triggering re-renders during scroll.
   // We only update currentIndex when the user has been on a question long enough
@@ -999,25 +1043,45 @@ export default function UnifiedQuizEngine() {
         const raw = await AsyncStorage.getItem(catalogKey);
         if (raw) {
           const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) parsed.forEach((t: string) => t && allTags.add(t));
+          if (Array.isArray(parsed)) {
+            parsed.forEach((t: string) => {
+              if (t && typeof t === 'string' && t.trim()) {
+                allTags.add(t.trim());
+              }
+            });
+          }
         }
-      } catch {}
+      } catch (e) {
+        console.warn('Failed to load custom tags from AsyncStorage:', e);
+      }
 
       // 2. Also pull tags from question_states (legacy / cross-device data)
-      const { data } = await supabase
-        .from('question_states')
-        .select('review_tags')
-        .eq('user_id', session.user.id)
-        .not('review_tags', 'is', null);
+      try {
+        const { data } = await supabase
+          .from('question_states')
+          .select('review_tags')
+          .eq('user_id', session.user.id)
+          .not('review_tags', 'is', null);
 
-      if (data) {
-        data.forEach(row => {
-          if (Array.isArray(row.review_tags)) {
-            row.review_tags.forEach((t: string) => allTags.add(t));
-          }
-        });
+        if (data) {
+          data.forEach(row => {
+            if (Array.isArray(row.review_tags)) {
+              row.review_tags.forEach((t: string) => {
+                if (t && typeof t === 'string' && t.trim()) {
+                  allTags.add(t.trim());
+                }
+              });
+            }
+          });
+        }
+      } catch (e) {
+        console.warn('Failed to load tags from Supabase:', e);
       }
-      setUserStudyTags(Array.from(allTags));
+
+      // Always ensure we have at least DEFAULT_STUDY_TAGS
+      const finalTags = Array.from(allTags).sort();
+      console.log('[Engine] Final userStudyTags loaded:', finalTags);
+      setUserStudyTags(finalTags.length > 0 ? finalTags : DEFAULT_STUDY_TAGS);
     };
     fetchExistingTags();
   }, [session?.user?.id]);
@@ -1097,29 +1161,6 @@ export default function UnifiedQuizEngine() {
     setTimeout(attemptScroll, 80);
   }, [viewMode]);
 
-  // 3. Store Selectors
-  const currentAnswers = store.answers;
-  const clearStoredAnswers = store.clearAnswers;
-
-  const hasUnsavedLearningProgress = useMemo(() => {
-    if (arenaMode !== 'learning') return false;
-    const values = Object.values(currentAnswers || {});
-    return values.some((entry: any) => {
-      if (!entry) return false;
-      return Boolean(
-        entry.selectedAnswer ||
-        entry.confidence ||
-        entry.difficulty ||
-        entry.errorCategory ||
-        (Array.isArray(entry.studyTags) && entry.studyTags.length > 0) ||
-        (entry.note && String(entry.note).trim().length > 0) ||
-        (entry.timeSpentSeconds || 0) > 0 ||
-        entry.isReview ||
-        entry.isBookmarked
-      );
-    });
-  }, [arenaMode, currentAnswers]);
-
   // 4. Fetch Questions
   useEffect(() => {
     if (session?.user?.id) {
@@ -1145,25 +1186,43 @@ export default function UnifiedQuizEngine() {
   const fetchQuestions = async () => {
     setLoading(true);
     let tagList: string[] = [];
+    const SELECT_COLS = 'id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)';
     
     // Helper to process results
-    const processResults = (data: any[]) => {
+    const processResults = (data: any[], originalTestIds?: Set<string>) => {
       const rawQs = data || [];
       const useExactPaperSequence = !!params.testId;
+      const isUpscPyqInPaper = useExactPaperSequence && rawQs.some((q: any) => {
+        const groupName = String(q?.source?.group || q?.exam_group || q?.tests?.series || q?.tests?.title || '').toUpperCase();
+        return Boolean(q?.is_pyq) && (Boolean(q?.is_upsc_cse) || groupName.includes('UPSC'));
+      });
+      const shouldMerge = !useExactPaperSequence || isUpscPyqInPaper;
 
       let mergedQs: any[] = rawQs;
       let idToMergedId = new Map<string, string>();
 
-      if (useExactPaperSequence) {
-        mergedQs = rawQs;
-        rawQs.forEach((q: any) => idToMergedId.set(q.id, q.id));
-      } else {
+      if (shouldMerge) {
         const merged = mergeQuestions(rawQs);
         mergedQs = merged.mergedQs;
         idToMergedId = merged.idToMergedId;
+      } else {
+        mergedQs = rawQs;
+        rawQs.forEach((q: any) => idToMergedId.set(q.id, q.id));
       }
 
       let finalQs = mergedQs;
+      
+      // DEBUG: Log merged questions to verify _explanations
+      if (shouldMerge && mergedQs.length > 0) {
+        console.log('[Merge Debug] Sample merged question:', {
+          id: mergedQs[0].id,
+          hasExplanations: !!mergedQs[0]._explanations,
+          explanationsCount: mergedQs[0]._explanations?.length || 0,
+          institutes: mergedQs[0]._institutes,
+          sampleExpl: mergedQs[0]._explanations?.[0]
+        });
+      }
+      
       const resIds = typeof params.resultIds === 'string' ? params.resultIds.split(',').filter((id: string) => id.trim().length > 0) : null;
       const parseQuestionNumber = (q: any) => {
         const raw = q?.question_number;
@@ -1181,11 +1240,10 @@ export default function UnifiedQuizEngine() {
         const uniqueOrderedIds = Array.from(new Set(orderedMergedIds));
         finalQs = uniqueOrderedIds.map(id => mergedQs.find(q => q.id === id)).filter(Boolean);
       } else if (useExactPaperSequence) {
-        // Paper-wise learn/exam must keep the exact uploaded book order.
-        // Sort strictly by `question_number`; use stable `id` as the
-        // secondary key so even cached/offline data (which may arrive in
-        // arbitrary order) still produces the deterministic book sequence.
-        finalQs = [...finalQs]
+        // Paper-wise learn/exam must keep deterministic paper sequence.
+        // For merged UPSC sessions, preserve base paper order by mapping each
+        // paper row to its merged cluster id and keeping first occurrence.
+        const orderedBase = [...rawQs]
           .map((q: any, idx: number) => ({ q, idx, qNo: parseQuestionNumber(q) }))
           .sort((a, b) => {
             if (a.qNo !== b.qNo) return a.qNo - b.qNo;
@@ -1195,6 +1253,9 @@ export default function UnifiedQuizEngine() {
             return a.idx - b.idx;
           })
           .map(({ q }) => q);
+        const orderedMergedIds = orderedBase.map((q: any) => idToMergedId.get(q.id) || q.id);
+        const uniqueOrderedIds = Array.from(new Set(orderedMergedIds));
+        finalQs = uniqueOrderedIds.map(id => mergedQs.find(q => q.id === id)).filter(Boolean);
       } else {
         // Apply priority sorting: Relevance → UPSC Priority → Newest Year.
         finalQs = [...finalQs].sort((a: any, b: any) => {
@@ -1223,18 +1284,26 @@ export default function UnifiedQuizEngine() {
         });
       }
 
-      setQuestions(finalQs);
-      
-      // Honour initialId from AI Search — scroll to the tapped question
-      if (params.initialId && !hasJumped) {
-        const targetId = idToMergedId.get(params.initialId as string) || params.initialId as string;
-        const idx = finalQs.findIndex((item: any) => item.id === targetId);
-        if (idx > 0) {
-          setCurrentIndex(idx);
-          setHasJumped(true);
+      // Filter to original testId questions only if siblings were added for enrichment
+      if (originalTestIds && originalTestIds.size > 0) {
+        // Keep only cluster heads that map back to original test questions
+        const originalMergedHeads = new Set<string>();
+        for (const originalId of Array.from(originalTestIds)) {
+          const mergedHeadId = idToMergedId.get(originalId);
+          if (mergedHeadId) originalMergedHeads.add(mergedHeadId);
         }
+        const preFilterCount = finalQs.length;
+        finalQs = finalQs.filter(q => originalMergedHeads.has(q.id));
+        console.log('[Merge Debug] After filtering to original questions:', {
+          preFilterCount,
+          postFilterCount: finalQs.length,
+          originalMergedHeadsSize: originalMergedHeads.size
+        });
       }
 
+      setQuestions(finalQs);
+      
+      // Jump to question if specified in params
       if (params.questionId && !hasJumped) {
         const jumpId = params.questionId;
         const targetId = idToMergedId.get(jumpId) || jumpId;
@@ -1280,7 +1349,7 @@ export default function UnifiedQuizEngine() {
       const MAX_TOTAL = 10000; // Safety cap to prevent memory issues
       
       while (from < MAX_TOTAL) {
-        let query = supabase.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)');
+        let query = supabase.from('questions').select(SELECT_COLS);
         const resIds = typeof params.resultIds === 'string' ? params.resultIds.split(',').filter((id: string) => id.trim().length > 0) : null;
         
         if (resIds && resIds.length > 0) {
@@ -1292,7 +1361,6 @@ export default function UnifiedQuizEngine() {
           if (from > 0) break; // Only one question (cluster head)
           // PARITY FIX: fetch sibling rows so the merger can rebuild the full
           // multi-institute explanation cluster, exactly like the index path.
-          const SELECT_COLS = 'id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)';
           const { data: tgt } = await supabase
             .from('questions')
             .select(SELECT_COLS)
@@ -1557,10 +1625,78 @@ export default function UnifiedQuizEngine() {
         from += CHUNK;
       }
 
+const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && params.year_end;
+        let trackedOriginalIds: Set<string> | undefined;
+        
+        console.log('[Fetch Debug] PYQ enrichment check:', {
+          isPyqUpscsearch,
+          params: { pyqFilter: params.pyqFilter, year_start: params.year_start, year_end: params.year_end },
+        allFreshDataLength: allFreshData.length
+      });
+      
+      if ((params.testId || isPyqUpscsearch) && allFreshData.length > 0) {
+        // UPSC CSE PYQ Enrichment: Fetch sibling versions for merged explanations
+        // Keep count at original testId count, but enrich with all institute explanations
+        const isUpscPaperSession = allFreshData.some((q: any) => {
+          const groupName = String(q?.source?.group || q?.exam_group || q?.tests?.series || q?.tests?.title || '').toUpperCase();
+          return Boolean(q?.is_pyq) && (Boolean(q?.is_upsc_cse) || groupName.includes('UPSC'));
+        });
+        if (isUpscPaperSession) {
+          const originalIds = new Set(allFreshData.map((q: any) => q.id));
+          trackedOriginalIds = originalIds; // Track for later filtering
+          const years = Array.from(new Set(
+            allFreshData
+              .filter((q: any) => Boolean(q?.is_pyq) && (Boolean(q?.is_upsc_cse) || String(q?.source?.group || q?.exam_group || q?.tests?.series || '').toUpperCase().includes('UPSC')))
+              .map((q: any) => String(q?.exam_year || '').trim())
+              .filter(Boolean)
+          ));
+          if (years.length > 0) {
+            const { data: siblings } = await supabase
+              .from('questions')
+              .select(SELECT_COLS)
+              .in('exam_year', years)
+              .eq('is_pyq', true)
+              .eq('is_upsc_cse', true)
+              .limit(5000);
+            if (siblings && siblings.length > 0) {
+              // Add siblings for merging explanations, but remember original IDs
+              siblings.forEach((q: any) => {
+                if (!originalIds.has(q.id)) allFreshData.push(q);
+              });
+            }
+          }
+        }
+      }
+
       // Only process fresh data if we actually got some rows.
       // Never blow away cached questions with empty server response.
       if (allFreshData.length > 0) {
-        processResults(allFreshData);
+        // For enrichment filtering: use tracked original IDs from enrichment block
+        let originalQuestionIds: Set<string> | undefined;
+        
+        if (params.testId) {
+          // Test mode: keep only questions with matching test_id
+          originalQuestionIds = new Set(
+            allFreshData
+              .filter((q: any) => q.test_id === params.testId)
+              .map((q: any) => q.id)
+          );
+        } else if (isPyqUpscsearch && trackedOriginalIds) {
+          // PYQ search mode: use tracked original IDs
+          originalQuestionIds = trackedOriginalIds;
+          console.log('[Fetch Debug] Using trackedOriginalIds for PYQ search:', {
+            trackedOriginalIdsSize: trackedOriginalIds.size,
+            sampleIds: Array.from(trackedOriginalIds).slice(0, 3)
+          });
+        }
+        
+        console.log('[Fetch Debug] Before processResults:', {
+          allFreshDataLength: allFreshData.length,
+          hasOriginalQuestionIds: !!originalQuestionIds,
+          originalQuestionIdsSize: originalQuestionIds?.size || 0
+        });
+        
+        processResults(allFreshData, originalQuestionIds);
       }
     } catch (err) {
       console.error('Fetch error:', err);
@@ -1582,7 +1718,7 @@ export default function UnifiedQuizEngine() {
   }, [questions.length, timerType]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval> | undefined;
     if (isTimerActive) {
       interval = setInterval(() => {
         setSeconds(prev => {
@@ -1802,6 +1938,38 @@ export default function UnifiedQuizEngine() {
        setRevealedExplanations({});
     } else {
         setShowExitModal(true);
+    }
+  };
+
+  const handleSavePersonalNote = async (qId: string, html: string) => {
+    store.setMetadata(qId, { note: html }, arenaMode === 'exam');
+    store.syncAnswer(qId);
+    setEditNoteQId(null);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    
+    // Auto-switch to the "My Note" tab after saving
+    const explanations = buildCanonicalExplanations(questions.find(qq => qq.id === qId));
+    setActiveExplIndex(prev => ({ ...prev, [qId]: explanations.length })); // Index of the newly added "My Note"
+  };
+
+  const handleCloneToNote = (qId: string, text: string) => {
+    setNoteEditorText(text);
+    setEditNoteQId(qId);
+  };
+
+  const handleAiRefineNote = async () => {
+    if (!noteEditorText.trim()) return;
+    setIsAiRefiningNote(true);
+    try {
+      const refined = await aiTransformNoteContent(
+        noteEditorText.replace(/<[^>]+>/g, ''), 
+        "Refine this UPSC study note to be more concise, add mnemonics if possible, and ensure it's easy to memorize."
+      );
+      setNoteEditorText(refined);
+    } catch (e: any) {
+      Alert.alert("AI Refinement Failed", e.message);
+    } finally {
+      setIsAiRefiningNote(false);
     }
   };
 
@@ -2326,6 +2494,10 @@ export default function UnifiedQuizEngine() {
         mdStyles={mdStyles}
         mdRules={mdRules}
         onCreateTag={() => setIsAddingTag(true)}
+        onNoteDraft={(qid: string, text: string) => {
+          setEditNoteQId(qid);
+          setNoteEditorText(text);
+        }}
       />
     );
   };
@@ -2713,13 +2885,14 @@ export default function UnifiedQuizEngine() {
             {/* Paper / List view toggle (always visible). 'paper' = Simulated Exam Mode. */}
             <TouchableOpacity
               onPress={() => {
-                setViewMode(prev => prev === 'paper' ? 'list' : 'paper');
+                // Toggle between list and card views
+                setViewMode(prev => prev === 'card' ? 'list' : 'card');
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
               }}
-              style={[styles.headerBtn, viewMode === 'paper' && { backgroundColor: (isZenMode ? '#43342220' : colors.primary + '15'), borderRadius: 10 }]}
-              testID="engine-paper-toggle"
+              style={styles.headerBtn}
+              testID="engine-view-toggle"
             >
-              <BookOpen size={20} color={viewMode === 'paper' ? (isZenMode ? '#433422' : colors.primary) : (isZenMode ? '#433422' : colors.textPrimary)} />
+              <BookOpen size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
             </TouchableOpacity>
             {/* Palette / Navigator — promoted out of the quick menu so it's
                 always one tap away (essential during a paper-style exam). */}
@@ -2731,8 +2904,8 @@ export default function UnifiedQuizEngine() {
               <LayoutGrid size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
             </TouchableOpacity>
 
-            {/* Exit simulation mode but STAY in quiz engine (switch to list view) */}
-            {viewMode === 'paper' && (
+            {/* Exit card view but STAY in quiz engine (switch to list view) */}
+            {viewMode === 'card' && (
               <TouchableOpacity
                 onPress={() => {
                   setViewMode('list');
@@ -3366,6 +3539,16 @@ export default function UnifiedQuizEngine() {
             const ans = currentAnswers[q.id] || { selectedAnswer: null, isReview: false, note: '' };
             // Build the explanation list (same logic as inline)
             const explanations: any[] = buildCanonicalExplanations(q);
+            
+            // Add "My Note" to the tabs if it exists
+            if (ans.note) {
+              explanations.push({
+                source: 'My Note',
+                sourceKey: 'my_note',
+                text: ans.note,
+                isUserNote: true
+              });
+            }
             const activeIdx = activeExplIndex[q.id] ?? -1;
             const safeIdx = activeIdx >= 0 && activeIdx < explanations.length ? activeIdx : -1;
             const text = safeIdx === -1
@@ -3423,13 +3606,23 @@ export default function UnifiedQuizEngine() {
                         <TouchableOpacity
                           key={`m-tab-${i}`}
                           onPress={() => setActiveExplIndex(prev => ({ ...prev, [q.id]: i }))}
-                          style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, backgroundColor: safeIdx === i ? colors.primary : colors.surfaceStrong, borderWidth: 1, borderColor: colors.border }}
+                          style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, backgroundColor: safeIdx === i ? (e.isUserNote ? '#10b981' : colors.primary) : colors.surfaceStrong, borderWidth: 1, borderColor: colors.border }}
                         >
                           <Text style={{ fontSize: 10, fontWeight: '900', color: safeIdx === i ? colors.buttonText : colors.textTertiary }}>
-                            {String(e.source).toUpperCase()}{e.year ? ' · ' + e.year : ''}
+                            {e.isUserNote ? '📝 ' : ''}{String(e.source).toUpperCase()}{e.year ? ' · ' + e.year : ''}
                           </Text>
                         </TouchableOpacity>
                       ))}
+                      {/* Plus button to add/edit note */}
+                      <TouchableOpacity
+                        onPress={() => {
+                          setEditNoteQId(q.id);
+                          setNoteEditorText(ans.note || '');
+                        }}
+                        style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.border, alignSelf: 'center' }}
+                      >
+                        <Plus size={16} color={colors.primary} />
+                      </TouchableOpacity>
                     </ScrollView>
                   )}
 
@@ -3441,9 +3634,29 @@ export default function UnifiedQuizEngine() {
                     nestedScrollEnabled
                     keyboardShouldPersistTaps="handled"
                   >
-                    <Markdown style={mdStyles} rules={mdRules}>
-                      {text}
-                    </Markdown>
+                        <Markdown style={mdStyles} rules={mdRules}>
+                          {text}
+                        </Markdown>
+
+                        {/* Clone to My Note shortcut */}
+                        {safeIdx !== -1 && !explanations[safeIdx].isUserNote && (
+                          <TouchableOpacity
+                            onPress={() => handleCloneToNote(q.id, text)}
+                            style={{ 
+                              flexDirection: 'row', 
+                              alignItems: 'center', 
+                              gap: 6, 
+                              marginTop: 12, 
+                              padding: 8, 
+                              borderRadius: 8, 
+                              backgroundColor: colors.primary + '10',
+                              alignSelf: 'flex-start'
+                            }}
+                          >
+                            <Copy size={14} color={colors.primary} />
+                            <Text style={{ fontSize: 11, fontWeight: '800', color: colors.primary }}>Clone to My Note</Text>
+                          </TouchableOpacity>
+                        )}
 
                     {/* Mistake type chips inside modal */}
                     <View style={{ marginTop: 18, paddingTop: 14, borderTopWidth: 1, borderTopColor: colors.border + '40' }}>
@@ -3690,6 +3903,126 @@ export default function UnifiedQuizEngine() {
           setValue={setCustomTestName}
           isSaving={isSavingAttempt}
         />
+
+        {/* Personalized Rich Note Editor Modal */}
+        <Modal
+          visible={!!editNoteQId}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setEditNoteQId(null)}
+        >
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
+            <KeyboardAvoidingView 
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              style={{ width: '100%' }}
+            >
+              <View style={{ 
+                backgroundColor: colors.surface, 
+                borderTopLeftRadius: 24, 
+                borderTopRightRadius: 24, 
+                padding: 20,
+                height: height * 0.85,
+                borderWidth: 1,
+                borderColor: colors.border
+              }}>
+                {/* Modal Header */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: '#10b98115', alignItems: 'center', justifyContent: 'center' }}>
+                      <Edit2 size={20} color="#10b981" />
+                    </View>
+                    <View>
+                      <Text style={{ fontSize: 16, fontWeight: '900', color: colors.textPrimary }}>Personalized Note</Text>
+                      <Text style={{ fontSize: 11, color: colors.textTertiary, fontWeight: '700' }}>Rich Text & AI Refined</Text>
+                    </View>
+                  </View>
+                  <TouchableOpacity 
+                    onPress={() => setEditNoteQId(null)}
+                    style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <X size={20} color={colors.textPrimary} />
+                  </TouchableOpacity>
+                </View>
+
+                {/* Rich Toolbar */}
+                <View style={{ backgroundColor: colors.surfaceStrong, borderRadius: 12, marginBottom: 12, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' }}>
+                  <RichToolbar
+                    getEditor={() => (richNoteRef.current)}
+                    selectedIconTint={colors.primary}
+                    iconTint={colors.textSecondary}
+                    style={{ backgroundColor: 'transparent' }}
+                    actions={[
+                      actions.undo,
+                      actions.redo,
+                      actions.setBold,
+                      actions.setItalic,
+                      actions.insertBulletsList,
+                      actions.insertOrderedList,
+                      'highlight',
+                      'aiRefine'
+                    ]}
+                    iconMap={{
+                      [actions.undo]: ({ tintColor }: any) => <Undo2 size={18} color={tintColor} />,
+                      [actions.redo]: ({ tintColor }: any) => <Redo2 size={18} color={tintColor} />,
+                      highlight: ({ tintColor }: any) => <Highlighter size={18} color={tintColor} />,
+                      aiRefine: ({ tintColor }: any) => (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: colors.primary }}>
+                          <Brain size={14} color="#fff" />
+                          <Text style={{ color: '#fff', fontSize: 10, fontWeight: '900' }}>REFINE</Text>
+                        </View>
+                      )
+                    }}
+                    onPress={(action: any) => {
+                      if (action === 'aiRefine') {
+                        handleAiRefineNote();
+                        return;
+                      }
+                      if (action === 'highlight') {
+                        richNoteRef.current?.commandDOM?.("document.execCommand('hiliteColor', false, '#FFF59D')");
+                        return;
+                      }
+                    }}
+                  />
+                </View>
+
+                {/* Editor Shell */}
+                <View style={{ flex: 1, borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: colors.border }}>
+                  <RichNoteEditor
+                    ref={richNoteRef}
+                    html={noteEditorText}
+                    onChange={setNoteEditorText}
+                    themeColors={{
+                      bg: colors.surface,
+                      surface: colors.surface,
+                      textPrimary: colors.textPrimary,
+                      border: colors.border,
+                      primary: colors.primary
+                    }}
+                    editorStyle={{ minHeight: 400 }}
+                    placeholder="Type your personal tricks, mnemonics, or refined explanation here..."
+                  />
+                </View>
+
+                {/* Action Buttons */}
+                <View style={{ flexDirection: 'row', gap: 12, marginTop: 20, marginBottom: Platform.OS === 'ios' ? 20 : 0 }}>
+                  <TouchableOpacity 
+                    style={{ flex: 1, height: 54, borderRadius: 16, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center' }}
+                    onPress={() => setEditNoteQId(null)}
+                  >
+                    <Text style={{ fontWeight: '800', color: colors.textPrimary }}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={{ flex: 2, height: 54, borderRadius: 16, backgroundColor: '#10b981', alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 10 }}
+                    onPress={() => editNoteQId && handleSavePersonalNote(editNoteQId, noteEditorText)}
+                  >
+                    <Check size={20} color="#fff" />
+                    <Text style={{ fontWeight: '900', color: '#fff', fontSize: 16 }}>Save Note</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </KeyboardAvoidingView>
+          </View>
+        </Modal>
 
         {/* POST-SUBMISSION SUMMARY MODAL */}
         <Modal visible={!!summary} transparent animationType="fade" onRequestClose={() => {}}>

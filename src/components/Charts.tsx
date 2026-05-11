@@ -17,9 +17,10 @@ interface BarChartProps {
   height?: number;
   max?: number;
   color?: string;
+  onPress?: (label: string) => void;
 }
 
-export const BarChart = ({ data, height = 200, max = 100, color }: BarChartProps) => {
+export const BarChart = ({ data, height = 200, max = 100, color, onPress }: BarChartProps) => {
   const { colors: theme } = useTheme();
   if (!data || data.length === 0) return <View style={{ height: height + 40, alignItems: 'center', justifyContent: 'center' }}><Text style={{ color: theme.textTertiary, fontSize: 12 }}>No data available</Text></View>;
 
@@ -37,7 +38,15 @@ export const BarChart = ({ data, height = 200, max = 100, color }: BarChartProps
           const y = height - barHeight;
 
           return (
-            <G key={item.label}>
+            <G key={item.label} onPress={() => onPress?.(item.label)}>
+              {/* Tap Target */}
+              <Rect
+                x={x - gap/2}
+                y={0}
+                width={barWidth + gap}
+                height={height + 40}
+                fill="transparent"
+              />
               {/* Bar */}
               <Rect
                 x={x}
@@ -678,34 +687,40 @@ interface RadarChartProps {
   data: { label: string; value: number }[];
   size?: number;
   max?: number;
+  onPress?: (label: string) => void;
 }
 
-export const RadarChart = ({ data, size = 200, max = 100 }: RadarChartProps) => {
+export const RadarChart = ({ data, size = 200, max = 100, onPress }: RadarChartProps) => {
   const { colors: theme } = useTheme();
-  const center = size / 2;
-  const radius = size / 2 - 20;
-  const angleStep = (Math.PI * 2) / data.length;
+  
+  // Increase SVG size to provide 'floating' room for labels
+  const svgSize = size + 80; 
+  const center = svgSize / 2;
+  const chartRadius = (size / 2) - 40; // Smaller radius to give more room for labels
+  const angleStep = (Math.PI * 2) / (data.length || 1);
 
   const points = data.map((item, i) => {
     const angle = i * angleStep - Math.PI / 2;
-    const r = (item.value / max) * radius;
+    const r = (item.value / max) * chartRadius;
     const x = center + r * Math.cos(angle);
     const y = center + r * Math.sin(angle);
     return { x, y };
   });
 
-  const pathData = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
+  const pathData = points.length > 0 
+    ? points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z'
+    : '';
 
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center', marginVertical: spacing.md }}>
-      <Svg height={size} width={size}>
+      <Svg height={svgSize} width={svgSize}>
         {/* Grid Circles */}
         {[0.2, 0.4, 0.6, 0.8, 1].map((p, i) => (
           <Circle
             key={i}
             cx={center}
             cy={center}
-            r={radius * p}
+            r={chartRadius * p}
             fill="none"
             stroke={theme.border}
             strokeWidth="1"
@@ -716,8 +731,8 @@ export const RadarChart = ({ data, size = 200, max = 100 }: RadarChartProps) => 
         {/* Axes */}
         {data.map((_, i) => {
           const angle = i * angleStep - Math.PI / 2;
-          const x = center + radius * Math.cos(angle);
-          const y = center + radius * Math.sin(angle);
+          const x = center + chartRadius * Math.cos(angle);
+          const y = center + chartRadius * Math.sin(angle);
           return (
             <Path
               key={i}
@@ -729,37 +744,57 @@ export const RadarChart = ({ data, size = 200, max = 100 }: RadarChartProps) => 
         })}
 
         {/* Data Path */}
-        <Path
-          d={pathData}
-          fill={theme.primary + '30'}
-          stroke={theme.primary}
-          strokeWidth="2"
-        />
+        {pathData ? (
+          <Path
+            d={pathData}
+            fill={theme.primary + '30'}
+            stroke={theme.primary}
+            strokeWidth="2"
+          />
+        ) : null}
 
-        {/* Labels */}
+        {/* Labels - Interactive */}
         {data.map((item, i) => {
           const angle = i * angleStep - Math.PI / 2;
-          const x = center + (radius + 15) * Math.cos(angle);
-          const y = center + (radius + 15) * Math.sin(angle);
+          // Position labels further out but still inside the larger SVG canvas
+          const x = center + (chartRadius + 30) * Math.cos(angle);
+          const y = center + (chartRadius + 30) * Math.sin(angle);
+          
           return (
-            <SvgText
-              key={i}
-              x={x}
-              y={y}
-              fill={theme.textSecondary}
-              fontSize="10"
-              fontWeight="800"
-              textAnchor="middle"
-              alignmentBaseline="middle"
-            >
-              {item.label}
-            </SvgText>
+            <G key={i} onPress={() => onPress?.(item.label)}>
+              <Circle
+                cx={x}
+                cy={y}
+                r={22}
+                fill={theme.surface}
+                fillOpacity={0.9}
+                stroke={theme.border}
+                strokeWidth={1}
+                shadowColor="#000"
+                shadowOffset={{ width: 0, height: 2 }}
+                shadowOpacity={0.1}
+                shadowRadius={4}
+              />
+              <SvgText
+                x={x}
+                y={y}
+                fill={theme.textPrimary}
+                fontSize="9"
+                fontWeight="900"
+                textAnchor="middle"
+                alignmentBaseline="middle"
+              >
+                {item.label.length > 10 ? item.label.substring(0, 8) + '..' : item.label}
+              </SvgText>
+            </G>
           );
         })}
+
       </Svg>
     </View>
   );
 };
+
 
 interface ScatterPlotProps {
   data: { x: number; y: number }[];

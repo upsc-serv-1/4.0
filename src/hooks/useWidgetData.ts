@@ -180,7 +180,7 @@ export function useWidgetData(userId: string | undefined) {
 
       const [statesRes, cardsRes, notesRes, attemptsRes] = await Promise.all([
         supabase.from('question_states').select('question_id, is_incorrect_last_attempt, updated_at, review_tags').eq('user_id', userId),
-        supabase.from('user_cards').select('id, learning_status, next_review, status').eq('user_id', userId),
+        supabase.from('user_cards').select('id, learning_status, next_review, status, cards!inner(id, is_deleted)').eq('user_id', userId).eq('cards.is_deleted', false),
         supabase.from('user_notes').select('id, title, updated_at').eq('user_id', userId).order('updated_at', { ascending: false }).limit(5),
         supabase.from('test_attempts').select('id, title, score, total, submitted_at, duration_seconds').eq('user_id', userId).order('submitted_at', { ascending: false }).limit(20),
       ]);

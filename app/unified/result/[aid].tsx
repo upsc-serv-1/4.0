@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Share, Platform, Alert, Dimensions, Animated } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Share, Platform, Alert, Dimensions, Animated, Switch } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { useTheme } from '../../../src/context/ThemeContext';
 import { spacing, radius } from '../../../src/theme';
-import { 
-  ChevronLeft, 
-  Share2, 
-  Trophy, 
-  Target, 
+import {
+  ChevronLeft,
+  Share2,
+  Trophy,
+  Target,
   ArrowRight,
   Zap,
   ArrowDownCircle,
@@ -36,15 +37,55 @@ import Markdown from 'react-native-markdown-display';
 import { aiExplainQuestion } from '../../../src/services/GeminiService';
 import { SharedQuestionCard } from '../../../src/components/unified/SharedQuestionCard';
 import { getPYQCategorization, buildCanonicalExplanations } from '../../../src/utils/questionUtils';
+import { PilotV2SaveSheet } from '../../../src/components/pilot-v2/PilotV2SaveSheet';
+import { QuizCaptureSheet } from '../../../src/components/hardnotes/QuizCaptureSheet';
+import { DetailedBreakdown } from '../../../src/components/unified/DetailedBreakdown';
+import { TrendingUp, BarChart2 } from 'lucide-react-native';
+import { markdownToHtml } from '../../../src/utils/textUtils';
+import { AnalyseSection } from '../../../src/components/unified/AnalyseSection';
+import { Modal, Pressable } from 'react-native';
 
 export default function ResultScreen() {
   const { aid } = useLocalSearchParams<{ aid: string }>();
   const { colors } = useTheme();
-  
+
   const [activeExplSources, setActiveExplSources] = useState<Record<string, string>>({});
   const [aiExplanations, setAiExplanations] = useState<Record<string, string>>({});
   const [aiLoading, setAiLoading] = useState<Record<string, boolean>>({});
   const [revealedExplanations, setRevealedExplanations] = useState<Record<string, boolean>>({});
+
+  // Pilot V2 Save states
+  const [pilotV2SaveOpen, setPilotV2SaveOpen] = useState(false);
+  const [pilotSaveTargetQuestion, setPilotSaveTargetQuestion] = useState<any>(null);
+  const [pilotSaveHtml, setPilotSaveHtml] = useState('');
+
+  // Hardnotes states
+  const [hardnotesPickerVisible, setHardnotesPickerVisible] = useState(false);
+  const [hardnotesPayload, setHardnotesPayload] = useState<{ markdown: string; title: string } | null>(null);
+
+  const openNotebookFromQuestion = (
+    q: any,
+    explanationText?: string,
+    optsOrMode?: { closeExplanation?: boolean } | string
+  ) => {
+    const activeText = explanationText || q.explanation_markdown || '';
+    setPilotSaveTargetQuestion(q);
+    setPilotSaveHtml(markdownToHtml(activeText));
+    setPilotV2SaveOpen(true);
+  };
+
+  const openHardnoteFromQuestion = (
+    q: any,
+    explanationText?: string,
+    opts?: { closeExplanation?: boolean }
+  ) => {
+    const activeText = explanationText || q.explanation_markdown || '';
+    setHardnotesPayload({
+      markdown: activeText,
+      title: q.question_text?.slice(0, 50) || 'Question Explanation'
+    });
+    setHardnotesPickerVisible(true);
+  };
 
   const handleAiExplain = async (question: any) => {
     if (aiLoading[question.id]) return;
@@ -57,15 +98,19 @@ export default function ResultScreen() {
         C: rawOptions.c || rawOptions.C || '',
         D: rawOptions.d || rawOptions.D || '',
       };
-      const context = question.explanation_markdown 
-        ? [{ source: 'Analysis', text: question.explanation_markdown }] 
-        : [];
-        
+      const context = (question._explanations && Array.isArray(question._explanations) && question._explanations.length > 0)
+        ? question._explanations.map((e: any) => ({
+          source: e.source || e.institute || 'Source',
+          text: e.text || e.explanation || e.explanation_markdown || '',
+          answer: e.answer || e.correct_answer
+        }))
+        : (question.explanation_markdown ? [{ source: 'Analysis', text: question.explanation_markdown }] : []);
+
       const res = await aiExplainQuestion(
         question.question_text || '',
         optionsMap,
         question.correctAnswer || '',
-        JSON.stringify(context)
+        context
       );
       setAiExplanations(prev => ({ ...prev, [question.id]: res.text }));
       setActiveExplSources(prev => ({ ...prev, [question.id]: 'ai' }));
@@ -78,17 +123,53 @@ export default function ResultScreen() {
 
   const { session } = useAuth();
   const { loading, error, scoreData, questions, testId, testTitle, hierarchicalPerformance, confidenceMetrics } = useSingleTestAnalytics(aid);
-  const [activeTab, setActiveTab] = useState<'review' | 'analysis'>('review');
+  const [activeTab, setActiveTab] = useState<'review' | 'analysis' | 'detailed'>('review');
   const [filterType, setFilterType] = useState<'all' | 'attempted' | 'correct' | 'incorrect' | 'skipped' | 'pyq' | 'imp_fact' | 'must_revise'>('all');
   const [localTags, setLocalTags] = useState<Record<string, string>>({});
   const [localReviewTags, setLocalReviewTags] = useState<Record<string, string[]>>({});
   const [savingFlashcard, setSavingFlashcard] = useState<Record<string, boolean>>({});
   const [inFlashcardDeck, setInFlashcardDeck] = useState<Record<string, boolean>>({});
   const [aff, setAff] = useState<{ visible: boolean; cardId: string | null; hint: { subject?: string; section_group?: string; microtopic?: string }; questionId?: string | null }>({ visible: false, cardId: null, hint: {}, questionId: null });
-  
+
   const scrollY = React.useRef(new Animated.Value(0)).current;
   const [showPYQTags] = useState(true); // Always follow rule from search bar
   const [exportSheetVisible, setExportSheetVisible] = useState(false);
+  const [showTrends, setShowTrends] = useState(false);
+  const [showMistakes, setShowMistakes] = useState(true);
+
+  const handleAddToFlashcards = async (item: any) => {
+    if (!session?.user?.id || savingFlashcard[item.id]) return;
+    setSavingFlashcard(prev => ({ ...prev, [item.id]: true }));
+    try {
+      const qText = item.question_text || item.text || '';
+      const { data, error } = await FlashcardSvc.createFromQuestion(session.user.id, {
+        questionId: item.id,
+        questionText: qText,
+        answerText: item.correctAnswer || item.correct_answer || '',
+        explanationText: aiExplanations[item.id] || item.explanation_markdown || '',
+        subject: item.subject,
+        section: item.section_group || item.sectionGroup,
+        topic: item.micro_topic || item.microTopic
+      });
+
+      if (error) throw error;
+      setInFlashcardDeck(prev => ({ ...prev, [item.id]: true }));
+      setAff({
+        visible: true,
+        cardId: data.id,
+        hint: {
+          subject: item.subject,
+          section_group: item.section_group || item.sectionGroup,
+          microtopic: item.micro_topic || item.microTopic
+        },
+        questionId: item.id
+      });
+    } catch (err: any) {
+      Alert.alert('Error', err.message || 'Failed to add to flashcards');
+    } finally {
+      setSavingFlashcard(prev => ({ ...prev, [item.id]: false }));
+    }
+  };
 
   const userTags = useMemo(() => {
     const s = new Set<string>();
@@ -99,9 +180,12 @@ export default function ResultScreen() {
     return Array.from(s);
   }, [questions, localReviewTags]);
 
-  const exportPayload = useMemo(() => {
-    if (!questions) return null;
-    const rows = questions.map((q: any) => ({
+  const prepareExportPayload = () => {
+    if (!filteredQuestions || filteredQuestions.length === 0) {
+      Alert.alert("No Questions", "The current filter has no questions to export.");
+      return;
+    }
+    const rows = filteredQuestions.map((q: any) => ({
       id: q.id,
       question_text: q.question_text || q.text || q.statement || '',
       options: q.options,
@@ -118,8 +202,9 @@ export default function ResultScreen() {
       review_tags: localReviewTags[q.id] || q.reviewTags || [],
       time_taken_seconds: q.timeTakenSeconds || q.time_taken_seconds,
     }));
-    return { kind: 'questions' as const, rows };
-  }, [questions, localReviewTags]);
+    setExportPayload({ kind: 'questions' as const, rows });
+    setExportSheetVisible(true);
+  };
 
   const headerOpacity = scrollY.interpolate({
     inputRange: [0, 100],
@@ -140,20 +225,55 @@ export default function ResultScreen() {
       if (filterType === 'incorrect') return !isCorrect && !isSkipped;
       if (filterType === 'skipped') return isSkipped;
       if (filterType === 'pyq') return q.isPyq;
-      if (filterType === 'imp_fact') return tags.includes('Imp. Fact');
-      if (filterType === 'must_revise') return tags.includes('Must Revise');
+      if (filterType.startsWith('tag:')) {
+        const tagName = filterType.replace('tag:', '');
+        return tags.includes(tagName);
+      }
       return true;
     });
   }, [questions, filterType, localReviewTags]);
 
+  const [allUserTags, setAllUserTags] = useState<string[]>(['Guessed', 'Silly Mistake', 'Must Revise', 'Time Mgmt', 'Imp. Fact']);
+
+  useEffect(() => {
+    const fetchAllTags = async () => {
+      if (!session?.user?.id) return;
+      const tags = new Set<string>(['Guessed', 'Silly Mistake', 'Must Revise', 'Time Mgmt', 'Imp. Fact']);
+
+      try {
+        const catalogKey = `review_tag_catalog_${session.user.id}`;
+        const raw = await AsyncStorage.getItem(catalogKey);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) parsed.forEach(t => t && tags.add(t));
+        }
+      } catch { }
+
+      const { data } = await supabase
+        .from('question_states')
+        .select('review_tags')
+        .eq('user_id', session.user.id)
+        .not('review_tags', 'is', null);
+
+      if (data) {
+        data.forEach(row => {
+          if (Array.isArray(row.review_tags)) {
+            row.review_tags.forEach(t => tags.add(t));
+          }
+        });
+      }
+      setAllUserTags(Array.from(tags).sort());
+    };
+    fetchAllTags();
+  }, [session?.user?.id]);
+
   const userStudyTags = useMemo(() => {
-    const defaultTags = ['Guessed', 'Silly Mistake', 'Must Revise', 'Time Mgmt', 'Imp. Fact'];
-    const allTags = new Set(defaultTags);
+    const s = new Set<string>(allUserTags);
     Object.values(localReviewTags).flat().forEach(tag => {
-      if (tag) allTags.add(tag);
+      if (tag) s.add(tag);
     });
-    return Array.from(allTags);
-  }, [localReviewTags]);
+    return Array.from(s).sort();
+  }, [allUserTags, localReviewTags]);
 
   const handleShare = async () => {
     if (!scoreData) return;
@@ -173,7 +293,7 @@ export default function ResultScreen() {
     const allIds = questions.map(q => q.id);
     router.push({
       pathname: '/unified/engine',
-      params: { 
+      params: {
         testId: testId || 'manual',
         resultIds: allIds.join(','),
         mode: mode,
@@ -182,21 +302,19 @@ export default function ResultScreen() {
     });
   };
 
-  const handleReviewIncorrect = () => {
-    const incorrectIds = questions
-      ?.filter(q => q.selectedAnswer && q.selectedAnswer !== q.correctAnswer)
-      .map(q => q.id);
-    
-    if (!incorrectIds || incorrectIds.length === 0) {
-      Alert.alert("Perfect Score!", "You don't have any incorrect questions to review.");
+  const handleReviewFiltered = () => {
+    const targetIds = filteredQuestions.map(q => q.id);
+
+    if (targetIds.length === 0) {
+      Alert.alert("No Questions", "There are no questions in the current filter to review.");
       return;
     }
-    
+
     router.push({
       pathname: '/unified/engine',
-      params: { 
+      params: {
         testId: testId || 'manual',
-        resultIds: incorrectIds.join(','),
+        resultIds: targetIds.join(','),
         mode: 'learning',
         view: 'card'
       }
@@ -250,15 +368,15 @@ export default function ResultScreen() {
     const incorrectIds = questions
       ?.filter(q => q.selectedAnswer && q.selectedAnswer !== q.correctAnswer)
       .map(q => q.id);
-    
+
     if (!incorrectIds || incorrectIds.length === 0) {
       Alert.alert("All Correct!", "No incorrect questions found to retake.");
       return;
     }
-    
+
     router.push({
       pathname: '/unified/engine',
-      params: { 
+      params: {
         testId: `${testId}_retake_err`,
         resultIds: incorrectIds.join(','),
         mode: 'exam',
@@ -269,15 +387,15 @@ export default function ResultScreen() {
 
   const handleRetakePYQ = () => {
     const pyqIds = questions?.filter(q => q.isPyq).map(q => q.id);
-    
+
     if (!pyqIds || pyqIds.length === 0) {
       Alert.alert("No PYQs", "This test doesn't contain any Previous Year Questions.");
       return;
     }
-    
+
     router.push({
       pathname: '/unified/engine',
-      params: { 
+      params: {
         testId: `${testId}_retake_pyq`,
         resultIds: pyqIds.join(','),
         mode: 'exam',
@@ -311,10 +429,10 @@ export default function ResultScreen() {
 
   const toggleReviewTag = async (questionId: string, tag: string) => {
     if (!aid || !session?.user?.id) return;
-    
+
     const q = questions?.find(x => x.id === questionId);
     const existingTags = localReviewTags[questionId] || q?.reviewTags || [];
-    const newTags = existingTags.includes(tag) 
+    const newTags = existingTags.includes(tag)
       ? existingTags.filter(t => t !== tag)
       : [...existingTags, tag];
 
@@ -345,7 +463,7 @@ export default function ResultScreen() {
       Alert.alert('Info', 'Already in your deck.');
       return;
     }
-    
+
     setSavingFlashcard(prev => ({ ...prev, [q.id]: true }));
     try {
       const cardId = await FlashcardSvc.createCard(session.user.id, {
@@ -394,7 +512,7 @@ export default function ResultScreen() {
         <Text style={{ color: colors.textPrimary, fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>
           {typeof error === 'string' ? error : (error as any)?.message || "We couldn't load this result."}
         </Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.backBtn, { backgroundColor: colors.primary, marginTop: spacing.xl }]}
           onPress={() => router.back()}
         >
@@ -407,10 +525,10 @@ export default function ResultScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
       <Stack.Screen options={{ headerShown: false }} />
-      
+
       {/* Dynamic Header */}
-      <Animated.View style={[styles.header, { 
-        backgroundColor: colors.surface, 
+      <Animated.View style={[styles.header, {
+        backgroundColor: colors.surface,
         borderBottomColor: colors.border,
         opacity: headerOpacity,
         zIndex: 10,
@@ -423,7 +541,13 @@ export default function ResultScreen() {
             {testTitle || 'Test Result'}
           </Text>
           <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity testID="analysis-export-button" onPress={() => setExportSheetVisible(true)} style={styles.headerIcon}>
+            <TouchableOpacity
+              onPress={() => setShowTrends(true)}
+              style={[styles.headerIcon, { backgroundColor: colors.primary + '15', borderRadius: 8, marginRight: 8 }]}
+            >
+              <BarChart2 color={colors.primary} size={18} />
+            </TouchableOpacity>
+            <TouchableOpacity testID="analysis-export-button" onPress={prepareExportPayload} style={styles.headerIcon}>
               <FileDown color={colors.textPrimary} size={20} />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleShare} style={styles.headerIcon}>
@@ -437,38 +561,37 @@ export default function ResultScreen() {
         data={activeTab === 'review' ? filteredQuestions : []}
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => (
-            <SharedQuestionCard 
-              item={{
-                ...item,
-                correct_answer: item.correctAnswer,
-                question_text: item.question_text || item.statement_line,
-                _explanations: item._explanations || []
-              }}
-              index={index} 
-              answerData={{
-                selectedAnswer: item.selectedAnswer,
-                isReview: !!localReviewTags[item.id]?.includes('Must Revise'),
-                studyTags: localReviewTags[item.id] || []
-              }}
-              arenaMode="learning"
-              isRevealed={revealedExplanations[item.id]}
-              colors={colors}
-              activeExplSource={activeExplSources[item.id] || 'all'}
-              onExplSourceChange={(src: string) => setActiveExplSources(prev => ({ ...prev, [item.id]: src }))}
-              aiExplanation={aiExplanations[item.id]}
-              isAiLoading={aiLoading[item.id]}
-              isSavingFlashcard={savingFlashcard[item.id]}
-              isFlashcarded={inFlashcardDeck[item.id]}
-              onRevealExplanation={() => setRevealedExplanations(prev => ({ ...prev, [item.id]: true }))}
-              onOptionSelect={() => {}}
-              onAddFlashcard={() => handleAddToFlashcard(item)}
-              onAiExplain={() => handleAiExplain(item)}
-              mdStyles={mdStyles}
-              mdRules={mdRules}
-              showPYQTags={showPYQTags}
-              userStudyTags={userStudyTags}
-              toggleStudyTag={(qid: string, tags: string[], tag: string) => toggleReviewTag(qid, tag)}
-            />
+          <SharedQuestionCard
+            key={item.id}
+            item={{
+              ...item,
+              correct_answer: item.correctAnswer || item.correct_answer,
+              question_text: item.question_text || item.statement_line || item.text,
+              _explanations: item._explanations || []
+            }}
+            index={index}
+            arenaMode="learning"
+            colors={colors}
+            isRevealed={!!revealedExplanations[item.id]}
+            activeExplSource={activeExplSources[item.id] || 'all'}
+            onExplSourceChange={(src) => setActiveExplSources(prev => ({ ...prev, [item.id]: src }))}
+            aiExplanation={aiExplanations[item.id]}
+            isAiLoading={aiLoading[item.id]}
+            onAiExplain={() => handleAiExplain(item)}
+            onAddFlashcard={() => handleAddToFlashcards(item)}
+            isFlashcarded={inFlashcardDeck[item.id]}
+            isSavingFlashcard={savingFlashcard[item.id]}
+            openNotebookFromQuestion={openNotebookFromQuestion}
+            openHardnoteFromQuestion={openHardnoteFromQuestion}
+            onRevealExplanation={() => setRevealedExplanations(prev => ({ ...prev, [item.id]: true }))}
+            onOptionSelect={() => { }}
+            mdStyles={mdStyles}
+            mdRules={mdRules}
+            showPYQTags={showPYQTags}
+            userStudyTags={userStudyTags}
+            toggleStudyTag={(qid: string, tags: string[], tag: string) => toggleReviewTag(qid, tag)}
+            showMistakes={showMistakes}
+          />
         )}
         ListHeaderComponent={
           <>
@@ -477,15 +600,14 @@ export default function ResultScreen() {
               <TouchableOpacity onPress={() => router.back()} style={styles.floatingBack}>
                 <ChevronLeft color={colors.textPrimary} size={24} />
               </TouchableOpacity>
-              
+
               <View style={styles.trophyContainer}>
                 <Trophy size={48} color={colors.primary} />
               </View>
-              
               <Text style={[styles.heroTitle, { color: colors.textPrimary }]}>
                 {scoreData.accuracy > 80 ? 'Exceptional Work!' : scoreData.accuracy > 50 ? 'Good Effort!' : 'Keep Practicing!'}
               </Text>
-              
+
               <View style={styles.scoreRow}>
                 <View style={styles.scoreItem}>
                   <Text style={[styles.scoreValue, { color: colors.primary }]}>{scoreData.totalMarks}</Text>
@@ -524,14 +646,14 @@ export default function ResultScreen() {
 
             {/* Action Buttons */}
             <View style={styles.actionRow}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.primaryAction, { backgroundColor: colors.primary }]}
-                onPress={handleReviewIncorrect}
+                onPress={handleReviewFiltered}
               >
                 <RefreshCcw size={18} color="#fff" />
-                <Text style={styles.primaryActionText}>Review Mistakes</Text>
+                <Text style={styles.primaryActionText}>Review Results</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.secondaryAction, { backgroundColor: colors.surface, borderColor: colors.border }]}
                 onPress={() => handleRePractice('exam')}
               >
@@ -541,14 +663,14 @@ export default function ResultScreen() {
             </View>
 
             <View style={styles.retakeRow}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.retakeBtn, { backgroundColor: colors.surface, borderColor: colors.error + '40' }]}
                 onPress={handleRetakeIncorrect}
               >
                 <XCircle size={16} color={colors.error} />
                 <Text style={[styles.retakeBtnText, { color: colors.error }]}>RETAKE MISTAKES</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.retakeBtn, { backgroundColor: colors.surface, borderColor: colors.success + '40' }]}
                 onPress={handleRetakePYQ}
               >
@@ -559,19 +681,26 @@ export default function ResultScreen() {
 
             {/* Tabs */}
             <View style={[styles.tabContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.tab, activeTab === 'review' && { backgroundColor: colors.surfaceStrong }]}
                 onPress={() => setActiveTab('review')}
               >
                 <Search size={18} color={activeTab === 'review' ? colors.primary : colors.textTertiary} />
                 <Text style={[styles.tabText, { color: activeTab === 'review' ? colors.textPrimary : colors.textTertiary }]}>Review</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.tab, activeTab === 'analysis' && { backgroundColor: colors.surfaceStrong }]}
                 onPress={() => setActiveTab('analysis')}
               >
                 <BarChart3 size={18} color={activeTab === 'analysis' ? colors.primary : colors.textTertiary} />
                 <Text style={[styles.tabText, { color: activeTab === 'analysis' ? colors.textPrimary : colors.textTertiary }]}>Analysis</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.tab, activeTab === 'detailed' && { backgroundColor: colors.surfaceStrong }]}
+                onPress={() => setActiveTab('detailed')}
+              >
+                <TrendingUp size={18} color={activeTab === 'detailed' ? colors.primary : colors.textTertiary} />
+                <Text style={[styles.tabText, { color: activeTab === 'detailed' ? colors.textPrimary : colors.textTertiary }]}>Breakdown</Text>
               </TouchableOpacity>
             </View>
 
@@ -586,8 +715,7 @@ export default function ResultScreen() {
                     { id: 'incorrect', label: 'Incorrect' },
                     { id: 'skipped', label: 'Skipped' },
                     { id: 'pyq', label: 'PYQ' },
-                    { id: 'imp_fact', label: 'Imp. Fact' },
-                    { id: 'must_revise', label: 'Must Revise' }
+                    ...allUserTags.map(tag => ({ id: `tag:${tag}`, label: tag }))
                   ].map(type => (
                     <TouchableOpacity
                       key={type.id}
@@ -608,10 +736,26 @@ export default function ResultScreen() {
                     </TouchableOpacity>
                   ))}
                 </ScrollView>
+
+                {/* Revision Mode Toggle */}
+                <View style={[styles.revisionToggleRow, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.revisionToggleTitle, { color: colors.textPrimary }]}>Revision Mode</Text>
+                    <Text style={[styles.revisionToggleSub, { color: colors.textTertiary }]}>
+                      {showMistakes ? "Showing original answers & mistakes" : "Practice Mode: Answers hidden for re-attempt"}
+                    </Text>
+                  </View>
+                  <Switch
+                    value={showMistakes}
+                    onValueChange={setShowMistakes}
+                    trackColor={{ false: colors.border, true: colors.primary }}
+                    thumbColor="#fff"
+                  />
+                </View>
               </View>
-            ) : (
-              <ReviewSection 
-                testAttemptId={aid || ''} 
+            ) : activeTab === 'analysis' ? (
+              <ReviewSection
+                testAttemptId={aid || ''}
                 externalTags={localTags}
                 onExternalTagUpdate={handleTagError}
                 preComputedScoreData={scoreData}
@@ -619,6 +763,8 @@ export default function ResultScreen() {
                 preComputedHierarchy={hierarchicalPerformance}
                 preComputedConfidence={confidenceMetrics}
               />
+            ) : (
+              <DetailedBreakdown performance={hierarchicalPerformance} />
             )}
           </>
         }
@@ -640,6 +786,33 @@ export default function ResultScreen() {
         maxToRenderPerBatch={10}
         windowSize={5}
       />
+
+      {/* Trends Modal */}
+      <Modal
+        visible={showTrends}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowTrends(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: colors.bg }}>
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: 16,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.border
+          }}>
+            <Text style={{ fontSize: 18, fontWeight: '900', color: colors.textPrimary }}>Overall Trends</Text>
+            <Pressable onPress={() => setShowTrends(false)} style={{ padding: 8 }}>
+              <Text style={{ fontSize: 16, fontWeight: '800', color: colors.textSecondary }}>✕</Text>
+            </Pressable>
+          </View>
+          <ScrollView>
+            {session?.user?.id && <AnalyseSection userId={session.user.id} />}
+          </ScrollView>
+        </View>
+      </Modal>
 
       <AddToFlashcardSheet
         visible={aff.visible}
@@ -663,10 +836,8 @@ export default function ResultScreen() {
         initialOptions={{
           title: testTitle || 'Test Analysis Report',
           moduleName: 'Full Analysis Report',
-          includePerformanceMetrics: true,
-          showTOC: true,
-          headerText: 'Dr. UPSC · Test Analysis',
-          footerText: testTitle || 'Test Analysis Report',
+          headerText: 'UPSC Preparation Analytics',
+          footerText: 'Generated by Noji AI Analytics'
         }}
         renderExtraFilters={(o, setO) => (
           userTags.length > 0 ? (
@@ -1068,5 +1239,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 12,
-  }
+  },
+  revisionToggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    marginTop: 8,
+    marginBottom: 20,
+  },
+  revisionToggleTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  revisionToggleSub: {
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 2,
+  },
 });

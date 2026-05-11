@@ -90,7 +90,7 @@ export default function MicrotopicScreen() {
       let cardIds: string[] = [];
       let baseCards: any[] = [];
       const offlineCards: any[] = (((OfflineManager as any).getCollectionSync('cards') ?? []) as any[])
-        .filter((c: any) => !c.deleted);
+        .filter((c: any) => !c.deleted && !c.is_deleted);
 
       if (isBranchMode) {
         // AnkiPro branch mode: get cards from this branch (+ descendants if recursive)
@@ -109,7 +109,8 @@ export default function MicrotopicScreen() {
               const { data, error } = await supabase
                 .from('cards')
                 .select('*')
-                .in('id', slice);
+                .in('id', slice)
+                .eq('is_deleted', false);
               if (error) throw error;
               fetchedCards.push(...(data ?? []));
             }

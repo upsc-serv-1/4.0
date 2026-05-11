@@ -265,7 +265,7 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
           .qa-unified .qa-answer {
             margin-top: 8px;
             padding-top: 8px;
-            border-top: 1px dashed ${qaBorder};
+            border-top: 1px dotted ${qaBorder};
           }
           .qa-split { display: flex; flex-direction: column; gap: 8px; }
           .qa-question, .qa-answer { overflow-wrap: break-word; word-break: break-word; }
@@ -313,7 +313,7 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
             border-radius: 12px;
           }
           .toc-title { font-weight: 900; font-size: 14px; margin-bottom: 12px; color: inherit; }
-          .toc-item { display: block; font-size: 12px; color: inherit; text-decoration: none; margin-bottom: 6px; border-bottom: 1px dashed rgba(0,0,0,0.1); }
+          .toc-item { display: block; font-size: 12px; color: inherit; text-decoration: none; margin-bottom: 6px; border-bottom: 1px dotted rgba(0,0,0,0.1); }
           .checklist-pdf { margin: 14px 0 26px; }
           .checkpoint-priority { break-inside: avoid; page-break-inside: avoid; }
           .checklist-item-pdf { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }

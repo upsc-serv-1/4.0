@@ -62,6 +62,9 @@ OPTIONS:
 
 CORRECT ANSWER: {{correct_answer}}
 
+INSTITUTE EXPLANATIONS (context provided for reference):
+{{institute_explanations}}
+
 Write a complete study note with:
 1. Why the correct answer is right
 2. Detailed explanation of each option

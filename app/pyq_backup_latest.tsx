@@ -1167,16 +1167,20 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         console.log(`[PDFExport] Printing to file...`);
         const { uri } = await Print.printToFileAsync({ html });
         console.log(`[PDFExport] File printed to: ${uri}. Opening share menu...`);
-        setExporting(false); 
         
         // Small delay to ensure the overlay is fully gone from the UI hierarchy
         await new Promise(resolve => setTimeout(resolve, 300));
 
         try {
-          await Sharing.shareAsync(uri, { 
+          // Use Promise.race with timeout to prevent hanging on iPad
+          const sharePromise = Sharing.shareAsync(uri, { 
             mimeType: 'application/pdf', 
             dialogTitle: 'PYQ Analysis Report',
             UTI: 'com.adobe.pdf' 
+          });
+          const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 8000)); // 8 second timeout
+          await Promise.race([sharePromise, timeoutPromise]).catch(() => {
+            console.warn('[PDFExport] Share operation timed out or was dismissed');
           });
         } catch (shareErr) {
           console.error('[PDFExport] Sharing failed, falling back to Print dialog', shareErr);

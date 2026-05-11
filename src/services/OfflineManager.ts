@@ -288,12 +288,12 @@ class OfflineManagerService {
     onProgress({ phase: 'cards', current: 0, total: 1, detail: 'Fetching your flashcards...' });
     let totalCards = 0;
     try {
-      const cards = await this.fetchAllRows('cards');
+      const cards = await this.fetchAllRows('cards', (query) => query.eq('is_deleted', false));
       if (cards) KVStore.setJson(CARDS_PREFIX, cards);
 
       const userCards = await this.fetchAllRows(
         'user_cards',
-        (query) => query.eq('user_id', userId)
+        (query) => query.eq('user_id', userId).neq('status', 'deleted')
       );
       if (userCards) {
         KVStore.setJson(`${USER_CARDS_PREFIX}${userId}`, userCards);

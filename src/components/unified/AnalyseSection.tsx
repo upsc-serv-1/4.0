@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Dimensions, Modal } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Dimensions, Modal, Alert } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { spacing, radius } from '../../theme';
 import { useAggregateTestAnalytics } from '../../hooks/useTestAnalytics';
 import { LineChart, RadarChart, BarChart, DonutChart, ScatterPlot } from '../Charts';
+import { prelimsTaxonomy } from '../../data/taxonomy';
 import {
   AlertTriangle, TrendingUp, Filter, Lightbulb, Clock,
   BarChart2 as BarChartIcon, Target, Download,
-  CheckCircle2, XCircle, HelpCircle, BarChart3,
+  CheckCircle2, XCircle, HelpCircle, BarChart3, Trash2,
 } from 'lucide-react-native';
 import { DEFAULT_ANALYTICS_LAYOUT, loadAnalyticsLayout } from '../../utils/analyticsLayout';
 import {
@@ -17,6 +18,7 @@ import {
 } from '../../lib/hierarchical-analytics';
 import { AnalysisExportSheet, AnalysisExportQuestion } from '../export/AnalysisExportSheet';
 import { buildPredictive, probableHotsFor2026 } from '../../lib/pyqPredictive';
+import { supabase } from '../../lib/supabase';
 
 interface AnalyseSectionProps {
   userId: string;
@@ -45,6 +47,38 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
   const [selectedAttemptIndices, setSelectedAttemptIndices] = useState<number[] | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isExportSheetVisible, setIsExportSheetVisible] = useState(false);
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const [selectedForDelete, setSelectedForDelete] = useState<string[]>([]);
+  const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Heatmap drill-down state
+  const [heatmapSubject, setHeatmapSubject] = useState<string | null>(null);
+  const [heatmapSection, setHeatmapSection] = useState<string | null>(null);
+  const [allUserTags, setAllUserTags] = useState<string[]>([]);
+  const scrollRef = React.useRef<ScrollView>(null);
+  const [heatmapY, setHeatmapY] = useState(0);
+
+  useEffect(() => {
+    // Fetch all user revision tags for global context in export
+    const fetchTags = async () => {
+      try {
+        const { data } = await supabase.from('question_states')
+          .select('review_tags')
+          .eq('user_id', userId)
+          .not('review_tags', 'is', null);
+        
+        const tags = new Set<string>();
+        data?.forEach(row => {
+          if (Array.isArray(row.review_tags)) row.review_tags.forEach(t => tags.add(t));
+        });
+        setAllUserTags(Array.from(tags).sort());
+      } catch (e) {
+        console.error("Error fetching global tags", e);
+      }
+    };
+    fetchTags();
+  }, [userId]);
 
   useEffect(() => {
     loadAnalyticsLayout().then(layout => {
@@ -114,11 +148,12 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
         if (q.selectedAnswer) trendsByTest[q.testId].total++;
       });
 
-      historicalScores = filteredAttempts.map((attempt, index) => {
+      historicalScores = filteredAttempts.map((attempt) => {
         const stats = trendsByTest[attempt.test_id] || { correct: 0, total: 0 };
         return {
-          attemptIndex: index + 1,
+          attemptIndex: attempt.attemptIndex,
           testId: attempt.test_id,
+          title: attempt.title,
           date: attempt.submitted_at,
           score: attempt.score,
           accuracy: stats.total > 0 ? (stats.correct / stats.total) * 100 : 0,
@@ -192,6 +227,30 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
       forecastHigh: row.forecast2026.high,
       hotScore: row.hotScore,
     }));
+  };
+
+  const handleDeleteTests = async () => {
+    if (selectedForDelete.length === 0) return;
+    
+    setIsDeleting(true);
+    try {
+      for (const attemptId of selectedForDelete) {
+        await supabase.from('question_states').delete().eq('attempt_id', attemptId);
+        await supabase.from('test_attempts').delete().eq('id', attemptId);
+      }
+      
+      setIsDeleteMode(false);
+      setSelectedForDelete([]);
+      setIsDeleteConfirmVisible(false);
+      
+      Alert.alert('Success', 'Tests deleted successfully. Refreshing analytics...');
+      setTimeout(() => window.location.reload?.(), 500);
+    } catch (err) {
+      console.error('Error deleting tests:', err);
+      Alert.alert('Error', 'Failed to delete tests. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   if (loading && !activeTrends) {
@@ -311,6 +370,8 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
           labels={activeTrends.historicalScores.map(t => `#${t.attemptIndex}`)}
           height={180}
           colors={[colors.primary]}
+          stickyY={true}
+          backgroundColor={colors.surface}
         />
         <View style={styles.chartDivider} />
         <Text style={[styles.chartSubLabel, { color: colors.textTertiary, marginBottom: 8 }]}>Negative Marking Penalty</Text>
@@ -319,6 +380,8 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
           labels={activeTrends.historicalScores.map(t => `#${t.attemptIndex}`)}
           height={180}
           colors={['#ef4444']}
+          stickyY={true}
+          backgroundColor={colors.surface}
         />
       </View>
     ),
@@ -338,6 +401,18 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
                 .map(sg => ({ label: sg.name, value: sg.accuracy }))
           }
           size={240}
+          onPress={(label) => {
+            if (!isSingleSubject) {
+              setSelectedSubjects([label]);
+            } else {
+              setHeatmapSubject(selectedSubjects[0]);
+              setHeatmapSection(label);
+              // Scroll to heatmap with a small offset
+              setTimeout(() => {
+                scrollRef.current?.scrollTo({ y: heatmapY + 150, animated: true });
+              }, 100);
+            }
+          }}
         />
       </View>
     ) : null,
@@ -357,63 +432,132 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
       </View>
     ),
     theme_heatmap: (selectedSubjects.includes('All') || selectedSubjects.includes('PYQ') || isSingleSubject) ? (() => {
-      const heatmapRows = drillDownItems.filter(item => item.isSection);
-      const displayRows = heatmapRows.length > 0 ? heatmapRows : drillDownItems.slice(0, 10);
+      const allScores = activeTrends.historicalScores;
+      const testsToDisplay = selectedAttemptIndices && selectedAttemptIndices.length > 0
+        ? allScores.filter(t => selectedAttemptIndices.includes(t.attemptIndex))
+        : allScores;
 
-      if (displayRows.length === 0) return null;
-
-      return (
-        <View key="theme_heatmap" style={[styles.chartCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <View style={styles.cardHeader}>
-            <BarChart3 size={18} color={colors.primary} />
-            <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>Theme Mastery Heatmap</Text>
-          </View>
-          <Text style={[styles.chartSubtitle, { color: colors.textTertiary, textTransform: 'none', marginBottom: spacing.md }]}>
-            Section accuracy across recent submitted tests.
-          </Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.heatmapGrid}>
-              <View style={styles.heatmapRow}>
-                <View style={[styles.heatmapCell, styles.heatmapHeaderCell]} />
-                {activeTrends.historicalScores.slice(-5).map((t, i) => (
-                  <View key={`header-${i}`} style={[styles.heatmapCell, styles.heatmapHeaderCell]}>
-                    <Text style={[styles.heatmapHeaderText, { color: colors.textSecondary }]}>T{t.attemptIndex}</Text>
-                  </View>
+      const renderHeatmap = (title: string, dataRows: any[], level: 'subject' | 'section' | 'micro', onRowPress?: (name: string) => void) => {
+        if (dataRows.length === 0) return null;
+        
+        return (
+          <View key={`heatmap-${level}`} style={[styles.chartCard, { backgroundColor: colors.surface, borderColor: colors.border, marginBottom: spacing.md }]}>
+            <View style={styles.cardHeader}>
+              <BarChart3 size={18} color={colors.primary} />
+              <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>{title}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', marginTop: spacing.md }}>
+              {/* Frozen First Column (Labels) */}
+              <View style={{ width: 100, zIndex: 10, backgroundColor: colors.surface }}>
+                <View style={styles.heatmapRow}>
+                  <View style={[styles.heatmapCell, styles.heatmapHeaderCell, { width: 100 }]} />
+                </View>
+                {dataRows.map((item, rowIndex) => (
+                  <TouchableOpacity 
+                    key={`sticky-${rowIndex}`} 
+                    style={styles.heatmapRow}
+                    onPress={() => onRowPress?.(item.name)}
+                    disabled={!onRowPress}
+                  >
+                    <View style={[styles.heatmapCell, styles.heatmapHeaderCell, { width: 100 }]}>
+                      <Text style={[styles.heatmapRowTitle, { color: onRowPress ? colors.primary : colors.textPrimary }]} numberOfLines={1}>
+                        {item.name}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
                 ))}
               </View>
-              {displayRows.map((item, rowIndex) => (
-                <View key={`row-${rowIndex}`} style={styles.heatmapRow}>
-                  <View style={[styles.heatmapCell, styles.heatmapHeaderCell]}>
-                    <Text style={[styles.heatmapRowTitle, { color: colors.textPrimary }]} numberOfLines={1}>
-                      {item.name.length > 12 ? item.name.substring(0, 10) + '..' : item.name}
-                    </Text>
-                  </View>
-                  {activeTrends.historicalScores.slice(-5).map((t, colIndex) => {
-                    const mockVariance = ((rowIndex + colIndex) % 3) * 10 - 10;
-                    const cellAcc = Math.max(0, Math.min(100, item.accuracy + mockVariance));
-                    const ratio = cellAcc / 100;
-                    let bgColor = colors.surfaceStrong;
-                    let textColor = colors.textTertiary;
-                    if (cellAcc > 0) {
-                      const h = 70 + (ratio * 155);
-                      const s = 65 + (ratio * 20);
-                      const l = 85 - (ratio * 55);
-                      bgColor = `hsl(${h}, ${s}%, ${l}%)`;
-                      textColor = l < 55 ? '#ffffff' : '#065f46';
-                    }
 
-                    return (
-                      <View key={`cell-${rowIndex}-${colIndex}`} style={[styles.heatmapCell, { backgroundColor: bgColor }]}>
-                        <Text style={[styles.heatmapCellText, { color: textColor }]}>
-                          {Math.round(cellAcc)}%
-                        </Text>
+              {/* Scrollable Data Columns */}
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={styles.heatmapGrid}>
+                  <View style={styles.heatmapRow}>
+                    {testsToDisplay.map((t, i) => (
+                      <View key={`header-${i}`} style={[styles.heatmapCell, { width: 50, backgroundColor: 'transparent' }]}>
+                        <Text style={[styles.heatmapHeaderText, { color: colors.textSecondary, width: 50, marginRight: 0 }]}>#{t.attemptIndex}</Text>
                       </View>
-                    );
-                  })}
+                    ))}
+                  </View>
+
+                  {dataRows.map((item, rowIndex) => (
+                    <View key={`row-${rowIndex}`} style={styles.heatmapRow}>
+                      {testsToDisplay.map((t, colIndex) => {
+                        // In a real app, we'd fetch actual per-test category accuracy here.
+                        // For now, we simulate using the aggregate + attempt variance.
+                        const attemptRatio = t.accuracy / 100;
+                        const cellAcc = Math.max(0, Math.min(100, item.accuracy * (0.8 + (attemptRatio * 0.4))));
+                        const ratio = cellAcc / 100;
+                        let bgColor = colors.surfaceStrong;
+                        let textColor = colors.textTertiary;
+                        if (cellAcc > 0) {
+                          const h = 120; // Green Hue
+                          const s = 65 + (ratio * 20);
+                          const l = 95 - (ratio * 50);
+                          bgColor = `hsl(${h}, ${s}%, ${l}%)`;
+                          textColor = l < 55 ? '#ffffff' : '#065f46';
+                        }
+
+                        return (
+                          <View key={`cell-${rowIndex}-${colIndex}`} style={[styles.heatmapCell, { backgroundColor: bgColor, width: 50 }]}>
+                            <Text style={[styles.heatmapCellText, { color: textColor }]}>
+                              {Math.round(cellAcc)}%
+                            </Text>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  ))}
                 </View>
-              ))}
+              </ScrollView>
             </View>
-          </ScrollView>
+          </View>
+        );
+      };
+
+      const subjectRows = Object.values(activeCumulative.subjects)
+        .filter(s => s.total > 0)
+        .sort((a, b) => b.total - a.total);
+
+      const sectionRows = heatmapSubject && activeCumulative.subjects[heatmapSubject]
+        ? Object.values(activeCumulative.subjects[heatmapSubject].sectionGroups)
+            .filter(sg => sg.total > 0)
+            .sort((a, b) => b.total - a.total)
+        : [];
+
+      const microRows = (() => {
+        if (!heatmapSection || !heatmapSubject) return [];
+        
+        // Get topics from taxonomy for this section
+        const taxonomyTopics = prelimsTaxonomy
+          .filter(t => t.subject === heatmapSubject && t.sectionGroup === heatmapSection)
+          .map(t => t.microTopic);
+        
+        const existingMetrics = activeCumulative.subjects[heatmapSubject]?.sectionGroups[heatmapSection]?.microTopics || {};
+        
+        // Merge taxonomy with actual performance metrics
+        const merged = Array.from(new Set([...taxonomyTopics, ...Object.keys(existingMetrics)])).map(mtName => {
+          const stats = existingMetrics[mtName] || { correct: 0, incorrect: 0, unattempted: 0, total: 0, accuracy: 0, timeSpent: 0 };
+          return { name: mtName, ...stats };
+        });
+
+        return merged.sort((a, b) => (b.total || 0) - (a.total || 0));
+      })();
+
+      return (
+        <View 
+          key="theme_heatmap_container" 
+          onLayout={(e) => setHeatmapY(e.nativeEvent.layout.y)}
+        >
+          {renderHeatmap('Subject Mastery Heatmap', subjectRows, 'subject', (name) => {
+            setHeatmapSubject(name === heatmapSubject ? null : name);
+            setHeatmapSection(null);
+          })}
+          
+          {heatmapSubject && renderHeatmap(`${heatmapSubject}: Themes`, sectionRows, 'section', (name) => {
+            setHeatmapSection(name === heatmapSection ? null : name);
+          })}
+
+          {heatmapSection && renderHeatmap(`${heatmapSection}: Microtopics`, microRows, 'micro')}
         </View>
       );
     })() : null,
@@ -476,31 +620,109 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView ref={scrollRef} contentContainerStyle={styles.container}>
 
       {/* Top-right single Export button + compact Filter entry */}
       <View style={[styles.topBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <TouchableOpacity
-          testID="analysis-filter-btn"
-          onPress={() => setIsModalVisible(true)}
-          style={styles.topFilter}
-        >
-          <Filter color={colors.primary} size={16} />
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.topLabel, { color: colors.textTertiary }]}>Filter Data</Text>
-            <Text style={[styles.topValue, { color: colors.textPrimary }]} numberOfLines={1}>{selectedTestsLabel}</Text>
-          </View>
-        </TouchableOpacity>
+        {isDeleteMode ? (
+          <>
+            <TouchableOpacity
+              testID="analysis-cancel-delete-btn"
+              onPress={() => {
+                setIsDeleteMode(false);
+                setSelectedForDelete([]);
+              }}
+              style={styles.topFilter}
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.topLabel, { color: colors.textTertiary }]}>Delete Tests</Text>
+                <Text style={[styles.topValue, { color: colors.textPrimary }]} numberOfLines={1}>
+                  {selectedForDelete.length === 0 ? 'Select tests' : `${selectedForDelete.length} selected`}
+                </Text>
+              </View>
+            </TouchableOpacity>
+            {selectedForDelete.length > 0 && (
+              <TouchableOpacity
+                onPress={() => setIsDeleteConfirmVisible(true)}
+                style={[styles.exportTopBtn, { backgroundColor: '#ef4444' }]}
+              >
+                <Trash2 color="#fff" size={16} />
+                <Text style={styles.exportTopBtnText}>Delete</Text>
+              </TouchableOpacity>
+            )}
+          </>
+        ) : (
+          <>
+            <TouchableOpacity
+              testID="analysis-filter-btn"
+              onPress={() => setIsModalVisible(true)}
+              style={styles.topFilter}
+            >
+              <Filter color={colors.primary} size={16} />
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.topLabel, { color: colors.textTertiary }]}>Filter Data</Text>
+                <Text style={[styles.topValue, { color: colors.textPrimary }]} numberOfLines={1}>{selectedTestsLabel}</Text>
+              </View>
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          testID="analysis-export-btn"
-          onPress={() => setIsExportSheetVisible(true)}
-          style={[styles.exportTopBtn, { backgroundColor: colors.primary }]}
-        >
-          <Download color="#fff" size={16} />
-          <Text style={styles.exportTopBtnText}>Export</Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+              testID="analysis-delete-btn"
+              onPress={() => setIsDeleteMode(true)}
+              style={[styles.exportTopBtn, { backgroundColor: colors.primary + '40', borderWidth: 1, borderColor: colors.primary }]}
+            >
+              <Trash2 color={colors.primary} size={16} />
+              <Text style={[styles.exportTopBtnText, { color: colors.primary }]}>Select</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              testID="analysis-export-btn"
+              onPress={() => setIsExportSheetVisible(true)}
+              style={[styles.exportTopBtn, { backgroundColor: colors.primary, shadowColor: colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6, borderWidth: 1.5, borderColor: '#fff' }]}
+            >
+              <Download color="#fff" size={16} />
+              <Text style={styles.exportTopBtnText}>GET REPORT</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        visible={isDeleteConfirmVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsDeleteConfirmVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface, borderColor: colors.border, padding: spacing.xl }]}>
+            <Text style={[styles.modalTitle, { color: colors.textPrimary, marginBottom: spacing.lg }]}>
+              Delete {selectedForDelete.length} Test{selectedForDelete.length > 1 ? 's' : ''}?
+            </Text>
+            <Text style={[{ color: colors.textSecondary, fontSize: 14, lineHeight: 20, marginBottom: spacing.lg }]}>
+              This will permanently delete these tests from Supabase and all trends will be recalculated.
+            </Text>
+            <View style={{ flexDirection: 'row', gap: spacing.md }}>
+              <TouchableOpacity
+                onPress={() => setIsDeleteConfirmVisible(false)}
+                style={[styles.actionChip, { backgroundColor: colors.bg, borderColor: colors.border, flex: 1 }]}
+              >
+                <Text style={{ color: colors.textSecondary, fontSize: 14, fontWeight: '700', textAlign: 'center' }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleDeleteTests}
+                disabled={isDeleting}
+                style={[styles.actionChip, { backgroundColor: '#ef4444', flex: 1 }]}
+              >
+                {isDeleting ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700', textAlign: 'center' }}>Delete All</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Sticky Filter Bar (Subjects) */}
       <View style={[styles.stickyFilterContainer, { backgroundColor: colors.bg }]}>
@@ -604,40 +826,66 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  const allScores = activeTrends.historicalScores;
-                  const last5 = allScores.slice(-5).map(t => t.attemptIndex);
-                  setSelectedAttemptIndices(last5);
+                  const allScores = trends.historicalScores;
+                  const allIndices = allScores.map(t => t.attemptIndex);
+                  setSelectedAttemptIndices(allIndices);
                 }}
                 style={[styles.actionChip, { backgroundColor: colors.bg, borderColor: colors.border }]}
               >
-                <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: '700' }}>Last 5</Text>
+                <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: '700' }}>Select All</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setSelectedAttemptIndices([])}
+                style={[styles.actionChip, { backgroundColor: colors.bg, borderColor: colors.border }]}
+              >
+                <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: '700' }}>Deselect All</Text>
               </TouchableOpacity>
             </View>
 
             <ScrollView contentContainerStyle={styles.modalList}>
-              {[...activeTrends.historicalScores].reverse().map((t) => {
-                const isSelected = !selectedAttemptIndices || selectedAttemptIndices.includes(t.attemptIndex);
+              {(isDeleteMode ? [...trends.historicalScores].reverse() : [...activeTrends.historicalScores].reverse()).map((t) => {
+                const isSelected = isDeleteMode 
+                  ? selectedForDelete.includes(t.testId)
+                  : (!selectedAttemptIndices || selectedAttemptIndices.includes(t.attemptIndex));
+                
                 return (
                   <TouchableOpacity
-                    key={t.attemptIndex}
+                    key={t.testId || t.attemptIndex}
                     style={[styles.testItem, { borderBottomColor: colors.border + '30' }]}
                     onPress={() => {
-                      const allScores = activeTrends.historicalScores;
-                      const current = selectedAttemptIndices || allScores.map(x => x.attemptIndex);
-                      if (current.includes(t.attemptIndex)) {
-                        const next = current.filter(idx => idx !== t.attemptIndex);
-                        setSelectedAttemptIndices(next.length === allScores.length ? null : next);
+                      if (isDeleteMode) {
+                        setSelectedForDelete(prev =>
+                          prev.includes(t.testId)
+                            ? prev.filter(id => id !== t.testId)
+                            : [...prev, t.testId]
+                        );
                       } else {
-                        const next = [...current, t.attemptIndex];
-                        setSelectedAttemptIndices(next.length === allScores.length ? null : next);
+                        const current = selectedAttemptIndices || activeTrends.historicalScores.map(x => x.attemptIndex);
+                        if (current.includes(t.attemptIndex)) {
+                          const next = current.filter(id => id !== t.attemptIndex);
+                          setSelectedAttemptIndices(next.length === activeTrends.historicalScores.length ? null : next);
+                        } else {
+                          const next = [...current, t.attemptIndex];
+                          setSelectedAttemptIndices(next.length === activeTrends.historicalScores.length ? null : next);
+                        }
                       }
                     }}
                   >
-                    <View>
-                      <Text style={[styles.testItemTitle, { color: colors.textPrimary }]}>Test Attempt #{t.attemptIndex}</Text>
-                      <Text style={[styles.testItemSub, { color: colors.textSecondary }]}>Score: {t.score} | Accuracy: {Math.round(t.accuracy)}%</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.testItemTitle, { color: colors.textPrimary }]}>
+                        {t.title || `Attempt #${t.attemptIndex}`}
+                      </Text>
+                      <Text style={[styles.testItemSub, { color: colors.textSecondary }]}>
+                        {t.date ? new Date(t.date).toLocaleDateString() : 'Recent'} • Score: {t.score} • Accuracy: {Math.round(t.accuracy)}%
+                      </Text>
                     </View>
-                    <View style={[styles.checkbox, { borderColor: colors.primary, backgroundColor: isSelected ? colors.primary : 'transparent' }]}>
+                    <View style={[
+                      styles.checkbox, 
+                      { 
+                        borderColor: isDeleteMode ? '#ef4444' : colors.primary, 
+                        backgroundColor: isSelected ? (isDeleteMode ? '#ef4444' : colors.primary) : 'transparent' 
+                      }
+                    ]}>
                       {isSelected && <Text style={{ color: '#fff', fontSize: 10, fontWeight: '900' }}>✓</Text>}
                     </View>
                   </TouchableOpacity>
@@ -658,6 +906,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
         weaknesses={activeWeaknesses}
         buildForecastRows={buildForecastRows}
         title="Analysis Export"
+        allRevisionTags={allUserTags}
       />
 
     </ScrollView>

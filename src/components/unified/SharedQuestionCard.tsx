@@ -93,24 +93,45 @@ export const SharedQuestionCard = ({
   showNotebookButton = false,
   onCreateTag,
   onQuickSave,
-  toggleMistakeType,
   onNoteChange,
   onCommitToMemory,
+  showMistakes = true, // Default to true for backward compatibility
 }: any) => {
     const { colors: themeColors } = useTheme();
     const effectiveColors = colors || themeColors;
     // AI Chat toggle state
     const [showAiChat, setShowAiChat] = useState(false);
     
+    // Practice mode state
+    const [localPracticeAnswer, setLocalPracticeAnswer] = useState<string | null>(null);
+    
     if (!item) return null;
-    const effectiveAnswerData = answerData || { selectedAnswer: null, confidence: null, difficulty: null, isReview: false, studyTags: [] };
-    const showExplanation = arenaMode === 'learning' && isRevealed;
+    const effectiveAnswerData = answerData || { 
+      selectedAnswer: item.selectedAnswer || null, 
+      confidence: item.confidence || null, 
+      difficulty: item.difficulty || null, 
+      isReview: item.isReview || false, 
+      studyTags: item.reviewTags || [],
+      note: item.note || null
+    };
+    const showExplanation = showMistakes 
+      ? (arenaMode === 'learning' && isRevealed) 
+      : (localPracticeAnswer !== null);
 
     const normalizedExplanations = buildCanonicalExplanations(item);
 
     const formatMetaLine = (e: any): string => {
       return String(e?.source || '').toUpperCase().trim();
     };
+
+    // DEBUG: Log explanation data
+    if (normalizedExplanations.length === 0 && Array.isArray(item?._explanations)) {
+      console.log('[Explanation Debug] Empty normalized but has _explanations:', {
+        questionId: item.id,
+        rawExplanations: item._explanations,
+        institutes: item._institutes
+      });
+    }
 
     const inferredInstitutes = (() => {
       const list = Array.isArray((item as any)._institutes)
@@ -128,12 +149,16 @@ export const SharedQuestionCard = ({
     normalizedExplanations.forEach((e: any) => {
       availableExplSourceMap.set(e.sourceKey, e.source);
     });
-    inferredInstitutes.forEach((label: string) => {
+    (inferredInstitutes as string[]).forEach((label: string) => {
       const key = String(label || '').toLowerCase();
       if (key && !availableExplSourceMap.has(key)) {
         availableExplSourceMap.set(key, label);
       }
     });
+
+    if (effectiveAnswerData.note) {
+      availableExplSourceMap.set('my_note', 'My Note');
+    }
 
     const availableExplSources = Array.from(availableExplSourceMap.entries()).map(([key, label]) => ({ key, label }));
 
@@ -142,6 +167,7 @@ export const SharedQuestionCard = ({
       selectedExplSourceRaw === 'all'
       || selectedExplSourceRaw === 'ai'
       || selectedExplSourceRaw === 'vitamin'
+      || selectedExplSourceRaw === 'my_note'
       || availableExplSourceMap.has(selectedExplSourceRaw)
     ) ? selectedExplSourceRaw : 'all';
 
@@ -179,17 +205,26 @@ export const SharedQuestionCard = ({
             : (item.explanation_markdown || 'No explanation available.'));
     }
 
+    // Ensure best answer is loaded
+    ensureBestAnswerLoaded(item.id);
+    const savedBest = bestAnswers[item.id] || null;
+
+    // Determine viewer kind and effective text
     let viewerKind: 'markdown' | 'ai' | 'vitamin' = 'markdown';
     if (selectedExplSource === 'ai') {
       effectiveExplanationText = aiExplanation || effectiveExplanationText;
       viewerKind = 'ai';
-    } else if (selectedExplSource === 'vitamin') {
-      effectiveExplanationText = bestAnswers[item.id]?.answer_text || '';
+    } else if (selectedExplSource === 'vitamin' && savedBest) {
+      effectiveExplanationText = savedBest.answer_text || '';
       viewerKind = 'vitamin';
+    } else if (selectedExplSource === 'vitamin' && !savedBest && aiExplanation) {
+      // Fallback: if vitamin selected but not saved yet, show AI explanation (in transition)
+      effectiveExplanationText = aiExplanation;
+      viewerKind = 'ai';
+    } else if (selectedExplSource === 'my_note') {
+      effectiveExplanationText = effectiveAnswerData.note || '';
+      viewerKind = 'markdown';
     }
-
-    ensureBestAnswerLoaded(item.id);
-    const savedBest = bestAnswers[item.id] || null;
 
     return (
       <View style={[styles.questionCard, { backgroundColor: isZenMode ? 'transparent' : effectiveColors.surface, borderColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : effectiveColors.border, borderWidth: isZenMode ? 0 : 1 }]}>
@@ -266,7 +301,7 @@ export const SharedQuestionCard = ({
               <Rocket size={19} color={isZenMode ? '#433422' : '#5B4EFA'} />
             </TouchableOpacity>
 
-             {showNotebookButton && (
+            {showNotebookButton && (
               <TouchableOpacity 
                 onPress={() => openNotebookFromQuestion && openNotebookFromQuestion(item, undefined, 'pilot-v2')}
               >
@@ -279,15 +314,45 @@ export const SharedQuestionCard = ({
           </View>
         </View>
 
+        {/* Skipped Badge (FR-103) */}
+        {showMistakes && !effectiveAnswerData.selectedAnswer && !localPracticeAnswer && (
+          <View style={{ 
+            flexDirection: 'row', 
+            alignItems: 'center', 
+            gap: 6, 
+            backgroundColor: effectiveColors.surfaceStrong, 
+            paddingHorizontal: 10, 
+            paddingVertical: 6, 
+            borderRadius: 8,
+            alignSelf: 'flex-start',
+            marginBottom: 12,
+            borderWidth: 1,
+            borderColor: effectiveColors.border
+          }}>
+            <AlertCircle size={14} color={effectiveColors.textTertiary} />
+            <Text style={{ fontSize: 10, fontWeight: '800', color: effectiveColors.textTertiary, letterSpacing: 0.5 }}>
+              NOT ATTEMPTED IN ORIGINAL TEST
+            </Text>
+          </View>
+        )}
+
         <Markdown style={mdStyles} rules={mdRules}>
           {item.statement_line || item.question_text}
         </Markdown>
 
         <View style={styles.optionsContainer}>
           {Object.entries(item.options || {}).map(([label, text]) => {
-            const isSelected = effectiveAnswerData.selectedAnswer === label;
+            // Determine selection and correctness based on mode
+            const historySelected = effectiveAnswerData.selectedAnswer === label;
+            const practiceSelected = localPracticeAnswer === label;
+            
+            const isSelected = showMistakes ? historySelected : practiceSelected;
             const isCorrect = label.toLowerCase() === item.correct_answer?.toLowerCase();
+            
+            // Show result if in history mode OR if they just practiced and chose this option
+            const showResult = showMistakes ? !!effectiveAnswerData.selectedAnswer : practiceSelected;
             const isWrong = isSelected && !isCorrect;
+
             return (
               <OptionButton
                 key={label}
@@ -296,9 +361,16 @@ export const SharedQuestionCard = ({
                 isSelected={isSelected}
                 isCorrect={isCorrect}
                 isWrong={isWrong}
-                showResult={arenaMode === 'learning' && !!effectiveAnswerData.selectedAnswer}
-                onSelect={() => onOptionSelect(item.id, label)}
-                disabled={arenaMode === 'learning' && showExplanation}
+                showResult={showResult}
+                onSelect={() => {
+                  if (!showMistakes) {
+                    setLocalPracticeAnswer(label);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+                  } else if (onOptionSelect) {
+                    onOptionSelect(item.id, label);
+                  }
+                }}
+                disabled={showMistakes && !!effectiveAnswerData.selectedAnswer}
                 fontSize={fontSize}
               />
             );
@@ -351,29 +423,35 @@ export const SharedQuestionCard = ({
           )}
 
           <View style={styles.controlRow}>
-            <Text style={[styles.controlLabel, { color: effectiveColors.textTertiary }]}>STUDY TAGS</Text>
-            {/* ISSUE FIX #14: Enable scroll indicator so users know there are more tags */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={true} contentContainerStyle={styles.chipScroll}>
-              {[...userStudyTags].map(tag => {
-                const selected = (effectiveAnswerData.studyTags || []).includes(tag);
-                return (
-                  <TouchableOpacity
-                    key={tag}
-                    onPress={() => toggleStudyTag && toggleStudyTag(item.id, effectiveAnswerData.studyTags || [], tag)}
-                    style={[styles.chip, { backgroundColor: effectiveColors.surfaceStrong, borderColor: effectiveColors.border }, selected && { backgroundColor: effectiveColors.primary + '20', borderColor: effectiveColors.primary }]}
-                  >
-                    <Text style={[styles.chipText, { color: selected ? effectiveColors.primary : effectiveColors.textSecondary }]}>{tag}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-              {onCreateTag && (
-                <TouchableOpacity
-                  onPress={onCreateTag}
-                  style={[styles.chip, { backgroundColor: effectiveColors.primary + '10', borderColor: effectiveColors.primary + '40', paddingHorizontal: 8 }]}
-                  testID="create-tag-shared-btn"
-                >
-                  <Plus size={10} color={effectiveColors.primary} />
-                </TouchableOpacity>
+            <Text style={[styles.controlLabel, { color: effectiveColors.textTertiary }]}>REVISION TAGS</Text>
+            {/* ISSUE FIX #14: Enable scroll indicator so users know there are more tags + Ensure ALL tags show */}
+            <ScrollView horizontal showsHorizontalScrollIndicator={userStudyTags && userStudyTags.length > 3} contentContainerStyle={styles.chipScroll}>
+              {(!userStudyTags || userStudyTags.length === 0) ? (
+                <Text style={{ color: effectiveColors.textTertiary, fontSize: 11, marginTop: 8 }}>No revision tags created yet</Text>
+              ) : (
+                <>
+                  {[...userStudyTags].map(tag => {
+                    const selected = (effectiveAnswerData.studyTags || []).includes(tag);
+                    return (
+                      <TouchableOpacity
+                        key={tag}
+                        onPress={() => toggleStudyTag && toggleStudyTag(item.id, effectiveAnswerData.studyTags || [], tag)}
+                        style={[styles.chip, { backgroundColor: effectiveColors.surfaceStrong, borderColor: effectiveColors.border }, selected && { backgroundColor: effectiveColors.primary + '20', borderColor: effectiveColors.primary }]}
+                      >
+                        <Text style={[styles.chipText, { color: selected ? effectiveColors.primary : effectiveColors.textSecondary }]}>{tag}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                  {onCreateTag && (
+                    <TouchableOpacity
+                      onPress={onCreateTag}
+                      style={[styles.chip, { backgroundColor: effectiveColors.primary + '10', borderColor: effectiveColors.primary + '40', paddingHorizontal: 8 }]}
+                      testID="create-tag-shared-btn"
+                    >
+                      <Plus size={10} color={effectiveColors.primary} />
+                    </TouchableOpacity>
+                  )}
+                </>
               )}
             </ScrollView>
           </View>
@@ -454,22 +532,88 @@ export const SharedQuestionCard = ({
                         flexDirection: 'row', alignItems: 'center', gap: 5,
                         paddingHorizontal: 12, paddingVertical: 6,
                         borderRadius: 20, borderWidth: 1,
-                        backgroundColor: selectedExplSource === 'ai' ? '#7c3aed' : '#7c3aed18',
-                        borderColor:     selectedExplSource === 'ai' ? '#7c3aed' : '#7c3aed40',
+                        backgroundColor: selectedExplSource === 'ai' ? effectiveColors.primary : effectiveColors.primary + '18',
+                        borderColor:     selectedExplSource === 'ai' ? effectiveColors.primary : effectiveColors.primary + '40',
                       }}
                     >
                       {isAiLoading
-                        ? <ActivityIndicator size="small" color={selectedExplSource === 'ai' ? '#fff' : '#7c3aed'} />
-                        : <Sparkles size={11} color={selectedExplSource === 'ai' ? '#fff' : '#7c3aed'} />
+                        ? <ActivityIndicator size="small" color={selectedExplSource === 'ai' ? '#fff' : effectiveColors.primary} />
+                        : <Sparkles size={11} color={selectedExplSource === 'ai' ? '#fff' : effectiveColors.primary} />
                       }
-                      <Text style={{ fontSize: Math.max(9, fontSize - 7), fontWeight: '900', color: selectedExplSource === 'ai' ? '#fff' : '#7c3aed' }}>
+                      <Text style={{ fontSize: Math.max(9, fontSize - 7), fontWeight: '900', color: selectedExplSource === 'ai' ? '#fff' : effectiveColors.primary }}>
                         {aiExplanation ? '🧠 AI' : '+ AI EXPLAIN'}
                       </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => setShowAiChat(!showAiChat)}
+                      activeOpacity={0.7}
+                      style={{
+                        flexDirection: 'row', alignItems: 'center', gap: 5,
+                        paddingHorizontal: 12, paddingVertical: 6,
+                        borderRadius: 20, borderWidth: 1,
+                        backgroundColor: showAiChat ? effectiveColors.primary : effectiveColors.surfaceStrong,
+                        borderColor:     showAiChat ? effectiveColors.primary : effectiveColors.border,
+                      }}
+                    >
+                      <MessageCircle size={11} color={showAiChat ? '#fff' : effectiveColors.textTertiary} />
+                      <Text style={{ fontSize: Math.max(9, fontSize - 7), fontWeight: '900', color: showAiChat ? '#fff' : effectiveColors.textTertiary }}>
+                        {showAiChat ? 'CLOSE CHAT' : 'ASK AI'}
+                      </Text>
+                    </TouchableOpacity>
+
+                    {/* My Note Tab */}
+                    {effectiveAnswerData.note && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          onExplSourceChange('my_note');
+                        }}
+                        activeOpacity={0.7}
+                        style={{
+                          flexDirection: 'row', alignItems: 'center', gap: 5,
+                          paddingHorizontal: 12, paddingVertical: 6,
+                          borderRadius: 20, borderWidth: 1,
+                          backgroundColor: selectedExplSource === 'my_note' ? '#10b981' : '#10b98115',
+                          borderColor:     selectedExplSource === 'my_note' ? '#10b981' : '#10b98140',
+                        }}
+                      >
+                        <Text style={{ fontSize: 10, fontWeight: '900', color: selectedExplSource === 'my_note' ? '#fff' : '#10b981' }}>
+                          📝 MY NOTE
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+
+                    {/* Plus Button to Add/Edit Note */}
+                    <TouchableOpacity
+                      onPress={() => onNoteDraft && onNoteDraft(item.id, effectiveAnswerData.note || '')}
+                      activeOpacity={0.7}
+                      style={{
+                        width: 28, height: 28, borderRadius: 14,
+                        backgroundColor: effectiveColors.surfaceStrong,
+                        alignItems: 'center', justifyContent: 'center',
+                        borderWidth: 1, borderColor: effectiveColors.border,
+                        marginLeft: 4
+                      }}
+                    >
+                      <Plus size={16} color={effectiveColors.primary} />
                     </TouchableOpacity>
                   </View>
                 )}
 
 
+
+                {showAiChat && (
+                  <View style={{ marginBottom: 16 }}>
+                    <AIExplanationChat
+                      questionId={item.id}
+                      questionText={item.question_text || item.text || ''}
+                      options={Object.values(item.options || {})}
+                      correctAnswer={item.correct_answer || item.correctAnswer || ''}
+                      instituteExplanations={JSON.stringify(normalizedExplanations)}
+                      initialExplanation={aiExplanation}
+                    />
+                  </View>
+                )}
 
                 {viewerKind === 'markdown' ? (
                   <Markdown style={mdStyles} rules={mdRules}>
@@ -477,7 +621,7 @@ export const SharedQuestionCard = ({
                   </Markdown>
                 ) : viewerKind === 'ai' && isAiLoading && !aiExplanation ? (
                   <View style={{ paddingVertical: 28, alignItems: 'center', gap: 10 }}>
-                    <ActivityIndicator size="small" color="#7c3aed" />
+                    <ActivityIndicator size="small" color={effectiveColors.primary} />
                     <Text style={{ fontSize: 11, color: effectiveColors.textTertiary, fontWeight: '700', letterSpacing: 0.6 }}>
                       GEMINI IS THINKING…
                     </Text>
@@ -486,6 +630,26 @@ export const SharedQuestionCard = ({
                   <Text style={{ fontSize: fontSize, color: effectiveColors.textPrimary, lineHeight: fontSize * 1.6, fontWeight: '500' }}>
                     {renderAIText(effectiveExplanationText, { fontSize: fontSize, color: effectiveColors.textPrimary, lineHeight: fontSize * 1.6, fontWeight: '500' })}
                   </Text>
+                )}
+
+                {/* Clone to My Note shortcut */}
+                {showExplanation && selectedExplSource !== 'my_note' && effectiveExplanationText && (
+                  <TouchableOpacity
+                    onPress={() => onNoteDraft && onNoteDraft(item.id, effectiveExplanationText)}
+                    style={{ 
+                      flexDirection: 'row', 
+                      alignItems: 'center', 
+                      gap: 6, 
+                      marginTop: 12, 
+                      padding: 8, 
+                      borderRadius: 8, 
+                      backgroundColor: effectiveColors.primary + '10',
+                      alignSelf: 'flex-start'
+                    }}
+                  >
+                    <Copy size={14} color={effectiveColors.primary} />
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: effectiveColors.primary }}>Clone to My Note</Text>
+                  </TouchableOpacity>
                 )}
 
                 {(viewerKind === 'ai' || viewerKind === 'vitamin') && !!effectiveExplanationText && !modifyOpen[item.id] && (
@@ -513,6 +677,28 @@ export const SharedQuestionCard = ({
                           </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
+                          onPress={() => {
+                            setImprovePromptOpen && setImprovePromptOpen((prev: any) => ({ ...prev, [item.id]: true }));
+                            setImprovePromptText && setImprovePromptText((prev: any) => ({ ...prev, [item.id]: '' }));
+                          }}
+                          activeOpacity={0.7}
+                          style={{
+                            flexDirection: 'row', alignItems: 'center', gap: 5,
+                            paddingHorizontal: 11, paddingVertical: 7, borderRadius: 10,
+                            backgroundColor: effectiveColors.surfaceStrong,
+                            borderWidth: 1, borderColor: effectiveColors.border,
+                          }}
+                        >
+                          <RotateCcw size={12} color={effectiveColors.textSecondary} />
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: effectiveColors.textSecondary }}>
+                            Regenerate
+                          </Text>
+                        </TouchableOpacity>
+                      </>
+                    )}
+                    {viewerKind === 'vitamin' && savedBest && (
+                      <>
+                        <TouchableOpacity
                           onPress={() => handleOpenModify && handleOpenModify(item)}
                           activeOpacity={0.7}
                           style={{
@@ -524,11 +710,95 @@ export const SharedQuestionCard = ({
                         >
                           <Edit2 size={12} color={effectiveColors.textSecondary} />
                           <Text style={{ fontSize: 11, fontWeight: '800', color: effectiveColors.textSecondary }}>
-                            Modify & Save
+                            Edit & Update
+                          </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => {
+                            setImprovePromptOpen && setImprovePromptOpen((prev: any) => ({ ...prev, [item.id]: true }));
+                            setImprovePromptText && setImprovePromptText((prev: any) => ({ ...prev, [item.id]: '' }));
+                          }}
+                          activeOpacity={0.7}
+                          style={{
+                            flexDirection: 'row', alignItems: 'center', gap: 5,
+                            paddingHorizontal: 11, paddingVertical: 7, borderRadius: 10,
+                            backgroundColor: effectiveColors.surfaceStrong,
+                            borderWidth: 1, borderColor: effectiveColors.border,
+                          }}
+                        >
+                          <RotateCcw size={12} color={effectiveColors.textSecondary} />
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: effectiveColors.textSecondary }}>
+                            Regenerate
                           </Text>
                         </TouchableOpacity>
                       </>
                     )}
+                  </View>
+                )}
+                
+                {/* Regenerate Prompt Modal for AI */}
+                {viewerKind === 'ai' && improvePromptOpen?.[item.id] && (
+                  <View style={{ marginTop: 12, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 8, backgroundColor: effectiveColors.bg, borderWidth: 1, borderColor: effectiveColors.border }}>
+                    <Text style={{ fontSize: 11, fontWeight: '900', color: effectiveColors.textSecondary, marginBottom: 8 }}>REGENERATE WITH CUSTOM PROMPT</Text>
+                    <TextInput
+                      placeholder="e.g., Explain like I'm 5... Make it simpler... Add examples..."
+                      placeholderTextColor={effectiveColors.textTertiary}
+                      style={{
+                        backgroundColor: effectiveColors.surface,
+                        borderWidth: 1,
+                        borderColor: effectiveColors.border,
+                        borderRadius: 6,
+                        paddingHorizontal: 10,
+                        paddingVertical: 8,
+                        fontSize: 12,
+                        color: effectiveColors.textPrimary,
+                        minHeight: 60,
+                        textAlignVertical: 'top',
+                      }}
+                      multiline
+                      value={improvePromptText?.[item.id] || ''}
+                      onChangeText={(text) => setImprovePromptText && setImprovePromptText((prev: any) => ({ ...prev, [item.id]: text }))}
+                    />
+                    <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+                      <TouchableOpacity
+                        onPress={() => setImprovePromptOpen && setImprovePromptOpen((prev: any) => ({ ...prev, [item.id]: false }))}
+                        activeOpacity={0.7}
+                        style={{
+                          flex: 1,
+                          paddingHorizontal: 10,
+                          paddingVertical: 8,
+                          borderRadius: 8,
+                          backgroundColor: effectiveColors.surfaceStrong,
+                          borderWidth: 1,
+                          borderColor: effectiveColors.border,
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Text style={{ fontSize: 11, fontWeight: '800', color: effectiveColors.textSecondary }}>Cancel</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => {
+                          handleImproveSubmit && handleImproveSubmit(item, improvePromptText?.[item.id] || '');
+                          setImprovePromptOpen && setImprovePromptOpen((prev: any) => ({ ...prev, [item.id]: false }));
+                        }}
+                        disabled={improving?.[item.id]}
+                        activeOpacity={0.7}
+                        style={{
+                          flex: 1,
+                          paddingHorizontal: 10,
+                          paddingVertical: 8,
+                          borderRadius: 8,
+                          backgroundColor: effectiveColors.primary,
+                          alignItems: 'center',
+                        }}
+                      >
+                        {improving?.[item.id] ? (
+                          <ActivityIndicator size="small" color="#fff" />
+                        ) : (
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>Regenerate</Text>
+                        )}
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 )}
               </View>
@@ -572,30 +842,7 @@ export const SharedQuestionCard = ({
                         </Text>
                       </TouchableOpacity>
                     </>
-                  ) : (
-                    <TouchableOpacity
-                      testID={`open-ai-chat-${item.id}`}
-                      onPress={() => setShowAiChat(true)}
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        gap: 6,
-                        paddingHorizontal: 14,
-                        paddingVertical: 8,
-                        borderRadius: 20,
-                        borderWidth: 1,
-                        borderColor: '#7c3aed40',
-                        backgroundColor: '#7c3aed08',
-                        alignSelf: 'flex-start',
-                        marginBottom: 8,
-                      }}
-                    >
-                      <MessageCircle size={14} color="#7c3aed" />
-                      <Text style={{ fontSize: 12, fontWeight: '800', color: '#7c3aed' }}>
-                        💬 Ask AI (ELI5 / Chat)
-                      </Text>
-                    </TouchableOpacity>
-                  )}
+                  ) : null}
                 </View>
               )}
 
@@ -633,6 +880,14 @@ export const SharedQuestionCard = ({
                  >
                     <PenTool size={16} color={effectiveColors.primary} />
                     <Text style={[styles.actionBtnText, { color: effectiveColors.primary }]}>Hardnotes</Text>
+                 </TouchableOpacity>
+
+                 <TouchableOpacity 
+                   style={[styles.actionBtn, { backgroundColor: effectiveColors.primary + '15', borderColor: effectiveColors.primary + '30' }]}
+                   onPress={() => setShowAiChat(!showAiChat)}
+                 >
+                    <MessageCircle size={16} color={effectiveColors.primary} />
+                    <Text style={[styles.actionBtnText, { color: effectiveColors.primary }]}>{showAiChat ? 'Hide Chat' : 'Chat with AI'}</Text>
                  </TouchableOpacity>
 
                  <TouchableOpacity 

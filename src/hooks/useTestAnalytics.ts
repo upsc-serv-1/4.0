@@ -267,7 +267,7 @@ export function useAggregateTestAnalytics(userId: string | null) {
         let attempts = await OfflineManager.getOfflineAttempts(userId);
         const { data: remoteData } = await supabase
           .from('test_attempts')
-          .select('id, submitted_at, attempt_payload, score')
+          .select('id, submitted_at, attempt_payload, score, title')
           .eq('user_id', userId)
           .not('submitted_at', 'is', null)
           .order('submitted_at', { ascending: true });
@@ -320,7 +320,7 @@ export function useAggregateTestAnalytics(userId: string | null) {
         const allQuestions: QuestionAttempt[] = [];
         const attemptRowsForTrend: any[] = [];
 
-        attempts.forEach((attempt: any) => {
+        attempts.forEach((attempt: any, index: number) => {
           const rows = normalizeAttemptPayload(attempt);
           const questions = buildQuestionAttempts(rows, questionsMeta, attempt.id);
           allQuestions.push(...questions);
@@ -330,8 +330,10 @@ export function useAggregateTestAnalytics(userId: string | null) {
                                 questions.reduce((sum, q) => sum + (q.timeSpentSeconds || 0), 0);
 
           attemptRowsForTrend.push({
+            attemptIndex: index + 1,
             test_id: attempt.id,
             submitted_at: attempt.submitted_at,
+            title: attempt.title || attempt.attempt_payload?.test_title || attempt.attempt_payload?.title || `Attempt #${index + 1}`,
             score: computed ? Number(computed.totalMarks) : (attempt.score || 0),
             accuracy: computed ? computed.accuracy : 0,
             correct_count: computed ? computed.correct : 0,

@@ -249,6 +249,7 @@ export function buildAggregateHierarchicalAccuracy(questions: QuestionAttempt[])
 export interface TestAttemptRow {
   test_id: string;
   submitted_at: string;
+  title?: string;
   score?: number;
   accuracy?: number;
   correct_count?: number;
@@ -265,6 +266,7 @@ export function buildAggregateTestTrends(attempts: TestAttemptRow[]) {
   const historicalScores = sortedAttempts.map((attempt, index) => ({
     attemptIndex: index + 1,
     testId: attempt.test_id,
+    title: (attempt as any).title || `Attempt #${index + 1}`,
     date: attempt.submitted_at,
     score: attempt.score || 0,
     accuracy: attempt.accuracy || 0,

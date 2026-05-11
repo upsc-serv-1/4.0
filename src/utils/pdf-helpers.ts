@@ -1,3 +1,5 @@
+import { prelimsTaxonomy } from '../data/taxonomy';
+
 export const generateAnalyticsPdfHtml = ({
   userName,
   timestamp,
@@ -76,8 +78,8 @@ export const generateAnalyticsPdfHtml = ({
     const bottom = 30;
     const plotW = widthSvg - left - right;
     const plotH = heightSvg - top - bottom;
-    const barW = (plotW / data.length) * 0.6;
-    const gap = (plotW / data.length) * 0.4;
+    const barW = (plotW / (data.length || 1)) * 0.6;
+    const gap = (plotW / (data.length || 1)) * 0.4;
 
     return `
       <div class="section-container">
@@ -158,7 +160,6 @@ export const generateAnalyticsPdfHtml = ({
 
   const renderHeatmap = () => {
     if (!sections.heatmap) return '';
-    // Calculate drill-down items for heatmap
     const dItems: { name: string; accuracy: number; isSection: boolean }[] = Object.entries(cumulative.subjects).map(([name, stats]: [string, any]) => ({
       name,
       accuracy: stats.accuracy,
@@ -206,6 +207,45 @@ export const generateAnalyticsPdfHtml = ({
     `;
   };
 
+  const renderPreparationIntelligence = () => {
+    const totalQs = overall.total || 0;
+    const avgAcc = overall.accuracy || 0;
+    const strongSubjects = subjects.filter(s => s.accuracy >= 75).map(s => s.name);
+    const weakSubjects = subjects.filter(s => s.accuracy < 50).map(s => s.name);
+    
+    return `
+      <div class="section-container">
+        <h2>Preparation Intelligence</h2>
+        <div style="background: #f8fafc; border-radius: 16px; padding: 20px; border: 1px solid #e2e8f0; margin-top: 15px;">
+          <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div style="flex: 1; background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0;">
+              <div style="font-size: 10px; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px;">Overall Mastery</div>
+              <div style="font-size: 24px; font-weight: 900; color: #1e293b;">${avgAcc}%</div>
+            </div>
+            <div style="flex: 1; background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0;">
+              <div style="font-size: 10px; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px;">Questions Analyzed</div>
+              <div style="font-size: 24px; font-weight: 900; color: #1e293b;">${totalQs}</div>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <div style="font-size: 12px; font-weight: 800; color: #475569; margin-bottom: 8px;">Core Strengths</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              ${strongSubjects.length ? strongSubjects.map(s => `<span style="background: #dcfce7; color: #15803d; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700;">${esc(s)}</span>`).join('') : '<span style="color: #94a3b8; font-size: 11px; font-style: italic;">No subjects with >75% accuracy yet.</span>'}
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size: 12px; font-weight: 800; color: #475569; margin-bottom: 8px;">High-Priority Gaps</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              ${weakSubjects.length ? weakSubjects.map(s => `<span style="background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700;">${esc(s)}</span>`).join('') : '<span style="color: #94a3b8; font-size: 11px; font-style: italic;">Great! No subjects below 50% accuracy.</span>'}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
   const scoreLabelsPdf = trends.historicalScores.map((item: any) => `T${item?.attemptIndex || ''}`);
   const scoreValuesPdf = trends.historicalScores.map((item: any) => item?.score || 0);
   const negativeValuesPdf = trends.negativeMarkingTrends?.map((item: any) => item?.negativeMarksPenalty || 0) || [];
@@ -227,6 +267,68 @@ export const generateAnalyticsPdfHtml = ({
   const mistakesData = Object.entries(overall.advanced?.errors || {})
     .map(([cat, count]) => ({ tag: cat, count: count as number }));
 
+  const subjectPages = sections.isDetailedReport ? subjects.map(sub => {
+    const subData = cumulative.subjects[sub.name];
+    const sectionChartData = Object.values(subData.sectionGroups || {})
+      .filter((sg: any) => sg.total > 0)
+      .map((sg: any) => ({ label: sg.name, value: sg.accuracy }));
+
+    // Build full micro-topic list from taxonomy
+    const allMicroRows = (() => {
+      const subName = sub.name;
+      const subSections = Object.keys(subData.sectionGroups || {});
+      
+      let htmlRows = '';
+      subSections.forEach(secName => {
+          const taxonomyTopics = prelimsTaxonomy
+              .filter(t => t.subject === subName && t.sectionGroup === secName)
+              .map(t => t.microTopic);
+          
+          const existingMetrics = subData.sectionGroups[secName]?.microTopics || {};
+          const merged = Array.from(new Set([...taxonomyTopics, ...Object.keys(existingMetrics)])).map(mtName => {
+            const stats = existingMetrics[mtName] || { correct: 0, total: 0, accuracy: 0 };
+            return { name: mtName, ...stats };
+          });
+
+          htmlRows += `
+            <tr style="background: #f8fafc;">
+              <td colspan="3" style="font-weight: 800; color: #6366f1; padding: 8px 12px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">${esc(secName)}</td>
+            </tr>
+            ${merged.map(mt => `
+              <tr>
+                <td style="padding-left: 24px;">${esc(mt.name)}</td>
+                <td style="font-weight: 700; color: ${mt.total > 0 ? (mt.accuracy >= 50 ? '#10b981' : '#ef4444') : '#94a3b8'};">${mt.total > 0 ? Math.round(mt.accuracy) + '%' : '—'}</td>
+                <td>${mt.total} Qs</td>
+              </tr>
+            `).join('')}
+          `;
+      });
+      return htmlRows;
+    })();
+
+    return `
+      <div class="page-break"></div>
+      <div class="header">
+        <h1>Detailed Analysis: ${esc(sub.name)}</h1>
+        <p>Overall Accuracy: <strong>${Math.round(sub.accuracy)}%</strong> &bull; Status: <strong>${sub.accuracy >= 75 ? 'Mastery' : sub.accuracy >= 50 ? 'Developing' : 'Critical'}</strong></p>
+      </div>
+
+      ${renderBarChart('Theme Accuracy Breakdown', sectionChartData, '#6366f1')}
+
+      <div class="section-container">
+        <h2>Syllabus Tracker: Micro-topic Mastery</h2>
+        <table>
+          <thead>
+            <tr><th>Micro-topic</th><th>Accuracy</th><th>Questions Attempted</th></tr>
+          </thead>
+          <tbody>
+            ${allMicroRows}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }).join('') : '';
+
   return `
     <html>
       <head>
@@ -244,15 +346,18 @@ export const generateAnalyticsPdfHtml = ({
           th { background: #f8fafc !important; text-align: left; font-weight: bold; color: #475569; }
           .chart-card { background: #fff !important; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; }
           .chip { display: inline-block; margin: 4px 8px 4px 0; background: #fee2e2 !important; color: #b91c1c; border-radius: 999px; padding: 6px 14px; font-size: 11px; font-weight: bold; }
+          .page-break { break-before: page; page-break-before: always; }
           .footer { margin-top: 50px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center; font-size: 11px; color: #94a3b8; }
         </style>
       </head>
       <body>
         <div class="header">
-          <h1>Advanced Performance Analysis</h1>
-          <p>User: <strong>${esc(userName)}</strong> • Generated: <strong>${esc(timestamp)}</strong></p>
-          <p>Scope: <strong>${esc(filterLabel)}</strong> • Tests Included: <strong>${esc(trends.historicalScores.length)}</strong></p>
+          <h1>UPSC Performance Analysis</h1>
+          <p>User: <strong>${esc(userName)}</strong> &bull; Generated: <strong>${esc(timestamp)}</strong></p>
+          <p>Scope: <strong>${esc(filterLabel)}</strong> &bull; Tests Analyzed: <strong>${esc(trends.historicalScores.length)}</strong></p>
         </div>
+
+        ${renderPreparationIntelligence()}
 
         ${sections.trajectory ? renderSimpleLine('Overall Score Trajectory', scoreLabelsPdf, scoreValuesPdf, '#6366f1') : ''}
         ${sections.trajectory ? renderSimpleLine('Negative Marking Penalty', scoreLabelsPdf, negativeValuesPdf, '#ef4444') : ''}
@@ -268,7 +373,7 @@ export const generateAnalyticsPdfHtml = ({
                 ${subjects.map(s => `
                   <tr>
                     <td style="font-weight: 600;">${esc(s.name)}</td>
-                    <td style="font-weight: 700; color: ${s.accuracy >= 75 ? '#22c55e' : s.accuracy >= 50 ? '#f59e0b' : '#ef4444'};">${s.accuracy}%</td>
+                    <td style="font-weight: 700; color: ${s.accuracy >= 75 ? '#22c55e' : s.accuracy >= 50 ? '#f59e0b' : '#ef4444'};">${Math.round(s.accuracy)}%</td>
                     <td>${s.total}</td>
                     <td>
                       <span style="padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; background: ${s.accuracy >= 75 ? '#dcfce7' : s.accuracy >= 50 ? '#ffedd5' : '#fee2e2'} !important; color: ${s.accuracy >= 75 ? '#15803d' : s.accuracy >= 50 ? '#b45309' : '#b91c1c'} !important;">
@@ -305,27 +410,7 @@ export const generateAnalyticsPdfHtml = ({
           </div>
         ` : ''}
 
-        ${sections.drilldown ? `
-          <div class="section-container">
-            <h2>Detailed Topic Performance</h2>
-            <table>
-              <thead>
-                <tr><th>Subject / Topic</th><th>Accuracy</th><th>Total Qs</th></tr>
-              </thead>
-              <tbody>
-                ${Object.entries(cumulative.subjects).map(([subName, sub]: [string, any]) => 
-                  Object.values(sub.sectionGroups || {}).map((sg: any) => `
-                    <tr>
-                      <td><span style="font-size: 10px; color: #64748b;">${esc(subName)}</span><br/><strong>${esc(sg.name)}</strong></td>
-                      <td style="font-weight: 700; color: ${sg.accuracy >= 50 ? '#10b981' : '#ef4444'};">${sg.accuracy}%</td>
-                      <td>${sg.total}</td>
-                    </tr>
-                  `).join('')
-                ).join('')}
-              </tbody>
-            </table>
-          </div>
-        ` : ''}
+        ${subjectPages}
 
         <div class="footer">
           Generated by Noji Intelligence Engine &bull; Confidential Performance Report &bull; https://noji.app
@@ -333,4 +418,5 @@ export const generateAnalyticsPdfHtml = ({
       </body>
     </html>
   `;
+
 };

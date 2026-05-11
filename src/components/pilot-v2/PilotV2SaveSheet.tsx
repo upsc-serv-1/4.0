@@ -136,6 +136,8 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const [aiPrompt, setAiPrompt] = useState('');
   const [aiOutput, setAiOutput] = useState('');
   const [aiBusy, setAiBusy] = useState(false);
+  const aiInputRef = useRef<TextInput | null>(null);
+  const aiPanelYRef = useRef(0);
   const [hlColor, setHlColor] = useState('#FFF59D');
   const [editorKey, setEditorKey] = useState(0);
   const [saving, setSaving]       = useState(false);
@@ -501,10 +503,20 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={backdropStyle}>
-        <TouchableOpacity activeOpacity={1} onPress={onClose} style={StyleSheet.absoluteFill} />
-        <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: keyboardOpen ? 'flex-start' : 'center', paddingTop: keyboardOpen ? 12 : 16, paddingBottom: 16 }}>
+        {/* Backdrop tap-to-close: explicit lower zIndex than sheet */}
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={onClose}
+          style={[StyleSheet.absoluteFill, { zIndex: 1 }]}
+        />
+        <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: keyboardOpen ? 'flex-start' : 'center', paddingTop: keyboardOpen ? 12 : 16, paddingBottom: 16, zIndex: 10 }}>
           <Animated.View style={{ transform: [{ translateY: sheetTranslate }], width: '100%', alignItems: 'center' }}>
-            <View testID="pilot-v2-save-sheet" style={[sheetStyle, { backgroundColor: colors.surface }]}>
+            <View
+              testID="pilot-v2-save-sheet"
+              style={[sheetStyle, { backgroundColor: colors.surface }]}
+              onStartShouldSetResponder={() => true}
+              onMoveShouldSetResponder={() => true}
+            >
             <Animated.View
               style={{ transform: [{ translateY: topTranslate }], zIndex: 4 }}
               onLayout={(e) => setTopAreaH(e.nativeEvent.layout.height)}
@@ -654,6 +666,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                       return;
                     }
                     if (action === 'aiAssist') {
+                      setShowHlPicker(false);
                       setShowAiPanel(v => !v);
                       return;
                     }
@@ -756,9 +769,13 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                 </TouchableOpacity>
               </View>
               {showAiPanel && (
-                <View style={[styles.aiPanel, { borderColor: colors.border, backgroundColor: colors.surface }]}>
+                <View
+                  style={[styles.aiPanel, { borderColor: colors.border, backgroundColor: colors.surface }]}
+                  onLayout={(e) => { aiPanelYRef.current = e.nativeEvent.layout.y; }}
+                >
                   <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>AI command</Text>
                   <TextInput
+                    ref={(r) => { aiInputRef.current = r; }}
                     value={aiPrompt}
                     onChangeText={setAiPrompt}
                     placeholder="Example: Convert to bullet points in Hindi"
@@ -810,44 +827,46 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
             )}
 
             {/* Footer actions */}
-            <View style={[styles.footer, { borderTopColor: colors.border }]}>
-              {savedNoteId ? (
-                <View style={{ flexDirection: 'row', gap: 8 }}>
+            {!keyboardOpen && (
+              <View style={[styles.footer, { borderTopColor: colors.border }]}>
+                {savedNoteId ? (
+                  <View style={{ flexDirection: 'row', gap: 8 }}>
+                    <TouchableOpacity
+                      testID="pilot-v2-save-another"
+                      style={[styles.btnGhost, { borderColor: colors.border }]}
+                      onPress={handleSaveAnother}
+                    >
+                      <Plus size={14} color={colors.textPrimary} />
+                      <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>Save another</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      testID="pilot-v2-save-open"
+                      style={[styles.btnPrimary, { backgroundColor: '#5B4EFA', flex: 1 }]}
+                      onPress={handleOpen}
+                    >
+                      <Text style={styles.btnPrimaryText}>Open in Pilot V2</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
                   <TouchableOpacity
-                    testID="pilot-v2-save-another"
-                    style={[styles.btnGhost, { borderColor: colors.border }]}
-                    onPress={handleSaveAnother}
+                    testID="pilot-v2-save-confirm"
+                    disabled={!canSave || saving}
+                    onPress={handleSave}
+                    style={[
+                      styles.btnPrimary,
+                      { backgroundColor: '#5B4EFA', opacity: canSave && !saving ? 1 : 0.5 },
+                    ]}
                   >
-                    <Plus size={14} color={colors.textPrimary} />
-                    <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>Save another</Text>
+                    {saving ? <ActivityIndicator color="#fff" size="small" /> : (
+                      <>
+                        <Rocket size={14} color="#fff" />
+                        <Text style={styles.btnPrimaryText}>Save to Pilot V2</Text>
+                      </>
+                    )}
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    testID="pilot-v2-save-open"
-                    style={[styles.btnPrimary, { backgroundColor: '#5B4EFA', flex: 1 }]}
-                    onPress={handleOpen}
-                  >
-                    <Text style={styles.btnPrimaryText}>Open in Pilot V2</Text>
-                  </TouchableOpacity>
-                </View>
-              ) : (
-                <TouchableOpacity
-                  testID="pilot-v2-save-confirm"
-                  disabled={!canSave || saving}
-                  onPress={handleSave}
-                  style={[
-                    styles.btnPrimary,
-                    { backgroundColor: '#5B4EFA', opacity: canSave && !saving ? 1 : 0.5 },
-                  ]}
-                >
-                  {saving ? <ActivityIndicator color="#fff" size="small" /> : (
-                    <>
-                      <Rocket size={14} color="#fff" />
-                      <Text style={styles.btnPrimaryText}>Save to Pilot V2</Text>
-                    </>
-                  )}
-                </TouchableOpacity>
-              )}
-            </View>
+                )}
+              </View>
+            )}
             <PremiumMoveSheet
               visible={moveOpen}
               title="Change Directory"
@@ -900,6 +919,9 @@ const styles = StyleSheet.create({
     paddingTop: 2,
     paddingBottom: 2,
     marginBottom: 8,
+    // Stretch to sheet edges (iPad-friendly)
+    marginHorizontal: -18,
+    paddingHorizontal: 8,
   },
   formGroup: {
     marginBottom: 6,

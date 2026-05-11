@@ -1142,21 +1142,23 @@ export function PilotV2EditorView() {
                   actions.insertOrderedList,
                 ]}
               />
-              <RichNoteEditor
-                key={`block-edit-${blockEditKey}`}
-                ref={blockEditRef}
-                html={blockEditSheet.body}
-                onChange={(v) => setBlockEditSheet((s) => ({ ...s, body: v }))}
-                themeColors={{
-                  bg: colors.surfaceStrong,
-                  surface: colors.surface,
-                  textPrimary: colors.textPrimary,
-                  border: colors.border,
-                  primary: '#5B4EFA',
-                }}
-                editorStyle={{ minHeight: 280 }}
-                placeholder="Edit this block with full formatting."
-              />
+              <View style={{ height: 360 }}>
+                <RichNoteEditor
+                  key={`block-edit-${blockEditKey}`}
+                  ref={blockEditRef}
+                  html={blockEditSheet.body}
+                  onChange={(v) => setBlockEditSheet((s) => ({ ...s, body: v }))}
+                  themeColors={{
+                    bg: colors.surfaceStrong,
+                    surface: colors.surface,
+                    textPrimary: colors.textPrimary,
+                    border: colors.border,
+                    primary: '#5B4EFA',
+                  }}
+                  editorStyle={{ minHeight: 340 }}
+                  placeholder="Edit this block with full formatting."
+                />
+              </View>
             </View>
             <View style={styles.modalActions}>
               <TouchableOpacity onPress={() => setBlockEditSheet({ visible: false, blockId: null, body: '' })} style={styles.modalBtnGhost}>
@@ -1178,6 +1180,26 @@ export function PilotV2EditorView() {
         style={[styles.pencilFab, pencil.drawingMode && { backgroundColor: '#0F172A' }]}
       >
         <Pen size={22} color="#ffffff" strokeWidth={2.5} />
+      </TouchableOpacity>
+
+      {/* ── Quick formatting toolbar toggle (bottom-right) ─────────── */}
+      <TouchableOpacity
+        testID="pilot-v2-formatting-fab"
+        onPress={() => setShowToolbar((v) => {
+          globalToolbarVisible = !v;
+          return !v;
+        })}
+        activeOpacity={0.85}
+        style={[
+          styles.pencilFab,
+          {
+            right: 18,
+            bottom: 148,
+            backgroundColor: showToolbar ? '#0F172A' : '#5B4EFA',
+          },
+        ]}
+      >
+        <Type size={22} color="#ffffff" strokeWidth={2.5} />
       </TouchableOpacity>
 
       {/* ── Washi-Tape FAB (active recall masking) ──────────────────── */}

@@ -74,6 +74,7 @@ export interface ExportOptions {
   moduleName?: string;
 
   includePerformanceMetrics?: boolean;
+  hideResponses?: boolean;
 
   // Question filters (apply before render)
   statusFilter?: 'all' | 'correct' | 'incorrect' | 'unattempted';
@@ -116,6 +117,7 @@ export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): Ex
   watermark: '',
   moduleName: '',
   includePerformanceMetrics: false,
+  hideResponses: false,
   statusFilter: 'all',
   revisionTags: [],
   pyqOnly: false,
@@ -207,24 +209,24 @@ export interface ExportHardnote {
 // ---------- Theme tokens ----------
 
 const themeTokens: Record<ExportTheme, { bg: string; fg: string; accent: string; rule: string; card: string }> = {
-  modern:     { bg: '#ffffff', fg: '#111827', accent: '#6366f1', rule: '#e5e7eb', card: '#ffffff' },
-  classic:    { bg: '#ffffff', fg: '#111111', accent: '#1d4ed8', rule: '#e5e7eb', card: '#ffffff' },
-  sepia:      { bg: '#F4ECD8', fg: '#433422', accent: '#9a3412', rule: '#d9c7a3', card: '#fdf6e3' },
+  modern: { bg: '#ffffff', fg: '#111827', accent: '#6366f1', rule: '#e5e7eb', card: '#ffffff' },
+  classic: { bg: '#ffffff', fg: '#111111', accent: '#1d4ed8', rule: '#e5e7eb', card: '#ffffff' },
+  sepia: { bg: '#F4ECD8', fg: '#433422', accent: '#9a3412', rule: '#d9c7a3', card: '#fdf6e3' },
   historical: { bg: '#fdf6e3', fg: '#2d2419', accent: '#7c2d12', rule: '#d6c9a8', card: '#fffaf0' },
-  dark:       { bg: '#0b0f17', fg: '#e5e7eb', accent: '#60a5fa', rule: '#1f2937', card: '#111827' },
+  dark: { bg: '#0b0f17', fg: '#e5e7eb', accent: '#60a5fa', rule: '#1f2937', card: '#111827' },
 };
 
 const fontFamilyCss: Record<ExportFontFamily, string> = {
-  sans:        `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif`,
-  serif:       `'Georgia', 'Times New Roman', serif`,
+  sans: `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif`,
+  serif: `'Georgia', 'Times New Roman', serif`,
   handwriting: `'Caveat', 'Patrick Hand', cursive`,
-  mono:        `'Menlo', 'Consolas', 'JetBrains Mono', 'Courier New', monospace`,
+  mono: `'Menlo', 'Consolas', 'JetBrains Mono', 'Courier New', monospace`,
 };
 
 const paperBg: Record<ExportPaperStyle, string> = {
-  plain:  'none',
-  lined:  `repeating-linear-gradient(to bottom, #ffffff 0, #ffffff 27px, #dbe4f3 28px)`,
-  grid:   `linear-gradient(to right, var(--rule) 1px, transparent 1px) 0 0/24px 24px, linear-gradient(to bottom, var(--rule) 1px, transparent 1px) 0 0/24px 24px`,
+  plain: 'none',
+  lined: `repeating-linear-gradient(to bottom, #ffffff 0, #ffffff 27px, #dbe4f3 28px)`,
+  grid: `linear-gradient(to right, var(--rule) 1px, transparent 1px) 0 0/24px 24px, linear-gradient(to bottom, var(--rule) 1px, transparent 1px) 0 0/24px 24px`,
   dotted: `radial-gradient(var(--rule) 1px, transparent 1px) 0 0/16px 16px`,
 };
 
@@ -338,7 +340,7 @@ const baseCss = (o: ExportOptions) => {
     .qa-unified .qa-answer {
       margin-top: 2mm;
       padding-top: 2mm;
-      border-top: 1px dashed var(--qa-border);
+      border-top: 1px dotted var(--qa-border);
     }
     .qa-split-stack {
       display: flex;
@@ -349,7 +351,7 @@ const baseCss = (o: ExportOptions) => {
     /* Rich text preservation */
     b, strong { font-weight: 700; }
     i, em { font-style: italic; }
-    u { text-decoration: underline; }
+    u { text-decoration: underline; text-decoration-skip-ink: auto; text-underline-offset: 2px; text-underline-position: under; vertical-align: baseline; }
     s, strike, del { text-decoration: line-through; }
     mark, .highlight { background-color: #FFF59D; color: inherit; padding: 0 2px; border-radius: 2px; font-size: inherit !important; line-height: inherit !important; }
     span[style*="background"] { padding: 0 2px; border-radius: 2px; font-size: inherit !important; line-height: inherit !important; }
@@ -357,12 +359,12 @@ const baseCss = (o: ExportOptions) => {
     ul, ol { padding-left: 22px; margin: 4px 0; }
     li { margin: 2px 0; }
     h1, h2, h3, h4, h5, h6 { line-height: 1.25; margin: 8px 0 4px 0; color: var(--fg); }
-    a { color: var(--accent); text-decoration: underline; }
+    a { color: var(--accent); text-decoration: underline; text-decoration-skip-ink: auto; text-underline-offset: 2px; }
     code { background: rgba(0,0,0,0.06); padding: 1px 4px; border-radius: 3px; font-family: Menlo, monospace; font-size: 0.9em; }
 
     /* Flashcards */
     .card { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; border: 1px solid var(--rule); border-radius: 6px; padding: 4mm; margin: 3mm 0; break-inside: avoid; }
-    .card .side { border-right: 1px dashed var(--rule); padding-right: 4mm; }
+    .card .side { border-right: 1px dotted var(--rule); padding-right: 4mm; }
     .card .side:last-child { border-right: none; padding-right: 0; }
     .card-face-label { font-size: ${o.fontSize - 3}pt; font-weight: 800; color: var(--accent); letter-spacing: 1px; margin-bottom: 1mm; text-transform: uppercase; }
     .card-state { display: inline-block; font-size: ${o.fontSize - 4}pt; padding: 0 6px; border-radius: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; background: var(--accent); color: #fff; }
@@ -385,7 +387,7 @@ const baseCss = (o: ExportOptions) => {
     /* TOC */
     .toc { margin: 0 0 10mm 0; padding: 4mm 6mm; background: rgba(0,0,0,0.03); border-radius: 6px; border: 1px solid var(--rule); }
     .toc-title { font-weight: 900; margin-bottom: 2mm; font-size: ${o.fontSize + 1}pt; color: var(--accent); }
-    .toc-item { font-size: ${o.fontSize - 1}pt; padding: 1mm 0; border-bottom: 1px dashed var(--rule); }
+    .toc-item { font-size: ${o.fontSize - 1}pt; padding: 1mm 0; border-bottom: 1px dotted var(--rule); }
 
     /* Executive summary prepend support */
     .executive-summary { margin-bottom: 8mm; }
@@ -400,7 +402,7 @@ const baseCss = (o: ExportOptions) => {
     /* Answer Key appendix */
     .answer-key { page-break-before: always; margin-top: 10mm; }
     .answer-key h2 { color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 2mm; }
-    .ak-row { padding: 2mm 0; border-bottom: 1px dashed var(--rule); font-size: ${o.fontSize - 1}pt; }
+    .ak-row { padding: 2mm 0; border-bottom: 1px dotted var(--rule); font-size: ${o.fontSize - 1}pt; }
     .ak-num { color: var(--accent); font-weight: 800; margin-right: 6px; }
 
     /* Perf metrics */
@@ -532,12 +534,12 @@ export const sortQuestions = (rows: ExportQuestion[], o: ExportOptions): ExportQ
       for (const lvl of lvls) {
         const av =
           lvl === 'subject' ? (a.subject || '')
-          : lvl === 'section_group' ? (a.section_group || '')
-          : (a.micro_topic || '');
+            : lvl === 'section_group' ? (a.section_group || '')
+              : (a.micro_topic || '');
         const bv =
           lvl === 'subject' ? (b.subject || '')
-          : lvl === 'section_group' ? (b.section_group || '')
-          : (b.micro_topic || '');
+            : lvl === 'section_group' ? (b.section_group || '')
+              : (b.micro_topic || '');
         const cmp = av.localeCompare(bv);
         if (cmp !== 0) return cmp;
       }
@@ -616,20 +618,20 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
     const meta = [q.subject, q.section_group, q.micro_topic, q.exam_year, q.is_pyq ? 'PYQ' : null, q.is_ncert ? 'NCERT' : null]
       .filter(Boolean).map(x => `<span class="pill">${escapeHtml(String(x))}</span>`).join('');
 
-    const answer = (q.correct_answer || '').toUpperCase();
-    const explanation = q.explanation_markdown || q.explanation || '';
+    const answer = o.hideResponses ? '' : (q.correct_answer || '').toUpperCase();
+    const explanation = o.hideResponses ? '' : (q.explanation_markdown || q.explanation || '');
 
     const optsBlock = showOpts && q.options ? (() => {
       const opts = q.options!;
       return `<ul class="opts">${['a', 'b', 'c', 'd'].filter(k => (opts as any)[k]).map(k => {
         const label = k.toUpperCase();
         let cls = '';
-        if (inline && answer === label) cls = 'correct';
+        if (!o.hideResponses && inline && answer === label) cls = 'correct';
         return `<li class="${cls}"><b>${label}.</b> ${renderInline(String((opts as any)[k]))}</li>`;
       }).join('')}</ul>`;
     })() : '';
 
-    const metricsBlock = o.includePerformanceMetrics
+    const metricsBlock = (o.includePerformanceMetrics && !o.hideResponses)
       ? `${q.time_taken_seconds ? `<span class="metrics">⏱ ${q.time_taken_seconds}s</span>` : ''}${q.is_correct === true ? '<span class="metrics">✓ Correct</span>' : q.is_correct === false ? '<span class="metrics">✗ Incorrect</span>' : q.selected_answer ? '' : '<span class="metrics">— Skipped</span>'}`
       : '';
 
@@ -671,7 +673,7 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
       ? (hasMicro ? 'subject_section_microtopic' : hasSection ? 'subject_section' : 'subject')
       : (o.sortBy === 'subject_section' ? 'subject_section'
         : o.sortBy === 'subject_section_microtopic' ? 'subject_section_microtopic'
-        : 'subject');
+          : 'subject');
 
   if (needsGrouping) {
     // Build grouped structure: Subject → Section Group → Microtopic → Questions
@@ -745,17 +747,17 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
     });
 
     // Answer key appendix
-    const answerKey = !isFlashStyle && !inline && (o.contentScope !== 'q_only')
+    const answerKey = !isFlashStyle && !inline && !o.hideResponses && (o.contentScope !== 'q_only')
       ? `<div class="answer-key">
           <h2>Answer Key${showExpl ? ' & Explanations' : ''}</h2>
           ${rows.map((q, i) => {
-            const a = (q.correct_answer || '').toUpperCase();
-            const e = q.explanation_markdown || q.explanation || '';
-            return `<div class="ak-row">
+        const a = (q.correct_answer || '').toUpperCase();
+        const e = q.explanation_markdown || q.explanation || '';
+        return `<div class="ak-row">
               <span class="ak-num">${i + 1}.</span>${a ? `<b>Ans: ${a}</b>` : ''}
               ${showExpl && e ? `<div class="expl" style="margin-top:1mm">${renderInline(e)}</div>` : ''}
             </div>`;
-          }).join('')}
+      }).join('')}
         </div>`
       : '';
 
@@ -777,17 +779,17 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
   const itemsHtml = rows.map((q, i) => renderQuestionItem(q, i)).join('');
 
   // Answer key appendix if not inline
-  const answerKey = !isFlashStyle && !inline && (o.contentScope !== 'q_only')
+  const answerKey = !isFlashStyle && !inline && !o.hideResponses && (o.contentScope !== 'q_only')
     ? `<div class="answer-key">
         <h2>Answer Key${showExpl ? ' & Explanations' : ''}</h2>
         ${rows.map((q, i) => {
-          const a = (q.correct_answer || '').toUpperCase();
-          const e = q.explanation_markdown || q.explanation || '';
-          return `<div class="ak-row">
+      const a = (q.correct_answer || '').toUpperCase();
+      const e = q.explanation_markdown || q.explanation || '';
+      return `<div class="ak-row">
             <span class="ak-num">${i + 1}.</span>${a ? `<b>Ans: ${a}</b>` : ''}
             ${showExpl && e ? `<div class="expl" style="margin-top:1mm">${renderInline(e)}</div>` : ''}
           </div>`;
-        }).join('')}
+    }).join('')}
       </div>`
     : '';
 
@@ -865,7 +867,7 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
       const meta = [q.subject, q.micro_topic, q.exam_year].filter(Boolean).map(x => `<span class="pill">${escapeHtml(String(x))}</span>`).join('');
       const answer = (q.correct_answer || '').toUpperCase();
       const explanation = q.explanation_markdown || q.explanation || '';
-      const optsBlock = showOpts && q.options ? `<ul class="opts">${['a','b','c','d'].filter(k => (q.options as any)[k]).map(k => `<li class="${inline && answer === k.toUpperCase() ? 'correct' : ''}"><b>${k.toUpperCase()}.</b> ${renderInline(String((q.options as any)[k]))}</li>`).join('')}</ul>` : '';
+      const optsBlock = showOpts && q.options ? `<ul class="opts">${['a', 'b', 'c', 'd'].filter(k => (q.options as any)[k]).map(k => `<li class="${inline && answer === k.toUpperCase() ? 'correct' : ''}"><b>${k.toUpperCase()}.</b> ${renderInline(String((q.options as any)[k]))}</li>`).join('')}</ul>` : '';
       const questionBlock = `
         <div class="qstem"><span class="qnum">${i + 1}.</span>${renderInline(stem)}</div>
         ${meta ? `<div class="metarow">${meta}</div>` : ''}
@@ -876,13 +878,13 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
         ${inline && showExpl && explanation ? `<div class="expl">${renderInline(explanation)}</div>` : ''}
       `.trim();
       if (isFlashStyle) {
-      const right = answerBlock || `<div class="expl">Answer/explanation hidden for this card.</div>`;
-      return `<div class="card">
+        const right = answerBlock || `<div class="expl">Answer/explanation hidden for this card.</div>`;
+        return `<div class="card">
         <div class="side"><div class="card-face-label">Question</div>${questionBlock}</div>
         <div class="side"><div class="card-face-label">Answer & Explanation</div>${right}</div>
       </div>`;
-    }
-    return `<div class="item">${renderQaLayoutBlock(questionBlock, answerBlock, o)}</div>`;
+      }
+      return `<div class="item">${renderQaLayoutBlock(questionBlock, answerBlock, o)}</div>`;
     }).join('');
     return `<div class="tag-section">
       <div class="tag-title">#${escapeHtml(g.tag)} <span style="font-weight:500;opacity:0.7">(${rows.length})</span></div>
@@ -895,10 +897,10 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
     ? `<div class="answer-key">
         <h2>Answer Key${showExpl ? ' & Explanations' : ''}</h2>
         ${groups.flatMap((g, gi) => g.questions.map((q, i) => {
-          const a = (q.correct_answer || '').toUpperCase();
-          const e = q.explanation_markdown || q.explanation || '';
-          return `<div class="ak-row"><span class="ak-num">#${escapeHtml(g.tag)} · ${i + 1}.</span>${a ? `<b>Ans: ${a}</b>` : ''}${showExpl && e ? `<div class="expl" style="margin-top:1mm">${renderInline(e)}</div>` : ''}</div>`;
-        })).join('')}
+      const a = (q.correct_answer || '').toUpperCase();
+      const e = q.explanation_markdown || q.explanation || '';
+      return `<div class="ak-row"><span class="ak-num">#${escapeHtml(g.tag)} · ${i + 1}.</span>${a ? `<b>Ans: ${a}</b>` : ''}${showExpl && e ? `<div class="expl" style="margin-top:1mm">${renderInline(e)}</div>` : ''}</div>`;
+    })).join('')}
       </div>`
     : '';
 
@@ -911,19 +913,26 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
  * Convert a stroke's point series to an SVG path `d` attribute using the
  * same midpoint-quadratic smoothing used by the on-device Skia canvas.
  * Keeps the exported PDF visually identical to what the user sees.
+ * 
+ * NOTE: Stroke coordinates might need adjustment if they shift vertically
+ * in PDF due to line-height or baseline differences between canvas and PDF.
  */
-const hardnoteStrokeToSvgPath = (pts: ExportHardnoteStrokePoint[]): string => {
+const hardnoteStrokeToSvgPath = (pts: ExportHardnoteStrokePoint[], adjustYBy: number = 0): string => {
   if (!pts.length) return '';
-  let d = `M ${pts[0].x.toFixed(2)} ${pts[0].y.toFixed(2)}`;
+  const firstY = pts[0].y + adjustYBy;
+  let d = `M ${pts[0].x.toFixed(2)} ${firstY.toFixed(2)}`;
   for (let i = 1; i < pts.length; i++) {
     const prev = pts[i - 1];
     const p = pts[i];
+    const prevY = prev.y + adjustYBy;
+    const pY = p.y + adjustYBy;
     const mx = (prev.x + p.x) / 2;
-    const my = (prev.y + p.y) / 2;
-    d += ` Q ${prev.x.toFixed(2)} ${prev.y.toFixed(2)} ${mx.toFixed(2)} ${my.toFixed(2)}`;
+    const my = (prevY + pY) / 2;
+    d += ` Q ${prev.x.toFixed(2)} ${prevY.toFixed(2)} ${mx.toFixed(2)} ${my.toFixed(2)}`;
   }
   const last = pts[pts.length - 1];
-  d += ` L ${last.x.toFixed(2)} ${last.y.toFixed(2)}`;
+  const lastY = last.y + adjustYBy;
+  d += ` L ${last.x.toFixed(2)} ${lastY.toFixed(2)}`;
   return d;
 };
 
@@ -934,7 +943,10 @@ export const buildHardnoteHtml = (note: ExportHardnote, o: ExportOptions): strin
   const strokesSvg = (note.strokes || [])
     .filter((s) => s && s.tool !== 'eraser' && s.points?.length > 0)
     .map((s) => {
-      const d = hardnoteStrokeToSvgPath(s.points);
+      // Apply Y-axis adjustment proportional to font size to account for PDF rendering baseline differences
+      // This fixes strokes shifting 2-3 lines up/down. The adjustment scales with fontSize automatically.
+      const yAdjustment = -o.fontSize * 6.5;
+      const d = hardnoteStrokeToSvgPath(s.points, yAdjustment);
       if (!d) return '';
       const avgP = s.points.reduce((a, p) => a + (p.p ?? 0.5), 0) / s.points.length;
       const isHL = s.tool === 'highlighter';
@@ -972,6 +984,12 @@ export const buildHardnoteHtml = (note: ExportHardnote, o: ExportOptions): strin
   // separate canvas).  We grow the viewBox height beyond `canvasHeight`
   // when a stroke endpoint extends below it, so the auto-flowing markdown
   // is never clipped above its host stroke.
+  //
+  // CRITICAL: To prevent strokes from shifting 2-3 lines vertically in PDF:
+  // - foreignObject must be exactly positioned at x="0" y="0"
+  // - SVG viewBox must match the original canvas coordinate space
+  // - CSS margins/padding on elements inside foreignObject must be minimized
+  // - line-height must be consistent between canvas and PDF rendering
   let strokeMaxY = 0;
   for (const s of note.strokes || []) {
     if (!s || s.tool === 'eraser' || !s.points?.length) continue;
@@ -982,6 +1000,11 @@ export const buildHardnoteHtml = (note: ExportHardnote, o: ExportOptions): strin
   const baseLayerInner = note.baseLayerMarkdown
     ? renderInline(note.baseLayerMarkdown)
     : '';
+
+  // Calculate CSS baseline shift - account for margin + line-height differences
+  // that might cause strokes to shift visually
+  const baseFontSize = o.fontSize;
+  const baselineShift = 0; // No shift needed if we normalize margins below
 
   const body = `
     ${meta}
@@ -1000,17 +1023,22 @@ export const buildHardnoteHtml = (note: ExportHardnote, o: ExportOptions): strin
     .hn-crumb { font-size:9pt; font-weight:800; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
     .hn-stats { display:flex; gap:3mm; flex-wrap:wrap; }
     .hn-pill-soft { font-size:8pt; font-weight:700; padding:1mm 3mm; border-radius:4mm; background:var(--rule); color:var(--fg); }
-    .hn-stack { position:relative; width:100%; background:transparent; }
-    .hn-stack-svg { display:block; width:100%; height:auto; overflow:visible; background:transparent; }
+    .hn-stack { position:relative; width:100%; background:transparent; margin:0; padding:0; }
+    .hn-stack-svg { display:block; width:100%; height:auto; overflow:visible; background:transparent; margin:0; padding:0; }
     .hn-base-body {
       width:100%; box-sizing:border-box;
       font-size:${o.fontSize}pt; line-height:1.45;
       color:var(--fg); background:transparent;
       font-family:${fontFamilyCss[o.fontFamily]};
       margin:0; padding:0;
+      display:flex; flex-direction:column; gap:0;
     }
-    .hn-base-body p, .hn-base-body div, .hn-base-body ul, .hn-base-body ol, .hn-base-body blockquote { margin:0 0 4px 0; }
-    .hn-base-body h1, .hn-base-body h2, .hn-base-body h3, .hn-base-body h4, .hn-base-body h5, .hn-base-body h6 { margin:8px 0 4px 0; }
+    .hn-base-body p, .hn-base-body div, .hn-base-body ul, .hn-base-body ol, .hn-base-body blockquote { 
+      margin:0; padding:0; line-height:1.45; 
+    }
+    .hn-base-body h1, .hn-base-body h2, .hn-base-body h3, .hn-base-body h4, .hn-base-body h5, .hn-base-body h6 { 
+      margin:0; padding:0; line-height:1.4; 
+    }
   `;
 
   return wrap(
@@ -1103,7 +1131,7 @@ const hslToHex = (h: number, s: number, l: number): string => {
   else if (hh < 180) [r, g, b] = [0, c, x];
   else if (hh < 240) [r, g, b] = [0, x, c];
   else if (hh < 300) [r, g, b] = [x, 0, c];
-  else [r, g, b] = [c, 0, x];
+  else[r, g, b] = [c, 0, x];
 
   const toHex = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, '0');
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
@@ -1227,34 +1255,34 @@ const renderPyqHeatmapSvg = (
             <tr>
               <td>${escHtml(row.label)}</td>
               ${years.map((year) => {
-                const count = row.byYear[year] || 0;
-                let bg = '#F8FAFC';
-                let tc = '#94A3B8';
-                if (count > 0) {
-                  const capped = Math.min(count, 22);
-                  const ratio = (capped - 1) / 21;
-                  if (palette === 'spectral') {
-                    const h = 70 + (ratio * 155);
-                    const s = 65 + (ratio * 20);
-                    const l = 85 - (ratio * 55);
-                    bg = hslToHex(h, s, l);
-                    tc = l < 55 ? '#FFFFFF' : '#065F46';
-                  } else {
-                    const h = 210 + (ratio * 15);
-                    const s = 60 + (ratio * 35);
-                    const l = 90 - (ratio * 65);
-                    bg = hslToHex(h, s, l);
-                    tc = l < 55 ? '#FFFFFF' : '#1E3A8A';
-                  }
-                }
+    const count = row.byYear[year] || 0;
+    let bg = '#F8FAFC';
+    let tc = '#94A3B8';
+    if (count > 0) {
+      const capped = Math.min(count, 22);
+      const ratio = (capped - 1) / 21;
+      if (palette === 'spectral') {
+        const h = 70 + (ratio * 155);
+        const s = 65 + (ratio * 20);
+        const l = 85 - (ratio * 55);
+        bg = hslToHex(h, s, l);
+        tc = l < 55 ? '#FFFFFF' : '#065F46';
+      } else {
+        const h = 210 + (ratio * 15);
+        const s = 60 + (ratio * 35);
+        const l = 90 - (ratio * 65);
+        bg = hslToHex(h, s, l);
+        tc = l < 55 ? '#FFFFFF' : '#1E3A8A';
+      }
+    }
 
-                return `<td style="padding: 1px; border: none; width: 44px; height: 32px;">
+    return `<td style="padding: 1px; border: none; width: 44px; height: 32px;">
                   <svg width="44" height="32" viewBox="0 0 44 32" xmlns="http://www.w3.org/2000/svg">
                     <rect width="44" height="32" rx="5" fill="${normalizeHex(bg, '#F8FAFC')}" fill-opacity="1" />
                     <text x="22" y="20.5" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="800" fill="${normalizeHex(tc, '#0F172A')}" fill-opacity="1">${count || ''}</text>
                   </svg>
                 </td>`;
-              }).join('')}
+  }).join('')}
             </tr>
           `).join('')}
         </tbody>
@@ -1446,11 +1474,11 @@ export type ExportPayload =
 
 export const renderHtml = (payload: ExportPayload, options: ExportOptions): string => {
   switch (payload.kind) {
-    case 'questions':  return buildQuestionsHtml(payload.rows, options);
+    case 'questions': return buildQuestionsHtml(payload.rows, options);
     case 'flashcards': return buildFlashcardsHtml(payload.rows, options);
-    case 'notes':      return buildNotesBlocksHtml(payload.blocks, options, payload.selectedHeadingIds);
-    case 'tags':       return buildTagsHtml(payload.groups, options);
-    case 'hardnote':   return buildHardnoteHtml(payload.note, options);
+    case 'notes': return buildNotesBlocksHtml(payload.blocks, options, payload.selectedHeadingIds);
+    case 'tags': return buildTagsHtml(payload.groups, options);
+    case 'hardnote': return buildHardnoteHtml(payload.note, options);
   }
 };
 
@@ -1475,9 +1503,13 @@ const sharePdfWithTimeout = async (uri: string, dialogTitle: string): Promise<vo
   // the app being unresponsive when they return. We instead let the UI
   // recover the moment the system sheet appears.
   try {
-    Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle }).catch(() => null);
-  } catch {
+    // Create a race between the share promise and a timeout to prevent hangs
+    const sharePromise = Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle });
+    const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 5000)); // 5 second timeout
+    Promise.race([sharePromise, timeoutPromise]).catch(() => null);
+  } catch (e) {
     // ignore — UI is already unblocked
+    console.warn('[Export] Share error (non-fatal):', e);
   }
   // Brief settle so the system sheet has time to appear before the caller
   // dismisses any "preparing" UI.
@@ -1489,7 +1521,7 @@ export async function exportToPdf(payload: ExportPayload, options: ExportOptions
   const { uri } = await Print.printToFileAsync({ html, base64: false });
   const safe = options.title.replace(/[^a-z0-9-_ ]/gi, '_').slice(0, 48) || 'export';
   const dest = `${FileSystem.cacheDirectory}${safe}.pdf`;
-  try { await FileSystem.moveAsync({ from: uri, to: dest }); } catch {}
+  try { await FileSystem.moveAsync({ from: uri, to: dest }); } catch { }
   const info = await FileSystem.getInfoAsync(dest);
   const finalUri = info.exists ? dest : uri;
   if (await Sharing.isAvailableAsync()) {

@@ -31,9 +31,15 @@ const Row: React.FC<{ item: DLItem; onRemove: () => void }> = ({ item, onRemove 
     if (!item.uri) return;
     try {
       if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(item.uri, { mimeType: item.mime || 'application/pdf' });
+        const sharePromise = Sharing.shareAsync(item.uri, { mimeType: item.mime || 'application/pdf' });
+        const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 8000)); // 8 second timeout
+        await Promise.race([sharePromise, timeoutPromise]).catch(() => {
+          console.warn('[DownloadManager] Share operation timed out or was dismissed');
+        });
       }
-    } catch {}
+    } catch (e) {
+      console.error('[DownloadManager] Share error:', e);
+    }
   };
 
   return (

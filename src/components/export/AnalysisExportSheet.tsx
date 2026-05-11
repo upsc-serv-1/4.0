@@ -51,6 +51,9 @@ export interface AnalysisReportToggles {
   heatmaps: boolean;
   focused_trend: boolean;
   forecast: boolean;
+  trajectory_graph: boolean;
+  score_history_table: boolean;
+  raw_data_csv: boolean;
 }
 
 export interface AnalysisExportQuestion {
@@ -107,10 +110,10 @@ export interface AnalysisExportSheetProps {
     examStage?: string;
     selectedPaper?: string;
     selectedRange?: string;
-    customYearStart?: string;
-    customYearEnd?: string;
     heatmapPalette?: 'spectral' | 'ocean';
   };
+  /** Global revision tags (if provided, replaces derived tags) */
+  allRevisionTags?: string[];
 }
 
 const CHOICES = {
@@ -176,12 +179,15 @@ const CHOICES = {
 };
 
 const ANALYTICS_REPORT_TOGGLES: Array<{ key: keyof AnalysisReportToggles; label: string }> = [
-  { key: 'full_report', label: 'Full Report (Performance Analytics)' },
+  { key: 'full_report', label: 'Full Analytics Report (PDF)' },
+  { key: 'trajectory_graph', label: 'Performance Trajectory (Graph)' },
+  { key: 'score_history_table', label: 'Score History Table' },
+  { key: 'heatmaps', label: 'Mastery Heatmaps (Drill-down)' },
   { key: 'subject_momentum', label: 'Subject Momentum' },
   { key: 'subject_distribution', label: 'Subject Distribution (Donut)' },
-  { key: 'heatmaps', label: 'Heatmaps' },
   { key: 'focused_trend', label: 'Focused Trend' },
-  { key: 'forecast', label: 'Forecast (Probable 2026 Topics)' },
+  { key: 'forecast', label: 'Probable 2026 Topics (Forecast)' },
+  { key: 'raw_data_csv', label: 'Export Raw Data (CSV)' },
 ];
 
 const PYQ_REPORT_TOGGLES: Array<{ key: keyof AnalysisReportToggles; label: string }> = [
@@ -194,12 +200,12 @@ const PYQ_REPORT_TOGGLES: Array<{ key: keyof AnalysisReportToggles; label: strin
 ];
 
 const defaultReports: AnalysisReportToggles = {
-  full_report: true,
-  subject_momentum: false,
-  subject_distribution: false,
   heatmaps: false,
   focused_trend: false,
   forecast: false,
+  trajectory_graph: true,
+  score_history_table: true,
+  raw_data_csv: false,
 };
 
 export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
@@ -214,6 +220,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
   userName = 'Aspirant',
   reportVariant = 'analytics',
   pyqMeta,
+  allRevisionTags,
 }) => {
   const { colors } = useTheme();
 
@@ -236,6 +243,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
   }));
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isDetailedReport, setIsDetailedReport] = useState(true);
 
   // Re-seed on open
   useEffect(() => {
@@ -314,6 +322,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
   }, [questions]);
 
   const revisionTagOptions = useMemo(() => {
+    if (allRevisionTags && allRevisionTags.length > 0) return allRevisionTags;
     const set = new Set<string>();
     questions.forEach((q) => {
       (q.review_tags || []).forEach((tag) => {
@@ -322,7 +331,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
       });
     });
     return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [questions]);
+  }, [questions, allRevisionTags]);
 
   // ---- Filtering pipeline (applies to both analysis and PYQ export) ----
   const yearBounds = useMemo(() => {
@@ -396,6 +405,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
           mistakes: true,
           weaknesses: true,
           drilldown: true,
+          isDetailedReport,
         },
       });
       // Strip outer <html>/<body> tags so it can be injected as a fragment.
@@ -473,6 +483,13 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
     setIsExporting(true);
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+
+      // Specialized CSV Export for Trends
+      if (reports.raw_data_csv) {
+        await exportTrendsToCsv(trends, cumulative);
+        onClose();
+        return;
+      }
 
       const prependHtml = includeReport ? buildAnalysisHtml() : '';
 
@@ -555,20 +572,39 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
           </View>
 
           <ScrollView style={{ maxHeight: 560 }} showsVerticalScrollIndicator={false}>
-            <Section title="What to Export" colors={colors}>
-              <Row>
-                {CHOICES.scopes.map(s => (
-                  <Chip
-                    key={`scope-${s.id}`}
-                    active={scope === s.id}
-                    onPress={() => setScope(s.id)}
-                    testID={`analysis-scope-${s.id}`}
-                  >
-                    {s.label}
-                  </Chip>
-                ))}
-              </Row>
-            </Section>
+            {reportVariant === 'pyq' && (
+              <Section title="What to Export" colors={colors}>
+                <Row>
+                  {CHOICES.scopes.map(s => (
+                    <Chip
+                      key={`scope-${s.id}`}
+                      active={scope === s.id}
+                      onPress={() => setScope(s.id)}
+                      testID={`analysis-scope-${s.id}`}
+                    >
+                      {s.label}
+                    </Chip>
+                  ))}
+                </Row>
+              </Section>
+            )}
+
+            {reportVariant === 'pyq' && includePyqs && (
+              <Section title="Sort By" colors={colors}>
+                <Row>
+                  {CHOICES.sortBys.map(s => (
+                    <Chip
+                      key={s.id}
+                      active={opts.sortBy === s.id}
+                      onPress={() => set('sortBy', s.id)}
+                      testID={`analysis-export-sort-${s.id}`}
+                    >
+                      {s.label}
+                    </Chip>
+                  ))}
+                </Row>
+              </Section>
+            )}
 
             <Section title="Subjects" colors={colors}>
               {allSubjects.length === 0 ? (
@@ -732,7 +768,15 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
             </Section>
 
             {includeReport && (
-              <Section title="Report Types" colors={colors}>
+              <Section title="Report Options" colors={colors}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                   <Text style={{ color: colors.textPrimary, fontSize: 13, fontWeight: '700' }}>Subject-wise Detailed Pages</Text>
+                   <Switch 
+                     value={isDetailedReport} 
+                     onValueChange={setIsDetailedReport} 
+                     trackColor={{ true: colors.primary, false: colors.border }}
+                   />
+                </View>
                 <Row>
                   {reportToggleChoices.map(t => (
                     <CheckRow
@@ -767,31 +811,29 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
               <Row>{CHOICES.fontSizes.map(sz => <Chip key={sz} active={opts.fontSize === sz} onPress={() => set('fontSize', sz)}>{sz}</Chip>)}</Row>
             </Section>
 
-            {/* Visual Style — shown whenever PYQs are in scope */}
-            {includePyqs && (
-              <Section title="Visual Style" colors={colors}>
-                <Row>
-                  {CHOICES.visualStyles.map(v => (
-                    <Chip
-                      key={v.id}
-                      active={opts.visualStyle === v.id}
-                      onPress={() => set('visualStyle', v.id)}
-                      testID={`analysis-export-visual-${v.id}`}
-                    >
-                      {v.label}
-                    </Chip>
-                  ))}
-                </Row>
-                {opts.visualStyle === 'flashcard' && (
-                  <Text style={{ fontSize: 10, color: colors.textTertiary, fontWeight: '600', marginTop: 4 }}>
-                    Each question is printed as a two-sided card (Question | Answer &amp; Explanation)
-                  </Text>
-                )}
-              </Section>
-            )}
-
-            {includePyqs && (
+            {/* Only show PYQ specific settings if in PYQ variant and scope includes them */}
+            {reportVariant === 'pyq' && includePyqs && (
               <>
+                <Section title="Visual Style" colors={colors}>
+                  <Row>
+                    {CHOICES.visualStyles.map(v => (
+                      <Chip
+                        key={v.id}
+                        active={opts.visualStyle === v.id}
+                        onPress={() => set('visualStyle', v.id)}
+                        testID={`analysis-export-visual-${v.id}`}
+                      >
+                        {v.label}
+                      </Chip>
+                    ))}
+                  </Row>
+                  {opts.visualStyle === 'flashcard' && (
+                    <Text style={{ fontSize: 10, color: colors.textTertiary, fontWeight: '600', marginTop: 4 }}>
+                      Each question is printed as a two-sided card (Question | Answer &amp; Explanation)
+                    </Text>
+                  )}
+                </Section>
+
                 <Section title="Q&A Highlight" colors={colors}>
                   <Label colors={colors}>LAYOUT</Label>
                   <Row>{CHOICES.qaLayouts.map(q => <Chip key={q.id} active={opts.qaLayoutMode === q.id} onPress={() => set('qaLayoutMode', q.id)}>{q.label}</Chip>)}</Row>
@@ -1002,9 +1044,15 @@ async function printStandaloneReport(fragmentHtml: string, o: ExportOptions): Pr
   const info = await FileSystem.getInfoAsync(dest);
   const finalUri = info.exists ? dest : uri;
   if (await Sharing.isAvailableAsync()) {
-    // Fire-and-forget: see comment in unifiedExportEngine.sharePdfWithTimeout.
-    Sharing.shareAsync(finalUri, { mimeType: 'application/pdf', dialogTitle: o.title || 'Analysis Report' }).catch(() => null);
-    await new Promise<void>((resolve) => setTimeout(resolve, 250));
+    // Fire-and-forget with timeout to prevent hangs on iPad
+    try {
+      const sharePromise = Sharing.shareAsync(finalUri, { mimeType: 'application/pdf', dialogTitle: o.title || 'Analysis Report' });
+      const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 5000)); // 5 second timeout
+      Promise.race([sharePromise, timeoutPromise]).catch(() => null);
+      await new Promise<void>((resolve) => setTimeout(resolve, 250));
+    } catch (e) {
+      console.warn('[AnalysisExport] Share error (non-fatal):', e);
+    }
   }
 }
 
@@ -1178,6 +1226,28 @@ function buildSummaryFromFilteredQuestions(
       : 'Forecast — Probable 2026 Topics',
   });
 }
+
+const exportTrendsToCsv = async (trends: any, cumulative: any) => {
+  try {
+    if (!trends || !trends.historicalScores) {
+      Alert.alert('No data', 'No performance trends available to export.');
+      return;
+    }
+
+    let csv = 'Attempt #,Date,Title,Score,Accuracy (%)\n';
+    trends.historicalScores.forEach((t: any) => {
+      const date = t.date ? new Date(t.date).toLocaleDateString() : 'N/A';
+      csv += `${t.attemptIndex},"${date}","${t.title || 'Attempt'}","${t.score}","${Math.round(t.accuracy)}"\n`;
+    });
+
+    const filename = `Performance_Trends_${new Date().getTime()}.csv`;
+    const filePath = `${FileSystem.documentDirectory}${filename}`;
+    await FileSystem.writeAsStringAsync(filePath, csv);
+    await Sharing.shareAsync(filePath);
+  } catch (e: any) {
+    Alert.alert('CSV Export Failed', e.message);
+  }
+};
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },

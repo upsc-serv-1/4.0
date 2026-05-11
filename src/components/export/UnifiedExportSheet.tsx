@@ -430,8 +430,8 @@ export const UnifiedExportSheet: React.FC<Props> = ({
                         const cur = opts.groupingLevels || [];
                         const next = active ? cur.filter(x => x !== g.id) : [...cur, g.id];
                         // Preserve canonical hierarchy order
-                        const order: ExportGroupingLevel[] = ['subject','section_group','microtopic'];
-                        next.sort((a,b) => order.indexOf(a) - order.indexOf(b));
+                        const order: ExportGroupingLevel[] = ['subject', 'section_group', 'microtopic'];
+                        next.sort((a, b) => order.indexOf(a) - order.indexOf(b));
                         set('groupingLevels', next);
                       }}
                       testID={`export-group-${g.id}`}
@@ -449,6 +449,7 @@ export const UnifiedExportSheet: React.FC<Props> = ({
                 <Row>{CHOICES.statusFilters.map(s => <Chip key={s.id} active={(opts.statusFilter || 'all') === (s.id as any)} onPress={() => set('statusFilter', s.id as any)} testID={`export-status-${s.id}`}>{s.label}</Chip>)}</Row>
                 <ToggleRow label="PYQ only" value={!!opts.pyqOnly} onChange={v => set('pyqOnly', v)} colors={colors} />
                 <ToggleRow label="NCERT only" value={!!opts.ncertOnly} onChange={v => set('ncertOnly', v)} colors={colors} />
+                <ToggleRow label="Hide all answers (fresh practice test)" value={!!opts.hideResponses} onChange={v => set('hideResponses', v)} colors={colors} />
                 {renderExtraFilters && renderExtraFilters(opts, setOpts)}
                 <ToggleRow label="Performance metrics (time / correctness)" value={!!opts.includePerformanceMetrics} onChange={v => set('includePerformanceMetrics', v)} colors={colors} />
               </Section>

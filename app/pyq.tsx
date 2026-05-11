@@ -140,6 +140,7 @@ function StickyHeatmapTable({
   onCellPress,
   onRowPress,
   onLabelActionPress,
+  onYearPress,
   heatmapPalette,
   maxValue,
   labelWidth,
@@ -155,7 +156,8 @@ function StickyHeatmapTable({
   onCellPress?: (rowLabel: string, year: string) => void;
   onRowPress?: (rowLabel: string) => void;
   onLabelActionPress?: (rowLabel: string) => void;
-  heatmapPalette: 'spectral' | 'ocean';
+  onYearPress?: (year: string) => void;
+  heatmapPalette: 'spectral' | 'ocean' | 'sunset' | 'forest';
   maxValue?: number;
   labelWidth?: number;
   compactLabel?: boolean;
@@ -192,9 +194,14 @@ function StickyHeatmapTable({
             >
               <View style={styles.heatmapYearHeaderTrack}>
                 {years.map((year) => (
-                  <View key={`header-${labelHeader}-${year}`} style={[styles.heatmapYearHeaderCell, { borderRightColor: colors.border, width: finalCellWidth, height: finalRowHeight }]}> 
+                  <TouchableOpacity 
+                    key={`header-${labelHeader}-${year}`} 
+                    style={[styles.heatmapYearHeaderCell, { borderRightColor: colors.border, width: finalCellWidth, height: finalRowHeight }]}
+                    onPress={() => onYearPress?.(year)}
+                    activeOpacity={0.6}
+                  > 
                     <Text style={[styles.heatmapYearHeaderText, { color: colors.textTertiary }]}>{year}</Text>
-                  </View>
+                  </TouchableOpacity>
                 ))}
               </View>
             </ScrollView>
@@ -255,13 +262,27 @@ function StickyHeatmapTable({
                             const l = 85 - (ratio * 55);
                             bgColor = `hsl(${h}, ${s}%, ${l}%)`;
                             textColor = l < 55 ? '#ffffff' : '#065f46';
-                          } else {
+                          } else if (heatmapPalette === 'ocean') {
                             // Ocean: Light Blue to Deep Navy
                             const h = 210 + (ratio * 15); // Stays in blue range
                             const s = 60 + (ratio * 35); // Gets more saturated
                             const l = 90 - (ratio * 65); // Gets much darker
                             bgColor = `hsl(${h}, ${s}%, ${l}%)`;
                             textColor = l < 55 ? '#ffffff' : '#1e3a8a';
+                          } else if (heatmapPalette === 'sunset') {
+                            // Sunset: Coral to Deep Orange/Red
+                            const h = 10 + (ratio * 20); // Coral to Orange-Red
+                            const s = 75 + (ratio * 20); // Gets more saturated
+                            const l = 80 - (ratio * 55); // Gets much darker
+                            bgColor = `hsl(${h}, ${s}%, ${l}%)`;
+                            textColor = l < 55 ? '#ffffff' : '#7c2d12';
+                          } else if (heatmapPalette === 'forest') {
+                            // Forest: Light Green to Deep Forest Green
+                            const h = 100 + (ratio * 80); // Green range
+                            const s = 40 + (ratio * 45); // Gets more saturated
+                            const l = 80 - (ratio * 50); // Gets darker
+                            bgColor = `hsl(${h}, ${s}%, ${l}%)`;
+                            textColor = l < 55 ? '#ffffff' : '#14532d';
                           }
                         } else {
                           opacity = 0.4;
@@ -352,7 +373,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const [focusMicro, setFocusMicro] = useState('All');
   const [exportSubject, setExportSubject] = useState('');
 
-  const [heatmapPalette, setHeatmapPalette] = useState<'spectral' | 'ocean'>('spectral');
+  const [heatmapPalette, setHeatmapPalette] = useState<'spectral' | 'ocean' | 'sunset' | 'forest'>('spectral');
 
   // Auto-scroll refs/coords for PYQ analysis heatmap (Issue #20)
   const mainScrollRef = useRef<ScrollView | null>(null);
@@ -1683,16 +1704,20 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         console.log(`[PDFExport] Printing to file...`);
         const { uri } = await Print.printToFileAsync({ html });
         console.log(`[PDFExport] File printed to: ${uri}. Opening share menu...`);
-        setExporting(false); 
         
         // Small delay to ensure the overlay is fully gone from the UI hierarchy
         await new Promise(resolve => setTimeout(resolve, 300));
 
         try {
-          await Sharing.shareAsync(uri, { 
+          // Use Promise.race with timeout to prevent hanging on iPad
+          const sharePromise = Sharing.shareAsync(uri, { 
             mimeType: 'application/pdf', 
             dialogTitle: 'PYQ Analysis Report',
             UTI: 'com.adobe.pdf' 
+          });
+          const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 8000)); // 8 second timeout
+          await Promise.race([sharePromise, timeoutPromise]).catch(() => {
+            console.warn('[PDFExport] Share operation timed out or was dismissed');
           });
         } catch (shareErr) {
           console.error('[PDFExport] Sharing failed, falling back to Print dialog', shareErr);
@@ -2047,6 +2072,24 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           >
             <Text style={[styles.paletteChipText, { color: heatmapPalette === 'ocean' ? '#fff' : colors.textSecondary }]}>Ocean Blue</Text>
           </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.paletteChip, heatmapPalette === 'sunset' && { backgroundColor: colors.primary, borderColor: colors.primary }]} 
+            onPress={() => setHeatmapPalette('sunset')}
+          >
+            <Text style={[styles.paletteChipText, { color: heatmapPalette === 'sunset' ? '#fff' : colors.textSecondary }]}>Sunset</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.paletteChip, heatmapPalette === 'forest' && { backgroundColor: colors.primary, borderColor: colors.primary }]} 
+            onPress={() => setHeatmapPalette('forest')}
+          >
+            <Text style={[styles.paletteChipText, { color: heatmapPalette === 'forest' ? '#fff' : colors.textSecondary }]}>Forest</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.paletteChip, { backgroundColor: colors.primary, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }]}
+            onPress={() => router.push('/dedup-manager')}
+          >
+            <Text style={[styles.paletteChipText, { color: '#fff', fontWeight: '800', fontSize: 11 }]}>🔄 Dedup</Text>
+          </TouchableOpacity>
         </View>
 
         {/* How-to instructions for the heatmap */}
@@ -2080,6 +2123,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
             onLabelActionPress={(subj) => {
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
               handleHeatmapPress(subj, { subject: subj });
+            }}
+            onYearPress={(year) => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              handleHeatmapPress('', { year }, year);
             }}
             onCellPress={(subj, year) => handleHeatmapPress(subj, { subject: subj }, year)}
           />
@@ -2123,6 +2170,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                   handleHeatmapPress(sec, { subject: pilotSubject, section: sec });
                 }}
+                onYearPress={(year) => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  handleHeatmapPress('', { subject: pilotSubject, year }, year);
+                }}
                 onCellPress={(sec, year) => handleHeatmapPress(sec, { subject: pilotSubject, section: sec }, year)}
               />
 
@@ -2149,6 +2200,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                 onLabelActionPress={(m) => {
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                   handleHeatmapPress(m, { subject: pilotSubject, section: pilotSection || undefined, micro: m });
+                }}
+                onYearPress={(year) => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  handleHeatmapPress('', { subject: pilotSubject, section: pilotSection || undefined, year }, year);
                 }}
                 onCellPress={(m, year) => handleHeatmapPress(m, { subject: pilotSubject, section: pilotSection || undefined, micro: m }, year)}
               />

@@ -30,7 +30,11 @@ const RichNoteEditor = forwardRef<any, Props>((props, ref) => {
         onChange={onChange}
         onFocus={onFocus}
         placeholder={placeholder || 'Start writing...'}
-        style={{ minHeight: 600, backgroundColor: themeColors.bg || '#ffffff' }}
+        style={{
+          minHeight: editorStyle?.minHeight ?? 260,
+          backgroundColor: themeColors.bg || '#ffffff',
+          ...(editorStyle?.containerStyle || null),
+        }}
         editorStyle={{
           backgroundColor: themeColors.bg || '#ffffff',
           color: themeColors.textPrimary || '#000000',
@@ -55,7 +59,7 @@ const RichNoteEditor = forwardRef<any, Props>((props, ref) => {
           ...(editorStyle || {}),
         }}
         useContainer
-        initialHeight={400}
+        initialHeight={editorStyle?.minHeight ?? 320}
       />
     </View>
   );

@@ -89,7 +89,8 @@ export class FlashcardSvc {
   // ============ READS ============
   static async getSubjects(userId: string) {
     const { data, error } = await supabase
-      .from('user_cards').select('cards(subject)').eq('user_id', userId);
+      .from('user_cards').select('cards(subject)').eq('user_id', userId)
+      .eq('cards.is_deleted', false);
     if (error) throw error;
     return Array.from(new Set((data ?? []).map((d: any) => d.cards?.subject).filter(Boolean))).sort();
   }
@@ -97,7 +98,8 @@ export class FlashcardSvc {
   static async getDecks(userId: string, subject: string) {
     const { data, error } = await supabase
       .from('user_cards').select('cards(section_group, microtopic)')
-      .eq('user_id', userId).eq('cards.subject', subject);
+      .eq('user_id', userId).eq('cards.subject', subject)
+      .eq('cards.is_deleted', false);
     if (error) throw error;
     const decks: Record<string, string[]> = {};
     (data ?? []).forEach((d: any) => {
@@ -113,7 +115,8 @@ export class FlashcardSvc {
     const { data, error } = await supabase
       .from('user_cards').select('*, cards!inner(*)')
       .eq('user_id', userId).eq('cards.subject', subject)
-      .eq('cards.section_group', section).eq('cards.microtopic', microtopic);
+      .eq('cards.section_group', section).eq('cards.microtopic', microtopic)
+      .eq('cards.is_deleted', false);
     if (error) throw error;
     return (data ?? []).map((d: any) => ({ ...d.cards, ...d, id: d.card_id }));
   }
@@ -142,7 +145,8 @@ export class FlashcardSvc {
     }
 
     const branchSet = branchCardIds ? new Set(branchCardIds) : null;
-    const allCards = ((OfflineManager as any).getCollectionSync('cards') ?? []);
+    const allCards = ((OfflineManager as any).getCollectionSync('cards') ?? [])
+      .filter((c: any) => !c.deleted && !c.is_deleted);
     const cardById = new Map(allCards.map((c: any) => [c.id, c]));
     const data = ((OfflineManager as any).getCollectionSync('user_cards', userId) ?? [])
       .filter((d: any) => d.user_id === userId)
@@ -236,7 +240,8 @@ export class FlashcardSvc {
     }
 
     const branchSet = branchCardIds ? new Set(branchCardIds) : null;
-    const allCards = ((OfflineManager as any).getCollectionSync('cards') ?? []);
+    const allCards = ((OfflineManager as any).getCollectionSync('cards') ?? [])
+      .filter((c: any) => !c.deleted && !c.is_deleted);
     const cardById = new Map(allCards.map((c: any) => [c.id, c]));
     const data = ((OfflineManager as any).getCollectionSync('user_cards', userId) ?? [])
       .filter((r: any) => r.user_id === userId)
@@ -317,7 +322,7 @@ export class FlashcardSvc {
 
     let card: { id: string } | null = null;
     if (input.question_id) {
-      const { data } = await supabase.from('cards').select('id').eq('question_id', input.question_id).maybeSingle();
+      const { data } = await supabase.from('cards').select('id').eq('question_id', input.question_id).eq('is_deleted', false).maybeSingle();
       if (data) card = data;
     }
 
@@ -600,7 +605,7 @@ export class FlashcardSvc {
   }
 
   private static async getCard(cardId: string) {
-    const { data, error } = await supabase.from('cards').select('*').eq('id', cardId).single();
+    const { data, error } = await supabase.from('cards').select('*').eq('id', cardId).eq('is_deleted', false).single();
     if (error) throw error;
     return data;
   }

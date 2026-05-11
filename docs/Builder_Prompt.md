@@ -1,16 +1,22 @@
-# Builder Prompt — Pilot V2 UI/UX Animation Law
+# Builder Prompt - Analytics Enhancements
 
-## Mandatory Mockup-Driven Animation & Transition Law
-The `/docs/design/animation-research.md` is the **UNQUESTIONABLE source of truth** for all front-end transition, expansion, and collapse physics in the sidebar.
+## Stack-Specific Instructions
+- Use **React Native** components from `src/components/unified`.
+- For the **Stacked Status Bar**, create a custom shared component that takes `counts: { correct, incorrect, skipped }`.
+- Ensure the hierarchical list is performant using `FlashList` or `SectionList` if nesting is deep.
 
-You must NOT use static snaps or basic bounding-box layout transitions that cause micro-stutters or jerkiness. Before implementing or refining the sidebar, review the animation research file and implement the GPU-accelerated **React Native Reanimated** spring interpolation and correlated property fades exactly as specified.
+## Mandatory Mockup-Driven Implementation
+The `/docs/mockups` folder is the **UNQUESTIONABLE source of truth** for all front-end UI/UX.
+You must NOT deviate from the layout, color palette, typography, or component structure defined in the mockups.
+Specifically, replicate the **Stacked Status Bar** design and the **Subject -> Section Group -> Microtopic** drill-down structure from `analytics_breakdown.html`.
 
----
+## MUS Priority Order
+1. **FR-005**: Visual Status Meter component.
+2. **FR-001**: Subject Breakdown logic and UI.
+3. **FR-002**: Section Group Breakdown logic and UI.
+4. **FR-004**: Hierarchical Navigation (Drill-down).
+5. **FR-003**: Microtopic Error Analysis.
 
-## Priority Order for Next Session (Phase 6)
-
-1. **Implement FR-005 (Inline Reanimated Spring Collapsible)**: 
-   - Replace standard LayoutAnimation in `PilotV2Sidebar.tsx` with a Reanimated `<InlineCollapsible>` container.
-   - Animate height, opacity, and translateY smoothly to achieve the fade-and-slide "emerging" look.
-2. **Implement FR-006 (Viewport Edge Fade-out)**:
-   - Apply ScrollView content-offset listeners to fade-out and scale-down sidebar items as they approach the top or bottom boundaries of the sidebar.
+## Special Considerations
+- Ensure the "vibe" segments (Green/Red/Gray) use the exact colors from the design system.
+- Match the rounded corner radius (`radius.xl` or 24-32px) from the existing theme.

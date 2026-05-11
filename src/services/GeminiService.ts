@@ -86,17 +86,21 @@ CORRECT ANSWER (official, must be respected): {{correct_answer}}
 INSTITUTE EXPLANATIONS (if any — read all and merge the strongest reasoning into one best answer; do NOT contradict the official correct answer above):
 {{institute_explanations}}
 
+CRITICAL INSTRUCTIONS:
+- Do NOT repeat or summarize the question verbatim
+- Do NOT just restate the institute explanations unchanged
+- Create a fresh, original analysis that teaches the concepts
+- If you see text like "Ditto without any line change..." you MUST ignore it and create a proper explanation
+- Make it educational and help the student understand the concept deeply
+
 Your task — write a complete study note with these exact sections:
 
 ✅ CORRECT ANSWER
-State the correct option and explain WHY it is correct in 2-3 sentences with key facts.
+State the correct option and explain WHY it is correct in 2-3 sentences with key facts. Use simple, clear language.
 
 📚 OPTION-BY-OPTION BREAKDOWN
-For each option (A, B, C, D) — even wrong ones — write 2-3 sentences explaining what
-that concept/person/place actually is, as if writing a mini encyclopedia entry.
-A student reading this should be able to answer any future UPSC question about it.
-Wrap important names, dates, or terms in **bold**. You may use __underline__ for the
-single most exam-critical fact in each option.
+For each option (A, B, C, D) — even wrong ones — write 2-3 sentences explaining what that concept/person/place actually is, as if writing a mini encyclopedia entry. A student reading this should be able to answer any future UPSC question about it.
+Wrap important names, dates, or terms in **bold**. You may use __underline__ for the single most exam-critical fact in each option.
 
 🎯 EXAMINER'S ANGLE
 One sentence: why did UPSC ask this? What theme or syllabus area does it test?
@@ -319,8 +323,18 @@ export async function aiExplainQuestion(
 
   // Render institute explanations as a simple labelled block. Cap each entry
   // at 1500 chars so a single noisy source can't blow the prompt budget.
-  const explBlock = (instituteExplanations || [])
-    .filter((e) => e && (e.text || '').trim())
+  // CRITICAL: Filter out "Ditto" responses and other placeholder text
+  const validExplanations = (Array.isArray(instituteExplanations) ? instituteExplanations : [])
+    .filter((e) => {
+      if (!e || !e.text) return false;
+      const text = String(e.text).trim().toLowerCase();
+      // Skip placeholder/ditto responses
+      if (text.includes('ditto') || text.includes('same as') || text.includes('refer above')) return false;
+      if (text.length < 10) return false; // Too short, likely invalid
+      return true;
+    });
+
+  const explBlock = validExplanations
     .map((e, i) => {
       const meta = [e.source, e.program].filter(Boolean).join(' · ');
       const ans  = e.answer ? ` (marked answer: ${e.answer})` : '';

@@ -170,6 +170,7 @@ export const AIExplanationChat: React.FC<AIExplanationChatProps> = ({
         options: options.join('\n'),
         correct_answer: correctAnswer,
         wrong_options: wrongOptions.join('\n'),
+        institute_explanations: instituteExplanations || '(none)',
       });
 
       const userMsg: ConversationMessage = {
@@ -183,7 +184,12 @@ export const AIExplanationChat: React.FC<AIExplanationChatProps> = ({
 
       const response = await generateWithHistory(
         updatedMessages.map(m => ({ role: m.role, content: m.content })),
-        { question: questionText, options, correct_answer: correctAnswer }
+        { 
+          question: questionText, 
+          options, 
+          correct_answer: correctAnswer,
+          institute_explanations: instituteExplanations 
+        }
       );
 
       const aiMsg: ConversationMessage = {

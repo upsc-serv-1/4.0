@@ -15,7 +15,10 @@ export const getExamInfo = (item: any) => {
   return {} as any;
 };
 
-export const normalizeInstituteLabel = (i: string) => String(i || '').trim() || 'Primary';
+export const normalizeInstituteLabel = (i: string) => {
+  const s = String(i || '').trim().replace(/\s+/g, ' ');
+  return s || 'Primary';
+};
 
 export const extractYearFromText = (value: any): string => {
   const match = String(value || '').match(/\b(19|20)\d{2}\b/);

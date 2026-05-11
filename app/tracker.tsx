@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useRouter } from 'expo-router';
 import { 
   View, 
   Text, 
   StyleSheet, 
   ScrollView, 
   TouchableOpacity, 
-  Dimensions, 
   LayoutAnimation,
   Platform,
-  UIManager
+  UIManager,
+  TextInput,
+  ActivityIndicator,
+  useWindowDimensions,
 } from 'react-native';
 import Animated, { 
-  FadeIn, 
   FadeInDown, 
   useSharedValue, 
   useAnimatedStyle, 
@@ -24,26 +24,28 @@ import {
   CheckCircle2, 
   ChevronDown, 
   ChevronUp, 
-  BookOpen, 
-  FileText, 
-  Layers,
+  ChevronRight,
   ArrowLeft,
   Target,
-  BarChart3,
   Circle,
-  ToggleLeft,
-  TrendingUp,
-  ChevronRight
+  Download,
+  X,
+  Check,
 } from 'lucide-react-native';
+
+
 import Svg, { Circle as SvgCircle, G, Text as SvgText } from 'react-native-svg';
+import { RadarChart, BarChart } from '../src/components/Charts';
 import { useTheme } from '../src/context/ThemeContext';
 import { PageWrapper } from '../src/components/PageWrapper';
-import { spacing, radius } from '../src/theme';
+import { spacing } from '../src/theme';
 import { MICRO_SYLLABUS, MAINS_SYLLABUS, ANTHROPOLOGY_SYLLABUS } from '../src/data/syllabus';
 import { SyllabusService, SyllabusProgress } from '../src/services/SyllabusService';
 import { useAuth } from '../src/context/AuthContext';
+import { buildWeightedSyllabusData, WeightedYearFilter } from '../src/lib/syllabusWeightedProgress';
 import { AIQuickActionButton } from '../src/components/AIQuickActionButton';
 import { DEFAULT_SYLLABUS_TEMPLATES } from '../src/services/AIPromptManager';
+import { SyllabusExportSheet } from '../src/components/export/SyllabusExportSheet';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -53,8 +55,6 @@ import { useFocusEffect, router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-const { width } = Dimensions.get('window');
 
 const OPTIONAL_SYLLABUS: any = {
   "Paper 1": {
@@ -84,9 +84,13 @@ const OPTIONAL_SYLLABUS: any = {
 };
 
 type Mode = 'prelims' | 'mains' | 'optional';
+type CoverageMode = 'equal' | 'weighted';
+type WeightedYearMode = 'all' | 'single' | 'range';
 
 export default function SyllabusTracker() {
   const { colors } = useTheme();
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
   const { session } = useAuth();
   const [mode, setMode] = useState<Mode>('prelims');
   const [progress, setProgress] = useState<Record<string, SyllabusProgress>>({});
@@ -94,6 +98,21 @@ export default function SyllabusTracker() {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const [trackingMethod, setTrackingMethod] = useState<'single' | 'multi'>('multi');
   const [optionalChoice, setOptionalChoice] = useState<string>('Anthropology');
+  const [coverageMode, setCoverageMode] = useState<CoverageMode>('equal');
+  const [weightedYearMode, setWeightedYearMode] = useState<WeightedYearMode>('all');
+  const [weightedSingleYear, setWeightedSingleYear] = useState<string>('2025');
+  const [weightedStartYear, setWeightedStartYear] = useState<string>('2016');
+  const [weightedEndYear, setWeightedEndYear] = useState<string>('2025');
+  const [weightedTopicCounts, setWeightedTopicCounts] = useState<Record<string, number>>({});
+  const [weightedSectionCounts, setWeightedSectionCounts] = useState<Record<string, number>>({});
+  const [weightedSubjectCounts, setWeightedSubjectCounts] = useState<Record<string, number>>({});
+  const [availableWeightedYears, setAvailableWeightedYears] = useState<string[]>([]);
+  const [loadingWeightedData, setLoadingWeightedData] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(330);
+  const [selectedCompSubject, setSelectedCompSubject] = useState<string | null>(null);
+  const [heatmapSection, setHeatmapSection] = useState<string | null>(null);
+  const [aiContextMode, setAiContextMode] = useState<'all' | 'subject'>('subject');
+  const [isExportSheetVisible, setIsExportSheetVisible] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -164,12 +183,74 @@ export default function SyllabusTracker() {
   }, [optionalChoice]);
 
   const activeSyllabus = mode === 'prelims' ? MICRO_SYLLABUS : mode === 'mains' ? MAINS_SYLLABUS : activeOptionalSyllabus;
+  const activeSyllabusMap = activeSyllabus as Record<string, Record<string, string[]>>;
+
+  useEffect(() => {
+    if (coverageMode !== 'weighted' || mode !== 'prelims') return;
+    let cancelled = false;
+
+    const fetchWeighted = async () => {
+      try {
+        setLoadingWeightedData(true);
+        const filter: WeightedYearFilter =
+          weightedYearMode === 'single'
+            ? { mode: 'single', singleYear: Number(weightedSingleYear) }
+            : weightedYearMode === 'range'
+            ? { mode: 'range', startYear: Number(weightedStartYear), endYear: Number(weightedEndYear) }
+            : { mode: 'all' };
+
+        const data = await buildWeightedSyllabusData(filter);
+        if (cancelled) return;
+
+        setWeightedTopicCounts(data.topicCounts);
+        setWeightedSectionCounts(data.sectionCounts);
+        setWeightedSubjectCounts(data.subjectCounts);
+        const years = data.years.map(String);
+        setAvailableWeightedYears(years);
+
+        if (years.length > 0) {
+          if (weightedYearMode === 'single' && !years.includes(weightedSingleYear)) {
+            setWeightedSingleYear(years[0]);
+          }
+          if (weightedYearMode === 'range') {
+            const latest = years[0];
+            const oldest = years[years.length - 1];
+            if (!weightedStartYear) setWeightedStartYear(oldest);
+            if (!weightedEndYear) setWeightedEndYear(latest);
+          }
+        }
+      } catch (err) {
+        console.error('weighted syllabus fetch failed', err);
+      } finally {
+        if (!cancelled) setLoadingWeightedData(false);
+      }
+    };
+    fetchWeighted();
+    return () => {
+      cancelled = true;
+    };
+  }, [coverageMode, mode, weightedYearMode, weightedSingleYear, weightedStartYear, weightedEndYear]);
+
+  const getTopicCompletionScore = (item: SyllabusProgress) => {
+    if (trackingMethod === 'single') return item.mastered ? 1 : 0;
+    const done = Number(Boolean(item.mastered)) + Number(Boolean(item.ncert)) + Number(Boolean(item.pyqs)) + Number(Boolean(item.books));
+    return done / 4;
+  };
+
+  const getTopicWeight = (subject: string, group: string, topic: string) => {
+    const t = topic.trim().toLowerCase();
+    const g = group.trim().toLowerCase();
+    const s = subject.trim().toLowerCase();
+    return weightedTopicCounts[t] || weightedSectionCounts[g] || weightedSubjectCounts[s] || 0;
+  };
 
   const getOverallStats = () => {
     let totalItems = 0;
     let completedItems = 0;
+    let weightedTotal = 0;
+    let weightedCovered = 0;
 
-    Object.entries(activeSyllabus).forEach(([sub, groups]) => {
+    Object.entries(activeSyllabusMap).forEach(([sub, groups]) => {
       Object.entries(groups).forEach(([group, topics]) => {
         (topics as string[]).forEach(topic => {
           const path = `${sub}.${group}.${topic}`;
@@ -185,17 +266,32 @@ export default function SyllabusTracker() {
              if (item.pyqs) completedItems += 1;
              if (item.books) completedItems += 1;
           }
+
+          if (coverageMode === 'weighted' && mode === 'prelims') {
+            const weight = getTopicWeight(sub, group, topic);
+            weightedTotal += weight;
+            weightedCovered += weight * getTopicCompletionScore(item);
+          }
         });
       });
     });
-
-    return { totalItems, completedItems, percent: totalItems ? Math.round((completedItems / totalItems) * 100) : 0 };
+    const weightedPercent = weightedTotal ? Math.round((weightedCovered / weightedTotal) * 100) : 0;
+    const linearPercent = totalItems ? Math.round((completedItems / totalItems) * 100) : 0;
+    return {
+      totalItems,
+      completedItems,
+      weightedTotal,
+      weightedCovered,
+      percent: coverageMode === 'weighted' && mode === 'prelims' && weightedTotal > 0 ? weightedPercent : linearPercent,
+    };
   };
 
   const getSubjectStats = (subject: string) => {
     let totalItems = 0;
     let completedItems = 0;
-    const groups = activeSyllabus[subject];
+    let weightedTotal = 0;
+    let weightedCovered = 0;
+    const groups = activeSyllabusMap[subject];
     if (groups) {
       Object.entries(groups).forEach(([group, topics]) => {
         (topics as string[]).forEach(topic => {
@@ -212,13 +308,75 @@ export default function SyllabusTracker() {
              if (item.pyqs) completedItems += 1;
              if (item.books) completedItems += 1;
           }
+
+          if (coverageMode === 'weighted' && mode === 'prelims') {
+            const weight = getTopicWeight(subject, group, topic);
+            weightedTotal += weight;
+            weightedCovered += weight * getTopicCompletionScore(item);
+          }
         });
       });
     }
-    return { totalItems, completedItems, percent: totalItems ? Math.round((completedItems / totalItems) * 100) : 0 };
+    const weightedPercent = weightedTotal ? Math.round((weightedCovered / weightedTotal) * 100) : 0;
+    const linearPercent = totalItems ? Math.round((completedItems / totalItems) * 100) : 0;
+    return {
+      totalItems,
+      completedItems,
+      weightedTotal,
+      weightedCovered,
+      percent: coverageMode === 'weighted' && mode === 'prelims' && weightedTotal > 0 ? weightedPercent : linearPercent,
+    };
   };
 
-  const stats = useMemo(getOverallStats, [mode, progress, activeSyllabus, trackingMethod]);
+  const stats = useMemo(
+    getOverallStats,
+    [mode, progress, activeSyllabus, trackingMethod, coverageMode, weightedTopicCounts, weightedSectionCounts, weightedSubjectCounts]
+  );
+
+  const getGroupStats = (subject: string, group: string, topics: string[]) => {
+    let totalItems = 0;
+    let completedItems = 0;
+    topics.forEach((topic) => {
+      const path = `${subject}.${group}.${topic}`;
+      const item = progress[path] || {};
+      if (trackingMethod === 'single') {
+        totalItems += 1;
+        if (item.mastered) completedItems += 1;
+      } else {
+        totalItems += 4;
+        if (item.mastered) completedItems += 1;
+        if (item.ncert) completedItems += 1;
+        if (item.pyqs) completedItems += 1;
+        if (item.books) completedItems += 1;
+      }
+    });
+    return { percent: totalItems ? Math.round((completedItems / totalItems) * 100) : 0 };
+  };
+
+  const getSubjectDrilldown = (subject: string) => {
+    const groups = activeSyllabusMap[subject] || {};
+    const sectionRows = Object.entries(groups)
+      .map(([group, topics]) => ({ name: group, percent: getGroupStats(subject, group, topics as string[]).percent }))
+      .sort((a, b) => b.percent - a.percent);
+
+    const microRows: Array<{ name: string; percent: number; group: string }> = [];
+    Object.entries(groups).forEach(([group, topics]) => {
+      (topics as string[]).forEach((topic) => {
+        const path = `${subject}.${group}.${topic}`;
+        const item = progress[path] || {};
+        microRows.push({
+          name: topic,
+          group,
+          percent: Math.round(getTopicCompletionScore(item) * 100),
+        });
+      });
+    });
+
+    return {
+      sectionRows,
+      microRows: microRows.sort((a, b) => b.percent - a.percent),
+    };
+  };
 
   // View: Overview Dashboard
   const renderOverview = () => (
@@ -241,19 +399,34 @@ export default function SyllabusTracker() {
         </View>
       )}
 
-      <View style={[s.intelCard, { backgroundColor: colors.surface, borderColor: colors.border, marginTop: mode === 'optional' ? 0 : 8 }]}>
+      <View style={[s.intelCard, { backgroundColor: colors.surface, borderColor: colors.border, marginTop: mode === 'optional' ? 0 : 8, padding: isTablet ? 16 : 20 }]}>
          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
             <Target color={colors.primary} size={20} />
             <Text style={[s.intelTitle, { color: colors.textPrimary, marginLeft: 8 }]}>Preparation Intelligence</Text>
+            <TouchableOpacity 
+              onPress={() => setIsExportSheetVisible(true)}
+              style={[s.exportPill, { borderColor: colors.border, marginLeft: 'auto' }]}
+            >
+              <Download size={14} color={colors.textSecondary} />
+              <Text style={[s.exportPillText, { color: colors.textSecondary }]}>Export</Text>
+            </TouchableOpacity>
          </View>
          <View style={{ flexDirection: 'row', gap: 12 }}>
             <View style={[s.intelMetric, { backgroundColor: colors.bg, borderColor: colors.border }]}>
-               <Text style={[s.intelMetricLabel, { color: colors.textSecondary }]}>TOTAL {trackingMethod === 'single' ? 'TOPICS' : 'CHECKPOINTS'}</Text>
-               <Text style={[s.intelMetricVal, { color: colors.textPrimary }]}>{stats.totalItems}</Text>
+               <Text style={[s.intelMetricLabel, { color: colors.textSecondary }]}>
+                 {coverageMode === 'weighted' && mode === 'prelims' ? 'PYQ WEIGHT (TOTAL Q)' : `TOTAL ${trackingMethod === 'single' ? 'TOPICS' : 'CHECKPOINTS'}`}
+               </Text>
+               <Text style={[s.intelMetricVal, { color: colors.textPrimary }]}>
+                 {coverageMode === 'weighted' && mode === 'prelims' ? Math.round(stats.weightedTotal || 0) : stats.totalItems}
+               </Text>
             </View>
             <View style={[s.intelMetric, { backgroundColor: '#14532d', borderColor: '#166534' }]}>
-               <Text style={[s.intelMetricLabel, { color: 'rgba(255,255,255,0.7)' }]}>COMPLETED</Text>
-               <Text style={[s.intelMetricVal, { color: '#fff' }]}>{stats.completedItems}</Text>
+               <Text style={[s.intelMetricLabel, { color: 'rgba(255,255,255,0.7)' }]}>
+                 {coverageMode === 'weighted' && mode === 'prelims' ? 'WEIGHTED COVERED' : 'COMPLETED'}
+               </Text>
+               <Text style={[s.intelMetricVal, { color: '#fff' }]}>
+                 {coverageMode === 'weighted' && mode === 'prelims' ? Math.round(stats.weightedCovered || 0) : stats.completedItems}
+               </Text>
             </View>
          </View>
          <View style={[s.intelEfficiency, { backgroundColor: '#1c1917' }]}>
@@ -261,46 +434,32 @@ export default function SyllabusTracker() {
                <Text style={[s.intelMetricLabel, { color: 'rgba(255,255,255,0.6)' }]}>AGGREGATE EFFICIENCY</Text>
                <Text style={[s.intelMetricVal, { color: '#fff' }]}>{stats.percent}%</Text>
             </View>
-            <TouchableOpacity 
-              onPress={() => router.push('/analyseBeta')}
-              style={s.efficiencyIcon}
-            >
-               <TrendingUp color="#a8a29e" size={24} />
-            </TouchableOpacity>
+            <DoughnutChart percentage={stats.percent} size={68} strokeWidth={8} color="#8a795d" />
          </View>
-         
-         <TouchableOpacity 
-           onPress={() => router.push('/analyseBeta')}
-           style={[s.betaBanner, { backgroundColor: colors.primary + '10', borderColor: colors.primary + '30' }]}
-         >
-           <TrendingUp size={16} color={colors.primary} />
-           <Text style={[s.betaBannerText, { color: colors.primary }]}>Try new Analyse Beta (Ultra Stable)</Text>
-           <ChevronRight size={16} color={colors.primary} />
-         </TouchableOpacity>
-      </View>
-
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
-         <DoughnutChart percentage={stats.percent} size={160} strokeWidth={20} color="#8a795d" />
       </View>
 
       <Text style={[s.sectionTitle, { color: colors.textPrimary }]}>Subject Progress Summary</Text>
-      <View style={s.subjectGrid}>
-        {Object.keys(activeSyllabus).map(subject => {
+      <View style={[s.subjectGrid, isTablet && { gap: 10 }]}>
+        {Object.keys(activeSyllabusMap).map(subject => {
           const subStats = getSubjectStats(subject);
           return (
             <TouchableOpacity 
               key={subject}
-              style={[s.subjectGridCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+              style={[s.subjectGridCard, { backgroundColor: colors.surface, borderColor: colors.border, width: isTablet ? '31.8%' : '48%', padding: isTablet ? 12 : 16 }]}
               onPress={() => {
                 LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
                 setSelectedSubject(subject);
-                setExpandedGroup(null);
+                setExpandedGroup(Object.keys(activeSyllabusMap[subject])[0] || null);
               }}
             >
               <Text style={[s.subjectGridName, { color: colors.textSecondary }]} numberOfLines={1}>{subject}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 12 }}>
                  <Text style={[s.subjectGridPercent, { color: colors.textPrimary }]}>{subStats.percent}%</Text>
-                 <Text style={[s.subjectGridRatio, { color: colors.textTertiary }]}>{subStats.completedItems}/{subStats.totalItems}</Text>
+                 <Text style={[s.subjectGridRatio, { color: colors.textTertiary }]}>
+                   {coverageMode === 'weighted' && mode === 'prelims'
+                     ? `${Math.round(subStats.weightedCovered || 0)}/${Math.round(subStats.weightedTotal || 0)}`
+                     : `${subStats.completedItems}/${subStats.totalItems}`}
+                 </Text>
               </View>
               <View style={[s.progressBarBg, { backgroundColor: colors.bg, marginTop: 8 }]}>
                  <View style={[s.progressBarFill, { width: `${subStats.percent}%`, backgroundColor: colors.primary }]} />
@@ -310,26 +469,183 @@ export default function SyllabusTracker() {
         })}
       </View>
 
-      <Text style={[s.sectionTitle, { color: colors.textPrimary, marginTop: 40 }]}>Comparative Analysis</Text>
-      <View style={[s.compCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <View style={{ marginBottom: 20 }}>
-           <Text style={[s.compCardTitle, { color: colors.textPrimary }]}>Performance Across Subjects</Text>
-           <Text style={[s.compCardSub, { color: colors.textSecondary }]}>Compare your syllabus completion</Text>
+      <Text style={[s.sectionTitle, { color: colors.textPrimary, marginTop: 26 }]}>Comparative Analysis & Drilldown</Text>
+      <View style={[s.compCard, { backgroundColor: colors.surface, borderColor: colors.border, padding: 0, overflow: 'hidden' }]}>
+        <View style={{ padding: 20, width: '100%' }}>
+           <Text style={[s.compCardTitle, { color: colors.textPrimary }]}>1. Radial Progress Map</Text>
+           <Text style={[s.compCardSub, { color: colors.textSecondary }]}>Interactive radar view of subject mastery</Text>
         </View>
-        {Object.keys(activeSyllabus)
-          .map(subj => ({ name: subj, stats: getSubjectStats(subj) }))
-          .sort((a, b) => b.stats.percent - a.stats.percent) // Sort highest to lowest
-          .map(({ name, stats }, idx) => (
-            <View key={name} style={{ marginBottom: 16 }}>
-               <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
-                 <Text style={[s.compSubjectName, { color: colors.textPrimary }]}>{name}</Text>
-                 <Text style={[s.compSubjectPercent, { color: colors.primary }]}>{stats.percent}%</Text>
-               </View>
-               <View style={[s.progressBarBg, { backgroundColor: colors.bg, height: 10 }]}>
-                 <View style={[s.progressBarFill, { width: `${stats.percent}%`, backgroundColor: idx < 2 ? '#22c55e' : stats.percent < 30 ? '#ef4444' : colors.primary }]} />
-               </View>
+        
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          contentContainerStyle={{ paddingHorizontal: 30, paddingBottom: 30 }}
+        >
+          <View style={{ width: 440, height: 400, alignItems: 'center', justifyContent: 'center' }}>
+            <RadarChart 
+              data={Object.keys(activeSyllabusMap).map(subj => ({ 
+                label: subj, 
+                value: getSubjectStats(subj).percent 
+              }))}
+              size={340}
+              onPress={(label) => {
+                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                setSelectedCompSubject(label === selectedCompSubject ? null : label);
+                setHeatmapSection(null);
+              }}
+            />
+          </View>
+        </ScrollView>
+
+        <View style={{ padding: 20, borderTopWidth: 1, borderTopColor: colors.border }}>
+           <Text style={[s.compCardTitle, { color: colors.textPrimary }]}>2. All Subject Completion</Text>
+           <Text style={[s.compCardSub, { color: colors.textSecondary }]}>Overview of your entire syllabus progress</Text>
+           
+           <View style={{ marginTop: 16, gap: 10 }}>
+             {Object.keys(activeSyllabusMap).map(subj => {
+               const stats = getSubjectStats(subj);
+               return (
+                 <TouchableOpacity 
+                   key={subj} 
+                   onPress={() => {
+                     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                     setSelectedCompSubject(subj);
+                     setHeatmapSection(null);
+                   }}
+                   style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
+                 >
+                   <Text style={{ width: 100, fontSize: 11, fontWeight: '700', color: colors.textSecondary }} numberOfLines={1}>{subj}</Text>
+                   <View style={{ flex: 1, height: 8, backgroundColor: colors.bg, borderRadius: 4, overflow: 'hidden', borderWidth: 1, borderColor: colors.border }}>
+                     <View style={{ width: `${stats.percent}%`, height: '100%', backgroundColor: colors.primary }} />
+                   </View>
+                   <Text style={{ width: 35, fontSize: 11, fontWeight: '800', color: colors.primary, textAlign: 'right' }}>{stats.percent}%</Text>
+                 </TouchableOpacity>
+               );
+             })}
+           </View>
+        </View>
+
+        {selectedCompSubject && (
+          <Animated.View entering={FadeInDown.duration(300)} style={{ width: '100%', padding: 20, borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.bg + '50' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <View>
+                <Text style={[s.compCardTitle, { color: colors.textPrimary, fontSize: 16 }]}>3. {selectedCompSubject}: Sections</Text>
+                <Text style={[s.compCardSub, { color: colors.textSecondary }]}>Tap a section to see micro-topics</Text>
+              </View>
+              <TouchableOpacity onPress={() => setSelectedCompSubject(null)}>
+                <X size={18} color={colors.textTertiary} />
+              </TouchableOpacity>
             </View>
-        ))}
+
+            <BarChart
+              data={Object.entries(activeSyllabusMap[selectedCompSubject]).map(([group, topics], idx) => {
+                const groupColors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
+                const groupColor = groupColors[idx % groupColors.length];
+                return {
+                  label: group,
+                  value: getGroupStats(selectedCompSubject, group, topics as string[]).percent,
+                  color: groupColor
+                };
+              })}
+              height={180}
+              onPress={(label) => {
+                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                setHeatmapSection(label === heatmapSection ? null : label);
+              }}
+            />
+
+            {selectedCompSubject && (
+              <Animated.View entering={FadeInDown.duration(300)} style={{ marginTop: 24, padding: 16, backgroundColor: colors.surface, borderRadius: 16, borderWidth: 1, borderColor: colors.border }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                  <Text style={[s.compCardTitle, { color: colors.textPrimary, fontSize: 14 }]}>
+                    4. {heatmapSection ? `${heatmapSection}: ` : 'All '}Micro-topics
+                  </Text>
+                  {heatmapSection && (
+                    <TouchableOpacity onPress={() => setHeatmapSection(null)}>
+                      <X size={16} color={colors.textTertiary} />
+                    </TouchableOpacity>
+                  )}
+                </View>
+                
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 10 }}>
+                  {Object.entries(activeSyllabusMap[selectedCompSubject])
+                    .filter(([group]) => !heatmapSection || group === heatmapSection)
+                    .flatMap(([group, topics], idx) => {
+                      const groupColors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
+                      const groupColor = groupColors[idx % groupColors.length];
+                      return (topics as string[]).map(topic => ({ group, topic, color: groupColor }));
+                    })
+                    .map(({ group, topic, color }) => {
+                      const path = `${selectedCompSubject}.${group}.${topic}`;
+                      const item = progress[path] || {};
+                      const isDone = item.mastered;
+                      
+                      return (
+                        <TouchableOpacity 
+                          key={path}
+                          onPress={() => {
+                            toggleStatus(path, 'mastered');
+                          }}
+                          style={{ 
+                            width: '48.5%',
+                            flexDirection: 'row', 
+                            alignItems: 'center', 
+                            padding: 10,
+                            backgroundColor: isDone ? color + '15' : colors.bg,
+                            borderRadius: 10,
+                            borderWidth: 1.5,
+                            borderColor: isDone ? color : colors.border,
+                            marginBottom: 2
+                          }}
+                        >
+                          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <View style={{ 
+                              width: 18, 
+                              height: 18, 
+                              borderRadius: 4, 
+                              backgroundColor: isDone ? color : 'transparent',
+                              borderWidth: 2,
+                              borderColor: isDone ? color : colors.textTertiary,
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}>
+                              {isDone && <Check color="#fff" size={12} strokeWidth={4} />}
+                            </View>
+                            <View style={{ flex: 1 }}>
+                              {!heatmapSection && (
+                                <Text style={{ fontSize: 8, fontWeight: '900', color: color, textTransform: 'uppercase' }} numberOfLines={1}>
+                                  {group}
+                                </Text>
+                              )}
+                              <Text style={{ fontSize: 11, color: isDone ? colors.textSecondary : colors.textPrimary, flex: 1, lineHeight: 13, fontWeight: isDone ? '600' : '700' }} numberOfLines={2}>
+                                {topic}
+                              </Text>
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    })}
+                </View>
+                
+                <TouchableOpacity 
+                  onPress={() => {
+                    setSelectedSubject(selectedCompSubject);
+                    setExpandedGroup(heatmapSection || Object.keys(activeSyllabusMap[selectedCompSubject])[0]);
+                  }}
+                  style={{ 
+                    marginTop: 16, 
+                    backgroundColor: colors.primary, 
+                    paddingVertical: 12, 
+                    borderRadius: 12,
+                    alignItems: 'center' 
+                  }}
+                >
+                  <Text style={{ fontSize: 13, fontWeight: '900', color: '#fff' }}>VIEW ALL CHECKPOINTS</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            )}
+          </Animated.View>
+        )}
       </View>
 
       <View style={[s.compCard, { backgroundColor: colors.surface, borderColor: colors.border, marginTop: 16 }]}>
@@ -337,7 +653,7 @@ export default function SyllabusTracker() {
            <Target color="#ef4444" size={20} />
            <Text style={[s.compCardTitle, { color: colors.textPrimary, marginLeft: 8 }]}>Weak Area Radar</Text>
         </View>
-        {Object.keys(activeSyllabus)
+        {Object.keys(activeSyllabusMap)
           .map(subj => ({ name: subj, stats: getSubjectStats(subj) }))
           .filter(s => s.stats.percent < 40)
           .sort((a, b) => a.stats.percent - b.stats.percent)
@@ -347,7 +663,7 @@ export default function SyllabusTracker() {
                <Text style={[s.weakAction, { color: '#ef4444' }]}>Needs Attention ({stats.percent}%)</Text>
             </View>
         ))}
-        {Object.keys(activeSyllabus).map(subj => ({ name: subj, stats: getSubjectStats(subj) })).filter(s => s.stats.percent < 40).length === 0 && (
+        {Object.keys(activeSyllabusMap).map(subj => ({ name: subj, stats: getSubjectStats(subj) })).filter(s => s.stats.percent < 40).length === 0 && (
            <Text style={[s.weakAction, { color: '#22c55e', marginTop: 8 }]}>No critical weak areas identified! All subjects {'>'}40%.</Text>
         )}
       </View>
@@ -358,7 +674,7 @@ export default function SyllabusTracker() {
   const renderSubjectDetail = () => {
     if (!selectedSubject) return null;
     const subStats = getSubjectStats(selectedSubject);
-    const groups = activeSyllabus[selectedSubject];
+    const groups = activeSyllabusMap[selectedSubject];
 
     return (
       <Animated.View entering={FadeInDown.duration(400).springify()} style={s.detailContainer}>
@@ -391,7 +707,11 @@ export default function SyllabusTracker() {
         <View style={[s.linearProgressBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
               <Text style={[s.linearProgressTitle, { color: colors.textPrimary }]}>Linear Progress</Text>
-              <Text style={[s.linearProgressRatio, { color: colors.textPrimary }]}>{subStats.completedItems}/{subStats.totalItems} {trackingMethod === 'single' ? 'Topics' : 'Checkpoints'}</Text>
+              <Text style={[s.linearProgressRatio, { color: colors.textPrimary }]}>
+                {coverageMode === 'weighted' && mode === 'prelims'
+                  ? `${Math.round(subStats.weightedCovered || 0)}/${Math.round(subStats.weightedTotal || 0)} Weighted`
+                  : `${subStats.completedItems}/${subStats.totalItems} ${trackingMethod === 'single' ? 'Topics' : 'Checkpoints'}`}
+              </Text>
            </View>
            <View style={[s.progressBarBg, { backgroundColor: colors.bg, height: 6 }]}>
               <View style={[s.progressBarFill, { width: `${subStats.percent}%`, backgroundColor: colors.primary }]} />
@@ -432,23 +752,6 @@ export default function SyllabusTracker() {
                              <Text style={[s.topicText, { color: itemProgress.mastered ? colors.textSecondary : colors.textPrimary, textDecorationLine: itemProgress.mastered ? 'line-through' : 'none' }]}>
                                {topic}
                              </Text>
-                             <AIQuickActionButton
-                               context={{
-                                 type: 'syllabus',
-                                 title: topic,
-                                 metadata: {
-                                   progress: String(
-                                     Math.round(
-                                       (Object.values(itemProgress).filter(Boolean).length /
-                                         Object.values(itemProgress).length) * 100
-                                     )
-                                   ),
-                                 },
-                               }}
-                               templates={DEFAULT_SYLLABUS_TEMPLATES}
-                               buttonLabel="📅 AI Plan"
-                               buttonStyle={{ marginTop: 6, paddingHorizontal: 10, paddingVertical: 5 }}
-                             />
                            </View>
                         </View>
                         
@@ -474,99 +777,108 @@ export default function SyllabusTracker() {
   return (
     <PageWrapper>
       {!selectedSubject && (
-        <Animated.View style={[headerAnimatedStyle, { backgroundColor: colors.bg }]}>
+        <Animated.View
+          style={[headerAnimatedStyle, { backgroundColor: colors.bg }]}
+          onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
+        >
           <View style={s.header}>
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={[s.h1, { color: colors.textPrimary }]}>Syllabus Progress</Text>
               <Text style={[s.subhead, { color: colors.textSecondary }]}>Track your completion, identify weak areas, and master the UPSC syllabus.</Text>
             </View>
-          </View>
-
-          <View style={[s.tabBar, { backgroundColor: colors.surface, borderColor: colors.border, marginBottom: 12 }]}>
-            <TouchableOpacity 
-              style={[s.tab, trackingMethod === 'single' && { backgroundColor: colors.primary }]}
-              onPress={() => {
-                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                setTrackingMethod('single');
+            <TouchableOpacity
+              onPress={() => setIsExportSheetVisible(true)}
+              style={{
+                backgroundColor: colors.primary,
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+                borderRadius: 12,
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 6,
+                borderWidth: 1.5,
+                borderColor: '#fff',
+                shadowColor: colors.primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 6
               }}
             >
-                <Text 
-                  style={[s.tabText, { color: trackingMethod === 'single' ? '#fff' : colors.textSecondary }]}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.7}
-                >
-                  Single-Stage
-                </Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[s.tab, trackingMethod === 'multi' && { backgroundColor: colors.primary }]}
-              onPress={() => {
-                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                setTrackingMethod('multi');
-              }}
-            >
-                <Text 
-                  style={[s.tabText, { color: trackingMethod === 'multi' ? '#fff' : colors.textSecondary }]}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.7}
-                >
-                  Multi-Stage
-                </Text>
+              <Download color="#fff" size={16} />
+              <Text style={{ color: '#fff', fontSize: 12, fontWeight: '900' }}>GET REPORT</Text>
             </TouchableOpacity>
           </View>
 
-          <View style={[s.tabBar, { backgroundColor: colors.surface, borderColor: colors.border, marginBottom: 8 }]}>
-            <TouchableOpacity 
-              style={[s.tab, mode === 'prelims' && { backgroundColor: colors.primary }]}
-              onPress={() => {
-                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                setMode('prelims');
-              }}
-            >
-                <Text 
-                  style={[s.tabText, { color: mode === 'prelims' ? '#fff' : colors.textSecondary }]}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.7}
-                >
-                  Prelims Tracker
-                </Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[s.tab, mode === 'mains' && { backgroundColor: colors.primary }]}
-              onPress={() => {
-                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                setMode('mains');
-              }}
-            >
-                <Text 
-                  style={[s.tabText, { color: mode === 'mains' ? '#fff' : colors.textSecondary }]}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.7}
-                >
-                  Mains Tracker
-                </Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[s.tab, mode === 'optional' && { backgroundColor: colors.primary }]}
-              onPress={() => {
-                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                setMode('optional');
-              }}
-            >
-                <Text 
-                  style={[s.tabText, { color: mode === 'optional' ? '#fff' : colors.textSecondary }]}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.7}
-                >
-                  Optional
-                </Text>
-            </TouchableOpacity>
+          <View style={[s.topControlGrid, { marginHorizontal: spacing.lg }]}>
+            <View style={[s.topLeftPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <View style={[s.tabBar, { marginHorizontal: 0, marginBottom: 8, backgroundColor: colors.bg, borderColor: colors.border }]}>
+                <TouchableOpacity style={[s.tab, trackingMethod === 'single' && { backgroundColor: colors.primary }]} onPress={() => setTrackingMethod('single')}>
+                  <Text style={[s.tabText, { color: trackingMethod === 'single' ? '#fff' : colors.textSecondary }]}>Single</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[s.tab, trackingMethod === 'multi' && { backgroundColor: colors.primary }]} onPress={() => setTrackingMethod('multi')}>
+                  <Text style={[s.tabText, { color: trackingMethod === 'multi' ? '#fff' : colors.textSecondary }]}>Multi</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={[s.tabBar, { marginHorizontal: 0, marginBottom: 0, backgroundColor: colors.bg, borderColor: colors.border }]}>
+                <TouchableOpacity style={[s.tab, coverageMode === 'equal' && { backgroundColor: colors.primary }]} onPress={() => setCoverageMode('equal')}>
+                  <Text style={[s.tabText, { color: coverageMode === 'equal' ? '#fff' : colors.textSecondary }]}>Normal</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[s.tab, coverageMode === 'weighted' && { backgroundColor: colors.primary }]} onPress={() => setCoverageMode('weighted')}>
+                  <Text style={[s.tabText, { color: coverageMode === 'weighted' ? '#fff' : colors.textSecondary }]}>PYQ</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={[s.topRightPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              {(['prelims', 'mains', 'optional'] as Mode[]).map((m) => (
+                <TouchableOpacity key={m} style={[s.modeLineBtn, { borderColor: colors.border }, mode === m && { backgroundColor: colors.primary, borderColor: colors.primary }]} onPress={() => setMode(m)}>
+                  <Text style={[s.modeLineText, { color: mode === m ? '#fff' : colors.textSecondary }]}>{m === 'prelims' ? 'Prelims' : m === 'mains' ? 'Mains' : 'Optional'}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
+
+          {coverageMode === 'weighted' && mode === 'prelims' && (
+            <View style={[s.weightedCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <View style={s.weightedChips}>
+                <TouchableOpacity style={[s.weightedChip, { borderColor: colors.border }, weightedYearMode === 'all' && { backgroundColor: colors.primary, borderColor: colors.primary }]} onPress={() => setWeightedYearMode('all')}>
+                  <Text style={[s.weightedChipText, { color: weightedYearMode === 'all' ? '#fff' : colors.textSecondary }]}>All Years</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[s.weightedChip, { borderColor: colors.border }, weightedYearMode === 'single' && { backgroundColor: colors.primary, borderColor: colors.primary }]} onPress={() => setWeightedYearMode('single')}>
+                  <Text style={[s.weightedChipText, { color: weightedYearMode === 'single' ? '#fff' : colors.textSecondary }]}>Single</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[s.weightedChip, { borderColor: colors.border }, weightedYearMode === 'range' && { backgroundColor: colors.primary, borderColor: colors.primary }]} onPress={() => setWeightedYearMode('range')}>
+                  <Text style={[s.weightedChipText, { color: weightedYearMode === 'range' ? '#fff' : colors.textSecondary }]}>Range</Text>
+                </TouchableOpacity>
+              </View>
+              {weightedYearMode === 'single' && (
+                <TextInput
+                  value={weightedSingleYear}
+                  onChangeText={setWeightedSingleYear}
+                  keyboardType="number-pad"
+                  maxLength={4}
+                  style={[s.weightedInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.bg }]}
+                />
+              )}
+              {weightedYearMode === 'range' && (
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <TextInput value={weightedStartYear} onChangeText={setWeightedStartYear} keyboardType="number-pad" maxLength={4} style={[s.weightedInput, { flex: 1, color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.bg }]} placeholder="From" placeholderTextColor={colors.textTertiary} />
+                  <TextInput value={weightedEndYear} onChangeText={setWeightedEndYear} keyboardType="number-pad" maxLength={4} style={[s.weightedInput, { flex: 1, color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.bg }]} placeholder="To" placeholderTextColor={colors.textTertiary} />
+                </View>
+              )}
+              {loadingWeightedData ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
+                  <ActivityIndicator size="small" color={colors.primary} />
+                  <Text style={[s.weightedHint, { color: colors.textSecondary, marginLeft: 8 }]}>Loading weights...</Text>
+                </View>
+              ) : (
+                <Text style={[s.weightedHint, { color: colors.textSecondary }]}>
+                  {availableWeightedYears.length ? `Data years: ${availableWeightedYears[availableWeightedYears.length - 1]}-${availableWeightedYears[0]}` : 'No PYQ data found'}
+                </Text>
+              )}
+            </View>
+          )}
         </Animated.View>
       )}
 
@@ -580,13 +892,49 @@ export default function SyllabusTracker() {
       )}
 
       <Animated.ScrollView 
-        contentContainerStyle={[s.content, !selectedSubject && { paddingTop: 240 + (insets.top > 0 ? insets.top : 20) }]} 
+        contentContainerStyle={[s.content, !selectedSubject && { paddingTop: headerHeight + 16 }]} 
         showsVerticalScrollIndicator={false}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
       >
         {selectedSubject ? renderSubjectDetail() : renderOverview()}
       </Animated.ScrollView>
+      {!selectedSubject && (
+        <View style={[s.aiDock, { bottom: insets.bottom + 12 }]}>
+          <View style={[s.aiModeStrip, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <TouchableOpacity style={[s.aiModeChip, aiContextMode === 'subject' && { backgroundColor: colors.primary }]} onPress={() => setAiContextMode('subject')}>
+              <Text style={[s.aiModeText, { color: aiContextMode === 'subject' ? '#fff' : colors.textSecondary }]}>Current Subject</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[s.aiModeChip, aiContextMode === 'all' && { backgroundColor: colors.primary }]} onPress={() => setAiContextMode('all')}>
+              <Text style={[s.aiModeText, { color: aiContextMode === 'all' ? '#fff' : colors.textSecondary }]}>All Subjects</Text>
+            </TouchableOpacity>
+          </View>
+          <AIQuickActionButton
+            context={{
+              type: 'syllabus',
+              title:
+                aiContextMode === 'all'
+                  ? `${mode.toUpperCase()} Full Syllabus`
+                  : selectedCompSubject || Object.keys(activeSyllabusMap)[0] || mode.toUpperCase(),
+              metadata: {
+                progress: String(stats.percent),
+                mode,
+                coverage: coverageMode,
+              },
+            }}
+            templates={DEFAULT_SYLLABUS_TEMPLATES}
+            buttonLabel="AI Plan"
+            buttonStyle={s.aiFab}
+          />
+        </View>
+      )}
+      <SyllabusExportSheet
+        visible={isExportSheetVisible}
+        onClose={() => setIsExportSheetVisible(false)}
+        progress={progress}
+        syllabus={activeSyllabusMap}
+        title="Syllabus Completion Report"
+      />
     </PageWrapper>
   );
 }
@@ -641,53 +989,49 @@ function StatusBtn({ active, onPress, label, colors }: any) {
 
 const s = StyleSheet.create({
   header: { padding: spacing.lg, paddingBottom: 12 },
-  h1: { fontSize: 32, fontWeight: '900', letterSpacing: -1 },
-  subhead: { fontSize: 14, marginTop: 8, lineHeight: 20 },
+  h1: { fontSize: 28, fontWeight: '900', letterSpacing: -0.8 },
+  subhead: { fontSize: 13, marginTop: 6, lineHeight: 18 },
   
-  tabBar: { flexDirection: 'row', marginHorizontal: spacing.lg, borderRadius: 16, padding: 4, borderWidth: 1, marginBottom: 12 },
-  tab: { flex: 1, paddingVertical: 12, paddingHorizontal: 4, alignItems: 'center', borderRadius: 12, justifyContent: 'center' },
-  tabText: { fontSize: 13, fontWeight: '800', textAlign: 'center' },
+  tabBar: { flexDirection: 'row', marginHorizontal: spacing.lg, borderRadius: 14, padding: 4, borderWidth: 1, marginBottom: 10 },
+  tab: { flex: 1, paddingVertical: 9, paddingHorizontal: 4, alignItems: 'center', borderRadius: 10, justifyContent: 'center' },
+  tabText: { fontSize: 12, fontWeight: '800', textAlign: 'center' },
+  topControlGrid: { flexDirection: 'row', gap: 10, marginBottom: 10 },
+  topLeftPanel: { flex: 1, borderWidth: 1, borderRadius: 14, padding: 8 },
+  topRightPanel: { width: 180, borderWidth: 1, borderRadius: 14, padding: 8, gap: 6 },
+  modeLineBtn: { paddingVertical: 8, borderWidth: 1, borderRadius: 9, alignItems: 'center' },
+  modeLineText: { fontSize: 11, fontWeight: '800' },
+  weightedCard: { marginHorizontal: spacing.lg, marginBottom: 10, borderRadius: 16, borderWidth: 1, padding: 12 },
+  weightedChips: { flexDirection: 'row', gap: 8, marginBottom: 6 },
+  weightedChip: { paddingHorizontal: 8, paddingVertical: 6, borderRadius: 9, backgroundColor: '#00000010', borderWidth: 1 },
+  weightedChipText: { fontSize: 10, fontWeight: '800' },
+  weightedInput: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6, marginBottom: 6, fontWeight: '700', fontSize: 12 },
+  weightedHint: { fontSize: 10, fontWeight: '600' },
   
   content: { paddingHorizontal: spacing.lg, paddingBottom: 120 },
   
   // Overview Styles
-  intelCard: { borderRadius: 24, padding: 20, borderWidth: 1, marginBottom: 32 },
+  intelCard: { borderRadius: 20, padding: 16, borderWidth: 1, marginBottom: 24 },
   intelTitle: { fontSize: 18, fontWeight: '900' },
   intelMetric: { flex: 1, padding: 16, borderRadius: 16, borderWidth: 1 },
   intelMetricLabel: { fontSize: 10, fontWeight: '800', letterSpacing: 1, marginBottom: 8 },
   intelMetricVal: { fontSize: 24, fontWeight: '900' },
   intelEfficiency: { marginTop: 12, padding: 20, borderRadius: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  efficiencyIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
+  exportPill: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
+  exportPillText: { fontSize: 11, fontWeight: '700' },
   
   sectionTitle: { fontSize: 20, fontWeight: '900', marginBottom: 16 },
   subjectGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  subjectGridCard: { width: '48%', padding: 16, borderRadius: 20, borderWidth: 1 },
+  subjectGridCard: { width: '48%', padding: 14, borderRadius: 16, borderWidth: 1 },
   subjectGridName: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase' },
   subjectGridPercent: { fontSize: 24, fontWeight: '900' },
   subjectGridRatio: { fontSize: 10, fontWeight: '700', paddingBottom: 4 },
   progressBarBg: { height: 4, borderRadius: 4, overflow: 'hidden' },
   progressBarFill: { height: '100%', borderRadius: 4 },
   
-  compCard: { padding: 24, borderRadius: 24, borderWidth: 1 },
+  compCard: { padding: 18, borderRadius: 18, borderWidth: 1 },
   compCardTitle: { fontSize: 18, fontWeight: '900' },
   compCardSub: { fontSize: 12, marginTop: 4 },
   compSubjectName: { fontSize: 13, fontWeight: '800' },
-  betaBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-  },
-  betaBannerText: {
-    fontSize: 12,
-    fontWeight: '800',
-    letterSpacing: -0.2,
-  },
   compSubjectPercent: { fontSize: 13, fontWeight: '900' },
   
   weakRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1 },
@@ -719,5 +1063,10 @@ const s = StyleSheet.create({
   topicText: { fontSize: 15, fontWeight: '600', lineHeight: 22, flexShrink: 1 },
   statusGrid: { flexDirection: 'row', gap: 8, paddingLeft: 36, flexWrap: 'wrap' },
   statusBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1 },
-  statusLabel: { fontSize: 10, fontWeight: '800', letterSpacing: 0.5 }
+  statusLabel: { fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
+  aiDock: { position: 'absolute', right: 16, alignItems: 'flex-end', gap: 8 },
+  aiModeStrip: { flexDirection: 'row', gap: 6, borderWidth: 1, borderRadius: 999, padding: 4 },
+  aiModeChip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
+  aiModeText: { fontSize: 10, fontWeight: '800' },
+  aiFab: { backgroundColor: '#7c3aed', paddingHorizontal: 14, paddingVertical: 9, borderRadius: 999 },
 });

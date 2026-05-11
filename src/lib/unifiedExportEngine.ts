@@ -619,7 +619,28 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
       .filter(Boolean).map(x => `<span class="pill">${escapeHtml(String(x))}</span>`).join('');
 
     const answer = o.hideResponses ? '' : (q.correct_answer || '').toUpperCase();
-    const explanation = o.hideResponses ? '' : (q.explanation_markdown || q.explanation || '');
+    
+    // Build explanation: use merged explanations from all institutes if available, otherwise fall back to single explanation
+    let explanation = '';
+    if (!o.hideResponses) {
+      // Check if this question has merged explanations from multiple institutes
+      if (Array.isArray(q._explanations) && q._explanations.length > 0) {
+        // Render combined explanations from all institutes
+        explanation = q._explanations
+          .map((expl: any) => {
+            const source = expl.source || 'Unknown Source';
+            const year = expl.year ? ` (${expl.year})` : '';
+            const ans = expl.answer ? ` • Answer: ${expl.answer.toUpperCase()}` : '';
+            const text = expl.text || expl.explanation || '';
+            const header = `<strong>${escapeHtml(source)}${year}${ans}:</strong>`;
+            return text ? `${header}<br/>${renderInline(text)}` : header;
+          })
+          .join('<br/><br/>---<br/><br/>');
+      } else {
+        // Fall back to single explanation
+        explanation = q.explanation_markdown || q.explanation || '';
+      }
+    }
 
     const optsBlock = showOpts && q.options ? (() => {
       const opts = q.options!;
@@ -752,7 +773,22 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
           <h2>Answer Key${showExpl ? ' & Explanations' : ''}</h2>
           ${rows.map((q, i) => {
         const a = (q.correct_answer || '').toUpperCase();
-        const e = q.explanation_markdown || q.explanation || '';
+        // Use merged explanations if available, otherwise fall back to single explanation
+        let e = '';
+        if (Array.isArray(q._explanations) && q._explanations.length > 0) {
+          e = q._explanations
+            .map((expl: any) => {
+              const source = expl.source || 'Unknown Source';
+              const year = expl.year ? ` (${expl.year})` : '';
+              const ans = expl.answer ? ` • Answer: ${expl.answer.toUpperCase()}` : '';
+              const text = expl.text || expl.explanation || '';
+              const header = `<strong>${escapeHtml(source)}${year}${ans}:</strong>`;
+              return text ? `${header}<br/>${renderInline(text)}` : header;
+            })
+            .join('<br/><br/>---<br/><br/>');
+        } else {
+          e = q.explanation_markdown || q.explanation || '';
+        }
         return `<div class="ak-row">
               <span class="ak-num">${i + 1}.</span>${a ? `<b>Ans: ${a}</b>` : ''}
               ${showExpl && e ? `<div class="expl" style="margin-top:1mm">${renderInline(e)}</div>` : ''}
@@ -784,7 +820,22 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
         <h2>Answer Key${showExpl ? ' & Explanations' : ''}</h2>
         ${rows.map((q, i) => {
       const a = (q.correct_answer || '').toUpperCase();
-      const e = q.explanation_markdown || q.explanation || '';
+      // Use merged explanations if available, otherwise fall back to single explanation
+      let e = '';
+      if (Array.isArray(q._explanations) && q._explanations.length > 0) {
+        e = q._explanations
+          .map((expl: any) => {
+            const source = expl.source || 'Unknown Source';
+            const year = expl.year ? ` (${expl.year})` : '';
+            const ans = expl.answer ? ` • Answer: ${expl.answer.toUpperCase()}` : '';
+            const text = expl.text || expl.explanation || '';
+            const header = `<strong>${escapeHtml(source)}${year}${ans}:</strong>`;
+            return text ? `${header}<br/>${renderInline(text)}` : header;
+          })
+          .join('<br/><br/>---<br/><br/>');
+      } else {
+        e = q.explanation_markdown || q.explanation || '';
+      }
       return `<div class="ak-row">
             <span class="ak-num">${i + 1}.</span>${a ? `<b>Ans: ${a}</b>` : ''}
             ${showExpl && e ? `<div class="expl" style="margin-top:1mm">${renderInline(e)}</div>` : ''}

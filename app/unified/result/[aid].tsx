@@ -59,6 +59,10 @@ export default function ResultScreen() {
   const [pilotSaveTargetQuestion, setPilotSaveTargetQuestion] = useState<any>(null);
   const [pilotSaveHtml, setPilotSaveHtml] = useState('');
 
+  // Export states
+  const [exportSheetVisible, setExportSheetVisible] = useState(false);
+  const [exportPayload, setExportPayload] = useState<any>(null);
+
   // Hardnotes states
   const [hardnotesPickerVisible, setHardnotesPickerVisible] = useState(false);
   const [hardnotesPayload, setHardnotesPayload] = useState<{ markdown: string; title: string } | null>(null);
@@ -133,7 +137,6 @@ export default function ResultScreen() {
 
   const scrollY = React.useRef(new Animated.Value(0)).current;
   const [showPYQTags] = useState(true); // Always follow rule from search bar
-  const [exportSheetVisible, setExportSheetVisible] = useState(false);
   const [showTrends, setShowTrends] = useState(false);
   const [showMistakes, setShowMistakes] = useState(true);
 
@@ -201,6 +204,8 @@ export default function ResultScreen() {
       is_ncert: !!(q.isNcert || q.is_ncert),
       review_tags: localReviewTags[q.id] || q.reviewTags || [],
       time_taken_seconds: q.timeTakenSeconds || q.time_taken_seconds,
+      // Include merged explanations from all institutes (dedup merger)
+      _explanations: Array.isArray(q._explanations) ? q._explanations : [],
     }));
     setExportPayload({ kind: 'questions' as const, rows });
     setExportSheetVisible(true);
@@ -861,6 +866,21 @@ export default function ResultScreen() {
           ) : null
         )}
       />
+
+      {/* Floating See Your Response Toggle */}
+      <TouchableOpacity
+        onPress={() => setShowMistakes(!showMistakes)}
+        activeOpacity={0.8}
+        style={[
+          styles.floatingBtn,
+          { backgroundColor: showMistakes ? colors.primary : colors.surfaceStrong, borderColor: showMistakes ? colors.primary : colors.border, borderWidth: 1 }
+        ]}
+      >
+        <Zap color={showMistakes ? '#fff' : colors.primary} size={18} />
+        <Text style={[styles.floatingBtnText, { color: showMistakes ? '#fff' : colors.textPrimary }]}>
+          See Your Resposn
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -1257,5 +1277,26 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
     marginTop: 2,
+  },
+  floatingBtn: {
+    position: 'absolute',
+    top: 110,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 25,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    zIndex: 1000,
+  },
+  floatingBtnText: {
+    fontSize: 13,
+    fontWeight: '800',
   },
 });

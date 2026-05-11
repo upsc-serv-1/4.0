@@ -459,6 +459,8 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
       difficulty: q.difficulty,
       review_tags: q.review_tags,
       time_taken_seconds: q.time_taken_seconds,
+      // Include merged explanations from all institutes (dedup merger)
+      _explanations: Array.isArray((q as any)._explanations) ? (q as any)._explanations : [],
     }));
     return { kind: 'questions', rows };
   }, [includePyqs, filteredQuestions]);

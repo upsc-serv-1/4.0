@@ -1169,6 +1169,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       exam_year: getAnalyticsYear(q) || '',
       is_pyq: !!q.is_pyq,
       is_ncert: !!q.is_ncert,
+      // Include merged explanations from all institutes (dedup merger)
+      _explanations: Array.isArray(q._explanations) ? q._explanations : [],
     }));
 
     return { kind: 'questions', rows } as ExportPayload;

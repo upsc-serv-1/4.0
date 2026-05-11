@@ -646,9 +646,9 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
       const opts = q.options!;
       return `<ul class="opts">${['a', 'b', 'c', 'd'].filter(k => (opts as any)[k]).map(k => {
         const label = k.toUpperCase();
-        let cls = '';
-        if (!o.hideResponses && inline && answer === label) cls = 'correct';
-        return `<li class="${cls}"><b>${label}.</b> ${renderInline(String((opts as any)[k]))}</li>`;
+        // Don't highlight correct answer in inline rendering - only show in answer key
+        // This preserves practice/testing mode where users shouldn't see correct answers highlighted
+        return `<li class=""><b>${label}.</b> ${renderInline(String((opts as any)[k]))}</li>`;
       }).join('')}</ul>`;
     })() : '';
 
@@ -917,8 +917,24 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
       const stem = q.question_text || q.statement || '';
       const meta = [q.subject, q.micro_topic, q.exam_year].filter(Boolean).map(x => `<span class="pill">${escapeHtml(String(x))}</span>`).join('');
       const answer = (q.correct_answer || '').toUpperCase();
-      const explanation = q.explanation_markdown || q.explanation || '';
-      const optsBlock = showOpts && q.options ? `<ul class="opts">${['a', 'b', 'c', 'd'].filter(k => (q.options as any)[k]).map(k => `<li class="${inline && answer === k.toUpperCase() ? 'correct' : ''}"><b>${k.toUpperCase()}.</b> ${renderInline(String((q.options as any)[k]))}</li>`).join('')}</ul>` : '';
+      // Use merged explanations if available
+      let explanation = '';
+      if (Array.isArray(q._explanations) && q._explanations.length > 0) {
+        explanation = q._explanations
+          .map((expl: any) => {
+            const source = expl.source || 'Unknown Source';
+            const year = expl.year ? ` (${expl.year})` : '';
+            const ans = expl.answer ? ` • Answer: ${expl.answer.toUpperCase()}` : '';
+            const text = expl.text || expl.explanation || '';
+            const header = `<strong>${escapeHtml(source)}${year}${ans}:</strong>`;
+            return text ? `${header}<br/>${renderInline(text)}` : header;
+          })
+          .join('<br/><br/>---<br/><br/>');
+      } else {
+        explanation = q.explanation_markdown || q.explanation || '';
+      }
+      // Don't highlight correct answer in inline rendering - preserve practice mode
+      const optsBlock = showOpts && q.options ? `<ul class="opts">${['a', 'b', 'c', 'd'].filter(k => (q.options as any)[k]).map(k => `<li class=""><b>${k.toUpperCase()}.</b> ${renderInline(String((q.options as any)[k]))}</li>`).join('')}</ul>` : '';
       const questionBlock = `
         <div class="qstem"><span class="qnum">${i + 1}.</span>${renderInline(stem)}</div>
         ${meta ? `<div class="metarow">${meta}</div>` : ''}
@@ -949,7 +965,22 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
         <h2>Answer Key${showExpl ? ' & Explanations' : ''}</h2>
         ${groups.flatMap((g, gi) => g.questions.map((q, i) => {
       const a = (q.correct_answer || '').toUpperCase();
-      const e = q.explanation_markdown || q.explanation || '';
+      // Use merged explanations if available
+      let e = '';
+      if (Array.isArray(q._explanations) && q._explanations.length > 0) {
+        e = q._explanations
+          .map((expl: any) => {
+            const source = expl.source || 'Unknown Source';
+            const year = expl.year ? ` (${expl.year})` : '';
+            const ans = expl.answer ? ` • Answer: ${expl.answer.toUpperCase()}` : '';
+            const text = expl.text || expl.explanation || '';
+            const header = `<strong>${escapeHtml(source)}${year}${ans}:</strong>`;
+            return text ? `${header}<br/>${renderInline(text)}` : header;
+          })
+          .join('<br/><br/>---<br/><br/>');
+      } else {
+        e = q.explanation_markdown || q.explanation || '';
+      }
       return `<div class="ak-row"><span class="ak-num">#${escapeHtml(g.tag)} · ${i + 1}.</span>${a ? `<b>Ans: ${a}</b>` : ''}${showExpl && e ? `<div class="expl" style="margin-top:1mm">${renderInline(e)}</div>` : ''}</div>`;
     })).join('')}
       </div>`

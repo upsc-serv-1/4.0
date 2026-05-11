@@ -694,12 +694,11 @@ export default function NoteEditor() {
         // On iOS, printToFileAsync followed by Sharing is more reliable for columns and CSS
         const { uri } = await Print.printToFileAsync({ html });
         try {
-          // Fire-and-forget share with generous timeout for large PDFs
-          const shareWithTimeout = Promise.race([
+          // Share with generous timeout for large PDFs
+          await Promise.race([
             Sharing.shareAsync(uri, { UTIType: 'com.adobe.pdf', mimeType: 'application/pdf' }),
             new Promise<void>((resolve) => setTimeout(resolve, 20000)), // 20 second timeout
-          ]);
-          shareWithTimeout.catch(() => {
+          ]).catch(() => {
             console.warn('[NoteExport] Share operation timed out or was dismissed (non-fatal)');
           });
         } catch (shareErr) {

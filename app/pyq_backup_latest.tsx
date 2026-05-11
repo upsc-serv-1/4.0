@@ -1172,16 +1172,15 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         await new Promise(resolve => setTimeout(resolve, 300));
 
         try {
-          // Fire-and-forget share with generous timeout for large PDFs
-          const shareWithTimeout = Promise.race([
+          // Share with generous timeout for large PDFs
+          await Promise.race([
             Sharing.shareAsync(uri, { 
               mimeType: 'application/pdf', 
               dialogTitle: 'PYQ Analysis Report',
               UTI: 'com.adobe.pdf' 
             }),
             new Promise<void>((resolve) => setTimeout(resolve, 20000)), // 20 second timeout
-          ]);
-          shareWithTimeout.catch(() => {
+          ]).catch(() => {
             console.warn('[PDFExport] Share operation timed out or was dismissed (non-fatal)');
           });
         } catch (shareErr) {
@@ -2049,3 +2048,4 @@ const styles = StyleSheet.create({
   },
   actionFabText: { color: '#fff', fontSize: 15, fontWeight: '900' },
 });
+

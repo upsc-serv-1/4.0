@@ -195,12 +195,11 @@ export const SyllabusExportSheet = ({ visible, onClose, progress, syllabus, titl
       const { uri } = await Print.printToFileAsync({ html });
       setLoading(false); // Reset button as soon as PDF is ready
       try {
-        // Fire-and-forget share with generous timeout for large PDFs
-        const shareWithTimeout = Promise.race([
+        // Share with generous timeout for large PDFs
+        await Promise.race([
           Sharing.shareAsync(uri),
           new Promise<void>((resolve) => setTimeout(resolve, 20000)), // 20 second timeout
-        ]);
-        shareWithTimeout.catch(() => {
+        ]).catch(() => {
           console.warn('[SyllabusExport] Share operation timed out or was dismissed (non-fatal)');
         });
       } catch (shareErr) {

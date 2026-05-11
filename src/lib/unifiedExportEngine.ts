@@ -1500,15 +1500,11 @@ const sharePdfWithTimeout = async (uri: string, dialogTitle: string): Promise<vo
   // with large PDFs. We don't want to block the UI, so we start the share operation
   // and resolve immediately, letting it happen in the background.
   try {
-    // Start the share operation but don't block on it
-    // Use a generous timeout in case the share sheet is slow to appear
-    const shareWithTimeout = Promise.race([
+    // Share with generous timeout for large PDFs
+    await Promise.race([
       Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle }),
       new Promise<void>((resolve) => setTimeout(resolve, 20000)), // 20 second timeout for large PDFs
-    ]);
-    
-    // Fire and forget - don't await the result
-    shareWithTimeout.catch((e) => {
+    ]).catch((e) => {
       console.warn('[Export] Share operation failed (non-fatal):', e?.message || e);
     });
   } catch (e) {

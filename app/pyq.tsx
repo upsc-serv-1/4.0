@@ -1709,15 +1709,17 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         await new Promise(resolve => setTimeout(resolve, 300));
 
         try {
-          // Use Promise.race with timeout to prevent hanging on iPad
-          const sharePromise = Sharing.shareAsync(uri, { 
-            mimeType: 'application/pdf', 
-            dialogTitle: 'PYQ Analysis Report',
-            UTI: 'com.adobe.pdf' 
-          });
-          const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 8000)); // 8 second timeout
-          await Promise.race([sharePromise, timeoutPromise]).catch(() => {
-            console.warn('[PDFExport] Share operation timed out or was dismissed');
+          // Fire-and-forget share with generous timeout for large PDFs
+          const shareWithTimeout = Promise.race([
+            Sharing.shareAsync(uri, { 
+              mimeType: 'application/pdf', 
+              dialogTitle: 'PYQ Analysis Report',
+              UTI: 'com.adobe.pdf' 
+            }),
+            new Promise<void>((resolve) => setTimeout(resolve, 20000)), // 20 second timeout
+          ]);
+          shareWithTimeout.catch(() => {
+            console.warn('[PDFExport] Share operation timed out or was dismissed (non-fatal)');
           });
         } catch (shareErr) {
           console.error('[PDFExport] Sharing failed, falling back to Print dialog', shareErr);

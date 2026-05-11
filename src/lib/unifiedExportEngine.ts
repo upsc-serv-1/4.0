@@ -1496,24 +1496,27 @@ const injectExecutiveSummary = (html: string, prependHtml?: string): string => {
 };
 
 const sharePdfWithTimeout = async (uri: string, dialogTitle: string): Promise<void> => {
-  // Fire-and-forget: hand the PDF to the OS share/print sheet and resolve the
-  // promise immediately. Awaiting Sharing.shareAsync on Android keeps the
-  // calling component (UnifiedExportSheet) in an "isExporting" state for as
-  // long as the user is browsing the share/print menu, which manifests as
-  // the app being unresponsive when they return. We instead let the UI
-  // recover the moment the system sheet appears.
+  // On iPad/iOS, the share sheet can take time to render and animate, especially
+  // with large PDFs. We don't want to block the UI, so we start the share operation
+  // and resolve immediately, letting it happen in the background.
   try {
-    // Create a race between the share promise and a timeout to prevent hangs
-    const sharePromise = Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle });
-    const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 5000)); // 5 second timeout
-    Promise.race([sharePromise, timeoutPromise]).catch(() => null);
+    // Start the share operation but don't block on it
+    // Use a generous timeout in case the share sheet is slow to appear
+    const shareWithTimeout = Promise.race([
+      Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle }),
+      new Promise<void>((resolve) => setTimeout(resolve, 20000)), // 20 second timeout for large PDFs
+    ]);
+    
+    // Fire and forget - don't await the result
+    shareWithTimeout.catch((e) => {
+      console.warn('[Export] Share operation failed (non-fatal):', e?.message || e);
+    });
   } catch (e) {
-    // ignore — UI is already unblocked
     console.warn('[Export] Share error (non-fatal):', e);
   }
-  // Brief settle so the system sheet has time to appear before the caller
-  // dismisses any "preparing" UI.
-  await new Promise<void>((resolve) => setTimeout(resolve, 250));
+  
+  // Wait a bit to let the system share sheet start appearing
+  await new Promise<void>((resolve) => setTimeout(resolve, 500));
 };
 
 export async function exportToPdf(payload: ExportPayload, options: ExportOptions, extras: ExportRenderExtras = {}): Promise<string> {

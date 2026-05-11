@@ -1044,12 +1044,16 @@ async function printStandaloneReport(fragmentHtml: string, o: ExportOptions): Pr
   const info = await FileSystem.getInfoAsync(dest);
   const finalUri = info.exists ? dest : uri;
   if (await Sharing.isAvailableAsync()) {
-    // Fire-and-forget with timeout to prevent hangs on iPad
+    // Fire-and-forget with generous timeout to prevent hangs on iPad
     try {
-      const sharePromise = Sharing.shareAsync(finalUri, { mimeType: 'application/pdf', dialogTitle: o.title || 'Analysis Report' });
-      const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 5000)); // 5 second timeout
-      Promise.race([sharePromise, timeoutPromise]).catch(() => null);
-      await new Promise<void>((resolve) => setTimeout(resolve, 250));
+      const shareWithTimeout = Promise.race([
+        Sharing.shareAsync(finalUri, { mimeType: 'application/pdf', dialogTitle: o.title || 'Analysis Report' }),
+        new Promise<void>((resolve) => setTimeout(resolve, 20000)), // 20 second timeout for large PDFs
+      ]);
+      shareWithTimeout.catch(() => {
+        console.warn('[AnalysisExport] Share operation timed out or failed (non-fatal)');
+      });
+      await new Promise<void>((resolve) => setTimeout(resolve, 500));
     } catch (e) {
       console.warn('[AnalysisExport] Share error (non-fatal):', e);
     }

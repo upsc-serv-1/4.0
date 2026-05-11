@@ -31,10 +31,13 @@ const Row: React.FC<{ item: DLItem; onRemove: () => void }> = ({ item, onRemove 
     if (!item.uri) return;
     try {
       if (await Sharing.isAvailableAsync()) {
-        const sharePromise = Sharing.shareAsync(item.uri, { mimeType: item.mime || 'application/pdf' });
-        const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 8000)); // 8 second timeout
-        await Promise.race([sharePromise, timeoutPromise]).catch(() => {
-          console.warn('[DownloadManager] Share operation timed out or was dismissed');
+        // Fire-and-forget share with generous timeout for large PDFs
+        const shareWithTimeout = Promise.race([
+          Sharing.shareAsync(item.uri, { mimeType: item.mime || 'application/pdf' }),
+          new Promise<void>((resolve) => setTimeout(resolve, 20000)), // 20 second timeout
+        ]);
+        shareWithTimeout.catch(() => {
+          console.warn('[DownloadManager] Share operation timed out or was dismissed (non-fatal)');
         });
       }
     } catch (e) {

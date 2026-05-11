@@ -36,6 +36,7 @@ import {
 } from '../../repositories/pilotV2Repo';
 import { PilotV2Block, PilotV2PencilStroke, PILOT_V2_HIGHLIGHT_PALETTE } from './types';
 import { PencilCanvas } from './PencilCanvas';
+import { PencilAnnotationEngine } from './PencilAnnotationEngine';
 import { PencilToolbar } from './PencilToolbar';
 import { usePilotV2Pencil } from './usePilotV2Pencil';
 import { PilotV2UnifiedExport } from './PilotV2UnifiedExport';
@@ -191,9 +192,23 @@ export function PilotV2GlanceView() {
     });
   }, [paperSize.h, paperSize.w, blocks]);
 
+  /** Ref to the pencil engine — used by persistGlanceStrokes to sync anchor
+   *  metadata back into the engine's in-memory strokes without creating a
+   *  circular dependency between the callback and the usePilotV2Pencil hook. */
+  const engineRef = useRef<PencilAnnotationEngine | null>(null);
+
   const persistGlanceStrokes = useCallback((next: PilotV2PencilStroke[]) => {
     if (!note?.id) return;
     const anchored = assignAnchorToStrokes(next);
+    // Sync anchor metadata into the engine's in-memory strokes so the
+    // CommittedStrokesLayer's applyBlockOffset can use startRelX/endRelX/relY
+    // for Notability-style word-tracking reprojection immediately (without
+    // waiting for a round-trip through persistence + reload).
+    if (engineRef.current) {
+      anchored.forEach((s) => {
+        if (s.anchor) engineRef.current!.setStrokeAnchor(s.id, s.anchor);
+      });
+    }
     const content = {
       blocks: note.content?.blocks ?? [],
       version: note.content?.version ?? 1,
@@ -209,6 +224,8 @@ export function PilotV2GlanceView() {
     pageHeight: paperSize.h,
     onChange: persistGlanceStrokes,
   });
+  // Keep the ref in sync so persistGlanceStrokes can always access the current engine.
+  engineRef.current = pencil.engine;
 
   /* ── zoom state ─────────────────────────────────────────────────────────── */
   const scale      = useSharedValue(1);

@@ -87,6 +87,10 @@ export interface EstimateLayoutOptions {
  * (not a real text engine) but it is deterministic and stable across
  * multiple invocations with the same inputs — which is what the anchored
  * stroke remap needs.
+ *
+ * The gap between blocks defaults to ~2× line height to match the
+ * `\n\n` → `<br/><br/>` spacing produced by `blocksToBaseLayerMarkdown`
+ * + `renderInline` inside the foreignObject.
  */
 export function estimateExportBlockLayouts(
   blocks: PilotV2Block[],
@@ -94,8 +98,6 @@ export function estimateExportBlockLayouts(
 ): Map<string, ExportBlockRect> {
   const out = new Map<string, ExportBlockRect>();
   const cols = Math.max(1, Math.min(2, Math.round(opts.columns || 1)));
-  const gap = opts.blockGap ?? 8;
-  const topPad = opts.topPadding ?? 0;
   const colGutter = cols === 2 ? 24 : 0;
   const colWidth = (opts.canvasWidth - colGutter * (cols - 1)) / cols;
 
@@ -107,6 +109,12 @@ export function estimateExportBlockLayouts(
   const lineHeight = fontPx * 1.45;
   const headingScale = 1.45; // approximate H2 multiplier
   const codePad = 4;
+
+  // Block gap: the markdown converter joins blocks with `\n\n`, which
+  // `renderInline` turns into `<br/><br/>` (2× line height).  When an
+  // explicit blockGap is provided (e.g., for non-markdown paths), honour it.
+  const gap = opts.blockGap ?? Math.round(lineHeight * 2);
+  const topPad = opts.topPadding ?? 0;
 
   // Distribute blocks across columns round-robin: simplest model that
   // matches the engine's CSS column-count flow (close enough for the
@@ -137,11 +145,6 @@ export function estimateExportBlockLayouts(
     colCursors[colIdx] = y + h + gap;
   });
 
-  // Optional: clamp final block y inside the canvas.
-  const maxY = Math.max(...colCursors, topPad);
-  void maxY; // intentionally not used to clamp — exported PDF auto-grows
-  void opts.canvasHeight;
-
   return out;
 }
 
@@ -166,6 +169,15 @@ export interface RemapContext {
  * Convert a single stroke into an `ExportHardnoteStroke` in export-canvas
  * coordinates, or `null` if the stroke should be dropped (anchored to a
  * missing block).
+ *
+ * When the export canvas matches the editor canvas (the default case), ALL
+ * strokes — including anchored ones — use direct scaling from their relative
+ * (0..1) coordinates.  This avoids the cumulative drift that the block-layout
+ * estimation introduces (the estimation cannot perfectly match HTML/CSS text
+ * rendering, so every heuristic mismatch shifts strokes further from their
+ * intended position).  The anchor-based remap only kicks in when the user
+ * explicitly changes export settings (font size, columns) that cause the
+ * text to reflow in the PDF.
  */
 export function remapStrokeForExport(
   stroke: PilotV2PencilStroke,
@@ -174,10 +186,36 @@ export function remapStrokeForExport(
   if (!stroke || !stroke.points || stroke.points.length === 0) return null;
   if (stroke.tool === 'lasso') return null;
 
+  const tool = stroke.tool === 'eraser' ? 'eraser' : stroke.tool;
+
+  // ── Fast path: export canvas ≈ editor canvas (default export) ──────
+  // Use raw relative → absolute scaling for ALL strokes so they render
+  // at the same pixel positions they occupied on-screen.  This is the
+  // same approach Notability uses for its PDF export: strokes are in
+  // page-relative coords, and the export page matches the editor page.
+  const wRatio = ctx.exportCanvasWidth  / Math.max(1, ctx.editorCanvasWidth);
+  const hRatio = ctx.exportCanvasHeight / Math.max(1, ctx.editorCanvasHeight);
+  const canvasMatch = Math.abs(wRatio - 1) < 0.02 && Math.abs(hRatio - 1) < 0.02;
+
+  if (canvasMatch) {
+    const points: ExportHardnoteStrokePoint[] = stroke.points.map((p) => ({
+      x: round2(clamp01(p.x) * ctx.exportCanvasWidth),
+      y: round2(clamp01(p.y) * ctx.exportCanvasHeight),
+      p: typeof p.pressure === 'number' ? p.pressure : 0.5,
+    }));
+    return {
+      id: stroke.id,
+      tool: tool as ExportHardnoteStroke['tool'],
+      color: stroke.color,
+      width: stroke.width,
+      opacity: stroke.opacity,
+      points,
+    };
+  }
+
+  // ── Anchor-based remap (only when export settings differ) ──────────
   const anchorBlockId =
     stroke.anchor?.elementId ?? stroke.anchor?.blockId ?? null;
-
-  const tool = stroke.tool === 'eraser' ? 'eraser' : stroke.tool;
 
   if (
     anchorBlockId &&
@@ -224,10 +262,7 @@ export function remapStrokeForExport(
     };
   }
 
-  // Unanchored stroke: keep the relative shape but project onto the export
-  // canvas using the export/editor canvas ratio.  Pilot V2 stroke points
-  // are stored as RELATIVE coords (0..1 of the editor page), so the ratio
-  // collapses to multiplying by the export canvas dims.
+  // Unanchored stroke: scale relative coords → export canvas coords.
   const points: ExportHardnoteStrokePoint[] = stroke.points.map((p) => ({
     x: round2(clamp01(p.x) * ctx.exportCanvasWidth),
     y: round2(clamp01(p.y) * ctx.exportCanvasHeight),

@@ -42,8 +42,9 @@ interface Props {
   testID?: string;
   /** Current block layout map keyed by blockId (pixels within the page).
    *  Passed through to CommittedStrokesLayer so anchored strokes can be
-   *  shifted when blocks are reordered — the core Step-7 transform. */
-  blockLayouts?: Map<string, { y: number; h: number }>;
+   *  repositioned when blocks move or the page width changes (sidebar
+   *  show/hide) — the Notability-style word-tracking transform. */
+  blockLayouts?: Map<string, { x: number; y: number; w: number; h: number }>;
   /** Opaque counter that increments whenever blockLayouts changes.
    *  Forces CommittedStrokesLayer to re-render and recompute offsets. */
   blockLayoutVersion?: number;
@@ -464,10 +465,13 @@ interface CommittedLayerProps {
   strokes: PilotV2PencilStroke[];
   width: number;
   height: number;
-  /** Current block y-positions in pixels within the page.  When present,
-   *  anchored strokes are shifted by (currentBlockY / height − blockOriginY)
-   *  so they follow their host block after a reorder. */
-  blockLayouts?: Map<string, { y: number; h: number }>;
+  /** Current block positions in pixels within the page.  When present,
+   *  anchored strokes are repositioned using their span-anchor data (startRelX,
+   *  endRelX, relY) so they follow the text they annotate even when page width
+   *  changes (e.g. sidebar show/hide) — exactly how Notability keeps strokes
+   *  locked to words despite zoom / resize.  Falls back to Y-only delta for
+   *  strokes that lack span-offset data (legacy anchors). */
+  blockLayouts?: Map<string, { x: number; y: number; w: number; h: number }>;
   /** Increments when blockLayouts changes, forcing the memo to re-run. */
   blockLayoutVersion: number;
 }
@@ -485,13 +489,94 @@ const CommittedStrokesLayer = React.memo(function CommittedStrokesLayer({
     prevVersionRef.current = blockLayoutVersion;
   }
 
-  /** Apply block-reorder Y-offset to an anchored stroke.
-   *  Returns the original stroke unchanged when no anchor / no offset. */
+  /** Reproject an anchored stroke onto its host block's CURRENT position.
+   *
+   *  **Notability / GoodNotes approach — word-tracking anchors:**
+   *
+   *  Strokes that carry span-anchor data (startRelX, endRelX, relY) are
+   *  fully reprojected: every point is mapped from "fraction along the
+   *  original stroke x-extent" to the same fraction within the block's
+   *  current bounding box.  This handles:
+   *    • sidebar show / hide changing page width  (horizontal shift)
+   *    • block reorder changing page position      (vertical shift)
+   *    • zoom / resize                              (both axes)
+   *
+   *  Strokes with a legacy anchor (blockId + blockOriginY only) fall back
+   *  to the original Y-delta logic.
+   */
   const applyBlockOffset = (s: PilotV2PencilStroke): PilotV2PencilStroke => {
-    if (!s.anchor || !blockLayouts?.size || height <= 0) return s;
-    const currentY = blockLayouts.get(s.anchor.blockId)?.y;
-    if (currentY === undefined) return s;
-    const dy = currentY / height - s.anchor.blockOriginY;
+    if (!s.anchor || !blockLayouts?.size || height <= 0 || width <= 0) return s;
+
+    const blockRect = blockLayouts.get(s.anchor.blockId);
+    if (!blockRect) return s;
+
+    // ── Full span-anchor reprojection (Step 9+ strokes) ──────────────
+    // These strokes have block-relative X/Y coordinates stored at commit
+    // time.  We recompute absolute page-relative coordinates from the
+    // block's CURRENT position so the stroke follows the text regardless
+    // of page-width changes (sidebar toggle, rotation, etc.).
+    if (
+      typeof s.anchor.startRelX === 'number' &&
+      typeof s.anchor.endRelX === 'number' &&
+      typeof s.anchor.relY === 'number'
+    ) {
+      const startRelX = Math.max(0, Math.min(1, s.anchor.startRelX));
+      const endRelX   = Math.max(startRelX, Math.max(0, Math.min(1, s.anchor.endRelX)));
+      const relY      = Math.max(0, Math.min(1, s.anchor.relY));
+
+      // Determine each point's fraction along the original stroke extent
+      // so the stroke's shape (curves, pressure variance) is preserved.
+      let minX = Infinity, maxX = -Infinity;
+      let minY = Infinity, maxY = -Infinity;
+      for (const p of s.points) {
+        if (p.x < minX) minX = p.x;
+        if (p.x > maxX) maxX = p.x;
+        if (p.y < minY) minY = p.y;
+        if (p.y > maxY) maxY = p.y;
+      }
+      const xExtent = Math.max(1e-9, maxX - minX);
+      const yExtent = Math.max(1e-9, maxY - minY);
+
+      // Target position in page-relative (0..1) coordinates derived from
+      // the block's current pixel rect.
+      const targetX0     = (blockRect.x + startRelX * blockRect.w) / width;
+      const targetXEnd   = (blockRect.x + endRelX * blockRect.w) / width;
+      const targetXSpan  = targetXEnd - targetX0;
+      const targetY      = (blockRect.y + relY * blockRect.h) / height;
+
+      // Check if the stroke's Y extent is small relative to its X extent
+      // (i.e. it's a roughly horizontal underline / highlight).
+      const isHorizontal = (maxY - minY) < (maxX - minX) * 0.5;
+
+      const points = s.points.map((p) => {
+        const fx = (p.x - minX) / xExtent; // 0..1 along the stroke X
+        const newX = targetX0 + fx * targetXSpan;
+        let newY: number;
+        if (isHorizontal) {
+          // For horizontal strokes (underlines, highlights), pin all
+          // points to the same target Y so the line stays flat at the
+          // correct text baseline.
+          const fy = (p.y - minY) / yExtent;
+          newY = targetY + (fy - 0.5) * (yExtent * 0.5);
+        } else {
+          // For non-horizontal strokes (circles, arrows), preserve the
+          // stroke's relative shape and translate its centroid to the
+          // block's current position.
+          const cy = (minY + maxY) / 2;
+          const dy = targetY - cy;
+          newY = p.y + dy;
+        }
+        return {
+          ...p,
+          x: Math.max(0, Math.min(1, newX)),
+          y: Math.max(0, Math.min(1, newY)),
+        };
+      });
+      return { ...s, points };
+    }
+
+    // ── Legacy Y-only delta (pre-Step-9 anchors without span offsets) ──
+    const dy = blockRect.y / height - s.anchor.blockOriginY;
     if (Math.abs(dy) < 0.002) return s; // < 0.2 % of page — negligible
     const points = s.points.map(p => ({
       ...p,

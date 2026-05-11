@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import { Layers, StickyNote, Tag, Layout, ChevronRight, Book, Database, BarChart3 } from 'lucide-react-native';
+import { Layers, StickyNote, Tag, Layout, ChevronRight, Book, Database, BarChart3, FileText, Sparkles } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
-import { useTheme } from '../src/context/ThemeContext';
-import { useAuth } from '../src/context/AuthContext';
-import { radius, spacing } from '../src/theme';
-import { ThemeSwitcher } from '../src/components/ThemeSwitcher';
-import { PageWrapper } from '../src/components/PageWrapper';
-import { SyllabusService } from '../src/services/SyllabusService';
-import { MICRO_SYLLABUS } from '../src/data/syllabus';
+import { useTheme } from '../../src/context/ThemeContext';
+import { useAuth } from '../../src/context/AuthContext';
+import { radius, spacing } from '../../src/theme';
+import { ThemeSwitcher } from '../../src/components/ThemeSwitcher';
+import { PageWrapper } from '../../src/components/PageWrapper';
+import { SyllabusService } from '../../src/services/SyllabusService';
+import { MICRO_SYLLABUS } from '../../src/data/syllabus';
 
 const { width } = Dimensions.get('window');
 
@@ -77,6 +77,30 @@ export default function ReviseTab() {
 
   const REVISE_SECTIONS = [
     {
+      id: 'notes',
+      title: 'My Vault',
+      desc: 'Central knowledge hub and personal notes.',
+      icon: FileText,
+      color: '#007AFF',
+      route: '/notes'
+    },
+    {
+      id: 'hardnotes',
+      title: 'Hardnotes',
+      desc: 'Premium structured notes with drawing.',
+      icon: StickyNote,
+      color: '#5856D6',
+      route: '/hardnotes'
+    },
+    {
+      id: 'softnotes',
+      title: 'Softnotes',
+      desc: 'Handwritten notebooks and sketches.',
+      icon: Book,
+      color: '#34C759',
+      route: '/softnotes'
+    },
+    {
       id: 'flashcards',
       title: 'Flashcards',
       desc: 'Active recall with spaced repetition.',
@@ -107,6 +131,14 @@ export default function ReviseTab() {
       icon: Database,
       color: '#34C759',
       route: '/repo'
+    },
+    {
+      id: 'capsule',
+      title: 'Capsule',
+      desc: 'Daily current affairs and updates.',
+      icon: Sparkles,
+      color: '#FFD700',
+      route: '/capsule'
     }
   ];
 

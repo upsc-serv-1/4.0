@@ -17,7 +17,7 @@ import Animated, {
 import {
   Plus, Search as SearchIcon, X, Flame, Clock, Sparkles, Layers, ArrowUpDown,
   Folder, CheckCircle2, Minus, ChevronLeft, ArrowUpRight, Settings, MoreVertical,
-  FolderPlus, Play, ChevronRight, Trash
+  FolderPlus, Play, ChevronRight, Trash, Check
 } from 'lucide-react-native';
 import { supabase } from '../src/lib/supabase';
 import { useAuth } from '../src/context/AuthContext';
@@ -50,6 +50,7 @@ export default function FlashcardsHub() {
   const [createModal, setCreateModal] = useState<{ type: 'folder' | 'deck', parentId?: string | null, parentName?: string, color?: string } | null>(null);
   const [renameModal, setRenameModal] = useState<{ node: BranchNode } | null>(null);
   const [moveModal, setMoveModal] = useState<{ node: BranchNode } | null>(null);
+  const [emptyCardModal, setEmptyCardModal] = useState<'due' | 'new' | null>(null);
   const [nameDraft, setNameDraft] = useState('');
 
   // Bulk Delete Selection
@@ -382,6 +383,11 @@ export default function FlashcardsHub() {
   };
 
   const startStudy = (mode: 'due' | 'new') => {
+    const cardCount = mode === 'due' ? aggregateStats.due : aggregateStats.new;
+    if (cardCount === 0) {
+      setEmptyCardModal(mode);
+      return;
+    }
     router.push({
       pathname: '/flashcards/review',
       params: { 
@@ -647,6 +653,27 @@ export default function FlashcardsHub() {
 
         <PremiumMoveModal visible={!!moveModal} node={moveModal?.node ?? null} tree={tree} onClose={() => setMoveModal(null)} onConfirm={handleMove} />
 
+        {/* Empty Cards Modal */}
+        <Modal visible={!!emptyCardModal} transparent animationType="fade" onRequestClose={() => setEmptyCardModal(null)}>
+          <Pressable style={[styles.modalOverlay, { backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'center', alignItems: 'center' }]} onPress={() => setEmptyCardModal(null)}>
+            <View style={[styles.emptyCardModal, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Check size={56} color={colors.primary} style={{ marginBottom: 16 }} />
+              <Text style={[styles.emptyCardTitle, { color: colors.textPrimary }]}>
+                {emptyCardModal === 'due' ? 'All caught up!' : 'All new cards completed!'}
+              </Text>
+              <Text style={[styles.emptyCardSub, { color: colors.textTertiary, marginTop: 12 }]}>
+                {emptyCardModal === 'due' ? 'No cards are due right now.' : 'No new cards available.'}
+              </Text>
+              <TouchableOpacity
+                style={[styles.emptyCardBtn, { backgroundColor: colors.primary, marginTop: 24 }]}
+                onPress={() => setEmptyCardModal(null)}
+              >
+                <Text style={styles.emptyCardBtnText}>Got it</Text>
+              </TouchableOpacity>
+            </View>
+          </Pressable>
+        </Modal>
+
         <UnifiedExportSheet
           visible={exportSheetVisible}
           onClose={() => setExportSheetVisible(false)}
@@ -711,6 +738,37 @@ const styles = StyleSheet.create({
   colorCircle: { width: 44, height: 44, borderRadius: 22 },
   bigCreateBtn: { height: 64, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
   bigCreateBtnTxt: { color: '#04223a', fontSize: 18, fontWeight: '900' },
+  
+  emptyCardModal: {
+    borderRadius: 24,
+    padding: 32,
+    alignItems: 'center',
+    width: '86%',
+    maxWidth: 340,
+    borderWidth: 1,
+  },
+  emptyCardTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    textAlign: 'center',
+  },
+  emptyCardSub: {
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  emptyCardBtn: {
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyCardBtnText: {
+    color: '#04223a',
+    fontSize: 16,
+    fontWeight: '900',
+  },
 });
 
 function AddMenuItem({ icon, title, sub, onPress }: { icon: any, title: string, sub: string, onPress: () => void }) {

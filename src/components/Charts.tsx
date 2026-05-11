@@ -516,17 +516,18 @@ export const LineChart = ({
   const safeLabelStep = Math.max(1, labelStep || 1);
   const screenWidth = width || (Dimensions.get('window').width - spacing.lg * 4);
   const paddingLeft = 40;
-  const paddingBottom = labels.length > 12 ? 45 : 30;
+  const paddingBottom = labels.length > 8 ? 120 : 80;
   const paddingRight = 20;
   const chartWidth = screenWidth - paddingLeft;
   const chartHeight = height - paddingBottom - topInset;
+  const svgHeight = height + 100; // Add extra space below for scrolling room
   
   const allValues = data.flatMap(d => d.values);
   const maxValue = allValues.length > 0 ? Math.max(1, ...allValues) : 1;
   const palette = seriesColors || ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
 
   const renderChartSvg = () => (
-    <Svg height={height} width={screenWidth}>
+    <Svg height={svgHeight} width={screenWidth}>
       {/* Y Axis Grid Lines */}
       {[0, 0.25, 0.5, 0.75, 1].map((p, i) => (
         <G key={i}>
@@ -560,10 +561,11 @@ export const LineChart = ({
         if (!isFirst && !isLast && !isStep) return null;
 
         const x = paddingLeft + (i / (labels.length - 1 || 1)) * (chartWidth - paddingRight - 10) + 10;
-        const y = height - 10;
+        const y = height - 15;
         
-        // Compact long labels
-        const displayLabel = label.length > 10 ? label.substring(0, 8) + '..' : label;
+        // Show more of label for better readability when scrolling
+        const maxLabelLength = stickyY && labels.length > 8 ? label.length : 10;
+        const displayLabel = label.length > maxLabelLength ? label.substring(0, maxLabelLength - 1) + '…' : label;
 
         return (
           <SvgText
@@ -571,10 +573,10 @@ export const LineChart = ({
             x={x}
             y={y}
             fill={theme.textSecondary}
-            fontSize="9"
+            fontSize="8"
             textAnchor={labels.length > 8 ? "end" : "middle"}
             fontWeight="700"
-            transform={labels.length > 8 ? `rotate(-30, ${x}, ${y})` : ""}
+            transform={labels.length > 8 ? `rotate(-45, ${x}, ${y})` : ""}
           >
             {displayLabel}
           </SvgText>
@@ -638,8 +640,12 @@ export const LineChart = ({
 
   if (stickyY) {
     return (
-      <View style={{ height, width: '100%', marginTop: spacing.md }}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <View style={{ height: svgHeight, width: '100%', marginTop: spacing.md }}>
+        <ScrollView 
+          horizontal 
+          scrollEnabled={true}
+          showsHorizontalScrollIndicator={false}
+        >
           {renderChartSvg()}
         </ScrollView>
         {/* Sticky Y-Axis Overlay */}

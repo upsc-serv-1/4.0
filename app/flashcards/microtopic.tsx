@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View, Text, StyleSheet, TouchableOpacity, FlatList,
   ActivityIndicator, TextInput, Modal, ScrollView, Alert, Image,
@@ -185,6 +186,13 @@ export default function MicrotopicScreen() {
   }, [uid, subject, section, microtopic, branchId, isBranchMode, isRecursive]);
 
   useEffect(() => { loadAll(); }, [loadAll]);
+
+  // Reload cards whenever the screen comes back into focus (after adding/editing cards)
+  useFocusEffect(
+    useCallback(() => {
+      loadAll();
+    }, [loadAll])
+  );
 
   const filteredSortedCards = useMemo(() => {
     let list = [...cards];

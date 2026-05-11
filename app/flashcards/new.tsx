@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -42,7 +42,7 @@ export default function NewCard() {
   const { session } = useAuth();
   const uid = session?.user?.id;
 
-  const params = useLocalSearchParams<{
+  const params = useLocalSearchParams<{   
     subject?: string;
     section?: string;
     microtopic?: string;
@@ -67,6 +67,29 @@ export default function NewCard() {
     section_group: String(params.section || 'General'),
     microtopic: String(params.microtopic || 'General'),
   }), [params.subject, params.section, params.microtopic]);
+
+  // Auto-populate destination from branchId if coming from inside a deck
+  React.useEffect(() => {
+    if (params.branchId && params.branchName) {
+      setDestination({
+        id: String(params.branchId),
+        name: String(params.branchName),
+        path: String(params.branchName),
+      });
+    }
+  }, [params.branchId, params.branchName]);
+  
+  // Auto-populate destination from branchId if coming from inside a deck
+  useEffect(() => {
+    if (params.branchId && params.branchName) {
+      const path = params.branchName ? String(params.branchName) : '';
+      setDestination({
+        id: String(params.branchId),
+        name: String(params.branchName),
+        path,
+      });
+    }
+  }, [params.branchId, params.branchName]);
 
   const destinationLabel = destination?.path || null;
 
@@ -171,25 +194,48 @@ export default function NewCard() {
             <View style={{ height: 32 }} />
 
             <Text style={[s.label, { color: colors.textTertiary }]}>DESTINATION</Text>
-            <TouchableOpacity
-              style={[s.destinationBtn, { borderColor: destination ? colors.primary : colors.border, backgroundColor: colors.surfaceStrong }]}
-              onPress={() => setDestinationPicker(true)}
-              testID="btn-select-destination"
-            >
-              <MapPin size={16} color={destination ? colors.primary : colors.textTertiary} />
-              <Text
-                style={{
-                  flex: 1,
-                  color: destination ? colors.textPrimary : colors.textTertiary,
-                  fontWeight: destination ? '800' : '600',
-                  fontSize: 14
-                }}
-                numberOfLines={1}
+            {params.branchId ? (
+              // If coming from inside a deck, show destination as read-only
+              <View
+                style={[s.destinationBtn, { borderColor: colors.primary, backgroundColor: colors.surfaceStrong }]}
+                testID="destination-readonly"
               >
-                {destinationLabel || 'Choose deck...'}
-              </Text>
-              {destination ? <CheckCircle2 size={18} color={colors.primary} /> : null}
-            </TouchableOpacity>
+                <MapPin size={16} color={colors.primary} />
+                <Text
+                  style={{
+                    flex: 1,
+                    color: colors.textPrimary,
+                    fontWeight: '800',
+                    fontSize: 14
+                  }}
+                  numberOfLines={1}
+                >
+                  {destinationLabel}
+                </Text>
+                <CheckCircle2 size={18} color={colors.primary} />
+              </View>
+            ) : (
+              // If starting fresh, show picker button
+              <TouchableOpacity
+                style={[s.destinationBtn, { borderColor: destination ? colors.primary : colors.border, backgroundColor: colors.surfaceStrong }]}
+                onPress={() => setDestinationPicker(true)}
+                testID="btn-select-destination"
+              >
+                <MapPin size={16} color={destination ? colors.primary : colors.textTertiary} />
+                <Text
+                  style={{
+                    flex: 1,
+                    color: destination ? colors.textPrimary : colors.textTertiary,
+                    fontWeight: destination ? '800' : '600',
+                    fontSize: 14
+                  }}
+                  numberOfLines={1}
+                >
+                  {destinationLabel || 'Choose deck...'}
+                </Text>
+                {destination ? <CheckCircle2 size={18} color={colors.primary} /> : null}
+              </TouchableOpacity>
+            )}
           </View>
         </ScrollView>
 

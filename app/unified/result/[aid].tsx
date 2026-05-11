@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Share, Platform, Alert, Dimensions, Animated, Switch } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
@@ -39,10 +39,13 @@ import { SharedQuestionCard } from '../../../src/components/unified/SharedQuesti
 import { getPYQCategorization, buildCanonicalExplanations } from '../../../src/utils/questionUtils';
 import { PilotV2SaveSheet } from '../../../src/components/pilot-v2/PilotV2SaveSheet';
 import { QuizCaptureSheet } from '../../../src/components/hardnotes/QuizCaptureSheet';
+import { MyVitaminEditorSheet } from '../../../src/components/unified/MyVitaminEditorSheet';
+import { fetchBestAnswer, saveBestAnswer, deleteBestAnswer } from '../../../src/services/BestAnswerService';
 import { DetailedBreakdown } from '../../../src/components/unified/DetailedBreakdown';
 import { TrendingUp, BarChart2 } from 'lucide-react-native';
 import { markdownToHtml } from '../../../src/utils/textUtils';
 import { AnalyseSection } from '../../../src/components/unified/AnalyseSection';
+import { PilotV2AIChat } from '../../../src/components/pilot-v2/PilotV2AIChat';
 import { Modal, Pressable } from 'react-native';
 
 export default function ResultScreen() {
@@ -67,6 +70,55 @@ export default function ResultScreen() {
   const [hardnotesPickerVisible, setHardnotesPickerVisible] = useState(false);
   const [hardnotesPayload, setHardnotesPayload] = useState<{ markdown: string; title: string } | null>(null);
 
+  // AI Chat FAB states
+  const [activeAiQuestion, setActiveAiQuestion] = useState<any>(null);
+  const [aiChatTrigger, setAiChatTrigger] = useState(0);
+
+  // My Vitamin states
+  const [bestAnswers, setBestAnswers] = useState<Record<string, any>>({});
+  const [savingBest, setSavingBest] = useState<Record<string, boolean>>({});
+  const [vitaminEditorVisible, setVitaminEditorVisible] = useState(false);
+  const [vitaminEditorContent, setVitaminEditorContent] = useState('');
+  const [editingQuestion, setEditingQuestion] = useState<any>(null);
+
+  const ensureBestAnswerLoaded = async (qid: string) => {
+    if (bestAnswers[qid] !== undefined) return;
+    try {
+      const best = await fetchBestAnswer(qid);
+      setBestAnswers(prev => ({ ...prev, [qid]: best || null }));
+    } catch (e) {
+      console.error('[Result] Error fetching best answer:', e);
+    }
+  };
+
+  const handleEditVitamin = (item: any) => {
+    const id = item.id || item.question_id;
+    const existing = bestAnswers[id];
+    setEditingQuestion(item);
+    setVitaminEditorContent(existing?.answer_text || aiExplanations[id] || '');
+    setVitaminEditorVisible(true);
+  };
+
+  const handleSaveVitamin = async (content: string) => {
+    if (!editingQuestion) return;
+    const id = editingQuestion.id || editingQuestion.question_id;
+    setSavingBest(prev => ({ ...prev, [id]: true }));
+    try {
+      const saved = await saveBestAnswer(id, content, null, null);
+      if (saved) {
+        setBestAnswers(prev => ({ ...prev, [id]: saved }));
+        setActiveExplSources(prev => ({ ...prev, [id]: 'vitamin' }));
+        if (Platform.OS === 'android') {
+          (global as any).ToastAndroid?.show('My Vitamin saved!', (global as any).ToastAndroid?.SHORT);
+        }
+      }
+    } catch (e: any) {
+      Alert.alert('Save failed', e?.message || 'Could not save My Vitamin.');
+    } finally {
+      setSavingBest(prev => ({ ...prev, [id]: false }));
+      setVitaminEditorVisible(false);
+    }
+  };
   const openNotebookFromQuestion = (
     q: any,
     explanationText?: string,
@@ -90,6 +142,11 @@ export default function ResultScreen() {
     });
     setHardnotesPickerVisible(true);
   };
+
+  const handleAiChat = useCallback((item: any) => {
+    setActiveAiQuestion(item);
+    setAiChatTrigger(prev => prev + 1);
+  }, []);
 
   const handleAiExplain = async (question: any) => {
     if (aiLoading[question.id]) return;
@@ -582,12 +639,17 @@ export default function ResultScreen() {
             onExplSourceChange={(src) => setActiveExplSources(prev => ({ ...prev, [item.id]: src }))}
             aiExplanation={aiExplanations[item.id]}
             isAiLoading={aiLoading[item.id]}
-            onAiExplain={() => handleAiExplain(item)}
+            onAiExplain={handleAiExplain}
+            onAiChat={handleAiChat}
             onAddFlashcard={() => handleAddToFlashcards(item)}
             isFlashcarded={inFlashcardDeck[item.id]}
             isSavingFlashcard={savingFlashcard[item.id]}
             openNotebookFromQuestion={openNotebookFromQuestion}
             openHardnoteFromQuestion={openHardnoteFromQuestion}
+            onEditVitamin={handleEditVitamin}
+            bestAnswers={bestAnswers}
+            ensureBestAnswerLoaded={ensureBestAnswerLoaded}
+            savingBest={savingBest}
             onRevealExplanation={() => setRevealedExplanations(prev => ({ ...prev, [item.id]: true }))}
             onOptionSelect={() => { }}
             mdStyles={mdStyles}
@@ -867,6 +929,15 @@ export default function ResultScreen() {
         )}
       />
 
+      <MyVitaminEditorSheet
+        visible={vitaminEditorVisible}
+        onClose={() => setVitaminEditorVisible(false)}
+        onSave={handleSaveVitamin}
+        initialContent={vitaminEditorContent}
+        questionText={editingQuestion?.question_text || editingQuestion?.question || ''}
+        seedQuestion={editingQuestion}
+      />
+
       {/* Floating See Your Response Toggle */}
       <TouchableOpacity
         onPress={() => setShowMistakes(!showMistakes)}
@@ -878,9 +949,34 @@ export default function ResultScreen() {
       >
         <Zap color={showMistakes ? '#fff' : colors.primary} size={18} />
         <Text style={[styles.floatingBtnText, { color: showMistakes ? '#fff' : colors.textPrimary }]}>
-          See Your Resposn
+          See Your Response
         </Text>
       </TouchableOpacity>
+
+      <PilotV2AIChat 
+        activeQuestion={activeAiQuestion}
+        externalOpenTrigger={aiChatTrigger}
+        onSaveResponse={(text: string) => {
+          if (!activeAiQuestion) return;
+          setPilotSaveTargetQuestion(activeAiQuestion);
+          setPilotSaveHtml(markdownToHtml(text || ''));
+          setPilotV2SaveOpen(true);
+        }}
+      />
+
+      <PilotV2SaveSheet
+        visible={pilotV2SaveOpen}
+        onClose={() => setPilotV2SaveOpen(false)}
+        initialHtml={pilotSaveHtml}
+        questionId={pilotSaveTargetQuestion?.id}
+      />
+
+      <QuizCaptureSheet
+        visible={hardnotesPickerVisible}
+        onClose={() => setHardnotesPickerVisible(false)}
+        initialMarkdown={hardnotesPayload?.markdown || ''}
+        initialTitle={hardnotesPayload?.title || ''}
+      />
     </View>
   );
 }

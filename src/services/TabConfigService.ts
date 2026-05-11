@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type TabKey = 'index' | 'arena' | 'analyse' | 'pyq' | 'flashcards' | 'tags' | 'notes' | 'hardnotes' | 'capsule' | 'softnotes' | 'revise' | 'tracker' | 'noji_hub' | 'ai-search' | 'pilot-v2' | 'browser';
 
-const DEFAULT_TAB_ORDER: TabKey[] = ['index', 'arena', 'analyse', 'pyq', 'flashcards', 'ai-search', 'tags', 'notes', 'hardnotes', 'capsule', 'pilot-v2', 'browser', 'softnotes', 'revise', 'tracker', 'noji_hub'];
+const DEFAULT_TAB_ORDER: TabKey[] = ['index', 'revise', 'arena', 'analyse', 'pyq', 'flashcards', 'ai-search', 'tags', 'pilot-v2', 'browser', 'tracker', 'noji_hub', 'hardnotes', 'softnotes', 'notes', 'capsule'];
 
 const normalizeOrder = (order: TabKey[]): TabKey[] => {
   const cleaned = order.filter((key, index) => order.indexOf(key) === index);
@@ -14,8 +14,8 @@ const normalizeOrder = (order: TabKey[]): TabKey[] => {
     if (!cleaned.includes(key)) cleaned.push(key);
   });
 
-  // Hardnotes must always be visible in tab customization/order.
-  if (!cleaned.includes('hardnotes')) cleaned.push('hardnotes');
+  // Notes must always be visible in tab customization/order.
+  if (!cleaned.includes('notes')) cleaned.push('notes');
 
   return cleaned;
 };

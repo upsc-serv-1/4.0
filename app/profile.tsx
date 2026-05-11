@@ -50,18 +50,7 @@ import { DEFAULT_ANALYTICS_LAYOUT, loadAnalyticsLayout, moveLayoutItem, saveAnal
 import { OfflineManager, SyncProgress, OfflineMetadata } from '../src/services/OfflineManager';
 import { ThemeSwitcher } from '../src/components/ThemeSwitcher';
 
-const AVATARS = [
-  { id: 'boy1', uri: require('../assets/avatars/boy1.png') },
-  { id: 'boy2', uri: require('../assets/avatars/boy2.png') },
-  { id: 'boy3', uri: require('../assets/avatars/boy3.png') },
-  { id: 'boy4', uri: require('../assets/avatars/boy4.png') },
-  { id: 'boy5', uri: require('../assets/avatars/boy5.png') },
-  { id: 'girl1', uri: require('../assets/avatars/girl1.png') },
-  { id: 'girl2', uri: require('../assets/avatars/girl2.png') },
-  { id: 'girl3', uri: require('../assets/avatars/girl3.png') },
-  { id: 'girl4', uri: require('../assets/avatars/girl4.png') },
-  { id: 'girl5', uri: require('../assets/avatars/girl5.png') },
-];
+import { AVATARS } from '../src/constants/avatars';
 
 
 
@@ -106,6 +95,12 @@ export default function Profile() {
   useEffect(() => {
     AsyncStorage.getItem('optional_choice').then(val => {
       if (val) setOptional(val);
+    });
+    AsyncStorage.getItem('profile_display_name').then(val => {
+      if (val) setNewName(val);
+    });
+    AsyncStorage.getItem('profile_avatar_id').then(val => {
+      if (val) setSelectedAvatar(val);
     });
     loadAnalyticsLayout().then(setAnalyticsLayout);
     OfflineManager.getMetadata().then(setOfflineMeta);
@@ -195,6 +190,7 @@ export default function Profile() {
       });
       if (error) throw error;
       await AsyncStorage.setItem('profile_display_name', newName.trim());
+      await AsyncStorage.setItem('profile_avatar_id', selectedAvatar);
       Alert.alert("Success", "Profile updated successfully!");
     } catch (err: any) {
       Alert.alert("Error", err.message);
@@ -244,6 +240,7 @@ export default function Profile() {
             )}
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, marginBottom: 4 }}>DISPLAY NAME</Text>
             <TextInput 
               style={[styles.nameInput, { color: colors.textPrimary }]} 
               value={newName} 
@@ -254,8 +251,12 @@ export default function Profile() {
             <Text style={[styles.uemail, { color: colors.textSecondary }]}>{email}</Text>
           </View>
           {newName !== name || selectedAvatar !== (session?.user.user_metadata as any)?.avatar_id ? (
-            <TouchableOpacity onPress={updateProfile} disabled={updating}>
-              {updating ? <ActivityIndicator size="small" color={colors.primary} /> : <Text style={{ color: colors.primary, fontWeight: '700' }}>Save</Text>}
+            <TouchableOpacity 
+              onPress={updateProfile} 
+              disabled={updating}
+              style={{ backgroundColor: colors.primary, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 }}
+            >
+              {updating ? <ActivityIndicator size="small" color="#fff" /> : <Text style={{ color: '#fff', fontWeight: '700' }}>Save</Text>}
             </TouchableOpacity>
           ) : null}
         </View>

@@ -22,6 +22,8 @@ import { WidgetService, Widget } from '../../src/services/WidgetService';
 import { useWidgetData } from '../../src/hooks/useWidgetData';
 import { WidgetRenderer } from '../../src/components/widgets/WidgetRenderer';
 import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
+import { AVATARS } from '../../src/constants/avatars';
+import { Image } from 'react-native';
 
 type Stats = {
   attempts: number;
@@ -53,6 +55,7 @@ export default function Home() {
   const [displayName, setDisplayName] = useState(
     (session?.user.user_metadata as any)?.display_name || session?.user.email?.split('@')[0] || 'Aspirant'
   );
+  const [avatarId, setAvatarId] = useState<string>((session?.user.user_metadata as any)?.avatar_id || '');
   const name = displayName;
   const pulseCardGap = 12;
   const pulseColumns = windowWidth >= 900 ? 4 : 2;
@@ -105,6 +108,10 @@ export default function Home() {
     AsyncStorage.getItem('profile_display_name').then((v) => {
       if (v && v.trim()) setDisplayName(v.trim());
       else setDisplayName((session?.user.user_metadata as any)?.display_name || session?.user.email?.split('@')[0] || 'Aspirant');
+    });
+    AsyncStorage.getItem('profile_avatar_id').then((v) => {
+      if (v) setAvatarId(v);
+      else setAvatarId((session?.user.user_metadata as any)?.avatar_id || '');
     });
   }, [session]));
 
@@ -308,8 +315,15 @@ export default function Home() {
                   <Text style={[styles.userName, { color: colors.textPrimary }]}>{name}.</Text>
                 </View>
                 <TouchableOpacity onPress={() => router.push('/profile')} style={styles.profileBtn}>
-                  <LinearGradient colors={[colors.primary, colors.primary + 'CC']} style={styles.avatarWrap}>
-                    <Text style={styles.avatarTxt}>{(name[0] || 'A').toUpperCase()}</Text>
+                  <LinearGradient colors={[colors.primary, colors.primary + 'CC']} style={[styles.avatarWrap, { overflow: 'hidden' }]}>
+                    {avatarId ? (
+                      <Image 
+                        source={AVATARS.find(a => a.id === avatarId)?.uri} 
+                        style={{ width: '100%', height: '100%' }} 
+                      />
+                    ) : (
+                      <Text style={styles.avatarTxt}>{(name[0] || 'A').toUpperCase()}</Text>
+                    )}
                   </LinearGradient>
                 </TouchableOpacity>
               </View>

@@ -54,13 +54,12 @@ function RootStack() {
       <Stack screenOptions={{ 
         headerShown: false, 
         contentStyle: { backgroundColor: 'transparent' },
-        animation: 'slide_from_right',
-        animationDuration: 400,
+        animation: 'none',
         gestureEnabled: true,
         fullScreenGestureEnabled: false,
       }}>
-        <Stack.Screen name="index" options={{ animation: 'fade' }} />
-        <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
+        <Stack.Screen name="index" options={{ animation: 'fade', gestureEnabled: false }} />
+        <Stack.Screen name="(tabs)" options={{ animation: 'fade', gestureEnabled: false }} />
         <Stack.Screen name="notes" options={{ animation: 'slide_from_right', gestureEnabled: true, fullScreenGestureEnabled: false }} />
       </Stack>
       <DownloadManager />

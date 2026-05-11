@@ -290,11 +290,13 @@ export class FlashcardSvc {
     const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
     // A card is "introduced today" if last_reviewed is today AND it was previously not_studied.
     // Approx: count card_reviews where prev_interval=0 AND reviewed_at >= today.
+    // Also filter out deleted cards.
     let q = supabase
       .from('card_reviews')
       .select('id, card_id, cards!inner(subject, section_group, microtopic)', { count: 'exact', head: true })
       .eq('user_id', userId)
       .eq('prev_interval', 0)
+      .eq('cards.is_deleted', false)
       .gte('reviewed_at', startOfDay.toISOString());
     if (folder.subject) q = q.eq('cards.subject', folder.subject);
     if (folder.section && folder.section !== 'General') q = q.eq('cards.section_group', folder.section);
@@ -386,6 +388,24 @@ export class FlashcardSvc {
       // Multiple taps / stale callbacks can race here. Treat duplicate link as success.
       if (error && !this.isUniqueViolation(error, 'uq_user_cards_user_card')) throw error;
     }
+
+    // Update local cache with the new card
+    const { upsertFlashcard } = await import('../repositories/flashcards.repo');
+    upsertFlashcard({
+      id: card!.id,
+      user_id: userId,
+      front_text: frontText,
+      back_text: backText,
+      front_image_url: input.front_image_url || null,
+      back_image_url: input.back_image_url || null,
+      subject: input.subject || 'General',
+      section_group: input.section_group || 'General',
+      microtopic: input.microtopic || 'General',
+      card_type: input.card_type || 'manual',
+      source: input.source || {},
+      deleted: false,
+      updated_at: new Date().toISOString(),
+    });
 
     return card!.id;
   }
@@ -756,14 +776,19 @@ export class FlashcardSvc {
 
   static async softDeleteCardForUser(userId: string, cardId: string) {
     await this.ensureUserHasCard(userId, cardId);
-    // 1. Delete user_cards row (hard delete from Supabase, not soft-delete)
+
+    // 1. Update local cache to mark as deleted immediately
+    const { deleteFlashcard } = await import('../repositories/flashcards.repo');
+    deleteFlashcard(cardId);
+
+    // 2. Delete user_cards row (hard delete from Supabase, not soft-delete)
     const { error } = await supabase
       .from('user_cards')
       .delete()
       .eq('user_id', userId).eq('card_id', cardId);
     if (error) throw error;
 
-    // 2. Clean up flashcard_branch_cards references
+    // 3. Clean up flashcard_branch_cards references
     try {
       await supabase
         .from('flashcard_branch_cards')
@@ -774,7 +799,7 @@ export class FlashcardSvc {
       console.warn('[softDeleteCardForUser] branch_cards cleanup failed (non-fatal):', e);
     }
 
-    // 3. Clean up card_reviews
+    // 4. Clean up card_reviews
     try {
       await supabase
         .from('card_reviews')

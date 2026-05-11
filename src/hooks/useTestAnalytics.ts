@@ -267,7 +267,7 @@ export function useAggregateTestAnalytics(userId: string | null) {
         let attempts = await OfflineManager.getOfflineAttempts(userId);
         const { data: remoteData } = await supabase
           .from('test_attempts')
-          .select('id, submitted_at, attempt_payload, score, title')
+          .select('id, submitted_at, attempt_payload, score')
           .eq('user_id', userId)
           .not('submitted_at', 'is', null)
           .order('submitted_at', { ascending: true });

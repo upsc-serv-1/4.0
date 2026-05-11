@@ -76,8 +76,10 @@ import {
   Copy,
   Wand2,
   Undo2,
-  Redo2
+  Redo2,
+  FileDown
 } from 'lucide-react-native';
+import { UnifiedExportSheet } from '../../src/components/export/UnifiedExportSheet';
 import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 import RichNoteEditor from '../../src/components/RichNoteEditor';
 import { aiTransformNoteContent } from '../../src/services/GeminiService';
@@ -105,6 +107,7 @@ import { OfflineManager } from '../../src/services/OfflineManager';
 import { LocalQuery } from '../../src/services/LocalQuery';
 import { useFlashcardAction } from '../../src/hooks/useFlashcardAction';
 import { SharedQuestionCard } from '../../src/components/unified/SharedQuestionCard';
+import { MyVitaminEditorSheet } from '../../src/components/unified/MyVitaminEditorSheet';
 import {
   aiExplainQuestion,
   aiSummarizeExplanation,
@@ -126,7 +129,7 @@ import { OptionButton } from '../../src/components/unified/OptionButton';
 const ThemeSwitcher = require('../../src/components/ThemeSwitcher').ThemeSwitcher;
 
 const { width, height } = Dimensions.get('window');
-
+const isTablet = width >= 768;
 
 
 // Shared Markdown utilities are now imported from src/utils/markdownUtils.tsx
@@ -432,6 +435,9 @@ export default function UnifiedQuizEngine() {
 
   // 🆕 Declare arenaMode FIRST — fixes TDZ crash
   const [arenaMode, setArenaMode] = useState<'learning' | 'exam'>((params.mode as 'learning' | 'exam') || 'learning');
+  const [vitaminEditorVisible, setVitaminEditorVisible] = useState(false);
+  const [vitaminEditorContent, setVitaminEditorContent] = useState('');
+  const [editingQuestion, setEditingQuestion] = useState<any>(null);
 
   // 3. Store Selectors — must be before hasUnsavedLearningProgress
   const currentAnswers = store.answers;
@@ -454,6 +460,15 @@ export default function UnifiedQuizEngine() {
   const [improvePromptOpen, setImprovePromptOpen] = useState<Record<string, boolean>>({});
   const [improvePromptText, setImprovePromptText] = useState<Record<string, string>>({});
   const [improving, setImproving]           = useState<Record<string, boolean>>({});
+
+  // AI Chat FAB states
+  const [activeAiQuestion, setActiveAiQuestion] = useState<any>(null);
+  const [aiChatTrigger, setAiChatTrigger] = useState(0);
+
+  const handleAiChat = useCallback((item: any) => {
+    setActiveAiQuestion(item);
+    setAiChatTrigger(prev => prev + 1);
+  }, []);
 
   // Build the InstituteExplanation[] payload for AI prompts from the question's
   // _explanations array (already built by merger.ts at fetch time).
@@ -557,6 +572,35 @@ export default function UnifiedQuizEngine() {
       Alert.alert('Save failed', e?.message || 'Could not save best answer.');
     } finally {
       setSavingBest(prev => ({ ...prev, [id]: false }));
+    }
+  };
+
+  const handleEditVitamin = (item: any) => {
+    const id = item.id || item.question_id;
+    const existing = bestAnswers[id];
+    setEditingQuestion(item);
+    setVitaminEditorContent(existing?.answer_text || aiExplanations[id] || '');
+    setVitaminEditorVisible(true);
+  };
+
+  const handleSaveVitamin = async (content: string) => {
+    if (!editingQuestion) return;
+    const id = editingQuestion.id || editingQuestion.question_id;
+    setSavingBest(prev => ({ ...prev, [id]: true }));
+    try {
+      const saved = await saveBestAnswer(id, content, aiSummaries[id] || null, null);
+      if (saved) {
+        setBestAnswers(prev => ({ ...prev, [id]: saved }));
+        setActiveExplSource(prev => ({ ...prev, [id]: 'vitamin' }));
+        if (Platform.OS === 'android') {
+          (global as any).ToastAndroid?.show('My Vitamin saved!', (global as any).ToastAndroid?.SHORT);
+        }
+      }
+    } catch (e: any) {
+      Alert.alert('Save failed', e?.message || 'Could not save My Vitamin.');
+    } finally {
+      setSavingBest(prev => ({ ...prev, [id]: false }));
+      setVitaminEditorVisible(false);
     }
   };
 
@@ -830,8 +874,40 @@ export default function UnifiedQuizEngine() {
     if (timerType === 'none') setShowTimerPicker(true);
     else setShowClockControl(true);
   };
+
+  const prepareExportPayload = () => {
+    if (!questions || questions.length === 0) {
+      Alert.alert("No Questions", "There are no questions to export.");
+      return;
+    }
+    const rows = questions.map((q: any) => ({
+      id: q.id,
+      question_text: q.question_text || q.text || q.statement || '',
+      options: q.options,
+      correct_answer: q.correct_answer || q.correctAnswer,
+      selected_answer: currentAnswers[q.id]?.selectedAnswer || null,
+      is_correct: currentAnswers[q.id]?.selectedAnswer ? (currentAnswers[q.id]?.selectedAnswer === q.correct_answer) : undefined,
+      explanation_markdown: q.explanation_markdown || q.explanation,
+      subject: q.subject,
+      section_group: q.section_group,
+      micro_topic: q.micro_topic,
+      exam_year: q.exam_year,
+      is_pyq: q.is_pyq,
+      is_ncert: q.is_ncert
+    }));
+
+    setExportPayload({
+      kind: 'questions',
+      rows,
+    });
+    setExportSheetVisible(true);
+    setShowQuickMenu(false);
+    setShowPaperQuickMenu(false);
+  };
   const [showQuickMenu, setShowQuickMenu] = useState(false);
   const [showPaperQuickMenu, setShowPaperQuickMenu] = useState(false);
+  const [exportSheetVisible, setExportSheetVisible] = useState(false);
+  const [exportPayload, setExportPayload] = useState<any>(null);
   const [showPaperPagination, setShowPaperPagination] = useState(false);
   // Simulated Exam Mode (paper view) state
   const [paperPage, setPaperPage] = useState(0); // current paper page (0-indexed)
@@ -2456,10 +2532,12 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
         isAiLoading={aiLoading[item.id]}
         isSavingFlashcard={savingFlashcard[item.id]}
         isFlashcarded={flashcardedIds.has(item.id)}
+        onEditVitamin={handleEditVitamin}
         onRevealExplanation={() => setRevealedExplanations(prev => ({ ...prev, [item.id]: true }))}
         onOptionSelect={handleOptionSelect}
         onAddFlashcard={handleAddToFlashcards}
         onAiExplain={handleAiExplain}
+        onAiChat={handleAiChat}
         onViewSource={handleViewSource}
         onToggleReview={(qid: string) => store.setMetadata(qid, { isReview: !answerData.isReview }, arenaMode === 'exam')}
         userStudyTags={userStudyTags}
@@ -2797,17 +2875,11 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
           }
         ]}>
           <TouchableOpacity
-            onPress={() => {
-              if (!isFromSearch && arenaMode === 'learning') {
-                setShowIndex((visible) => !visible);
-                return;
-              }
-              handleExit();
-            }}
+            onPress={handleExit}
             style={styles.headerBtn}
             testID="engine-top-left-nav-btn"
           >
-            {(!isFromSearch && arenaMode === 'learning')
+            {(!isFromSearch && arenaMode === 'learning' && !showIndex)
               ? <ListIcon size={22} color={isZenMode ? '#433422' : colors.textPrimary} />
               : <ChevronLeft size={24} color={isZenMode ? '#433422' : colors.textPrimary} />}
           </TouchableOpacity>
@@ -2879,21 +2951,25 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
 
 
           <View style={styles.headerActions}>
-            <TouchableOpacity onPress={toggleZenMode} style={styles.headerBtn}>
-              <Sparkles size={20} color={isZenMode ? '#433422' : colors.primary} />
-            </TouchableOpacity>
+            {isTablet && (
+              <TouchableOpacity onPress={toggleZenMode} style={styles.headerBtn}>
+                <Sparkles size={20} color={isZenMode ? '#433422' : colors.primary} />
+              </TouchableOpacity>
+            )}
             {/* Paper / List view toggle (always visible). 'paper' = Simulated Exam Mode. */}
-            <TouchableOpacity
-              onPress={() => {
-                // Toggle between list and card views
-                setViewMode(prev => prev === 'card' ? 'list' : 'card');
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-              }}
-              style={styles.headerBtn}
-              testID="engine-view-toggle"
-            >
-              <BookOpen size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
-            </TouchableOpacity>
+            {isTablet && (
+              <TouchableOpacity
+                onPress={() => {
+                  // Toggle between list and card views
+                  setViewMode(prev => prev === 'card' ? 'list' : 'card');
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+                }}
+                style={styles.headerBtn}
+                testID="engine-view-toggle"
+              >
+                <BookOpen size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
+              </TouchableOpacity>
+            )}
             {/* Palette / Navigator — promoted out of the quick menu so it's
                 always one tap away (essential during a paper-style exam). */}
             <TouchableOpacity
@@ -2918,13 +2994,15 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
               </TouchableOpacity>
             )}
 
-            <TouchableOpacity
-              onPress={() => setShowModelSwitcher(true)}
-              style={styles.headerBtn}
-              testID="engine-ai-switcher-btn"
-            >
-              <Brain size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
-            </TouchableOpacity>
+            {isTablet && (
+              <TouchableOpacity
+                onPress={() => setShowModelSwitcher(true)}
+                style={styles.headerBtn}
+                testID="engine-ai-switcher-btn"
+              >
+                <Brain size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               onPress={handleClockButtonPress}
               style={[styles.headerBtn, timerType !== 'none' && { flexDirection: 'row', gap: 4 }]}
@@ -2943,13 +3021,15 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                 <ListIcon size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
               </TouchableOpacity>
             )}
-            <TouchableOpacity 
-              onPress={() => setDoubtModalVisible(true)}
-              style={styles.headerBtn}
-              testID="engine-ask-doubt-btn"
-            >
-              <MessageSquare size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
-            </TouchableOpacity>
+            {isTablet && (
+              <TouchableOpacity 
+                onPress={() => setDoubtModalVisible(true)}
+                style={styles.headerBtn}
+                testID="engine-ask-doubt-btn"
+              >
+                <MessageSquare size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
+              </TouchableOpacity>
+            )}
             <TouchableOpacity onPress={() => setShowQuickMenu(!showQuickMenu)} style={styles.headerBtn}>
               <MoreVertical size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
             </TouchableOpacity>
@@ -3090,6 +3170,15 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                 <LayoutGrid size={16} color={colors.textPrimary} />
                 <Text style={{ color: colors.textPrimary, fontWeight: '800', fontSize: 12 }}>Palette</Text>
               </TouchableOpacity>
+
+              <TouchableOpacity
+                style={stylesPaper.paperQuickMenuItem}
+                onPress={prepareExportPayload}
+                testID="paper-quick-export"
+              >
+                <FileDown size={16} color={colors.textPrimary} />
+                <Text style={{ color: colors.textPrimary, fontWeight: '800', fontSize: 12 }}>Export PDF</Text>
+              </TouchableOpacity>
             </View>
           </Pressable>
         </Modal>
@@ -3105,12 +3194,44 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
             <Modal visible={showQuickMenu} transparent animationType="none" onRequestClose={() => setShowQuickMenu(false)}>
               <Pressable style={StyleSheet.absoluteFill} onPress={() => setShowQuickMenu(false)}>
                 <View style={[styles.verticalMenu, { backgroundColor: colors.surface, borderColor: colors.border, top: Platform.OS === 'ios' ? 100 : 80 }]}>
-                  <TouchableOpacity 
-                    style={styles.utilBtn} 
-                    onPress={() => { setShowFontSlider(true); setShowQuickMenu(false); }}
-                  >
-                    <Text style={{ fontWeight: '900', color: colors.textPrimary, fontSize: 16 }}>Aa</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity 
+                      style={styles.utilBtn} 
+                      onPress={() => { setShowFontSlider(true); setShowQuickMenu(false); }}
+                    >
+                      <Text style={{ fontWeight: '900', color: colors.textPrimary, fontSize: 16 }}>Aa</Text>
+                    </TouchableOpacity>
+
+                    {!isTablet && (
+                      <>
+                        <TouchableOpacity 
+                          style={styles.utilBtn} 
+                          onPress={() => { setShowModelSwitcher(true); setShowQuickMenu(false); }}
+                        >
+                          <Brain size={20} color={colors.textPrimary} />
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                          style={styles.utilBtn} 
+                          onPress={() => { setDoubtModalVisible(true); setShowQuickMenu(false); }}
+                        >
+                          <MessageSquare size={20} color={colors.textPrimary} />
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                          style={styles.utilBtn} 
+                          onPress={() => { toggleZenMode(); setShowQuickMenu(false); }}
+                        >
+                          <Sparkles size={20} color={isZenMode ? colors.primary : colors.textPrimary} />
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                          style={styles.utilBtn} 
+                          onPress={() => { 
+                            setViewMode(prev => prev === 'card' ? 'list' : 'card');
+                            setShowQuickMenu(false); 
+                          }}
+                        >
+                          <BookOpen size={20} color={colors.textPrimary} />
+                        </TouchableOpacity>
+                      </>
+                    )}
 
 
                   <TouchableOpacity 
@@ -3122,6 +3243,13 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
 
 
                   
+                  <TouchableOpacity 
+                    style={styles.utilBtn} 
+                    onPress={prepareExportPayload}
+                  >
+                    <FileDown size={20} color={colors.textPrimary} />
+                  </TouchableOpacity>
+
                   <View style={{ height: 1, backgroundColor: colors.border, width: '100%', marginVertical: 4 }} />
                   
                   <ThemeSwitcher />
@@ -4260,14 +4388,58 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
 
         {/* Floating Context-Aware AI Chat Card overlay */}
         <PilotV2AIChat
-          activeQuestion={questions[currentIndex]}
+          activeQuestion={activeAiQuestion || questions[currentIndex]}
+          externalOpenTrigger={aiChatTrigger}
           onSaveResponse={(text: string) => {
-            const q = questions[currentIndex];
+            const q = activeAiQuestion || questions[currentIndex];
             if (!q) return;
             setPilotSaveTargetQuestion(q);
             setPilotSaveHtml(markdownToHtml(text || ''));
             setPilotV2SaveOpen(true);
           }}
+        />
+
+        <UnifiedExportSheet
+          visible={exportSheetVisible}
+          onClose={() => setExportSheetVisible(false)}
+          payload={exportPayload}
+          title={sessionName || customTestName || 'Practice Session'}
+          initialOptions={{
+            title: sessionName || customTestName || 'Practice Session Report',
+            moduleName: 'Quiz Engine Export',
+            headerText: 'Noji AI Quiz Engine',
+            footerText: 'Generated by Noji AI'
+          }}
+          renderExtraFilters={(o, setO) => (
+            userStudyTags.length > 0 ? (
+              <View style={{ marginTop: 6 }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 6 }}>REVISION TAGS</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                  {userStudyTags.map(tag => {
+                    const isActive = (o.revisionTags || []).includes(tag);
+                    return (
+                      <TouchableOpacity
+                        key={tag}
+                        onPress={() => setO(prev => ({ ...prev, revisionTags: isActive ? (prev.revisionTags || []).filter(t => t !== tag) : [...(prev.revisionTags || []), tag] }))}
+                        style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: 1, backgroundColor: isActive ? colors.primary : colors.surfaceStrong, borderColor: isActive ? colors.primary : colors.border }}
+                      >
+                        <Text style={{ fontSize: 11, fontWeight: '800', color: isActive ? '#fff' : colors.textPrimary }}>{tag}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            ) : null
+          )}
+        />
+
+        <MyVitaminEditorSheet
+          visible={vitaminEditorVisible}
+          onClose={() => setVitaminEditorVisible(false)}
+          onSave={handleSaveVitamin}
+          initialContent={vitaminEditorContent}
+          questionText={editingQuestion?.question_text || editingQuestion?.question || ''}
+          seedQuestion={editingQuestion}
         />
       </SafeAreaView>
     </PageWrapper>

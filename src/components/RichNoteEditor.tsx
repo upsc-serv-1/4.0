@@ -9,6 +9,7 @@ type Props = {
   editorStyle?: any;
   placeholder?: string;
   onFocus?: () => void;
+  useContainer?: boolean;
 };
 
 /**
@@ -20,10 +21,10 @@ type Props = {
  * which is preserved exactly when exporting to PDF via the notesPdfEngine.
  */
 const RichNoteEditor = forwardRef<any, Props>((props, ref) => {
-  const { html, onChange, themeColors, editorStyle, placeholder, onFocus } = props;
+  const { html, onChange, themeColors, editorStyle, placeholder, onFocus, useContainer = true } = props;
 
   return (
-    <View style={{ flex: 1, backgroundColor: themeColors.bg || '#ffffff' }}>
+    <View style={{ flex: useContainer ? 1 : undefined, backgroundColor: themeColors.bg || '#ffffff' }}>
       <RichEditor
         ref={ref as any}
         initialContentHTML={html}
@@ -47,18 +48,21 @@ const RichNoteEditor = forwardRef<any, Props>((props, ref) => {
             caret-color: ${themeColors.primary || '#6366f1'};
           `,
           cssText: `
-            b, strong { font-weight: 700; }
+            body, p, li, div { font-size: 16px !important; line-height: 1.6; }
+            h1 { font-size: 24px !important; font-weight: 800; margin-top: 12px; margin-bottom: 6px; }
+            h2 { font-size: 20px !important; font-weight: 700; margin-top: 10px; margin-bottom: 5px; }
+            h3 { font-size: 18px !important; font-weight: 700; margin-top: 8px; margin-bottom: 4px; }
+            b, strong { font-weight: bold !important; }
             i, em { font-style: italic; }
             u { text-decoration: underline; }
             mark, .highlight { background-color: #FFF59D; padding: 0 2px; border-radius: 2px; }
-            ul, ol { padding-left: 20px; margin: 6px 0; }
-            li { margin: 2px 0; }
-            blockquote { border-left: 3px solid ${themeColors.primary || '#6366f1'}; padding-left: 10px; color: #555; }
-            p { margin: 4px 0; }
+            ul, ol { padding-left: 20px; margin: 8px 0; font-size: 16px; }
+            li { margin: 4px 0; }
+            blockquote { border-left: 3px solid ${themeColors.primary || '#6366f1'}; padding-left: 10px; color: #555; font-style: italic; }
+            p { margin: 6px 0; }
           `,
-          ...(editorStyle || {}),
         }}
-        useContainer
+        useContainer={useContainer}
         initialHeight={editorStyle?.minHeight ?? 320}
       />
     </View>

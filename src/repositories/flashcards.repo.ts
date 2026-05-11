@@ -12,6 +12,15 @@ import { SyncQueue } from '../services/SyncQueue';
 
 const CARDS_KEY = '@user_cards_flashcards';
 
+// Register sync callback to invalidate cache after card deletions are synced
+SyncQueue.onFlush((kind, payload) => {
+  if (kind === 'card_delete') {
+    // After card deletion syncs, clear cache to force refresh from Supabase
+    KVStore.delete(CARDS_KEY);
+    KVStore.delete('@cards_all');
+  }
+});
+
 export type Flashcard = {
   id: string;
   user_id: string;
@@ -51,6 +60,11 @@ export const upsertFlashcard = (input: Partial<Flashcard> & { user_id: string })
   const merged = [...list.filter(c => c.id !== id), next];
   KVStore.setJson(CARDS_KEY, merged);
 
+  // Also sync with OfflineManager's cards cache (@cards_all)
+  const offlineCards = KVStore.getJson<Flashcard[]>('@cards_all') ?? [];
+  const offlineMerged = [...offlineCards.filter(c => c.id !== id), next];
+  KVStore.setJson('@cards_all', offlineMerged);
+
   // Enqueue for remote sync — strip _dirty before sending
   const { _dirty, ...payload } = next;
   SyncQueue.enqueue('card_review', payload);
@@ -60,9 +74,21 @@ export const upsertFlashcard = (input: Partial<Flashcard> & { user_id: string })
 export const deleteFlashcard = (id: string) => {
   const list = KVStore.getJson<Flashcard[]>(CARDS_KEY) ?? [];
   const now = new Date().toISOString();
-  KVStore.setJson(
-    CARDS_KEY,
-    list.map(c => (c.id === id ? { ...c, deleted: true, _dirty: true, updated_at: now } : c)),
-  );
-  SyncQueue.enqueue('card_review', { id, deleted: true, updated_at: now });
+  // Update local cache to mark as deleted
+  const updated = list.map(c => (c.id === id ? { ...c, deleted: true, _dirty: true, updated_at: now } : c));
+  KVStore.setJson(CARDS_KEY, updated);
+
+  // Also update the OfflineManager's cards cache (@cards_all)
+  const offlineCards = KVStore.getJson<Flashcard[]>('@cards_all') ?? [];
+  const updatedOffline = offlineCards.map(c => (c.id === id ? { ...c, deleted: true, updated_at: now } : c));
+  KVStore.setJson('@cards_all', updatedOffline);
+
+  // Enqueue sync to Supabase — use card_delete to properly update cards.is_deleted
+  SyncQueue.enqueue('card_delete', { id, updated_at: now });
+};
+
+/** Clear the flashcard cache to force a refresh from Supabase on next read. */
+export const invalidateFlashcardCache = () => {
+  KVStore.delete(CARDS_KEY);
+  KVStore.delete('@cards_all');
 };

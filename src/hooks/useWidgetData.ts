@@ -115,9 +115,10 @@ export function useWidgetData(userId: string | undefined) {
       // 7. PYQ Years Coverage (derived from attempts with UPSC titles)
       const coveredYears = new Set(
         attempts
-          .filter(a => a.title?.toLowerCase().includes('upsc'))
+          .filter(a => (a.attempt_payload?.title || a.title)?.toLowerCase().includes('upsc'))
           .map(a => {
-            const match = a.title?.match(/20\d{2}/);
+            const title = a.attempt_payload?.title || a.title;
+            const match = title?.match(/20\d{2}/);
             return match ? parseInt(match[0]) : null;
           })
           .filter(Boolean)
@@ -182,7 +183,7 @@ export function useWidgetData(userId: string | undefined) {
         supabase.from('question_states').select('question_id, is_incorrect_last_attempt, updated_at, review_tags').eq('user_id', userId),
         supabase.from('user_cards').select('id, learning_status, next_review, status, cards!inner(id, is_deleted)').eq('user_id', userId).eq('cards.is_deleted', false),
         supabase.from('user_notes').select('id, title, updated_at').eq('user_id', userId).order('updated_at', { ascending: false }).limit(5),
-        supabase.from('test_attempts').select('id, title, score, total, submitted_at, duration_seconds').eq('user_id', userId).order('submitted_at', { ascending: false }).limit(20),
+        supabase.from('test_attempts').select('id, attempt_payload, score, total, submitted_at, duration_seconds').eq('user_id', userId).order('submitted_at', { ascending: false }).limit(20),
       ]);
 
       if (!statesRes.error && !cardsRes.error && !notesRes.error && !attemptsRes.error) {

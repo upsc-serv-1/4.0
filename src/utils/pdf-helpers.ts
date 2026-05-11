@@ -51,6 +51,11 @@ export const generateAnalyticsPdfHtml = ({
       if (labels.length > 10 && i % 2 !== 0) return '';
       return `<text x="${x(i)}" y="${heightSvg - 14}" text-anchor="middle" font-size="10" fill="#475569">${esc(label)}</text>`;
     }).join('');
+    
+    // Add numerical value labels above each point
+    const valueLabels = values.map((v, i) => {
+      return `<text x="${x(i)}" y="${y(v) - 10}" text-anchor="middle" font-size="11" font-weight="bold" fill="${color}" style="fill: ${color} !important;">${Math.round(v)}</text>`;
+    }).join('');
 
     return `
       <div class="section-container">
@@ -61,6 +66,7 @@ export const generateAnalyticsPdfHtml = ({
             ${[0, 25, 50, 75, 100].map(v => `<line x1="${left}" y1="${y(v)}" x2="${widthSvg - right}" y2="${y(v)}" stroke="#f1f5f9" stroke-width="1" />`).join('')}
             <polyline fill="none" stroke="${color}" stroke-width="3" points="${points}" />
             ${values.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="${color}" stroke="#fff" stroke-width="2" />`).join('')}
+            ${valueLabels}
             ${xLabels}
           </svg>
         </div>
@@ -167,8 +173,10 @@ export const generateAnalyticsPdfHtml = ({
     }));
     dItems.sort((a, b) => a.accuracy - b.accuracy);
     const displayRows = dItems.slice(0, 10);
-    const lastTests = trends.historicalScores.slice(-5);
-    if (displayRows.length === 0) return '';
+    // Use all historicalScores from filtered trends (respects current filter selection)
+    // Limit to last 15 for readability if many tests are selected
+    const testsForHeatmap = trends.historicalScores.slice(Math.max(0, trends.historicalScores.length - 15));
+    if (displayRows.length === 0 || testsForHeatmap.length === 0) return '';
 
     return `
       <div class="section-container">
@@ -177,14 +185,14 @@ export const generateAnalyticsPdfHtml = ({
           <thead>
             <tr>
               <th style="background: #f1f5f9; border: none;">Topic</th>
-              ${lastTests.map((t: any) => `<th style="background: #f1f5f9; border: none; text-align: center;">T${t.attemptIndex}</th>`).join('')}
+              ${testsForHeatmap.map((t: any) => `<th style="background: #f1f5f9; border: none; text-align: center;">T${t.attemptIndex}</th>`).join('')}
             </tr>
           </thead>
           <tbody>
             ${displayRows.map((item, rowIndex) => `
               <tr>
                 <td style="font-weight: bold; background: #fff; border: none; padding: 8px;">${esc(item.name)}</td>
-                ${lastTests.map((t: any, colIndex: number) => {
+                ${testsForHeatmap.map((t: any, colIndex: number) => {
                   const mockVar = ((rowIndex + colIndex) % 3) * 10 - 10;
                   const cellAcc = Math.max(0, Math.min(100, item.accuracy + mockVar));
                   const ratio = cellAcc / 100;

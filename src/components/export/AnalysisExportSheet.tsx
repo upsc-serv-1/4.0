@@ -1029,7 +1029,9 @@ const ToggleRow = ({ label, value, onChange, colors }: any) => (
  * question-bank body, so users can export analytics alone.
  */
 async function printStandaloneReport(fragmentHtml: string, o: ExportOptions): Promise<void> {
-  const html = `<!doctype html><html><head><meta charset="utf-8"/>
+  let tempUri: string | null = null;
+  try {
+    const html = `<!doctype html><html><head><meta charset="utf-8"/>
     <style>
       @page { size: A4; margin: ${clamp(o.pageMarginTopCm, 1)}cm ${clamp(o.pageMarginRightCm, 1)}cm ${clamp(o.pageMarginBottomCm, 1)}cm ${clamp(o.pageMarginLeftCm, 1)}cm; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
@@ -1039,24 +1041,57 @@ async function printStandaloneReport(fragmentHtml: string, o: ExportOptions): Pr
       ${o.watermark ? `<div class="watermark">${escapeHtml(o.watermark)}</div>` : ''}
       ${fragmentHtml}
     </body></html>`;
-  const { uri } = await Print.printToFileAsync({ html, base64: false });
-  const safe = (o.title || 'analysis').replace(/[^a-z0-9-_ ]/gi, '_').slice(0, 48) || 'analysis';
-  const dest = `${FileSystem.cacheDirectory}${safe}.pdf`;
-  try { await FileSystem.moveAsync({ from: uri, to: dest }); } catch {}
-  const info = await FileSystem.getInfoAsync(dest);
-  const finalUri = info.exists ? dest : uri;
-  if (await Sharing.isAvailableAsync()) {
-    // Share with generous timeout to prevent hangs on iPad
-    try {
-      await Promise.race([
-        Sharing.shareAsync(finalUri, { mimeType: 'application/pdf', dialogTitle: o.title || 'Analysis Report' }),
-        new Promise<void>((resolve) => setTimeout(resolve, 20000)), // 20 second timeout for large PDFs
-      ]).catch(() => {
-        console.warn('[AnalysisExport] Share operation timed out or failed (non-fatal)');
-      });
+    
+    const { uri } = await Promise.race([
+      Print.printToFileAsync({ html, base64: false }),
+      new Promise<{ uri: string }>((_, reject) => 
+        setTimeout(() => reject(new Error('Print timeout')), 30000) // 30s timeout
+      ),
+    ]);
+    
+    tempUri = uri;
+    const safe = (o.title || 'analysis').replace(/[^a-z0-9-_ ]/gi, '_').slice(0, 48) || 'analysis';
+    const dest = `${FileSystem.cacheDirectory}${safe}_${Date.now()}.pdf`;
+    
+    try { 
+      await FileSystem.moveAsync({ from: uri, to: dest }); 
+      tempUri = dest;
     } catch (e) {
-      console.warn('[AnalysisExport] Share error (non-fatal):', e);
+      console.warn('[AnalysisExport] Move failed, using temp uri', e);
     }
+    
+    const info = await FileSystem.getInfoAsync(tempUri || dest);
+    const finalUri = info.exists ? (tempUri || dest) : uri;
+    
+    if (await Sharing.isAvailableAsync()) {
+      try {
+        // Use timeout to prevent indefinite hangs on print preview
+        const sharePromise = Sharing.shareAsync(finalUri, { 
+          mimeType: 'application/pdf', 
+          dialogTitle: o.title || 'Analysis Report' 
+        });
+        
+        await Promise.race([
+          sharePromise,
+          new Promise<void>((resolve) => setTimeout(resolve, 25000)), // 25 second timeout
+        ]).catch(() => {
+          console.warn('[AnalysisExport] Share operation completed/timed out');
+        });
+      } catch (e) {
+        console.warn('[AnalysisExport] Share error (non-fatal):', e);
+      }
+    }
+  } catch (e) {
+    console.error('[AnalysisExport] Print operation failed:', e);
+    throw e;
+  } finally {
+    // Cleanup: delete temporary files after a short delay to allow sharing to complete
+    setTimeout(() => {
+      if (tempUri) {
+        FileSystem.deleteAsync(tempUri, { idempotent: true })
+          .catch(err => console.warn('[AnalysisExport] Cleanup failed:', err));
+      }
+    }, 2000);
   }
 }
 

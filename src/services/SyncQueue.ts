@@ -33,6 +33,7 @@ export type SyncKind =
   | 'note_upsert'            // payload = user_notes row
   | 'card_review'            // payload = { user_id, card_id, ...srs fields }
   | 'user_card_upsert'       // payload = user_cards row
+  | 'card_delete'            // payload = { id, updated_at } - mark card as deleted
   | 'card_review_insert'     // payload = card_reviews row
   | 'study_session_upsert';  // payload = study_sessions daily aggregate row
 
@@ -67,7 +68,20 @@ function saveDead(list: SyncItem[]) {
   KVStore.setJson(DEADLETTER_KEY, list);
 }
 
+// Callbacks invoked after a successful sync — allows dependent services to refresh
+type SyncCallback = (kind: SyncKind, payload: any) => void;
+const syncCallbacks: SyncCallback[] = [];
+
 export const SyncQueue = {
+  /** Register a callback to be invoked after successful sync of a particular kind. */
+  onFlush(callback: SyncCallback): () => void {
+    syncCallbacks.push(callback);
+    return () => {
+      const idx = syncCallbacks.indexOf(callback);
+      if (idx !== -1) syncCallbacks.splice(idx, 1);
+    };
+  },
+
   /** Enqueue a new mutation for eventual sync. Returns the assigned id. */
   enqueue(kind: SyncKind, payload: any): string {
     const item: SyncItem = {
@@ -121,6 +135,14 @@ export const SyncQueue = {
       try {
         await dispatch(item);
         flushed += 1;
+        // Invoke callbacks for successful sync
+        syncCallbacks.forEach(cb => {
+          try {
+            cb(item.kind, item.payload);
+          } catch (e) {
+            console.warn('[SyncQueue] callback error', e);
+          }
+        });
       } catch (e: any) {
         item.attempts += 1;
         item.last_error = e?.message || String(e);
@@ -190,6 +212,15 @@ async function dispatch(item: SyncItem) {
       const { error } = await supabase
         .from('user_cards')
         .upsert(item.payload, { onConflict: 'user_id,card_id' });
+      if (error) throw error;
+      return;
+    }
+    case 'card_delete': {
+      // Mark card as deleted in the cards table by setting is_deleted = true
+      const { error } = await supabase
+        .from('cards')
+        .update({ is_deleted: true, updated_at: item.payload.updated_at })
+        .eq('id', item.payload.id);
       if (error) throw error;
       return;
     }

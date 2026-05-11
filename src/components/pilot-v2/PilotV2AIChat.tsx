@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TextInput, 
-  ScrollView, 
-  TouchableOpacity, 
-  Keyboard, 
-  useWindowDimensions, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+  TouchableOpacity,
+  Keyboard,
+  useWindowDimensions,
   Platform,
   ActivityIndicator,
   Clipboard
 } from 'react-native';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
   withTiming,
-  interpolate, 
+  interpolate,
   Extrapolate,
   Easing
 } from 'react-native-reanimated';
@@ -36,7 +36,7 @@ interface Message {
 // Global session-level cache to guarantee conversation histories are 100% persistent across question swaps
 const globalHistoryCache: Record<string, Message[]> = {};
 
-export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse }: PilotV2AIChatProps) {
+export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse, externalOpenTrigger }: PilotV2AIChatProps) {
   const { colors } = useTheme();
   const { session } = useAuth();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -46,9 +46,9 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
   const [isLoading, setIsLoading] = useState(false);
   const [templates, setTemplates] = useState<PromptTemplate[]>(DEFAULT_QUIZ_TEMPLATES);
   const [copiedId, setCopiedId] = useState<number | null>(null);
-  
+
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Hello! I am Dr. UPSC Assistant, your personal GS and Polity tutor. Ask me anything or choose a preset mode below!' }
+    { role: 'assistant', content: 'Hello! I am Dr. UPSC, your personal tutor. Ask me anything or choose a preset mode above!' }
   ]);
 
   // When `true`, tapping a preset combines the user-typed prompt + the preset
@@ -70,30 +70,46 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
     try {
       const temps = await promptManager.fetchPromptTemplates(session.user.id, 'quiz');
       if (temps.length > 0) setTemplates(temps);
-    } catch {}
+    } catch { }
   };
 
   // Sync and load/save messages from globalHistoryCache when activeQuestion changes
   useEffect(() => {
-    if (activeQuestion?.id) {
+    if (activeQuestion?.id && session?.user?.id) {
       const cached = globalHistoryCache[activeQuestion.id];
       if (cached && cached.length > 0) {
         setMessages(cached);
       } else {
-        const initial: Message[] = [
-          { role: 'assistant', content: 'Hello! I am Dr. UPSC Assistant, your personal GS and Polity tutor. Ask me anything or choose a preset mode below!' }
-        ];
-        setMessages(initial);
-        globalHistoryCache[activeQuestion.id] = initial;
+        // Try fetching from Supabase first
+        promptManager.getConversationHistory(session.user.id, activeQuestion.id)
+          .then(history => {
+            if (history && history.length > 0) {
+              setMessages(history);
+              globalHistoryCache[activeQuestion.id] = history;
+            } else {
+              const initial: Message[] = [
+                { role: 'assistant', content: 'Hello! I am Dr. UPSC, your personal tutor. Ask me anything or choose a preset mode above!' }
+              ];
+              setMessages(initial);
+              globalHistoryCache[activeQuestion.id] = initial;
+            }
+          })
+          .catch(() => {
+            const initial: Message[] = [
+              { role: 'assistant', content: 'Hello! I am Dr. UPSC, your personal tutor. Ask me anything or choose a preset mode above!' }
+            ];
+            setMessages(initial);
+            globalHistoryCache[activeQuestion.id] = initial;
+          });
       }
     }
-  }, [activeQuestion?.id]);
+  }, [activeQuestion?.id, session?.user?.id]);
 
   // Sync isOpen state changes with highly-damped premium ease transition (strictly no bouncing)
   useEffect(() => {
-    progress.value = withTiming(isOpen ? 1 : 0, { 
-      duration: 360, 
-      easing: Easing.out(Easing.quad) 
+    progress.value = withTiming(isOpen ? 1 : 0, {
+      duration: 360,
+      easing: Easing.out(Easing.quad)
     });
   }, [isOpen]);
 
@@ -103,6 +119,12 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
       setIsOpen(false);
     }
   }, [isOtherPopupOpen]);
+
+  useEffect(() => {
+    if (externalOpenTrigger) {
+      setIsOpen(true);
+    }
+  }, [externalOpenTrigger]);
 
   // Premium timing-based tracking (completely eliminates button shaking/bouncing)
   useEffect(() => {
@@ -160,11 +182,15 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
         role: 'assistant',
         content: response,
       };
-      
+
       setMessages(prev => {
         const next = [...prev, aiMsg];
         if (activeQuestion?.id) {
           globalHistoryCache[activeQuestion.id] = next;
+          if (session?.user?.id) {
+            promptManager.saveMessage(session.user.id, activeQuestion.id, userMsg);
+            promptManager.saveMessage(session.user.id, activeQuestion.id, aiMsg);
+          }
         }
         return next;
       });
@@ -239,13 +265,6 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  // GPU-interpolated morphing and positioning animation
-  // NOTE: previously the height used `interpolate(progress, ...)` AND a
-  // dynamic keyboard offset which together produced a visible jump (the
-  // panel collapsed → expanded → settled).  We removed the keyboard term
-  // from the interpolation so the *open* height stays rock-stable as soon
-  // as progress reaches 1.  Default is now ~88% of screen (was 72%) so the
-  // AI output box has plenty of room for long replies.
   const containerAnimatedStyle = useAnimatedStyle(() => {
     const isTablet = screenWidth >= 768;
 
@@ -261,8 +280,8 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
     const finalHeight = interpolate(progress.value, [0, 1], [64, baseHeight]);
     const borderRadius = interpolate(progress.value, [0, 1], [32, isFullscreen ? 16 : 20]);
 
-    // Bottom only lifts when the keyboard is up — never collapses height.
-    const finalBottom = interpolate(progress.value, [0, 1], [24, 24 + keyboardHeight.value * 0.5]);
+    // Bottom lifts when the keyboard is up to keep the whole card visible.
+    const finalBottom = 24;
 
     return {
       width: finalWidth,
@@ -286,7 +305,6 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
   });
 
   const chatStyle = useAnimatedStyle(() => {
-    // Fast fade-out of contents during closing (progress < 0.55) to prevent squishing or double-collapse stutter
     const opacity = interpolate(progress.value, [0.55, 1], [0, 1], Extrapolate.CLAMP);
     const scale = interpolate(progress.value, [0.55, 1], [0.96, 1], Extrapolate.CLAMP);
     return {
@@ -301,8 +319,8 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
     <Animated.View
       style={[
         styles.cardContainer,
-        { 
-          backgroundColor: colors.surface, 
+        {
+          backgroundColor: colors.surface,
           borderColor: colors.border,
           shadowColor: '#5B4EFA',
         },
@@ -324,7 +342,7 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
 
       {/* Morph State 2: Expanded AI Assistant Card */}
       <Animated.View style={chatStyle}>
-        {/* Header Row with Branding and Fullscreen Toggle */}
+        {/* Header Row */}
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
           <View style={styles.headerTitleContainer}>
             <View style={[styles.logoCircle, { backgroundColor: '#EEECFF' }]}>
@@ -336,16 +354,8 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
             </View>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <TouchableOpacity 
-              onPress={() => setIsFullscreen(!isFullscreen)} 
-              style={styles.headerBtn}
-              activeOpacity={0.7}
-            >
-              {isFullscreen ? (
-                <Minimize2 size={16} color={colors.textSecondary} />
-              ) : (
-                <Maximize2 size={16} color={colors.textSecondary} />
-              )}
+            <TouchableOpacity onPress={() => setIsFullscreen(!isFullscreen)} style={styles.headerBtn}>
+              {isFullscreen ? <Minimize2 size={16} color={colors.textSecondary} /> : <Maximize2 size={16} color={colors.textSecondary} />}
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setIsOpen(false)} style={styles.closeBtn}>
               <X size={16} color={colors.textSecondary} />
@@ -353,11 +363,11 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
           </View>
         </View>
 
-        {/* Top-Anchored Dynamic Input Bar */}
-        <View style={[styles.inputContainer, { borderBottomColor: colors.border }]}>
+        {/* Input Bar — Moved back to top per user request */}
+        <View style={[styles.inputContainer, { borderBottomColor: colors.border, borderBottomWidth: 1 }]}>
           <TextInput
             style={[styles.input, { color: colors.textPrimary, backgroundColor: colors.surfaceStrong }]}
-            placeholder={`Ask a UPSC ${activeQuestion?.subject || 'Polity'} query...`}
+            placeholder="Ask a UPSC query..."
             placeholderTextColor={colors.textTertiary}
             value={inputText}
             onChangeText={setInputText}
@@ -368,15 +378,14 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
           </TouchableOpacity>
         </View>
 
-        {/* Compact preset icon chips — replaces the old large "running AI" pills */}
-        <View style={[styles.presetsBar, { borderBottomColor: colors.border }]}>
+        {/* Presets Bar — Under the input */}
+        <View style={[styles.presetsBar, { borderBottomColor: colors.border, borderBottomWidth: 1 }]}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.actionsGrid}>
             {templates.map((template) => (
               <TouchableOpacity
                 key={template.template_key}
                 onPress={() => handleActionPill(template)}
                 style={[styles.pill, { backgroundColor: colors.surfaceStrong, borderColor: colors.border, borderWidth: 1 }]}
-                testID={`pilot-v2-ai-preset-${template.template_key}`}
               >
                 <Text style={{ fontSize: 14 }}>{template.button_emoji || '🤖'}</Text>
                 <Text style={{ color: colors.textPrimary, fontSize: 10, fontWeight: '700', marginLeft: 4 }} numberOfLines={1}>
@@ -390,24 +399,19 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
         {/* Chat Messages */}
         <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
           {messages.map((m, idx) => {
-            // Keep system/pill prompts fully hidden from view
-            if (m.role === 'user' && !m.isManual) {
-              return null;
-            }
+            if (m.role === 'user' && !m.isManual) return null;
             return (
               <View
                 key={idx}
                 style={[
                   styles.msgBubble,
-                  m.role === 'user' 
-                    ? [styles.userMsg, { backgroundColor: '#5B4EFA' }] 
+                  m.role === 'user'
+                    ? [styles.userMsg, { backgroundColor: '#5B4EFA' }]
                     : [styles.aiMsg, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]
                 ]}
               >
                 {m.role === 'user' ? (
-                  <Text style={{ color: '#FFF', fontSize: 13, lineHeight: 18 }}>
-                    {m.content}
-                  </Text>
+                  <Text style={{ color: '#FFF', fontSize: 13, lineHeight: 18 }}>{m.content}</Text>
                 ) : (
                   <View style={{ gap: 8 }}>
                     <Markdown
@@ -419,31 +423,25 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
                     >
                       {m.content}
                     </Markdown>
-                    <TouchableOpacity 
-                      onPress={() => handleCopy(m.content, idx)} 
-                      style={[styles.copyBtn, { borderColor: colors.border }]}
-                      activeOpacity={0.7}
-                    >
-                      {copiedId === idx ? (
-                        <Check size={12} color="#10B981" />
-                      ) : (
-                        <Copy size={12} color={colors.textTertiary} />
-                      )}
-                      <Text style={{ fontSize: 10, color: copiedId === idx ? "#10B981" : colors.textTertiary, fontWeight: '600' }}>
-                        {copiedId === idx ? "Copied!" : "Copy"}
-                      </Text>
-                    </TouchableOpacity>
-                    {!!onSaveResponse && (
+                    <View style={{ flexDirection: 'row', gap: 8 }}>
                       <TouchableOpacity
-                        onPress={() => onSaveResponse(m.content)}
-                        style={[styles.copyBtn, { borderColor: '#5B4EFA55', backgroundColor: '#5B4EFA14' }]}
-                        activeOpacity={0.8}
+                        onPress={() => handleCopy(m.content, idx)}
+                        style={[styles.copyBtn, { borderColor: colors.border }]}
                       >
-                        <Text style={{ fontSize: 10, color: '#5B4EFA', fontWeight: '800' }}>
-                          Save to Pilot
+                        {copiedId === idx ? <Check size={12} color="#10B981" /> : <Copy size={12} color={colors.textTertiary} />}
+                        <Text style={{ fontSize: 10, color: copiedId === idx ? "#10B981" : colors.textTertiary, fontWeight: '600' }}>
+                          {copiedId === idx ? "Copied!" : "Copy"}
                         </Text>
                       </TouchableOpacity>
-                    )}
+                      {!!onSaveResponse && (
+                        <TouchableOpacity
+                          onPress={() => onSaveResponse(m.content)}
+                          style={[styles.copyBtn, { borderColor: '#5B4EFA55', backgroundColor: '#5B4EFA14' }]}
+                        >
+                          <Text style={{ fontSize: 10, color: '#5B4EFA', fontWeight: '800' }}>Save to Pilot</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
                   </View>
                 )}
               </View>
@@ -465,6 +463,7 @@ interface PilotV2AIChatProps {
   isOtherPopupOpen?: boolean;
   activeQuestion?: any;
   onSaveResponse?: (text: string) => void;
+  externalOpenTrigger?: number;
 }
 
 const styles = StyleSheet.create({
@@ -530,7 +529,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderBottomWidth: 1,
     gap: 8,
   },
   input: {
@@ -549,7 +547,6 @@ const styles = StyleSheet.create({
   },
   presetsBar: {
     paddingVertical: 10,
-    borderBottomWidth: 1,
   },
   scroll: {
     flex: 1,

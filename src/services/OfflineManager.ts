@@ -288,34 +288,58 @@ class OfflineManagerService {
     onProgress({ phase: 'cards', current: 0, total: 1, detail: 'Fetching your flashcards...' });
     let totalCards = 0;
     try {
+      // Fetch only non-deleted cards from Supabase
       const cards = await this.fetchAllRows('cards', (query) => query.eq('is_deleted', false));
-      if (cards) KVStore.setJson(CARDS_PREFIX, cards);
+      if (cards) {
+        KVStore.setJson(CARDS_PREFIX, cards);
+        // Also update the application flashcard cache to reflect deletions from server
+        const filtered = cards.filter(c => !c.is_deleted);
+        KVStore.setJson('@user_cards_flashcards', filtered.map(c => ({
+          ...c,
+          deleted: c.is_deleted === true ? true : false
+        })));
+      }
 
       const userCards = await this.fetchAllRows(
         'user_cards',
         (query) => query.eq('user_id', userId).neq('status', 'deleted')
       );
       if (userCards) {
-        KVStore.setJson(`${USER_CARDS_PREFIX}${userId}`, userCards);
-        totalCards = userCards.length;
+        // Filter to only include user_cards for non-deleted cards
+        const validCardIds = new Set((cards ?? []).map(c => c.id));
+        const filtered = (userCards ?? []).filter(uc => validCardIds.has(uc.card_id));
+        KVStore.setJson(`${USER_CARDS_PREFIX}${userId}`, filtered);
+        totalCards = filtered.length;
       }
 
-      const userTables: Array<[string, string]> = [
-        ['card_reviews', `${USER_CARD_REVIEWS_PREFIX}${userId}`],
-        ['study_sessions', `${USER_STUDY_SESSIONS_PREFIX}${userId}`],
-        ['user_note_nodes', `${USER_NOTE_NODES_PREFIX}${userId}`],
-        ['folders', `${USER_FOLDERS_PREFIX}${userId}`],
-        ['flashcard_branches', `${USER_BRANCHES_PREFIX}${userId}`],
-        ['flashcard_branch_cards', `${USER_BRANCH_CARDS_PREFIX}${userId}`],
-        ['draft_attempts', `${USER_DRAFT_ATTEMPTS_PREFIX}${userId}`],
-        ['user_settings', `${USER_SETTINGS_PREFIX}${userId}`],
-        ['user_widgets', `${USER_WIDGETS_PREFIX}${userId}`],
+      const validCardIds = new Set((cards ?? []).map(c => c.id));
+      const userTables: Array<[string, string, (q: any) => any]> = [
+        ['card_reviews', `${USER_CARD_REVIEWS_PREFIX}${userId}`, 
+          (q) => q.eq('user_id', userId)],
+        ['study_sessions', `${USER_STUDY_SESSIONS_PREFIX}${userId}`, 
+          (q) => q.eq('user_id', userId)],
+        ['user_note_nodes', `${USER_NOTE_NODES_PREFIX}${userId}`, 
+          (q) => q.eq('user_id', userId)],
+        ['folders', `${USER_FOLDERS_PREFIX}${userId}`, 
+          (q) => q.eq('user_id', userId)],
+        ['flashcard_branches', `${USER_BRANCHES_PREFIX}${userId}`, 
+          (q) => q.eq('user_id', userId)],
+        ['flashcard_branch_cards', `${USER_BRANCH_CARDS_PREFIX}${userId}`, 
+          (q) => q],
+        ['draft_attempts', `${USER_DRAFT_ATTEMPTS_PREFIX}${userId}`, 
+          (q) => q.eq('user_id', userId)],
+        ['user_settings', `${USER_SETTINGS_PREFIX}${userId}`, 
+          (q) => q.eq('user_id', userId)],
+        ['user_widgets', `${USER_WIDGETS_PREFIX}${userId}`, 
+          (q) => q.eq('user_id', userId)],
       ];
-      for (const [table, key] of userTables) {
-        const data = await this.fetchAllRows(
-          table,
-          (query) => query.eq('user_id', userId)
-        );
+      
+      for (const [table, key, queryFn] of userTables) {
+        let data = await this.fetchAllRows(table, queryFn);
+        // Filter card_reviews to only include reviews for non-deleted cards
+        if (table === 'card_reviews' && data) {
+          data = (data as any[]).filter(cr => validCardIds.has(cr.card_id));
+        }
         if (data) KVStore.setJson(key, data);
       }
 

@@ -21,7 +21,7 @@ import {
   useWindowDimensions, Keyboard, TextInput,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Rocket, X, Plus, Wand2, Highlighter, Eraser, Undo2, Redo2, Brain, Copy } from 'lucide-react-native';
+import { Rocket, X, Plus, Wand2, Highlighter, Eraser, Undo2, Redo2, Brain, Copy, Sparkles, Clipboard } from 'lucide-react-native';
 import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 import RichNoteEditor from '../RichNoteEditor';
 import PilotV2SaveAIPanel from './PilotV2SaveAIPanel';
@@ -38,14 +38,18 @@ import {
   createPilotV2Node,
 } from '../../repositories/pilotV2Repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Clipboard from 'expo-clipboard';
+import * as ExpoClipboard from 'expo-clipboard';
 import { aiTransformNoteContent } from '../../services/GeminiService';
 
 const STORAGE_LAST_USED = 'pilot-v2:save-sheet:last-used';
 const STORAGE_SAVE_SHEET_AI_PROMPT = 'pilot-v2:save-sheet:ai-preset-prompt';
+const STORAGE_HEADER_INCLUDE = 'pilot-v2:save-sheet:include-header';
+const STORAGE_HEADER_STYLE = 'pilot-v2:save-sheet:header-style';
+const STORAGE_CUSTOM_HEADER = 'pilot-v2:save-sheet:custom-header';
 type LastUsed = {
   subject?: string; topic?: string; subtopic?: string; notebook?: string;
 };
+type HeaderStyle = 'auto-title' | 'question-only' | 'custom' | 'none';
 const readLastUsed = async (): Promise<LastUsed> => {
   try {
     const raw = await AsyncStorage.getItem(STORAGE_LAST_USED);
@@ -88,6 +92,33 @@ export function textToPilotV2Blocks(text: string): PilotV2Block[] {
     }
   }
   return blocks;
+}
+
+function markdownishToHtml(text: string): string {
+  if (!text) return '';
+  let t = text;
+  t = t.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  t = t.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  t = t.replace(/(^|[^*])\*([^*]+)\*/g, '$1<i>$2</i>');
+  t = t.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  t = t.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  t = t.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  const lines = t.split(/\r?\n/);
+  const out: string[] = [];
+  let inUl = false;
+  for (const ln of lines) {
+    if (/^\s*[-*]\s+/.test(ln)) {
+      if (!inUl) { out.push('<ul>'); inUl = true; }
+      out.push(`<li>${ln.replace(/^\s*[-*]\s+/, '')}</li>`);
+    } else {
+      if (inUl) { out.push('</ul>'); inUl = false; }
+      if (ln.trim() === '') out.push('<p><br></p>');
+      else if (/^<h[1-3]>/.test(ln)) out.push(ln);
+      else out.push(`<p>${ln}</p>`);
+    }
+  }
+  if (inUl) out.push('</ul>');
+  return out.join('\n');
 }
 
 export type PilotSaveSeedQuestion = {
@@ -143,6 +174,9 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const [saving, setSaving]       = useState(false);
   const [savedNoteId, setSavedNoteId] = useState<string | null>(null);
   const [appendCount, setAppendCount] = useState(0);
+  const [includeHeader, setIncludeHeader] = useState(true);
+  const [headerStyle, setHeaderStyle] = useState<HeaderStyle>('auto-title');
+  const [customHeader, setCustomHeader] = useState('');
   // Dropdowns state
   const [activeLevel, setActiveLevel] = useState<'subject' | 'topic' | 'subtopic' | 'notebook' | null>(null);
   const [moveOpen, setMoveOpen] = useState(false);
@@ -166,6 +200,17 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     }
   };
 
+  const handlePasteFormatted = async () => {
+    const text = await ExpoClipboard.getStringAsync();
+    if (!text) return;
+    const html = markdownishToHtml(text);
+    richRef.current?.insertHTML(html);
+    setTimeout(async () => {
+      const live = await richRef.current?.getContentHtml?.();
+      if (live) setBody(live);
+    }, 100);
+  };
+
   // Notebooks
   const [existingNotebooks, setExistingNotebooks] = useState<string[]>([]);
   // User's actual Pilot V2 hierarchy (loaded once when sheet becomes visible)
@@ -184,8 +229,16 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     (async () => {
       const opts = await fetchPilotV2HierarchyOptions(userId);
       const nodes = await fetchCanonicalPilotV2Nodes(userId, false);
-      if (!cancelled) setUserHierarchy(opts);
-      if (!cancelled) setAllNodes(nodes);
+      const headerIncStr = await AsyncStorage.getItem(STORAGE_HEADER_INCLUDE);
+      const headerStyleStr = await AsyncStorage.getItem(STORAGE_HEADER_STYLE);
+      const customHeaderStr = await AsyncStorage.getItem(STORAGE_CUSTOM_HEADER);
+      if (!cancelled) {
+        setUserHierarchy(opts);
+        setAllNodes(nodes);
+        setIncludeHeader(headerIncStr !== 'false');
+        setHeaderStyle((headerStyleStr as HeaderStyle) || 'auto-title');
+        setCustomHeader(customHeaderStr || '');
+      }
     })();
     return () => { cancelled = true; };
   }, [visible, userId]);
@@ -377,6 +430,25 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     notebook.trim().length > 0 &&
     plainTextLen(body) > 0;
 
+  // Generate header text based on style selection
+  const generateHeaderText = (): string => {
+    if (!includeHeader) return '';
+    if (headerStyle === 'none') return '';
+    if (headerStyle === 'question-only') {
+      return seedQuestion?.statement_line || seedQuestion?.question_text || '';
+    }
+    if (headerStyle === 'custom') {
+      return customHeader.trim() || 'Note';
+    }
+    // 'auto-title' (default)
+    return (
+      briefBlockTitle ||
+      notebook ||
+      (source ? source.replace(/^Quiz\s*\/?\/s*/i, '').trim() : '') ||
+      'Explanation'
+    );
+  };
+
   const handleSave = async () => {
     if (!canSave) return;
     setSaving(true);
@@ -395,26 +467,27 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
         subtopic: subtopic.trim() || null,
         title: notebookTitle,
       });
-      const headingText =
-        briefBlockTitle ||
-        notebookTitle ||
-        (source ? source.replace(/^Quiz\s*\/?\s*/i, '').trim() : '') ||
-        'Explanation';
-      const blocks: PilotV2Block[] = [
-        {
+      const headerText = generateHeaderText();
+      const blocks: PilotV2Block[] = [];
+      
+      // Add header block only if enabled and not 'none'
+      if (includeHeader && headerText.trim()) {
+        blocks.push({
           id: newId(),
           type: 'heading',
           level: 2,
-          text: headingText,
+          text: headerText,
           meta: { tag: 'quiz_import', source: source || 'quiz' },
-        },
-        {
-          id: newId(),
-          type: 'paragraph',
-          text: html.trim(),
-          meta: { tag: 'quiz_import', importedAt: new Date().toISOString(), source: source || 'quiz' },
-        },
-      ];
+        });
+      }
+      
+      // Always add content block
+      blocks.push({
+        id: newId(),
+        type: 'paragraph',
+        text: html.trim(),
+        meta: { tag: 'quiz_import', importedAt: new Date().toISOString(), source: source || 'quiz' },
+      });
       const ok = await appendBlocksToPilotV2Note(result.noteId, blocks);
       if (!ok) throw new Error('append failed');
       setSavedNoteId(result.noteId);
@@ -428,6 +501,11 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
         subtopic: subtopic.trim(),
         notebook: notebookTitle,
       });
+      
+      // Persist header options
+      AsyncStorage.setItem(STORAGE_HEADER_INCLUDE, includeHeader.toString()).catch(() => null);
+      AsyncStorage.setItem(STORAGE_HEADER_STYLE, headerStyle).catch(() => null);
+      AsyncStorage.setItem(STORAGE_CUSTOM_HEADER, customHeader).catch(() => null);
 
       // Show confirmation
       Alert.alert(
@@ -490,13 +568,10 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const sheetStyle = [
     styles.sheet,
     {
-      width: isTablet ? '80%' : '92%',
-      height: isTablet ? '82%' : '86%',
-      maxWidth: 980,
-      maxHeight: 920,
+      width: '92%',
+      height: '85%',
       borderRadius: 28,
-      paddingTop: 18,
-      paddingHorizontal: 18,
+      padding: 16,
     },
   ];
 
@@ -509,8 +584,8 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
           onPress={onClose}
           style={[StyleSheet.absoluteFill, { zIndex: 1 }]}
         />
-        <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: keyboardOpen ? 'flex-start' : 'center', paddingTop: keyboardOpen ? 12 : 16, paddingBottom: 16, zIndex: 10 }}>
-          <Animated.View style={{ transform: [{ translateY: sheetTranslate }], width: '100%', alignItems: 'center' }}>
+        <View style={{ width: '100%', height: '100%', zIndex: 10 }}>
+          <Animated.View style={{ transform: [{ translateY: sheetTranslate }], width: '100%', height: '100%', alignItems: 'center', justifyContent: keyboardOpen ? 'flex-start' : 'center', paddingTop: keyboardOpen ? 12 : 16, paddingBottom: 16 }}>
             <View
               testID="pilot-v2-save-sheet"
               style={[sheetStyle, { backgroundColor: colors.surface }]}
@@ -532,44 +607,47 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     Auto-routed by subject → topic → microtopic. Same path = same note.
                   </Text>
                 </View>
-                <TouchableOpacity
-                  testID="pilot-v2-save-ai-toggle"
-                  onPress={() => setAiPanelOpen(v => !v)}
-                  style={[styles.closeBtn, { marginRight: 4, backgroundColor: aiPanelOpen ? '#EEECFF' : 'transparent', borderRadius: 8 }]}
-                >
-                  <Brain size={20} color={aiPanelOpen ? '#5B4EFA' : colors.textPrimary} />
-                </TouchableOpacity>
+
                 <TouchableOpacity onPress={onClose} testID="pilot-v2-save-close" style={styles.closeBtn}>
                   <X size={20} color={colors.textPrimary} />
                 </TouchableOpacity>
               </View>
 
-              {/* Save path + directory controls */}
-              <View style={[styles.formGroup, { backgroundColor: colors.surface, paddingBottom: 10 }]}>
-                <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>Save path</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-                  <TouchableOpacity onPress={() => setActiveLevel('subject')} style={[styles.pathChip, { borderColor: '#8B5CF6', backgroundColor: '#EDE9FE' }]}><Text style={{ color: '#5B21B6', fontWeight: '800' }}>{subject || 'Subject'}</Text></TouchableOpacity>
-                  <Text style={{ color: colors.textTertiary }}>→</Text>
-                  <TouchableOpacity onPress={() => subject && setActiveLevel('topic')} style={[styles.pathChip, { borderColor: '#3B82F6', backgroundColor: '#DBEAFE', opacity: subject ? 1 : 0.5 }]}><Text style={{ color: '#1D4ED8', fontWeight: '800' }}>{topic || 'Section Group'}</Text></TouchableOpacity>
-                  <Text style={{ color: colors.textTertiary }}>→</Text>
-                  <TouchableOpacity onPress={() => topic && setActiveLevel('subtopic')} style={[styles.pathChip, { borderColor: '#10B981', backgroundColor: '#D1FAE5', opacity: topic ? 1 : 0.5 }]}><Text style={{ color: '#047857', fontWeight: '800' }}>{subtopic || 'Micro Topic'}</Text></TouchableOpacity>
-                  <Text style={{ color: colors.textTertiary }}>→</Text>
-                  <TouchableOpacity onPress={() => subject && setActiveLevel('notebook')} style={[styles.pathChip, { borderColor: '#F59E0B', backgroundColor: '#FEF3C7', opacity: subject ? 1 : 0.5 }]}><Text style={{ color: '#92400E', fontWeight: '800' }}>{notebook || 'Notebook'}</Text></TouchableOpacity>
+              {/* Merged Configuration Block */}
+              <View style={[styles.formGroup, { backgroundColor: colors.surface, paddingBottom: 8, paddingHorizontal: 12 }]}>
+                <View style={{ flexDirection: 'row', gap: 12 }}>
+                  {/* Column 1: Save Path Context */}
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>Save path</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 5 }}>
+                      <TouchableOpacity onPress={() => setActiveLevel('subject')} style={[styles.pathChip, { borderColor: '#8B5CF6', backgroundColor: '#EDE9FE' }]}><Text style={{ color: '#5B21B6', fontWeight: '800', fontSize: 10 }}>{subject || 'Subject'}</Text></TouchableOpacity>
+                      <Text style={{ color: colors.textTertiary, fontSize: 10 }}>→</Text>
+                      <TouchableOpacity onPress={() => subject && setActiveLevel('topic')} style={[styles.pathChip, { borderColor: '#3B82F6', backgroundColor: '#DBEAFE', opacity: subject ? 1 : 0.5 }]}><Text style={{ color: '#1D4ED8', fontWeight: '800', fontSize: 10 }}>{topic || 'Section Group'}</Text></TouchableOpacity>
+                      <Text style={{ color: colors.textTertiary, fontSize: 10 }}>→</Text>
+                      <TouchableOpacity onPress={() => topic && setActiveLevel('subtopic')} style={[styles.pathChip, { borderColor: '#10B981', backgroundColor: '#D1FAE5', opacity: topic ? 1 : 0.5 }]}><Text style={{ color: '#047857', fontWeight: '800', fontSize: 10 }}>{subtopic || 'Micro Topic'}</Text></TouchableOpacity>
+                      <Text style={{ color: colors.textTertiary, fontSize: 10 }}>→</Text>
+                      <TouchableOpacity onPress={() => subject && setActiveLevel('notebook')} style={[styles.pathChip, { borderColor: '#F59E0B', backgroundColor: '#FEF3C7', opacity: subject ? 1 : 0.5 }]}><Text style={{ color: '#92400E', fontWeight: '800', fontSize: 10 }}>{notebook || 'Notebook'}</Text></TouchableOpacity>
+                    </View>
+                  </View>
+
+                  {/* Column 2: Stacked Directory Buttons */}
+                  <View style={{ gap: 4, justifyContent: 'flex-end', minWidth: 96 }}>
+                    <TouchableOpacity style={[styles.modeButton, { paddingVertical: 4, paddingHorizontal: 6, flex: 0 }]} onPress={() => setMoveOpen(true)}>
+                      <Text style={[styles.modeButtonText, { fontSize: 9 }]}>Change Directory</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.modeButton, { paddingVertical: 4, paddingHorizontal: 6, flex: 0 }]} onPress={() => setMoveOpen(true)}>
+                      <Text style={[styles.modeButtonText, { fontSize: 9 }]}>New Directory</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
-                  <TouchableOpacity style={[styles.modeButton, { flex: 1 }]} onPress={() => setMoveOpen(true)}>
-                    <Text style={styles.modeButtonText}>Change Directory</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[styles.modeButton, { flex: 1 }]} onPress={() => setMoveOpen(true)}>
-                    <Text style={styles.modeButtonText}>New Directory</Text>
-                  </TouchableOpacity>
-                </View>
+
+                {/* Path Level Dropdown Selectors */}
                 {activeLevel && (
-                  <View style={[styles.selectorCard, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}>
+                  <View style={[styles.selectorCard, { borderColor: colors.border, backgroundColor: colors.surfaceStrong, marginTop: 8 }]}>
                     <Text style={{ color: colors.textTertiary, fontSize: 11, fontWeight: '800', marginBottom: 8 }}>
                       {activeLevel === 'subject' ? 'Choose Subject' : activeLevel === 'topic' ? 'Choose Section Group' : activeLevel === 'subtopic' ? 'Choose Micro Topic' : 'Choose Notebook'}
                     </Text>
-                    <ScrollView style={{ maxHeight: 170 }}>
+                    <ScrollView style={{ maxHeight: 140 }}>
                       {(activeLevel === 'subject' ? allSubjects : activeLevel === 'topic' ? allTopics : activeLevel === 'subtopic' ? allSubtopics : existingNotebooks).map((item, idx) => (
                         <TouchableOpacity
                           key={`${activeLevel}-${idx}-${item}`}
@@ -589,12 +667,66 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                             }
                           }}
                         >
-                          <Text style={{ color: colors.textPrimary, fontWeight: '700' }}>{item}</Text>
+                          <Text style={{ color: colors.textPrimary, fontWeight: '700', fontSize: 13 }}>{item}</Text>
                         </TouchableOpacity>
                       ))}
                     </ScrollView>
                   </View>
                 )}
+
+                {/* Unified Header Option Line */}
+                <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Text style={{ color: colors.textTertiary, fontSize: 11, fontWeight: '700', minWidth: 85 }}>Include Header</Text>
+                    <View style={{ flex: 1, flexDirection: 'row', gap: 4 }}>
+                      {(['auto-title', 'question-only', 'custom', 'none'] as const).map((style) => (
+                        <TouchableOpacity
+                          key={style}
+                          onPress={() => {
+                            setHeaderStyle(style);
+                            setIncludeHeader(style !== 'none');
+                          }}
+                          style={{
+                            flex: 1,
+                            paddingVertical: 5,
+                            borderRadius: 6,
+                            backgroundColor: (includeHeader && headerStyle === style) || (!includeHeader && style === 'none') ? '#5B4EFA' : colors.surfaceStrong,
+                            borderWidth: 1,
+                            borderColor: (includeHeader && headerStyle === style) || (!includeHeader && style === 'none') ? '#5B4EFA' : colors.border,
+                            alignItems: 'center'
+                          }}
+                        >
+                          <Text style={{ fontSize: 9, fontWeight: '700', color: (includeHeader && headerStyle === style) || (!includeHeader && style === 'none') ? '#fff' : colors.textSecondary }}>
+                            {style === 'auto-title' ? '🤖 Auto' : style === 'question-only' ? '❓ Q Only' : style === 'custom' ? '✏️ Custom' : '✕ None'}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                  
+                  {/* Custom Text Injection Bar */}
+                  {includeHeader && headerStyle === 'custom' && (
+                    <View style={{ marginTop: 6 }}>
+                      <TextInput
+                        placeholder="Custom header title..."
+                        placeholderTextColor={colors.textTertiary}
+                        value={customHeader}
+                        onChangeText={setCustomHeader}
+                        maxLength={200}
+                        style={{
+                          backgroundColor: colors.surface,
+                          borderWidth: 1,
+                          borderColor: colors.border,
+                          borderRadius: 6,
+                          paddingHorizontal: 8,
+                          paddingVertical: 5,
+                          fontSize: 12,
+                          color: colors.textPrimary,
+                        }}
+                      />
+                    </View>
+                  )}
+                </View>
               </View>
             </Animated.View>
 
@@ -627,12 +759,13 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
               stickyHeaderIndices={[0]}
             >
               {/* Sticky formatting toolbar */}
-              <View style={[styles.toolbarSticky, { backgroundColor: colors.surfaceStrong, borderBottomColor: colors.border }]}>
-                <RichToolbar
-                  getEditor={() => richRef.current}
-                  selectedIconTint="#5B4EFA"
-                  iconTint={colors.textPrimary}
-                  style={{ backgroundColor: 'transparent', height: 44 }}
+              <View style={[styles.toolbarSticky, { backgroundColor: colors.surfaceStrong, borderBottomColor: colors.border, flexDirection: 'row', alignItems: 'center' }]}>
+                <View style={{ flex: 1 }}>
+                  <RichToolbar
+                    getEditor={() => richRef.current}
+                    selectedIconTint="#5B4EFA"
+                    iconTint={colors.textPrimary}
+                    style={{ backgroundColor: 'transparent', height: 44 }}
                   actions={[
                     actions.undo,
                     actions.redo,
@@ -646,7 +779,6 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     actions.insertOrderedList,
                     actions.blockquote,
                     'highlight',
-                    'aiAssist',
                   ]}
                   iconMap={{
                     [actions.undo]: ({ tintColor }: any) => <Undo2 size={16} color={tintColor} />,
@@ -658,18 +790,13 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                         <Highlighter size={15} color={tintColor} />
                       </View>
                     ),
-                    aiAssist: ({ tintColor }: any) => <Brain size={16} color={tintColor} />,
                   }}
                   onPress={(action) => {
                     if (action === 'highlight') {
                       setShowHlPicker(v => !v);
                       return;
                     }
-                    if (action === 'aiAssist') {
-                      setShowHlPicker(false);
-                      setShowAiPanel(v => !v);
-                      return;
-                    }
+
 
                     richRef.current?.focusContentEditor?.();
                     if (action === actions.heading1) {
@@ -713,6 +840,40 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     }, 50);
                   }}
                 />
+              </View>
+              {/* Secondary Action Shortcuts */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingRight: 10, marginLeft: 'auto' as any, flex: 0 }}>
+                <TouchableOpacity
+                  onPress={() => handlePasteFormatted()}
+                  style={{ width: 30, height: 30, borderRadius: 6, backgroundColor: '#EEECFF', borderColor: '#5B4EFA', borderWidth: 1, alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <Clipboard size={14} color="#5B4EFA" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={async () => {
+                    try {
+                      const html = await richRef.current?.getContentHtml?.();
+                      if (html && html.trim()) {
+                        await ExpoClipboard.setStringAsync(html);
+                        Alert.alert('Copied', 'Pilot sheet content copied to clipboard.');
+                      } else {
+                        Alert.alert('Empty', 'Nothing to copy. Add content to the editor first.');
+                      }
+                    } catch (e) {
+                      Alert.alert('Error', 'Failed to copy content.');
+                    }
+                  }}
+                  style={{ width: 30, height: 30, borderRadius: 6, backgroundColor: '#EEECFF', borderColor: '#5B4EFA', borderWidth: 1, alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <Copy size={14} color="#5B4EFA" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setAiPanelOpen(v => !v)}
+                  style={{ width: 30, height: 30, borderRadius: 6, backgroundColor: aiPanelOpen ? '#EEECFF' : 'transparent', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <Brain size={16} color={aiPanelOpen ? '#5B4EFA' : colors.textPrimary} />
+                </TouchableOpacity>
+              </View>
                 {showHlPicker && (
                   <View style={styles.hlRow}>
                     {['transparent', '#FBCFE8', '#DDD6FE', '#BFDBFE', '#BBF7D0', '#FDE68A', '#FED7AA', '#CFFAFE', '#E9D5FF', '#FFF59D'].map(c => (
@@ -738,6 +899,9 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                   </View>
                 )}
               </View>
+
+              {/* Spacer moved header block up */}
+              <View style={{ height: 8 }} />
 
               <Text style={[styles.fieldLabel, { color: colors.textTertiary, marginTop: 12 }]}>Content</Text>
               <View style={[styles.richShell, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}>
@@ -910,10 +1074,10 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', paddingVertical: 16 },
-  pathChip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1 },
+  pathChip: { paddingHorizontal: 6, paddingVertical: 3, borderRadius: 999, borderWidth: 1 },
   selectorCard: { borderWidth: 1, borderRadius: 12, padding: 10, marginTop: 10 },
   selectorItem: { paddingVertical: 10, borderBottomWidth: 1 },
-  sheet: { width: '94%', maxWidth: 520, borderRadius: 28, padding: 18, paddingBottom: 22, overflow: 'hidden' },
+  sheet: { width: '92%', height: '85%', borderRadius: 28, padding: 16, overflow: 'hidden' },
   toolbarSticky: {
     borderBottomWidth: 1,
     paddingTop: 2,
@@ -995,8 +1159,8 @@ const styles = StyleSheet.create({
   },
   modeButton: {
     flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
     borderWidth: 1.5,
     borderColor: '#E0E0E0',
     borderRadius: 8,
@@ -1007,7 +1171,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F3FF',
   },
   modeButtonText: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '600',
     color: '#333',
   },

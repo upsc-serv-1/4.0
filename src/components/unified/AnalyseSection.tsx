@@ -364,33 +364,51 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
           <TrendingUp size={18} color={colors.primary} />
           <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>Performance Trajectory</Text>
         </View>
-        <Text style={[styles.chartSubLabel, { color: colors.textTertiary, marginBottom: 8 }]}>Overall Score Trajectory</Text>
-        <LineChart
-          data={[{ label: 'Score', values: activeTrends.historicalScores.map(t => t.score) }]}
-          labels={activeTrends.historicalScores.map(t => {
-            const name = t.title && t.title !== `Attempt #${t.attemptIndex}` ? t.title : '';
-            const short = name.length > 18 ? name.slice(0, 18) + '…' : name;
-            return short ? `#${t.attemptIndex} (${short})` : `#${t.attemptIndex}`;
-          })}
-          height={180}
-          colors={[colors.primary]}
-          stickyY={true}
-          backgroundColor={colors.surface}
-        />
+        <View style={{ marginTop: spacing.md }}>
+          <Text style={[styles.chartSubLabel, { color: colors.textTertiary, marginBottom: 8 }]}>Overall Score Trajectory</Text>
+          <ScrollView 
+            style={{ height: 400, marginBottom: spacing.md }} 
+            showsVerticalScrollIndicator={true} 
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+          >
+            <LineChart
+              data={[{ label: 'Score', values: activeTrends.historicalScores.map(t => t.score) }]}
+              labels={activeTrends.historicalScores.map(t => {
+                const name = t.title && t.title !== `Attempt #${t.attemptIndex}` ? t.title : '';
+                return name ? `#${t.attemptIndex} (${name})` : `#${t.attemptIndex}`;
+              })}
+              height={280}
+              colors={[colors.primary]}
+              stickyY={true}
+              backgroundColor={colors.surface}
+              showValues={true}
+            />
+          </ScrollView>
+        </View>
         <View style={styles.chartDivider} />
-        <Text style={[styles.chartSubLabel, { color: colors.textTertiary, marginBottom: 8 }]}>Negative Marking Penalty</Text>
-        <LineChart
-          data={[{ label: 'Penalty', values: activeTrends.negativeMarkingTrends.map(t => t.negativeMarksPenalty) }]}
-          labels={activeTrends.historicalScores.map(t => {
-            const name = t.title && t.title !== `Attempt #${t.attemptIndex}` ? t.title : '';
-            const short = name.length > 18 ? name.slice(0, 18) + '…' : name;
-            return short ? `#${t.attemptIndex} (${short})` : `#${t.attemptIndex}`;
-          })}
-          height={180}
-          colors={['#ef4444']}
-          stickyY={true}
-          backgroundColor={colors.surface}
-        />
+        <View style={{ marginTop: spacing.md }}>
+          <Text style={[styles.chartSubLabel, { color: colors.textTertiary, marginBottom: 8 }]}>Negative Marking Penalty</Text>
+          <ScrollView 
+            style={{ height: 400 }} 
+            showsVerticalScrollIndicator={true} 
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+          >
+            <LineChart
+              data={[{ label: 'Penalty', values: activeTrends.negativeMarkingTrends.map(t => t.negativeMarksPenalty) }]}
+              labels={activeTrends.historicalScores.map(t => {
+                const name = t.title && t.title !== `Attempt #${t.attemptIndex}` ? t.title : '';
+                return name ? `#${t.attemptIndex} (${name})` : `#${t.attemptIndex}`;
+              })}
+              height={280}
+              colors={['#ef4444']}
+              stickyY={true}
+              backgroundColor={colors.surface}
+              showValues={true}
+            />
+          </ScrollView>
+        </View>
       </View>
     ),
     subject_proficiency: proficiencyData.length > 0 ? (

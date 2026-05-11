@@ -3,7 +3,7 @@ import { Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { KVStore } from '../lib/kvStore';
 import { OfflineManager } from '../services/OfflineManager';
-import { SyncQueue, stopSyncQueueWorker } from '../services/SyncQueue';
+import { SyncQueue, stopSyncQueueWorker, startSyncQueueWorker } from '../services/SyncQueue';
 
 type AuthCtx = {
   session: Session | null;
@@ -35,7 +35,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initAuth();
     
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      setSession(s);
+      // Start SyncQueue worker when user logs in
+      if (s?.user?.id) {
+        startSyncQueueWorker();
+      }
+    });
     return () => sub.subscription.unsubscribe();
   }, []);
 

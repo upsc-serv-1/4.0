@@ -1585,7 +1585,7 @@ const sharePdfWithTimeout = async (uri: string, dialogTitle: string): Promise<vo
     // Share with generous timeout for large PDFs
     await Promise.race([
       Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle }),
-      new Promise<void>((resolve) => setTimeout(resolve, 20000)), // 20 second timeout for large PDFs
+      new Promise<void>((resolve) => setTimeout(resolve, 25000)), // 25 second timeout for large PDFs
     ]).catch((e) => {
       console.warn('[Export] Share operation failed (non-fatal):', e?.message || e);
     });
@@ -1598,6 +1598,7 @@ const sharePdfWithTimeout = async (uri: string, dialogTitle: string): Promise<vo
 };
 
 export async function exportToPdf(payload: ExportPayload, options: ExportOptions, extras: ExportRenderExtras = {}): Promise<string> {
+  let tempUri: string | null = null;
   try {
     const html = injectExecutiveSummary(renderHtml(payload, options), extras.prependHtml);
     
@@ -1618,10 +1619,13 @@ export async function exportToPdf(payload: ExportPayload, options: ExportOptions
     }
     
     const safe = options.title.replace(/[^a-z0-9-_ ]/gi, '_').slice(0, 48) || 'export';
-    const dest = `${FileSystem.cacheDirectory}${safe}.pdf`;
+    const dest = `${FileSystem.cacheDirectory}${safe}_${Date.now()}.pdf`;
     try { await FileSystem.moveAsync({ from: uri, to: dest }); } catch { }
+    
     const info = await FileSystem.getInfoAsync(dest);
     const finalUri = info.exists ? dest : uri;
+    tempUri = finalUri;
+    
     if (await Sharing.isAvailableAsync()) {
       await sharePdfWithTimeout(finalUri, options.title);
     } else {
@@ -1631,5 +1635,13 @@ export async function exportToPdf(payload: ExportPayload, options: ExportOptions
   } catch (err) {
     console.error('[exportToPdf] Fatal error:', err);
     throw err;
+  } finally {
+    // Cleanup: schedule deletion of temp files to avoid memory bloat
+    if (tempUri) {
+      setTimeout(() => {
+        FileSystem.deleteAsync(tempUri!, { idempotent: true })
+          .catch(e => console.warn('[exportToPdf] Cleanup failed:', e));
+      }, 3000); // Wait 3 seconds before cleanup
+    }
   }
 }

@@ -27,8 +27,10 @@ import {
   ScrollView,
   ActivityIndicator,
   useWindowDimensions,
+  Alert
 } from 'react-native';
-import { Send, Maximize2, Minimize2, Plus, ArrowDownToLine, Sparkles, X } from 'lucide-react-native';
+import * as ExpoClipboard from 'expo-clipboard';
+import { Send, Maximize2, Minimize2, Plus, ArrowDownToLine, Sparkles, X, Copy, Undo2, Redo2, Brain, Clipboard } from 'lucide-react-native';
 import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 import RichNoteEditor from '../RichNoteEditor';
 import { useTheme } from '../../context/ThemeContext';
@@ -73,7 +75,7 @@ const PilotV2SaveAIPanel: React.FC<Props> = ({ visible, onClose, onInsert, seedC
       try {
         const temps = await promptManager.fetchPromptTemplates(session.user.id, 'quiz');
         if (temps.length > 0) setTemplates(temps);
-      } catch {}
+      } catch { }
     })();
   }, [session?.user?.id]);
 
@@ -112,11 +114,22 @@ const PilotV2SaveAIPanel: React.FC<Props> = ({ visible, onClose, onInsert, seedC
 
     setLoading(true);
     try {
+      const bodyText = seedContext?.body || '';
+      
+      // Strip HTML tags from body for AI processing
+      const bodyTextPlain = bodyText ? bodyText.replace(/<[^>]*>/g, '').trim() : '';
+      
+      // Only include the actual Pilot Sheet editor content, NOT the question
+      const fullPrompt = bodyTextPlain 
+        ? `${final}\n\n---\n\nPILOT SHEET CONTENT:\n${bodyTextPlain}` 
+        : final;
+
+      // For AI context, only send the body content the user typed
       const optionsArr = Object.entries(seedContext?.options || {}).map(([k, v]) => `${k}) ${v}`);
       const response = await generateWithHistory(
-        [{ role: 'user', content: final }],
+        [{ role: 'user', content: fullPrompt }],
         {
-          question: seedContext?.question || seedContext?.body || '',
+          question: bodyTextPlain || 'General UPSC Context',
           options: optionsArr,
           correct_answer: seedContext?.correctAnswer || '',
         }
@@ -139,9 +152,20 @@ const PilotV2SaveAIPanel: React.FC<Props> = ({ visible, onClose, onInsert, seedC
     try {
       const live = await richRef.current?.getContentHtml?.();
       if (typeof live === 'string' && live.trim().length > 0) html = live;
-    } catch {}
+    } catch { }
     if (!html.trim()) return;
     onInsert(html);
+  };
+
+  const handlePasteFormatted = async () => {
+    const text = await ExpoClipboard.getStringAsync();
+    if (!text) return;
+    const html = markdownishToHtml(text);
+    richRef.current?.insertHTML(html);
+    setTimeout(async () => {
+      const live = await richRef.current?.getContentHtml?.();
+      if (live) setOutput(live);
+    }, 100);
   };
 
   const panelHeight = isFullscreen ? screenHeight * 0.92 : screenHeight * 0.62;
@@ -269,14 +293,16 @@ const PilotV2SaveAIPanel: React.FC<Props> = ({ visible, onClose, onInsert, seedC
       )}
 
       {/* Rich-editor output area — full formatting toolbar copied as-is */}
-      <View style={[styles.outputShell, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}>
-        <View style={[styles.toolbarSticky, { backgroundColor: colors.surfaceStrong, borderBottomColor: colors.border }]}>
+      <View style={[styles.outputShell, { borderColor: colors.border, backgroundColor: colors.surfaceStrong, flex: 1 }]}>
+        <View style={[styles.toolbarSticky, { backgroundColor: colors.surfaceStrong, borderBottomColor: colors.border, flexDirection: 'row', alignItems: 'center' }]}>
           <RichToolbar
             getEditor={() => richRef.current}
             selectedIconTint="#5B4EFA"
             iconTint={colors.textPrimary}
-            style={{ backgroundColor: 'transparent', height: 40 }}
+            style={{ backgroundColor: 'transparent', height: 40, flex: 1 }}
             actions={[
+              actions.undo,
+              actions.redo,
               actions.setBold,
               actions.setItalic,
               actions.setUnderline,
@@ -288,6 +314,8 @@ const PilotV2SaveAIPanel: React.FC<Props> = ({ visible, onClose, onInsert, seedC
               actions.blockquote,
             ]}
             iconMap={{
+              [actions.undo]: ({ tintColor }: any) => <Undo2 size={16} color={tintColor} />,
+              [actions.redo]: ({ tintColor }: any) => <Redo2 size={16} color={tintColor} />,
               [actions.heading1]: ({ tintColor }: any) => (
                 <Text style={{ color: tintColor, fontWeight: '900', fontSize: 13 }}>H1</Text>
               ),
@@ -296,8 +324,33 @@ const PilotV2SaveAIPanel: React.FC<Props> = ({ visible, onClose, onInsert, seedC
               ),
             }}
           />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, paddingRight: 8 }}>
+            <TouchableOpacity
+              onPress={() => handlePasteFormatted()}
+              style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: '#EEECFF', borderColor: '#5B4EFA', borderWidth: 1, alignItems: 'center', justifyContent: 'center' }}
+            >
+              <Clipboard size={13} color="#5B4EFA" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                richRef.current?.getContentHtml?.().then((html: string) => {
+                  if (html) ExpoClipboard.setStringAsync(html.replace(/<[^>]*>/g, ''));
+                  Alert.alert('Copied', 'AI response copied to clipboard.');
+                });
+              }}
+              style={[styles.headerBtn, { borderColor: colors.border, width: 28, height: 28 }]}
+            >
+              <Copy size={13} color={colors.textSecondary} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={onClose}
+              style={{ width: 28, height: 28, borderRadius: 6, alignItems: 'center', justifyContent: 'center' }}
+            >
+              <Brain size={15} color={colors.textPrimary} />
+            </TouchableOpacity>
+          </View>
         </View>
-        <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled">
+        <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
           <RichNoteEditor
             key={editorKey}
             ref={richRef}
@@ -311,7 +364,8 @@ const PilotV2SaveAIPanel: React.FC<Props> = ({ visible, onClose, onInsert, seedC
               primary: '#5B4EFA',
             }}
             placeholder="AI response will appear here. Tap a preset above or type & send."
-            editorStyle={{ minHeight: 320 }}
+            editorStyle={{ minHeight: 300 }}
+            useContainer={false}
           />
         </ScrollView>
       </View>

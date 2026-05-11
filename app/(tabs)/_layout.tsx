@@ -12,7 +12,7 @@ export default function TabsLayout() {
   const segments = useSegments();
   const [tabOrder, setTabOrder] = useState<TabKey[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Hide FAB if on Arena tab
   const isArena = segments[segments.length - 1] === 'arena';
 
@@ -38,7 +38,7 @@ export default function TabsLayout() {
       </View>
     );
   }
-  
+
   if (!session) return <Redirect href="/(auth)/login" />;
 
   const TAB_DEFINITIONS: Record<TabKey, { title: string; icon: any }> = {
@@ -64,7 +64,7 @@ export default function TabsLayout() {
       <Tabs
         tabBar={(props) => {
           const currentRouteName = props.state.routes[props.state.index].name;
-          if (currentRouteName !== 'index' && currentRouteName !== 'hardnotes') return null;
+          if (currentRouteName !== 'index' && currentRouteName !== 'revise') return null;
           return <ScrollableTabBar {...props} colors={colors} order={tabOrder} defs={TAB_DEFINITIONS} />;
         }}
         screenOptions={{
@@ -74,7 +74,7 @@ export default function TabsLayout() {
         }}
       >
         <Tabs.Screen name="index" options={{ title: 'Home' }} />
-        <Tabs.Screen name="hardnotes" options={{ title: 'Hardnotes' }} />
+        <Tabs.Screen name="revise" options={{ title: 'Revise' }} />
       </Tabs>
     </View>
   );
@@ -85,7 +85,13 @@ function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs 
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
 
-  const visibleOrder = order.filter((tabKey: TabKey) => !!defs[tabKey]);
+  const visibleOrder = order.filter((tabKey: TabKey) => 
+    !!defs[tabKey] && 
+    tabKey !== 'notes' && 
+    tabKey !== 'hardnotes' && 
+    tabKey !== 'softnotes' &&
+    tabKey !== 'capsule'
+  );
   const tabletItemWidth = isTablet
     ? Math.max(74, Math.floor((Math.max(width, 768) - 20) / Math.max(1, visibleOrder.length)))
     : undefined;
@@ -110,8 +116,8 @@ function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs 
           const onPress = () => {
             if (tabKey === 'index') {
               navigation.navigate('index');
-            } else if (tabKey === 'hardnotes') {
-              navigation.navigate('hardnotes');
+            } else if (tabKey === 'revise') {
+              navigation.navigate('revise');
             } else {
               // Push onto root stack for full-screen view with back gesture
               const path = tabKey === 'arena' ? '/unified/arena' : `/${tabKey}`;
@@ -129,14 +135,14 @@ function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs 
                 isTablet && tabletItemWidth ? { width: tabletItemWidth } : null,
               ]}
             >
-              <Icon 
-                color={isFocused ? colors.primary : colors.textTertiary} 
-                size={22} 
-                strokeWidth={isFocused ? 2.5 : 2} 
+              <Icon
+                color={isFocused ? colors.primary : colors.textTertiary}
+                size={22}
+                strokeWidth={isFocused ? 2.5 : 2}
               />
-              <Text 
+              <Text
                 style={[
-                  styles.tabLabel, 
+                  styles.tabLabel,
                   { color: isFocused ? colors.primary : colors.textTertiary }
                 ]}
                 numberOfLines={1}

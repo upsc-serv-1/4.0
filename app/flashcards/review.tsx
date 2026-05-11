@@ -632,14 +632,24 @@ export default function ReviewScreen() {
 
   if (queue.length === 0) {
     return (
-      <View style={styles.center}>
-        <Check size={64} color={colors.primary} />
-        <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>All caught up!</Text>
-        <Text style={[styles.emptySub, { color: colors.textTertiary }]}>No cards are due right now.</Text>
-        <TouchableOpacity style={[styles.doneBtn, { backgroundColor: colors.primary }]} onPress={() => router.back()} testID="btn-empty-done">
-          <Text style={[styles.doneBtnText, { color: '#04223a' }]}>Return</Text>
-        </TouchableOpacity>
-      </View>
+      <PageWrapper>
+        <View style={styles.center}>
+          <View style={[styles.modalOverlay, { backgroundColor: colors.bg }]}>
+            <View style={[styles.emptyPopup, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Check size={48} color={colors.primary} />
+              <Text style={[styles.emptyTitle, { color: colors.textPrimary, marginTop: 16 }]}>All caught up!</Text>
+              <Text style={[styles.emptySub, { color: colors.textTertiary, marginTop: 8 }]}>No cards are due right now.</Text>
+              <TouchableOpacity
+                style={[styles.doneBtn, { backgroundColor: colors.primary, marginTop: 24 }]}
+                onPress={() => router.back()}
+                testID="btn-empty-done"
+              >
+                <Text style={[styles.doneBtnText, { color: '#04223a' }]}>Return</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </PageWrapper>
     );
   }
 
@@ -1472,5 +1482,13 @@ const styles = StyleSheet.create({
     color: '#04223a',
     fontWeight: '900',
     fontSize: 14,
+  },
+  emptyPopup: {
+    alignItems: 'center',
+    padding: 32,
+    borderRadius: 20,
+    borderWidth: 1,
+    minWidth: 280,
+    maxWidth: 320,
   },
 });

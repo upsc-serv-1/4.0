@@ -118,6 +118,24 @@ export function PilotV2GlanceView() {
   const scrollKey = note?.id || '__demo__';
   const lastScrollY = useRef<number>(glanceScrollMemory.current[scrollKey] || 0);
 
+  /* ── Fixed page width (GoodNotes / Notability approach) ─────────────── */
+  /* The content + drawing surface are laid out at a FIXED width that never
+   * changes when the sidebar toggles. This ensures:
+   *   • Text never reflows → stroke positions stay pixel-perfect
+   *   • Drawing coordinates are always relative to the same page width
+   *   • Sidebar show/hide only affects centering, not content layout
+   *
+   * The fixed width is computed as: screenWidth − sidebarWidth − padding.
+   * This guarantees the content fits even when the sidebar IS visible.
+   * When the sidebar is hidden, the content is centered with extra space.
+   */
+  const SIDEBAR_WIDTH = 320;
+  const BODY_PADDING = 32; // paddingHorizontal: 16 × 2
+  const isTablet = screenWidth >= 768;
+  const fixedPageWidth = isTablet
+    ? Math.max(400, screenWidth - SIDEBAR_WIDTH - BODY_PADDING)
+    : Math.max(300, screenWidth - BODY_PADDING);
+
   /* ── Pencil overlay (Step 6) — drawable EVERYWHERE in glance view ─── */
   const [paperSize, setPaperSize] = useState({ w: 1, h: 1 });
   /** Block layout map — keyed by block.id, same shape as EditorView.
@@ -631,13 +649,15 @@ export function PilotV2GlanceView() {
               ref={scrollRef}
               testID="pilot-v2-glance-scroll"
               style={[styles.scroll, { backgroundColor: colors.bg }]}
-              contentContainerStyle={[styles.body, { paddingBottom: 100 }]}
+              contentContainerStyle={[styles.body, { paddingBottom: 100, alignItems: 'center' }]}
               showsVerticalScrollIndicator
               scrollEnabled={scrollEnabled && !pencil.drawingMode}
               onScroll={onScroll}
               scrollEventThrottle={32}
               bounces={!isZoomed}
             >
+              {/* Fixed-width page container — content + strokes never reflow */}
+              <View style={{ width: fixedPageWidth }}>
               {/* Title row */}
               <View style={styles.titleRow}>
                 <Text style={[styles.h1, { color: colors.textPrimary }]}>{title}</Text>
@@ -647,7 +667,8 @@ export function PilotV2GlanceView() {
               </View>
 
               <View
-                onLayout={(e) => setPaperSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
+                style={{ width: fixedPageWidth, alignSelf: 'center' }}
+                onLayout={(e) => setPaperSize({ w: fixedPageWidth, h: e.nativeEvent.layout.height })}
               >
                 {blocks.map(b => (
                   <View
@@ -705,6 +726,7 @@ export function PilotV2GlanceView() {
                   />
                 ) : null}
               </View>
+              </View>{/* end fixed-width page container */}
             </ScrollView>
           </Animated.View>
         </GestureDetector>

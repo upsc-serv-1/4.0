@@ -367,7 +367,11 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
         <Text style={[styles.chartSubLabel, { color: colors.textTertiary, marginBottom: 8 }]}>Overall Score Trajectory</Text>
         <LineChart
           data={[{ label: 'Score', values: activeTrends.historicalScores.map(t => t.score) }]}
-          labels={activeTrends.historicalScores.map(t => `#${t.attemptIndex}`)}
+          labels={activeTrends.historicalScores.map(t => {
+            const name = t.title && t.title !== `Attempt #${t.attemptIndex}` ? t.title : '';
+            const short = name.length > 18 ? name.slice(0, 18) + '…' : name;
+            return short ? `#${t.attemptIndex} (${short})` : `#${t.attemptIndex}`;
+          })}
           height={180}
           colors={[colors.primary]}
           stickyY={true}
@@ -377,7 +381,11 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
         <Text style={[styles.chartSubLabel, { color: colors.textTertiary, marginBottom: 8 }]}>Negative Marking Penalty</Text>
         <LineChart
           data={[{ label: 'Penalty', values: activeTrends.negativeMarkingTrends.map(t => t.negativeMarksPenalty) }]}
-          labels={activeTrends.historicalScores.map(t => `#${t.attemptIndex}`)}
+          labels={activeTrends.historicalScores.map(t => {
+            const name = t.title && t.title !== `Attempt #${t.attemptIndex}` ? t.title : '';
+            const short = name.length > 18 ? name.slice(0, 18) + '…' : name;
+            return short ? `#${t.attemptIndex} (${short})` : `#${t.attemptIndex}`;
+          })}
           height={180}
           colors={['#ef4444']}
           stickyY={true}
@@ -472,11 +480,16 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View style={styles.heatmapGrid}>
                   <View style={styles.heatmapRow}>
-                    {testsToDisplay.map((t, i) => (
-                      <View key={`header-${i}`} style={[styles.heatmapCell, { width: 50, backgroundColor: 'transparent' }]}>
-                        <Text style={[styles.heatmapHeaderText, { color: colors.textSecondary, width: 50, marginRight: 0 }]}>#{t.attemptIndex}</Text>
-                      </View>
-                    ))}
+                    {testsToDisplay.map((t, i) => {
+                      const hasCustomTitle = t.title && t.title !== `Attempt #${t.attemptIndex}`;
+                      const shortTitle = hasCustomTitle ? (t.title!.length > 8 ? t.title!.slice(0, 8) + '…' : t.title!) : '';
+                      return (
+                        <View key={`header-${i}`} style={[styles.heatmapCell, { width: 50, backgroundColor: 'transparent' }]}>
+                          <Text style={[styles.heatmapHeaderText, { color: colors.textSecondary, width: 50, marginRight: 0 }]}>#{t.attemptIndex}</Text>
+                          {shortTitle ? <Text style={[styles.heatmapHeaderText, { color: colors.textTertiary, width: 50, marginRight: 0, fontSize: 7 }]} numberOfLines={1}>{shortTitle}</Text> : null}
+                        </View>
+                      );
+                    })}
                   </View>
 
                   {dataRows.map((item, rowIndex) => (
@@ -873,7 +886,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
                   >
                     <View style={{ flex: 1 }}>
                       <Text style={[styles.testItemTitle, { color: colors.textPrimary }]}>
-                        {t.title || `Attempt #${t.attemptIndex}`}
+                        Attempt #{t.attemptIndex}{t.title && t.title !== `Attempt #${t.attemptIndex}` ? ` (${t.title})` : ''}
                       </Text>
                       <Text style={[styles.testItemSub, { color: colors.textSecondary }]}>
                         {t.date ? new Date(t.date).toLocaleDateString() : 'Recent'} • Score: {t.score} • Accuracy: {Math.round(t.accuracy)}%

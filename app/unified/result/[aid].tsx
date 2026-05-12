@@ -833,7 +833,7 @@ export default function ResultScreen() {
             bestAnswers={bestAnswers}
             ensureBestAnswerLoaded={ensureBestAnswerLoaded}
             savingBest={savingBest}
-            onRevealExplanation={() => setRevealedExplanations(prev => ({ ...prev, [item.id]: true }))}
+            onRevealExplanation={(qid: string) => setRevealedExplanations(prev => ({ ...prev, [qid]: true }))}
             onOptionSelect={() => { }}
             mdStyles={mdStyles}
             mdRules={mdRules}

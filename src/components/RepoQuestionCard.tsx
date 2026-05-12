@@ -5,7 +5,7 @@ import { spacing, radius } from '../theme';
 import { TaggedQuestion } from '../hooks/useTaggedQuestions';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Eye, Trash2, Zap, ExternalLink, BookOpen, ChevronDown, ChevronUp, Plus, X as XIcon } from 'lucide-react-native';
+import { Eye, Trash2, Zap, ExternalLink, BookOpen, ChevronDown, ChevronUp, Plus, X as XIcon, Rocket, MessageCircle } from 'lucide-react-native';
 import { FlashcardSvc } from '../services/FlashcardService';
 import { AddToFlashcardSheet } from './flashcards/AddToFlashcardSheet';
 import { autoCleanupQuestionState } from '../utils/questionStateUtils';
@@ -19,9 +19,11 @@ interface RepoQuestionCardProps {
   isZenMode?: boolean;
   /** When provided, "Ask AI" opens the floating PilotV2AIChat chatbot instead of a local chat modal */
   onOpenAIChat?: (questionData: { id: string; question_text: string; correct_answer: string; explanation: string; subject?: string }) => void;
+  /** When provided, "Save to Pilot" opens the PilotV2SaveSheet */
+  onOpenPilot?: (question: TaggedQuestion) => void;
 }
 
-export const RepoQuestionCard = ({ question, onUpdate, isZenMode, onOpenAIChat }: RepoQuestionCardProps) => {
+export const RepoQuestionCard = ({ question, onUpdate, isZenMode, onOpenAIChat, onOpenPilot }: RepoQuestionCardProps) => {
   const { colors } = useTheme();
   const { session } = useAuth();
   const router = useRouter();

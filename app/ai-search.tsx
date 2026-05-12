@@ -1382,7 +1382,7 @@ export default function AISearchTab() {
       pathname: '/unified/engine',
       params: {
         resultIds: resultIdList,
-        initialId: item.id,
+        questionId: item.id,
         mode: openInQuizMode || 'learning',
         sourceLabel: 'AI Search',
       },
@@ -2456,7 +2456,8 @@ export default function AISearchTab() {
           {QuickFilterBar}
           {SearchBar}
 
-          {/* Fix #4 — Search History Dropdown: positioned inside a relative wrapper so it sits below the search bar (toggle row ~33px + search row ~68px = ~101px) */}
+          {/* Fix #4 — Search History Dropdown: renders inline below search bar,
+              no absolute positioning so it never covers the search input */}
           {showHistory && (searchHistory.length > 0 || instituteOptions.length > 0) && (
             <View style={[styles.historyDropdown, {
               backgroundColor: colors.surface,
@@ -2968,7 +2969,7 @@ const styles = StyleSheet.create({
   fchipSel:       { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
   fchipText:      { fontSize: 11, fontWeight: '700' },
   // Fix #4 styles — dropdown sits below the search row (toggle row ~33px + search row ~68px = ~101px)
-  historyDropdown:{ position: 'absolute', top: 105, left: 14, right: 14, zIndex: 999, borderRadius: 14, borderWidth: 1, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 },
+  historyDropdown:{ borderRadius: 14, borderWidth: 1, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5, marginHorizontal: 14, marginTop: 4 },
   historyItem:    { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: 0.5 },
   historyText:    { flex: 1, fontSize: 13, fontWeight: '500' },
   // Fix #5 styles

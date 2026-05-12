@@ -829,7 +829,7 @@ export default function UnifiedArenaSetup() {
     metadata.forEach(m => {
       if (!m.test_id) return;
       if (deferredSelectedInstitutes.length > 0 && !deferredSelectedInstitutes.includes(m.institute)) return;
-      if (selectedPrograms.length > 0 && m.program_name !== selectedPrograms) return;
+      if (selectedPrograms.length > 0 && !selectedPrograms.includes(m.program_name)) return;
       if (selectedExamStage !== 'All' && m.series !== selectedExamStage) return;
 
       if (!tests.has(m.test_id)) {
@@ -1239,7 +1239,7 @@ export default function UnifiedArenaSetup() {
                   selected={selectedInstitutes}
                   onSelect={(vals: string[]) => {
                     setSelectedInstitutes(vals);
-                    setSelectedPrograms('All');
+                    setSelectedPrograms([]);
                   }}
                   multi
                 />
@@ -1275,7 +1275,7 @@ export default function UnifiedArenaSetup() {
                   selected={selectedInstitutes}
                   onSelect={(vals: string[]) => {
                     setSelectedInstitutes(vals);
-                    setSelectedPrograms('All');
+                    setSelectedPrograms([]);
                   }}
                   multi
                 />

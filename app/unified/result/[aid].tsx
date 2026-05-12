@@ -791,7 +791,7 @@ export default function ResultScreen() {
       <Animated.FlatList
         data={activeTab === 'review' ? filteredQuestions : []}
         keyExtractor={(item) => item.id}
-        extraData={{ revealedExplanations, showMistakes }}
+        extraData={{ revealedExplanations, showMistakes, enrichedQuestions }}
         renderItem={({ item, index }) => {
           // Look up enriched data for this question
           const enriched = enrichedQuestions.find((eq: any) => eq.id === item.id);

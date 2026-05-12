@@ -511,6 +511,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
     //   PDF-generation-and-share chain can continue independently
     //   after the modal unmounts.
     const prependHtml = includeReport ? buildAnalysisHtml() : '';
+    console.log('[AnalysisExport] prependHtml length:', prependHtml?.length, 'includeReport:', includeReport, 'hasTrends:', !!trends, 'hasCumulative:', !!cumulative, 'filteredQuestions:', filteredQuestions.length);
     const payload = pyqPayload as ExportPayload | null;
     const exportOptions = {
       ...opts,
@@ -537,13 +538,16 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
     try {
       if (isReportOnly) {
         if (!prependHtml) {
-          Alert.alert('Nothing to export', 'Selected reports produced no content.');
+          console.warn('[AnalysisExport] prependHtml empty - no report content generated');
+          Alert.alert('Nothing to export', 'Selected reports produced no content. Try selecting different report options.');
+          setIsExporting(false);
           return;
         }
         await printStandaloneReport(prependHtml, opts);
       } else {
         if (!payload || (payload.kind === 'questions' && !payload.rows.length)) {
           Alert.alert('Nothing to export', 'No questions matched your filters.');
+          setIsExporting(false);
           return;
         }
         await exportToPdf(payload, exportOptions, { prependHtml });
@@ -551,6 +555,8 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
     } catch (err: any) {
       console.error('[AnalysisExport] failed', err);
       Alert.alert('Export failed', err?.message || 'Could not generate the PDF.');
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -1128,6 +1134,9 @@ async function printStandaloneReport(fragmentHtml: string, o: ExportOptions): Pr
       } catch (e) {
         console.warn('[AnalysisExport] Share error (non-fatal):', e);
       }
+    } else {
+      // Fallback when share is not available
+      Alert.alert('Export Ready', `PDF saved. You can find it at the export location.`);
     }
   } catch (e) {
     console.error('[AnalysisExport] Print operation failed:', e);

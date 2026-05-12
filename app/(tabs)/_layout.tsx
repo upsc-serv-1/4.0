@@ -71,7 +71,7 @@ export default function TabsLayout() {
     hardnotes: { title: 'Hardnotes', icon: PenTool },
     capsule: { title: 'Capsule', icon: Sparkles },
     'pilot-v2': { title: 'Notes V4', icon: Compass },
-    browser: { title: 'Ghost Browser', icon: Globe },
+    browser: { title: 'Ghost', icon: Globe },
     softnotes: { title: 'Softnotes', icon: BookOpen },
     revise: { title: 'Repo', icon: RotateCcw },
     tracker: { title: 'Syllabus', icon: LayoutList },

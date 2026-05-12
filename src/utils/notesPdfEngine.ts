@@ -144,10 +144,10 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
         <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
         <style>
-          @page { margin: ${clampCm(config.pageMarginTopCm)}cm ${clampCm(config.pageMarginRightCm)}cm ${clampCm(config.pageMarginBottomCm)}cm ${clampCm(config.pageMarginLeftCm)}cm; }
+          @page { margin: 0; }
           body {
             font-family: ${config.fontFamily === 'handwriting' ? "'Caveat', cursive" : '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'};
-            padding: 0;
+            padding: ${clampCm(config.pageMarginTopCm)}cm ${clampCm(config.pageMarginRightCm)}cm ${clampCm(config.pageMarginBottomCm)}cm ${clampCm(config.pageMarginLeftCm)}cm;
             margin: 0;
             color: ${config.theme === 'sepia' ? '#433422' : config.theme === 'historical' ? '#2d2419' : '#374151'};
             font-size: ${config.fontSize}px;

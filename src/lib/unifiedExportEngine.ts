@@ -251,7 +251,10 @@ const baseCss = (o: ExportOptions) => {
   const qaBorder = anyBgVisible ? 'rgba(15, 23, 42, 0.12)' : 'transparent';
   return `
     :root { --bg:${t.bg}; --fg:${t.fg}; --accent:${t.accent}; --rule:${t.rule}; --card:${t.card}; --qa-bg:${qaBg}; --qa-q-bg:${qBg}; --qa-a-bg:${aBg}; --qa-border:${qaBorder}; }
-    @page { size: A4 !important; margin: ${clampCm(o.pageMarginTopCm)}cm ${clampCm(o.pageMarginRightCm)}cm ${clampCm(o.pageMarginBottomCm)}cm ${clampCm(o.pageMarginLeftCm)}cm; }
+    /* 🔧 FIX: @page margin is unreliable on Android (Chromium WebView ignores it).
+       We zero out @page margin and apply the user's margin as explicit padding on the
+       .paper container, which works consistently across all platforms. */
+    @page { size: A4 !important; margin: 0; }
     * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     html, body { margin: 0; padding: 0; }
     body {
@@ -263,7 +266,7 @@ const baseCss = (o: ExportOptions) => {
       orphans: 2;
       widows: 2;
     }
-    .paper { background-color: ${o.paperStyle === 'lined' ? '#ffffff' : 'var(--bg)'}; background-image: ${paperBg[o.paperStyle]}; padding: 4px; min-height: 100%; }
+    .paper { background-color: ${o.paperStyle === 'lined' ? '#ffffff' : 'var(--bg)'}; background-image: ${paperBg[o.paperStyle]}; padding: ${clampCm(o.pageMarginTopCm)}cm ${clampCm(o.pageMarginRightCm)}cm ${clampCm(o.pageMarginBottomCm)}cm ${clampCm(o.pageMarginLeftCm)}cm; min-height: 100%; }
 
     h1.cover { font-size: ${o.fontSize + 14}pt; margin: 0 0 6mm 0; color: var(--accent); font-weight: 900; letter-spacing: -0.5px; }
     .meta { color: var(--accent); font-size: ${o.fontSize - 2}pt; margin-bottom: 6mm; }

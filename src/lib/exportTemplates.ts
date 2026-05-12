@@ -35,10 +35,10 @@ export const baseStyles = (o: ExportOptions) => {
   const t = themeTokens[o.theme];
   return `
     :root { --bg:${t.bg}; --fg:${t.fg}; --accent:${t.accent}; --rule:${t.rule}; }
-    @page { size: ${o.pageSize}; margin: 18mm 14mm; }
+    @page { size: ${o.pageSize}; margin: 0; }
     * { box-sizing: border-box; }
     body { background: var(--bg); color: var(--fg); font-family: ${fontFamily[o.font]};
-           font-size: 12pt; line-height: 1.55; margin: 0; }
+           font-size: 12pt; line-height: 1.55; margin: 0; padding: 18mm 14mm; }
     .paper { background-image: ${paperBg[o.paper]}; padding: 4px; }
     h1.cover { font-size: 26pt; margin: 0 0 6mm 0; color: var(--accent); }
     .meta { color: var(--accent); font-size: 10pt; margin-bottom: 8mm; }

@@ -518,10 +518,13 @@ export const LineChart = ({
   const paddingLeft = 40;
   const paddingBottom = labels.length > 8 ? 120 : 80;
   const paddingRight = 20;
-  // Dynamic width: space points evenly (~80px per point) so few points aren't scattered
-  // Minimum width = baseWidth so single-screen view always works
-  const idealWidth = labels.length * 80 + paddingLeft + paddingRight;
-  const screenWidth = Math.max(baseWidth, idealWidth);
+  // Smart width: use consistent ~45px spacing between points so charts look
+  // proportionally similar regardless of data count. For few points the chart
+  // shrinks (keeping points grouped), for many points it fills screen width.
+  const MIN_CHART_WIDTH = 200;
+  const TARGET_SPACING = 45;
+  const idealWidth = Math.max(1, labels.length - 1) * TARGET_SPACING + paddingLeft + paddingRight;
+  const screenWidth = Math.max(MIN_CHART_WIDTH, Math.min(baseWidth, idealWidth));
   const chartWidth = screenWidth - paddingLeft;
   const chartHeight = height - paddingBottom - topInset;
   const svgHeight = height + 100; // Add extra space below for scrolling room

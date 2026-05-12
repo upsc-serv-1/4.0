@@ -800,6 +800,8 @@ export default function UnifiedQuizEngine() {
   const [activeExplSource, setActiveExplSource] = useState<Record<string, string>>({});
   const [showSaveNameModal, setShowSaveNameModal] = useState(false);
   const [isSavingAttempt, setIsSavingAttempt] = useState(false);
+  const indexPanelScrollRef = useRef<ScrollView>(null);
+  const indexPanelScrollOffset = useRef(0);
   const {
     savingFlashcard,
     flashcardedIds,
@@ -1330,11 +1332,18 @@ export default function UnifiedQuizEngine() {
     // We only want to run this once per sessionTestId
   }, [sessionTestId, sessionAttemptId, session?.user?.id]);
 
-  // REMOVED: Auto-scroll useEffect that was causing scroll snapping.
-  // The scroll position is now only changed programmatically via:
-  //   - scrollToIndexRobust() called from the question palette/navigator
-  //   - initialScrollIndex on first mount only
-  // This ensures user's manual scroll position is NEVER overridden.
+  // ── Scroll to currentIndex when entering list mode ────────────────
+  // When the user switches from card → list mode (or palette jumps into
+  // card then toggles to list), the FlatList re-mounts fresh. Without
+  // an explicit scroll, it shows Question 1.  `initialScrollIndex` alone
+  // is unreliable without `getItemLayout`, so we scroll programmatically.
+  React.useEffect(() => {
+    if (viewMode !== 'list') return;
+    const idx = currentIndex;
+    // Small delay so FlatList can render before we ask it to scroll.
+    const t = setTimeout(() => scrollToIndexRobust(idx), 80);
+    return () => clearTimeout(t);
+  }, [viewMode]);
 
   useEffect(() => {
     if (!isPaperMode) {
@@ -3188,22 +3197,24 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
               <LayoutGrid size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
             </TouchableOpacity>
 
-            {/* View mode toggle — switches between List and Card mode */}
+            {/* View mode toggle — switches between single-card and scrollable-list view */}
             {!isPaperMode && (
-              <TouchableOpacity
-                onPress={() => {
-                  setViewMode(prev => prev === 'card' ? 'list' : 'card');
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-                }}
-                style={[styles.headerBtn, viewMode === 'list' && { backgroundColor: colors.primary + '15' }]}
-                testID="engine-view-toggle-btn"
-              >
-                {viewMode === 'card' ? (
-                  <Layout size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
-                ) : (
-                  <ListIcon size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
-                )}
-              </TouchableOpacity>
+              <View style={{ flexDirection: 'row', gap: 2, backgroundColor: colors.surfaceStrong, borderRadius: 8, padding: 2 }}>
+                <TouchableOpacity
+                  onPress={() => { if (viewMode !== 'list') { setViewMode('list'); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {}); } }}
+                  style={[styles.toggleMiniBtn, viewMode === 'list' && { backgroundColor: colors.primary }]}
+                  testID="engine-view-list-btn"
+                >
+                  <ListIcon size={14} color={viewMode === 'list' ? '#fff' : colors.textSecondary} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => { if (viewMode !== 'card') { setViewMode('card'); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {}); } }}
+                  style={[styles.toggleMiniBtn, viewMode === 'card' && { backgroundColor: colors.primary }]}
+                  testID="engine-view-card-btn"
+                >
+                  <Layout size={14} color={viewMode === 'card' ? '#fff' : colors.textSecondary} />
+                </TouchableOpacity>
+              </View>
             )}
 
             {/* FIX #15: Removed AI Settings button from top bar (moved to Quick Menu) */}
@@ -3867,7 +3878,18 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                     <X size={20} color={colors.textTertiary} />
                   </TouchableOpacity>
                 </View>
-                <ScrollView style={{ flex: 1 }}>
+                <ScrollView
+                  ref={indexPanelScrollRef}
+                  style={{ flex: 1 }}
+                  scrollEventThrottle={32}
+                  onScroll={(e) => { indexPanelScrollOffset.current = e.nativeEvent.contentOffset.y; }}
+                  onContentSizeChange={() => {
+                    // Restore scroll offset after content renders
+                    if (indexPanelScrollOffset.current > 0) {
+                      indexPanelScrollRef.current?.scrollTo({ y: indexPanelScrollOffset.current, animated: false });
+                    }
+                  }}
+                >
                   {questions.map((q, idx) => {
                     const isActive = idx === currentIndex;
                     const ans = store.answers[q.id];
@@ -3876,8 +3898,11 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                       <TouchableOpacity
                         key={q.id}
                         onPress={() => {
-                          setCurrentIndex(idx);
                           setShowIndexPanel(false);
+                          setCurrentIndex(idx);
+                          // Switch to card mode for reliable direct navigation
+                          // (same pattern as the palette navigator)
+                          if (viewMode === 'list') setViewMode('card');
                         }}
                         style={{
                           paddingHorizontal: 16, paddingVertical: 12,
@@ -4838,6 +4863,7 @@ const styles = StyleSheet.create({
   indexSnippet: { fontSize: 13, fontWeight: '600', lineHeight: 18 },
   pageBtn: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent' },
   headerBtn: { padding: 8, borderRadius: 12 },
+  toggleMiniBtn: { width: 26, height: 26, borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
   headerTitleContainer: { flex: 1, alignItems: 'center' },
   headerTitle: { fontSize: 14, fontWeight: '800' },
   headerActions: { flexDirection: 'row', gap: 4 },

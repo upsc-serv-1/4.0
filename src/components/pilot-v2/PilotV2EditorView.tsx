@@ -913,11 +913,15 @@ export function PilotV2EditorView() {
               <Text style={{ color: colors.textTertiary, fontSize: 13 }}>Add block</Text>
             </TouchableOpacity>
 
-            {/* Pencil canvas — rendered INSIDE the paper view so it scrolls naturally
-                with the document content and stays anchored to page coordinates.
-                Pointer events pass through when drawingMode is off. */}
+            {/* Pencil canvas — Skia renders to a native surface that does NOT
+                respect React Native's ScrollView scroll offset. We wrap it in
+                an Animated.View that applies the inverse scroll transform so
+                strokes follow the content. */}
             {paperSize.w > 1 && paperSize.h > 1 && (
-              <View pointerEvents={pencil.drawingMode ? 'auto' : 'none'} style={StyleSheet.absoluteFill}>
+              <Animated.View
+                pointerEvents={pencil.drawingMode ? 'auto' : 'none'}
+                style={[StyleSheet.absoluteFill, { transform: [{ translateY: Animated.multiply(scrollY, -1) }] }]}
+              >
                 <PencilCanvas
                   engine={pencil.engine}
                   tool={pencil.tool}
@@ -928,13 +932,15 @@ export function PilotV2EditorView() {
                   blockLayouts={blockLayoutsRef.current}
                   blockLayoutVersion={blockLayoutVersion}
                 />
-              </View>
+              </Animated.View>
             )}
 
-            {/* Washi Tape layer — rendered INSIDE the paper view so it scrolls with content.
-                Pointer events pass through when not actively adding washi tape. */}
+            {/* Washi Tape layer — same scroll-fix as PencilCanvas above */}
             {paperSize.w > 1 && paperSize.h > 1 && (
-              <View pointerEvents={washiMode ? 'auto' : 'none'} style={StyleSheet.absoluteFill}>
+              <Animated.View
+                pointerEvents={washiMode ? 'auto' : 'none'}
+                style={[StyleSheet.absoluteFill, { transform: [{ translateY: Animated.multiply(scrollY, -1) }] }]}
+              >
                 <WashiTapeLayer
                   tapes={washiTapes}
                   width={paperSize.w}
@@ -945,7 +951,7 @@ export function PilotV2EditorView() {
                   onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
                   onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
                 />
-              </View>
+              </Animated.View>
             )}
 
             </AnimatedReanimated.View>

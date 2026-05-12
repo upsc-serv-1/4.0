@@ -78,7 +78,7 @@ type SearchResult = {
 type Filters = {
   searchMode:    'Matching' | 'Exact';
   searchAcross:  string[]; // array of field keys: 'Questions' | 'Explanations' | 'Options'
-  stage:         string;   // 'All' | 'Prelims' | 'Mains'
+  stage:         string;   // 'All' | comma-separated (Prelims, Mains, Optional)
   institutes:    string;   // 'All' | comma-separated
   programs:      string;   // 'All' | comma-separated
   pyqFilter:     string;   // 'All' | 'PYQ Only' | 'Non-PYQ'
@@ -176,39 +176,80 @@ function highlightKeywords(text: string, allKeywords: string[]): React.ReactNode
 }
 
 // ── Contextual snippet builder ───────────────────────────────────────────────
-// Finds the first keyword match in the text and returns ~10-12 words before
-// and after it, so even matches in deep paragraphs are visible in the snippet.
-function buildContextSnippet(text: string, keywords: string[], maxContextWords: number = 12): React.ReactNode {
-  if (!text) return null;
-  const lowerText = text.toLowerCase();
-  // Find the first matching keyword
-  const matchingKw = keywords.find(k => k.length > 2 && lowerText.includes(k.toLowerCase()));
-  if (!matchingKw) return <Text>{text.slice(0, 150)}</Text>;
+// Searches across question_text, options, and explanation_markdown for the
+// best keyword match. Shows ~10-12 words before & after with a source label
+// (e.g. "Options:" or "Explanation:") so the user knows why this result appeared.
+function buildContextSnippet(
+  text: string,
+  keywords: string[],
+  options?: Record<string, string> | null,
+  explanation?: string | null,
+  maxContextWords: number = 12,
+): React.ReactNode {
+  const lowerText = (text || '').toLowerCase();
   
-  const matchIdx = lowerText.indexOf(matchingKw.toLowerCase());
-  if (matchIdx === -1) return <Text>{text.slice(0, 150)}</Text>;
+  // Build searchable fields with labels
+  const fields: { text: string; label: string }[] = [{ text: text || '', label: '' }];
   
-  const matchEnd = matchIdx + matchingKw.length;
+  // Add options text
+  if (options) {
+    const optsText = Object.entries(options)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(' ');
+    if (optsText) fields.push({ text: optsText, label: '(Options)' });
+  }
   
-  // Count words before the match
-  const beforeText = text.slice(0, matchIdx);
+  // Add explanation
+  if (explanation) {
+    fields.push({ text: explanation, label: '(Explanation)' });
+  }
+  
+  // Find the best match across all fields - find first keyword that matches any field
+  let bestField: { text: string; label: string } | null = null;
+  let bestKw: string | null = null;
+  let bestIdx = -1;
+  
+  for (const field of fields) {
+    if (!field.text) continue;
+    const lower = field.text.toLowerCase();
+    const kw = keywords.find(k => k.length > 2 && lower.includes(k.toLowerCase()));
+    if (kw) {
+      const idx = lower.indexOf(kw.toLowerCase());
+      if (bestField === null || idx < bestIdx || (bestKw && kw.length > bestKw.length)) {
+        bestField = field;
+        bestKw = kw;
+        bestIdx = idx;
+      }
+    }
+  }
+  
+  // No keyword found in any field - show truncated question text
+  if (!bestField || !bestKw) {
+    return <Text>{(text || '').slice(0, 150)}</Text>;
+  }
+  
+  const matchIdx = bestField.text.toLowerCase().indexOf(bestKw.toLowerCase());
+  if (matchIdx === -1) return <Text>{(text || '').slice(0, 150)}</Text>;
+  
+  const matchEnd = matchIdx + bestKw.length;
+  
+  // Extract context around the match
+  const beforeText = bestField.text.slice(0, matchIdx);
   const beforeWords = beforeText.split(/\s+/).filter(Boolean);
   const contextBefore = beforeWords.slice(-maxContextWords).join(' ');
   const hasMoreBefore = beforeWords.length > maxContextWords;
   
-  // Count words after the match
-  const afterText = text.slice(matchEnd);
+  const afterText = bestField.text.slice(matchEnd);
   const afterWords = afterText.split(/\s+/).filter(Boolean);
   const contextAfter = afterWords.slice(0, maxContextWords).join(' ');
   const hasMoreAfter = afterWords.length > maxContextWords;
   
-  // Build snippet with ellipsis
   const prefix = hasMoreBefore ? '... ' : '';
   const suffix = hasMoreAfter ? ' ...' : '';
-  const snippet = `${prefix}${contextBefore} ${matchingKw} ${contextAfter}${suffix}`;
+  const label = bestField.label ? `${bestField.label} ` : '';
+  const snippet = `${label}${prefix}${contextBefore} ${bestKw} ${contextAfter}${suffix}`;
   
-  // Highlight the keyword in the snippet
-  return highlightKeywords(snippet, [matchingKw]);
+  return highlightKeywords(snippet, [bestKw]);
 }
 
 // ── PYQ chip color by exam category ──────────────────────────────────────────
@@ -275,6 +316,7 @@ export default function AISearchTab() {
   const [sectionOptions, setSectionOptions]     = useState<string[]>([]);
   const [microtopicOptions, setMicrotopicOptions] = useState<string[]>([]);
   const [instituteOptions, setInstituteOptions] = useState<string[]>([]);
+  const [programOptions, setProgramOptions] = useState<string[]>([]);
 
   // ISSUE FIX #12: Track all subjects from search results for sidebar
   // so filter options remain visible even after selection
@@ -709,6 +751,12 @@ export default function AISearchTab() {
         const unique = [...new Set(instData.map((r: any) => r.institute).filter(Boolean))].sort() as string[];
         setInstituteOptions(unique);
       }
+      const { data: progData } = await supabase
+        .from('tests').select('program_name').not('program_name', 'is', null).limit(300);
+      if (progData) {
+        const unique = [...new Set(progData.map((r: any) => r.program_name).filter(Boolean))].sort() as string[];
+        setProgramOptions(unique);
+      }
       const raw = await AsyncStorage.getItem('ai_search_history');
       if (raw) setSearchHistory(JSON.parse(raw));
 
@@ -911,7 +959,11 @@ export default function AISearchTab() {
         const progList = af.programs !== 'All' ? af.programs.split(',').filter(Boolean) : [];
         if (stageActive || instList.length > 0 || progList.length > 0) {
           let testsQ = supabase.from('tests').select('id');
-          if (stageActive) testsQ = testsQ.ilike('series', `%${af.stage}%`);
+          if (stageActive) {
+            const stageList = af.stage.split(',').filter(Boolean);
+            if (stageList.length === 1) testsQ = testsQ.ilike('series', `%${af.stage}%`);
+            else if (stageList.length > 1) testsQ = testsQ.in('series', stageList);
+          }
           if (instList.length > 0) testsQ = testsQ.in('institute', instList);
           if (progList.length > 0) testsQ = testsQ.in('program_name', progList);
           const { data: testRows } = await testsQ;
@@ -1387,7 +1439,9 @@ export default function AISearchTab() {
           {/* FIX: use buildContextSnippet to show ~12 words before & after the match, */}
           {/* ensuring matches in deep paragraphs are visible in the snippet */}
           <Text style={[styles.cardText, { color: colors.textPrimary }]} numberOfLines={3}>
-            {keywords.length > 0 ? buildContextSnippet(item.question_text, keywords) : item.question_text}
+            {keywords.length > 0
+              ? buildContextSnippet(item.question_text, keywords, item.options, item.explanation_markdown)
+              : item.question_text}
           </Text>
 
           <View style={styles.cardChips}>
@@ -2026,34 +2080,65 @@ export default function AISearchTab() {
               </View>
             )}
 
-            {/* Programs — multi-select chips */}
+            {/* Exam Stage / Series */}
             <View style={styles.filterGroup}>
-              <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>PROGRAMS</Text>
+              <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>EXAM STAGE</Text>
               <View style={styles.chipsWrap}>
                 <TouchableOpacity
-                  onPress={() => setPendingFilters(p => ({ ...p, programs: 'All' }))}
-                  style={[styles.fchip, pendingFilters.programs === 'All' && styles.fchipSel]}
+                  onPress={() => setPendingFilters(p => ({ ...p, stage: 'All' }))}
+                  style={[styles.fchip, pendingFilters.stage === 'All' && styles.fchipSel]}
                 >
-                  <Text style={[styles.fchipText, { color: pendingFilters.programs === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
+                  <Text style={[styles.fchipText, { color: pendingFilters.stage === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
                 </TouchableOpacity>
-                {['Prelims', 'Mains', 'Optional'].map(prog => {
-                  const isSelected = pendingFilters.programs.split(',').includes(prog);
+                {['Prelims', 'Mains', 'Optional'].map(s => {
+                  const isSelected = pendingFilters.stage.split(',').includes(s);
                   return (
                     <TouchableOpacity
-                      key={prog}
+                      key={s}
                       onPress={() => {
-                        const list = pendingFilters.programs === 'All' ? [] : pendingFilters.programs.split(',').filter(Boolean);
-                        const next = isSelected ? list.filter(p => p !== prog) : [...list, prog];
-                        setPendingFilters(p => ({ ...p, programs: next.length ? next.join(',') : 'All' }));
+                        const list = pendingFilters.stage === 'All' ? [] : pendingFilters.stage.split(',').filter(Boolean);
+                        const next = isSelected ? list.filter(x => x !== s) : [...list, s];
+                        setPendingFilters(p => ({ ...p, stage: next.length ? next.join(',') : 'All' }));
                       }}
                       style={[styles.fchip, isSelected && styles.fchipSel]}
                     >
-                      <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{prog}</Text>
+                      <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{s}</Text>
                     </TouchableOpacity>
                   );
                 })}
               </View>
             </View>
+
+            {/* Real Programs — dynamically from tests table, multi-select */}
+            {programOptions.length > 0 && (
+              <View style={styles.filterGroup}>
+                <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>PROGRAMS</Text>
+                <View style={styles.chipsWrap}>
+                  <TouchableOpacity
+                    onPress={() => setPendingFilters(p => ({ ...p, programs: 'All' }))}
+                    style={[styles.fchip, pendingFilters.programs === 'All' && styles.fchipSel]}
+                  >
+                    <Text style={[styles.fchipText, { color: pendingFilters.programs === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
+                  </TouchableOpacity>
+                  {programOptions.map(prog => {
+                    const isSelected = pendingFilters.programs.split(',').includes(prog);
+                    return (
+                      <TouchableOpacity
+                        key={prog}
+                        onPress={() => {
+                          const list = pendingFilters.programs === 'All' ? [] : pendingFilters.programs.split(',').filter(Boolean);
+                          const next = isSelected ? list.filter(p => p !== prog) : [...list, prog];
+                          setPendingFilters(p => ({ ...p, programs: next.length ? next.join(',') : 'All' }));
+                        }}
+                        style={[styles.fchip, isSelected && styles.fchipSel]}
+                      >
+                        <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{prog}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
 
             {/* Subjects — dynamically loaded from questions table */}
             <View style={styles.filterGroup}>

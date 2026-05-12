@@ -197,7 +197,7 @@ export default function UnifiedArenaSetup() {
 
   const [selectedInstitutes, setSelectedInstitutes] = useState<string[]>([]);
   const deferredSelectedInstitutes = useDeferredValue(selectedInstitutes);
-  const [selectedProgram, setSelectedProgram] = useState('All');
+  const [selectedPrograms, setSelectedProgramss] = useState<string[]>([]);
   const [selectedExamStage, setSelectedExamStage] = useState('All');
   const [selectedTestId, setSelectedTestId] = useState<string | null>(null);
 
@@ -278,6 +278,16 @@ export default function UnifiedArenaSetup() {
     }
     if (params.pyqFilter) setPyqMaster(params.pyqFilter as string);
     if (params.ncertFilter) setNcertFilter(params.ncertFilter as string);
+    if (params.program) {
+      const prog = String(params.program);
+      if (prog === 'All') setSelectedPrograms([]);
+      else setSelectedPrograms(prog.split(',').filter(Boolean));
+    }
+    if (params.programs) {
+      const prog = String(params.programs);
+      if (prog === 'All') setSelectedPrograms([]);
+      else setSelectedPrograms(prog.split(',').filter(Boolean));
+    }
   }, [params]);
 
   useEffect(() => {
@@ -308,7 +318,7 @@ export default function UnifiedArenaSetup() {
       pyq: pyqMaster,
       examCat: selectedExamCategory,
       inst: deferredSelectedInstitutes,
-      prog: selectedProgram,
+      prog: selectedPrograms,
       tags: selectedTags,
       ncert: ncertFilter,
     });
@@ -334,7 +344,7 @@ export default function UnifiedArenaSetup() {
     pyqMaster,
     selectedExamCategory,
     deferredSelectedInstitutes,
-    selectedProgram,
+    selectedPrograms,
     selectedExamStage,
     selectedTestId,
     selectedTags,
@@ -360,7 +370,7 @@ export default function UnifiedArenaSetup() {
     if (activeTab === 'paper') {
       setPaperVisibleCount(40);
     }
-  }, [activeTab, deferredSelectedInstitutes, selectedProgram, selectedExamStage, selectedTestId]);
+  }, [activeTab, deferredSelectedInstitutes, selectedPrograms, selectedExamStage, selectedTestId]);
 
   const fetchSearchResults = async () => {
     if (!searchQuery && Object.keys(searchFilters).length === 0) {
@@ -625,7 +635,7 @@ export default function UnifiedArenaSetup() {
         pyqMaster === 'All' &&
         selectedExamCategory.length === 0 &&
         deferredSelectedInstitutes.length === 0 &&
-        selectedProgram === 'All' &&
+        selectedPrograms.length === 0 &&
         selectedTags.length === 0 &&
         ncertFilter === 'All';
 
@@ -657,7 +667,7 @@ export default function UnifiedArenaSetup() {
           rows = rows.filter((m: any) => m.test_id === selectedTestId);
         } else {
           if (deferredSelectedInstitutes.length > 0) rows = rows.filter((m: any) => deferredSelectedInstitutes.includes(m.institute));
-          if (selectedProgram !== 'All') rows = rows.filter((m: any) => m.program_name === selectedProgram);
+          if (selectedPrograms.length > 0) rows = rows.filter((m: any) => selectedPrograms.includes(m.program_name));
           if (selectedExamStage !== 'All') rows = rows.filter((m: any) => m.series === selectedExamStage);
         }
 
@@ -726,10 +736,10 @@ export default function UnifiedArenaSetup() {
           }
         }
 
-        if (deferredSelectedInstitutes.length > 0 || selectedProgram !== 'All') {
+        if (deferredSelectedInstitutes.length > 0 || selectedPrograms.length > 0) {
           let tQuery = LocalQuery.from('tests').select('id');
           if (deferredSelectedInstitutes.length > 0) tQuery = tQuery.in('institute', deferredSelectedInstitutes);
-          if (selectedProgram !== 'All') tQuery = tQuery.eq('program_name', selectedProgram);
+          if (selectedPrograms.length > 0) tQuery = tQuery.in('program_name', selectedPrograms);
           const { data: testRows } = await tQuery;
           const testIds = (testRows || []).map(t => t.id);
           if (testIds.length > 0) query = query.in('test_id', testIds);
@@ -746,7 +756,7 @@ export default function UnifiedArenaSetup() {
       const cacheKey = JSON.stringify({
         tab: activeTab, subjects: selectedSubjects, section: selectedSection,
         microtopic: selectedMicrotopic, pyq: pyqMaster, examCat: selectedExamCategory,
-        inst: deferredSelectedInstitutes, prog: selectedProgram, tags: selectedTags, ncert: ncertFilter
+        inst: deferredSelectedInstitutes, prog: selectedPrograms, tags: selectedTags, ncert: ncertFilter
       });
       const cache = countCacheRef.current;
       cache.set(cacheKey, count || 0);
@@ -819,7 +829,7 @@ export default function UnifiedArenaSetup() {
     metadata.forEach(m => {
       if (!m.test_id) return;
       if (deferredSelectedInstitutes.length > 0 && !deferredSelectedInstitutes.includes(m.institute)) return;
-      if (selectedProgram !== 'All' && m.program_name !== selectedProgram) return;
+      if (selectedPrograms.length > 0 && m.program_name !== selectedPrograms) return;
       if (selectedExamStage !== 'All' && m.series !== selectedExamStage) return;
 
       if (!tests.has(m.test_id)) {
@@ -833,7 +843,7 @@ export default function UnifiedArenaSetup() {
       }
     });
     return Array.from(tests.values()).sort((a, b) => String(a.title).localeCompare(String(b.title)));
-  }, [metadata, deferredSelectedInstitutes, selectedProgram, selectedExamStage]);
+  }, [metadata, deferredSelectedInstitutes, selectedPrograms, selectedExamStage]);
 
   const visiblePaperTests = useMemo(() => testList.slice(0, paperVisibleCount), [testList, paperVisibleCount]);
 
@@ -864,7 +874,7 @@ export default function UnifiedArenaSetup() {
         section: searchFilters.selectedSections?.join('|') || '',
         microtopic: searchFilters.selectedMicrotopics?.join('|') || '',
         institutes: searchFilters.selectedInstitutes?.join(','),
-        programs: searchFilters.selectedPrograms?.join(','),
+        programs: searchFilters.selectedProgramss?.join(','),
         examStage: searchFilters.examStage,
         pyqFilter: searchFilters.pyqFilter,
         pyqCategory: searchFilters.pyqCategory?.join(','),
@@ -882,7 +892,7 @@ export default function UnifiedArenaSetup() {
         examCategory: Array.isArray(selectedExamCategory) ? selectedExamCategory.join(',') : (selectedExamCategory || ''),
         institute: selectedInstitutes[0] || 'All',
         institutes: selectedInstitutes.join(','),
-        program: selectedProgram,
+        program: selectedPrograms.join(',') || 'All',
         tags: selectedTags.join('|'),
         ncertFilter: ncertFilter,
         testId: '',
@@ -897,7 +907,7 @@ export default function UnifiedArenaSetup() {
         examCategory: '',
         institute: selectedInstitutes[0] || 'All',
         institutes: selectedInstitutes.join(','),
-        program: selectedProgram,
+        program: selectedPrograms.join(',') || 'All',
         examStage: selectedExamStage,
         tags: '',
         ncertFilter: ncertFilter,
@@ -1229,15 +1239,16 @@ export default function UnifiedArenaSetup() {
                   selected={selectedInstitutes}
                   onSelect={(vals: string[]) => {
                     setSelectedInstitutes(vals);
-                    setSelectedProgram('All');
+                    setSelectedPrograms('All');
                   }}
                   multi
                 />
                 <FilterRow
                   title="Program"
                   items={programs}
-                  selected={selectedProgram}
-                  onSelect={setSelectedProgram}
+                  selected={selectedPrograms}
+                  onSelect={setSelectedPrograms}
+                  multi
                   visible={selectedInstitutes.length > 0}
                 />
               </View>
@@ -1264,15 +1275,15 @@ export default function UnifiedArenaSetup() {
                   selected={selectedInstitutes}
                   onSelect={(vals: string[]) => {
                     setSelectedInstitutes(vals);
-                    setSelectedProgram('All');
+                    setSelectedPrograms('All');
                   }}
                   multi
                 />
                 <FilterRow
                   title="Program"
                   items={programs}
-                  selected={selectedProgram}
-                  onSelect={setSelectedProgram}
+                  selected={selectedPrograms}
+                  onSelect={setSelectedPrograms}
                 />
                 <FilterRow
                   title="Curriculum"

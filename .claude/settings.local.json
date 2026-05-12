@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(xxd)",
-      "Bash(grep -n \"const questionBlock = \\\\`\" src/lib/unifiedExportEngine.ts)"
+      "Bash(grep -n \"const questionBlock = \\\\`\" src/lib/unifiedExportEngine.ts)",
+      "Bash(grep -Pn \"^\\\\s+const questionBlock = \\\\`\" src/lib/unifiedExportEngine.ts)"
     ]
   }
 }

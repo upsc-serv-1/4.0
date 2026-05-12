@@ -51,8 +51,8 @@ export default function TabsLayout() {
     tags: '#06b6d4',        // Cyan
     'pilot-v2': '#10b981',  // Emerald
     browser: '#ec4899',     // Pink
-    revise: '#3b82f6',      // Blue
-    tracker: '#f97316',     // Orange
+    revise: '#3b82f6',      // Blue (Repo)
+    tracker: '#f97316',     // Orange (Syllabus)
     'ai-search': '#6366f1', // Indigo
     notes: '#a855f7',       // Violet
     hardnotes: '#ef4444',   // Red
@@ -73,8 +73,8 @@ export default function TabsLayout() {
     'pilot-v2': { title: 'Notes V4', icon: Compass },
     browser: { title: 'Ghost Browser', icon: Globe },
     softnotes: { title: 'Softnotes', icon: BookOpen },
-    revise: { title: 'Revise', icon: RotateCcw },
-    tracker: { title: 'Syllabus Tracker', icon: LayoutList },
+    revise: { title: 'Repo', icon: RotateCcw },
+    tracker: { title: 'Syllabus', icon: LayoutList },
     'ai-search': { title: 'Search', icon: Search },
   };
 

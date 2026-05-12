@@ -293,7 +293,7 @@ export function PilotV2SidebarSubject() {
 }
 
 const styles = StyleSheet.create({
-  root: { width: 300, borderRightWidth: 1, flexDirection: 'column' },
+  root: { width: 390, borderRightWidth: 1, flexDirection: 'column' },
   header: { paddingHorizontal: 24, paddingVertical: 24, borderBottomWidth: 1 },
   backRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   subjectIcon: { width: 40, height: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },

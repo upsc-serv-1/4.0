@@ -2426,9 +2426,16 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
   };
 
   const handleExit = () => {
-    // Back button — navigate to previous screen / arena topic-wise page
+    // Back button — If learn mode and NOT already on the Arena Index, show it first.
+    // This way the user sees the question grid before being thrown out of the engine.
     if (arenaMode === 'exam') {
       setShowSaveSessionModal(true);
+      return;
+    }
+
+    if (arenaMode === 'learning' && !showIndex && !isPaperMode) {
+      setShowIndex(true);
+      setShowIndexPanel(false);
       return;
     }
 
@@ -2609,10 +2616,14 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
             const isAnswered = !!store.answers[item.id];
             
             return (
-              <TouchableOpacity 
-                onPress={() => { 
-                  setCurrentIndex(actualIndex); 
-                  setShowIndex(false); 
+              <TouchableOpacity
+                onPress={() => {
+                  setCurrentIndex(actualIndex);
+                  setShowIndex(false);
+                  // Switch to Card mode so the selected question opens directly
+                  // without FlatList scroll-position issues. The user can still
+                  // switch back to List mode via the view toggle.
+                  if (viewMode === 'list') setViewMode('card');
                 }}
                 style={[styles.indexItem, { backgroundColor: colors.surface, borderColor: colors.border }, isAnswered && { borderColor: colors.primary + '40' }]}
               >
@@ -3177,17 +3188,21 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
               <LayoutGrid size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
             </TouchableOpacity>
 
-            {/* Exit card view but STAY in quiz engine (switch to list view) */}
-            {viewMode === 'card' && (
+            {/* View mode toggle — switches between List and Card mode */}
+            {!isPaperMode && (
               <TouchableOpacity
                 onPress={() => {
-                  setViewMode('list');
-                  setArenaMode('learning');
+                  setViewMode(prev => prev === 'card' ? 'list' : 'card');
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
                 }}
-                style={[styles.headerBtn, { backgroundColor: '#ef444420' }]}
-                testID="engine-exit-sim-btn"
+                style={[styles.headerBtn, viewMode === 'list' && { backgroundColor: colors.primary + '15' }]}
+                testID="engine-view-toggle-btn"
               >
-                <Minimize2 size={18} color="#ef4444" />
+                {viewMode === 'card' ? (
+                  <ListIcon size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
+                ) : (
+                  <Layout size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
+                )}
               </TouchableOpacity>
             )}
 

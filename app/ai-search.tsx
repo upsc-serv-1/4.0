@@ -175,6 +175,42 @@ function highlightKeywords(text: string, allKeywords: string[]): React.ReactNode
   );
 }
 
+// ── Contextual snippet builder ───────────────────────────────────────────────
+// Finds the first keyword match in the text and returns ~10-12 words before
+// and after it, so even matches in deep paragraphs are visible in the snippet.
+function buildContextSnippet(text: string, keywords: string[], maxContextWords: number = 12): React.ReactNode {
+  if (!text) return null;
+  const lowerText = text.toLowerCase();
+  // Find the first matching keyword
+  const matchingKw = keywords.find(k => k.length > 2 && lowerText.includes(k.toLowerCase()));
+  if (!matchingKw) return <Text>{text.slice(0, 150)}</Text>;
+  
+  const matchIdx = lowerText.indexOf(matchingKw.toLowerCase());
+  if (matchIdx === -1) return <Text>{text.slice(0, 150)}</Text>;
+  
+  const matchEnd = matchIdx + matchingKw.length;
+  
+  // Count words before the match
+  const beforeText = text.slice(0, matchIdx);
+  const beforeWords = beforeText.split(/\s+/).filter(Boolean);
+  const contextBefore = beforeWords.slice(-maxContextWords).join(' ');
+  const hasMoreBefore = beforeWords.length > maxContextWords;
+  
+  // Count words after the match
+  const afterText = text.slice(matchEnd);
+  const afterWords = afterText.split(/\s+/).filter(Boolean);
+  const contextAfter = afterWords.slice(0, maxContextWords).join(' ');
+  const hasMoreAfter = afterWords.length > maxContextWords;
+  
+  // Build snippet with ellipsis
+  const prefix = hasMoreBefore ? '... ' : '';
+  const suffix = hasMoreAfter ? ' ...' : '';
+  const snippet = `${prefix}${contextBefore} ${matchingKw} ${contextAfter}${suffix}`;
+  
+  // Highlight the keyword in the snippet
+  return highlightKeywords(snippet, [matchingKw]);
+}
+
 // ── PYQ chip color by exam category ──────────────────────────────────────────
 function getPYQChipStyle(pyq: ReturnType<typeof getPYQCategorization>) {
   if (!pyq.hasPYQData) return null;
@@ -1338,8 +1374,10 @@ export default function AISearchTab() {
           {/* Enhancement 1 — keyword highlighting with ALL matchable keywords */}
           {/* Uses ALL keywords from the search (not just first 3), so cards matching */}
           {/* AI-expanded terms like "Krishnadevaraya" also show those words highlighted */}
+          {/* FIX: use buildContextSnippet to show ~12 words before & after the match, */}
+          {/* ensuring matches in deep paragraphs are visible in the snippet */}
           <Text style={[styles.cardText, { color: colors.textPrimary }]} numberOfLines={3}>
-            {keywords.length > 0 ? highlightKeywords(item.question_text, keywords) : item.question_text}
+            {keywords.length > 0 ? buildContextSnippet(item.question_text, keywords) : item.question_text}
           </Text>
 
           <View style={styles.cardChips}>

@@ -1125,6 +1125,7 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
       }).join('')}</ul>` : '';
       const questionBlock = `
         <div class="qstem"><span class="qnum">${i + 1}.</span>${renderInline(stem)}</div>
+        ${o.showMetaChips ? buildHierarchyBreadcrumb(q) : ''}
         ${optsBlock}
       `;
       const answerBlock = `

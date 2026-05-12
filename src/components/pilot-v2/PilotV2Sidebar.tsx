@@ -943,7 +943,7 @@ function NavRow({ label, Icon, colors, active, testID, onPress }: NavRowProps) {
 
 const styles = StyleSheet.create({
   root: {
-    width: 320,
+    width: 416,
     borderRightWidth: 1,
     flexDirection: 'column',
   },

@@ -1246,13 +1246,13 @@ export default function AISearchTab() {
       // Compute tiers for sorting
       const rawTermLower = rawTerm.toLowerCase();
       const getSearchTier = (r: any): number => {
-        const text = ((r.question_text || '') + ' ' + (r.explanation_markdown || '')).toLowerCase();
-        if (text.includes(rawTermLower)) return 0;
-        if (userWords.length > 1 && userWords.every(w => text.includes(w))) return 1;
-        const matchCount = userWords.filter(w => text.includes(w)).length;
+        const searchText = ((r.question_text || '') + ' ' + (r.explanation_markdown || ''));
+        // Word-boundary matching — "rain" won't match inside "training"
+        if (rawTermLower.length > 2 && hasWholeWord(searchText, rawTermLower)) return 0;
+        if (userWords.length > 1 && userWords.every(w => hasWholeWord(searchText, w))) return 1;
+        const matchCount = userWords.filter(w => hasWholeWord(searchText, w)).length;
         if (userWords.length > 0 && matchCount >= Math.ceil(userWords.length / 2)) return 2;
-        const kwLower = displayKeywords.map(k => k.toLowerCase());
-        if (kwLower.some(k => text.includes(k))) return 3;
+        if (displayKeywords.some(k => k.length > 2 && hasWholeWord(searchText, k))) return 3;
         return 4;
       };
       const stamped = localResults.map((r: any) => ({ ...r, _searchTier: getSearchTier(r) }));
@@ -1342,10 +1342,10 @@ export default function AISearchTab() {
     
     const rawTermLower = query.trim().toLowerCase().split(/\s+/)[0] || '';
     
-    // Check if question_text directly contains the user's exact search word
+    // Check if question_text contains the user's exact search word (whole-word match)
     const isExactMatch = (r: SearchResult): boolean => {
-      if (!rawTermLower) return false;
-      return (r.question_text || '').toLowerCase().includes(rawTermLower);
+      if (!rawTermLower || rawTermLower.length < 2) return false;
+      return hasWholeWord(r.question_text || '', rawTermLower);
     };
     
     // PYQ relevance (lower = more relevant)

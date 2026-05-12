@@ -290,14 +290,37 @@ export default function UnifiedArenaSetup() {
     handleLaunch('learning');
   }, [params.autorun, activeTab, calculatingCount, questionCount]);
 
+  // Simple LRU cache for question counts by filter combo key
+  const countCacheRef = useRef<Map<string, number>>(new Map());
+  const COUNTCACHE_MAX = 50;
+
   useEffect(() => {
     if (countDebounceRef.current) {
       clearTimeout(countDebounceRef.current);
     }
 
+    // Build cache key from current filters
+    const cacheKey = JSON.stringify({
+      tab: activeTab,
+      subjects: selectedSubjects,
+      section: selectedSection,
+      microtopic: selectedMicrotopic,
+      pyq: pyqMaster,
+      examCat: selectedExamCategory,
+      inst: deferredSelectedInstitutes,
+      prog: selectedProgram,
+      tags: selectedTags,
+      ncert: ncertFilter,
+    });
+    const cached = countCacheRef.current.get(cacheKey);
+    if (cached !== undefined) {
+      setQuestionCount(cached);
+      return;
+    }
+
     countDebounceRef.current = setTimeout(() => {
       updateQuestionCount();
-    }, 120);
+    }, 400);
 
     return () => {
       if (countDebounceRef.current) {
@@ -719,6 +742,18 @@ export default function UnifiedArenaSetup() {
       const { count, error } = await query;
       if (error) throw error;
       setQuestionCount(count || 0);
+      // Cache this count result
+      const cacheKey = JSON.stringify({
+        tab: activeTab, subjects: selectedSubjects, section: selectedSection,
+        microtopic: selectedMicrotopic, pyq: pyqMaster, examCat: selectedExamCategory,
+        inst: deferredSelectedInstitutes, prog: selectedProgram, tags: selectedTags, ncert: ncertFilter
+      });
+      const cache = countCacheRef.current;
+      cache.set(cacheKey, count || 0);
+      if (cache.size > 50) {
+        const first = cache.keys().next().value;
+        if (first) cache.delete(first);
+      }
     } catch (err) {
       console.error('Count update error:', err);
     } finally {

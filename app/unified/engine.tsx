@@ -85,6 +85,7 @@ import RichNoteEditor from '../../src/components/RichNoteEditor';
 import { aiTransformNoteContent } from '../../src/services/GeminiService';
 import { AIModelSwitcher } from '../../src/components/ai/AIModelSwitcher';
 import { PilotV2AIChat } from '../../src/components/pilot-v2/PilotV2AIChat';
+import { PilotV2Provider } from '../../src/context/PilotV2Context';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PinchGestureHandler, State as GHState } from 'react-native-gesture-handler';
@@ -531,6 +532,8 @@ export default function UnifiedQuizEngine() {
         Alert.alert('Gemini key needed', 'Go to Settings → AI Settings and paste your Gemini key.');
       } else if (msg.includes('No Groq API key found')) {
         Alert.alert('Groq key needed', 'Go to Settings → AI Settings and paste your Groq key.\nFree at console.groq.com');
+      } else if (msg.includes('No DeepSeek API key found')) {
+        Alert.alert('DeepSeek key needed', 'Go to Settings → AI Settings and paste your DeepSeek key.\nGet keys at platform.deepseek.com');
       } else {
         Alert.alert('AI Error', msg);
       }
@@ -1541,6 +1544,48 @@ export default function UnifiedQuizEngine() {
               } else {
                 filtered = [];
               }
+            }
+          }
+
+          // Apply NCERT/curriculum filter — was missing, same issue:
+          // without it, ALL cached questions flow into mergeQuestions
+          const ncertFilter = params.ncertFilter;
+          if (ncertFilter === 'NCERT Only') {
+            filtered = filtered.filter((q: any) => {
+              const v = q.is_ncert;
+              return v === true || v === 1 || (typeof v === 'string' && ['true','1','yes'].includes(v.trim().toLowerCase()));
+            });
+          } else if (ncertFilter === 'Non-NCERT') {
+            filtered = filtered.filter((q: any) => {
+              const v = q.is_ncert;
+              return !(v === true || v === 1 || (typeof v === 'string' && ['true','1','yes'].includes(v.trim().toLowerCase())));
+            });
+          }
+
+          // Apply institute filter (critical — prevents mergeQuestions from
+          // scanning ALL cached questions when a specific institute is selected)
+          const insts = params.institutes || params.institute;
+          if (insts && insts !== 'All' && insts !== '' && insts !== '[]') {
+            const instList = typeof insts === 'string' ? insts.split(',').filter(Boolean) : [];
+            if (instList.length > 0) {
+              filtered = filtered.filter((q: any) => {
+                const tests = Array.isArray(q?.tests) ? q.tests[0] : q?.tests;
+                const inst = tests?.institute || q?.provider || q?.source?.institute || '';
+                return instList.includes(inst);
+              });
+            }
+          }
+
+          // Apply program filter
+          const progs = params.programs || params.program;
+          if (progs && progs !== 'All' && progs !== '' && progs !== '[]') {
+            const progList = typeof progs === 'string' ? progs.split(',').filter(Boolean) : [];
+            if (progList.length > 0) {
+              filtered = filtered.filter((q: any) => {
+                const tests = Array.isArray(q?.tests) ? q.tests[0] : q?.tests;
+                const prog = tests?.program_name || q?.program_name || '';
+                return progList.includes(prog);
+              });
             }
           }
 
@@ -4561,24 +4606,26 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
         />
 
         {/* Floating Context-Aware AI Chat Card overlay */}
-        <PilotV2AIChat
-          activeQuestion={activeAiQuestion || questions[currentIndex]}
-          externalOpenTrigger={aiChatTrigger}
-          onSaveResponse={(text: string) => {
-            const q = activeAiQuestion || questions[currentIndex];
-            if (!q) return;
-            setPilotSaveTargetQuestion(q);
-            setPilotSaveHtml(markdownToHtml(text || ''));
-            setPilotV2SaveOpen(true);
-          }}
-          onOpenVitaminEditor={(text: string) => {
-            const q = activeAiQuestion || questions[currentIndex];
-            if (!q) return;
-            setEditingQuestion(q);
-            setVitaminEditorContent(markdownToHtml(text || ''));
-            setVitaminEditorVisible(true);
-          }}
-        />
+        <PilotV2Provider>
+          <PilotV2AIChat
+            activeQuestion={activeAiQuestion || questions[currentIndex]}
+            externalOpenTrigger={aiChatTrigger}
+            onSaveResponse={(text: string) => {
+              const q = activeAiQuestion || questions[currentIndex];
+              if (!q) return;
+              setPilotSaveTargetQuestion(q);
+              setPilotSaveHtml(markdownToHtml(text || ''));
+              setPilotV2SaveOpen(true);
+            }}
+            onOpenVitaminEditor={(text: string) => {
+              const q = activeAiQuestion || questions[currentIndex];
+              if (!q) return;
+              setEditingQuestion(q);
+              setVitaminEditorContent(markdownToHtml(text || ''));
+              setVitaminEditorVisible(true);
+            }}
+          />
+        </PilotV2Provider>
 
         <UnifiedExportSheet
           visible={exportSheetVisible}

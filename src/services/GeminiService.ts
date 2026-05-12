@@ -23,8 +23,28 @@ export const GEMINI_MODELS = [
   { id: 'gemini-2.0-flash',        label: 'Flash 2.0',    sub: 'Fast · next-gen standard' },
 ] as const;
 
-export const AI_PROVIDER_KEY = 'ai_provider'; // 'gemini' | 'groq'
+export const AI_PROVIDER_KEY = 'ai_provider'; // 'gemini' | 'groq' | 'openrouter' | 'deepseek'
 export const GROQ_API_KEY_STORAGE = 'groq_api_key';
+
+// ── DeepSeek ─────────────────────────────────────────────────────────────
+export const DEEPSEEK_API_KEY_STORAGE = 'deepseek_api_key';
+export const DEEPSEEK_MODEL_KEY = 'deepseek_model';
+export const DEFAULT_DEEPSEEK_MODEL = 'deepseek-chat';
+
+export const DEEPSEEK_MODELS = [
+  { id: 'deepseek-chat',                     label: 'DeepSeek V3',       sub: 'Latest · 64K context · best quality' },
+  { id: 'deepseek-v4-flash',                 label: 'DeepSeek V4 Flash', sub: 'Fastest · new Flash architecture' },
+  { id: 'deepseek-reasoner',                 label: 'DeepSeek R1',       sub: 'Reasoning · chain-of-thought' },
+] as const;
+
+export const DEEPSEEK_KEY_STORAGE_KEYS = [
+  'deepseek_api_key',
+  'deepseek_api_key_2',
+  'deepseek_api_key_3',
+  'deepseek_api_key_4',
+] as const;
+
+export const DEEPSEEK_ACTIVE_KEY_INDEX = 'deepseek_active_key_index';
 
 export const GROQ_MODELS = [
   { id: 'llama-3.3-70b-versatile',    label: 'Llama 3.3 70B',  sub: 'Best quality · 14400 req/day free' },
@@ -289,6 +309,56 @@ async function callOpenRouter(prompt: string, maxTokens = 600): Promise<string> 
   return text.trim();
 }
 
+async function callDeepSeek(prompt: string, maxTokens = 600): Promise<string> {
+  // Get active DeepSeek key
+  let activeIndex = 0;
+  try {
+    const idx = await AsyncStorage.getItem(DEEPSEEK_ACTIVE_KEY_INDEX);
+    activeIndex = idx ? parseInt(idx, 10) : 0;
+  } catch {}
+
+  const storageKey = DEEPSEEK_KEY_STORAGE_KEYS[activeIndex] ?? DEEPSEEK_KEY_STORAGE_KEYS[0];
+  let key = '';
+  try {
+    key = (await AsyncStorage.getItem(storageKey)) || '';
+  } catch {}
+
+  if (!key) throw new Error('No DeepSeek API key found. Go to Settings → AI Settings and paste your DeepSeek key.');
+
+  // Get selected DeepSeek model
+  let model = DEFAULT_DEEPSEEK_MODEL;
+  try {
+    model = (await AsyncStorage.getItem(DEEPSEEK_MODEL_KEY)) || DEFAULT_DEEPSEEK_MODEL;
+  } catch {}
+
+  const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.2,
+      max_tokens: maxTokens,
+    }),
+  });
+
+  if (res.status === 429) {
+    throw new Error('429: DeepSeek quota exceeded. Switch to another key in Settings → AI Settings.');
+  }
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`DeepSeek API error ${res.status}: ${err}`);
+  }
+
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) throw new Error('Empty response from DeepSeek');
+  return text.trim();
+}
+
 async function callAI(prompt: string, maxTokens = 600): Promise<string> {
   let provider = 'gemini';
   try {
@@ -300,6 +370,9 @@ async function callAI(prompt: string, maxTokens = 600): Promise<string> {
   }
   if (provider === 'openrouter') {
     return callOpenRouter(prompt, maxTokens);
+  }
+  if (provider === 'deepseek') {
+    return callDeepSeek(prompt, maxTokens);
   }
   return callGemini(prompt, maxTokens);
 }
@@ -522,6 +595,9 @@ ${systemPrompt}`;
     if (provider === 'openrouter') {
       return await generateOpenRouterWithHistory(messages, systemPrompt);
     }
+    if (provider === 'deepseek') {
+      return await generateDeepSeekWithHistory(messages, systemPrompt);
+    }
     return await generateGeminiWithHistory(messages, systemPrompt);
   } catch (error) {
     console.error('Error generating with history:', error);
@@ -636,6 +712,50 @@ async function generateOpenRouterWithHistory(
   const data = await res.json();
   const text = data?.choices?.[0]?.message?.content;
   if (!text) throw new Error('Empty response from OpenRouter');
+  return text.trim();
+}
+
+async function generateDeepSeekWithHistory(
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>,
+  systemPrompt: string
+): Promise<string> {
+  let activeIndex = 0;
+  try {
+    const idx = await AsyncStorage.getItem(DEEPSEEK_ACTIVE_KEY_INDEX);
+    activeIndex = idx ? parseInt(idx, 10) : 0;
+  } catch {}
+
+  const storageKey = DEEPSEEK_KEY_STORAGE_KEYS[activeIndex] ?? DEEPSEEK_KEY_STORAGE_KEYS[0];
+  let key = '';
+  try { key = (await AsyncStorage.getItem(storageKey)) || ''; } catch {}
+  if (!key) throw new Error('No DeepSeek API key found. Go to Settings → AI Settings.');
+
+  let model = DEFAULT_DEEPSEEK_MODEL;
+  try { model = (await AsyncStorage.getItem(DEEPSEEK_MODEL_KEY)) || DEFAULT_DEEPSEEK_MODEL; } catch {}
+
+  const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages,
+      ],
+      temperature: 0.4,
+      max_tokens: 800,
+    }),
+  });
+
+  if (res.status === 429) throw new Error('429: DeepSeek rate limit. Switch key in AI Settings.');
+  if (!res.ok) { const err = await res.text(); throw new Error(`DeepSeek error ${res.status}: ${err}`); }
+
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) throw new Error('Empty response from DeepSeek');
   return text.trim();
 }
 

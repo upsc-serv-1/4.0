@@ -1,18 +1,18 @@
-/**
- * PilotV2SaveSheet — flashcard-style save popup for Pilot V2.
+﻿/**
+ * PilotV2SaveSheet ΓÇö flashcard-style save popup for Pilot V2.
  *
  * Mirrors the flashcard / capsule popup UX:
- *   • Pre-filled subject → topic → subtopic → notebook title (from question).
- *   • All four fields editable before saving.
- *   • The block payload (markdown / bullets) is editable too.
- *   • One-tap Save uses `findOrCreatePilotV2Note` so repeated saves of the
+ *   ΓÇó Pre-filled subject ΓåÆ topic ΓåÆ subtopic ΓåÆ notebook title (from question).
+ *   ΓÇó All four fields editable before saving.
+ *   ΓÇó The block payload (markdown / bullets) is editable too.
+ *   ΓÇó One-tap Save uses `findOrCreatePilotV2Note` so repeated saves of the
  *     same subject/topic/subtopic/microtopic append to the SAME note rather
  *     than creating duplicates.
  *
  * After save the user can:
- *   • "Open in Pilot V2" — jumps to the editor screen of the note that was
+ *   ΓÇó "Open in Pilot V2" ΓÇö jumps to the editor screen of the note that was
  *     just appended to (so the content stays fully editable).
- *   • "Save another" — keep the popup open with cleared body for chaining.
+ *   ΓÇó "Save another" ΓÇö keep the popup open with cleared body for chaining.
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -25,7 +25,6 @@ import { Rocket, X, Plus, Wand2, Highlighter, Eraser, Undo2, Redo2, Brain, Copy,
 import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 import RichNoteEditor from '../RichNoteEditor';
 import PilotV2SaveAIPanel from './PilotV2SaveAIPanel';
-import { htmlToPilotV2Blocks } from './htmlToPilotV2Blocks';
 import { useTheme } from '../../context/ThemeContext';
 import { PremiumMoveSheet, MoveTarget } from '../common/PremiumMoveSheet';
 import { SUBJECT_TOPICS } from './PilotV2SidebarSubject';
@@ -100,7 +99,6 @@ function markdownishToHtml(text: string): string {
   let t = text;
   t = t.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   t = t.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
-  t = t.replace(/__([^_]+)__/g, '<u>$1</u>');
   t = t.replace(/(^|[^*])\*([^*]+)\*/g, '$1<i>$2</i>');
   t = t.replace(/^### (.+)$/gm, '<h3>$1</h3>');
   t = t.replace(/^## (.+)$/gm, '<h2>$1</h2>');
@@ -162,7 +160,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const [topic, setTopic]         = useState(autoSeed.topic || '');
   const [subtopic, setSubtopic]   = useState(autoSeed.subtopic || '');
   const [notebook, setNotebook]   = useState(autoSeed.notebookTitle || autoSeed.subtopic || autoSeed.topic || autoSeed.subject || '');
-  const [body, setBody]           = useState(markdownishToHtml(initialBody || ''));
+  const [body, setBody]           = useState(initialBody || '');
   const richRef = useRef<any>(null);
   const [showHlPicker, setShowHlPicker] = useState(false);
   const [showAiPanel, setShowAiPanel] = useState(false);
@@ -216,7 +214,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   // Notebooks
   const [existingNotebooks, setExistingNotebooks] = useState<string[]>([]);
   // User's actual Pilot V2 hierarchy (loaded once when sheet becomes visible)
-  // — merged with the static palette so the Subject / Topic / Microtopic
+  // ΓÇö merged with the static palette so the Subject / Topic / Microtopic
   // dropdowns expose every branch the user has already created, not just the
   // hard-coded palette. This was the "only History showing" complaint.
   const [userHierarchy, setUserHierarchy] = useState<{
@@ -264,7 +262,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
         ''
       );
     })();
-    setBody(markdownishToHtml(initialBody || ''));
+    setBody(initialBody || '');
     setSavedNoteId(null);
     setAppendCount(0);
     setEditorKey(k => k + 1);
@@ -360,13 +358,13 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     const stem = (
       (seedQuestion?.statement_line || seedQuestion?.question_text || '') as string
     ).trim();
-    const short = stem.length > 100 ? `${stem.slice(0, 97)}…` : stem;
+    const short = stem.length > 100 ? `${stem.slice(0, 97)}ΓÇª` : stem;
     if (short) return short;
     if (seedQuestion?.micro_topic?.trim()) return seedQuestion.micro_topic.trim();
     return '';
   }, [seedQuestion]);
 
-  // Helper: merged subject list — user's actual Pilot V2 subjects first, then
+  // Helper: merged subject list ΓÇö user's actual Pilot V2 subjects first, then
   // any palette subjects the user hasn't seeded yet, deduped.
   const allSubjects = useMemo(() => {
     const palette = PILOT_V2_SUBJECT_PALETTE.map(s => s.label);
@@ -483,21 +481,20 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
         });
       }
       
-      // Parse HTML into proper blocks — preserves line breaks, bullets, numbering
-      const contentBlocks = htmlToPilotV2Blocks(html);
-      if (contentBlocks.length === 0) {
-        blocks.push({ id: newId(), type: 'paragraph', text: html.trim(), meta: { tag: 'quiz_import', importedAt: new Date().toISOString(), source: source || 'quiz' } });
-      } else {
-        contentBlocks.forEach((b) => { (b as any).meta = { tag: 'quiz_import', importedAt: new Date().toISOString(), source: source || 'quiz' }; });
-        blocks.push(...contentBlocks);
-      }
+      // Always add content block
+      blocks.push({
+        id: newId(),
+        type: 'paragraph',
+        text: html.trim(),
+        meta: { tag: 'quiz_import', importedAt: new Date().toISOString(), source: source || 'quiz' },
+      });
       const ok = await appendBlocksToPilotV2Note(result.noteId, blocks);
       if (!ok) throw new Error('append failed');
       setSavedNoteId(result.noteId);
       setAppendCount(c => c + 1);
 
       // Persist the chosen hierarchy as last-used so future Save Sheet opens
-      // pre-fill the same selections (Step 8 — last-used preferences gap).
+      // pre-fill the same selections (Step 8 ΓÇö last-used preferences gap).
       writeLastUsed({
         subject: subject.trim(),
         topic: topic.trim(),
@@ -539,7 +536,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
 
   const addSectionBreak = () => {
     const extra =
-      '<p><br></p><p style="text-align:center;color:#94a3b8;">———</p><p><br></p>';
+      '<p><br></p><p style="text-align:center;color:#94a3b8;">ΓÇöΓÇöΓÇö</p><p><br></p>';
     setBody(prev => `${prev || ''}${extra}`);
     setEditorKey(k => k + 1);
   };
@@ -607,7 +604,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.title, { color: colors.textPrimary }]}>Save to Pilot V2</Text>
                   <Text style={[styles.subtitle, { color: colors.textTertiary }]}>
-                    Auto-routed by subject → topic → microtopic. Same path = same note.
+                    Auto-routed by subject ΓåÆ topic ΓåÆ microtopic. Same path = same note.
                   </Text>
                 </View>
 
@@ -624,11 +621,11 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     <Text style={[styles.fieldLabel, { color: colors.textTertiary }]}>Save path</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 5 }}>
                       <TouchableOpacity onPress={() => setActiveLevel('subject')} style={[styles.pathChip, { borderColor: '#8B5CF6', backgroundColor: '#EDE9FE' }]}><Text style={{ color: '#5B21B6', fontWeight: '800', fontSize: 10 }}>{subject || 'Subject'}</Text></TouchableOpacity>
-                      <Text style={{ color: colors.textTertiary, fontSize: 10 }}>→</Text>
+                      <Text style={{ color: colors.textTertiary, fontSize: 10 }}>ΓåÆ</Text>
                       <TouchableOpacity onPress={() => subject && setActiveLevel('topic')} style={[styles.pathChip, { borderColor: '#3B82F6', backgroundColor: '#DBEAFE', opacity: subject ? 1 : 0.5 }]}><Text style={{ color: '#1D4ED8', fontWeight: '800', fontSize: 10 }}>{topic || 'Section Group'}</Text></TouchableOpacity>
-                      <Text style={{ color: colors.textTertiary, fontSize: 10 }}>→</Text>
+                      <Text style={{ color: colors.textTertiary, fontSize: 10 }}>ΓåÆ</Text>
                       <TouchableOpacity onPress={() => topic && setActiveLevel('subtopic')} style={[styles.pathChip, { borderColor: '#10B981', backgroundColor: '#D1FAE5', opacity: topic ? 1 : 0.5 }]}><Text style={{ color: '#047857', fontWeight: '800', fontSize: 10 }}>{subtopic || 'Micro Topic'}</Text></TouchableOpacity>
-                      <Text style={{ color: colors.textTertiary, fontSize: 10 }}>→</Text>
+                      <Text style={{ color: colors.textTertiary, fontSize: 10 }}>ΓåÆ</Text>
                       <TouchableOpacity onPress={() => subject && setActiveLevel('notebook')} style={[styles.pathChip, { borderColor: '#F59E0B', backgroundColor: '#FEF3C7', opacity: subject ? 1 : 0.5 }]}><Text style={{ color: '#92400E', fontWeight: '800', fontSize: 10 }}>{notebook || 'Notebook'}</Text></TouchableOpacity>
                     </View>
                   </View>
@@ -700,7 +697,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                           }}
                         >
                           <Text style={{ fontSize: 9, fontWeight: '700', color: (includeHeader && headerStyle === style) || (!includeHeader && style === 'none') ? '#fff' : colors.textSecondary }}>
-                            {style === 'auto-title' ? '🤖 Auto' : style === 'question-only' ? '❓ Q Only' : style === 'custom' ? '✏️ Custom' : '✕ None'}
+                            {style === 'auto-title' ? '≡ƒñû Auto' : style === 'question-only' ? 'Γ¥ô Q Only' : style === 'custom' ? 'Γ£Å∩╕Å Custom' : 'Γ£ò None'}
                           </Text>
                         </TouchableOpacity>
                       ))}
@@ -742,6 +739,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     ? `${body}<p><br></p>${html}`
                     : html;
                   setBody(next);
+                  pushHistory(next);
                   setEditorKey(k => k + 1);
                   setAiPanelOpen(false);
                 }}
@@ -927,7 +925,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     primary: '#5B4EFA',
                   }}
                   editorStyle={{ minHeight: keyboardOpen ? 260 : 320 }}
-                  placeholder="Edit explanation — bold, lists, and highlights match Pilot notes."
+                  placeholder="Edit explanation ΓÇö bold, lists, and highlights match Pilot notes."
                 />
                 <TouchableOpacity onPress={addSectionBreak} style={styles.splitBtn}>
                   <Plus size={14} color="#5B4EFA" />
@@ -961,7 +959,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     <TouchableOpacity
                       onPress={async () => {
                         if (!aiOutput.trim()) return;
-                        await ExpoClipboard.setStringAsync(aiOutput);
+                        await Clipboard.setStringAsync(aiOutput);
                         Alert.alert('Copied', 'AI output copied. Paste it where you want.');
                       }}
                       style={[styles.miniBtn, { borderColor: colors.border, borderWidth: 1, flexDirection: 'row', gap: 6 }]}

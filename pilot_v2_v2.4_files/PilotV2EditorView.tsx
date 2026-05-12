@@ -1,24 +1,23 @@
-/**
- * Pilot V2 — Editor View (Samsung Notes-style block editor)
+﻿/**
+ * Pilot V2 ΓÇö Editor View (Samsung Notes-style block editor)
  *
  * Faithful port of the KM `EditorView`:
- *   • Top bar: doc title, undo/redo, "Saved" status, close button
- *   • Document title input (large)
- *   • Formatting toolbar:
+ *   ΓÇó Top bar: doc title, undo/redo, "Saved" status, close button
+ *   ΓÇó Document title input (large)
+ *   ΓÇó Formatting toolbar:
  *       H1, H2, B, I, U, divider,
  *       OL, UL, Checklist, divider,
  *       Highlight (with palette pop-over),
  *       Link, Image, Calendar, Paperclip, Table, Code
- *   • Block-based editor area
- *   • Right-hand outline panel (Blocks / Outline tabs) on tablets
- *   • Bottom bar: font size, zoom, word count
+ *   ΓÇó Block-based editor area
+ *   ΓÇó Right-hand outline panel (Blocks / Outline tabs) on tablets
+ *   ΓÇó Bottom bar: font size, zoom, word count
  *
  * Auto-save on every change is debounced and mirrored to the in-memory
  * note via `PATCH_BLOCKS`. Step 10 wires this to Supabase via pilotV2Repo.
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import AnimatedReanimated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, runOnJS } from 'react-native-reanimated';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AnimatedReanimated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import RenderHtml from 'react-native-render-html';
 import {
@@ -99,52 +98,6 @@ const DEFAULT_BLOCKS: PilotV2Block[] = [
 ];
 
 export function PilotV2EditorView() {
-  // Persistence system for Pencil FAB Positioning
-  const pencilDragX = useSharedValue(0);
-  const pencilDragY = useSharedValue(0);
-  const pencilStartDragX = useSharedValue(0);
-  const pencilStartDragY = useSharedValue(0);
-
-  const savePencilPos = useCallback((x: number, y: number) => {
-    AsyncStorage.setItem('pilot_v2_pencil_fab_pos', JSON.stringify({ x, y })).catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    AsyncStorage.getItem('pilot_v2_pencil_fab_pos').then(saved => {
-      if (saved) {
-        try {
-          const p = JSON.parse(saved);
-          if (typeof p.x === 'number') pencilDragX.value = p.x;
-          if (typeof p.y === 'number') pencilDragY.value = p.y;
-        } catch {}
-      }
-    });
-  }, []);
-
-  const pencilPanGesture = useMemo(() => 
-    Gesture.Pan()
-      .minDistance(5)
-      .onStart(() => {
-        pencilStartDragX.value = pencilDragX.value;
-        pencilStartDragY.value = pencilDragY.value;
-      })
-      .onUpdate((e) => {
-        pencilDragX.value = pencilStartDragX.value + e.translationX;
-        pencilDragY.value = pencilStartDragY.value + e.translationY;
-      })
-      .onFinalize(() => {
-        runOnJS(savePencilPos)(pencilDragX.value, pencilDragY.value);
-      }),
-    [savePencilPos]
-  );
-
-  const pencilFabAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: pencilDragX.value },
-      { translateY: pencilDragY.value }
-    ]
-  }));
-
   const { colors } = useTheme();
   const { dispatch, currentNote } = usePilotV2();
   const note = currentNote();
@@ -167,9 +120,9 @@ export function PilotV2EditorView() {
   const [outlineTab, setOutlineTab] = useState<'blocks' | 'outline'>('blocks');
   const [savingState, setSavingState] = useState<'idle' | 'saving' | 'saved'>('saved');
   const saveTimer = useRef<any>(null);
-  /** Maps blockId → {y, h} in pixels within the paper view.  Updated by
+  /** Maps blockId ΓåÆ {y, h} in pixels within the paper view.  Updated by
    *  each BlockRow's onLayout callback.  Used to assign anchor.blockOriginY
-   *  when a stroke is committed (Step 6 — block-level anchoring). */
+   *  when a stroke is committed (Step 6 ΓÇö block-level anchoring). */
   const blockLayoutsRef = useRef<Map<string, { x: number; y: number; w: number; h: number }>>(new Map());
   /** Incremented whenever a block's y/h changes significantly (e.g. after a
    *  block-reorder or text height change).  Passed to <PencilCanvas> so the
@@ -186,7 +139,7 @@ export function PilotV2EditorView() {
     html: '',
   });
 
-  /* --------------- Bottom bar — font scale & zoom --------------- */
+  /* --------------- Bottom bar ΓÇö font scale & zoom --------------- */
   // Each step is a distinct "Aa" preset that scales every block's font, plus a
   // zoom multiplier for the whole canvas. Both persist for the editor session.
   const FONT_SCALES = [0.85, 1.0, 1.15, 1.3];
@@ -387,7 +340,7 @@ export function PilotV2EditorView() {
   });
   const [reminderPickerVisible, setReminderPickerVisible] = useState(false);
 
-  // Export sheet state — single unified export (replaces 3 legacy buttons)
+  // Export sheet state ΓÇö single unified export (replaces 3 legacy buttons)
   const [exportSheetOpen, setExportSheetOpen] = useState(false);
 
   const insertLink = () => {
@@ -439,7 +392,7 @@ export function PilotV2EditorView() {
     const when = new Date(Date.now() + offsetMinutes * 60 * 1000);
     const label = when.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
     insertBlockAfterActive('paragraph', {
-      text: `📅 Reminder · ${label}`,
+      text: `≡ƒôà Reminder ┬╖ ${label}`,
       remindAt: when.toISOString(),
     });
     setReminderPickerVisible(false);
@@ -463,7 +416,7 @@ export function PilotV2EditorView() {
       const asset = result.assets[0];
       const name = asset.fileName ?? asset.uri.split('/').pop() ?? 'attachment';
       insertBlockAfterActive('paragraph', {
-        text: `📎 ${name}`,
+        text: `≡ƒôÄ ${name}`,
         attachment: { name, uri: asset.uri, mime: asset.mimeType, size: asset.fileSize },
       });
     } catch (e) {
@@ -476,9 +429,9 @@ export function PilotV2EditorView() {
       'Insert table',
       'Choose a layout',
       [
-        { text: '2 × 2', onPress: () => addTableBlock(2, 2) },
-        { text: '3 × 3', onPress: () => addTableBlock(3, 3) },
-        { text: '4 × 4', onPress: () => addTableBlock(4, 4) },
+        { text: '2 ├ù 2', onPress: () => addTableBlock(2, 2) },
+        { text: '3 ├ù 3', onPress: () => addTableBlock(3, 3) },
+        { text: '4 ├ù 4', onPress: () => addTableBlock(4, 4) },
         { text: 'Cancel', style: 'cancel' },
       ],
     );
@@ -515,13 +468,12 @@ export function PilotV2EditorView() {
   });
   const [blockEditSaving, setBlockEditSaving] = useState(false);
   const [blockEditKey, setBlockEditKey] = useState(0);
-  const [slashPicker, setSlashPicker] = useState<{ visible: boolean; blockId: string | null }>({ visible: false, blockId: null });
   const blockEditRef = useRef<any>(null);
 
   /* --------------- Pencil annotation overlay (Step 5+6) --------------- */
   const [paperSize, setPaperSize] = useState({ w: 1, h: 1 });
 
-  /* ── Editor Zoom & Pan (GlanceView-style Pinch & Drag) ────────────────── */
+  /* ΓöÇΓöÇ Editor Zoom & Pan (GlanceView-style Pinch & Drag) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
   const editorScale = useSharedValue(1);
   const editorOffsetX = useSharedValue(0);
   const editorOffsetY = useSharedValue(0);
@@ -577,7 +529,7 @@ export function PilotV2EditorView() {
     savedEditorScale.value = zoom;
   }, [zoom]);
   const initialStrokes = (note?.content?.pencilStrokes ?? []) as PilotV2PencilStroke[];
-  // Pending content ref — captures the latest blocks + strokes payload that
+  // Pending content ref ΓÇö captures the latest blocks + strokes payload that
   // hasn't been flushed yet. We flush this ref on unmount so a debounced
   // save in flight is never lost when the user navigates away mid-stroke
   // (which previously caused 'drawings disappear after navigation').
@@ -588,7 +540,7 @@ export function PilotV2EditorView() {
    *  anchor.blockOriginY.  Also detects underline / highlight strokes and
    *  populates span-offset fields (Step 9) for future text-edit tracking.
    *  Strokes that already carry an anchor are left untouched (idempotent).
-   *  O(n_strokes × n_blocks). */
+   *  O(n_strokes ├ù n_blocks). */
   const assignAnchorToStrokes = useCallback(
     (strokes: PilotV2PencilStroke[]): PilotV2PencilStroke[] => {
       const ph = Math.max(1, paperSize.h);
@@ -598,7 +550,7 @@ export function PilotV2EditorView() {
         const pts = s.points;
         if (!pts.length) return s;
 
-        // ── 1. Find host block (centroid Y) ──────────────────────────────
+        // ΓöÇΓöÇ 1. Find host block (centroid Y) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
         let cy = 0;
         for (const p of pts) cy += p.y;
         cy = (cy / pts.length) * ph;
@@ -615,7 +567,7 @@ export function PilotV2EditorView() {
         const blockRect = blockLayoutsRef.current.get(bestId)!;
         const blockOriginY = blockRect.y / ph;
 
-        // ── 2. Span-offset detection for underlines / highlights ─────────
+        // ΓöÇΓöÇ 2. Span-offset detection for underlines / highlights ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
         // A stroke is treated as a text annotation when:
         //   a) tool is 'highlighter', OR
         //   b) tool is 'pen' and the stroke is nearly horizontal:
@@ -646,7 +598,7 @@ export function PilotV2EditorView() {
               (cy - blockRect.y) / blockH,
             ));
             // Estimate char offsets using the block's text length.
-            // charPos = fraction_of_block_width × block_text_length.
+            // charPos = fraction_of_block_width ├ù block_text_length.
             // This is a heuristic; precise measurement requires text-layout.
             const blockText = blocks.find(b => b.id === bestId)?.text ?? '';
             const textLen = Math.max(1, blockText.length);
@@ -715,7 +667,7 @@ export function PilotV2EditorView() {
     onChange: persistStrokes,
   });
 
-  // ── Washi-Tape state ─────────────────────────────────────────────────
+  // ΓöÇΓöÇ Washi-Tape state ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   const [washiTapes, setWashiTapes] = useState<PilotV2WashiTape[]>(
     () => (note?.content as any)?.washiTapes || []
   );
@@ -913,41 +865,31 @@ export function PilotV2EditorView() {
               <Text style={{ color: colors.textTertiary, fontSize: 13 }}>Add block</Text>
             </TouchableOpacity>
 
-            {/* Pencil canvas — rendered INSIDE the paper view so it scrolls naturally
-                with the document content and stays anchored to page coordinates.
-                Pointer events pass through when drawingMode is off. */}
             {paperSize.w > 1 && paperSize.h > 1 && (
-              <View pointerEvents={pencil.drawingMode ? 'auto' : 'none'} style={StyleSheet.absoluteFill}>
-                <PencilCanvas
-                  engine={pencil.engine}
-                  tool={pencil.tool}
-                  width={paperSize.w}
-                  height={paperSize.h}
-                  drawingMode={pencil.drawingMode}
-                  onCommit={(strokes) => persistStrokes(strokes)}
-                  blockLayouts={blockLayoutsRef.current}
-                  blockLayoutVersion={blockLayoutVersion}
-                />
-              </View>
+              <PencilCanvas
+                engine={pencil.engine}
+                tool={pencil.tool}
+                width={paperSize.w}
+                height={paperSize.h}
+                drawingMode={pencil.drawingMode}
+                onCommit={(strokes) => persistStrokes(strokes)}
+                blockLayouts={blockLayoutsRef.current}
+                blockLayoutVersion={blockLayoutVersion}
+              />
             )}
 
-            {/* Washi Tape layer — rendered INSIDE the paper view so it scrolls with content.
-                Pointer events pass through when not actively adding washi tape. */}
             {paperSize.w > 1 && paperSize.h > 1 && (
-              <View pointerEvents={washiMode ? 'auto' : 'none'} style={StyleSheet.absoluteFill}>
-                <WashiTapeLayer
-                  tapes={washiTapes}
-                  width={paperSize.w}
-                  height={paperSize.h}
-                  drawingMode={washiMode}
-                  activeColor={washiColor}
-                  onAdd={(t) => persistWashi([...washiTapes, t])}
-                  onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
-                  onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
-                />
-              </View>
+              <WashiTapeLayer
+                tapes={washiTapes}
+                width={paperSize.w}
+                height={paperSize.h}
+                drawingMode={washiMode}
+                activeColor={washiColor}
+                onAdd={(t) => persistWashi([...washiTapes, t])}
+                onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
+                onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
+              />
             )}
-
             </AnimatedReanimated.View>
           </GestureDetector>
         </Animated.ScrollView>
@@ -977,6 +919,7 @@ export function PilotV2EditorView() {
           </AnimatedReanimated.View>
         )}
       </View>
+
 
 
       {/* Link prompt modal */}
@@ -1063,7 +1006,7 @@ export function PilotV2EditorView() {
       >
         <View style={styles.modalBackdrop}>
           <View style={[styles.modalCard, { borderColor: colors.border }]} testID="pilot-v2-slash-modal">
-            <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Insert…</Text>
+            <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>InsertΓÇª</Text>
             {[
               { label: 'Heading 1', action: () => setActiveBlockType('heading', 1) },
               { label: 'Heading 2', action: () => setActiveBlockType('heading', 2) },
@@ -1073,7 +1016,7 @@ export function PilotV2EditorView() {
               { label: 'Quote', action: () => setActiveBlockType('quote') },
               { label: 'Highlight', action: () => setActiveBlockType('highlight') },
               { label: 'Code', action: () => setActiveBlockType('code') },
-              { label: 'Table (2×2)', action: () => addTableBlock(2, 2) },
+              { label: 'Table (2├ù2)', action: () => addTableBlock(2, 2) },
             ].map(opt => (
               <TouchableOpacity
                 key={opt.label}
@@ -1231,30 +1174,17 @@ export function PilotV2EditorView() {
         </View>
       </Modal>
 
-      {/* ── Pencil mode FAB ─────────────────────────────────────────── */}
-      <AnimatedReanimated.View style={[{ position: 'absolute', zIndex: 1100, right: 18, bottom: 80 }, pencilFabAnimatedStyle]}>
-        <GestureDetector gesture={pencilPanGesture}>
-          <TouchableOpacity
-            testID="pilot-v2-pencil-fab"
-            onPress={() => {
-              console.log('[PENCIL FAB] Current drawingMode:', pencil.drawingMode);
-              pencil.setDrawingMode(!pencil.drawingMode);
-              console.log('[PENCIL FAB] Set drawingMode to:', !pencil.drawingMode);
-            }}
-            activeOpacity={0.85}
-            style={[
-              styles.pencilFab, 
-              pencil.drawingMode && { backgroundColor: '#0F172A' },
-              // Explicitly override positioning since outer container handles it now
-              { position: 'relative', right: 0, bottom: 0 }
-            ]}
-          >
-            <Pen size={22} color="#ffffff" strokeWidth={2.5} />
-          </TouchableOpacity>
-        </GestureDetector>
-      </AnimatedReanimated.View>
+      {/* ΓöÇΓöÇ Pencil mode FAB ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */}
+      <TouchableOpacity
+        testID="pilot-v2-pencil-fab"
+        onPress={() => pencil.setDrawingMode(!pencil.drawingMode)}
+        activeOpacity={0.85}
+        style={[styles.pencilFab, pencil.drawingMode && { backgroundColor: '#0F172A' }]}
+      >
+        <Pen size={22} color="#ffffff" strokeWidth={2.5} />
+      </TouchableOpacity>
 
-      {/* ── Quick formatting toolbar toggle (bottom-right) ─────────── */}
+      {/* ΓöÇΓöÇ Quick formatting toolbar toggle (bottom-right) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */}
       <TouchableOpacity
         testID="pilot-v2-formatting-fab"
         onPress={() => setShowToolbar((v) => {
@@ -1274,7 +1204,7 @@ export function PilotV2EditorView() {
         <Type size={22} color="#ffffff" strokeWidth={2.5} />
       </TouchableOpacity>
 
-      {/* ── Washi-Tape FAB (active recall masking) ──────────────────── */}
+      {/* ΓöÇΓöÇ Washi-Tape FAB (active recall masking) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */}
       <TouchableOpacity
         testID="pilot-v2-washi-fab"
         onPress={() => setWashiMode((m) => !m)}
@@ -1284,7 +1214,7 @@ export function PilotV2EditorView() {
           { right: 88, backgroundColor: washiMode ? '#0F172A' : '#FFE88A' },
         ]}
       >
-        <Text style={{ fontSize: 20 }}>{washiMode ? '🛑' : '🩹'}</Text>
+        <Text style={{ fontSize: 20 }}>{washiMode ? '≡ƒ¢æ' : '≡ƒ⌐╣'}</Text>
       </TouchableOpacity>
 
       {/* Washi-Tape control panel (only while in tape mode) */}
@@ -1321,12 +1251,12 @@ export function PilotV2EditorView() {
             </TouchableOpacity>
           </View>
           <Text style={{ fontSize: 10, color: '#94A3B8', marginTop: 4 }}>
-            Drag to place tape · Tap to reveal · Long-press to remove
+            Drag to place tape ┬╖ Tap to reveal ┬╖ Long-press to remove
           </Text>
         </View>
       ) : null}
 
-      {/* ── Notability-style pencil toolbar (only when drawing) ─── */}
+      {/* ΓöÇΓöÇ Notability-style pencil toolbar (only when drawing) ΓöÇΓöÇΓöÇ */}
       {pencil.drawingMode && (
         <View style={styles.pencilToolbarFloat} pointerEvents="box-none">
           <PencilToolbar
@@ -1351,12 +1281,12 @@ export function PilotV2EditorView() {
         </View>
       )}
 
-      {/* ── More menu w/ working Export ────────────────────────────── */}
+      {/* ΓöÇΓöÇ More menu w/ working Export ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */}
       <Modal visible={moreMenuOpen} animationType="fade" transparent onRequestClose={() => setMoreMenuOpen(false)}>
         <TouchableOpacity activeOpacity={1} onPress={() => setMoreMenuOpen(false)} style={{ flex: 1, backgroundColor: 'rgba(15,23,42,0.35)' }}>
           <View style={[styles.moreMenu, { borderColor: colors.border, backgroundColor: '#fff' }]} testID="pilot-v2-more-menu">
             {[
-              { label: 'Export…', sub: 'PDF · pastel themes · choose blocks', testID: 'pilot-v2-more-export', onPress: () => { setMoreMenuOpen(false); setExportSheetOpen(true); } },
+              { label: 'ExportΓÇª', sub: 'PDF ┬╖ pastel themes ┬╖ choose blocks', testID: 'pilot-v2-more-export', onPress: () => { setMoreMenuOpen(false); setExportSheetOpen(true); } },
               { label: `Text Size: ${Math.round(fontScale * 100)}%`, sub: 'Tap to increase text scale (cycles)', testID: 'pilot-v2-more-fontscale', onPress: () => { cycleFontScale(); } },
               { label: `Zoom Level: ${Math.round(zoom * 100)}%`, sub: 'Tap to change canvas zoom (cycles)', testID: 'pilot-v2-more-zoom', onPress: () => { cycleZoom(); } },
               { label: showToolbar ? 'Hide Formatting Toolbar' : 'Show Formatting Toolbar', sub: 'Draggable rich formatting bar', testID: 'pilot-v2-more-toolbar', onPress: () => { setShowToolbar(v => { globalToolbarVisible = !v; return !v; }); } },
@@ -1369,7 +1299,7 @@ export function PilotV2EditorView() {
           </View>
         </TouchableOpacity>
       </Modal>
-      {/* ── Unified Export sheet (single, replaces all legacy export entry-points) ── */}
+      {/* ΓöÇΓöÇ Unified Export sheet (single, replaces all legacy export entry-points) ΓöÇΓöÇ */}
       <PilotV2UnifiedExport
         visible={exportSheetOpen}
         onClose={() => setExportSheetOpen(false)}
@@ -1381,7 +1311,7 @@ export function PilotV2EditorView() {
         contentRef={contentRef}
       />
 
-      {/* ── Per-block rich-text edit modal (full formatting toolbar) ── */}
+      {/* ΓöÇΓöÇ Per-block rich-text edit modal (full formatting toolbar) ΓöÇΓöÇ */}
       <PilotV2BlockRichEditModal
         visible={richBlockEdit.visible}
         initialHtml={richBlockEdit.html}
@@ -1412,7 +1342,7 @@ interface BlockRowProps {
   onEditTable: () => void;
   /** Opens the rich-editor modal for this block (full formatting toolbar). */
   onOpenRichEdit: () => void;
-  /** Called when the block's layout changes — used for block-level anchoring. */
+  /** Called when the block's layout changes ΓÇö used for block-level anchoring. */
   onBlockLayout: (id: string, x: number, y: number, w: number, h: number) => void;
 }
 
@@ -1436,7 +1366,7 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
     ? PILOT_V2_HIGHLIGHT_PALETTE.find(c => c.name === block.highlightColor)?.bg ?? '#FDE68A'
     : 'transparent';
 
-  // Step 8 — block-tag badge ("Added by quiz import" etc.)
+  // Step 8 ΓÇö block-tag badge ("Added by quiz import" etc.)
   const tag = getBlockTag(block);
 
   return (
@@ -1476,7 +1406,7 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
         </View>
       ) : null}
       <View style={{ flexDirection: 'row', width: '100%', alignItems: 'flex-start', gap: 8 }}>
-        {block.type === 'bullet' && <Text style={[styles.lead, { color: colors.textPrimary }]}>•</Text>}
+        {block.type === 'bullet' && <Text style={[styles.lead, { color: colors.textPrimary }]}>ΓÇó</Text>}
       {block.type === 'numbered' && <Text style={[styles.lead, { color: colors.textPrimary, fontWeight: '600' }]}>1.</Text>}
       {block.type === 'checklist' && (
         <TouchableOpacity onPress={onToggleCheck} hitSlop={6} style={[
@@ -1535,7 +1465,7 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
               value={stripHtml(block.text)}
               onChangeText={(text) => onChange(preserveHtmlWrap(block.text, text))}
               onFocus={onFocus}
-              placeholder={block.type === 'heading' ? 'Heading…' : 'Type something…'}
+              placeholder={block.type === 'heading' ? 'HeadingΓÇª' : 'Type somethingΓÇª'}
               placeholderTextColor={colors.textTertiary}
               style={{
                 fontSize,
@@ -1554,7 +1484,7 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
               style={{ paddingVertical: 4 }}
             >
               <RenderHtml
-                source={{ html: block.text || '<i>Type something…</i>' }}
+                source={{ html: block.text || '<i>Type somethingΓÇª</i>' }}
                 contentWidth={width - 80}
                 baseStyle={{
                   color: block.link ? '#5B4EFA' : colors.textPrimary,
@@ -1582,7 +1512,7 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
             onPress={() => Linking.openURL(block.link as string).catch(() => Alert.alert('Could not open', block.link as string))}
             style={{ paddingTop: 4 }}
           >
-            <Text style={{ fontSize: 11, color: '#5B4EFA' }}>↗ Open {block.link}</Text>
+            <Text style={{ fontSize: 11, color: '#5B4EFA' }}>Γåù Open {block.link}</Text>
           </TouchableOpacity>
         ) : null}
       </View>
@@ -1630,7 +1560,7 @@ function FloatingToolbar(props: any) {
     onPanResponderRelease: () => {
       const x = (pos.x as any)._value;
       const y = (pos.y as any)._value;
-      // Snap to nearest edge — auto-orient horizontal vs vertical
+      // Snap to nearest edge ΓÇö auto-orient horizontal vs vertical
       const distLeft = x;
       const distRight = width - x;
       const distTop = y;
@@ -1685,7 +1615,7 @@ function FloatingToolbar(props: any) {
       {...pan.panHandlers}
     >
       <TouchableOpacity onPress={() => setCollapsed(c => !c)} style={styles.dragHandle} testID="pilot-v2-toolbar-collapse">
-        <Text style={{ color: colors.textTertiary, fontSize: 14, fontWeight: '700' }}>{collapsed ? '⋮' : '⋯'}</Text>
+        <Text style={{ color: colors.textTertiary, fontSize: 14, fontWeight: '700' }}>{collapsed ? 'Γï«' : 'Γï»'}</Text>
       </TouchableOpacity>
       {!collapsed && items.map((it: any, i: number) => (
         it.type === 'text' ? (

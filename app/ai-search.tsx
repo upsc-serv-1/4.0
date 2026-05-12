@@ -31,6 +31,7 @@ import { SharedQuestionCard } from '../src/components/unified/SharedQuestionCard
 import { getPYQCategorization, buildCanonicalExplanations } from '../src/utils/questionUtils';
 import { mergeQuestions } from '../src/utils/merger';
 import { QuestionCache } from '../src/services/QuestionCache';
+import { OfflineManager } from '../src/services/OfflineManager';
 import { buildPredictive, probableHotsFor2026, type PredictiveRow } from '../src/lib/pyqPredictive';
 import { StudentSync } from '../src/services/StudentSync';
 import { useQuizStore } from '../src/store/quizStore';
@@ -76,7 +77,7 @@ type SearchResult = {
 
 type Filters = {
   searchMode:    'Matching' | 'Exact';
-  searchAcross:  'Questions' | 'Explanations' | 'Options' | 'Notes' | 'Questions+Options' | 'All';
+  searchAcross:  string[]; // array of field keys: 'Questions' | 'Explanations' | 'Options'
   stage:         string;   // 'All' | 'Prelims' | 'Mains'
   institutes:    string;   // 'All' | comma-separated
   programs:      string;   // 'All' | comma-separated
@@ -93,7 +94,7 @@ type Filters = {
 
 const DEFAULT_FILTERS: Filters = {
   searchMode:   'Matching',
-  searchAcross: 'Questions',
+  searchAcross: ['Questions', 'Options'],
   stage:        'All',
   institutes:   'All',
   programs:     'All',
@@ -114,8 +115,11 @@ type SortMode = 'Relevance' | 'Year' | 'Subject';
 
 function countActiveFilters(f: Filters): number {
   let n = 0;
-  if (f.searchMode !== 'Matching')    n++;
-  if (f.searchAcross !== 'Questions') n++;
+  // Default is ['Questions', 'Options'] — only count as active if different
+  const defaultAcross = ['Questions', 'Options'];
+  const isDefaultAcross = f.searchAcross.length === defaultAcross.length &&
+    defaultAcross.every(v => f.searchAcross.includes(v));
+  if (!isDefaultAcross) n++;
   if (f.stage !== 'All')              n++;
   if (f.institutes !== 'All')         n++;
   if (f.programs !== 'All')           n++;
@@ -131,6 +135,16 @@ function countActiveFilters(f: Filters): number {
   return n;
 }
 
+/** Convert multi-select searchAcross array to DB field names */
+const getSearchFields = (sa: string[]): string[] => {
+  if (sa.includes('All') || sa.length === 0) return ['question_text', 'explanation_markdown', 'options'];
+  const fields: string[] = [];
+  if (sa.includes('Questions'))     fields.push('question_text');
+  if (sa.includes('Explanations'))  fields.push('explanation_markdown');
+  if (sa.includes('Options'))        fields.push('options');
+  return fields.length > 0 ? fields : ['question_text'];
+};
+
 function getSubjectColor(sub: string): string {
   const map: Record<string, string> = {
     geography: '#0ea5e9', polity: '#8b5cf6', history: '#f59e0b',
@@ -143,10 +157,15 @@ function getSubjectColor(sub: string): string {
 }
 
 // ── Keyword Highlighter helper ────────────────────────────────────────────────
-function highlightKeywords(text: string, keywords: string[]): React.ReactNode {
-  const kws = keywords.slice(0, 3).filter(k => k.length > 2);
-  if (!kws.length) return text;
-  const escaped = kws.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+// Highlights ALL keywords found in the text (not just the first 3).
+// Uses per-card matching: only keywords that actually appear in this text
+// get highlighted, so cards matching "Krishnadevaraya" show that word in gold.
+function highlightKeywords(text: string, allKeywords: string[]): React.ReactNode {
+  const lowerText = text.toLowerCase();
+  // Only use keywords that actually appear in this card's text
+  const matchingKws = allKeywords.filter(k => k.length > 2 && lowerText.includes(k.toLowerCase()));
+  if (!matchingKws.length) return <Text>{text}</Text>;
+  const escaped = matchingKws.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
   const pattern = new RegExp(`(${escaped.join('|')})`, 'gi');
   const parts = text.split(pattern);
   return parts.map((part, i) =>
@@ -225,6 +244,9 @@ export default function AISearchTab() {
   // so filter options remain visible even after selection
   const [allSearchSubjects, setAllSearchSubjects] = useState<string[]>([]);
 
+  // Keyword toggle: which AI-expanded keywords are excluded from client-side filter
+  const [excludedKeywords, setExcludedKeywords] = useState<Set<string>>(new Set());
+
   // PYQ Widget — hot topics from predictive analysis
   const [pyqHotTopics, setPyqHotTopics] = useState<PredictiveRow[]>([]);
 
@@ -255,6 +277,7 @@ export default function AISearchTab() {
   // Notebook states for "Add to Notebook" parity
   const [pilotV2SaveOpen, setPilotV2SaveOpen] = useState(false);
   const [previewNotebookDraft, setPreviewNotebookDraft] = useState<string>('');
+  const [pilotV2InitialBodyOverride, setPilotV2InitialBodyOverride] = useState<string>('');
 
   // Notes editor for preview modal
   const [previewNotes, setPreviewNotes] = useState<string>('');
@@ -692,6 +715,93 @@ export default function AISearchTab() {
     });
   }, [pendingFilters.subjects, pendingFilters.sections]);
 
+  // ── Offline-first: search ALL 20k locally-downloaded questions ──────────────
+  // Synchronous, instant, no limit. Then Supabase supplements new questions.
+  const searchOfflineSync = React.useCallback((searchTerms: string[], af: Filters, fields: string[]): any[] => {
+    // Get all 20k offline questions from MMKV (synchronous, ~0.2ms)
+    const allQuestions = OfflineManager.getOfflineQuestionsEnrichedSync() ?? [];
+    if (allQuestions.length === 0) return [];
+
+    // Filter: any question matching ANY search term in ANY selected field (OR expansion)
+    const termSet = new Set(searchTerms.map(t => t.toLowerCase()));
+    let results = allQuestions.filter((q: any) => {
+      // For each question, check if ANY search term appears in ANY selected field
+      for (const field of fields) {
+        const text = String(q[field] ?? '').toLowerCase();
+        for (const term of termSet) {
+          if (text.includes(term)) return true;
+        }
+      }
+      return false;
+    });
+
+    // Apply hard filters locally (same logic as applyFilters for Supabase)
+    if (af.pyqFilter === 'PYQ Only')  results = results.filter((r: any) => r.is_pyq);
+    else if (af.pyqFilter === 'Non-PYQ') results = results.filter((r: any) => !r.is_pyq);
+
+    if (af.subjects !== 'All') {
+      const subs = af.subjects.split(',').filter(Boolean);
+      if (subs.length > 0) results = results.filter((r: any) => subs.includes(r.subject));
+    }
+    if (af.sections !== 'All') {
+      const secs = af.sections.split(',').filter(Boolean);
+      if (secs.length > 0) results = results.filter((r: any) => secs.includes(r.section_group));
+    }
+    if (af.microtopics !== 'All') {
+      const mts = af.microtopics.split(',').filter(Boolean);
+      if (mts.length > 0) results = results.filter((r: any) => mts.includes(r.micro_topic));
+    }
+
+    // 🐛 FIX: NCERT filter — normalize is_ncert (can be boolean, number 0/1, or string 'true'/'false')
+    const isNcert = (v: any) => {
+      if (v === true || v === 1) return true;
+      if (typeof v === 'string') return ['true','1','yes'].includes(v.trim().toLowerCase());
+      return false;
+    };
+    if (af.ncertFilter === 'NCERT Only') {
+      results = results.filter((r: any) => isNcert(r.is_ncert));
+    } else if (af.ncertFilter === 'Non-NCERT') {
+      results = results.filter((r: any) => !isNcert(r.is_ncert));
+    }
+
+    if (af.examCategory === 'UPSC')   results = results.filter((r: any) => r.is_upsc_cse);
+    else if (af.examCategory === 'Allied') results = results.filter((r: any) => r.is_allied);
+    else if (af.examCategory === 'Others') results = results.filter((r: any) => r.is_others);
+
+    // Year range
+    const yearStr = af.yearRange || null;
+    if (yearStr) {
+      const years = yearStr.includes(',') ? yearStr.split(',').map(Number) : [parseInt(yearStr, 10)];
+      results = results.filter((r: any) => years.includes(r.exam_year));
+    }
+
+    // Apply program filter
+    if (af.programs !== 'All') {
+      const progList = af.programs.split(',').filter(Boolean);
+      if (progList.length > 0) {
+        results = results.filter((r: any) => {
+          const tests = Array.isArray(r?.tests) ? r.tests[0] : r?.tests;
+          const prog = tests?.program_name || r?.program_name || '';
+          return progList.includes(prog);
+        });
+      }
+    }
+
+    // Apply institute filter
+    if (af.institutes !== 'All') {
+      const instList = af.institutes.split(',').filter(Boolean);
+      if (instList.length > 0) {
+        results = results.filter((r: any) => {
+          const tests = Array.isArray(r?.tests) ? r.tests[0] : r?.tests;
+          const inst = tests?.institute || r?.provider || r?.source?.institute || '';
+          return instList.includes(inst);
+        });
+      }
+    }
+
+    return results;
+  }, []);
+
   // ── Core search — handles AI / Matching / Exact modes ──────────────────────
 
   const runSearch = useCallback(async (q: string, activeFilters: Filters, engineMode?: SearchEngineMode) => {
@@ -759,13 +869,15 @@ export default function AISearchTab() {
           if (yearStr.includes(',')) q2 = q2.in('exam_year', yearStr.split(',').map(Number));
           else q2 = q2.eq('exam_year', parseInt(yearStr, 10));
         }
-        // Stage + institutes (joint subquery)
+        // Stage + institutes + programs (joint subquery on tests)
         const stageActive = af.stage && af.stage !== 'All';
         const instList = af.institutes !== 'All' ? af.institutes.split(',').filter(Boolean) : [];
-        if (stageActive || instList.length > 0) {
+        const progList = af.programs !== 'All' ? af.programs.split(',').filter(Boolean) : [];
+        if (stageActive || instList.length > 0 || progList.length > 0) {
           let testsQ = supabase.from('tests').select('id');
           if (stageActive) testsQ = testsQ.ilike('series', `%${af.stage}%`);
           if (instList.length > 0) testsQ = testsQ.in('institute', instList);
+          if (progList.length > 0) testsQ = testsQ.in('program_name', progList);
           const { data: testRows } = await testsQ;
           const testIds = (testRows || []).map((t: any) => t.id);
           q2 = testIds.length > 0 ? q2.in('test_id', testIds) : q2.in('test_id', ['__NO_MATCH__']);
@@ -779,43 +891,77 @@ export default function AISearchTab() {
         test_id,tests(institute,series,program_name)`;
 
       // ─────────────────────────────────────────────────────────────────────
-      // EXACT MODE: literal phrase match only
+      // EXACT MODE: offline-first + Supabase supplement
       // ─────────────────────────────────────────────────────────────────────
       if (mode === 'Exact') {
         const term = q.trim();
         setKeywords([term]);
-        let field = 'question_text';
-        if (activeFilters.searchAcross === 'Explanations') field = 'explanation_markdown';
-        let dbQ = supabase.from('questions').select(BASE_SELECT)
-          .ilike(field, `%${term}%`).limit(80);
-        dbQ = await applyFilters(dbQ, activeFilters);
-        const { data, error } = await dbQ;
-        if (error) throw error;
-        const raw = (data || []) as unknown as SearchResult[];
-        const { mergedQs } = mergeQuestions(raw as any);
-        setResults(mergedQs as SearchResult[]);
+        const fields = getSearchFields(activeFilters.searchAcross);
+
+        // STEP 1: Search 20k MMKV questions synchronously (instant, no limit)
+        const localResults = searchOfflineSync([term], activeFilters, fields);
+        setMasterResults(localResults as SearchResult[]);
+
+        // STEP 2: Set immediate results (no network wait)
+        const { mergedQs: localMerged } = mergeQuestions(localResults as any);
+        if (!sidebarSubjectFilter) {
+          const uniqueSubjects = [...new Set(localMerged.map((r: any) => r.subject).filter(Boolean))];
+          setAllSearchSubjects(uniqueSubjects as string[]);
+        }
+        setResults(localMerged as SearchResult[]);
+
+        // STEP 3: Fire Supabase in background for any NEW questions (unlimited)
+        (async () => {
+          try {
+            // Search in ALL selected fields
+            let orConditions: string[] = [];
+            for (const f of fields) orConditions.push(`${f}.ilike.%${term}%`);
+            let dbQ = supabase.from('questions').select(BASE_SELECT)
+              .or(orConditions.join(',')).limit(500);
+            dbQ = await applyFilters(dbQ, activeFilters);
+            const { data } = await dbQ;
+            if (!data || data.length === 0) return;
+            const localIds = new Set(localResults.map((r: any) => r.id));
+            const fresh = (data as any[]).filter((r: any) => !localIds.has(r.id));
+            if (fresh.length === 0) return;
+            const all = [...localResults, ...fresh];
+            const { mergedQs } = mergeQuestions(all as any);
+            setMasterResults(all as SearchResult[]);
+            if (!sidebarSubjectFilter) {
+              const uniqueSubjects = [...new Set(mergedQs.map((r: any) => r.subject).filter(Boolean))];
+              setAllSearchSubjects(uniqueSubjects as string[]);
+            }
+            setResults(mergedQs as SearchResult[]);
+          } catch (e) { /* background supplement failure is non-critical */ }
+        })();
         return;
       }
 
       // ─────────────────────────────────────────────────────────────────────
-      // MATCHING MODE: cache-first + fuzzy Supabase (no AI)
+      // MATCHING MODE: offline-first + Supabase supplement
       // ─────────────────────────────────────────────────────────────────────
       if (mode === 'Matching') {
         setKeywords([q.trim()]);
-        const cacheMode = activeFilters.searchMode === 'Exact' ? 'Exact' : 'Matching';
-        const cacheFields = activeFilters.searchAcross === 'Explanations'
-          ? ['Explanations'] : ['Questions'];
+        const term = q.trim();
+        const fields = getSearchFields(activeFilters.searchAcross);
 
-        // 1) Cache-first
-        let localResults = await QuestionCache.searchLocal(q.trim(), cacheMode, cacheFields) as any[];
-        // Apply hard filters to cache results
-        const subList = activeFilters.subjects !== 'All' ? activeFilters.subjects.split(',') : [];
-        const secList = activeFilters.sections !== 'All' ? activeFilters.sections.split(',') : [];
-        const mtList  = activeFilters.microtopics !== 'All' ? activeFilters.microtopics.split(',') : [];
+        // STEP 1: Search 20k MMKV questions synchronously (instant, no limit)
+        const localResults = searchOfflineSync([term], activeFilters, fields);
+
+        // Also do original QuestionCache.searchLocal for cache users without full offline download
+        let cachedResults = localResults;
+        try {
+          const cacheMode = 'Matching';
+          const cacheFields = activeFilters.searchAcross;
+          cachedResults = await QuestionCache.searchLocal(term, cacheMode, cacheFields) as any[];
+          // Merge MMKV + QuestionCache, dedup by ID
+          const mmkvIds = new Set(localResults.map((r: any) => r.id));
+          for (const r of cachedResults) { if (!mmkvIds.has(r.id)) localResults.push(r); }
+        } catch {}
+
+        // Apply revision tag filter (needs Supabase question_states query)
+        let finalLocal = [...localResults];
         const revTagList = activeFilters.revisionTags !== 'All' ? activeFilters.revisionTags.split(',').filter(Boolean) : [];
-        if (subList.length) localResults = localResults.filter((r: any) => subList.includes(r.subject));
-        if (secList.length) localResults = localResults.filter((r: any) => secList.includes(r.section_group));
-        if (mtList.length)  localResults = localResults.filter((r: any) => mtList.includes(r.micro_topic));
         if (revTagList.length && session?.user?.id) {
           const orQuery = revTagList.map(tag => `review_tags.cs.["${tag.replace(/"/g, '\\"')}"]`).join(',');
           const { data: taggedRows } = await supabase
@@ -824,67 +970,58 @@ export default function AISearchTab() {
             .eq('user_id', session.user.id)
             .or(orQuery);
           const taggedIds = new Set((taggedRows || []).map((row: any) => row.question_id));
-          localResults = localResults.filter((r: any) => taggedIds.has(r.id));
+          finalLocal = finalLocal.filter((r: any) => taggedIds.has(r.id));
         }
-        if (activeFilters.pyqFilter === 'PYQ Only')  localResults = localResults.filter((r: any) => r.is_pyq);
-        if (activeFilters.pyqFilter === 'Non-PYQ')   localResults = localResults.filter((r: any) => !r.is_pyq);
-        if (activeFilters.ncertFilter === 'NCERT Only') localResults = localResults.filter((r: any) => r.is_ncert);
 
-        // 2) Remote: main + fuzzy fallback
-        const term = q.trim();
-        let conditions: string[] = [];
-        if (activeFilters.searchAcross === 'Explanations') {
-          conditions = [`explanation_markdown.ilike.%${term}%`];
-        } else {
-          conditions = [`question_text.ilike.%${term}%`];
-          // Add fuzzy patterns for 1-char tolerance — match WORDS only, not substrings
-          // For "Gandhi" (6 chars), generate patterns like " Gandhi" variants as whole words
-          if (term.length > 3 && term.length < 20) {
-            // Single character deletion patterns (transposition + deletion tolerance)
-            for (let i = 0; i < term.length; i++) {
-              const pattern = term.slice(0, i) + term.slice(i + 1);
-              // Match as whole word: space+pattern+space, or at boundaries
-              conditions.push(`question_text.ilike.% ${pattern} %`);  // word boundary
-              conditions.push(`question_text.ilike.${pattern},%`);    // start of sentence
-              conditions.push(`question_text.ilike.% ${pattern},%`);  // after punctuation
-            }
-            // Single character substitution (common typos)
-            for (let i = 0; i < term.length; i++) {
-              // Replace each char with common mistyped chars (vowel swaps, similar consonants)
-              const vowelSwaps = ['a', 'e', 'i', 'o', 'u'];
-              for (const swap of vowelSwaps) {
-                if (swap !== term[i]) {
-                  const pattern = term.slice(0, i) + swap + term.slice(i + 1);
-                  conditions.push(`question_text.ilike.% ${pattern} %`);
+        setMasterResults(finalLocal as SearchResult[]);
+        const { mergedQs: localMerged } = mergeQuestions(finalLocal as any);
+        if (!sidebarSubjectFilter) {
+          const uniqueSubjects = [...new Set(localMerged.map((r: any) => r.subject).filter(Boolean))];
+          setAllSearchSubjects(uniqueSubjects as string[]);
+        }
+        setResults(localMerged as SearchResult[]);
+
+        // STEP 2: Fire Supabase in background for supplement (fuzzy patterns)
+        (async () => {
+          try {
+            let conditions: string[] = [];
+            const searchAcrossFields = getSearchFields(activeFilters.searchAcross);
+            // For each selected field, build ilike conditions
+            for (const f of searchAcrossFields) {
+              conditions.push(`${f}.ilike.%${term}%`);
+              if (term.length > 3 && term.length < 20) {
+                for (let i = 0; i < term.length; i++) {
+                  const pattern = term.slice(0, i) + term.slice(i + 1);
+                  conditions.push(`${f}.ilike.% ${pattern} %`);
+                  conditions.push(`${f}.ilike.${pattern},%`);
+                  conditions.push(`${f}.ilike.% ${pattern},%`);
+                }
+                for (let i = 0; i < term.length; i++) {
+                  const vowelSwaps = ['a', 'e', 'i', 'o', 'u'];
+                  for (const swap of vowelSwaps) {
+                    if (swap !== term[i]) {
+                      const pattern = term.slice(0, i) + swap + term.slice(i + 1);
+                      conditions.push(`${f}.ilike.% ${pattern} %`);
+                    }
+                  }
                 }
               }
             }
-          }
-        }
-        // Limit to 10 conditions to avoid query explosion
-        let dbQ = supabase.from('questions').select(BASE_SELECT)
-          .or(conditions.slice(0, 10).join(','))
-          .limit(60);
-        dbQ = await applyFilters(dbQ, activeFilters);
-        const { data: remote } = await dbQ;
-
-        // Merge
-        const localIds = new Set(localResults.map((r: any) => r.id));
-        const merged = [...localResults, ...(remote || []).filter((r: any) => !localIds.has(r.id))];
-
-        // Sort: exact match first, then PYQ rank, then year
-        const sorted = merged.sort((a: any, b: any) => {
-          const at = (a.question_text || '').toLowerCase();
-          const bt = (b.question_text || '').toLowerCase();
-          const tl = term.toLowerCase();
-          const ae = at.includes(tl), be = bt.includes(tl);
-          if (ae && !be) return -1; if (!ae && be) return 1;
-          const rank = (q: any) => q.is_upsc_cse ? 3 : q.is_allied ? 2 : q.is_pyq ? 1 : 0;
-          const rd = rank(b) - rank(a); if (rd !== 0) return rd;
-          return (b.exam_year || 0) - (a.exam_year || 0);
-        });
-        const { mergedQs } = mergeQuestions(sorted as any);
-        setResults(mergedQs as SearchResult[]);
+            let dbQ = supabase.from('questions').select(BASE_SELECT)
+              .or(conditions.slice(0, 10).join(','))
+              .limit(500);
+            dbQ = await applyFilters(dbQ, activeFilters);
+            const { data: remote } = await dbQ;
+            if (!remote || remote.length === 0) return;
+            const localIds = new Set(finalLocal.map((r: any) => r.id));
+            const fresh = remote.filter((r: any) => !localIds.has(r.id));
+            if (fresh.length === 0) return;
+            const all = [...finalLocal, ...fresh];
+            const { mergedQs } = mergeQuestions(all as any);
+            setMasterResults(all as SearchResult[]);
+            setResults(mergedQs as SearchResult[]);
+          } catch (e) { /* background supplement non-critical */ }
+        })();
         return;
       }
 
@@ -892,139 +1029,96 @@ export default function AISearchTab() {
       // AI + FUZZY MODE: Combines both AI semantic search + fuzzy matching
       // Runs both AI and Matching modes, merges results with dedup
       // ─────────────────────────────────────────────────────────────────────
+      // AI+FUZZY MODE: offline-first — MMKV + AI keywords + Supabase supplement
+      // ─────────────────────────────────────────────────────────────────────
       if (mode === 'AI+Fuzzy') {
-        // Run matching (fuzzy) mode first for cache results
         setKeywords([q.trim()]);
-        const cacheMode = activeFilters.searchMode === 'Exact' ? 'Exact' : 'Matching';
-        const cacheFields = activeFilters.searchAcross === 'Explanations'
-          ? ['Explanations'] : ['Questions'];
-        let matchingResults = await QuestionCache.searchLocal(q.trim(), cacheMode, cacheFields) as any[];
-        
-        // Apply hard filters to cache results (same as Matching mode)
-        const subList = activeFilters.subjects !== 'All' ? activeFilters.subjects.split(',') : [];
-        const secList = activeFilters.sections !== 'All' ? activeFilters.sections.split(',') : [];
-        const mtList  = activeFilters.microtopics !== 'All' ? activeFilters.microtopics.split(',') : [];
-        const revTagList = activeFilters.revisionTags !== 'All' ? activeFilters.revisionTags.split(',').filter(Boolean) : [];
-        if (subList.length) matchingResults = matchingResults.filter((r: any) => subList.includes(r.subject));
-        if (secList.length) matchingResults = matchingResults.filter((r: any) => secList.includes(r.section_group));
-        if (mtList.length)  matchingResults = matchingResults.filter((r: any) => mtList.includes(r.micro_topic));
-        if (revTagList.length && session?.user?.id) {
-          const orQuery = revTagList.map(tag => `review_tags.cs.["${tag.replace(/"/g, '\\"')}"]`).join(',');
-          const { data: taggedRows } = await supabase
-            .from('question_states')
-            .select('question_id')
-            .eq('user_id', session.user.id)
-            .or(orQuery);
-          const taggedIds = new Set((taggedRows || []).map((row: any) => row.question_id));
-          matchingResults = matchingResults.filter((r: any) => taggedIds.has(r.id));
-        }
-        if (activeFilters.pyqFilter === 'PYQ Only')  matchingResults = matchingResults.filter((r: any) => r.is_pyq);
-        if (activeFilters.pyqFilter === 'Non-PYQ')   matchingResults = matchingResults.filter((r: any) => !r.is_pyq);
-        if (activeFilters.ncertFilter === 'NCERT Only') matchingResults = matchingResults.filter((r: any) => r.is_ncert);
+        const rawTerm = q.trim();
+        const fields = getSearchFields(activeFilters.searchAcross);
+        const userWords = rawTerm.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2);
 
-        // Now run AI search with expanded keywords
-        const aiResult = await aiExpandSearchQuery(q.trim());
+        // STEP 1: Get AI keywords (Gemini)
+        const aiResult = await aiExpandSearchQuery(rawTerm);
         const displayKeywords = aiResult.keywords;
-        setKeywords(displayKeywords);
-        if (displayKeywords.length === 0) {
-          const { mergedQs } = mergeQuestions(matchingResults as any);
-          setResults(mergedQs as SearchResult[]);
-          return;
-        }
+        setKeywords(displayKeywords.length > 0 ? displayKeywords : [rawTerm]);
 
+        // Merge AI-inferred filters (local only, do NOT persist to state)
         const mergedFilters: Filters = { ...activeFilters };
         if (aiResult.filters.subject      && activeFilters.subjects     === 'All') mergedFilters.subjects     = aiResult.filters.subject;
         if (aiResult.filters.stage        && activeFilters.stage        === 'All') mergedFilters.stage        = aiResult.filters.stage;
         if (aiResult.filters.pyqFilter    && activeFilters.pyqFilter    === 'All') mergedFilters.pyqFilter    = aiResult.filters.pyqFilter;
         if (aiResult.filters.examCategory && activeFilters.examCategory === 'All') mergedFilters.examCategory = aiResult.filters.examCategory;
         if (aiResult.filters.ncertFilter  && activeFilters.ncertFilter  === 'All') mergedFilters.ncertFilter  = aiResult.filters.ncertFilter;
-        const aiYear = aiResult.filters.specificYear || null;
         setAiInferredFilters(aiResult.filters);
-        setFilters(mergedFilters);
 
-        // Get AI results from tiers (same as AI mode)
-        const rawTerm = q.trim();
-        const field = mergedFilters.searchAcross === 'Explanations'
-          ? 'explanation_markdown'
-          : 'question_text';
+        // Build ALL search terms: original query + user words + AI keywords
+        const allSearchTerms: string[] = [rawTerm];
+        for (const w of userWords) allSearchTerms.push(w);
+        for (const kw of displayKeywords) allSearchTerms.push(kw);
+        const uniqueTerms = [...new Set(allSearchTerms)];
 
-        const seenIds = new Set<string>();
-        const priorityResults: SearchResult[] = [];
-        const addBatch = (rows: SearchResult[]) => {
-          for (const r of rows) {
-            if (!seenIds.has(r.id)) {
-              seenIds.add(r.id);
-              priorityResults.push(r);
-            }
-          }
-        };
+        // STEP 2: Search 20k MMKV questions synchronously with ALL terms (instant, no limit)
+        const localResults = searchOfflineSync(uniqueTerms, mergedFilters, fields);
+        setMasterResults(localResults as SearchResult[]);
 
-        // Run AI tiers (same as AI mode)
-        let dbQ = supabase.from('questions').select(BASE_SELECT)
-          .ilike(field, `%${rawTerm}%`)
-          .limit(40);
-        dbQ = await applyFilters(dbQ, mergedFilters, aiYear);
-        const { data: tier0 } = await dbQ;
-        addBatch((tier0 || []) as unknown as SearchResult[]);
-
-        const userWords = rawTerm.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2);
-        if (userWords.length > 1) {
-          let dbQ2: any = supabase.from('questions').select(BASE_SELECT).limit(30);
-          for (const w of userWords) {
-            dbQ2 = dbQ2.ilike(field, `%${w}%`);
-          }
-          dbQ2 = await applyFilters(dbQ2, mergedFilters, aiYear);
-          const { data: tier1 } = await dbQ2;
-          addBatch((tier1 || []) as unknown as SearchResult[]);
-        }
-
-        const safeKws = displayKeywords.slice(0, 12);
-        const topKws = safeKws.slice(0, 3);
-        if (topKws.length > 1) {
-          let dbQ3: any = supabase.from('questions').select(BASE_SELECT).limit(30);
-          for (const kw of topKws) {
-            dbQ3 = dbQ3.ilike(field, `%${kw}%`);
-          }
-          dbQ3 = await applyFilters(dbQ3, mergedFilters, aiYear);
-          const { data: tier3 } = await dbQ3;
-          addBatch((tier3 || []) as unknown as SearchResult[]);
-        }
-
-        // Merge AI results with Matching results
-        const matchingIds = new Set(matchingResults.map((r: any) => r.id));
-        for (const r of matchingResults) {
-          if (!seenIds.has(r.id)) {
-            seenIds.add(r.id);
-            priorityResults.push(r);
-          }
-        }
-
-        const { mergedQs: aiFuzzyResults } = mergeQuestions(priorityResults as any);
-        setResults(aiFuzzyResults as SearchResult[]);
-        
+        const { mergedQs: localMerged } = mergeQuestions(localResults as any);
         if (!sidebarSubjectFilter) {
-          const uniqueSubjects = [...new Set(aiFuzzyResults.map((r: any) => r.subject).filter(Boolean))];
+          const uniqueSubjects = [...new Set(localMerged.map((r: any) => r.subject).filter(Boolean))];
           setAllSearchSubjects(uniqueSubjects as string[]);
         }
+        setResults(localMerged as SearchResult[]);
+        if (displayKeywords.length === 0) return;
+
+        // STEP 3: Fire Supabase supplement in background (new questions only)
+        (async () => {
+          try {
+            const seenIds = new Set<string>();
+            const priorityResults: SearchResult[] = [];
+            const addBatch = (rows: SearchResult[]) => {
+              for (const r of rows) { if (!seenIds.has(r.id)) { seenIds.add(r.id); priorityResults.push(r); } }
+            };
+            // First add all local results
+            for (const r of localResults) addBatch(r as any);
+
+            // Tier 0: exact phrase from Supabase (search in ALL selected fields)
+            let orConditions: string[] = [];
+            for (const f of fields) orConditions.push(`${f}.ilike.%${rawTerm}%`);
+            let dbQ = supabase.from('questions').select(BASE_SELECT)
+              .or(orConditions.join(',')).limit(500);
+            dbQ = await applyFilters(dbQ, mergedFilters, aiResult.filters.specificYear || null);
+            const { data: tier0 } = await dbQ;
+            if (tier0) addBatch(tier0 as unknown as SearchResult[]);
+
+            // Tier 1: ALL terms as big OR chunks
+            const searchSqlTerms: string[] = [];
+            for (const f of fields) {
+              for (const w of userWords) searchSqlTerms.push(`${f}.ilike.%${w}%`);
+              for (const kw of displayKeywords) searchSqlTerms.push(`${f}.ilike.%${kw}%`);
+            }
+            const sqlUniq = [...new Set(searchSqlTerms)];
+            for (let i = 0; i < sqlUniq.length; i += 10) {
+              const chunk = sqlUniq.slice(i, i + 10);
+              let qB = supabase.from('questions').select(BASE_SELECT).or(chunk.join(',')).limit(500);
+              qB = await applyFilters(qB, mergedFilters, aiResult.filters.specificYear || null);
+              const { data } = await qB;
+              if (data) addBatch(data as unknown as SearchResult[]);
+            }
+            const { mergedQs } = mergeQuestions(priorityResults as any);
+            setMasterResults(priorityResults as SearchResult[]);
+            setResults(mergedQs as SearchResult[]);
+          } catch (e) { /* supplement non-critical */ }
+        })();
         return;
       }
 
       // ─────────────────────────────────────────────────────────────────────
-      // AI MODE: Hybrid ranking pipeline
-      //
-      // Priority tiers (fetched in order, merged with dedup):
-      //   Tier 0 — Exact original phrase match (highest priority)
-      //   Tier 1 — All AI keywords matched together (AND-like, using multi-word)
-      //   Tier 2 — Individual AI keyword matches (OR across each keyword)
-      //   Tier 3 — Remaining fuzzy AI keyword matches (lowest priority)
-      //
-      // This guarantees the user's literal intent always surfaces first,
-      // followed by AI-expanded semantic matches as supplementary results.
+      // AI MODE: offline-first — MMKV + AI keywords + Supabase supplement
       // ─────────────────────────────────────────────────────────────────────
       const aiResult = await aiExpandSearchQuery(q.trim());
       const displayKeywords = aiResult.keywords;
+      const rawTerm = q.trim();
 
-      // Merge AI-inferred filters with user-chosen filters (user-chosen take priority)
+      // Merge AI-inferred filters (local only, do NOT persist to state)
       const mergedFilters: Filters = { ...activeFilters };
       if (aiResult.filters.subject      && activeFilters.subjects     === 'All') mergedFilters.subjects     = aiResult.filters.subject;
       if (aiResult.filters.stage        && activeFilters.stage        === 'All') mergedFilters.stage        = aiResult.filters.stage;
@@ -1034,181 +1128,87 @@ export default function AISearchTab() {
 
       const aiYear = aiResult.filters.specificYear || null;
       setAiInferredFilters(aiResult.filters);
-      setFilters(mergedFilters);
-      activeFilters = mergedFilters;
 
-      setKeywords(displayKeywords);
+      setKeywords(displayKeywords.length > 0 ? displayKeywords : [rawTerm]);
       if (displayKeywords.length === 0) { setLoading(false); return; }
 
-      // The raw query text the user typed — used for exact-phrase tier
-      const rawTerm = q.trim();
-      const field = activeFilters.searchAcross === 'Explanations'
-        ? 'explanation_markdown'
-        : 'question_text';
-
-      // Dedup accumulator — preserves insertion order (= priority order)
-      const seenIds = new Set<string>();
-      const priorityResults: SearchResult[] = [];
-
-      // Extract user words for Exact Keyword matching (words > 2 chars)
+      const fields = getSearchFields(mergedFilters.searchAcross);
       const userWords = rawTerm.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2);
 
-      const addBatch = (rows: SearchResult[]) => {
-        for (const r of rows) {
-          if (!seenIds.has(r.id)) {
-            seenIds.add(r.id);
-            priorityResults.push(r);
-          }
-        }
-      };
+      // Build ALL search terms: original query + user words + AI keywords
+      const allSearchTerms: string[] = [rawTerm];
+      for (const w of userWords) allSearchTerms.push(w);
+      for (const kw of displayKeywords) allSearchTerms.push(kw);
+      const uniqueTerms = [...new Set(allSearchTerms)];
 
-      // ── TIER 0: Exact original phrase ─────────────────────────────────────
-      // Highest confidence: the user's literal input is present verbatim.
-      {
-        let dbQ = supabase.from('questions').select(BASE_SELECT)
-          .ilike(field, `%${rawTerm}%`)
-          .limit(40);
-        dbQ = await applyFilters(dbQ, activeFilters, aiYear);
-        const { data } = await dbQ;
-        addBatch((data || []) as unknown as SearchResult[]);
-      }
+      // STEP 1: Search 20k MMKV questions synchronously with ALL terms (instant, no limit)
+      const localResults = searchOfflineSync(uniqueTerms, mergedFilters, fields);
+      setMasterResults(localResults as SearchResult[]);
 
-      // ── TIER 1: Exact keyword matches (All User Words) ─────────────────────
-      // User's own typed keywords, matched as AND
-      if (userWords.length > 1) {
-        let dbQ: any = supabase.from('questions').select(BASE_SELECT).limit(30);
-        for (const w of userWords) {
-          dbQ = dbQ.ilike(field, `%${w}%`);
-        }
-        dbQ = await applyFilters(dbQ, activeFilters, aiYear);
-        const { data } = await dbQ;
-        addBatch((data || []) as unknown as SearchResult[]);
-      }
-
-      // ── TIER 2: Fuzzy keyword matches (Any User Word) ──────────────────────
-      // User's own typed keywords, matched as OR with fuzzy patterns
-      for (const w of userWords) {
-        let fuzzyConditions: string[] = [`${field}.ilike.%${w}%`];
-        // Generate fuzzy patterns for 1-char tolerance — match WORDS only, not substrings
-        if (w.length > 3 && w.length < 20) {
-          // Single character deletion patterns
-          for (let i = 0; i < w.length; i++) {
-            const pattern = w.slice(0, i) + w.slice(i + 1);
-            fuzzyConditions.push(`${field}.ilike.% ${pattern} %`);  // word boundary
-            fuzzyConditions.push(`${field}.ilike.${pattern},%`);    // start of line/sentence
-            fuzzyConditions.push(`${field}.ilike.% ${pattern},%`);  // after punctuation
-          }
-          // Single character substitution (vowel swaps, common typos)
-          for (let i = 0; i < w.length; i++) {
-            const vowelSwaps = ['a', 'e', 'i', 'o', 'u'];
-            for (const swap of vowelSwaps) {
-              if (swap !== w[i]) {
-                const pattern = w.slice(0, i) + swap + w.slice(i + 1);
-                fuzzyConditions.push(`${field}.ilike.% ${pattern} %`);
-              }
-            }
-          }
-        }
-        let dbQ = supabase.from('questions').select(BASE_SELECT)
-          .or(fuzzyConditions.slice(0, 10).join(','))
-          .limit(20);
-        dbQ = await applyFilters(dbQ, activeFilters, aiYear);
-        const { data } = await dbQ;
-        addBatch((data || []) as unknown as SearchResult[]);
-      }
-
-      // ── TIER 3: Multi-keyword AND simulation (AI Words) ──────────────────
-      // Questions that contain ALL of the first 3 AI keywords are more
-      // relevant than those containing only some of them.
-      const safeKws = displayKeywords.slice(0, 12);
-      const topKws = safeKws.slice(0, 3);
-      if (topKws.length > 1) {
-        // Build an AND filter by chaining multiple .ilike() calls
-        let dbQ: any = supabase.from('questions').select(BASE_SELECT).limit(30);
-        for (const kw of topKws) {
-          dbQ = dbQ.ilike(field, `%${kw}%`);
-        }
-        dbQ = await applyFilters(dbQ, activeFilters, aiYear);
-        const { data } = await dbQ;
-        addBatch((data || []) as unknown as SearchResult[]);
-      }
-
-      // ── TIER 4: Individual AI keyword OR queries with fuzzy ────────────────
-      // Each keyword searched independently with fuzzy patterns and added in 
-      // keyword order, so earlier (higher-confidence) AI keywords get priority.
-      for (const kw of safeKws) {
-        let fuzzyConditions: string[] = [`${field}.ilike.%${kw}%`];
-        // Generate fuzzy patterns for 1-char tolerance — match WORDS only, not substrings
-        if (kw.length > 3 && kw.length < 20) {
-          // Single character deletion patterns
-          for (let i = 0; i < kw.length; i++) {
-            const pattern = kw.slice(0, i) + kw.slice(i + 1);
-            fuzzyConditions.push(`${field}.ilike.% ${pattern} %`);  // word boundary
-            fuzzyConditions.push(`${field}.ilike.${pattern},%`);    // start of line/sentence
-            fuzzyConditions.push(`${field}.ilike.% ${pattern},%`);  // after punctuation
-          }
-          // Single character substitution (vowel swaps, common typos)
-          for (let i = 0; i < kw.length; i++) {
-            const vowelSwaps = ['a', 'e', 'i', 'o', 'u'];
-            for (const swap of vowelSwaps) {
-              if (swap !== kw[i]) {
-                const pattern = kw.slice(0, i) + swap + kw.slice(i + 1);
-                fuzzyConditions.push(`${field}.ilike.% ${pattern} %`);
-              }
-            }
-          }
-        }
-        let dbQ = supabase.from('questions').select(BASE_SELECT)
-          .or(fuzzyConditions.slice(0, 10).join(','))
-          .limit(20);
-        dbQ = await applyFilters(dbQ, activeFilters, aiYear);
-        const { data } = await dbQ;
-        addBatch((data || []) as unknown as SearchResult[]);
-      }
-
-      // Deduplicate across merged question variants
-      const { mergedQs } = mergeQuestions(priorityResults as any);
-
-      // Attach a search-rank score for the final sort step
+      // Compute tiers for sorting
       const rawTermLower = rawTerm.toLowerCase();
-      const topKwsLower = topKws.map(k => k.toLowerCase());
-
       const getSearchTier = (r: any): number => {
         const text = ((r.question_text || '') + ' ' + (r.explanation_markdown || '')).toLowerCase();
-        
-        // Tier 0: Exact phrase
         if (text.includes(rawTermLower)) return 0;
-        
-        // Tier 1: All user keywords (Exact keyword match)
         if (userWords.length > 1 && userWords.every(w => text.includes(w))) return 1;
-        
-        // Tier 2: Fuzzy match (at least half of user keywords)
         const matchCount = userWords.filter(w => text.includes(w)).length;
         if (userWords.length > 0 && matchCount >= Math.ceil(userWords.length / 2)) return 2;
-        
-        // Tier 3: All AI keywords
-        if (topKwsLower.length > 0 && topKwsLower.every(k => text.includes(k))) return 3;
-        
-        // Tier 4: AI semantic / Any AI keyword
+        const kwLower = displayKeywords.map(k => k.toLowerCase());
+        if (kwLower.some(k => text.includes(k))) return 3;
         return 4;
       };
+      const stamped = localResults.map((r: any) => ({ ...r, _searchTier: getSearchTier(r) }));
+      const { mergedQs: localMerged } = mergeQuestions(stamped as any);
 
-      // Stamp each result with its tier (used in sortedResults)
-      const stamped = mergedQs.map((r: any) => ({ ...r, _searchTier: getSearchTier(r) }));
-      setMasterResults(stamped as SearchResult[]); // Issue #11: Store master for client-side filtering
-      setResults(stamped as SearchResult[]);
-
-      // ISSUE FIX #12: Track all unique subjects from initial search results
-      // so sidebar filters remain visible even after filtering
       if (!sidebarSubjectFilter) {
-        const uniqueSubjects = [...new Set(stamped.map((r: any) => r.subject).filter(Boolean))];
+        const uniqueSubjects = [...new Set(localMerged.map((r: any) => r.subject).filter(Boolean))];
         setAllSearchSubjects(uniqueSubjects as string[]);
       }
+      setResults(localMerged as SearchResult[]);
 
+      // STEP 2: Fire Supabase supplement in background (new questions only)
+      (async () => {
+        try {
+          const seenIds = new Set<string>();
+          const priorityResults: SearchResult[] = [];
+          const addBatch = (rows: SearchResult[]) => {
+            for (const r of rows) { if (!seenIds.has(r.id)) { seenIds.add(r.id); priorityResults.push(r); } }
+          };
+          // Add all local results first
+          for (const r of localResults) addBatch(r as any);
 
+          // Tier 0: exact phrase from Supabase (search in ALL selected fields)
+          let orConditions: string[] = [];
+          for (const f of fields) orConditions.push(`${f}.ilike.%${rawTerm}%`);
+          let dbQ = supabase.from('questions').select(BASE_SELECT)
+            .or(orConditions.join(',')).limit(500);
+          dbQ = await applyFilters(dbQ, mergedFilters, aiYear);
+          const { data: tier0 } = await dbQ;
+          if (tier0) addBatch(tier0 as unknown as SearchResult[]);
+
+          // Tier 1: ALL terms as big OR chunks
+          const searchSqlTerms: string[] = [];
+          for (const f of fields) {
+            for (const w of userWords) searchSqlTerms.push(`${f}.ilike.%${w}%`);
+            for (const kw of displayKeywords) searchSqlTerms.push(`${f}.ilike.%${kw}%`);
+          }
+          const sqlUniq = [...new Set(searchSqlTerms)];
+          for (let i = 0; i < sqlUniq.length; i += 10) {
+            const chunk = sqlUniq.slice(i, i + 10);
+            let qB = supabase.from('questions').select(BASE_SELECT).or(chunk.join(',')).limit(500);
+            qB = await applyFilters(qB, mergedFilters, aiYear);
+            const { data } = await qB;
+            if (data) addBatch(data as unknown as SearchResult[]);
+          }
+          const { mergedQs } = mergeQuestions(priorityResults as any);
+          const stamped2 = mergedQs.map((r: any) => ({ ...r, _searchTier: getSearchTier(r) }));
+          setMasterResults(priorityResults as SearchResult[]);
+          setResults(stamped2 as SearchResult[]);
+        } catch (e) { /* supplement non-critical */ }
+      })();
     } catch (e: any) {
       const msg: string = e?.message || 'Unknown error';
-      if (msg.includes('No Gemini API key found') || msg.includes('No Groq API key found')) {
+      if (msg.includes('No Gemini API key found') || msg.includes('No Groq API key found') || msg.includes('No DeepSeek API key found')) {
         Alert.alert('AI key needed', 'Go to Settings → AI Settings and paste your key, or switch to Matching mode.');
       } else if (msg.includes('429')) {
         Alert.alert('Quota exceeded', 'This key hit its limit. Switch to another key or use Matching mode.');
@@ -1270,9 +1270,13 @@ export default function AISearchTab() {
   };
 
   const applyFilters = () => {
-    setFilters(pendingFilters);
+    // FIX #1: Sync pyqMode → pyqFilter (popup uses pyqMode, but applyFilters helper reads pyqFilter)
+    // Also ensure examCategory is cleared when PYQ mode is not PYQ Only (stale state leak fix)
+    const examCatSafe = pendingFilters.pyqMode !== 'PYQ Only' ? 'All' : pendingFilters.examCategory;
+    const syncedFilters = { ...pendingFilters, pyqFilter: pendingFilters.pyqMode, examCategory: examCatSafe };
+    setFilters(syncedFilters);
     setFilterOpen(false);
-    if (hasSearched && query.trim()) runSearch(query, pendingFilters);
+    if (hasSearched && query.trim()) runSearch(query, syncedFilters);
   };
 
   const activeFilterCount = countActiveFilters(filters);
@@ -1338,7 +1342,9 @@ export default function AISearchTab() {
         </View>
 
         <View style={{ flex: 1 }}>
-          {/* Enhancement 1 — keyword highlighting in question text */}
+          {/* Enhancement 1 — keyword highlighting with ALL matchable keywords */}
+          {/* Uses ALL keywords from the search (not just first 3), so cards matching */}
+          {/* AI-expanded terms like "Krishnadevaraya" also show those words highlighted */}
           <Text style={[styles.cardText, { color: colors.textPrimary }]} numberOfLines={3}>
             {keywords.length > 0 ? highlightKeywords(item.question_text, keywords) : item.question_text}
           </Text>
@@ -1427,9 +1433,6 @@ export default function AISearchTab() {
           <Brain size={28} color="#fff" />
         </View>
         <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>AI-Powered Search</Text>
-        <Text style={[styles.emptySub, { color: colors.textTertiary }]}>
-          Ask in plain language.{'\n'}Gemini maps intent → filters + keywords,{'\n'}then searches across all questions.
-        </Text>
 
         {/* Recent searches section */}
         {historyItems.length > 0 && (
@@ -1517,27 +1520,70 @@ export default function AISearchTab() {
   // ── Left panel (iPad sidebar / inline on phone) ───────────────────────────
 
   const LeftPanel = (
-    <View style={[
-      IS_IPAD ? styles.leftPanel : styles.phoneKeywordsPanel,
-      { backgroundColor: IS_IPAD ? colors.surface : colors.bg, borderRightColor: colors.border },
-    ]}>
+    <ScrollView
+      style={[
+        IS_IPAD ? styles.leftPanel : styles.phoneKeywordsPanel,
+        { backgroundColor: IS_IPAD ? colors.surface : colors.bg, borderRightColor: colors.border },
+      ]}
+      contentContainerStyle={{ flexGrow: 1 }}
+      showsVerticalScrollIndicator={true}
+      nestedScrollEnabled
+    >
       {keywords.length > 0 && (
         <>
-          {/* Fix #6 — collapsible keywords */}
+          {/* Keyword toggle section — tap to uncheck = hide results matching only that keyword */}
           <TouchableOpacity
             onPress={() => setKeywordsExpanded(e => !e)}
             style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6 }}
           >
             <Sparkles size={11} color="#7c3aed" />
             <Text style={[styles.panelLabel, { color: '#7c3aed', marginBottom: 0, flex: 1 }]}>
-              {keywords.length} AI KEYWORDS USED
+              {keywords.length - excludedKeywords.size}/{keywords.length} KEYWORDS
             </Text>
             {keywordsExpanded
               ? <ChevronUp size={13} color={colors.textTertiary} />
               : <ChevronDown size={13} color={colors.textTertiary} />
             }
           </TouchableOpacity>
-          {keywordsExpanded && renderKeywordPills()}
+          {keywordsExpanded && (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 2 }}>
+              {keywords.map((kw, i) => {
+                const isExcluded = excludedKeywords.has(kw);
+                return (
+                  <TouchableOpacity
+                    key={i}
+                    onPress={() => {
+                      const next = new Set(excludedKeywords);
+                      if (isExcluded) next.delete(kw);
+                      else next.add(kw);
+                      setExcludedKeywords(next);
+                      // Re-filter results client-side from masterResults
+                      if (next.size === 0) {
+                        setResults(masterResults);
+                      } else {
+                        const filtered = masterResults.filter((r: any) => {
+                          const text = ((r.question_text || '') + ' ' + (r.explanation_markdown || '')).toLowerCase();
+                          // Keep result if it matches at least one non-excluded keyword
+                          return keywords.some(k => !next.has(k) && text.includes(k.toLowerCase()));
+                        });
+                        setResults(filtered);
+                      }
+                    }}
+                    style={[styles.pill, {
+                      backgroundColor: isExcluded ? '#f1f5f9' : '#ede9fe',
+                      borderColor: isExcluded ? colors.border : '#c4b5fd',
+                      opacity: isExcluded ? 0.5 : 1,
+                    }]}
+                  >
+                    <Text style={[styles.pillText, {
+                      color: isExcluded ? colors.textTertiary : '#7c3aed',
+                      textDecorationLine: isExcluded ? 'line-through' : 'none',
+                    }]}>{kw}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
         </>
       )}
 
@@ -1623,12 +1669,19 @@ export default function AISearchTab() {
               onPress={() => {
                 const newFilters = { ...filters, pyqFilter: opt };
                 setFilters(newFilters);
-                // Issue #11: Client-side filtering
+                // Issue #11: Client-side filtering first
                 let filtered = sidebarSubjectFilter
                   ? masterResults.filter(r => r.subject === sidebarSubjectFilter)
                   : [...masterResults];
                 if (opt === 'PYQ Only') filtered = filtered.filter(r => r.is_pyq);
                 else if (opt === 'Non-PYQ') filtered = filtered.filter(r => !r.is_pyq);
+                // FIX #4: If client-side filtering yields suspiciously few results
+                // (less than 20% of master), the original query likely didn't fetch
+                // enough of the desired type. Re-query from Supabase.
+                if (filtered.length < masterResults.length * 0.2 && query.trim()) {
+                  runSearch(query, { ...filters, pyqFilter: opt });
+                  return;
+                }
                 setResults(filtered);
               }}
             >
@@ -1689,10 +1742,10 @@ export default function AISearchTab() {
               </>
             );
           })()}
-        </>
-      )}
-    </View>
-  );
+            </>
+          )}
+        </ScrollView>
+      );
 
   // ── Results header with Learn/Exam launch buttons ───────────────────────
   const ResultsHeader = (
@@ -1790,21 +1843,29 @@ export default function AISearchTab() {
 
           <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.popupBody} showsVerticalScrollIndicator={true}>
 
-            <FilterGroup
-              label="SEARCH MODE"
-              options={['Matching', 'Exact']}
-              value={pendingFilters.searchMode}
-              onSelect={(v) => setPendingFilters(p => ({ ...p, searchMode: v as any }))}
-              colors={colors}
-            />
+            {/* 🔥 Removed redundant SEARCH MODE — already available as top toggle buttons */}
 
-            <FilterGroup
-              label="SEARCH ACROSS"
-              options={['Questions', 'Explanations', 'Options', 'Notes', 'Questions+Options', 'All']}
-              value={pendingFilters.searchAcross}
-              onSelect={(v) => setPendingFilters(p => ({ ...p, searchAcross: v as any }))}
-              colors={colors}
-            />
+            <View style={styles.filterGroup}>
+              <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>SEARCH ACROSS</Text>
+              <View style={styles.chipsWrap}>
+                {['Questions', 'Explanations', 'Options'].map(opt => {
+                  const isSelected = pendingFilters.searchAcross.includes(opt);
+                  return (
+                    <TouchableOpacity
+                      key={opt}
+                      onPress={() => {
+                        const list = [...pendingFilters.searchAcross];
+                        const next = isSelected ? list.filter(i => i !== opt) : [...list, opt];
+                        setPendingFilters(p => ({ ...p, searchAcross: next.length > 0 ? next : ['Questions'] }));
+                      }}
+                      style={[styles.fchip, isSelected && styles.fchipSel]}
+                    >
+                      <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
 
             <FilterGroup
               label="EXAM STAGE"
@@ -1818,7 +1879,11 @@ export default function AISearchTab() {
               label="PYQ MODE"
               options={['All', 'PYQ Only', 'Non-PYQ']}
               value={pendingFilters.pyqMode}
-              onSelect={(v) => setPendingFilters(p => ({ ...p, pyqMode: v }))}
+              onSelect={(v) => setPendingFilters(p => ({
+                ...p,
+                pyqMode: v,
+                examCategory: v !== 'PYQ Only' ? 'All' : p.examCategory, // 🐛 FIX: clear examCategory when PYQ mode is not 'PYQ Only' so stale category doesn't leak
+              }))}
               colors={colors}
             />
 
@@ -1852,6 +1917,24 @@ export default function AISearchTab() {
                   >
                     <Text style={[styles.fchipText, { color: pendingFilters.revisionTags === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
                   </TouchableOpacity>
+                  {/* Select All — selects every tag so results are filtered to tagged questions only */}
+                  {userTags.length > 1 && (
+                    <TouchableOpacity
+                      onPress={() => setPendingFilters(p => ({
+                        ...p,
+                        revisionTags: userTags.join(','),
+                      }))}
+                      style={[styles.fchip, {
+                        borderColor: '#7c3aed',
+                        backgroundColor: pendingFilters.revisionTags === userTags.join(',') ? '#7c3aed' : '#ede9fe',
+                      }]}
+                    >
+                      <Text style={[styles.fchipText, {
+                        color: pendingFilters.revisionTags === userTags.join(',') ? '#fff' : '#7c3aed',
+                        fontWeight: '800',
+                      }]}>Select All</Text>
+                    </TouchableOpacity>
+                  )}
                   {userTags.map(tag => {
                     const isSelected = pendingFilters.revisionTags.split(',').includes(tag);
                     return (
@@ -2055,6 +2138,58 @@ export default function AISearchTab() {
 
   // ── Search bar ────────────────────────────────────────────────────────────
 
+  const QuickFilterBar = (
+    <View style={{ paddingHorizontal: 14, paddingVertical: 6 }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+        <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 0.8 }}>QUICK:</Text>
+        {/* PYQ Mode quick chips */}
+        {(['All', 'PYQ Only', 'Non-PYQ'] as const).map(opt => {
+          const isActive = filters.pyqFilter === opt || (opt === 'All' && filters.pyqFilter === 'All');
+          return (
+            <TouchableOpacity
+              key={opt}
+              onPress={() => {
+                const newF = { ...filters, pyqFilter: opt, pyqMode: opt };
+                setFilters(newF);
+                if (hasSearched && query.trim()) runSearch(query, newF);
+              }}
+              style={{
+                paddingHorizontal: 10, paddingVertical: 4, borderRadius: 14,
+                backgroundColor: isActive ? '#7c3aed' : colors.surfaceStrong,
+                borderWidth: 1, borderColor: isActive ? '#7c3aed' : colors.border,
+              }}
+            >
+              <Text style={{ fontSize: 10, fontWeight: '700', color: isActive ? '#fff' : colors.textSecondary }}>{opt}</Text>
+            </TouchableOpacity>
+          );
+        })}
+        {/* Search Across quick chips */}
+        {['Questions', 'Explanations', 'Options'].map(opt => {
+          const isSelected = filters.searchAcross.includes(opt);
+          return (
+            <TouchableOpacity
+              key={opt}
+              onPress={() => {
+                const list = [...filters.searchAcross];
+                const next = isSelected ? list.filter(i => i !== opt) : [...list, opt];
+                const newF = { ...filters, searchAcross: next.length > 0 ? next : ['Questions'] };
+                setFilters(newF);
+                if (hasSearched && query.trim()) runSearch(query, newF);
+              }}
+              style={{
+                paddingHorizontal: 10, paddingVertical: 4, borderRadius: 14,
+                backgroundColor: isSelected ? colors.primary : colors.surfaceStrong,
+                borderWidth: 1, borderColor: isSelected ? colors.primary : colors.border,
+              }}
+            >
+              <Text style={{ fontSize: 10, fontWeight: '700', color: isSelected ? '#fff' : colors.textSecondary }}>{opt}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+
   const SearchBar = (
     <View>
       {/* ── 3-Mode Engine Toggle ──────────────────────────────────────────── */}
@@ -2089,9 +2224,6 @@ export default function AISearchTab() {
           </TouchableOpacity>
         ))}
         <View style={{ flex: 1 }} />
-        <Text style={{ fontSize: 10, color: colors.textTertiary, alignSelf: 'center' }}>
-          {searchEngineMode === 'AI' ? 'Gemini understands your intent' : searchEngineMode === 'AI+Fuzzy' ? 'AI + fuzzy both' : searchEngineMode === 'Matching' ? 'Fuzzy keyword match' : 'Exact phrase only'}
-        </Text>
       </View>
 
       {/* ── Search input row ─────────────────────────────────────────────── */}
@@ -2181,7 +2313,7 @@ export default function AISearchTab() {
             <View>
               <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>AI Search</Text>
               <Text style={[styles.headerSub, { color: colors.textTertiary }]}>
-                NATURAL LANGUAGE · GEMINI FLASH · FUZZY + TYPO TOLERANT
+                AI · FUZZY · EXACT + TYPO TOLERANT
               </Text>
             </View>
           </View>
@@ -2192,6 +2324,7 @@ export default function AISearchTab() {
         </View>
 
         <View style={{ position: 'relative' }}>
+          {QuickFilterBar}
           {SearchBar}
 
           {/* Fix #4 — Search History Dropdown: positioned inside a relative wrapper so it sits below the search bar (toggle row ~33px + search row ~68px = ~101px) */}
@@ -2270,7 +2403,9 @@ export default function AISearchTab() {
 
         {IS_IPAD ? (
           <View style={styles.ipadBody}>
+            <View style={{ width: 260, overflow: 'hidden' }}>
             {LeftPanel}
+            </View>
             <View style={{ flex: 1 }}>
               {hasSearched && ResultsHeader}
               {hasSearched ? (
@@ -2404,61 +2539,110 @@ export default function AISearchTab() {
                     contentContainerStyle={{ padding: 16 }}
                     showsVerticalScrollIndicator={true}
                   >
-                    <SharedQuestionCard
-                      item={{
-                        ...previewQuestion,
-                        exam_info: {
-                          is_upsc_cse: previewQuestion?.is_upsc_cse,
-                          is_allied: previewQuestion?.is_allied,
-                          is_others: previewQuestion?.is_others,
-                          group: previewQuestion?.exam_group,
-                          exam_name: previewQuestion?.exam_group,
-                          year: previewQuestion?.exam_year,
-                          ...(previewQuestion?.exam_info || {})
-                        },
-                        _explanations: enrichedExplanations || previewQuestion._explanations || [],
-                        _institutes: previewQuestion._institutes || [],
-                      }}
-                      index={0}
-                      arenaMode="learning"
-                      isRevealed={previewRevealed}
-                      colors={colors}
-                      mdStyles={mdStyles}
-                      mdRules={mdRules}
-                      fontSize={previewFontSize}
-                      answerData={{
-                        selectedAnswer: previewAnswer,
-                        isReview: previewStudyTags.length > 0,
-                        studyTags: previewStudyTags
-                      }}
-                      userStudyTags={userTags}
-                      toggleStudyTag={handleToggleTag}
-                      activeExplSource={previewExplSource}
-                      onExplSourceChange={setPreviewExplSource}
-                      aiExplanation={aiExplanation}
-                      isAiLoading={aiExplainLoading}
-                      isSavingFlashcard={savingFlashcard[previewQuestion.id]}
-                      isFlashcarded={flashcardedIds.has(previewQuestion.id)}
-                      onRevealExplanation={() => setPreviewRevealed(true)}
-                      onOptionSelect={(qid: string, opt: string) => setPreviewAnswer(opt)}
-                      onAddFlashcard={handleAddToFlashcards}
-                      onAiExplain={handleAiExplainPopup}
-                      bestAnswers={bestAnswers}
-                      ensureBestAnswerLoaded={ensureBestAnswerLoaded}
-                      showNotebookButton={false}
-                      openNotebookFromQuestion={(_: any, activeText?: string) => {
-                        // Ensure we always have content with proper fallbacks
-                        const content = (activeText && activeText.trim()) 
-                          ? activeText 
-                          : (_?.explanation_markdown || `**Question:** ${_?.question_text || 'Question'}`);
-                        setPreviewNotebookDraft(content);
-                        // Close light-preview modal first; then open Pilot sheet
-                        // so it always appears on top (prevents hidden modal bug).
-                        closePreviewModal();
-                        setTimeout(() => setPilotV2SaveOpen(true), 120);
-                      }}
-                      onCreateTag={() => setIsAddingTag(true)}
-                    />
+                    {(() => {
+                      // Compute activeExplanationText based on current explanation source
+                      // This ensures the rocket icon captures the correct currently-displayed content
+                      let computedActiveExplText = '';
+                      
+                      // Priority 1: Use AI explanation if source is 'ai' and available
+                      if (previewExplSource === 'ai' && aiExplanation?.trim()) {
+                        computedActiveExplText = aiExplanation;
+                      }
+                      // Priority 2: Combine all explanations when 'all' is selected and enriched data exists
+                      else if (previewExplSource === 'all' && enrichedExplanations?.length) {
+                        const normalized = (enrichedExplanations || []).map((e: any) => ({
+                          source: e.source || 'Unknown',
+                          text: e.text || '*No explanation provided.*'
+                        }));
+                        computedActiveExplText = normalized
+                          .map((e: any) => `**${e.source}**:\n\n${e.text}`)
+                          .join('\n\n---\n\n');
+                      }
+                      // Priority 3: Use first enriched explanation as fallback
+                      else if (enrichedExplanations?.length && enrichedExplanations[0]?.text?.trim()) {
+                        computedActiveExplText = enrichedExplanations[0].text;
+                      }
+                      // Priority 4: Fall back to question's explanation_markdown
+                      else if (previewQuestion?.explanation_markdown?.trim()) {
+                        computedActiveExplText = previewQuestion.explanation_markdown;
+                      }
+                      // Priority 5: Last resort - use question text
+                      else {
+                        computedActiveExplText = previewQuestion?.question_text ? `**Question:** ${previewQuestion.question_text}` : 'No content available';
+                      }
+                      
+                      return (
+                        <SharedQuestionCard
+                          item={{
+                            ...previewQuestion,
+                            exam_info: {
+                              is_upsc_cse: previewQuestion?.is_upsc_cse,
+                              is_allied: previewQuestion?.is_allied,
+                              is_others: previewQuestion?.is_others,
+                              group: previewQuestion?.exam_group,
+                              exam_name: previewQuestion?.exam_group,
+                              year: previewQuestion?.exam_year,
+                              ...(previewQuestion?.exam_info || {})
+                            },
+                            _explanations: enrichedExplanations || previewQuestion._explanations || [],
+                            _institutes: previewQuestion._institutes || [],
+                          }}
+                          index={0}
+                          arenaMode="learning"
+                          isRevealed={previewRevealed}
+                          colors={colors}
+                          mdStyles={mdStyles}
+                          mdRules={mdRules}
+                          fontSize={previewFontSize}
+                          answerData={{
+                            selectedAnswer: previewAnswer,
+                            isReview: previewStudyTags.length > 0,
+                            studyTags: previewStudyTags
+                          }}
+                          userStudyTags={userTags}
+                          toggleStudyTag={handleToggleTag}
+                          activeExplSource={previewExplSource}
+                          onExplSourceChange={setPreviewExplSource}
+                          activeExplanationText={computedActiveExplText}
+                          aiExplanation={aiExplanation}
+                          isAiLoading={aiExplainLoading}
+                          isSavingFlashcard={savingFlashcard[previewQuestion.id]}
+                          isFlashcarded={flashcardedIds.has(previewQuestion.id)}
+                          onRevealExplanation={() => setPreviewRevealed(true)}
+                          onOptionSelect={(qid: string, opt: string) => setPreviewAnswer(opt)}
+                          onAddFlashcard={handleAddToFlashcards}
+                          onAiExplain={handleAiExplainPopup}
+                          bestAnswers={bestAnswers}
+                          ensureBestAnswerLoaded={ensureBestAnswerLoaded}
+                          showNotebookButton={false}
+                          openNotebookFromQuestion={(_: any, activeText?: string) => {
+                            // Build fallback content chain if activeText is empty
+                            let content = '';
+                            if (activeText && activeText.trim()) {
+                              content = activeText;
+                            } else if (previewExplSource === 'ai' && aiExplanation?.trim()) {
+                              content = aiExplanation;
+                            } else if (enrichedExplanations?.length && enrichedExplanations[0]?.text?.trim()) {
+                              content = enrichedExplanations[0].text;
+                            } else if (previewQuestion?.explanation_markdown?.trim()) {
+                              content = previewQuestion.explanation_markdown;
+                            } else if (_?.explanation_markdown?.trim()) {
+                              content = _?.explanation_markdown;
+                            } else {
+                              content = `**Question:** ${(previewQuestion?.question_text || _?.question_text || 'Question')}`;
+                            }
+                            // Set the override state so the sheet gets the right content
+                            setPilotV2InitialBodyOverride(content);
+                            setPreviewNotebookDraft(content);
+                            // Close light-preview modal first; then open Pilot sheet
+                            // so it always appears on top (prevents hidden modal bug).
+                            closePreviewModal();
+                            setTimeout(() => setPilotV2SaveOpen(true), 120);
+                          }}
+                          onCreateTag={() => setIsAddingTag(true)}
+                        />
+                      );
+                    })()}
                     
                     {previewQuestion.micro_topic && (
                       <View style={{ marginTop: 12, padding: 12, backgroundColor: colors.surfaceStrong, borderRadius: 16, borderWidth: 1, borderColor: colors.border + '50' }}>
@@ -2579,7 +2763,10 @@ export default function AISearchTab() {
         <PilotV2SaveSheet
           visible={pilotV2SaveOpen}
           userId={session?.user?.id || ''}
-          onClose={() => setPilotV2SaveOpen(false)}
+          onClose={() => {
+            setPilotV2SaveOpen(false);
+            setPilotV2InitialBodyOverride('');
+          }}
           autoSeed={previewQuestion ? {
             subject: previewQuestion.subject || null,
             topic: (previewQuestion as any).section_group || null,
@@ -2587,7 +2774,8 @@ export default function AISearchTab() {
             notebookTitle: previewQuestion.micro_topic || previewQuestion.subject || null,
           } : { subject: null, topic: null, subtopic: null, notebookTitle: null }}
           initialBody={
-            previewNotebookDraft
+            pilotV2InitialBodyOverride
+            || previewNotebookDraft
             || (previewExplSource === 'ai' ? aiExplanation : null)
             || previewQuestion?.explanation_markdown
             || ''
@@ -2677,7 +2865,7 @@ const styles = StyleSheet.create({
   filterBadge:    { position: 'absolute', top: -4, right: -4, width: 16, height: 16, borderRadius: 8, backgroundColor: '#7c3aed', alignItems: 'center', justifyContent: 'center' },
   filterBadgeText:{ fontSize: 9, fontWeight: '900', color: '#fff' },
   ipadBody:       { flex: 1, flexDirection: 'row' },
-  leftPanel:      { width: 240, borderRightWidth: 0.5, padding: 14 },
+  leftPanel:      { width: 180, maxWidth: 180, flexGrow: 0, borderRightWidth: 0.5, padding: 5, overflow: 'hidden' },
   phoneKeywordsPanel: { paddingHorizontal: 14, paddingBottom: 4 },
   panelLabel:     { fontSize: 10, fontWeight: '800', letterSpacing: 1.2, marginBottom: 7 },
   pillsWrap:      { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
@@ -2687,9 +2875,9 @@ const styles = StyleSheet.create({
   statCard:       { flex: 1, borderRadius: 10, padding: 10 },
   statNum:        { fontSize: 22, fontWeight: '800', lineHeight: 26 },
   statLabel:      { fontSize: 10, fontWeight: '600' },
-  subjectChip:    { flexDirection: 'row', alignItems: 'center', gap: 7, padding: 7, paddingHorizontal: 10, borderRadius: 9, borderWidth: 1, marginBottom: 4 },
-  subjectDot:     { width: 7, height: 7, borderRadius: 4 },
-  subjectChipText:{ fontSize: 12, fontWeight: '600', flex: 1 },
+  subjectChip:    { flexDirection: 'row', alignItems: 'center', gap: 4, padding: 5, paddingHorizontal: 7, borderRadius: 7, borderWidth: 1, marginBottom: 3 },
+  subjectDot:     { width: 6, height: 6, borderRadius: 3 },
+  subjectChipText:{ fontSize: 11, fontWeight: '600', flex: 1 },
   subjectCount:   { fontSize: 10, fontWeight: '700' },
   resultsHeader:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 10, paddingHorizontal: 14, borderBottomWidth: 0.5 },
   resultsCount:   { fontSize: 11, fontWeight: '700' },

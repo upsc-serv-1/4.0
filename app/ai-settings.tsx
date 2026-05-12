@@ -40,7 +40,10 @@ import {
   OPENROUTER_API_KEY_STORAGE,
   OPENROUTER_MODEL_KEY,
   OPENROUTER_MODELS,
-  DEFAULT_OPENROUTER_MODEL
+  DEFAULT_OPENROUTER_MODEL,
+  DEEPSEEK_MODELS,
+  DEFAULT_DEEPSEEK_MODEL,
+  DEEPSEEK_MODEL_KEY,
 } from '../src/services/GeminiService';
 import {
   AIPromptManager,
@@ -56,6 +59,7 @@ import {
 import { useAuth } from '../src/context/AuthContext';
 import { PageWrapper } from '../src/components/PageWrapper';
 import { useTheme } from '../src/context/ThemeContext';
+import { loadAIPromptsFromServer, saveAllAIPrompts } from '../src/services/UserAIPromptService';
 
 export default function AISettings() {
   const SAVE_SHEET_AI_PROMPT_KEY = 'pilot-v2:save-sheet:ai-preset-prompt';
@@ -75,9 +79,14 @@ export default function AISettings() {
   const [groqModel, setGroqModel] = useState<string>(DEFAULT_GROQ_MODEL);
 
   // ── OpenRouter State ──────────────────────────
-  const [aiProvider, setAiProvider] = useState<'gemini' | 'groq' | 'openrouter'>('gemini');
+  const [aiProvider, setAiProvider] = useState<'gemini' | 'groq' | 'openrouter' | 'deepseek'>('gemini');
   const [openrouterKey, setOpenrouterKey] = useState<string>('');
   const [openrouterModel, setOpenrouterModel] = useState<string>(DEFAULT_OPENROUTER_MODEL);
+
+  // ── DeepSeek State ──────────────────────────
+  const [deepseekKeys, setDeepseekKeys] = useState<string[]>(['', '', '', '']);
+  const [activeDeepSeekKeyIndex, setActiveDeepSeekKeyIndex] = useState<number>(0);
+  const [deepseekModel, setDeepseekModel] = useState<string>(DEFAULT_DEEPSEEK_MODEL);
 
   // ── Prompts State ─────────────────────────────
   const [explainPrompt, setExplainPrompt]     = useState('');
@@ -149,12 +158,42 @@ export default function AISettings() {
       setOpenrouterKey(ork || '');
       setOpenrouterModel(orm || DEFAULT_OPENROUTER_MODEL);
 
+      // DeepSeek
+      const dsk1 = await AsyncStorage.getItem('deepseek_api_key');
+      const dsk2 = await AsyncStorage.getItem('deepseek_api_key_2');
+      const dsk3 = await AsyncStorage.getItem('deepseek_api_key_3');
+      const dsk4 = await AsyncStorage.getItem('deepseek_api_key_4');
+      const dsActiveIdx = await AsyncStorage.getItem('deepseek_active_key_index');
+      const dsModel = await AsyncStorage.getItem(DEEPSEEK_MODEL_KEY);
+      setDeepseekKeys([dsk1 || '', dsk2 || '', dsk3 || '', dsk4 || '']);
+      setActiveDeepSeekKeyIndex(dsActiveIdx ? parseInt(dsActiveIdx, 10) : 0);
+      setDeepseekModel(dsModel || DEFAULT_DEEPSEEK_MODEL);
+
       setExplainPrompt(ep || DEFAULT_PROMPTS.explain);
       setSummarizePrompt(sp || DEFAULT_PROMPTS.summarize);
       setSearchPrompt(srp || DEFAULT_PROMPTS.search);
       setSaveSheetPrompt(saveSheetAiPrompt || '');
+
+      // ── Cross-device sync: fetch prompts from Supabase ────────────
+      // This runs after local load so the UI shows instantly, then
+      // Supabase values overwrite if they're newer.
+      if (session?.user?.id) {
+        try {
+          const serverPrompts = await loadAIPromptsFromServer(session.user.id);
+          const serverExplain = serverPrompts[PROMPT_KEYS.explain];
+          const serverSummarize = serverPrompts[PROMPT_KEYS.summarize];
+          const serverSearch = serverPrompts[PROMPT_KEYS.search];
+          const serverSaveSheet = serverPrompts['pilot-v2:save-sheet:ai-preset-prompt'];
+          if (serverExplain)   setExplainPrompt(serverExplain);
+          if (serverSummarize) setSummarizePrompt(serverSummarize);
+          if (serverSearch)    setSearchPrompt(serverSearch);
+          if (serverSaveSheet) setSaveSheetPrompt(serverSaveSheet);
+        } catch (e) {
+          console.warn('[AISettings] Failed to sync prompts from Supabase:', e);
+        }
+      }
     })();
-  }, []);
+  }, [session?.user?.id]);
 
   const saveAiSettings = async () => {
     setPromptSaving(true);
@@ -175,11 +214,33 @@ export default function AISettings() {
         AsyncStorage.setItem(GROQ_MODEL_KEY, groqModel),
         AsyncStorage.setItem(OPENROUTER_API_KEY_STORAGE, openrouterKey.trim()),
         AsyncStorage.setItem(OPENROUTER_MODEL_KEY, openrouterModel),
+        // DeepSeek
+        AsyncStorage.setItem('deepseek_api_key',   deepseekKeys[0].trim()),
+        AsyncStorage.setItem('deepseek_api_key_2', deepseekKeys[1].trim()),
+        AsyncStorage.setItem('deepseek_api_key_3', deepseekKeys[2].trim()),
+        AsyncStorage.setItem('deepseek_api_key_4', deepseekKeys[3].trim()),
+        AsyncStorage.setItem('deepseek_active_key_index', String(activeDeepSeekKeyIndex)),
+        AsyncStorage.setItem(DEEPSEEK_MODEL_KEY, deepseekModel),
         AsyncStorage.setItem(PROMPT_KEYS.explain,    explainPrompt.trim()   || DEFAULT_PROMPTS.explain),
         AsyncStorage.setItem(PROMPT_KEYS.summarize,  summarizePrompt.trim() || DEFAULT_PROMPTS.summarize),
         AsyncStorage.setItem(PROMPT_KEYS.search,     searchPrompt.trim()    || DEFAULT_PROMPTS.search),
         AsyncStorage.setItem(SAVE_SHEET_AI_PROMPT_KEY, saveSheetPrompt.trim()),
       ]);
+      // ── Cross-device sync: save prompts to Supabase ──────────────
+      if (session?.user?.id) {
+        try {
+          await saveAllAIPrompts(session.user.id, {
+            [PROMPT_KEYS.explain]:    explainPrompt.trim()   || DEFAULT_PROMPTS.explain,
+            [PROMPT_KEYS.summarize]:  summarizePrompt.trim() || DEFAULT_PROMPTS.summarize,
+            [PROMPT_KEYS.search]:     searchPrompt.trim()    || DEFAULT_PROMPTS.search,
+            [SAVE_SHEET_AI_PROMPT_KEY]: saveSheetPrompt.trim(),
+          });
+        } catch (e) {
+          console.warn('[AISettings] Failed to sync prompts to Supabase:', e);
+          // Non-critical — local save succeeded
+        }
+      }
+
       setPromptSaved(true);
       setTimeout(() => setPromptSaved(false), 2500);
     } catch (e: any) {
@@ -191,9 +252,20 @@ export default function AISettings() {
 
   const resetPrompt = async (key: 'explain' | 'summarize' | 'search') => {
     await AsyncStorage.removeItem(PROMPT_KEYS[key]);
-    if (key === 'explain')    setExplainPrompt(DEFAULT_PROMPTS.explain);
-    if (key === 'summarize')  setSummarizePrompt(DEFAULT_PROMPTS.summarize);
-    if (key === 'search')     setSearchPrompt(DEFAULT_PROMPTS.search);
+    const defaultText = key === 'explain' ? DEFAULT_PROMPTS.explain : key === 'summarize' ? DEFAULT_PROMPTS.summarize : DEFAULT_PROMPTS.search;
+    if (key === 'explain')    setExplainPrompt(defaultText);
+    if (key === 'summarize')  setSummarizePrompt(defaultText);
+    if (key === 'search')     setSearchPrompt(defaultText);
+
+    // Sync reset to Supabase
+    if (session?.user?.id) {
+      try {
+        const { saveAIPrompt } = await import('../src/services/UserAIPromptService');
+        await saveAIPrompt(session.user.id, PROMPT_KEYS[key], defaultText);
+      } catch (e) {
+        console.warn('[AISettings] Failed to sync prompt reset:', e);
+      }
+    }
   };
 
   // ── Template Helpers ──────────────────────────
@@ -324,11 +396,11 @@ export default function AISettings() {
           AI Settings
         </Text>
         <View style={{
-          backgroundColor: aiProvider === 'groq' ? '#f97316' : aiProvider === 'openrouter' ? '#0891b2' : '#7c3aed',
+          backgroundColor: aiProvider === 'groq' ? '#f97316' : aiProvider === 'openrouter' ? '#0891b2' : aiProvider === 'deepseek' ? '#0ea5e9' : '#7c3aed',
           borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4,
         }}>
           <Text style={{ fontSize: 12, fontWeight: '900', color: '#fff' }}>
-            {aiProvider === 'groq' ? '⚡ Groq Active' : aiProvider === 'openrouter' ? '🌐 OpenRouter Active' : '✦ Gemini Active'}
+            {aiProvider === 'groq' ? '⚡ Groq Active' : aiProvider === 'openrouter' ? '🌐 OpenRouter Active' : aiProvider === 'deepseek' ? '🌀 DeepSeek Active' : '✦ Gemini Active'}
           </Text>
         </View>
       </View>
@@ -392,20 +464,38 @@ export default function AISettings() {
             <Text style={styles.providerSub}>33+ free models · DeepSeek, Qwen, Llama</Text>
             {aiProvider === 'openrouter' && <View style={[styles.activeBadge, { backgroundColor: '#0891b2' }]}><Text style={styles.activeBadgeText}>ACTIVE</Text></View>}
           </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setAiProvider('deepseek')}
+            style={[
+              styles.providerCard,
+              { 
+                borderColor: aiProvider === 'deepseek' ? '#0ea5e9' : colors.border,
+                backgroundColor: aiProvider === 'deepseek' ? '#0ea5e915' : colors.surface,
+                borderWidth: aiProvider === 'deepseek' ? 2 : 1,
+              }
+            ]}
+          >
+            <Text style={{ fontSize: 15 }}>🌀</Text>
+            <Text style={[styles.providerName, { color: aiProvider === 'deepseek' ? '#0ea5e9' : colors.textPrimary }]}>DeepSeek</Text>
+            <Text style={styles.providerSub}>Direct API · V4 Flash, V3, R1</Text>
+            {aiProvider === 'deepseek' && <View style={[styles.activeBadge, { backgroundColor: '#0ea5e9' }]}><Text style={styles.activeBadgeText}>ACTIVE</Text></View>}
+          </TouchableOpacity>
         </View>
 
         {/* ── MODEL SELECTOR ─────────────────────────────────── */}
         <Text style={styles.sectionTitle}>MODEL</Text>
         <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
-          {(aiProvider === 'groq' ? GROQ_MODELS : aiProvider === 'openrouter' ? OPENROUTER_MODELS : GEMINI_MODELS).map(m => {
-            const isSelected = (aiProvider === 'groq' ? groqModel : aiProvider === 'openrouter' ? openrouterModel : geminiModel) === m.id;
-            const accent = aiProvider === 'groq' ? '#f97316' : aiProvider === 'openrouter' ? '#0891b2' : '#7c3aed';
+          {(aiProvider === 'groq' ? GROQ_MODELS : aiProvider === 'openrouter' ? OPENROUTER_MODELS : aiProvider === 'deepseek' ? DEEPSEEK_MODELS : GEMINI_MODELS).map(m => {
+            const isSelected = (aiProvider === 'groq' ? groqModel : aiProvider === 'openrouter' ? openrouterModel : aiProvider === 'deepseek' ? deepseekModel : geminiModel) === m.id;
+            const accent = aiProvider === 'groq' ? '#f97316' : aiProvider === 'openrouter' ? '#0891b2' : aiProvider === 'deepseek' ? '#0ea5e9' : '#7c3aed';
             return (
               <TouchableOpacity
                 key={m.id}
                 onPress={() => {
                   if (aiProvider === 'groq') setGroqModel(m.id);
                   else if (aiProvider === 'openrouter') setOpenrouterModel(m.id);
+                  else if (aiProvider === 'deepseek') setDeepseekModel(m.id);
                   else setGeminiModel(m.id);
                 }}
                 style={{
@@ -431,15 +521,17 @@ export default function AISettings() {
             <Text style={{ fontSize: 11, color: colors.textTertiary, marginBottom: 12 }}>
               {aiProvider === 'gemini' 
                 ? 'Add up to 4 keys from aistudio.google.com. Tap to set active.' 
+                : aiProvider === 'deepseek'
+                ? 'Add up to 4 keys from platform.deepseek.com/api_keys. Tap to set active.'
                 : 'Free keys from console.groq.com. 14,400 free requests/day.'}
             </Text>
 
             {(aiProvider !== 'openrouter') ? (['Key 1', 'Key 2', 'Key 3', 'Key 4'] as const).map((label, idx) => {
-              const keys = aiProvider === 'groq' ? groqKeys : geminiKeys;
-              const activeIdx = aiProvider === 'groq' ? activeGroqKeyIndex : activeKeyIndex;
+              const keys = aiProvider === 'groq' ? groqKeys : aiProvider === 'deepseek' ? deepseekKeys : geminiKeys;
+              const activeIdx = aiProvider === 'groq' ? activeGroqKeyIndex : aiProvider === 'deepseek' ? activeDeepSeekKeyIndex : activeKeyIndex;
               const isActive = activeIdx === idx;
               const hasValue = !!keys[idx].trim();
-              const accent = aiProvider === 'groq' ? '#f97316' : '#7c3aed';
+              const accent = aiProvider === 'groq' ? '#f97316' : aiProvider === 'deepseek' ? '#0ea5e9' : '#7c3aed';
 
               return (
                 <View key={idx} style={{ marginBottom: 10 }}>
@@ -447,7 +539,7 @@ export default function AISettings() {
                     <Text style={{ fontSize: 11, fontWeight: '700', color: isActive ? accent : colors.textTertiary }}>{label}</Text>
                     {isActive && <View style={[styles.keyBadge, { backgroundColor: accent }]}><Text style={styles.keyBadgeText}>ACTIVE</Text></View>}
                     {!isActive && hasValue && (
-                      <TouchableOpacity onPress={() => aiProvider === 'groq' ? setActiveGroqKeyIndex(idx) : setActiveKeyIndex(idx)} style={[styles.keyBadge, { borderWidth: 1, borderColor: accent }]}>
+                      <TouchableOpacity onPress={() => aiProvider === 'groq' ? setActiveGroqKeyIndex(idx) : aiProvider === 'deepseek' ? setActiveDeepSeekKeyIndex(idx) : setActiveKeyIndex(idx)} style={[styles.keyBadge, { borderWidth: 1, borderColor: accent }]}>
                         <Text style={[styles.keyBadgeText, { color: accent }]}>SET ACTIVE</Text>
                       </TouchableOpacity>
                     )}
@@ -457,11 +549,13 @@ export default function AISettings() {
                     onChangeText={val => {
                       if (aiProvider === 'groq') {
                         const updated = [...groqKeys]; updated[idx] = val; setGroqKeys(updated);
+                      } else if (aiProvider === 'deepseek') {
+                        const updated = [...deepseekKeys]; updated[idx] = val; setDeepseekKeys(updated);
                       } else {
                         const updated = [...geminiKeys]; updated[idx] = val; setGeminiKeys(updated);
                       }
                     }}
-                    placeholder={idx === 0 ? `Paste your ${aiProvider === 'groq' ? 'gsk_...' : 'AIzaSy...'} key here` : 'Optional key'}
+                    placeholder={idx === 0 ? `Paste your ${aiProvider === 'groq' ? 'gsk_...' : aiProvider === 'deepseek' ? 'sk-...' : 'AIzaSy...'} key here` : 'Optional key'}
                     placeholderTextColor={colors.textTertiary}
                     secureTextEntry
                     autoCorrect={false}
@@ -731,7 +825,7 @@ export default function AISettings() {
           disabled={promptSaving}
           style={[
             styles.saveBtn, 
-            { backgroundColor: promptSaved ? '#22c55e' : aiProvider === 'groq' ? '#f97316' : aiProvider === 'openrouter' ? '#0891b2' : '#7c3aed' }
+            { backgroundColor: promptSaved ? '#22c55e' : aiProvider === 'groq' ? '#f97316' : aiProvider === 'openrouter' ? '#0891b2' : aiProvider === 'deepseek' ? '#0ea5e9' : '#7c3aed' }
           ]}
         >
           {promptSaving ? <ActivityIndicator size="small" color="#fff" /> : <Brain size={16} color="#fff" />}

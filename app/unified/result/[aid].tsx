@@ -46,6 +46,7 @@ import { TrendingUp, BarChart2 } from 'lucide-react-native';
 import { markdownToHtml } from '../../../src/utils/textUtils';
 import { AnalyseSection } from '../../../src/components/unified/AnalyseSection';
 import { PilotV2AIChat } from '../../../src/components/pilot-v2/PilotV2AIChat';
+import { PilotV2Provider } from '../../../src/context/PilotV2Context';
 import { Modal, Pressable } from 'react-native';
 
 export default function ResultScreen() {
@@ -1013,22 +1014,24 @@ export default function ResultScreen() {
         </Text>
       </TouchableOpacity>
 
-      <PilotV2AIChat 
-        activeQuestion={activeAiQuestion}
-        externalOpenTrigger={aiChatTrigger}
-        onSaveResponse={(text: string) => {
-          if (!activeAiQuestion) return;
-          setPilotSaveTargetQuestion(activeAiQuestion);
-          setPilotSaveHtml(markdownToHtml(text || ''));
-          setPilotV2SaveOpen(true);
-        }}
-        onOpenVitaminEditor={(text: string) => {
-          if (!activeAiQuestion) return;
-          setEditingQuestion(activeAiQuestion);
-          setVitaminEditorContent(markdownToHtml(text || ''));
-          setVitaminEditorVisible(true);
-        }}
-      />
+      <PilotV2Provider>
+        <PilotV2AIChat 
+          activeQuestion={activeAiQuestion}
+          externalOpenTrigger={aiChatTrigger}
+          onSaveResponse={(text: string) => {
+            if (!activeAiQuestion) return;
+            setPilotSaveTargetQuestion(activeAiQuestion);
+            setPilotSaveHtml(markdownToHtml(text || ''));
+            setPilotV2SaveOpen(true);
+          }}
+          onOpenVitaminEditor={(text: string) => {
+            if (!activeAiQuestion) return;
+            setEditingQuestion(activeAiQuestion);
+            setVitaminEditorContent(markdownToHtml(text || ''));
+            setVitaminEditorVisible(true);
+          }}
+        />
+      </PilotV2Provider>
 
       <PilotV2SaveSheet
         visible={pilotV2SaveOpen}

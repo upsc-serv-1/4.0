@@ -231,11 +231,16 @@ export default function Home() {
       let colorIdx = 0;
 
       // Fetch weighted counts if requested by widget configuration
-      let weightedCounts: Record<string, number> = {};
+      let topicW: Record<string, number> = {};
+      let sectionW: Record<string, number> = {};
+      let subjectW: Record<string, number> = {};
+
       if (pyqDisplayMode === 'pyq_weighted') {
         try {
           const weightResults = await buildWeightedSyllabusData({ mode: 'all' });
-          weightedCounts = weightResults.topicCounts || {};
+          topicW = weightResults.topicCounts || {};
+          sectionW = weightResults.sectionCounts || {};
+          subjectW = weightResults.subjectCounts || {};
         } catch (weightedErr) {
           console.warn('[StatsLoad] Failed building weighted syllabus data:', weightedErr);
         }
@@ -263,24 +268,38 @@ export default function Home() {
         Object.entries(groups as any).forEach(([group, topics]) => {
           (topics as string[]).forEach(topic => {
             const path = `${sub}.${group}.${topic}`;
-            const isMastered = progress[path]?.mastered;
+            const item = progress[path] || {};
             
-            // Perform frequency weighting if in weighted mode
+            // 1. Replication of Tracker Logic: Topic Completion Score
+            let compScore = 0;
+            if (pyqReportMode === 'single') {
+              compScore = item.mastered ? 1 : 0;
+            } else {
+              // Checkpoints averaging (matches tracker logic exactly)
+              const done = Number(Boolean(item.mastered)) + Number(Boolean(item.ncert)) + Number(Boolean(item.pyqs)) + Number(Boolean(item.books));
+              compScore = done / 4;
+            }
+
+            // 2. Replication of Tracker Logic: Weight Hierarchy fallback
             let weight = 1;
-            if (pyqDisplayMode === 'pyq_weighted') {
-              const key = String(topic).trim().toLowerCase();
-              weight = weightedCounts[key] || 0;
+            const isEligibleForWeights = pyqDisplayMode === 'pyq_weighted' && activeCategory.toLowerCase() === 'prelims';
+            if (isEligibleForWeights) {
+              const t = String(topic).trim().toLowerCase();
+              const g = String(group).trim().toLowerCase();
+              const s = String(sub).trim().toLowerCase();
+              weight = topicW[t] || sectionW[g] || subjectW[s] || 0;
             }
 
             totalItems += weight;
-            if (isMastered) completedItems += weight;
+            completedItems += weight * compScore;
             subjectStats[sub].total += weight;
-            if (isMastered) subjectStats[sub].completed += weight;
+            subjectStats[sub].completed += weight * compScore;
           });
         });
       });
 
-      syllabusPercent = totalItems ? Math.round((completedItems / totalItems) * 100) : 0;
+      // Final evaluation handling zero-weights fallback matching app/tracker.tsx
+      syllabusPercent = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
       subjectProgress = Object.entries(subjectStats).map(([label, s]) => ({
         label, progress: s.total ? s.completed / s.total : 0, color: s.color
       })).sort((a, b) => b.progress - a.progress);
@@ -292,7 +311,7 @@ export default function Home() {
       setStats(next);
       await cacheSet(`home:${userId}`, next);
     } catch (err) { console.error("Home Load Error:", err); }
-  }, [userId, widgetCategory, selectedSubjects, optionalChoice, pyqDisplayMode, pyqExamType]);
+  }, [userId, widgetCategory, selectedSubjects, optionalChoice, pyqDisplayMode, pyqExamType, pyqReportMode]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
@@ -404,14 +423,14 @@ export default function Home() {
         activationDistance={20}
         contentContainerStyle={{ paddingBottom: 120 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
-        ListHeaderComponent={() => (
+        ListHeaderComponent={
           <>
             {/* 1. Header Section */}
             <View style={styles.heroSection}>
               <View style={styles.headerRow}>
                 <View>
                   <Text style={[styles.greeting, { color: colors.textTertiary }]}>WELCOME BACK</Text>
-                  <Text style={[styles.userName, { color: colors.textPrimary }]}>{name}.</Text>
+                  <Text style={[styles.userName, { color: colors.textPrimary }]}>{name}</Text>
                 </View>
                 <TouchableOpacity onPress={() => router.push('/profile')} style={styles.profileBtn}>
                   <AvatarDisplay avatarId={avatarId} name={name} colors={colors} />
@@ -594,7 +613,7 @@ export default function Home() {
               </Text>
             )}
           </>
-        )}
+        }
         renderItem={({ item, drag }) => (
           <ScaleDecorator>
             <TouchableOpacity 

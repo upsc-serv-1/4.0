@@ -1672,7 +1672,11 @@ export default function AISearchTab() {
             }
           </TouchableOpacity>
           {keywordsExpanded && (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 2 }}>
+            <>
+              <Text style={[styles.pillText, { color: colors.textTertiary, fontSize: 11, marginTop: 6, marginBottom: 6 }]}>
+                💡 Tap a keyword to exclude it and filter results
+              </Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
               {keywords.map((kw, i) => {
                 const isExcluded = excludedKeywords.has(kw);
                 return (
@@ -1704,7 +1708,8 @@ export default function AISearchTab() {
                     <Text style={[styles.pillText, {
                       color: isExcluded ? colors.textTertiary : '#7c3aed',
                       textDecorationLine: isExcluded ? 'line-through' : 'none',
-                    }]}>{kw}</Text>
+              </View>
+            </  }]}>{kw}</Text>
                   </TouchableOpacity>
                 );
               })}

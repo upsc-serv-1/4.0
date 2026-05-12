@@ -89,6 +89,7 @@ export interface PilotV2NoteContent {
   version?: number;
   /** Pencil annotation strokes — page-level continuous overlay (Step 5/6). */
   pencilStrokes?: PilotV2PencilStroke[];
+  layout?: 'standard' | 'wide';
 }
 
 /* ========================================================================== */

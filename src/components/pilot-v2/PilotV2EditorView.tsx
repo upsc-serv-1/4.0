@@ -162,6 +162,7 @@ export function PilotV2EditorView() {
     return [{ id: newId(), type: 'paragraph', text: '' }];
   });
   const [activeBlockId, setActiveBlockId] = useState<string | null>(blocks[0]?.id ?? null);
+  const [layout, setLayout] = useState<'standard' | 'wide'>(note?.content?.layout ?? 'standard');
   const [showHighlightPicker, setShowHighlightPicker] = useState(false);
   const [activeHighlight, setActiveHighlight] = useState('Yellow');
   const [outlineTab, setOutlineTab] = useState<'blocks' | 'outline'>('blocks');
@@ -245,15 +246,23 @@ export function PilotV2EditorView() {
     [blocks]
   );
 
-  const scheduleSave = (nextBlocks: PilotV2Block[], nextTitle: string) => {
+  const scheduleSave = (nextBlocks: PilotV2Block[], nextTitle: string, nextLayout: 'standard' | 'wide' = layout) => {
     setSavingState('saving');
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
       try {
         if (note?.id) {
           if (nextTitle !== note.title) await renamePilotV2Note(note.id, nextTitle);
-          await savePilotV2NoteOfflineFirst(note.id, { blocks: nextBlocks, version: 1 });
+          const currentContent = note.content || {};
+          const nextContent = {
+            ...currentContent,
+            blocks: nextBlocks,
+            version: currentContent.version ?? 1,
+            layout: nextLayout,
+          };
+          await savePilotV2NoteOfflineFirst(note.id, nextContent);
           dispatch({ type: 'PATCH_BLOCKS', payload: { id: note.id, blocks: nextBlocks } });
+          dispatch({ type: 'PATCH_LAYOUT', payload: { id: note.id, layout: nextLayout } });
           dispatch({ type: 'PATCH_CURRENT_NOTE', payload: { id: note.id, patch: { title: nextTitle } } });
         }
         setSavingState('saved');
@@ -859,7 +868,12 @@ export function PilotV2EditorView() {
           <GestureDetector gesture={editorComposedGesture}>
             <AnimatedReanimated.View
               ref={contentRef}
-              style={[styles.paper, { backgroundColor: '#fff', borderColor: colors.border }, animatedEditorStyle]}
+              style={[
+                styles.paper,
+                { backgroundColor: '#fff', borderColor: colors.border },
+                layout === 'wide' ? { maxWidth: 1600 } : null,
+                animatedEditorStyle
+              ]}
               onLayout={(e) => setPaperSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
             >
             {blocks.map(b => (
@@ -1357,6 +1371,16 @@ export function PilotV2EditorView() {
           <View style={[styles.moreMenu, { borderColor: colors.border, backgroundColor: '#fff' }]} testID="pilot-v2-more-menu">
             {[
               { label: 'Export…', sub: 'PDF · pastel themes · choose blocks', testID: 'pilot-v2-more-export', onPress: () => { setMoreMenuOpen(false); setExportSheetOpen(true); } },
+              { 
+                label: `Page Layout: ${layout === 'wide' ? 'Wide' : 'Standard'}`, 
+                sub: 'Toggle page width (edge-to-edge)', 
+                testID: 'pilot-v2-more-pagelayout', 
+                onPress: () => {
+                  const next = layout === 'wide' ? 'standard' : 'wide';
+                  setLayout(next);
+                  scheduleSave(blocks, title, next);
+                } 
+              },
               { label: `Text Size: ${Math.round(fontScale * 100)}%`, sub: 'Tap to increase text scale (cycles)', testID: 'pilot-v2-more-fontscale', onPress: () => { cycleFontScale(); } },
               { label: `Zoom Level: ${Math.round(zoom * 100)}%`, sub: 'Tap to change canvas zoom (cycles)', testID: 'pilot-v2-more-zoom', onPress: () => { cycleZoom(); } },
               { label: showToolbar ? 'Hide Formatting Toolbar' : 'Show Formatting Toolbar', sub: 'Draggable rich formatting bar', testID: 'pilot-v2-more-toolbar', onPress: () => { setShowToolbar(v => { globalToolbarVisible = !v; return !v; }); } },

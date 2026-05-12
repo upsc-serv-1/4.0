@@ -168,6 +168,7 @@ const parseContent = (raw: string | null | undefined): PilotV2NoteContent => {
         blocks: parsed.blocks,
         version: parsed.version ?? 1,
         pencilStrokes: parsed.pencilStrokes || [],
+        layout: parsed.layout,
       };
     }
   } catch {
@@ -284,10 +285,12 @@ export async function createPilotV2Note(input: {
   subject: string;
   parentNodeId: string;
   initialBlocks?: PilotV2Block[];
+  layout?: 'standard' | 'wide';
 }): Promise<{ noteId: string; nodeId: string } | null> {
   const empty: PilotV2NoteContent = {
     blocks: input.initialBlocks ?? [],
     version: 1,
+    layout: input.layout ?? 'standard',
   };
   const { data: note, error: noteErr } = await supabase
     .from('user_notes')
@@ -390,6 +393,7 @@ export async function findOrCreatePilotV2Note(input: {
   topic?: string | null;
   subtopic?: string | null;
   title: string;
+  layout?: 'standard' | 'wide';
 }): Promise<{ noteId: string; nodeId: string; isNew: boolean }> {
   // Find-or-create a node strictly within the Pilot V2 surface. Filtering by
   // `metadata->>surface` AND using a list-with-limit (instead of maybeSingle)
@@ -463,6 +467,7 @@ export async function findOrCreatePilotV2Note(input: {
     title: input.title,
     subject: input.subject,
     parentNodeId: parent.id,
+    layout: input.layout,
   });
   if (!created) throw new Error('[pilot-v2] failed to create note');
   return { ...created, isNew: true };

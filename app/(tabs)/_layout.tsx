@@ -76,7 +76,6 @@ export default function TabsLayout() {
     revise: { title: 'Repo', icon: RotateCcw },
     tracker: { title: 'Syllabus', icon: LayoutList },
     'ai-search': { title: 'Search', icon: Search },
-    noji_hub: { title: 'Noji Hub', icon: Home },
   };
 
   return (

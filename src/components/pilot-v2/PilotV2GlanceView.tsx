@@ -135,16 +135,18 @@ export function PilotV2GlanceView() {
   const lastScrollY = useRef<number>(glanceScrollMemory.current[scrollKey] || 0);
 
   /* ── TRULY fixed page width (GoodNotes / Notability approach) ────────── */
-  const SIDEBAR_WIDTH = 320;
-  const BODY_PADDING = 32;
   const isTablet = screenWidth >= 768;
-  const frozenWidthRef = useRef<number>(0);
-  if (frozenWidthRef.current === 0) {
-    frozenWidthRef.current = isTablet
-      ? Math.max(400, screenWidth - SIDEBAR_WIDTH - BODY_PADDING)
-      : Math.max(300, screenWidth - BODY_PADDING);
-  }
-  const fixedPageWidth = frozenWidthRef.current;
+  const SIDEBAR_WIDTH = state.view.sidebarCollapsed ? 0 : 320;
+  const BODY_PADDING = isTablet ? 40 : 16;
+  
+  const layout = note?.content?.layout ?? 'standard';
+  const maxContentWidth = layout === 'wide' ? 1400 : 1000;
+  
+  const availableWidth = isTablet
+    ? screenWidth - SIDEBAR_WIDTH - (BODY_PADDING * 2)
+    : screenWidth - (BODY_PADDING * 2);
+    
+  const fixedPageWidth = Math.min(availableWidth, maxContentWidth);
 
   /* ── Pencil overlay ─────────────────────────────────────────────────── */
   const [paperSize, setPaperSize] = useState({ w: 1, h: 1 });
@@ -504,6 +506,16 @@ export function PilotV2GlanceView() {
       { text: 'AI ✨ — Summarize', onPress: () => handleAIContextSelect('summarize') },
       { text: 'AI ✨ — Expand Content', onPress: () => handleAIContextSelect('expand') },
       { text: 'AI ✨ — Analyze', onPress: () => handleAIContextSelect('analyze') },
+      { 
+        text: `Page Layout: ${note?.content?.layout === 'wide' ? 'Wide' : 'Standard'}`, 
+        onPress: async () => {
+          if (!note?.id) return;
+          const nextLayout = note.content?.layout === 'wide' ? 'standard' : 'wide';
+          const updatedContent = { ...(note.content || {}), layout: nextLayout };
+          await savePilotV2NoteOfflineFirst(note.id, updatedContent);
+          dispatch({ type: 'PATCH_LAYOUT', payload: { id: note.id, layout: nextLayout } });
+        } 
+      },
       {
         text: note?.is_pinned ? 'Unpin' : 'Pin',
         onPress: async () => {

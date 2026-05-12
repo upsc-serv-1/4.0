@@ -177,8 +177,8 @@ function highlightKeywords(text: string, allKeywords: string[]): React.ReactNode
 
 // ── Contextual snippet builder ───────────────────────────────────────────────
 // Searches across question_text, options, and explanation_markdown for the
-// best keyword match. Shows ~10-12 words before & after with a source label
-// (e.g. "Options:" or "Explanation:") so the user knows why this result appeared.
+// best keyword match. Priority order: question_text > options > explanation.
+// Only shows source label when match is NOT from question_text.
 function buildContextSnippet(
   text: string,
   keywords: string[],
@@ -188,42 +188,43 @@ function buildContextSnippet(
 ): React.ReactNode {
   const lowerText = (text || '').toLowerCase();
   
-  // Build searchable fields with labels
-  const fields: { text: string; label: string }[] = [{ text: text || '', label: '' }];
+  // Build searchable fields with labels (ordered by priority)
+  const fields: { text: string; label: string; priority: number }[] = [
+    { text: text || '', label: '', priority: 0 },
+  ];
   
   // Add options text
   if (options) {
     const optsText = Object.entries(options)
       .map(([k, v]) => `${k}: ${v}`)
       .join(' ');
-    if (optsText) fields.push({ text: optsText, label: '(Options)' });
+    if (optsText) fields.push({ text: optsText, label: '(Options)', priority: 1 });
   }
   
   // Add explanation
   if (explanation) {
-    fields.push({ text: explanation, label: '(Explanation)' });
+    fields.push({ text: explanation, label: '(Explanation)', priority: 2 });
   }
   
-  // Find the best match across all fields - find first keyword that matches any field
-  let bestField: { text: string; label: string } | null = null;
+  // Find best match by priority (question_text > options > explanation)
+  // and within same priority, first keyword match wins
+  let bestField: { text: string; label: string; priority: number } | null = null;
   let bestKw: string | null = null;
-  let bestIdx = -1;
   
   for (const field of fields) {
     if (!field.text) continue;
     const lower = field.text.toLowerCase();
     const kw = keywords.find(k => k.length > 2 && lower.includes(k.toLowerCase()));
     if (kw) {
-      const idx = lower.indexOf(kw.toLowerCase());
-      if (bestField === null || idx < bestIdx || (bestKw && kw.length > bestKw.length)) {
+      // First match in this priority level — always prefer higher priority
+      if (bestField === null || field.priority < bestField.priority) {
         bestField = field;
         bestKw = kw;
-        bestIdx = idx;
       }
     }
   }
   
-  // No keyword found in any field - show truncated question text
+  // No keyword found in any field — show truncated question text
   if (!bestField || !bestKw) {
     return <Text>{(text || '').slice(0, 150)}</Text>;
   }

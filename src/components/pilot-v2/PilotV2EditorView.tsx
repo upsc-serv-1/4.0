@@ -503,6 +503,8 @@ export function PilotV2EditorView() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const titleOpacity = scrollY.interpolate({ inputRange: [0, 60, 120], outputRange: [1, 0.4, 0], extrapolate: 'clamp' });
   const titleTranslate = scrollY.interpolate({ inputRange: [0, 120], outputRange: [0, -40], extrapolate: 'clamp' });
+  // Plain JS scroll offset for PencilCanvas — Skia needs a number, not Animated.Value.
+  const [scrollOffset, setScrollOffset] = useState(0);
 
   // Floating control panel menu
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
@@ -850,7 +852,13 @@ export function PilotV2EditorView() {
           contentContainerStyle={styles.canvas}
           keyboardShouldPersistTaps="handled"
           scrollEventThrottle={16}
-          onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false, listener: (e: any) => {
+              const y = e?.nativeEvent?.contentOffset?.y ?? 0;
+              setScrollOffset(y);
+            }}
+          )}
         >
           <GestureDetector gesture={editorComposedGesture}>
             <AnimatedReanimated.View
@@ -913,51 +921,52 @@ export function PilotV2EditorView() {
               <Text style={{ color: colors.textTertiary, fontSize: 13 }}>Add block</Text>
             </TouchableOpacity>
 
+            {/* Pencil canvas — rendered inside the content flow so strokes scroll
+                naturally with the document. position:absolute overlays on top of text.
+                Skia native surfaces do NOT respond to Animated transform / translateY,
+                so we must NOT use absoluteFill+translateY at viewport level. */}
+            {paperSize.w > 1 && paperSize.h > 1 && (
+              <View
+                pointerEvents={pencil.drawingMode ? 'auto' : 'none'}
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+              >
+                <PencilCanvas
+                  engine={pencil.engine}
+                  tool={pencil.tool}
+                  width={paperSize.w}
+                  height={paperSize.h}
+                  drawingMode={pencil.drawingMode}
+                  scrollY={scrollOffset}
+                  onCommit={(strokes) => persistStrokes(strokes)}
+                  blockLayouts={blockLayoutsRef.current}
+                  blockLayoutVersion={blockLayoutVersion}
+                />
+              </View>
+            )}
+
+            {/* Washi Tape layer — same inline approach */}
+            {paperSize.w > 1 && paperSize.h > 1 && (
+              <View
+                pointerEvents={washiMode ? 'auto' : 'none'}
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+              >
+                <WashiTapeLayer
+                  tapes={washiTapes}
+                  width={paperSize.w}
+                  height={paperSize.h}
+                  drawingMode={washiMode}
+                  activeColor={washiColor}
+                  onAdd={(t) => persistWashi([...washiTapes, t])}
+                  onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
+                  onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
+                />
+              </View>
+            )}
+
             </AnimatedReanimated.View>
           </GestureDetector>
         </Animated.ScrollView>
 
-        {/* 🔧 FIX: Pencil canvas + Washi Tape moved OUTSIDE the ScrollView so they
-            render at viewport level. StyleSheet.absoluteFill inside a ScrollView uses
-            the content coordinate system, making the inverse scroll transform unreliable.
-            At viewport level, absoluteFill is screen-fixed and translateY(-scrollY)
-            correctly cancels scroll, keeping strokes anchored to their content position. */}
-        {paperSize.w > 1 && paperSize.h > 1 && (
-          <Animated.View
-            pointerEvents={pencil.drawingMode ? 'auto' : 'none'}
-            style={[StyleSheet.absoluteFill, { transform: [{ translateY: Animated.multiply(scrollY, -1) }] }]}
-          >
-            <PencilCanvas
-              engine={pencil.engine}
-              tool={pencil.tool}
-              width={paperSize.w}
-              height={paperSize.h}
-              drawingMode={pencil.drawingMode}
-              onCommit={(strokes) => persistStrokes(strokes)}
-              blockLayouts={blockLayoutsRef.current}
-              blockLayoutVersion={blockLayoutVersion}
-            />
-          </Animated.View>
-        )}
-
-        {/* Washi Tape layer — same viewport-level fix */}
-        {paperSize.w > 1 && paperSize.h > 1 && (
-          <Animated.View
-            pointerEvents={washiMode ? 'auto' : 'none'}
-            style={[StyleSheet.absoluteFill, { transform: [{ translateY: Animated.multiply(scrollY, -1) }] }]}
-          >
-            <WashiTapeLayer
-              tapes={washiTapes}
-              width={paperSize.w}
-              height={paperSize.h}
-              drawingMode={washiMode}
-              activeColor={washiColor}
-              onAdd={(t) => persistWashi([...washiTapes, t])}
-              onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
-              onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
-            />
-          </Animated.View>
-        )}
 
         {isTablet && (
           <AnimatedReanimated.View style={[styles.outlinePanel, { borderLeftColor: colors.border, paddingTop: 130 }, animatedOutlineStyle]}>

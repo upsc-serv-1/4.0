@@ -197,7 +197,7 @@ export default function UnifiedArenaSetup() {
 
   const [selectedInstitutes, setSelectedInstitutes] = useState<string[]>([]);
   const deferredSelectedInstitutes = useDeferredValue(selectedInstitutes);
-  const [selectedPrograms, setSelectedProgramss] = useState<string[]>([]);
+  const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
   const [selectedExamStage, setSelectedExamStage] = useState('All');
   const [selectedTestId, setSelectedTestId] = useState<string | null>(null);
 
@@ -874,7 +874,7 @@ export default function UnifiedArenaSetup() {
         section: searchFilters.selectedSections?.join('|') || '',
         microtopic: searchFilters.selectedMicrotopics?.join('|') || '',
         institutes: searchFilters.selectedInstitutes?.join(','),
-        programs: searchFilters.selectedProgramss?.join(','),
+        programs: searchFilters.selectedPrograms?.join(','),
         examStage: searchFilters.examStage,
         pyqFilter: searchFilters.pyqFilter,
         pyqCategory: searchFilters.pyqCategory?.join(','),

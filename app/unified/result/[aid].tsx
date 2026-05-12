@@ -547,7 +547,7 @@ export default function ResultScreen() {
         testId: testId || 'manual',
         resultIds: targetIds.join(','),
         mode: 'learning',
-        view: 'card'
+        view: 'list'
       }
     });
   };
@@ -792,7 +792,10 @@ export default function ResultScreen() {
         data={activeTab === 'review' ? filteredQuestions : []}
         keyExtractor={(item) => item.id}
         extraData={{ revealedExplanations, showMistakes }}
-        renderItem={({ item, index }) => (
+        renderItem={({ item, index }) => {
+          // Look up enriched data for this question
+          const enriched = enrichedQuestions.find((eq: any) => eq.id === item.id);
+          return (
           <SharedQuestionCard
             key={item.id}
             item={{
@@ -806,7 +809,10 @@ export default function ResultScreen() {
               is_allied: item.is_allied ?? false,
               is_others: item.is_others ?? false,
               source: item.source || {},
-              _explanations: item._explanations || []
+              // Use enriched _explanations (populated by enrichWithCrossInstituteExplanations)
+              // so all institute answers are visible on the page
+              _explanations: enriched?._explanations?.length ? enriched._explanations : (item._explanations || []),
+              _institutes: enriched?._institutes?.length ? enriched._institutes : (item._institutes || []),
             }}
             index={index}
             arenaMode="learning"

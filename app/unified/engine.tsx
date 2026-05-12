@@ -2420,18 +2420,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
   };
 
   const handleExit = () => {
-    // If side panel is open, close it first (toggle behavior)
-    if (showIndexPanel) {
-      setShowIndexPanel(false);
-      return;
-    }
-    // Open floating 40% right-side panel instead of navigating away,
-    // preserving current question context.
-    if (!isFromSearch && arenaMode === 'learning' && !showIndex) {
-      setShowIndexPanel(true);
-      return;
-    }
-
+    // Back button — navigate to previous screen / arena topic-wise page
     if (arenaMode === 'exam') {
       setShowSaveSessionModal(true);
       return;
@@ -3101,9 +3090,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
             style={styles.headerBtn}
             testID="engine-top-left-nav-btn"
           >
-            {(!isFromSearch && arenaMode === 'learning' && !showIndex && !showIndexPanel)
-              ? <ListIcon size={22} color={isZenMode ? '#433422' : colors.textPrimary} />
-              : <ChevronLeft size={24} color={isZenMode ? '#433422' : colors.textPrimary} />}
+            <ChevronLeft size={24} color={isZenMode ? '#433422' : colors.textPrimary} />
           </TouchableOpacity>
 
           {/* Search panel button — grouped with the back button for navigation clarity */}

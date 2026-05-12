@@ -849,7 +849,7 @@ export default function ResultScreen() {
             }}
             showMistakes={showMistakes}
           />
-        )}
+        )}}
         ListHeaderComponent={
           <>
             {/* Score Hero Section */}

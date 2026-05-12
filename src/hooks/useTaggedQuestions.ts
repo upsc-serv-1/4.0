@@ -303,7 +303,7 @@ export function useTaggedVault(userId: string | undefined) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchVaultData, loadTagCatalog, userId]);
+  }, [userId]);
 
   // Auto-refresh whenever another screen renames/adds/removes a tag.
   const tagStoreVersion = useTagStore((s) => s.version);

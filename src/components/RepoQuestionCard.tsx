@@ -17,9 +17,11 @@ interface RepoQuestionCardProps {
   question: TaggedQuestion;
   onUpdate?: () => void;
   isZenMode?: boolean;
+  /** When provided, "Ask AI" opens the floating PilotV2AIChat chatbot instead of a local chat modal */
+  onOpenAIChat?: (questionData: { id: string; question_text: string; correct_answer: string; explanation: string; subject?: string }) => void;
 }
 
-export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestionCardProps) => {
+export const RepoQuestionCard = ({ question, onUpdate, isZenMode, onOpenAIChat }: RepoQuestionCardProps) => {
   const { colors } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
@@ -225,7 +227,13 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestion
                 onPress={() => {
                   router.push({
                     pathname: '/unified/engine',
-                    params: { testId: question.testId, mode: 'learning' },
+                    params: {
+                      testId: question.testId,
+                      mode: 'learning',
+                      questionId: question.id,
+                      fromTags: 'true',
+                      revealAll: '1',
+                    },
                   });
                 }}
                 style={[styles.actionBtn, { borderColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.border }]}
@@ -290,6 +298,7 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestion
                 instituteExplanations={question.instituteExplanations}
                 institutes={question.institutes}
                 mergedIds={question.mergedIds}
+                onOpenAIChat={onOpenAIChat}
               />
             </Pressable>
           ) : null}

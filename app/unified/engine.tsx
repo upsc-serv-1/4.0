@@ -401,6 +401,8 @@ export default function UnifiedQuizEngine() {
     timer?: string,
     showPYQTags?: string,
     questionId?: string,
+    revealAll?: string,
+    fromTags?: string,
     institute?: string,
     program?: string,
     section?: string,
@@ -695,11 +697,16 @@ export default function UnifiedQuizEngine() {
     });
   }, [arenaMode, currentAnswers]);
 
+  // Store the pending navigation action so SaveNameModal / SaveSessionModal can dispatch it
+  const pendingNavActionRef = useRef<any>(null);
+
   // Prevent accidental exit during formal exams and unsaved learning sessions
   usePreventRemove(
     !isNavigatingAway.current && (arenaMode === 'exam' || (arenaMode === 'learning' && hasUnsavedLearningProgress)),
     ({ data }) => {
       const isLearningExit = arenaMode === 'learning';
+      // Store the navigation action so modals can complete the exit after saving
+      pendingNavActionRef.current = data.action;
       Alert.alert(
         isLearningExit ? 'Exit Learn Session?' : 'Exit Exam?',
         isLearningExit
@@ -709,7 +716,7 @@ export default function UnifiedQuizEngine() {
           {
             text: 'Cancel',
             style: 'cancel',
-            onPress: () => {},
+            onPress: () => { pendingNavActionRef.current = null; },
           },
           {
             text: 'Exit without saving',
@@ -719,6 +726,7 @@ export default function UnifiedQuizEngine() {
                 clearStoredAnswers();
                 setRevealedExplanations({});
               }
+              pendingNavActionRef.current = null;
               isNavigatingAway.current = true;
               navigation.dispatch(data.action);
             },
@@ -726,17 +734,10 @@ export default function UnifiedQuizEngine() {
           {
             text: 'Save & Exit',
             onPress: async () => {
-              try {
-                if (isLearningExit) {
-                  await commitManualSave(`Learn Session - ${new Date().toLocaleDateString()}`);
-                } else {
-                  await handleFinalSubmit();
-                }
-              } catch (e) {
-                console.warn('Save on exit failed', e);
-              } finally {
-                isNavigatingAway.current = true;
-                navigation.dispatch(data.action);
+              if (isLearningExit) {
+                setShowSaveNameModal(true);
+              } else {
+                setShowSaveSessionModal(true);
               }
             },
           },
@@ -1124,7 +1125,12 @@ export default function UnifiedQuizEngine() {
   const sessionTestId = useMemo(() => {
     return routeParams.testId || `custom_${routeParams.subject || 'all'}_${new Date().toISOString().split('T')[0]}`;
   }, [routeParams.testId, routeParams.subject]);
-  const sessionAttemptId = useMemo(() => `${sessionTestId}__${Date.now()}`, [sessionTestId]);
+  // Issue 54: Stable attempt ID across re-renders (useRef so mode switches don't wipe answers)
+  const attemptIdRef = useRef<string | null>(null);
+  if (!attemptIdRef.current || !attemptIdRef.current.startsWith(sessionTestId)) {
+    attemptIdRef.current = `${sessionTestId}__${Date.now()}`;
+  }
+  const sessionAttemptId = attemptIdRef.current;
 
   // 0. Persistence: Load and Save currentIndex
   const INDEX_PERSIST_KEY = useMemo(() => `quiz_index_${sessionTestId}`, [sessionTestId]);
@@ -1463,12 +1469,20 @@ export default function UnifiedQuizEngine() {
           setShowIndex(false);
           setViewMode('card'); // Default to Card Mode for direct navigation
           setHasJumped(true);
+          // If revealAll is passed (from Tags tab), auto-reveal the explanation
+          if (routeParams.revealAll === '1' || routeParams.fromTags === 'true') {
+            const q = finalQs[index];
+            if (q) {
+              setRevealedExplanations(prev => ({ ...prev, [q.id]: true }));
+            }
+          }
         }
       }
       
       if (session?.user?.id && finalQs.length > 0) {
-        const shouldLoadAnswers = arenaMode === 'exam' && params.testId && !params.testId.startsWith('custom_');
-        store.loadStates(mergedQs.map(q => q.id), !!shouldLoadAnswers);
+        // Issue 54: Always load persisted answers so they survive mode switches
+        const shouldLoadAnswers = !!params.testId && !params.testId.startsWith('custom_');
+        store.loadStates(mergedQs.map(q => q.id), shouldLoadAnswers);
         checkFlashcards(finalQs.map(q => q.id));
       }
     };
@@ -2005,7 +2019,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
 
   // 6. Action Handlers
   const handleOptionSelect = (qId: string, label: string) => {
-    store.setAnswer(qId, label, undefined, arenaMode === 'exam');
+    store.setAnswer(qId, label, undefined, true); // Issue 54: Always autoSync so answers persist across mode switches
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     
     // REDUNDANT: store.setAnswer already triggers sync via store.syncAnswer
@@ -2201,7 +2215,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
   };
 
   const handleSavePersonalNote = async (qId: string, html: string) => {
-    store.setMetadata(qId, { note: html }, arenaMode === 'exam');
+    store.setMetadata(qId, { note: html }, true); // Issue 54: persist notes across mode switches
     store.syncAnswer(qId);
     setEditNoteQId(null);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -2406,10 +2420,15 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
   };
 
   const handleExit = () => {
-    // Issue #8: If not showing index and in learning mode, show index first
-    // instead of navigating away. Only exit on second press or from index view.
+    // If side panel is open, close it first (toggle behavior)
+    if (showIndexPanel) {
+      setShowIndexPanel(false);
+      return;
+    }
+    // Open floating 40% right-side panel instead of navigating away,
+    // preserving current question context.
     if (!isFromSearch && arenaMode === 'learning' && !showIndex) {
-      setShowIndex(true);
+      setShowIndexPanel(true);
       return;
     }
 
@@ -2538,6 +2557,15 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
         durationSec,
         attemptId: attemptId
       });
+
+      // 🐛 FIX: Complete the pending exit navigation that was blocked by usePreventRemove
+      // The SaveNameModal / SaveSessionModal was triggered by usePreventRemove's Save & Exit.
+      // After saving, tell the guard we've navigated away and dispatch the pending action.
+      if (pendingNavActionRef.current) {
+        isNavigatingAway.current = true;
+        navigation.dispatch(pendingNavActionRef.current);
+        pendingNavActionRef.current = null;
+      }
     } catch (err) {
       console.error('Save error:', err);
       Alert.alert("Error", "Failed to save session.");
@@ -2722,11 +2750,12 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
         onAiExplain={handleAiExplain}
         onAiChat={handleAiChat}
         onViewSource={handleViewSource}
-        onToggleReview={(qid: string) => store.setMetadata(qid, { isReview: !answerData.isReview }, arenaMode === 'exam')}
+        onToggleReview={(qid: string) => store.setMetadata(qid, { isReview: !answerData.isReview }, true)}
         userStudyTags={userStudyTags}
         toggleStudyTag={toggleStudyTag}
         toggleGuess={toggleGuess}
         toggleDifficulty={toggleDifficulty}
+        showMistakes={arenaMode !== 'exam'}
         toggleMistakeType={toggleMistakeType}
         activeExplIndex={activeExplIndex}
         setActiveExplIndex={setActiveExplIndex}
@@ -2806,7 +2835,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
           </View>
           <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
             <TouchableOpacity
-              onPress={() => store.setMetadata(item.id, { isReview: !answerData.isReview }, arenaMode === 'exam')}
+              onPress={() => store.setMetadata(item.id, { isReview: !answerData.isReview }, true)}
               testID={`paper-review-${item.id}`}
             >
               <Flag size={16} color={answerData.isReview ? '#eab308' : colors.textTertiary} fill={answerData.isReview ? '#eab308' : 'transparent'} />
@@ -3072,7 +3101,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
             style={styles.headerBtn}
             testID="engine-top-left-nav-btn"
           >
-            {(!isFromSearch && arenaMode === 'learning' && !showIndex)
+            {(!isFromSearch && arenaMode === 'learning' && !showIndex && !showIndexPanel)
               ? <ListIcon size={22} color={isZenMode ? '#433422' : colors.textPrimary} />
               : <ChevronLeft size={24} color={isZenMode ? '#433422' : colors.textPrimary} />}
           </TouchableOpacity>
@@ -3823,38 +3852,78 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                 onPress={() => setShowIndexPanel(false)}
                 style={{ flex: 1, backgroundColor: 'transparent' }}
               />
-              {/* Index panel (right 40%) */}
+              {/* Index panel (right 40%) — card format matches Search Results panel exactly */}
               <View style={{ width: '40%', backgroundColor: colors.surface, borderLeftWidth: 1, borderLeftColor: colors.border }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-                  <Text style={{ fontSize: 14, fontWeight: '800', color: colors.textPrimary }}>Arena Index</Text>
-                  <TouchableOpacity
-                    onPress={() => setShowIndexPanel(false)}
-                    style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    <X size={18} color={colors.textSecondary} />
+                  <View>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: colors.textPrimary }}>Arena Index</Text>
+                    <Text style={{ fontSize: 10, fontWeight: '700', color: colors.textTertiary }}>{questions.length} questions</Text>
+                  </View>
+                  <TouchableOpacity onPress={() => setShowIndexPanel(false)} style={{ padding: 6 }}>
+                    <X size={20} color={colors.textTertiary} />
                   </TouchableOpacity>
                 </View>
-                <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 0 }}>
-                  {questions.map((q, idx) => (
-                    <TouchableOpacity
-                      key={q.id}
-                      onPress={() => {
-                        setCurrentIndex(idx);
-                        setShowIndexPanel(false);
-                      }}
-                      style={{
-                        paddingHorizontal: 16,
-                        paddingVertical: 12,
-                        backgroundColor: currentIndex === idx ? colors.primary + '15' : 'transparent',
-                        borderBottomWidth: 1,
-                        borderBottomColor: colors.border + '30',
-                      }}
-                    >
-                      <Text style={{ fontSize: 12, fontWeight: currentIndex === idx ? '800' : '600', color: currentIndex === idx ? colors.primary : colors.textSecondary }}>
-                        Q{idx + 1} · {(q.subject || 'General').slice(0, 20)}{(q.subject || 'General').length > 20 ? '…' : ''}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                <ScrollView style={{ flex: 1 }}>
+                  {questions.map((q, idx) => {
+                    const isActive = idx === currentIndex;
+                    const ans = store.answers[q.id];
+                    const isAnswered = !!ans?.selectedAnswer;
+                    return (
+                      <TouchableOpacity
+                        key={q.id}
+                        onPress={() => {
+                          setCurrentIndex(idx);
+                          setShowIndexPanel(false);
+                        }}
+                        style={{
+                          paddingHorizontal: 16, paddingVertical: 12,
+                          borderBottomWidth: 1, borderBottomColor: colors.border,
+                          backgroundColor: isActive ? colors.primary + '12' : 'transparent',
+                        }}
+                      >
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                          <View style={{
+                            width: 26, height: 26, borderRadius: 8, alignItems: 'center', justifyContent: 'center',
+                            backgroundColor: isAnswered ? '#22c55e' : (isActive ? colors.primary : colors.surfaceStrong),
+                          }}>
+                            <Text style={{ fontSize: 10, fontWeight: '900', color: isAnswered || isActive ? '#fff' : colors.textTertiary }}>{idx + 1}</Text>
+                          </View>
+                          {q.subject && (
+                            <Text style={{ fontSize: 10, fontWeight: '700', color: '#7c3aed', backgroundColor: '#ede9fe', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>{q.subject}</Text>
+                          )}
+                          {(() => {
+                            const synthInfo = {
+                              group: q.exam_group,
+                              year: q.exam_year ?? (q.exam_info?.year),
+                              is_upsc_cse: q.is_upsc_cse,
+                              is_allied: q.is_allied,
+                              is_others: q.is_others,
+                            };
+                            const pyqCat = getPYQCategorization({ ...q, exam_info: { ...q.exam_info, ...synthInfo } });
+                            if (!pyqCat.hasPYQData) return null;
+                            const chipColor =
+                              pyqCat.isUPSC   ? { bg: '#dbeafe', color: '#1d4ed8' } :
+                              pyqCat.isAllied ? { bg: '#dcfce7', color: '#15803d' } :
+                              pyqCat.isOther  ? { bg: '#ffedd5', color: '#c2410c' } :
+                                               { bg: '#fef3c7', color: '#b45309' };
+                            return (
+                              <Text style={{
+                                fontSize: 9, fontWeight: '800',
+                                color: chipColor.color, backgroundColor: chipColor.bg,
+                                paddingHorizontal: 5, paddingVertical: 1, borderRadius: 4,
+                              }}>
+                                {`${pyqCat.groupName} ${pyqCat.year ?? ''}`.trim()}
+                              </Text>
+                            );
+                          })()}
+                        </View>
+                        <Text numberOfLines={4} style={{ fontSize: 12, fontWeight: isActive ? '700' : '500', color: isActive ? colors.textPrimary : colors.textSecondary }}>
+                          {q.question_text?.replace(/<[^>]*>/g, '')}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                  <View style={{ height: 40 }} />
                 </ScrollView>
               </View>
             </View>
@@ -4058,7 +4127,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                   {/* Sticky action bar — full-text labels */}
                   <View style={[stylesPaper.stickyBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
                     <TouchableOpacity
-                      onPress={() => store.setMetadata(q.id, { isReview: !ans.isReview }, arenaMode === 'exam')}
+                      onPress={() => store.setMetadata(q.id, { isReview: !ans.isReview }, true)}
                       style={[stylesPaper.stickyBtn, { backgroundColor: ans.isReview ? '#fef9c3' : colors.surfaceStrong, borderColor: ans.isReview ? '#eab308' : colors.border }]}
                       testID="paper-modal-review"
                     >

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -62,6 +62,8 @@ import { AIQuickActionButton } from '../src/components/AIQuickActionButton';
 import { DEFAULT_TAGS_TEMPLATES } from '../src/services/AIPromptManager';
 import { buildNotesPdfHtml } from '../src/utils/notesPdfEngine';
 import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet';
+import { PilotV2Provider } from '../src/context/PilotV2Context';
+import { PilotV2AIChat } from '../src/components/pilot-v2/PilotV2AIChat';
 
 type ExportScope = 'all' | 'single' | 'multi';
 type ContentMode = 'questions' | 'questions_answers';
@@ -113,6 +115,10 @@ export default function TaggedRepoScreen() {
   const [renamingTag, setRenamingTag] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const [savingTag, setSavingTag] = useState(false);
+
+  // AI Chat state (Issue 21 — PilotV2AIChat integration)
+  const [aiChatQuestion, setAiChatQuestion] = useState<any>(null);
+  const [aiChatTrigger, setAiChatTrigger] = useState(0);
 
   // Export state
   const [exportVisible, setExportVisible] = useState(false);
@@ -415,6 +421,12 @@ ${answerText}` : ''}`,
     }
   };
 
+  // Issue 21: Opens PilotV2AIChat floating chatbot with question context
+  const handleOpenAIChat = useCallback((qData: { id: string; question_text: string; correct_answer: string; explanation: string; subject?: string }) => {
+    setAiChatQuestion(qData);
+    setAiChatTrigger(prev => prev + 1);
+  }, []);
+
   const removeTagEverywhere = async (tag: string) => {
     Alert.alert(
       'Remove tag from Review?',
@@ -474,82 +486,90 @@ ${answerText}` : ''}`,
   if (activeSubject) {
     const subjectData = vaultData.subjects.find((s) => s.name === activeSubject);
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: zenBg }}>
-        <View style={[styles.detailHeader, { borderBottomColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.border }]}>
-          <TouchableOpacity onPress={() => setActiveSubject(null)} style={styles.backButton}>
-            <ArrowLeft size={20} color={zenTextColor} />
-          </TouchableOpacity>
-          <Text style={[styles.detailTitle, { color: zenTextColor, flex: 1 }]}>{activeSubject}</Text>
-          <TouchableOpacity onPress={toggleZenMode} style={{ padding: 4 }}>
-            <Sparkles size={22} color={isZenMode ? '#433422' : colors.primary} />
-          </TouchableOpacity>
-        </View>
-        {!isZenMode && renderTagFilters(true)}
-        {!isZenMode && (
-          <View style={{ paddingHorizontal: 16, paddingVertical: 8, alignItems: 'flex-end' }}>
-            <AIQuickActionButton
-              context={{ type: 'tag', title: activeSubject }}
-              templates={DEFAULT_TAGS_TEMPLATES}
-              buttonLabel="✨ Ask AI about this subject"
-            />
+      <PilotV2Provider>
+        <SafeAreaView style={{ flex: 1, backgroundColor: zenBg }}>
+          <View style={[styles.detailHeader, { borderBottomColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.border }]}>
+            <TouchableOpacity onPress={() => setActiveSubject(null)} style={styles.backButton}>
+              <ArrowLeft size={20} color={zenTextColor} />
+            </TouchableOpacity>
+            <Text style={[styles.detailTitle, { color: zenTextColor, flex: 1 }]}>{activeSubject}</Text>
+            <TouchableOpacity onPress={toggleZenMode} style={{ padding: 4 }}>
+              <Sparkles size={22} color={isZenMode ? '#433422' : colors.primary} />
+            </TouchableOpacity>
           </View>
-        )}
-        <ScrollView contentContainerStyle={styles.detailScroll} showsVerticalScrollIndicator={false}>
-          {subjectData &&
-            Object.values(subjectData.sectionGroups).map((section) => (
-              <View key={section.name} style={styles.sectionContainer}>
-                <TouchableOpacity
-                  onPress={() => toggleSection(section.name)}
-                  style={[
-                    styles.sectionHeader,
-                    {
-                      backgroundColor: isZenMode ? 'rgba(67, 52, 34, 0.05)' : colors.surface,
-                      borderColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.primary + '40',
-                      borderWidth: 1.5,
-                    },
-                  ]}
-                >
-                  <Layers size={18} color={isZenMode ? '#433422' : colors.primary} />
-                  <View style={{ flex: 1 }}>
-                    <Text style={[styles.sectionName, { color: zenTextColor }]}>{section.name}</Text>
-                    <Text style={[styles.sectionStats, { color: isZenMode ? '#43342280' : colors.textTertiary }]}>{section.totalCount} items</Text>
-                  </View>
-                  {expandedSections[section.name] ? (
-                    <ChevronDown size={18} color={isZenMode ? '#433422' : colors.textTertiary} />
-                  ) : (
-                    <ChevronRight size={18} color={isZenMode ? '#433422' : colors.textTertiary} />
+          {!isZenMode && renderTagFilters(true)}
+          {!isZenMode && (
+            <View style={{ paddingHorizontal: 16, paddingVertical: 8, alignItems: 'flex-end' }}>
+              <AIQuickActionButton
+                context={{ type: 'tag', title: activeSubject }}
+                templates={DEFAULT_TAGS_TEMPLATES}
+                buttonLabel="✨ Ask AI about this subject"
+              />
+            </View>
+          )}
+          <ScrollView contentContainerStyle={styles.detailScroll} showsVerticalScrollIndicator={false}>
+            {subjectData &&
+              Object.values(subjectData.sectionGroups).map((section) => (
+                <View key={section.name} style={styles.sectionContainer}>
+                  <TouchableOpacity
+                    onPress={() => toggleSection(section.name)}
+                    style={[
+                      styles.sectionHeader,
+                      {
+                        backgroundColor: isZenMode ? 'rgba(67, 52, 34, 0.05)' : colors.surface,
+                        borderColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.primary + '40',
+                        borderWidth: 1.5,
+                      },
+                    ]}
+                  >
+                    <Layers size={18} color={isZenMode ? '#433422' : colors.primary} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.sectionName, { color: zenTextColor }]}>{section.name}</Text>
+                      <Text style={[styles.sectionStats, { color: isZenMode ? '#43342280' : colors.textTertiary }]}>{section.totalCount} items</Text>
+                    </View>
+                    {expandedSections[section.name] ? (
+                      <ChevronDown size={18} color={isZenMode ? '#433422' : colors.textTertiary} />
+                    ) : (
+                      <ChevronRight size={18} color={isZenMode ? '#433422' : colors.textTertiary} />
+                    )}
+                  </TouchableOpacity>
+                  {expandedSections[section.name] && (
+                    <View style={styles.microTopicContainer}>
+                      {Object.values(section.microTopics).map((topic) => (
+                        <View key={topic.name} style={styles.topicBlock}>
+                          <TouchableOpacity onPress={() => toggleMicroTopic(`${section.name}-${topic.name}`)} style={[styles.topicAccordion, { borderBottomColor: colors.border }]}>
+                            <FolderOpen size={14} color={colors.textSecondary} />
+                            <Text style={[styles.topicName, { color: colors.textSecondary }]}>{topic.name}</Text>
+                            <View style={[styles.countBadge, { backgroundColor: colors.surfaceStrong + '20' }]}>
+                              <Text style={[styles.countText, { color: colors.textSecondary }]}>{topic.questions.length}</Text>
+                            </View>
+                          </TouchableOpacity>
+                          {expandedMicroTopics[`${section.name}-${topic.name}`] && (
+                            <View style={styles.questionsList}>
+                              {topic.questions.map((q) => (
+                                <RepoQuestionCard key={q.id} question={q} onUpdate={refresh} isZenMode={isZenMode} onOpenAIChat={handleOpenAIChat} />
+                              ))}
+                            </View>
+                          )}
+                        </View>
+                      ))}
+                    </View>
                   )}
-                </TouchableOpacity>
-                {expandedSections[section.name] && (
-                  <View style={styles.microTopicContainer}>
-                    {Object.values(section.microTopics).map((topic) => (
-                      <View key={topic.name} style={styles.topicBlock}>
-                        <TouchableOpacity onPress={() => toggleMicroTopic(`${section.name}-${topic.name}`)} style={[styles.topicAccordion, { borderBottomColor: colors.border }]}>
-                          <FolderOpen size={14} color={colors.textSecondary} />
-                          <Text style={[styles.topicName, { color: colors.textSecondary }]}>{topic.name}</Text>
-                          <View style={[styles.countBadge, { backgroundColor: colors.surfaceStrong + '20' }]}>
-                            <Text style={[styles.countText, { color: colors.textSecondary }]}>{topic.questions.length}</Text>
-                          </View>
-                        </TouchableOpacity>
-                        {expandedMicroTopics[`${section.name}-${topic.name}`] && (
-                          <View style={styles.questionsList}>
-                            {topic.questions.map((q) => (
-                              <RepoQuestionCard key={q.id} question={q} onUpdate={refresh} isZenMode={isZenMode} />
-                            ))}
-                          </View>
-                        )}
-                      </View>
-                    ))}
-                  </View>
-                )}
-              </View>
-            ))}
-        </ScrollView>
-      </SafeAreaView>
+                </View>
+              ))}
+          </ScrollView>
+          {/* Issue 21: Floating AI Chat overlay */}
+          <PilotV2AIChat
+            activeQuestion={aiChatQuestion}
+            externalOpenTrigger={aiChatTrigger}
+          />
+        </SafeAreaView>
+      </PilotV2Provider>
     );
   }
 
   return (
+    <PilotV2Provider>
     <SafeAreaView style={{ flex: 1, backgroundColor: zenBg }}>
       <PageWrapper>
         {isZenMode && (
@@ -1098,7 +1118,13 @@ ${answerText}` : ''}`,
           )}
         />
       </PageWrapper>
+      {/* Issue 21: Floating AI Chat overlay */}
+      <PilotV2AIChat
+        activeQuestion={aiChatQuestion}
+        externalOpenTrigger={aiChatTrigger}
+      />
     </SafeAreaView>
+    </PilotV2Provider>
   );
 }
 

@@ -19,8 +19,18 @@ export interface FirstLoginWelcomeModalProps {
   visible: boolean;
   onClose: () => void;
   syncInProgress: boolean;
-  syncProgress?: { loaded: number; total: number };
+  syncProgress?: { phase: string; detail: string; current: number; total: number };
 }
+
+const PHASE_LABELS: Record<string, string> = {
+  tests: 'Downloading test catalogue',
+  questions: 'Downloading questions',
+  states: 'Syncing your tags & bookmarks',
+  notes: 'Syncing your notebooks',
+  attempts: 'Syncing test attempts',
+  cards: 'Syncing flashcards',
+  done: 'Finalizing',
+};
 
 export function FirstLoginWelcomeModal({
   visible,
@@ -48,9 +58,12 @@ export function FirstLoginWelcomeModal({
     }
   }, [visible, syncInProgress]);
 
-  const progressPercent = syncProgress
-    ? Math.min(100, Math.round((syncProgress.loaded / syncProgress.total) * 100))
+  const progressPercent = syncProgress && syncProgress.total > 0
+    ? Math.min(100, Math.round((syncProgress.current / syncProgress.total) * 100))
     : 0;
+  const phaseLabel = syncProgress
+    ? (PHASE_LABELS[syncProgress.phase] || syncProgress.detail || 'Syncing...')
+    : 'Preparing download...';
 
   return (
     <Modal
@@ -108,15 +121,17 @@ export function FirstLoginWelcomeModal({
               />
             </View>
 
-            {syncInProgress && syncProgress && (
+            {syncInProgress && (
               <View style={styles.syncSection}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12, justifyContent: 'space-between' }}>
                   <Text style={[styles.syncLabel, { color: colors.textSecondary }]}>
-                    Downloading Questions
+                    {phaseLabel}
                   </Text>
-                  <Text style={[styles.syncPercent, { color: colors.primary, fontWeight: '900' }]}>
-                    {progressPercent}%
-                  </Text>
+                  {syncProgress && syncProgress.total > 0 && (
+                    <Text style={[styles.syncPercent, { color: colors.primary, fontWeight: '900' }]}>
+                      {progressPercent}%
+                    </Text>
+                  )}
                 </View>
                 <View style={[styles.progressBar, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}>
                   <View
@@ -130,7 +145,7 @@ export function FirstLoginWelcomeModal({
                   />
                 </View>
                 <Text style={[styles.syncInfo, { color: colors.textTertiary }]}>
-                  {syncProgress.loaded.toLocaleString()} / {syncProgress.total.toLocaleString()} questions
+                  {syncProgress ? syncProgress.detail : 'Starting...'}
                 </Text>
               </View>
             )}

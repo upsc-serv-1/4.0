@@ -211,7 +211,13 @@ export default function AnalyseTab() {
     setLoading(true);
     try {
       const offline = await OfflineManager.getOfflineAttempts(session.user.id);
-      if (offline?.length > 0) setAttempts(offline);
+      if (offline?.length > 0) {
+        // Sort offline attempts newest first by submitted_at
+        const sorted = offline.sort((a: any, b: any) =>
+          new Date(b.submitted_at || 0).getTime() - new Date(a.submitted_at || 0).getTime()
+        );
+        setAttempts(sorted);
+      }
 
       const { data, error } = await supabase
         .from('test_attempts')
@@ -219,7 +225,7 @@ export default function AnalyseTab() {
         .eq('user_id', session.user.id)
         .eq('is_deleted', false) // Issue 23: Soft-delete filter
         .order('submitted_at', { ascending: false })
-        .limit(50);
+        .limit(1000);
 
       if (!error && data?.length > 0) setAttempts(data);
     } catch (err) {

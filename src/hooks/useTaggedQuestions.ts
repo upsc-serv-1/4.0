@@ -175,11 +175,40 @@ export function useTaggedVault(userId: string | undefined) {
 
       if (questionsError) throw questionsError;
 
-      const { mergedQs, idToMergedId } = mergeQuestions((questions || []) as any[]);
+      // Issue 52: Fetch sibling UPSC PYQ questions for full multi-institute coverage.
+      // The merger needs ALL institute variants of the same question to aggregate
+      // explanations — but we only fetched the specific questions the user tagged.
+      // Find UPSC PYQs among tagged questions and fetch their siblings.
+      const rawQuestions = questions || [];
+      const upscPyqYears = new Set<string>();
+      for (const q of rawQuestions) {
+        const groupName = String(q?.tests?.series || q?.exam_group || '').toUpperCase();
+        const isUpsc = !!q?.is_upsc_cse || groupName.includes('UPSC');
+        if (q?.is_pyq && isUpsc && q?.exam_year) {
+          upscPyqYears.add(String(q.exam_year));
+        }
+      }
+      let allQuestions = [...rawQuestions];
+      if (upscPyqYears.size > 0) {
+        const { data: siblings } = await supabase
+          .from('questions')
+          .select('id, test_id, subject, section_group, micro_topic, question_text, explanation_markdown, correct_answer, options, is_pyq, is_upsc_cse, exam_year, exam_group, tests(institute,program_name,series)')
+          .in('exam_year', Array.from(upscPyqYears))
+          .eq('is_pyq', true)
+          .eq('is_upsc_cse', true)
+          .limit(2000);
+        if (siblings && siblings.length > 0) {
+          const existingIds = new Set(rawQuestions.map(q => q.id));
+          const newSiblings = siblings.filter((s: any) => !existingIds.has(s.id));
+          allQuestions = [...rawQuestions, ...newSiblings];
+        }
+      }
+
+      const { mergedQs, idToMergedId } = mergeQuestions(allQuestions as any[]);
       const questionsById = new Map<string, any>();
-      (questions || []).forEach((q: any) => questionsById.set(q.id, q));
+      allQuestions.forEach((q: any) => questionsById.set(q.id, q));
       mergedQs.forEach((q: any) => questionsById.set(q.id, q));
-      const testIds = Array.from(new Set((questions || []).map(q => q.test_id).filter(Boolean)));
+      const testIds = Array.from(new Set(allQuestions.map(q => q.test_id).filter(Boolean)));
 
       let testsById = new Map<string, string>();
       if (testIds.length > 0) {

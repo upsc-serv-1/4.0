@@ -130,14 +130,34 @@ const buildExplanationEntry = (q: any, inst: string, year: string): ExplanationE
 };
 
 const addExplanation = (existing: any[], entry: ExplanationEntry) => {
-  const norm = (s: string) => cleanText(s).slice(0, 200);
-  const dup = existing.some(e =>
-    String(e.source).toLowerCase() === entry.source.toLowerCase() &&
-    String(e.program || '').toLowerCase() === String(entry.program || '').toLowerCase() &&
-    String(e.year) === entry.year &&
-    norm(e.text) === norm(entry.text) &&
-    String(e.answer || '').toUpperCase() === String(entry.answer || '').toUpperCase()
-  );
+  // Normalize text for comparison, handling empty/undefined safely
+  const norm = (s: string) => {
+    if (!s) return '';
+    return cleanText(s).slice(0, 200);
+  };
+  const entryText = norm(entry.text);
+  const entryAnswer = String(entry.answer || '').toUpperCase();
+  const entrySource = String(entry.source).toLowerCase().trim();
+  const entryProgram = String(entry.program || '').toLowerCase().trim();
+  const entryYear = String(entry.year);
+  
+  // Check for exact duplicate across ALL fields
+  const dup = existing.some(e => {
+    const eSource = String(e.source || '').toLowerCase().trim();
+    const eProgram = String(e.program || '').toLowerCase().trim();
+    // Different source → not a duplicate (keep multi-institute)
+    if (eSource !== entrySource) return false;
+    // Same source but different program → keep both
+    if (eProgram !== entryProgram) return false;
+    // Same source+program but different year → keep both
+    if (String(e.year) !== entryYear) return false;
+    // Same source+program+year but different text → keep both
+    if (norm(e.text) !== entryText) return false;
+    // Same source+program+year+text but different answer → keep both
+    if (String(e.answer || '').toUpperCase() !== entryAnswer) return false;
+    // All fields identical → truly a duplicate
+    return true;
+  });
   if (!dup) existing.push(entry);
 };
 

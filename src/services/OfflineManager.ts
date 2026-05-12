@@ -94,6 +94,7 @@ const DEFAULT_META: OfflineMetadata = {
 class OfflineManagerService {
   private _cancelled = false;
   private _fullSyncPromise: Promise<void> | null = null;
+  currentSyncProgress: SyncProgress | null = null;
 
   private async fetchAllRows(
     table: string,
@@ -151,7 +152,7 @@ class OfflineManagerService {
   }
 
   // ── Cancel support ────────────────────────────────────────────
-  cancelSync() { this._cancelled = true; }
+  cancelSync() { this._cancelled = true; this.currentSyncProgress = null; }
 
   // ── FULL SYNC ─────────────────────────────────────────────────
   async syncAllContent(
@@ -171,16 +172,22 @@ class OfflineManagerService {
     onProgress: (p: SyncProgress) => void
   ) {
     this._cancelled = false;
+    this.currentSyncProgress = null;
     let totalQuestions = 0;
 
+    const report = (p: SyncProgress) => {
+      this.currentSyncProgress = p;
+      onProgress(p);
+    };
+
     // ──────── 1. TESTS ──────────────────────────────────────────
-    onProgress({ phase: 'tests', current: 0, total: 1, detail: 'Fetching test catalogue...' });
+    report({ phase: 'tests', current: 0, total: 1, detail: 'Fetching test catalogue...' });
 
     const tests = await this.fetchAllRows('tests');
     if (!tests || tests.length === 0) throw new Error('No tests found on server');
 
     KVStore.setJson(OFFLINE_TESTS_KEY, tests);
-    onProgress({ phase: 'tests', current: 1, total: 1, detail: `${tests.length} tests saved` });
+    report({ phase: 'tests', current: 1, total: 1, detail: `${tests.length} tests saved` });
     if (this._cancelled) return;
 
     // ──────── 2. QUESTIONS (chunked by test) ────────────────────
@@ -188,7 +195,7 @@ class OfflineManagerService {
     for (let i = 0; i < totalTests; i++) {
       if (this._cancelled) return;
       const test = tests[i];
-      onProgress({
+      report({
         phase: 'questions',
         current: i,
         total: totalTests,
@@ -215,11 +222,11 @@ class OfflineManagerService {
         console.warn(`[Offline] Failed to cache test ${test.id}`, err);
       }
     }
-    onProgress({ phase: 'questions', current: totalTests, total: totalTests, detail: `${totalQuestions} questions saved` });
+    report({ phase: 'questions', current: totalTests, total: totalTests, detail: `${totalQuestions} questions saved` });
     if (this._cancelled) return;
 
     // ──────── 3. USER QUESTION STATES (paginated) ───────────────
-    onProgress({ phase: 'states', current: 0, total: 1, detail: 'Fetching your tags, bookmarks & notes...' });
+    report({ phase: 'states', current: 0, total: 1, detail: 'Fetching your tags, bookmarks & notes...' });
     let totalStates = 0;
     try {
       const allStates: any[] = [];
@@ -243,11 +250,11 @@ class OfflineManagerService {
     } catch (err) {
       console.warn('[Offline] Failed to fetch question_states', err);
     }
-    onProgress({ phase: 'states', current: 1, total: 1, detail: `${totalStates} question states saved` });
+    report({ phase: 'states', current: 1, total: 1, detail: `${totalStates} question states saved` });
     if (this._cancelled) return;
 
     // ──────── 4. USER NOTES ─────────────────────────────────────
-    onProgress({ phase: 'notes', current: 0, total: 1, detail: 'Fetching your notebooks...' });
+    report({ phase: 'notes', current: 0, total: 1, detail: 'Fetching your notebooks...' });
     let totalNotes = 0;
     try {
       const notes = await this.fetchAllRows(
@@ -261,11 +268,11 @@ class OfflineManagerService {
     } catch (err) {
       console.warn('[Offline] Failed to fetch user_notes', err);
     }
-    onProgress({ phase: 'notes', current: 1, total: 1, detail: `${totalNotes} notebooks saved` });
+    report({ phase: 'notes', current: 1, total: 1, detail: `${totalNotes} notebooks saved` });
     if (this._cancelled) return;
 
     // ──────── 5. TEST ATTEMPTS ──────────────────────────────────
-    onProgress({ phase: 'attempts', current: 0, total: 1, detail: 'Fetching your test attempts...' });
+    report({ phase: 'attempts', current: 0, total: 1, detail: 'Fetching your test attempts...' });
     let totalAttempts = 0;
     try {
       const { data: attempts, error: aErr } = await supabase
@@ -281,11 +288,11 @@ class OfflineManagerService {
     } catch (err) {
       console.warn('[Offline] Failed to fetch test_attempts', err);
     }
-    onProgress({ phase: 'attempts', current: 1, total: 1, detail: `${totalAttempts} attempts saved` });
+    report({ phase: 'attempts', current: 1, total: 1, detail: `${totalAttempts} attempts saved` });
     if (this._cancelled) return;
 
     // ──────── 6. FLASHCARD DATA ─────────────────────────────────
-    onProgress({ phase: 'cards', current: 0, total: 1, detail: 'Fetching your flashcards...' });
+    report({ phase: 'cards', current: 0, total: 1, detail: 'Fetching your flashcards...' });
     let totalCards = 0;
     try {
       // Fetch only non-deleted cards from Supabase
@@ -348,7 +355,7 @@ class OfflineManagerService {
     } catch (err) {
       console.warn('[Offline] Failed to fetch flashcard data', err);
     }
-    onProgress({ phase: 'cards', current: 1, total: 1, detail: `${totalCards} flashcards saved` });
+    report({ phase: 'cards', current: 1, total: 1, detail: `${totalCards} flashcards saved` });
 
     // ──────── FINALIZE ──────────────────────────────────────────
     await this.setMetadata({
@@ -362,7 +369,7 @@ class OfflineManagerService {
       totalAttempts,
       totalCards,
     });
-    onProgress({ phase: 'done', current: 1, total: 1, detail: 'All data downloaded!' });
+    report({ phase: 'done', current: 1, total: 1, detail: 'All data downloaded!' });
   }
 
   // ── INCREMENTAL SYNC ──────────────────────────────────────────

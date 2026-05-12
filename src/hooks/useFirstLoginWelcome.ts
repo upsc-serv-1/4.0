@@ -16,8 +16,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const FIRST_LOGIN_KEY = 'first_login_modal_shown';
 
-export interface SyncProgress {
-  loaded: number;
+export interface WelcomeSyncProgress {
+  phase: string;
+  detail: string;
+  current: number;
   total: number;
 }
 
@@ -25,14 +27,14 @@ export function useFirstLoginWelcome() {
   const { session } = useAuth();
   const [showWelcome, setShowWelcome] = useState(false);
   const [syncInProgress, setSyncInProgress] = useState(false);
-  const [syncProgress, setSyncProgress] = useState<SyncProgress | undefined>();
+  const [syncProgress, setSyncProgress] = useState<WelcomeSyncProgress | undefined>();
 
   const lastUserIdRef = useRef<string | null>(null);
   const checkInitializedRef = useRef(false);
 
   useEffect(() => {
     if (checkInitializedRef.current) return; // Only run once per session
-    
+
     (async () => {
       const userId = session?.user?.id;
 
@@ -54,26 +56,36 @@ export function useFirstLoginWelcome() {
           if (!shown) {
             // Check metadata to see if this is truly first sync
             const meta = await OfflineManager.getMetadata();
-            
+
             if (!meta.lastFullSync) {
-              // First sync - show welcome modal and indicate sync in progress
+              // First sync - show welcome modal and track progress
               setShowWelcome(true);
               setSyncInProgress(true);
-              
+
               // Mark that we've shown the modal (don't show again)
               await AsyncStorage.setItem(userWelcomeKey, 'true');
-              
-              // In the background, sync will happen via useOfflineBootstrap
-              // Once sync completes, we'll detect it and auto-close the modal
-              // Check periodically if sync completed
+
+              // Poll sync progress and completion
               const checkInterval = setInterval(async () => {
+                // Read real-time progress from OfflineManager
+                const progress = OfflineManager.currentSyncProgress;
+                if (progress) {
+                  setSyncProgress({
+                    phase: progress.phase,
+                    detail: progress.detail,
+                    current: progress.current,
+                    total: progress.total,
+                  });
+                }
+
+                // Check if sync completed
                 const updatedMeta = await OfflineManager.getMetadata();
                 if (updatedMeta.lastFullSync) {
                   setSyncInProgress(false);
                   clearInterval(checkInterval);
                 }
-              }, 2000); // Check every 2 seconds
-              
+              }, 500); // Poll every 500ms for smoother progress updates
+
               return () => clearInterval(checkInterval);
             }
           }

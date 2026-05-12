@@ -314,16 +314,18 @@ export const SharedQuestionCard = ({
                />
             </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => setShowNoteField(prev => !prev)}
-              style={{ padding: 4, backgroundColor: showNoteField ? (isZenMode ? 'rgba(67,52,34,0.1)' : effectiveColors.primary + '15') : 'transparent', borderRadius: 6 }}
-              testID={`note-toggle-shortcut-${item.id}`}
-            >
-               <PenTool
-                 size={18} 
-                 color={isZenMode ? '#433422' : (showNoteField ? effectiveColors.primary : effectiveColors.textTertiary)} 
-               />
-            </TouchableOpacity>
+            {arenaMode !== 'exam' && (
+              <TouchableOpacity
+                onPress={() => setShowNoteField(prev => !prev)}
+                style={{ padding: 4, backgroundColor: showNoteField ? (isZenMode ? 'rgba(67,52,34,0.1)' : effectiveColors.primary + '15') : 'transparent', borderRadius: 6 }}
+                testID={`note-toggle-shortcut-${item.id}`}
+              >
+                 <PenTool
+                   size={18}
+                   color={isZenMode ? '#433422' : (showNoteField ? effectiveColors.primary : effectiveColors.textTertiary)}
+                 />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 
@@ -340,7 +342,8 @@ export const SharedQuestionCard = ({
             const isSelected = showMistakes ? historySelected : practiceSelected;
             const isCorrect = label.toLowerCase() === item.correct_answer?.toLowerCase();
             
-            const showResult = showMistakes ? !!effectiveAnswerData.selectedAnswer : practiceSelected;
+            // 🐛 FIX: In exam mode, never show result (correct/wrong) — that's only for learning mode
+            const showResult = arenaMode === 'exam' ? false : (showMistakes ? !!effectiveAnswerData.selectedAnswer : practiceSelected);
             const isWrong = isSelected && !isCorrect;
 
             return (
@@ -402,9 +405,9 @@ export const SharedQuestionCard = ({
                     <TouchableOpacity
                       key={diff.value}
                       onPress={() => toggleDifficulty && toggleDifficulty(item.id, diff.value)}
-                      style={[styles.difficultyBtn, { borderColor: effectiveColors.border }, effectiveAnswerData.difficulty === diff.value && { backgroundColor: diff.color + '20', borderColor: diff.color }]}
+                      style={[styles.difficultyBtn, { borderColor: effectiveColors.border }, effectiveAnswerData.difficulty === diff.value && { backgroundColor: effectiveColors.primary, borderColor: diff.color }]}
                     >
-                      <Text style={[styles.difficultyText, { color: effectiveAnswerData.difficulty === diff.value ? diff.color : effectiveColors.textSecondary }]}>{diff.label}</Text>
+                      <Text style={[styles.difficultyText, { color: effectiveAnswerData.difficulty === diff.value ? effectiveColors.buttonText : effectiveColors.textSecondary }]}>{diff.label}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -425,9 +428,9 @@ export const SharedQuestionCard = ({
                       <TouchableOpacity
                         key={tag}
                         onPress={() => toggleStudyTag && toggleStudyTag(item.id, effectiveAnswerData.studyTags || [], tag)}
-                        style={[styles.chip, { backgroundColor: effectiveColors.surfaceStrong, borderColor: effectiveColors.border }, selected && { backgroundColor: effectiveColors.primary + '20', borderColor: effectiveColors.primary }]}
+                        style={[styles.chip, { backgroundColor: effectiveColors.surfaceStrong, borderColor: effectiveColors.border }, selected && { backgroundColor: effectiveColors.primary, borderColor: effectiveColors.primary }]}
                       >
-                        <Text style={[styles.chipText, { color: selected ? effectiveColors.primary : effectiveColors.textSecondary }]}>{tag}</Text>
+                        <Text style={[styles.chipText, { color: selected ? effectiveColors.buttonText : effectiveColors.textSecondary }]}>{tag}</Text>
                       </TouchableOpacity>
                     );
                   })}
@@ -453,9 +456,9 @@ export const SharedQuestionCard = ({
                 <TouchableOpacity
                   key={type}
                   onPress={() => toggleMistakeType && toggleMistakeType(item.id, type)}
-                  style={[styles.chip, { backgroundColor: effectiveColors.surface, borderColor: effectiveColors.border }, effectiveAnswerData.errorCategory === type && { backgroundColor: effectiveColors.primary + '20', borderColor: effectiveColors.primary }]}
+                  style={[styles.chip, { backgroundColor: effectiveColors.surface, borderColor: effectiveColors.border }, effectiveAnswerData.errorCategory === type && { backgroundColor: effectiveColors.primary, borderColor: effectiveColors.primary }]}
                 >
-                  <Text style={[styles.chipText, { color: effectiveAnswerData.errorCategory === type ? effectiveColors.primary : effectiveColors.textSecondary }]}>{type}</Text>
+                  <Text style={[styles.chipText, { color: effectiveAnswerData.errorCategory === type ? effectiveColors.buttonText : effectiveColors.textSecondary }]}>{type}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -769,8 +772,8 @@ export const SharedQuestionCard = ({
             </>
           )}
           
-          {/* Expanded Note Box Section (Inline, full width) */}
-          {showNoteField && (
+          {/* 🐛 FIX: Hide notes in exam mode to prevent cheating */}
+          {arenaMode !== 'exam' && showNoteField && (
             <View style={{
               marginTop: 16,
               backgroundColor: effectiveColors.surface,

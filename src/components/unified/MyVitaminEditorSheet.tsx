@@ -138,9 +138,8 @@ export const MyVitaminEditorSheet: React.FC<MyVitaminEditorSheetProps> = ({
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={{ flex: 1 }}
           >
-            {/* Header */}
-            {!isKeyboardVisible && (
-              <View style={[styles.header, { borderBottomColor: colors.border }]}>
+            {/* Header — always visible so user can close the sheet */}
+            <View style={[styles.header, { borderBottomColor: colors.border }]}>
               <View style={[styles.brand, { backgroundColor: '#5B4EFA' }]}>
                 <Save size={18} color="#fff" />
               </View>
@@ -156,9 +155,13 @@ export const MyVitaminEditorSheet: React.FC<MyVitaminEditorSheetProps> = ({
               >
                 <Brain size={20} color={showAiPanel ? '#5B4EFA' : colors.textPrimary} />
               </TouchableOpacity>
-              {/* 🐛 FIX #32: Removed redundant Close (X) button - AI icon toggle + overlay tap already closes */}
+              <TouchableOpacity
+                onPress={onClose}
+                style={[styles.actionBtn, { marginLeft: 4 }]}
+              >
+                <X size={20} color={colors.textPrimary} />
+              </TouchableOpacity>
             </View>
-            )}
 
             {showAiPanel ? (
               <View style={{ flex: 1 }}>

@@ -1,91 +1,144 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { Check, X } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 
 export const OptionButton = ({ label, text, isSelected, isCorrect, isWrong, showResult, onSelect, disabled, fontSize = 16 }: any) => {
   const { colors } = useTheme();
-  
-  // FIX #10: Add animated background color transition
-  const bgColorAnim = React.useRef(new Animated.Value(0)).current;
-  
+
+  // Smooth opacity-based selection overlay (more performant than color interpolation)
+  const selectedOpacity = useRef(new Animated.Value(0)).current;
+  const resultOpacity = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
-    Animated.timing(bgColorAnim, {
-      toValue: isSelected || showResult ? 1 : 0,
-      duration: 300,
-      useNativeDriver: false,
+    // Animate selection highlight smoothly
+    Animated.timing(selectedOpacity, {
+      toValue: isSelected ? 1 : 0,
+      duration: 350,
+      useNativeDriver: true,
     }).start();
-  }, [isSelected, showResult, bgColorAnim]);
-  
+  }, [isSelected, selectedOpacity]);
+
+  useEffect(() => {
+    // Animate result (correct/wrong) overlay smoothly
+    Animated.timing(resultOpacity, {
+      toValue: showResult ? 1 : 0,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
+  }, [showResult, resultOpacity]);
+
   let borderColor = colors.border;
-  let baseBackgroundColor = colors.surface;
-  let selectedBackgroundColor = colors.primary + '10';
   let textColor = colors.textPrimary;
   let letterBg = colors.surfaceStrong;
   let letterColor = colors.textSecondary;
+  let borderWidth = 1;
+
+  const overlayColor = 'transparent';
+  const resultOverlayColor = 'transparent';
+  let resultLetterBg = letterBg;
+  let resultLetterColor = letterColor;
+  let resultTextColor = textColor;
 
   if (isSelected && !showResult) {
     borderColor = colors.primary;
-    selectedBackgroundColor = colors.primary + '10';
+    borderWidth = 2;
     letterBg = colors.primary;
     letterColor = colors.buttonText;
   }
 
   if (showResult) {
+    borderWidth = 2;
     if (isCorrect) {
       borderColor = '#22c55e';
-      selectedBackgroundColor = '#dcfce7';
-      baseBackgroundColor = '#dcfce7';
       textColor = '#15803d';
       letterBg = '#22c55e';
       letterColor = '#fff';
+      resultLetterBg = '#22c55e';
+      resultLetterColor = '#fff';
+      resultTextColor = '#15803d';
     } else if (isWrong) {
       borderColor = '#ef4444';
-      selectedBackgroundColor = '#fee2e2';
-      baseBackgroundColor = '#fee2e2';
       textColor = '#b91c1c';
       letterBg = '#ef4444';
       letterColor = '#fff';
+      resultLetterBg = '#ef4444';
+      resultLetterColor = '#fff';
+      resultTextColor = '#b91c1c';
+    } else {
+      // Unselected option when results shown — subtle background
+      textColor = colors.textSecondary;
+      letterBg = colors.surfaceStrong;
+      letterColor = colors.textTertiary;
     }
   }
-  
-  // Animate background color smoothly
-  const animatedBgColor = bgColorAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [baseBackgroundColor, selectedBackgroundColor],
-  });
 
   return (
     <TouchableOpacity
       onPress={onSelect}
       disabled={disabled}
-      activeOpacity={0.8}
+      activeOpacity={0.85}
       style={[
         styles.optionBtn,
-        { borderColor, borderWidth: isSelected || showResult ? 2 : 1 },
+        { borderColor, borderWidth },
       ]}
     >
-      <Animated.View
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            backgroundColor: animatedBgColor,
-            borderRadius: 16,
-            zIndex: -1,
-          },
-        ]}
-      />
-      <View style={[styles.optionLabel, { backgroundColor: letterBg }]}>
+      {/* Soft selection highlight overlay (fades in/out with opacity) */}
+      {!showResult && (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              backgroundColor: colors.primary,
+              borderRadius: 16,
+              opacity: Animated.multiply(selectedOpacity, 0.1),
+              zIndex: -1,
+            },
+          ]}
+        />
+      )}
+
+      {/* Result overlay — correct (green) or wrong (red) with smooth fade */}
+      {showResult && (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              borderRadius: 16,
+              zIndex: -1,
+              opacity: resultOpacity,
+              backgroundColor: isCorrect
+                ? '#dcfce7'
+                : isWrong
+                  ? '#fee2e2'
+                  : 'transparent',
+            },
+          ]}
+        />
+      )}
+
+      <View style={[
+        styles.optionLabel,
+        { backgroundColor: showResult && !isCorrect && !isWrong ? colors.surfaceStrong : letterBg },
+      ]}>
         <Text style={[styles.optionLabelText, { color: letterColor }]}>
           {label}
         </Text>
       </View>
-      <Text style={[styles.optionText, { 
-        color: textColor, 
-        fontWeight: (isCorrect && showResult) || isSelected ? '700' : '500', 
-        fontSize: Math.max(12, fontSize - 1), 
-        lineHeight: Math.max(18, (fontSize - 1) * 1.35) 
-      }]}>
+      <Text
+        style={[
+          styles.optionText,
+          {
+            color: textColor,
+            fontWeight: (isCorrect && showResult) || isSelected ? '700' : '500',
+            fontSize: Math.max(12, fontSize - 1),
+            lineHeight: Math.max(18, (fontSize - 1) * 1.35),
+          },
+        ]}
+        numberOfLines={6}
+      >
         {text}
       </Text>
       {showResult && isCorrect && <Check size={18} color="#22c55e" style={{ marginLeft: 'auto' }} />}
@@ -95,27 +148,27 @@ export const OptionButton = ({ label, text, isSelected, isCorrect, isWrong, show
 };
 
 const styles = StyleSheet.create({
-  optionBtn: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    padding: 16, 
-    borderRadius: 16, 
-    borderWidth: 1, 
+  optionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 16,
     gap: 12,
-    marginBottom: 8 
+    marginBottom: 8,
+    overflow: 'hidden',
   },
-  optionLabel: { 
-    width: 28, 
-    height: 28, 
-    borderRadius: 8, 
-    alignItems: 'center', 
-    justifyContent: 'center' 
+  optionLabel: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  optionLabelText: { 
-    fontSize: 14, 
-    fontWeight: '900' 
+  optionLabelText: {
+    fontSize: 14,
+    fontWeight: '900',
   },
-  optionText: { 
-    flex: 1 
+  optionText: {
+    flex: 1,
   },
 });

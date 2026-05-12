@@ -1042,13 +1042,11 @@ export default function AISearchTab() {
         const displayKeywords = aiResult.keywords;
         setKeywords(displayKeywords.length > 0 ? displayKeywords : [rawTerm]);
 
-        // Merge AI-inferred filters (local only, do NOT persist to state)
+        // AI should ONLY expand keywords — never override user's active filters
         const mergedFilters: Filters = { ...activeFilters };
-        if (aiResult.filters.subject      && activeFilters.subjects     === 'All') mergedFilters.subjects     = aiResult.filters.subject;
-        if (aiResult.filters.stage        && activeFilters.stage        === 'All') mergedFilters.stage        = aiResult.filters.stage;
-        if (aiResult.filters.pyqFilter    && activeFilters.pyqFilter    === 'All') mergedFilters.pyqFilter    = aiResult.filters.pyqFilter;
-        if (aiResult.filters.examCategory && activeFilters.examCategory === 'All') mergedFilters.examCategory = aiResult.filters.examCategory;
-        if (aiResult.filters.ncertFilter  && activeFilters.ncertFilter  === 'All') mergedFilters.ncertFilter  = aiResult.filters.ncertFilter;
+        // Only AI-inferred specificYear is accepted since it acts as a fine-grained search hint
+        const aiYear = aiResult.filters.specificYear || null;
+        // Show AI-inferred filters as labels only (for user awareness) but don't apply them
         setAiInferredFilters(aiResult.filters);
 
         // Build ALL search terms: original query + user words + AI keywords
@@ -1118,15 +1116,10 @@ export default function AISearchTab() {
       const displayKeywords = aiResult.keywords;
       const rawTerm = q.trim();
 
-      // Merge AI-inferred filters (local only, do NOT persist to state)
+      // AI should ONLY expand keywords — never override user's active filters
       const mergedFilters: Filters = { ...activeFilters };
-      if (aiResult.filters.subject      && activeFilters.subjects     === 'All') mergedFilters.subjects     = aiResult.filters.subject;
-      if (aiResult.filters.stage        && activeFilters.stage        === 'All') mergedFilters.stage        = aiResult.filters.stage;
-      if (aiResult.filters.pyqFilter    && activeFilters.pyqFilter    === 'All') mergedFilters.pyqFilter    = aiResult.filters.pyqFilter;
-      if (aiResult.filters.examCategory && activeFilters.examCategory === 'All') mergedFilters.examCategory = aiResult.filters.examCategory;
-      if (aiResult.filters.ncertFilter  && activeFilters.ncertFilter  === 'All') mergedFilters.ncertFilter  = aiResult.filters.ncertFilter;
-
       const aiYear = aiResult.filters.specificYear || null;
+      // Show AI-inferred filters as labels only (for user awareness) but don't apply them
       setAiInferredFilters(aiResult.filters);
 
       setKeywords(displayKeywords.length > 0 ? displayKeywords : [rawTerm]);
@@ -1603,7 +1596,7 @@ export default function AISearchTab() {
 
           {/* Subject drill-down: tapping a subject re-runs search with that subject filter. */}
           {/* ISSUE FIX #12: Use allSearchSubjects so filter options remain visible after selection */}
-          {allSearchSubjects.length > 1 && (
+          {allSearchSubjects.length >= 1 && (
             <>
               <Text style={[styles.panelLabel, { color: colors.textTertiary, marginTop: 14 }]}>BY SUBJECT</Text>
               {/* Fix #2 - clear chip */}
@@ -2193,12 +2186,12 @@ export default function AISearchTab() {
   const SearchBar = (
     <View>
       {/* ── 3-Mode Engine Toggle ──────────────────────────────────────────── */}
-      <View style={{ flexDirection: 'row', gap: 6, paddingHorizontal: 14, paddingTop: 8, paddingBottom: 4 }}>
+      <View style={{ flexDirection: 'row', gap: 4, paddingHorizontal: 12, paddingTop: 6, paddingBottom: 4 }}>
         {([
-          { mode: 'AI' as SearchEngineMode, icon: <Brain size={12} color={searchEngineMode === 'AI' ? '#fff' : '#7c3aed'} />, label: 'AI' },
-          { mode: 'AI+Fuzzy' as SearchEngineMode, icon: <Zap size={12} color={searchEngineMode === 'AI+Fuzzy' ? '#fff' : '#06b6d4'} />, label: 'AI+Fuzzy' },
-          { mode: 'Matching' as SearchEngineMode, icon: <Zap size={12} color={searchEngineMode === 'Matching' ? '#fff' : colors.textSecondary} />, label: 'Fuzzy' },
-          { mode: 'Exact' as SearchEngineMode, icon: <Target size={12} color={searchEngineMode === 'Exact' ? '#fff' : colors.textSecondary} />, label: 'Exact' },
+          { mode: 'AI' as SearchEngineMode, icon: <Brain size={10} color={searchEngineMode === 'AI' ? '#fff' : '#7c3aed'} />, label: IS_IPAD ? 'AI' : 'AI' },
+          { mode: 'AI+Fuzzy' as SearchEngineMode, icon: <Zap size={10} color={searchEngineMode === 'AI+Fuzzy' ? '#fff' : '#06b6d4'} />, label: IS_IPAD ? 'AI+Fuzzy' : 'AI+Fz' },
+          { mode: 'Matching' as SearchEngineMode, icon: <Zap size={10} color={searchEngineMode === 'Matching' ? '#fff' : colors.textSecondary} />, label: IS_IPAD ? 'Fuzzy' : 'Fuzz' },
+          { mode: 'Exact' as SearchEngineMode, icon: <Target size={10} color={searchEngineMode === 'Exact' ? '#fff' : colors.textSecondary} />, label: IS_IPAD ? 'Exact' : 'Exact' },
         ]).map(({ mode, icon, label }) => (
           <TouchableOpacity
             key={mode}
@@ -2208,8 +2201,8 @@ export default function AISearchTab() {
             }}
             testID={`search-mode-${mode.toLowerCase()}`}
             style={{
-              flexDirection: 'row', alignItems: 'center', gap: 4,
-              paddingHorizontal: 10, paddingVertical: 5, borderRadius: 16,
+              flexDirection: 'row', alignItems: 'center', gap: 3,
+              paddingHorizontal: 8, paddingVertical: 4, borderRadius: 14,
               backgroundColor: searchEngineMode === mode
                 ? (mode === 'AI' ? '#7c3aed' : (mode === 'AI+Fuzzy' ? '#06b6d4' : (mode === 'Matching' ? '#0ea5e9' : '#f59e0b')))
                 : colors.surface,
@@ -2220,14 +2213,14 @@ export default function AISearchTab() {
             }}
           >
             {icon}
-            <Text style={{ fontSize: 11, fontWeight: '800', color: searchEngineMode === mode ? '#fff' : colors.textSecondary }}>{label}</Text>
+            <Text style={{ fontSize: 10, fontWeight: '800', color: searchEngineMode === mode ? '#fff' : colors.textSecondary }}>{label}</Text>
           </TouchableOpacity>
         ))}
         <View style={{ flex: 1 }} />
       </View>
 
       {/* ── Search input row ─────────────────────────────────────────────── */}
-      <View style={styles.searchRow}>
+      <View style={[styles.searchRow, IS_IPAD ? {} : { paddingHorizontal: 10, paddingVertical: 6, gap: 5 }]}>
         <View style={[styles.searchWrap, {
           backgroundColor: colors.surface, borderColor:
             searchEngineMode === 'AI' ? '#7c3aed60' : searchEngineMode === 'Matching' ? '#0ea5e940' : '#f59e0b40'
@@ -2271,22 +2264,24 @@ export default function AISearchTab() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          onPress={() => setShowModelSwitcher(true)}
-          style={[styles.filterBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
-        >
-          <Brain size={18} color="#7c3aed" />
-        </TouchableOpacity>
+        {IS_IPAD && (
+          <TouchableOpacity
+            onPress={() => setShowModelSwitcher(true)}
+            style={[styles.filterBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          >
+            <Brain size={18} color="#7c3aed" />
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity
           onPress={openFilterPopup}
           testID="ai-search-filter-open"
-          style={[styles.filterBtn, {
+          style={[styles.filterBtn, IS_IPAD ? {} : { height: 40, paddingHorizontal: 10 }, {
             backgroundColor: activeFilterCount > 0 ? '#ede9fe' : colors.surface,
             borderColor: activeFilterCount > 0 ? '#c4b5fd' : colors.border,
           }]}
         >
-          <SlidersHorizontal size={15} color={activeFilterCount > 0 ? '#7c3aed' : colors.textSecondary} />
+          <SlidersHorizontal size={13} color={activeFilterCount > 0 ? '#7c3aed' : colors.textSecondary} />
           {activeFilterCount > 0 && (
             <View style={styles.filterBadge}>
               <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
@@ -2334,37 +2329,6 @@ export default function AISearchTab() {
               borderColor: colors.border,
             }]}>
               {/* Quick institute filter chips */}
-              {instituteOptions.length > 0 && (
-                <View style={{ paddingHorizontal: 12, paddingTop: 10, paddingBottom: 6 }}>
-                  <Text style={[styles.panelLabel, { color: colors.textTertiary, marginBottom: 6 }]}>FILTER BY INSTITUTE</Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexDirection: 'row' }}>
-                    {instituteOptions.slice(0, 10).map(inst => {
-                      const isActive = filters.institutes.split(',').includes(inst);
-                      return (
-                        <TouchableOpacity
-                          key={inst}
-                          onPress={() => {
-                            const list = filters.institutes === 'All' ? [] : filters.institutes.split(',').filter(Boolean);
-                            const next = isActive ? list.filter(i => i !== inst) : [...list, inst];
-                            const newFilters = { ...filters, institutes: next.length ? next.join(',') : 'All' };
-                            setFilters(newFilters);
-                            if (hasSearched && query.trim()) runSearch(query, newFilters);
-                          }}
-                          style={{
-                            marginRight: 6,
-                            paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20,
-                            backgroundColor: isActive ? '#7c3aed' : colors.surfaceStrong,
-                            borderWidth: 1, borderColor: isActive ? '#7c3aed' : colors.border,
-                          }}
-                        >
-                          <Text style={{ fontSize: 11, fontWeight: '700', color: isActive ? '#fff' : colors.textSecondary }}>{inst}</Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </ScrollView>
-                </View>
-              )}
-
               {/* Recent searches */}
               {searchHistory.length > 0 && (
                 <>
@@ -2434,53 +2398,6 @@ export default function AISearchTab() {
             renderItem={renderResultCard}
             ListHeaderComponent={
               <>
-                {/* AI Smart Filters chips */}
-                {Object.keys(aiInferredFilters).length > 0 && hasSearched && (
-                  <View style={{ paddingHorizontal: 12, paddingTop: 6, paddingBottom: 2 }}>
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5, alignItems: 'center' }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginRight: 2 }}>
-                        <Brain size={10} color="#7c3aed" />
-                        <Text style={{ fontSize: 9, fontWeight: '800', color: '#7c3aed', letterSpacing: 0.8 }}>AI APPLIED</Text>
-                      </View>
-                      {aiInferredFilters.subject && (
-                        <TouchableOpacity style={styles.aiChip} onPress={() => {
-                          setAiInferredFilters(prev => { const n = {...prev}; delete n.subject; return n; });
-                          const f = { ...filters, subjects: 'All' }; setFilters(f); runSearch(query, f);
-                        }}><Text style={styles.aiChipText}>{aiInferredFilters.subject}</Text><X size={8} color="#6d28d9" /></TouchableOpacity>
-                      )}
-                      {aiInferredFilters.stage && (
-                        <TouchableOpacity style={styles.aiChip} onPress={() => {
-                          setAiInferredFilters(prev => { const n = {...prev}; delete n.stage; return n; });
-                          const f = { ...filters, stage: 'All' }; setFilters(f); runSearch(query, f);
-                        }}><Text style={styles.aiChipText}>{aiInferredFilters.stage}</Text><X size={8} color="#6d28d9" /></TouchableOpacity>
-                      )}
-                      {aiInferredFilters.pyqFilter && (
-                        <TouchableOpacity style={styles.aiChip} onPress={() => {
-                          setAiInferredFilters(prev => { const n = {...prev}; delete n.pyqFilter; return n; });
-                          const f = { ...filters, pyqFilter: 'All' }; setFilters(f); runSearch(query, f);
-                        }}><Text style={styles.aiChipText}>{aiInferredFilters.pyqFilter}</Text><X size={8} color="#6d28d9" /></TouchableOpacity>
-                      )}
-                      {aiInferredFilters.examCategory && (
-                        <TouchableOpacity style={styles.aiChip} onPress={() => {
-                          setAiInferredFilters(prev => { const n = {...prev}; delete n.examCategory; return n; });
-                          const f = { ...filters, examCategory: 'All' }; setFilters(f); runSearch(query, f);
-                        }}><Text style={styles.aiChipText}>{aiInferredFilters.examCategory}</Text><X size={8} color="#6d28d9" /></TouchableOpacity>
-                      )}
-                      {aiInferredFilters.ncertFilter && (
-                        <TouchableOpacity style={styles.aiChip} onPress={() => {
-                          setAiInferredFilters(prev => { const n = {...prev}; delete n.ncertFilter; return n; });
-                          const f = { ...filters, ncertFilter: 'All' }; setFilters(f); runSearch(query, f);
-                        }}><Text style={styles.aiChipText}>{aiInferredFilters.ncertFilter}</Text><X size={8} color="#6d28d9" /></TouchableOpacity>
-                      )}
-                      {aiInferredFilters.specificYear && (
-                        <TouchableOpacity style={styles.aiChip} onPress={() => {
-                          setAiInferredFilters(prev => { const n = {...prev}; delete n.specificYear; return n; });
-                          runSearch(query, filters);
-                        }}><Text style={styles.aiChipText}>{aiInferredFilters.specificYear}</Text><X size={8} color="#6d28d9" /></TouchableOpacity>
-                      )}
-                    </View>
-                  </View>
-                )}
                 {/* Fix #6 — collapsible keywords on phone */}
                 {keywords.length > 0 && (
                   <View style={{ paddingHorizontal: 14, paddingBottom: 4 }}>
@@ -2573,6 +2490,7 @@ export default function AISearchTab() {
                       
                       return (
                         <SharedQuestionCard
+                          key={`${previewQuestion?.id}-${previewStudyTags?.length || 0}-${previewAnswer || 'none'}`}
                           item={{
                             ...previewQuestion,
                             exam_info: {

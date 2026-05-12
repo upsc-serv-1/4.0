@@ -161,9 +161,7 @@ function getSubjectColor(sub: string): string {
 // Uses per-card matching: only keywords that actually appear in this text
 // get highlighted, so cards matching "Krishnadevaraya" show that word in gold.
 function highlightKeywords(text: string, allKeywords: string[]): React.ReactNode {
-  const lowerText = text.toLowerCase();
-  // Only use keywords that actually appear in this card's text
-  const matchingKws = allKeywords.filter(k => k.length > 2 && lowerText.includes(k.toLowerCase()));
+  const matchingKws = allKeywords.filter(k => k.length > 2 && hasWholeWord(text, k));
   if (!matchingKws.length) return <Text>{text}</Text>;
   const escaped = matchingKws.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
   const pattern = new RegExp(`(${escaped.join('|')})`, 'gi');
@@ -180,6 +178,14 @@ function highlightKeywords(text: string, allKeywords: string[]): React.ReactNode
 // best keyword match. Priority: rawTerm in question_text > AI keywords.
 // Always shows context with the matched keyword highlighted, or a fallback
 // showing why this question appeared.
+// Uses word-boundary matching (\b) so "rain" doesn't match inside "training".
+
+const wholeWordRegex = (word: string): RegExp =>
+  new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+
+const hasWholeWord = (text: string, word: string): boolean =>
+  wholeWordRegex(word).test(text);
+
 function buildContextSnippet(
   text: string,
   keywords: string[],
@@ -192,29 +198,24 @@ function buildContextSnippet(
 
   // Priority 1: Try to match rawTerm (user's original query) in question_text
   if (rawTerm && rawTerm.length > 2) {
-    const rawLower = rawTerm.toLowerCase();
-    const rawWords = rawLower.split(/\s+/).filter(w => w.length > 2);
+    const rawWords = rawTerm.toLowerCase().split(/\s+/).filter(w => w.length > 2);
     for (const word of rawWords) {
-      if ((text || '').toLowerCase().includes(word)) {
+      if (hasWholeWord(text || '', word)) {
         return buildSnippetFromField(text || '', word, '', maxContextWords);
       }
     }
   }
 
   // Priority 2: Try AI keywords in question_text (no label)
-  const textLower = (text || '').toLowerCase();
-  const textKw = keywords.find(k => k.length > 2 && textLower.includes(k.toLowerCase()));
+  const textKw = keywords.find(k => k.length > 2 && hasWholeWord(text || '', k));
   if (textKw) {
     return buildSnippetFromField(text || '', textKw, '', maxContextWords);
   }
 
   // Priority 3: Try keywords in options
   if (options) {
-    const optsText = Object.entries(options)
-      .map(([k, v]) => `${k}: ${v}`)
-      .join(' ');
-    const optsLower = optsText.toLowerCase();
-    const optsKw = keywords.find(k => k.length > 2 && optsLower.includes(k.toLowerCase()));
+    const optsText = Object.entries(options).map(([k, v]) => `${k}: ${v}`).join(' ');
+    const optsKw = keywords.find(k => k.length > 2 && hasWholeWord(optsText, k));
     if (optsKw) {
       return buildSnippetFromField(optsText, optsKw, '(Options)', maxContextWords);
     }
@@ -222,8 +223,7 @@ function buildContextSnippet(
 
   // Priority 4: Try keywords in explanation
   if (explanation) {
-    const explLower = explanation.toLowerCase();
-    const explKw = keywords.find(k => k.length > 2 && explLower.includes(k.toLowerCase()));
+    const explKw = keywords.find(k => k.length > 2 && hasWholeWord(explanation, k));
     if (explKw) {
       return buildSnippetFromField(explanation, explKw, '(Explanation)', maxContextWords);
     }
@@ -233,7 +233,7 @@ function buildContextSnippet(
   const hint = keywords.find(k => k.length > 2) || '';
   const fallbackText = (text || '').slice(0, 150);
   if (hint) {
-    return <Text>{fallbackText}{fallbackText.length >= 150 ? '...' : ''} <Text style={{ fontSize: 9, color: '#888', fontStyle: 'italic' }}>(matched: {hint})</Text></Text>;
+    return <Text>{fallbackText}{fallbackText.length >= 150 ? '...' : ''} <Text style={{ fontSize: 9, color: '#888', fontStyle: 'italic' }}>(matched keyword: {hint})</Text></Text>;
   }
   return <Text>{fallbackText}</Text>;
 }
@@ -245,13 +245,12 @@ function buildSnippetFromField(
   label: string,
   maxContextWords: number,
 ): React.ReactNode {
-  const lower = fieldText.toLowerCase();
-  const matchIdx = lower.indexOf(keyword.toLowerCase());
-  if (matchIdx === -1) {
+  const match = fieldText.match(wholeWordRegex(keyword));
+  if (!match || match.index === undefined) {
     return <Text>{fieldText.slice(0, 150)}</Text>;
   }
-
-  const matchEnd = matchIdx + keyword.length;
+  const matchIdx = match.index;
+  const matchEnd = matchIdx + match[0].length;
   const beforeText = fieldText.slice(0, matchIdx);
   const beforeWords = beforeText.split(/\s+/).filter(Boolean);
   const contextBefore = beforeWords.slice(-maxContextWords).join(' ');

@@ -251,7 +251,7 @@ export default function NewCard() {
               </TouchableOpacity>
 
               {aiError && (
-                <Text style={[s.errorText, { color: colors.error }]}>
+                <Text style={[s.errorText, { color: colors.textSecondary }]}>
                   {aiError}
                 </Text>
               )}

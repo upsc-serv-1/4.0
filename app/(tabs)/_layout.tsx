@@ -76,6 +76,7 @@ export default function TabsLayout() {
     revise: { title: 'Repo', icon: RotateCcw },
     tracker: { title: 'Syllabus', icon: LayoutList },
     'ai-search': { title: 'Search', icon: Search },
+    noji_hub: { title: 'Noji Hub', icon: Home },
   };
 
   return (
@@ -89,7 +90,7 @@ export default function TabsLayout() {
         screenOptions={{
           headerShown: false,
           headerStyle: { backgroundColor: 'transparent' },
-          sceneContainerStyle: { backgroundColor: 'transparent' },
+          contentStyle: { backgroundColor: 'transparent' },
         }}
       >
         <Tabs.Screen name="index" options={{ title: 'Home' }} />

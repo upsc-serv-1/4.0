@@ -630,6 +630,29 @@ export function PilotV2GlanceView() {
                   ))}
                   <View style={[styles.divider, { backgroundColor: colors.border }]} />
                   <Text style={[styles.eog, { color: colors.textTertiary }]}>— End of Glance —</Text>
+
+                  {paperSize.w > 1 && paperSize.h > 1 && (
+                    <PencilCanvas
+                      engine={pencil.engine} tool={pencil.tool}
+                      width={paperSize.w} height={paperSize.h}
+                      drawingMode={pencil.drawingMode}
+                      onCommit={persistGlanceStrokes}
+                      blockLayouts={blockLayoutsRef.current}
+                      blockLayoutVersion={blockLayoutVersion}
+                    />
+                  )}
+
+                  {paperSize.w > 1 && paperSize.h > 1 && (
+                    <WashiTapeLayer
+                      tapes={washiTapes}
+                      width={paperSize.w} height={paperSize.h}
+                      drawingMode={washiMode}
+                      activeColor={washiColor}
+                      onAdd={(t) => persistWashi([...washiTapes, t])}
+                      onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
+                      onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
+                    />
+                  )}
                 </View>
               </View>
             </ScrollView>
@@ -637,40 +660,7 @@ export function PilotV2GlanceView() {
         </GestureDetector>
       </View>
 
-      {/* Pencil canvas — rendered OUTSIDE the ScrollView and GestureDetector as
-          an absolutely-positioned overlay so its draw gesture NEVER competes
-          with the ScrollView's internal pan or the outer pinch/zoom gesture.
-          When drawingMode=false, pointerEvents='none' lets all touches pass
-          through to the scroll view below. */}
-      {paperSize.w > 1 && paperSize.h > 1 && (
-        <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
-          <PencilCanvas
-            engine={pencil.engine} tool={pencil.tool}
-            width={paperSize.w} height={paperSize.h}
-            drawingMode={pencil.drawingMode}
-            onCommit={persistGlanceStrokes}
-            blockLayouts={blockLayoutsRef.current}
-            blockLayoutVersion={blockLayoutVersion}
-          />
-        </View>
-      )}
 
-      {/* Washi Tape layer — rendered OUTSIDE GestureDetector so its pan gesture
-          is NOT intercepted by pinch/zoom. Positioned absolutely on top. */}
-      {paperSize.w > 1 && paperSize.h > 1 && (
-        <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
-          <WashiTapeLayer
-            tapes={washiTapes}
-            width={paperSize.w}
-            height={paperSize.h}
-            drawingMode={washiMode}
-            activeColor={washiColor}
-            onAdd={(t) => persistWashi([...washiTapes, t])}
-            onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
-            onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
-          />
-        </View>
-      )}
 
       {/* Zoom help bar */}
       {isZoomed && (

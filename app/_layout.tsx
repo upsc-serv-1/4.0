@@ -56,7 +56,7 @@ function RootStack() {
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
       <LinearGradient
-        colors={colors?.bgGradient || ['#f8fafc', '#f1f5f9']}
+        colors={(colors?.bgGradient || ['#f8fafc', '#f1f5f9']) as [string, ...string[]]}
         style={StyleSheet.absoluteFill}
         locations={[0, 1]}
         start={{ x: 0, y: 0 }}

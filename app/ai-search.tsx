@@ -513,6 +513,7 @@ export default function AISearchTab() {
             setPreviewNotes('');
           }
         })
+        .then(() => {})
         .catch(() => setPreviewNotes(''));
     }
 
@@ -598,9 +599,10 @@ export default function AISearchTab() {
             if (!previewAnswer) setPreviewAnswer(data.selected_answer);
           }
         })
-        .catch(err => console.error("Tag sync check failed:", err));
+        .then(() => {})
+        .catch((err: any) => console.error("Tag sync check failed:", err));
     }
-  }, [previewQuestion?.id, session?.user?.id, ensureBestAnswerLoaded]);
+  }, [previewQuestion?.id, session?.user?.id]);
 
   const handleToggleTag = async (qid: string, currentTags: string[], tag: string) => {
     if (!session?.user?.id) return;

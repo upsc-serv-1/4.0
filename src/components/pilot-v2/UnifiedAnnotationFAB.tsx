@@ -81,6 +81,9 @@ export function UnifiedAnnotationFAB({
       damping: 18,
       stiffness: 160,
     });
+    if (next) {
+      onModeChange(mode);
+    }
     ping();
   };
 

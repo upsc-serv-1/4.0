@@ -158,7 +158,7 @@ function StickyHeatmapTable({
   onRowPress?: (rowLabel: string) => void;
   onLabelActionPress?: (rowLabel: string) => void;
   onYearPress?: (year: string) => void;
-  heatmapPalette: 'spectral' | 'ocean' | 'sunset' | 'forest';
+  heatmapPalette: 'spectral' | 'ocean';
   maxValue?: number;
   labelWidth?: number;
   compactLabel?: boolean;
@@ -374,7 +374,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const [focusMicro, setFocusMicro] = useState('All');
   const [exportSubject, setExportSubject] = useState('');
 
-  const [heatmapPalette, setHeatmapPalette] = useState<'spectral' | 'ocean' | 'sunset' | 'forest'>('spectral');
+  const [heatmapPalette, setHeatmapPalette] = useState<'spectral' | 'ocean'>('spectral');
 
   // Auto-scroll refs/coords for PYQ analysis heatmap (Issue #20)
   const mainScrollRef = useRef<ScrollView | null>(null);

@@ -686,6 +686,11 @@ export default function NoteEditor() {
           includeChecklist: pdfIncludeChecklist,
           spacing: pdfSpacing,
           fontFamily: pdfFontFamily,
+          pageMarginTopCm: 1,
+          pageMarginRightCm: 1,
+          pageMarginBottomCm: 1,
+          pageMarginLeftCm: 1,
+          marginMultiplier: 1,
         },
       });
 
@@ -696,7 +701,7 @@ export default function NoteEditor() {
         try {
           // Share with generous timeout for large PDFs
           await Promise.race([
-            Sharing.shareAsync(uri, { UTIType: 'com.adobe.pdf', mimeType: 'application/pdf' }),
+            Sharing.shareAsync(uri, { mimeType: 'application/pdf' }),
             new Promise<void>((resolve) => setTimeout(resolve, 20000)), // 20 second timeout
           ]).catch(() => {
             console.warn('[NoteExport] Share operation timed out or was dismissed (non-fatal)');

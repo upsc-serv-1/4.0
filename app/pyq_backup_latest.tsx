@@ -468,11 +468,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     setTopicYearHeatmap({});
     setTopTopics([]);
     setTrendSubjects([]);
-    setSelectedSubject(null);
-    setSelectedSection(null);
-    setHeatmapSubject('All');
-    setSectionData([]);
-    setMicroTopicData([]);
+    setSelSubjects([]);
+    setSelSections([]);
+    setFocusSubject('All');
+    setSelMicros([]);
   };
 
   const processAnalytics = (data: any[]) => {

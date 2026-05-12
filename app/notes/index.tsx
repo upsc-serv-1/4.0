@@ -1140,7 +1140,7 @@ export default function NotesIndex() {
           visible={contextMenu.visible}
           transparent
           animationType="fade"
-          onRequestClose={() => setContextMenu({ visible: false, node: null })}
+          onRequestClose={() => setContextMenu({ visible: false, node: null, x: 0, y: 0 })}
         >
           <Pressable 
             style={styles.modalOverlay} 
@@ -1160,7 +1160,7 @@ export default function NotesIndex() {
                 style={styles.contextItem}
                 onPress={() => {
                   const node = contextMenu.node;
-                  setContextMenu({ visible: false, node: null });
+                  setContextMenu({ visible: false, node: null, x: 0, y: 0 });
                   if (node) {
                     setCreateParentId(node.id);
                     setCreateType('folder');
@@ -1176,7 +1176,7 @@ export default function NotesIndex() {
                 style={styles.contextItem}
                 onPress={() => {
                   const node = contextMenu.node;
-                  setContextMenu({ visible: false, node: null });
+                  setContextMenu({ visible: false, node: null, x: 0, y: 0 });
                   if (node) {
                     setEditFolderTitle(node.title);
                     setActionNodeId(node.id);
@@ -1192,7 +1192,7 @@ export default function NotesIndex() {
                 style={styles.contextItem}
                 onPress={() => {
                   const node = contextMenu.node;
-                  setContextMenu({ visible: false, node: null });
+                  setContextMenu({ visible: false, node: null, x: 0, y: 0 });
                   if (node) {
                     setRenameValue(node.title);
                     setActionNodeId(node.id);
@@ -1210,7 +1210,7 @@ export default function NotesIndex() {
                 style={styles.contextItem}
                 onPress={() => {
                   const node = contextMenu.node;
-                  setContextMenu({ visible: false, node: null });
+                  setContextMenu({ visible: false, node: null, x: 0, y: 0 });
                   if (node) doDelete(node);
                 }}
               >

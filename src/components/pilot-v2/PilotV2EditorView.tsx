@@ -853,10 +853,7 @@ export function PilotV2EditorView() {
           scrollEventThrottle={16}
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: false, listener: (e: any) => {
-              const y = e?.nativeEvent?.contentOffset?.y ?? 0;
-              setScrollOffset(y);
-            }}
+            { useNativeDriver: false }
           )}
         >
           <GestureDetector gesture={editorComposedGesture}>
@@ -1782,6 +1779,7 @@ const styles = StyleSheet.create({
 
   canvas: { padding: 24, paddingBottom: 80 },
   paper: {
+    position: 'relative',
     padding: 28, borderRadius: 12, borderWidth: 0, gap: 8, maxWidth: 1100, alignSelf: 'center', width: '100%',
     backgroundColor: '#ffffff',
     shadowColor: '#0F172A', shadowOpacity: 0.04, shadowRadius: 20, shadowOffset: { width: 0, height: 8 },

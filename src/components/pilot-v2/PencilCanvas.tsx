@@ -34,11 +34,7 @@ interface Props {
   width: number;
   /** Height of the page in px (full document height). */
   height: number;
-  /** Vertical scroll offset in px — applied via Skia Group.transform so
-   *  all strokes (committed + active + lasso) shift together with the
-   *  scroll position. Skia's native GPU surface does NOT respond to RN's
-   *  ScrollView clipping, so we must transform paths ourselves. */
-  scrollY?: number;
+
   /** When false, the canvas is purely visual & lets touches pass through. */
   drawingMode: boolean;
   /** Called after every committed stroke — host persists to MMKV/Supabase. */
@@ -65,7 +61,7 @@ const withAlpha = (hex: string, alpha: number): string => {
 
 export function PencilCanvas({
   engine, tool = 'pen', width, height, drawingMode, onCommit, testID,
-  blockLayouts, blockLayoutVersion = 0, scrollY = 0,
+  blockLayouts, blockLayoutVersion = 0,
 }: Props) {
   const [committedStrokes, setCommittedStrokes] = useState<PilotV2PencilStroke[]>(engine.getPersisted());
   const [activeStroke, setActiveStroke] = useState<PilotV2PencilStroke | null>(engine.getCurrent());
@@ -141,10 +137,9 @@ export function PencilCanvas({
     setActivePathStr('');
   }, []);
 
-  // Debug logging for drawing mode
   useEffect(() => {
-    console.log('[PencilCanvas] drawingMode changed to:', drawingMode, 'tool:', tool);
-  }, [drawingMode, tool]);
+    engine.setConfig({ pageWidth: width, pageHeight: height });
+  }, [engine, width, height]);
 
   useEffect(() => {
     // PERSISTED listener — refresh the committed-strokes layer ONLY when a
@@ -296,15 +291,12 @@ export function PencilCanvas({
       testID={testID || 'pilot-v2-pencil-canvas'}
       pointerEvents={drawingMode ? 'auto' : 'none'}
       style={[styles.layer, { width, height }]}
+      collapsable={false}
     >
       <GestureDetector gesture={drawGesture}>
         <Animated.View style={{ width, height }}>
           <Canvas style={{ width, height }}>
-            {/* 🔧 Skia Group.transform translates all child paths (committed,
-                active, lasso) by -scrollY so strokes scroll with the document.
-                Skia's GPU surface ignores RN transform / ScrollView clipping,
-                so we must shift paths within Skia's own coordinate space. */}
-            <Group transform={[{ translateY: -scrollY }]}>
+            <Group>
               {/* Committed strokes — memoised so they DO NOT re-render when
                   the active path string updates on every move event. */}
               <CommittedStrokesLayer strokes={committedStrokes} width={width} height={height} blockLayouts={blockLayouts} blockLayoutVersion={blockLayoutVersion} />
@@ -459,6 +451,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     backgroundColor: 'transparent',
+    overflow: 'hidden',
   },
 });
 

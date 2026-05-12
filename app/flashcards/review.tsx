@@ -932,7 +932,7 @@ export default function ReviewScreen() {
                             borderWidth: 1, borderColor: colors.border,
                           }}
                         >
-                          {savingBest ? <ActivityIndicator size="small" color={colors.primary} /> : <SaveIcon size={12} color={colors.primary} />}
+                          {savingBest ? <ActivityIndicator size="small" color={colors.primary} /> : <Save size={12} color={colors.primary} />}
                           <Text style={{ fontSize: 11, fontWeight: '800', color: colors.primary }}>Save to My Vitamin</Text>
                         </TouchableOpacity>
                       )}

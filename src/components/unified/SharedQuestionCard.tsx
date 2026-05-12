@@ -657,13 +657,13 @@ export const SharedQuestionCard = ({
                 {showExplanation && selectedExplSource !== 'my_note' && viewerKind !== 'vitamin' && effectiveExplanationText && (
                   <TouchableOpacity
                     onPress={() => handleCopy(effectiveExplanationText)}
-                    style={{ 
-                      flexDirection: 'row', 
-                      alignItems: 'center', 
-                      gap: 6, 
-                      marginTop: 12, 
-                      padding: 8, 
-                      borderRadius: 8, 
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 6,
+                      marginTop: 12,
+                      padding: 8,
+                      borderRadius: 8,
                       backgroundColor: effectiveColors.primary + '10',
                       alignSelf: 'flex-start'
                     }}
@@ -671,6 +671,31 @@ export const SharedQuestionCard = ({
                     <Copy size={14} color={effectiveColors.primary} />
                     <Text style={{ fontSize: 11, fontWeight: '800', color: effectiveColors.primary }}>Copy</Text>
                   </TouchableOpacity>
+                )}
+
+                {/* Source metadata — institute, program, test, source info */}
+                {showExplanation && selectedExplSource !== 'my_note' && (
+                  <View style={{ alignItems: 'center', marginTop: 10, paddingTop: 8, borderTopWidth: 1, borderTopColor: effectiveColors.border + '40' }}>
+                    {safeIdx >= 0 && displayExplanations[safeIdx] ? (
+                      <Text style={{ fontSize: 9, color: effectiveColors.textTertiary, textAlign: 'center' }}>
+                        {displayExplanations[safeIdx].source}
+                        {displayExplanations[safeIdx]?.program ? ` · ${displayExplanations[safeIdx].program}` : ''}
+                        {displayExplanations[safeIdx]?.year ? ` (${displayExplanations[safeIdx].year})` : ''}
+                      </Text>
+                    ) : safeIdx === -1 && availableExplSources.length > 1 ? (
+                      <Text style={{ fontSize: 9, color: effectiveColors.textTertiary, textAlign: 'center' }}>
+                        {availableExplSources.length} sources
+                      </Text>
+                    ) : null}
+                    {(displayExplanations[safeIdx] || item.tests?.title) && (
+                      <Text style={{ fontSize: 9, color: effectiveColors.textTertiary, textAlign: 'center', marginTop: 2 }}>
+                        {item.tests?.title ? `Test: ${item.tests.title}` : ''}
+                        {item.tests?.program_name ? ` · ${item.tests.program_name}` : ''}
+                        {item.tests?.institute ? ` · ${item.tests.institute}` : ''}
+                        {!item.tests && item.source?.group ? ` · Source: ${item.source.group}` : ''}
+                      </Text>
+                    )}
+                  </View>
                 )}
 
                 {/* Vitamin Actions */}

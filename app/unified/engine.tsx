@@ -3754,6 +3754,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
             </Modal>
 
             {showIndex ? renderQuestionIndex() : (
+              <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
               <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
                 <View style={{ flex: 1 }}>
               {viewMode === 'paper' ? (
@@ -3846,6 +3847,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
               )}
                 </View>
               </PinchGestureHandler>
+              </KeyboardAvoidingView>
             )}
           </>
         )}

@@ -843,7 +843,7 @@ export function PilotV2EditorView() {
         />
       )}
 
-      <View style={{ flex: 1, flexDirection: 'row' }}>
+      <View style={{ flex: 1, flexDirection: 'row', position: 'relative' }}>
         <Animated.ScrollView
           testID="pilot-v2-editor-canvas"
           style={{ flex: 1, backgroundColor: '#F9FAFB' }}
@@ -913,50 +913,51 @@ export function PilotV2EditorView() {
               <Text style={{ color: colors.textTertiary, fontSize: 13 }}>Add block</Text>
             </TouchableOpacity>
 
-            {/* Pencil canvas — Skia renders to a native surface that does NOT
-                respect React Native's ScrollView scroll offset. We wrap it in
-                an Animated.View that applies the inverse scroll transform so
-                strokes follow the content. */}
-            {paperSize.w > 1 && paperSize.h > 1 && (
-              <Animated.View
-                pointerEvents={pencil.drawingMode ? 'auto' : 'none'}
-                style={[StyleSheet.absoluteFill, { transform: [{ translateY: Animated.multiply(scrollY, -1) }] }]}
-              >
-                <PencilCanvas
-                  engine={pencil.engine}
-                  tool={pencil.tool}
-                  width={paperSize.w}
-                  height={paperSize.h}
-                  drawingMode={pencil.drawingMode}
-                  onCommit={(strokes) => persistStrokes(strokes)}
-                  blockLayouts={blockLayoutsRef.current}
-                  blockLayoutVersion={blockLayoutVersion}
-                />
-              </Animated.View>
-            )}
-
-            {/* Washi Tape layer — same scroll-fix as PencilCanvas above */}
-            {paperSize.w > 1 && paperSize.h > 1 && (
-              <Animated.View
-                pointerEvents={washiMode ? 'auto' : 'none'}
-                style={[StyleSheet.absoluteFill, { transform: [{ translateY: Animated.multiply(scrollY, -1) }] }]}
-              >
-                <WashiTapeLayer
-                  tapes={washiTapes}
-                  width={paperSize.w}
-                  height={paperSize.h}
-                  drawingMode={washiMode}
-                  activeColor={washiColor}
-                  onAdd={(t) => persistWashi([...washiTapes, t])}
-                  onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
-                  onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
-                />
-              </Animated.View>
-            )}
-
             </AnimatedReanimated.View>
           </GestureDetector>
         </Animated.ScrollView>
+
+        {/* 🔧 FIX: Pencil canvas + Washi Tape moved OUTSIDE the ScrollView so they
+            render at viewport level. StyleSheet.absoluteFill inside a ScrollView uses
+            the content coordinate system, making the inverse scroll transform unreliable.
+            At viewport level, absoluteFill is screen-fixed and translateY(-scrollY)
+            correctly cancels scroll, keeping strokes anchored to their content position. */}
+        {paperSize.w > 1 && paperSize.h > 1 && (
+          <Animated.View
+            pointerEvents={pencil.drawingMode ? 'auto' : 'none'}
+            style={[StyleSheet.absoluteFill, { transform: [{ translateY: Animated.multiply(scrollY, -1) }] }]}
+          >
+            <PencilCanvas
+              engine={pencil.engine}
+              tool={pencil.tool}
+              width={paperSize.w}
+              height={paperSize.h}
+              drawingMode={pencil.drawingMode}
+              onCommit={(strokes) => persistStrokes(strokes)}
+              blockLayouts={blockLayoutsRef.current}
+              blockLayoutVersion={blockLayoutVersion}
+            />
+          </Animated.View>
+        )}
+
+        {/* Washi Tape layer — same viewport-level fix */}
+        {paperSize.w > 1 && paperSize.h > 1 && (
+          <Animated.View
+            pointerEvents={washiMode ? 'auto' : 'none'}
+            style={[StyleSheet.absoluteFill, { transform: [{ translateY: Animated.multiply(scrollY, -1) }] }]}
+          >
+            <WashiTapeLayer
+              tapes={washiTapes}
+              width={paperSize.w}
+              height={paperSize.h}
+              drawingMode={washiMode}
+              activeColor={washiColor}
+              onAdd={(t) => persistWashi([...washiTapes, t])}
+              onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
+              onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
+            />
+          </Animated.View>
+        )}
 
         {isTablet && (
           <AnimatedReanimated.View style={[styles.outlinePanel, { borderLeftColor: colors.border, paddingTop: 130 }, animatedOutlineStyle]}>

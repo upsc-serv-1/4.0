@@ -341,7 +341,7 @@ export const UnifiedExportSheet: React.FC<Props> = ({
               </Section>
             )}
 
-            {(payload?.kind === 'questions' || payload?.kind === 'tags') && (
+            {(payload?.kind === 'questions' || payload?.kind === 'tags' || payload?.kind === 'flashcards') && (
               <Section title="Q&A Highlight" colors={colors}>
                 <Label colors={colors}>LAYOUT</Label>
                 <Row>{CHOICES.qaLayouts.map(q => <Chip key={q.id} active={opts.qaLayoutMode === q.id} onPress={() => set('qaLayoutMode', q.id)}>{q.label}</Chip>)}</Row>

@@ -276,7 +276,14 @@ const getExportExamInfo = (q: ExportQuestion): Record<string, any> => {
  * Build a PYQ chip label matching the SharedQuestionCard behavior.
  * Returns null when no PYQ data should be shown.
  */
-const getExportPyqChip = (q: ExportQuestion): string | null => {
+interface PyqChipInfo {
+  label: string;
+  isUPSC: boolean;
+  isAllied: boolean;
+  isOther: boolean;
+}
+
+const getExportPyqChip = (q: ExportQuestion): PyqChipInfo | null => {
   if (!toBool(q.is_pyq)) return null;
   const examInfo = getExportExamInfo(q);
   let rawGroup = String(examInfo?.group || examInfo?.exam_name || '').trim();
@@ -308,7 +315,12 @@ const getExportPyqChip = (q: ExportQuestion): string | null => {
     else groupName = 'PYQ';
   }
 
-  return `${groupName} ${year}`.trim();
+  return {
+    label: `${groupName} ${year}`.trim(),
+    isUPSC,
+    isAllied,
+    isOther,
+  };
 };
 
 const baseCss = (o: ExportOptions) => {
@@ -386,7 +398,11 @@ const baseCss = (o: ExportOptions) => {
     .qstem b, .qstem strong { font-weight: 700; }
     .metarow { opacity: 0.7; font-size: ${o.fontSize - 3}pt; margin-top: 1mm; }
     .pill { display: inline-block; padding: 1px 6px; border-radius: 10px; background: var(--rule); color: var(--fg); font-size: ${o.fontSize - 4}pt; margin-right: 4px; }
-    .q-chip-bar { display: flex; flex-wrap: wrap; gap: 3px; flex-shrink: 0; max-width: 50%; justify-content: flex-end; }
+    .q-chip-bar { display: flex; flex-wrap: wrap; gap: 4px; flex-shrink: 0; max-width: 50%; justify-content: flex-end; }
+    .pyq-chip { display: inline-block; padding: 2px 10px; border-radius: 14px; font-size: ${o.fontSize - 2}pt; font-weight: 800; }
+    .q-breadcrumb { font-size: ${o.fontSize - 3}pt; color: var(--fg); opacity: 0.7; margin-bottom: 1mm; }
+    .q-breadcrumb-arrow { margin: 0 2px; opacity: 0.5; }
+    .q-breadcrumb-chip { display: inline-block; padding: 0 6px; border-radius: 6px; background: #e0f2fe; color: #0369a1; font-weight: 700; font-size: ${o.fontSize - 4}pt; margin-left: 4px; }
     .opts { margin: 2mm 0 0 4mm; padding: 0; list-style: none; }
     .opts li { margin: 1mm 0; padding: 1mm 2mm; border-radius: 4px; }
     .opts li.correct { background: rgba(34,197,94,0.12); border-left: 3px solid #22c55e; }
@@ -684,26 +700,32 @@ export const sortQuestions = (rows: ExportQuestion[], o: ExportOptions): ExportQ
 
 // ---------- Questions ----------
 
+/** Build hierarchy breadcrumb: Subject → Section → Microtopic */
+const buildHierarchyBreadcrumb = (q: ExportQuestion): string => {
+  const parts: string[] = [];
+  if (q.subject) parts.push(escapeHtml(q.subject));
+  if (q.section_group) parts.push(escapeHtml(q.section_group));
+  if (q.micro_topic) parts.push(escapeHtml(q.micro_topic));
+  if (parts.length === 0) return '';
+  return `<div class="q-breadcrumb">${parts.join(' <span class="q-breadcrumb-arrow">→</span> ')}${q.is_ncert ? ' <span class="q-breadcrumb-chip">NCERT</span>' : ''}</div>`;
+};
+
+/** Build PYQ + chip bar (styled with SharedQuestionCard colors) */
 const buildQuestionChips = (q: ExportQuestion, o: ExportOptions): string => {
   const chips: string[] = [];
-  
-  // Meta chips (subject, section_group, micro_topic, year)
-  if (o.showMetaChips) {
-    if (q.subject) chips.push(escapeHtml(q.subject));
-    if (q.section_group) chips.push(escapeHtml(q.section_group));
-    if (q.micro_topic) chips.push(escapeHtml(q.micro_topic));
-    if (q.exam_year) chips.push(escapeHtml(String(q.exam_year)));
-    if (q.is_ncert) chips.push('NCERT');
-  }
-  
+
   // PYQ chip using the proper categorization that matches SharedQuestionCard
   if (o.showPYQChips) {
     const pyqChip = getExportPyqChip(q);
-    if (pyqChip) chips.push(escapeHtml(pyqChip));
+    if (pyqChip) {
+      const chipBg = pyqChip.isUPSC ? '#dcfce7' : pyqChip.isAllied ? '#fef9c3' : pyqChip.isOther ? '#f1f5f9' : '#ede9fe';
+      const chipFg = pyqChip.isUPSC ? '#15803d' : pyqChip.isAllied ? '#a16207' : pyqChip.isOther ? '#475569' : '#7c3aed';
+      chips.push(`<span class="pyq-chip" style="background:${chipBg};color:${chipFg}">${escapeHtml(pyqChip.label)}</span>`);
+    }
   }
-  
+
   if (chips.length === 0) return '';
-  return `<div class="q-chip-bar">${chips.map(c => `<span class="pill">${c}</span>`).join('')}</div>`;
+  return `<div class="q-chip-bar">${chips.join('')}</div>`;
 };
 
 const renderQaLayoutBlock = (questionHtml: string, answerHtml: string, chipsHtml: string, o: ExportOptions): string => {
@@ -792,6 +814,7 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
 
     const questionBlock = `
       <div class="qstem"><span class="qnum">${i + 1}.</span>${renderInline(stem)}${metricsBlock}</div>
+      ${o.showMetaChips ? buildHierarchyBreadcrumb(q) : ''}
       ${optsBlock}
     `;
 
@@ -985,10 +1008,18 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
 // ---------- Flashcards ----------
 
 export const buildFlashcardsHtml = (rows: ExportFlashcard[], o: ExportOptions): string => {
+  const qaBg = o.qaBackgroundColor || 'transparent';
+  const qBg = o.qaQuestionBackgroundColor || qaBg;
+  const aBg = o.qaAnswerBackgroundColor || qaBg;
+  const boxBg = o.qaLayoutMode === 'split' ? qBg : qaBg;
+  const answerBoxBg = o.qaLayoutMode === 'split' ? aBg : qaBg;
+  const anyBgVisible = boxBg !== 'transparent' || answerBoxBg !== 'transparent';
+  const cardBorder = anyBgVisible ? 'rgba(15, 23, 42, 0.12)' : 'var(--rule)';
+
   const cards = rows.map(c => `
-    <div class="card">
-      <div class="side"><div style="font-size:${o.fontSize - 3}pt;font-weight:800;color:var(--accent);letter-spacing:1px;margin-bottom:1mm">FRONT</div><div>${renderInline(c.front)}</div></div>
-      <div class="side"><div style="font-size:${o.fontSize - 3}pt;font-weight:800;color:var(--accent);letter-spacing:1px;margin-bottom:1mm">BACK</div><div>${renderInline(c.back)}</div>${c.state ? `<div style="margin-top:2mm"><span class="card-state">${c.state}</span></div>` : ''}</div>
+    <div class="card" style="background:${boxBg};border-color:${cardBorder}">
+      <div class="side" style="${o.qaLayoutMode === 'split' ? `background:${qBg};` : ''}border-right-color:${cardBorder}"><div style="font-size:${o.fontSize - 3}pt;font-weight:800;color:var(--accent);letter-spacing:1px;margin-bottom:1mm">FRONT</div><div>${renderInline(c.front)}</div></div>
+      <div class="side" style="${o.qaLayoutMode === 'split' ? `background:${aBg};` : ''}border-right:none"><div style="font-size:${o.fontSize - 3}pt;font-weight:800;color:var(--accent);letter-spacing:1px;margin-bottom:1mm">BACK</div><div>${renderInline(c.back)}</div>${c.state ? `<div style="margin-top:2mm"><span class="card-state">${c.state}</span></div>` : ''}</div>
     </div>`).join('');
   return wrap(o, cards);
 };

@@ -17,7 +17,7 @@ import Animated, {
 import {
   Plus, Search as SearchIcon, X, Flame, Clock, Sparkles, Layers, ArrowUpDown,
   Folder, CheckCircle2, Minus, ChevronLeft, ArrowUpRight, Settings, MoreVertical,
-  FolderPlus, Play, ChevronRight, Trash, Check
+  FolderPlus, Play, ChevronRight, Trash, Check, FileDown
 } from 'lucide-react-native';
 import { supabase } from '../src/lib/supabase';
 import { useAuth } from '../src/context/AuthContext';
@@ -130,6 +130,79 @@ export default function FlashcardsHub() {
         },
       ]
     );
+  };
+
+  const handleBulkExport = async () => {
+    if (selectedIds.size === 0 || !uid) return;
+    try {
+      setPreparingExportId('__bulk__');
+      const selectedNodes = BranchSvc.flatten(tree).filter(n => selectedIds.has(n.id));
+
+      // Collect card IDs from all selected branches recursively
+      const allCardIds: string[] = [];
+      for (const node of selectedNodes) {
+        const ids = await BranchSvc.listCardIdsInBranch(node.id, {
+          recursive: true,
+          userId: uid,
+        });
+        allCardIds.push(...ids);
+      }
+
+      if (allCardIds.length === 0) {
+        Alert.alert('Nothing to export', 'Selected decks have no cards yet.');
+        return;
+      }
+
+      const uniqueCardIds = [...new Set(allCardIds)];
+      const { data, error } = await supabase
+        .from('user_cards')
+        .select(`
+          card_id,
+          learning_status,
+          cards!inner(
+            id,
+            front_text,
+            back_text,
+            question_text,
+            answer_text,
+            subject,
+            section_group,
+            microtopic
+          )
+        `)
+        .eq('user_id', uid)
+        .eq('status', 'active')
+        .in('card_id', uniqueCardIds);
+
+      if (error) throw error;
+
+      const rows: ExportFlashcard[] = (data ?? []).map((row: any) => {
+        const card = Array.isArray(row.cards) ? row.cards[0] : row.cards;
+        return {
+          id: row.card_id,
+          front: String(card?.front_text || card?.question_text || '').trim() || 'Front unavailable',
+          back: String(card?.back_text || card?.answer_text || '').trim() || 'Back unavailable',
+          deck: selectedNodes.length === 1 ? selectedNodes[0].name : 'Bulk Export',
+          state: normalizeLearningState(row.learning_status),
+          subject: card?.subject || undefined,
+          micro_topic: card?.microtopic || card?.section_group || undefined,
+        };
+      });
+
+      const uniqueRows: ExportFlashcard[] = Array.from(new Map<string, ExportFlashcard>(rows.map((r) => [r.id, r])).values());
+      if (uniqueRows.length === 0) {
+        Alert.alert('Nothing to export', 'Selected decks have no active cards yet.');
+        return;
+      }
+
+      setExportPayload({ kind: 'flashcards', rows: uniqueRows } as ExportPayload);
+      setExportTitle(`${selectedIds.size} Deck${selectedIds.size > 1 ? 's' : ''} · ${uniqueRows.length} Cards`);
+      setExportSheetVisible(true);
+    } catch (e: any) {
+      Alert.alert('Export failed', e?.message || 'Could not prepare flashcards export.');
+    } finally {
+      setPreparingExportId(null);
+    }
   };
   
   const FOLDER_COLORS = DEFAULT_BRANCH_COLORS;
@@ -431,8 +504,15 @@ export default function FlashcardsHub() {
                 >
                   <Text style={{ color: colors.primary, fontWeight: '700', fontSize: 14 }}>Select All</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  onPress={handleBulkDelete} 
+                <TouchableOpacity
+                  onPress={handleBulkExport}
+                  disabled={selectedIds.size === 0}
+                  style={[styles.iconBtn, { width: 'auto', paddingHorizontal: 10, opacity: selectedIds.size === 0 ? 0.4 : 1 }]}
+                >
+                  <Text style={{ color: '#06b6d4', fontWeight: '700', fontSize: 14 }}>Export</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleBulkDelete}
                   disabled={selectedIds.size === 0}
                   style={[styles.iconBtn, { opacity: selectedIds.size === 0 ? 0.4 : 1 }]}
                 >
@@ -567,11 +647,11 @@ export default function FlashcardsHub() {
                 sub="Organize decks into folders" 
                 onPress={() => { setAddMenuVisible(false); setCreateModal({ type: 'folder' }); }} 
               />
-              <AddMenuItem 
-                icon={<Trash size={22} color="#ef4444" />} 
-                title="Select & Delete" 
-                sub="Select and delete multiple folders/decks" 
-                onPress={() => { setAddMenuVisible(false); setIsSelectionMode(true); setSelectedIds(new Set()); }} 
+              <AddMenuItem
+                icon={<Layers size={22} color="#06b6d4" />}
+                title="Select to Manage"
+                sub="Select multiple decks to export or delete"
+                onPress={() => { setAddMenuVisible(false); setIsSelectionMode(true); setSelectedIds(new Set()); }}
               />
             </View>
           </Pressable>

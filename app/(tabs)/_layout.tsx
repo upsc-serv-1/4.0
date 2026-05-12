@@ -1,5 +1,5 @@
 import { Tabs, useSegments, useRouter, Redirect, useFocusEffect } from 'expo-router';
-import { Home, BarChart2, RotateCcw, LayoutList, Tag, Target, FileText, TrendingUp, BarChart3, Layers, Database, PenTool, Brain, Sparkles, BookOpen, Compass, Globe } from 'lucide-react-native';
+import { Home, BarChart2, RotateCcw, LayoutList, Tag, Target, FileText, TrendingUp, BarChart3, Layers, Database, PenTool, Sparkles, BookOpen, Compass, Globe, Search } from 'lucide-react-native';
 import { useAuth } from '../../src/context/AuthContext';
 import { View, ActivityIndicator, ScrollView, TouchableOpacity, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import { useTheme } from '../../src/context/ThemeContext';
@@ -41,22 +41,41 @@ export default function TabsLayout() {
 
   if (!session) return <Redirect href="/(auth)/login" />;
 
+  // Distinct accent colors for each tab icon (vibrant, not just gray)
+  const TAB_COLORS: Record<string, string> = {
+    index: '#6366f1',       // Indigo
+    arena: '#ef4444',       // Red
+    analyse: '#14b8a6',     // Teal
+    pyq: '#f59e0b',         // Amber
+    flashcards: '#8b5cf6',  // Purple
+    tags: '#06b6d4',        // Cyan
+    'pilot-v2': '#10b981',  // Emerald
+    browser: '#ec4899',     // Pink
+    revise: '#3b82f6',      // Blue
+    tracker: '#f97316',     // Orange
+    'ai-search': '#6366f1', // Indigo
+    notes: '#a855f7',       // Violet
+    hardnotes: '#ef4444',   // Red
+    capsule: '#eab308',     // Yellow
+    softnotes: '#14b8a6',   // Teal
+  };
+
   const TAB_DEFINITIONS: Record<TabKey, { title: string; icon: any }> = {
     index: { title: 'Home', icon: Home },
     arena: { title: 'Arena', icon: Target },
     analyse: { title: 'Analyse', icon: BarChart2 },
-    pyq: { title: 'PYQs', icon: BarChart3 },
-    flashcards: { title: 'Cards', icon: Layers },
+    pyq: { title: 'PYQ Analysis', icon: BarChart3 },
+    flashcards: { title: 'Flashcards', icon: Layers },
     tags: { title: 'Tags', icon: Tag },
     notes: { title: 'Notes', icon: FileText },
     hardnotes: { title: 'Hardnotes', icon: PenTool },
     capsule: { title: 'Capsule', icon: Sparkles },
-    'pilot-v2': { title: 'Pilot V2', icon: Compass },
-    browser: { title: 'Browser', icon: Globe },
+    'pilot-v2': { title: 'Notes V4', icon: Compass },
+    browser: { title: 'Ghost Browser', icon: Globe },
     softnotes: { title: 'Softnotes', icon: BookOpen },
     revise: { title: 'Revise', icon: RotateCcw },
-    tracker: { title: 'Tracker', icon: LayoutList },
-    'ai-search': { title: 'AI Search', icon: Brain },
+    tracker: { title: 'Syllabus Tracker', icon: LayoutList },
+    'ai-search': { title: 'Search', icon: Search },
   };
 
   return (
@@ -65,7 +84,7 @@ export default function TabsLayout() {
         tabBar={(props) => {
           const currentRouteName = props.state.routes[props.state.index].name;
           if (currentRouteName !== 'index' && currentRouteName !== 'revise') return null;
-          return <ScrollableTabBar {...props} colors={colors} order={tabOrder} defs={TAB_DEFINITIONS} />;
+          return <ScrollableTabBar {...props} colors={colors} order={tabOrder} defs={TAB_DEFINITIONS} tabColors={TAB_COLORS} />;
         }}
         screenOptions={{
           headerShown: false,
@@ -80,7 +99,7 @@ export default function TabsLayout() {
   );
 }
 
-function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs }: any) {
+function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs, tabColors }: any) {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
@@ -136,14 +155,14 @@ function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs 
               ]}
             >
               <Icon
-                color={isFocused ? colors.primary : colors.textTertiary}
+                color={isFocused ? colors.primary : (tabColors?.[tabKey] || colors.textTertiary)}
                 size={22}
                 strokeWidth={isFocused ? 2.5 : 2}
               />
               <Text
                 style={[
                   styles.tabLabel,
-                  { color: isFocused ? colors.primary : colors.textTertiary }
+                  { color: isFocused ? colors.primary : (tabColors?.[tabKey] || colors.textTertiary) }
                 ]}
                 numberOfLines={1}
                 adjustsFontSizeToFit

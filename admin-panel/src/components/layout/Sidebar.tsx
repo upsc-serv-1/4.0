@@ -22,7 +22,7 @@ export function Sidebar() {
   const isSuperAdmin = role === 'super_admin';
 
   return (
-    <aside className={`${collapsed ? 'w-16' : 'w-56'} border-r border-border bg-panel flex flex-col gap-1 p-2 transition-all duration-200 shrink-0`}>
+    <aside className={`${collapsed ? 'w-16' : 'w-72'} border-r border-border bg-panel flex flex-col gap-1 p-2 transition-all duration-200 shrink-0`}>
       <div className="flex items-center gap-2 px-3 py-4 mb-2">
         {!collapsed && (
           <div>

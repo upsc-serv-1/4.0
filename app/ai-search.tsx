@@ -1365,10 +1365,22 @@ export default function AISearchTab() {
     };
     
     const exactMatches = results.filter(isExactMatch).sort(withinGroupSorter);
-    const semanticMatches = results.filter(r => !isExactMatch(r)).sort(withinGroupSorter);
+    
+    // Filter semantic matches: only show questions where at least ONE keyword
+    // appears as a whole word in question_text, options, or explanation.
+    const semanticMatches = results
+      .filter(r => !isExactMatch(r))
+      .filter(r => {
+        // Build full searchable text from all fields
+        const optsText = r.options ? Object.values(r.options).join(' ') : '';
+        const searchText = ((r.question_text || '') + ' ' + optsText + ' ' + (r.explanation_markdown || ''));
+        if (rawTermLower.length > 2 && hasWholeWord(searchText, rawTermLower)) return true;
+        return [...new Set(keywords)].some(k => k.length > 2 && hasWholeWord(searchText, k));
+      })
+      .sort(withinGroupSorter);
     
     return [...exactMatches, ...semanticMatches];
-  }, [results, sortMode, query]);
+  }, [results, sortMode, query, keywords]);
 
   // ── Filter popup ──────────────────────────────────────────────────────────
 

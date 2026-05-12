@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import AppInfoGuide from '../src/components/AppInfoGuide';
 import { Animated as RNAnimated } from 'react-native';
 import {
   View,
@@ -92,6 +93,7 @@ export default function Profile() {
   const progressAnim = useRef(new RNAnimated.Value(0)).current;
 
   const [aiProvider, setAiProvider] = useState<'gemini' | 'groq'>('gemini');
+  const [showAppGuide, setShowAppGuide] = useState(false);
 
   useEffect(() => {
     AsyncStorage.getItem('optional_choice').then(val => {
@@ -283,6 +285,18 @@ export default function Profile() {
           />
         </View>
 
+        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>APP GUIDE</Text>
+        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
+          <Row
+            testID="profile-app-guide"
+            icon={<BookOpen color={colors.primary} size={20} />}
+            label="App Guide"
+            sub="Learn about every feature"
+            onPress={() => setShowAppGuide(true)}
+            isLast
+          />
+        </View>
+
         <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>SETTINGS</Text>
         <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
           <Row testID="profile-theme" icon={<Palette color={colors.primary} size={20} />} label="Zen Theme" sub="Change global appearance" onPress={() => router.push('/theme-preview')} />
@@ -383,7 +397,10 @@ export default function Profile() {
           </View>
         ) : null}
 
-        <TouchableOpacity testID="logout-button" style={[styles.logout, { borderColor: 'rgba(255,59,48,0.2)', backgroundColor: 'rgba(255,59,48,0.05)' }]} onPress={confirmLogout}>
+      {/* App Guide Modal */}
+      <AppInfoGuide visible={showAppGuide} onClose={() => setShowAppGuide(false)} />
+
+      <TouchableOpacity testID="logout-button" style={[styles.logout, { borderColor: 'rgba(255,59,48,0.2)', backgroundColor: 'rgba(255,59,48,0.05)' }]} onPress={confirmLogout}>
           <LogOut color="#FF3B30" size={18} />
           <Text style={styles.logoutText}>Sign Out</Text>
         </TouchableOpacity>

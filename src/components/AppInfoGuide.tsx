@@ -83,32 +83,6 @@ const FEATURES: FeatureSection[] = [
     ],
   },
   {
-    icon: FileText,
-    color: '#a855f7',
-    title: 'Notes',
-    tagline: 'Rich Text Notes for Every Question',
-    description: 'Add personal notes to any question with a rich text editor supporting bold, italic, headings, and lists. Notes persist across sessions and sync to the cloud.',
-    highlights: [
-      'Rich text editing — bold, italic, headings, bullet points',
-      'Notes attached per-question for contextual revision',
-      'Cloud sync across devices',
-      'Export notes alongside questions in PDF',
-    ],
-  },
-  {
-    icon: PenTool,
-    color: '#ef4444',
-    title: 'Hardnotes',
-    tagline: 'Sketch & Annotate with Pencil Tools',
-    description: 'A full-featured handwritten notes canvas. Draw diagrams, annotate questions, highlight passages, and save your sketches as visual notes. Perfect for visual learners and diagram-heavy subjects.',
-    highlights: [
-      'Freehand drawing with multiple brush styles',
-      'Highlighter pen for text annotation',
-      'Shape recognition for clean diagrams',
-      'Save sketches as permanent visual notes',
-    ],
-  },
-  {
     icon: Compass,
     color: '#10b981',
     title: 'Notes V4',
@@ -132,19 +106,6 @@ const FEATURES: FeatureSection[] = [
       'Full search with keyword highlighting',
       'View multi-institute explanations',
       'Ideal for quick reference & exploration',
-    ],
-  },
-  {
-    icon: BookOpen,
-    color: '#14b8a6',
-    title: 'Softnotes',
-    tagline: 'Lightweight Quick Notes',
-    description: 'A minimalist note-taking layer for quick jottings. Add short notes, highlight key points, and mark questions for follow-up without the overhead of full note-taking. Perfect for rapid capture during revision.',
-    highlights: [
-      'Quick lightweight notes per question',
-      'Highlight and mark for follow-up',
-      'Minimal interface for fast capture',
-      'Syncs across devices automatically',
     ],
   },
   {

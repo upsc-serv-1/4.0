@@ -17,6 +17,7 @@ import { SyllabusService } from '../../src/services/SyllabusService';
 import { MICRO_SYLLABUS } from '../../src/data/syllabus';
 import { fetchPilotV2NotesForUser } from '../../src/repositories/pilotV2Repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AppInfoGuide from '../../src/components/AppInfoGuide';
 import { Check, X } from 'lucide-react-native';
 import { Alert } from 'react-native';
 import { WidgetService, Widget } from '../../src/services/WidgetService';
@@ -114,6 +115,7 @@ export default function Home() {
 
   // Widget Configuration
   const [configVisible, setConfigVisible] = useState(false);
+  const [showFirstLaunchGuide, setShowFirstLaunchGuide] = useState(false);
   const [widgetCategory, setWidgetCategory] = useState<'Prelims' | 'Mains' | 'Optional'>('Prelims');
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [optionalChoice, setOptionalChoice] = useState('Anthropology');
@@ -413,6 +415,19 @@ export default function Home() {
     refreshWidgets();
     load();
   };
+
+  // ── First Launch: Show App Guide ────────────────
+  useEffect(() => {
+    const checkFirstLaunch = async () => {
+      try {
+        const seen = await AsyncStorage.getItem('app_guide_seen');
+        if (!seen) {
+          setShowFirstLaunchGuide(true);
+        }
+      } catch (e) {}
+    };
+    checkFirstLaunch();
+  }, []);
 
   return (
     <PageWrapper>
@@ -740,6 +755,14 @@ export default function Home() {
           </View>
         </View>
       </Modal>
+      {/* First Launch App Guide */}
+      <AppInfoGuide
+        visible={showFirstLaunchGuide}
+        onClose={() => {
+          setShowFirstLaunchGuide(false);
+          AsyncStorage.setItem('app_guide_seen', 'true').catch(() => {});
+        }}
+      />
     </PageWrapper>
   );
 }

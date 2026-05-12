@@ -514,10 +514,14 @@ export const LineChart = ({
 }) => {
   const { colors: theme } = useTheme();
   const safeLabelStep = Math.max(1, labelStep || 1);
-  const screenWidth = width || (Dimensions.get('window').width - spacing.lg * 4);
+  const baseWidth = width || (Dimensions.get('window').width - spacing.lg * 4);
   const paddingLeft = 40;
   const paddingBottom = labels.length > 8 ? 120 : 80;
   const paddingRight = 20;
+  // Dynamic width: space points evenly (~80px per point) so few points aren't scattered
+  // Minimum width = baseWidth so single-screen view always works
+  const idealWidth = labels.length * 80 + paddingLeft + paddingRight;
+  const screenWidth = Math.max(baseWidth, idealWidth);
   const chartWidth = screenWidth - paddingLeft;
   const chartHeight = height - paddingBottom - topInset;
   const svgHeight = height + 100; // Add extra space below for scrolling room

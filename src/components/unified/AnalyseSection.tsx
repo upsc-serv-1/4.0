@@ -605,7 +605,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
             label: half === '1' ? 'First Half' : 'Second Half',
             value: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0
           }))}
-          height={180}
+          height={120}
         />
         <View style={styles.chartDivider} />
         <Text style={[styles.chartSubtitle, { color: colors.textTertiary, marginBottom: 10 }]}>Difficulty-wise Accuracy</Text>
@@ -614,7 +614,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
             label: level,
             value: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0
           }))}
-          height={180}
+          height={120}
           color={colors.primary + '80'}
         />
       </View>

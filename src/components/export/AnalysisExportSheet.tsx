@@ -503,15 +503,13 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
       try {
         await exportTrendsToCsv(trends, cumulative);
       } catch (e) { /* already alerted in exportTrendsToCsv */ }
+      setIsExporting(false);
       onClose();
       return;
     }
 
-    // ▸ Capture all export data into local constants so the async
-    //   PDF-generation-and-share chain can continue independently
-    //   after the modal unmounts.
+    // Capture all export data into local constants
     const prependHtml = includeReport ? buildAnalysisHtml() : '';
-    console.log('[AnalysisExport] prependHtml length:', prependHtml?.length, 'includeReport:', includeReport, 'hasTrends:', !!trends, 'hasCumulative:', !!cumulative, 'filteredQuestions:', filteredQuestions.length);
     const payload = pyqPayload as ExportPayload | null;
     const exportOptions = {
       ...opts,
@@ -527,18 +525,11 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
     };
     const isReportOnly = scope === 'report_only';
 
-    // ▸ Close the modal IMMEDIATELY — this frees the full `questions`
-    //   dataset from React state and lets the OS reclaim memory.
-    onClose();
-
-    // ▸ Give React one tick to unmount the Modal before starting
-    //   the heavy HTML→PDF→Share pipeline.
-    await new Promise(r => setTimeout(r, 200));
-
+    // Keep the sheet open with loading indicator during the export
+    // so the user sees progress and the app doesn't appear to freeze.
     try {
       if (isReportOnly) {
         if (!prependHtml) {
-          console.warn('[AnalysisExport] prependHtml empty - no report content generated');
           Alert.alert('Nothing to export', 'Selected reports produced no content. Try selecting different report options.');
           setIsExporting(false);
           return;
@@ -552,11 +543,11 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
         }
         await exportToPdf(payload, exportOptions, { prependHtml });
       }
+      onClose();
     } catch (err: any) {
       console.error('[AnalysisExport] failed', err);
-      Alert.alert('Export failed', err?.message || 'Could not generate the PDF.');
-    } finally {
       setIsExporting(false);
+      Alert.alert('Export failed', err?.message || 'Could not generate the PDF.');
     }
   };
 

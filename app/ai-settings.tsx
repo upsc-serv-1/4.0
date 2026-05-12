@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { 
   ChevronLeft,
+  ChevronRight,
   Brain,
   Sparkles,
   Search,
@@ -60,6 +61,7 @@ import { useAuth } from '../src/context/AuthContext';
 import { PageWrapper } from '../src/components/PageWrapper';
 import { useTheme } from '../src/context/ThemeContext';
 import { loadAIPromptsFromServer, saveAllAIPrompts } from '../src/services/UserAIPromptService';
+import AppInfoGuide from '../src/components/AppInfoGuide';
 
 export default function AISettings() {
   const SAVE_SHEET_AI_PROMPT_KEY = 'pilot-v2:save-sheet:ai-preset-prompt';
@@ -102,6 +104,7 @@ export default function AISettings() {
   const [templatesList, setTemplatesList] = useState<PromptTemplate[]>([]);
   const [templatesLoading, setTemplatesLoading] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [showAppGuide, setShowAppGuide] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<PromptTemplate | null>(null);
   const [templateForm, setTemplateForm] = useState<Partial<PromptTemplate>>({
     template_name: '', template_key: '', button_label: '', button_emoji: '🤖',
@@ -411,6 +414,28 @@ export default function AISettings() {
       >
         <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
         
+        {/* ── APP GUIDE ─────────────────────────────────── */}
+        <TouchableOpacity
+          onPress={() => setShowAppGuide(true)}
+          style={{
+            flexDirection: 'row', alignItems: 'center', gap: 10,
+            backgroundColor: colors.primary + '12', borderRadius: 14,
+            padding: 16, marginBottom: 20, borderWidth: 1, borderColor: colors.primary + '30',
+          }}
+        >
+          <View style={{
+            width: 40, height: 40, borderRadius: 12,
+            backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center',
+          }}>
+            <Text style={{ fontSize: 20 }}>📖</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 15, fontWeight: '800', color: colors.textPrimary }}>App Guide</Text>
+            <Text style={{ fontSize: 12, color: colors.textTertiary }}>Learn about every feature in the app</Text>
+          </View>
+          <ChevronRight size={18} color={colors.textTertiary} />
+        </TouchableOpacity>
+
         {/* ── PROVIDER TOGGLE ───────────────────────────────── */}
         <Text style={styles.sectionTitle}>AI PROVIDER</Text>
         <View style={{ flexDirection: 'row', gap: 10, marginBottom: 20 }}>
@@ -817,6 +842,9 @@ export default function AISettings() {
           </KeyboardAvoidingView>
         </View>
       </Modal>
+
+      {/* App Guide Modal */}
+      <AppInfoGuide visible={showAppGuide} onClose={() => setShowAppGuide(false)} />
 
       {/* Sticky Save Button */}
       <View style={[styles.stickyFooter, { backgroundColor: colors.bg, borderTopColor: colors.border }]}>

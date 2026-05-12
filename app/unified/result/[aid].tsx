@@ -791,6 +791,7 @@ export default function ResultScreen() {
       <Animated.FlatList
         data={activeTab === 'review' ? filteredQuestions : []}
         keyExtractor={(item) => item.id}
+        extraData={{ revealedExplanations, showMistakes }}
         renderItem={({ item, index }) => (
           <SharedQuestionCard
             key={item.id}

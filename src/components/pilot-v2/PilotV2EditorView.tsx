@@ -504,7 +504,6 @@ export function PilotV2EditorView() {
   const titleOpacity = scrollY.interpolate({ inputRange: [0, 60, 120], outputRange: [1, 0.4, 0], extrapolate: 'clamp' });
   const titleTranslate = scrollY.interpolate({ inputRange: [0, 120], outputRange: [0, -40], extrapolate: 'clamp' });
   // Plain JS scroll offset for PencilCanvas — Skia needs a number, not Animated.Value.
-  const [scrollOffset, setScrollOffset] = useState(0);
 
   // Floating control panel menu
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
@@ -921,46 +920,34 @@ export function PilotV2EditorView() {
               <Text style={{ color: colors.textTertiary, fontSize: 13 }}>Add block</Text>
             </TouchableOpacity>
 
-            {/* Pencil canvas — rendered inside the content flow so strokes scroll
-                naturally with the document. position:absolute overlays on top of text.
-                Skia native surfaces do NOT respond to Animated transform / translateY,
-                so we must NOT use absoluteFill+translateY at viewport level. */}
+            {/* Pencil canvas — rendered directly inside the paper view so it
+                scrolls naturally with the document. The canvas internally uses
+                position:absolute to overlay text blocks. */}
             {paperSize.w > 1 && paperSize.h > 1 && (
-              <View
-                pointerEvents={pencil.drawingMode ? 'auto' : 'none'}
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-              >
-                <PencilCanvas
-                  engine={pencil.engine}
-                  tool={pencil.tool}
-                  width={paperSize.w}
-                  height={paperSize.h}
-                  drawingMode={pencil.drawingMode}
-                  scrollY={scrollOffset}
-                  onCommit={(strokes) => persistStrokes(strokes)}
-                  blockLayouts={blockLayoutsRef.current}
-                  blockLayoutVersion={blockLayoutVersion}
-                />
-              </View>
+              <PencilCanvas
+                engine={pencil.engine}
+                tool={pencil.tool}
+                width={paperSize.w}
+                height={paperSize.h}
+                drawingMode={pencil.drawingMode}
+                onCommit={(strokes) => persistStrokes(strokes)}
+                blockLayouts={blockLayoutsRef.current}
+                blockLayoutVersion={blockLayoutVersion}
+              />
             )}
 
-            {/* Washi Tape layer — same inline approach */}
+            {/* Washi Tape layer — same approach */}
             {paperSize.w > 1 && paperSize.h > 1 && (
-              <View
-                pointerEvents={washiMode ? 'auto' : 'none'}
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-              >
-                <WashiTapeLayer
-                  tapes={washiTapes}
-                  width={paperSize.w}
-                  height={paperSize.h}
-                  drawingMode={washiMode}
-                  activeColor={washiColor}
-                  onAdd={(t) => persistWashi([...washiTapes, t])}
-                  onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
-                  onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
-                />
-              </View>
+              <WashiTapeLayer
+                tapes={washiTapes}
+                width={paperSize.w}
+                height={paperSize.h}
+                drawingMode={washiMode}
+                activeColor={washiColor}
+                onAdd={(t) => persistWashi([...washiTapes, t])}
+                onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
+                onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
+              />
             )}
 
             </AnimatedReanimated.View>

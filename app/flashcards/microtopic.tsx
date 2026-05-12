@@ -237,11 +237,21 @@ export default function MicrotopicScreen() {
     const now = Date.now();
     const t = new Date(c.next_review).getTime();
     const diff = t - now;
-    if (diff <= 0) return 'Today';
     const day = 24 * 60 * 60 * 1000;
+    if (diff <= 0) {
+      const overdue = Math.abs(diff);
+      if (overdue < day) {
+        const hrs = Math.round(overdue / (60 * 60 * 1000));
+        return hrs < 1 ? 'Overdue' : `Overdue ${hrs}h`;
+      }
+      const days = Math.round(overdue / day);
+      if (days < 30) return `Overdue ${days}d`;
+      const months = Math.round(days / 30);
+      return months < 12 ? `Overdue ${months}mo` : `Overdue ${Math.round(days/365)}y`;
+    }
     if (diff < day) {
       const hrs = Math.round(diff / (60 * 60 * 1000));
-      return hrs < 1 ? 'Soon' : `${hrs}h`;
+      return hrs < 1 ? 'Soon' : `in ${hrs}h`;
     }
     const days = Math.round(diff / day);
     if (days === 1) return 'Tomorrow';

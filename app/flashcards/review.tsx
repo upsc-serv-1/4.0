@@ -634,8 +634,7 @@ export default function ReviewScreen() {
     return (
       <PageWrapper>
         <View style={styles.center}>
-          <View style={[styles.modalOverlay, { backgroundColor: colors.bg }]}>
-            <View style={[styles.emptyPopup, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <View style={[styles.emptyPopup, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <Check size={48} color={colors.primary} />
               <Text style={[styles.emptyTitle, { color: colors.textPrimary, marginTop: 16 }]}>All caught up!</Text>
               <Text style={[styles.emptySub, { color: colors.textTertiary, marginTop: 8 }]}>No cards are due right now.</Text>
@@ -647,7 +646,6 @@ export default function ReviewScreen() {
                 <Text style={[styles.doneBtnText, { color: '#04223a' }]}>Return</Text>
               </TouchableOpacity>
             </View>
-          </View>
         </View>
       </PageWrapper>
     );
@@ -732,7 +730,7 @@ export default function ReviewScreen() {
         </View>
 
         {/* CARD AREA */}
-        <GestureHandlerRootView style={{ flex: 1 }}>
+        <GestureHandlerRootView style={{ flex: 1 }} pointerEvents="box-none">
           <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
             <ScrollView 
               ref={scrollViewRef}

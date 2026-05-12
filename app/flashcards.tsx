@@ -223,6 +223,7 @@ export default function FlashcardsHub() {
   const [exportPayload, setExportPayload] = useState<ExportPayload | null>(null);
   const [exportTitle, setExportTitle] = useState('Flashcards Export');
   const [preparingExportId, setPreparingExportId] = useState<string | null>(null);
+  const [capAwareStats, setCapAwareStats] = useState<{ due: number; new: number; total: number } | null>(null);
 
 
   const load = useCallback(async () => {
@@ -253,6 +254,25 @@ export default function FlashcardsHub() {
 
   const onRefresh = async () => { setRefreshing(true); await load(); };
 
+  // Fetch cap-aware stats (applies daily limits matching the review screen)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!uid) return;
+      try {
+        const folder = currentFolder ? { branch_id: currentFolder.id, recursive: true, userId: uid } : undefined;
+        const stats = await (await import('../src/services/FlashcardService')).FlashcardSvc.getFolderStats(uid, folder as any);
+        if (cancelled) return;
+        setCapAwareStats({
+          due: (stats.learning_due || 0) + (stats.review_due || 0),
+          new: stats.not_studied || 0,
+          total: stats.total || 0,
+        });
+      } catch { /* fall back to tree stats */ }
+    })();
+    return () => { cancelled = true; };
+  }, [uid, currentFolder]);
+
   const toggleExpand = (id: string) => {
     setExpanded(prev => {
       const next = new Set(prev);
@@ -279,11 +299,13 @@ export default function FlashcardsHub() {
   }, [tree, search, currentFolder, expanded]);
 
   const aggregateStats = useMemo(() => {
+    // Use cap-aware stats (applies daily limits) when available, fall back to tree counts.
+    if (capAwareStats) return capAwareStats;
     let due = 0, new_ = 0, total = 0;
     const targetSet = currentFolder ? [currentFolder] : tree;
     targetSet.forEach(n => { due += n.due_count; new_ += n.new_count; total += n.total_count; });
     return { due, new: new_, total };
-  }, [tree, currentFolder]);
+  }, [tree, currentFolder, capAwareStats]);
 
   const handleMove = async (targetParentId: string | null) => {
     if (!moveModal) return;

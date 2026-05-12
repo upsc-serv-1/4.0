@@ -145,18 +145,60 @@ export class FlashcardSvc {
     }
 
     const branchSet = branchCardIds ? new Set(branchCardIds) : null;
-    const allCards = ((OfflineManager as any).getCollectionSync('cards') ?? [])
-      .filter((c: any) => !c.deleted && !c.is_deleted);
-    const cardById = new Map(allCards.map((c: any) => [c.id, c]));
-    const data = ((OfflineManager as any).getCollectionSync('user_cards', userId) ?? [])
-      .filter((d: any) => d.user_id === userId)
-      .filter((d: any) => d.status === 'active')
-      .filter((d: any) => !branchSet || branchSet.has(d.card_id))
-      .map((d: any) => ({ ...d, cards: cardById.get(d.card_id) }))
-      .filter((d: any) => d.cards)
-      .filter((d: any) => !folder.subject || d.cards.subject === folder.subject)
-      .filter((d: any) => !folder.section || folder.section === 'General' || d.cards.section_group === folder.section)
-      .filter((d: any) => !folder.microtopic || d.cards.microtopic === folder.microtopic);
+
+    // Try offline cache first
+    let data: any[] = [];
+    let cardsByIdMap = new Map<string, any>();
+    
+    try {
+      const allCards = ((OfflineManager as any).getCollectionSync('cards') ?? [])
+        .filter((c: any) => !c.deleted && !c.is_deleted);
+      cardsByIdMap = new Map(allCards.map((c: any) => [c.id, c]));
+      data = ((OfflineManager as any).getCollectionSync('user_cards', userId) ?? [])
+        .filter((d: any) => d.user_id === userId)
+        .filter((d: any) => d.status === 'active')
+        .filter((d: any) => !branchSet || branchSet.has(d.card_id))
+        .map((d: any) => ({ ...d, cards: cardsByIdMap.get(d.card_id) }))
+        .filter((d: any) => d.cards)
+        .filter((d: any) => !folder.subject || d.cards.subject === folder.subject)
+        .filter((d: any) => !folder.section || folder.section === 'General' || d.cards.section_group === folder.section)
+        .filter((d: any) => !folder.microtopic || d.cards.microtopic === folder.microtopic);
+    } catch (e) {
+      // Offline cache failed, continue to network fallback
+    }
+
+    // If offline cache returned nothing, try network
+    if (data.length === 0) {
+      try {
+        let query = supabase
+          .from('user_cards')
+          .select('*, cards!inner(*)')
+          .eq('user_id', userId)
+          .eq('status', 'active')
+          .eq('cards.is_deleted', false);
+        
+        if (folder.subject) query = query.eq('cards.subject', folder.subject);
+        if (folder.section) query = query.eq('cards.section_group', folder.section);
+        if (folder.microtopic) query = query.eq('cards.microtopic', folder.microtopic);
+        if (branchSet) query = query.in('card_id', Array.from(branchSet));
+        
+        const { data: networkData, error } = await query;
+        if (!error && networkData) {
+          data = networkData.map((d: any) => ({
+            ...d,
+            cards: d.cards,
+            card_id: d.card_id || (d as any).cards?.id,
+          }));
+          // Build cardById from the cards data
+          networkData.forEach((d: any) => {
+            if (d.cards) cardsByIdMap.set(d.cards.id, d.cards);
+          });
+        }
+      } catch (e) {
+        console.warn('[FlashcardSvc] Network fallback fetch failed:', e);
+        if (data.length === 0) return [];
+      }
+    }
 
     const mapped: QueueCard[] = data.map((d: any) => {
       const c = d.cards;

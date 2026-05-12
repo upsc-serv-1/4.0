@@ -324,6 +324,8 @@ export const getPYQCategorization = (item: any) => {
   const examInfo = getExamInfo(item);
   const isPYQ = toBool(item?.is_pyq);
 
+  // 🐛 FIX #40: Non-PYQ questions MUST NEVER show PYQ tags.
+  // Even if examInfo has stale UPSC data, we return hasPYQData: false immediately.
   if (!isPYQ) {
     return {
       hasPYQData: false,
@@ -336,10 +338,11 @@ export const getPYQCategorization = (item: any) => {
     };
   }
 
+  // Only read exam_group / exam_info from the source field, never from item.exam_group
+  // which may contain stale data for non-PYQ rows that weren't cleaned at import.
   let rawGroup = String(examInfo?.group || examInfo?.exam_name || '').trim();
-  if (!rawGroup && item?.exam_group) {
-    rawGroup = String(item.exam_group).trim();
-  }
+  // Strict fix: Do NOT fall back to item.exam_group for non-PYQ questions
+  // as this field can contain "UPSC CSE" text even when is_pyq is false.
   const groupNameUpper = rawGroup.toUpperCase();
 
   const isUPSC = toBool(examInfo?.is_upsc_cse) || toBool(item?.is_upsc_cse) || groupNameUpper === 'UPSC' || groupNameUpper.includes('UPSC CSE') || groupNameUpper.includes('IAS');
@@ -469,6 +472,13 @@ export default function UnifiedQuizEngine() {
     setActiveAiQuestion(item);
     setAiChatTrigger(prev => prev + 1);
   }, []);
+
+  useEffect(() => {
+    const currentQ = questions[currentIndex];
+    if (currentQ) {
+      setActiveAiQuestion(currentQ);
+    }
+  }, [currentIndex, questions]);
 
   // Build the InstituteExplanation[] payload for AI prompts from the question's
   // _explanations array (already built by merger.ts at fetch time).
@@ -792,7 +802,9 @@ export default function UnifiedQuizEngine() {
     setFlashcardedIds,
     aff,
     setAff,
-    handleAddToFlashcards
+    handleAddToFlashcards,
+    handleFlashcardPlaced,
+    handleFlashcardDeleted
   } = useFlashcardAction(session?.user?.id);
   const [lastNoteTap, setLastNoteTap] = useState(0);
   const [fontSize, setFontSize] = useState(16);
@@ -947,6 +959,8 @@ export default function UnifiedQuizEngine() {
     // Skip arena index when coming from search (resultIds present) — show question directly
     arenaMode === 'learning' && !params.resultIds
   );
+  // FIX #5: State for side panel index (40% width, right side, non-navigating)
+  const [showIndexPanel, setShowIndexPanel] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [showTimerPicker, setShowTimerPicker] = useState(false);
   const [showClockControl, setShowClockControl] = useState(false);
@@ -1209,17 +1223,44 @@ export default function UnifiedQuizEngine() {
 
   const toggleGuess = (qId: string, selectedAnswer: string | null | undefined, guessValue: string) => {
     const currentGuess = currentAnswers[qId]?.confidence || null;
-    store.setAnswer(qId, selectedAnswer ?? null, currentGuess === guessValue ? null : guessValue, arenaMode === 'exam');
+    const newVal = currentGuess === guessValue ? null : guessValue;
+    store.setAnswer(qId, selectedAnswer ?? null, newVal, false);
+    if (session?.user?.id) {
+      StudentSync.enqueue('question_state', {
+        userId: session.user.id,
+        questionId: qId,
+        testId: questions.find(q => q.id === qId)?.tests?.id || 'manual',
+        patch: { confidence: newVal, selected_answer: selectedAnswer ?? null }
+      });
+    }
   };
 
   const toggleDifficulty = (qId: string, difficultyValue: string) => {
     const currentDifficulty = currentAnswers[qId]?.difficulty || null;
-    store.setMetadata(qId, { difficulty: currentDifficulty === difficultyValue ? null : difficultyValue }, arenaMode === 'exam');
+    const newVal = currentDifficulty === difficultyValue ? null : difficultyValue;
+    store.setMetadata(qId, { difficulty: newVal }, false);
+    if (session?.user?.id) {
+      StudentSync.enqueue('question_state', {
+        userId: session.user.id,
+        questionId: qId,
+        testId: questions.find(q => q.id === qId)?.tests?.id || 'manual',
+        patch: { review_difficulty: newVal }
+      });
+    }
   };
 
   const toggleMistakeType = (qId: string, errorType: string) => {
     const currentError = currentAnswers[qId]?.errorCategory || null;
-    store.setMetadata(qId, { errorCategory: currentError === errorType ? null : errorType }, arenaMode === 'exam');
+    const newVal = currentError === errorType ? null : errorType;
+    store.setMetadata(qId, { errorCategory: newVal }, false);
+    if (session?.user?.id) {
+      StudentSync.enqueue('question_state', {
+        userId: session.user.id,
+        questionId: qId,
+        testId: questions.find(q => q.id === qId)?.tests?.id || 'manual',
+        patch: { error_category: newVal }
+      });
+    }
   };
 
   const NOTE_PREFS_KEY = 'notebook_save_prefs';
@@ -1407,14 +1448,17 @@ export default function UnifiedQuizEngine() {
 
       setQuestions(finalQs);
       
-      // Jump to question if specified in params
+      // 🐛 FIX #41: Direct question navigation - use Card Mode as default during jump
+      // Scroll to correct question without resetting to Question 1
       if (params.questionId && !hasJumped) {
         const jumpId = params.questionId;
         const targetId = idToMergedId.get(jumpId) || jumpId;
         const index = finalQs.findIndex(item => item.id === targetId);
         if (index !== -1) {
+          // Set current index BEFORE marking as jumped to prevent race condition
           setCurrentIndex(index);
           setShowIndex(false);
+          setViewMode('card'); // Default to Card Mode for direct navigation
           setHasJumped(true);
         }
       }
@@ -1478,6 +1522,26 @@ export default function UnifiedQuizEngine() {
           if (sectionVal && sectionVal !== 'All' && sectionVal !== '' && sectionVal !== '[]') {
             const sectionList = typeof sectionVal === 'string' ? sectionVal.split('|').filter(Boolean) : [];
             if (sectionList.length > 0) filtered = filtered.filter((q: any) => sectionList.includes(q.section_group || 'General'));
+          }
+
+          // 🐛 FIX #30: Apply tags filter to offline cache path
+          const tagsRaw = params.tags;
+          if (tagsRaw && tagsRaw !== 'All' && tagsRaw !== '' && tagsRaw !== '[]' && session?.user?.id) {
+            const tagList = typeof tagsRaw === 'string' ? tagsRaw.split('|').filter(Boolean) : [];
+            if (tagList.length > 0) {
+              // Build a Set of question IDs that have matching tags from question_states
+              const { data: tagStates } = await supabase
+                .from('question_states')
+                .select('question_id')
+                .eq('user_id', session.user.id)
+                .or(tagList.map(t => `review_tags.cs.["${t}"]`).join(','));
+              const allowedIds = new Set((tagStates || []).map((t: any) => t.question_id));
+              if (allowedIds.size > 0) {
+                filtered = filtered.filter((q: any) => allowedIds.has(q.id));
+              } else {
+                filtered = [];
+              }
+            }
           }
 
           if (filtered.length > 0) {
@@ -1878,8 +1942,9 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
           }
           return prev + 1;
         });
-        if (questions[currentIndex]) {
-          store.incrementTime(questions[currentIndex].id);
+        const current = questions[currentIndex];
+        if (current?.id) {
+          store.incrementTime(current.id);
         }
       }, 1000);
     }
@@ -2044,7 +2109,10 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
     const closeOpts = typeof optsOrMode === 'object' ? optsOrMode : undefined;
 
     runAfterPaperOverlayClose(() => {
-      const activeText = explanationText || q.explanation_markdown || '';
+      // Ensure we always have content: prefer passed explanation, fallback to question's explanation, then use question text
+      const activeText = (explanationText && explanationText.trim()) 
+        ? explanationText 
+        : (q.explanation_markdown || `**Question:** ${q.question_text || 'Question'}`);
       setPilotSaveTargetQuestion(q);
       setPilotSaveHtml(markdownToHtml(activeText));
       setPilotV2SaveOpen(true);
@@ -2614,6 +2682,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
         toggleStudyTag={toggleStudyTag}
         toggleGuess={toggleGuess}
         toggleDifficulty={toggleDifficulty}
+        toggleMistakeType={toggleMistakeType}
         activeExplIndex={activeExplIndex}
         setActiveExplIndex={setActiveExplIndex}
         bestAnswers={bestAnswers}
@@ -2980,24 +3049,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
             </TouchableOpacity>
           )}
 
-          {/* Arena Index shortcut — main engine parity with the AI Search
-              quick-jump button. Tap to return to the Arena Index (question
-              picker). Only shown in Learning mode where the index exists. */}
-          {!isFromSearch && arenaMode === 'learning' && !showIndex && (
-            <TouchableOpacity
-              onPress={() => setShowIndex(true)}
-              testID="engine-arena-index-btn"
-              style={{
-                flexDirection: 'row', alignItems: 'center', gap: 5,
-                backgroundColor: colors.primary + '15', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12,
-              }}
-            >
-              <ListIcon size={14} color={colors.primary} />
-              <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 11 }}>
-                {currentIndex + 1}/{questions.length}
-              </Text>
-            </TouchableOpacity>
-          )}
+          {/* FIX #16: Removed duplicate Arena Index button (already in left button state) */}
 
           <View style={styles.headerTitleContainer}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -3035,16 +3087,15 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                 <Sparkles size={20} color={isZenMode ? '#433422' : colors.primary} />
               </TouchableOpacity>
             )}
-            {/* Paper / List view toggle (always visible). 'paper' = Simulated Exam Mode. */}
+            {/* FIX #11: Exam Simulation Mode button — opens paper view with 6 q/page, 2-col layout */}
             {isTablet && (
               <TouchableOpacity
                 onPress={() => {
-                  // Toggle between list and card views
-                  setViewMode(prev => prev === 'card' ? 'list' : 'card');
+                  setViewMode('paper');
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
                 }}
                 style={styles.headerBtn}
-                testID="engine-view-toggle"
+                testID="engine-exam-sim-btn"
               >
                 <BookOpen size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
               </TouchableOpacity>
@@ -3073,15 +3124,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
               </TouchableOpacity>
             )}
 
-            {isTablet && (
-              <TouchableOpacity
-                onPress={() => setShowModelSwitcher(true)}
-                style={styles.headerBtn}
-                testID="engine-ai-switcher-btn"
-              >
-                <Brain size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
-              </TouchableOpacity>
-            )}
+            {/* FIX #15: Removed AI Settings button from top bar (moved to Quick Menu) */}
             <TouchableOpacity
               onPress={handleClockButtonPress}
               style={[styles.headerBtn, timerType !== 'none' && { flexDirection: 'row', gap: 4 }]}
@@ -3096,17 +3139,8 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
               )}
             </TouchableOpacity>
             {!showIndex && (
-              <TouchableOpacity onPress={() => setShowIndex(true)} style={styles.headerBtn}>
+              <TouchableOpacity onPress={() => setShowIndexPanel(true)} style={styles.headerBtn}>
                 <ListIcon size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
-              </TouchableOpacity>
-            )}
-            {isTablet && (
-              <TouchableOpacity 
-                onPress={() => setDoubtModalVisible(true)}
-                style={styles.headerBtn}
-                testID="engine-ask-doubt-btn"
-              >
-                <MessageSquare size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
               </TouchableOpacity>
             )}
             <TouchableOpacity onPress={() => setShowQuickMenu(!showQuickMenu)} style={styles.headerBtn}>
@@ -3725,6 +3759,61 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
               </PinchGestureHandler>
             )}
           </>
+        )}
+
+        {/* ============================================================
+            FIX #5: INDEX SIDE PANEL — Floating 40% width right panel
+            Opens without navigation, preserving the current question view.
+        ============================================================ */}
+        {showIndexPanel && (
+          <Modal
+            visible={true}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setShowIndexPanel(false)}
+          >
+            <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.3)' }}>
+              {/* Main content (left 60%) — slightly dimmed */}
+              <Pressable
+                onPress={() => setShowIndexPanel(false)}
+                style={{ flex: 1, backgroundColor: 'transparent' }}
+              />
+              {/* Index panel (right 40%) */}
+              <View style={{ width: '40%', backgroundColor: colors.surface, borderLeftWidth: 1, borderLeftColor: colors.border }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+                  <Text style={{ fontSize: 14, fontWeight: '800', color: colors.textPrimary }}>Arena Index</Text>
+                  <TouchableOpacity
+                    onPress={() => setShowIndexPanel(false)}
+                    style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <X size={18} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                </View>
+                <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 0 }}>
+                  {questions.map((q, idx) => (
+                    <TouchableOpacity
+                      key={q.id}
+                      onPress={() => {
+                        setCurrentIndex(idx);
+                        setShowIndexPanel(false);
+                      }}
+                      style={{
+                        paddingHorizontal: 16,
+                        paddingVertical: 12,
+                        backgroundColor: currentIndex === idx ? colors.primary + '15' : 'transparent',
+                        borderBottomWidth: 1,
+                        borderBottomColor: colors.border + '30',
+                      }}
+                    >
+                      <Text style={{ fontSize: 12, fontWeight: currentIndex === idx ? '800' : '600', color: currentIndex === idx ? colors.primary : colors.textSecondary }}>
+                        Q{idx + 1} · {(q.subject || 'General').slice(0, 20)}{(q.subject || 'General').length > 20 ? '…' : ''}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </View>
+          </Modal>
         )}
 
         {/* ============================================================
@@ -4463,6 +4552,12 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
           userId={session?.user?.id || ''}
           cardId={aff.cardId}
           hint={aff.hint}
+          onPlaced={(pathLabel: string) => {
+            // Add to flashcardedIds only when successfully placed
+            if (aff.cardId && questions[currentIndex]) {
+              handleFlashcardPlaced(aff.cardId, questions[currentIndex].id);
+            }
+          }}
         />
 
         {/* Floating Context-Aware AI Chat Card overlay */}

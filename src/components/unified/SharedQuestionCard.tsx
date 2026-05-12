@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Platform, ActivityIndicator, StyleSheet, Animated, TextInput, Dimensions, Alert } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
@@ -112,6 +112,17 @@ export const SharedQuestionCard = ({
       note: item.note || null,
       errorCategory: null
     };
+    
+    // Initialize showNoteField based on whether note exists
+    // Also watch for changes to automatically show/hide if note is cleared
+    const [showNoteField, setShowNoteField] = useState<boolean>(!!effectiveAnswerData?.note);
+    
+    // Update showNoteField whenever note content changes
+    useEffect(() => {
+      if (effectiveAnswerData?.note) {
+        setShowNoteField(true);
+      }
+    }, [effectiveAnswerData?.note]);
     const showExplanation = showMistakes 
       ? (arenaMode === 'learning' && isRevealed) 
       : (localPracticeAnswer !== null);
@@ -285,7 +296,7 @@ export const SharedQuestionCard = ({
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => openNotebookFromQuestion && openNotebookFromQuestion(item, undefined, 'pilot-v2')}
+              onPress={() => openNotebookFromQuestion && openNotebookFromQuestion(item, effectiveExplanationText, 'pilot-v2')}
               style={{ padding: 4, marginRight: 4 }}
               testID={`pilot-save-shortcut-${item.id}`}
             >
@@ -300,6 +311,17 @@ export const SharedQuestionCard = ({
                <Plus
                  size={20} 
                  color={isZenMode ? '#433422' : effectiveColors.primary} 
+               />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setShowNoteField(prev => !prev)}
+              style={{ padding: 4, backgroundColor: showNoteField ? (isZenMode ? 'rgba(67,52,34,0.1)' : effectiveColors.primary + '15') : 'transparent', borderRadius: 6 }}
+              testID={`note-toggle-shortcut-${item.id}`}
+            >
+               <PenTool
+                 size={18} 
+                 color={isZenMode ? '#433422' : (showNoteField ? effectiveColors.primary : effectiveColors.textTertiary)} 
                />
             </TouchableOpacity>
           </View>
@@ -742,69 +764,75 @@ export const SharedQuestionCard = ({
                   </View>
                 )}
 
-                {/* Notes Box - Top Right Corner */}
-                <View style={{
-                  position: 'absolute',
-                  top: 12,
-                  right: 12,
-                  width: 180,
-                  height: 130,
-                  backgroundColor: effectiveColors.surface,
-                  borderRadius: 12,
-                  borderWidth: 1,
-                  borderColor: effectiveColors.primary + '40',
-                  padding: 10,
-                  gap: 6,
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 3.84,
-                  elevation: 5,
-                  zIndex: 10,
-                }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                    <Lightbulb size={12} color={effectiveColors.primary} />
-                    <Text style={{ fontSize: 9, fontWeight: '900', color: effectiveColors.primary, letterSpacing: 0.5 }}>NOTES</Text>
-                  </View>
-                  
-                  <TextInput
-                    style={{
-                      flex: 1,
-                      color: effectiveColors.textPrimary,
-                      fontSize: 11,
-                      padding: 6,
-                      borderRadius: 8,
-                      backgroundColor: effectiveColors.bg,
-                      borderWidth: 1,
-                      borderColor: effectiveColors.border,
-                      textAlignVertical: 'top',
-                    }}
-                    placeholder="Quick notes..."
-                    placeholderTextColor={effectiveColors.textTertiary}
-                    multiline
-                    scrollEnabled={false}
-                    value={effectiveAnswerData.note || ''}
-                    onChangeText={(val) => onNoteChange && onNoteChange(item.id, val)}
-                  />
-                  
-                  {onCommitToMemory && (
-                    <TouchableOpacity 
-                      onPress={() => onCommitToMemory(item.id)}
-                      style={{
-                        paddingVertical: 4,
-                        paddingHorizontal: 8,
-                        borderRadius: 6,
-                        backgroundColor: effectiveColors.primary,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Text style={{ color: '#fff', fontSize: 9, fontWeight: '700' }}>Save</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
+                {/* Notes Box moved below */}
               </View>
             </>
+          )}
+          
+          {/* Expanded Note Box Section (Inline, full width) */}
+          {showNoteField && (
+            <View style={{
+              marginTop: 16,
+              backgroundColor: effectiveColors.surface,
+              borderRadius: 16,
+              borderWidth: 1,
+              borderColor: effectiveColors.primary + '30',
+              padding: 14,
+              gap: 10,
+            }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <PenTool size={14} color={effectiveColors.primary} />
+                  {/* 🐛 FIX #37: Removed "QUICK NOTE" label - redundant floating UI */}
+                </View>
+                {/* 🐛 FIX #38: Save button always visible - content persists via onNoteChange */}
+                {onCommitToMemory && (
+                  <TouchableOpacity 
+                    onPress={() => onCommitToMemory(item.id)}
+                    style={{
+                      paddingVertical: 5,
+                      paddingHorizontal: 12,
+                      borderRadius: 8,
+                      backgroundColor: effectiveColors.primary,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Text style={{ color: '#fff', fontSize: 10, fontWeight: '900' }}>Save Note</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              
+              <TextInput
+                style={{
+                  width: '100%',
+                  minHeight: 80,
+                  maxHeight: 200,
+                  color: effectiveColors.textPrimary,
+                  fontSize: 13,
+                  lineHeight: 18,
+                  padding: 10,
+                  borderRadius: 10,
+                  backgroundColor: effectiveColors.surfaceStrong,
+                  borderWidth: 1,
+                  borderColor: effectiveColors.border,
+                  textAlignVertical: 'top',
+                }}
+                placeholder="Jot down a quick mnemonics or observation..."
+                placeholderTextColor={effectiveColors.textTertiary}
+                multiline
+                // 🐛 FIX #38: Added scrollEnabled to allow scrolling when keyboard is open
+                scrollEnabled={true}
+                value={effectiveAnswerData.note || ''}
+                onChangeText={(val) => onNoteChange && onNoteChange(item.id, val)}
+                onBlur={() => {
+                  // 🐛 FIX #38: Auto-save on blur (keyboard dismiss)
+                  if (onQuickSave && effectiveAnswerData.note) {
+                    onQuickSave(item.id);
+                  }
+                }}
+              />
+            </View>
           )}
         </View>
         {footerContent}

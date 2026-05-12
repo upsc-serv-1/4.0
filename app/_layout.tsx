@@ -3,12 +3,15 @@ import { StatusBar } from 'expo-status-bar';
 import { View, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from '../src/context/ThemeContext';
-import { AuthProvider } from '../src/context/AuthContext';
+import { AuthProvider, useAuth } from '../src/context/AuthContext';
+import { ProfileProvider } from '../src/context/ProfileContext';
 import { NetworkProvider } from '../src/context/NetworkContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useOfflineBootstrap } from '../src/hooks/useOfflineBootstrap';
+import { useFirstLoginWelcome } from '../src/hooks/useFirstLoginWelcome';
 import { OfflineBanner } from '../src/components/OfflineBanner';
+import { FirstLoginWelcomeModal } from '../src/components/FirstLoginWelcomeModal';
 import { DownloadManagerProvider } from '../src/context/DownloadManagerContext';
 import { DownloadManager } from '../src/components/pyq/DownloadManager';
 
@@ -17,23 +20,33 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <AuthProvider>
-          <NetworkProvider>
-            <ThemeProvider>
-              <DownloadManagerProvider>
-                <RootStack />
-              </DownloadManagerProvider>
-            </ThemeProvider>
-          </NetworkProvider>
+          <ProfileProviderWrapper>
+            <NetworkProvider>
+              <ThemeProvider>
+                <DownloadManagerProvider>
+                  <RootStack />
+                </DownloadManagerProvider>
+              </ThemeProvider>
+            </NetworkProvider>
+          </ProfileProviderWrapper>
         </AuthProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
 
+function ProfileProviderWrapper({ children }: { children: React.ReactNode }) {
+  const { session } = useAuth();
+  return <ProfileProvider session={session}>{children}</ProfileProvider>;
+}
+
 function RootStack() {
   const { theme, colors } = useTheme();
   // Wire offline-first behaviour: auto-sync on login, background queue drain.
   useOfflineBootstrap();
+  
+  // Track first login and show welcome modal
+  const { showWelcome, syncInProgress, syncProgress, onCloseWelcome } = useFirstLoginWelcome();
   
   // Decide if status bar should be light or dark based on theme brightness
   // Themes like 'ivory', 'sage', 'lavender', 'child_of_light' are light
@@ -63,6 +76,12 @@ function RootStack() {
         <Stack.Screen name="notes" options={{ animation: 'slide_from_right', gestureEnabled: true, fullScreenGestureEnabled: false }} />
       </Stack>
       <DownloadManager />
+      <FirstLoginWelcomeModal
+        visible={showWelcome}
+        onClose={onCloseWelcome}
+        syncInProgress={syncInProgress}
+        syncProgress={syncProgress}
+      />
     </View>
   );
 }

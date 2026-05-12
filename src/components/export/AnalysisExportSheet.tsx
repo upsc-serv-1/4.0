@@ -75,10 +75,6 @@ export interface AnalysisExportQuestion {
   difficulty?: string;
   review_tags?: string[];
   time_taken_seconds?: number;
-  /** Merged institute names from dedupe manager */
-  _institutes?: string[];
-  /** Merged explanations from dedupe manager */
-  _explanations?: Array<{ source: string; program?: string; text: string; year: string; answer: string }>;
 }
 
 export interface AnalysisExportSheetProps {
@@ -530,6 +526,14 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
     };
     const isReportOnly = scope === 'report_only';
 
+    // ▸ Close the modal IMMEDIATELY — this frees the full `questions`
+    //   dataset from React state and lets the OS reclaim memory.
+    onClose();
+
+    // ▸ Give React one tick to unmount the Modal before starting
+    //   the heavy HTML→PDF→Share pipeline.
+    await new Promise(r => setTimeout(r, 200));
+
     try {
       if (isReportOnly) {
         if (!prependHtml) {
@@ -538,7 +542,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
         }
         await printStandaloneReport(prependHtml, opts);
       } else {
-        if (!payload || !payload.rows.length) {
+        if (!payload || (payload.kind === 'questions' && !payload.rows.length)) {
           Alert.alert('Nothing to export', 'No questions matched your filters.');
           return;
         }
@@ -547,9 +551,6 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
     } catch (err: any) {
       console.error('[AnalysisExport] failed', err);
       Alert.alert('Export failed', err?.message || 'Could not generate the PDF.');
-    } finally {
-      onClose();
-      setIsExporting(false);
     }
   };
 
@@ -599,15 +600,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
           </View>
 
           <ScrollView style={{ maxHeight: 560 }} showsVerticalScrollIndicator={false}>
-            {isExporting ? (
-              <View style={{ padding: 60, alignItems: 'center', justifyContent: 'center' }}>
-                <ActivityIndicator size="large" color={colors.primary} />
-                <Text style={{ color: colors.textPrimary, fontWeight: '700', marginTop: 16 }}>Compiling Document...</Text>
-                <Text style={{ color: colors.textTertiary, fontSize: 11, marginTop: 4, textAlign: 'center' }}>Processing data into PDF format.</Text>
-              </View>
-            ) : (
-              <>
-                {reportVariant === 'pyq' && (
+            {reportVariant === 'pyq' && (
               <Section title="What to Export" colors={colors}>
                 <Row>
                   {CHOICES.scopes.map(s => (
@@ -1025,8 +1018,6 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
                   value={opts.watermark} onChangeText={(t: string) => set('watermark', t)}
                   placeholder="e.g. DRAFT" placeholderTextColor={colors.textTertiary} />
               </Section>
-            )}
-              </>
             )}
           </ScrollView>
 

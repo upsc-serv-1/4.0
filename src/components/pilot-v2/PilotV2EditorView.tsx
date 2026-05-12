@@ -17,7 +17,8 @@
  * note via `PATCH_BLOCKS`. Step 10 wires this to Supabase via pilotV2Repo.
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import AnimatedReanimated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
+import AnimatedReanimated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, runOnJS } from 'react-native-reanimated';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import RenderHtml from 'react-native-render-html';
 import {
@@ -98,6 +99,52 @@ const DEFAULT_BLOCKS: PilotV2Block[] = [
 ];
 
 export function PilotV2EditorView() {
+  // Persistence system for Pencil FAB Positioning
+  const pencilDragX = useSharedValue(0);
+  const pencilDragY = useSharedValue(0);
+  const pencilStartDragX = useSharedValue(0);
+  const pencilStartDragY = useSharedValue(0);
+
+  const savePencilPos = useCallback((x: number, y: number) => {
+    AsyncStorage.setItem('pilot_v2_pencil_fab_pos', JSON.stringify({ x, y })).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    AsyncStorage.getItem('pilot_v2_pencil_fab_pos').then(saved => {
+      if (saved) {
+        try {
+          const p = JSON.parse(saved);
+          if (typeof p.x === 'number') pencilDragX.value = p.x;
+          if (typeof p.y === 'number') pencilDragY.value = p.y;
+        } catch {}
+      }
+    });
+  }, []);
+
+  const pencilPanGesture = useMemo(() => 
+    Gesture.Pan()
+      .minDistance(5)
+      .onStart(() => {
+        pencilStartDragX.value = pencilDragX.value;
+        pencilStartDragY.value = pencilDragY.value;
+      })
+      .onUpdate((e) => {
+        pencilDragX.value = pencilStartDragX.value + e.translationX;
+        pencilDragY.value = pencilStartDragY.value + e.translationY;
+      })
+      .onFinalize(() => {
+        runOnJS(savePencilPos)(pencilDragX.value, pencilDragY.value);
+      }),
+    [savePencilPos]
+  );
+
+  const pencilFabAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: pencilDragX.value },
+      { translateY: pencilDragY.value }
+    ]
+  }));
+
   const { colors } = useTheme();
   const { dispatch, currentNote } = usePilotV2();
   const note = currentNote();
@@ -468,6 +515,7 @@ export function PilotV2EditorView() {
   });
   const [blockEditSaving, setBlockEditSaving] = useState(false);
   const [blockEditKey, setBlockEditKey] = useState(0);
+  const [slashPicker, setSlashPicker] = useState<{ visible: boolean; blockId: string | null }>({ visible: false, blockId: null });
   const blockEditRef = useRef<any>(null);
 
   /* --------------- Pencil annotation overlay (Step 5+6) --------------- */
@@ -865,35 +913,27 @@ export function PilotV2EditorView() {
               <Text style={{ color: colors.textTertiary, fontSize: 13 }}>Add block</Text>
             </TouchableOpacity>
 
-            {paperSize.w > 1 && paperSize.h > 1 && (
-              <PencilCanvas
-                engine={pencil.engine}
-                tool={pencil.tool}
-                width={paperSize.w}
-                height={paperSize.h}
-                drawingMode={pencil.drawingMode}
-                onCommit={(strokes) => persistStrokes(strokes)}
-                blockLayouts={blockLayoutsRef.current}
-                blockLayoutVersion={blockLayoutVersion}
-              />
-            )}
-
-            {paperSize.w > 1 && paperSize.h > 1 && (
-              <WashiTapeLayer
-                tapes={washiTapes}
-                width={paperSize.w}
-                height={paperSize.h}
-                drawingMode={washiMode}
-                activeColor={washiColor}
-                onAdd={(t) => persistWashi([...washiTapes, t])}
-                onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
-                onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
-              />
-            )}
             </AnimatedReanimated.View>
           </GestureDetector>
         </Animated.ScrollView>
 
+      {/* Pencil canvas — rendered OUTSIDE the GestureDetector as an absolutely-positioned
+          overlay so its draw gesture NEVER competes with the editor's pinch/pan gesture.
+          When drawingMode=false, pointerEvents='none' lets all touches pass through. */}
+      {paperSize.w > 1 && paperSize.h > 1 && (
+        <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
+          <PencilCanvas
+            engine={pencil.engine}
+            tool={pencil.tool}
+            width={paperSize.w}
+            height={paperSize.h}
+            drawingMode={pencil.drawingMode}
+            onCommit={(strokes) => persistStrokes(strokes)}
+            blockLayouts={blockLayoutsRef.current}
+            blockLayoutVersion={blockLayoutVersion}
+          />
+        </View>
+      )}
         {isTablet && (
           <AnimatedReanimated.View style={[styles.outlinePanel, { borderLeftColor: colors.border, paddingTop: 130 }, animatedOutlineStyle]}>
             <View style={[styles.outlineTabs, { borderBottomColor: colors.border }]}>
@@ -919,6 +959,23 @@ export function PilotV2EditorView() {
           </AnimatedReanimated.View>
         )}
       </View>
+
+      {/* Washi Tape layer — rendered OUTSIDE GestureDetector so its pan gesture
+          is NOT intercepted by pinch/zoom gestures. Positioned absolutely. */}
+      {paperSize.w > 1 && paperSize.h > 1 && (
+        <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
+          <WashiTapeLayer
+            tapes={washiTapes}
+            width={paperSize.w}
+            height={paperSize.h}
+            drawingMode={washiMode}
+            activeColor={washiColor}
+            onAdd={(t) => persistWashi([...washiTapes, t])}
+            onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
+            onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
+          />
+        </View>
+      )}
 
 
 
@@ -1175,14 +1232,27 @@ export function PilotV2EditorView() {
       </Modal>
 
       {/* ── Pencil mode FAB ─────────────────────────────────────────── */}
-      <TouchableOpacity
-        testID="pilot-v2-pencil-fab"
-        onPress={() => pencil.setDrawingMode(!pencil.drawingMode)}
-        activeOpacity={0.85}
-        style={[styles.pencilFab, pencil.drawingMode && { backgroundColor: '#0F172A' }]}
-      >
-        <Pen size={22} color="#ffffff" strokeWidth={2.5} />
-      </TouchableOpacity>
+      <AnimatedReanimated.View style={[{ position: 'absolute', zIndex: 1100, right: 18, bottom: 80 }, pencilFabAnimatedStyle]}>
+        <GestureDetector gesture={pencilPanGesture}>
+          <TouchableOpacity
+            testID="pilot-v2-pencil-fab"
+            onPress={() => {
+              console.log('[PENCIL FAB] Current drawingMode:', pencil.drawingMode);
+              pencil.setDrawingMode(!pencil.drawingMode);
+              console.log('[PENCIL FAB] Set drawingMode to:', !pencil.drawingMode);
+            }}
+            activeOpacity={0.85}
+            style={[
+              styles.pencilFab, 
+              pencil.drawingMode && { backgroundColor: '#0F172A' },
+              // Explicitly override positioning since outer container handles it now
+              { position: 'relative', right: 0, bottom: 0 }
+            ]}
+          >
+            <Pen size={22} color="#ffffff" strokeWidth={2.5} />
+          </TouchableOpacity>
+        </GestureDetector>
+      </AnimatedReanimated.View>
 
       {/* ── Quick formatting toolbar toggle (bottom-right) ─────────── */}
       <TouchableOpacity

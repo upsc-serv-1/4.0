@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Pressable } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Pressable, TextInput, Modal, ScrollView } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { spacing, radius } from '../theme';
 import { TaggedQuestion } from '../hooks/useTaggedQuestions';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Eye, Trash2, Zap, ExternalLink, BookOpen, ChevronDown, ChevronUp } from 'lucide-react-native';
+import { Eye, Trash2, Zap, ExternalLink, BookOpen, ChevronDown, ChevronUp, Plus, X as XIcon } from 'lucide-react-native';
 import { FlashcardSvc } from '../services/FlashcardService';
 import { AddToFlashcardSheet } from './flashcards/AddToFlashcardSheet';
 import { autoCleanupQuestionState } from '../utils/questionStateUtils';
 import { TagsQuestionAIPanel } from './tags/TagsQuestionAIPanel';
 import { useRouter } from 'expo-router';
+import { normalizeTag } from '../utils/tagUtils';
 
 interface RepoQuestionCardProps {
   question: TaggedQuestion;
@@ -27,6 +28,9 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestion
   const [aiPanelOpen, setAiPanelOpen] = useState(false);
   const [loadingAction, setLoadingAction] = useState<'remove' | 'flash' | null>(null);
   const [aff, setAff] = useState<{ visible: boolean; cardId: string | null; hint: any }>({ visible: false, cardId: null, hint: {} });
+  const [tagManageVisible, setTagManageVisible] = useState(false);
+  const [newTagInput, setNewTagInput] = useState('');
+  const [savingTag, setSavingTag] = useState(false);
   
   const zenTextColor = isZenMode ? '#433422' : colors.textPrimary;
   const zenSecColor = isZenMode ? '#43342295' : colors.textSecondary;
@@ -128,9 +132,14 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestion
       
       <View style={styles.header}>
         <View style={styles.tagRow}>
-          {question.reviewTags.slice(0, 2).map((tag, idx) => (
+          {question.reviewTags.slice(0, 3).map((tag, idx) => (
             <View key={idx} style={[styles.tagBadge, { backgroundColor: isZenMode ? 'rgba(67, 52, 34, 0.05)' : colors.surfaceStrong + '10' }]}><Text style={[styles.tagText, { color: zenSecColor }]}>{tag}</Text></View>
           ))}
+          {question.reviewTags.length > 3 && (
+            <View style={[styles.tagBadge, { backgroundColor: colors.primary + '15' }]}>
+              <Text style={[styles.tagText, { color: colors.primary }]}>+{question.reviewTags.length - 3}</Text>
+            </View>
+          )}
         </View>
         <Text style={[styles.statusText, { color: zenTertColor }]}>{revealStage === 0 ? 'RECALL' : revealStage === 1 ? 'CHECK' : 'SAVED'}</Text>
       </View>
@@ -229,6 +238,44 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestion
           </View>
 
           {/* Issues 2/3/32 — inline AI Vitamin / institute-explanation panel */}
+          {/* ALL tags shown inline below answer with add/remove */}
+          {revealStage === 2 && (
+            <View style={[styles.tagsSection, { borderTopColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : 'rgba(255, 255, 255, 0.05)', marginTop: 6, paddingTop: 6 }]}>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, alignItems: 'center' }}>
+                {question.reviewTags.map((tag, idx) => (
+                  <TouchableOpacity
+                    key={idx}
+                    style={[styles.inlineTag, { backgroundColor: isZenMode ? 'rgba(67, 52, 34, 0.08)' : colors.primary + '12', borderColor: isZenMode ? 'rgba(67, 52, 34, 0.2)' : colors.primary + '25' }]}
+                    onPress={async () => {
+                      if (!session?.user?.id) return;
+                      try {
+                        const { error } = await supabase
+                          .from('question_states')
+                          .update({ review_tags: question.reviewTags.filter(t => t !== tag) })
+                          .eq('user_id', session.user.id)
+                          .eq('question_id', question.id);
+                        if (error) throw error;
+                        if (onUpdate) onUpdate();
+                      } catch (err: any) {
+                        Alert.alert('Error removing tag', err.message);
+                      }
+                    }}
+                  >
+                    <Text style={[styles.inlineTagText, { color: isZenMode ? '#433422' : colors.primary, fontSize: 9 }]}>{tag}</Text>
+                    <XIcon size={10} color={isZenMode ? '#433422' : colors.primary} />
+                  </TouchableOpacity>
+                ))}
+                <TouchableOpacity
+                  style={[styles.inlineTagAdd, { borderColor: colors.primary + '40' }]}
+                  onPress={() => setTagManageVisible(true)}
+                >
+                  <Plus size={10} color={colors.primary} />
+                  <Text style={[styles.inlineTagText, { color: colors.primary, fontSize: 8 }]}>ADD</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
           {aiPanelOpen ? (
             <Pressable onPress={(e) => e.stopPropagation()}>
               <TagsQuestionAIPanel
@@ -246,6 +293,58 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode }: RepoQuestion
               />
             </Pressable>
           ) : null}
+
+          {/* Inline Add Tag Modal */}
+          <Modal transparent visible={tagManageVisible} animationType="fade" onRequestClose={() => setTagManageVisible(false)}>
+            <Pressable style={styles.modalOverlay} onPress={() => setTagManageVisible(false)}>
+              <View style={[styles.addTagModal, { backgroundColor: colors.surface, borderColor: colors.border }]} onStartShouldSetResponder={() => true}>
+                <Text style={[styles.addTagTitle, { color: colors.textPrimary }]}>Add Tag</Text>
+                <TextInput
+                  value={newTagInput}
+                  onChangeText={setNewTagInput}
+                  placeholder="Enter tag name..."
+                  placeholderTextColor={colors.textTertiary}
+                  style={[styles.addTagInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.bg }]}
+                  autoFocus
+                />
+                <View style={{ flexDirection: 'row', gap: 12, marginTop: 12 }}>
+                  <TouchableOpacity
+                    style={{ flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: colors.surfaceStrong, alignItems: 'center' }}
+                    onPress={() => { setTagManageVisible(false); setNewTagInput(''); }}
+                  >
+                    <Text style={{ color: colors.textSecondary, fontWeight: '700', fontSize: 13 }}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    disabled={!newTagInput.trim() || savingTag}
+                    style={[styles.addTagBtn, { backgroundColor: colors.primary, opacity: !newTagInput.trim() || savingTag ? 0.5 : 1 }]}
+                    onPress={async () => {
+                      if (!session?.user?.id || !newTagInput.trim()) return;
+                      setSavingTag(true);
+                      try {
+                        const currentTags = question.reviewTags || [];
+                        const newTags = [...currentTags, newTagInput.trim()];
+                        const { error } = await supabase
+                          .from('question_states')
+                          .update({ review_tags: newTags })
+                          .eq('user_id', session.user.id)
+                          .eq('question_id', question.id);
+                        if (error) throw error;
+                        setNewTagInput('');
+                        setTagManageVisible(false);
+                        if (onUpdate) onUpdate();
+                      } catch (err: any) {
+                        Alert.alert('Error', err.message);
+                      } finally {
+                        setSavingTag(false);
+                      }
+                    }}
+                  >
+                    {savingTag ? <ActivityIndicator size="small" color="#fff" /> : <Text style={{ color: '#fff', fontWeight: '800', fontSize: 13 }}>Add</Text>}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Pressable>
+          </Modal>
         </View>
       )}
     </TouchableOpacity>
@@ -283,5 +382,16 @@ const styles = StyleSheet.create({
   explanationText: { fontSize: 11, lineHeight: 16, fontWeight: '500', marginBottom: 10 },
   actionsBar: { flexDirection: 'row', gap: 6 },
   actionBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 3, paddingVertical: 6, borderRadius: 8, borderWidth: 1 },
-  actionBtnText: { fontSize: 9, fontWeight: '800' }
+  actionBtnText: { fontSize: 9, fontWeight: '800' },
+  // Inline tag management
+  tagsSection: { borderTopWidth: 1 },
+  inlineTag: { flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, borderWidth: 1 },
+  inlineTagText: { fontWeight: '700' },
+  inlineTagAdd: { flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 6, paddingVertical: 3, borderRadius: 8, borderWidth: 1.5, borderStyle: 'dashed' },
+  // Add tag modal
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
+  addTagModal: { width: '80%', padding: 20, borderRadius: 16, borderWidth: 1 },
+  addTagTitle: { fontSize: 18, fontWeight: '900', marginBottom: 16 },
+  addTagInput: { borderRadius: 10, borderWidth: 1, padding: 12, fontSize: 14, fontWeight: '600' },
+  addTagBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
 });

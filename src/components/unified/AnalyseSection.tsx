@@ -41,7 +41,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
   const isCompactScreen = screenWidth < 390;
 
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>(['All']);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'correct' | 'incorrect' | 'skipped'>('all');
+  const [statusFilters, setStatusFilters] = useState<string[]>([]);
   const [heatmapMode, setHeatmapMode] = useState<'mastery' | 'accuracy'>('mastery');
   const [sectionOrder, setSectionOrder] = useState<string[]>(DEFAULT_ANALYTICS_LAYOUT.overall);
   const [selectedAttemptIndices, setSelectedAttemptIndices] = useState<number[] | null>(null);
@@ -124,21 +124,22 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
       });
     }
 
-    if (statusFilter !== 'all') {
+    if (statusFilters.length > 0) {
       filteredQuestions = filteredQuestions.filter(q => {
         const isCorrect = q.selectedAnswer?.toLowerCase() === q.correctAnswer?.toLowerCase() && !!q.selectedAnswer;
         const isIncorrect = q.selectedAnswer?.toLowerCase() !== q.correctAnswer?.toLowerCase() && !!q.selectedAnswer;
         const isSkipped = !q.selectedAnswer;
-
-        if (statusFilter === 'correct') return isCorrect;
-        if (statusFilter === 'incorrect') return isIncorrect;
-        if (statusFilter === 'skipped') return isSkipped;
-        return true;
+        
+        const matches = [];
+        if (statusFilters.includes('correct') && isCorrect) matches.push(true);
+        if (statusFilters.includes('incorrect') && isIncorrect) matches.push(true);
+        if (statusFilters.includes('skipped') && isSkipped) matches.push(true);
+        return matches.length > 0;
       });
     }
 
     let historicalScores = [];
-    if (selectedSubjects.includes('All') && statusFilter === 'all') {
+    if (selectedSubjects.includes('All') && statusFilters.length === 0) {
       historicalScores = buildAggregateTestTrends(filteredAttempts).historicalScores;
     } else {
       const trendsByTest: Record<string, { correct: number, total: number }> = {};
@@ -176,7 +177,7 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
       repeatedWeaknesses: filteredRepeatedWeaknesses,
       filteredQuestions,
     };
-  }, [selectedAttemptIndices, rawAttemptsForTrend, allQuestions, rawAllQuestions, statusFilter, selectedSubjects]);
+  }, [selectedAttemptIndices, rawAttemptsForTrend, allQuestions, rawAllQuestions, statusFilters, selectedSubjects]);
 
   const activeTrends = filteredAggregate?.trends || trends;
   const activeCumulative = filteredAggregate?.cumulativeHierarchy || cumulativeHierarchy;
@@ -801,17 +802,21 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
       <View style={{ marginBottom: spacing.md }}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 4 }}>
           {[
-            { id: 'all', label: 'All Status', icon: Target },
             { id: 'correct', label: 'Correct', icon: CheckCircle2 },
             { id: 'incorrect', label: 'Incorrect', icon: XCircle },
             { id: 'skipped', label: 'Skipped', icon: HelpCircle }
           ].map((pill: any) => {
-            const isSelected = statusFilter === pill.id;
+            const isSelected = statusFilters.includes(pill.id);
             const Icon = pill.icon;
             return (
               <TouchableOpacity
                 key={pill.id}
-                onPress={() => setStatusFilter(pill.id)}
+                onPress={() => {
+                  setStatusFilters(prev => {
+                    if (prev.includes(pill.id)) return prev.filter(s => s !== pill.id);
+                    return [...prev, pill.id];
+                  });
+                }}
                 style={[
                   styles.statusPill,
                   {
@@ -874,7 +879,8 @@ export const AnalyseSection = ({ userId }: AnalyseSectionProps) => {
             </View>
 
             <ScrollView contentContainerStyle={styles.modalList}>
-              {(isDeleteMode ? [...trends.historicalScores].reverse() : [...activeTrends.historicalScores].reverse()).map((t) => {
+              {/* Issue 24: Always show ALL tests in the modal, regardless of filtering */}
+              {([...(trends?.historicalScores || [])].reverse()).map((t: any) => {
                 const isSelected = isDeleteMode 
                   ? selectedForDelete.includes(t.testId)
                   : (!selectedAttemptIndices || selectedAttemptIndices.includes(t.attemptIndex));

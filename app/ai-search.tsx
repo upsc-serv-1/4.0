@@ -1641,7 +1641,11 @@ export default function AISearchTab() {
 
           {/* Institute breakdown in results */}
           {(() => {
-            const instInResults = masterResults
+            // FIX #1: Apply subject filter to institute counts (AND logic, not OR)
+            const filteredBySubject = sidebarSubjectFilter
+              ? masterResults.filter(r => r.subject === sidebarSubjectFilter)
+              : masterResults;
+            const instInResults = filteredBySubject
               .map(r => r.tests?.institute)
               .filter(Boolean) as string[];
             const instCounts: Record<string, number> = {};
@@ -1818,13 +1822,16 @@ export default function AISearchTab() {
               colors={colors}
             />
 
-            <FilterGroup
-              label="EXAM CATEGORY"
-              options={['All', 'UPSC', 'Allied', 'Others']}
-              value={pendingFilters.examCategory}
-              onSelect={(v) => setPendingFilters(p => ({ ...p, examCategory: v }))}
-              colors={colors}
-            />
+            {/* FIX #3: Only show EXAM CATEGORY when PYQ MODE is "PYQ Only" (AND logic, not OR) */}
+            {pendingFilters.pyqMode === 'PYQ Only' && (
+              <FilterGroup
+                label="EXAM CATEGORY"
+                options={['All', 'UPSC', 'Allied', 'Others']}
+                value={pendingFilters.examCategory}
+                onSelect={(v) => setPendingFilters(p => ({ ...p, examCategory: v }))}
+                colors={colors}
+              />
+            )}
 
             <FilterGroup
               label="CURRICULUM"
@@ -2440,7 +2447,11 @@ export default function AISearchTab() {
                       ensureBestAnswerLoaded={ensureBestAnswerLoaded}
                       showNotebookButton={false}
                       openNotebookFromQuestion={(_: any, activeText?: string) => {
-                        setPreviewNotebookDraft(activeText || '');
+                        // Ensure we always have content with proper fallbacks
+                        const content = (activeText && activeText.trim()) 
+                          ? activeText 
+                          : (_?.explanation_markdown || `**Question:** ${_?.question_text || 'Question'}`);
+                        setPreviewNotebookDraft(content);
                         // Close light-preview modal first; then open Pilot sheet
                         // so it always appears on top (prevents hidden modal bug).
                         closePreviewModal();

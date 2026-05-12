@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef, memo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Modal, Pressable, FlatList, Vibration, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform, useWindowDimensions } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -9,6 +9,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../../src/lib/supabase';
 import { useAuth } from '../../src/context/AuthContext';
+import { useProfile } from '../../src/context/ProfileContext';
 import { cacheGet, cacheSet } from '../../src/lib/cache';
 import { useTheme } from '../../src/context/ThemeContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
@@ -24,6 +25,7 @@ import { WidgetRenderer } from '../../src/components/widgets/WidgetRenderer';
 import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
 import { AVATARS } from '../../src/constants/avatars';
 import { Image } from 'react-native';
+import { buildWeightedSyllabusData } from '../../src/lib/syllabusWeightedProgress';
 
 type Stats = {
   attempts: number;
@@ -47,15 +49,50 @@ const normalizeText = (value: string) =>
     .replace(/\s+/g, ' ')
     .trim();
 
+const WIDGET_LABELS: Record<string, string> = {
+  daily_goal: 'Daily Goal Tracker',
+  exam_countdown: 'Exam Countdown',
+  questions_today: 'Questions Done Today',
+  study_time_today: 'Study Time',
+  weekly_streak: 'Weekly Activity Streak',
+  accuracy_trend: 'Accuracy Trend',
+  correct_incorrect: 'Today Correct vs Incorrect',
+  speed_meter: 'Study Speed Meter',
+  due_cards: 'Overdue Flashcards',
+  mastery_ring: 'Syllabus Mastery Ring',
+  pyq_coverage: 'PYQ Coverage Summary',
+  recent_notes: 'Recent Notebook Activity',
+  tagged_count: 'Tagged Questions Tally',
+  quick_practice: 'Quick Practice Hub',
+  last_test: 'Last Test Quick Score',
+  test_scores: 'Test Scores Timeline',
+  study_heatmap: 'Daily Consistency Heatmap'
+};
+
+// Memoized avatar component to prevent flicker on navigation
+const AvatarDisplay = memo(function AvatarDisplay({ avatarId, name, colors }: any) {
+  const avatarSource = useMemo(() => AVATARS.find(a => a.id === avatarId)?.uri, [avatarId]);
+  
+  return (
+    <LinearGradient colors={[colors.primary, colors.primary + 'CC']} style={[styles.avatarWrap, { overflow: 'hidden' }]}>
+      {avatarId && avatarSource ? (
+        <Image 
+          source={avatarSource}
+          style={{ width: '100%', height: '100%' }} 
+        />
+      ) : (
+        <Text style={styles.avatarTxt}>{(name[0] || 'A').toUpperCase()}</Text>
+      )}
+    </LinearGradient>
+  );
+});
+
 export default function Home() {
   const { colors } = useTheme();
   const { session } = useAuth();
   const { width: windowWidth } = useWindowDimensions();
   const userId = session?.user.id;
-  const [displayName, setDisplayName] = useState(
-    (session?.user.user_metadata as any)?.display_name || session?.user.email?.split('@')[0] || 'Aspirant'
-  );
-  const [avatarId, setAvatarId] = useState<string>((session?.user.user_metadata as any)?.avatar_id || '');
+  const { displayName, avatarId } = useProfile();
   const name = displayName;
   const pulseCardGap = 12;
   const pulseColumns = windowWidth >= 900 ? 4 : 2;
@@ -81,6 +118,11 @@ export default function Home() {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [optionalChoice, setOptionalChoice] = useState('Anthropology');
 
+  // PYQ Widget Configuration
+  const [pyqDisplayMode, setPyqDisplayMode] = useState<'normal' | 'pyq_weighted'>('normal');
+  const [pyqExamType, setPyqExamType] = useState<'prelims' | 'mains' | 'optional'>('prelims');
+  const [pyqReportMode, setPyqReportMode] = useState<'single' | 'multi'>('single');
+
   const [widgets, setWidgets] = useState<Widget[]>([]);
   const [showManage, setShowManage] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -101,19 +143,41 @@ export default function Home() {
     AsyncStorage.getItem('optional_choice').then(val => {
       if (val) setOptionalChoice(val);
     });
+    // Load PYQ widget configuration - always set values
+    WidgetService.getWidgetConfig('mastery_ring').then(config => {
+      setPyqDisplayMode((config.pyqMode as any) || 'normal');
+      setPyqExamType((config.examType as any) || 'prelims');
+      setPyqReportMode((config.reportMode as any) || 'single');
+    }).catch(() => {
+      // On error, ensure defaults are set
+      setPyqDisplayMode('normal');
+      setPyqExamType('prelims');
+      setPyqReportMode('single');
+    });
+    if (userId) loadWidgets();
+  }, [userId]);
+
+
+
+  const loadWidgets = useCallback(() => {
     if (userId) WidgetService.list(userId).then(setWidgets);
   }, [userId]);
 
-  useFocusEffect(useCallback(() => {
-    AsyncStorage.getItem('profile_display_name').then((v) => {
-      if (v && v.trim()) setDisplayName(v.trim());
-      else setDisplayName((session?.user.user_metadata as any)?.display_name || session?.user.email?.split('@')[0] || 'Aspirant');
-    });
-    AsyncStorage.getItem('profile_avatar_id').then((v) => {
-      if (v) setAvatarId(v);
-      else setAvatarId((session?.user.user_metadata as any)?.avatar_id || '');
-    });
-  }, [session]));
+  const handleToggleArchive = useCallback(async (w: Widget) => {
+    const newStatus = !w.is_archived;
+    // Optimistic local state update so UI reflects instantly
+    setWidgets(prev => prev.map(item => item.id === w.id ? { ...item, is_archived: newStatus } : item));
+    try {
+      if (newStatus) {
+        await WidgetService.archive(userId!, w.id);
+      } else {
+        await WidgetService.restore(userId!, w.id);
+      }
+    } catch (e) {
+      // Revert on error by re-fetching
+      loadWidgets();
+    }
+  }, [userId, loadWidgets]);
 
   const load = useCallback(async () => {
     if (!userId) return;
@@ -166,11 +230,25 @@ export default function Home() {
       const COLORS = ['#007AFF', '#FF9500', '#34C759', '#AF52DE', '#FF2D55', '#5856D6', '#FFCC00'];
       let colorIdx = 0;
 
+      // Fetch weighted counts if requested by widget configuration
+      let weightedCounts: Record<string, number> = {};
+      if (pyqDisplayMode === 'pyq_weighted') {
+        try {
+          const weightResults = await buildWeightedSyllabusData({ mode: 'all' });
+          weightedCounts = weightResults.topicCounts || {};
+        } catch (weightedErr) {
+          console.warn('[StatsLoad] Failed building weighted syllabus data:', weightedErr);
+        }
+      }
+
+      // Align active category pool from either source
+      const activeCategory = pyqExamType ? (pyqExamType.charAt(0).toUpperCase() + pyqExamType.slice(1)) : widgetCategory;
+
       let dataPool = {};
-      if (widgetCategory === 'Optional') {
+      if (activeCategory === 'Optional') {
         const sourceSyllabus = (optionalChoice === 'Anthropology') ? require('../../src/data/syllabus').ANTHROPOLOGY_SYLLABUS : { "Paper 1": { "Fundamentals": [] }, "Paper 2": { "Indian Context": [] } };
         dataPool = { [`${optionalChoice} Paper 1`]: sourceSyllabus["Paper 1"], [`${optionalChoice} Paper 2`]: sourceSyllabus["Paper 2"] };
-      } else if (widgetCategory === 'Mains') {
+      } else if (activeCategory === 'Mains') {
         dataPool = require('../../src/data/syllabus').MAINS_SYLLABUS;
       } else {
         dataPool = MICRO_SYLLABUS;
@@ -184,12 +262,20 @@ export default function Home() {
         }
         Object.entries(groups as any).forEach(([group, topics]) => {
           (topics as string[]).forEach(topic => {
-            totalItems++;
             const path = `${sub}.${group}.${topic}`;
             const isMastered = progress[path]?.mastered;
-            if (isMastered) completedItems++;
-            subjectStats[sub].total++;
-            if (isMastered) subjectStats[sub].completed++;
+            
+            // Perform frequency weighting if in weighted mode
+            let weight = 1;
+            if (pyqDisplayMode === 'pyq_weighted') {
+              const key = String(topic).trim().toLowerCase();
+              weight = weightedCounts[key] || 0;
+            }
+
+            totalItems += weight;
+            if (isMastered) completedItems += weight;
+            subjectStats[sub].total += weight;
+            if (isMastered) subjectStats[sub].completed += weight;
           });
         });
       });
@@ -206,7 +292,7 @@ export default function Home() {
       setStats(next);
       await cacheSet(`home:${userId}`, next);
     } catch (err) { console.error("Home Load Error:", err); }
-  }, [userId, widgetCategory, selectedSubjects, optionalChoice]);
+  }, [userId, widgetCategory, selectedSubjects, optionalChoice, pyqDisplayMode, pyqExamType]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
@@ -290,9 +376,22 @@ export default function Home() {
     </TouchableOpacity>
   );
 
-  const saveConfig = async (category: any, subjects: string[]) => {
+  const saveConfig = async (category: any, subjects: string[], pyqMode?: 'normal' | 'pyq_weighted', examType?: 'prelims' | 'mains' | 'optional', reportMode?: 'single' | 'multi') => {
     const newConfig = { category, subjects };
     await AsyncStorage.setItem('dashboard_widget_config', JSON.stringify(newConfig));
+    
+    // Always save PYQ widget configuration
+    if (pyqMode && examType && reportMode) {
+      const pyqConfig = { pyqMode, examType, reportMode };
+      await WidgetService.setWidgetConfig('mastery_ring', pyqConfig);
+      // Update state immediately to reflect changes in UI
+      setPyqDisplayMode(pyqMode);
+      setPyqExamType(examType);
+      setPyqReportMode(reportMode);
+    }
+    
+    // Refresh widget data to ensure display updates
+    refreshWidgets();
     load();
   };
 
@@ -315,16 +414,7 @@ export default function Home() {
                   <Text style={[styles.userName, { color: colors.textPrimary }]}>{name}.</Text>
                 </View>
                 <TouchableOpacity onPress={() => router.push('/profile')} style={styles.profileBtn}>
-                  <LinearGradient colors={[colors.primary, colors.primary + 'CC']} style={[styles.avatarWrap, { overflow: 'hidden' }]}>
-                    {avatarId ? (
-                      <Image 
-                        source={AVATARS.find(a => a.id === avatarId)?.uri} 
-                        style={{ width: '100%', height: '100%' }} 
-                      />
-                    ) : (
-                      <Text style={styles.avatarTxt}>{(name[0] || 'A').toUpperCase()}</Text>
-                    )}
-                  </LinearGradient>
+                  <AvatarDisplay avatarId={avatarId} name={name} colors={colors} />
                 </TouchableOpacity>
               </View>
 
@@ -402,8 +492,15 @@ export default function Home() {
                 </View>
                 <View style={{ flex: 1, marginLeft: 16 }}>
                   <Text style={[styles.trackerTitle, { color: colors.textPrimary }]}>Syllabus Mastery</Text>
-                  <View style={[styles.catBadge, { backgroundColor: colors.primary + '15' }]}>
-                    <Text style={[styles.badgeCatText, { color: colors.primary }]}>{widgetCategory.toUpperCase()}</Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
+                    <View style={[styles.catBadge, { backgroundColor: colors.primary + '15' }]}>
+                      <Text style={[styles.badgeCatText, { color: colors.primary }]}>{(pyqExamType ? pyqExamType.toUpperCase() : widgetCategory.toUpperCase())}</Text>
+                    </View>
+                    {pyqDisplayMode === 'pyq_weighted' && (
+                      <View style={[styles.catBadge, { backgroundColor: '#f59e0b20' }]}>
+                        <Text style={[styles.badgeCatText, { color: '#d97706' }]}>PYQ WEIGHTED</Text>
+                      </View>
+                    )}
                   </View>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
@@ -468,13 +565,57 @@ export default function Home() {
               </View>
             </View>
 
-            <Text style={[styles.sectionLabel, { color: colors.textTertiary, marginLeft: 20, marginTop: 32 }]}>MY CUSTOM WIDGETS</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginTop: 32, marginBottom: 12 }}>
+              <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>MY CUSTOM WIDGETS</Text>
+              <TouchableOpacity
+                onPress={() => setIsEditMode(!isEditMode)}
+                style={{
+                  flexDirection: 'row', alignItems: 'center', gap: 6,
+                  backgroundColor: isEditMode ? '#ef444415' : colors.border + '30',
+                  paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8
+                }}
+              >
+                {isEditMode ? (
+                  <>
+                    <Check size={12} color="#ef4444" />
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: '#ef4444' }}>DONE</Text>
+                  </>
+                ) : (
+                  <>
+                    <Sliders size={12} color={colors.textSecondary} />
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textSecondary }}>EDIT LAYOUT</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+            {isEditMode && (
+              <Text style={{ color: colors.textTertiary, fontSize: 11, marginLeft: 20, marginBottom: 16, fontWeight: '600' }}>
+                Hold and drag to reorder. Tap the Red X to remove.
+              </Text>
+            )}
           </>
         )}
         renderItem={({ item, drag }) => (
           <ScaleDecorator>
-            <TouchableOpacity onLongPress={drag} style={styles.customWidgetItem}>
-              <WidgetRenderer widgetKey={item.widget_key} data={widgetData} onArchive={() => WidgetService.archive(userId!, item.id).then(load)} />
+            <TouchableOpacity 
+              onLongPress={drag} 
+              style={[
+                styles.customWidgetItem, 
+                isEditMode && { borderWidth: 1, borderColor: '#ef444430', borderStyle: 'dashed', borderRadius: 12 }
+              ]}
+              disabled={!isEditMode}
+            >
+              <WidgetRenderer 
+                widgetKey={item.widget_key} 
+                data={widgetData} 
+                onArchive={() => handleToggleArchive(item)}
+                isEditMode={isEditMode}
+                config={
+                  item.widget_key === 'mastery_ring' 
+                    ? { pyqMode: pyqDisplayMode, examType: pyqExamType, reportMode: pyqReportMode }
+                    : {}
+                }
+              />
             </TouchableOpacity>
           </ScaleDecorator>
         )}
@@ -514,33 +655,68 @@ export default function Home() {
         </Pressable>
       </Modal>
 
-      <WidgetConfigModal visible={configVisible} onClose={() => setConfigVisible(false)} onSave={saveConfig} category={widgetCategory} setCategory={setWidgetCategory} selectedSubjects={selectedSubjects} setSelectedSubjects={setSelectedSubjects} optionalChoice={optionalChoice} colors={colors} />
+      <WidgetConfigModal visible={configVisible} onClose={() => setConfigVisible(false)} onSave={saveConfig} category={widgetCategory} setCategory={setWidgetCategory} selectedSubjects={selectedSubjects} setSelectedSubjects={setSelectedSubjects} optionalChoice={optionalChoice} pyqDisplayMode={pyqDisplayMode} setPyqDisplayMode={setPyqDisplayMode} pyqExamType={pyqExamType} setPyqExamType={setPyqExamType} pyqReportMode={pyqReportMode} setPyqReportMode={setPyqReportMode} colors={colors} />
 
       <Modal visible={showManage} transparent animationType="fade" onRequestClose={() => setShowManage(false)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
           <View style={{ backgroundColor: colors.surface, padding: 24, borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '80%' }}>
-            <Text style={{ fontSize: 20, fontWeight: '900', color: colors.textPrimary, marginBottom: 16 }}>Archived Widgets</Text>
-            <ScrollView nestedScrollEnabled>
-              {archivedWidgets.length === 0 ? (
-                <Text style={{ color: colors.textTertiary, textAlign: 'center', padding: 24 }}>No archived widgets.</Text>
-              ) : (
-                archivedWidgets.map(w => (
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <View>
+                <Text style={{ fontSize: 20, fontWeight: '900', color: colors.textPrimary }}>Manage Dashboard</Text>
+                <Text style={{ fontSize: 12, color: colors.textTertiary, marginTop: 2 }}>Select widgets to show on your screen</Text>
+              </View>
+              <TouchableOpacity onPress={() => setShowManage(false)} style={{ backgroundColor: colors.border + '50', padding: 6, borderRadius: 20 }}>
+                <X size={20} color={colors.textPrimary} />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView nestedScrollEnabled contentContainerStyle={{ paddingBottom: 20 }}>
+              {widgets.map(w => {
+                const isActive = !w.is_archived;
+                const label = WIDGET_LABELS[w.widget_key] || w.widget_key.replace(/_/g, ' ').toUpperCase();
+                return (
                   <TouchableOpacity
                     key={w.id}
-                    style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 12, borderBottomWidth: 1, borderBottomColor: colors.border }}
-                    onPress={async () => {
-                      await WidgetService.restore(userId!, w.id);
-                      load();
+                    style={{ 
+                      flexDirection: 'row', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center',
+                      paddingVertical: 14, 
+                      paddingHorizontal: 16,
+                      borderBottomWidth: 1, 
+                      borderBottomColor: colors.border,
+                      backgroundColor: isActive ? 'transparent' : colors.surfaceStrong + '50',
+                      borderRadius: 8,
+                      marginBottom: 4
                     }}
+                    onPress={() => handleToggleArchive(w)}
                   >
-                    <Text style={{ color: colors.textPrimary }}>{w.widget_key}</Text>
-                    <Text style={{ color: colors.primary, fontWeight: '700' }}>RESTORE</Text>
+                    <View style={{ flex: 1, paddingRight: 12 }}>
+                      <Text style={{ color: isActive ? colors.textPrimary : colors.textTertiary, fontSize: 15, fontWeight: '700' }}>
+                        {label}
+                      </Text>
+                    </View>
+                    <View style={{ 
+                      width: 44, height: 24, borderRadius: 12, 
+                      backgroundColor: isActive ? colors.primary : colors.border,
+                      justifyContent: 'center',
+                      paddingHorizontal: 2
+                    }}>
+                      <View style={{ 
+                        width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff',
+                        alignSelf: isActive ? 'flex-end' : 'flex-start',
+                        elevation: 2
+                      }} />
+                    </View>
                   </TouchableOpacity>
-                ))
-              )}
+                );
+              })}
             </ScrollView>
-            <TouchableOpacity onPress={() => setShowManage(false)} style={{ padding: 16, alignItems: 'center' }}>
-              <Text style={{ color: colors.textTertiary, fontWeight: '700' }}>CLOSE</Text>
+            <TouchableOpacity 
+              style={[styles.applyBtn, { backgroundColor: colors.primary, marginTop: 16 }]} 
+              onPress={() => setShowManage(false)}
+            >
+              <Text style={styles.applyText}>Save Changes</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -549,7 +725,7 @@ export default function Home() {
   );
 }
 
-function WidgetConfigModal({ visible, onClose, onSave, category, setCategory, selectedSubjects, setSelectedSubjects, optionalChoice, colors }: any) {
+function WidgetConfigModal({ visible, onClose, onSave, category, setCategory, selectedSubjects, setSelectedSubjects, optionalChoice, pyqDisplayMode, setPyqDisplayMode, pyqExamType, setPyqExamType, pyqReportMode, setPyqReportMode, colors }: any) {
   const categories = ['Prelims', 'Mains', 'Optional'];
   const subjects = useMemo(() => {
     if (category === 'Optional') return [`${optionalChoice} Paper 1`, `${optionalChoice} Paper 2`];
@@ -562,6 +738,11 @@ function WidgetConfigModal({ visible, onClose, onSave, category, setCategory, se
     else setSelectedSubjects([...selectedSubjects, s]);
   };
 
+  const handleSave = () => {
+    onSave(category, selectedSubjects, pyqDisplayMode, pyqExamType, pyqReportMode);
+    onClose();
+  };
+
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.modalOverlay} onPress={onClose}>
@@ -571,29 +752,96 @@ function WidgetConfigModal({ visible, onClose, onSave, category, setCategory, se
             <TouchableOpacity onPress={onClose}><X color={colors.textPrimary} size={24} /></TouchableOpacity>
           </View>
 
-          <Text style={[styles.modalLabel, { color: colors.textSecondary }]}>SYLLABUS CATEGORY</Text>
-          <View style={styles.catRow}>
-            {categories.map(c => (
-              <TouchableOpacity key={c} style={[styles.catBtn, { backgroundColor: category === c ? colors.primary : colors.surfaceStrong }]} onPress={() => setCategory(c)}>
-                <Text style={[styles.configCatText, { color: category === c ? '#fff' : colors.textPrimary }]}>{c}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 500 }}>
+            {/* Syllabus Category Section */}
+            <Text style={[styles.modalLabel, { color: colors.textSecondary }]}>SYLLABUS CATEGORY</Text>
+            <View style={styles.catRow}>
+              {categories.map(c => (
+                <TouchableOpacity key={c} style={[styles.catBtn, { backgroundColor: category === c ? colors.primary : colors.surfaceStrong }]} onPress={() => { setCategory(c); setPyqExamType(c.toLowerCase() as any); }}>
+                  <Text style={[styles.configCatText, { color: category === c ? '#fff' : colors.textPrimary }]}>{c}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
 
-          <Text style={[styles.modalLabel, { color: colors.textSecondary, marginTop: 24 }]}>VISIBLE SUBJECTS</Text>
-          <ScrollView contentContainerStyle={styles.subGrid}>
-            <TouchableOpacity style={[styles.subItem, selectedSubjects.length === 0 && { backgroundColor: colors.primary + '20', borderColor: colors.primary }]} onPress={() => setSelectedSubjects([])}>
-              <Text style={[styles.subText, { color: colors.textPrimary }, selectedSubjects.length === 0 && { color: colors.primary, fontWeight: '800' }]}>All Subjects</Text>
-            </TouchableOpacity>
-            {subjects.map((s: any) => (
-              <TouchableOpacity key={s} style={[styles.subItem, selectedSubjects.includes(s) && { backgroundColor: colors.primary + '20', borderColor: colors.primary }]} onPress={() => toggleSubject(s)}>
-                <Text style={[styles.subText, { color: colors.textPrimary }, selectedSubjects.includes(s) && { color: colors.primary, fontWeight: '800' }]}>{s}</Text>
-                {selectedSubjects.includes(s) && <Check size={14} color={colors.primary} />}
+            {/* Visible Subjects Section */}
+            <Text style={[styles.modalLabel, { color: colors.textSecondary, marginTop: 24 }]}>VISIBLE SUBJECTS</Text>
+            <View style={styles.subGrid}>
+              <TouchableOpacity style={[styles.subItem, { borderColor: colors.border }, selectedSubjects.length === 0 && { backgroundColor: colors.primary + '20', borderColor: colors.primary }]} onPress={() => setSelectedSubjects([])}>
+                <Text style={[styles.subText, { color: colors.textPrimary }, selectedSubjects.length === 0 && { color: colors.primary, fontWeight: '800' }]}>All Subjects</Text>
               </TouchableOpacity>
-            ))}
+              {subjects.map((s: any) => (
+                <TouchableOpacity key={s} style={[styles.subItem, { borderColor: colors.border }, selectedSubjects.includes(s) && { backgroundColor: colors.primary + '20', borderColor: colors.primary }]} onPress={() => toggleSubject(s)}>
+                  <Text style={[styles.subText, { color: colors.textPrimary }, selectedSubjects.includes(s) && { color: colors.primary, fontWeight: '800' }]}>{s}</Text>
+                  {selectedSubjects.includes(s) && <Check size={14} color={colors.primary} />}
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* PYQ Display Mode Section */}
+            <Text style={[styles.modalLabel, { color: colors.textSecondary, marginTop: 24 }]}>DISPLAY MODE</Text>
+            <View style={{ gap: 10 }}>
+              {(['normal', 'pyq_weighted'] as const).map(mode => (
+                <TouchableOpacity
+                  key={mode}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  style={[styles.optionRow, { borderColor: colors.border, backgroundColor: pyqDisplayMode === mode ? colors.primary + '10' : 'transparent' }]}
+                  onPress={() => { console.log('Setting display mode to:', mode); setPyqDisplayMode(mode); }}
+                >
+                  <View style={[styles.radioButton, { borderColor: colors.primary, backgroundColor: pyqDisplayMode === mode ? colors.primary : 'transparent' }]}>
+                    {pyqDisplayMode === mode && <View style={[styles.radioDot, { backgroundColor: '#fff' }]} />}
+                  </View>
+                  <Text style={[styles.optionText, { color: colors.textPrimary }]}>
+                    {mode === 'normal' ? 'Normal Percentage' : 'PYQ Weighted Average'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Exam Type Section */}
+            <Text style={[styles.modalLabel, { color: colors.textSecondary, marginTop: 24 }]}>EXAM TYPE</Text>
+            <View style={{ gap: 10 }}>
+              {(['prelims', 'mains', 'optional'] as const).map(examType => (
+                <TouchableOpacity
+                  key={examType}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  style={[styles.optionRow, { borderColor: colors.border, backgroundColor: pyqExamType === examType ? colors.primary + '10' : 'transparent' }]}
+                  onPress={() => { setPyqExamType(examType); setCategory(examType.charAt(0).toUpperCase() + examType.slice(1)); }}
+                >
+                  <View style={[styles.radioButton, { borderColor: colors.primary, backgroundColor: pyqExamType === examType ? colors.primary : 'transparent' }]}>
+                    {pyqExamType === examType && <View style={[styles.radioDot, { backgroundColor: '#fff' }]} />}
+                  </View>
+                  <Text style={[styles.optionText, { color: colors.textPrimary }]}>
+                    {examType.charAt(0).toUpperCase() + examType.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Report Mode Section */}
+            <Text style={[styles.modalLabel, { color: colors.textSecondary, marginTop: 24 }]}>REPORT MODE</Text>
+            <View style={{ gap: 10 }}>
+              {(['single', 'multi'] as const).map(mode => (
+                <TouchableOpacity
+                  key={mode}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  style={[styles.optionRow, { borderColor: colors.border, backgroundColor: pyqReportMode === mode ? colors.primary + '10' : 'transparent' }]}
+                  onPress={() => { console.log('Setting report mode to:', mode); setPyqReportMode(mode); }}
+                >
+                  <View style={[styles.radioButton, { borderColor: colors.primary, backgroundColor: pyqReportMode === mode ? colors.primary : 'transparent' }]}>
+                    {pyqReportMode === mode && <View style={[styles.radioDot, { backgroundColor: '#fff' }]} />}
+                  </View>
+                  <Text style={[styles.optionText, { color: colors.textPrimary }]}>
+                    {mode === 'single' ? 'Single Report' : 'Multi-Report'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </ScrollView>
 
-          <TouchableOpacity style={[styles.applyBtn, { backgroundColor: colors.primary }]} onPress={() => { onSave(category, selectedSubjects); onClose(); }}>
+          <TouchableOpacity style={[styles.applyBtn, { backgroundColor: colors.primary }]} onPress={handleSave}>
             <Text style={styles.applyText}>Done</Text>
           </TouchableOpacity>
         </View>
@@ -687,10 +935,14 @@ const styles = StyleSheet.create({
   catRow: { flexDirection: 'row', gap: 10 },
   catBtn: { flex: 1, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   configCatText: { fontSize: 14, fontWeight: '700' },
-  subGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, maxHeight: 300, marginBottom: 20 },
+  subGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 },
   subItem: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
   subText: { fontSize: 13, fontWeight: '600' },
   applyBtn: { height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   applyText: { color: '#fff', fontSize: 16, fontWeight: '800' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
+  optionRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 12, paddingVertical: 12, borderRadius: 12, borderWidth: 1 },
+  radioButton: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  radioDot: { width: 8, height: 8, borderRadius: 4 },
+  optionText: { fontSize: 14, fontWeight: '600' },
 });

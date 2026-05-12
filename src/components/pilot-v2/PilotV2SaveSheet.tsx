@@ -25,6 +25,7 @@ import { Rocket, X, Plus, Wand2, Highlighter, Eraser, Undo2, Redo2, Brain, Copy,
 import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 import RichNoteEditor from '../RichNoteEditor';
 import PilotV2SaveAIPanel from './PilotV2SaveAIPanel';
+import { htmlToPilotV2Blocks } from './htmlToPilotV2Blocks';
 import { useTheme } from '../../context/ThemeContext';
 import { PremiumMoveSheet, MoveTarget } from '../common/PremiumMoveSheet';
 import { SUBJECT_TOPICS } from './PilotV2SidebarSubject';
@@ -481,13 +482,14 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
         });
       }
       
-      // Always add content block
-      blocks.push({
-        id: newId(),
-        type: 'paragraph',
-        text: html.trim(),
-        meta: { tag: 'quiz_import', importedAt: new Date().toISOString(), source: source || 'quiz' },
-      });
+      // Parse HTML into proper blocks — preserves line breaks, bullets, numbering
+      const contentBlocks = htmlToPilotV2Blocks(html);
+      if (contentBlocks.length === 0) {
+        blocks.push({ id: newId(), type: 'paragraph', text: html.trim(), meta: { tag: 'quiz_import', importedAt: new Date().toISOString(), source: source || 'quiz' } });
+      } else {
+        contentBlocks.forEach((b) => { (b as any).meta = { tag: 'quiz_import', importedAt: new Date().toISOString(), source: source || 'quiz' }; });
+        blocks.push(...contentBlocks);
+      }
       const ok = await appendBlocksToPilotV2Note(result.noteId, blocks);
       if (!ok) throw new Error('append failed');
       setSavedNoteId(result.noteId);
@@ -739,7 +741,6 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     ? `${body}<p><br></p>${html}`
                     : html;
                   setBody(next);
-                  pushHistory(next);
                   setEditorKey(k => k + 1);
                   setAiPanelOpen(false);
                 }}
@@ -959,7 +960,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     <TouchableOpacity
                       onPress={async () => {
                         if (!aiOutput.trim()) return;
-                        await Clipboard.setStringAsync(aiOutput);
+                        await ExpoClipboard.setStringAsync(aiOutput);
                         Alert.alert('Copied', 'AI output copied. Paste it where you want.');
                       }}
                       style={[styles.miniBtn, { borderColor: colors.border, borderWidth: 1, flexDirection: 'row', gap: 6 }]}

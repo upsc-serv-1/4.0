@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, Modal,
   SafeAreaView, KeyboardAvoidingView, Platform,
-  ActivityIndicator, Alert, Dimensions, ScrollView
+  ActivityIndicator, Alert, Dimensions, ScrollView, Keyboard
 } from 'react-native';
-import { X, Save, Clipboard, Brain, Undo2, Redo2, Highlighter, Eraser, Plus, Sparkles } from 'lucide-react-native';
+import { X, Save, Clipboard, Brain, Undo2, Redo2, Highlighter, Eraser, Plus, Sparkles, ArrowDownToLine } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import RichNoteEditor from '../RichNoteEditor';
 import { RichToolbar, actions } from 'react-native-pell-rich-editor';
-import PilotV2SaveAIPanel from '../pilot-v2/PilotV2SaveAIPanel';
+import PilotV2SaveAIPanel, { PilotV2SaveAIPanelHandle } from '../pilot-v2/PilotV2SaveAIPanel';
 import * as ClipboardSvc from 'expo-clipboard';
 
 interface MyVitaminEditorSheetProps {
@@ -68,10 +68,21 @@ export const MyVitaminEditorSheet: React.FC<MyVitaminEditorSheetProps> = ({
   const [content, setContent] = useState(initialContent || '');
   const [loading, setLoading] = useState(false);
   const richRef = useRef<any>(null);
+  const aiPanelRef = useRef<PilotV2SaveAIPanelHandle>(null);
   const [showAiPanel, setShowAiPanel] = useState(false);
   const [hlColor, setHlColor] = useState('#FFF59D');
   const [showHlPicker, setShowHlPicker] = useState(false);
   const [editorKey, setEditorKey] = useState(0);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow', () => setIsKeyboardVisible(true));
+    const hideSub = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', () => setIsKeyboardVisible(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   useEffect(() => {
     if (visible) {
@@ -128,7 +139,8 @@ export const MyVitaminEditorSheet: React.FC<MyVitaminEditorSheetProps> = ({
             style={{ flex: 1 }}
           >
             {/* Header */}
-            <View style={[styles.header, { borderBottomColor: colors.border }]}>
+            {!isKeyboardVisible && (
+              <View style={[styles.header, { borderBottomColor: colors.border }]}>
               <View style={[styles.brand, { backgroundColor: '#5B4EFA' }]}>
                 <Save size={18} color="#fff" />
               </View>
@@ -144,14 +156,14 @@ export const MyVitaminEditorSheet: React.FC<MyVitaminEditorSheetProps> = ({
               >
                 <Brain size={20} color={showAiPanel ? '#5B4EFA' : colors.textPrimary} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-                <X size={20} color={colors.textPrimary} />
-              </TouchableOpacity>
+              {/* 🐛 FIX #32: Removed redundant Close (X) button - AI icon toggle + overlay tap already closes */}
             </View>
+            )}
 
             {showAiPanel ? (
               <View style={{ flex: 1 }}>
                 <PilotV2SaveAIPanel
+                  ref={aiPanelRef}
                   visible={showAiPanel}
                   onClose={() => setShowAiPanel(false)}
                   onInsert={(html) => {
@@ -170,7 +182,8 @@ export const MyVitaminEditorSheet: React.FC<MyVitaminEditorSheetProps> = ({
               </View>
             ) : (
               <>
-                {/* Toolbar */}
+                {/* Toolbar - Hide when keyboard is visible to maximize writing area */}
+                {!isKeyboardVisible && (
                 <View style={[styles.toolbarContainer, { backgroundColor: colors.surfaceStrong, borderBottomColor: colors.border }]}>
                   <RichToolbar
                     getEditor={() => richRef.current}
@@ -237,6 +250,7 @@ export const MyVitaminEditorSheet: React.FC<MyVitaminEditorSheetProps> = ({
                     </View>
                   )}
                 </View>
+                )}
 
                 {/* Editor Area */}
                 <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled">
@@ -257,28 +271,68 @@ export const MyVitaminEditorSheet: React.FC<MyVitaminEditorSheetProps> = ({
 
             {/* Footer */}
             <View style={[styles.footer, { borderTopColor: colors.border }]}>
-              <TouchableOpacity
-                onPress={handlePasteFormatted}
-                style={[styles.pasteAiBtn, { backgroundColor: '#EEECFF', borderColor: '#5B4EFA' }]}
-              >
-                <Sparkles size={16} color="#5B4EFA" />
-                <Text style={{ color: '#5B4EFA', fontWeight: '800', fontSize: 13 }}>Paste AI Response</Text>
-              </TouchableOpacity>
+              {showAiPanel ? (
+                <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
+                  {/* Paste AI Response (Left) */}
+                  <TouchableOpacity
+                    onPress={handlePasteFormatted}
+                    style={[styles.pasteAiBtn, { flex: 1, backgroundColor: '#EEECFF', borderColor: '#5B4EFA', paddingVertical: 12 }]}
+                  >
+                    <Sparkles size={14} color="#5B4EFA" />
+                    <Text style={{ color: '#5B4EFA', fontWeight: '800', fontSize: 12 }}>Paste AI</Text>
+                  </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={handleSave}
-                disabled={loading}
-                style={[styles.saveBtn, { backgroundColor: colors.primary, opacity: loading ? 0.6 : 1 }]}
-              >
-                {loading ? (
-                  <ActivityIndicator size="small" color="#fff" />
-                ) : (
-                  <>
-                    <Save size={18} color="#fff" />
-                    <Text style={styles.saveText}>Save to My Vitamin</Text>
-                  </>
-                )}
-              </TouchableOpacity>
+                  {/* Save to My Vitamin (Center) */}
+                  <TouchableOpacity
+                    onPress={handleSave}
+                    disabled={loading}
+                    style={[styles.saveBtn, { flex: 1.2, backgroundColor: colors.primary, opacity: loading ? 0.6 : 1, paddingVertical: 12 }]}
+                  >
+                    {loading ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <>
+                        <Save size={16} color="#fff" />
+                        <Text style={[styles.saveText, { fontSize: 13 }]}>Save Note</Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+
+                  {/* Insert Into Note (Right) */}
+                  <TouchableOpacity
+                    onPress={() => aiPanelRef.current?.triggerInsert()}
+                    style={[styles.saveBtn, { flex: 1, backgroundColor: '#10b981', paddingVertical: 12 }]}
+                  >
+                    <ArrowDownToLine size={14} color="#fff" />
+                    <Text style={{ color: '#fff', fontWeight: '800', fontSize: 12 }}>Insert</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <>
+                  <TouchableOpacity
+                    onPress={handlePasteFormatted}
+                    style={[styles.pasteAiBtn, { backgroundColor: '#EEECFF', borderColor: '#5B4EFA' }]}
+                  >
+                    <Sparkles size={16} color="#5B4EFA" />
+                    <Text style={{ color: '#5B4EFA', fontWeight: '800', fontSize: 13 }}>Paste AI Response</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={handleSave}
+                    disabled={loading}
+                    style={[styles.saveBtn, { backgroundColor: colors.primary, opacity: loading ? 0.6 : 1 }]}
+                  >
+                    {loading ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <>
+                        <Save size={18} color="#fff" />
+                        <Text style={styles.saveText}>Save to My Vitamin</Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
           </KeyboardAvoidingView>
         </SafeAreaView>
@@ -291,15 +345,16 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
   sheet: {
-    width: '92%',
-    height: '85%',
-    borderRadius: 28,
+    width: '100%',
+    height: '100%',
     overflow: 'hidden',
     padding: 16,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
   },
   header: {
     flexDirection: 'row',

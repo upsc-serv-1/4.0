@@ -17,7 +17,7 @@
  *   • "Insert into note" button — pushes the (possibly edited) HTML into
  *     the SaveSheet body so it can be saved with one tap.
  */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import {
   View,
   Text,
@@ -56,10 +56,18 @@ type Props = {
   };
 };
 
-const PilotV2SaveAIPanel: React.FC<Props> = ({ visible, onClose, onInsert, seedContext }) => {
+export interface PilotV2SaveAIPanelHandle {
+  triggerInsert: () => Promise<void>;
+}
+
+const PilotV2SaveAIPanel = forwardRef((
+  { visible, onClose, onInsert, seedContext }: Props, 
+  ref: React.ForwardedRef<PilotV2SaveAIPanelHandle>
+) => {
   const { colors } = useTheme();
   const { session } = useAuth();
-  const { height: screenHeight } = useWindowDimensions();
+  const { width: windowWidth, height: screenHeight } = useWindowDimensions();
+  const isTablet = windowWidth >= 768;
   const [isFullscreen, setIsFullscreen] = useState(true);
   const [prompt, setPrompt] = useState('');
   const [output, setOutput] = useState('');
@@ -68,6 +76,12 @@ const PilotV2SaveAIPanel: React.FC<Props> = ({ visible, onClose, onInsert, seedC
   const promptManager = AIPromptManager.getInstance();
   const richRef = useRef<any>(null);
   const [editorKey, setEditorKey] = useState(0);
+
+  useImperativeHandle(ref, () => ({
+    triggerInsert: async () => {
+      await handleInsert();
+    }
+  }));
 
   useEffect(() => {
     if (!session?.user?.id) return;
@@ -82,8 +96,10 @@ const PilotV2SaveAIPanel: React.FC<Props> = ({ visible, onClose, onInsert, seedC
   if (!visible) return null;
 
   const computedPrompt = (presetTemplate?: PromptTemplate): string => {
+    // 🐛 FIX #31: In "Edit My Vitamin" mode, body content should take priority over question context.
+    // When body is present, the AI should only see the user's vitamin text, not the question.
     const ctxQuestion =
-      seedContext?.question || seedContext?.body || seedContext?.topic || seedContext?.subject || '';
+      seedContext?.body || seedContext?.question || seedContext?.topic || seedContext?.subject || '';
     const optionsObj = seedContext?.options || {};
     const optionsStr = Object.entries(optionsObj)
       .map(([k, v]) => `${k}) ${v}`)
@@ -178,108 +194,128 @@ const PilotV2SaveAIPanel: React.FC<Props> = ({ visible, onClose, onInsert, seedC
         {
           backgroundColor: colors.surface,
           borderColor: colors.border,
-          height: panelHeight,
+          flex: 1,
         },
       ]}
     >
-      {/* Header */}
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <View style={styles.headerLeft}>
-          <View style={[styles.brain, { backgroundColor: '#EEECFF' }]}>
-            <Sparkles size={16} color="#5B4EFA" />
-          </View>
-          <View>
-            <Text style={[styles.title, { color: colors.textPrimary }]}>AI Assistant</Text>
-            <Text style={[styles.subtitle, { color: colors.textTertiary }]}>
-              Type a command or tap a preset to run instantly
-            </Text>
-          </View>
-        </View>
-        <View style={styles.headerRight}>
-          <TouchableOpacity
-            testID="pilot-v2-save-ai-expand"
-            onPress={() => setIsFullscreen((v) => !v)}
-            style={[styles.headerBtn, { borderColor: colors.border }]}
-          >
-            {isFullscreen ? (
-              <Minimize2 size={14} color={colors.textSecondary} />
-            ) : (
-              <Maximize2 size={14} color={colors.textSecondary} />
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity
-            testID="pilot-v2-save-ai-close"
-            onPress={onClose}
-            style={[styles.headerBtn, { borderColor: colors.border }]}
-          >
-            <X size={14} color={colors.textSecondary} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Prompt input row */}
-      <View style={[styles.promptRow, { borderBottomColor: colors.border }]}>
-        <TextInput
-          testID="pilot-v2-save-ai-input"
-          value={prompt}
-          onChangeText={setPrompt}
-          placeholder='Ask AI anything — e.g. "Convert to Hindi"'
-          placeholderTextColor={colors.textTertiary}
-          style={[
-            styles.promptInput,
-            {
-              color: colors.textPrimary,
-              backgroundColor: colors.surfaceStrong,
-              borderColor: colors.border,
-            },
+      {/* 1. Toolbar MOVED UPWARD directly below top level header */}
+      <View style={[styles.toolbarSticky, { backgroundColor: colors.surfaceStrong, borderBottomColor: colors.border, flexDirection: 'row', alignItems: 'center', paddingVertical: 2 }]}>
+        <RichToolbar
+          getEditor={() => richRef.current}
+          selectedIconTint="#5B4EFA"
+          iconTint={colors.textPrimary}
+          style={{ backgroundColor: 'transparent', height: 44, flex: 1 }}
+          actions={[
+            actions.undo,
+            actions.redo,
+            actions.setBold,
+            actions.setItalic,
+            actions.setUnderline,
+            actions.setStrikethrough,
+            actions.heading1,
+            actions.heading2,
+            actions.insertBulletsList,
+            actions.insertOrderedList,
+            actions.blockquote,
           ]}
-          multiline
+          iconMap={{
+            [actions.undo]: ({ tintColor }: any) => <Undo2 size={16} color={tintColor} />,
+            [actions.redo]: ({ tintColor }: any) => <Redo2 size={16} color={tintColor} />,
+            [actions.heading1]: ({ tintColor }: any) => (
+              <Text style={{ color: tintColor, fontWeight: '900', fontSize: 13 }}>H1</Text>
+            ),
+            [actions.heading2]: ({ tintColor }: any) => (
+              <Text style={{ color: tintColor, fontWeight: '800', fontSize: 11 }}>H2</Text>
+            ),
+          }}
         />
-        <TouchableOpacity
-          testID="pilot-v2-save-ai-send"
-          onPress={() => runAI()}
-          disabled={loading || !prompt.trim()}
-          style={[
-            styles.sendBtn,
-            { backgroundColor: '#5B4EFA', opacity: loading || !prompt.trim() ? 0.5 : 1 },
-          ]}
-        >
-          {loading ? <ActivityIndicator color="#fff" size="small" /> : <Send size={14} color="#FFF" />}
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingRight: 12 }}>
+          <TouchableOpacity
+            onPress={() => handlePasteFormatted()}
+            style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: '#EEECFF', borderColor: '#5B4EFA', borderWidth: 1, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Clipboard size={14} color="#5B4EFA" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              richRef.current?.getContentHtml?.().then((html: string) => {
+                if (html) ExpoClipboard.setStringAsync(html.replace(/<[^>]*>/g, ''));
+                Alert.alert('Copied', 'AI response copied to clipboard.');
+              });
+            }}
+            style={[styles.headerBtn, { borderColor: colors.border, width: 32, height: 32 }]}
+          >
+            <Copy size={14} color={colors.textSecondary} />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      {/* Preset chips (replaces the old "Running AI" tab) */}
-      <View style={[styles.presetsBar, { borderBottomColor: colors.border }]}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.presetsContent}
-        >
-          {templates.map((t) => (
-            <TouchableOpacity
-              key={t.template_key}
-              testID={`pilot-v2-save-ai-preset-${t.template_key}`}
-              onPress={() => runAI(t)}
-              disabled={loading}
-              style={[
-                styles.presetChip,
-                {
-                  backgroundColor: colors.surfaceStrong,
-                  borderColor: colors.border,
-                  opacity: loading ? 0.6 : 1,
-                },
-              ]}
-            >
-              <Text style={styles.presetEmoji}>{t.button_emoji || '🤖'}</Text>
-              <Text
-                style={[styles.presetLabel, { color: colors.textPrimary }]}
-                numberOfLines={1}
+      {/* Combined Input & Presets Row with Tablet Layout Handling */}
+      <View style={[isTablet ? styles.tabletLayoutRow : styles.stackedLayout, { borderBottomColor: colors.border }]}>
+        {/* Search Bar (Prompts) */}
+        <View style={[styles.promptRow, isTablet ? { flex: 1, borderBottomWidth: 0, paddingRight: 4 } : {}]}>
+          <TextInput
+            testID="pilot-v2-save-ai-input"
+            value={prompt}
+            onChangeText={setPrompt}
+            placeholder='Ask AI — e.g. "Translate this"'
+            placeholderTextColor={colors.textTertiary}
+            style={[
+              styles.promptInput,
+              {
+                color: colors.textPrimary,
+                backgroundColor: colors.surfaceStrong,
+                borderColor: colors.border,
+              },
+            ]}
+            multiline={false}
+          />
+          <TouchableOpacity
+            testID="pilot-v2-save-ai-send"
+            onPress={() => runAI()}
+            disabled={loading || !prompt.trim()}
+            style={[
+              styles.sendBtn,
+              { backgroundColor: '#5B4EFA', opacity: loading || !prompt.trim() ? 0.5 : 1 },
+            ]}
+          >
+            {loading ? <ActivityIndicator color="#fff" size="small" /> : <Send size={14} color="#FFF" />}
+          </TouchableOpacity>
+        </View>
+
+        {/* Presets Scrollable on Right for Tablet, or Below for Phone */}
+        <View style={[styles.presetsBar, isTablet ? { flex: 1, borderBottomWidth: 0, paddingVertical: 0 } : {}, { justifyContent: 'center' }]}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={[styles.presetsContent, { alignItems: 'center', height: '100%' }]}
+          >
+            {templates.map((t) => (
+              <TouchableOpacity
+                key={t.template_key}
+                testID={`pilot-v2-save-ai-preset-${t.template_key}`}
+                onPress={() => runAI(t)}
+                disabled={loading}
+                style={[
+                  styles.presetChip,
+                  {
+                    backgroundColor: colors.surfaceStrong,
+                    borderColor: colors.border,
+                    opacity: loading ? 0.6 : 1,
+                  },
+                ]}
               >
-                {t.button_label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+                <Text style={styles.presetEmoji}>{t.button_emoji || '🤖'}</Text>
+                <Text
+                  style={[styles.presetLabel, { color: colors.textPrimary }]}
+                  numberOfLines={1}
+                >
+                  {t.button_label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
       </View>
 
       {/* Loading indicator */}
@@ -287,69 +323,13 @@ const PilotV2SaveAIPanel: React.FC<Props> = ({ visible, onClose, onInsert, seedC
         <View style={[styles.loadingRow, { borderBottomColor: colors.border }]}>
           <ActivityIndicator size="small" color="#5B4EFA" />
           <Text style={{ fontSize: 12, color: colors.textTertiary, marginLeft: 8 }}>
-            Thinking…
+            Processing your request…
           </Text>
         </View>
       )}
 
-      {/* Rich-editor output area — full formatting toolbar copied as-is */}
+      {/* Output Editor Container - No interior toolbar here anymore */}
       <View style={[styles.outputShell, { borderColor: colors.border, backgroundColor: colors.surfaceStrong, flex: 1 }]}>
-        <View style={[styles.toolbarSticky, { backgroundColor: colors.surfaceStrong, borderBottomColor: colors.border, flexDirection: 'row', alignItems: 'center' }]}>
-          <RichToolbar
-            getEditor={() => richRef.current}
-            selectedIconTint="#5B4EFA"
-            iconTint={colors.textPrimary}
-            style={{ backgroundColor: 'transparent', height: 40, flex: 1 }}
-            actions={[
-              actions.undo,
-              actions.redo,
-              actions.setBold,
-              actions.setItalic,
-              actions.setUnderline,
-              actions.setStrikethrough,
-              actions.heading1,
-              actions.heading2,
-              actions.insertBulletsList,
-              actions.insertOrderedList,
-              actions.blockquote,
-            ]}
-            iconMap={{
-              [actions.undo]: ({ tintColor }: any) => <Undo2 size={16} color={tintColor} />,
-              [actions.redo]: ({ tintColor }: any) => <Redo2 size={16} color={tintColor} />,
-              [actions.heading1]: ({ tintColor }: any) => (
-                <Text style={{ color: tintColor, fontWeight: '900', fontSize: 13 }}>H1</Text>
-              ),
-              [actions.heading2]: ({ tintColor }: any) => (
-                <Text style={{ color: tintColor, fontWeight: '800', fontSize: 11 }}>H2</Text>
-              ),
-            }}
-          />
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, paddingRight: 8 }}>
-            <TouchableOpacity
-              onPress={() => handlePasteFormatted()}
-              style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: '#EEECFF', borderColor: '#5B4EFA', borderWidth: 1, alignItems: 'center', justifyContent: 'center' }}
-            >
-              <Clipboard size={13} color="#5B4EFA" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                richRef.current?.getContentHtml?.().then((html: string) => {
-                  if (html) ExpoClipboard.setStringAsync(html.replace(/<[^>]*>/g, ''));
-                  Alert.alert('Copied', 'AI response copied to clipboard.');
-                });
-              }}
-              style={[styles.headerBtn, { borderColor: colors.border, width: 28, height: 28 }]}
-            >
-              <Copy size={13} color={colors.textSecondary} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={onClose}
-              style={{ width: 28, height: 28, borderRadius: 6, alignItems: 'center', justifyContent: 'center' }}
-            >
-              <Brain size={15} color={colors.textPrimary} />
-            </TouchableOpacity>
-          </View>
-        </View>
         <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
           <RichNoteEditor
             key={editorKey}
@@ -363,38 +343,15 @@ const PilotV2SaveAIPanel: React.FC<Props> = ({ visible, onClose, onInsert, seedC
               border: colors.border,
               primary: '#5B4EFA',
             }}
-            placeholder="AI response will appear here. Tap a preset above or type & send."
-            editorStyle={{ minHeight: 300 }}
+            placeholder="AI response yields here..."
+            editorStyle={{ minHeight: 250 }}
             useContainer={false}
           />
         </ScrollView>
       </View>
-
-      {/* Footer */}
-      <View style={[styles.footer, { borderTopColor: colors.border }]}>
-        <TouchableOpacity
-          testID="pilot-v2-save-ai-clear"
-          onPress={() => {
-            setOutput('');
-            setEditorKey((k) => k + 1);
-          }}
-          style={[styles.footerBtnGhost, { borderColor: colors.border }]}
-        >
-          <Plus size={14} color={colors.textPrimary} style={{ transform: [{ rotate: '45deg' }] }} />
-          <Text style={{ color: colors.textPrimary, fontWeight: '700', fontSize: 12 }}>Clear</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          testID="pilot-v2-save-ai-insert"
-          onPress={handleInsert}
-          style={[styles.footerBtnPrimary, { backgroundColor: '#5B4EFA' }]}
-        >
-          <ArrowDownToLine size={14} color="#FFF" />
-          <Text style={{ color: '#FFF', fontWeight: '800', fontSize: 12 }}>Insert into note</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
-};
+});
 
 /** Minimal markdown → HTML converter that keeps things readable inside the
  *  Pell rich editor (which only knows simple HTML).  We deliberately avoid a
@@ -541,6 +498,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+  },
+  tabletLayoutRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    gap: 8,
+  },
+  stackedLayout: {
+    flexDirection: 'column',
+    borderBottomWidth: 1,
   },
 });
 

@@ -9,7 +9,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
 
-export type PromptCategory = 'quiz' | 'notes' | 'tags' | 'analysis' | 'syllabus';
+export type PromptCategory = 'quiz' | 'notes' | 'tags' | 'analysis' | 'syllabus' | 'flashcard';
 
 export type PromptTemplate = {
   id?: string;
@@ -282,12 +282,137 @@ Include:
   },
 ];
 
+export const DEFAULT_FLASHCARD_TEMPLATES: PromptTemplate[] = [
+  {
+    template_name: 'Standard Format',
+    template_key: 'standard',
+    button_label: 'Standard',
+    button_emoji: '📚',
+    prompt_text: `You are an expert UPSC exam flashcard creator.
+
+Your task: Convert the provided content/notes into a high-quality flashcard suitable for spaced repetition learning.
+
+CRITICAL FORMAT REQUIREMENT:
+Respond in EXACTLY this format:
+front - [question/prompt/cue here] - back - [answer/explanation here] -
+
+Rules:
+1. Front side: Create a clear, concise question or cue (15-50 words)
+2. Back side: Provide a comprehensive but focused answer (30-150 words)
+3. UPSC-specific: Use official terminology, include specific facts (dates, articles, acts, names)
+4. Format: Start front content immediately after "front - ", and back content after "back - "
+5. Do NOT add any explanation, preamble, or closing text
+6. Do NOT use markdown, bold, or italics
+
+CONTENT TO CONVERT:
+{{content}}`,
+    category: 'flashcard',
+    is_active: true,
+    display_order: 0,
+  },
+  {
+    template_name: 'Definition Only',
+    template_key: 'definition',
+    button_label: 'Definition',
+    button_emoji: '📖',
+    prompt_text: `Create a simple definition flashcard from this content.
+
+Format as:
+front - [Term or Concept] - back - [Clear, concise definition] -
+
+CONTENT:
+{{content}}
+
+Keep definitions brief (1-2 sentences max) and focused on exam relevance.`,
+    category: 'flashcard',
+    is_active: true,
+    display_order: 1,
+  },
+  {
+    template_name: 'Application/Example',
+    template_key: 'application',
+    button_label: 'Example',
+    button_emoji: '💡',
+    prompt_text: `Create a flashcard focusing on practical application or examples.
+
+Format as:
+front - [Scenario/Example question] - back - [How this applies or real-world connection] -
+
+CONTENT:
+{{content}}
+
+Front should ask "What is an example of..." or "How does this apply..."
+Back should provide concrete examples relevant to UPSC.`,
+    category: 'flashcard',
+    is_active: true,
+    display_order: 2,
+  },
+  {
+    template_name: 'Comparison Card',
+    template_key: 'comparison',
+    button_label: 'Comparison',
+    button_emoji: '⚖️',
+    prompt_text: `Create a flashcard comparing two or more concepts from this content.
+
+Format as:
+front - [What to compare: Concept A vs Concept B] - back - [Key differences in bullet points] -
+
+CONTENT:
+{{content}}
+
+Front: Ask for comparison clearly
+Back: Provide 3-4 key differences between the concepts.`,
+    category: 'flashcard',
+    is_active: true,
+    display_order: 3,
+  },
+  {
+    template_name: 'Key Facts/Dates',
+    template_key: 'key_facts',
+    button_label: 'Facts',
+    button_emoji: '📍',
+    prompt_text: `Create a flashcard for important facts, dates, or statistics.
+
+Format as:
+front - [The fact/event in question form] - back - [The answer with specific details] -
+
+CONTENT:
+{{content}}
+
+Front: Pose as a question about a specific fact, year, or detail
+Back: Include the exact answer + any context (act number, article, specific detail).`,
+    category: 'flashcard',
+    is_active: true,
+    display_order: 4,
+  },
+  {
+    template_name: 'Fill the Blank',
+    template_key: 'fill_blank',
+    button_label: 'Fill Blank',
+    button_emoji: '✏️',
+    prompt_text: `Create a fill-in-the-blank flashcard for quick recall.
+
+Format as:
+front - [Sentence with ___ blank] - back - [The correct word/phrase to fill] -
+
+CONTENT:
+{{content}}
+
+Front: Create a sentence from the content with ONE blank to fill
+Back: Provide the exact answer that fills the blank.`,
+    category: 'flashcard',
+    is_active: true,
+    display_order: 5,
+  },
+];
+
 const ALL_DEFAULTS: Record<string, PromptTemplate[]> = {
   quiz: DEFAULT_QUIZ_TEMPLATES,
   notes: DEFAULT_NOTES_TEMPLATES,
   tags: DEFAULT_TAGS_TEMPLATES,
   analysis: DEFAULT_ANALYSIS_TEMPLATES,
   syllabus: DEFAULT_SYLLABUS_TEMPLATES,
+  flashcard: DEFAULT_FLASHCARD_TEMPLATES,
 };
 
 // ──────────────────────────────────────────────────────────

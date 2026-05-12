@@ -3,10 +3,19 @@
  * ------------------------------------------------------------------
  * Sits ABOVE the text/pencil layers when active. Tap to toggle reveal.
  * Long-press to remove. Drag-while-active to draw a new tape rect.
+ *
+ * Uses RNGH Gesture.Pan (instead of old PanResponder) so it works
+ * reliably alongside pinch/pan/double-tap gestures in both
+ * GlanceView and EditorView.
+ *
+ * CRITICAL: All React state updates (setDraft, onAdd) must go through
+ * runOnJS because gesture callbacks run on the UI-thread worklet.
  */
 
-import React, { useRef, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, PanResponder, Text } from 'react-native';
+import React, { useRef, useState, useCallback } from 'react';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, { runOnJS, useSharedValue } from 'react-native-reanimated';
 import {
   PilotV2WashiTape, washiBg, washiEdge, createWashiTape,
   WashiTapeColor, WASHI_TAPE_COLORS,
@@ -30,47 +39,94 @@ export function WashiTapeLayer({
   onAdd, onToggle, onRemove, testID,
 }: Props) {
   const [draft, setDraft] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
-  const startRef = useRef({ x: 0, y: 0 });
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => drawingMode,
-      onMoveShouldSetPanResponder: () => drawingMode,
-      onPanResponderGrant: (evt) => {
-        const { locationX, locationY } = evt.nativeEvent;
-        startRef.current = { x: locationX / Math.max(1, width), y: locationY / Math.max(1, height) };
-        setDraft({ x: startRef.current.x, y: startRef.current.y, w: 0, h: 0 });
-      },
-      onPanResponderMove: (evt) => {
-        const { locationX, locationY } = evt.nativeEvent;
-        const cx = locationX / Math.max(1, width);
-        const cy = locationY / Math.max(1, height);
-        setDraft({
-          x: Math.min(startRef.current.x, cx),
-          y: Math.min(startRef.current.y, cy),
-          w: Math.abs(cx - startRef.current.x),
-          h: Math.abs(cy - startRef.current.y),
-        });
-      },
-      onPanResponderRelease: () => {
-        setDraft((d) => {
-          if (d && d.w > 0.02 && d.h > 0.015) {
-            onAdd(createWashiTape(d.x, d.y, d.w, d.h, activeColor));
-          }
-          return null;
-        });
-      },
-      onPanResponderTerminate: () => setDraft(null),
+  // Shared values for worklet-to-JS communication
+  const sxSV = useSharedValue(0);
+  const sySV = useSharedValue(0);
+  const dxSV = useSharedValue(0);
+  const dySV = useSharedValue(0);
+  const dwSV = useSharedValue(0);
+  const dhSV = useSharedValue(0);
+  const endedSV = useSharedValue(false);
+
+  /** Called via runOnJS from gesture onBegin — resets draft */
+  const onBeginJS = useCallback((sx: number, sy: number) => {
+    setDraft({ x: sx, y: sy, w: 0, h: 0 });
+  }, []);
+
+  /** Called via runOnJS from gesture onUpdate — updates draft */
+  const onUpdateJS = useCallback((x: number, y: number, w: number, h: number) => {
+    setDraft({ x, y, w, h });
+  }, []);
+
+  /** Called via runOnJS from gesture onEnd — commits tape or clears draft */
+  const onEndJS = useCallback((d: { x: number; y: number; w: number; h: number } | null) => {
+    if (d && d.w > 0.02 && d.h > 0.015) {
+      onAdd(createWashiTape(d.x, d.y, d.w, d.h, activeColor));
+    }
+    setDraft(null);
+  }, [activeColor, onAdd]);
+
+  /** Called via runOnJS from gesture onFinalize — cleanup */
+  const onFinalizeJS = useCallback(() => {
+    setDraft(null);
+  }, []);
+
+  const drawGesture = Gesture.Pan()
+    .enabled(drawingMode)
+    .minDistance(3)
+    .onBegin((e) => {
+      'worklet';
+      endedSV.value = false;
+      sxSV.value = e.x / Math.max(1, width);
+      sySV.value = e.y / Math.max(1, height);
+      runOnJS(onBeginJS)(sxSV.value, sySV.value);
     })
-  ).current;
+    .onUpdate((e) => {
+      'worklet';
+      const cx = (sxSV.value * width + e.translationX) / Math.max(1, width);
+      const cy = (sySV.value * height + e.translationY) / Math.max(1, height);
+      const sx = sxSV.value;
+      const sy = sySV.value;
+      const ux = Math.min(sx, cx);
+      const uy = Math.min(sy, cy);
+      const uw = Math.abs(cx - sx);
+      const uh = Math.abs(cy - sy);
+      dxSV.value = ux;
+      dySV.value = uy;
+      dwSV.value = uw;
+      dhSV.value = uh;
+      runOnJS(onUpdateJS)(ux, uy, uw, uh);
+    })
+    .onEnd(() => {
+      'worklet';
+      if (endedSV.value) return;
+      endedSV.value = true;
+      const d = (dwSV.value > 0.02 && dhSV.value > 0.015)
+        ? { x: dxSV.value, y: dySV.value, w: dwSV.value, h: dhSV.value }
+        : null;
+      runOnJS(onEndJS)(d);
+    })
+    .onFinalize(() => {
+      'worklet';
+      endedSV.value = true;
+      runOnJS(onFinalizeJS)();
+    });
 
   return (
     <View
       pointerEvents={drawingMode ? 'auto' : 'box-none'}
       style={[styles.layer, { width, height }]}
       testID={testID || 'pilot-v2-washi-layer'}
-      {...(drawingMode ? panResponder.panHandlers : {})}
     >
+      {/* Gesture overlay for drawing new tapes */}
+      {drawingMode && (
+        <GestureDetector gesture={drawGesture}>
+          <Animated.View style={{ ...StyleSheet.absoluteFillObject, width, height }} />
+        </GestureDetector>
+      )}
+
+      {/* Existing tapes */}
       {tapes.map((t) => (
         <TouchableOpacity
           key={t.id}

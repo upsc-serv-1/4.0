@@ -124,7 +124,10 @@ export default function ResultScreen() {
     explanationText?: string,
     optsOrMode?: { closeExplanation?: boolean } | string
   ) => {
-    const activeText = explanationText || q.explanation_markdown || '';
+    // Ensure we always have content: prefer passed explanation, fallback to question's explanation, then use question text
+    const activeText = (explanationText && explanationText.trim()) 
+      ? explanationText 
+      : (q.explanation_markdown || `**Question:** ${q.question_text || 'Question'}`);
     setPilotSaveTargetQuestion(q);
     setPilotSaveHtml(markdownToHtml(activeText));
     setPilotV2SaveOpen(true);
@@ -685,6 +688,13 @@ export default function ResultScreen() {
             showPYQTags={showPYQTags}
             userStudyTags={userStudyTags}
             toggleStudyTag={(qid: string, tags: string[], tag: string) => toggleReviewTag(qid, tag)}
+            toggleMistakeType={handleTagError}
+            answerData={{
+              selectedAnswer: item.selectedAnswer,
+              studyTags: localReviewTags[item.id] || item.reviewTags || [],
+              errorCategory: localTags[item.id] || item.errorCategory || null,
+              isReview: !!item.isReview
+            }}
             showMistakes={showMistakes}
           />
         )}

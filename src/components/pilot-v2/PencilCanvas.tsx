@@ -136,9 +136,10 @@ export function PencilCanvas({
     setActivePathStr('');
   }, []);
 
+  // Debug logging for drawing mode
   useEffect(() => {
-    engine.setConfig({ pageWidth: width, pageHeight: height });
-  }, [engine, width, height]);
+    console.log('[PencilCanvas] drawingMode changed to:', drawingMode, 'tool:', tool);
+  }, [drawingMode, tool]);
 
   useEffect(() => {
     // PERSISTED listener — refresh the committed-strokes layer ONLY when a

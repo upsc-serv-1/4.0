@@ -36,11 +36,12 @@ export function useFlashcardAction(userId: string | undefined) {
       // 1. Create or resolve the flashcard
       const cardId = await FlashcardSvc.createFromQuestion(userId, q, activeAnswerText);
       
-      // 2. Update local state
-      setFlashcardedIds(prev => new Set([...prev, q.id]));
+      // 2. DO NOT add to flashcardedIds yet - only add after successful placement
+      // (handled by onPlaced callback)
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       
       // 3. Open the directory selection popup (AddToFlashcardSheet)
+      // The onPlaced callback will add the card to flashcardedIds
       setAff({
         visible: true,
         cardId,
@@ -58,6 +59,20 @@ export function useFlashcardAction(userId: string | undefined) {
     } finally {
       setSavingFlashcard(prev => ({ ...prev, [q.id]: false }));
     }
+  };
+
+  const handleFlashcardPlaced = (cardId: string, questionId: string) => {
+    // Called when flashcard is successfully placed in a deck
+    setFlashcardedIds(prev => new Set([...prev, questionId]));
+  };
+
+  const handleFlashcardDeleted = (questionId: string) => {
+    // Called when flashcard is deleted
+    setFlashcardedIds(prev => {
+      const next = new Set(prev);
+      next.delete(questionId);
+      return next;
+    });
   };
 
   const fetchFlashcardedStatus = async (qIds: string[]) => {
@@ -94,6 +109,8 @@ export function useFlashcardAction(userId: string | undefined) {
     aff,
     setAff,
     handleAddToFlashcards,
+    handleFlashcardPlaced,
+    handleFlashcardDeleted,
     fetchFlashcardedStatus,
   };
 }

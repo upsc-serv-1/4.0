@@ -760,8 +760,13 @@ export default function UnifiedArenaSetup() {
   const examCategories = ['UPSC CSE', 'Allied Exams', 'Others'];
 
   const institutes = useMemo(() => {
-    return Array.from(new Set(metadata.map(m => m.institute).filter(Boolean))).sort();
-  }, [metadata]);
+    let base = metadata;
+    // Apply subject filter with AND logic
+    if (selectedSubjects.length > 0) {
+      base = base.filter(m => selectedSubjects.includes(m.subject));
+    }
+    return Array.from(new Set(base.map(m => m.institute).filter(Boolean))).sort();
+  }, [metadata, selectedSubjects]);
 
   const programs = useMemo(() => {
     let base = metadata;

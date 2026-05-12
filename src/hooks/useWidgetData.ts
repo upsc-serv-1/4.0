@@ -100,15 +100,29 @@ export function useWidgetData(userId: string | undefined) {
 
       const now = new Date();
       const dueCardsCount = cards.filter(c => {
+        // Only active cards
         if (c.status !== 'active') return false;
         const learning = String(c.learning_status || '').toLowerCase();
 
-        // Keep homepage count aligned with deck "cards for today":
-        // include all not-studied cards + due learning/review cards.
+        // NOT_STUDIED/NEW: always count as due (never reviewed)
         if (learning === 'not_studied' || learning === 'new') return true;
-        if (learning === 'learning' || learning === 'review' || learning === 'leech') {
+        
+        // LEARNING: cards in learning queue with next_review <= now
+        if (learning === 'learning') {
           return !!c.next_review && new Date(c.next_review) <= now;
         }
+        
+        // REVIEW: mature cards due for review
+        if (learning === 'review') {
+          return !!c.next_review && new Date(c.next_review) <= now;
+        }
+        
+        // LEECH: treated like review
+        if (learning === 'leech') {
+          return !!c.next_review && new Date(c.next_review) <= now;
+        }
+
+        // MASTERED/DELETED/FROZEN: don't count
         return false;
       }).length;
 

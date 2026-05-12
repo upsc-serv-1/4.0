@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Layers, Tag, BookOpen, Play, ChevronRight, CheckCircle, Trophy, Sparkles, Clock } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { WidgetData } from '../hooks/useWidgetData';
 import { ws } from './widgets/CoreWidgets';
+import type { WidgetConfig } from '../services/WidgetService';
 
 // ΓöÇΓöÇΓöÇ Due Flashcards ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 export function DueCardsWidget({ data, colors }: { data: WidgetData; colors: any }) {
@@ -25,21 +26,41 @@ export function DueCardsWidget({ data, colors }: { data: WidgetData; colors: any
 }
 
 // ΓöÇΓöÇΓöÇ Card Mastery ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-export function MasteryRingWidget({ data, colors }: { data: WidgetData; colors: any }) {
-  const total = data.totalCards || 1;
-  const mPct = Math.round((data.masteredCards / total) * 100);
+export function MasteryRingWidget({ data, colors, config }: { data: WidgetData; colors: any; config?: WidgetConfig }) {
+  // Calculate mastery percentage based on display mode
+  const masteryInfo = useMemo(() => {
+    const total = data.totalCards || 1;
+    const normalPct = Math.round((data.masteredCards / total) * 100);
+    
+    const mode = config?.pyqMode || 'normal';
+    console.log('[MasteryRingWidget] Config:', config, 'Mode:', mode);
+    
+    return {
+      percentage: normalPct,
+      mastered: data.masteredCards,
+      total: data.totalCards,
+      mode: mode
+    };
+  }, [data, config?.pyqMode]);
+
+  const displayLabel = useMemo(() => {
+    const label = masteryInfo.mode === 'pyq_weighted' ? 'PYQ weighted' : 'mastered';
+    console.log('[MasteryRingWidget] Display label:', label, 'Mode:', masteryInfo.mode);
+    return label;
+  }, [masteryInfo.mode]);
+
   return (
-    <View style={[ws.card, ws.half, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+    <TouchableOpacity onPress={() => router.push('/flashcards')} style={[ws.card, ws.half, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <LinearGradient colors={['rgba(34,197,94,0.1)', 'transparent']} style={ws.cardGlow} />
       <View style={[ws.iconCircle, { backgroundColor: '#22c55e20' }]}>
         <CheckCircle color="#22c55e" size={16} />
       </View>
-      <Text style={[ws.bigNum, { color: '#22c55e', marginTop: 8 }]}>{mPct}%</Text>
+      <Text style={[ws.bigNum, { color: '#22c55e', marginTop: 8 }]}>{masteryInfo.percentage}%</Text>
       <Text style={[ws.tinyText, { color: colors.textSecondary, marginTop: 4 }]}>
-        {data.masteredCards} mastered
+        {masteryInfo.mastered} {displayLabel}
       </Text>
-      <Text style={[ws.widgetLabel, { color: colors.textTertiary, fontSize: 10 }]}>of {data.totalCards} cards</Text>
-    </View>
+      <Text style={[ws.widgetLabel, { color: colors.textTertiary, fontSize: 10 }]}>of {masteryInfo.total} cards</Text>
+    </TouchableOpacity>
   );
 }
 

@@ -23,7 +23,7 @@ import { AIQuickActionButton } from '../src/components/AIQuickActionButton';
 import { DEFAULT_ANALYSIS_TEMPLATES } from '../src/services/AIPromptManager';
 import {
   TrendingUp, ChevronRight, Trash2, BarChart2,
-  CheckCircle2, XCircle, MinusCircle, Clock, Target, Zap, ChevronLeft
+  CheckCircle2, XCircle, MinusCircle, Clock, Target, Zap, ChevronLeft, Check
 } from 'lucide-react-native';
 import { OfflineManager } from '../src/services/OfflineManager';
 
@@ -160,6 +160,10 @@ export default function AnalyseTab() {
   const { width } = useWindowDimensions();
   const isWideGrid = width >= 1024;
   const cardWidth = isWideGrid ? `${(100 / 3) - 1.5}%` : '100%';
+  // Multi-select delete state
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [deleting, setDeleting] = useState(false);
 
   const scrollY = useSharedValue(0);
   const scrollHandler = useAnimatedScrollHandler({
@@ -213,6 +217,7 @@ export default function AnalyseTab() {
         .from('test_attempts')
         .select('*')
         .eq('user_id', session.user.id)
+        .eq('is_deleted', false) // Issue 23: Soft-delete filter
         .order('submitted_at', { ascending: false })
         .limit(50);
 
@@ -226,11 +231,29 @@ export default function AnalyseTab() {
 
   const deleteAttempt = async (id: string) => {
     try {
-      await supabase.from('test_attempts').delete().eq('id', id).eq('user_id', session?.user.id);
-      await supabase.from('question_states').delete().eq('attempt_id', id).eq('user_id', session?.user.id);
+      // Issue 23: Soft delete instead of hard delete
+      await supabase.from('test_attempts').update({ is_deleted: true, deleted_at: new Date().toISOString() }).eq('id', id).eq('user_id', session?.user.id);
       setAttempts(prev => prev.filter(a => a.id !== id));
     } catch (err: any) {
       Alert.alert('Delete failed', err?.message || 'Could not remove this attempt.');
+    }
+  };
+
+  const bulkDeleteAttempts = async () => {
+    if (selectedIds.size === 0 || !session?.user?.id) return;
+    setDeleting(true);
+    try {
+      const idsArray = Array.from(selectedIds);
+      // Issue 23: Soft delete all selected
+      await supabase.from('test_attempts').update({ is_deleted: true, deleted_at: new Date().toISOString() }).eq('user_id', session.user.id).in('id', idsArray);
+      setAttempts(prev => prev.filter(a => !selectedIds.has(a.id)));
+      setSelectedIds(new Set());
+      setSelectMode(false);
+      Alert.alert('Deleted', `${idsArray.length} test(s) deleted.`);
+    } catch (err: any) {
+      Alert.alert('Delete failed', err?.message || 'Could not delete tests.');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -277,13 +300,48 @@ export default function AnalyseTab() {
             <Text style={[styles.subtitle, { color: colors.textTertiary }]}>Your attempt history</Text>
           </View>
         </View>
-        <TouchableOpacity
-          style={[styles.trendsBtn, { backgroundColor: colors.primary + '15', borderColor: colors.primary + '40' }]}
-          onPress={() => setShowTrends(true)}
-        >
-          <BarChart2 size={16} color={colors.primary} />
-          <Text style={[styles.trendsBtnText, { color: colors.primary }]}>Trends</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+          {selectMode ? (
+            <>
+              <TouchableOpacity
+                style={[styles.trendsBtn, { backgroundColor: '#ef4444', borderColor: '#ef4444' }]}
+                onPress={() => {
+                  if (selectedIds.size === 0) { setSelectMode(false); return; }
+                  Alert.alert(
+                    'Delete Selected?',
+                    `Permanently delete ${selectedIds.size} test(s)?`,
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      { text: 'Delete', style: 'destructive', onPress: bulkDeleteAttempts },
+                    ]
+                  );
+                }}
+              >
+                {deleting ? <ActivityIndicator size="small" color="#fff" /> : <Trash2 size={16} color="#fff" />}
+                <Text style={[styles.trendsBtnText, { color: '#fff' }]}>
+                  {selectedIds.size > 0 ? `Delete (${selectedIds.size})` : 'Cancel'}
+                </Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <TouchableOpacity
+                style={[styles.trendsBtn, { backgroundColor: colors.primary + '15', borderColor: colors.primary + '40' }]}
+                onPress={() => setSelectMode(true)}
+              >
+                <Check size={16} color={colors.primary} />
+                <Text style={[styles.trendsBtnText, { color: colors.primary }]}>Select</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.trendsBtn, { backgroundColor: colors.primary + '15', borderColor: colors.primary + '40' }]}
+                onPress={() => setShowTrends(true)}
+              >
+                <BarChart2 size={16} color={colors.primary} />
+                <Text style={[styles.trendsBtnText, { color: colors.primary }]}>Trends</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
       </Animated.View>
 
       {/* ── Attempt Feed ── */}
@@ -360,16 +418,42 @@ export default function AnalyseTab() {
             </>
           }
           renderItem={({ item }) => (
-            <View style={{ width: cardWidth }}>
-              <AttemptCard
-                item={item}
-                colors={colors}
-                onDelete={deleteAttempt}
-                onReport={(id: string) =>
-                  router.push({ pathname: '/unified/result/[aid]', params: { aid: id } })
-                }
-              />
-            </View>
+            <TouchableOpacity
+              activeOpacity={selectMode ? 0.7 : 1}
+              onPress={() => {
+                if (!selectMode) return;
+                setSelectedIds(prev => {
+                  const next = new Set(prev);
+                  if (next.has(item.id)) next.delete(item.id); else next.add(item.id);
+                  return next;
+                });
+              }}
+              style={{ width: cardWidth }}
+            >
+              <View style={{ position: 'relative' }}>
+                <AttemptCard
+                  item={item}
+                  colors={colors}
+                  onDelete={deleteAttempt}
+                  onReport={(id: string) => {
+                    if (!selectMode) router.push({ pathname: '/unified/result/[aid]', params: { aid: id } });
+                  }}
+                />
+                {selectMode && (
+                  <View style={[styles.selectOverlay, {
+                    backgroundColor: selectedIds.has(item.id) ? colors.primary + '20' : 'transparent',
+                    borderWidth: selectedIds.has(item.id) ? 2 : 0,
+                    borderColor: colors.primary,
+                  }]}>
+                    {selectedIds.has(item.id) && (
+                      <View style={[styles.selectCheck, { backgroundColor: colors.primary }]}>
+                        <Check size={14} color="#fff" />
+                      </View>
+                    )}
+                  </View>
+                )}
+              </View>
+            </TouchableOpacity>
           )}
         />
       )}
@@ -515,4 +599,16 @@ const styles = StyleSheet.create({
   modalTitle: { fontSize: 20, fontWeight: '900' },
   closeBtn: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   closeBtnText: { fontSize: 14, fontWeight: '800' },
+  // Multi-select overlay
+  selectOverlay: {
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+    borderRadius: 20,
+    alignItems: 'flex-end',
+    justifyContent: 'flex-start',
+    padding: 8,
+  },
+  selectCheck: {
+    width: 24, height: 24, borderRadius: 12,
+    alignItems: 'center', justifyContent: 'center',
+  },
 });

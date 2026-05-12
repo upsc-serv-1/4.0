@@ -21,6 +21,8 @@ import {
   ImagePlus,
   CheckCircle2,
   MapPin,
+  Sparkles,
+  Edit,
 } from 'lucide-react-native';
 import { useAuth } from '../../src/context/AuthContext';
 import { useTheme } from '../../src/context/ThemeContext';
@@ -30,6 +32,7 @@ import { pickAndUploadFlashcardImage } from '../../src/services/ImageUpload';
 import { FlashcardSvc } from '../../src/services/FlashcardService';
 import { BranchPlacement } from '../../src/services/BranchPlacement';
 import { AddToFlashcardSheet } from '../../src/components/flashcards/AddToFlashcardSheet';
+import { useFlashcardAI } from '../../src/hooks/useFlashcardAI';
 
 type DeckSelection = {
   id: string;
@@ -48,11 +51,19 @@ export default function NewCard() {
     microtopic?: string;
     branchId?: string;
     branchName?: string;
+    aiPrefilledContent?: string;
+    mode?: 'ai' | 'manual';
   }>();
 
   const [front, setFront] = useState('');
   const [back, setBack] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // AI-related state
+  const { generateFlashcard, loading: aiGenerating, error: aiError } = useFlashcardAI();
+  const [mode, setMode] = useState<'ai' | 'manual'>(params.mode === 'ai' ? 'ai' : 'manual');
+  const [aiInput, setAiInput] = useState(params.aiPrefilledContent || '');
+  const [aiLoading, setAiLoading] = useState(false);
 
   const [frontImageUrl, setFrontImageUrl] = useState<string | null>(null);
   const [backImageUrl, setBackImageUrl] = useState<string | null>(null);
@@ -92,6 +103,28 @@ export default function NewCard() {
   }, [params.branchId, params.branchName]);
 
   const destinationLabel = destination?.path || null;
+
+  const handleGenerateFlashcard = async () => {
+    if (!aiInput.trim()) {
+      Alert.alert('Empty Input', 'Please enter some content for AI to generate a flashcard from.');
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      const result = await generateFlashcard(aiInput);
+      if (result) {
+        setFront(result.front);
+        setBack(result.back);
+      } else {
+        Alert.alert('Generation Failed', 'Could not parse AI response. Please try again.');
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to generate flashcard');
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const save = async () => {
     if (!uid) return;
@@ -162,6 +195,71 @@ export default function NewCard() {
           showsVerticalScrollIndicator={false} 
           keyboardShouldPersistTaps="handled"
         >
+          {/* Tab selector for AI vs Manual mode */}
+          <View style={[s.tabContainer, { borderBottomColor: colors.border }]}>
+            <TouchableOpacity
+              onPress={() => setMode('ai')}
+              style={[s.tab, mode === 'ai' && [s.tabActive, { borderBottomColor: colors.primary }]]}
+            >
+              <Sparkles size={18} color={mode === 'ai' ? colors.primary : colors.textTertiary} />
+              <Text style={[s.tabText, { color: mode === 'ai' ? colors.primary : colors.textTertiary }]}>
+                AI Generate
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setMode('manual')}
+              style={[s.tab, mode === 'manual' && [s.tabActive, { borderBottomColor: colors.primary }]]}
+            >
+              <Edit size={18} color={mode === 'manual' ? colors.primary : colors.textTertiary} />
+              <Text style={[s.tabText, { color: mode === 'manual' ? colors.primary : colors.textTertiary }]}>
+                Manual
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* AI Input section */}
+          {mode === 'ai' && (
+            <View style={s.inputContainer}>
+              <Text style={[s.label, { color: colors.textTertiary }]}>Content for AI</Text>
+              <TextInput
+                value={aiInput}
+                onChangeText={setAiInput}
+                placeholder="Paste notes, text, or content here..."
+                placeholderTextColor={colors.textTertiary + '80'}
+                multiline
+                textAlignVertical="top"
+                style={[s.textArea, { backgroundColor: colors.surfaceStrong, color: colors.textPrimary }]}
+                editable={!aiLoading}
+              />
+
+              <TouchableOpacity
+                onPress={handleGenerateFlashcard}
+                disabled={aiLoading}
+                style={[s.generateBtn, { backgroundColor: aiLoading ? colors.border : colors.primary }]}
+              >
+                {aiLoading ? (
+                  <ActivityIndicator size="small" color={colors.surfaceStrong} />
+                ) : (
+                  <>
+                    <Sparkles size={20} color={colors.surfaceStrong} />
+                    <Text style={[s.generateBtnText, { color: colors.surfaceStrong }]}>
+                      Generate with AI
+                    </Text>
+                  </>
+                )}
+              </TouchableOpacity>
+
+              {aiError && (
+                <Text style={[s.errorText, { color: colors.error }]}>
+                  {aiError}
+                </Text>
+              )}
+
+              <View style={{ height: 24 }} />
+            </View>
+          )}
+
           <View style={s.inputContainer}>
             <Text style={[s.label, { color: colors.textTertiary }]}>Front side</Text>
             <TextInput
@@ -369,4 +467,44 @@ const s = StyleSheet.create({
     borderRadius: 14,
   },
   saveBtnText: { fontSize: 16, fontWeight: '900', letterSpacing: 0.5 },
+  tabContainer: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    marginBottom: spacing.lg,
+  },
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  tabActive: {
+    borderBottomWidth: 2,
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  generateBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    height: 52,
+    borderRadius: 14,
+    marginTop: spacing.md,
+  },
+  generateBtnText: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  errorText: {
+    fontSize: 13,
+    fontWeight: '500',
+    marginTop: spacing.sm,
+  },
 });

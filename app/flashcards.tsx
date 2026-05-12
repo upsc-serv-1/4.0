@@ -265,14 +265,21 @@ export default function FlashcardsHub() {
     try {
       setPreparingExportId(node.id);
 
-      const cardIds = await BranchSvc.listCardIdsInBranch(node.id, {
-        recursive: !!node.is_folder,
+      let cardIds = await BranchSvc.listCardIdsInBranch(node.id, {
+        recursive: true, // Issue 29: Always recursive to include child decks
         userId: uid,
       });
 
       if (cardIds.length === 0) {
-        Alert.alert('Nothing to export', `${node.name} has no cards yet.`);
-        return;
+        const leafCardIds = await BranchSvc.listCardIdsInBranch(node.id, {
+          recursive: false,
+          userId: uid,
+        });
+        if (leafCardIds.length === 0) {
+          Alert.alert('Nothing to export', `${node.name} has no cards yet.`);
+          return;
+        }
+        cardIds.push(...leafCardIds);
       }
 
       const { data, error } = await supabase

@@ -10,7 +10,7 @@ export function DailyGoalWidget({ data, colors, dailyGoal }: { data: WidgetData;
   const pct = Math.min(data.todayCount / (dailyGoal || 50), 1);
   const deg = pct * 360;
   return (
-    <View style={[ws.card, ws.half, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+    <TouchableOpacity onPress={() => router.push('/analyse')} style={[ws.card, ws.half, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <LinearGradient colors={[colors.primary + '15', 'transparent']} style={ws.cardGlow} />
       <View style={ws.ringOuter}>
         <View style={[ws.ringBg, { borderColor: colors.border }]} />
@@ -22,7 +22,7 @@ export function DailyGoalWidget({ data, colors, dailyGoal }: { data: WidgetData;
         <ArrowUpRight size={12} color={colors.success || '#10b981'} />
         <Text style={[ws.trendText, { color: colors.success || '#10b981' }]}>+12%</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -34,7 +34,7 @@ export function ExamCountdownWidget({ colors, examDate }: { colors: any; examDat
     daysLeft = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   }
   return (
-    <View style={[ws.card, ws.half, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+    <TouchableOpacity onPress={() => router.push('/profile')} style={[ws.card, ws.half, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <LinearGradient colors={[ (examDate ? '#ef4444' : colors.textTertiary) + '10', 'transparent']} style={ws.cardGlow} />
       <Target color={examDate ? '#ef4444' : colors.textTertiary} size={28} />
       <Text style={[ws.bigNum, { color: examDate ? colors.textPrimary : colors.textTertiary }]}>
@@ -43,19 +43,19 @@ export function ExamCountdownWidget({ colors, examDate }: { colors: any; examDat
       <Text style={[ws.widgetLabel, { color: colors.textSecondary }]}>
         {examDate ? 'days left' : 'Set exam date'}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 
 // ─── Questions Today ─────────────────────────────────────────
 export function QuestionsTodayWidget({ data, colors }: { data: WidgetData; colors: any }) {
   return (
-    <View style={[ws.card, ws.half, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+    <TouchableOpacity onPress={() => router.push({ pathname: '/unified/arena', params: { tab: 'topic', autorun: 'learn' } })} style={[ws.card, ws.half, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <LinearGradient colors={[colors.primary + '15', 'transparent']} style={ws.cardGlow} />
       <Zap color={colors.primary} size={24} fill={colors.primary} />
       <Text style={[ws.bigNum, { color: colors.textPrimary }]}>{data.todayCount}</Text>
       <Text style={[ws.widgetLabel, { color: colors.textSecondary }]}>questions today</Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -63,12 +63,12 @@ export function QuestionsTodayWidget({ data, colors }: { data: WidgetData; color
 export function StudyTimeWidget({ data, colors }: { data: WidgetData; colors: any }) {
   const mins = Math.floor(data.todayTimeSeconds / 60);
   return (
-    <View style={[ws.card, ws.half, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+    <TouchableOpacity onPress={() => router.push('/analytics')} style={[ws.card, ws.half, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <LinearGradient colors={['rgba(249,115,22,0.1)', 'transparent']} style={ws.cardGlow} />
       <Clock color="#f97316" size={24} />
       <Text style={[ws.bigNum, { color: colors.textPrimary }]}>{mins || data.todayCount * 2}m</Text>
       <Text style={[ws.widgetLabel, { color: colors.textSecondary }]}>study time</Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -77,7 +77,7 @@ export function WeeklyActivityWidget({ data, colors }: { data: WidgetData; color
   const maxVal = Math.max(1, ...data.weeklyActivity.map(d => d.count));
   const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
   return (
-    <View style={[ws.card, ws.full, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+    <TouchableOpacity onPress={() => router.push('/analytics')} style={[ws.card, ws.full, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <LinearGradient colors={[colors.primary + '08', 'transparent']} style={ws.cardGlow} />
       <View style={ws.cardHeader}>
         <View style={[ws.iconCircle, { backgroundColor: '#f9731620' }]}>
@@ -103,7 +103,7 @@ export function WeeklyActivityWidget({ data, colors }: { data: WidgetData; color
           );
         })}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -111,7 +111,7 @@ export function WeeklyActivityWidget({ data, colors }: { data: WidgetData; color
 export function AccuracyTrendWidget({ data, colors }: { data: WidgetData; colors: any }) {
   const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
   return (
-    <View style={[ws.card, ws.full, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+    <TouchableOpacity onPress={() => router.push('/analyse')} style={[ws.card, ws.full, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <LinearGradient colors={['rgba(34,197,94,0.08)', 'transparent']} style={ws.cardGlow} />
       <View style={ws.cardHeader}>
         <View style={[ws.iconCircle, { backgroundColor: '#22c55e20' }]}>
@@ -136,7 +136,7 @@ export function AccuracyTrendWidget({ data, colors }: { data: WidgetData; colors
           );
         })}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -146,7 +146,7 @@ export function TodayScoreWidget({ data, colors }: { data: WidgetData; colors: a
   const pct = total > 0 ? Math.round((data.todayCorrect / total) * 100) : 0;
   const color = pct >= 60 ? '#22c55e' : '#ef4444';
   return (
-    <View style={[ws.card, ws.half, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+    <TouchableOpacity onPress={() => router.push('/analyse')} style={[ws.card, ws.half, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <LinearGradient colors={[color + '15', 'transparent']} style={ws.cardGlow} />
       <Text style={[ws.bigNum, { color }]}>{pct}%</Text>
       <View style={ws.scoreDetail}>
@@ -154,7 +154,7 @@ export function TodayScoreWidget({ data, colors }: { data: WidgetData; colors: a
         <Text style={[ws.scoreText, { color: '#ef4444' }]}>✗{data.todayIncorrect}</Text>
       </View>
       <Text style={[ws.widgetLabel, { color: colors.textSecondary }]}>today's score</Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -196,7 +196,7 @@ export function WeakestSubjectWidget({ data, colors }: { data: WidgetData; color
 export function StudyHeatmapWidget({ data, colors }: { data: any; colors: any }) {
   const grid = data.activityHeatmap || [];
   return (
-    <View style={[ws.card, ws.full, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+    <TouchableOpacity onPress={() => router.push('/analytics')} style={[ws.card, ws.full, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <LinearGradient colors={[colors.primary + '08', 'transparent']} style={ws.cardGlow} />
       <View style={ws.cardHeader}>
         <View style={[ws.iconCircle, { backgroundColor: colors.primary + '20' }]}>
@@ -216,7 +216,7 @@ export function StudyHeatmapWidget({ data, colors }: { data: any; colors: any })
           );
         })}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -225,12 +225,12 @@ export function SpeedMeterWidget({ data, colors }: { data: WidgetData; colors: a
   const avg = data.totalAttempted > 0 ? Math.round((data.todayCount > 0 ? data.todayTimeSeconds / data.todayCount : 120)) : 0;
   const display = avg > 0 ? `${avg}s` : '—';
   return (
-    <View style={[ws.card, ws.half, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+    <TouchableOpacity onPress={() => router.push('/analyse')} style={[ws.card, ws.half, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <LinearGradient colors={['rgba(139,92,246,0.1)', 'transparent']} style={ws.cardGlow} />
       <Clock color="#8b5cf6" size={24} />
       <Text style={[ws.bigNum, { color: colors.textPrimary }]}>{display}</Text>
       <Text style={[ws.widgetLabel, { color: colors.textSecondary }]}>avg/question</Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 

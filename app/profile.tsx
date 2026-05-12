@@ -49,6 +49,7 @@ import { useAuth } from '../src/context/AuthContext';
 import { DEFAULT_ANALYTICS_LAYOUT, loadAnalyticsLayout, moveLayoutItem, saveAnalyticsLayout } from '../src/utils/analyticsLayout';
 import { OfflineManager, SyncProgress, OfflineMetadata } from '../src/services/OfflineManager';
 import { ThemeSwitcher } from '../src/components/ThemeSwitcher';
+import { useProfile } from '../src/context/ProfileContext';
 
 import { AVATARS } from '../src/constants/avatars';
 
@@ -68,16 +69,16 @@ const spacing = {
 export default function Profile() {
   const { colors } = useTheme();
   const { session, signOut } = useAuth();
+  const { displayName, avatarId, updateProfile: updateProfileContext } = useProfile();
   const router = useRouter();
   const email = session?.user.email || '';
-  const name = (session?.user.user_metadata as any)?.display_name || email.split('@')[0];
-  const initial = (name[0] || 'A').toUpperCase();
+  const initial = (displayName[0] || 'A').toUpperCase();
 
   const [optional, setOptional] = useState('Anthropology');
   const [pickerVisible, setPickerVisible] = useState(false);
-  const [newName, setNewName] = useState(name);
+  const [newName, setNewName] = useState(displayName);
   const [updating, setUpdating] = useState(false);
-  const [selectedAvatar, setSelectedAvatar] = useState((session?.user.user_metadata as any)?.avatar_id || '');
+  const [selectedAvatar, setSelectedAvatar] = useState(avatarId);
   const [layoutAdminVisible, setLayoutAdminVisible] = useState(false);
   const [analyticsLayout, setAnalyticsLayout] = useState(DEFAULT_ANALYTICS_LAYOUT);
   const isAnalyticsAdmin = email.toLowerCase() === 'your@email.com';
@@ -95,12 +96,6 @@ export default function Profile() {
   useEffect(() => {
     AsyncStorage.getItem('optional_choice').then(val => {
       if (val) setOptional(val);
-    });
-    AsyncStorage.getItem('profile_display_name').then(val => {
-      if (val) setNewName(val);
-    });
-    AsyncStorage.getItem('profile_avatar_id').then(val => {
-      if (val) setSelectedAvatar(val);
     });
     loadAnalyticsLayout().then(setAnalyticsLayout);
     OfflineManager.getMetadata().then(setOfflineMeta);
@@ -189,8 +184,7 @@ export default function Profile() {
         data: { display_name: newName, avatar_id: selectedAvatar }
       });
       if (error) throw error;
-      await AsyncStorage.setItem('profile_display_name', newName.trim());
-      await AsyncStorage.setItem('profile_avatar_id', selectedAvatar);
+      await updateProfileContext(newName.trim(), selectedAvatar);
       Alert.alert("Success", "Profile updated successfully!");
     } catch (err: any) {
       Alert.alert("Error", err.message);
@@ -250,7 +244,7 @@ export default function Profile() {
             />
             <Text style={[styles.uemail, { color: colors.textSecondary }]}>{email}</Text>
           </View>
-          {newName !== name || selectedAvatar !== (session?.user.user_metadata as any)?.avatar_id ? (
+          {newName !== displayName || selectedAvatar !== avatarId ? (
             <TouchableOpacity 
               onPress={updateProfile} 
               disabled={updating}
@@ -294,7 +288,21 @@ export default function Profile() {
           <Row testID="profile-theme" icon={<Palette color={colors.primary} size={20} />} label="Zen Theme" sub="Change global appearance" onPress={() => router.push('/theme-preview')} />
           <Row testID="profile-tabs" icon={<LayoutList color={colors.primary} size={20} />} label="Customize Tabs" sub="Reorder bottom bar" onPress={() => router.push('/customize_tabs')} />
           <Row testID="profile-dedup" icon={<Layers color={colors.primary} size={20} />} label="Dedup Manager" sub="Smart-merge UPSC PYQs across institutes" onPress={() => router.push('/dedup-manager')} />
-          <Row testID="profile-widgets" icon={<BarChart3 color={colors.primary} size={20} />} label="Manage Widgets" sub="Long-press dashboard header for 4s to edit" onPress={() => Alert.alert('Widget Editor', 'Go to Dashboard and long-press the header area for 4 seconds to enter widget edit mode. You can add, remove, and rearrange widgets.')} />
+          <Row 
+            testID="profile-widgets" 
+            icon={<BarChart3 color={colors.primary} size={20} />} 
+            label="Manage Widgets" 
+            sub="Configure syllabus tracking & layout" 
+            onPress={() => { 
+              router.push('/(tabs)/' as any); 
+              setTimeout(() => {
+                Alert.alert(
+                  'Widget Configuration', 
+                  '1. Long-press the Syllabus Tracker to configure PYQ Mode & Report Type.\n\n2. Scroll down & tap "Manage Dashboard Widgets" to show/hide widgets.'
+                );
+              }, 500);
+            }} 
+          />
           {isAnalyticsAdmin ? (
             <Row testID="profile-analytics-layout" icon={<BarChart3 color={colors.primary} size={20} />} label="Analytics Layout Admin" sub="Arrange review and overall cards" onPress={() => setLayoutAdminVisible(true)} />
           ) : null}

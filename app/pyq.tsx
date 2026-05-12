@@ -2403,6 +2403,20 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                     getYear={getAnalyticsYear}
                     getSubject={getAnalyticsSubject}
                     level="micro_topic"
+                    onRowPress={(level, key) => {
+                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                      // Find the subject for this topic and open in learn mode (same as heatmap behavior)
+                      const matchingQ = rawQuestions.find(q => {
+                        const topic = level === 'micro_topic' ? q.micro_topic : level === 'subject' ? getAnalyticsSubject(q) : q.section_group;
+                        return topic === key;
+                      });
+                      navigateToLearning({
+                        subject: matchingQ ? getAnalyticsSubject(matchingQ) : undefined,
+                        micro: level === 'micro_topic' ? key : undefined,
+                        section: level === 'section_group' ? key : undefined,
+                        mode: 'choice',
+                      });
+                    }}
                   />
                 )}
                 {activeHub === 'compare' && (

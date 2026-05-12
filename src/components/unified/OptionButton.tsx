@@ -1,20 +1,32 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { Check, X } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 
 export const OptionButton = ({ label, text, isSelected, isCorrect, isWrong, showResult, onSelect, disabled, fontSize = 16 }: any) => {
   const { colors } = useTheme();
   
+  // FIX #10: Add animated background color transition
+  const bgColorAnim = React.useRef(new Animated.Value(0)).current;
+  
+  useEffect(() => {
+    Animated.timing(bgColorAnim, {
+      toValue: isSelected || showResult ? 1 : 0,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  }, [isSelected, showResult, bgColorAnim]);
+  
   let borderColor = colors.border;
-  let backgroundColor = colors.surface;
+  let baseBackgroundColor = colors.surface;
+  let selectedBackgroundColor = colors.primary + '10';
   let textColor = colors.textPrimary;
   let letterBg = colors.surfaceStrong;
   let letterColor = colors.textSecondary;
 
-  if (isSelected) {
+  if (isSelected && !showResult) {
     borderColor = colors.primary;
-    backgroundColor = colors.primary + '10';
+    selectedBackgroundColor = colors.primary + '10';
     letterBg = colors.primary;
     letterColor = colors.buttonText;
   }
@@ -22,18 +34,26 @@ export const OptionButton = ({ label, text, isSelected, isCorrect, isWrong, show
   if (showResult) {
     if (isCorrect) {
       borderColor = '#22c55e';
-      backgroundColor = '#dcfce7';
+      selectedBackgroundColor = '#dcfce7';
+      baseBackgroundColor = '#dcfce7';
       textColor = '#15803d';
       letterBg = '#22c55e';
       letterColor = '#fff';
     } else if (isWrong) {
       borderColor = '#ef4444';
-      backgroundColor = '#fee2e2';
+      selectedBackgroundColor = '#fee2e2';
+      baseBackgroundColor = '#fee2e2';
       textColor = '#b91c1c';
       letterBg = '#ef4444';
       letterColor = '#fff';
     }
   }
+  
+  // Animate background color smoothly
+  const animatedBgColor = bgColorAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [baseBackgroundColor, selectedBackgroundColor],
+  });
 
   return (
     <TouchableOpacity
@@ -42,9 +62,19 @@ export const OptionButton = ({ label, text, isSelected, isCorrect, isWrong, show
       activeOpacity={0.8}
       style={[
         styles.optionBtn,
-        { backgroundColor, borderColor, borderWidth: isSelected || showResult ? 2 : 1 },
+        { borderColor, borderWidth: isSelected || showResult ? 2 : 1 },
       ]}
     >
+      <Animated.View
+        style={[
+          StyleSheet.absoluteFill,
+          {
+            backgroundColor: animatedBgColor,
+            borderRadius: 16,
+            zIndex: -1,
+          },
+        ]}
+      />
       <View style={[styles.optionLabel, { backgroundColor: letterBg }]}>
         <Text style={[styles.optionLabelText, { color: letterColor }]}>
           {label}

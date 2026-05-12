@@ -304,6 +304,9 @@ async function callAI(prompt: string, maxTokens = 600): Promise<string> {
   return callGemini(prompt, maxTokens);
 }
 
+// Export callAI for use in custom AI hooks
+export { callAI };
+
 export type InstituteExplanation = {
   source: string;
   program?: string;
@@ -456,21 +459,34 @@ export async function aiExpandSearchQuery(userQuery: string): Promise<AISearchRe
  */
 export async function generateWithHistory(
   messages: Array<{ role: 'user' | 'assistant'; content: string }>,
-  questionContext?: {
-    question: string;
-    options: string[];
-    correct_answer: string;
+  context?: {
+    question?: string;
+    options?: string[];
+    correct_answer?: string;
     institute_explanations?: string;
+    noteTitle?: string;
+    noteContent?: string;
   }
 ): Promise<string> {
-  const systemPrompt = `You are an expert UPSC coach helping a student understand exam questions.
-${questionContext ? `
-QUESTION: ${questionContext.question}
-OPTIONS: ${questionContext.options.join(', ')}
-CORRECT ANSWER: ${questionContext.correct_answer}
-${questionContext.institute_explanations ? `CONTEXT: ${questionContext.institute_explanations.slice(0, 800)}` : ''}
-` : ''}
-Be concise, accurate, and helpful. Always relate answers to UPSC preparation.`;
+  let systemPrompt = `You are an expert UPSC coach. Be concise, accurate, and helpful. Always relate answers to UPSC preparation.`;
+  
+  if (context?.noteContent) {
+    systemPrompt = `You are an expert UPSC coach helping a student with their study note named "${context.noteTitle || 'Untitled'}". 
+Use the following extracted note context to answer questions or provide insights:
+
+DOCUMENT CONTEXT:
+${context.noteContent}
+
+${systemPrompt}`;
+  } else if (context?.question) {
+    systemPrompt = `You are an expert UPSC coach helping a student understand exam questions.
+QUESTION: ${context.question}
+OPTIONS: ${context.options?.join(', ') || ''}
+CORRECT ANSWER: ${context.correct_answer || ''}
+${context.institute_explanations ? `CONTEXT: ${context.institute_explanations.slice(0, 800)}` : ''}
+
+${systemPrompt}`;
+  }
 
   // Try backend proxy first (uses Emergent LLM key)
   try {

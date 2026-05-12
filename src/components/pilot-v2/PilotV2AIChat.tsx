@@ -36,7 +36,7 @@ interface Message {
 // Global session-level cache to guarantee conversation histories are 100% persistent across question swaps
 const globalHistoryCache: Record<string, Message[]> = {};
 
-export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse, externalOpenTrigger }: PilotV2AIChatProps) {
+export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse, externalOpenTrigger, onOpenVitaminEditor }: PilotV2AIChatProps) {
   const { colors } = useTheme();
   const { session } = useAuth();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -441,6 +441,14 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
                           <Text style={{ fontSize: 10, color: '#5B4EFA', fontWeight: '800' }}>Save to Pilot</Text>
                         </TouchableOpacity>
                       )}
+                      {!!onOpenVitaminEditor && (
+                        <TouchableOpacity
+                          onPress={() => onOpenVitaminEditor(m.content)}
+                          style={[styles.copyBtn, { borderColor: '#10b98155', backgroundColor: '#10b98114' }]}
+                        >
+                          <Text style={{ fontSize: 10, color: '#10b981', fontWeight: '800' }}>Open in Vitamin</Text>
+                        </TouchableOpacity>
+                      )}
                     </View>
                   </View>
                 )}
@@ -464,6 +472,7 @@ interface PilotV2AIChatProps {
   activeQuestion?: any;
   onSaveResponse?: (text: string) => void;
   externalOpenTrigger?: number;
+  onOpenVitaminEditor?: (text: string) => void;
 }
 
 const styles = StyleSheet.create({

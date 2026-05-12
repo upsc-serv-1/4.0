@@ -75,6 +75,7 @@ export interface ExportOptions {
 
   includePerformanceMetrics?: boolean;
   hideResponses?: boolean;
+  showMyResponses?: boolean; // When true, show user's response colors (red for wrong, green for correct); when false, don't show any coloring
 
   // Question filters (apply before render)
   statusFilter?: 'all' | 'correct' | 'incorrect' | 'unattempted';
@@ -87,6 +88,7 @@ export interface ExportOptions {
   yearStart?: number | null;
   yearEnd?: number | null;
 
+  instituteFilters?: string[];
   // Notes-specific injections
   notesSubheadingColor?: string;
   notesChecklistMode?: boolean;
@@ -118,6 +120,7 @@ export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): Ex
   moduleName: '',
   includePerformanceMetrics: false,
   hideResponses: false,
+  showMyResponses: false,
   statusFilter: 'all',
   revisionTags: [],
   pyqOnly: false,
@@ -125,6 +128,7 @@ export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): Ex
   subjectFilters: [],
   sectionGroupFilters: [],
   microTopicFilters: [],
+  instituteFilters: [],
   yearStart: null,
   yearEnd: null,
   notesSubheadingColor: '#6A5BFF20',
@@ -468,6 +472,14 @@ const wrap = (o: ExportOptions, body: string, extras: string = '') => `<!doctype
   </div>
 </body></html>`;
 
+// ---------- Helper: filter _explanations by institute filters ----------
+const filterExplanationsByInstitute = (explanations: any[] | undefined, o: ExportOptions): any[] => {
+  if (!Array.isArray(explanations)) return [];
+  if (!o.instituteFilters || o.instituteFilters.length === 0) return explanations;
+  const filterSet = new Set(o.instituteFilters.map((s: string) => s.toLowerCase().trim()));
+  return explanations.filter((e: any) => filterSet.has((e.source || '').toLowerCase().trim()));
+};
+
 // ---------- Filtering & Sorting ----------
 
 const normalize = (s: string = '') => s.toLowerCase().replace(/[^\w]/g, '').trim();
@@ -624,9 +636,10 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
     let explanation = '';
     if (!o.hideResponses) {
       // Check if this question has merged explanations from multiple institutes
-      if (Array.isArray(q._explanations) && q._explanations.length > 0) {
+      const explList = filterExplanationsByInstitute(q._explanations, o);
+      if (Array.isArray(explList) && explList.length > 0) {
         // Render combined explanations from all institutes
-        explanation = q._explanations
+        explanation = explList
           .map((expl: any) => {
             const source = expl.source || 'Unknown Source';
             const year = expl.year ? ` (${expl.year})` : '';
@@ -644,11 +657,28 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
 
     const optsBlock = showOpts && q.options ? (() => {
       const opts = q.options!;
+      const correctAnswer = (q.correct_answer || '').toLowerCase();
+      const selectedAnswer = (q.selected_answer || '').toLowerCase();
+      const showColors = o.showMyResponses && !o.hideResponses;
+      
       return `<ul class="opts">${['a', 'b', 'c', 'd'].filter(k => (opts as any)[k]).map(k => {
         const label = k.toUpperCase();
-        // Don't highlight correct answer in inline rendering - only show in answer key
-        // This preserves practice/testing mode where users shouldn't see correct answers highlighted
-        return `<li class=""><b>${label}.</b> ${renderInline(String((opts as any)[k]))}</li>`;
+        let className = '';
+        
+        if (showColors) {
+          // When showing responses, highlight user's choice and correct answer
+          if (k === correctAnswer) {
+            className = 'correct'; // Mark correct answer in green
+          }
+          if (k === selectedAnswer && selectedAnswer !== correctAnswer) {
+            className = 'wrong'; // Mark user's incorrect choice in red
+          }
+          if (k === selectedAnswer && selectedAnswer === correctAnswer) {
+            className = 'correct'; // If user selected correct answer, mark in green
+          }
+        }
+        
+        return `<li class="${className}"><b>${label}.</b> ${renderInline(String((opts as any)[k]))}</li>`;
       }).join('')}</ul>`;
     })() : '';
 
@@ -775,8 +805,9 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
         const a = (q.correct_answer || '').toUpperCase();
         // Use merged explanations if available, otherwise fall back to single explanation
         let e = '';
-        if (Array.isArray(q._explanations) && q._explanations.length > 0) {
-          e = q._explanations
+        const explList = filterExplanationsByInstitute(q._explanations, o);
+        if (explList.length > 0) {
+          e = explList
             .map((expl: any) => {
               const source = expl.source || 'Unknown Source';
               const year = expl.year ? ` (${expl.year})` : '';
@@ -822,8 +853,9 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
       const a = (q.correct_answer || '').toUpperCase();
       // Use merged explanations if available, otherwise fall back to single explanation
       let e = '';
-      if (Array.isArray(q._explanations) && q._explanations.length > 0) {
-        e = q._explanations
+      const explList = filterExplanationsByInstitute(q._explanations, o);
+      if (explList.length > 0) {
+        e = explList
           .map((expl: any) => {
             const source = expl.source || 'Unknown Source';
             const year = expl.year ? ` (${expl.year})` : '';
@@ -933,8 +965,27 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
       } else {
         explanation = q.explanation_markdown || q.explanation || '';
       }
-      // Don't highlight correct answer in inline rendering - preserve practice mode
-      const optsBlock = showOpts && q.options ? `<ul class="opts">${['a', 'b', 'c', 'd'].filter(k => (q.options as any)[k]).map(k => `<li class=""><b>${k.toUpperCase()}.</b> ${renderInline(String((q.options as any)[k]))}</li>`).join('')}</ul>` : '';
+      // Apply response coloring if enabled
+      const correctAnswer = (q.correct_answer || '').toLowerCase();
+      const selectedAnswer = (q.selected_answer || '').toLowerCase();
+      const showColors = o.showMyResponses && !o.hideResponses;
+      
+      const optsBlock = showOpts && q.options ? `<ul class="opts">${['a', 'b', 'c', 'd'].filter(k => (q.options as any)[k]).map(k => {
+        let className = '';
+        if (showColors) {
+          // When showing responses, highlight user's choice and correct answer
+          if (k === correctAnswer) {
+            className = 'correct'; // Mark correct answer in green
+          }
+          if (k === selectedAnswer && selectedAnswer !== correctAnswer) {
+            className = 'wrong'; // Mark user's incorrect choice in red
+          }
+          if (k === selectedAnswer && selectedAnswer === correctAnswer) {
+            className = 'correct'; // If user selected correct answer, mark in green
+          }
+        }
+        return `<li class="${className}"><b>${k.toUpperCase()}.</b> ${renderInline(String((q.options as any)[k]))}</li>`;
+      }).join('')}</ul>` : '';
       const questionBlock = `
         <div class="qstem"><span class="qnum">${i + 1}.</span>${renderInline(stem)}</div>
         ${meta ? `<div class="metarow">${meta}</div>` : ''}
@@ -1107,6 +1158,72 @@ export const buildHardnoteHtml = (note: ExportHardnote, o: ExportOptions): strin
   return wrap(
     o,
     `<style>${extraCss}</style>${body}`
+  );
+};
+
+export const buildSnapshotHtml = (
+  payload: { base64: string; pageWidth: number; pageHeight: number; title: string },
+  o: ExportOptions
+): string => {
+  const rawW = payload.pageWidth > 0 ? payload.pageWidth : 794;
+  const rawH = payload.pageHeight > 0 ? payload.pageHeight : 1123;
+
+  // Calculate content area ratio factoring in margins
+  // Standard A4: 21cm x 29.7cm.
+  const mTop = clampCm(o.pageMarginTopCm);
+  const mBottom = clampCm(o.pageMarginBottomCm);
+  const mLeft = clampCm(o.pageMarginLeftCm);
+  const mRight = clampCm(o.pageMarginRightCm);
+  const contentW = 21 - mLeft - mRight;
+  const contentH = 29.7 - mTop - mBottom;
+  // Force contentH explicitly or default to safe ratio if clamped strangely
+  const pdfPageRatio = contentW > 0 ? contentH / contentW : 1.4142;
+
+  const viewRatio = rawH / rawW;
+  // Total pages needed to fit the snapshot
+  const numPages = Math.max(1, Math.ceil(viewRatio / pdfPageRatio));
+
+  // Clean Base64 against whitespace errors
+  const cleanBase64 = (payload.base64 || '').replace(/\s/g, '');
+
+  // Build segmented pages. We use the image nested in a viewport container.
+  // Shifting it by -100% container height each iteration correctly aligns subsequent segments.
+  let html = '';
+  for (let i = 0; i < numPages; i++) {
+    html += `
+      <div class="snapshot-page-slice">
+        <img src="data:image/png;base64,${cleanBase64}" class="slice-img" style="top: -${i * 100}%;" />
+      </div>
+    `;
+  }
+
+  const extraCss = `
+    .snapshot-page-slice {
+      position: relative;
+      width: 100%;
+      /* Aspect ratio force height */
+      padding-top: ${pdfPageRatio * 100}%;
+      overflow: hidden;
+      page-break-after: always;
+      background: #fff;
+      margin: 0;
+    }
+    .slice-img {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      /* Natural flow dictates image will stretch taller than container, which is what we want */
+      height: auto; 
+    }
+    /* For high fidelity export, hide standard title/headers that would displace slice 1 */
+    h1.cover, .header-bar, .meta { display: none !important; }
+    /* Reset outer paper constraints */
+    .paper { padding: 0 !important; }
+  `;
+
+  return wrap(
+    o,
+    `<style>${extraCss}</style>${html}`
   );
 };
 
@@ -1533,7 +1650,8 @@ export type ExportPayload =
   | { kind: 'flashcards'; rows: ExportFlashcard[] }
   | { kind: 'notes'; blocks: ExportNoteBlock[]; selectedHeadingIds?: Set<string> }
   | { kind: 'tags'; groups: { tag: string; questions: ExportQuestion[] }[] }
-  | { kind: 'hardnote'; note: ExportHardnote };
+  | { kind: 'hardnote'; note: ExportHardnote }
+  | { kind: 'snapshot'; base64: string; pageWidth: number; pageHeight: number; title: string };
 
 export const renderHtml = (payload: ExportPayload, options: ExportOptions): string => {
   switch (payload.kind) {
@@ -1542,6 +1660,7 @@ export const renderHtml = (payload: ExportPayload, options: ExportOptions): stri
     case 'notes': return buildNotesBlocksHtml(payload.blocks, options, payload.selectedHeadingIds);
     case 'tags': return buildTagsHtml(payload.groups, options);
     case 'hardnote': return buildHardnoteHtml(payload.note, options);
+    case 'snapshot': return buildSnapshotHtml(payload, options);
   }
 };
 

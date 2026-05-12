@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { WebView } from "react-native-webview";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 import AddressBar from "../src/components/browser/AddressBar";
 import IdentityPanel from "../src/components/browser/IdentityPanel";
@@ -35,6 +36,7 @@ function newTab(): Tab {
 }
 
 export default function GhostBrowseScreen() {
+  const router = useRouter();
   const [tabs, setTabs] = React.useState<Tab[]>([newTab()]);
   const [activeId, setActiveId] = React.useState<string>(tabs[0].id);
   const [resetMode, setResetMode] = React.useState<ResetMode>("per-session");
@@ -173,6 +175,7 @@ export default function GhostBrowseScreen() {
           onSubmit={handleNavigate}
           onRotate={() => rotateIdentity(active.id)}
           onMenu={() => setShowMenu(true)}
+          onBack={() => router.back()}
           loading={loading}
           identityId={active.identity.id}
         />

@@ -213,7 +213,7 @@ export function remapStrokeForExport(
     };
   }
 
-  // ── Anchor-based remap (only when export settings differ) ──────────
+  // ── Anchor-based remap (page-relative anchors) ────────────────────
   const anchorBlockId =
     stroke.anchor?.elementId ?? stroke.anchor?.blockId ?? null;
 
@@ -226,9 +226,34 @@ export function remapStrokeForExport(
     const rect = ctx.layouts.get(anchorBlockId);
     if (!rect) return null; // anchored block was not laid out → drop
 
-    const startRelX = clamp01(stroke.anchor.startRelX!);
-    const endRelX = Math.max(startRelX, clamp01(stroke.anchor.endRelX!));
-    const relY = clamp01(stroke.anchor.relY!);
+    // ── Y-axis: use pageRelY when available (orientation-safe) ─────────
+    // When pageRelY is present, compute absolute Y via pageRelY * exportHeight
+    // then map onto the block's export rect.  Falls back to block-relative relY.
+    let targetY: number;
+    if (typeof stroke.anchor.pageRelY === 'number') {
+      const absY = clamp01(stroke.anchor.pageRelY) * ctx.exportCanvasHeight;
+      const blockRelY = Math.max(0, Math.min(1,
+        (absY - rect.y) / Math.max(1, rect.h)
+      ));
+      targetY = rect.y + blockRelY * rect.h;
+    } else {
+      targetY = rect.y + clamp01(stroke.anchor.relY!) * rect.h;
+    }
+
+    // startRelX/endRelX are PAGE-relative fractions (0..1 of page width).
+    // Convert to absolute pixel positions in the EXPORT canvas coordinate
+    // system using the export canvas width.
+    const absStartX = clamp01(stroke.anchor.startRelX!) * ctx.exportCanvasWidth;
+    const absEndX   = Math.max(absStartX, clamp01(stroke.anchor.endRelX!) * ctx.exportCanvasWidth);
+
+    // Map these absolute positions onto the block's export layout rect
+    // to get block-relative fractions.
+    const blockRelStart = Math.max(0, Math.min(1,
+      (absStartX - rect.x) / Math.max(1, rect.w)
+    ));
+    const blockRelEnd = Math.max(blockRelStart, Math.max(0, Math.min(1,
+      (absEndX - rect.x) / Math.max(1, rect.w)
+    )));
 
     // Determine each point's fraction along the original stroke x-extent
     // so curves are preserved (instead of collapsing to a flat line).
@@ -239,9 +264,8 @@ export function remapStrokeForExport(
     }
     const xExtent = Math.max(1e-6, maxX - minX);
 
-    const targetY = rect.y + relY * rect.h;
-    const targetX0 = rect.x + startRelX * rect.w;
-    const targetXSpan = (endRelX - startRelX) * rect.w;
+    const targetX0 = rect.x + blockRelStart * rect.w;
+    const targetXSpan = rect.w * (blockRelEnd - blockRelStart);
 
     const points: ExportHardnoteStrokePoint[] = stroke.points.map((p) => {
       const f = (p.x - minX) / xExtent; // 0..1 along the stroke

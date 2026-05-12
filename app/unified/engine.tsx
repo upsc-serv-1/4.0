@@ -893,8 +893,35 @@ export default function UnifiedQuizEngine() {
       micro_topic: q.micro_topic,
       exam_year: q.exam_year,
       is_pyq: q.is_pyq,
-      is_ncert: q.is_ncert
+      is_ncert: q.is_ncert,
+      _explanations: Array.isArray(q._explanations) ? q._explanations : []
     }));
+
+    // Inject My Vitamin (best answer) into _explanations for each question
+    rows.forEach((row: any) => {
+      const best = bestAnswers[row.id];
+      if (best?.answer_text) {
+        if (!Array.isArray(row._explanations)) {
+          row._explanations = [];
+        }
+        row._explanations.push({
+          source: 'My Vitamin',
+          text: best.answer_text,
+          year: '',
+        });
+      }
+    });
+
+    // Extract available institute names for the filter chips
+    const instituteSet = new Set<string>();
+    rows.forEach((row: any) => {
+      if (Array.isArray(row._explanations)) {
+        row._explanations.forEach((expl: any) => {
+          if (expl.source) instituteSet.add(expl.source);
+        });
+      }
+    });
+    setAvailableInstitutes(Array.from(instituteSet).sort());
 
     setExportPayload({
       kind: 'questions',
@@ -904,6 +931,7 @@ export default function UnifiedQuizEngine() {
     setShowQuickMenu(false);
     setShowPaperQuickMenu(false);
   };
+  const [availableInstitutes, setAvailableInstitutes] = useState<string[]>([]);
   const [showQuickMenu, setShowQuickMenu] = useState(false);
   const [showPaperQuickMenu, setShowPaperQuickMenu] = useState(false);
   const [exportSheetVisible, setExportSheetVisible] = useState(false);
@@ -1415,6 +1443,48 @@ export default function UnifiedQuizEngine() {
           processResults(cached);
           localFound = true;
           setLoading(false);
+        }
+      } else {
+        // ──────── 1b. OFFLINE-FALLBACK: Filter all cached questions ────────
+        const allOffline = OfflineManager.getOfflineQuestionsAllSync() || [];
+        if (allOffline.length > 0) {
+          let filtered = [...allOffline];
+
+          // Apply subject filter
+          const subs = params.subjects || params.subject;
+          if (subs && subs !== 'All' && subs !== '' && subs !== '[]') {
+            const subList = typeof subs === 'string' ? subs.split(',').filter(Boolean) : [];
+            if (subList.length > 0) filtered = filtered.filter((q: any) => subList.includes(q.subject));
+          }
+
+          // Apply pyq filter
+          const pyqM = params.pyqMaster || params.pyqFilter;
+          if (pyqM === 'PYQ Only') filtered = filtered.filter((q: any) => q.is_pyq);
+          else if (pyqM === 'Non-PYQ' || pyqM === 'Non PYQ') filtered = filtered.filter((q: any) => !q.is_pyq);
+
+          // Apply year range
+          if (params.year_start) filtered = filtered.filter((q: any) => q.exam_year >= params.year_start);
+          if (params.year_end) filtered = filtered.filter((q: any) => q.exam_year <= params.year_end);
+
+          // Apply micro_topic
+          const mt = params.microTopics || params.microtopic;
+          if (mt && mt !== 'All' && mt !== '' && mt !== '[]') {
+            const mtList = typeof mt === 'string' ? mt.split('|').filter(Boolean) : [];
+            if (mtList.length > 0) filtered = filtered.filter((q: any) => mtList.includes(q.micro_topic));
+          }
+
+          // Apply section_group
+          const sectionVal = params.section;
+          if (sectionVal && sectionVal !== 'All' && sectionVal !== '' && sectionVal !== '[]') {
+            const sectionList = typeof sectionVal === 'string' ? sectionVal.split('|').filter(Boolean) : [];
+            if (sectionList.length > 0) filtered = filtered.filter((q: any) => sectionList.includes(q.section_group || 'General'));
+          }
+
+          if (filtered.length > 0) {
+            processResults(filtered);
+            localFound = true;
+            setLoading(false);
+          }
         }
       }
 
@@ -2575,6 +2645,15 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
         onNoteDraft={(qid: string, text: string) => {
           setEditNoteQId(qid);
           setNoteEditorText(text);
+        }}
+        onNoteChange={(qid: string, noteText: string) => {
+          store.setMetadata(qid, { note: noteText });
+        }}
+        onQuickSave={(qid: string) => {
+          store.setMetadata(qid, {}, true);
+        }}
+        onCommitToMemory={(qid: string) => {
+          store.setMetadata(qid, {}, true);
         }}
       />
     );
@@ -4397,6 +4476,13 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
             setPilotSaveHtml(markdownToHtml(text || ''));
             setPilotV2SaveOpen(true);
           }}
+          onOpenVitaminEditor={(text: string) => {
+            const q = activeAiQuestion || questions[currentIndex];
+            if (!q) return;
+            setEditingQuestion(q);
+            setVitaminEditorContent(markdownToHtml(text || ''));
+            setVitaminEditorVisible(true);
+          }}
         />
 
         <UnifiedExportSheet
@@ -4411,25 +4497,47 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
             footerText: 'Generated by Noji AI'
           }}
           renderExtraFilters={(o, setO) => (
-            userStudyTags.length > 0 ? (
-              <View style={{ marginTop: 6 }}>
-                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 6 }}>REVISION TAGS</Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-                  {userStudyTags.map(tag => {
-                    const isActive = (o.revisionTags || []).includes(tag);
-                    return (
-                      <TouchableOpacity
-                        key={tag}
-                        onPress={() => setO(prev => ({ ...prev, revisionTags: isActive ? (prev.revisionTags || []).filter(t => t !== tag) : [...(prev.revisionTags || []), tag] }))}
-                        style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: 1, backgroundColor: isActive ? colors.primary : colors.surfaceStrong, borderColor: isActive ? colors.primary : colors.border }}
-                      >
-                        <Text style={{ fontSize: 11, fontWeight: '800', color: isActive ? '#fff' : colors.textPrimary }}>{tag}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
+            <>
+              {userStudyTags.length > 0 && (
+                <View style={{ marginTop: 6 }}>
+                  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 6 }}>REVISION TAGS</Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                    {userStudyTags.map(tag => {
+                      const isActive = (o.revisionTags || []).includes(tag);
+                      return (
+                        <TouchableOpacity
+                          key={tag}
+                          onPress={() => setO(prev => ({ ...prev, revisionTags: isActive ? (prev.revisionTags || []).filter(t => t !== tag) : [...(prev.revisionTags || []), tag] }))}
+                          style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: 1, backgroundColor: isActive ? colors.primary : colors.surfaceStrong, borderColor: isActive ? colors.primary : colors.border }}
+                        >
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: isActive ? '#fff' : colors.textPrimary }}>{tag}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
                 </View>
-              </View>
-            ) : null
+              )}
+              {availableInstitutes.length > 0 && (
+                <View style={{ marginTop: 10 }}>
+                  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 6 }}>INSTITUTE EXPLANATIONS</Text>
+                  <Text style={{ fontSize: 9, color: colors.textTertiary, marginBottom: 6 }}>Multi-select — only chosen institutes will appear in the PDF</Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                    {availableInstitutes.map(inst => {
+                      const isActive = (o.instituteFilters || []).includes(inst);
+                      return (
+                        <TouchableOpacity
+                          key={inst}
+                          onPress={() => setO(prev => ({ ...prev, instituteFilters: isActive ? (prev.instituteFilters || []).filter(i => i !== inst) : [...(prev.instituteFilters || []), inst] }))}
+                          style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: 1, backgroundColor: isActive ? colors.primary : colors.surfaceStrong, borderColor: isActive ? colors.primary : colors.border }}
+                        >
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: isActive ? '#fff' : colors.textPrimary }}>{inst}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+              )}
+            </>
           )}
         />
 

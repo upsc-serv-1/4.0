@@ -41,6 +41,9 @@ import {
   estimateExportBlockLayouts,
   remapStrokesForExport,
 } from '../../lib/pilotV2StrokeRemap';
+import { captureRef } from 'react-native-view-shot';
+import * as FileSystem from 'expo-file-system/legacy';
+import { Alert } from 'react-native';
 
 // ---------- Block-type chip catalogue ------------------------------------
 
@@ -148,6 +151,8 @@ interface Props {
   pageWidth?: number;
   /** Editor page height in CSS pixels (used for stroke remap). */
   pageHeight?: number;
+  /** Reference to the content container to capture for snapshot mode. */
+  contentRef?: React.RefObject<View | null>;
 }
 
 export const PilotV2UnifiedExport: React.FC<Props> = ({
@@ -158,6 +163,7 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
   strokes = [],
   pageWidth = 0,
   pageHeight = 0,
+  contentRef,
 }) => {
   // Block-type filter — all on by default
   const [activeTypes, setActiveTypes] = useState<Record<PilotV2BlockType, boolean>>(
@@ -174,7 +180,9 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
   // is at least one stroke captured on this page.
   const hasStrokes = strokes.length > 0;
   const [includeAnnotations, setIncludeAnnotations] = useState<boolean>(hasStrokes);
+  const [useSnapshotMode, setUseSnapshotMode] = useState<boolean>(false);
   const [bgMode, setBgMode] = useState<PilotExportBgMode>('heading_quote');
+  const [cachedBase64, setCachedBase64] = useState<string | null>(null);
 
   // Re-seed when sheet opens or blocks change
   useEffect(() => {
@@ -183,8 +191,27 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
       {} as Record<PilotV2BlockType, boolean>));
     setSelectedBlockIds(new Set(blocks.map((b) => b.id)));
     setIncludeAnnotations(hasStrokes);
+    setUseSnapshotMode(false);
     setBgMode('heading_quote');
-  }, [visible, blocks, hasStrokes]);
+    setCachedBase64(null); // reset cached version
+
+    // EAGER CAPTURE: Trigger visual snapshot IMMEDIATELY before/during modal layout.
+    // This guarantees the background view hierarchy is fully painted and unobstructed.
+    if (contentRef?.current) {
+      const targetRef = contentRef.current;
+      setTimeout(async () => {
+        try {
+          const uri = await captureRef(targetRef, { format: 'png', quality: 0.9, result: 'tmpfile' });
+          if (uri) {
+            const b64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+            setCachedBase64(b64);
+          }
+        } catch (e) {
+          console.warn('[PilotV2UnifiedExport] Eager capture warning:', e);
+        }
+      }, 100); // mini debounce to ensure ref layout is locked
+    }
+  }, [visible, blocks, hasStrokes, contentRef]);
 
   // Filter blocks → adapted ExportNoteBlock[] for the engine
   const filteredBlocks = useMemo(
@@ -209,8 +236,13 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
     });
   }, [includeAnnotations, strokes, blocks, filteredBlocks]);
 
-  // Page dims used for hardnote canvas (Step 21).  Fall back to A4 @ 96dpi
-  // when the parent did not pass paperSize (e.g., very early mount).
+  // Page dims used for hardnote canvas.  Since the glance view now uses a
+  // FROZEN page width that never changes (not on orientation, not on sidebar
+  // toggle), we use that same width as the export canvas.  This ensures the
+  // canvasMatch fast path in remapStrokeForExport triggers (export canvas ≈
+  // editor canvas), giving pixel-perfect stroke positioning via raw relative→
+  // absolute scaling — exactly what the user sees on screen.
+  // Fall back to A4 @ 96dpi only when the parent did not pass paperSize.
   const exportCanvasWidth  = pageWidth  > 1 ? pageWidth  : 794;
   const exportCanvasHeight = pageHeight > 1 ? pageHeight : 1123;
   const editorCanvasWidth  = pageWidth  > 1 ? pageWidth  : exportCanvasWidth;
@@ -277,11 +309,48 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
     initialOptions, bgMode,
   ]);
 
+  // ---------- Interceptor for Snapshot mode ----------
+  const onPreExport = async (): Promise<ExportPayload | null> => {
+    if (!useSnapshotMode) return null; // fallback to standard payload prop
+
+    // 1. Use cached eager-capture version if ready (bypasses modal obstruction)
+    let base64 = cachedBase64;
+
+    // 2. Fallback if eager capture missed it
+    if (!base64) {
+      if (!contentRef?.current) {
+        Alert.alert('Snapshot Error', 'Content container is not available for capture.');
+        return null;
+      }
+      try {
+        const uri = await captureRef(contentRef.current, { format: 'png', quality: 0.9, result: 'tmpfile' });
+        if (!uri) throw new Error('Failed fallback capture');
+        base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+      } catch (err: any) {
+        console.error('[UnifiedExport] Sync snapshot fallback failed', err);
+        Alert.alert('Snapshot Failed', 'Background content was not ready. Try closing and reopening this menu.');
+        return null;
+      }
+    }
+
+    if (!base64) return null;
+
+    // 3. Build lightweight snapshot payload
+    return {
+      kind: 'snapshot',
+      base64,
+      pageWidth: exportCanvasWidth,
+      pageHeight: exportCanvasHeight,
+      title,
+    };
+  };
+
   return (
     <UnifiedExportSheet
       visible={visible}
       onClose={onClose}
       payload={payload}
+      onPreExport={onPreExport}
       title={title || 'Pilot V2 Export'}
       initialOptions={initialOptions}
       hideSections={['content', 'answer', 'sort']}
@@ -295,6 +364,8 @@ export const PilotV2UnifiedExport: React.FC<Props> = ({
           hasStrokes={hasStrokes}
           includeAnnotations={includeAnnotations}
           setIncludeAnnotations={setIncludeAnnotations}
+          useSnapshotMode={useSnapshotMode}
+          setUseSnapshotMode={setUseSnapshotMode}
           bgMode={bgMode}
           setBgMode={setBgMode}
         />
@@ -314,6 +385,8 @@ interface ExtraProps {
   hasStrokes: boolean;
   includeAnnotations: boolean;
   setIncludeAnnotations: React.Dispatch<React.SetStateAction<boolean>>;
+  useSnapshotMode: boolean;
+  setUseSnapshotMode: React.Dispatch<React.SetStateAction<boolean>>;
   bgMode: PilotExportBgMode;
   setBgMode: React.Dispatch<React.SetStateAction<PilotExportBgMode>>;
 }
@@ -327,6 +400,8 @@ const PilotV2ExtraFilters: React.FC<ExtraProps> = ({
   hasStrokes,
   includeAnnotations,
   setIncludeAnnotations,
+  useSnapshotMode,
+  setUseSnapshotMode,
   bgMode,
   setBgMode,
 }) => {
@@ -374,6 +449,33 @@ const PilotV2ExtraFilters: React.FC<ExtraProps> = ({
           />
         </View>
       ) : null}
+
+      {/* ── High Fidelity Visual Snapshot Toggle ─────────────────────── */}
+      <View
+        testID="pilot-v2-export-snapshot-mode-row"
+        style={{
+          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+          paddingVertical: 10, paddingHorizontal: 12, borderRadius: 12, borderWidth: 1,
+          backgroundColor: colors.surfaceStrong, borderColor: useSnapshotMode ? colors.primary : colors.border,
+          marginBottom: 12,
+        }}
+      >
+        <View style={{ flex: 1, paddingRight: 12 }}>
+          <Text style={{ color: colors.textPrimary, fontSize: 13, fontWeight: '800' }}>
+            High-Fidelity Mode ✨
+          </Text>
+          <Text style={{ color: colors.textTertiary, fontSize: 11, marginTop: 2 }}>
+            Visual snapshot capture guarantees 100% pixel-perfect pencil stroke alignment.
+          </Text>
+        </View>
+        <Switch
+          testID="pilot-v2-export-snapshot-mode"
+          value={useSnapshotMode}
+          onValueChange={setUseSnapshotMode}
+          trackColor={{ false: colors.border, true: colors.primary + '88' }}
+          thumbColor={useSnapshotMode ? colors.primary : '#fff'}
+        />
+      </View>
 
       {/* ── Block-type chips ─────────────────────────────────────────── */}
       <Text

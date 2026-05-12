@@ -157,6 +157,7 @@ export function PilotV2EditorView() {
   const redoStack = useRef<Array<{ blocks: PilotV2Block[]; title: string }>>([]);
   const skipHistoryRef = useRef(false);
   const [historyTick, setHistoryTick] = useState(0);
+  const contentRef = useRef<View>(null);
 
   const pushHistory = (prevBlocks: PilotV2Block[], prevTitle: string) => {
     if (skipHistoryRef.current) return;
@@ -805,6 +806,7 @@ export function PilotV2EditorView() {
         >
           <GestureDetector gesture={editorComposedGesture}>
             <AnimatedReanimated.View
+              ref={contentRef}
               style={[styles.paper, { backgroundColor: '#fff', borderColor: colors.border }, animatedEditorStyle]}
               onLayout={(e) => setPaperSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
             >
@@ -1306,6 +1308,7 @@ export function PilotV2EditorView() {
         strokes={pencil.engine.getPersisted()}
         pageWidth={paperSize.w}
         pageHeight={paperSize.h}
+        contentRef={contentRef}
       />
 
       {/* ── Per-block rich-text edit modal (full formatting toolbar) ── */}

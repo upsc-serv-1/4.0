@@ -311,11 +311,9 @@ export class AIPromptManager {
     category: string
   ): Promise<PromptTemplate[]> {
     const cacheKey = `prompts_${userId}_${category}`;
-    try {
-      const cached = await AsyncStorage.getItem(cacheKey);
-      if (cached) return JSON.parse(cached);
-    } catch {}
+    const serverKey = `prompts_${userId}_${category}_server_ts`;
 
+    // Try to fetch from server first (online-first strategy)
     try {
       const { data, error } = await supabase
         .from('prompt_templates')
@@ -325,32 +323,40 @@ export class AIPromptManager {
         .eq('is_active', true)
         .order('display_order', { ascending: true });
 
-      if (error) throw error;
+      if (!error && data) {
+        const customTemplates = data || [];
+        const defaultTemplates = ALL_DEFAULTS[category] || [];
 
-      const customTemplates = data || [];
-      const defaultTemplates = ALL_DEFAULTS[category] || [];
+        // Merge defaults with custom templates. Custom templates with matching keys override defaults.
+        const merged: PromptTemplate[] = [...defaultTemplates];
 
-      // Merge defaults with custom templates. Custom templates with matching keys override defaults.
-      const merged: PromptTemplate[] = [...defaultTemplates];
+        customTemplates.forEach(custom => {
+          const existingIdx = merged.findIndex(d => d.template_key === custom.template_key);
+          if (existingIdx > -1) {
+            merged[existingIdx] = custom;
+          } else {
+            merged.push(custom);
+          }
+        });
 
-      customTemplates.forEach(custom => {
-        const existingIdx = merged.findIndex(d => d.template_key === custom.template_key);
-        if (existingIdx > -1) {
-          // Override the default template with the user's custom one
-          merged[existingIdx] = custom;
-        } else {
-          // Append new custom templates
-          merged.push(custom);
-        }
-      });
-
-      try {
-        await AsyncStorage.setItem(cacheKey, JSON.stringify(merged));
-      } catch {}
-      return merged;
+        // Update cache
+        try {
+          await AsyncStorage.setItem(cacheKey, JSON.stringify(merged));
+          await AsyncStorage.setItem(serverKey, String(Date.now()));
+        } catch {}
+        return merged;
+      }
     } catch {
-      return ALL_DEFAULTS[category] || [];
+      // Server fetch failed, fall through to cache
     }
+
+    // Offline fallback: read from cache
+    try {
+      const cached = await AsyncStorage.getItem(cacheKey);
+      if (cached) return JSON.parse(cached);
+    } catch {}
+
+    return ALL_DEFAULTS[category] || [];
   }
 
   async createPromptTemplate(

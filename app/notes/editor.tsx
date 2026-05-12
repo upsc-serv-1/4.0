@@ -62,24 +62,24 @@ import {
   Scissors,
   Eraser
 } from 'lucide-react-native';
-import { supabase } from '@/src/lib/supabase';
-import { useAuth } from '@/src/context/AuthContext';
-import { useTheme } from '@/src/context/ThemeContext';
-import { PageWrapper } from '@/src/components/PageWrapper';
+import { supabase } from '../../src/lib/supabase';
+import { useAuth } from '../../src/context/AuthContext';
+import { useTheme } from '../../src/context/ThemeContext';
+import { PageWrapper } from '../../src/components/PageWrapper';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
-import { FlashcardSvc } from '@/src/services/FlashcardService';
-import { AddBlockToFlashcardSheet } from '@/src/components/AddBlockToFlashcardSheet';
-import { useRecentNotes } from '@/src/hooks/useRecentNotes';
+import { FlashcardSvc } from '../../src/services/FlashcardService';
+import { AddBlockToFlashcardSheet } from '../../src/components/AddBlockToFlashcardSheet';
+import { useRecentNotes } from '../../src/hooks/useRecentNotes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RichNoteEditor from '../../src/components/RichNoteEditor';
 import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 import RenderHtml from 'react-native-render-html';
-import { buildNotesPdfHtml } from '@/src/utils/notesPdfEngine';
-import { UnifiedExportSheet } from '@/src/components/export/UnifiedExportSheet';
-import type { ExportPayload, ExportNoteBlock } from '@/src/lib/unifiedExportEngine';
-import { AIQuickActionButton } from '@/src/components/AIQuickActionButton';
-import { DEFAULT_NOTES_TEMPLATES } from '@/src/services/AIPromptManager';
+import { buildNotesPdfHtml } from '../../src/utils/notesPdfEngine';
+import { UnifiedExportSheet } from '../../src/components/export/UnifiedExportSheet';
+import type { ExportPayload, ExportNoteBlock } from '../../src/lib/unifiedExportEngine';
+import { AIQuickActionButton } from '../../src/components/AIQuickActionButton';
+import { DEFAULT_NOTES_TEMPLATES } from '../../src/services/AIPromptManager';
 
 const { width, height } = Dimensions.get('window');
 

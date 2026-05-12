@@ -163,6 +163,18 @@ export interface PilotV2PencilStroke {
     /** Stroke centroid Y as a fraction (0..1) of the block HEIGHT at
      *  commit time.  Identifies which line the annotation sits on. */
     relY?: number;
+    /** Stroke centroid Y as a PAGE-relative fraction (0..1 of page height)
+     *  at commit time.  Used in conjunction with page-relative startRelX/
+     *  endRelX to reproject strokes after orientation/sidebar changes that
+     *  affect both page width and height.  Falls back to relY (block-
+     *  relative) when absent. */
+    pageRelY?: number;
+    /** Page width (px) at anchor time — used to recompute the absolute
+     *  position when the page width changes (sidebar show/hide,
+     *  orientation change), then re-project onto the block's current rect. */
+    pageWidth?: number;
+    /** Page height (px) at anchor time. */
+    pageHeight?: number;
   };
 }
 

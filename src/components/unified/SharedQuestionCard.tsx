@@ -119,7 +119,9 @@ export const SharedQuestionCard = ({
     const normalizedExplanations = buildCanonicalExplanations(item);
 
     const formatMetaLine = (e: any): string => {
-      return String(e?.source || '').toUpperCase().trim();
+      const source = String(e?.source || '').toUpperCase().trim();
+      const program = String(e?.program || '').toUpperCase().trim();
+      return program ? `${source} - ${program}` : source;
     };
 
     const inferredInstitutes = (() => {
@@ -303,26 +305,6 @@ export const SharedQuestionCard = ({
           </View>
         </View>
 
-        {showMistakes && !effectiveAnswerData.selectedAnswer && !localPracticeAnswer && (
-          <View style={{ 
-            flexDirection: 'row', 
-            alignItems: 'center', 
-            gap: 6, 
-            backgroundColor: effectiveColors.surfaceStrong, 
-            paddingHorizontal: 10, 
-            paddingVertical: 6, 
-            borderRadius: 8,
-            alignSelf: 'flex-start',
-            marginBottom: 12,
-            borderWidth: 1,
-            borderColor: effectiveColors.border
-          }}>
-            <AlertCircle size={14} color={effectiveColors.textTertiary} />
-            <Text style={{ fontSize: 10, fontWeight: '800', color: effectiveColors.textTertiary, letterSpacing: 0.5 }}>
-              NOT ATTEMPTED IN ORIGINAL TEST
-            </Text>
-          </View>
-        )}
 
         <Markdown style={mdStyles} rules={mdRules}>
           {item.statement_line || item.question_text}
@@ -438,6 +420,22 @@ export const SharedQuestionCard = ({
                   )}
                 </>
               )}
+            </ScrollView>
+          </View>
+
+          {/* Mistake Type - Moved below Revision Tags */}
+          <View style={[styles.controlRow, { marginTop: 12 }]}>
+            <Text style={[styles.controlLabel, { color: effectiveColors.textTertiary }]}>MISTAKE TYPE</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
+              {ERROR_TYPES.map(type => (
+                <TouchableOpacity
+                  key={type}
+                  onPress={() => toggleMistakeType && toggleMistakeType(item.id, type)}
+                  style={[styles.chip, { backgroundColor: effectiveColors.surface, borderColor: effectiveColors.border }, effectiveAnswerData.errorCategory === type && { backgroundColor: effectiveColors.primary + '20', borderColor: effectiveColors.primary }]}
+                >
+                  <Text style={[styles.chipText, { color: effectiveAnswerData.errorCategory === type ? effectiveColors.primary : effectiveColors.textSecondary }]}>{type}</Text>
+                </TouchableOpacity>
+              ))}
             </ScrollView>
           </View>
 
@@ -743,137 +741,68 @@ export const SharedQuestionCard = ({
                     </View>
                   </View>
                 )}
-              </View>
 
-              {/* Action Buttons Row */}
-              <View style={styles.actionRow}>
-                 <TouchableOpacity 
-                   style={[styles.actionBtn, { backgroundColor: effectiveColors.primary + '15', borderColor: effectiveColors.primary + '30' }]}
-                   onPress={() => {
-                     const activeText = (() => {
-                       if (selectedExplSource === 'vitamin' && savedBest) {
-                         const kp = savedBest.key_points ? `\n\n**✨ Key Points**\n\n${savedBest.key_points}` : '';
-                         return `${savedBest.answer_text}${kp}`;
-                       }
-                       return effectiveExplanationText || item.explanation_markdown || '';
-                     })();
-                     openNotebookFromQuestion && openNotebookFromQuestion(item, activeText, 'pilot-v2');
-                   }}
-                 >
-                    <Rocket size={16} color={effectiveColors.primary} />
-                    <Text style={[styles.actionBtnText, { color: effectiveColors.primary }]}>Save to Pilot</Text>
-                 </TouchableOpacity>
-
-                 <TouchableOpacity
-                   style={[styles.actionBtn, { backgroundColor: effectiveColors.primary + '15', borderColor: effectiveColors.primary + '30' }]}
-                   onPress={() => onEditVitamin && onEditVitamin(item)}
-                 >
-                    <PenTool size={16} color={effectiveColors.primary} />
-                    <Text style={[styles.actionBtnText, { color: effectiveColors.primary }]}>Save Note</Text>
-                 </TouchableOpacity>
-
-                 <TouchableOpacity 
-                    style={[styles.actionBtn, { backgroundColor: effectiveColors.primary + '15', borderColor: effectiveColors.primary + '30' }]}
-                    onPress={() => onAiChat && onAiChat(item)}
-                  >
-                     <MessageCircle size={16} color={effectiveColors.primary} />
-                     <Text style={[styles.actionBtnText, { color: effectiveColors.primary }]}>Chat with AI</Text>
-                  </TouchableOpacity>
-
-                 <TouchableOpacity 
-                   style={[styles.actionBtn, { backgroundColor: effectiveColors.primary + '15', borderColor: effectiveColors.primary + '30' }]}
-                   onPress={() => {
-                     const activeText = (() => {
-                       if (selectedExplSource === 'vitamin' && savedBest) {
-                         const kp = savedBest.key_points ? `\n\n**✨ Key Points**\n\n${savedBest.key_points}` : '';
-                         return `${savedBest.answer_text}${kp}`;
-                       }
-                       return effectiveExplanationText || item.explanation_markdown || '';
-                     })();
-                     onAddFlashcard && onAddFlashcard(item, activeText);
-                   }}
-                   disabled={isSavingFlashcard}
-                 >
-                    {isSavingFlashcard ? (
-                      <ActivityIndicator size="small" color={effectiveColors.primary} />
-                    ) : (
-                      <>
-                        <Zap size={16} color={isFlashcarded ? effectiveColors.primary : effectiveColors.textPrimary} fill={isFlashcarded ? effectiveColors.primary : 'transparent'} />
-                        <Text style={[styles.actionBtnText, { color: isFlashcarded ? effectiveColors.primary : effectiveColors.textPrimary }]}>Flashcard</Text>
-                      </>
-                    )}
-                 </TouchableOpacity>
-
-                 {onQuickSave && (
-                   <TouchableOpacity 
-                     style={[styles.actionBtn, { backgroundColor: effectiveColors.surfaceStrong, borderColor: effectiveColors.border }]}
-                     onPress={() => onQuickSave(item)}
-                   >
-                      <SaveIcon size={16} color={effectiveColors.textPrimary} />
-                      <Text style={[styles.actionBtnText, { color: effectiveColors.textPrimary }]}>Save</Text>
-                   </TouchableOpacity>
-                 )}
-
-                 {!!item.test_id && onViewSource && (
-                   <TouchableOpacity
-                     style={[styles.actionBtn, { backgroundColor: effectiveColors.surfaceStrong, borderColor: effectiveColors.border }]}
-                     onPress={() => onViewSource(item)}
-                   >
-                      <ExternalLink size={16} color={effectiveColors.textPrimary} />
-                      <Text style={[styles.actionBtnText, { color: effectiveColors.textPrimary }]}>View Source</Text>
-                   </TouchableOpacity>
-                 )}
-              </View>
-
-              {/* Your Insights Section */}
-              <View style={[styles.noteSection, { backgroundColor: effectiveColors.surfaceStrong + '50', borderColor: effectiveColors.border }]}>
-                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                     <View style={{ width: 3, height: 16, backgroundColor: effectiveColors.primary, marginRight: 8, borderRadius: 2 }} />
-                     <Text style={{ fontSize: 11, fontWeight: '900', color: effectiveColors.primary, letterSpacing: 1 }}>YOUR INSIGHTS</Text>
-                   </View>
-
-                   <View style={[styles.controlRow, { marginBottom: 16 }]}>
-                     <Text style={[styles.controlLabel, { color: effectiveColors.textTertiary }]}>MISTAKE TYPE</Text>
-                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
-                       {ERROR_TYPES.map(type => (
-                         <TouchableOpacity
-                           key={type}
-                           onPress={() => toggleMistakeType && toggleMistakeType(item.id, type)}
-                           style={[styles.chip, { backgroundColor: effectiveColors.surface, borderColor: effectiveColors.border }, effectiveAnswerData.errorCategory === type && { backgroundColor: effectiveColors.primary + '20', borderColor: effectiveColors.primary }]}
-                         >
-                           <Text style={[styles.chipText, { color: effectiveAnswerData.errorCategory === type ? effectiveColors.primary : effectiveColors.textSecondary }]}>{type}</Text>
-                         </TouchableOpacity>
-                       ))}
-                     </ScrollView>
-                   </View>
-
-                   <View style={[styles.noteInputWrapper, { backgroundColor: effectiveColors.surface, borderColor: effectiveColors.border }]}>
-                       <TextInput
-                         style={[styles.noteInput, { color: effectiveColors.textPrimary }]}
-                         placeholder="Double-tap to record your strategy..."
-                         multiline
-                         placeholderTextColor={effectiveColors.textSecondary || '#6B7280'}
-                         value={effectiveAnswerData.note || ''}
-                         onChangeText={(val) => onNoteChange && onNoteChange(item.id, val)}
-                       />
-                   </View>
-                   {onCommitToMemory && (
-                     <TouchableOpacity 
-                       onPress={() => onCommitToMemory(item.id)}
-                       style={{ marginTop: 16 }}
-                     >
-                       <LinearGradient 
-                         colors={['#FF6B6B', '#7B2CBF']} 
-                         locations={[0, 1]}
-                         start={{ x: 0, y: 0 }} 
-                         end={{ x: 1, y: 0 }} 
-                         style={{ height: 54, borderRadius: 18, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 10 }}
-                       >
-                          <SaveIcon size={20} color="#fff" />
-                          <Text style={{ color: '#fff', fontSize: 16, fontWeight: '900' }}>Commit to Memory</Text>
-                       </LinearGradient>
-                     </TouchableOpacity>
-                   )}
+                {/* Notes Box - Top Right Corner */}
+                <View style={{
+                  position: 'absolute',
+                  top: 12,
+                  right: 12,
+                  width: 180,
+                  height: 130,
+                  backgroundColor: effectiveColors.surface,
+                  borderRadius: 12,
+                  borderWidth: 1,
+                  borderColor: effectiveColors.primary + '40',
+                  padding: 10,
+                  gap: 6,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 3.84,
+                  elevation: 5,
+                  zIndex: 10,
+                }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <Lightbulb size={12} color={effectiveColors.primary} />
+                    <Text style={{ fontSize: 9, fontWeight: '900', color: effectiveColors.primary, letterSpacing: 0.5 }}>NOTES</Text>
+                  </View>
+                  
+                  <TextInput
+                    style={{
+                      flex: 1,
+                      color: effectiveColors.textPrimary,
+                      fontSize: 11,
+                      padding: 6,
+                      borderRadius: 8,
+                      backgroundColor: effectiveColors.bg,
+                      borderWidth: 1,
+                      borderColor: effectiveColors.border,
+                      textAlignVertical: 'top',
+                    }}
+                    placeholder="Quick notes..."
+                    placeholderTextColor={effectiveColors.textTertiary}
+                    multiline
+                    scrollEnabled={false}
+                    value={effectiveAnswerData.note || ''}
+                    onChangeText={(val) => onNoteChange && onNoteChange(item.id, val)}
+                  />
+                  
+                  {onCommitToMemory && (
+                    <TouchableOpacity 
+                      onPress={() => onCommitToMemory(item.id)}
+                      style={{
+                        paddingVertical: 4,
+                        paddingHorizontal: 8,
+                        borderRadius: 6,
+                        backgroundColor: effectiveColors.primary,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Text style={{ color: '#fff', fontSize: 9, fontWeight: '700' }}>Save</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               </View>
             </>
           )}
@@ -905,7 +834,7 @@ const styles = StyleSheet.create({
   difficultyRow: { flexDirection: 'row', gap: 10 },
   difficultyBtn: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10, borderWidth: 1 },
   difficultyText: { fontSize: 11, fontWeight: '800' },
-  explanationBox: { padding: 16, borderRadius: 16, gap: 8 },
+  explanationBox: { padding: 16, borderRadius: 16, gap: 8, position: 'relative' },
   explanationHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   explanationTitle: { fontSize: 11, fontWeight: '900' },
   actionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12, marginBottom: 16 },

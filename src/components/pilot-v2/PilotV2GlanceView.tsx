@@ -39,6 +39,7 @@ import { PencilCanvas } from './PencilCanvas';
 import { PencilAnnotationEngine } from './PencilAnnotationEngine';
 import { PencilToolbar } from './PencilToolbar';
 import { usePilotV2Pencil } from './usePilotV2Pencil';
+import { PilotV2GlanceExport } from './PilotV2GlanceExport';
 import { PilotV2UnifiedExport } from './PilotV2UnifiedExport';
 import { savePilotV2NoteContent } from '../../repositories/pilotV2Repo';
 import { savePilotV2NoteOfflineFirst } from './pilotV2OfflineSave';
@@ -118,23 +119,29 @@ export function PilotV2GlanceView() {
   const scrollKey = note?.id || '__demo__';
   const lastScrollY = useRef<number>(glanceScrollMemory.current[scrollKey] || 0);
 
-  /* ── Fixed page width (GoodNotes / Notability approach) ─────────────── */
-  /* The content + drawing surface are laid out at a FIXED width that never
-   * changes when the sidebar toggles. This ensures:
-   *   • Text never reflows → stroke positions stay pixel-perfect
-   *   • Drawing coordinates are always relative to the same page width
-   *   • Sidebar show/hide only affects centering, not content layout
+  /* ── TRULY fixed page width (GoodNotes / Notability approach) ────────── */
+  /* The content + drawing surface are laid out at a width computed ONCE on
+   * first render and stored in a ref.  This width NEVER changes — not on
+   * orientation change, not on sidebar toggle.  This guarantees:
+   *   • Text never reflows → all block positions stay pixel-perfect
+   *   • Drawing coordinates remain invariant → strokes never shift
+   *   • Sidebar show/hide and orientation only affect centering
    *
-   * The fixed width is computed as: screenWidth − sidebarWidth − padding.
-   * This guarantees the content fits even when the sidebar IS visible.
-   * When the sidebar is hidden, the content is centered with extra space.
+   * On tablets the initial width is: screenWidth − sidebarWidth − padding.
+   * On phones: screenWidth − padding.
+   * In both cases the value is frozen at mount time.
    */
   const SIDEBAR_WIDTH = 320;
-  const BODY_PADDING = 32; // paddingHorizontal: 16 × 2
+  const BODY_PADDING = 32;
   const isTablet = screenWidth >= 768;
-  const fixedPageWidth = isTablet
-    ? Math.max(400, screenWidth - SIDEBAR_WIDTH - BODY_PADDING)
-    : Math.max(300, screenWidth - BODY_PADDING);
+  // useRef to hold the frozen width — computed once, never updated
+  const frozenWidthRef = useRef<number>(0);
+  if (frozenWidthRef.current === 0) {
+    frozenWidthRef.current = isTablet
+      ? Math.max(400, screenWidth - SIDEBAR_WIDTH - BODY_PADDING)
+      : Math.max(300, screenWidth - BODY_PADDING);
+  }
+  const fixedPageWidth = frozenWidthRef.current;
 
   /* ── Pencil overlay (Step 6) — drawable EVERYWHERE in glance view ─── */
   const [paperSize, setPaperSize] = useState({ w: 1, h: 1 });
@@ -143,6 +150,7 @@ export function PilotV2GlanceView() {
    *  anchored strokes follow block reorders in the read-only view (Step 10). */
   const blockLayoutsRef = useRef<Map<string, { x: number; y: number; w: number; h: number }>>(new Map());
   const [blockLayoutVersion, setBlockLayoutVersion] = useState(0);
+  const contentRef = useRef<View>(null);
   const initialStrokes = (note?.content?.pencilStrokes ?? []) as PilotV2PencilStroke[];
   const assignAnchorToStrokes = useCallback((strokes: PilotV2PencilStroke[]): PilotV2PencilStroke[] => {
     const ph = Math.max(1, paperSize.h);
@@ -187,13 +195,23 @@ export function PilotV2GlanceView() {
           const blockW = Math.max(1, blockRect.w);
           const minXpx = minX * pw;
           const maxXpx = maxX * pw;
-          const startRelX = Math.max(0, Math.min(1, (minXpx - blockRect.x) / blockW));
-          const endRelX = Math.max(startRelX, Math.max(0, Math.min(1, (maxXpx - blockRect.x) / blockW)));
+          // Store startRelX/endRelX as PAGE-relative fractions (0..1 of page width).
+          // This preserves the stroke's absolute pixel position against the
+          // page coordinate system, which is what gets remapped by the
+          // applyBlockOffset when the block moves or page resizes.
+          const startRelX = Math.max(0, Math.min(1, minXpx / pw));
+          const endRelX = Math.max(startRelX, Math.max(0, Math.min(1, maxXpx / pw)));
+          // relY stays block-relative (for vertical positioning within the block)
           const relY = Math.max(0, Math.min(1, (cy - blockRect.y) / blockH));
           const blockText = blocks.find(b => b.id === bestId)?.text ?? '';
           const textLen = Math.max(1, blockText.length);
           const startOffset = Math.round(startRelX * textLen);
           const endOffset = Math.min(textLen, Math.round(endRelX * textLen));
+          // Store page-relative Y too (the stroke's absolute Y / page height)
+          // This is crucial for orientation changes where both width and height
+          // change, causing the block's Y position to shift differently than
+          // the block-relative relY can track.
+          const pageRelY = Math.max(0, Math.min(1, cy / ph));
           spanAnchor = {
             elementId: bestId,
             spanIndex: 0,
@@ -202,6 +220,11 @@ export function PilotV2GlanceView() {
             startRelX,
             endRelX,
             relY,
+            pageRelY,
+            // Store the page dimensions at anchor time so downstream can detect
+            // when a reprojection is needed.
+            pageWidth: pw,
+            pageHeight: ph,
           };
         }
       }
@@ -657,7 +680,7 @@ export function PilotV2GlanceView() {
               bounces={!isZoomed}
             >
               {/* Fixed-width page container — content + strokes never reflow */}
-              <View style={{ width: fixedPageWidth }}>
+              <View ref={contentRef} style={{ width: fixedPageWidth, backgroundColor: '#fff' }}>
               {/* Title row */}
               <View style={styles.titleRow}>
                 <Text style={[styles.h1, { color: colors.textPrimary }]}>{title}</Text>
@@ -799,6 +822,7 @@ export function PilotV2GlanceView() {
         strokes={pencil.engine.getPersisted()}
         pageWidth={paperSize.w}
         pageHeight={paperSize.h}
+        contentRef={contentRef}
       />
     </View>
   );

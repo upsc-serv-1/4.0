@@ -227,3 +227,133 @@ export const mergeQuestions = (questions: any[]) => {
 
   return { mergedQs, idToMergedId };
 };
+
+/**
+ * Enrich already-merged canonical UPSC PYQ questions with explanations
+ * from OTHER coaching institutes (Vision IAS, ForumIAS, Vajiram, etc.)
+ * by fetching their variants from the DB and running the same fuzzy
+ * Jaccard matching against each canonical question.
+ *
+ * This is used by the PYQ Analysis tab so exported questions carry
+ * multi-institute _explanations and _institutes arrays, enabling
+ * user-selectable institute filters in the export sheet.
+ *
+ * @param canonicalQs - Already merged canonical UPSC questions (mutated in-place).
+ * @param supabaseClient - Supabase client instance for querying.
+ */
+export const enrichWithCrossInstituteExplanations = async (
+  canonicalQs: any[],
+  supabaseClient: any,
+) => {
+  if (!canonicalQs.length) return;
+
+  // Collect canonical question texts and years for fuzzy matching
+  const canonEntries = canonicalQs.map((canon) => ({
+    canon,
+    text: getQuestionText(canon),
+    year: getYear(canon),
+    tokens: new Set(tokenize(getQuestionText(canon))),
+  }));
+
+  // Determine the year range present in canonicals
+  const years = Array.from(new Set(canonEntries.map((e) => e.year).filter(Boolean)));
+
+  // Fetch ALL other-institute PYQ-UPSC questions for the relevant years
+  // Exclude UPSC-institute questions — those are already merged.
+  const INSTITUTE_EXCLUDE_KEYWORDS = ['upsc', 'cse', 'official'];
+
+  // We need to fetch questions from the database where:
+  // - is_pyq = true AND is_upsc_cse = true
+  // - institute is NOT UPSC (non-official)
+  // - exam_year matches one of our years
+  const allVariants: any[] = [];
+  for (const year of years) {
+    if (!year) continue;
+    let from = 0;
+    const PAGE = 1000;
+    while (true) {
+      const { data, error } = await supabaseClient
+        .from('questions')
+        .select('id, question_text, explanation_markdown, correct_answer, subject, exam_year, test_id, is_pyq, is_upsc_cse, tests(institute, program_name, series)')
+        .eq('is_pyq', true)
+        .eq('is_upsc_cse', true)
+        .eq('exam_year', year)
+        .order('id', { ascending: true })
+        .range(from, from + PAGE - 1);
+
+      if (error) {
+        console.warn('[enrichCrossInstitute] query error for year', year, error);
+        break;
+      }
+      if (!data?.length) break;
+
+      // Filter out UPSC-institute rows
+      const nonUpsc = data.filter((q: any) => {
+        const inst = normalizeInstitute(
+          (Array.isArray(q?.tests) ? q.tests[0] : q?.tests)?.institute || q?.test_id || ''
+        );
+        return inst.toLowerCase() !== 'upsc';
+      });
+
+      allVariants.push(...nonUpsc);
+      if (data.length < PAGE) break;
+      from += PAGE;
+    }
+  }
+
+  if (!allVariants.length) {
+    console.log('[enrichCrossInstitute] No other-institute variants found for years:', years.join(','));
+    return;
+  }
+
+  console.log(`[enrichCrossInstitute] Fetched ${allVariants.length} other-institute variants across years ${years.join(',')}`);
+
+  // Prepare variant entries for matching
+  const variantEntries = allVariants.map((q) => ({
+    q,
+    text: getQuestionText(q),
+    year: getYear(q),
+    tokens: new Set(tokenize(getQuestionText(q))),
+    inst: getInstitute(q),
+  }));
+
+  // Fuzzy-match each variant to the best canonical question in the same year
+  const SIM_THRESHOLD = 0.78;
+  let matchedCount = 0;
+
+  for (const v of variantEntries) {
+    if (!v.year) continue;
+
+    // Find best canonical match in the same year
+    let bestMatch: { canon: any; score: number } | null = null;
+    for (const c of canonEntries) {
+      if (c.year !== v.year) continue;
+      const score = jaccard(v.tokens, c.tokens);
+      if (score > (bestMatch?.score || 0)) bestMatch = { canon: c.canon, score };
+    }
+
+    if (bestMatch && bestMatch.score >= SIM_THRESHOLD) {
+      const canon = bestMatch.canon;
+
+      // Add institute if not already present
+      if (!canon._institutes.includes(v.inst)) {
+        canon._institutes.push(v.inst);
+      }
+
+      // Add explanation entry
+      const expl = buildExplanationEntry(v.q, v.inst, v.year);
+      if (expl) {
+        addExplanation(canon._explanations || [], expl);
+      }
+
+      // Also add to _mergedIds for traceability
+      if (!canon._mergedIds.includes(v.q.id)) {
+        canon._mergedIds.push(v.q.id);
+      }
+
+      matchedCount++;
+    }
+  }
+
+  console.log(`[enrichCrossInstitute] Matched ${matchedCount}/${variantEntries.length} other-institute variants to ${canonicalQs.length} canonical UPSC questions`);
+};

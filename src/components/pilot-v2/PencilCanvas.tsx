@@ -501,6 +501,12 @@ const CommittedStrokesLayer = React.memo(function CommittedStrokesLayer({
    *    • block reorder changing page position      (vertical shift)
    *    • zoom / resize                              (both axes)
    *
+   *  **Important:** startRelX/endRelX are stored as PAGE-relative fractions
+   *  (0..1 of page width).  To reproject correctly after a page width change
+   *  (e.g. sidebar toggle), we first compute the absolute pixel position
+   *  using the CURRENT page width, then map that onto the block's current
+   *  bounding box to derive the block-relative fraction for rendering.
+   *
    *  Strokes with a legacy anchor (blockId + blockOriginY only) fall back
    *  to the original Y-delta logic.
    */
@@ -510,19 +516,32 @@ const CommittedStrokesLayer = React.memo(function CommittedStrokesLayer({
     const blockRect = blockLayouts.get(s.anchor.blockId);
     if (!blockRect) return s;
 
-    // ── Full span-anchor reprojection (Step 9+ strokes) ──────────────
-    // These strokes have block-relative X/Y coordinates stored at commit
-    // time.  We recompute absolute page-relative coordinates from the
-    // block's CURRENT position so the stroke follows the text regardless
-    // of page-width changes (sidebar toggle, rotation, etc.).
+    // ── Full span-anchor reprojection (page-relative anchors) ─────────
+    // startRelX/endRelX are PAGE-relative (0..1 of page width).
+    // We take startRelX * currentWidth to get the absolute pixel X in the
+    // current page coordinate system, then find where that falls within
+    // the block's current bounding box to get block-relative fractions.
     if (
       typeof s.anchor.startRelX === 'number' &&
       typeof s.anchor.endRelX === 'number' &&
       typeof s.anchor.relY === 'number'
     ) {
-      const startRelX = Math.max(0, Math.min(1, s.anchor.startRelX));
-      const endRelX   = Math.max(startRelX, Math.max(0, Math.min(1, s.anchor.endRelX)));
-      const relY      = Math.max(0, Math.min(1, s.anchor.relY));
+      // ── Y-axis: use pageRelY when available (orientation-safe) ─────────
+      // When pageRelY is present, we compute the absolute Y pixel via
+      // pageRelY * currentHeight, then find where that falls within the
+      // block's current bounding box.  This correctly handles orientation
+      // changes where BOTH width and height may change.
+      // Falls back to block-relative relY when pageRelY is absent.
+      let targetY: number;
+      if (typeof s.anchor.pageRelY === 'number') {
+        const absY = s.anchor.pageRelY * height;
+        const blockRelY = Math.max(0, Math.min(1,
+          (absY - blockRect.y) / Math.max(1, blockRect.h)
+        ));
+        targetY = (blockRect.y + blockRelY * blockRect.h) / height;
+      } else {
+        targetY = (blockRect.y + Math.max(0, Math.min(1, s.anchor.relY)) * blockRect.h) / height;
+      }
 
       // Determine each point's fraction along the original stroke extent
       // so the stroke's shape (curves, pressure variance) is preserved.
@@ -537,12 +556,25 @@ const CommittedStrokesLayer = React.memo(function CommittedStrokesLayer({
       const xExtent = Math.max(1e-9, maxX - minX);
       const yExtent = Math.max(1e-9, maxY - minY);
 
+      // Convert page-relative startRelX/endRelX to absolute pixel positions
+      // in the CURRENT page coordinate system.
+      const currentStartPx = s.anchor.startRelX * width;
+      const currentEndPx   = s.anchor.endRelX * width;
+
+      // Map these absolute positions onto the current block rect to get
+      // block-relative fractions (0..1 of block width).
+      const targetBlockRelStart = Math.max(0, Math.min(1,
+        (currentStartPx - blockRect.x) / Math.max(1, blockRect.w)
+      ));
+      const targetBlockRelEnd = Math.max(targetBlockRelStart, Math.max(0, Math.min(1,
+        (currentEndPx - blockRect.x) / Math.max(1, blockRect.w)
+      )));
+
       // Target position in page-relative (0..1) coordinates derived from
       // the block's current pixel rect.
-      const targetX0     = (blockRect.x + startRelX * blockRect.w) / width;
-      const targetXEnd   = (blockRect.x + endRelX * blockRect.w) / width;
+      const targetX0     = (blockRect.x + targetBlockRelStart * blockRect.w) / width;
+      const targetXEnd   = (blockRect.x + targetBlockRelEnd * blockRect.w) / width;
       const targetXSpan  = targetXEnd - targetX0;
-      const targetY      = (blockRect.y + relY * blockRect.h) / height;
 
       // Check if the stroke's Y extent is small relative to its X extent
       // (i.e. it's a roughly horizontal underline / highlight).

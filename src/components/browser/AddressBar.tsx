@@ -7,11 +7,12 @@ type Props = {
   onSubmit: (url: string) => void;
   onRotate: () => void;
   onMenu: () => void;
+  onBack: () => void;
   loading: boolean;
   identityId: string;
 };
 
-export default function AddressBar({ url, onSubmit, onRotate, onMenu, loading, identityId }: Props) {
+export default function AddressBar({ url, onSubmit, onRotate, onMenu, onBack, loading, identityId }: Props) {
   const [text, setText] = React.useState(url);
 
   React.useEffect(() => {
@@ -34,6 +35,14 @@ export default function AddressBar({ url, onSubmit, onRotate, onMenu, loading, i
   return (
     <View style={styles.wrap} testID="address-bar">
       <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.iconBtn, { borderColor: "transparent" }]}
+          onPress={onBack}
+          testID="exit-browser-btn"
+        >
+          <Ionicons name="chevron-back" size={24} color="#F5F5F5" />
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.iconBtn}
           onPress={onRotate}

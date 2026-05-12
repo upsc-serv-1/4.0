@@ -39,6 +39,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { prelimsTaxonomy } from '../src/data/taxonomy';
 import { AnalysisExportSheet } from '../src/components/export/AnalysisExportSheet';
 import { buildPyqAnalysisSummaryHtml, type ExportPayload } from '../src/lib/unifiedExportEngine';
+import { mergeQuestions, enrichWithCrossInstituteExplanations } from '../src/utils/merger';
 import { useDownloadManager } from '../src/context/DownloadManagerContext';
 import { useExportGuard } from '../src/lib/useExportGuard';
 import { ActiveFiltersBar, ActiveFilter } from '../src/components/pyq/ActiveFiltersBar';
@@ -526,7 +527,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     while (true) {
       const { data, error } = await supabase
         .from('questions')
-        .select('*')
+        .select('*, tests(institute)')
         .in('test_id', testIds)
         .order('test_id', { ascending: true })
         .order('question_number', { ascending: true })
@@ -600,13 +601,24 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       const testsMetaMap = Object.fromEntries(visibleTests.map((test: any) => [String(test.id), test]));
       const questions = await fetchQuestionsForTests(testIds);
       
-      setRawQuestions(questions);
-      setTestsMetaById(testsMetaMap);
-      processAnalytics(questions);
+      // Run dedup merge so each question carries _explanations and _institutes
+      const { mergedQs } = mergeQuestions(questions);
 
-      // Save to cache
+      // Enrich with cross-institute explanations from other coaching institutes
+      // (runs fuzzy Jaccard matching against non-UPSC PYQ variants in the DB)
+      try {
+        await enrichWithCrossInstituteExplanations(mergedQs, supabase);
+      } catch (enrichErr) {
+        console.warn('[PYQ] Cross-institute enrichment failed (non-fatal)', enrichErr);
+      }
+
+      setRawQuestions(mergedQs);
+      setTestsMetaById(testsMetaMap);
+      processAnalytics(mergedQs);
+
+      // Save to cache — store enriched questions so _institutes/_explanations survive cache
       KVStore.setJson(cacheKey, {
-        questions,
+        questions: mergedQs,
         testsMeta: testsMetaMap,
         timestamp: Date.now()
       });
@@ -1171,6 +1183,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       is_ncert: !!q.is_ncert,
       // Include merged explanations from all institutes (dedup merger)
       _explanations: Array.isArray(q._explanations) ? q._explanations : [],
+      // Include all contributing institutes
+      _institutes: Array.isArray(q._institutes) ? q._institutes : [],
     }));
 
     return { kind: 'questions', rows } as ExportPayload;
@@ -2778,6 +2792,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           is_ncert: !!q.is_ncert,
           difficulty: q.difficulty || q.difficulty_level,
           review_tags: q.review_tags,
+          _explanations: Array.isArray(q._explanations) ? q._explanations : [],
+          _institutes: Array.isArray(q._institutes) ? q._institutes : [],
         }))}
         buildForecastRows={(rows) => {
           const predictive = buildPredictive(

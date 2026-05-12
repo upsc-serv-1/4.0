@@ -44,6 +44,12 @@ interface Props {
    * Hide specific sections of the sheet (use when irrelevant for a module).
    */
   hideSections?: Array<'content' | 'sort' | 'answer' | 'filters' | 'advanced'>;
+  /**
+   * Optional async hook called immediately before exporting begins.
+   * Useful for time-of-export captures (e.g. view snapshot).
+   * If it returns a payload, that payload overrides the default prop payload.
+   */
+  onPreExport?: (cols: 1 | 2, opts: ExportOptions) => Promise<ExportPayload | null>;
 }
 
 const CHOICES = {
@@ -133,6 +139,7 @@ export const UnifiedExportSheet: React.FC<Props> = ({
   onBuildAnalysisHtml,
   renderExtraFilters,
   hideSections = DEFAULT_HIDE_SECTIONS,
+  onPreExport,
 }) => {
   const { colors } = useTheme();
   const [opts, setOpts] = useState<ExportOptions>(() => defaultExportOptions({
@@ -193,9 +200,20 @@ export const UnifiedExportSheet: React.FC<Props> = ({
         ? onBuildAnalysisHtml(selectedAnalysisReports)
         : '';
 
-      const payloadForExport: ExportPayload = payload.kind === 'notes'
-        ? { ...payload, selectedHeadingIds: notesSelectedHeadings }
-        : payload;
+      // Hook to inject dynamic content (like screen snapshots) just before generation
+      let finalPayload = payload;
+      if (onPreExport) {
+        const override = await onPreExport(cols, opts);
+        if (override) finalPayload = override;
+      }
+
+      if (!finalPayload) {
+        throw new Error('Export content preparation failed');
+      }
+
+      const payloadForExport: ExportPayload = finalPayload.kind === 'notes'
+        ? { ...finalPayload, selectedHeadingIds: notesSelectedHeadings }
+        : finalPayload;
 
       await exportToPdf(payloadForExport, { ...opts, columns: cols }, { prependHtml });
     } catch (e: any) {
@@ -450,6 +468,7 @@ export const UnifiedExportSheet: React.FC<Props> = ({
                 <ToggleRow label="PYQ only" value={!!opts.pyqOnly} onChange={v => set('pyqOnly', v)} colors={colors} />
                 <ToggleRow label="NCERT only" value={!!opts.ncertOnly} onChange={v => set('ncertOnly', v)} colors={colors} />
                 <ToggleRow label="Hide all answers (fresh practice test)" value={!!opts.hideResponses} onChange={v => set('hideResponses', v)} colors={colors} />
+                <ToggleRow label="Show my responses (red/green coloring)" value={!!opts.showMyResponses} onChange={v => set('showMyResponses', v)} colors={colors} />
                 {renderExtraFilters && renderExtraFilters(opts, setOpts)}
                 <ToggleRow label="Performance metrics (time / correctness)" value={!!opts.includePerformanceMetrics} onChange={v => set('includePerformanceMetrics', v)} colors={colors} />
               </Section>

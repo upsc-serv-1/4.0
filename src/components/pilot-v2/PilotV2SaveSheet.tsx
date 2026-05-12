@@ -160,10 +160,10 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
 
-  const [subject, setSubject]     = useState(autoSeed.subject || '');
-  const [topic, setTopic]         = useState(autoSeed.topic || '');
-  const [subtopic, setSubtopic]   = useState(autoSeed.subtopic || '');
-  const [notebook, setNotebook]   = useState(autoSeed.notebookTitle || autoSeed.subtopic || autoSeed.topic || autoSeed.subject || '');
+  const [subject, setSubject]     = useState(autoSeed?.subject || '');
+  const [topic, setTopic]         = useState(autoSeed?.topic || '');
+  const [subtopic, setSubtopic]   = useState(autoSeed?.subtopic || '');
+  const [notebook, setNotebook]   = useState(autoSeed?.notebookTitle || autoSeed?.subtopic || autoSeed?.topic || autoSeed?.subject || '');
   const [body, setBody]           = useState(markdownishToHtml(initialBody || ''));
   const richRef = useRef<any>(null);
   const [showHlPicker, setShowHlPicker] = useState(false);
@@ -254,15 +254,15 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     (async () => {
       const last = await readLastUsed();
       if (cancelled) return;
-      setSubject(autoSeed.subject || last.subject || '');
-      setTopic(autoSeed.topic || last.topic || '');
-      setSubtopic(autoSeed.subtopic || last.subtopic || '');
+      setSubject(autoSeed?.subject || last.subject || '');
+      setTopic(autoSeed?.topic || last.topic || '');
+      setSubtopic(autoSeed?.subtopic || last.subtopic || '');
       setNotebook(
-        autoSeed.notebookTitle ||
+        autoSeed?.notebookTitle ||
         last.notebook ||
-        autoSeed.subtopic ||
-        autoSeed.topic ||
-        autoSeed.subject ||
+        autoSeed?.subtopic ||
+        autoSeed?.topic ||
+        autoSeed?.subject ||
         ''
       );
     })();

@@ -580,6 +580,8 @@ export const UnifiedExportSheet: React.FC<Props> = ({
             {showAdvanced && !hideSections.includes('advanced') && (
               <Section title="" colors={colors}>
                 <ToggleRow label="Table of Contents" value={!!opts.showTOC} onChange={v => set('showTOC', v)} colors={colors} />
+                <ToggleRow label="Subject / Section / Microtopic chips" value={!!opts.showMetaChips} onChange={v => set('showMetaChips', v)} colors={colors} />
+                <ToggleRow label="PYQ categorization chip" value={!!opts.showPYQChips} onChange={v => set('showPYQChips', v)} colors={colors} />
                 <Label colors={colors}>PAGE MARGINS (CM)</Label>
                 <Text style={{ fontSize: 11, color: colors.textTertiary, marginBottom: 6 }}>Default is 1cm on all sides.</Text>
                 <Label colors={colors}>LEFT</Label>

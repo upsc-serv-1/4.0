@@ -909,7 +909,13 @@ export default function UnifiedQuizEngine() {
       micro_topic: q.micro_topic,
       exam_year: q.exam_year,
       is_pyq: q.is_pyq,
+      is_upsc_cse: q.is_upsc_cse,
+      is_allied: q.is_allied,
+      is_others: q.is_others,
+      exam_group: q.exam_group,
       is_ncert: q.is_ncert,
+      source: q.source,
+      exam_info: q.exam_info,
       _explanations: Array.isArray(q._explanations) ? q._explanations : []
     }));
 

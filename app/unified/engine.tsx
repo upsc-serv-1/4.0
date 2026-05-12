@@ -20,7 +20,7 @@ import {
   BackHandler
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { usePreventRemove, useNavigation } from '@react-navigation/native';
 import { 
   ChevronLeft, 
@@ -810,8 +810,17 @@ export default function UnifiedQuizEngine() {
     setAff,
     handleAddToFlashcards,
     handleFlashcardPlaced,
-    handleFlashcardDeleted
+    handleFlashcardDeleted,
+    fetchFlashcardedStatus
   } = useFlashcardAction(session?.user?.id);
+  // Sync flashcard state when screen gains focus — picks up cards that were
+  // deleted from the flashcards screen while this engine was in the background.
+  useFocusEffect(
+    useCallback(() => {
+      const ids = questions.map(q => q.id);
+      if (ids.length > 0) fetchFlashcardedStatus(ids);
+    }, [questions, fetchFlashcardedStatus])
+  );
   const [lastNoteTap, setLastNoteTap] = useState(0);
   const [fontSize, setFontSize] = useState(16);
 

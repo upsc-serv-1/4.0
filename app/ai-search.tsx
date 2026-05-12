@@ -177,80 +177,97 @@ function highlightKeywords(text: string, allKeywords: string[]): React.ReactNode
 
 // ── Contextual snippet builder ───────────────────────────────────────────────
 // Searches across question_text, options, and explanation_markdown for the
-// best keyword match. Priority order: question_text > options > explanation.
-// Only shows source label when match is NOT from question_text.
+// best keyword match. Priority: rawTerm in question_text > AI keywords.
+// Always shows context with the matched keyword highlighted, or a fallback
+// showing why this question appeared.
 function buildContextSnippet(
   text: string,
   keywords: string[],
   options?: Record<string, string> | null,
   explanation?: string | null,
+  rawTerm?: string,
   maxContextWords: number = 12,
 ): React.ReactNode {
-  const lowerText = (text || '').toLowerCase();
-  
-  // Build searchable fields with labels (ordered by priority)
-  const fields: { text: string; label: string; priority: number }[] = [
-    { text: text || '', label: '', priority: 0 },
-  ];
-  
-  // Add options text
+  if (!text && !options && !explanation) return null;
+
+  // Priority 1: Try to match rawTerm (user's original query) in question_text
+  if (rawTerm && rawTerm.length > 2) {
+    const rawLower = rawTerm.toLowerCase();
+    const rawWords = rawLower.split(/\s+/).filter(w => w.length > 2);
+    for (const word of rawWords) {
+      if ((text || '').toLowerCase().includes(word)) {
+        return buildSnippetFromField(text || '', word, '', maxContextWords);
+      }
+    }
+  }
+
+  // Priority 2: Try AI keywords in question_text (no label)
+  const textLower = (text || '').toLowerCase();
+  const textKw = keywords.find(k => k.length > 2 && textLower.includes(k.toLowerCase()));
+  if (textKw) {
+    return buildSnippetFromField(text || '', textKw, '', maxContextWords);
+  }
+
+  // Priority 3: Try keywords in options
   if (options) {
     const optsText = Object.entries(options)
       .map(([k, v]) => `${k}: ${v}`)
       .join(' ');
-    if (optsText) fields.push({ text: optsText, label: '(Options)', priority: 1 });
-  }
-  
-  // Add explanation
-  if (explanation) {
-    fields.push({ text: explanation, label: '(Explanation)', priority: 2 });
-  }
-  
-  // Find best match by priority (question_text > options > explanation)
-  // and within same priority, first keyword match wins
-  let bestField: { text: string; label: string; priority: number } | null = null;
-  let bestKw: string | null = null;
-  
-  for (const field of fields) {
-    if (!field.text) continue;
-    const lower = field.text.toLowerCase();
-    const kw = keywords.find(k => k.length > 2 && lower.includes(k.toLowerCase()));
-    if (kw) {
-      // First match in this priority level — always prefer higher priority
-      if (bestField === null || field.priority < bestField.priority) {
-        bestField = field;
-        bestKw = kw;
-      }
+    const optsLower = optsText.toLowerCase();
+    const optsKw = keywords.find(k => k.length > 2 && optsLower.includes(k.toLowerCase()));
+    if (optsKw) {
+      return buildSnippetFromField(optsText, optsKw, '(Options)', maxContextWords);
     }
   }
-  
-  // No keyword found in any field — show truncated question text
-  if (!bestField || !bestKw) {
-    return <Text>{(text || '').slice(0, 150)}</Text>;
+
+  // Priority 4: Try keywords in explanation
+  if (explanation) {
+    const explLower = explanation.toLowerCase();
+    const explKw = keywords.find(k => k.length > 2 && explLower.includes(k.toLowerCase()));
+    if (explKw) {
+      return buildSnippetFromField(explanation, explKw, '(Explanation)', maxContextWords);
+    }
   }
-  
-  const matchIdx = bestField.text.toLowerCase().indexOf(bestKw.toLowerCase());
-  if (matchIdx === -1) return <Text>{(text || '').slice(0, 150)}</Text>;
-  
-  const matchEnd = matchIdx + bestKw.length;
-  
-  // Extract context around the match
-  const beforeText = bestField.text.slice(0, matchIdx);
+
+  // Fallback: show first 150 chars with the first keyword name as hint
+  const hint = keywords.find(k => k.length > 2) || '';
+  const fallbackText = (text || '').slice(0, 150);
+  if (hint) {
+    return <Text>{fallbackText}{fallbackText.length >= 150 ? '...' : ''} <Text style={{ fontSize: 9, color: '#888', fontStyle: 'italic' }}>(matched: {hint})</Text></Text>;
+  }
+  return <Text>{fallbackText}</Text>;
+}
+
+// Helper: build snippet with context around a matched keyword
+function buildSnippetFromField(
+  fieldText: string,
+  keyword: string,
+  label: string,
+  maxContextWords: number,
+): React.ReactNode {
+  const lower = fieldText.toLowerCase();
+  const matchIdx = lower.indexOf(keyword.toLowerCase());
+  if (matchIdx === -1) {
+    return <Text>{fieldText.slice(0, 150)}</Text>;
+  }
+
+  const matchEnd = matchIdx + keyword.length;
+  const beforeText = fieldText.slice(0, matchIdx);
   const beforeWords = beforeText.split(/\s+/).filter(Boolean);
   const contextBefore = beforeWords.slice(-maxContextWords).join(' ');
   const hasMoreBefore = beforeWords.length > maxContextWords;
-  
-  const afterText = bestField.text.slice(matchEnd);
+
+  const afterText = fieldText.slice(matchEnd);
   const afterWords = afterText.split(/\s+/).filter(Boolean);
   const contextAfter = afterWords.slice(0, maxContextWords).join(' ');
   const hasMoreAfter = afterWords.length > maxContextWords;
-  
+
   const prefix = hasMoreBefore ? '... ' : '';
   const suffix = hasMoreAfter ? ' ...' : '';
-  const label = bestField.label ? `${bestField.label} ` : '';
-  const snippet = `${label}${prefix}${contextBefore} ${bestKw} ${contextAfter}${suffix}`;
-  
-  return highlightKeywords(snippet, [bestKw]);
+  const labelPrefix = label ? `${label} ` : '';
+  const snippet = `${labelPrefix}${prefix}${contextBefore} ${keyword} ${contextAfter}${suffix}`;
+
+  return highlightKeywords(snippet, [keyword]);
 }
 
 // ── PYQ chip color by exam category ──────────────────────────────────────────
@@ -1441,7 +1458,7 @@ export default function AISearchTab() {
           {/* ensuring matches in deep paragraphs are visible in the snippet */}
           <Text style={[styles.cardText, { color: colors.textPrimary }]} numberOfLines={3}>
             {keywords.length > 0
-              ? buildContextSnippet(item.question_text, keywords, item.options, item.explanation_markdown)
+              ? buildContextSnippet(item.question_text, keywords, item.options, item.explanation_markdown, query)
               : item.question_text}
           </Text>
 

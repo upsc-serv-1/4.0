@@ -93,8 +93,15 @@ export function useFlashcardAction(userId: string | undefined) {
         }
       }
       setFlashcardedIds(prev => {
-        const next = new Set(prev);
-        allFound.forEach(id => next.add(id));
+        // Replace rather than merge — this removes IDs for cards that
+        // were deleted (from the flashcards screen) so the button
+        // immediately loses its sparkled/highlighted state.
+        const next = new Set(allFound);
+        // Preserve any IDs that weren't in the checked batch (e.g. from
+        // external navigation) to avoid dropping them.
+        for (const id of prev) {
+          if (!qIds.includes(id)) next.add(id);
+        }
         return next;
       });
     } catch (e) {

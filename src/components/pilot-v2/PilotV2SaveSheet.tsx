@@ -47,6 +47,7 @@ const STORAGE_SAVE_SHEET_AI_PROMPT = 'pilot-v2:save-sheet:ai-preset-prompt';
 const STORAGE_HEADER_INCLUDE = 'pilot-v2:save-sheet:include-header';
 const STORAGE_HEADER_STYLE = 'pilot-v2:save-sheet:header-style';
 const STORAGE_CUSTOM_HEADER = 'pilot-v2:save-sheet:custom-header';
+const STORAGE_PAGE_LAYOUT = 'pilot-v2:save-sheet:page-layout';
 type LastUsed = {
   subject?: string; topic?: string; subtopic?: string; notebook?: string;
 };
@@ -79,7 +80,6 @@ export function textToPilotV2Blocks(text: string): PilotV2Block[] {
   const blocks: PilotV2Block[] = [];
   for (const raw of lines) {
     const line = raw.replace(/<br\s*\/?>(?=\s*\n?)/gi, '').replace(/<[^>]+>/g, '').trim();
-    if (!line) continue;
     if (line.startsWith('# ')) {
       blocks.push({ id: newId(), type: 'heading', level: 1, text: line.slice(2).trim() });
     } else if (line.startsWith('## ')) {
@@ -181,6 +181,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
   const [includeHeader, setIncludeHeader] = useState(true);
   const [headerStyle, setHeaderStyle] = useState<HeaderStyle>('auto-title');
   const [customHeader, setCustomHeader] = useState('');
+  const [pageLayout, setPageLayout] = useState<'standard' | 'wide'>('standard');
   // Dropdowns state
   const [activeLevel, setActiveLevel] = useState<'subject' | 'topic' | 'subtopic' | 'notebook' | null>(null);
   const [moveOpen, setMoveOpen] = useState(false);
@@ -236,12 +237,14 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
       const headerIncStr = await AsyncStorage.getItem(STORAGE_HEADER_INCLUDE);
       const headerStyleStr = await AsyncStorage.getItem(STORAGE_HEADER_STYLE);
       const customHeaderStr = await AsyncStorage.getItem(STORAGE_CUSTOM_HEADER);
+      const layoutStr = await AsyncStorage.getItem(STORAGE_PAGE_LAYOUT);
       if (!cancelled) {
         setUserHierarchy(opts);
         setAllNodes(nodes);
         setIncludeHeader(headerIncStr !== 'false');
         setHeaderStyle((headerStyleStr as HeaderStyle) || 'auto-title');
         setCustomHeader(customHeaderStr || '');
+        if (layoutStr === 'wide' || layoutStr === 'standard') setPageLayout(layoutStr);
       }
     })();
     return () => { cancelled = true; };
@@ -470,6 +473,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
         topic: topic.trim() || null,
         subtopic: subtopic.trim() || null,
         title: notebookTitle,
+        layout: pageLayout,
       });
       const headerText = generateHeaderText();
       const blocks: PilotV2Block[] = [];
@@ -511,6 +515,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
       AsyncStorage.setItem(STORAGE_HEADER_INCLUDE, includeHeader.toString()).catch(() => null);
       AsyncStorage.setItem(STORAGE_HEADER_STYLE, headerStyle).catch(() => null);
       AsyncStorage.setItem(STORAGE_CUSTOM_HEADER, customHeader).catch(() => null);
+      AsyncStorage.setItem(STORAGE_PAGE_LAYOUT, pageLayout).catch(() => null);
 
       // Show confirmation
       Alert.alert(
@@ -731,6 +736,34 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                       />
                     </View>
                   )}
+
+                  {/* Page Layout Option Line */}
+                  <View style={{ marginTop: 6, paddingTop: 6, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <Text style={{ color: colors.textTertiary, fontSize: 11, fontWeight: '700', minWidth: 85 }}>Page Layout</Text>
+                      <View style={{ flex: 1, flexDirection: 'row', gap: 4 }}>
+                        {(['standard', 'wide'] as const).map((lay) => (
+                          <TouchableOpacity
+                            key={lay}
+                            onPress={() => setPageLayout(lay)}
+                            style={{
+                              flex: 1,
+                              paddingVertical: 5,
+                              borderRadius: 6,
+                              backgroundColor: pageLayout === lay ? '#5B4EFA' : colors.surfaceStrong,
+                              borderWidth: 1,
+                              borderColor: pageLayout === lay ? '#5B4EFA' : colors.border,
+                              alignItems: 'center'
+                            }}
+                          >
+                            <Text style={{ fontSize: 9, fontWeight: '700', color: pageLayout === lay ? '#fff' : colors.textSecondary }}>
+                              {lay === 'standard' ? '📄 Standard' : '↔️ Wide (A4)'}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+                  </View>
                 </View>
               </View>
             </Animated.View>

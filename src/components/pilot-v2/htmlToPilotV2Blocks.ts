@@ -25,8 +25,7 @@ export function htmlToPilotV2Blocks(html: string): PilotV2Block[] {
     .replace(/<\/p>/gi, '</p>')
     .replace(/<p>([^<]*?)<br\s*\/?>([^<]*?)<\/p>/gi, '<p>$1</p><p>$2</p>')
     .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '</p><p>')
-    .replace(/<br\s*\/?>/gi, '</p><p>')
-    .replace(/<p>\s*<\/p>/gi, '');
+    .replace(/<br\s*\/?>/gi, '</p><p>');
 
   // Extract headings
   processed = processed.replace(/<h([1-3])[^>]*>(.*?)<\/h\1>/gis, (_: any, level: string, content: string) => {
@@ -59,7 +58,7 @@ export function htmlToPilotV2Blocks(html: string): PilotV2Block[] {
   let pMatch;
   while ((pMatch = pRegex.exec(noList)) !== null) {
     const clean = pMatch[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
-    if (clean) blocks.push({ id: newId(), type: 'paragraph', text: clean });
+    blocks.push({ id: newId(), type: 'paragraph', text: clean });
   }
 
   // Fallback: if nothing extracted, treat as plain text
@@ -81,7 +80,6 @@ function textToBlocks(text: string): PilotV2Block[] {
   const blocks: PilotV2Block[] = [];
   for (const line of lines) {
     const cleanLine = line.trim();
-    if (!cleanLine) continue;
     if (cleanLine.startsWith('# ')) {
       blocks.push({ id: newId(), type: 'heading', level: 1, text: cleanLine.slice(2).trim() });
     } else if (cleanLine.startsWith('## ')) {

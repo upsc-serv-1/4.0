@@ -302,10 +302,10 @@ export function PilotV2NoteList() {
     try {
       const result = await findOrCreatePilotV2Note({
         userId,
-        subjectTitle: subjectMeta?.label ?? 'General',
-        topicTitle: subjectMeta?.label ?? 'General',
-        subtopicTitle: topicName,
-        noteTitle: title,
+        subject: subjectMeta?.label ?? 'General',
+        topic: subjectMeta?.label ?? 'General',
+        subtopic: topicName,
+        title,
       });
       if (!result) throw new Error('Could not create note');
       await refreshNotes();

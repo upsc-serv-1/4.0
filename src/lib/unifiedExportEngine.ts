@@ -89,6 +89,11 @@ export interface ExportOptions {
   yearEnd?: number | null;
 
   instituteFilters?: string[];
+
+  // Meta chips display
+  showMetaChips?: boolean;   // Show subject / section_group / micro_topic / year chips
+  showPYQChips?: boolean;    // Show PYQ categorization chip (UPSC CSE 2025, etc.)
+
   // Notes-specific injections
   notesSubheadingColor?: string;
   notesChecklistMode?: boolean;
@@ -133,6 +138,8 @@ export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): Ex
   yearEnd: null,
   notesSubheadingColor: '#6A5BFF20',
   notesChecklistMode: true,
+  showMetaChips: true,
+  showPYQChips: true,
   ...overrides,
 });
 
@@ -159,6 +166,13 @@ export interface ExportQuestion {
   time_taken_seconds?: number;
   attempted_at?: string;
   _explanations?: Array<{ source: string; text: string; year?: string }>;
+  // PYQ categorization fields (used for proper chip rendering matching SharedQuestionCard)
+  is_upsc_cse?: boolean;
+  is_allied?: boolean;
+  is_others?: boolean;
+  exam_group?: string;
+  source?: Record<string, any>;
+  exam_info?: Record<string, any>;
 }
 
 export interface ExportFlashcard {
@@ -251,10 +265,12 @@ const baseCss = (o: ExportOptions) => {
   const qaBorder = anyBgVisible ? 'rgba(15, 23, 42, 0.12)' : 'transparent';
   return `
     :root { --bg:${t.bg}; --fg:${t.fg}; --accent:${t.accent}; --rule:${t.rule}; --card:${t.card}; --qa-bg:${qaBg}; --qa-q-bg:${qBg}; --qa-a-bg:${aBg}; --qa-border:${qaBorder}; }
-    /* 🔧 FIX: @page margin is unreliable on Android (Chromium WebView ignores it).
-       We zero out @page margin and apply the user's margin as explicit padding on the
-       .paper container, which works consistently across all platforms. */
-    @page { size: A4 !important; margin: 0; }
+    /* 🔧 FIX: @page margin is unreliable on Android (Chromium WebView via expo-print
+       ignores the @page margin CSS rule). We keep @page margin for top/bottom (the
+       ONLY mechanism that re-applies top/bottom spacing at each page break in paged
+       media), and additionally apply padding on the .paper wrapper for reliable
+       left/right spacing on all platforms. */
+    @page { size: A4 !important; margin: ${clampCm(o.pageMarginTopCm)}cm ${clampCm(o.pageMarginRightCm)}cm ${clampCm(o.pageMarginBottomCm)}cm ${clampCm(o.pageMarginLeftCm)}cm; }
     * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     html, body { margin: 0; padding: 0; }
     body {

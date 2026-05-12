@@ -1078,9 +1078,10 @@ async function printStandaloneReport(fragmentHtml: string, o: ExportOptions): Pr
   try {
     const html = `<!doctype html><html><head><meta charset="utf-8"/>
     <style>
-      @page { size: A4; margin: 0; }
+      @page { size: A4; margin: ${clamp(o.pageMarginTopCm, 1)}cm ${clamp(o.pageMarginRightCm, 1)}cm ${clamp(o.pageMarginBottomCm, 1)}cm ${clamp(o.pageMarginLeftCm, 1)}cm; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
-      html, body { margin: 0; padding: ${clamp(o.pageMarginTopCm, 1)}cm ${clamp(o.pageMarginRightCm, 1)}cm ${clamp(o.pageMarginBottomCm, 1)}cm ${clamp(o.pageMarginLeftCm, 1)}cm; font-family: ${o.fontFamily === 'serif' ? "'Georgia', serif" : o.fontFamily === 'mono' ? "'Menlo', monospace" : o.fontFamily === 'handwriting' ? "'Caveat', cursive" : "-apple-system, Segoe UI, Roboto, sans-serif"}; color: #0f172a; font-size: ${o.fontSize}pt; }
+      html, body { margin: 0; padding: 0; }
+      body { padding: 0 ${clamp(o.pageMarginRightCm, 1)}cm 0 ${clamp(o.pageMarginLeftCm, 1)}cm; font-family: ${o.fontFamily === 'serif' ? "'Georgia', serif" : o.fontFamily === 'mono' ? "'Menlo', monospace" : o.fontFamily === 'handwriting' ? "'Caveat', cursive" : "-apple-system, Segoe UI, Roboto, sans-serif"}; color: #0f172a; font-size: ${o.fontSize}pt; }
       ${o.watermark ? `.watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(-45deg); font-size: 80pt; font-weight: 900; color: rgba(0,0,0,0.06); pointer-events: none; z-index: -1; }` : ''}
     </style></head><body>
       ${o.watermark ? `<div class="watermark">${escapeHtml(o.watermark)}</div>` : ''}

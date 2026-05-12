@@ -1251,16 +1251,18 @@ export default function AISearchTab() {
     }
   }, [searchEngineMode, query]);
 
-  // ── Sorted results (Hybrid ranking) ──────────────────────────────────────
+  // ── Sorted results (Exact match first, then semantic) ───────────────────
   //
-  // When sortMode === 'Relevance', results are ranked by a 3-level key:
-  //   1. Search tier  (0=exact phrase, 1=all top kws, 2=any top kw, 3=AI-only)
-  //   2. PYQ tier     (UPSC CSE PYQ > Allied PYQ > Others PYQ > Practice)
-  //   3. Exam year    (newer first)
+  // Results are split into two clean groups:
   //
-  // This ensures the user's exact typed phrase always floats to the top,
-  // followed by questions matching all their keywords, then individual
-  // keyword matches, and finally AI-semantic-only retrievals at the bottom.
+  //   GROUP 1 (Top) — Questions where question_text contains the user's
+  //   exact search term. Sub-sorted: PYQ first (by year ↓), then non-PYQ.
+  //
+  //   GROUP 2 (Below) — Semantic/keyword-matched questions only.
+  //   Sub-sorted: PYQ first (by year ↓), then non-PYQ.
+  //
+  // This ensures the exact word the user typed always appears first,
+  // regardless of AI-expanded keywords ranking higher by PYQ status.
   const sortedResults = React.useMemo(() => {
     if (sortMode === 'Year') {
       return [...results].sort((a, b) => (b.exam_year || 0) - (a.exam_year || 0));
@@ -1268,7 +1270,16 @@ export default function AISearchTab() {
     if (sortMode === 'Subject') {
       return [...results].sort((a, b) => (a.subject || '').localeCompare(b.subject || ''));
     }
-    // PYQ relevance tier (lower = more relevant)
+    
+    const rawTermLower = query.trim().toLowerCase().split(/\s+/)[0] || '';
+    
+    // Check if question_text directly contains the user's exact search word
+    const isExactMatch = (r: SearchResult): boolean => {
+      if (!rawTermLower) return false;
+      return (r.question_text || '').toLowerCase().includes(rawTermLower);
+    };
+    
+    // PYQ relevance (lower = more relevant)
     const pyqTier = (r: SearchResult): number => {
       if (r.is_pyq && r.is_upsc_cse) return 0;
       if (r.is_pyq && r.is_allied)   return 1;
@@ -1276,20 +1287,19 @@ export default function AISearchTab() {
       if (r.is_pyq)                  return 3;
       return 4;
     };
-    return [...results].sort((a: any, b: any) => {
-      // Primary: search-match tier (exact phrase first, AI-semantic last)
-      const sTierA = a._searchTier ?? 3;
-      const sTierB = b._searchTier ?? 3;
-      if (sTierA !== sTierB) return sTierA - sTierB;
-
-      // Secondary: PYQ relevance
+    
+    // Within-group sorter: PYQ first by year, then non-PYQ by year
+    const withinGroupSorter = (a: SearchResult, b: SearchResult): number => {
       const ptd = pyqTier(a) - pyqTier(b);
       if (ptd !== 0) return ptd;
-
-      // Tertiary: exam year (newer first)
       return (b.exam_year || 0) - (a.exam_year || 0);
-    });
-  }, [results, sortMode]);
+    };
+    
+    const exactMatches = results.filter(isExactMatch).sort(withinGroupSorter);
+    const semanticMatches = results.filter(r => !isExactMatch(r)).sort(withinGroupSorter);
+    
+    return [...exactMatches, ...semanticMatches];
+  }, [results, sortMode, query]);
 
   // ── Filter popup ──────────────────────────────────────────────────────────
 

@@ -3199,9 +3199,9 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                 testID="engine-view-toggle-btn"
               >
                 {viewMode === 'card' ? (
-                  <ListIcon size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
-                ) : (
                   <Layout size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
+                ) : (
+                  <ListIcon size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
                 )}
               </TouchableOpacity>
             )}
@@ -3520,23 +3520,18 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                       else if (isMissed) { itemBg = '#ef4444'; itemBorder = '#ef4444'; itemText = '#fff'; }
 
                       return (
-                        <TouchableOpacity 
-                          key={q.id} 
-                          onPress={() => { 
-                            setShowNavigator(false); 
-                            // Use scrollToIndexRobust to jump to the question.
-                            // The delay matches the modal close animation.
-                            setTimeout(() => {
-                              setCurrentIndex(idx);
-                              if (viewMode === 'paper') {
-                                setPaperPage(Math.floor(idx / paperPageSize));
-                              } else if (viewMode === 'list') {
-                                // Schedule scroll after the state update so the
-                                // FlatList can re-render before we ask it to jump.
-                                requestAnimationFrame(() => scrollToIndexRobust(idx));
-                              }
-                              // card mode: setCurrentIndex already re-renders
-                            }, 120);
+                        <TouchableOpacity
+                          key={q.id}
+                          onPress={() => {
+                            setShowNavigator(false);
+                            // Switch to card mode for reliable direct navigation.
+                            // FlatList scroll-position issues prevented restoring list mode.
+                            setCurrentIndex(idx);
+                            if (viewMode === 'paper') {
+                              setPaperPage(Math.floor(idx / paperPageSize));
+                            } else {
+                              setViewMode('card');
+                            }
                           }}
                           style={[
                             styles.paletteItem, 

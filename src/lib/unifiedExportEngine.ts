@@ -256,6 +256,61 @@ const clampCm = (value: number, fallback = 1): number => {
   return Math.max(0.3, Math.min(4, n));
 };
 
+const toBool = (value: any): boolean => {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value === 1;
+  if (typeof value === 'string') {
+    const v = value.trim().toLowerCase();
+    return v === 'true' || v === '1' || v === 'yes';
+  }
+  return false;
+};
+
+const getExportExamInfo = (q: ExportQuestion): Record<string, any> => {
+  if (q?.exam_info && typeof q.exam_info === 'object' && !Array.isArray(q.exam_info)) return q.exam_info as Record<string, any>;
+  if (q?.source && typeof q.source === 'object' && !Array.isArray(q.source)) return q.source as Record<string, any>;
+  return {};
+};
+
+/**
+ * Build a PYQ chip label matching the SharedQuestionCard behavior.
+ * Returns null when no PYQ data should be shown.
+ */
+const getExportPyqChip = (q: ExportQuestion): string | null => {
+  if (!toBool(q.is_pyq)) return null;
+  const examInfo = getExportExamInfo(q);
+  let rawGroup = String(examInfo?.group || examInfo?.exam_name || '').trim();
+  if (!rawGroup && q.exam_group) {
+    rawGroup = String(q.exam_group).trim();
+  }
+  const groupNameUpper = rawGroup.toUpperCase();
+
+  const isUPSC = toBool(examInfo?.is_upsc_cse) || toBool(q.is_upsc_cse) || groupNameUpper === 'UPSC' || groupNameUpper.includes('UPSC CSE') || groupNameUpper.includes('IAS');
+  const isAllied = toBool(examInfo?.is_allied) || toBool(q.is_allied) || ['CAPF', 'CDS', 'NDA', 'EPFO', 'CISF', 'ALLIED'].some(g => groupNameUpper.includes(g));
+  const isOther = toBool(examInfo?.is_others) || toBool(q.is_others) || ['UPPCS', 'BPSC', 'MPSC', 'RPSC', 'UKPSC', 'MPPSC', 'CGPSC', 'STATE PSC', 'OTHER'].some(g => groupNameUpper.includes(g));
+
+  const rawYear = examInfo?.year ?? '';
+  let year = typeof rawYear === 'string' ? rawYear.trim() : String(rawYear).trim();
+  if (!year) {
+    const colYear = q.exam_year;
+    if (colYear !== undefined && colYear !== null && String(colYear).trim()) {
+      year = String(colYear).trim();
+    }
+  }
+
+  if (!rawGroup && !year) return null; // No meaningful PYQ data
+
+  let groupName = rawGroup;
+  if (!groupName) {
+    if (isUPSC) groupName = 'UPSC CSE';
+    else if (isAllied) groupName = 'Allied';
+    else if (isOther) groupName = 'Other';
+    else groupName = 'PYQ';
+  }
+
+  return `${groupName} ${year}`.trim();
+};
+
 const baseCss = (o: ExportOptions) => {
   const t = themeTokens[o.theme];
   const qaBg = o.qaBackgroundColor || 'transparent';
@@ -331,6 +386,7 @@ const baseCss = (o: ExportOptions) => {
     .qstem b, .qstem strong { font-weight: 700; }
     .metarow { opacity: 0.7; font-size: ${o.fontSize - 3}pt; margin-top: 1mm; }
     .pill { display: inline-block; padding: 1px 6px; border-radius: 10px; background: var(--rule); color: var(--fg); font-size: ${o.fontSize - 4}pt; margin-right: 4px; }
+    .q-chip-bar { display: flex; flex-wrap: wrap; gap: 3px; flex-shrink: 0; max-width: 50%; justify-content: flex-end; }
     .opts { margin: 2mm 0 0 4mm; padding: 0; list-style: none; }
     .opts li { margin: 1mm 0; padding: 1mm 2mm; border-radius: 4px; }
     .opts li.correct { background: rgba(34,197,94,0.12); border-left: 3px solid #22c55e; }
@@ -628,11 +684,39 @@ export const sortQuestions = (rows: ExportQuestion[], o: ExportOptions): ExportQ
 
 // ---------- Questions ----------
 
-const renderQaLayoutBlock = (questionHtml: string, answerHtml: string, o: ExportOptions): string => {
-  if (o.qaLayoutMode === 'split') {
-    return `<div class="qa-split-stack"><div class="qa-question-box">${questionHtml}</div>${answerHtml ? `<div class="qa-answer-box">${answerHtml}</div>` : ''}</div>`;
+const buildQuestionChips = (q: ExportQuestion, o: ExportOptions): string => {
+  const chips: string[] = [];
+  
+  // Meta chips (subject, section_group, micro_topic, year)
+  if (o.showMetaChips) {
+    if (q.subject) chips.push(escapeHtml(q.subject));
+    if (q.section_group) chips.push(escapeHtml(q.section_group));
+    if (q.micro_topic) chips.push(escapeHtml(q.micro_topic));
+    if (q.exam_year) chips.push(escapeHtml(String(q.exam_year)));
+    if (q.is_ncert) chips.push('NCERT');
   }
-  return `<div class="qa-unified"><div class="qa-question">${questionHtml}</div>${answerHtml ? `<div class="qa-answer">${answerHtml}</div>` : ''}</div>`;
+  
+  // PYQ chip using the proper categorization that matches SharedQuestionCard
+  if (o.showPYQChips) {
+    const pyqChip = getExportPyqChip(q);
+    if (pyqChip) chips.push(escapeHtml(pyqChip));
+  }
+  
+  if (chips.length === 0) return '';
+  return `<div class="q-chip-bar">${chips.map(c => `<span class="pill">${c}</span>`).join('')}</div>`;
+};
+
+const renderQaLayoutBlock = (questionHtml: string, answerHtml: string, chipsHtml: string, o: ExportOptions): string => {
+  if (o.qaLayoutMode === 'split') {
+    const qBox = chipsHtml
+      ? `<div class="qa-question-box"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="flex:1">${questionHtml}</div>${chipsHtml}</div></div>${answerHtml ? `<div class="qa-answer-box">${answerHtml}</div>` : ''}`
+      : `<div class="qa-split-stack"><div class="qa-question-box">${questionHtml}</div>${answerHtml ? `<div class="qa-answer-box">${answerHtml}</div>` : ''}</div>`;
+    return qBox;
+  }
+  const unifiedInner = chipsHtml
+    ? `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="flex:1">${questionHtml}</div>${chipsHtml}</div>${answerHtml ? `<div class="qa-answer">${answerHtml}</div>` : ''}`
+    : `<div class="qa-question">${questionHtml}</div>${answerHtml ? `<div class="qa-answer">${answerHtml}</div>` : ''}`;
+  return `<div class="qa-unified">${unifiedInner}</div>`;
 };
 
 export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions): string => {
@@ -647,19 +731,8 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
   const renderQuestionItem = (q: ExportQuestion, i: number) => {
     const stem = q.question_text || q.statement || '';
     
-    // Build proper PYQ tag (e.g. "UPSC CSE 2023") instead of just "PYQ"
-    const pyqTag = q.is_pyq ? (() => {
-      const group = (q as any).exam_group || '';
-      const year = q.exam_year ? String(q.exam_year) : '';
-      const isUpsc = (q as any).is_upsc_cse;
-      const isAllied = (q as any).is_allied;
-      if (isUpsc || group.toUpperCase().includes('UPSC')) return `UPSC CSE ${year}`.trim();
-      if (isAllied) return `${group} ${year}`.trim();
-      return group ? `${group} ${year}`.trim() : `PYQ ${year}`.trim();
-    })() : null;
-    
-    const meta = [q.subject, q.section_group, q.micro_topic, q.exam_year, pyqTag, q.is_ncert ? 'NCERT' : null]
-      .filter(Boolean).map(x => `<span class="pill">${escapeHtml(String(x))}</span>`).join('');
+    // Build chips bar for top-right of QA box (controlled by toggles)
+    const chipsHtml = buildQuestionChips(q, o);
 
     const answer = o.hideResponses ? '' : (q.correct_answer || '').toUpperCase();
     
@@ -719,7 +792,6 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
 
     const questionBlock = `
       <div class="qstem"><span class="qnum">${i + 1}.</span>${renderInline(stem)}${metricsBlock}</div>
-      ${meta ? `<div class="metarow">${meta}</div>` : ''}
       ${optsBlock}
     `;
 
@@ -731,11 +803,11 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
     if (isFlashStyle) {
       const right = answerBlock || `<div class="expl">Answer/explanation hidden for this card.</div>`;
       return `<div class="card">
-        <div class="side"><div class="card-face-label">Question</div>${questionBlock}</div>
+        <div class="side"><div class="card-face-label">Question</div>${chipsHtml}${questionBlock}</div>
         <div class="side"><div class="card-face-label">Answer & Explanation</div>${right}</div>
       </div>`;
     }
-    return `<div class="item">${renderQaLayoutBlock(questionBlock, answerBlock, o)}</div>`;
+    return `<div class="item">${renderQaLayoutBlock(questionBlock, answerBlock, chipsHtml, o)}</div>`;
   };
 
   // ── Hierarchical grouping for subject-based sorts ──
@@ -979,18 +1051,9 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
     const items = rows.map((q, i) => {
       const stem = q.question_text || q.statement || '';
       
-      // Build proper PYQ tag (e.g. "UPSC CSE 2023") instead of just "PYQ"
-      const pyqTag = q.is_pyq ? (() => {
-        const group = (q as any).exam_group || '';
-        const year = q.exam_year ? String(q.exam_year) : '';
-        const isUpsc = (q as any).is_upsc_cse;
-        const isAllied = (q as any).is_allied;
-        if (isUpsc || group.toUpperCase().includes('UPSC')) return `UPSC CSE ${year}`.trim();
-        if (isAllied) return `${group} ${year}`.trim();
-        return group ? `${group} ${year}`.trim() : `PYQ ${year}`.trim();
-      })() : null;
+      // Build chips using the same engine as buildQuestionsHtml
+      const chipsHtml = buildQuestionChips(q, o);
       
-      const meta = [q.subject, q.micro_topic, q.exam_year, pyqTag, q.is_ncert ? 'NCERT' : null]
       const answer = (q.correct_answer || '').toUpperCase();
       // Use merged explanations if available
       let explanation = '';
@@ -1031,7 +1094,6 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
       }).join('')}</ul>` : '';
       const questionBlock = `
         <div class="qstem"><span class="qnum">${i + 1}.</span>${renderInline(stem)}</div>
-        ${meta ? `<div class="metarow">${meta}</div>` : ''}
         ${optsBlock}
       `;
       const answerBlock = `
@@ -1041,11 +1103,11 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
       if (isFlashStyle) {
         const right = answerBlock || `<div class="expl">Answer/explanation hidden for this card.</div>`;
         return `<div class="card">
-        <div class="side"><div class="card-face-label">Question</div>${questionBlock}</div>
+        <div class="side"><div class="card-face-label">Question</div>${chipsHtml}${questionBlock}</div>
         <div class="side"><div class="card-face-label">Answer & Explanation</div>${right}</div>
       </div>`;
       }
-      return `<div class="item">${renderQaLayoutBlock(questionBlock, answerBlock, o)}</div>`;
+      return `<div class="item">${renderQaLayoutBlock(questionBlock, answerBlock, chipsHtml, o)}</div>`;
     }).join('');
     return `<div class="tag-section">
       <div class="tag-title">#${escapeHtml(g.tag)} <span style="font-weight:500;opacity:0.7">(${rows.length})</span></div>

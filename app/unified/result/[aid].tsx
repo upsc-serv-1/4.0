@@ -237,7 +237,7 @@ export default function ResultScreen() {
   }, [questions, supabase]);
 
   const [activeTab, setActiveTab] = useState<'review' | 'analysis' | 'detailed'>('review');
-  const [filterType, setFilterType] = useState<'all' | 'attempted' | 'correct' | 'incorrect' | 'skipped' | 'pyq' | 'imp_fact' | 'must_revise'>('all');
+  const [filterType, setFilterType] = useState<string[]>([]); // multi-select: empty array = show all
   const [localTags, setLocalTags] = useState<Record<string, string>>({});
   const [localReviewTags, setLocalReviewTags] = useState<Record<string, string[]>>({});
   const [savingFlashcard, setSavingFlashcard] = useState<Record<string, boolean>>({});
@@ -450,17 +450,22 @@ export default function ResultScreen() {
       const isSkipped = !q.selectedAnswer;
       const tags = localReviewTags[q.id] || q.reviewTags || [];
 
-      if (filterType === 'all') return true;
-      if (filterType === 'attempted') return !isSkipped;
-      if (filterType === 'correct') return isCorrect;
-      if (filterType === 'incorrect') return !isCorrect && !isSkipped;
-      if (filterType === 'skipped') return isSkipped;
-      if (filterType === 'pyq') return q.isPyq;
-      if (filterType.startsWith('tag:')) {
-        const tagName = filterType.replace('tag:', '');
-        return tags.includes(tagName);
-      }
-      return true;
+      // Empty filter array = show all (no filtering)
+      if (!filterType || filterType.length === 0) return true;
+
+      // Multi-select: question passes if it matches ANY selected filter
+      return filterType.some(ft => {
+        if (ft === 'attempted') return !isSkipped;
+        if (ft === 'correct') return isCorrect;
+        if (ft === 'incorrect') return !isCorrect && !isSkipped;
+        if (ft === 'skipped') return isSkipped;
+        if (ft === 'pyq') return q.isPyq;
+        if (ft.startsWith('tag:')) {
+          const tagName = ft.replace('tag:', '');
+          return tags.includes(tagName);
+        }
+        return false;
+      });
     });
   }, [questions, filterType, localReviewTags]);
 
@@ -963,35 +968,58 @@ export default function ResultScreen() {
 
             {activeTab === 'review' ? (
               <View style={styles.reviewContent}>
-                {/* Filter Pills */}
+                {/* Filter Pills - Multi-select */}
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
+                  <TouchableOpacity
+                    key="all"
+                    onPress={() => setFilterType([])}
+                    style={[
+                      styles.filterPill,
+                      { borderColor: colors.border, backgroundColor: colors.surface },
+                      filterType.length === 0 && { backgroundColor: colors.primary, borderColor: colors.primary }
+                    ]}
+                  >
+                    <Text style={[
+                      styles.filterPillText,
+                      { color: colors.textSecondary },
+                      filterType.length === 0 && { color: '#fff' }
+                    ]}>
+                      All
+                    </Text>
+                  </TouchableOpacity>
                   {[
-                    { id: 'all', label: 'All' },
                     { id: 'attempted', label: 'Attempted' },
                     { id: 'correct', label: 'Correct' },
                     { id: 'incorrect', label: 'Incorrect' },
                     { id: 'skipped', label: 'Skipped' },
                     { id: 'pyq', label: 'PYQ' },
                     ...allUserTags.map(tag => ({ id: `tag:${tag}`, label: tag }))
-                  ].map(type => (
-                    <TouchableOpacity
-                      key={type.id}
-                      onPress={() => setFilterType(type.id as any)}
-                      style={[
-                        styles.filterPill,
-                        { borderColor: colors.border, backgroundColor: colors.surface },
-                        filterType === type.id && { backgroundColor: colors.primary, borderColor: colors.primary }
-                      ]}
-                    >
-                      <Text style={[
-                        styles.filterPillText,
-                        { color: colors.textSecondary },
-                        filterType === type.id && { color: '#fff' }
-                      ]}>
-                        {type.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                  ].map(type => {
+                    const isActive = filterType.includes(type.id);
+                    return (
+                      <TouchableOpacity
+                        key={type.id}
+                        onPress={() => {
+                          setFilterType(prev => 
+                            isActive ? prev.filter(f => f !== type.id) : [...prev, type.id]
+                          );
+                        }}
+                        style={[
+                          styles.filterPill,
+                          { borderColor: colors.border, backgroundColor: colors.surface },
+                          isActive && { backgroundColor: colors.primary, borderColor: colors.primary }
+                        ]}
+                      >
+                        <Text style={[
+                          styles.filterPillText,
+                          { color: colors.textSecondary },
+                          isActive && { color: '#fff' }
+                        ]}>
+                          {type.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </ScrollView>
 
                 {/* Revision Mode Toggle */}

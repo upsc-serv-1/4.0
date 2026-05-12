@@ -84,6 +84,13 @@ const buildQuestionAttempts = (rows: AttemptPayloadQuestion[], questionsMeta: Re
         timeSpentSeconds: Number(row.time_spent_seconds ?? row.timeSpentSeconds ?? 0),
         attemptHour,
         isPyq: !!meta.is_pyq,
+        is_pyq: !!meta.is_pyq,
+        exam_year: meta.exam_year || '',
+        exam_group: meta.exam_group || '',
+        is_upsc_cse: !!meta.is_upsc_cse,
+        is_allied: !!meta.is_allied,
+        is_others: !!meta.is_others,
+        source: meta.source || {},
         options: meta.options || {},
         question_text: meta.question_text,
         explanation_markdown: meta.explanation_markdown,
@@ -101,7 +108,7 @@ const fetchQuestionsMeta = async (questionIds: string[]) => {
     const chunk = questionIds.slice(i, i + CHUNK_SIZE);
     const { data, error } = await supabase
       .from('questions')
-      .select('id, subject, section_group, micro_topic, correct_answer, question_text, options, explanation_markdown, is_pyq')
+      .select('id, subject, section_group, micro_topic, correct_answer, question_text, options, explanation_markdown, is_pyq, exam_year, exam_group, is_upsc_cse, is_allied, is_others, source')
       .in('id', chunk);
 
     if (error) throw error;

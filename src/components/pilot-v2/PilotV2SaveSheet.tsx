@@ -97,8 +97,10 @@ export function textToPilotV2Blocks(text: string): PilotV2Block[] {
 
 function markdownishToHtml(text: string): string {
   if (!text) return '';
+  // If already HTML (from markdownToHtml, AI output, etc.), skip conversion
+  // to avoid double-escaping: <b> → &lt;b&gt;
+  if (/<[a-zA-Z]/.test(text)) return text;
   let t = text;
-  t = t.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   t = t.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
   t = t.replace(/__([^_]+)__/g, '<u>$1</u>');
   t = t.replace(/(^|[^*])\*([^*]+)\*/g, '$1<i>$2</i>');

@@ -846,7 +846,7 @@ export default function UnifiedArenaSetup() {
 
     const baseParams = {
       mode: mode,
-      view: viewMode,
+      view: mode === 'exam' ? 'paper' : viewMode,
       timer: mode === 'exam' ? (timer || 'none') : 'none',
       showPYQTags: mode === 'exam' ? 'false' : (showPYQTags ? 'true' : 'false'),
     };

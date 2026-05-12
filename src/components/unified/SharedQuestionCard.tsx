@@ -99,9 +99,6 @@ export const SharedQuestionCard = ({
     const { colors: themeColors } = useTheme();
     const effectiveColors = colors || themeColors;
     
-    // Practice mode state
-    const [localPracticeAnswer, setLocalPracticeAnswer] = useState<string | null>(null);
-    
     if (!item) return null;
     const effectiveAnswerData = answerData || { 
       selectedAnswer: item.selectedAnswer || null, 
@@ -113,6 +110,11 @@ export const SharedQuestionCard = ({
       errorCategory: null
     };
     
+    // Practice mode state - Initialize from stored answer data to preserve selections across mode switches
+    const [localPracticeAnswer, setLocalPracticeAnswer] = useState<string | null>(
+      effectiveAnswerData?.selectedAnswer || null
+    );
+    
     // Initialize showNoteField based on whether note exists
     // Also watch for changes to automatically show/hide if note is cleared
     const [showNoteField, setShowNoteField] = useState<boolean>(!!effectiveAnswerData?.note);
@@ -123,6 +125,17 @@ export const SharedQuestionCard = ({
         setShowNoteField(true);
       }
     }, [effectiveAnswerData?.note]);
+    
+    // FIX: Sync localPracticeAnswer with stored answer when switching modes
+    // This ensures option selections persist when moving between exam and paper modes
+    // Also clears localPracticeAnswer when parent explicitly passes null (e.g. Practice Mode toggle)
+    useEffect(() => {
+      if (effectiveAnswerData?.selectedAnswer) {
+        setLocalPracticeAnswer(effectiveAnswerData.selectedAnswer);
+      } else {
+        setLocalPracticeAnswer(null);
+      }
+    }, [item.id, effectiveAnswerData?.selectedAnswer]);
     const showExplanation = showMistakes 
       ? (arenaMode === 'learning' && isRevealed) 
       : (localPracticeAnswer !== null);
@@ -358,6 +371,11 @@ export const SharedQuestionCard = ({
                 onSelect={() => {
                   if (!showMistakes) {
                     setLocalPracticeAnswer(label);
+                    // CRITICAL FIX: Also persist exam mode selections to the store
+                    // so answers persist when switching between exam and paper modes
+                    if (onOptionSelect) {
+                      onOptionSelect(item.id, label);
+                    }
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
                   } else if (onOptionSelect) {
                     onOptionSelect(item.id, label);

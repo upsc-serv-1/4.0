@@ -627,7 +627,19 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
   // Helper to render a single question item
   const renderQuestionItem = (q: ExportQuestion, i: number) => {
     const stem = q.question_text || q.statement || '';
-    const meta = [q.subject, q.section_group, q.micro_topic, q.exam_year, q.is_pyq ? 'PYQ' : null, q.is_ncert ? 'NCERT' : null]
+    
+    // Build proper PYQ tag (e.g. "UPSC CSE 2023") instead of just "PYQ"
+    const pyqTag = q.is_pyq ? (() => {
+      const group = (q as any).exam_group || '';
+      const year = q.exam_year ? String(q.exam_year) : '';
+      const isUpsc = (q as any).is_upsc_cse;
+      const isAllied = (q as any).is_allied;
+      if (isUpsc || group.toUpperCase().includes('UPSC')) return `UPSC CSE ${year}`.trim();
+      if (isAllied) return `${group} ${year}`.trim();
+      return group ? `${group} ${year}`.trim() : `PYQ ${year}`.trim();
+    })() : null;
+    
+    const meta = [q.subject, q.section_group, q.micro_topic, q.exam_year, pyqTag, q.is_ncert ? 'NCERT' : null]
       .filter(Boolean).map(x => `<span class="pill">${escapeHtml(String(x))}</span>`).join('');
 
     const answer = o.hideResponses ? '' : (q.correct_answer || '').toUpperCase();
@@ -947,7 +959,19 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
     const rows = sortQuestions(filterQuestions(g.questions, o), o);
     const items = rows.map((q, i) => {
       const stem = q.question_text || q.statement || '';
-      const meta = [q.subject, q.micro_topic, q.exam_year].filter(Boolean).map(x => `<span class="pill">${escapeHtml(String(x))}</span>`).join('');
+      
+      // Build proper PYQ tag (e.g. "UPSC CSE 2023") instead of just "PYQ"
+      const pyqTag = q.is_pyq ? (() => {
+        const group = (q as any).exam_group || '';
+        const year = q.exam_year ? String(q.exam_year) : '';
+        const isUpsc = (q as any).is_upsc_cse;
+        const isAllied = (q as any).is_allied;
+        if (isUpsc || group.toUpperCase().includes('UPSC')) return `UPSC CSE ${year}`.trim();
+        if (isAllied) return `${group} ${year}`.trim();
+        return group ? `${group} ${year}`.trim() : `PYQ ${year}`.trim();
+      })() : null;
+      
+      const meta = [q.subject, q.micro_topic, q.exam_year, pyqTag, q.is_ncert ? 'NCERT' : null]
       const answer = (q.correct_answer || '').toUpperCase();
       // Use merged explanations if available
       let explanation = '';

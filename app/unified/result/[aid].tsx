@@ -37,6 +37,7 @@ import Markdown from 'react-native-markdown-display';
 import { aiExplainQuestion } from '../../../src/services/GeminiService';
 import { SharedQuestionCard } from '../../../src/components/unified/SharedQuestionCard';
 import { getPYQCategorization, buildCanonicalExplanations } from '../../../src/utils/questionUtils';
+import { enrichWithCrossInstituteExplanations } from '../../../src/utils/merger';
 import { PilotV2SaveSheet } from '../../../src/components/pilot-v2/PilotV2SaveSheet';
 import { QuizCaptureSheet } from '../../../src/components/hardnotes/QuizCaptureSheet';
 import { MyVitaminEditorSheet } from '../../../src/components/unified/MyVitaminEditorSheet';
@@ -188,6 +189,53 @@ export default function ResultScreen() {
 
   const { session } = useAuth();
   const { loading, error, scoreData, questions, testId, testTitle, hierarchicalPerformance, confidenceMetrics } = useSingleTestAnalytics(aid);
+  
+  // Enrich questions with cross-institute explanations (like PYQ tab does)
+  // This populates _explanations and _institutes on each question so the export
+  // includes answers from ALL coaching institutes, not just the source test.
+  const [enrichedQuestions, setEnrichedQuestions] = useState<any[]>([]);
+  const [enriching, setEnriching] = useState(false);
+
+  useEffect(() => {
+    if (!questions || questions.length === 0 || !supabase) return;
+    
+    const doEnrich = async () => {
+      setEnriching(true);
+      try {
+        // Build a mutable copy with fields enrichWithCrossInstituteExplanations expects
+        const canonQs = questions.map((q: any) => ({
+          ...q,
+          id: q.id,
+          is_pyq: q.isPyq ?? q.is_pyq ?? false,
+          is_upsc_cse: q.is_upsc_cse ?? true, // Default to UPSC CSE for enrichment
+          exam_year: q.exam_year || q.examYear || '',
+          exam_group: q.exam_group || '',
+          question_text: q.question_text || q.text || q.statement || '',
+          _explanations: Array.isArray(q._explanations) ? [...q._explanations] : [],
+          _institutes: Array.isArray(q._institutes) ? [...q._institutes] : [],
+          _mergedIds: [q.id],
+        }));
+
+        // Call enrichment (same function used by PYQ tab)
+        await enrichWithCrossInstituteExplanations(canonQs, supabase);
+        
+        setEnrichedQuestions(canonQs);
+      } catch (e) {
+        console.warn('[Result] Cross-institute enrichment failed (non-fatal)', e);
+        // Fall back to un-enriched questions
+        setEnrichedQuestions(questions.map((q: any) => ({
+          ...q,
+          _explanations: [],
+          _institutes: [],
+        })));
+      } finally {
+        setEnriching(false);
+      }
+    };
+
+    doEnrich();
+  }, [questions, supabase]);
+
   const [activeTab, setActiveTab] = useState<'review' | 'analysis' | 'detailed'>('review');
   const [filterType, setFilterType] = useState<'all' | 'attempted' | 'correct' | 'incorrect' | 'skipped' | 'pyq' | 'imp_fact' | 'must_revise'>('all');
   const [localTags, setLocalTags] = useState<Record<string, string>>({});
@@ -249,25 +297,31 @@ export default function ResultScreen() {
       Alert.alert("No Questions", "The current filter has no questions to export.");
       return;
     }
-    const rows = filteredQuestions.map((q: any) => ({
-      id: q.id,
-      question_text: q.question_text || q.text || q.statement || '',
-      options: q.options,
-      correct_answer: q.correctAnswer || q.correct_answer,
-      selected_answer: q.selectedAnswer || q.selected_answer,
-      is_correct: (q.selectedAnswer || q.selected_answer) ? (q.selectedAnswer === q.correctAnswer) : undefined,
-      explanation_markdown: q.explanation_markdown || q.explanation,
-      subject: q.subject,
-      section_group: q.section_group || q.sectionGroup,
-      micro_topic: q.micro_topic || q.microTopic,
-      exam_year: q.exam_year || q.examYear,
-      is_pyq: !!(q.isPyq || q.is_pyq),
-      is_ncert: !!(q.isNcert || q.is_ncert),
-      review_tags: localReviewTags[q.id] || q.reviewTags || [],
-      time_taken_seconds: q.timeTakenSeconds || q.time_taken_seconds,
-      // Include merged explanations from all institutes (dedup merger)
-      _explanations: Array.isArray(q._explanations) ? q._explanations : [],
-    }));
+    const rows = filteredQuestions.map((q: any) => {
+      // Look up enriched explanations from cross-institute enrichment
+      const enriched = enrichedQuestions.find((eq: any) => eq.id === q.id);
+      return {
+        id: q.id,
+        question_text: q.question_text || q.text || q.statement || '',
+        options: q.options,
+        correct_answer: q.correctAnswer || q.correct_answer,
+        selected_answer: q.selectedAnswer || q.selected_answer,
+        is_correct: (q.selectedAnswer || q.selected_answer) ? (q.selectedAnswer === q.correctAnswer) : undefined,
+        explanation_markdown: q.explanation_markdown || q.explanation,
+        subject: q.subject,
+        section_group: q.section_group || q.sectionGroup,
+        micro_topic: q.micro_topic || q.microTopic,
+        exam_year: q.exam_year || q.examYear,
+        is_pyq: !!(q.isPyq || q.is_pyq),
+        is_ncert: !!(q.isNcert || q.is_ncert),
+        review_tags: localReviewTags[q.id] || q.reviewTags || [],
+        time_taken_seconds: q.timeTakenSeconds || q.time_taken_seconds,
+        // Use enriched explanations from cross-institute enrichment (like PYQ tab)
+        _explanations: enriched?._explanations?.length ? enriched._explanations : (Array.isArray(q._explanations) ? q._explanations : []),
+        // Include all contributing institutes for filter chips
+        _institutes: enriched?._institutes?.length ? enriched._institutes : (Array.isArray(q._institutes) ? q._institutes : []),
+      };
+    });
     
     // Inject My Vitamin (best answer) into _explanations for each question
     rows.forEach((row: any) => {
@@ -298,6 +352,89 @@ export default function ResultScreen() {
     setExportPayload({ kind: 'questions' as const, rows });
     setExportSheetVisible(true);
   };
+
+  // Build HTML summary for the analysis report (prepended before questions in the PDF)
+  const buildAnalysisHtml = useCallback((selectedReports: Record<string, boolean>): string => {
+    if (!scoreData) return '';
+    const sections: string[] = [];
+
+    if (selectedReports['score_summary']) {
+      sections.push(`
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 32px; margin-bottom: 24px; text-align: center;">
+          <h2 style="color: #fff; font-size: 24px; font-weight: 700; margin: 0 0 8px 0;">${testTitle || 'Test Analysis'}</h2>
+          <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin: 0 0 24px 0;">Performance Summary Report</p>
+          <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;">
+            <div style="text-align: center;">
+              <div style="font-size: 36px; font-weight: 900; color: #fff;">${scoreData.totalMarks}</div>
+              <div style="font-size: 12px; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 1px;">Score</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 36px; font-weight: 900; color: ${scoreData.accuracy >= 70 ? '#4ade80' : scoreData.accuracy >= 40 ? '#fbbf24' : '#f87171'};">${scoreData.accuracy}%</div>
+              <div style="font-size: 12px; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 1px;">Accuracy</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 36px; font-weight: 900; color: #fff;">${scoreData.attemptQualityScore}</div>
+              <div style="font-size: 12px; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 1px;">Quality Score</div>
+            </div>
+          </div>
+        </div>
+      `);
+    }
+
+    if (selectedReports['detailed_metrics']) {
+      const totalQs = scoreData.correct + scoreData.incorrect + scoreData.unattempted;
+      sections.push(`
+        <div style="margin-bottom: 24px;">
+          <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0 0 16px 0; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;">📊 Detailed Metrics</h3>
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <tr>
+              <td style="padding: 10px 12px; border: 1px solid #e2e8f0; font-weight: 600; color: #475569;">Total Questions</td>
+              <td style="padding: 10px 12px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #1e293b;">${totalQs}</td>
+            </tr>
+            <tr style="background-color: #f0fdf4;">
+              <td style="padding: 10px 12px; border: 1px solid #e2e8f0; font-weight: 600; color: #166534;">✅ Correct</td>
+              <td style="padding: 10px 12px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #16a34a;">${scoreData.correct}</td>
+            </tr>
+            <tr style="background-color: #fef2f2;">
+              <td style="padding: 10px 12px; border: 1px solid #e2e8f0; font-weight: 600; color: #991b1b;">❌ Incorrect</td>
+              <td style="padding: 10px 12px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #dc2626;">${scoreData.incorrect}</td>
+            </tr>
+            <tr style="background-color: #f8fafc;">
+              <td style="padding: 10px 12px; border: 1px solid #e2e8f0; font-weight: 600; color: #64748b;">⏭️ Skipped</td>
+              <td style="padding: 10px 12px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #64748b;">${scoreData.unattempted}</td>
+            </tr>
+          </table>
+        </div>
+      `);
+    }
+
+    if (selectedReports['time_metrics']) {
+      const mins = Math.floor(scoreData.totalTimeSeconds / 60);
+      const secs = scoreData.totalTimeSeconds % 60;
+      sections.push(`
+        <div style="margin-bottom: 24px;">
+          <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0 0 16px 0; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;">⏱️ Time Analysis</h3>
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <tr>
+              <td style="padding: 10px 12px; border: 1px solid #e2e8f0; font-weight: 600; color: #475569;">Total Time Spent</td>
+              <td style="padding: 10px 12px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #1e293b;">${mins}m ${secs}s</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 12px; border: 1px solid #e2e8f0; font-weight: 600; color: #475569;">Avg Time Per Question</td>
+              <td style="padding: 10px 12px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #1e293b;">${scoreData.avgTimePerQuestion}s</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 12px; border: 1px solid #e2e8f0; font-weight: 600; color: #475569;">Quality Label</td>
+              <td style="padding: 10px 12px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #6366f1;">${scoreData.qualityLabel}</td>
+            </tr>
+          </table>
+        </div>
+      `);
+    }
+
+    return sections.join('\n');
+  }, [scoreData, testTitle]);
+
   const [availableInstitutes, setAvailableInstitutes] = useState<string[]>([]);
 
   const headerOpacity = scrollY.interpolate({
@@ -661,6 +798,13 @@ export default function ResultScreen() {
               ...item,
               correct_answer: item.correctAnswer || item.correct_answer,
               question_text: item.question_text || item.statement_line || item.text,
+              is_pyq: item.isPyq ?? item.is_pyq ?? false,
+              exam_year: item.exam_year || item.examYear || '',
+              exam_group: item.exam_group || '',
+              is_upsc_cse: item.is_upsc_cse ?? false,
+              is_allied: item.is_allied ?? false,
+              is_others: item.is_others ?? false,
+              source: item.source || {},
               _explanations: item._explanations || []
             }}
             index={index}
@@ -691,7 +835,7 @@ export default function ResultScreen() {
             toggleStudyTag={(qid: string, tags: string[], tag: string) => toggleReviewTag(qid, tag)}
             toggleMistakeType={handleTagError}
             answerData={{
-              selectedAnswer: item.selectedAnswer,
+              selectedAnswer: showMistakes ? item.selectedAnswer : null,
               studyTags: localReviewTags[item.id] || item.reviewTags || [],
               errorCategory: localTags[item.id] || item.errorCategory || null,
               isReview: !!item.isReview
@@ -945,6 +1089,12 @@ export default function ResultScreen() {
           headerText: 'UPSC Preparation Analytics',
           footerText: 'Generated by Noji AI Analytics'
         }}
+        analysisReports={[
+          { key: 'score_summary', label: 'Score Summary', defaultSelected: true },
+          { key: 'detailed_metrics', label: 'Detailed Metrics', defaultSelected: true },
+          { key: 'time_metrics', label: 'Time Analysis', defaultSelected: true },
+        ]}
+        onBuildAnalysisHtml={buildAnalysisHtml}
         renderExtraFilters={(o, setO) => (
           <>
             {userTags.length > 0 && (

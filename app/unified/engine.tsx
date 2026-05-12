@@ -3750,6 +3750,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                   data={questions}
                   renderItem={renderQuestionBlock}
                   keyExtractor={(item) => item.id}
+                  extraData={currentAnswers}
                   // initialScrollIndex only used for first mount from Navigator/Index jump.
                   // DO NOT remove – but we rely on onScrollToIndexFailed to handle
                   // out-of-range gracefully rather than crashing.

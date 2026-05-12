@@ -101,6 +101,20 @@ export default function TaggedRepoScreen() {
   const [expandedMicroTopics, setExpandedMicroTopics] = useState<Record<string, boolean>>({});
   const [showFilters, setShowFilters] = useState(false);
 
+  // Pick a random motivational quote once (stable during loading)
+  const loadingQuote = useRef([
+    '"Success is not final, failure is not fatal." — Churchill',
+    '"Consistency > Intensity. Show up every day."',
+    '"The expert in anything was once a beginner."',
+    '"Your only competition is your previous self."',
+    '"Every UPSC topper was once where you are now."',
+    '"Discipline is choosing between what you want now and what you want most."',
+    '"Small daily improvements lead to massive results."',
+    '"The best time to start was yesterday. The next best time is now."',
+    '"It does not matter how slowly you go, as long as you do not stop." — Confucius',
+    '"Hard work beats talent when talent does not work hard."',
+  ][Math.floor(Math.random() * 10)]);
+
   // Fade animation
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -632,7 +646,9 @@ ${answerText}` : ''}`,
         {loading && vaultData.totalCount === 0 ? (
           <View style={styles.center}>
             <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={{ color: colors.textSecondary, marginTop: 16, fontWeight: '600' }}>Opening Vault...</Text>
+            <Text style={{ color: colors.textSecondary, marginTop: 16, fontWeight: '600', fontStyle: 'italic', textAlign: 'center', paddingHorizontal: 32 }}>
+              {loadingQuote.current}
+            </Text>
           </View>
         ) : (
           <Animated.View style={{ flex: 1, opacity: fadeAnim }}>

@@ -64,6 +64,8 @@ import { buildNotesPdfHtml } from '../src/utils/notesPdfEngine';
 import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet';
 import { PilotV2Provider } from '../src/context/PilotV2Context';
 import { PilotV2AIChat } from '../src/components/pilot-v2/PilotV2AIChat';
+import { PilotV2SaveSheet } from '../src/components/pilot-v2/PilotV2SaveSheet';
+import { markdownToHtml } from '../src/utils/textUtils';
 
 type ExportScope = 'all' | 'single' | 'multi';
 type ContentMode = 'questions' | 'questions_answers';
@@ -133,6 +135,11 @@ export default function TaggedRepoScreen() {
   // AI Chat state (Issue 21 — PilotV2AIChat integration)
   const [aiChatQuestion, setAiChatQuestion] = useState<any>(null);
   const [aiChatTrigger, setAiChatTrigger] = useState(0);
+
+  // Pilot V2 save sheet state
+  const [pilotV2SaveOpen, setPilotV2SaveOpen] = useState(false);
+  const [pilotSaveTargetQuestion, setPilotSaveTargetQuestion] = useState<any>(null);
+  const [pilotSaveHtml, setPilotSaveHtml] = useState('');
 
   // Export state
   const [exportVisible, setExportVisible] = useState(false);
@@ -441,6 +448,21 @@ ${answerText}` : ''}`,
     setAiChatTrigger(prev => prev + 1);
   }, []);
 
+  const handleOpenPilot = useCallback((q: any) => {
+    const html = markdownToHtml(q.explanation || `**Question:** ${q.questionText || 'Question'}`);
+    setPilotSaveTargetQuestion({
+      id: q.id,
+      subject: q.subject || null,
+      section_group: (q as any).sectionGroup || null,
+      micro_topic: (q as any).microTopic || null,
+      exam_year: (q as any).examYear || null,
+      question_text: q.questionText || '',
+      explanation_markdown: q.explanation || '',
+    });
+    setPilotSaveHtml(html);
+    setPilotV2SaveOpen(true);
+  }, []);
+
   const removeTagEverywhere = async (tag: string) => {
     Alert.alert(
       'Remove tag from Review?',
@@ -561,7 +583,7 @@ ${answerText}` : ''}`,
                           {expandedMicroTopics[`${section.name}-${topic.name}`] && (
                             <View style={styles.questionsList}>
                               {topic.questions.map((q) => (
-                                <RepoQuestionCard key={q.id} question={q} onUpdate={refresh} isZenMode={isZenMode} onOpenAIChat={handleOpenAIChat} />
+                                <RepoQuestionCard key={q.id} question={q} onUpdate={refresh} isZenMode={isZenMode} onOpenAIChat={handleOpenAIChat} onOpenPilot={handleOpenPilot} />
                               ))}
                             </View>
                           )}
@@ -1138,6 +1160,24 @@ ${answerText}` : ''}`,
       <PilotV2AIChat
         activeQuestion={aiChatQuestion}
         externalOpenTrigger={aiChatTrigger}
+      />
+      {/* Save to Pilot sheet */}
+      <PilotV2SaveSheet
+        visible={pilotV2SaveOpen}
+        onClose={() => {
+          setPilotV2SaveOpen(false);
+          setPilotSaveTargetQuestion(null);
+          setPilotSaveHtml('');
+        }}
+        autoSeed={pilotSaveTargetQuestion ? {
+          subject: pilotSaveTargetQuestion.subject || null,
+          topic: pilotSaveTargetQuestion.section_group || null,
+          subtopic: pilotSaveTargetQuestion.micro_topic || null,
+          notebookTitle: pilotSaveTargetQuestion.micro_topic || pilotSaveTargetQuestion.subject || null,
+        } : undefined}
+        seedQuestion={pilotSaveTargetQuestion || null}
+        initialBody={pilotSaveHtml}
+        source={pilotSaveTargetQuestion ? `Tags / ${pilotSaveTargetQuestion.subject || ''}`.trim() : 'Tags'}
       />
     </SafeAreaView>
     </PilotV2Provider>

@@ -138,7 +138,7 @@ export const SharedQuestionCard = ({
     }, [item.id, effectiveAnswerData?.selectedAnswer]);
     const showExplanation = showMistakes 
       ? (arenaMode === 'learning' && isRevealed) 
-      : (localPracticeAnswer !== null);
+      : (localPracticeAnswer !== null || isRevealed);
 
     const normalizedExplanations = buildCanonicalExplanations(item);
 

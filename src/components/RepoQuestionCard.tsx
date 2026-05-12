@@ -164,17 +164,34 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode, onOpenAIChat, 
           <Text style={[styles.explanationText, { color: zenSecColor }]}>{question.explanation}</Text>
 
           <View style={styles.actionsBar}>
-            {/* Issue 32: Inline AI Panel toggle — keeps user in Tags tab. */}
+            {/* Explanation toggle — keeps user in Tags tab. */}
             <TouchableOpacity
               onPress={() => setAiPanelOpen((o) => !o)}
               style={[styles.actionBtn, { backgroundColor: '#a855f715', borderColor: '#a855f733', flex: 1.4 }]}
-              testID="ai-panel-toggle"
+              testID="explanation-toggle"
             >
               <Zap size={10} color="#a855f7" />
-              <Text style={[styles.actionBtnText, { color: '#a855f7' }]}>AI Panel</Text>
+              <Text style={[styles.actionBtnText, { color: '#a855f7' }]}>Explanation</Text>
               {aiPanelOpen ? <ChevronUp size={10} color="#a855f7" /> : <ChevronDown size={10} color="#a855f7" />}
             </TouchableOpacity>
-            {/* Issue #2: Full View button opens question in unified engine with all AI features */}
+            {/* Ask AI — inline chat trigger, positioned between Explanation and Learn */}
+            {onOpenAIChat && (
+              <TouchableOpacity
+                onPress={() => onOpenAIChat({
+                  id: question.id,
+                  question_text: question.questionText,
+                  correct_answer: question.correctAnswer,
+                  explanation: question.explanation,
+                  subject: question.subject,
+                })}
+                style={[styles.actionBtn, { backgroundColor: '#f59e0b15', borderColor: '#f59e0b30', flex: 1.2 }]}
+                testID="ask-ai-inline-btn"
+              >
+                <MessageCircle size={10} color="#f59e0b" />
+                <Text style={[styles.actionBtnText, { color: '#f59e0b' }]}>Ask AI</Text>
+              </TouchableOpacity>
+            )}
+            {/* Full View — opens question in unified engine */}
             <TouchableOpacity
               onPress={() => {
                 router.push({
@@ -192,7 +209,7 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode, onOpenAIChat, 
               testID="full-view-btn"
             >
               <BookOpen size={10} color={colors.primary} />
-              <Text style={[styles.actionBtnText, { color: colors.primary }]}>Learn</Text>
+              <Text style={[styles.actionBtnText, { color: colors.primary }]}>Learn Mode</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
@@ -216,13 +233,24 @@ export const RepoQuestionCard = ({ question, onUpdate, isZenMode, onOpenAIChat, 
               <Zap size={10} color={colors.primary} />
               <Text style={[styles.actionBtnText, { color: colors.primary }]}>AI Explain</Text>
             </TouchableOpacity>
+            {/* Save to Pilot — opens PilotV2SaveSheet */}
+            {onOpenPilot && (
+              <TouchableOpacity
+                onPress={() => onOpenPilot(question)}
+                style={[styles.actionBtn, { backgroundColor: '#5B4EFA15', borderColor: '#5B4EFA30', flex: 1.2 }]}
+                testID="save-to-pilot-btn"
+              >
+                <Rocket size={10} color="#5B4EFA" />
+                <Text style={[styles.actionBtnText, { color: '#5B4EFA' }]}>Pilot</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity onPress={handleRemoveTag} disabled={!!loadingAction} style={[styles.actionBtn, { borderColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : colors.border }]}>
               {loadingAction === 'remove' ? <ActivityIndicator size="small" color={zenTertColor} /> : <Trash2 size={10} color={zenSecColor} />}
               <Text style={[styles.actionBtnText, { color: zenSecColor }]}>Remove</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleAddToFlashcard} disabled={!!loadingAction} style={[styles.actionBtn, { backgroundColor: colors.primary + '10', borderColor: colors.primary + '20' }]}>
               {loadingAction === 'flash' ? <ActivityIndicator size="small" color={colors.primary} /> : <Zap size={10} color={colors.primary} />}
-              <Text style={[styles.actionBtnText, { color: colors.primary }]}>Flash</Text>
+              <Text style={[styles.actionBtnText, { color: colors.primary }]}>Flash Card</Text>
             </TouchableOpacity>
             {question.testId && (
               <TouchableOpacity

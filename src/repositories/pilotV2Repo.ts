@@ -112,6 +112,14 @@ export async function renamePilotV2Node(id: string, title: string): Promise<bool
   return !error;
 }
 
+export async function updatePilotV2NodeParent(id: string, parentId: string | null): Promise<boolean> {
+  const { error } = await supabase
+    .from('user_note_nodes')
+    .update({ parent_id: parentId, updated_at: new Date().toISOString() })
+    .eq('id', id);
+  return !error;
+}
+
 export async function archivePilotV2Node(id: string): Promise<boolean> {
   const { error } = await supabase
     .from('user_note_nodes')
@@ -543,7 +551,7 @@ export async function fetchNotebooksAtLevel(
   topic?: string | null,
   subtopic?: string | null
 ): Promise<string[]> {
-  const ensureNode = async (
+  const findNode = async (
     type: PilotV2NodeType,
     title: string,
     parentId: string | null
@@ -563,21 +571,23 @@ export async function fetchNotebooksAtLevel(
       query = query.eq('parent_id', parentId);
     }
 
-    const { data } = await query.maybeSingle();
-    return data as PilotV2Node | null;
+    // Use order().limit(1) instead of maybeSingle() to handle duplicate rows gracefully
+    const { data } = await query.order('created_at', { ascending: true }).limit(1);
+    const list = data as PilotV2Node[] | null;
+    return list && list.length > 0 ? list[0] : null;
   };
 
   try {
-    let parent: PilotV2Node | null = await ensureNode('subject', subject, null);
+    let parent: PilotV2Node | null = await findNode('subject', subject, null);
     if (!parent) return [];
 
     if (topic) {
-      parent = await ensureNode('topic', topic, parent.id);
+      parent = await findNode('topic', topic, parent.id);
       if (!parent) return [];
     }
 
     if (subtopic) {
-      parent = await ensureNode('subtopic', subtopic, parent.id);
+      parent = await findNode('subtopic', subtopic, parent.id);
       if (!parent) return [];
     }
 
@@ -591,7 +601,15 @@ export async function fetchNotebooksAtLevel(
       .eq('metadata->>surface', PILOT_V2_SURFACE)
       .order('updated_at', { ascending: false });
 
-    return notebooks?.map(n => n.title) || [];
+    // Deduplicate notebook titles (duplicate rows from legacy issues can cause multiples)
+    const seen = new Set<string>();
+    return (notebooks || [])
+      .filter(n => {
+        if (seen.has(n.title)) return false;
+        seen.add(n.title);
+        return true;
+      })
+      .map(n => n.title);
   } catch (error) {
     console.error('[pilot-v2] Failed to fetch notebooks:', error);
     return [];

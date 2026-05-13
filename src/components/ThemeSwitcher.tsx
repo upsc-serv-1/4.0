@@ -11,7 +11,7 @@ export const ThemeSwitcher = () => {
     'default', 'nature', 'modern', 'sand', 'cute', 'medical', 
     'sage', 'lavender', 'ivory', 
     'midnight_nebula', 'golden_night', 'emerald_dream', 'royal_purple', 'fitness_navy',
-    'child_of_light', 'aruba_aqua', 'zinnia', 'fuchsia_blue', 'original_dark', 'yogesh_1', 'yogesh_2', 'yogesh_3', 'yogesh_4'
+    'child_of_light', 'aruba_aqua', 'zinnia', 'fuchsia_blue', 'original_dark', 'yogesh_2', 'yogesh_4'
   ];
 
   const getThemeName = (t: string) => {

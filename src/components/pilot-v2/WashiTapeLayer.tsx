@@ -31,12 +31,13 @@ interface Props {
   onAdd: (tape: PilotV2WashiTape) => void;
   onToggle: (tapeId: string) => void;
   onRemove: (tapeId: string) => void;
+  eraserMode?: boolean;
   testID?: string;
 }
 
 export function WashiTapeLayer({
   tapes, width, height, drawingMode, activeColor,
-  onAdd, onToggle, onRemove, testID,
+  onAdd, onToggle, onRemove, eraserMode, testID,
 }: Props) {
   const [draft, setDraft] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
 
@@ -61,7 +62,7 @@ export function WashiTapeLayer({
 
   /** Called via runOnJS from gesture onEnd — commits tape or clears draft */
   const onEndJS = useCallback((d: { x: number; y: number; w: number; h: number } | null) => {
-    if (d && d.w > 0.02 && d.h > 0.015) {
+    if (d && (d.w > 0.005 || d.h > 0.005)) {
       onAdd(createWashiTape(d.x, d.y, d.w, d.h, activeColor));
     }
     setDraft(null);
@@ -102,7 +103,7 @@ export function WashiTapeLayer({
       'worklet';
       if (endedSV.value) return;
       endedSV.value = true;
-      const d = (dwSV.value > 0.02 && dhSV.value > 0.015)
+      const d = (dwSV.value > 0.005 || dhSV.value > 0.005)
         ? { x: dxSV.value, y: dySV.value, w: dwSV.value, h: dhSV.value }
         : null;
       runOnJS(onEndJS)(d);
@@ -131,7 +132,13 @@ export function WashiTapeLayer({
         <TouchableOpacity
           key={t.id}
           activeOpacity={0.85}
-          onPress={() => onToggle(t.id)}
+          onPress={() => {
+            if (eraserMode) {
+              onRemove(t.id);
+            } else {
+              onToggle(t.id);
+            }
+          }}
           onLongPress={() => onRemove(t.id)}
           delayLongPress={500}
           style={[
@@ -144,7 +151,7 @@ export function WashiTapeLayer({
               backgroundColor: washiBg(t.color),
               borderColor: washiEdge(t.color),
               transform: [{ rotate: `${t.rotation || 0}deg` }],
-              opacity: t.revealed ? 0.35 : 0.92,
+              opacity: t.revealed ? 0.35 : 1.0,
             },
           ]}
           testID={`pilot-v2-washi-${t.id}`}

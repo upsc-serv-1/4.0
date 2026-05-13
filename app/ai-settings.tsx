@@ -55,6 +55,7 @@ import {
   DEFAULT_ANALYSIS_TEMPLATES,
   DEFAULT_SYLLABUS_TEMPLATES,
   DEFAULT_FLASHCARD_TEMPLATES,
+  DEFAULT_SAVE_SHEET_TEMPLATES,
 } from '../src/services/AIPromptManager';
 import { useAuth } from '../src/context/AuthContext';
 import { PageWrapper } from '../src/components/PageWrapper';
@@ -115,6 +116,7 @@ export default function AISettings() {
     { key: 'analysis', label: 'Analysis', emoji: '📊' },
     { key: 'syllabus', label: 'Syllabus', emoji: '📅' },
     { key: 'flashcard', label: 'Flashcards', emoji: '🃏' },
+    { key: 'save_sheet', label: 'Save Sheet', emoji: '💾' },
   ];
 
   // Load AI settings
@@ -292,6 +294,7 @@ export default function AISettings() {
       analysis: DEFAULT_ANALYSIS_TEMPLATES,
       syllabus: DEFAULT_SYLLABUS_TEMPLATES,
       flashcard: DEFAULT_FLASHCARD_TEMPLATES,
+      save_sheet: DEFAULT_SAVE_SHEET_TEMPLATES,
     };
     return map[cat] || [];
   };

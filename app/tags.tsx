@@ -606,7 +606,7 @@ ${answerText}` : ''}`,
 
   return (
     <PilotV2Provider>
-    <SafeAreaView style={{ flex: 1, backgroundColor: zenBg }}>
+    <View style={{ flex: 1, backgroundColor: zenBg }}>
       <PageWrapper>
         {isZenMode && (
           <TouchableOpacity style={styles.floatingZenExit} onPress={() => setIsZenMode(false)} activeOpacity={0.7}>
@@ -1179,7 +1179,7 @@ ${answerText}` : ''}`,
         initialBody={pilotSaveHtml}
         source={pilotSaveTargetQuestion ? `Tags / ${pilotSaveTargetQuestion.subject || ''}`.trim() : 'Tags'}
       />
-    </SafeAreaView>
+    </View>
     </PilotV2Provider>
   );
 }
@@ -1190,7 +1190,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    margin: spacing.lg,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
+    marginTop: 8,
     borderRadius: 24,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)',

@@ -15,24 +15,79 @@
  * Management app (#5B4EFA primary, #F9FAFB canvas, #FFFFFF surface, etc.).
  */
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, TextInput, Platform, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, TextInput, Platform, Animated, KeyboardAvoidingView } from 'react-native';
 import {
   Home as HomeIcon, Pin, Clock, Share2, Trash2, Plus, Settings, ChevronRight, ChevronDown, ChevronLeft,
   Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical, Book, X, Search,
+  FolderPlus, Edit2, FolderInput,
+  Shield, Palette, Flag, Columns, Building, Briefcase, Sprout, Rocket, Dna, Cpu, Mountain, Wind, Waves, TreePine, Coins, BookOpen, Brain, Calculator, FileText,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
-import { PILOT_V2_SUBJECT_PALETTE, PilotV2QuickFilter, iconForSubject } from './types';
+import { PILOT_V2_SUBJECT_PALETTE, PilotV2QuickFilter, iconForSubject, iconForTopic } from './types';
 import { PilotV2SidebarSubject, SUBJECT_TOPICS } from './PilotV2SidebarSubject';
 import { createPilotV2Node, archivePilotV2Node, fetchAllPilotV2Nodes, fetchPilotV2NotesForUser } from '../../repositories/pilotV2Repo';
-import { Swipeable } from 'react-native-gesture-handler';
+import { PilotV2MoveModal, NodeToMove } from './PilotV2MoveModal';
+import { Swipeable, RectButton } from 'react-native-gesture-handler';
 import AnimatedReanimated, { useSharedValue, useAnimatedStyle, withSpring, interpolate, FadeInUp } from 'react-native-reanimated';
 import { usePilotV2DoubleTap } from './usePilotV2DoubleTap';
 
 const SUBJECT_ICONS: Record<string, any> = {
-  Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical,
+  Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical, Book,
 };
+
+const TOPIC_ICONS: Record<string, any> = {
+  Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical, Book,
+  Shield, Palette, Flag, Columns, Building, Briefcase, Sprout, Rocket, Dna, Cpu, Mountain, Wind, Waves, TreePine, Coins, BookOpen, Brain, Calculator, FileText,
+};
+
+function ActionBtn({ icon, label, onPress }: any) {
+  const { colors } = useTheme();
+  return (
+    <RectButton
+      onPress={onPress}
+      style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 4,
+        paddingHorizontal: 10,
+        height: '100%',
+        minWidth: 55,
+      }}
+    >
+      <View
+        style={{
+          width: 34,
+          height: 34,
+          borderRadius: 17,
+          borderWidth: 1,
+          borderColor: colors.border,
+          backgroundColor: colors.surface,
+          alignItems: 'center',
+          justifyContent: 'center',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.05,
+          shadowRadius: 2,
+          elevation: 1,
+        }}
+      >
+        {React.cloneElement(icon, { color: colors.textPrimary, size: 16 })}
+      </View>
+      <Text
+        style={{
+          fontSize: 7,
+          fontWeight: '800',
+          textTransform: 'uppercase',
+          color: colors.textSecondary,
+        }}
+      >
+        {label}
+      </Text>
+    </RectButton>
+  );
+}
 
 function CollapsibleTopicItem({
   t,
@@ -43,6 +98,14 @@ function CollapsibleTopicItem({
   colors,
   handleSelectTopic,
   handleSelectSubtopic,
+  onAddTopic,
+  onRenameTopic,
+  onDeleteTopic,
+  onMoveTopic,
+  onAddSubtopic,
+  onRenameSubtopic,
+  onDeleteSubtopic,
+  onMoveSubtopic,
   handleTopicLongPress,
   handleSubtopicLongPress,
 }: {
@@ -54,66 +117,53 @@ function CollapsibleTopicItem({
   colors: any;
   handleSelectTopic: (topicId: string, hasSub: boolean) => void;
   handleSelectSubtopic: (subtopicId: string) => void;
-  handleTopicLongPress: (topic: any, label: string) => void;
-  handleSubtopicLongPress: (st: any, t: any, label: string) => void;
+  onAddTopic: (t: any) => void;
+  onRenameTopic: (t: any) => void;
+  onDeleteTopic: (t: any) => void;
+  onMoveTopic: (t: any) => void;
+  onAddSubtopic: (st: any, t: any) => void;
+  onRenameSubtopic: (st: any, t: any) => void;
+  onDeleteSubtopic: (st: any, t: any) => void;
+  onMoveSubtopic: (st: any, t: any) => void;
+  handleTopicLongPress?: (t: any, label: string) => void;
+  handleSubtopicLongPress?: (st: any, t: any, label: string) => void;
 }) {
   const hasSub = !!t.subtopics?.length;
   const isSelectedTopic = state.view.selectedTopic === t.id && state.view.mode === 'noteList';
-  const subtopicsCount = t.subtopics?.length ?? 0;
-  const containerHeight = subtopicsCount * 44; // Give plenty of height per subtopic
-
-  const animationProgress = useSharedValue(isExpanded ? 1 : 0);
-
-  useEffect(() => {
-    animationProgress.value = withSpring(isExpanded ? 1 : 0, {
-      damping: 20,
-      stiffness: 200,
-      mass: 0.5,
-      overshootClamping: true,
-    });
-  }, [isExpanded]);
-
-  const chevronStyle = useAnimatedStyle(() => {
-    const rotate = interpolate(animationProgress.value, [0, 1], [-90, 0]);
-    return {
-      transform: [{ rotate: `${rotate}deg` }],
-    };
-  });
-
-  const collapsibleStyle = useAnimatedStyle(() => {
-    const height = interpolate(animationProgress.value, [0, 1], [0, containerHeight]);
-    const opacity = interpolate(animationProgress.value, [0, 0.2, 1], [0, 0.4, 1]);
-    return {
-      height,
-      opacity,
-      overflow: 'hidden',
-    };
-  });
+  const topicIconKey = iconForTopic(t.label);
+  const TopicIconComponent = TOPIC_ICONS[topicIconKey] || FileText;
 
   return (
     <View style={{ marginBottom: 4 }}>
       <Swipeable
         renderRightActions={(progress, dragX) => {
           const trans = dragX.interpolate({
-            inputRange: [-60, 0],
-            outputRange: [0, 60],
+            inputRange: [-220, 0],
+            outputRange: [0, 220],
             extrapolate: 'clamp',
           });
           return (
-            <Animated.View style={{ transform: [{ translateX: trans }], width: 60 }}>
-              <TouchableOpacity
-                onPress={() => handleTopicLongPress(t, subjectLabel)}
-                style={{
-                  backgroundColor: '#ef4444',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: 8,
-                }}
-              >
-                <Trash2 size={16} color="#fff" />
-              </TouchableOpacity>
+            <Animated.View style={{ transform: [{ translateX: trans }], width: 220, flexDirection: 'row', height: '100%', paddingLeft: 5, backgroundColor: colors.surfaceStrong }}>
+              <ActionBtn
+                icon={<FolderPlus />}
+                label="Add"
+                onPress={() => onAddTopic(t)}
+              />
+              <ActionBtn
+                icon={<FolderInput />}
+                label="Move"
+                onPress={() => onMoveTopic(t)}
+              />
+              <ActionBtn
+                icon={<Edit2 />}
+                label="Rename"
+                onPress={() => onRenameTopic(t)}
+              />
+              <ActionBtn
+                icon={<Trash2 />}
+                label="Delete"
+                onPress={() => onDeleteTopic(t)}
+              />
             </Animated.View>
           );
         }}
@@ -122,52 +172,63 @@ function CollapsibleTopicItem({
       >
         <TouchableOpacity
           onPress={() => handleSelectTopic(t.id, hasSub)}
-          onLongPress={() => handleTopicLongPress(t, subjectLabel)}
+          onLongPress={() => handleTopicLongPress ? handleTopicLongPress(t, subjectLabel) : null}
           style={[
             styles.topicRow,
             isSelectedTopic ? { backgroundColor: '#F3F4F6' } : null,
           ]}
         >
           <Text style={{ color: colors.textTertiary, fontSize: 11, width: 22 }}>{idx + 1}.</Text>
+          <TopicIconComponent size={15} color={colors.textSecondary} style={{ marginRight: 6 }} />
           <Text style={{ flex: 1, fontSize: 13, fontWeight: '500', color: colors.textPrimary }}>
             {t.label}
           </Text>
           {hasSub && (
-            <AnimatedReanimated.View style={chevronStyle}>
+            <View style={{ transform: [{ rotate: isExpanded ? '0deg' : '-90deg' }] }}>
               <ChevronDown size={12} color={colors.textTertiary} />
-            </AnimatedReanimated.View>
+            </View>
           )}
         </TouchableOpacity>
       </Swipeable>
 
-      {hasSub && (
-        <AnimatedReanimated.View style={[collapsibleStyle, { paddingLeft: 22, marginTop: 2, gap: 2 }]}>
+      {hasSub && isExpanded && (
+        <View style={{ paddingLeft: 22, marginTop: 2, gap: 2 }}>
           {t.subtopics!.map((st: any, stIdx: number) => {
             const isSelectedSub = state.view.selectedSubtopic === st.id && state.view.mode === 'noteList';
+            const subIconKey = iconForTopic(t.label); // Key Requirement: Map based on parent Topic's name!
+            const SubIconComponent = TOPIC_ICONS[subIconKey] || FileText;
+            
             return (
               <Swipeable
                 key={`${t.id}-${st.id}-${stIdx}`}
                 renderRightActions={(progress, dragX) => {
                   const trans = dragX.interpolate({
-                    inputRange: [-50, 0],
-                    outputRange: [0, 50],
+                    inputRange: [-220, 0],
+                    outputRange: [0, 220],
                     extrapolate: 'clamp',
                   });
                   return (
-                    <Animated.View style={{ transform: [{ translateX: trans }], width: 50 }}>
-                      <TouchableOpacity
-                        onPress={() => handleSubtopicLongPress(st, t, subjectLabel)}
-                        style={{
-                          backgroundColor: '#ef4444',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          width: '100%',
-                          height: '100%',
-                          borderRadius: 6,
-                        }}
-                      >
-                        <Trash2 size={14} color="#fff" />
-                      </TouchableOpacity>
+                    <Animated.View style={{ transform: [{ translateX: trans }], width: 220, flexDirection: 'row', height: '100%', paddingLeft: 5, backgroundColor: colors.surfaceStrong }}>
+                      <ActionBtn
+                        icon={<Plus />}
+                        label="Add"
+                        onPress={() => onAddSubtopic(st, t)}
+                      />
+                      <ActionBtn
+                        icon={<FolderInput />}
+                        label="Move"
+                        onPress={() => onMoveSubtopic(st, t)}
+                      />
+                      <ActionBtn
+                        icon={<Edit2 />}
+                        label="Rename"
+                        onPress={() => onRenameSubtopic(st, t)}
+                      />
+                      <ActionBtn
+                        icon={<Trash2 />}
+                        label="Delete"
+                        onPress={() => onDeleteSubtopic(st, t)}
+                      />
                     </Animated.View>
                   );
                 }}
@@ -176,20 +237,22 @@ function CollapsibleTopicItem({
               >
                 <TouchableOpacity
                   onPress={() => handleSelectSubtopic(st.id)}
-                  onLongPress={() => handleSubtopicLongPress(st, t, subjectLabel)}
+                  onLongPress={() => handleSubtopicLongPress ? handleSubtopicLongPress(st, t, subjectLabel) : null}
                   style={[
                     styles.subtopicRow,
                     isSelectedSub ? { backgroundColor: '#F9FAFB' } : null,
+                    { flexDirection: 'row', alignItems: 'center' }
                   ]}
                 >
-                  <Text style={{ fontSize: 12, color: isSelectedSub ? colors.textPrimary : colors.textSecondary, fontWeight: isSelectedSub ? '600' : '400' }}>
+                  <SubIconComponent size={13} color={colors.textSecondary} style={{ marginRight: 6, opacity: 0.75 }} />
+                  <Text style={{ flex: 1, fontSize: 12, color: isSelectedSub ? colors.textPrimary : colors.textSecondary, fontWeight: isSelectedSub ? '600' : '400' }}>
                     {st.label}
                   </Text>
                 </TouchableOpacity>
               </Swipeable>
             );
           })}
-        </AnimatedReanimated.View>
+        </View>
       )}
     </View>
   );
@@ -202,13 +265,23 @@ function CollapsibleSubjectItem({
   isExpanded,
   toggleSubjectExpanded,
   handleSelectSubject,
-  handleSubjectLongPress,
   getTopicsForSubject,
   expanded,
-  handleTopicLongPress,
   handleSelectTopic,
-  handleSubtopicLongPress,
   handleSelectSubtopic,
+  onAddSubject,
+  onRenameSubject,
+  onDeleteSubject,
+  onMoveSubject,
+  onAddTopic,
+  onRenameTopic,
+  onDeleteTopic,
+  onMoveTopic,
+  onAddSubtopic,
+  onRenameSubtopic,
+  onDeleteSubtopic,
+  onMoveSubtopic,
+  handleSubjectLongPress,
   isFocused,
   onClearFocus,
 }: {
@@ -218,13 +291,23 @@ function CollapsibleSubjectItem({
   isExpanded: boolean;
   toggleSubjectExpanded: (subjId: string) => void;
   handleSelectSubject: (subjId: string) => void;
-  handleSubjectLongPress: (subject: any) => void;
   getTopicsForSubject: (subjId: string) => any[];
   expanded: string[];
-  handleTopicLongPress: (topic: any, label: string) => void;
   handleSelectTopic: (topicId: string, hasSub: boolean) => void;
-  handleSubtopicLongPress: (st: any, t: any, label: string) => void;
   handleSelectSubtopic: (subtopicId: string) => void;
+  onAddSubject: (s: any) => void;
+  onRenameSubject: (s: any) => void;
+  onDeleteSubject: (s: any) => void;
+  onMoveSubject: (s: any) => void;
+  onAddTopic: (t: any) => void;
+  onRenameTopic: (t: any) => void;
+  onDeleteTopic: (t: any) => void;
+  onMoveTopic: (t: any) => void;
+  onAddSubtopic: (st: any, t: any) => void;
+  onRenameSubtopic: (st: any, t: any) => void;
+  onDeleteSubtopic: (st: any, t: any) => void;
+  onMoveSubtopic: (st: any, t: any) => void;
+  handleSubjectLongPress?: (subject: any) => void;
   isFocused?: boolean;
   onClearFocus?: () => void;
 }) {
@@ -233,70 +316,38 @@ function CollapsibleSubjectItem({
   const Icon = SUBJECT_ICONS[iconKey] || Book;
   const isSelectedSubject = state.view.selectedSubject === s.id && (state.view.mode === 'subject' || (state.view.mode === 'noteList' && !state.view.selectedSubtopic));
   const topics = getTopicsForSubject(s.id);
-  const topicsCount = topics.length;
-
-  // Compute accurate container height based on expanded topic subtopics
-  const expandedTopicsCount = (() => {
-    return topics.reduce((sum: number, t: any) => {
-      return sum + (expanded.includes(t.id) ? (t.subtopics?.length ?? 0) : 0);
-    }, 0);
-  })();
-
-  const totalHeight = topicsCount * 50 + expandedTopicsCount * 44 + 12;
-
-  const animationProgress = useSharedValue(isExpanded ? 1 : 0);
-
-  useEffect(() => {
-    animationProgress.value = withSpring(isExpanded ? 1 : 0, {
-      damping: 20,
-      stiffness: 200,
-      mass: 0.5,
-      overshootClamping: true,
-    });
-  }, [isExpanded]);
-
-  const chevronStyle = useAnimatedStyle(() => {
-    const rotate = interpolate(animationProgress.value, [0, 1], [-90, 0]);
-    return {
-      transform: [{ rotate: `${rotate}deg` }],
-    };
-  });
-
-  const collapsibleStyle = useAnimatedStyle(() => {
-    const height = interpolate(animationProgress.value, [0, 1], [0, totalHeight]);
-    const opacity = interpolate(animationProgress.value, [0, 0.15, 1], [0, 0.3, 1]);
-    return {
-      height,
-      opacity,
-      overflow: 'hidden',
-    };
-  });
 
   return (
     <View style={{ marginBottom: 4 }}>
       <Swipeable
         renderRightActions={(progress, dragX) => {
           const trans = dragX.interpolate({
-            inputRange: [-70, 0],
-            outputRange: [0, 70],
+            inputRange: [-220, 0],
+            outputRange: [0, 220],
             extrapolate: 'clamp',
           });
           return (
-            <Animated.View style={{ transform: [{ translateX: trans }], width: 70 }}>
-              <TouchableOpacity
-                onPress={() => handleSubjectLongPress(s)}
-                style={{
-                  backgroundColor: '#ef4444',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: 12,
-                  marginVertical: 1,
-                }}
-              >
-                <Trash2 size={20} color="#fff" />
-              </TouchableOpacity>
+            <Animated.View style={{ transform: [{ translateX: trans }], width: 220, flexDirection: 'row', height: '100%', paddingLeft: 5, marginVertical: 1, backgroundColor: colors.surfaceStrong }}>
+              <ActionBtn
+                icon={<FolderPlus />}
+                label="Add"
+                onPress={() => onAddSubject(s)}
+              />
+              <ActionBtn
+                icon={<FolderInput />}
+                label="Move"
+                onPress={() => onMoveSubject(s)}
+              />
+              <ActionBtn
+                icon={<Edit2 />}
+                label="Rename"
+                onPress={() => onRenameSubject(s)}
+              />
+              <ActionBtn
+                icon={<Trash2 />}
+                label="Delete"
+                onPress={() => onDeleteSubject(s)}
+              />
             </Animated.View>
           );
         }}
@@ -307,7 +358,7 @@ function CollapsibleSubjectItem({
           testID={`pilot-v2-subject-${s.id}`}
           activeOpacity={0.7}
           onPress={() => handleSelectSubject(s.id)}
-          onLongPress={() => handleSubjectLongPress(s)}
+          onLongPress={() => handleSubjectLongPress ? handleSubjectLongPress(s) : null}
           style={[
             styles.subjectRow,
             isSelectedSubject ? { backgroundColor: '#F3F4F6' } : null,
@@ -338,30 +389,38 @@ function CollapsibleSubjectItem({
             }}
             style={{ padding: 6 }}
           >
-            <AnimatedReanimated.View style={chevronStyle}>
+            <View style={{ transform: [{ rotate: isExpanded ? '0deg' : '-90deg' }] }}>
               <ChevronDown size={16} color={colors.textTertiary} />
-            </AnimatedReanimated.View>
+            </View>
           </TouchableOpacity>
         </TouchableOpacity>
       </Swipeable>
 
-      <AnimatedReanimated.View style={[collapsibleStyle, { paddingLeft: 16, marginTop: 4, marginBottom: 4 }]}>
-        {topics.map((t, idx) => (
-          <CollapsibleTopicItem
-            key={t.id}
-            t={t}
-            idx={idx}
-            subjectLabel={s.label}
-            isExpanded={expanded.includes(t.id)}
-            state={state}
-            colors={colors}
-            handleSelectTopic={handleSelectTopic}
-            handleSelectSubtopic={handleSelectSubtopic}
-            handleTopicLongPress={handleTopicLongPress}
-            handleSubtopicLongPress={handleSubtopicLongPress}
-          />
-        ))}
-      </AnimatedReanimated.View>
+      {isExpanded && (
+        <View style={{ paddingLeft: 16, marginTop: 4, marginBottom: 4 }}>
+          {topics.map((t, idx) => (
+            <CollapsibleTopicItem
+              key={t.id}
+              t={t}
+              idx={idx}
+              subjectLabel={s.label}
+              isExpanded={expanded.includes(t.id)}
+              state={state}
+              colors={colors}
+              handleSelectTopic={handleSelectTopic}
+              handleSelectSubtopic={handleSelectSubtopic}
+              onAddTopic={onAddTopic}
+              onRenameTopic={onRenameTopic}
+              onDeleteTopic={onDeleteTopic}
+              onMoveTopic={onMoveTopic}
+              onAddSubtopic={onAddSubtopic}
+              onRenameSubtopic={onRenameSubtopic}
+              onDeleteSubtopic={onDeleteSubtopic}
+              onMoveSubtopic={onMoveSubtopic}
+            />
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -381,6 +440,20 @@ function PilotV2SidebarHome() {
   const activeFilter = state.view.mode === 'dashboard' ? state.view.quickFilter : 'none';
   const [newSubjectModal, setNewSubjectModal] = useState(false);
   const [newSubjectName, setNewSubjectName] = useState('');
+
+  const [newTopicModal, setNewTopicModal] = useState(false);
+  const [newTopicName, setNewTopicName] = useState('');
+  const [targetSubject, setTargetSubject] = useState<any>(null);
+
+  const [newSubtopicModal, setNewSubtopicModal] = useState(false);
+  const [newSubtopicName, setNewSubtopicName] = useState('');
+  const [targetTopic, setTargetTopic] = useState<{ id: string; label: string; subjectLabel: string } | null>(null);
+
+  const [renameModal, setRenameModal] = useState(false);
+  const [renameValue, setRenameValue] = useState('');
+  const [targetRenameNode, setTargetRenameNode] = useState<any>(null);
+  const [moveModalVisible, setMoveModalVisible] = useState(false);
+  const [targetMoveNode, setTargetMoveNode] = useState<NodeToMove | null>(null);
   const [creating, setCreating] = useState(false);
   const [expanded, setExpanded] = useState<string[]>(['fundamental-rights']);
   const [expandedSubjects, setExpandedSubjects] = useState<string[]>([]);
@@ -389,20 +462,7 @@ function PilotV2SidebarHome() {
 
   const focusedSubject = state.view.focusedSubject;
 
-  const quickNavAnimStyle = useAnimatedStyle(() => {
-    const translateY = withSpring(focusedSubject ? -120 : 0, {
-      damping: 20, stiffness: 200, mass: 0.5, overshootClamping: true,
-    });
-    const opacity = withSpring(focusedSubject ? 0 : 1, {
-      damping: 20, stiffness: 200, mass: 0.5,
-    });
-    return {
-      transform: [{ translateY }],
-      opacity,
-      height: focusedSubject ? 0 : undefined,
-      overflow: 'hidden',
-    };
-  });
+
 
   const selectedSubjectId = state.view.selectedSubject;
   const subjectsList = useMemo(() => {
@@ -415,9 +475,9 @@ function PilotV2SidebarHome() {
         list.push({
           id: subjectName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
           label: subjectName,
-          icon: 'Book',
-          bg: '#E9D5FF',
-          text: '#7C3AED',
+          icon: iconForSubject(subjectName),
+          bg: '#F3F4F6',
+          text: '#4B5563',
         });
       }
     });
@@ -441,9 +501,8 @@ function PilotV2SidebarHome() {
     );
 
     activeNotes.forEach(note => {
-      if (!note.subtopic) return;
-      const subtopicLabel = note.subtopic;
-      const topicLabel = note.topic || 'General Notes';
+      if (!note.topic) return;
+      const topicLabel = note.topic;
 
       let topicObj = list.find(t => t.label.toLowerCase() === topicLabel.toLowerCase());
       if (!topicObj) {
@@ -455,12 +514,15 @@ function PilotV2SidebarHome() {
         list.push(topicObj);
       }
 
-      const hasSub = topicObj.subtopics?.some(st => st.label.toLowerCase() === subtopicLabel.toLowerCase());
-      if (!hasSub) {
-        topicObj.subtopics?.push({
-          id: subtopicLabel,
-          label: subtopicLabel
-        });
+      if (note.subtopic) {
+        const subtopicLabel = note.subtopic;
+        const hasSub = topicObj.subtopics?.some(st => st.label.toLowerCase() === subtopicLabel.toLowerCase());
+        if (!hasSub) {
+          topicObj.subtopics?.push({
+            id: subtopicLabel,
+            label: subtopicLabel
+          });
+        }
       }
     });
 
@@ -474,6 +536,10 @@ function PilotV2SidebarHome() {
   const handleSelectTopic = (topicId: string, hasSubtopics: boolean) => {
     if (hasSubtopics) {
       if (state.view.selectedTopic === topicId) {
+        // Already on this topic — show topic-level notes (clear subtopic filter)
+        dispatch({ type: 'SET_SELECTED_SUBTOPIC', payload: null });
+        dispatch({ type: 'SET_VIEW_MODE', payload: 'noteList' });
+        // Also toggle sidebar expansion
         toggleTopic(topicId);
       } else {
         dispatch({ type: 'SET_QUICK_FILTER', payload: 'home' });
@@ -505,7 +571,7 @@ function PilotV2SidebarHome() {
         setTimeout(() => {
           scrollViewRef.current?.scrollTo({
             y: Math.max(0, subjectPositions[subjId] - 60),
-            animated: true,
+            animated: false,
           });
         }, 100);
       }
@@ -516,11 +582,10 @@ function PilotV2SidebarHome() {
 
   const handleSelectSubject = (subjectId: string) => {
     if (state.view.selectedSubject === subjectId) {
-      // Second click triggers focus mode!
-      dispatch({ type: 'SET_FOCUSED_SUBJECT', payload: subjectId });
-      if (!expandedSubjects.includes(subjectId)) {
-        setExpandedSubjects(prev => [...prev, subjectId]);
-      }
+      // Already on this subject — show subject-level notes (clear topic/subtopic filters)
+      dispatch({ type: 'SET_SELECTED_TOPIC', payload: null });
+      dispatch({ type: 'SET_SELECTED_SUBTOPIC', payload: null });
+      dispatch({ type: 'SET_VIEW_MODE', payload: 'noteList' });
     } else {
       dispatch({ type: 'SET_QUICK_FILTER', payload: 'home' });
       dispatch({ type: 'SET_SELECTED_SUBJECT', payload: subjectId });
@@ -580,210 +645,458 @@ function PilotV2SidebarHome() {
 
   const handleSubjectLongPress = (s: any) => {
     Alert.alert(
-      `Delete Subject`,
-      `Are you sure you want to delete the subject "${s.label}" and all its topics and notes? This action cannot be undone.`,
+      `Subject Options`,
+      `Manage subject "${s.label}":`,
       [
         { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            if (!session?.user?.id) {
-              Alert.alert('Sign in required', 'Please sign in to delete subjects.');
-              return;
-            }
-            dispatch({ type: 'SET_LOADING', payload: true });
-            try {
-              const nodes = await fetchAllPilotV2Nodes(session.user.id);
-              const subjectNode = nodes.find(
-                n => n.type === 'subject' && (n.id === s.id || n.title.toLowerCase() === s.label.toLowerCase())
-              );
-
-              if (subjectNode) {
-                await archivePilotV2Node(subjectNode.id);
-                const archiveChildren = async (parentId: string) => {
-                  const children = nodes.filter(n => n.parent_id === parentId);
-                  for (const child of children) {
-                    await archivePilotV2Node(child.id);
-                    await archiveChildren(child.id);
-                  }
-                };
-                await archiveChildren(subjectNode.id);
-              } else {
-                const subjectNotes = state.notes.filter(
-                  n => n.subject && n.subject.toLowerCase() === s.label.toLowerCase()
-                );
-                for (const note of subjectNotes) {
-                  const noteNode = nodes.find(nd => nd.note_id === note.id);
-                  if (noteNode) {
-                    await archivePilotV2Node(noteNode.id);
-                  }
-                }
-              }
-
-              const fresh = await fetchPilotV2NotesForUser(session.user.id);
-              dispatch({ type: 'SET_NOTES', payload: fresh });
-
-              if (state.view.selectedSubject === s.id) {
-                dispatch({ type: 'SET_SELECTED_SUBJECT', payload: null });
-                dispatch({ type: 'SET_VIEW_MODE', payload: 'dashboard' });
-              }
-              Alert.alert('Success', `Subject "${s.label}" has been deleted.`);
-            } catch (err) {
-              Alert.alert('Error', `Could not delete subject: ${(err as Error).message}`);
-            } finally {
-              dispatch({ type: 'SET_LOADING', payload: false });
-            }
+        { 
+          text: 'Add Topic', 
+          onPress: () => {
+            setTargetSubject(s);
+            setNewTopicName('');
+            setNewTopicModal(true);
+          } 
+        },
+        { 
+          text: 'Rename Subject', 
+          onPress: () => {
+            setTargetRenameNode({ id: s.id, type: 'subject', label: s.label });
+            setRenameValue(s.label);
+            setRenameModal(true);
           }
+        },
+        { 
+          text: 'Delete Subject', 
+          style: 'destructive',
+          onPress: () => promptDeleteSubject(s) 
         }
       ]
     );
   };
 
+  const promptDeleteSubject = (s: any) => {
+    Alert.alert(
+      `Delete Subject`,
+      `Are you sure you want to delete the subject "${s.label}" and all its topics and notes? This action cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: () => executeSubjectDeletion(s) }
+      ]
+    );
+  };
+
+  const executeSubjectDeletion = async (s: any) => {
+    if (!session?.user?.id) {
+      Alert.alert('Sign in required', 'Please sign in to delete subjects.');
+      return;
+    }
+    dispatch({ type: 'SET_LOADING', payload: true });
+    try {
+      const { fetchAllPilotV2Nodes, archivePilotV2Node, fetchPilotV2NotesForUser } = await import('../../repositories/pilotV2Repo');
+      const nodes = await fetchAllPilotV2Nodes(session.user.id);
+      const subjectNode = nodes.find(
+        n => n.type === 'subject' && (n.id === s.id || n.title.toLowerCase() === s.label.toLowerCase())
+      );
+
+      if (subjectNode) {
+        await archivePilotV2Node(subjectNode.id);
+        const archiveChildren = async (parentId: string) => {
+          const children = nodes.filter(n => n.parent_id === parentId);
+          for (const child of children) {
+            await archivePilotV2Node(child.id);
+            await archiveChildren(child.id);
+          }
+        };
+        await archiveChildren(subjectNode.id);
+      } else {
+        const subjectNotes = state.notes.filter(
+          n => n.subject && n.subject.toLowerCase() === s.label.toLowerCase()
+        );
+        for (const note of subjectNotes) {
+          const noteNode = nodes.find(nd => nd.note_id === note.id);
+          if (noteNode) {
+            await archivePilotV2Node(noteNode.id);
+          }
+        }
+      }
+
+      const fresh = await fetchPilotV2NotesForUser(session.user.id);
+      dispatch({ type: 'SET_NOTES', payload: fresh });
+
+      if (state.view.selectedSubject === s.id) {
+        dispatch({ type: 'SET_SELECTED_SUBJECT', payload: null });
+        dispatch({ type: 'SET_VIEW_MODE', payload: 'dashboard' });
+      }
+      Alert.alert('Success', `Subject "${s.label}" has been deleted.`);
+    } catch (err) {
+      Alert.alert('Error', `Could not delete subject: ${(err as Error).message}`);
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
+
+  const handleMoveSuccess = async () => {
+    if (!session?.user?.id) return;
+    dispatch({ type: 'SET_LOADING', payload: true });
+    try {
+      const fresh = await fetchPilotV2NotesForUser(session.user.id);
+      dispatch({ type: 'SET_NOTES', payload: fresh });
+      Alert.alert('Success', 'Item moved successfully.');
+    } catch (err) {
+      console.warn('[Sidebar] Failed to refresh notes post-move:', err);
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
+
+  const submitNewTopic = async () => {
+    const topName = newTopicName.trim();
+    if (!topName || !targetSubject) return;
+    if (!session?.user?.id) {
+      Alert.alert('Sign in required', 'Please sign in to create topics.');
+      return;
+    }
+    setCreating(true);
+    try {
+      const title = `Untitled notebook · ${new Date().toLocaleString([], { month: 'short', day: 'numeric' })}`;
+      const { findOrCreatePilotV2Note, fetchPilotV2NotesForUser } = await import('../../repositories/pilotV2Repo');
+      const result = await findOrCreatePilotV2Note({
+        userId: session.user.id,
+        subject: targetSubject.label,
+        topic: topName,
+        subtopic: null,
+        title,
+      });
+      if (!result) throw new Error('Failed to create topic');
+      
+      const fresh = await fetchPilotV2NotesForUser(session.user.id);
+      dispatch({ type: 'SET_NOTES', payload: fresh });
+
+      if (!expandedSubjects.includes(targetSubject.id)) {
+        setExpandedSubjects(prev => [...prev, targetSubject.id]);
+      }
+      setNewTopicModal(false);
+    } catch (err) {
+      Alert.alert('Error', `Could not create topic: ${(err as Error).message}`);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const submitNewSubtopic = async () => {
+    const subName = newSubtopicName.trim();
+    if (!subName || !targetTopic) return;
+    if (!session?.user?.id) {
+      Alert.alert('Sign in required', 'Please sign in to create subtopics.');
+      return;
+    }
+    setCreating(true);
+    try {
+      const title = `Untitled notebook · ${new Date().toLocaleString([], { month: 'short', day: 'numeric' })}`;
+      const { findOrCreatePilotV2Note, fetchPilotV2NotesForUser } = await import('../../repositories/pilotV2Repo');
+      const result = await findOrCreatePilotV2Note({
+        userId: session.user.id,
+        subject: targetTopic.subjectLabel,
+        topic: targetTopic.label,
+        subtopic: subName,
+        title,
+      });
+      if (!result) throw new Error('Failed to create node');
+
+      const fresh = await fetchPilotV2NotesForUser(session.user.id);
+      dispatch({ type: 'SET_NOTES', payload: fresh });
+
+      const topicId = targetTopic.id || targetTopic.label.toLowerCase().replace(/[^a-z0-9]/g, '-');
+      if (!expanded.includes(topicId)) {
+        setExpanded(prev => [...prev, topicId]);
+      }
+      setNewSubtopicModal(false);
+    } catch (err) {
+      Alert.alert('Error', `Could not create subtopic: ${(err as Error).message}`);
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const handleTopicLongPress = (t: any, subjectLabel: string) => {
+    Alert.alert(
+      `Topic Options`,
+      `Manage topic "${t.label}":`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Add Subtopic',
+          onPress: () => {
+            setTargetTopic({ id: t.id, label: t.label, subjectLabel });
+            setNewSubtopicName('');
+            setNewSubtopicModal(true);
+          },
+        },
+        {
+          text: 'Rename Topic',
+          onPress: () => {
+            setTargetRenameNode({ id: t.id, type: 'topic', label: t.label, subjectLabel });
+            setRenameValue(t.label);
+            setRenameModal(true);
+          }
+        },
+        {
+          text: 'Delete Topic',
+          style: 'destructive',
+          onPress: () => promptDeleteTopic(t, subjectLabel),
+        },
+      ]
+    );
+  };
+
+  const promptDeleteTopic = (t: any, subjectLabel: string) => {
     Alert.alert(
       `Delete Topic`,
       `Are you sure you want to delete the topic "${t.label}" and all its subtopics and notes? This action cannot be undone.`,
       [
         { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            if (!session?.user?.id) {
-              Alert.alert('Sign in required', 'Please sign in to delete topics.');
-              return;
-            }
-            dispatch({ type: 'SET_LOADING', payload: true });
-            try {
-              const nodes = await fetchAllPilotV2Nodes(session.user.id);
-              const subjectNode = nodes.find(
-                n => n.type === 'subject' && n.title.toLowerCase() === subjectLabel.toLowerCase()
-              );
+        { text: 'Delete', style: 'destructive', onPress: () => executeTopicDeletion(t, subjectLabel) }
+      ]
+    );
+  };
 
-              const topicNode = nodes.find(
-                n => n.type === 'topic' &&
-                     (n.id === t.id || n.title.toLowerCase() === t.label.toLowerCase()) &&
-                     (!subjectNode || n.parent_id === subjectNode.id)
-              );
+  const executeTopicDeletion = async (t: any, subjectLabel: string) => {
+    if (!session?.user?.id) {
+      Alert.alert('Sign in required', 'Please sign in to delete topics.');
+      return;
+    }
+    dispatch({ type: 'SET_LOADING', payload: true });
+    try {
+      const { fetchAllPilotV2Nodes, archivePilotV2Node, fetchPilotV2NotesForUser } = await import('../../repositories/pilotV2Repo');
+      const nodes = await fetchAllPilotV2Nodes(session.user.id);
+      const subjectNode = nodes.find(
+        n => n.type === 'subject' && n.title.toLowerCase() === subjectLabel.toLowerCase()
+      );
 
-              if (topicNode) {
-                await archivePilotV2Node(topicNode.id);
-                const archiveChildren = async (parentId: string) => {
-                  const children = nodes.filter(n => n.parent_id === parentId);
-                  for (const child of children) {
-                    await archivePilotV2Node(child.id);
-                    await archiveChildren(child.id);
-                  }
-                };
-                await archiveChildren(topicNode.id);
-              } else {
-                const topicNotes = state.notes.filter(
-                  n => n.subject && n.subject.toLowerCase() === subjectLabel.toLowerCase() &&
-                       n.topic && n.topic.toLowerCase() === t.label.toLowerCase()
-                );
-                for (const note of topicNotes) {
-                  const noteNode = nodes.find(nd => nd.note_id === note.id);
-                  if (noteNode) {
-                    await archivePilotV2Node(noteNode.id);
-                  }
-                }
-              }
+      const topicNode = nodes.find(
+        n => n.type === 'topic' &&
+             (n.id === t.id || n.title.toLowerCase() === t.label.toLowerCase()) &&
+             (!subjectNode || n.parent_id === subjectNode.id)
+      );
 
-              const fresh = await fetchPilotV2NotesForUser(session.user.id);
-              dispatch({ type: 'SET_NOTES', payload: fresh });
-
-              if (state.view.selectedTopic === t.id) {
-                dispatch({ type: 'SET_SELECTED_TOPIC', payload: null });
-                dispatch({ type: 'SET_SELECTED_SUBTOPIC', payload: null });
-                dispatch({ type: 'SET_VIEW_MODE', payload: 'dashboard' });
-              }
-              Alert.alert('Success', `Topic "${t.label}" has been deleted.`);
-            } catch (err) {
-              Alert.alert('Error', `Could not delete topic: ${(err as Error).message}`);
-            } finally {
-              dispatch({ type: 'SET_LOADING', payload: false });
-            }
+      if (topicNode) {
+        await archivePilotV2Node(topicNode.id);
+        const archiveChildren = async (parentId: string) => {
+          const children = nodes.filter(n => n.parent_id === parentId);
+          for (const child of children) {
+            await archivePilotV2Node(child.id);
+            await archiveChildren(child.id);
           }
+        };
+        await archiveChildren(topicNode.id);
+      } else {
+        const topicNotes = state.notes.filter(
+          n => n.subject && n.subject.toLowerCase() === subjectLabel.toLowerCase() &&
+               n.topic && n.topic.toLowerCase() === t.label.toLowerCase()
+        );
+        for (const note of topicNotes) {
+          const noteNode = nodes.find(nd => nd.note_id === note.id);
+          if (noteNode) {
+            await archivePilotV2Node(noteNode.id);
+          }
+        }
+      }
+
+      const fresh = await fetchPilotV2NotesForUser(session.user.id);
+      dispatch({ type: 'SET_NOTES', payload: fresh });
+
+      if (state.view.selectedTopic === t.id) {
+        dispatch({ type: 'SET_SELECTED_TOPIC', payload: null });
+        dispatch({ type: 'SET_SELECTED_SUBTOPIC', payload: null });
+        dispatch({ type: 'SET_VIEW_MODE', payload: 'dashboard' });
+      }
+      Alert.alert('Success', `Topic "${t.label}" has been deleted.`);
+    } catch (err) {
+      Alert.alert('Error', `Could not delete topic: ${(err as Error).message}`);
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
+
+  const handleSubtopicLongPress = (st: any, t: any, subjectLabel: string) => {
+    Alert.alert(
+      `Subtopic Options`,
+      `Manage subtopic "${st.label}":`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Add Notebook', 
+          onPress: () => addNewNoteToSubtopic(subjectLabel, t.label, st.label) 
+        },
+        { 
+          text: 'Rename Subtopic', 
+          onPress: () => {
+            setTargetRenameNode({ id: st.id, type: 'subtopic', label: st.label, subjectLabel, topicLabel: t.label });
+            setRenameValue(st.label);
+            setRenameModal(true);
+          } 
+        },
+        {
+          text: 'Delete Subtopic',
+          style: 'destructive',
+          onPress: () => promptDeleteSubtopic(st, t, subjectLabel)
         }
       ]
     );
   };
 
-  const handleSubtopicLongPress = (st: any, t: any, subjectLabel: string) => {
+  const promptDeleteSubtopic = (st: any, t: any, subjectLabel: string) => {
     Alert.alert(
       `Delete Subtopic`,
       `Are you sure you want to delete the subtopic "${st.label}" and all its notes? This action cannot be undone.`,
       [
         { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            if (!session?.user?.id) {
-              Alert.alert('Sign in required', 'Please sign in to delete subtopics.');
-              return;
-            }
-            dispatch({ type: 'SET_LOADING', payload: true });
-            try {
-              const nodes = await fetchAllPilotV2Nodes(session.user.id);
-              const subjectNode = nodes.find(
-                n => n.type === 'subject' && n.title.toLowerCase() === subjectLabel.toLowerCase()
-              );
-
-              const topicNode = nodes.find(
-                n => n.type === 'topic' &&
-                     (n.id === t.id || n.title.toLowerCase() === t.label.toLowerCase()) &&
-                     (!subjectNode || n.parent_id === subjectNode.id)
-              );
-
-              const subtopicNode = nodes.find(
-                n => n.type === 'subtopic' &&
-                     (n.id === st.id || n.title.toLowerCase() === st.label.toLowerCase()) &&
-                     (!topicNode || n.parent_id === topicNode.id)
-              );
-
-              if (subtopicNode) {
-                await archivePilotV2Node(subtopicNode.id);
-                const archiveChildren = async (parentId: string) => {
-                  const children = nodes.filter(n => n.parent_id === parentId);
-                  for (const child of children) {
-                    await archivePilotV2Node(child.id);
-                    await archiveChildren(child.id);
-                  }
-                };
-                await archiveChildren(subtopicNode.id);
-              } else {
-                const subtopicNotes = state.notes.filter(
-                  n => n.subject && n.subject.toLowerCase() === subjectLabel.toLowerCase() &&
-                       n.topic && n.topic.toLowerCase() === t.label.toLowerCase() &&
-                       n.subtopic && n.subtopic.toLowerCase() === st.label.toLowerCase()
-                );
-                for (const note of subtopicNotes) {
-                  const noteNode = nodes.find(nd => nd.note_id === note.id);
-                  if (noteNode) {
-                    await archivePilotV2Node(noteNode.id);
-                  }
-                }
-              }
-
-              const fresh = await fetchPilotV2NotesForUser(session.user.id);
-              dispatch({ type: 'SET_NOTES', payload: fresh });
-
-              if (state.view.selectedSubtopic === st.id) {
-                dispatch({ type: 'SET_SELECTED_SUBTOPIC', payload: null });
-                dispatch({ type: 'SET_VIEW_MODE', payload: 'dashboard' });
-              }
-              Alert.alert('Success', `Subtopic "${st.label}" has been deleted.`);
-            } catch (err) {
-              Alert.alert('Error', `Could not delete subtopic: ${(err as Error).message}`);
-            } finally {
-              dispatch({ type: 'SET_LOADING', payload: false });
-            }
-          }
-        }
+        { text: 'Delete', style: 'destructive', onPress: () => executeSubtopicDeletion(st, t, subjectLabel) }
       ]
     );
+  };
+
+  const executeSubtopicDeletion = async (st: any, t: any, subjectLabel: string) => {
+    if (!session?.user?.id) {
+      Alert.alert('Sign in required', 'Please sign in to delete subtopics.');
+      return;
+    }
+    dispatch({ type: 'SET_LOADING', payload: true });
+    try {
+      const { fetchAllPilotV2Nodes, archivePilotV2Node, fetchPilotV2NotesForUser } = await import('../../repositories/pilotV2Repo');
+      const nodes = await fetchAllPilotV2Nodes(session.user.id);
+      const subjectNode = nodes.find(
+        n => n.type === 'subject' && n.title.toLowerCase() === subjectLabel.toLowerCase()
+      );
+
+      const topicNode = nodes.find(
+        n => n.type === 'topic' &&
+             (n.id === t.id || n.title.toLowerCase() === t.label.toLowerCase()) &&
+             (!subjectNode || n.parent_id === subjectNode.id)
+      );
+
+      const subtopicNode = nodes.find(
+        n => n.type === 'subtopic' &&
+             (n.id === st.id || n.title.toLowerCase() === st.label.toLowerCase()) &&
+             (!topicNode || n.parent_id === topicNode.id)
+      );
+
+      if (subtopicNode) {
+        await archivePilotV2Node(subtopicNode.id);
+        const archiveChildren = async (parentId: string) => {
+          const children = nodes.filter(n => n.parent_id === parentId);
+          for (const child of children) {
+            await archivePilotV2Node(child.id);
+            await archiveChildren(child.id);
+          }
+        };
+        await archiveChildren(subtopicNode.id);
+      } else {
+        const subtopicNotes = state.notes.filter(
+          n => n.subject && n.subject.toLowerCase() === subjectLabel.toLowerCase() &&
+               n.topic && n.topic.toLowerCase() === t.label.toLowerCase() &&
+               n.subtopic && n.subtopic.toLowerCase() === st.label.toLowerCase()
+        );
+        for (const note of subtopicNotes) {
+          const noteNode = nodes.find(nd => nd.note_id === note.id);
+          if (noteNode) {
+            await archivePilotV2Node(noteNode.id);
+          }
+        }
+      }
+
+      const fresh = await fetchPilotV2NotesForUser(session.user.id);
+      dispatch({ type: 'SET_NOTES', payload: fresh });
+
+      if (state.view.selectedSubtopic === st.id) {
+        dispatch({ type: 'SET_SELECTED_SUBTOPIC', payload: null });
+        dispatch({ type: 'SET_VIEW_MODE', payload: 'dashboard' });
+      }
+      Alert.alert('Success', `Subtopic "${st.label}" has been deleted.`);
+    } catch (err) {
+      Alert.alert('Error', `Could not delete subtopic: ${(err as Error).message}`);
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
+
+  const addNewNoteToSubtopic = async (subjectLabel: string, topicLabel: string, subtopicLabel: string) => {
+    if (!session?.user?.id) {
+      Alert.alert('Sign in required', 'Please sign in to create notebooks.');
+      return;
+    }
+    setCreating(true);
+    try {
+      const title = `Untitled notebook · ${new Date().toLocaleString([], { month: 'short', day: 'numeric' })}`;
+      const { findOrCreatePilotV2Note, fetchPilotV2NotesForUser } = await import('../../repositories/pilotV2Repo');
+      const result = await findOrCreatePilotV2Note({
+        userId: session.user.id,
+        subject: subjectLabel,
+        topic: topicLabel,
+        subtopic: subtopicLabel,
+        title,
+      });
+      if (!result) throw new Error('Failed to create note');
+      
+      const fresh = await fetchPilotV2NotesForUser(session.user.id);
+      dispatch({ type: 'SET_NOTES', payload: fresh });
+      Alert.alert('Success', `Notebook seeded inside "${subtopicLabel}".`);
+    } catch (err) {
+      Alert.alert('Error', `Could not create notebook: ${(err as Error).message}`);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const submitRenameNode = async () => {
+    const val = renameValue.trim();
+    if (!val || !targetRenameNode) return;
+    if (!session?.user?.id) {
+      Alert.alert('Sign in required', 'Please sign in to rename items.');
+      return;
+    }
+    setCreating(true);
+    try {
+      const { renamePilotV2Node, fetchAllPilotV2Nodes, fetchPilotV2NotesForUser } = await import('../../repositories/pilotV2Repo');
+      const nodes = await fetchAllPilotV2Nodes(session.user.id);
+      let dbNode = null;
+
+      if (targetRenameNode.type === 'subject') {
+        dbNode = nodes.find(n => n.type === 'subject' && (n.id === targetRenameNode.id || n.title.toLowerCase() === targetRenameNode.label.toLowerCase()));
+      } else if (targetRenameNode.type === 'topic') {
+        const parentSubjectNode = nodes.find(n => n.type === 'subject' && n.title.toLowerCase() === targetRenameNode.subjectLabel.toLowerCase());
+        dbNode = nodes.find(n => n.type === 'topic' && (n.id === targetRenameNode.id || n.title.toLowerCase() === targetRenameNode.label.toLowerCase()) && (!parentSubjectNode || n.parent_id === parentSubjectNode.id));
+      } else if (targetRenameNode.type === 'subtopic') {
+        const parentSubjectNode = nodes.find(n => n.type === 'subject' && n.title.toLowerCase() === targetRenameNode.subjectLabel.toLowerCase());
+        const parentTopicNode = nodes.find(n => n.type === 'topic' && n.title.toLowerCase() === targetRenameNode.topicLabel.toLowerCase() && (!parentSubjectNode || n.parent_id === parentSubjectNode.id));
+        dbNode = nodes.find(n => n.type === 'subtopic' && (n.id === targetRenameNode.id || n.title.toLowerCase() === targetRenameNode.label.toLowerCase()) && (!parentTopicNode || n.parent_id === parentTopicNode.id));
+      }
+
+      if (dbNode) {
+        const success = await renamePilotV2Node(dbNode.id, val);
+        if (!success) throw new Error('Database update failure');
+      } else {
+        const { ensurePilotV2SubjectNode, ensurePilotV2TopicNode, ensurePilotV2SubtopicNode } = await import('../../repositories/pilotV2Repo');
+        if (targetRenameNode.type === 'subject') {
+          const provisioned = await ensurePilotV2SubjectNode(session.user.id, targetRenameNode.label);
+          if (provisioned) await renamePilotV2Node(provisioned.id, val);
+        } else if (targetRenameNode.type === 'topic') {
+          const provisioned = await ensurePilotV2TopicNode(session.user.id, targetRenameNode.subjectLabel, targetRenameNode.label);
+          if (provisioned) await renamePilotV2Node(provisioned.id, val);
+        } else if (targetRenameNode.type === 'subtopic') {
+          const provisioned = await ensurePilotV2SubtopicNode(session.user.id, targetRenameNode.subjectLabel, targetRenameNode.topicLabel, targetRenameNode.label);
+          if (provisioned) await renamePilotV2Node(provisioned.id, val);
+        }
+      }
+
+      const fresh = await fetchPilotV2NotesForUser(session.user.id);
+      dispatch({ type: 'SET_NOTES', payload: fresh });
+      setRenameModal(false);
+    } catch (err) {
+      Alert.alert('Error', `Could not rename: ${(err as Error).message}`);
+    } finally {
+      setCreating(false);
+    }
   };
 
 
@@ -834,15 +1147,14 @@ function PilotV2SidebarHome() {
 
       <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
         {/* Quick nav — animated slide-up when focusedSubject is set */}
-        <AnimatedReanimated.View style={quickNavAnimStyle}>
+        {!focusedSubject && (
           <View style={{ paddingHorizontal: 12, paddingBottom: 8, paddingTop: 4 }}>
             <NavRow active={activeFilter === 'home'}    label="Home"           Icon={HomeIcon} colors={colors} testID="pilot-v2-nav-home"    onPress={() => handleQuickNav('home')} />
             <NavRow active={activeFilter === 'pinned'}  label="Pinned"         Icon={Pin}      colors={colors} testID="pilot-v2-nav-pinned"  onPress={() => handleQuickNav('pinned')} />
             <NavRow active={activeFilter === 'recent'}  label="Recent"         Icon={Clock}    colors={colors} testID="pilot-v2-nav-recent"  onPress={() => handleQuickNav('recent')} />
-            <NavRow active={activeFilter === 'shared'}  label="Shared with me" Icon={Share2}   colors={colors} testID="pilot-v2-nav-shared"  onPress={() => handleQuickNav('shared')} />
             <NavRow active={activeFilter === 'trash'}   label="Trash"          Icon={Trash2}   colors={colors} testID="pilot-v2-nav-trash"   onPress={() => handleQuickNav('trash')} />
           </View>
-        </AnimatedReanimated.View>
+        )}
 
         {!focusedSubject && <View style={[styles.divider, { backgroundColor: colors.border }]} />}
 
@@ -871,15 +1183,53 @@ function PilotV2SidebarHome() {
                 isExpanded={expandedSubjects.includes(s.id)}
                 toggleSubjectExpanded={toggleSubjectExpanded}
                 handleSelectSubject={handleSelectSubject}
-                handleSubjectLongPress={handleSubjectLongPress}
                 getTopicsForSubject={getTopicsForSubject}
                 expanded={expanded}
-                handleTopicLongPress={handleTopicLongPress}
                 handleSelectTopic={handleSelectTopic}
-                handleSubtopicLongPress={handleSubtopicLongPress}
                 handleSelectSubtopic={handleSelectSubtopic}
                 isFocused={focusedSubject === s.id}
                 onClearFocus={() => dispatch({ type: 'SET_FOCUSED_SUBJECT', payload: null })}
+                onAddSubject={(subject) => {
+                  setTargetSubject(subject);
+                  setNewTopicName('');
+                  setNewTopicModal(true);
+                }}
+                onRenameSubject={(subject) => {
+                  setTargetRenameNode({ id: subject.id, type: 'subject', label: subject.label });
+                  setRenameValue(subject.label);
+                  setRenameModal(true);
+                }}
+                onDeleteSubject={(subject) => promptDeleteSubject(subject)}
+                onMoveSubject={(subject) => {
+                  Alert.alert('Root Folder', 'Top-level Subjects are root folders and cannot be nested.');
+                }}
+                onAddTopic={(topic) => {
+                  setTargetTopic({ ...topic, subjectLabel: s.label });
+                  setNewSubtopicName('');
+                  setNewSubtopicModal(true);
+                }}
+                onRenameTopic={(topic) => {
+                  setTargetRenameNode({ id: topic.id, type: 'topic', label: topic.label, subjectLabel: s.label });
+                  setRenameValue(topic.label);
+                  setRenameModal(true);
+                }}
+                onDeleteTopic={(topic) => promptDeleteTopic(topic, s.label)}
+                onMoveTopic={(topic) => {
+                  setTargetMoveNode({ id: topic.id, type: 'topic', label: topic.label, currentParentLabel: s.label });
+                  setMoveModalVisible(true);
+                }}
+                onAddSubtopic={(st, t) => addNewNoteToSubtopic(s.label, t.label, st.label)}
+                onRenameSubtopic={(st, t) => {
+                  setTargetRenameNode({ id: st.id, type: 'subtopic', label: st.label, subjectLabel: s.label, topicLabel: t.label });
+                  setRenameValue(st.label);
+                  setRenameModal(true);
+                }}
+                onDeleteSubtopic={(st, t) => promptDeleteSubtopic(st, t, s.label)}
+                onMoveSubtopic={(st, t) => {
+                  setTargetMoveNode({ id: st.id, type: 'subtopic', label: st.label, currentParentLabel: t.label });
+                  setMoveModalVisible(true);
+                }}
+                handleSubjectLongPress={handleSubjectLongPress}
               />
             </View>
           ))}
@@ -891,28 +1241,15 @@ function PilotV2SidebarHome() {
               onPress={handleNewSubject}
               style={[styles.newSubjectRow]}
             >
-              <Plus size={18} color="#5B4EFA" />
-              <Text style={{ color: '#5B4EFA', fontSize: 14, fontWeight: '600' }}>New Subject</Text>
+              <Plus size={18} color={colors.textSecondary} />
+              <Text style={{ color: colors.textSecondary, fontSize: 14, fontWeight: '600' }}>New Subject</Text>
             </TouchableOpacity>
           )}
         </View>
 
       </ScrollView>
 
-      <View style={[styles.divider, { backgroundColor: colors.border }]} />
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingRight: 16, backgroundColor: colors.surface }}>
-        <TouchableOpacity testID="pilot-v2-settings" onPress={handleSettings} style={[styles.settingsRow, { flex: 1 }]}>
-          <Settings size={18} color={colors.textSecondary} />
-          <Text style={{ color: colors.textPrimary, fontSize: 14, fontWeight: '500' }}>Settings</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          testID="pilot-v2-hide-sidebar"
-          onPress={() => dispatch({ type: 'TOGGLE_SIDEBAR' })}
-          style={{ padding: 12, borderRadius: 8 }}
-        >
-          <ChevronLeft size={18} color={colors.textSecondary} />
-        </TouchableOpacity>
-      </View>
+      {/* Footer completely removed to ensure subject lists have unrestricted top-to-bottom scroll visibility */}
 
       {/* New Subject modal — Step 24 */}
       <Modal
@@ -923,46 +1260,218 @@ function PilotV2SidebarHome() {
       >
         <View style={styles.nsBackdrop}>
           <TouchableOpacity activeOpacity={1} onPress={() => setNewSubjectModal(false)} style={StyleSheet.absoluteFill} />
-          <View style={[styles.nsCard, { backgroundColor: colors.surface, borderColor: colors.border }]} testID="pilot-v2-new-subject-modal">
-            <View style={styles.nsHeader}>
-              <Text style={[styles.nsTitle, { color: colors.textPrimary }]}>New Subject</Text>
-              <TouchableOpacity onPress={() => setNewSubjectModal(false)} testID="pilot-v2-new-subject-close">
-                <X size={20} color={colors.textPrimary} />
-              </TouchableOpacity>
+          <KeyboardAvoidingView 
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+            style={{ width: '100%', alignItems: 'center', padding: 20 }}
+          >
+            <View style={[styles.nsCard, { backgroundColor: colors.surface, borderColor: colors.border }]} testID="pilot-v2-new-subject-modal">
+              <View style={styles.nsHeader}>
+                <Text style={[styles.nsTitle, { color: colors.textPrimary }]}>New Subject</Text>
+                <TouchableOpacity onPress={() => setNewSubjectModal(false)} testID="pilot-v2-new-subject-close">
+                  <X size={20} color={colors.textPrimary} />
+                </TouchableOpacity>
+              </View>
+              <Text style={[styles.nsHint, { color: colors.textTertiary }]}>
+                Add a custom subject to your Pilot V2 workspace. You can create topics and notes inside it afterwards.
+              </Text>
+              <TextInput
+                testID="pilot-v2-new-subject-input"
+                value={newSubjectName}
+                onChangeText={setNewSubjectName}
+                placeholder="e.g. International Relations"
+                placeholderTextColor={colors.textTertiary}
+                autoFocus
+                style={[styles.nsInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}
+                onSubmitEditing={submitNewSubject}
+              />
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                <TouchableOpacity
+                  onPress={() => setNewSubjectModal(false)}
+                  style={[styles.nsBtnGhost, { borderColor: colors.border }]}
+                >
+                  <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  testID="pilot-v2-new-subject-submit"
+                  onPress={submitNewSubject}
+                  disabled={!newSubjectName.trim() || creating}
+                  style={[styles.nsBtnPrimary, { backgroundColor: colors.primary, opacity: newSubjectName.trim() && !creating ? 1 : 0.5 }]}
+                >
+                  <Plus size={14} color="#fff" />
+                  <Text style={{ color: '#fff', fontWeight: '700' }}>{creating ? 'Creating…' : 'Create'}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <Text style={[styles.nsHint, { color: colors.textTertiary }]}>
-              Add a custom subject to your Pilot V2 workspace. You can create topics and notes inside it afterwards.
-            </Text>
-            <TextInput
-              testID="pilot-v2-new-subject-input"
-              value={newSubjectName}
-              onChangeText={setNewSubjectName}
-              placeholder="e.g. International Relations"
-              placeholderTextColor={colors.textTertiary}
-              autoFocus
-              style={[styles.nsInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}
-              onSubmitEditing={submitNewSubject}
-            />
-            <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
-              <TouchableOpacity
-                onPress={() => setNewSubjectModal(false)}
-                style={[styles.nsBtnGhost, { borderColor: colors.border }]}
-              >
-                <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                testID="pilot-v2-new-subject-submit"
-                onPress={submitNewSubject}
-                disabled={!newSubjectName.trim() || creating}
-                style={[styles.nsBtnPrimary, { backgroundColor: colors.primary, opacity: newSubjectName.trim() && !creating ? 1 : 0.5 }]}
-              >
-                <Plus size={14} color="#fff" />
-                <Text style={{ color: '#fff', fontWeight: '700' }}>{creating ? 'Creating…' : 'Create'}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          </KeyboardAvoidingView>
         </View>
       </Modal>
+
+      {/* New Topic Modal */}
+      <Modal
+        visible={newTopicModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setNewTopicModal(false)}
+      >
+        <View style={styles.nsBackdrop}>
+          <TouchableOpacity activeOpacity={1} onPress={() => setNewTopicModal(false)} style={StyleSheet.absoluteFill} />
+          <KeyboardAvoidingView 
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+            style={{ width: '100%', alignItems: 'center', padding: 20 }}
+          >
+            <View style={[styles.nsCard, { backgroundColor: colors.surface, borderColor: colors.border }]} testID="pilot-v2-new-topic-modal">
+              <View style={styles.nsHeader}>
+                <Text style={[styles.nsTitle, { color: colors.textPrimary }]}>New Topic</Text>
+                <TouchableOpacity onPress={() => setNewTopicModal(false)}>
+                  <X size={20} color={colors.textPrimary} />
+                </TouchableOpacity>
+              </View>
+              <Text style={[styles.nsHint, { color: colors.textTertiary }]}>
+                Create a new topic folder inside "{targetSubject?.label}". This will seed an empty notebook inside it!
+              </Text>
+              <TextInput
+                value={newTopicName}
+                onChangeText={setNewTopicName}
+                placeholder="e.g. Fundamental Rights"
+                placeholderTextColor={colors.textTertiary}
+                autoFocus
+                style={[styles.nsInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}
+                onSubmitEditing={submitNewTopic}
+              />
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                <TouchableOpacity
+                  onPress={() => setNewTopicModal(false)}
+                  style={[styles.nsBtnGhost, { borderColor: colors.border }]}
+                >
+                  <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={submitNewTopic}
+                  disabled={!newTopicName.trim() || creating}
+                  style={[styles.nsBtnPrimary, { backgroundColor: colors.primary, opacity: newTopicName.trim() && !creating ? 1 : 0.5 }]}
+                >
+                  <Plus size={14} color="#fff" />
+                  <Text style={{ color: '#fff', fontWeight: '700' }}>{creating ? 'Creating…' : 'Create'}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
+
+      {/* New Subtopic Modal */}
+      <Modal
+        visible={newSubtopicModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setNewSubtopicModal(false)}
+      >
+        <View style={styles.nsBackdrop}>
+          <TouchableOpacity activeOpacity={1} onPress={() => setNewSubtopicModal(false)} style={StyleSheet.absoluteFill} />
+          <KeyboardAvoidingView 
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+            style={{ width: '100%', alignItems: 'center', padding: 20 }}
+          >
+            <View style={[styles.nsCard, { backgroundColor: colors.surface, borderColor: colors.border }]} testID="pilot-v2-new-subtopic-modal">
+              <View style={styles.nsHeader}>
+                <Text style={[styles.nsTitle, { color: colors.textPrimary }]}>New Subtopic</Text>
+                <TouchableOpacity onPress={() => setNewSubtopicModal(false)}>
+                  <X size={20} color={colors.textPrimary} />
+                </TouchableOpacity>
+              </View>
+              <Text style={[styles.nsHint, { color: colors.textTertiary }]}>
+                Create a new nested folder inside "{targetTopic?.label}". This will seed an empty notebook inside it!
+              </Text>
+              <TextInput
+                testID="pilot-v2-new-subtopic-input"
+                value={newSubtopicName}
+                onChangeText={setNewSubtopicName}
+                placeholder="e.g. Case Studies"
+                placeholderTextColor={colors.textTertiary}
+                autoFocus
+                style={[styles.nsInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}
+                onSubmitEditing={submitNewSubtopic}
+              />
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                <TouchableOpacity
+                  onPress={() => setNewSubtopicModal(false)}
+                  style={[styles.nsBtnGhost, { borderColor: colors.border }]}
+                >
+                  <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  testID="pilot-v2-new-subtopic-submit"
+                  onPress={submitNewSubtopic}
+                  disabled={!newSubtopicName.trim() || creating}
+                  style={[styles.nsBtnPrimary, { backgroundColor: colors.primary, opacity: newSubtopicName.trim() && !creating ? 1 : 0.5 }]}
+                >
+                  <Plus size={14} color="#fff" />
+                  <Text style={{ color: '#fff', fontWeight: '700' }}>{creating ? 'Creating…' : 'Create'}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
+
+      {/* Universal Rename Modal */}
+      <Modal
+        visible={renameModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setRenameModal(false)}
+      >
+        <View style={styles.nsBackdrop}>
+          <TouchableOpacity activeOpacity={1} onPress={() => setRenameModal(false)} style={StyleSheet.absoluteFill} />
+          <KeyboardAvoidingView 
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+            style={{ width: '100%', alignItems: 'center', padding: 20 }}
+          >
+            <View style={[styles.nsCard, { backgroundColor: colors.surface, borderColor: colors.border }]} testID="pilot-v2-rename-modal">
+              <View style={styles.nsHeader}>
+                <Text style={[styles.nsTitle, { color: colors.textPrimary }]}>Rename {targetRenameNode?.type ? targetRenameNode.type.charAt(0).toUpperCase() + targetRenameNode.type.slice(1) : 'Item'}</Text>
+                <TouchableOpacity onPress={() => setRenameModal(false)}>
+                  <X size={20} color={colors.textPrimary} />
+                </TouchableOpacity>
+              </View>
+              <Text style={[styles.nsHint, { color: colors.textTertiary }]}>
+                Enter a new label for this {targetRenameNode?.type}. This will update all matching views instantly!
+              </Text>
+              <TextInput
+                value={renameValue}
+                onChangeText={setRenameValue}
+                placeholder="Updated label..."
+                placeholderTextColor={colors.textTertiary}
+                autoFocus
+                style={[styles.nsInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}
+                onSubmitEditing={submitRenameNode}
+              />
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                <TouchableOpacity
+                  onPress={() => setRenameModal(false)}
+                  style={[styles.nsBtnGhost, { borderColor: colors.border }]}
+                >
+                  <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={submitRenameNode}
+                  disabled={!renameValue.trim() || creating}
+                  style={[styles.nsBtnPrimary, { backgroundColor: colors.primary, opacity: renameValue.trim() && !creating ? 1 : 0.5 }]}
+                >
+                  <Text style={{ color: '#fff', fontWeight: '700' }}>{creating ? 'Saving…' : 'Save Change'}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
+
+      <PilotV2MoveModal
+        visible={moveModalVisible}
+        node={targetMoveNode}
+        onClose={() => setMoveModalVisible(false)}
+        onSuccess={handleMoveSuccess}
+      />
     </View>
   );
 }
@@ -1103,9 +1612,8 @@ const styles = StyleSheet.create({
   sbInput: {
     flex: 1,
     fontSize: 13,
-    paddingVertical: 8,
+    paddingVertical: 0, // CRITICAL: fixes text-clipping/bleeding caused by padding+height conflict
     paddingHorizontal: 4,
-    height: 40,
     textAlignVertical: 'center',
     ...(Platform.OS === 'web' ? { outlineStyle: 'none' as any } : null),
   },

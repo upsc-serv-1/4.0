@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  KeyboardAvoidingView, Platform, ActivityIndicator, Alert, ScrollView,
+  KeyboardAvoidingView, Platform, ActivityIndicator, Alert, ScrollView, Image,
 } from 'react-native';
 import { Link, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -31,14 +31,34 @@ export default function Login() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <View style={styles.themePos}><ThemeSwitcher /></View>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-          <View style={styles.brandRow}>
-            <View style={[styles.logoDot, { backgroundColor: colors.primary }]} />
-            <Text style={[styles.brand, { color: colors.textPrimary }]}>GRADE1</Text>
-          </View>
-          <Text style={[styles.h1, { color: colors.textPrimary }]}>Welcome back.</Text>
-          <Text style={[styles.sub, { color: colors.textSecondary }]}>Master the concepts. Ace the exam.</Text>
+          
+          {/* 🚀 PREMIUM BRAND FLOW: TEXT -> LOGO (w/ BRAND INSIDE) -> TAGLINE */}
+          <View style={{ alignItems: 'center', marginBottom: 36 }}>
+            <Text style={[styles.h1, { color: colors.textPrimary, textAlign: 'center', marginBottom: 22 }]}>
+              Welcome to
+            </Text>
+            
+            <Image 
+              source={require('../../assets/icon.png')} 
+              style={{ 
+                width: 120, 
+                height: 120, 
+                borderRadius: 28,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 6 },
+                shadowOpacity: 0.12,
+                shadowRadius: 14,
+                marginBottom: 22,
+              }}
+              resizeMode="cover"
+            />
 
-          <View style={{ marginTop: spacing.xl }}>
+            <Text style={[styles.sub, { color: colors.textSecondary, textAlign: 'center' }]}>
+              Master the concepts. Ace the exam.
+            </Text>
+          </View>
+
+          <View style={{ marginTop: spacing.lg }}>
             <Text style={[styles.label, { color: colors.textTertiary }]}>EMAIL</Text>
             <TextInput
               testID="login-email-input"
@@ -81,11 +101,8 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   scroll: { padding: spacing.lg, flexGrow: 1, justifyContent: 'center' },
   themePos: { position: 'absolute', top: 10, right: 20, zIndex: 1000 },
-  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: spacing.lg },
-  logoDot: { width: 12, height: 12, borderRadius: 3 },
-  brand: { fontWeight: '900', letterSpacing: 4, fontSize: 14 },
-  h1: { fontSize: 40, fontWeight: '900', letterSpacing: -1 },
-  sub: { marginTop: 8, fontSize: 15 },
+  h1: { fontSize: 36, fontWeight: '900', letterSpacing: -0.5 },
+  sub: { fontSize: 15 },
   label: { fontSize: 11, letterSpacing: 2, fontWeight: '800', marginBottom: 8 },
   input: { borderWidth: 1, borderRadius: radius.md, padding: 16, fontSize: 16 },
   cta: { padding: 18, borderRadius: radius.md, alignItems: 'center', marginTop: spacing.lg },

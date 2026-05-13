@@ -8,11 +8,11 @@
  * Steps 4-9 will replace each `<Placeholder>` with the real screen component.
  * For now the route resolves so the bottom-tab bar can navigate here.
  */
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, useWindowDimensions, TouchableOpacity } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft, Menu, ChevronRight } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { useTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
 import { PilotV2Provider, usePilotV2 } from '../../src/context/PilotV2Context';
@@ -38,6 +38,7 @@ function PilotV2Inner() {
   const params = useLocalSearchParams<{ noteId?: string }>();
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
+  const isFirstFocusRef = useRef(true);
 
   // Start the local-first sync queue once on mount.
   useEffect(() => {
@@ -45,51 +46,68 @@ function PilotV2Inner() {
     return stop;
   }, []);
 
+  // Extract loadNotes into a stable callback so it can be reused on focus.
+  const loadNotes = useCallback(async () => {
+    if (!userId) return;
+    dispatch({ type: 'SET_LOADING', payload: true });
+    try {
+      const notes = await fetchPilotV2NotesForUser(userId);
+      // Crash recovery: hydrate every note from local cache (newer-wins) and
+      // run the backward-compat migrator before exposing them to the UI.
+      const hydrated = notes.map((n) => {
+        const result = hydratePilotV2Note(n.id, {
+          content: n.content,
+          updatedAt: (n as any).updated_at || new Date().toISOString(),
+        });
+        return { ...n, content: result.content };
+      });
+      const migrated = migratePilotV2Notes(hydrated);
+      // Also rehydrate notes that exist locally but not in the server response
+      // (possible when the user was offline when they were created).
+      const knownIds = new Set(migrated.map(n => n.id));
+      for (const localId of PilotV2LocalStore.listAll()) {
+        if (!knownIds.has(localId)) {
+          const cached = PilotV2LocalStore.get(localId);
+          if (cached) {
+            migrated.push({
+              id: localId,
+              title: 'Untitled note',
+              content: cached.content,
+            } as any);
+          }
+        }
+      }
+      dispatch({ type: 'SET_NOTES', payload: migrated });
+    } catch (e) {
+      dispatch({ type: 'SET_ERROR', payload: (e as Error).message });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  }, [userId, dispatch]);
+
   // Initial load — fetch real notes from Supabase if a user is signed in.
   useEffect(() => {
     let cancelled = false;
-    const load = async () => {
-      if (!userId) return;
-      dispatch({ type: 'SET_LOADING', payload: true });
-      try {
-        const notes = await fetchPilotV2NotesForUser(userId);
-        // Crash recovery: hydrate every note from local cache (newer-wins) and
-        // run the backward-compat migrator before exposing them to the UI.
-        const hydrated = notes.map((n) => {
-          const result = hydratePilotV2Note(n.id, {
-            content: n.content,
-            updatedAt: (n as any).updated_at || new Date().toISOString(),
-          });
-          return { ...n, content: result.content };
-        });
-        const migrated = migratePilotV2Notes(hydrated);
-        // Also rehydrate notes that exist locally but not in the server response
-        // (possible when the user was offline when they were created).
-        const knownIds = new Set(migrated.map(n => n.id));
-        for (const localId of PilotV2LocalStore.listAll()) {
-          if (!knownIds.has(localId)) {
-            const cached = PilotV2LocalStore.get(localId);
-            if (cached) {
-              migrated.push({
-                id: localId,
-                title: 'Untitled note',
-                content: cached.content,
-              } as any);
-            }
-          }
-        }
-        if (!cancelled) dispatch({ type: 'SET_NOTES', payload: migrated });
-      } catch (e) {
-        if (!cancelled) {
-          dispatch({ type: 'SET_ERROR', payload: (e as Error).message });
-        }
-      } finally {
-        if (!cancelled) dispatch({ type: 'SET_LOADING', payload: false });
-      }
-    };
-    load();
+    (async () => {
+      await loadNotes();
+    })();
     return () => { cancelled = true; };
-  }, [userId, dispatch]);
+  }, [loadNotes]);
+
+  // FIX: Reload notes every time the Pilot V2 tab gains focus.
+  // This ensures hierarchy/nodes created externally (e.g. from PilotV2SaveSheet
+  // on quiz pages) are visible in the sidebar without a manual refresh.
+  useFocusEffect(
+    useCallback(() => {
+      // Skip the initial mount since the loadNotes call above already fires
+      // on mount. We use a ref to track first focus vs subsequent focuses.
+      const firstFocus = isFirstFocusRef.current;
+      isFirstFocusRef.current = false;
+      if (firstFocus) return;
+
+      loadNotes();
+    }, [loadNotes])
+  );
 
   // Deep-link support: open a specific Pilot V2 note when coming from Home
   // recent-notes cards.

@@ -55,8 +55,8 @@ import {
 import { WashiTapeLayer, WashiTapeColorPicker } from './WashiTapeLayer';
 import { PilotV2BlockRichEditModal } from './PilotV2BlockRichEditModal';
 
-let globalToolbarVisible = false;
-let globalToolbarPos = { x: 80, y: 150 };
+let globalToolbarVisible = true;
+let globalToolbarPos = { x: -1, y: -1 };
 
 const stripHtml = (html: string) => html ? html.replace(/<[^>]*>/g, '') : '';
 
@@ -505,7 +505,7 @@ export function PilotV2EditorView() {
   // Floating control panel menu
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [outlinePanelOpen, setOutlinePanelOpen] = useState(false);
-  const [showToolbar, setShowToolbar] = useState(false);
+  const [showToolbar, setShowToolbar] = useState(globalToolbarVisible);
   const [blockEditSheet, setBlockEditSheet] = useState<{ visible: boolean; blockId: string | null; body: string }>({
     visible: false,
     blockId: null,
@@ -680,14 +680,18 @@ export function PilotV2EditorView() {
       if (s.anchor) pencil.engine.setStrokeAnchor(s.id, s.anchor);
     });
     if (!note?.id) return;
-    const content = { blocks, version: 1, pencilStrokes: anchored };
+    const content = {
+      blocks,
+      version: 1,
+      pencilStrokes: anchored,
+      washiTapes: (note.content as any)?.washiTapes ?? [],
+    };
     pendingSaveRef.current = { noteId: note.id, content };
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
       try {
         await savePilotV2NoteOfflineFirst(note.id, content);
-        dispatch({ type: 'PATCH_BLOCKS', payload: { id: note.id, blocks } });
-        dispatch({ type: 'PATCH_PENCIL_STROKES', payload: { id: note.id, strokes: anchored } });
+        dispatch({ type: 'PATCH_CURRENT_NOTE', payload: { id: note.id, patch: { content } } });
         pendingSaveRef.current = null;
         setSavingState('saved');
       } catch { setSavingState('idle'); }
@@ -722,10 +726,18 @@ export function PilotV2EditorView() {
   const persistWashi = (next: PilotV2WashiTape[]) => {
     if (!note?.id) return;
     setWashiTapes(next);
-    const content: any = { blocks, version: 1, pencilStrokes: pencil.engine.getPersisted(), washiTapes: next };
+    const content: any = {
+      blocks,
+      version: 1,
+      pencilStrokes: pencil.engine.getPersisted(),
+      washiTapes: next,
+    };
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
-      try { await savePilotV2NoteOfflineFirst(note.id, content); } catch { /* ignore */ }
+      try {
+        await savePilotV2NoteOfflineFirst(note.id, content);
+        dispatch({ type: 'PATCH_CURRENT_NOTE', payload: { id: note.id, patch: { content } } });
+      } catch { /* ignore */ }
     }, 600);
   };
   return (
@@ -943,6 +955,7 @@ export function PilotV2EditorView() {
                 height={paperSize.h}
                 drawingMode={washiMode}
                 activeColor={washiColor}
+                eraserMode={pencil.tool === 'eraser'}
                 onAdd={(t) => persistWashi([...washiTapes, t])}
                 onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
                 onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
@@ -1571,7 +1584,16 @@ function BlockRow({ block, colors, fontScale, isActive, onFocus, onChange, onTog
 function FloatingToolbar(props: any) {
   const { colors, showHighlightPicker, activeHighlight, onApplyHighlight, isMarkActive } = props;
   const { width, height } = useWindowDimensions();
-  const pos = useRef(new Animated.ValueXY(globalToolbarPos)).current;
+
+  const getInitialPos = () => {
+    if (globalToolbarPos.x === -1 && globalToolbarPos.y === -1) {
+      // Position top-center horizontally! Estimating horizontal pill width around 360px.
+      return { x: Math.round((width - 360) / 2), y: 64 };
+    }
+    return globalToolbarPos;
+  };
+
+  const pos = useRef(new Animated.ValueXY(getInitialPos())).current;
   const [collapsed, setCollapsed] = useState(false);
   const [vertical, setVertical] = useState(false);
 

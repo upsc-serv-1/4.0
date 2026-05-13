@@ -16,7 +16,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import {
-  Pen, Highlighter, Eraser, X, Layers,
+  Pen, Highlighter, Eraser, X, Layers, Undo, Redo, Hand,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { PilotV2PencilTool } from './types';
@@ -151,6 +151,21 @@ export function UnifiedAnnotationFAB({
     onClose();
   };
 
+  const isHighlighter = mode === 'highlighter';
+  const minW = isHighlighter ? 6 : 1;
+  const maxW = isHighlighter ? 50 : 20;
+  
+  const decreaseWidth = () => {
+    const next = Math.max(minW, width - (isHighlighter ? 2 : 1));
+    onWidthChange(next);
+    ping();
+  };
+  const increaseWidth = () => {
+    const next = Math.min(maxW, width + (isHighlighter ? 2 : 1));
+    onWidthChange(next);
+    ping();
+  };
+
   // Animated styles
   const fabRotate = useAnimatedStyle(() => ({
     transform: [{ rotate: `${interpolate(expandAnim.value, [0, 1], [0, 45])}deg` }],
@@ -240,9 +255,7 @@ export function UnifiedAnnotationFAB({
             <PencilColorRow
               isHighlighter={mode === 'highlighter'}
               activeColor={color}
-              width={width}
               onColorChange={onColorChange}
-              onWidthChange={onWidthChange}
             />
           )}
 
@@ -259,7 +272,7 @@ export function UnifiedAnnotationFAB({
             </View>
           )}
 
-          {/* Row 3: Undo / Redo / Close */}
+          {/* Row 3: Undo / Redo / Size / Close */}
           <View style={styles.utilityRow}>
             <TouchableOpacity
               disabled={!canUndo}
@@ -267,7 +280,7 @@ export function UnifiedAnnotationFAB({
               style={[styles.utilBtn, !canUndo && { opacity: 0.3 }]}
               testID="fab-undo"
             >
-              <Undo2 size={16} color="#475569" />
+              <Undo size={16} color="#475569" />
             </TouchableOpacity>
             <TouchableOpacity
               disabled={!canRedo}
@@ -275,7 +288,7 @@ export function UnifiedAnnotationFAB({
               style={[styles.utilBtn, !canRedo && { opacity: 0.3 }]}
               testID="fab-redo"
             >
-              <Redo2 size={16} color="#475569" />
+              <Redo size={16} color="#475569" />
             </TouchableOpacity>
             {mode !== 'eraser' && (
               <TouchableOpacity
@@ -286,6 +299,31 @@ export function UnifiedAnnotationFAB({
                 <Hand size={16} color={pencilOnly ? '#b91c1c' : '#94a3b8'} />
               </TouchableOpacity>
             )}
+
+            {/* Inlined size +/- buttons for compact internal layout */}
+            {(mode === 'pen' || mode === 'highlighter') && (
+              <View style={styles.widthControlsGroup}>
+                <TouchableOpacity
+                  onPress={decreaseWidth}
+                  disabled={width <= minW}
+                  style={[styles.widthBtnSmall, width <= minW && { opacity: 0.35 }]}
+                >
+                  <Text style={styles.widthBtnTextSmall}>−</Text>
+                </TouchableOpacity>
+                <View style={styles.widthIndicatorSmall}>
+                  <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: color, opacity: 0.8, transform: [{ scale: 0.5 + (width / maxW) * 1.2 }] }} />
+                  <Text style={styles.widthValueLabelSmall}>{width}</Text>
+                </View>
+                <TouchableOpacity
+                  onPress={increaseWidth}
+                  disabled={width >= maxW}
+                  style={[styles.widthBtnSmall, width >= maxW && { opacity: 0.35 }]}
+                >
+                  <Text style={styles.widthBtnTextSmall}>+</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
             <TouchableOpacity
               onPress={handleClose}
               style={[styles.utilBtn, { marginLeft: 'auto' }]}
@@ -330,28 +368,13 @@ const PEN_COLORS = ['#0F172A', '#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5
 const HL_COLORS = ['#FDE68A', '#FCA5A5', '#A7F3D0', '#93C5FD', '#D8B4FE', '#FDBA74'];
 
 function PencilColorRow({
-  isHighlighter, activeColor, width, onColorChange, onWidthChange,
+  isHighlighter, activeColor, onColorChange,
 }: {
   isHighlighter: boolean;
   activeColor: string;
-  width: number;
   onColorChange: (c: string) => void;
-  onWidthChange: (w: number) => void;
 }) {
   const palette = isHighlighter ? HL_COLORS : PEN_COLORS;
-  const minW = isHighlighter ? 6 : 1;
-  const maxW = isHighlighter ? 50 : 20;
-
-  const decrease = () => {
-    const next = Math.max(minW, width - (isHighlighter ? 2 : 1));
-    onWidthChange(next);
-    ping();
-  };
-  const increase = () => {
-    const next = Math.min(maxW, width + (isHighlighter ? 2 : 1));
-    onWidthChange(next);
-    ping();
-  };
 
   return (
     <View style={styles.colorRow}>
@@ -369,54 +392,6 @@ function PencilColorRow({
           />
         ))}
       </ScrollView>
-      <View style={styles.widthSliderRow}>
-        {/* Minus button */}
-        <TouchableOpacity
-          onPress={decrease}
-          style={[styles.widthBtn, { opacity: width <= minW ? 0.35 : 1 }]}
-          testID="fab-width-minus"
-        >
-          <Text style={styles.widthBtnText}>−</Text>
-        </TouchableOpacity>
-
-        {/* Width track */}
-        <View style={styles.widthTrack}>
-          <View
-            style={[
-              styles.widthTrackFill,
-              {
-                flex: Math.max(0.01, width - minW) / Math.max(1, maxW - minW),
-                backgroundColor: activeColor,
-              },
-            ]}
-          />
-          <View
-            style={{ flex: Math.max(0.01, maxW - width) / Math.max(1, maxW - minW) }}
-          />
-          {/* Thumb */}
-          <View
-            style={[
-              styles.widthThumb,
-              {
-                backgroundColor: activeColor,
-                left: `${((width - minW) / Math.max(1, maxW - minW)) * 100}%`,
-              },
-            ]}
-          />
-        </View>
-
-        {/* Plus button */}
-        <TouchableOpacity
-          onPress={increase}
-          style={[styles.widthBtn, { opacity: width >= maxW ? 0.35 : 1 }]}
-          testID="fab-width-plus"
-        >
-          <Text style={styles.widthBtnText}>+</Text>
-        </TouchableOpacity>
-
-        {/* Width value label */}
-        <Text style={styles.widthValueLabel}>{width}</Text>
-      </View>
     </View>
   );
 }
@@ -446,30 +421,6 @@ function WashiColorRow({
           />
         ))}
       </ScrollView>
-    </View>
-  );
-}
-
-/* ── Icons not imported from lucide ────────────────────────────────────────── */
-
-function Undo2({ size, color }: { size: number; color: string }) {
-  return (
-    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ fontSize: size * 0.8, color }}>↩</Text>
-    </View>
-  );
-}
-function Redo2({ size, color }: { size: number; color: string }) {
-  return (
-    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ fontSize: size * 0.8, color }}>↪</Text>
-    </View>
-  );
-}
-function Hand({ size, color }: { size: number; color: string }) {
-  return (
-    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ fontSize: size * 0.7, color }}>✋</Text>
     </View>
   );
 }
@@ -675,5 +626,39 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  widthControlsGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginLeft: 8,
+    borderLeftWidth: 1,
+    borderLeftColor: '#f1f5f9',
+    paddingLeft: 8,
+  },
+  widthBtnSmall: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: '#f1f5f9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  widthBtnTextSmall: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  widthIndicatorSmall: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    minWidth: 32,
+    justifyContent: 'center',
+  },
+  widthValueLabelSmall: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#475569',
   },
 });

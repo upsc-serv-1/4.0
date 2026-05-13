@@ -225,19 +225,67 @@ export interface PilotV2SubjectMeta {
   text: string;
 }
 
-export const PILOT_V2_SUBJECT_PALETTE: PilotV2SubjectMeta[] = [];
+export const PILOT_V2_SUBJECT_PALETTE: PilotV2SubjectMeta[] = [
+  { id: 'history', label: 'History', icon: 'ScrollText', bg: '#FEE2E2', text: '#EF4444' },
+  { id: 'polity', label: 'Polity', icon: 'Landmark', bg: '#DBEAFE', text: '#3B82F6' },
+  { id: 'geography', label: 'Geography', icon: 'Globe2', bg: '#D1FAE5', text: '#10B981' },
+  { id: 'environment', label: 'Environment', icon: 'Leaf', bg: '#ECFCCB', text: '#84CC16' },
+  { id: 'economy', label: 'Economy', icon: 'TrendingUp', bg: '#FEF3C7', text: '#F59E0B' },
+  { id: 'science-technology', label: 'Science & Technology', icon: 'FlaskConical', bg: '#EDE9FE', text: '#8B5CF6' },
+  { id: 'international-relations', label: 'International Relations', icon: 'Globe2', bg: '#E0F2FE', text: '#0EA5E9' },
+  { id: 'agriculture', label: 'Agriculture', icon: 'Leaf', bg: '#DCFCE7', text: '#10B981' },
+  { id: 'csat', label: 'CSAT', icon: 'TrendingUp', bg: '#FCE7F3', text: '#EC4899' },
+];
 
 /** Map a subject label to the best-matching icon key. */
 export function iconForSubject(label: string): string {
-  const lc = label.toLowerCase().replace(/[^a-z]/g, '');
+  const lc = label.toLowerCase().replace(/[^a-z0-9&]/g, '');
   if (lc.includes('polit') || lc.includes('law') || lc.includes('constitut') || lc.includes('govern')) return 'Landmark';
-  if (lc.includes('econom') || lc.includes('finance') || lc.includes('budget') || lc.includes('market')) return 'TrendingUp';
+  if (lc.includes('econom') || lc.includes('finance') || lc.includes('budget') || lc.includes('market') || lc.includes('csat')) return 'TrendingUp';
   if (lc.includes('history') || lc.includes('ancient') || lc.includes('medieval') || lc.includes('modern')) return 'ScrollText';
-  if (lc.includes('geograph') || lc.includes('map') || lc.includes('environ') || lc.includes('ecology')) return 'Globe2';
-  if (lc.includes('scienc') || lc.includes('tech') || lc.includes('space') || lc.includes('biotech')) return 'FlaskConical';
+  if (lc.includes('geograph') || lc.includes('map') || lc.includes('intern') || lc.includes('relation')) return 'Globe2';
+  if (lc.includes('science') || lc.includes('tech') || lc.includes('space') || lc.includes('biotech')) return 'FlaskConical';
   if (lc.includes('ethic') || lc.includes('philosoph') || lc.includes('moral') || lc.includes('integrity')) return 'Scale';
-  if (lc.includes('sociolog') || lc.includes('culture') || lc.includes('art') || lc.includes('religion')) return 'Leaf';
+  if (lc.includes('environ') || lc.includes('ecology') || lc.includes('agri') || lc.includes('farm') || lc.includes('cultur') || lc.includes('art')) return 'Leaf';
   return 'Book';
+}
+
+/** Map a topic/section-group label to the best-matching icon key. */
+export function iconForTopic(label: string): string {
+  const lc = (label || '').toLowerCase();
+  if (lc.includes('ancient')) return 'Landmark';
+  if (lc.includes('medieval')) return 'Shield';
+  if (lc.includes('art') || lc.includes('cultur') || lc.includes('literat')) return 'Palette';
+  if (lc.includes('modern') || lc.includes('partition') || lc.includes('independence')) return 'Flag';
+  
+  if (lc.includes('foundat') || lc.includes('constitut') || lc.includes('framework') || lc.includes('preamble')) return 'Columns';
+  if (lc.includes('right') || lc.includes('dut') || lc.includes('amend') || lc.includes('basic struct')) return 'Scale';
+  if (lc.includes('union') || lc.includes('state') || lc.includes('relations') || lc.includes('territor')) return 'Building';
+  if (lc.includes('govern') || lc.includes('elect') || lc.includes('institut') || lc.includes('bod')) return 'Briefcase';
+  
+  if (lc.includes('agri') || lc.includes('crop') || lc.includes('farm') || lc.includes('product') || lc.includes('alli')) return 'Sprout';
+  
+  if (lc.includes('space') || lc.includes('defen') || lc.includes('navigat') || lc.includes('missil')) return 'Rocket';
+  if (lc.includes('scienc') || lc.includes('bio') || lc.includes('physics') || lc.includes('chem') || lc.includes('nuclear')) return 'Dna';
+  if (lc.includes('emerging') || lc.includes('technolog') || lc.includes('robot') || lc.includes('ai') || lc.includes('nano') || lc.includes('ict')) return 'Cpu';
+  
+  if (lc.includes('global') || lc.includes('intern') || lc.includes('bilater') || lc.includes('foreign') || lc.includes('relations') || lc.includes('grouping')) return 'Globe2';
+  
+  if (lc.includes('geomorph') || lc.includes('physi') || lc.includes('land') || lc.includes('rock') || lc.includes('mountain') || lc.includes('earth')) return 'Mountain';
+  if (lc.includes('climate') || lc.includes('atmospher') || lc.includes('wind') || lc.includes('cyclon') || lc.includes('temp')) return 'Wind';
+  if (lc.includes('ocean') || lc.includes('water') || lc.includes('drain') || lc.includes('river') || lc.includes('sea')) return 'Waves';
+  
+  if (lc.includes('ecology') || lc.includes('biodivers') || lc.includes('conserv') || lc.includes('species') || lc.includes('wildlif') || lc.includes('forest')) return 'TreePine';
+  if (lc.includes('pollut') || lc.includes('environment') || lc.includes('global warm')) return 'Leaf';
+  
+  if (lc.includes('bank') || lc.includes('money') || lc.includes('financ') || lc.includes('insur') || lc.includes('crypto')) return 'Coins';
+  if (lc.includes('fiscal') || lc.includes('budget') || lc.includes('tax') || lc.includes('econom') || lc.includes('gdp') || lc.includes('trade') || lc.includes('sector')) return 'TrendingUp';
+  
+  if (lc.includes('comprehens') || lc.includes('read') || lc.includes('passage')) return 'BookOpen';
+  if (lc.includes('reason') || lc.includes('logic') || lc.includes('puzzle') || lc.includes('mental') || lc.includes('analogy')) return 'Brain';
+  if (lc.includes('math') || lc.includes('number') || lc.includes('percent') || lc.includes('probab') || lc.includes('averag') || lc.includes('simpl') || lc.includes('ratio')) return 'Calculator';
+
+  return 'FileText';
 }
 
 /* ------------------------------------------------------------------------- */

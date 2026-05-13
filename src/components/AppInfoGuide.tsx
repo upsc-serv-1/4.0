@@ -123,19 +123,6 @@ const FEATURES: FeatureSection[] = [
       'Filters by subject, exam year, PYQ status & more',
     ],
   },
-  {
-    icon: Globe,
-    color: '#ec4899',
-    title: 'Ghost Browser',
-    tagline: 'Incognito Question Browser',
-    description: 'Browse and search questions anonymously without saving progress or creating attempt records. Perfect for quick lookups, exploring topics, or demonstrating the app without affecting your analytics.',
-    highlights: [
-      'Anonymous question browsing — no tracking',
-      'Full search with keyword highlighting',
-      'View multi-institute explanations',
-      'Ideal for quick reference & exploration',
-    ],
-  },
 ];
 
 interface Props {

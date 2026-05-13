@@ -1,7 +1,5 @@
 const TAG_LABELS: Record<string, string> = {
   'imp.fact': 'Imp. Fact',
-  'imp.fact': 'Imp. Fact',
-  'imp.concept': 'Imp. Concept',
   'imp.concept': 'Imp. Concept',
   'trap question': 'Trap Question',
   'must revise': 'Must Revise',

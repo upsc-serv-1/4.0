@@ -9,9 +9,7 @@ import { NetworkProvider } from '../src/context/NetworkContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useOfflineBootstrap } from '../src/hooks/useOfflineBootstrap';
-import { useFirstLoginWelcome } from '../src/hooks/useFirstLoginWelcome';
 import { OfflineBanner } from '../src/components/OfflineBanner';
-import { FirstLoginWelcomeModal } from '../src/components/FirstLoginWelcomeModal';
 import { DownloadManagerProvider } from '../src/context/DownloadManagerContext';
 import { DownloadManager } from '../src/components/pyq/DownloadManager';
 
@@ -41,17 +39,12 @@ function ProfileProviderWrapper({ children }: { children: React.ReactNode }) {
 }
 
 function RootStack() {
-  const { theme, colors } = useTheme();
+  const { isDark, colors } = useTheme();
   // Wire offline-first behaviour: auto-sync on login, background queue drain.
   useOfflineBootstrap();
   
-  // Track first login and show welcome modal
-  const { showWelcome, syncInProgress, syncProgress, onCloseWelcome } = useFirstLoginWelcome();
-  
-  // Decide if status bar should be light or dark based on theme brightness
-  // Themes like 'ivory', 'sage', 'lavender', 'child_of_light' are light
-  const isDarkTheme = theme.includes('dark') || theme.includes('midnight') || theme.includes('nebula') || theme.includes('night') || theme.includes('navy') || theme.includes('fuchsia') || theme.includes('emerald') || theme === 'modern';
-  const statusBarStyle = isDarkTheme ? 'light' : 'dark';
+  // Use the luminance-based isDark flag from ThemeContext
+  const statusBarStyle = isDark ? 'light' : 'dark';
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
@@ -76,12 +69,7 @@ function RootStack() {
         <Stack.Screen name="notes" options={{ animation: 'slide_from_right', gestureEnabled: true, fullScreenGestureEnabled: false }} />
       </Stack>
       <DownloadManager />
-      <FirstLoginWelcomeModal
-        visible={showWelcome}
-        onClose={onCloseWelcome}
-        syncInProgress={syncInProgress}
-        syncProgress={syncProgress}
-      />
+
     </View>
   );
 }

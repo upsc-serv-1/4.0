@@ -250,96 +250,180 @@ export const SharedQuestionCard = ({
       }
     };
 
+    const questionChips = useMemo(() => {
+      const pyq = getPYQCategorization(item);
+      const hasTags = showPYQTags && (pyq.hasPYQData || item.is_ncert || item.exam_info?.is_ncert || item.source?.is_ncert);
+      if (!hasTags) return [];
+
+      const chips: { label: string; bg: string; fg: string; border: string }[] = [];
+      if (pyq.hasPYQData && pyq.isUPSC) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#dcfce7', fg: isZenMode ? '#433422' : '#15803d', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#22c55e' });
+      if (pyq.hasPYQData && pyq.isAllied) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#fef9c3', fg: isZenMode ? '#433422' : '#a16207', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#eab308' });
+      if (pyq.hasPYQData && pyq.isOther) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#f1f5f9', fg: isZenMode ? '#433422' : '#475569', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#94a3b8' });
+      if (pyq.hasPYQData && pyq.isGenericPYQ) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : effectiveColors.primary + '10', fg: isZenMode ? '#433422' : effectiveColors.primary, border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : effectiveColors.primary });
+      if (item.is_ncert || item.exam_info?.is_ncert || item.source?.is_ncert || item.micro_topic === 'NCERT') chips.push({ label: 'NCERT', bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#e0f2fe', fg: isZenMode ? '#433422' : '#0369a1', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#0ea5e9' });
+
+      return chips;
+    }, [item, showPYQTags, isZenMode, effectiveColors]);
+
+    const isTablet = width >= 768;
+
     return (
       <View style={[styles.questionCard, { backgroundColor: isZenMode ? 'transparent' : effectiveColors.surface, borderColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : effectiveColors.border, borderWidth: isZenMode ? 0 : 1 }]}>
         <View style={styles.qHeader}>
-          <View style={{ flex: 1 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-              <View style={[styles.qNumberBadge, { backgroundColor: isZenMode ? '#433422' : effectiveColors.primary, width: Math.max(30, fontSize + 14), height: Math.max(30, fontSize + 14), borderRadius: Math.max(8, (fontSize + 14)/3.5) }]}>
-                <Text style={[styles.qNumberText, { color: isZenMode ? '#F4ECD8' : effectiveColors.buttonText, fontSize: Math.max(12, fontSize - 2) }]}>{index + 1}</Text>
-              </View>
-            </View>
-          </View>
-          <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
-            {(() => {
-              const pyq = getPYQCategorization(item);
-              const hasTags = showPYQTags && (pyq.hasPYQData || item.is_ncert || item.exam_info?.is_ncert || item.source?.is_ncert);
-              if (!hasTags) return null;
-
-              const chips: { label: string; bg: string; fg: string; border: string }[] = [];
-              if (pyq.hasPYQData && pyq.isUPSC) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#dcfce7', fg: isZenMode ? '#433422' : '#15803d', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#22c55e' });
-              if (pyq.hasPYQData && pyq.isAllied) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#fef9c3', fg: isZenMode ? '#433422' : '#a16207', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#eab308' });
-              if (pyq.hasPYQData && pyq.isOther) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#f1f5f9', fg: isZenMode ? '#433422' : '#475569', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#94a3b8' });
-              if (pyq.hasPYQData && pyq.isGenericPYQ) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : effectiveColors.primary + '10', fg: isZenMode ? '#433422' : effectiveColors.primary, border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : effectiveColors.primary });
-              if (item.is_ncert || item.exam_info?.is_ncert || item.source?.is_ncert || item.micro_topic === 'NCERT') chips.push({ label: 'NCERT', bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#e0f2fe', fg: isZenMode ? '#433422' : '#0369a1', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#0ea5e9' });
-
-              if (chips.length === 0) return null;
-
-              return (
-                <View style={{ flexDirection: 'row', gap: 6 }}>
-                  {chips.map((chip, idx) => (
-                    <View key={`chip-${item.id}-${idx}`} style={[styles.inlineBadge, { backgroundColor: chip.bg, borderColor: chip.border, paddingHorizontal: 6, paddingVertical: 2, height: 20 }]}> 
-                      <Text style={{ color: chip.fg, fontWeight: '900', fontSize: 9 }}>{chip.label}</Text>
-                    </View>
-                  ))}
+          {isTablet ? (
+            /* 📱 TABLET/IPAD LAYOUT: Beautiful Single-Row Inline */
+            <>
+              <View style={{ flex: 1 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                  <View style={[styles.qNumberBadge, { backgroundColor: isZenMode ? '#433422' : effectiveColors.primary, width: Math.max(30, fontSize + 14), height: Math.max(30, fontSize + 14), borderRadius: Math.max(8, (fontSize + 14)/3.5) }]}>
+                    <Text style={[styles.qNumberText, { color: isZenMode ? '#F4ECD8' : effectiveColors.buttonText, fontSize: Math.max(12, fontSize - 2) }]}>{index + 1}</Text>
+                  </View>
                 </View>
-              );
-            })()}
-            
-            <TouchableOpacity 
-              onPress={() => onToggleReview && onToggleReview(item.id)}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: effectiveAnswerData.isReview ? (isZenMode ? '#43342220' : '#fef9c3') : 'transparent' }}
-            >
-               <Flag size={18} color={effectiveAnswerData.isReview ? (isZenMode ? '#433422' : '#eab308') : (isZenMode ? '#43342240' : effectiveColors.textTertiary)} fill={effectiveAnswerData.isReview ? (isZenMode ? '#433422' : '#eab308') : 'transparent'} />
-            </TouchableOpacity>
-            
-             <TouchableOpacity 
-              onPress={() => onAddFlashcard(item)}
-              disabled={isSavingFlashcard}
-            >
-               {isSavingFlashcard ? (
-                 <ActivityIndicator size="small" color={effectiveColors.primary} />
-               ) : (
-                 <Zap 
-                   size={20} 
-                   color={isFlashcarded ? (isZenMode ? '#433422' : effectiveColors.primary) : (isZenMode ? '#43342240' : effectiveColors.textTertiary)} 
-                   fill={isFlashcarded ? (isZenMode ? '#433422' : effectiveColors.primary) : 'transparent'} 
-                 />
-               )}
-            </TouchableOpacity>
+              </View>
+              <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
+                {questionChips.length > 0 && (
+                  <View style={{ flexDirection: 'row', gap: 6 }}>
+                    {questionChips.map((chip, idx) => (
+                      <View key={`t-chip-${item.id}-${idx}`} style={[styles.inlineBadge, { backgroundColor: chip.bg, borderColor: chip.border, paddingHorizontal: 6, paddingVertical: 2, height: 20 }]}> 
+                        <Text style={{ color: chip.fg, fontWeight: '900', fontSize: 9 }}>{chip.label}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                
+                <TouchableOpacity 
+                  onPress={() => onToggleReview && onToggleReview(item.id)}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: effectiveAnswerData.isReview ? (isZenMode ? '#43342220' : '#fef9c3') : 'transparent' }}
+                >
+                   <Flag size={18} color={effectiveAnswerData.isReview ? (isZenMode ? '#433422' : '#eab308') : (isZenMode ? '#43342240' : effectiveColors.textTertiary)} fill={effectiveAnswerData.isReview ? (isZenMode ? '#433422' : '#eab308') : 'transparent'} />
+                </TouchableOpacity>
+                
+                 <TouchableOpacity 
+                  onPress={() => onAddFlashcard(item)}
+                  disabled={isSavingFlashcard}
+                >
+                   {isSavingFlashcard ? (
+                     <ActivityIndicator size="small" color={effectiveColors.primary} />
+                   ) : (
+                     <Zap 
+                       size={20} 
+                       color={isFlashcarded ? (isZenMode ? '#433422' : effectiveColors.primary) : (isZenMode ? '#43342240' : effectiveColors.textTertiary)} 
+                       fill={isFlashcarded ? (isZenMode ? '#433422' : effectiveColors.primary) : 'transparent'} 
+                     />
+                   )}
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => openNotebookFromQuestion && openNotebookFromQuestion(item, effectiveExplanationText, 'pilot-v2')}
-              style={{ padding: 4, marginRight: 4 }}
-              testID={`pilot-save-shortcut-${item.id}`}
-            >
-              <Rocket size={19} color={isZenMode ? '#433422' : '#5B4EFA'} />
-            </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => openNotebookFromQuestion && openNotebookFromQuestion(item, effectiveExplanationText, 'pilot-v2')}
+                  style={{ padding: 4, marginRight: 4 }}
+                  testID={`pilot-save-shortcut-${item.id}`}
+                >
+                  <Rocket size={19} color={isZenMode ? '#433422' : '#5B4EFA'} />
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => onEditVitamin && onEditVitamin(item)}
-              style={{ padding: 4 }}
-              testID={`vitamin-editor-shortcut-${item.id}`}
-            >
-               <Plus
-                 size={20} 
-                 color={isZenMode ? '#433422' : effectiveColors.primary} 
-               />
-            </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => onEditVitamin && onEditVitamin(item)}
+                  style={{ padding: 4 }}
+                  testID={`vitamin-editor-shortcut-${item.id}`}
+                >
+                   <Plus
+                     size={20} 
+                     color={isZenMode ? '#433422' : effectiveColors.primary} 
+                   />
+                </TouchableOpacity>
 
-            {arenaMode !== 'exam' && (
-              <TouchableOpacity
-                onPress={() => setShowNoteField(prev => !prev)}
-                style={{ padding: 4, backgroundColor: showNoteField ? (isZenMode ? 'rgba(67,52,34,0.1)' : effectiveColors.primary + '15') : 'transparent', borderRadius: 6 }}
-                testID={`note-toggle-shortcut-${item.id}`}
-              >
-                 <PenTool
-                   size={18}
-                   color={isZenMode ? '#433422' : (showNoteField ? effectiveColors.primary : effectiveColors.textTertiary)}
-                 />
-              </TouchableOpacity>
-            )}
-          </View>
+                {arenaMode !== 'exam' && (
+                  <TouchableOpacity
+                    onPress={() => setShowNoteField(prev => !prev)}
+                    style={{ padding: 4, backgroundColor: showNoteField ? (isZenMode ? 'rgba(67,52,34,0.1)' : effectiveColors.primary + '15') : 'transparent', borderRadius: 6 }}
+                    testID={`note-toggle-shortcut-${item.id}`}
+                  >
+                     <PenTool
+                       size={18}
+                       color={isZenMode ? '#433422' : (showNoteField ? effectiveColors.primary : effectiveColors.textTertiary)}
+                     />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </>
+          ) : (
+            /* 📱 MOBILE LAYOUT: Stacked Badge + Chips underneath to prevent clipping */
+            <>
+              {/* Left Section: Number Circle + Chips below it */}
+              <View style={{ flex: 1, flexDirection: 'column', alignItems: 'flex-start', gap: 8 }}>
+                <View style={[styles.qNumberBadge, { backgroundColor: isZenMode ? '#433422' : effectiveColors.primary, width: Math.max(30, fontSize + 14), height: Math.max(30, fontSize + 14), borderRadius: Math.max(8, (fontSize + 14)/3.5) }]}>
+                  <Text style={[styles.qNumberText, { color: isZenMode ? '#F4ECD8' : effectiveColors.buttonText, fontSize: Math.max(12, fontSize - 2) }]}>{index + 1}</Text>
+                </View>
+                
+                {questionChips.length > 0 && (
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                    {questionChips.map((chip, idx) => (
+                      <View key={`m-chip-${item.id}-${idx}`} style={[styles.inlineBadge, { backgroundColor: chip.bg, borderColor: chip.border, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, minHeight: 22 }]}> 
+                        <Text style={{ color: chip.fg, fontWeight: '900', fontSize: 10 }}>{chip.label}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+
+              {/* Right Section: Action Shortcuts aligned to the top */}
+              <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center', alignSelf: 'flex-start' }}>
+                <TouchableOpacity 
+                  onPress={() => onToggleReview && onToggleReview(item.id)}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: effectiveAnswerData.isReview ? (isZenMode ? '#43342220' : '#fef9c3') : 'transparent' }}
+                >
+                   <Flag size={18} color={effectiveAnswerData.isReview ? (isZenMode ? '#433422' : '#eab308') : (isZenMode ? '#43342240' : effectiveColors.textTertiary)} fill={effectiveAnswerData.isReview ? (isZenMode ? '#433422' : '#eab308') : 'transparent'} />
+                </TouchableOpacity>
+                
+                 <TouchableOpacity 
+                  onPress={() => onAddFlashcard(item)}
+                  disabled={isSavingFlashcard}
+                >
+                   {isSavingFlashcard ? (
+                     <ActivityIndicator size="small" color={effectiveColors.primary} />
+                   ) : (
+                     <Zap 
+                       size={20} 
+                       color={isFlashcarded ? (isZenMode ? '#433422' : effectiveColors.primary) : (isZenMode ? '#43342240' : effectiveColors.textTertiary)} 
+                       fill={isFlashcarded ? (isZenMode ? '#433422' : effectiveColors.primary) : 'transparent'} 
+                     />
+                   )}
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => openNotebookFromQuestion && openNotebookFromQuestion(item, effectiveExplanationText, 'pilot-v2')}
+                  style={{ padding: 4, marginRight: 4 }}
+                  testID={`pilot-save-shortcut-${item.id}`}
+                >
+                  <Rocket size={19} color={isZenMode ? '#433422' : '#5B4EFA'} />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => onEditVitamin && onEditVitamin(item)}
+                  style={{ padding: 4 }}
+                  testID={`vitamin-editor-shortcut-${item.id}`}
+                >
+                   <Plus
+                     size={20} 
+                     color={isZenMode ? '#433422' : effectiveColors.primary} 
+                   />
+                </TouchableOpacity>
+
+                {arenaMode !== 'exam' && (
+                  <TouchableOpacity
+                    onPress={() => setShowNoteField(prev => !prev)}
+                    style={{ padding: 4, backgroundColor: showNoteField ? (isZenMode ? 'rgba(67,52,34,0.1)' : effectiveColors.primary + '15') : 'transparent', borderRadius: 6 }}
+                    testID={`note-toggle-shortcut-${item.id}`}
+                  >
+                     <PenTool
+                       size={18}
+                       color={isZenMode ? '#433422' : (showNoteField ? effectiveColors.primary : effectiveColors.textTertiary)}
+                     />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </>
+          )}
         </View>
 
 

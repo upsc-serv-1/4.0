@@ -57,7 +57,7 @@ export const useTagStore = create<TagStore>((set) => ({
         unique.push(trimmed);
       });
       unique.sort((a, b) => a.localeCompare(b));
-      return { allTags: unique, version: s.version + 1 };
+      return { allTags: unique };
     }),
   registerTag: (tag) =>
     set((s) => {

@@ -900,7 +900,6 @@ export default function UnifiedQuizEngine() {
   const onPinchHandlerStateChange = (event: any) => {
     if (event.nativeEvent.state === GHState.END || event.nativeEvent.state === GHState.CANCELLED) {
       baseFontSizeRef.current = fontSize;
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     }
   };
 
@@ -1370,6 +1369,13 @@ export default function UnifiedQuizEngine() {
 
   const fetchQuestions = async () => {
     setLoading(true);
+    console.log('[ENGINE] fetchQuestions started:', {
+      testId: params.testId,
+      questionId: params.questionId,
+      query: params.query,
+      timestamp: new Date().toISOString()
+    });
+    
     let tagList: string[] = [];
     const SELECT_COLS = 'id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)';
     
@@ -1524,11 +1530,13 @@ export default function UnifiedQuizEngine() {
     let localFound = false;
     try {
       // ──────── 1. FAST: Load from Local Cache First ────────
+      console.log('[ENGINE-OFFLINE] Loading from local cache...');
       const cachedResultIds = getResultIds();
       if (cachedResultIds && cachedResultIds.length > 0) {
         // When resultIds are present, load ONLY those specific questions
         const cached = await OfflineManager.getOfflineQuestionsByIds(cachedResultIds);
         if (cached && cached.length > 0) {
+          console.log('[ENGINE-OFFLINE] ✅ Found cached result IDs:', { count: cached.length });
           processResults(cached);
           localFound = true;
           setLoading(false);
@@ -1536,6 +1544,7 @@ export default function UnifiedQuizEngine() {
       } else if (params.testId) {
         const cached = await OfflineManager.getOfflineQuestions(params.testId);
         if (cached && cached.length > 0) {
+          console.log('[ENGINE-OFFLINE] ✅ Found cached test:', { testId: params.testId, count: cached.length });
           processResults(cached);
           localFound = true;
           setLoading(false);
@@ -1543,6 +1552,7 @@ export default function UnifiedQuizEngine() {
       } else {
         // ──────── 1b. OFFLINE-FALLBACK: Filter all cached questions ────────
         const allOffline = OfflineManager.getOfflineQuestionsAllSync() || [];
+        console.log('[ENGINE-OFFLINE] Total offline questions available:', { count: allOffline.length });
         if (allOffline.length > 0) {
           let filtered = [...allOffline];
 
@@ -1846,8 +1856,36 @@ export default function UnifiedQuizEngine() {
           }
         }
 
+        console.log('[ENGINE-FETCH] Starting Supabase query chunk:', {
+          from,
+          chunk: CHUNK,
+          testId: params.testId,
+          hasSearchTerm: !!params.query,
+          localFoundAlready: localFound
+        });
+        
         let { data, error } = await query;
-        if (error) throw error;
+        
+        if (error) {
+          console.warn('[OFFLINE-FALLBACK] ⚠️ Supabase query FAILED:', {
+            errorMessage: error.message,
+            errorCode: error.code,
+            chunkFrom: from,
+            testId: params.testId,
+            localFoundAlready: localFound,
+            timestamp: new Date().toISOString()
+          });
+          throw error;
+        }
+
+        if (data && data.length > 0) {
+          console.log('[ENGINE-FETCH] ✅ Server chunk received:', {
+            chunkSize: data.length,
+            testId: params.testId,
+            from,
+            totalSoFar: allFreshData.length + data.length
+          });
+        }
 
         // ΓöÇ FUZZY FALLBACK (Search Tab Parity): If results are sparse, try 1-char tolerance
         const term = typeof params.query === 'string' ? params.query.trim() : '';
@@ -2004,11 +2042,20 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
         processResults(allFreshData, originalQuestionIds);
       }
     } catch (err) {
-      console.error('Fetch error:', err);
+      console.error('[ENGINE-ERROR] \u274c Fetch failed:', {
+        errorMessage: err instanceof Error ? err.message : String(err),
+        localFound,
+        allFreshDataLength: allFreshData.length,
+        timestamp: new Date().toISOString()
+      });
+      
       // If we didn't find local data and server failed, show empty.
-      // But if localFound=true, keep the cached questions rendered.
+      // But if localFound=true, keep the cached questions rendered (OFFLINE FALLBACK).
       if (!localFound) {
+        console.warn('[ENGINE-ERROR] \u26a0\ufe0f No offline cache and server failed - showing empty state');
         setQuestions([]);
+      } else {
+        console.log('[ENGINE-FALLBACK] \u2705 Using offline cache since server failed');
       }
     } finally {
       setLoading(false);
@@ -2164,7 +2211,6 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
       }
       return;
     }
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     isNavigatingAway.current = true;
     router.push({
       pathname: '/unified/engine',
@@ -2989,7 +3035,6 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
             onPress={() => {
               setExplanationModalQId(item.id);
               setRevealedExplanations(prev => ({ ...prev, [item.id]: true }));
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
             }}
             testID={`paper-explanation-btn-${item.id}`}
           >
@@ -3120,7 +3165,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
             <Minimize2 size={24} color="#433422" />
           </TouchableOpacity>
         )}
-        {!isPaperMode && (
+        {!isPaperMode && !showIndex && (
         <Animated.View style={[
           styles.header, 
           { 
@@ -3200,7 +3245,6 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
               <TouchableOpacity
                 onPress={() => {
                   setViewMode('paper');
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
                 }}
                 style={styles.headerBtn}
                 testID="engine-exam-sim-btn"
@@ -3208,28 +3252,29 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                 <BookOpen size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
               </TouchableOpacity>
             )}
-            {/* Palette / Navigator — promoted out of the quick menu so it's
-                always one tap away (essential during a paper-style exam). */}
-            <TouchableOpacity
-              onPress={() => setShowNavigator(true)}
-              style={styles.headerBtn}
-              testID="engine-palette-btn"
-            >
-              <LayoutGrid size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
-            </TouchableOpacity>
+            {/* Palette / Navigator — shown on tablet; hidden on mobile (moved to quick menu) */}
+            {isTablet && (
+              <TouchableOpacity
+                onPress={() => setShowNavigator(true)}
+                style={styles.headerBtn}
+                testID="engine-palette-btn"
+              >
+                <LayoutGrid size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
+              </TouchableOpacity>
+            )}
 
-            {/* View mode toggle — switches between single-card and scrollable-list view */}
-            {!isPaperMode && (
+            {/* View mode toggle — shown on tablet; hidden on mobile (moved to quick menu) */}
+            {isTablet && !isPaperMode && (
               <View style={{ flexDirection: 'row', gap: 2, backgroundColor: colors.surfaceStrong, borderRadius: 8, padding: 2 }}>
                 <TouchableOpacity
-                  onPress={() => { if (viewMode !== 'list') { setViewMode('list'); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {}); } }}
+                  onPress={() => { if (viewMode !== 'list') { setViewMode('list'); } }}
                   style={[styles.toggleMiniBtn, viewMode === 'list' && { backgroundColor: colors.primary }]}
                   testID="engine-view-list-btn"
                 >
                   <ListIcon size={14} color={viewMode === 'list' ? '#fff' : colors.textSecondary} />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => { if (viewMode !== 'card') { setViewMode('card'); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {}); } }}
+                  onPress={() => { if (viewMode !== 'card') { setViewMode('card'); } }}
                   style={[styles.toggleMiniBtn, viewMode === 'card' && { backgroundColor: colors.primary }]}
                   testID="engine-view-card-btn"
                 >
@@ -3448,15 +3493,27 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                         >
                           <Sparkles size={20} color={isZenMode ? colors.primary : colors.textPrimary} />
                         </TouchableOpacity>
+                        
+                        {/* Palette Navigator — mobile quick menu */}
                         <TouchableOpacity 
                           style={styles.utilBtn} 
-                          onPress={() => { 
-                            setViewMode(prev => prev === 'card' ? 'list' : 'card');
-                            setShowQuickMenu(false); 
-                          }}
+                          onPress={() => { setShowNavigator(true); setShowQuickMenu(false); }}
                         >
-                          <BookOpen size={20} color={colors.textPrimary} />
+                          <LayoutGrid size={20} color={colors.textPrimary} />
                         </TouchableOpacity>
+
+                        {/* View Mode Toggle — mobile quick menu */}
+                        {!isPaperMode && (
+                          <TouchableOpacity 
+                            style={styles.utilBtn} 
+                            onPress={() => { 
+                              setViewMode(prev => prev === 'card' ? 'list' : 'card');
+                              setShowQuickMenu(false); 
+                            }}
+                          >
+                            <BookOpen size={20} color={colors.textPrimary} />
+                          </TouchableOpacity>
+                        )}
                       </>
                     )}
 

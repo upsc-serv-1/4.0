@@ -2,11 +2,11 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Appearance } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type ThemeType = 'default' | 'nature' | 'modern' | 'sand' | 'cute' | 'medical' | 'sage' | 'lavender' | 'ivory' | 'midnight_nebula' | 'golden_night' | 'emerald_dream' | 'royal_purple' | 'fitness_navy' | 'child_of_light' | 'aruba_aqua' | 'zinnia' | 'fuchsia_blue' | 'original_dark' | 'yogesh_1' | 'yogesh_2' | 'yogesh_3' | 'yogesh_4';
+export type ThemeType = 'default' | 'nature' | 'modern' | 'sand' | 'cute' | 'medical' | 'sage' | 'lavender' | 'ivory' | 'midnight_nebula' | 'golden_night' | 'emerald_dream' | 'royal_purple' | 'fitness_navy' | 'child_of_light' | 'aruba_aqua' | 'zinnia' | 'fuchsia_blue' | 'original_dark' | 'yogesh_2' | 'yogesh_4';
 export type ThemeMode = 'light' | 'dark' | 'system';
 
 /** Curated default light & dark theme keys used when ThemeMode is 'light'/'dark'/'system'. */
-const DEFAULT_LIGHT_THEME: ThemeType = 'default';
+const DEFAULT_LIGHT_THEME: ThemeType = 'yogesh_2';
 const DEFAULT_DARK_THEME: ThemeType = 'original_dark';
 
 export interface ThemeColors {
@@ -23,6 +23,29 @@ export interface ThemeColors {
   accent: string;
   buttonText: string;
   primaryGradient?: string[];
+}
+
+/**
+ * Calculate relative luminance from a hex colour string (#RGB or #RRGGBB).
+ * Returns a value in [0, 1] where ~0 = pure black and ~1 = pure white.
+ * Uses the WCAG formula: L = 0.2126*R + 0.7152*G + 0.0722*B
+ */
+function hexLuminance(hex: string): number {
+  let h = hex.replace('#', '');
+  if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+  if (h.length !== 6) return 0.5; // fallback
+  const r = parseInt(h.substring(0, 2), 16) / 255;
+  const g = parseInt(h.substring(2, 4), 16) / 255;
+  const b = parseInt(h.substring(4, 6), 16) / 255;
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/** A theme is considered "dark" when its background luminance is below 0.4. */
+function isThemeDark(themeKey: ThemeType): boolean {
+  const c = themes[themeKey];
+  // Alpha-hex → strip alpha if present (e.g. "#RRGGBBAA")
+  const bg = (c.bg || '#ffffff').substring(0, 7);
+  return hexLuminance(bg) < 0.4;
 }
 
 export const themes: Record<ThemeType, ThemeColors> = {
@@ -292,21 +315,6 @@ export const themes: Record<ThemeType, ThemeColors> = {
     accent: '#FFC800',
     buttonText: '#000000',
   },
-  yogesh_1: {
-    bg: '#F7F8FC',
-    bgGradient: ['#F7F8FC', '#F0F2F9'],
-    surface: '#FFFFFF',
-    surfaceStrong: '#F0F2F9',
-    primary: '#5B4FE8',
-    primaryDark: '#4A3ED4',
-    textPrimary: '#1E1E2D',
-    textSecondary: '#6B7280',
-    textTertiary: '#9CA3AF',
-    border: '#E5E7EB',
-    accent: '#FF8E53',
-    buttonText: '#FFFFFF',
-    primaryGradient: ['#5B4FE8', '#7C73FF', '#6A5BFF'],
-  },
   yogesh_2: {
     bg: '#F7F8FC',
     bgGradient: ['#F7F8FC', '#F0F2F9'],
@@ -321,21 +329,6 @@ export const themes: Record<ThemeType, ThemeColors> = {
     accent: '#FF8E53',
     buttonText: '#FFFFFF',
     primaryGradient: ['#5B4FE8', '#7C73FF', '#6A5BFF'],
-  },
-  yogesh_3: {
-    bg: '#7B2CBF',
-    bgGradient: ['#7B2CBF', '#C77DFF'],
-    surface: '#ffffff',
-    surfaceStrong: '#F3E8FF',
-    primary: '#7B2CBF',
-    primaryDark: '#5A189A',
-    textPrimary: '#1e293b',
-    textSecondary: '#475569',
-    textTertiary: '#888888',
-    border: '#D0D0D0',
-    accent: '#C77DFF',
-    buttonText: '#ffffff',
-    primaryGradient: ['#7B2CBF', '#9D4EDD', '#C77DFF'],
   },
   yogesh_4: {
     bg: '#FDFBF7',
@@ -365,13 +358,8 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const DARK_THEMES: Set<ThemeType> = new Set([
-  'midnight_nebula','golden_night','emerald_dream','royal_purple',
-  'fitness_navy','fuchsia_blue','original_dark',
-]);
-
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setThemeState] = useState<ThemeType>('default');
+  const [theme, setThemeState] = useState<ThemeType>(DEFAULT_LIGHT_THEME);
   const [themeMode, setThemeModeState] = useState<ThemeMode>('light');
   const [systemScheme, setSystemScheme] = useState<'light' | 'dark'>(
     (Appearance.getColorScheme() === 'dark' ? 'dark' : 'light'),
@@ -403,22 +391,26 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     await AsyncStorage.setItem('user-theme-mode', m);
   };
 
-  // Resolve effective theme key: explicit user theme respected; mode acts as
-  // override when user has not picked a custom palette.
+  // Resolve effective theme:
+  // - If user explicitly chose a theme, ALWAYS use it (respect their choice)
+  // - ThemeMode only affects the DEFAULT fallback when theme is 'default'
+  // - 'system' mode: use user's chosen theme, but if theme is 'default', pick based on OS
   const effectiveTheme: ThemeType = (() => {
+    if (theme !== 'default') {
+      // User explicitly chose a non-default theme — always respect it
+      return theme;
+    }
+    // Default theme: use mode-based fallback
     if (themeMode === 'system') {
-      return systemScheme === 'dark'
-        ? (DARK_THEMES.has(theme) ? theme : DEFAULT_DARK_THEME)
-        : (DARK_THEMES.has(theme) ? DEFAULT_LIGHT_THEME : theme);
+      return systemScheme === 'dark' ? DEFAULT_DARK_THEME : DEFAULT_LIGHT_THEME;
     }
     if (themeMode === 'dark') {
-      return DARK_THEMES.has(theme) ? theme : DEFAULT_DARK_THEME;
+      return DEFAULT_DARK_THEME;
     }
-    // light mode
-    return DARK_THEMES.has(theme) ? DEFAULT_LIGHT_THEME : theme;
+    return DEFAULT_LIGHT_THEME;
   })();
 
-  const isDark = DARK_THEMES.has(effectiveTheme);
+  const isDark = isThemeDark(effectiveTheme);
 
   return (
     <ThemeContext.Provider value={{ theme: effectiveTheme, colors: themes[effectiveTheme], setTheme, themeMode, setThemeMode, isDark }}>

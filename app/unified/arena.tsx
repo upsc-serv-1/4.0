@@ -573,18 +573,26 @@ export default function UnifiedArenaSetup() {
   };
 
   const fetchMetadata = async () => {
+    console.log('[ARENA-INIT] fetchMetadata called', {
+      timestamp: new Date().toISOString(),
+      cacheAge: arenaMetadataCache ? Date.now() - arenaMetadataCachedAt : 'no-cache'
+    });
+    
     const hasWarmCache = Array.isArray(arenaMetadataCache) && arenaMetadataCache.length > 0;
 
     if (hasWarmCache) {
       // Immediate paint from warm cache to avoid entry lag/faded loading state.
+      console.log('[ARENA-CACHE] Using warm metadata cache:', { itemCount: (arenaMetadataCache || []).length });
       setMetadata(arenaMetadataCache || []);
       setLoading(false);
     } else {
+      console.log('[ARENA-CACHE] No warm cache, loading from storage...');
       setLoading(true);
     }
 
     const isCacheFresh = hasWarmCache && (Date.now() - arenaMetadataCachedAt) < ARENA_METADATA_CACHE_TTL_MS;
     if (isCacheFresh) {
+      console.log('[ARENA-CACHE] Metadata cache still fresh, skipping refresh');
       fetchUserTags();
       return;
     }
@@ -595,14 +603,18 @@ export default function UnifiedArenaSetup() {
     }
     
     try {
+      console.log('[ARENA-LOAD] Fetching consolidated metadata from OfflineManager...');
       const flattened = await OfflineManager.getConsolidatedMetadata();
       const normalized = Array.isArray(flattened) ? flattened : [];
+
+      console.log('[ARENA-LOAD] ✅ Metadata loaded successfully:', { itemCount: normalized.length });
 
       if (normalized.length > 0) {
         arenaMetadataCache = normalized;
         arenaMetadataCachedAt = Date.now();
         setMetadata(normalized);
       } else if (!hasWarmCache) {
+        console.warn('[ARENA-LOAD] ⚠️ No metadata found in cache');
         setMetadata([]);
       }
 
@@ -610,7 +622,7 @@ export default function UnifiedArenaSetup() {
         await fetchUserTags();
       }
     } catch (err) {
-      console.error('Metadata fetch error:', err);
+      console.error('[ARENA-LOAD] ❌ Metadata fetch error:', { error: err, timestamp: new Date().toISOString() });
     } finally {
       setRefreshingMetadata(false);
       if (!hasWarmCache) setLoading(false);
@@ -1304,7 +1316,6 @@ export default function UnifiedArenaSetup() {
                   key={test.id}
                   onPress={() => {
                     setSelectedTestId(test.id === selectedTestId ? null : test.id);
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   }}
                   style={[
                     styles.testCard,

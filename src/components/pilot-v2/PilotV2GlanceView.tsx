@@ -121,10 +121,10 @@ export function PilotV2GlanceView() {
   const { session } = useAuth();
   const userId = session?.user?.id;
   const { state, dispatch, currentNote, glanceScrollMemory } = usePilotV2();
-  const { width: screenWidth } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const note = currentNote();
-  const blocks = note?.content?.blocks?.length ? note.content.blocks : DEMO_BLOCKS;
-  const title = note?.title ?? 'Article 14 — Equality Before Law';
+  const blocks = note?.content?.blocks ?? [];
+  const title = note?.title ?? '';
 
   const [exportSheetOpen, setExportSheetOpen] = useState(false);
   const [blockSelectorOpen, setBlockSelectorOpen] = useState(false);
@@ -135,18 +135,35 @@ export function PilotV2GlanceView() {
   const lastScrollY = useRef<number>(glanceScrollMemory.current[scrollKey] || 0);
 
   /* ── TRULY fixed page width (GoodNotes / Notability approach) ────────── */
-  const isTablet = screenWidth >= 768;
-  const SIDEBAR_WIDTH = state.view.sidebarCollapsed ? 0 : 320;
-  const BODY_PADDING = isTablet ? 40 : 16;
+  /* This width is computed once and frozen in a ref. We base the baseline on
+   * the device's smaller screen dimension (minDimension) to guarantee that
+   * the virtual paper fits perfectly in both Portrait and Landscape. Text never
+   * reflows, and drawn strokes remain pixel-perfect invariant across sidebar
+   * toggles and device rotations. */
+  const frozenWidthRef = useRef<{ width: number; layout: string }>({ width: 0, layout: '' });
   
   const layout = note?.content?.layout ?? 'standard';
-  const maxContentWidth = layout === 'wide' ? 1400 : 1000;
+  const isTablet = screenWidth >= 768;
   
-  const availableWidth = isTablet
-    ? screenWidth - SIDEBAR_WIDTH - (BODY_PADDING * 2)
-    : screenWidth - (BODY_PADDING * 2);
+  if (frozenWidthRef.current.width === 0 || frozenWidthRef.current.layout !== layout) {
+    const isTablet = screenWidth >= 768;
+    const BASE_SIDEBAR_WIDTH = 320; // Use standard legacy baseline to maximize content width
+    const BODY_PADDING = isTablet ? 32 : 16;
+    const maxContentWidth = layout === 'wide' ? 1400 : 1000;
     
-  const fixedPageWidth = Math.min(availableWidth, maxContentWidth);
+    const baseAvailableWidth = isTablet
+      ? screenWidth - BASE_SIDEBAR_WIDTH - BODY_PADDING
+      : screenWidth - BODY_PADDING;
+      
+    const baseCalculated = Math.min(baseAvailableWidth, maxContentWidth);
+    
+    frozenWidthRef.current = {
+      // Restore the beautiful ~670px content width that users expect in landscape iPad
+      width: Math.max(isTablet ? 670 : 340, baseCalculated),
+      layout,
+    };
+  }
+  const fixedPageWidth = frozenWidthRef.current.width;
 
   /* ── Pencil overlay ─────────────────────────────────────────────────── */
   const [paperSize, setPaperSize] = useState({ w: 1, h: 1 });
@@ -229,6 +246,7 @@ export function PilotV2GlanceView() {
       blocks: note.content?.blocks ?? [],
       version: note.content?.version ?? 1,
       pencilStrokes: anchored,
+      washiTapes: (note.content as any)?.washiTapes ?? [], // Critical: Preserve existing tapes!
     };
     savePilotV2NoteOfflineFirst(note.id, content).catch(() => null);
     dispatch({ type: 'PATCH_CURRENT_NOTE', payload: { id: note.id, patch: { content } } });
@@ -257,11 +275,12 @@ export function PilotV2GlanceView() {
     const content: any = {
       blocks: note.content?.blocks ?? [],
       version: note.content?.version ?? 1,
-      pencilStrokes: pencil.engine.getPersisted(),
-      washiTapes: next,
+      pencilStrokes: pencil.engine.getPersisted(), // Preserves current strokes
+      washiTapes: next, // Saves new washi
     };
     savePilotV2NoteOfflineFirst(note.id, content).catch(() => null);
-  }, [note, pencil.engine]);
+    dispatch({ type: 'PATCH_CURRENT_NOTE', payload: { id: note.id, patch: { content } } }); // Critical: Update context state!
+  }, [note, pencil.engine, dispatch]);
 
   const handleAnnotationModeChange = useCallback((mode: AnnotationMode) => {
     setAnnotationMode(mode);
@@ -626,6 +645,7 @@ export function PilotV2GlanceView() {
                   onLayout={(e) => setPaperSize({ w: fixedPageWidth, h: e.nativeEvent.layout.height })}>
                   {blocks.map(b => (
                     <View key={b.id}
+                      style={{ paddingHorizontal: '4.5%' }}
                       onLayout={(e) => {
                         const { x, y, width: w, height: h } = e.nativeEvent.layout;
                         const cur = blockLayoutsRef.current.get(b.id);
@@ -633,7 +653,7 @@ export function PilotV2GlanceView() {
                         if (!cur || Math.abs(cur.x - x) > 2 || Math.abs(cur.y - y) > 2 || Math.abs(cur.w - w) > 2 || Math.abs(cur.h - h) > 2)
                           setBlockLayoutVersion(v => v + 1);
                       }}>
-                      <BlockRenderer block={b} colors={colors} />
+                      <BlockRenderer block={b} colors={colors} contentWidth={fixedPageWidth * 0.91} />
                     </View>
                   ))}
                   <View style={[styles.divider, { backgroundColor: colors.border }]} />
@@ -656,6 +676,7 @@ export function PilotV2GlanceView() {
                       width={paperSize.w} height={paperSize.h}
                       drawingMode={washiMode}
                       activeColor={washiColor}
+                      eraserMode={annotationMode === 'eraser' || pencil.tool === 'eraser'}
                       onAdd={(t) => persistWashi([...washiTapes, t])}
                       onToggle={(id) => persistWashi(toggleWashiReveal(washiTapes, id))}
                       onRemove={(id) => persistWashi(removeWashiTape(washiTapes, id))}
@@ -741,9 +762,9 @@ export function PilotV2GlanceView() {
 
 /* ─── Block renderer ─────────────────────────────────────────────────────── */
 
-interface BlockRendererProps { block: PilotV2Block; colors: any }
+interface BlockRendererProps { block: PilotV2Block; colors: any; contentWidth: number }
 
-function BlockRenderer({ block, colors }: BlockRendererProps) {
+function BlockRenderer({ block, colors, contentWidth }: BlockRendererProps) {
   const markStyle = {
     fontWeight: block.bold ? '700' as const : undefined,
     fontStyle: block.italic ? 'italic' as const : undefined,
@@ -789,7 +810,7 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
         <View style={bStyles.bulletRow}>
           <Text style={[bStyles.bulletDot, { color: colors.textPrimary }]}>•</Text>
           <View style={{ flex: 1 }}>
-            <RenderHtml source={{ html: block.text || '' }} contentWidth={800}
+            <RenderHtml source={{ html: block.text || '' }} contentWidth={contentWidth}
               baseStyle={{ color: colors.textPrimary, fontSize: 16, lineHeight: 24 }}
               tagsStyles={{ b: { fontWeight: 'bold' as const }, strong: { fontWeight: 'bold' as const }, i: { fontStyle: 'italic' as const }, em: { fontStyle: 'italic' as const } }} />
           </View>
@@ -800,7 +821,7 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
         <View style={bStyles.bulletRow}>
           <Text style={[bStyles.bulletDot, { color: colors.textPrimary, fontWeight: '600' }]}>1.</Text>
           <View style={{ flex: 1 }}>
-            <RenderHtml source={{ html: block.text || '' }} contentWidth={800}
+            <RenderHtml source={{ html: block.text || '' }} contentWidth={contentWidth}
               baseStyle={{ color: colors.textPrimary, fontSize: 16, lineHeight: 24 }}
               tagsStyles={{ b: { fontWeight: 'bold' as const }, strong: { fontWeight: 'bold' as const }, i: { fontStyle: 'italic' as const }, em: { fontStyle: 'italic' as const } }} />
           </View>
@@ -811,7 +832,7 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
         <View style={bStyles.bulletRow}>
           <View style={[bStyles.checkbox, { borderColor: colors.border, backgroundColor: block.checked ? colors.primary : 'transparent' }]} />
           <View style={{ flex: 1 }}>
-            <RenderHtml source={{ html: block.text || '' }} contentWidth={800}
+            <RenderHtml source={{ html: block.text || '' }} contentWidth={contentWidth}
               baseStyle={{ color: colors.textPrimary, fontSize: 16, lineHeight: 24, textDecorationLine: block.checked ? 'line-through' : 'none' }}
               tagsStyles={{ b: { fontWeight: 'bold' as const }, strong: { fontWeight: 'bold' as const }, i: { fontStyle: 'italic' as const }, em: { fontStyle: 'italic' as const } }} />
           </View>
@@ -821,7 +842,7 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
       return (
         <View style={[bStyles.quote, { borderLeftColor: colors.primary }]}>
           <View style={{ flex: 1 }}>
-            <RenderHtml source={{ html: block.text || '' }} contentWidth={800}
+            <RenderHtml source={{ html: block.text || '' }} contentWidth={contentWidth}
               baseStyle={{ color: colors.textSecondary, fontSize: 16, lineHeight: 24, fontStyle: 'italic' }}
               tagsStyles={{ b: { fontWeight: 'bold' as const }, strong: { fontWeight: 'bold' as const } }} />
           </View>
@@ -831,7 +852,7 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
       return (
         <View style={[bStyles.highlight, { backgroundColor: highlightBg(block.highlightColor) }]}>
           <View style={{ flex: 1 }}>
-            <RenderHtml source={{ html: block.text || '' }} contentWidth={800}
+            <RenderHtml source={{ html: block.text || '' }} contentWidth={contentWidth}
               baseStyle={{ color: '#1F2937', fontSize: 16, lineHeight: 24 }}
               tagsStyles={{ b: { fontWeight: 'bold' as const }, strong: { fontWeight: 'bold' as const } }} />
           </View>
@@ -845,7 +866,7 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
       );
     default:
       return (
-        <RenderHtml source={{ html: block.text || '' }} contentWidth={800}
+        <RenderHtml source={{ html: block.text || '' }} contentWidth={contentWidth}
           baseStyle={{ color: colors.textPrimary, fontSize: 16, lineHeight: 24 }}
           tagsStyles={{ b: { fontWeight: 'bold' as const }, strong: { fontWeight: 'bold' as const }, i: { fontStyle: 'italic' as const }, em: { fontStyle: 'italic' as const } }} />
       );
@@ -869,10 +890,10 @@ const styles = StyleSheet.create({
   page: { flex: 1 },
   scroll: { flex: 1 },
   body: { paddingHorizontal: 16, paddingTop: 28 },
-  titleRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20, gap: 12 },
+  titleRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20, gap: 12, paddingHorizontal: '4.5%' },
   h1: { flex: 1, fontSize: 26, fontWeight: '700', lineHeight: 36 },
   tagChip: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 9999 },
-  divider: { height: StyleSheet.hairlineWidth, marginVertical: 28 },
+  divider: { height: StyleSheet.hairlineWidth, marginVertical: 28, marginHorizontal: '4.5%' },
   eog: { fontSize: 12, textAlign: 'center', fontStyle: 'italic', marginBottom: 8 },
   zoomBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 8, borderTopWidth: StyleSheet.hairlineWidth },
   zoomBarText: { flex: 1, fontSize: 12, lineHeight: 16 },

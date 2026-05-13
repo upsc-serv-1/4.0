@@ -19,11 +19,15 @@ import {
   Platform,
   Animated,
 } from 'react-native';
-import { Swipeable } from 'react-native-gesture-handler';
-import { ChevronLeft, ChevronRight, Search, Plus, FileText, Star, MoreVertical, X, Trash2, CheckSquare } from 'lucide-react-native';
+import { Swipeable, RectButton } from 'react-native-gesture-handler';
+import { ChevronLeft, ChevronRight, Search, Plus, FileText, Star, MoreVertical, X, Trash2, CheckSquare, Edit2, FolderInput,
+  Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical, Book,
+  Shield, Palette, Flag, Columns, Building, Briefcase, Sprout, Rocket, Dna, Cpu, Mountain, Wind, Waves, TreePine, Coins, BookOpen, Brain, Calculator
+} from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
+import { PilotV2MoveModal, NodeToMove } from './PilotV2MoveModal';
 import {
   findOrCreatePilotV2Note,
   renamePilotV2Note,
@@ -34,8 +38,13 @@ import {
   fetchAllPilotV2Nodes,
   fetchPilotV2NotesForUser,
 } from '../../repositories/pilotV2Repo';
-import { PILOT_V2_SUBJECT_PALETTE, PilotV2Note } from './types';
+import { PILOT_V2_SUBJECT_PALETTE, PilotV2Note, iconForTopic } from './types';
 import { SUBJECT_TOPICS } from './PilotV2SidebarSubject';
+
+const NOTE_ICONS: Record<string, any> = {
+  Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical, Book,
+  Shield, Palette, Flag, Columns, Building, Briefcase, Sprout, Rocket, Dna, Cpu, Mountain, Wind, Waves, TreePine, Coins, BookOpen, Brain, Calculator, FileText,
+};
 
 const formatTime = (iso?: string) => {
   if (!iso) return '—';
@@ -64,6 +73,53 @@ const SUBTOPIC_LABELS: Record<string, string> = {
 
 const normalize = (v: string) => String(v || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 
+function ActionBtn({ icon, label, onPress }: any) {
+  const { colors } = useTheme();
+  return (
+    <RectButton
+      onPress={onPress}
+      style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 4,
+        paddingHorizontal: 10,
+        height: '100%',
+        minWidth: 60,
+      }}
+    >
+      <View
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 18,
+          borderWidth: 1,
+          borderColor: colors.border,
+          backgroundColor: colors.surface,
+          alignItems: 'center',
+          justifyContent: 'center',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.05,
+          shadowRadius: 2,
+          elevation: 1,
+        }}
+      >
+        {React.cloneElement(icon, { color: colors.textPrimary, size: 18 })}
+      </View>
+      <Text
+        style={{
+          fontSize: 8,
+          fontWeight: '800',
+          textTransform: 'uppercase',
+          color: colors.textSecondary,
+        }}
+      >
+        {label}
+      </Text>
+    </RectButton>
+  );
+}
+
 export function PilotV2NoteList() {
   const { colors } = useTheme();
   const { session } = useAuth();
@@ -82,6 +138,8 @@ export function PilotV2NoteList() {
     noteId: null,
     title: '',
   });
+  const [moveModalVisible, setMoveModalVisible] = useState(false);
+  const [targetMoveNode, setTargetMoveNode] = useState<NodeToMove | null>(null);
   const [savingRename, setSavingRename] = useState(false);
 
   const subtopicId = state.view.selectedSubtopic;
@@ -437,27 +495,36 @@ export function PilotV2NoteList() {
     };
 
     return (progress: any, dragX: any) => {
+      const totalWidth = isTrashMode ? 75 : 210;
       const trans = dragX.interpolate({
-        inputRange: [-70, 0],
-        outputRange: [0, 70],
+        inputRange: [-totalWidth, 0],
+        outputRange: [0, totalWidth],
         extrapolate: 'clamp',
       });
       return (
-        <Animated.View style={{ transform: [{ translateX: trans }], width: 70 }}>
-          <TouchableOpacity
+        <Animated.View style={{ transform: [{ translateX: trans }], width: totalWidth, flexDirection: 'row', height: '100%', paddingLeft: 10, backgroundColor: colors.surfaceStrong }}>
+          {!isTrashMode && (
+            <>
+              <ActionBtn
+                icon={<FolderInput />}
+                label="Move"
+                onPress={() => {
+                  setTargetMoveNode({ id: n.id, type: 'note', label: n.title });
+                  setMoveModalVisible(true);
+                }}
+              />
+              <ActionBtn
+                icon={<Edit2 />}
+                label="Rename"
+                onPress={() => setRenameModal({ visible: true, noteId: n.id, title: n.title })}
+              />
+            </>
+          )}
+          <ActionBtn
+            icon={<Trash2 />}
+            label="Delete"
             onPress={handle}
-            style={{
-              backgroundColor: '#ef4444',
-              justifyContent: 'center',
-              alignItems: 'center',
-              width: '100%',
-              height: '100%',
-              borderRadius: 12,
-              marginVertical: 4,
-            }}
-          >
-            <Trash2 size={20} color="#fff" />
-          </TouchableOpacity>
+          />
         </Animated.View>
       );
     };
@@ -467,6 +534,9 @@ export function PilotV2NoteList() {
     <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 8, padding: 12 }}>
       {filtered.map((n: any) => {
         const selected = !!selectedIds[n.id];
+        const noteIconKey = iconForTopic(n.topic || '');
+        const NoteIconComponent = NOTE_ICONS[noteIconKey] || FileText;
+
         return (
           <TouchableOpacity
             key={n.id}
@@ -487,7 +557,7 @@ export function PilotV2NoteList() {
             ]}
           >
             <View style={[{ backgroundColor: '#DBEAFE', borderRadius: 8, padding: 8, marginBottom: 8 }]}>
-              <FileText size={24} color="#2563EB" />
+              <NoteIconComponent size={24} color="#2563EB" />
             </View>
             <Text style={[styles.rowTitle, { color: colors.textPrimary, textAlign: 'center' }]} numberOfLines={2}>
               {n.title}
@@ -509,26 +579,37 @@ export function PilotV2NoteList() {
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
         {/* Beautiful Contextual Path Navigation Header (Slides naturally with content) */}
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-          <View style={{ flex: 1, gap: 4 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Text style={{ color: colors.textTertiary, fontSize: 12, fontWeight: '600', letterSpacing: 0.3 }}>
-                {subjectMeta?.label ?? 'Notes'}
-              </Text>
-              {topicName && topicName !== 'Notes' && topicName !== subjectMeta?.label && (
-                <>
-                  <ChevronRight size={12} color={colors.textTertiary} />
-                  <Text style={{ color: colors.textTertiary, fontSize: 12, fontWeight: '600' }} numberOfLines={1}>
-                    {topicName}
-                  </Text>
-                </>
-              )}
-            </View>
+          <View style={{ flex: 1 }}>
             <Text style={{ color: colors.textPrimary, fontSize: 26, fontWeight: '800', letterSpacing: -0.3 }}>
               {topicName && topicName !== 'Notes' ? topicName : subjectMeta?.label ?? 'Notes'}
             </Text>
           </View>
 
-          <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+            {!selectMode && (
+              <TouchableOpacity
+                testID="pilot-v2-notelist-new-header"
+                onPress={handleNewNote}
+                disabled={creating}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 6,
+                  height: 40,
+                  paddingHorizontal: 14,
+                  borderRadius: 20,
+                  backgroundColor: colors.textSecondary,
+                  shadowColor: colors.textSecondary,
+                  shadowOpacity: 0.15,
+                  shadowRadius: 6,
+                  shadowOffset: { width: 0, height: 3 },
+                  elevation: 2,
+                }}
+              >
+                <Plus size={16} color="#fff" strokeWidth={2.5} />
+                <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>New Note</Text>
+              </TouchableOpacity>
+            )}
             {!selectMode ? (
               <TouchableOpacity
                 testID="pilot-v2-notelist-menu"
@@ -626,6 +707,9 @@ export function PilotV2NoteList() {
         ) : (
           filtered.map((n: any) => {
             const selected = !!selectedIds[n.id];
+            const noteIconKey = iconForTopic(n.topic || '');
+            const NoteIconComponent = NOTE_ICONS[noteIconKey] || FileText;
+
             return (
               <Swipeable
                 key={n.id}
@@ -650,7 +734,7 @@ export function PilotV2NoteList() {
                   ]}
                 >
                   <View style={[styles.rowIcon, { backgroundColor: '#DBEAFE' }]}>
-                    <FileText size={18} color="#2563EB" />
+                    <NoteIconComponent size={18} color="#2563EB" />
                   </View>
                   <View style={{ flex: 1, minWidth: 0 }}>
                     <Text style={[styles.rowTitle, { color: colors.textPrimary }]} numberOfLines={1}>
@@ -677,33 +761,7 @@ export function PilotV2NoteList() {
         )}
       </ScrollView>
 
-      {/* ── Floating New Note FAB — Standardized Premium UI ── */}
-      {!selectMode && (
-        <TouchableOpacity
-          testID="pilot-v2-notelist-new-fab"
-          onPress={handleNewNote}
-          disabled={creating}
-          style={{
-            position: 'absolute',
-            bottom: 24,
-            right: 24,
-            zIndex: 1500,
-            width: 56,
-            height: 56,
-            borderRadius: 28,
-            backgroundColor: colors.primary,
-            alignItems: 'center',
-            justifyContent: 'center',
-            shadowColor: colors.primary,
-            shadowOpacity: 0.3,
-            shadowRadius: 8,
-            shadowOffset: { width: 0, height: 4 },
-            elevation: 5,
-          }}
-        >
-          <Plus size={24} color="#fff" />
-        </TouchableOpacity>
-      )}
+      {/* Floating New Note FAB removed — relocated to the header next to menu for cleaner UI */}
 
       {selectMode ? (
         <View style={[styles.bulkBar, { backgroundColor: '#fff', borderColor: colors.border }]}>
@@ -786,6 +844,13 @@ export function PilotV2NoteList() {
           </View>
         </View>
       </Modal>
+
+      <PilotV2MoveModal
+        visible={moveModalVisible}
+        node={targetMoveNode}
+        onClose={() => setMoveModalVisible(false)}
+        onSuccess={refreshNotes}
+      />
     </View>
   );
 }

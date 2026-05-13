@@ -57,50 +57,6 @@ function CollapsibleTopicItem({
 }) {
   const hasSub = !!t.subtopics?.length;
   const isSelectedTopic = state.view.selectedTopic === t.id;
-  const subtopicsCount = t.subtopics?.length ?? 0;
-  const containerHeight = subtopicsCount * 36; // 32 height + 4 margin/gap per item
-
-  // Shared progress value (runs on UI thread, extremely fast and reliable)
-  const animationProgress = useSharedValue(isExpanded ? 1 : 0);
-
-  useEffect(() => {
-    animationProgress.value = withSpring(isExpanded ? 1 : 0, { 
-      damping: 22, 
-      stiffness: 160,
-      mass: 0.75,
-      overshootClamping: true // Avoid bouncing below 0 or beyond height
-    });
-  }, [isExpanded]);
-
-  // Chevron rotation animation
-  const chevronStyle = useAnimatedStyle(() => {
-    const rotate = interpolate(animationProgress.value, [0, 1], [-90, 0]);
-    return {
-      transform: [{ rotate: `${rotate}deg` }],
-    };
-  });
-
-  // Height and Opacity animation style (100% compatible with Expo Go, iOS, Android, Web)
-  const collapsibleStyle = useAnimatedStyle(() => {
-    const height = interpolate(animationProgress.value, [0, 1], [0, containerHeight]);
-    const opacity = interpolate(animationProgress.value, [0, 0.2, 1], [0, 0.4, 1]);
-    
-    return {
-      height,
-      opacity,
-      overflow: 'hidden',
-    };
-  });
-
-  // Slide-in and Scale transition for subtopic items
-  const childItemStyle = useAnimatedStyle(() => {
-    const translateY = interpolate(animationProgress.value, [0, 1], [-8, 0]);
-    const scale = interpolate(animationProgress.value, [0, 1], [0.96, 1]);
-    
-    return {
-      transform: [{ translateY }, { scale }],
-    };
-  });
 
   return (
     <View style={{ marginBottom: 4 }}>
@@ -125,43 +81,41 @@ function CollapsibleTopicItem({
           {t.label}
         </Text>
         {hasSub && (
-          <Animated.View style={chevronStyle}>
+          <View style={{ transform: [{ rotate: isExpanded ? '0deg' : '-90deg' }] }}>
             <ChevronDown size={14} color={colors.textTertiary} />
-          </Animated.View>
+          </View>
         )}
       </TouchableOpacity>
 
-      {hasSub && (
-        <Animated.View style={[collapsibleStyle, { marginLeft: 32 }]}>
-          <Animated.View style={[childItemStyle, { gap: 4 }]}>
-            {t.subtopics!.map(st => {
-              const isSelected = state.view.selectedSubtopic === st.id;
-              return (
-                <TouchableOpacity
-                  key={st.id}
-                  testID={`pilot-v2-subtopic-${st.id}`}
-                  activeOpacity={0.7}
-                  onPress={() => handleSelectSubtopic(st.id)}
-                  style={[
-                    styles.subtopicRow,
-                    isSelected ? { backgroundColor: '#F9FAFB' } : null,
-                    { height: 32, justifyContent: 'center' }
-                  ]}
+      {hasSub && isExpanded && (
+        <View style={{ marginLeft: 32, gap: 4 }}>
+          {t.subtopics!.map(st => {
+            const isSelected = state.view.selectedSubtopic === st.id;
+            return (
+              <TouchableOpacity
+                key={st.id}
+                testID={`pilot-v2-subtopic-${st.id}`}
+                activeOpacity={0.7}
+                onPress={() => handleSelectSubtopic(st.id)}
+                style={[
+                  styles.subtopicRow,
+                  isSelected ? { backgroundColor: '#F9FAFB' } : null,
+                  { height: 32, justifyContent: 'center' }
+                ]}
+              >
+                <Text
+                  style={{
+                    fontSize: 13,
+                    color: isSelected ? colors.textPrimary : colors.textSecondary,
+                    fontWeight: isSelected ? '600' : '400',
+                  }}
                 >
-                  <Text
-                    style={{
-                      fontSize: 13,
-                      color: isSelected ? colors.textPrimary : colors.textSecondary,
-                      fontWeight: isSelected ? '600' : '400',
-                    }}
-                  >
-                    {st.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </Animated.View>
-        </Animated.View>
+                  {st.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       )}
     </View>
   );
@@ -252,7 +206,7 @@ export function PilotV2SidebarSubject() {
           topics.map((t, idx) => {
             const isExpanded = expanded.includes(t.id);
             return (
-              <Animated.View key={t.id} entering={FadeInUp.springify().damping(16).stiffness(140)}>
+              <View key={t.id}>
                 <CollapsibleTopicItem
                   t={t}
                   idx={idx}
@@ -262,7 +216,7 @@ export function PilotV2SidebarSubject() {
                   handleSelectTopic={handleSelectTopic}
                   handleSelectSubtopic={handleSelectSubtopic}
                 />
-              </Animated.View>
+              </View>
             );
           })
         )}

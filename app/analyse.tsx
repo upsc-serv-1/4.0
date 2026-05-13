@@ -210,24 +210,35 @@ export default function AnalyseTab() {
     if (!session?.user?.id) return;
     setLoading(true);
     try {
-      const offline = await OfflineManager.getOfflineAttempts(session.user.id);
-      if (offline?.length > 0) {
-        // Sort offline attempts newest first by submitted_at
-        const sorted = offline.sort((a: any, b: any) =>
-          new Date(b.submitted_at || 0).getTime() - new Date(a.submitted_at || 0).getTime()
-        );
-        setAttempts(sorted);
-      }
-
+      let allAttempts: any[] = [];
+      
+      // 1. Fetch from Supabase (primary source)
       const { data, error } = await supabase
         .from('test_attempts')
         .select('*')
         .eq('user_id', session.user.id)
-        .eq('is_deleted', false) // Issue 23: Soft-delete filter
+        .eq('deleted', false) // Fixed: changed from is_deleted
         .order('submitted_at', { ascending: false })
         .limit(1000);
 
-      if (!error && data?.length > 0) setAttempts(data);
+      if (!error && data?.length > 0) {
+        allAttempts = data;
+      }
+
+      // 2. Merge with offline attempts that aren't yet synced
+      const offline = await OfflineManager.getOfflineAttempts(session.user.id);
+      if (offline?.length > 0) {
+        const onlineIds = new Set(allAttempts.map(a => a.id));
+        const offlineOnly = offline.filter(a => !onlineIds.has(a.id));
+        allAttempts = [...allAttempts, ...offlineOnly];
+      }
+
+      // 3. Sort all attempts by date (newest first)
+      allAttempts.sort((a: any, b: any) =>
+        new Date(b.submitted_at || 0).getTime() - new Date(a.submitted_at || 0).getTime()
+      );
+
+      setAttempts(allAttempts);
     } catch (err) {
       console.error('Fetch attempts error:', err);
     } finally {
@@ -238,7 +249,7 @@ export default function AnalyseTab() {
   const deleteAttempt = async (id: string) => {
     try {
       // Issue 23: Soft delete instead of hard delete
-      await supabase.from('test_attempts').update({ is_deleted: true, deleted_at: new Date().toISOString() }).eq('id', id).eq('user_id', session?.user.id);
+      await supabase.from('test_attempts').update({ deleted: true, deleted_at: new Date().toISOString() }).eq('id', id).eq('user_id', session?.user.id);
       setAttempts(prev => prev.filter(a => a.id !== id));
     } catch (err: any) {
       Alert.alert('Delete failed', err?.message || 'Could not remove this attempt.');
@@ -251,7 +262,7 @@ export default function AnalyseTab() {
     try {
       const idsArray = Array.from(selectedIds);
       // Issue 23: Soft delete all selected
-      await supabase.from('test_attempts').update({ is_deleted: true, deleted_at: new Date().toISOString() }).eq('user_id', session.user.id).in('id', idsArray);
+      await supabase.from('test_attempts').update({ deleted: true, deleted_at: new Date().toISOString() }).eq('user_id', session.user.id).in('id', idsArray);
       setAttempts(prev => prev.filter(a => !selectedIds.has(a.id)));
       setSelectedIds(new Set());
       setSelectMode(false);

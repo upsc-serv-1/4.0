@@ -9,7 +9,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
 
-export type PromptCategory = 'quiz' | 'notes' | 'tags' | 'analysis' | 'syllabus' | 'flashcard';
+export type PromptCategory = 'quiz' | 'notes' | 'tags' | 'analysis' | 'syllabus' | 'flashcard' | 'save_sheet';
 
 export type PromptTemplate = {
   id?: string;
@@ -406,6 +406,50 @@ Back: Provide the exact answer that fills the blank.`,
   },
 ];
 
+export const DEFAULT_SAVE_SHEET_TEMPLATES: PromptTemplate[] = [
+  {
+    template_name: 'Question as Header',
+    template_key: 'header_question',
+    button_label: 'Q Header',
+    button_emoji: '❓',
+    prompt_text: `Generate a concise 5-7 word header/title summarizing the main topic of the question below. Output ONLY the header text, no quotes or formatting.
+
+QUESTION: {{question}}
+OPTIONS: {{options}}
+EXPLANATION: {{explanation}}`,
+    category: 'save_sheet',
+    is_active: true,
+    display_order: 0,
+  },
+  {
+    template_name: 'Bullet Points',
+    template_key: 'header_bullets',
+    button_label: 'Bullets',
+    button_emoji: '📋',
+    prompt_text: `Generate 3-5 key bullet points from the question below as a header. Each bullet should be max 5 words. Output ONLY the bullet points, one per line starting with •.
+
+QUESTION: {{question}}
+OPTIONS: {{options}}
+EXPLANATION: {{explanation}}`,
+    category: 'save_sheet',
+    is_active: true,
+    display_order: 1,
+  },
+  {
+    template_name: 'Hindi Summary',
+    template_key: 'header_hindi',
+    button_label: 'हिन्दी',
+    button_emoji: '🇮🇳',
+    prompt_text: `Generate a concise 5-7 word header in Hindi summarizing the question below. Output ONLY the Hindi header text.
+
+QUESTION: {{question}}
+EXPLANATION: {{explanation}}`,
+    category: 'save_sheet',
+    is_active: true,
+    display_order: 2,
+  },
+];
+
 const ALL_DEFAULTS: Record<string, PromptTemplate[]> = {
   quiz: DEFAULT_QUIZ_TEMPLATES,
   notes: DEFAULT_NOTES_TEMPLATES,
@@ -413,6 +457,7 @@ const ALL_DEFAULTS: Record<string, PromptTemplate[]> = {
   analysis: DEFAULT_ANALYSIS_TEMPLATES,
   syllabus: DEFAULT_SYLLABUS_TEMPLATES,
   flashcard: DEFAULT_FLASHCARD_TEMPLATES,
+  save_sheet: DEFAULT_SAVE_SHEET_TEMPLATES,
 };
 
 // ──────────────────────────────────────────────────────────

@@ -21,6 +21,7 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
+import { useProfile } from '../../context/ProfileContext';
 import {
   findOrCreatePilotV2Note, fetchPilotV2NotesForUser, fetchAllPilotV2Nodes, restorePilotV2Node, purgePilotV2NoteNode,
 } from '../../repositories/pilotV2Repo';
@@ -83,6 +84,8 @@ export function PilotV2Dashboard() {
   const search = state.view.search;
   const quickFilter = state.view.quickFilter;
 
+  const { displayName } = useProfile();
+
   const selectedSubjectId = state.view.selectedSubject;
   const activeSubject = useMemo(() => {
     const fromPalette = PILOT_V2_SUBJECT_PALETTE.find(s => s.id === selectedSubjectId);
@@ -127,8 +130,16 @@ export function PilotV2Dashboard() {
       new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime()
     );
     // Recent tab shows the full recent list; Home/other tabs show a compact carousel.
-    return quickFilter === 'recent' ? sorted : sorted.slice(0, 6);
+    return quickFilter === 'recent' ? sorted : sorted.slice(0, 10);
   }, [visibleNotes, quickFilter]);
+
+  const recentChunks = useMemo(() => {
+    const chunks = [];
+    for (let i = 0; i < recents.length; i += 2) {
+      chunks.push(recents.slice(i, i + 2));
+    }
+    return chunks;
+  }, [recents]);
 
   // Pinned tab → full grid (no slice). Home/other → compact preview (top 6).
   const pinned = useMemo(
@@ -241,14 +252,7 @@ export function PilotV2Dashboard() {
   return (
     <View testID="pilot-v2-dashboard" style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
-        {/* Breadcrumb inside scrollable area */}
-        {isSubjectMode && activeSubject && (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 16 }}>
-            <Text style={{ color: colors.textSecondary, fontSize: 13 }}>Subjects</Text>
-            <ChevronRight size={14} color={colors.textTertiary} />
-            <Text style={{ color: colors.textPrimary, fontSize: 13, fontWeight: '600' }}>{activeSubject.label}</Text>
-          </View>
-        )}
+
 
         {filterBadge ? (
           <View style={[styles.filterBadge, { marginBottom: 16 }]}>
@@ -343,50 +347,81 @@ export function PilotV2Dashboard() {
           </View>
         ) : (
           <>
-            {/* 🔧 FIX: Greeting banner removed — keeps right panel clean.
-                Content cards now start immediately after the scroll begins. */}
+            {/* Premium Greeting Banner */}
+            <View style={{ marginBottom: 28 }}>
+              <Text style={{ color: colors.textTertiary, fontSize: 13, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 2 }}>
+                Welcome Back
+              </Text>
+              <Text style={{ color: colors.textPrimary, fontSize: 32, fontWeight: '800', letterSpacing: -0.5 }}>
+                {displayName} 👋
+              </Text>
+            </View>
 
             {/* Continue Studying */}
             {showContinueStudying && (
             <View style={{ marginBottom: 40 }}>
               <View style={styles.sectionHead}>
                 <Text style={[styles.h2, { color: colors.textPrimary }]}>Continue Studying</Text>
-                <TouchableOpacity testID="pilot-v2-dashboard-seeall-recent" onPress={seeAllRecent}>
-                  <Text style={{ color: colors.primary, fontSize: 13, fontWeight: '600' }}>See All</Text>
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                  <TouchableOpacity
+                    testID="pilot-v2-dashboard-new-inline"
+                    onPress={handleNew}
+                    disabled={creating}
+                    activeOpacity={0.7}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 4,
+                      backgroundColor: colors.textSecondary,
+                      paddingHorizontal: 10,
+                      paddingVertical: 6,
+                      borderRadius: 15,
+                    }}
+                  >
+                    <Plus size={12} color="#fff" strokeWidth={3} />
+                    <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>New Note</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity testID="pilot-v2-dashboard-seeall-recent" onPress={seeAllRecent}>
+                    <Text style={{ color: colors.primary, fontSize: 13, fontWeight: '600' }}>See All</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
 
               {recents.length === 0 ? (
                 <Text style={{ color: colors.textTertiary, fontSize: 13, paddingVertical: 8 }}>No study sessions yet. Create a note to begin!</Text>
               ) : (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
-                  {recents.map((c: any) => {
-                    const meta = resolveSubjectMeta(c.subject, state.notes);
-                    const IconComponent = SUBJECT_ICONS[meta.icon] ?? Scale;
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
+                  {recentChunks.map((pair, chunkIdx) => (
+                    <View key={`chunk-${chunkIdx}`} style={{ gap: 12 }}>
+                      {pair.map((c: any) => {
+                        const meta = resolveSubjectMeta(c.subject, state.notes);
+                        const IconComponent = SUBJECT_ICONS[meta.icon] ?? Scale;
 
-                    return (
-                      <TouchableOpacity
-                        key={c.id}
-                        testID={`pilot-v2-dashboard-card-${c.id}`}
-                        activeOpacity={0.9}
-                        onPress={() => openGlance(c.id)}
-                        style={[styles.studyCard, { borderColor: colors.border }]}
-                      >
-                        <View style={[styles.studyIcon, { backgroundColor: c.iconBg ?? meta.bg }]}>
-                          <IconComponent size={16} color={c.iconColor ?? meta.text} />
-                        </View>
-                        <Text style={[styles.cardTitle, { color: colors.textPrimary }]} numberOfLines={1} ellipsizeMode="tail">
-                          {c.title}
-                        </Text>
-                        <View style={styles.cardFoot}>
-                          <Text style={{ color: colors.textTertiary, fontSize: 11, flexShrink: 1 }} numberOfLines={1}>{c.subject || 'General'}</Text>
-                          <Text style={{ color: colors.textTertiary, fontSize: 11, flexShrink: 0 }} numberOfLines={1}>
-                            {formatRelative(c.updated_at)}
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-                    );
-                  })}
+                        return (
+                          <TouchableOpacity
+                            key={c.id}
+                            testID={`pilot-v2-dashboard-card-${c.id}`}
+                            activeOpacity={0.9}
+                            onPress={() => openGlance(c.id)}
+                            style={[styles.studyCard, { borderColor: colors.border }]}
+                          >
+                            <View style={[styles.studyIcon, { backgroundColor: c.iconBg ?? meta.bg }]}>
+                              <IconComponent size={16} color={c.iconColor ?? meta.text} />
+                            </View>
+                            <Text style={[styles.cardTitle, { color: colors.textPrimary }]} numberOfLines={1} ellipsizeMode="tail">
+                              {c.title}
+                            </Text>
+                            <View style={styles.cardFoot}>
+                              <Text style={{ color: colors.textTertiary, fontSize: 11, flexShrink: 1 }} numberOfLines={1}>{c.subject || 'General'}</Text>
+                              <Text style={{ color: colors.textTertiary, fontSize: 11, flexShrink: 0 }} numberOfLines={1}>
+                                {formatRelative(c.updated_at)}
+                              </Text>
+                            </View>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  ))}
                 </ScrollView>
               )}
             </View>
@@ -487,22 +522,7 @@ export function PilotV2Dashboard() {
         )}
       </ScrollView>
 
-      {/* Floating New FAB — follows Glance pattern */}
-      <TouchableOpacity
-        testID="pilot-v2-dashboard-new-fab"
-        onPress={handleNew}
-        disabled={creating}
-        style={{
-          position: 'absolute', bottom: 24, right: 24, zIndex: 1500,
-          width: 56, height: 56, borderRadius: 28,
-          backgroundColor: colors.primary,
-          alignItems: 'center', justifyContent: 'center',
-          shadowColor: colors.primary, shadowOpacity: 0.3, shadowRadius: 8,
-          shadowOffset: { width: 0, height: 4 }, elevation: 5,
-        }}
-      >
-        <Plus size={24} color="#fff" />
-      </TouchableOpacity>
+      {/* Floating FAB removed per user request -> now anchored inline in the Continue Studying header */}
     </View>
   );
 }

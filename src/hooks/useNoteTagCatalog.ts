@@ -15,6 +15,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
+import { NetworkStatus } from '../lib/networkStatus';
+import { SyncQueue } from '../services/SyncQueue';
 import { formatTagLabel, normalizeTag } from '../utils/tagUtils';
 import { useTagStore } from '../store/tagStore';
 
@@ -73,6 +75,7 @@ export function useNoteTagCatalog(userId: string | undefined, discoveredFromItem
       setLoading(false);
       return [] as string[];
     }
+    if (!NetworkStatus.isOnline()) return [] as string[];
     try {
       const { data, error } = await supabase
         .from('user_settings')
@@ -112,11 +115,16 @@ export function useNoteTagCatalog(userId: string | undefined, discoveredFromItem
     const label = formatTagLabel(tag);
     if (!label) return false;
     if (customTags.some((t) => normalizeTag(t) === normalizeTag(label))) return true;
-    try {
-      const { error } = await supabase.rpc('add_user_tag', { p_tag: label });
-      if (error) throw error;
-    } catch {
-      // RPC may not be deployed in older envs — tolerate, AsyncStorage still wins.
+    // Push the new tag through SyncQueue when offline; otherwise hit RPC directly.
+    if (NetworkStatus.isOnline()) {
+      try {
+        const { error } = await supabase.rpc('add_user_tag', { p_tag: label });
+        if (error) throw error;
+      } catch {
+        SyncQueue.enqueue('tag_add', { tag: label });
+      }
+    } else {
+      SyncQueue.enqueue('tag_add', { tag: label });
     }
     const next = dedupe([...customTags, label]);
     setCustomTags(next);

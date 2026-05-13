@@ -17,6 +17,7 @@ import { SyllabusService } from '../../src/services/SyllabusService';
 import { MICRO_SYLLABUS } from '../../src/data/syllabus';
 import { fetchPilotV2NotesForUser } from '../../src/repositories/pilotV2Repo';
 import { OfflineManager } from '../../src/services/OfflineManager';
+import { NetworkStatus } from '../../src/lib/networkStatus';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppInfoGuide from '../../src/components/AppInfoGuide';
 import { Check, X } from 'lucide-react-native';
@@ -209,8 +210,10 @@ export default function Home() {
 
       setTopTags(top8Tags);
 
-      // Background: try Supabase for fresher data, but don't block UI
-      Promise.all([
+      // Background: try Supabase for fresher data, but don't block UI.
+      // Skip entirely when offline so we don't spam the network — the cache
+      // values set above already populate the screen.
+      if (NetworkStatus.isOnline()) Promise.all([
         supabase.from('question_states').select('is_incorrect_last_attempt').eq('user_id', userId),
         supabase.from('user_notes').select('id', { count: 'exact', head: true }).eq('user_id', userId),
         supabase.from('user_cards').select('id', { count: 'exact', head: true })

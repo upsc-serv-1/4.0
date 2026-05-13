@@ -35,7 +35,16 @@ export type SyncKind =
   | 'user_card_upsert'       // payload = user_cards row
   | 'card_delete'            // payload = { id, updated_at } - mark card as deleted
   | 'card_review_insert'     // payload = card_reviews row
-  | 'study_session_upsert';  // payload = study_sessions daily aggregate row
+  | 'study_session_upsert'    // payload = study_sessions daily aggregate row
+  | 'syllabus_progress_upsert' // payload = user_syllabus_progress row
+  | 'note_node_insert'       // payload = user_note_nodes row (new node)
+  | 'note_node_update'       // payload = { id, ...patch } for user_note_nodes
+  | 'note_node_delete'       // payload = { id }
+  | 'note_insert'            // payload = user_notes row (new note)
+  | 'note_delete'            // payload = { id }
+  | 'note_content_upsert'    // payload = user_notes row (content edit)
+  | 'user_tag_upsert'        // payload = user_tags row
+  | 'user_tag_delete';       // payload = { id }
 
 export interface SyncItem {
   id: string;               // client uuid; also used for idempotent writes
@@ -245,17 +254,88 @@ async function dispatch(item: SyncItem) {
       if (error) throw error;
       return;
     }
+    case 'syllabus_progress_upsert': {
+      const { error } = await supabase
+        .from('user_syllabus_progress')
+        .upsert(item.payload, { onConflict: 'user_id,path' });
+      if (error) throw error;
+      return;
+    }
+    case 'note_node_insert': {
+      const { error } = await supabase
+        .from('user_note_nodes')
+        .upsert(item.payload, { onConflict: 'id' });
+      if (error) throw error;
+      return;
+    }
+    case 'note_node_update': {
+      const { id, ...patch } = item.payload;
+      const { error } = await supabase
+        .from('user_note_nodes')
+        .update(patch)
+        .eq('id', id);
+      if (error) throw error;
+      return;
+    }
+    case 'note_node_delete': {
+      const { error } = await supabase
+        .from('user_note_nodes')
+        .delete()
+        .eq('id', item.payload.id);
+      if (error) throw error;
+      return;
+    }
+    case 'note_insert': {
+      const { error } = await supabase
+        .from('user_notes')
+        .upsert(item.payload, { onConflict: 'id' });
+      if (error) throw error;
+      return;
+    }
+    case 'note_delete': {
+      const { error } = await supabase
+        .from('user_notes')
+        .delete()
+        .eq('id', item.payload.id);
+      if (error) throw error;
+      return;
+    }
+    case 'note_content_upsert': {
+      const { id, ...patch } = item.payload;
+      const { error } = await supabase
+        .from('user_notes')
+        .update(patch)
+        .eq('id', id);
+      if (error) throw error;
+      return;
+    }
+    case 'user_tag_upsert': {
+      const { error } = await supabase
+        .from('user_tags')
+        .upsert(item.payload, { onConflict: 'user_id,name' });
+      if (error) throw error;
+      return;
+    }
+    case 'user_tag_delete': {
+      const { error } = await supabase
+        .from('user_tags')
+        .delete()
+        .eq('id', item.payload.id);
+      if (error) throw error;
+      return;
+    }
     default:
       throw new Error(`Unknown sync kind: ${(item as any).kind}`);
   }
 }
 
 /**
- * Best-effort connectivity probe. Used in lieu of @react-native-community/netinfo
- * (which is not in package.json). If this lightweight call succeeds we assume
- * we have network and drain the queue.
+ * Best-effort connectivity probe. Used to gate the background drain worker so
+ * we don't repeatedly retry against a known-offline network.
  */
+import { NetworkStatus } from '../lib/networkStatus';
 export async function isOnline(): Promise<boolean> {
+  if (!NetworkStatus.isOnline()) return false;
   try {
     const { error } = await supabase.auth.getSession();
     return !error;

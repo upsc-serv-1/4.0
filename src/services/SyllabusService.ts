@@ -1,5 +1,7 @@
 import { supabase } from '../lib/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NetworkStatus } from '../lib/networkStatus';
+import { SyncQueue } from './SyncQueue';
 
 export interface SyllabusProgress {
   ncert: boolean;
@@ -15,6 +17,14 @@ export class SyllabusService {
 
   static async getProgress(userId: string) {
     const cacheKey = `${this.STORAGE_KEY}_${userId}`;
+    // Offline-first: read cache immediately.
+    const local = await AsyncStorage.getItem(cacheKey);
+    const cached = local ? JSON.parse(local) : {};
+
+    if (!NetworkStatus.isOnline()) {
+      return cached;
+    }
+
     try {
       const { data, error } = await supabase
         .from('user_syllabus_progress')
@@ -27,13 +37,11 @@ export class SyllabusService {
       data.forEach((row: any) => {
         progress[row.path] = row.status;
       });
-      
-      // Save to cache
+
       await AsyncStorage.setItem(cacheKey, JSON.stringify(progress));
       return progress;
-    } catch (e) {
-      const local = await AsyncStorage.getItem(cacheKey);
-      return local ? JSON.parse(local) : {};
+    } catch {
+      return cached;
     }
   }
 
@@ -45,30 +53,32 @@ export class SyllabusService {
 
   static async updateProgress(userId: string, path: string, status: SyllabusProgress) {
     const cacheKey = `${this.STORAGE_KEY}_${userId}`;
+    // 1. Always update local cache first so UI reflects the change instantly.
+    const local = await AsyncStorage.getItem(cacheKey);
+    const data = local ? JSON.parse(local) : {};
+    data[path] = status;
+    await AsyncStorage.setItem(cacheKey, JSON.stringify(data));
+
+    const payload = {
+      user_id: userId,
+      path,
+      status,
+      updated_at: new Date().toISOString(),
+    };
+
+    // 2. Push to Supabase if online. If offline, enqueue for sync on reconnect.
+    if (!NetworkStatus.isOnline()) {
+      SyncQueue.enqueue('syllabus_progress_upsert', payload);
+      return;
+    }
     try {
       const { error } = await supabase
         .from('user_syllabus_progress')
-        .upsert({
-          user_id: userId,
-          path: path,
-          status: status,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'user_id,path' });
-
+        .upsert(payload, { onConflict: 'user_id,path' });
       if (error) throw error;
-      
-      // Update cache
-      const local = await AsyncStorage.getItem(cacheKey);
-      const data = local ? JSON.parse(local) : {};
-      data[path] = status;
-      await AsyncStorage.setItem(cacheKey, JSON.stringify(data));
-      
-    } catch (e) {
-      // Fallback
-      const local = await AsyncStorage.getItem(cacheKey);
-      const data = local ? JSON.parse(local) : {};
-      data[path] = status;
-      await AsyncStorage.setItem(cacheKey, JSON.stringify(data));
+    } catch {
+      // Network call failed (real device dropped offline mid-call). Queue it.
+      SyncQueue.enqueue('syllabus_progress_upsert', payload);
     }
   }
 }

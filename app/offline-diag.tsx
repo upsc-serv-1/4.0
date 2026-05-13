@@ -22,6 +22,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../src/context/ThemeContext';
 import { OfflineManager, OfflineMetadata } from '../src/services/OfflineManager';
 import { KVStore } from '../src/lib/kvStore';
+import { NetworkStatus } from '../src/lib/networkStatus';
 import {
   Wifi,
   WifiOff,
@@ -162,6 +163,7 @@ export default function OfflineDiagScreen() {
 
       // @ts-ignore
       global.__offlineDiagActive = true;
+      NetworkStatus.setSimulatedOffline(true);
       setSimulating(true);
     } catch (e: any) {
       Alert.alert('Error', 'Could not start simulation: ' + e.message);
@@ -177,6 +179,7 @@ export default function OfflineDiagScreen() {
       }
       // @ts-ignore
       global.__offlineDiagActive = false;
+      NetworkStatus.setSimulatedOffline(false);
       setSimulating(false);
     } catch (e: any) {
       Alert.alert('Error', 'Could not stop simulation: ' + e.message);

@@ -222,7 +222,7 @@ export default function Profile() {
         <View style={styles.topRow}>
           <View>
             <Text style={[styles.small, { color: colors.textTertiary }]}>ACCOUNT</Text>
-            <Text style={[styles.h1, { color: colors.textPrimary }]}>Profile.</Text>
+            <Text style={[styles.h1, { color: colors.textPrimary }]}>Profile</Text>
           </View>
           <ThemeSwitcher />
         </View>

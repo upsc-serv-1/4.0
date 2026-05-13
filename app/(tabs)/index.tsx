@@ -479,22 +479,6 @@ export default function Home() {
               </View>
 
               <View style={styles.pulseGrid}>
-                <TouchableOpacity style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => router.push('/pilot-v2')}>
-                  <View style={[styles.resumeIconWrap, { backgroundColor: '#EC489920' }]}>
-                    <BookOpen size={20} color="#EC4899" />
-                  </View>
-                  <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>Pilot V2</Text>
-                  <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Structured Notes</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => router.push('/analyse')}>
-                  <View style={[styles.resumeIconWrap, { backgroundColor: '#34C75920' }]}>
-                    <BarChart3 size={20} color="#34C759" />
-                  </View>
-                  <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>Analyse</Text>
-                  <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Performance</Text>
-                </TouchableOpacity>
-
                 <TouchableOpacity style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => router.push('/flashcards/review')}>
                   <View style={[styles.resumeIconWrap, { backgroundColor: '#F59E0B20' }]}>
                     <RotateCcw size={20} color="#F59E0B" />
@@ -598,52 +582,19 @@ export default function Home() {
                 })}
               </View>
             </View>
-
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginTop: 32, marginBottom: 12 }}>
-              <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>MY CUSTOM WIDGETS</Text>
-              <TouchableOpacity
-                onPress={() => setIsEditMode(!isEditMode)}
-                style={{
-                  flexDirection: 'row', alignItems: 'center', gap: 6,
-                  backgroundColor: isEditMode ? '#ef444415' : colors.border + '30',
-                  paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8
-                }}
-              >
-                {isEditMode ? (
-                  <>
-                    <Check size={12} color="#ef4444" />
-                    <Text style={{ fontSize: 11, fontWeight: '800', color: '#ef4444' }}>DONE</Text>
-                  </>
-                ) : (
-                  <>
-                    <Sliders size={12} color={colors.textSecondary} />
-                    <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textSecondary }}>EDIT LAYOUT</Text>
-                  </>
-                )}
-              </TouchableOpacity>
-            </View>
-            {isEditMode && (
-              <Text style={{ color: colors.textTertiary, fontSize: 11, marginLeft: 20, marginBottom: 16, fontWeight: '600' }}>
-                Hold and drag to reorder. Tap the Red X to remove.
-              </Text>
-            )}
           </>
         }
         renderItem={({ item, drag }) => (
           <ScaleDecorator>
             <TouchableOpacity 
-              onLongPress={drag} 
-              style={[
-                styles.customWidgetItem, 
-                isEditMode && { borderWidth: 1, borderColor: '#ef444430', borderStyle: 'dashed', borderRadius: 12 }
-              ]}
-              disabled={!isEditMode}
+              style={styles.customWidgetItem}
+              disabled={true}
             >
               <WidgetRenderer 
                 widgetKey={item.widget_key} 
                 data={widgetData} 
                 onArchive={() => handleToggleArchive(item)}
-                isEditMode={isEditMode}
+                isEditMode={false}
                 config={
                   item.widget_key === 'mastery_ring' 
                     ? { pyqMode: pyqDisplayMode, examType: pyqExamType, reportMode: pyqReportMode }

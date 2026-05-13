@@ -1,5 +1,5 @@
 /**
- * Per-folder algorithm settings (Noji-style).
+ * Per-folder algorithm settings (Dr. UPSC-style).
  *
  * Folder hierarchy:  GLOBAL  →  subject  →  subject|section  →  subject|section|microtopic
  *

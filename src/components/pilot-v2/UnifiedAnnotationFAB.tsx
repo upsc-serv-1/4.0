@@ -7,19 +7,22 @@
  * Collapsed: circular button with current tool icon
  * Expanded: springs open to show tool row + color/sub-tool row
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform,
 } from 'react-native';
 import Animated, {
-  useSharedValue, useAnimatedStyle, withSpring, withTiming, interpolate,
+  useSharedValue, useAnimatedStyle, withSpring, withTiming, interpolate, runOnJS,
 } from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import {
   Pen, Highlighter, Eraser, X, Layers,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { PilotV2PencilTool } from './types';
 import { WashiTapeColor, WASHI_TAPE_COLORS } from './washiTape';
+
+const FAB_POS_KEY = 'pilot_v2_fab_position';
 
 export type AnnotationMode = PilotV2PencilTool | 'washi';
 
@@ -73,6 +76,52 @@ export function UnifiedAnnotationFAB({
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const expandAnim = useSharedValue(0);
+
+  // Draggable position
+  const panX = useSharedValue(0);
+  const panY = useSharedValue(0);
+  const savedPanX = useSharedValue(0);
+  const savedPanY = useSharedValue(0);
+  const [fabOffset, setFabOffset] = useState({ x: 0, y: 0 });
+
+  const saveFabPosition = useCallback(async (x: number, y: number) => {
+    try {
+      const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+      await AsyncStorage.setItem(FAB_POS_KEY, JSON.stringify({ x, y }));
+    } catch {}
+  }, []);
+
+  const loadFabPosition = useCallback(async () => {
+    try {
+      const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+      const raw = await AsyncStorage.getItem(FAB_POS_KEY);
+      if (raw) {
+        const { x, y } = JSON.parse(raw);
+        panX.value = x;
+        panY.value = y;
+        savedPanX.value = x;
+        savedPanY.value = y;
+        setFabOffset({ x, y });
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => { loadFabPosition(); }, []);
+
+  const panGesture = Gesture.Pan()
+    .onUpdate((e) => {
+      panX.value = savedPanX.value + e.translationX;
+      panY.value = savedPanY.value + e.translationY;
+    })
+    .onEnd(() => {
+      savedPanX.value = panX.value;
+      savedPanY.value = panY.value;
+      runOnJS(saveFabPosition)(panX.value, panY.value);
+    });
+
+  const dragStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: panX.value }, { translateY: panY.value }],
+  }));
 
   const toggleExpand = () => {
     const next = !expanded;
@@ -138,6 +187,9 @@ export function UnifiedAnnotationFAB({
       style={styles.container}
       testID="unified-annotation-fab"
     >
+      {/* Draggable wrapper */}
+      <GestureDetector gesture={panGesture}>
+        <Animated.View style={dragStyle}>
       {/* Expandable panel */}
       {expanded && (
         <Animated.View
@@ -266,6 +318,8 @@ export function UnifiedAnnotationFAB({
           )}
         </Animated.View>
       </TouchableOpacity>
+        </Animated.View>
+      </GestureDetector>
     </View>
   );
 }

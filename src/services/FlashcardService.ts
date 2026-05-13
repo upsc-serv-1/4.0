@@ -518,7 +518,7 @@ export class FlashcardSvc {
 
   // ============ REVIEW ============
   /**
-   * Main review method. `grade` is 'again'|'hard'|'good'|'easy' (Noji 4-button).
+   * Main review method. `grade` is 'again'|'hard'|'good'|'easy' (Dr. UPSC 4-button).
    * Settings are resolved from the card's folder hierarchy.
    */
   static async reviewCard(userId: string, cardId: string, grade: Grade, opts: { durationSeconds?: number } = {}) {

@@ -36,6 +36,7 @@ type PilotV2Action =
   | { type: 'SET_QUICK_FILTER'; payload: PilotV2QuickFilter }
   | { type: 'TOGGLE_SIDEBAR' }
   | { type: 'SET_SIDEBAR_COLLAPSED'; payload: boolean }
+  | { type: 'SET_FOCUSED_SUBJECT'; payload: string | null }
   | { type: 'NAVIGATE_HOME' }
   | { type: 'PATCH_CURRENT_NOTE'; payload: { id: string; patch: Partial<PilotV2Note> } }
   | { type: 'PATCH_BLOCKS'; payload: { id: string; blocks: PilotV2Block[] } }
@@ -82,6 +83,7 @@ function reducer(state: PilotV2State, action: PilotV2Action): PilotV2State {
           selectedSubject: action.payload,
           selectedTopic: null,
           selectedSubtopic: null,
+          focusedSubject: null,
         },
       };
 
@@ -108,6 +110,12 @@ function reducer(state: PilotV2State, action: PilotV2Action): PilotV2State {
 
     case 'SET_SIDEBAR_COLLAPSED':
       return { ...state, view: { ...state.view, sidebarCollapsed: action.payload } };
+
+    case 'SET_FOCUSED_SUBJECT':
+      return {
+        ...state,
+        view: { ...state.view, focusedSubject: action.payload },
+      };
 
     case 'NAVIGATE_HOME':
       return {

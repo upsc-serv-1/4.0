@@ -773,7 +773,7 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
   if (block.link) {
     return (
       <TouchableOpacity onPress={() => Linking.openURL(block.link as string).catch(() => Alert.alert('Could not open', block.link as string))} style={{ marginVertical: 6 }}>
-        <Text style={[bStyles.text, { color: '#5B4EFA', textDecorationLine: 'underline' }, markStyle]}>{block.text || block.link}</Text>
+              <Text style={[bStyles.text, { color: colors.primary, textDecorationLine: 'underline' }, markStyle]}>{block.text || block.link}</Text>
       </TouchableOpacity>
     );
   }
@@ -809,7 +809,7 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
     case 'checklist':
       return (
         <View style={bStyles.bulletRow}>
-          <View style={[bStyles.checkbox, { borderColor: colors.border, backgroundColor: block.checked ? '#5B4EFA' : 'transparent' }]} />
+          <View style={[bStyles.checkbox, { borderColor: colors.border, backgroundColor: block.checked ? colors.primary : 'transparent' }]} />
           <View style={{ flex: 1 }}>
             <RenderHtml source={{ html: block.text || '' }} contentWidth={800}
               baseStyle={{ color: colors.textPrimary, fontSize: 16, lineHeight: 24, textDecorationLine: block.checked ? 'line-through' : 'none' }}
@@ -819,7 +819,7 @@ function BlockRenderer({ block, colors }: BlockRendererProps) {
       );
     case 'quote':
       return (
-        <View style={[bStyles.quote, { borderLeftColor: '#5B4EFA' }]}>
+        <View style={[bStyles.quote, { borderLeftColor: colors.primary }]}>
           <View style={{ flex: 1 }}>
             <RenderHtml source={{ html: block.text || '' }} contentWidth={800}
               baseStyle={{ color: colors.textSecondary, fontSize: 16, lineHeight: 24, fontStyle: 'italic' }}

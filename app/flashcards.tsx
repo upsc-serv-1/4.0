@@ -239,7 +239,7 @@ export default function FlashcardsHub() {
         return flat.find(n => n.id === prev.id) ?? null;
       });
     } catch (e: any) {
-      console.error('[NojiHub] load error:', e?.message);
+      console.error('[DrUPSCHub] load error:', e?.message);
     } finally {
       setLoading(false);
       setRefreshing(false);

@@ -23,28 +23,16 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
-import { PILOT_V2_SUBJECT_PALETTE, PilotV2QuickFilter } from './types';
+import { PILOT_V2_SUBJECT_PALETTE, PilotV2QuickFilter, iconForSubject } from './types';
 import { PilotV2SidebarSubject, SUBJECT_TOPICS } from './PilotV2SidebarSubject';
 import { createPilotV2Node, archivePilotV2Node, fetchAllPilotV2Nodes, fetchPilotV2NotesForUser } from '../../repositories/pilotV2Repo';
 import { Swipeable } from 'react-native-gesture-handler';
 import AnimatedReanimated, { useSharedValue, useAnimatedStyle, withSpring, interpolate, FadeInUp } from 'react-native-reanimated';
+import { usePilotV2DoubleTap } from './usePilotV2DoubleTap';
 
 const SUBJECT_ICONS: Record<string, any> = {
   Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical,
 };
-
-/** Map a subject label to the best-matching icon key. */
-function iconForSubject(label: string): string {
-  const lc = label.toLowerCase().replace(/[^a-z]/g, '');
-  if (lc.includes('polit') || lc.includes('law') || lc.includes('constitut') || lc.includes('govern')) return 'Landmark';
-  if (lc.includes('econom') || lc.includes('finance') || lc.includes('budget') || lc.includes('market')) return 'TrendingUp';
-  if (lc.includes('history') || lc.includes('ancient') || lc.includes('medieval') || lc.includes('modern')) return 'ScrollText';
-  if (lc.includes('geograph') || lc.includes('map') || lc.includes('environ') || lc.includes('ecology')) return 'Globe2';
-  if (lc.includes('scienc') || lc.includes('tech') || lc.includes('space') || lc.includes('biotech')) return 'FlaskConical';
-  if (lc.includes('ethic') || lc.includes('philosoph') || lc.includes('moral') || lc.includes('integrity')) return 'Scale';
-  if (lc.includes('sociolog') || lc.includes('culture') || lc.includes('art') || lc.includes('religion')) return 'Leaf';
-  return 'Book'; // Fallback
-}
 
 function CollapsibleTopicItem({
   t,
@@ -137,11 +125,11 @@ function CollapsibleTopicItem({
           onLongPress={() => handleTopicLongPress(t, subjectLabel)}
           style={[
             styles.topicRow,
-            isSelectedTopic ? { backgroundColor: '#EEECFF' } : null,
+            isSelectedTopic ? { backgroundColor: '#F3F4F6' } : null,
           ]}
         >
           <Text style={{ color: colors.textTertiary, fontSize: 11, width: 22 }}>{idx + 1}.</Text>
-          <Text style={{ flex: 1, fontSize: 13, fontWeight: '500', color: isSelectedTopic ? '#5B4EFA' : colors.textPrimary }}>
+          <Text style={{ flex: 1, fontSize: 13, fontWeight: '500', color: colors.textPrimary }}>
             {t.label}
           </Text>
           {hasSub && (
@@ -191,10 +179,10 @@ function CollapsibleTopicItem({
                   onLongPress={() => handleSubtopicLongPress(st, t, subjectLabel)}
                   style={[
                     styles.subtopicRow,
-                    isSelectedSub ? { backgroundColor: '#EEECFF' } : null,
+                    isSelectedSub ? { backgroundColor: '#F9FAFB' } : null,
                   ]}
                 >
-                  <Text style={{ fontSize: 12, color: isSelectedSub ? '#5B4EFA' : colors.textSecondary, fontWeight: isSelectedSub ? '600' : '400' }}>
+                  <Text style={{ fontSize: 12, color: isSelectedSub ? colors.textPrimary : colors.textSecondary, fontWeight: isSelectedSub ? '600' : '400' }}>
                     {st.label}
                   </Text>
                 </TouchableOpacity>
@@ -221,6 +209,8 @@ function CollapsibleSubjectItem({
   handleSelectTopic,
   handleSubtopicLongPress,
   handleSelectSubtopic,
+  isFocused,
+  onClearFocus,
 }: {
   s: any;
   state: any;
@@ -235,6 +225,8 @@ function CollapsibleSubjectItem({
   handleSelectTopic: (topicId: string, hasSub: boolean) => void;
   handleSubtopicLongPress: (st: any, t: any, label: string) => void;
   handleSelectSubtopic: (subtopicId: string) => void;
+  isFocused?: boolean;
+  onClearFocus?: () => void;
 }) {
   // Use s.icon if available; otherwise derive from the subject label.
   const iconKey = s.icon || iconForSubject(s.label || '');
@@ -319,8 +311,20 @@ function CollapsibleSubjectItem({
           style={[
             styles.subjectRow,
             isSelectedSubject ? { backgroundColor: '#F3F4F6' } : null,
+            isFocused ? { paddingLeft: 8 } : null,
           ]}
         >
+          {isFocused && onClearFocus && (
+            <TouchableOpacity
+              onPress={(e) => {
+                e.stopPropagation();
+                onClearFocus();
+              }}
+              style={{ padding: 10, marginRight: -2 }}
+            >
+              <ChevronLeft size={20} color={colors.textPrimary} />
+            </TouchableOpacity>
+          )}
           <View style={[styles.subjectIcon, { backgroundColor: s.bg }]}>
             <Icon size={16} color={s.text} />
           </View>
@@ -382,6 +386,23 @@ function PilotV2SidebarHome() {
   const [expandedSubjects, setExpandedSubjects] = useState<string[]>([]);
   const scrollViewRef = useRef<ScrollView>(null);
   const [subjectPositions, setSubjectPositions] = useState<Record<string, number>>({});
+
+  const focusedSubject = state.view.focusedSubject;
+
+  const quickNavAnimStyle = useAnimatedStyle(() => {
+    const translateY = withSpring(focusedSubject ? -120 : 0, {
+      damping: 20, stiffness: 200, mass: 0.5, overshootClamping: true,
+    });
+    const opacity = withSpring(focusedSubject ? 0 : 1, {
+      damping: 20, stiffness: 200, mass: 0.5,
+    });
+    return {
+      transform: [{ translateY }],
+      opacity,
+      height: focusedSubject ? 0 : undefined,
+      overflow: 'hidden',
+    };
+  });
 
   const selectedSubjectId = state.view.selectedSubject;
   const subjectsList = useMemo(() => {
@@ -495,13 +516,20 @@ function PilotV2SidebarHome() {
 
   const handleSelectSubject = (subjectId: string) => {
     if (state.view.selectedSubject === subjectId) {
-      toggleSubjectExpanded(subjectId);
+      // Second click triggers focus mode!
+      dispatch({ type: 'SET_FOCUSED_SUBJECT', payload: subjectId });
+      if (!expandedSubjects.includes(subjectId)) {
+        setExpandedSubjects(prev => [...prev, subjectId]);
+      }
     } else {
       dispatch({ type: 'SET_QUICK_FILTER', payload: 'home' });
       dispatch({ type: 'SET_SELECTED_SUBJECT', payload: subjectId });
       dispatch({ type: 'SET_SELECTED_TOPIC', payload: null });
       dispatch({ type: 'SET_SELECTED_SUBTOPIC', payload: null });
       dispatch({ type: 'SET_VIEW_MODE', payload: 'noteList' });
+      if (!expandedSubjects.includes(subjectId)) {
+        setExpandedSubjects(prev => [...prev, subjectId]);
+      }
     }
   };
 
@@ -784,42 +812,48 @@ function PilotV2SidebarHome() {
       style={[styles.root, { backgroundColor: colors.surface, borderRightColor: colors.border }]}
     >
 
-      <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32, paddingTop: 16 }}>
-        {/* Small search bar like in Notability */}
-        <View style={styles.sbContainer}>
-          <View style={[styles.sbBox, { backgroundColor: '#F3F4F6', borderColor: colors.border }]}>
-            <Search size={13} color={colors.textTertiary} />
-            <TextInput
-              testID="pilot-v2-sidebar-search"
-              value={state.view.search}
-              onChangeText={(text) => dispatch({ type: 'SET_SEARCH', payload: text })}
-              style={[styles.sbInput, { color: colors.textPrimary }]}
-              placeholder="Search..."
-              placeholderTextColor={colors.textTertiary}
-            />
-            {state.view.search.length > 0 && (
-              <TouchableOpacity onPress={() => dispatch({ type: 'SET_SEARCH', payload: '' })} hitSlop={6}>
-                <X size={13} color={colors.textTertiary} />
-              </TouchableOpacity>
-            )}
+      {/* Fixed search bar like in Notability -> Extracted above ScrollView */}
+      <View style={[styles.sbContainer, { paddingTop: 16 }]}>
+        <View style={[styles.sbBox, { backgroundColor: '#F3F4F6', borderColor: colors.border }]}>
+          <Search size={13} color={colors.textTertiary} />
+          <TextInput
+            testID="pilot-v2-sidebar-search"
+            value={state.view.search}
+            onChangeText={(text) => dispatch({ type: 'SET_SEARCH', payload: text })}
+            style={[styles.sbInput, { color: colors.textPrimary }]}
+            placeholder="Search..."
+            placeholderTextColor={colors.textTertiary}
+          />
+          {state.view.search.length > 0 && (
+            <TouchableOpacity onPress={() => dispatch({ type: 'SET_SEARCH', payload: '' })} hitSlop={6}>
+              <X size={13} color={colors.textTertiary} />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+
+      <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
+        {/* Quick nav — animated slide-up when focusedSubject is set */}
+        <AnimatedReanimated.View style={quickNavAnimStyle}>
+          <View style={{ paddingHorizontal: 12, paddingBottom: 8, paddingTop: 4 }}>
+            <NavRow active={activeFilter === 'home'}    label="Home"           Icon={HomeIcon} colors={colors} testID="pilot-v2-nav-home"    onPress={() => handleQuickNav('home')} />
+            <NavRow active={activeFilter === 'pinned'}  label="Pinned"         Icon={Pin}      colors={colors} testID="pilot-v2-nav-pinned"  onPress={() => handleQuickNav('pinned')} />
+            <NavRow active={activeFilter === 'recent'}  label="Recent"         Icon={Clock}    colors={colors} testID="pilot-v2-nav-recent"  onPress={() => handleQuickNav('recent')} />
+            <NavRow active={activeFilter === 'shared'}  label="Shared with me" Icon={Share2}   colors={colors} testID="pilot-v2-nav-shared"  onPress={() => handleQuickNav('shared')} />
+            <NavRow active={activeFilter === 'trash'}   label="Trash"          Icon={Trash2}   colors={colors} testID="pilot-v2-nav-trash"   onPress={() => handleQuickNav('trash')} />
           </View>
-        </View>
+        </AnimatedReanimated.View>
 
-        {/* Quick nav */}
-        <View style={{ paddingHorizontal: 12, paddingBottom: 8, paddingTop: 4 }}>
-          <NavRow active={activeFilter === 'home'}    label="Home"           Icon={HomeIcon} colors={colors} testID="pilot-v2-nav-home"    onPress={() => handleQuickNav('home')} />
-          <NavRow active={activeFilter === 'pinned'}  label="Pinned"         Icon={Pin}      colors={colors} testID="pilot-v2-nav-pinned"  onPress={() => handleQuickNav('pinned')} />
-          <NavRow active={activeFilter === 'recent'}  label="Recent"         Icon={Clock}    colors={colors} testID="pilot-v2-nav-recent"  onPress={() => handleQuickNav('recent')} />
-          <NavRow active={activeFilter === 'shared'}  label="Shared with me" Icon={Share2}   colors={colors} testID="pilot-v2-nav-shared"  onPress={() => handleQuickNav('shared')} />
-          <NavRow active={activeFilter === 'trash'}   label="Trash"          Icon={Trash2}   colors={colors} testID="pilot-v2-nav-trash"   onPress={() => handleQuickNav('trash')} />
-        </View>
-
-        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+        {!focusedSubject && <View style={[styles.divider, { backgroundColor: colors.border }]} />}
 
         {/* Subjects */}
         <View style={{ paddingHorizontal: 12, paddingVertical: 16 }}>
-          <Text style={[styles.sectionLabel, { color: colors.textTertiary, paddingHorizontal: 16 }]}>SUBJECTS</Text>
-          {subjectsList.map((s, idx) => (
+          {!focusedSubject && (
+            <Text style={[styles.sectionLabel, { color: colors.textTertiary, paddingHorizontal: 16 }]}>SUBJECTS</Text>
+          )}
+          {subjectsList
+            .filter(s => !focusedSubject || s.id === focusedSubject)
+            .map((s, idx) => (
             <View
               key={s.id}
               onLayout={(e) => {
@@ -844,19 +878,23 @@ function PilotV2SidebarHome() {
                 handleSelectTopic={handleSelectTopic}
                 handleSubtopicLongPress={handleSubtopicLongPress}
                 handleSelectSubtopic={handleSelectSubtopic}
+                isFocused={focusedSubject === s.id}
+                onClearFocus={() => dispatch({ type: 'SET_FOCUSED_SUBJECT', payload: null })}
               />
             </View>
           ))}
 
-          <TouchableOpacity
-            testID="pilot-v2-new-subject"
-            activeOpacity={0.7}
-            onPress={handleNewSubject}
-            style={[styles.newSubjectRow]}
-          >
-            <Plus size={18} color="#5B4EFA" />
-            <Text style={{ color: '#5B4EFA', fontSize: 14, fontWeight: '600' }}>New Subject</Text>
-          </TouchableOpacity>
+          {!focusedSubject && (
+            <TouchableOpacity
+              testID="pilot-v2-new-subject"
+              activeOpacity={0.7}
+              onPress={handleNewSubject}
+              style={[styles.newSubjectRow]}
+            >
+              <Plus size={18} color="#5B4EFA" />
+              <Text style={{ color: '#5B4EFA', fontSize: 14, fontWeight: '600' }}>New Subject</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
       </ScrollView>
@@ -916,7 +954,7 @@ function PilotV2SidebarHome() {
                 testID="pilot-v2-new-subject-submit"
                 onPress={submitNewSubject}
                 disabled={!newSubjectName.trim() || creating}
-                style={[styles.nsBtnPrimary, { backgroundColor: '#5B4EFA', opacity: newSubjectName.trim() && !creating ? 1 : 0.5 }]}
+                style={[styles.nsBtnPrimary, { backgroundColor: colors.primary, opacity: newSubjectName.trim() && !creating ? 1 : 0.5 }]}
               >
                 <Plus size={14} color="#fff" />
                 <Text style={{ color: '#fff', fontWeight: '700' }}>{creating ? 'Creating…' : 'Create'}</Text>
@@ -946,13 +984,13 @@ function NavRow({ label, Icon, colors, active, testID, onPress }: NavRowProps) {
       onPress={onPress}
       style={[
         styles.navRow,
-        active ? { backgroundColor: '#EEECFF' } : null,
+        active ? { backgroundColor: '#F3F4F6' } : null,
       ]}
     >
-      <Icon size={18} color={active ? '#5B4EFA' : colors.textSecondary} />
+      <Icon size={18} color={active ? colors.textPrimary : colors.textSecondary} />
       <Text
         style={{
-          color: active ? '#5B4EFA' : colors.textPrimary,
+          color: colors.textPrimary,
           fontSize: 14,
           fontWeight: active ? '600' : '500',
         }}

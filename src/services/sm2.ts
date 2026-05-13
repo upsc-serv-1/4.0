@@ -1,5 +1,5 @@
 /**
- * SM-2 Spaced-Repetition Engine — Noji / Anki style (config-driven).
+ * SM-2 Spaced-Repetition Engine — Dr. UPSC / Anki style (config-driven).
  *
  * Grade buttons (4-button UI):
  *   'again' → lapse: reset to learning queue, next due = learning_steps[0] minutes

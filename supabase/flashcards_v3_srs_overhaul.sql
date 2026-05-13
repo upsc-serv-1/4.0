@@ -30,7 +30,7 @@ update public.user_cards
     end
  where learning_step is null;
 
--- 2. folder_algorithm_settings (Noji-style per-folder overrides)
+-- 2. folder_algorithm_settings (Dr. UPSC-style per-folder overrides)
 create table if not exists public.folder_algorithm_settings (
   user_id    uuid not null,
   folder_key text not null,                -- '' | 'Subject' | 'Subject|Section' | 'Subject|Section|Microtopic'

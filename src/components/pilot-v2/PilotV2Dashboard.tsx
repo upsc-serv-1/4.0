@@ -240,55 +240,32 @@ export function PilotV2Dashboard() {
 
   return (
     <View testID="pilot-v2-dashboard" style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
-      {/* Top bar */}
-      <View style={[styles.topBar, { backgroundColor: '#fff', borderBottomColor: colors.border, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
-        <View style={styles.breadcrumb}>
-          {isSubjectMode && activeSubject && (
-            <>
-              <Text style={[styles.breadCrumb, { color: colors.textSecondary }]}>Subjects</Text>
-              <ChevronRight size={14} color={colors.textTertiary} />
-              <Text style={[styles.breadCrumb, { color: colors.textPrimary, fontWeight: '600' }]}>{activeSubject.label}</Text>
-            </>
-          )}
-        </View>
-
-        <TouchableOpacity
-          testID="pilot-v2-dashboard-new"
-          activeOpacity={0.85}
-          onPress={handleNew}
-          disabled={creating}
-          style={[styles.newBtn, { backgroundColor: '#5B4EFA', opacity: creating ? 0.7 : 1 }]}
-        >
-          <Plus size={16} color="#fff" />
-          <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>New</Text>
-        </TouchableOpacity>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
+        {/* Breadcrumb inside scrollable area */}
+        {isSubjectMode && activeSubject && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 16 }}>
+            <Text style={{ color: colors.textSecondary, fontSize: 13 }}>Subjects</Text>
+            <ChevronRight size={14} color={colors.textTertiary} />
+            <Text style={{ color: colors.textPrimary, fontSize: 13, fontWeight: '600' }}>{activeSubject.label}</Text>
+          </View>
+        )}
 
         {filterBadge ? (
-          <View style={styles.filterBadge}>
-            <Text style={{ fontSize: 11, color: '#5B4EFA', fontWeight: '600' }}>{filterBadge}</Text>
+          <View style={[styles.filterBadge, { marginBottom: 16 }]}>
+            <Text style={{ fontSize: 11, color: colors.primary, fontWeight: '600' }}>{filterBadge}</Text>
             {quickFilter !== 'trash' && (
               <TouchableOpacity
                 testID="pilot-v2-clear-filter"
                 onPress={() => dispatch({ type: 'SET_QUICK_FILTER', payload: 'home' })}
                 hitSlop={6}
               >
-                <Text style={{ fontSize: 11, color: '#5B4EFA', fontWeight: '700' }}>Clear ✕</Text>
+                <Text style={{ fontSize: 11, color: colors.primary, fontWeight: '700' }}>Clear ✕</Text>
               </TouchableOpacity>
             )}
           </View>
         ) : null}
-      </View>
-
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
         {quickFilter === 'trash' ? (
           <View>
-            <View style={{ marginBottom: 24 }}>
-              <Text style={[styles.h1, { color: colors.textPrimary }]}>Trash</Text>
-              <Text style={[styles.sub, { color: colors.textSecondary }]}>
-                {visibleNotes.length} {visibleNotes.length === 1 ? 'item' : 'items'} in Trash. Swipe left on any item to restore or delete permanently.
-              </Text>
-            </View>
-
             {visibleNotes.length === 0 ? (
               <View style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 64 }}>
                 <Trash2 size={48} color={colors.textTertiary} style={{ marginBottom: 16 }} />
@@ -366,19 +343,8 @@ export function PilotV2Dashboard() {
           </View>
         ) : (
           <>
-            {/* Greeting */}
-            <View style={{ marginBottom: 32 }}>
-              <Text style={[styles.h1, { color: colors.textPrimary }]}>
-                {isSubjectMode && activeSubject
-                  ? `${activeSubject.label} Study Hub`
-                  : `${greetingFor(new Date())}, Aspirant 👋`}
-              </Text>
-              <Text style={[styles.sub, { color: colors.textSecondary }]}>
-                {isSubjectMode && activeSubject
-                  ? `Ready to continue your ${activeSubject.label} preparation?`
-                  : 'Ready to continue your preparation?'}
-              </Text>
-            </View>
+            {/* 🔧 FIX: Greeting banner removed — keeps right panel clean.
+                Content cards now start immediately after the scroll begins. */}
 
             {/* Continue Studying */}
             {showContinueStudying && (
@@ -386,7 +352,7 @@ export function PilotV2Dashboard() {
               <View style={styles.sectionHead}>
                 <Text style={[styles.h2, { color: colors.textPrimary }]}>Continue Studying</Text>
                 <TouchableOpacity testID="pilot-v2-dashboard-seeall-recent" onPress={seeAllRecent}>
-                  <Text style={{ color: '#5B4EFA', fontSize: 13, fontWeight: '600' }}>See All</Text>
+                  <Text style={{ color: colors.primary, fontSize: 13, fontWeight: '600' }}>See All</Text>
                 </TouchableOpacity>
               </View>
 
@@ -413,8 +379,8 @@ export function PilotV2Dashboard() {
                           {c.title}
                         </Text>
                         <View style={styles.cardFoot}>
-                          <Text style={{ color: colors.textTertiary, fontSize: 11 }} numberOfLines={1}>{c.subject || 'General'}</Text>
-                          <Text style={{ color: colors.textTertiary, fontSize: 11 }} numberOfLines={1}>
+                          <Text style={{ color: colors.textTertiary, fontSize: 11, flexShrink: 1 }} numberOfLines={1}>{c.subject || 'General'}</Text>
+                          <Text style={{ color: colors.textTertiary, fontSize: 11, flexShrink: 0 }} numberOfLines={1}>
                             {formatRelative(c.updated_at)}
                           </Text>
                         </View>
@@ -474,7 +440,7 @@ export function PilotV2Dashboard() {
                 <Text style={[styles.h2, { color: colors.textPrimary }]}>Pinned Notes</Text>
                 {quickFilter === 'home' && (
                   <TouchableOpacity testID="pilot-v2-dashboard-seeall-pinned" onPress={seeAllPinned}>
-                    <Text style={{ color: '#5B4EFA', fontSize: 13, fontWeight: '600' }}>See All</Text>
+                    <Text style={{ color: colors.primary, fontSize: 13, fontWeight: '600' }}>See All</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -520,6 +486,23 @@ export function PilotV2Dashboard() {
           </>
         )}
       </ScrollView>
+
+      {/* Floating New FAB — follows Glance pattern */}
+      <TouchableOpacity
+        testID="pilot-v2-dashboard-new-fab"
+        onPress={handleNew}
+        disabled={creating}
+        style={{
+          position: 'absolute', bottom: 24, right: 24, zIndex: 1500,
+          width: 56, height: 56, borderRadius: 28,
+          backgroundColor: colors.primary,
+          alignItems: 'center', justifyContent: 'center',
+          shadowColor: colors.primary, shadowOpacity: 0.3, shadowRadius: 8,
+          shadowOffset: { width: 0, height: 4 }, elevation: 5,
+        }}
+      >
+        <Plus size={24} color="#fff" />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -529,7 +512,6 @@ const DEMO_CARDS: any[] = [];
 const DEMO_PINNED: any[] = [];
 
 const styles = StyleSheet.create({
-  topBar: { paddingHorizontal: 24, paddingVertical: 16, borderBottomWidth: 1 },
   breadcrumb: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 16, flexWrap: 'wrap' },
   breadCrumb: { fontSize: 13 },
   searchRow: { flexDirection: 'row', gap: 12, alignItems: 'center' },
@@ -544,15 +526,14 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   body: { paddingHorizontal: 36, paddingVertical: 28, paddingBottom: 96 },
-  h1: { fontSize: 26, fontWeight: '700', marginBottom: 4 },
-  sub: { fontSize: 14 },
   sectionHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
   h2: { fontSize: 18, fontWeight: '700' },
   studyCard: {
     width: 180, padding: 14, borderRadius: 16, borderWidth: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.85)',
     borderColor: 'rgba(255, 255, 255, 0.6)',
-    shadowColor: '#5B4EFA', shadowOpacity: 0.05, shadowRadius: 12, shadowOffset: { width: 0, height: 5 },
+    // shadowColor uses theme at runtime via inline style
+    shadowOpacity: 0.05, shadowRadius: 12, shadowOffset: { width: 0, height: 5 },
   },
   studyIcon: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
   cardTitle: { fontSize: 14, fontWeight: '600', marginBottom: 6 },

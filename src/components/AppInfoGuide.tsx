@@ -70,55 +70,31 @@ const FEATURES: FeatureSection[] = [
     ],
   },
   {
-    icon: Tag,
-    color: '#06b6d4',
-    title: 'Tags',
-    tagline: 'Organise & Review with Custom Tags',
-    description: 'Tag questions with custom revision tags like "Silly Mistake", "Must Revise", "Concept Gap", or create your own. Filter and review tagged questions to target weak areas efficiently.',
+    icon: Star,
+    color: '#f59e0b',
+    title: '⭐ My Vitamin',
+    tagline: 'Your Personalised Best Answer',
+    description: 'Create your own "Vitamin" — a personalised best answer for any question. Combine explanations from multiple institutes, add your own insights, and save it as your definitive answer. Switch between institute answers and your Vitamin with one tap.',
     highlights: [
-      'Create unlimited custom revision tags',
-      'Tag questions for focussed revision',
-      'Filter by tags across all study modules',
-      'Export tagged question sets as PDF',
+      'Create personalised best answers from multiple sources',
+      'Combine institute explanations with your own insights',
+      'One-tap toggle between institute answers & your Vitamin',
+      'Export your Vitamins alongside question banks',
     ],
   },
   {
-    icon: Compass,
-    color: '#10b981',
-    title: 'Notes V4',
-    tagline: 'Next-Gen Note-Taking with AI',
-    description: 'The most powerful note-taking system in the app. Save questions, explanations, and AI-generated summaries into organised notebooks. Features AI chat on any saved note, real-time collaboration, and smart search across all your notebooks.',
+    icon: Zap,
+    color: '#8b5cf6',
+    title: '⚡ AI Features',
+    tagline: 'Artificial Intelligence Throughout',
+    description: 'AI is deeply integrated into the app — from expanding search queries to generating explanations, summarising notes, creating flashcards, and analysing your performance. Multiple AI providers supported: Gemini, Groq, OpenRouter, and DeepSeek.',
     highlights: [
-      'Save questions & explanations into structured notebooks',
-      'AI chat — ask questions about your saved notes',
-      'AI summarisation & question generation from notes',
-      'Full markdown editor with formatting toolbar',
-    ],
-  },
-  {
-    icon: Globe,
-    color: '#ec4899',
-    title: 'Ghost Browser',
-    tagline: 'Incognito Question Browser',
-    description: 'Browse and search questions anonymously without saving progress or creating attempt records. Perfect for quick lookups, exploring topics, or demonstrating the app without affecting your analytics.',
-    highlights: [
-      'Anonymous question browsing — no tracking',
-      'Full search with keyword highlighting',
-      'View multi-institute explanations',
-      'Ideal for quick reference & exploration',
-    ],
-  },
-  {
-    icon: RotateCcw,
-    color: '#3b82f6',
-    title: 'Repo',
-    tagline: 'Your Personal Question Repository',
-    description: 'A central repository of all questions you\'ve interacted with — attempted, bookmarked, tagged, or noted. Quickly revisit any question from your history with full context preserved.',
-    highlights: [
-      'Centralised history of all attempted questions',
-      'Filter by status: correct, incorrect, skipped, tagged',
-      'Quick re-attempt or review from history',
-      'Full context — your answers, notes, and tags preserved',
+      'AI Explain — get detailed AI-generated explanations for any question',
+      'AI Chat — have a conversation about any question or note',
+      'AI Summarise — auto-summarise long explanations',
+      'AI Flashcard — generate flashcards from any content',
+      'AI Search — semantic understanding of your queries',
+      'Switch between Gemini, Groq, OpenRouter & DeepSeek',
     ],
   },
   {
@@ -148,31 +124,16 @@ const FEATURES: FeatureSection[] = [
     ],
   },
   {
-    icon: Star,
-    color: '#f59e0b',
-    title: '⭐ My Vitamin',
-    tagline: 'Your Personalised Best Answer',
-    description: 'Create your own "Vitamin" — a personalised best answer for any question. Combine explanations from multiple institutes, add your own insights, and save it as your definitive answer. Switch between institute answers and your Vitamin with one tap.',
+    icon: Globe,
+    color: '#ec4899',
+    title: 'Ghost Browser',
+    tagline: 'Incognito Question Browser',
+    description: 'Browse and search questions anonymously without saving progress or creating attempt records. Perfect for quick lookups, exploring topics, or demonstrating the app without affecting your analytics.',
     highlights: [
-      'Create personalised best answers from multiple sources',
-      'Combine institute explanations with your own insights',
-      'One-tap toggle between institute answers & your Vitamin',
-      'Export your Vitamins alongside question banks',
-    ],
-  },
-  {
-    icon: Zap,
-    color: '#8b5cf6',
-    title: '⚡ AI Features',
-    tagline: 'Artificial Intelligence Throughout',
-    description: 'AI is deeply integrated into the app — from expanding search queries to generating explanations, summarising notes, creating flashcards, and analysing your performance. Multiple AI providers supported: Gemini, Groq, OpenRouter, and DeepSeek.',
-    highlights: [
-      'AI Explain — get detailed AI-generated explanations for any question',
-      'AI Chat — have a conversation about any question or note',
-      'AI Summarise — auto-summarise long explanations',
-      'AI Flashcard — generate flashcards from any content',
-      'AI Search — semantic understanding of your queries',
-      'Switch between Gemini, Groq, OpenRouter & DeepSeek',
+      'Anonymous question browsing — no tracking',
+      'Full search with keyword highlighting',
+      'View multi-institute explanations',
+      'Ideal for quick reference & exploration',
     ],
   },
 ];
@@ -194,7 +155,7 @@ export default function AppInfoGuide({ visible, onClose }: Props) {
           <View style={{ flex: 1 }}>
             <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>App Guide</Text>
             <Text style={[styles.headerSub, { color: colors.textTertiary }]}>
-              Everything you need to know about Noji
+              Everything you need to know about Dr. UPSC
             </Text>
           </View>
           <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { backgroundColor: colors.surfaceStrong }]}>
@@ -206,7 +167,7 @@ export default function AppInfoGuide({ visible, onClose }: Props) {
           {/* Hero */}
           <View style={[styles.heroCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Text style={[styles.heroEmoji]}>📚</Text>
-            <Text style={[styles.heroTitle, { color: colors.textPrimary }]}>Welcome to Noji</Text>
+            <Text style={[styles.heroTitle, { color: colors.textPrimary }]}>Welcome to Dr. UPSC</Text>
             <Text style={[styles.heroDesc, { color: colors.textSecondary }]}>
               Your complete UPSC preparation companion. Practice questions, analyse performance,
               take notes, create flashcards — all powered by AI. Here's a tour of everything you can do.

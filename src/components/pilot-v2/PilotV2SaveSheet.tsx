@@ -609,14 +609,16 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
+      <View style={[styles.backdrop, { justifyContent: 'flex-start', alignItems: 'stretch', paddingVertical: 0 }]}>
+        <TouchableOpacity activeOpacity={1} onPress={onClose} style={[StyleSheet.absoluteFill, { zIndex: 1 }]} />
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={{ flex: 1, zIndex: 10 }}
         >
-          <View style={{ flex: 1, padding: 16 }}>
-            {/* Header */}
-            <View style={styles.header}>
+          <Animated.View style={{ transform: [{ translateY: sheetTranslate }], flex: 1, paddingTop: 16, paddingBottom: 16 }}>
+            <View testID="pilot-v2-save-sheet" style={[{ flex: 1, backgroundColor: colors.surface }]}>
+            <Animated.View style={{ transform: [{ translateY: topTranslate }], zIndex: 4 }} onLayout={(e) => setTopAreaH(e.nativeEvent.layout.height)}>
+              {/* Header */}
               <View style={styles.header}>
                 <View style={[styles.brand, { backgroundColor: '#5B4EFA' }]}>
                   <Rocket size={18} color="#fff" />
@@ -693,90 +695,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                     </ScrollView>
                   </View>
                 )}
-
-                {/* Unified Header Option Line */}
-                <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <Text style={{ color: colors.textTertiary, fontSize: 11, fontWeight: '700', minWidth: 85 }}>Include Header</Text>
-                    <View style={{ flex: 1, flexDirection: 'row', gap: 4 }}>
-                      {(['auto-title', 'question-only', 'custom', 'none'] as const).map((style) => (
-                        <TouchableOpacity
-                          key={style}
-                          onPress={() => {
-                            setHeaderStyle(style);
-                            setIncludeHeader(style !== 'none');
-                          }}
-                          style={{
-                            flex: 1,
-                            paddingVertical: 5,
-                            borderRadius: 6,
-                            backgroundColor: (includeHeader && headerStyle === style) || (!includeHeader && style === 'none') ? '#5B4EFA' : colors.surfaceStrong,
-                            borderWidth: 1,
-                            borderColor: (includeHeader && headerStyle === style) || (!includeHeader && style === 'none') ? '#5B4EFA' : colors.border,
-                            alignItems: 'center'
-                          }}
-                        >
-                          <Text style={{ fontSize: 9, fontWeight: '700', color: (includeHeader && headerStyle === style) || (!includeHeader && style === 'none') ? '#fff' : colors.textSecondary }}>
-                            {style === 'auto-title' ? '🤖 Auto' : style === 'question-only' ? '❓ Q Only' : style === 'custom' ? '✏️ Custom' : '✕ None'}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </View>
-                  
-                  {/* Custom Text Injection Bar */}
-                  {includeHeader && headerStyle === 'custom' && (
-                    <View style={{ marginTop: 6 }}>
-                      <TextInput
-                        placeholder="Custom header title..."
-                        placeholderTextColor={colors.textTertiary}
-                        value={customHeader}
-                        onChangeText={setCustomHeader}
-                        maxLength={200}
-                        style={{
-                          backgroundColor: colors.surface,
-                          borderWidth: 1,
-                          borderColor: colors.border,
-                          borderRadius: 6,
-                          paddingHorizontal: 8,
-                          paddingVertical: 5,
-                          fontSize: 12,
-                          color: colors.textPrimary,
-                        }}
-                      />
-                    </View>
-                  )}
-
-                  {/* Page Layout Option Line */}
-                  <View style={{ marginTop: 6, paddingTop: 6, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                      <Text style={{ color: colors.textTertiary, fontSize: 11, fontWeight: '700', minWidth: 85 }}>Page Layout</Text>
-                      <View style={{ flex: 1, flexDirection: 'row', gap: 4 }}>
-                        {(['standard', 'wide'] as const).map((lay) => (
-                          <TouchableOpacity
-                            key={lay}
-                            onPress={() => setPageLayout(lay)}
-                            style={{
-                              flex: 1,
-                              paddingVertical: 5,
-                              borderRadius: 6,
-                              backgroundColor: pageLayout === lay ? '#5B4EFA' : colors.surfaceStrong,
-                              borderWidth: 1,
-                              borderColor: pageLayout === lay ? '#5B4EFA' : colors.border,
-                              alignItems: 'center'
-                            }}
-                          >
-                            <Text style={{ fontSize: 9, fontWeight: '700', color: pageLayout === lay ? '#fff' : colors.textSecondary }}>
-                              {lay === 'standard' ? '📄 Standard' : '↔️ Wide (A4)'}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    </View>
-                  </View>
-                </View>
               </View>
-            </View>
 
             {aiPanelOpen ? (
               <PilotV2SaveAIPanel
@@ -803,8 +722,68 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
               style={{ flex: 1 }}
               keyboardShouldPersistTaps="always"
               contentContainerStyle={{ paddingBottom: Math.max(24, keyboardHeight ? keyboardHeight * 0.4 : 24) }}
-              stickyHeaderIndices={[0]}
+              // stickyHeaderIndices is REMOVED — header options inside scroll naturally.
             >
+              {/* Header & Page Layout Options (inside scroll, below sticky toolbar) */}
+              <View style={{ paddingHorizontal: 12, paddingVertical: 8 }}>
+                {/* Unified Header Option Line */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Text style={{ color: colors.textTertiary, fontSize: 11, fontWeight: '700', minWidth: 85 }}>Include Header</Text>
+                  <View style={{ flex: 1, flexDirection: 'row', gap: 4 }}>
+                    {(['auto-title', 'question-only', 'custom', 'none'] as const).map((style) => (
+                      <TouchableOpacity
+                        key={style}
+                        onPress={() => { setHeaderStyle(style); setIncludeHeader(style !== 'none'); }}
+                        style={{
+                          flex: 1, paddingVertical: 5, borderRadius: 6,
+                          backgroundColor: (includeHeader && headerStyle === style) || (!includeHeader && style === 'none') ? '#5B4EFA' : colors.surfaceStrong,
+                          borderWidth: 1,
+                          borderColor: (includeHeader && headerStyle === style) || (!includeHeader && style === 'none') ? '#5B4EFA' : colors.border,
+                          alignItems: 'center'
+                        }}
+                      >
+                        <Text style={{ fontSize: 9, fontWeight: '700', color: (includeHeader && headerStyle === style) || (!includeHeader && style === 'none') ? '#fff' : colors.textSecondary }}>
+                          {style === 'auto-title' ? '🤖 Auto' : style === 'question-only' ? '❓ Q Only' : style === 'custom' ? '✏️ Custom' : '✕ None'}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+
+                {includeHeader && headerStyle === 'custom' && (
+                  <View style={{ marginTop: 6 }}>
+                    <TextInput
+                      placeholder="Custom header title..." placeholderTextColor={colors.textTertiary}
+                      value={customHeader} onChangeText={setCustomHeader} maxLength={200}
+                      style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 5, fontSize: 12, color: colors.textPrimary }}
+                    />
+                  </View>
+                )}
+
+                <View style={{ marginTop: 6, paddingTop: 6, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Text style={{ color: colors.textTertiary, fontSize: 11, fontWeight: '700', minWidth: 85 }}>Page Layout</Text>
+                    <View style={{ flex: 1, flexDirection: 'row', gap: 4 }}>
+                      {(['standard', 'wide'] as const).map((lay) => (
+                        <TouchableOpacity
+                          key={lay}
+                          onPress={() => setPageLayout(lay)}
+                          style={{
+                            flex: 1, paddingVertical: 5, borderRadius: 6,
+                            backgroundColor: pageLayout === lay ? '#5B4EFA' : colors.surfaceStrong,
+                            borderWidth: 1, borderColor: pageLayout === lay ? '#5B4EFA' : colors.border, alignItems: 'center'
+                          }}
+                        >
+                          <Text style={{ fontSize: 9, fontWeight: '700', color: pageLayout === lay ? '#fff' : colors.textSecondary }}>
+                            {lay === 'standard' ? '📄 Standard' : '↔️ Wide (A4)'}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                </View>
+              </View>
+
               {/* Sticky formatting toolbar */}
               <View style={[styles.toolbarSticky, { backgroundColor: colors.surfaceStrong, borderBottomColor: colors.border, flexDirection: 'row', alignItems: 'center' }]}>
                 <View style={{ flex: 1 }}>
@@ -1111,9 +1090,11 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                 setMoveOpen(false);
               }}
             />
-            </View>
-          </KeyboardAvoidingView>
-        </SafeAreaView>
+            </Animated.View>
+        </View>
+      </Animated.View>
+    </KeyboardAvoidingView>
+  </View>
     </Modal>
   );
 };

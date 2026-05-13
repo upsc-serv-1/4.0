@@ -227,6 +227,19 @@ export interface PilotV2SubjectMeta {
 
 export const PILOT_V2_SUBJECT_PALETTE: PilotV2SubjectMeta[] = [];
 
+/** Map a subject label to the best-matching icon key. */
+export function iconForSubject(label: string): string {
+  const lc = label.toLowerCase().replace(/[^a-z]/g, '');
+  if (lc.includes('polit') || lc.includes('law') || lc.includes('constitut') || lc.includes('govern')) return 'Landmark';
+  if (lc.includes('econom') || lc.includes('finance') || lc.includes('budget') || lc.includes('market')) return 'TrendingUp';
+  if (lc.includes('history') || lc.includes('ancient') || lc.includes('medieval') || lc.includes('modern')) return 'ScrollText';
+  if (lc.includes('geograph') || lc.includes('map') || lc.includes('environ') || lc.includes('ecology')) return 'Globe2';
+  if (lc.includes('scienc') || lc.includes('tech') || lc.includes('space') || lc.includes('biotech')) return 'FlaskConical';
+  if (lc.includes('ethic') || lc.includes('philosoph') || lc.includes('moral') || lc.includes('integrity')) return 'Scale';
+  if (lc.includes('sociolog') || lc.includes('culture') || lc.includes('art') || lc.includes('religion')) return 'Leaf';
+  return 'Book';
+}
+
 /* ------------------------------------------------------------------------- */
 /* View state                                                                 */
 /* ------------------------------------------------------------------------- */
@@ -245,6 +258,9 @@ export interface PilotV2ViewState {
   /** Quick-nav filter applied on Dashboard / NoteList screens. */
   quickFilter: PilotV2QuickFilter;
   search: string;
+  /** When set, the sidebar enters "Focused Subject Mode" — only this subject's
+   *  tree is shown; quick-nav items slide upward and disappear. */
+  focusedSubject: string | null;
 }
 
 export const PILOT_V2_INITIAL_VIEW: PilotV2ViewState = {
@@ -256,6 +272,7 @@ export const PILOT_V2_INITIAL_VIEW: PilotV2ViewState = {
   sidebarCollapsed: false,
   quickFilter: 'home',
   search: '',
+  focusedSubject: null,
 };
 
 /* ========================================================================= */

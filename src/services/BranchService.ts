@@ -1,5 +1,5 @@
 /**
- * BranchService — AnkiPro / Noji style hierarchical decks.
+ * BranchService — AnkiPro / Dr. UPSC style hierarchical decks.
  *
  * Backed by two tables that already exist in the schema:
  *   - flashcard_branches     (id, user_id, name, parent_id, is_archived, is_deleted, sort_order)

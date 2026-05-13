@@ -1,5 +1,5 @@
 /**
- * LocalStore — AnkiPro / Noji-style hybrid offline-first engine.
+ * LocalStore — AnkiPro / Dr. UPSC-style hybrid offline-first engine.
  *
  * Strategy
  *   1. During study sessions, every review writes to MMKV synchronously (0 ms lag).

@@ -20,7 +20,7 @@ import {
   Animated,
 } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
-import { ChevronLeft, Search, Plus, FileText, Star, MoreVertical, X, Trash2, CheckSquare } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Search, Plus, FileText, Star, MoreVertical, X, Trash2, CheckSquare } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
@@ -506,63 +506,30 @@ export function PilotV2NoteList() {
 
   return (
     <View testID="pilot-v2-notelist" style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
-      <View style={[styles.header, { backgroundColor: '#fff', borderBottomColor: colors.border }]}>
-        {/* Breadcrumb Trail */}
-        {(state.view.selectedTopic || state.view.selectedSubtopic) && !isTrashMode && (
-          <View style={{ paddingHorizontal: 12, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-            {subjectMeta && (
-              <TouchableOpacity
-                onPress={() => {
-                  dispatch({ type: 'SET_SELECTED_TOPIC', payload: null });
-                  dispatch({ type: 'SET_SELECTED_SUBTOPIC', payload: null });
-                }}
-              >
-                <Text style={{ color: '#5B4EFA', fontSize: 12, fontWeight: '500' }}>
-                  {subjectMeta.label}
-                </Text>
-              </TouchableOpacity>
-            )}
-            {state.view.selectedTopic && (
-              <>
-                <Text style={{ color: colors.textTertiary, fontSize: 12 }}>/</Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    dispatch({ type: 'SET_SELECTED_SUBTOPIC', payload: null });
-                  }}
-                >
-                  <Text style={{ color: '#5B4EFA', fontSize: 12, fontWeight: '500' }}>
-                    {state.view.selectedTopic.replace(/-/g, ' ')}
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
+        {/* Beautiful Contextual Path Navigation Header (Slides naturally with content) */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+          <View style={{ flex: 1, gap: 4 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={{ color: colors.textTertiary, fontSize: 12, fontWeight: '600', letterSpacing: 0.3 }}>
+                {subjectMeta?.label ?? 'Notes'}
+              </Text>
+              {topicName && topicName !== 'Notes' && topicName !== subjectMeta?.label && (
+                <>
+                  <ChevronRight size={12} color={colors.textTertiary} />
+                  <Text style={{ color: colors.textTertiary, fontSize: 12, fontWeight: '600' }} numberOfLines={1}>
+                    {topicName}
                   </Text>
-                </TouchableOpacity>
-              </>
-            )}
-            {state.view.selectedSubtopic && (
-              <>
-                <Text style={{ color: colors.textTertiary, fontSize: 12 }}>/</Text>
-                <Text style={{ color: colors.textTertiary, fontSize: 12 }}>{topicName}</Text>
-              </>
-            )}
+                </>
+              )}
+            </View>
+            <Text style={{ color: colors.textPrimary, fontSize: 26, fontWeight: '800', letterSpacing: -0.3 }}>
+              {topicName && topicName !== 'Notes' ? topicName : subjectMeta?.label ?? 'Notes'}
+            </Text>
           </View>
-        )}
-        
-        <View style={styles.headerTop}>
-          <TouchableOpacity testID="pilot-v2-notelist-back" onPress={handleBack} style={styles.backBtn}>
-            <ChevronLeft size={20} color={colors.textPrimary} />
-          </TouchableOpacity>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>{isTrashMode ? 'Trash' : topicName}</Text>
-          <View style={{ flex: 1 }} />
-          {!selectMode ? (
-            <>
-              <TouchableOpacity
-                testID="pilot-v2-notelist-new"
-                activeOpacity={0.85}
-                onPress={handleNewNote}
-                disabled={creating}
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 8 }}
-              >
-                <Plus size={18} color="#5B4EFA" />
-                <Text style={{ color: '#5B4EFA', fontSize: 14, fontWeight: '600' }}>New</Text>
-              </TouchableOpacity>
+
+          <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+            {!selectMode ? (
               <TouchableOpacity
                 testID="pilot-v2-notelist-menu"
                 onPress={() => {
@@ -582,45 +549,74 @@ export function PilotV2NoteList() {
                     { text: 'Cancel', style: 'cancel' },
                   ]);
                 }}
-                style={{ paddingHorizontal: 12, paddingVertical: 8 }}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: '#fff',
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  shadowColor: '#000',
+                  shadowOpacity: 0.03,
+                  shadowRadius: 4,
+                  shadowOffset: { width: 0, height: 2 },
+                  elevation: 2,
+                }}
               >
                 <MoreVertical size={18} color={colors.textSecondary} />
               </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              <TouchableOpacity
-                testID="pilot-v2-notelist-select-all"
-                onPress={() => {
-                  const allSelected = filtered.length > 0 && filtered.length === Object.keys(selectedIds).filter(k => selectedIds[k]).length;
-                  if (allSelected) {
-                    setSelectedIds({});
-                  } else {
-                    const newIds: Record<string, boolean> = {};
-                    filtered.forEach((n: any) => {
-                      newIds[n.id] = true;
-                    });
-                    setSelectedIds(newIds);
-                  }
-                }}
-                style={{ marginRight: 12 }}
-              >
-                <CheckSquare size={16} color={colors.textSecondary} />
-                <Text style={{ color: colors.textSecondary, fontWeight: '800', fontSize: 12 }}>All</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                testID="pilot-v2-notelist-cancel-select"
-                onPress={clearSelection}
-                style={[styles.selectBtn, { borderColor: colors.border }]}
-              >
-                <Text style={{ color: colors.textSecondary, fontWeight: '800', fontSize: 12 }}>Done</Text>
-              </TouchableOpacity>
-            </>
-          )}
+            ) : (
+              <>
+                <TouchableOpacity
+                  testID="pilot-v2-notelist-select-all"
+                  onPress={() => {
+                    const allSelected = filtered.length > 0 && filtered.length === Object.keys(selectedIds).filter(k => selectedIds[k]).length;
+                    if (allSelected) {
+                      setSelectedIds({});
+                    } else {
+                      const newIds: Record<string, boolean> = {};
+                      filtered.forEach((n: any) => {
+                        newIds[n.id] = true;
+                      });
+                      setSelectedIds(newIds);
+                    }
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 6,
+                    paddingHorizontal: 12,
+                    paddingVertical: 8,
+                    borderRadius: 12,
+                    backgroundColor: '#fff',
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                  }}
+                >
+                  <CheckSquare size={16} color={colors.textSecondary} />
+                  <Text style={{ color: colors.textSecondary, fontWeight: '800', fontSize: 12 }}>All</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  testID="pilot-v2-notelist-cancel-select"
+                  onPress={clearSelection}
+                  style={{
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                    borderRadius: 12,
+                    backgroundColor: '#fff',
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                  }}
+                >
+                  <Text style={{ color: colors.textSecondary, fontWeight: '800', fontSize: 12 }}>Done</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
         </View>
-      </View>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
         {filtered.length === 0 ? (
           <Text style={{ color: colors.textTertiary, textAlign: 'center', marginTop: 40 }}>
             {isTrashMode ? 'Trash is empty' : 'No matching notes'}
@@ -650,7 +646,7 @@ export function PilotV2NoteList() {
                   style={[
                     styles.row,
                     { backgroundColor: '#fff', borderColor: colors.border },
-                    selected ? { borderColor: '#5B4EFA', backgroundColor: '#EEF2FF' } : null,
+                    selected ? { borderColor: colors.primary, backgroundColor: '#EEF2FF' } : null,
                   ]}
                 >
                   <View style={[styles.rowIcon, { backgroundColor: '#DBEAFE' }]}>
@@ -681,8 +677,36 @@ export function PilotV2NoteList() {
         )}
       </ScrollView>
 
+      {/* ── Floating New Note FAB — Standardized Premium UI ── */}
+      {!selectMode && (
+        <TouchableOpacity
+          testID="pilot-v2-notelist-new-fab"
+          onPress={handleNewNote}
+          disabled={creating}
+          style={{
+            position: 'absolute',
+            bottom: 24,
+            right: 24,
+            zIndex: 1500,
+            width: 56,
+            height: 56,
+            borderRadius: 28,
+            backgroundColor: colors.primary,
+            alignItems: 'center',
+            justifyContent: 'center',
+            shadowColor: colors.primary,
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            shadowOffset: { width: 0, height: 4 },
+            elevation: 5,
+          }}
+        >
+          <Plus size={24} color="#fff" />
+        </TouchableOpacity>
+      )}
+
       {selectMode ? (
-        <View style={[styles.bulkBar, { backgroundColor: '#fff', borderTopColor: colors.border }]}>
+        <View style={[styles.bulkBar, { backgroundColor: '#fff', borderColor: colors.border }]}>
           <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: '800' }}>{selectedList.length} selected</Text>
           <View style={{ flexDirection: 'row', gap: 10 }}>
             {isTrashMode ? (
@@ -754,7 +778,7 @@ export function PilotV2NoteList() {
                 testID="pilot-v2-rename-submit"
                 onPress={submitRename}
                 disabled={!renameModal.title.trim() || savingRename}
-                style={[styles.rmBtnPrimary, { backgroundColor: '#5B4EFA', opacity: renameModal.title.trim() && !savingRename ? 1 : 0.5 }]}
+                style={[styles.rmBtnPrimary, { backgroundColor: colors.primary, opacity: renameModal.title.trim() && !savingRename ? 1 : 0.5 }]}
               >
                 <Text style={{ color: '#fff', fontWeight: '700' }}>{savingRename ? 'Saving…' : 'Save'}</Text>
               </TouchableOpacity>
@@ -767,10 +791,6 @@ export function PilotV2NoteList() {
 }
 
 const styles = StyleSheet.create({
-  header: { paddingHorizontal: 24, paddingVertical: 16, borderBottomWidth: 1 },
-  headerTop: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 },
-  backBtn: { padding: 8, borderRadius: 8 },
-  title: { fontSize: 20, fontWeight: '700' },
   selectBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -800,7 +820,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
   },
-  body: { paddingHorizontal: 24, paddingVertical: 16, gap: 8, paddingBottom: 120 },
+  body: { paddingHorizontal: 24, paddingVertical: 28, gap: 8, paddingBottom: 120 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -829,16 +849,23 @@ const styles = StyleSheet.create({
   rmBtnPrimary: { flex: 1, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   bulkBar: {
     position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
+    left: 24,
+    right: 24,
+    bottom: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: 20,
+    borderWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
+    zIndex: 9999,
   },
   bulkBtn: {
     paddingHorizontal: 12,

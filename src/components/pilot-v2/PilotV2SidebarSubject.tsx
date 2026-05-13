@@ -23,7 +23,7 @@ import {
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { usePilotV2 } from '../../context/PilotV2Context';
-import { PILOT_V2_SUBJECT_PALETTE } from './types';
+import { PILOT_V2_SUBJECT_PALETTE, iconForSubject } from './types';
 
 const SUBJECT_ICONS: Record<string, any> = {
   Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical,
@@ -110,7 +110,7 @@ function CollapsibleTopicItem({
         onPress={() => handleSelectTopic(t.id, hasSub)}
         style={[
           styles.topicRow,
-          isSelectedTopic ? { backgroundColor: '#EEECFF' } : null,
+          isSelectedTopic ? { backgroundColor: '#F3F4F6' } : null,
         ]}
       >
         <Text style={{ color: colors.textTertiary, fontSize: 11, width: 22 }}>{idx + 1}.</Text>
@@ -119,7 +119,7 @@ function CollapsibleTopicItem({
             flex: 1,
             fontSize: 14,
             fontWeight: '500',
-            color: isSelectedTopic ? '#5B4EFA' : colors.textPrimary,
+            color: colors.textPrimary,
           }}
         >
           {t.label}
@@ -144,14 +144,14 @@ function CollapsibleTopicItem({
                   onPress={() => handleSelectSubtopic(st.id)}
                   style={[
                     styles.subtopicRow,
-                    isSelected ? { backgroundColor: '#EEECFF' } : null,
+                    isSelected ? { backgroundColor: '#F9FAFB' } : null,
                     { height: 32, justifyContent: 'center' }
                   ]}
                 >
                   <Text
                     style={{
                       fontSize: 13,
-                      color: isSelected ? '#5B4EFA' : colors.textSecondary,
+                      color: isSelected ? colors.textPrimary : colors.textSecondary,
                       fontWeight: isSelected ? '600' : '400',
                     }}
                   >
@@ -176,7 +176,8 @@ export function PilotV2SidebarSubject() {
   const subject = PILOT_V2_SUBJECT_PALETTE.find(s => s.id === subjectId);
   if (!subject) return null;
 
-  const Icon = SUBJECT_ICONS[subject.icon] ?? Book;
+  const iconKey = subject.icon || iconForSubject(subject.label || '');
+  const Icon = SUBJECT_ICONS[iconKey] ?? Book;
   const staticTopics = SUBJECT_TOPICS[subject.id] ?? [];
 
   const topics = useMemo(() => {
@@ -270,7 +271,8 @@ export function PilotV2SidebarSubject() {
       <View style={[styles.footer, { borderTopColor: colors.border }]}>
         <Text style={[styles.footerLabel, { color: colors.textTertiary }]}>OTHER SUBJECTS</Text>
         {PILOT_V2_SUBJECT_PALETTE.filter(s => s.id !== subject.id).slice(0, 4).map(s => {
-          const I = SUBJECT_ICONS[s.icon] ?? Book;
+          const iconKey = s.icon || iconForSubject(s.label || '');
+          const I = SUBJECT_ICONS[iconKey] ?? Book;
           return (
             <TouchableOpacity
               key={s.id}

@@ -70,7 +70,7 @@ export default function TabsLayout() {
     notes: { title: 'Notes', icon: FileText },
     hardnotes: { title: 'Hardnotes', icon: PenTool },
     capsule: { title: 'Capsule', icon: Sparkles },
-    'pilot-v2': { title: 'Notes V4', icon: Compass },
+    'pilot-v2': { title: 'Pilot V2', icon: Compass },
     browser: { title: 'Ghost', icon: Globe },
     softnotes: { title: 'Softnotes', icon: BookOpen },
     revise: { title: 'Repo', icon: RotateCcw },

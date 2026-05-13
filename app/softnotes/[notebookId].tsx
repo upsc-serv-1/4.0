@@ -29,6 +29,7 @@ import { Notebook, Page, SoftToolKind } from '../../src/softnotes/types';
 import { SoftCanvas } from '../../src/softnotes/SoftCanvas';
 import { SoftToolbar } from '../../src/softnotes/SoftToolbar';
 import { useSoftPage } from '../../src/softnotes/useSoftPage';
+import { SkeletonLoader } from '../../src/components/common/SkeletonLoader';
 
 export default function SoftNotebookEditor() {
   const router = useRouter();
@@ -115,7 +116,7 @@ export default function SoftNotebookEditor() {
   if (loading) {
     return (
       <SafeAreaView style={[styles.root, { backgroundColor: colors.bg }]}>
-        <View style={styles.loadingWrap}><ActivityIndicator color={colors.primary} /></View>
+        <SkeletonLoader type="list" count={5} colors={colors} />
       </SafeAreaView>
     );
   }

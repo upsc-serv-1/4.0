@@ -2,6 +2,7 @@ import { Redirect } from 'expo-router';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
 import { useTheme } from '../src/context/ThemeContext';
+import { SkeletonLoader } from '../src/components/common/SkeletonLoader';
 
 export default function Index() {
   const { session, loading } = useAuth();
@@ -11,7 +12,7 @@ export default function Index() {
   if (loading) {
     return (
       <View testID="splash-loader" style={[styles.center, { backgroundColor: colors.bg }]}>
-        <ActivityIndicator color={colors.primary} size="large" />
+        <SkeletonLoader type="list" count={5} colors={colors} />
       </View>
     );
   }

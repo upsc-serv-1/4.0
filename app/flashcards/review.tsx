@@ -28,6 +28,7 @@ import { OfflineManager } from '../../src/services/OfflineManager';
 import { buildCanonicalExplanations } from '../unified/engine';
 import { fetchBestAnswer, saveBestAnswer, BestAnswer } from '../../src/services/BestAnswerService';
 import { aiExplainQuestion, aiImproveAnswer, aiAskDoubt } from '../../src/services/GeminiService';
+import { SkeletonFlashcardReview } from '../../src/components/common/SkeletonLoader';
 import { renderAIText } from '../../src/utils/renderAIText';
 
 const { width, height } = Dimensions.get('window');
@@ -604,7 +605,7 @@ export default function ReviewScreen() {
   // ===== render states =====
 
   if (loading) {
-    return <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>;
+    return <SkeletonFlashcardReview colors={colors} />;
   }
 
   if (sessionSummary) {

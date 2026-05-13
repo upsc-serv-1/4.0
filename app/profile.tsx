@@ -381,6 +381,13 @@ export default function Profile() {
             label="Clear Offline Data"
             sub={offlineMeta?.totalQuestions ? `${offlineMeta.totalQuestions.toLocaleString()} questions cached` : 'No data cached'}
             onPress={handleClearOffline}
+          />
+          <Row 
+            testID="profile-offline-diag"
+            icon={<Wifi color="#8b5cf6" size={20} />}
+            label="Offline Diagnostic Test"
+            sub="Test which screens work in airplane mode"
+            onPress={() => router.push('/offline-diag')}
             isLast
           />
         </View>

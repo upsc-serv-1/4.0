@@ -38,6 +38,7 @@ import { SkiaCanvas, PaperKind } from '../../src/components/hardnotes/SkiaCanvas
 import { ToolPalette } from '../../src/components/hardnotes/ToolPalette';
 import { ScissorTextEditor } from '../../src/components/hardnotes/ScissorTextEditor';
 import { Stroke, ToolKind } from '../../src/components/hardnotes/strokes';
+import { SkeletonLoader } from '../../src/components/common/SkeletonLoader';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -233,10 +234,7 @@ export default function ProEditor() {
   if (loading) {
     return (
       <SafeAreaView style={[styles.flex, { backgroundColor: colors.bg }]} edges={['top']}>
-        <View style={styles.loadWrap}>
-          <ActivityIndicator color={colors.primary} />
-          <Text style={{ color: colors.textTertiary, marginTop: 12, fontWeight: '700' }}>Loading canvas…</Text>
-        </View>
+        <SkeletonLoader type="list" count={3} colors={colors} />
       </SafeAreaView>
     );
   }

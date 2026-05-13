@@ -16,6 +16,7 @@ import { Check, Sparkles, ListChecks, BookOpen as BookIcon, Tag as TagIcon, Play
 import { useTheme } from '../../context/ThemeContext';
 import { supabase } from '../../lib/supabase';
 import { normalizeTag } from '../../utils/tagUtils';
+import { SkeletonLine } from '../common/SkeletonLoader';
 
 const GLANCE_COLORS: Record<string, { bg: string; border: string; text: string }> = {
   'imp. concept': { bg: '#eef2ff', border: '#4a7fe8', text: '#4a7fe8' },
@@ -227,8 +228,7 @@ export function GlancePanel({ noteId, contentWidth, selectedTag, onPlay, onOpenE
   if (loading) {
     return (
       <View style={[styles.shell, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <ActivityIndicator size="small" color={colors.primary} />
-        <Text style={[styles.shellHint, { color: colors.textTertiary }]}>Unfolding…</Text>
+        <SkeletonLine width="60%" height={12} borderRadius={6} />
       </View>
     );
   }

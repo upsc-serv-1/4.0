@@ -8,6 +8,7 @@ import { DonutChart, BarChart, HorizontalBarChart } from '../Charts';
 import { AlertTriangle, Target, Activity, Clock, ShieldAlert, TrendingUp, Award, ChevronRight, CheckCircle2, XCircle, HelpCircle } from 'lucide-react-native';
 import { DEFAULT_ANALYTICS_LAYOUT, loadAnalyticsLayout } from '../../utils/analyticsLayout';
 import { useQuizStore } from '../../store/quizStore';
+import { SkeletonAnalytics } from '../common/SkeletonLoader';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { StudentSync } from '../../services/StudentSync';
@@ -165,12 +166,7 @@ export const ReviewSection = ({
   };
 
   if (loading) {
-    return (
-      <View style={[styles.center, { padding: spacing.xl }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={{ color: colors.textSecondary, marginTop: spacing.md }}>Analyzing Test Results...</Text>
-      </View>
-    );
+    return <SkeletonAnalytics colors={colors} />;
   }
 
   if (error || !scoreData || !hierarchicalPerformance || Object.keys(hierarchicalPerformance.subjects).length === 0) {

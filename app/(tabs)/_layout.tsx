@@ -6,20 +6,34 @@ import { useTheme } from '../../src/context/ThemeContext';
 import { useState, useEffect, useCallback } from 'react';
 import { TabConfigService, TabKey } from '../../src/services/TabConfigService';
 
+const DEFAULT_TAB_ORDER: TabKey[] = ['index', 'arena', 'analyse', 'pyq', 'flashcards', 'tags', 'pilot-v2', 'browser', 'revise', 'tracker'];
+
 export default function TabsLayout() {
   const { colors } = useTheme();
   const { session, loading: authLoading } = useAuth();
   const segments = useSegments();
-  const [tabOrder, setTabOrder] = useState<TabKey[]>([]);
+  const [tabOrder, setTabOrder] = useState<TabKey[]>(DEFAULT_TAB_ORDER);
   const [loading, setLoading] = useState(true);
 
   // Hide FAB if on Arena tab
   const isArena = segments[segments.length - 1] === 'arena';
 
   const loadConfig = async () => {
-    const order = await TabConfigService.getTabOrder();
-    setTabOrder(order);
-    setLoading(false);
+    try {
+      const timeoutPromise = new Promise<TabKey[]>((_, reject) => 
+        setTimeout(() => reject(new Error('Tab config load timeout')), 5000)
+      );
+      const order = await Promise.race([
+        TabConfigService.getTabOrder(),
+        timeoutPromise
+      ]);
+      setTabOrder(order);
+    } catch (err) {
+      console.error('Failed to load tab config:', err);
+      setTabOrder(DEFAULT_TAB_ORDER);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -28,10 +42,10 @@ export default function TabsLayout() {
 
   // Reload config when settings change (triggered by focus)
   useFocusEffect(useCallback(() => {
-    loadConfig();
-  }, []));
+    if (loading) loadConfig();
+  }, [loading]));
 
-  if (authLoading || loading) {
+  if (authLoading) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' }}>
         <ActivityIndicator color={colors.primary} />

@@ -5,6 +5,7 @@ import { spacing } from '../theme';
 import { supabase } from '../lib/supabase';
 import { LineChart, BarChart, HorizontalBarChart } from './Charts';
 import { TrendingUp, Target, Clock, Calendar, ChevronRight, BarChart2 } from 'lucide-react-native';
+import { SkeletonAnalytics } from './common/SkeletonLoader';
 
 interface AnalyseBetaProps {
   userId: string;
@@ -83,12 +84,7 @@ export const AnalyseBetaSection = ({ userId }: AnalyseBetaProps) => {
   };
 
   if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={{ color: colors.textSecondary, marginTop: 12 }}>Crunching your performance data...</Text>
-      </View>
-    );
+    return <SkeletonAnalytics colors={colors} />;
   }
 
   const avgAccuracy = attempts.length > 0 ? Math.round(attempts.reduce((acc, a) => acc + (a.accuracy || 0), 0) / attempts.length) : 0;

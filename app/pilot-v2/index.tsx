@@ -97,16 +97,41 @@ function PilotV2Inner() {
   // FIX: Reload notes every time the Pilot V2 tab gains focus.
   // This ensures hierarchy/nodes created externally (e.g. from PilotV2SaveSheet
   // on quiz pages) are visible in the sidebar without a manual refresh.
+  // IMPORTANT: Preserve washi tape data and other in-memory state that hasn't
+  // been persisted to Supabase yet.
+  const notesRef = useRef(state.notes);
+  notesRef.current = state.notes;
   useFocusEffect(
     useCallback(() => {
-      // Skip the initial mount since the loadNotes call above already fires
-      // on mount. We use a ref to track first focus vs subsequent focuses.
       const firstFocus = isFirstFocusRef.current;
       isFirstFocusRef.current = false;
       if (firstFocus) return;
 
-      loadNotes();
-    }, [loadNotes])
+      // Capture current notes (from ref) before reload to stash washi tapes
+      const currentNotes = notesRef.current;
+      const tapeCache = new Map<string, any>();
+      currentNotes.forEach((n: any) => {
+        const tapes = n.content?.washiTapes;
+        if (tapes && tapes.length > 0) {
+          tapeCache.set(n.id, tapes);
+        }
+      });
+
+      loadNotes().then(() => {
+        // After reload, restore washi tapes that were in memory.
+        // Use a fresh snapshot from the ref (updated by loadNotes -> SET_NOTES)
+        const freshNotes = notesRef.current;
+        if (tapeCache.size > 0) {
+          dispatch({ type: 'SET_NOTES', payload: freshNotes.map((n: any) => {
+            const cached = tapeCache.get(n.id);
+            if (cached) {
+              return { ...n, content: { ...(n.content || {}), washiTapes: cached } };
+            }
+            return n;
+          })});
+        }
+      });
+    }, [loadNotes, dispatch]) // NOTE: state.notes intentionally omitted to prevent infinite reload loop
   );
 
   // Deep-link support: open a specific Pilot V2 note when coming from Home

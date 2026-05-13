@@ -405,6 +405,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
   const buildAnalysisHtml = (): string => {
     if (!includeReport) return '';
     const pieces: string[] = [];
+    let analyticsCss = ''; // Capture CSS from generateAnalyticsPdfHtml to re-apply in the PDF shell
 
     const canRenderAnalyticsFullReport = reportVariant === 'analytics' && !!trends && !!cumulative;
 
@@ -431,6 +432,10 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
         marginBottomCm: opts.pageMarginBottomCm,
         marginLeftCm: opts.pageMarginLeftCm,
       });
+      // Extract the <style> block + <body> content so analytics chart styles
+      // survive injection into any parent HTML shell.
+      const styleMatch = fullHtml.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+      if (styleMatch) analyticsCss = styleMatch[1];
       const bodyMatch = fullHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
       pieces.push(bodyMatch ? bodyMatch[1] : fullHtml);
     }
@@ -455,7 +460,13 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
     }
 
     if (pieces.length === 0) return '';
-    return pieces.join('<div style="page-break-before: always;"></div>');
+    const joinedHtml = pieces.join('<div style="page-break-before: always;"></div>');
+    // Embed the analytics CSS as an inline <style> tag within the fragment so it
+    // survives injection into any parent HTML shell (both printStandaloneReport
+    // and exportToPdf/injectExecutiveSummary). The <style> tag in body is valid HTML5.
+    return analyticsCss
+      ? `<style>${analyticsCss}</style>\n${joinedHtml}`
+      : joinedHtml;
   };
 
   const pyqPayload = useMemo<ExportPayload | null>(() => {
@@ -1102,20 +1113,31 @@ const ToggleRow = ({ label, value, onChange, colors }: any) => (
  * HTML shell and hands it to expo-print + Sharing.  Mirrors what
  * unifiedExportEngine.exportToPdf does for questions, but without the
  * question-bank body, so users can export analytics alone.
+ *
  */
 async function printStandaloneReport(fragmentHtml: string, o: ExportOptions): Promise<void> {
   let tempUri: string | null = null;
   try {
+    // Use @page for top/bottom margins (re-applied at each page break) + .paper wrapper
+    // with padding as fallback for left/right (reliable on Android WebView).
+    // This mirrors the approach in unifiedExportEngine.ts line 335-352.
+    const mt = clamp(o.pageMarginTopCm, 1);
+    const mr = clamp(o.pageMarginRightCm, 1);
+    const mb = clamp(o.pageMarginBottomCm, 1);
+    const ml = clamp(o.pageMarginLeftCm, 1);
     const html = `<!doctype html><html><head><meta charset="utf-8"/>
     <style>
-      @page { size: A4; margin: ${clamp(o.pageMarginTopCm, 1)}cm ${clamp(o.pageMarginRightCm, 1)}cm ${clamp(o.pageMarginBottomCm, 1)}cm ${clamp(o.pageMarginLeftCm, 1)}cm; }
+      @page { size: A4; margin: ${mt}cm ${mr}cm ${mb}cm ${ml}cm; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
-      body { padding: ${clamp(o.pageMarginTopCm, 1)}cm ${clamp(o.pageMarginRightCm, 1)}cm ${clamp(o.pageMarginBottomCm, 1)}cm ${clamp(o.pageMarginLeftCm, 1)}cm; font-family: ${o.fontFamily === 'serif' ? "'Georgia', serif" : o.fontFamily === 'mono' ? "'Menlo', monospace" : o.fontFamily === 'handwriting' ? "'Caveat', cursive" : "-apple-system, Segoe UI, Roboto, sans-serif"}; color: #0f172a; font-size: ${o.fontSize}pt; }
+      body { font-family: ${o.fontFamily === 'serif' ? "'Georgia', serif" : o.fontFamily === 'mono' ? "'Menlo', monospace" : o.fontFamily === 'handwriting' ? "'Caveat', cursive" : "-apple-system, Segoe UI, Roboto, sans-serif"}; color: #0f172a; font-size: ${o.fontSize}pt; line-height: 1.5; }
+      .paper { padding: ${mt}cm ${mr}cm ${mb}cm ${ml}cm; min-height: 100%; }
       ${o.watermark ? `.watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(-45deg); font-size: 80pt; font-weight: 900; color: rgba(0,0,0,0.06); pointer-events: none; z-index: -1; }` : ''}
     </style></head><body>
+      <div class="paper">
       ${o.watermark ? `<div class="watermark">${escapeHtml(o.watermark)}</div>` : ''}
       ${fragmentHtml}
+      </div>
     </body></html>`;
     
     const { uri } = await Promise.race([

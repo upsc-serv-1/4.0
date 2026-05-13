@@ -18,6 +18,7 @@
  */
 import { KVStore } from '../lib/kvStore';
 import { supabase } from '../lib/supabase';
+import { NetworkStatus } from './NetworkStatus';
 
 const PENDING_KEY = 'sync:pending';
 const DEADLETTER_KEY = 'sync:deadletter';
@@ -31,11 +32,16 @@ export type SyncKind =
   | 'tag_add'                // payload = { tag }
   | 'tag_remove'             // payload = { tag }
   | 'note_upsert'            // payload = user_notes row
+  | 'note_delete'            // payload = { id }
+  | 'note_node_upsert'       // payload = user_note_nodes row (pilot v2)
+  | 'note_node_delete'       // payload = { id }
+  | 'note_content_upsert'    // payload = { id, content, updated_at }
   | 'card_review'            // payload = { user_id, card_id, ...srs fields }
   | 'user_card_upsert'       // payload = user_cards row
   | 'card_delete'            // payload = { id, updated_at } - mark card as deleted
   | 'card_review_insert'     // payload = card_reviews row
-  | 'study_session_upsert';  // payload = study_sessions daily aggregate row
+  | 'study_session_upsert'   // payload = study_sessions daily aggregate row
+  | 'syllabus_progress_upsert'; // payload = user_syllabus_progress row
 
 export interface SyncItem {
   id: string;               // client uuid; also used for idempotent writes
@@ -208,6 +214,44 @@ async function dispatch(item: SyncItem) {
       if (error) throw error;
       return;
     }
+    case 'note_delete': {
+      const { error } = await supabase
+        .from('user_notes')
+        .delete()
+        .eq('id', item.payload.id);
+      if (error) throw error;
+      return;
+    }
+    case 'note_content_upsert': {
+      const { error } = await supabase
+        .from('user_notes')
+        .update({ content: item.payload.content, updated_at: item.payload.updated_at })
+        .eq('id', item.payload.id);
+      if (error) throw error;
+      return;
+    }
+    case 'note_node_upsert': {
+      const { error } = await supabase
+        .from('user_note_nodes')
+        .upsert(item.payload, { onConflict: 'id' });
+      if (error) throw error;
+      return;
+    }
+    case 'note_node_delete': {
+      const { error } = await supabase
+        .from('user_note_nodes')
+        .delete()
+        .eq('id', item.payload.id);
+      if (error) throw error;
+      return;
+    }
+    case 'syllabus_progress_upsert': {
+      const { error } = await supabase
+        .from('user_syllabus_progress')
+        .upsert(item.payload, { onConflict: 'user_id,path' });
+      if (error) throw error;
+      return;
+    }
     case 'card_review': {
       const { error } = await supabase
         .from('user_cards')
@@ -251,11 +295,11 @@ async function dispatch(item: SyncItem) {
 }
 
 /**
- * Best-effort connectivity probe. Used in lieu of @react-native-community/netinfo
- * (which is not in package.json). If this lightweight call succeeds we assume
- * we have network and drain the queue.
+ * Best-effort connectivity probe. Checks NetworkStatus first (instant), then
+ * falls back to a lightweight Supabase auth ping.
  */
 export async function isOnline(): Promise<boolean> {
+  if (!NetworkStatus.isOnline()) return false;
   try {
     const { error } = await supabase.auth.getSession();
     return !error;

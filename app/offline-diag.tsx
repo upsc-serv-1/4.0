@@ -22,6 +22,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../src/context/ThemeContext';
 import { OfflineManager, OfflineMetadata } from '../src/services/OfflineManager';
 import { KVStore } from '../src/lib/kvStore';
+import { NetworkStatus } from '../src/services/NetworkStatus';
 import {
   Wifi,
   WifiOff,
@@ -133,18 +134,22 @@ export default function OfflineDiagScreen() {
 
   const startSimulation = () => {
     try {
+      // 1. Tell NetworkStatus we are offline — this gates the supabase customFetch
+      NetworkStatus.setSimulatedOffline(true);
+
+      // 2. Also patch global.fetch as a belt-and-suspenders approach, logging blocked calls
       // @ts-ignore
       if (!global.__offlineDiagOriginalFetch) {
         // @ts-ignore
-        global.__offlineDiagOriginalFetch = global.fetch || window.fetch;
+        global.__offlineDiagOriginalFetch = global.fetch || (typeof window !== 'undefined' ? window.fetch : undefined);
       }
       // @ts-ignore
-      const _fetch = global.__offlineDiagOriginalFetch || global.fetch || window.fetch;
+      const _fetch = global.__offlineDiagOriginalFetch || global.fetch;
 
       // @ts-ignore
       global.fetch = function (url: any, opts: any) {
         const urlStr = typeof url === 'string' ? url : url?.url || '';
-        if (urlStr.includes('supabase')) {
+        if (urlStr.includes('supabase') && !urlStr.includes('/auth/v1/token')) {
           const short = urlStr.replace(/https:\/\/[^/]+\//, '').substring(0, 100);
           // @ts-ignore
           if (global.__offlineDiagBlocked) {
@@ -157,7 +162,7 @@ export default function OfflineDiagScreen() {
           }
           return Promise.reject(new Error('Offline (simulated)'));
         }
-        return _fetch.call(global, url, opts);
+        return _fetch ? _fetch.call(global, url, opts) : Promise.reject(new Error('fetch unavailable'));
       };
 
       // @ts-ignore
@@ -170,6 +175,10 @@ export default function OfflineDiagScreen() {
 
   const stopSimulation = () => {
     try {
+      // 1. Restore real network state in NetworkStatus
+      NetworkStatus.clearSimulation();
+
+      // 2. Restore original global.fetch
       // @ts-ignore
       if (global.__offlineDiagOriginalFetch) {
         // @ts-ignore

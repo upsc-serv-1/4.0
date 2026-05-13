@@ -36,7 +36,9 @@ const USER_DRAFT_ATTEMPTS_PREFIX = '@user_draft_attempts_';
 const USER_SETTINGS_PREFIX = '@user_settings_';
 const USER_WIDGETS_PREFIX = '@user_widgets_';
 const CARD_FOLDER_MAP_KEY = '@card_folder_map_all';
-const OFFLINE_SYNC_VERSION = 3;
+const USER_TAGS_PREFIX = '@user_tags_';
+const USER_SYLLABUS_PROGRESS_PREFIX = '@user_syllabus_progress_';
+const OFFLINE_SYNC_VERSION = 4;
 
 export const TABLES = {
   questions: 'questions',
@@ -336,9 +338,13 @@ class OfflineManagerService {
         ['draft_attempts', `${USER_DRAFT_ATTEMPTS_PREFIX}${userId}`, 
           (q) => q.eq('user_id', userId)],
         ['user_settings', `${USER_SETTINGS_PREFIX}${userId}`, 
-          (q) => q.eq('user_id', userId)],
+          (q: any) => q.eq('user_id', userId)],
         ['user_widgets', `${USER_WIDGETS_PREFIX}${userId}`, 
-          (q) => q.eq('user_id', userId)],
+          (q: any) => q.eq('user_id', userId)],
+        ['user_tags', `${USER_TAGS_PREFIX}${userId}`, 
+          (q: any) => q.eq('user_id', userId)],
+        ['user_syllabus_progress', `${USER_SYLLABUS_PROGRESS_PREFIX}${userId}`, 
+          (q: any) => q.eq('user_id', userId)],
       ];
       
       for (const [table, key, queryFn] of userTables) {
@@ -497,6 +503,10 @@ class OfflineManagerService {
         return this.readUserScoped(USER_SETTINGS_PREFIX, userId);
       case 'user_widgets':
         return this.readUserScoped(USER_WIDGETS_PREFIX, userId);
+      case 'user_tags':
+        return this.readUserScoped(USER_TAGS_PREFIX, userId);
+      case 'user_syllabus_progress':
+        return this.readUserScoped(USER_SYLLABUS_PROGRESS_PREFIX, userId);
       default:
         return [];
     }
@@ -673,6 +683,8 @@ class OfflineManagerService {
     KVStore.deletePrefix(USER_DRAFT_ATTEMPTS_PREFIX);
     KVStore.deletePrefix(USER_SETTINGS_PREFIX);
     KVStore.deletePrefix(USER_WIDGETS_PREFIX);
+    KVStore.deletePrefix(USER_TAGS_PREFIX);
+    KVStore.deletePrefix(USER_SYLLABUS_PROGRESS_PREFIX);
     KVStore.delete(CARD_FOLDER_MAP_KEY);
   }
 

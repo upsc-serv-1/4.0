@@ -35,8 +35,13 @@ const USER_BRANCH_CARDS_PREFIX = '@user_flashcard_branch_cards_';
 const USER_DRAFT_ATTEMPTS_PREFIX = '@user_draft_attempts_';
 const USER_SETTINGS_PREFIX = '@user_settings_';
 const USER_WIDGETS_PREFIX = '@user_widgets_';
+const USER_TAGS_PREFIX = '@user_tags_';
+const USER_SYLLABUS_PROGRESS_PREFIX = '@user_syllabus_progress_';
+const USER_PROMPT_TEMPLATES_PREFIX = '@user_prompt_templates_';
+const USER_FOLDER_ALGO_SETTINGS_PREFIX = '@user_folder_algo_settings_';
+const USER_BEST_ANSWERS_PREFIX = '@user_best_answers_';
 const CARD_FOLDER_MAP_KEY = '@card_folder_map_all';
-const OFFLINE_SYNC_VERSION = 3;
+const OFFLINE_SYNC_VERSION = 4;
 
 export const TABLES = {
   questions: 'questions',
@@ -56,6 +61,11 @@ export const TABLES = {
   draft_attempts: 'draft_attempts',
   user_settings: 'user_settings',
   user_widgets: 'user_widgets',
+  user_tags: 'user_tags',
+  user_syllabus_progress: 'user_syllabus_progress',
+  prompt_templates: 'prompt_templates',
+  folder_algorithm_settings: 'folder_algorithm_settings',
+  user_best_answers: 'user_best_answers',
 };
 
 // ─── Types ───────────────────────────────────────────────────────
@@ -339,6 +349,18 @@ class OfflineManagerService {
           (q) => q.eq('user_id', userId)],
         ['user_widgets', `${USER_WIDGETS_PREFIX}${userId}`, 
           (q) => q.eq('user_id', userId)],
+        // Added in v4 — these were missing and caused background refresh
+        // calls to Supabase even when offline (see NEW LOG OFFLINE TEST 2.txt).
+        ['user_tags', `${USER_TAGS_PREFIX}${userId}`,
+          (q) => q.eq('user_id', userId)],
+        ['user_syllabus_progress', `${USER_SYLLABUS_PROGRESS_PREFIX}${userId}`,
+          (q) => q.eq('user_id', userId)],
+        ['prompt_templates', `${USER_PROMPT_TEMPLATES_PREFIX}${userId}`,
+          (q) => q.eq('user_id', userId)],
+        ['folder_algorithm_settings', `${USER_FOLDER_ALGO_SETTINGS_PREFIX}${userId}`,
+          (q) => q.eq('user_id', userId)],
+        ['user_best_answers', `${USER_BEST_ANSWERS_PREFIX}${userId}`,
+          (q) => q.eq('user_id', userId)],
       ];
       
       for (const [table, key, queryFn] of userTables) {
@@ -446,6 +468,26 @@ class OfflineManagerService {
         KVStore.setJson(CARDS_PREFIX, Array.from(cardMap.values()));
       }
 
+      // 6. Refresh user_tags / syllabus_progress / prompt_templates /
+      //    folder_algorithm_settings — these are small per-user tables so a
+      //    full refresh is acceptable and saves us from incremental bookkeeping.
+      const smallTables: Array<[string, string]> = [
+        ['user_tags', `${USER_TAGS_PREFIX}${userId}`],
+        ['user_syllabus_progress', `${USER_SYLLABUS_PROGRESS_PREFIX}${userId}`],
+        ['prompt_templates', `${USER_PROMPT_TEMPLATES_PREFIX}${userId}`],
+        ['folder_algorithm_settings', `${USER_FOLDER_ALGO_SETTINGS_PREFIX}${userId}`],
+        ['user_best_answers', `${USER_BEST_ANSWERS_PREFIX}${userId}`],
+        ['user_note_nodes', `${USER_NOTE_NODES_PREFIX}${userId}`],
+      ];
+      for (const [table, key] of smallTables) {
+        try {
+          const { data } = await supabase.from(table).select('*').eq('user_id', userId);
+          if (data) KVStore.setJson(key, data);
+        } catch {
+          /* offline or table missing — leave cache as-is */
+        }
+      }
+
       await this.setMetadata({ lastIncrementalSync: Date.now() });
     } catch (err) {
       console.warn('[Offline] Incremental sync failed (will retry later)', err);
@@ -497,6 +539,16 @@ class OfflineManagerService {
         return this.readUserScoped(USER_SETTINGS_PREFIX, userId);
       case 'user_widgets':
         return this.readUserScoped(USER_WIDGETS_PREFIX, userId);
+      case 'user_tags':
+        return this.readUserScoped(USER_TAGS_PREFIX, userId);
+      case 'user_syllabus_progress':
+        return this.readUserScoped(USER_SYLLABUS_PROGRESS_PREFIX, userId);
+      case 'prompt_templates':
+        return this.readUserScoped(USER_PROMPT_TEMPLATES_PREFIX, userId);
+      case 'folder_algorithm_settings':
+        return this.readUserScoped(USER_FOLDER_ALGO_SETTINGS_PREFIX, userId);
+      case 'user_best_answers':
+        return this.readUserScoped(USER_BEST_ANSWERS_PREFIX, userId);
       default:
         return [];
     }
@@ -673,6 +725,11 @@ class OfflineManagerService {
     KVStore.deletePrefix(USER_DRAFT_ATTEMPTS_PREFIX);
     KVStore.deletePrefix(USER_SETTINGS_PREFIX);
     KVStore.deletePrefix(USER_WIDGETS_PREFIX);
+    KVStore.deletePrefix(USER_TAGS_PREFIX);
+    KVStore.deletePrefix(USER_SYLLABUS_PROGRESS_PREFIX);
+    KVStore.deletePrefix(USER_PROMPT_TEMPLATES_PREFIX);
+    KVStore.deletePrefix(USER_FOLDER_ALGO_SETTINGS_PREFIX);
+    KVStore.deletePrefix(USER_BEST_ANSWERS_PREFIX);
     KVStore.delete(CARD_FOLDER_MAP_KEY);
   }
 

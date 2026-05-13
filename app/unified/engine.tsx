@@ -91,8 +91,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PinchGestureHandler, State as GHState } from 'react-native-gesture-handler';
 import { useTheme } from '../../src/context/ThemeContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
-import { supabase } from '../../src/lib/supabase';
-import { useAuth } from '../../src/context/AuthContext';
+import { supabase } from '../../src/lib/supabase';import { useAuth } from '../../src/context/AuthContext';
 import { useQuizStore } from '../../src/store/quizStore';
 import { useTagStore } from '../../src/store/tagStore';
 import { mergeQuestions } from '../../src/utils/merger';
@@ -106,6 +105,7 @@ import { PilotV2SaveSheet } from '../../src/components/pilot-v2/PilotV2SaveSheet
 import { QuizCaptureSheet } from '../../src/components/hardnotes/QuizCaptureSheet';
 import { OfflineManager } from '../../src/services/OfflineManager';
 import { LocalQuery } from '../../src/services/LocalQuery';
+import { NetworkStatus } from '../../src/lib/networkStatus';
 import { useFlashcardAction } from '../../src/hooks/useFlashcardAction';
 import { SharedQuestionCard } from '../../src/components/unified/SharedQuestionCard';
 import { MyVitaminEditorSheet } from '../../src/components/unified/MyVitaminEditorSheet';
@@ -1591,12 +1591,23 @@ export default function UnifiedQuizEngine() {
           if (tagsRaw && tagsRaw !== 'All' && tagsRaw !== '' && tagsRaw !== '[]' && session?.user?.id) {
             const tagList = typeof tagsRaw === 'string' ? tagsRaw.split('|').filter(Boolean) : [];
             if (tagList.length > 0) {
-              // Build a Set of question IDs that have matching tags from question_states
-              const { data: tagStates } = await supabase
-                .from('question_states')
-                .select('question_id')
-                .eq('user_id', session.user.id)
-                .or(tagList.map(t => `review_tags.cs.["${t}"]`).join(','));
+              // Build a Set of question IDs that have matching tags. Offline-aware.
+              let tagStates: any[] | null = null;
+              try {
+                const { data } = await LocalQuery.from('question_states')
+                  .select('question_id')
+                  .eq('user_id', session.user.id)
+                  .or(tagList.map(t => `review_tags.cs.["${t}"]`).join(','));
+                tagStates = data;
+              } catch { tagStates = null; }
+              if ((!tagStates || tagStates.length === 0) && NetworkStatus.isOnline()) {
+                const res = await supabase
+                  .from('question_states')
+                  .select('question_id')
+                  .eq('user_id', session.user.id)
+                  .or(tagList.map(t => `review_tags.cs.["${t}"]`).join(','));
+                tagStates = res.data;
+              }
               const allowedIds = new Set((tagStates || []).map((t: any) => t.question_id));
               if (allowedIds.size > 0) {
                 filtered = filtered.filter((q: any) => allowedIds.has(q.id));
@@ -1837,23 +1848,34 @@ export default function UnifiedQuizEngine() {
             query = query.order('question_number', { ascending: true }).order('id', { ascending: true });
           }
 
-          const tagsRaw = params.tags;
-          if (tagsRaw && tagsRaw !== 'All' && tagsRaw !== '' && tagsRaw !== '[]' && session?.user?.id) {
-            // Tag filtering requires separate fetch of IDs
-            const tagList = typeof tagsRaw === 'string' ? tagsRaw.split('|').filter(Boolean) : [];
-            const orQuery = tagList.map(t => `review_tags.cs.["${t}"]`).join(',');
-            // Use live server state for revision tags so deletions in Supabase
-            // are reflected immediately and no stale local snapshot leaks in.
-            const { data: tagIds } = await supabase.from('question_states').select('question_id').eq('user_id', session.user.id).or(orQuery);
-            if (tagIds && tagIds.length > 0) {
-               const slicedTagIds = tagIds.map((t: any) => t.question_id).slice(from, from + CHUNK);
-               if (slicedTagIds.length === 0) break;
-               query = query.in('id', slicedTagIds);
-            } else break;
-          } else {
-             // If no specific IDs/tags, use standard range pagination
-             query = query.range(from, from + CHUNK - 1);
-          }
+            const tagsRaw = params.tags;
+            if (tagsRaw && tagsRaw !== 'All' && tagsRaw !== '' && tagsRaw !== '[]' && session?.user?.id) {
+              // Tag filtering requires separate fetch of IDs
+              const tagList = typeof tagsRaw === 'string' ? tagsRaw.split('|').filter(Boolean) : [];
+              const orQuery = tagList.map(t => `review_tags.cs.["${t}"]`).join(',');
+              // Prefer LocalQuery so it works offline. We fall back to Supabase
+              // only when we have no local rows AND we are online.
+              let tagIds: any[] | null = null;
+              try {
+                const { data } = await LocalQuery.from('question_states')
+                  .select('question_id')
+                  .eq('user_id', session.user.id)
+                  .or(orQuery);
+                tagIds = data;
+              } catch { tagIds = null; }
+              if ((!tagIds || tagIds.length === 0) && NetworkStatus.isOnline()) {
+                const res = await supabase.from('question_states').select('question_id').eq('user_id', session.user.id).or(orQuery);
+                tagIds = res.data;
+              }
+              if (tagIds && tagIds.length > 0) {
+                 const slicedTagIds = tagIds.map((t: any) => t.question_id).slice(from, from + CHUNK);
+                 if (slicedTagIds.length === 0) break;
+                 query = query.in('id', slicedTagIds);
+              } else break;
+            } else {
+               // If no specific IDs/tags, use standard range pagination
+               query = query.range(from, from + CHUNK - 1);
+            }
         }
 
         console.log('[ENGINE-FETCH] Starting Supabase query chunk:', {

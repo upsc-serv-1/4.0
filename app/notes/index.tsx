@@ -31,6 +31,7 @@ import {
   Layers, FolderPlus, LayoutGrid, List as ListIcon, Sparkles, Edit2, Trash2,
 } from 'lucide-react-native';
 import { supabase } from '../../src/lib/supabase';
+import { OfflineManager } from '../../src/services/OfflineManager';
 import { useAuth } from '../../src/context/AuthContext';
 import { useTheme } from '../../src/context/ThemeContext';
 import { PremiumMoveSheet, MoveTarget } from '../../src/components/common/PremiumMoveSheet';
@@ -170,7 +171,21 @@ export default function NotesIndex() {
         } catch {}
       }
     } catch {
-      // Keep cached view on network failure.
+      // Network failed — try OfflineManager KVStore as additional fallback
+      if (!hasCached) {
+        try {
+          const offlineNodes = OfflineManager.getCollectionSync('user_note_nodes', session.user.id) as any[];
+          if (offlineNodes && offlineNodes.length > 0) {
+            const rows = offlineNodes.filter((n: any) => !n.is_archived) as RawNode[];
+            if (rows.length > 0) {
+              setAllNodes(rows);
+              try {
+                await AsyncStorage.setItem(cacheKey, JSON.stringify(rows));
+              } catch {}
+            }
+          }
+        } catch {}
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);

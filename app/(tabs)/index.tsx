@@ -16,6 +16,7 @@ import { PageWrapper } from '../../src/components/PageWrapper';
 import { SyllabusService } from '../../src/services/SyllabusService';
 import { MICRO_SYLLABUS } from '../../src/data/syllabus';
 import { fetchPilotV2NotesForUser } from '../../src/repositories/pilotV2Repo';
+import { OfflineManager } from '../../src/services/OfflineManager';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppInfoGuide from '../../src/components/AppInfoGuide';
 import { Check, X } from 'lucide-react-native';
@@ -186,41 +187,80 @@ export default function Home() {
     const cached = await cacheGet<Stats>(`home:${userId}`);
     if (cached) setStats(cached);
 
+    const now = new Date().toISOString();
+
     try {
-      const [
-        { data: qs },
-        { count: notesCount },
-        { count: cardsCount },
-        { data: tagsData }
-      ] = await Promise.all([
+      // ── OFFLINE-FIRST: Read from KVStore cache first ──
+      const offlineStates = OfflineManager.getCollectionSync('question_states', userId) as any[];
+      const offlineNotes = OfflineManager.getCollectionSync('user_notes', userId) as any[];
+      const offlineCards = OfflineManager.getCollectionSync('user_cards', userId) as any[];
+      const offlineTags = OfflineManager.getCollectionSync('user_tags', userId) as any[];
+
+      const total = offlineStates?.length || 0;
+      const correct = offlineStates?.filter(x => x.is_incorrect_last_attempt === false)?.length || 0;
+      const notesCount = offlineNotes?.length || 0;
+      const dueCards = (offlineCards || []).filter(c => 
+        c.status === 'active' && c.next_review && c.next_review <= now
+      ).length;
+      const top8Tags = (offlineTags || [])
+        .sort((a, b) => (b.usage_count || 0) - (a.usage_count || 0))
+        .slice(0, 8)
+        .map(t => ({ name: t.name, count: t.usage_count || 0 }));
+
+      setTopTags(top8Tags);
+
+      // Background: try Supabase for fresher data, but don't block UI
+      Promise.all([
         supabase.from('question_states').select('is_incorrect_last_attempt').eq('user_id', userId),
         supabase.from('user_notes').select('id', { count: 'exact', head: true }).eq('user_id', userId),
         supabase.from('user_cards').select('id', { count: 'exact', head: true })
-          .eq('user_id', userId)
-          .eq('status', 'active')
-          .not('next_review', 'is', null)
-          .lte('next_review', new Date().toISOString()),
-        supabase.from('user_tags')
-          .select('name, usage_count')
-          .eq('user_id', userId)
-          .order('usage_count', { ascending: false })
-          .limit(8)
-      ]);
+          .eq('user_id', userId).eq('status', 'active')
+          .not('next_review', 'is', null).lte('next_review', now),
+        supabase.from('user_tags').select('name, usage_count')
+          .eq('user_id', userId).order('usage_count', { ascending: false }).limit(8)
+      ]).then(([{ data: qs }, { count: supNotesCount }, { count: supCardsCount }, { data: supTags }]) => {
+        const supTotal = qs?.length || 0;
+        const supCorrect = qs?.filter(x => x.is_incorrect_last_attempt === false)?.length || 0;
+        const supDueCards = supCardsCount || 0;
+        const supNotes = supNotesCount || 0;
+        const supTopTags = supTags ? supTags.map(t => ({ name: t.name, count: t.usage_count || 0 })) : top8Tags;
+
+        // Only update if Supabase returned fresher data
+        setStats(prev => ({
+          ...prev,
+          attempts: supTotal > 0 ? supTotal : prev.attempts,
+          accuracy: supTotal > 0 ? Math.round((supCorrect / supTotal) * 100) : prev.accuracy,
+          dueCards: supDueCards > 0 || supCardsCount === 0 ? supDueCards : prev.dueCards,
+          totalNotes: supNotes > 0 || supNotesCount === 0 ? supNotes : prev.totalNotes,
+        }));
+        setTopTags(supTopTags.length > 0 ? supTopTags : top8Tags);
+      }).catch(() => {
+        // Supabase offline — keep using cached data, no error
+      });
 
       // Recent notes on Home should come from Pilot V2 notebooks only.
-      const pilotNotes = await fetchPilotV2NotesForUser(userId);
-      const mapped: NoteNode[] = (pilotNotes || []).slice(0, 8).map((n: any) => ({
-        id: n.id,
-        title: n.title || 'Untitled',
-        type: 'note',
-        updated_at: n.updated_at,
-        note_id: n.id,
-      }));
-      setRecentNotes(mapped);
-      if (tagsData) setTopTags(tagsData.map(t => ({ name: t.name, count: t.usage_count || 0 })));
-
-      const total = qs?.length || 0;
-      const correct = qs?.filter(x => x.is_incorrect_last_attempt === false)?.length || 0;
+      try {
+        const pilotNotes = await fetchPilotV2NotesForUser(userId);
+        const mapped: NoteNode[] = (pilotNotes || []).slice(0, 8).map((n: any) => ({
+          id: n.id,
+          title: n.title || 'Untitled',
+          type: 'note',
+          updated_at: n.updated_at,
+          note_id: n.id,
+        }));
+        setRecentNotes(mapped);
+      } catch (e) {
+        // Offline: use cached notes from KVStore
+        const cachedNotes = (OfflineManager.getCollectionSync('user_notes', userId) as any[]) || [];
+        const mapped: NoteNode[] = cachedNotes.slice(0, 8).map((n: any) => ({
+          id: n.id,
+          title: n.title || 'Untitled',
+          type: 'note',
+          updated_at: n.updated_at,
+          note_id: n.id,
+        }));
+        setRecentNotes(mapped);
+      }
 
       let syllabusPercent = 0;
       let subjectProgress: { label: string; progress: number; color: string }[] = [];
@@ -308,7 +348,7 @@ export default function Home() {
 
       const next: Stats = {
         attempts: total, accuracy: total ? Math.round((correct / total) * 100) : 0,
-        dueCards: cardsCount || 0, totalNotes: notesCount || 0, streak: 5, syllabusPercent, subjectProgress
+        dueCards, totalNotes: notesCount, streak: 5, syllabusPercent, subjectProgress
       };
       setStats(next);
       await cacheSet(`home:${userId}`, next);
@@ -346,17 +386,39 @@ export default function Home() {
 
   const startRandomPyqTest = useCallback(async (startYear: number, endYear: number, count: number) => {
     try {
-      const { data: testRows, error: testErr } = await supabase.from('tests').select('id, title, launch_year, exam_year, institute, program_id, program_name, series').limit(5000);
-      if (testErr) throw testErr;
-      const eligibleTests = (testRows || []).filter((t: any) => {
+      // OFFLINE-FIRST: Use cached tests and questions from KVStore
+      const cachedTests = OfflineManager.getOfflineTestsSync();
+      let testRows: any[] = cachedTests?.length > 0 ? cachedTests : [];
+      
+      // If no offline tests, try Supabase
+      if (testRows.length === 0) {
+        const { data, error } = await supabase.from('tests').select('id, title, launch_year, exam_year, institute, program_id, program_name, series').limit(5000);
+        if (error) throw error;
+        testRows = data || [];
+      }
+      
+      const eligibleTests = testRows.filter((t: any) => {
         const y = Number(t.launch_year || t.exam_year || 0);
         return y >= startYear && y <= endYear && isStrictPyqSource(t);
       });
       if (eligibleTests.length === 0) { Alert.alert('No tests found', 'No matching X-IAS / PYQ Book / UPSC CSE tests were found.'); return false; }
+      
       const testIdSet = new Set(eligibleTests.map((t: any) => String(t.id)));
-      const { data: qRows, error: qErr } = await supabase.from('questions').select('id, test_id, is_pyq, subject, section_group, micro_topic, source').in('test_id', Array.from(testIdSet)).eq('is_pyq', true).limit(12000);
-      if (qErr) throw qErr;
-      const filtered = (qRows || []).filter((q: any) => isStrictPyqSubject(q));
+      
+      // OFFLINE-FIRST: Filter cached questions
+      const cachedQuestions = OfflineManager.getOfflineQuestionsAllSync();
+      let qRows: any[] = [];
+      if (cachedQuestions.length > 0) {
+        qRows = cachedQuestions.filter((q: any) => testIdSet.has(String(q.test_id)));
+      } else {
+        const { data, error } = await supabase.from('questions')
+          .select('id, test_id, is_pyq, subject, section_group, micro_topic, source')
+          .in('test_id', Array.from(testIdSet)).eq('is_pyq', true).limit(12000);
+        if (error) throw error;
+        qRows = data || [];
+      }
+      
+      const filtered = qRows.filter((q: any) => isStrictPyqSubject(q));
       if (filtered.length < count) { Alert.alert('Not enough questions', `Found only ${filtered.length} strict PYQ questions.`); return false; }
       const selected = filtered.map((q: any) => q.id).sort(() => Math.random() - 0.5).slice(0, count);
       router.push({ pathname: '/unified/engine', params: { mode: 'exam', view: 'list', timer: 'countdown', resultIds: selected.join(','), title: `Random PYQ ${startYear}-${endYear}` } } as any);

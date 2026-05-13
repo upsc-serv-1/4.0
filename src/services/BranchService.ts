@@ -14,6 +14,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { safeSetItem } from '../lib/safeAsyncStorage';
 import { supabase } from '../lib/supabase';
+import { OfflineManager } from './OfflineManager';
 
 export interface Branch {
   id: string;

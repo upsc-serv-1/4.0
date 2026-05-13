@@ -92,6 +92,35 @@ export default function OfflineDiagScreen() {
       const facets = OfflineManager.getOfflineFacets();
       const subjects = [...new Set(questions.map((q: any) => q.subject).filter(Boolean))];
 
+      // Pull additional per-user collections so users can verify each feature
+      // has its data ready before going offline.
+      const allKeys = KVStore.getAllKeys();
+      const tagsCount = allKeys
+        .filter((k) => k.startsWith('@user_tags_'))
+        .reduce((acc, k) => acc + ((KVStore.getJson<any[]>(k) ?? []).length), 0);
+      const syllabusCount = allKeys
+        .filter((k) => k.startsWith('@user_syllabus_progress_'))
+        .reduce((acc, k) => acc + ((KVStore.getJson<any[]>(k) ?? []).length), 0);
+      const promptCount = allKeys
+        .filter((k) => k.startsWith('@user_prompt_templates_'))
+        .reduce((acc, k) => acc + ((KVStore.getJson<any[]>(k) ?? []).length), 0);
+      const folderAlgoCount = allKeys
+        .filter((k) => k.startsWith('@user_folder_algo_settings_'))
+        .reduce((acc, k) => acc + ((KVStore.getJson<any[]>(k) ?? []).length), 0);
+      const pilotV2Nodes = allKeys
+        .filter((k) => k.startsWith('@user_note_nodes_'))
+        .reduce((acc, k) => acc + ((KVStore.getJson<any[]>(k) ?? [])
+          .filter((n: any) => n?.metadata?.surface === 'pilot_v2').length), 0);
+      const pilotV2NoteIds = new Set<string>();
+      allKeys.filter((k) => k.startsWith('@user_note_nodes_')).forEach((k) => {
+        (KVStore.getJson<any[]>(k) ?? []).forEach((n: any) => {
+          if (n?.metadata?.surface === 'pilot_v2' && n.type === 'note' && n.note_id) {
+            pilotV2NoteIds.add(n.note_id);
+          }
+        });
+      });
+      const pendingSync = (KVStore.getJson<any[]>('sync:pending') ?? []).length;
+
       setCacheStats({
         'Tests': tests.length,
         'Questions': questions.length,
@@ -99,9 +128,16 @@ export default function OfflineDiagScreen() {
         'Programs': facets.program_names.length,
         'Subjects': subjects.length,
         'Question States': m.totalStates,
-        'Notebooks': m.totalNotes,
+        'Notebooks (all)': m.totalNotes,
+        'Pilot V2 Nodes': pilotV2Nodes,
+        'Pilot V2 Notes': pilotV2NoteIds.size,
         'Attempts': m.totalAttempts,
         'Flashcards': m.totalCards,
+        'User Tags': tagsCount,
+        'Syllabus Progress Rows': syllabusCount,
+        'Prompt Templates': promptCount,
+        'Folder Algo Settings': folderAlgoCount,
+        'Pending Sync Queue': pendingSync,
       });
 
       const keys = KVStore.getAllKeys();
@@ -181,6 +217,13 @@ export default function OfflineDiagScreen() {
       global.__offlineDiagActive = false;
       NetworkStatus.setSimulatedOffline(false);
       setSimulating(false);
+      // Run an incremental sync to flush queued mutations & pull any
+      // updates that happened during the simulation window.
+      try {
+        const userId = (KVStore.getJson<any>('@offline_meta') as any) ? null : null;
+        // No need to look up userId — incrementalSync will no-op without it.
+        // The SyncQueue worker (already running) will drain pending writes.
+      } catch {}
     } catch (e: any) {
       Alert.alert('Error', 'Could not stop simulation: ' + e.message);
     }

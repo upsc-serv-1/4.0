@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { OfflineManager } from './OfflineManager';
+import { NetworkStatus } from '../lib/networkStatus';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const ALL_WIDGET_KEYS = [
@@ -27,6 +28,7 @@ export type WidgetConfig = {
 
 class WidgetSvcImpl {
   async ensureSeeded(userId: string) {
+    if (!NetworkStatus.isOnline()) return;
     const { data, error } = await supabase
       .from('user_widgets').select('widget_key').eq('user_id', userId);
     if (error) throw error;
@@ -43,6 +45,9 @@ class WidgetSvcImpl {
     const cached = (OfflineManager.getCollectionSync('user_widgets', userId) as Widget[])
       .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
 
+    // Offline: return cached list immediately.
+    if (!NetworkStatus.isOnline()) return cached;
+
     try {
       await this.ensureSeeded(userId);
       const { data, error } = await supabase
@@ -57,16 +62,19 @@ class WidgetSvcImpl {
   }
 
   async archive(userId: string, id: string) {
+    if (!NetworkStatus.isOnline()) return;
     await supabase.from('user_widgets').update({ is_archived: true })
       .eq('id', id).eq('user_id', userId);
   }
 
   async restore(userId: string, id: string) {
+    if (!NetworkStatus.isOnline()) return;
     await supabase.from('user_widgets').update({ is_archived: false })
       .eq('id', id).eq('user_id', userId);
   }
 
   async reorder(userId: string, orderedIds: string[]) {
+    if (!NetworkStatus.isOnline()) return;
     const updates = orderedIds.map((id, idx) =>
       supabase.from('user_widgets').update({ position: idx })
         .eq('id', id).eq('user_id', userId)
@@ -74,7 +82,7 @@ class WidgetSvcImpl {
     await Promise.all(updates);
   }
 
-  // Widget Configuration Management
+  // Widget Configuration Management — local-only, no Supabase calls.
   private getConfigKey(widgetKey: string): string {
     return `widget_config:${widgetKey}`;
   }

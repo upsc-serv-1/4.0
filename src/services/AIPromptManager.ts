@@ -8,6 +8,8 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
+import { NetworkStatus } from '../lib/networkStatus';
+import { OfflineManager } from './OfflineManager';
 
 export type PromptCategory = 'quiz' | 'notes' | 'tags' | 'analysis' | 'syllabus' | 'flashcard' | 'save_sheet';
 
@@ -483,7 +485,29 @@ export class AIPromptManager {
     const cacheKey = `prompts_${userId}_${category}`;
     const serverKey = `prompts_${userId}_${category}_server_ts`;
 
-    // Try to fetch from server first (online-first strategy)
+    // OFFLINE-FIRST: when offline, prefer OfflineManager → AsyncStorage → defaults.
+    if (!NetworkStatus.isOnline()) {
+      try {
+        const kvRows = OfflineManager.getCollectionSync('prompt_templates', userId) as any[];
+        const offlineCustom = (kvRows || [])
+          .filter((r: any) => r.category === category && r.is_active !== false);
+        if (offlineCustom.length > 0) {
+          const merged: PromptTemplate[] = [...(ALL_DEFAULTS[category] || [])];
+          offlineCustom.forEach((c: any) => {
+            const idx = merged.findIndex((d) => d.template_key === c.template_key);
+            if (idx > -1) merged[idx] = c; else merged.push(c);
+          });
+          return merged;
+        }
+      } catch {}
+      try {
+        const cached = await AsyncStorage.getItem(cacheKey);
+        if (cached) return JSON.parse(cached);
+      } catch {}
+      return ALL_DEFAULTS[category] || [];
+    }
+
+    // Online: hit the network for fresh data.
     try {
       const { data, error } = await supabase
         .from('prompt_templates')

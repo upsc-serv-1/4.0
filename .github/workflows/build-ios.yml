@@ -1,0 +1,68 @@
+name: Build iOS IPA (Unsigned)
+
+on:
+  push:
+    branches: [ main, '2.*' ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Expo Prebuild
+        run: npx expo prebuild --platform ios --no-install
+
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          pod install
+
+      - name: Detect Xcode scheme
+        id: detect-scheme
+        run: |
+          cd ios
+          SCHEME=$(xcodebuild -list -json | jq -r '.project.targets[0]')
+          echo "Detected Scheme: $SCHEME"
+          echo "scheme=$SCHEME" >> $GITHUB_OUTPUT
+
+      - name: Build unsigned archive
+        run: |
+          cd ios
+          xcodebuild archive \
+            -workspace *.xcworkspace \
+            -scheme "${{ steps.detect-scheme.outputs.scheme }}" \
+            -configuration Release \
+            -archivePath build/App.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_ENTITLEMENTS="" \
+            CODE_SIGNING_INJECT_BASE_ENTITLEMENTS=NO
+
+      - name: Package as unsigned IPA
+        run: |
+          cd ios/build
+          mkdir -p Payload
+          cp -r App.xcarchive/Products/Applications/*.app Payload/
+          zip -qr unsigned-app.ipa Payload
+          ls -lah unsigned-app.ipa
+        working-directory: ${{ github.workspace }}
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-ipa
+          path: ios/build/unsigned-app.ipa

@@ -18,9 +18,10 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity,
   ScrollView, Platform, Alert, ActivityIndicator, Animated,
-  useWindowDimensions, Keyboard, TextInput,
+  useWindowDimensions, Keyboard, TextInput, Dimensions, KeyboardAvoidingView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Rocket, X, Plus, Wand2, Highlighter, Eraser, Undo2, Redo2, Brain, Copy, Sparkles, Clipboard } from 'lucide-react-native';
 import { RichToolbar, actions } from 'react-native-pell-rich-editor';
 import RichNoteEditor from '../RichNoteEditor';
@@ -250,26 +251,46 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
     return () => { cancelled = true; };
   }, [visible, userId]);
 
+  // Track visibility transitions to re-initialize ONLY when sheet opens,
+  // not on every prop reference change (which causes editor flickering).
+  const wasVisibleRef = useRef(false);
+  const initialBodySnapshot = useRef('');
+  const autoSeedSnapshot = useRef(autoSeed);
+
   useEffect(() => {
-    if (!visible) return;
+    if (!visible) {
+      wasVisibleRef.current = false;
+      return;
+    }
+    if (wasVisibleRef.current) return; // already initialized
+    wasVisibleRef.current = true;
+    initialBodySnapshot.current = initialBody || '';
+    autoSeedSnapshot.current = autoSeed;
+
+    // Re-initialize body & editor on open
+    setBody(markdownishToHtml(initialBody || ''));
+    setSavedNoteId(null);
+    setAppendCount(0);
+    setEditorKey(k => k + 1);
+
     // Read last-used preferences and merge with autoSeed (autoSeed wins).
     let cancelled = false;
     (async () => {
       const last = await readLastUsed();
       if (cancelled) return;
-      setSubject(autoSeed?.subject || last.subject || '');
-      setTopic(autoSeed?.topic || last.topic || '');
-      setSubtopic(autoSeed?.subtopic || last.subtopic || '');
+      const seed = autoSeedSnapshot.current;
+      setSubject(seed?.subject || last.subject || '');
+      setTopic(seed?.topic || last.topic || '');
+      setSubtopic(seed?.subtopic || last.subtopic || '');
       setNotebook(
-        autoSeed?.notebookTitle ||
+        seed?.notebookTitle ||
         last.notebook ||
-        autoSeed?.subtopic ||
-        autoSeed?.topic ||
-        autoSeed?.subject ||
+        seed?.subtopic ||
+        seed?.topic ||
+        seed?.subject ||
         ''
       );
     })();
-    setBody(markdownishToHtml(initialBody || ''));
     setSavedNoteId(null);
     setAppendCount(0);
     setEditorKey(k => k + 1);
@@ -278,7 +299,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
       else setAiPrompt('');
     });
     return () => { cancelled = true; };
-  }, [visible, autoSeed, initialBody]);
+  }, [visible]);
 
   useEffect(() => {
     const showEvt = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
@@ -287,9 +308,15 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
       setKeyboardOpen(true);
       const h = e?.endCoordinates?.height;
       setKeyboardHeight(typeof h === 'number' ? h : 0);
-      // Smoothly roll header+chips into top edge (like Syllabus tracker)
-      Animated.timing(topTranslate, {
-        toValue: -Math.max(0, topAreaH + 14),
+      // Sheet is 85% of screen.  With justifyContent:flex-start it sits at y=0.
+      // Translate it up so the sheet bottom clears the keyboard overlay.
+      // S = 0.15 * screenH - keyboardH  (derived from S + 0.85*H = H - K).
+      const screenH = Dimensions.get('window').height;
+      const sheetGap = screenH * 0.15; // 15% of screen below the sheet
+      const kbHeight = typeof h === 'number' ? h : 0;
+      const targetS = sheetGap - kbHeight; // negative = translate up
+      Animated.timing(sheetTranslate, {
+        toValue: targetS,
         duration: 260,
         useNativeDriver: true,
       }).start(() => {
@@ -297,11 +324,6 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
           (scrollRef.current as any).scrollTo({ y: Math.max(toolbarY - 12, 0), animated: true });
         }
       });
-      Animated.timing(sheetTranslate, {
-        toValue: -Math.min(160, (typeof h === 'number' ? h : 0) * 0.35),
-        duration: 260,
-        useNativeDriver: true,
-      }).start();
     });
     const h = Keyboard.addListener(hideEvt, () => {
       setKeyboardOpen(false);
@@ -587,26 +609,14 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <View style={backdropStyle}>
-        {/* Backdrop tap-to-close: explicit lower zIndex than sheet */}
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={onClose}
-          style={[StyleSheet.absoluteFill, { zIndex: 1 }]}
-        />
-        <View style={{ width: '100%', height: '100%', zIndex: 10 }}>
-          <Animated.View style={{ transform: [{ translateY: sheetTranslate }], width: '100%', height: '100%', alignItems: 'center', justifyContent: keyboardOpen ? 'flex-start' : 'center', paddingTop: keyboardOpen ? 12 : 16, paddingBottom: 16 }}>
-            <View
-              testID="pilot-v2-save-sheet"
-              style={[sheetStyle, { backgroundColor: colors.surface }]}
-              onStartShouldSetResponder={() => true}
-              onMoveShouldSetResponder={() => true}
-            >
-            <Animated.View
-              style={{ transform: [{ translateY: topTranslate }], zIndex: 4 }}
-              onLayout={(e) => setTopAreaH(e.nativeEvent.layout.height)}
-            >
-              {/* Header */}
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+        >
+          <View style={{ flex: 1, padding: 16 }}>
+            {/* Header */}
+            <View style={styles.header}>
               <View style={styles.header}>
                 <View style={[styles.brand, { backgroundColor: '#5B4EFA' }]}>
                   <Rocket size={18} color="#fff" />
@@ -766,7 +776,7 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
                   </View>
                 </View>
               </View>
-            </Animated.View>
+            </View>
 
             {aiPanelOpen ? (
               <PilotV2SaveAIPanel
@@ -1102,9 +1112,8 @@ export const PilotV2SaveSheet: React.FC<Props> = ({
               }}
             />
             </View>
-          </Animated.View>
-        </View>
-      </View>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
     </Modal>
   );
 };

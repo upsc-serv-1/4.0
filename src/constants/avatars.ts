@@ -9,4 +9,6 @@ export const AVATARS = [
   { id: 'girl3', uri: require('../../assets/avatars/girl3.png') },
   { id: 'girl4', uri: require('../../assets/avatars/girl4.png') },
   { id: 'girl5', uri: require('../../assets/avatars/girl5.png') },
+  { id: 'doctor_male', uri: require('../../assets/avatars/doctor_male.png') },
+  { id: 'doctor_female', uri: require('../../assets/avatars/doctor_female.png') },
 ];

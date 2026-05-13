@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { KVStore } from '../lib/kvStore';
+import { NetworkStatus } from '../lib/networkStatus';
 import { applySM2, DEFAULT_SETTINGS, Grade, AlgorithmSettings, previewAllGrades } from './sm2';
 import { FolderSettingsSvc } from './FolderSettingsService';
 import { SyncQueue } from './SyncQueue';
@@ -329,27 +330,45 @@ export class FlashcardSvc {
   static async remainingNewCapForToday(
     userId: string, folder: StudyQueueFolder, settings: AlgorithmSettings
   ): Promise<number> {
+    // OFFLINE-FIRST: compute from cached card_reviews if possible.
     const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
-    // A card is "introduced today" if last_reviewed is today AND it was previously not_studied.
-    // Approx: count card_reviews where prev_interval=0 AND reviewed_at >= today.
-    // Also filter out deleted cards.
-    let q = supabase
-      .from('card_reviews')
-      .select('id, card_id, cards!inner(subject, section_group, microtopic)', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .eq('prev_interval', 0)
-      .eq('cards.is_deleted', false)
-      .gte('reviewed_at', startOfDay.toISOString());
-    if (folder.subject) q = q.eq('cards.subject', folder.subject);
-    if (folder.section && folder.section !== 'General') q = q.eq('cards.section_group', folder.section);
-    if (folder.microtopic) q = q.eq('cards.microtopic', folder.microtopic);
+    try {
+      const reviews = ((OfflineManager as any).getCollectionSync('card_reviews', userId) ?? [])
+        .filter((r: any) => r.user_id === userId && Number(r.prev_interval) === 0
+          && r.reviewed_at && new Date(r.reviewed_at) >= startOfDay);
+      // Filter by folder using the cached cards table.
+      const cardsById = new Map(((OfflineManager as any).getCollectionSync('cards') ?? [])
+        .map((c: any) => [c.id, c]));
+      const introducedToday = reviews.filter((r: any) => {
+        const c = cardsById.get(r.card_id);
+        if (!c || c.is_deleted) return false;
+        if (folder.subject && c.subject !== folder.subject) return false;
+        if (folder.section && folder.section !== 'General' && c.section_group !== folder.section) return false;
+        if (folder.microtopic && c.microtopic !== folder.microtopic) return false;
+        return true;
+      }).length;
+      return Math.max(0, settings.new_cards_per_day - introducedToday);
+    } catch {}
 
-    const { count, error } = await q;
-    if (error) {
-      // Non-fatal — fall back to full cap
+    // Fallback to server (will fast-fail offline; treat as full cap).
+    try {
+      let q = supabase
+        .from('card_reviews')
+        .select('id, card_id, cards!inner(subject, section_group, microtopic)', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('prev_interval', 0)
+        .eq('cards.is_deleted', false)
+        .gte('reviewed_at', startOfDay.toISOString());
+      if (folder.subject) q = q.eq('cards.subject', folder.subject);
+      if (folder.section && folder.section !== 'General') q = q.eq('cards.section_group', folder.section);
+      if (folder.microtopic) q = q.eq('cards.microtopic', folder.microtopic);
+
+      const { count, error } = await q;
+      if (error) return settings.new_cards_per_day;
+      return Math.max(0, settings.new_cards_per_day - (count ?? 0));
+    } catch {
       return settings.new_cards_per_day;
     }
-    return Math.max(0, settings.new_cards_per_day - (count ?? 0));
   }
 
   // ============ CREATE ============
@@ -530,6 +549,9 @@ export class FlashcardSvc {
     let card: any = localCards.find((c: any) => c.id === cardId);
 
     if (!cur || !card) {
+      if (!NetworkStatus.isOnline()) {
+        throw new Error('Card not found in offline cache. Connect to internet to refresh.');
+      }
       const { data, error } = await supabase
         .from('user_cards')
         .select('*, cards!inner(subject, section_group, microtopic)')

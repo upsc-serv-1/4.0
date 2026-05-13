@@ -185,8 +185,10 @@ export const MyVitaminEditorSheet: React.FC<MyVitaminEditorSheetProps> = ({
               </View>
             ) : (
               <>
-                {/* Toolbar - Hide when keyboard is visible to maximize writing area */}
-                {!isKeyboardVisible && (
+                {/* 🔧 FIX: Toolbar is now ALWAYS visible — never hidden on keyboard open.
+                    Formatting tools are needed MOST while typing, so the old
+                    `isKeyboardVisible` guard was backwards.  The KeyboardAvoidingView
+                    handles viewport shrinkage so the toolbar stays docked at the top. */}
                 <View style={[styles.toolbarContainer, { backgroundColor: colors.surfaceStrong, borderBottomColor: colors.border }]}>
                   <RichToolbar
                     getEditor={() => richRef.current}
@@ -253,7 +255,6 @@ export const MyVitaminEditorSheet: React.FC<MyVitaminEditorSheetProps> = ({
                     </View>
                   )}
                 </View>
-                )}
 
                 {/* Editor Area */}
                 <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled">

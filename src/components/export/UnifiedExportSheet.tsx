@@ -6,6 +6,7 @@ import {
 import { X, FileDown, Layout, ChevronDown, ChevronRight, Settings, Check } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../../context/ThemeContext';
+import { useResponsive } from '../../hooks/useResponsive';
 import {
   ExportOptions, ExportPayload, defaultExportOptions, exportToPdf,
   ExportFontFamily, ExportTheme, ExportPaperStyle, ExportContentScope,
@@ -142,6 +143,7 @@ export const UnifiedExportSheet: React.FC<Props> = ({
   onPreExport,
 }) => {
   const { colors } = useTheme();
+  const { isTablet } = useResponsive();
   const [opts, setOpts] = useState<ExportOptions>(() => defaultExportOptions({
     title: title || initialOptions?.title || 'Export',
     ...(initialOptions || {}),
@@ -275,12 +277,30 @@ export const UnifiedExportSheet: React.FC<Props> = ({
     ? payload.blocks.filter((b) => b.type === 'microTopicHeading')
     : [];
 
+  const sheetBorderRadius = isTablet ? 24 : undefined;
+
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={styles.overlay}>
+      <View
+        style={[
+          styles.overlay,
+          isTablet && { justifyContent: 'center', alignItems: 'center', padding: 40 },
+        ]}
+      >
         <TouchableOpacity style={StyleSheet.absoluteFill} onPress={onClose} />
-        <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
-          <View style={styles.sheetHandle} />
+        <View
+          style={[
+            styles.sheet,
+            { backgroundColor: colors.surface, maxHeight: isTablet ? '85%' : '92%' },
+            isTablet && {
+              width: 540,
+              borderRadius: sheetBorderRadius,
+              borderBottomLeftRadius: sheetBorderRadius,
+              borderBottomRightRadius: sheetBorderRadius,
+            },
+          ]}
+        >
+          {!isTablet && <View style={styles.sheetHandle} />}
           <View style={styles.header}>
             <View style={{ flex: 1 }}>
               <Text style={[styles.title, { color: colors.textPrimary }]}>{title || 'Export'}</Text>

@@ -176,59 +176,35 @@ export function useTaggedVault(userId: string | undefined) {
       if (questionsError) throw questionsError;
 
       // Issue 52: Fetch sibling UPSC PYQ questions for full multi-institute coverage.
-      // The merger needs other-institute variants of the same question to aggregate
+      // The merger needs ALL institute variants of the same question to aggregate
       // explanations — but we only fetched the specific questions the user tagged.
-      // 🐛 FIX: Only fetch siblings for the SAME subject+year as tagged questions,
-      // instead of fetching ALL UPSC PYQs across all years (which can be 2000+).
+      // Find UPSC PYQs among tagged questions and fetch their siblings.
       const rawQuestions = questions || [];
-      // Group tagged UPSC PYQs by (year, subject) so we can fetch only relevant siblings
-      const yearSubjectPairs = new Map<string, Set<string>>();
+      const upscPyqYears = new Set<string>();
       for (const q of rawQuestions) {
-        const testsData = Array.isArray(q?.tests) ? q.tests[0] : q?.tests;
-        const groupName = String(testsData?.series || q?.exam_group || '').toUpperCase();
+        const groupName = String(q?.tests?.series || q?.exam_group || '').toUpperCase();
         const isUpsc = !!q?.is_upsc_cse || groupName.includes('UPSC');
-        if (q?.is_pyq && isUpsc && q?.exam_year && q?.subject) {
-          const y = String(q.exam_year);
-          if (!yearSubjectPairs.has(y)) yearSubjectPairs.set(y, new Set());
-          yearSubjectPairs.get(y)!.add(q.subject);
+        if (q?.is_pyq && isUpsc && q?.exam_year) {
+          upscPyqYears.add(String(q.exam_year));
         }
       }
       let allQuestions = [...rawQuestions];
-      if (yearSubjectPairs.size > 0) {
-        // Fetch siblings grouped by (year, subject) — each group is bounded
-        const siblingPromises: Promise<any[]>[] = [];
-        for (const [year, subjects] of yearSubjectPairs) {
-          const subList = Array.from(subjects);
-          siblingPromises.push(
-            supabase
-              .from('questions')
-              .select('id, test_id, subject, section_group, micro_topic, question_text, explanation_markdown, correct_answer, options, is_pyq, is_upsc_cse, exam_year, exam_group, tests(institute,program_name,series)')
-              .eq('exam_year', year)
-              .eq('is_pyq', true)
-              .eq('is_upsc_cse', true)
-              .in('subject', subList)
-              .limit(2000)
-              .then(({ data }) => data || [])
-          );
-        }
-        const siblingArrays = await Promise.all(siblingPromises);
-        const existingIds = new Set(rawQuestions.map(q => q.id));
-        for (const siblings of siblingArrays) {
-          if (siblings.length > 0) {
-            const newSiblings = siblings.filter((s: any) => !existingIds.has(s.id));
-            allQuestions = [...allQuestions, ...newSiblings];
-          }
+      if (upscPyqYears.size > 0) {
+        const { data: siblings } = await supabase
+          .from('questions')
+          .select('id, test_id, subject, section_group, micro_topic, question_text, explanation_markdown, correct_answer, options, is_pyq, is_upsc_cse, exam_year, exam_group, tests(institute,program_name,series)')
+          .in('exam_year', Array.from(upscPyqYears))
+          .eq('is_pyq', true)
+          .eq('is_upsc_cse', true)
+          .limit(2000);
+        if (siblings && siblings.length > 0) {
+          const existingIds = new Set(rawQuestions.map(q => q.id));
+          const newSiblings = siblings.filter((s: any) => !existingIds.has(s.id));
+          allQuestions = [...rawQuestions, ...newSiblings];
         }
       }
 
-      // 🐛 FIX: Run mergeQuestions asynchronously to prevent UI freeze
-      // (setTimeout yields to event loop so loading spinner renders)
-      const merged = await new Promise<{ mergedQs: any[]; idToMergedId: Map<string, string> }>(resolve => {
-        setTimeout(() => {
-          resolve(mergeQuestions(allQuestions as any[]));
-        }, 50);
-      });
-      const { mergedQs, idToMergedId } = merged;
+      const { mergedQs, idToMergedId } = mergeQuestions(allQuestions as any[]);
       const questionsById = new Map<string, any>();
       allQuestions.forEach((q: any) => questionsById.set(q.id, q));
       mergedQs.forEach((q: any) => questionsById.set(q.id, q));
@@ -309,8 +285,8 @@ export function useTaggedVault(userId: string | undefined) {
   }, [cacheKey, userId]);
 
   // Use refs to store latest function references for realtime callbacks
-  const fetchVaultDataRef = useRef<typeof fetchVaultData>();
-  const loadTagCatalogRef = useRef<typeof loadTagCatalog>();
+  const fetchVaultDataRef = useRef<(() => Promise<void>) | null>(null);
+  const loadTagCatalogRef = useRef<(() => Promise<void>) | null>(null);
 
   useEffect(() => {
     fetchVaultDataRef.current = fetchVaultData;

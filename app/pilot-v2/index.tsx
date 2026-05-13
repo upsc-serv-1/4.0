@@ -138,31 +138,36 @@ function PilotV2Inner() {
         )}
         <View style={{ flex: 1 }} testID="pilot-v2-main">
           {main}
-          {!showSidebar && (
-            <TouchableOpacity
-              testID="pilot-v2-show-sidebar"
-              onPress={() => dispatch({ type: 'TOGGLE_SIDEBAR' })}
-              style={{
-                position: 'absolute',
-                bottom: 24,
-                left: 24,
-                width: 44,
-                height: 44,
-                borderRadius: 22,
-                backgroundColor: '#5B4EFA',
-                alignItems: 'center',
-                justifyContent: 'center',
-                shadowColor: '#5B4EFA',
-                shadowOpacity: 0.3,
-                shadowRadius: 8,
-                shadowOffset: { width: 0, height: 4 },
-                elevation: 5,
-                zIndex: 9999,
-              }}
-            >
+          {/* Sidebar toggle — always visible for uniformity.
+             When sidebar is collapsed: shows ChevronRight to open.
+             When sidebar is open: shows ChevronLeft to close. */}
+          <TouchableOpacity
+            testID="pilot-v2-show-sidebar"
+            onPress={() => dispatch({ type: 'TOGGLE_SIDEBAR' })}
+            style={{
+              position: 'absolute',
+              bottom: 24,
+              left: 24,
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              backgroundColor: showSidebar ? '#1e293b' : '#5B4EFA',
+              alignItems: 'center',
+              justifyContent: 'center',
+              shadowColor: '#5B4EFA',
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              shadowOffset: { width: 0, height: 4 },
+              elevation: 5,
+              zIndex: 9999,
+            }}
+          >
+            {showSidebar ? (
+              <ChevronLeft size={20} color="#fff" />
+            ) : (
               <ChevronRight size={20} color="#fff" />
-            </TouchableOpacity>
-          )}
+            )}
+          </TouchableOpacity>
         </View>
       </View>
 

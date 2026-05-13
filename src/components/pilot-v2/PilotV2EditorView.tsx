@@ -83,20 +83,8 @@ const tomorrowMorningMinutes = (): number => {
   return Math.max(1, Math.round((next.getTime() - Date.now()) / 60000));
 };
 
-const DEFAULT_BLOCKS: PilotV2Block[] = [
-  { id: newId(), type: 'heading', level: 2, text: 'Key Points' },
-  { id: newId(), type: 'bullet', text: 'No person shall be deprived of his life or personal liberty except according to procedure established by law.' },
-  { id: newId(), type: 'bullet', text: 'Interpreted widely by the judiciary.' },
-  { id: newId(), type: 'bullet', text: 'Includes the right to live with dignity.' },
-  { id: newId(), type: 'heading', level: 2, text: 'Important Cases' },
-  { id: newId(), type: 'bullet', text: 'Maneka Gandhi v. Union of India' },
-  { id: newId(), type: 'bullet', text: 'Olga Tellis v. Bombay Municipal Corp.' },
-  { id: newId(), type: 'bullet', text: 'Puttaswamy Judgment (Privacy)' },
-  { id: newId(), type: 'heading', level: 2, text: 'Checklist' },
-  { id: newId(), type: 'checklist', text: 'Read Article 14 text', checked: false },
-  { id: newId(), type: 'checklist', text: 'Review key cases', checked: true },
-  { id: newId(), type: 'checklist', text: 'Practice previous year questions', checked: false },
-];
+// 🔧 FIX: DEFAULT_BLOCKS removed — new notes start with a single empty paragraph.
+const DEFAULT_BLOCKS: PilotV2Block[] = [{ id: newId(), type: 'paragraph', text: '' }];
 
 export function PilotV2EditorView() {
   // Persistence system for Pencil FAB Positioning
@@ -1245,64 +1233,12 @@ export function PilotV2EditorView() {
         </View>
       </Modal>
 
-      {/* ── Pencil mode FAB ─────────────────────────────────────────── */}
-      <AnimatedReanimated.View style={[{ position: 'absolute', zIndex: 1100, right: 18, bottom: 80 }, pencilFabAnimatedStyle]}>
-        <GestureDetector gesture={pencilPanGesture}>
-          <TouchableOpacity
-            testID="pilot-v2-pencil-fab"
-            onPress={() => {
-              console.log('[PENCIL FAB] Current drawingMode:', pencil.drawingMode);
-              pencil.setDrawingMode(!pencil.drawingMode);
-              console.log('[PENCIL FAB] Set drawingMode to:', !pencil.drawingMode);
-            }}
-            activeOpacity={0.85}
-            style={[
-              styles.pencilFab, 
-              pencil.drawingMode && { backgroundColor: '#0F172A' },
-              // Explicitly override positioning since outer container handles it now
-              { position: 'relative', right: 0, bottom: 0 }
-            ]}
-          >
-            <Pen size={22} color="#ffffff" strokeWidth={2.5} />
-          </TouchableOpacity>
-        </GestureDetector>
-      </AnimatedReanimated.View>
-
-      {/* ── Quick formatting toolbar toggle (bottom-right) ─────────── */}
-      <TouchableOpacity
-        testID="pilot-v2-formatting-fab"
-        onPress={() => setShowToolbar((v) => {
-          globalToolbarVisible = !v;
-          return !v;
-        })}
-        activeOpacity={0.85}
-        style={[
-          styles.pencilFab,
-          {
-            right: 18,
-            bottom: 148,
-            backgroundColor: showToolbar ? '#0F172A' : '#5B4EFA',
-          },
-        ]}
-      >
-        <Type size={22} color="#ffffff" strokeWidth={2.5} />
-      </TouchableOpacity>
-
-      {/* ── Washi-Tape FAB (active recall masking) ──────────────────── */}
-      <TouchableOpacity
-        testID="pilot-v2-washi-fab"
-        onPress={() => setWashiMode((m) => !m)}
-        activeOpacity={0.85}
-        style={[
-          styles.pencilFab,
-          { right: 88, backgroundColor: washiMode ? '#0F172A' : '#FFE88A' },
-        ]}
-      >
-        <Text style={{ fontSize: 20 }}>{washiMode ? '🛑' : '🩹'}</Text>
-      </TouchableOpacity>
+      {/* ── Pencil mode FAB REMOVED ────────────────────────────── */}
+      {/* ── Formatting toolbar toggle FAB REMOVED ──────────────── */}
+      {/* ── Washi-Tape FAB REMOVED ─────────────────────────────── */}
 
       {/* Washi-Tape control panel (only while in tape mode) */}
-      {washiMode ? (
+      {false ? ( // disabled — washi FAB removed
         <View
           testID="pilot-v2-washi-controls"
           style={{

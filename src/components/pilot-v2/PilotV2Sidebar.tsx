@@ -15,7 +15,7 @@
  * Management app (#5B4EFA primary, #F9FAFB canvas, #FFFFFF surface, etc.).
  */
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, TextInput, Platform, LayoutAnimation, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, TextInput, Platform, Animated } from 'react-native';
 import {
   Home as HomeIcon, Pin, Clock, Share2, Trash2, Plus, Settings, ChevronRight, ChevronDown, ChevronLeft,
   Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical, Book, X, Search,
@@ -32,6 +32,19 @@ import AnimatedReanimated, { useSharedValue, useAnimatedStyle, withSpring, inter
 const SUBJECT_ICONS: Record<string, any> = {
   Landmark, TrendingUp, ScrollText, Globe2, Scale, Leaf, FlaskConical,
 };
+
+/** Map a subject label to the best-matching icon key. */
+function iconForSubject(label: string): string {
+  const lc = label.toLowerCase().replace(/[^a-z]/g, '');
+  if (lc.includes('polit') || lc.includes('law') || lc.includes('constitut') || lc.includes('govern')) return 'Landmark';
+  if (lc.includes('econom') || lc.includes('finance') || lc.includes('budget') || lc.includes('market')) return 'TrendingUp';
+  if (lc.includes('history') || lc.includes('ancient') || lc.includes('medieval') || lc.includes('modern')) return 'ScrollText';
+  if (lc.includes('geograph') || lc.includes('map') || lc.includes('environ') || lc.includes('ecology')) return 'Globe2';
+  if (lc.includes('scienc') || lc.includes('tech') || lc.includes('space') || lc.includes('biotech')) return 'FlaskConical';
+  if (lc.includes('ethic') || lc.includes('philosoph') || lc.includes('moral') || lc.includes('integrity')) return 'Scale';
+  if (lc.includes('sociolog') || lc.includes('culture') || lc.includes('art') || lc.includes('religion')) return 'Leaf';
+  return 'Book'; // Fallback
+}
 
 function CollapsibleTopicItem({
   t,
@@ -65,9 +78,9 @@ function CollapsibleTopicItem({
 
   useEffect(() => {
     animationProgress.value = withSpring(isExpanded ? 1 : 0, {
-      damping: 24,
-      stiffness: 170,
-      mass: 0.8,
+      damping: 20,
+      stiffness: 200,
+      mass: 0.5,
       overshootClamping: true,
     });
   }, [isExpanded]);
@@ -223,18 +236,29 @@ function CollapsibleSubjectItem({
   handleSubtopicLongPress: (st: any, t: any, label: string) => void;
   handleSelectSubtopic: (subtopicId: string) => void;
 }) {
-  const Icon = SUBJECT_ICONS[s.icon] || SUBJECT_ICONS.Landmark;
+  // Use s.icon if available; otherwise derive from the subject label.
+  const iconKey = s.icon || iconForSubject(s.label || '');
+  const Icon = SUBJECT_ICONS[iconKey] || Book;
   const isSelectedSubject = state.view.selectedSubject === s.id && (state.view.mode === 'subject' || (state.view.mode === 'noteList' && !state.view.selectedSubtopic));
   const topics = getTopicsForSubject(s.id);
   const topicsCount = topics.length;
+
+  // Compute accurate container height based on expanded topic subtopics
+  const expandedTopicsCount = (() => {
+    return topics.reduce((sum: number, t: any) => {
+      return sum + (expanded.includes(t.id) ? (t.subtopics?.length ?? 0) : 0);
+    }, 0);
+  })();
+
+  const totalHeight = topicsCount * 50 + expandedTopicsCount * 44 + 12;
 
   const animationProgress = useSharedValue(isExpanded ? 1 : 0);
 
   useEffect(() => {
     animationProgress.value = withSpring(isExpanded ? 1 : 0, {
-      damping: 24,
-      stiffness: 170,
-      mass: 0.8,
+      damping: 20,
+      stiffness: 200,
+      mass: 0.5,
       overshootClamping: true,
     });
   }, [isExpanded]);
@@ -247,10 +271,10 @@ function CollapsibleSubjectItem({
   });
 
   const collapsibleStyle = useAnimatedStyle(() => {
-    const height = interpolate(animationProgress.value, [0, 1], [0, topicsCount * 44 + 300]);
+    const height = interpolate(animationProgress.value, [0, 1], [0, totalHeight]);
     const opacity = interpolate(animationProgress.value, [0, 0.15, 1], [0, 0.3, 1]);
     return {
-      maxHeight: height,
+      height,
       opacity,
       overflow: 'hidden',
     };
@@ -423,7 +447,6 @@ function PilotV2SidebarHome() {
   }, [state.notes, subjectsList]);
 
   const toggleTopic = (id: string) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpanded(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
@@ -452,7 +475,6 @@ function PilotV2SidebarHome() {
   };
 
   const toggleSubjectExpanded = (subjId: string) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpandedSubjects(prev => {
       const isCurrentlyExpanded = prev.includes(subjId);
       const newExpanded = isCurrentlyExpanded ? prev.filter(id => id !== subjId) : [...prev, subjId];
@@ -1036,16 +1058,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingHorizontal: 10,
-    height: 34,
+    height: 40,
     borderRadius: 8,
     borderWidth: 1,
   },
   sbInput: {
     flex: 1,
     fontSize: 13,
-    paddingVertical: 0,
+    paddingVertical: 8,
     paddingHorizontal: 4,
-    height: '100%',
+    height: 40,
     textAlignVertical: 'center',
     ...(Platform.OS === 'web' ? { outlineStyle: 'none' as any } : null),
   },

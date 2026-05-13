@@ -431,6 +431,13 @@ export default function UnifiedQuizEngine() {
     ncertFilter?: string
   }>();
   const routeParams = params as any;
+  const getResultIds = (): string[] | null => {
+    const raw = params.resultIds;
+    if (!raw) return null;
+    if (Array.isArray(raw)) return raw.filter((id: string) => id.trim().length > 0);
+    if (typeof raw === 'string') return raw.split(',').filter((id: string) => id.trim().length > 0);
+    return null;
+  };
   const router = useRouter();
   const { session } = useAuth();
   const store = useQuizStore();
@@ -1401,7 +1408,7 @@ export default function UnifiedQuizEngine() {
         });
       }
       
-      const resIds = typeof params.resultIds === 'string' ? params.resultIds.split(',').filter((id: string) => id.trim().length > 0) : null;
+      const resIds = getResultIds();
       const parseQuestionNumber = (q: any) => {
         const raw = q?.question_number;
         if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
@@ -1463,7 +1470,10 @@ export default function UnifiedQuizEngine() {
       }
 
       // Filter to original testId questions only if siblings were added for enrichment
-      if (originalTestIds && originalTestIds.size > 0) {
+      // But ONLY when resultIds are NOT present — when resultIds is set, those IDs are the
+      // authoritative filter (no originalTestIds override needed).
+      const skipOriginalFilter = resIds && resIds.length > 0;
+      if (!skipOriginalFilter && originalTestIds && originalTestIds.size > 0) {
         // Keep only cluster heads that map back to original test questions
         const originalMergedHeads = new Set<string>();
         for (const originalId of Array.from(originalTestIds)) {
@@ -1514,16 +1524,17 @@ export default function UnifiedQuizEngine() {
     let localFound = false;
     try {
       // ──────── 1. FAST: Load from Local Cache First ────────
-      if (params.testId) {
-        const cached = await OfflineManager.getOfflineQuestions(params.testId);
+      const cachedResultIds = getResultIds();
+      if (cachedResultIds && cachedResultIds.length > 0) {
+        // When resultIds are present, load ONLY those specific questions
+        const cached = await OfflineManager.getOfflineQuestionsByIds(cachedResultIds);
         if (cached && cached.length > 0) {
           processResults(cached);
           localFound = true;
           setLoading(false);
         }
-      } else if (params.resultIds) {
-        const ids = params.resultIds.split(',').filter((id: string) => Boolean(id));
-        const cached = await OfflineManager.getOfflineQuestionsByIds(ids);
+      } else if (params.testId) {
+        const cached = await OfflineManager.getOfflineQuestions(params.testId);
         if (cached && cached.length > 0) {
           processResults(cached);
           localFound = true;
@@ -1643,7 +1654,7 @@ export default function UnifiedQuizEngine() {
       
       while (from < MAX_TOTAL) {
         let query = supabase.from('questions').select(SELECT_COLS);
-        const resIds = typeof params.resultIds === 'string' ? params.resultIds.split(',').filter((id: string) => id.trim().length > 0) : null;
+        const resIds = getResultIds();
         
         if (resIds && resIds.length > 0) {
           // If we have specific IDs, chunk those IDs specifically
@@ -1927,7 +1938,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
         allFreshDataLength: allFreshData.length
       });
       
-      if ((params.testId || isPyqUpscsearch) && allFreshData.length > 0) {
+      if ((params.testId || isPyqUpscsearch) && allFreshData.length > 0 && !getResultIds()) {
         // UPSC CSE PYQ Enrichment: Fetch sibling versions for merged explanations
         // Keep count at original testId count, but enrich with all institute explanations
         const isUpscPaperSession = allFreshData.some((q: any) => {
@@ -1967,8 +1978,9 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
         // For enrichment filtering: use tracked original IDs from enrichment block
         let originalQuestionIds: Set<string> | undefined;
         
-        if (params.testId) {
+        if (params.testId && !getResultIds()) {
           // Test mode: keep only questions with matching test_id
+          // BUT skip when resultIds are present — those IDs are the authoritative filter
           originalQuestionIds = new Set(
             allFreshData
               .filter((q: any) => q.test_id === params.testId)

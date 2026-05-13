@@ -35,7 +35,7 @@ import Animated, {
 import * as Clipboard from 'expo-clipboard';
 import { useRouter } from 'expo-router';
 import {
-  ChevronLeft, MoreVertical, Sparkles,
+  ChevronLeft, MoreVertical, Sparkles, Zap,
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
@@ -502,11 +502,7 @@ export function PilotV2GlanceView() {
 
   const handleMore = () => {
     Alert.alert(title, undefined, [
-      { text: 'AI ✨ — Generate Flashcards', onPress: () => handleAIContextSelect('flashcard') },
-      { text: 'AI ✨ — Summarize', onPress: () => handleAIContextSelect('summarize') },
-      { text: 'AI ✨ — Expand Content', onPress: () => handleAIContextSelect('expand') },
-      { text: 'AI ✨ — Analyze', onPress: () => handleAIContextSelect('analyze') },
-      { 
+      {
         text: `Page Layout: ${note?.content?.layout === 'wide' ? 'Wide' : 'Standard'}`, 
         onPress: async () => {
           if (!note?.id) return;
@@ -590,12 +586,12 @@ export function PilotV2GlanceView() {
         </View>
       </View>
 
-      {/* Flashcard FAB */}
+      {/* Flashcard FAB — using Zap icon for consistency with SharedQuestionCard */}
       <TouchableOpacity
         testID="pilot-v2-glance-flashcard" onPress={handleCreateFlashcard} activeOpacity={0.85}
         style={[styles.floatingBack, { left: undefined as any, right: 78, width: 52, height: 52, backgroundColor: colors.primary, borderColor: colors.primary, shadowColor: colors.primary, shadowOpacity: 0.3, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 4 } as any]}
       >
-        <Sparkles size={22} color="#fff" strokeWidth={2.5} />
+        <Zap size={22} color="#fff" strokeWidth={2.5} />
       </TouchableOpacity>
 
       {/* More menu FAB */}

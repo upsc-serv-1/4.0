@@ -33,6 +33,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import { X, FileDown, Layout, ChevronDown, ChevronRight, Settings, Check } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../../context/ThemeContext';
+import { useResponsive } from '../../hooks/useResponsive';
 import {
   ExportOptions, ExportPayload, ExportQuestion,
   defaultExportOptions, exportToPdf,
@@ -224,6 +225,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
   allRevisionTags,
 }) => {
   const { colors } = useTheme();
+  const { isTablet } = useResponsive();
 
   const [scope, setScope] = useState<AnalysisExportScope>('report_only');
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
@@ -424,6 +426,10 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
           drilldown: true,
           isDetailedReport,
         },
+        marginTopCm: opts.pageMarginTopCm,
+        marginRightCm: opts.pageMarginRightCm,
+        marginBottomCm: opts.pageMarginBottomCm,
+        marginLeftCm: opts.pageMarginLeftCm,
       });
       const bodyMatch = fullHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
       pieces.push(bodyMatch ? bodyMatch[1] : fullHtml);
@@ -586,12 +592,30 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
   const toggleArr = (arr: string[], v: string): string[] =>
     arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v];
 
+  const sheetBorderRadius = isTablet ? 24 : undefined;
+
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={styles.overlay}>
+      <View
+        style={[
+          styles.overlay,
+          isTablet && { justifyContent: 'center', alignItems: 'center', padding: 40 },
+        ]}
+      >
         <TouchableOpacity style={StyleSheet.absoluteFill} onPress={onClose} />
-        <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
-          <View style={styles.sheetHandle} />
+        <View
+          style={[
+            styles.sheet,
+            { backgroundColor: colors.surface },
+            isTablet && {
+              width: 540,
+              borderRadius: sheetBorderRadius,
+              borderBottomLeftRadius: sheetBorderRadius,
+              borderBottomRightRadius: sheetBorderRadius,
+            },
+          ]}
+        >
+          {!isTablet && <View style={styles.sheetHandle} />}
           <View style={styles.header}>
             <View>
               <Text style={[styles.title, { color: colors.textPrimary }]} testID="analysis-export-sheet-title">{title}</Text>
@@ -1087,7 +1111,7 @@ async function printStandaloneReport(fragmentHtml: string, o: ExportOptions): Pr
       @page { size: A4; margin: ${clamp(o.pageMarginTopCm, 1)}cm ${clamp(o.pageMarginRightCm, 1)}cm ${clamp(o.pageMarginBottomCm, 1)}cm ${clamp(o.pageMarginLeftCm, 1)}cm; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
-      body { padding: 0 ${clamp(o.pageMarginRightCm, 1)}cm 0 ${clamp(o.pageMarginLeftCm, 1)}cm; font-family: ${o.fontFamily === 'serif' ? "'Georgia', serif" : o.fontFamily === 'mono' ? "'Menlo', monospace" : o.fontFamily === 'handwriting' ? "'Caveat', cursive" : "-apple-system, Segoe UI, Roboto, sans-serif"}; color: #0f172a; font-size: ${o.fontSize}pt; }
+      body { padding: ${clamp(o.pageMarginTopCm, 1)}cm ${clamp(o.pageMarginRightCm, 1)}cm ${clamp(o.pageMarginBottomCm, 1)}cm ${clamp(o.pageMarginLeftCm, 1)}cm; font-family: ${o.fontFamily === 'serif' ? "'Georgia', serif" : o.fontFamily === 'mono' ? "'Menlo', monospace" : o.fontFamily === 'handwriting' ? "'Caveat', cursive" : "-apple-system, Segoe UI, Roboto, sans-serif"}; color: #0f172a; font-size: ${o.fontSize}pt; }
       ${o.watermark ? `.watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(-45deg); font-size: 80pt; font-weight: 900; color: rgba(0,0,0,0.06); pointer-events: none; z-index: -1; }` : ''}
     </style></head><body>
       ${o.watermark ? `<div class="watermark">${escapeHtml(o.watermark)}</div>` : ''}
@@ -1343,7 +1367,7 @@ const exportTrendsToCsv = async (trends: any, cumulative: any) => {
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  sheet: { borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 20, paddingBottom: Platform.OS === 'ios' ? 36 : 20, maxHeight: '92%' },
+  sheet: { borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 20, paddingBottom: Platform.OS === 'ios' ? 36 : 20 },
   sheetHandle: { alignSelf: 'center', width: 38, height: 4, borderRadius: 2, backgroundColor: '#ccc', marginBottom: 12 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   title: { fontSize: 20, fontWeight: '900', letterSpacing: -0.2 },

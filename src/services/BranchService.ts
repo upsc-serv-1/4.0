@@ -95,6 +95,17 @@ export class BranchSvc {
           }
         }
       } catch {}
+      // Last resort: try OfflineManager KVStore
+      const offlineBranches = OfflineManager.getCollectionSync('flashcard_branches', userId) as any[];
+      if (offlineBranches && offlineBranches.length > 0) {
+        return filterRows(offlineBranches.map((b: any) => ({
+          ...b,
+          is_deleted: b.is_deleted ?? false,
+          is_archived: b.is_archived ?? false,
+          is_folder: b.is_folder ?? false,
+          sort_order: b.sort_order ?? 0,
+        })) as Branch[]);
+      }
       throw err;
     }
   }
@@ -389,6 +400,13 @@ export class BranchSvc {
           if (Array.isArray(parsed)) links = parsed;
         }
       } catch {}
+      if (!links || links.length === 0) {
+        // Try OfflineManager KVStore
+        const offlineLinks = OfflineManager.getCollectionSync('flashcard_branch_cards', userId) as any[];
+        if (offlineLinks && offlineLinks.length > 0) {
+          links = offlineLinks.map((l: any) => ({ branch_id: l.branch_id, card_id: l.card_id }));
+        }
+      }
       if (!links || links.length === 0) throw err;
     }
 
@@ -438,6 +456,20 @@ export class BranchSvc {
             if (Array.isArray(parsed)) userCardsRows = parsed;
           }
         } catch {}
+        if (!userCardsRows || userCardsRows.length === 0) {
+          // Try OfflineManager KVStore
+          const offlineUserCards = OfflineManager.getCollectionSync('user_cards', userId) as any[];
+          if (offlineUserCards && offlineUserCards.length > 0) {
+            userCardsRows = offlineUserCards
+              .filter((uc: any) => cardIdSet.has(uc.card_id))
+              .map((uc: any) => ({
+                card_id: uc.card_id,
+                learning_status: uc.learning_status,
+                status: uc.status,
+                next_review: uc.next_review,
+              }));
+          }
+        }
         if (!userCardsRows || userCardsRows.length === 0) throw err;
       }
 

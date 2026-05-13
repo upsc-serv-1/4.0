@@ -1875,6 +1875,11 @@ export default function UnifiedQuizEngine() {
             localFoundAlready: localFound,
             timestamp: new Date().toISOString()
           });
+          // If we already have offline data, silently stop fetching — don't crash
+          if (localFound) {
+            console.log('[OFFLINE-FALLBACK] Using cached data, stopping Supabase fetch.');
+            break;
+          }
           throw error;
         }
 

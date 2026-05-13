@@ -10,10 +10,12 @@ import {
   ArrowLeft, Play, Plus, ArrowUpDown, SlidersHorizontal, MoreHorizontal, BookOpen, X, Check, Info, Clock,
 } from 'lucide-react-native';
 import { supabase } from '../../src/lib/supabase';
+import { NetworkStatus } from '../../src/lib/networkStatus';
 import { useAuth } from '../../src/context/AuthContext';
 import { useTheme } from '../../src/context/ThemeContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
 import { FlashcardSvc } from '../../src/services/FlashcardService';
+import { logDiagEvent } from '../../src/../app/offline-diag';
 import { CardOverflowMenu, CardMenuAction } from '../../src/components/flashcards/CardOverflowMenu';
 import { SortSheet, SortKey } from '../../src/components/flashcards/SortSheet';
 import { FilterSheet, FilterValue, EMPTY_FILTER } from '../../src/components/flashcards/FilterSheet';
@@ -102,18 +104,30 @@ export default function MicrotopicScreen() {
           const offlineById = new Map(offlineCards.filter((c: any) => idSet.has(c.id)).map((c: any) => [c.id, c]));
           const missingIds = cardIds.filter((id) => !offlineById.has(id));
 
+          // 🔌 OFFLINE GUARD: When offline, skip the Supabase `cards` fetch entirely.
+          // Fetched cards that aren't in the local cache will simply be absent —
+          // better than throwing an error and showing nothing.
           const fetchedCards: any[] = [];
           if (missingIds.length > 0) {
-            const CHUNK = 200;
-            for (let i = 0; i < missingIds.length; i += CHUNK) {
-              const slice = missingIds.slice(i, i + CHUNK);
-              const { data, error } = await supabase
-                .from('cards')
-                .select('*')
-                .in('id', slice)
-                .eq('is_deleted', false);
-              if (error) throw error;
-              fetchedCards.push(...(data ?? []));
+            if (NetworkStatus.isOffline()) {
+              logDiagEvent('MicrotopicScreen.loadAll', 'offline_cards_fetch_skipped',
+                `Skipping fetch for ${missingIds.length} missing cards while offline (branch=${branchId})`);
+            } else {
+              const CHUNK = 200;
+              for (let i = 0; i < missingIds.length; i += CHUNK) {
+                const slice = missingIds.slice(i, i + CHUNK);
+                const { data, error } = await supabase
+                  .from('cards')
+                  .select('*')
+                  .in('id', slice)
+                  .eq('is_deleted', false);
+                if (error) {
+                  logDiagEvent('MicrotopicScreen.loadAll', 'offline_cards_fetch_fail',
+                    `slice error for cards: ${error.message}`);
+                  throw error;
+                }
+                fetchedCards.push(...(data ?? []));
+              }
             }
           }
 
@@ -141,7 +155,8 @@ export default function MicrotopicScreen() {
       let progress = ((OfflineManager as any).getCollectionSync('user_cards', uid) ?? [])
         .filter((p: any) => p.user_id === uid && cardIdSet.has(p.card_id));
 
-      if (cardIds.length > 0) {
+      // Skip network fetch when offline — cached progress is sufficient
+      if (cardIds.length > 0 && NetworkStatus.isOnline()) {
         const { data: freshProgress, error: progressErr } = await supabase
           .from('user_cards')
           .select('card_id, status, learning_status, next_review, last_reviewed, updated_at, interval_days')

@@ -1,0 +1,10 @@
+0000000000000000000000000000000000000000 1329b4b10bc99173e80dd56dfafad2c781e8313a Dr. Yogesh <upsc-serv-1@proton.me> 1778519835 +0530	clone: from https://github.com/upsc-serv-1/Question-Parser-Tool.git
+1329b4b10bc99173e80dd56dfafad2c781e8313a 1329b4b10bc99173e80dd56dfafad2c781e8313a Dr. Yogesh <upsc-serv-1@proton.me> 1778520555 +0530	checkout: moving from main to 1.1
+1329b4b10bc99173e80dd56dfafad2c781e8313a 0f7d5e39b81563bd0e10598c6c7ab8ef2dcdb6c1 Dr. Yogesh <upsc-serv-1@proton.me> 1778520560 +0530	commit: Prepare for cloud deployment
+0f7d5e39b81563bd0e10598c6c7ab8ef2dcdb6c1 0f71c1f8f9df55d7ab8f7bd61b109a09eac71400 Dr. Yogesh <upsc-serv-1@proton.me> 1778522356 +0530	commit: fix: remove unavailable dependency emergentintegrations
+0f71c1f8f9df55d7ab8f7bd61b109a09eac71400 b92c07f7dea96038163a267a0b5fccf9f4247f9a Dr. Yogesh <upsc-serv-1@proton.me> 1778525287 +0530	commit: chore: add expo export build script for static hosting
+b92c07f7dea96038163a267a0b5fccf9f4247f9a 0e6b3c8f4183272b8ab136fb24086167a380e90c Dr. Yogesh <upsc-serv-1@proton.me> 1778525957 +0530	commit: fix: export missing T theme variable to fix static build crash
+0e6b3c8f4183272b8ab136fb24086167a380e90c 2b89d4aadeec689c2783ed210bd213b441347b2a Dr. Yogesh <upsc-serv-1@proton.me> 1778532715 +0530	commit: fix: correct PDF requirements and standardize JSON schema export
+2b89d4aadeec689c2783ed210bd213b441347b2a 964868de8fbc66653ce78ca1afa0eea4d357b90b Dr. Yogesh <upsc-serv-1@proton.me> 1778533212 +0530	commit: feat: advanced workflow upgrades - side-by-side viewer, subject filters, low conf, revisions and bulk tag
+964868de8fbc66653ce78ca1afa0eea4d357b90b a52ed6796571b69db60473bcf279bd956244216c Dr. Yogesh <upsc-serv-1@proton.me> 1778533883 +0530	commit: feat: OCR engine integration and Geometric 2-Column reconstruction
+a52ed6796571b69db60473bcf279bd956244216c 9783d603fd0c52e1bcfe3656cb215b13c64edc9f Dr. Yogesh <upsc-serv-1@proton.me> 1778535920 +0530	commit: feat: teach prompt builder to digest Unified (Prisma) PDFs with inline answers

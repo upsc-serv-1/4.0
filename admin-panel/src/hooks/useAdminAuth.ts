@@ -22,31 +22,60 @@ export function useAdminAuth(): AdminAuthState {
   const [userId, setUserId] = useState<string | null>(null);
 
   const checkAdmin = async (uid: string) => {
-    const { data } = await supabase
-      .from('admin_users')
-      .select('role')
-      .eq('user_id', uid)
-      .maybeSingle();
-    if (data) {
-      setIsAdmin(true);
-      setRole(data.role);
-    } else {
+    try {
+      const { data } = await supabase
+        .from('admin_users')
+        .select('role')
+        .eq('user_id', uid)
+        .maybeSingle();
+      if (data) {
+        setIsAdmin(true);
+        setRole(data.role);
+      } else {
+        setIsAdmin(false);
+        setRole(null);
+      }
+    } catch (error) {
+      console.error('Error checking admin role:', error);
       setIsAdmin(false);
       setRole(null);
     }
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session: s } }) => {
-      setSession(s);
-      if (s?.user) {
-        setUserId(s.user.id);
-        await checkAdmin(s.user.id);
+    let isMounted = true;
+
+    const initSession = async () => {
+      // Safety timeout: Force loading off after 3.5 seconds if Supabase hangs
+      const timeoutId = setTimeout(() => {
+        if (isMounted) {
+          console.warn('Supabase session request timed out. Safety-breaking the loading screen.');
+          setLoading(false);
+        }
+      }, 3500);
+
+      try {
+        const { data: { session: s } } = await supabase.auth.getSession();
+        clearTimeout(timeoutId);
+        if (!isMounted) return;
+        setSession(s);
+        if (s?.user) {
+          setUserId(s.user.id);
+          await checkAdmin(s.user.id);
+        }
+      } catch (error) {
+        clearTimeout(timeoutId);
+        console.error('Supabase init session error:', error);
+      } finally {
+        clearTimeout(timeoutId);
+        if (isMounted) setLoading(false);
       }
-      setLoading(false);
-    });
+    };
+
+    initSession();
 
     const { data: sub } = supabase.auth.onAuthStateChange(async (_e, s) => {
+      if (!isMounted) return;
       setSession(s);
       if (s?.user) {
         setUserId(s.user.id);
@@ -58,7 +87,10 @@ export function useAdminAuth(): AdminAuthState {
       }
     });
 
-    return () => sub?.subscription?.unsubscribe();
+    return () => {
+      isMounted = false;
+      sub?.subscription?.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {

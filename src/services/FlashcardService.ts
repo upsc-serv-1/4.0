@@ -7,6 +7,7 @@ import { SyncQueue } from './SyncQueue';
 import { CardReviewsRepo } from '../repositories/card_reviews.repo';
 import { StudySessionsRepo } from '../repositories/study_sessions.repo';
 import { OfflineManager } from './OfflineManager';
+import { logDiagEvent } from '../../app/offline-diag';
 
 export type CardSource =
   | { kind: 'question'; question_id: string }
@@ -883,6 +884,10 @@ export class FlashcardSvc {
   }
 
   static async getLearningHistory(userId: string, cardId: string, limit = 30, offset = 0) {
+    if (NetworkStatus.isOffline()) {
+      logDiagEvent('FlashcardSvc.getLearningHistory', 'offline_no_fallback',
+        `cardId=${cardId} — no OfflineManager KVStore fallback for card_reviews`);
+    }
     const to = offset + limit - 1;
     const { data, error } = await supabase
       .from('card_reviews')
@@ -890,7 +895,13 @@ export class FlashcardSvc {
       .eq('user_id', userId).eq('card_id', cardId)
       .order('reviewed_at', { ascending: false })
       .range(offset, to);
-    if (error) throw error;
+    if (error) {
+      if (NetworkStatus.isOffline()) {
+        logDiagEvent('FlashcardSvc.getLearningHistory', 'offline_crash',
+          `cardId=${cardId}: ${error.message}`);
+      }
+      throw error;
+    }
     return data || [];
   }
 

@@ -47,14 +47,40 @@ interface BlockedCall {
   screen: string;
 }
 
+/** Extended diagnostic event — richer than a raw blocked-URL log. */
+export interface OfflineDiagEvent {
+  ts: number;
+  source: string;         // e.g. 'BranchService.listCardIdsInBranch'
+  event: string;          // e.g. 'offline_no_fallback'
+  detail: string;         // human-readable description
+}
+
 // @ts-ignore
 if (typeof global !== 'undefined' && !global.__offlineDiagBlocked) {
   // @ts-ignore
   global.__offlineDiagBlocked = [] as BlockedCall[];
   // @ts-ignore
+  global.__offlineDiagEvents = [] as OfflineDiagEvent[];
+  // @ts-ignore
   global.__offlineDiagActive = false;
   // @ts-ignore
   global.__offlineDiagOriginalFetch = null;
+}
+
+/** Log a diagnostic event to the global array so the diagnostic screen can display it. */
+export function logDiagEvent(source: string, event: string, detail: string) {
+  try {
+    // @ts-ignore
+    if (global.__offlineDiagActive && Array.isArray(global.__offlineDiagEvents)) {
+      // @ts-ignore
+      global.__offlineDiagEvents.push({ ts: Date.now(), source, event, detail });
+      // @ts-ignore
+      if (global.__offlineDiagEvents.length > 500) {
+        // @ts-ignore
+        global.__offlineDiagEvents = global.__offlineDiagEvents.slice(-250);
+      }
+    }
+  } catch { /* swallow */ }
 }
 
 function getBlockedCalls(): BlockedCall[] {
@@ -65,6 +91,8 @@ function getBlockedCalls(): BlockedCall[] {
 function clearBlockedCalls() {
   // @ts-ignore
   global.__offlineDiagBlocked = [];
+  // @ts-ignore
+  global.__offlineDiagEvents = [];
 }
 
 function isSimActive(): boolean {
@@ -79,6 +107,7 @@ export default function OfflineDiagScreen() {
   const [kvKeys, setKvKeys] = useState<string[]>([]);
   const [blockedCalls, setBlockedCalls] = useState<BlockedCall[]>([]);
   const [simulating, setSimulating] = useState(false);
+  const [diagEvents, setDiagEvents] = useState<OfflineDiagEvent[]>([]);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Load diagnostic data
@@ -161,6 +190,9 @@ export default function OfflineDiagScreen() {
       const calls = getBlockedCalls();
       setSimulating(active);
       setBlockedCalls([...calls]);
+      // @ts-ignore
+      const events: OfflineDiagEvent[] = (global.__offlineDiagEvents ?? []);
+      setDiagEvents([...events]);
     }, 1000);
 
     return () => {
@@ -243,6 +275,11 @@ export default function OfflineDiagScreen() {
     lines.push(`-- Blocked Supabase Calls (${blockedCalls.length}) --`);
     blockedCalls.forEach((c, i) => {
       lines.push(`  ${i + 1}. [${new Date(c.ts).toLocaleTimeString()}] ${c.url}`);
+    });
+    lines.push('');
+    lines.push(`-- DIAG Events (${diagEvents.length}) --`);
+    diagEvents.forEach((e, i) => {
+      lines.push(`  ${i + 1}. [${new Date(e.ts).toLocaleTimeString()}] ${e.source} | ${e.event} | ${e.detail}`);
     });
     lines.push('');
     const report = lines.join('\n');
@@ -362,6 +399,35 @@ export default function OfflineDiagScreen() {
           )}
         </View>
 
+        {/* DIAG Events — specific code-path failures logged from services */}
+        <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>
+          DIAG EVENTS ({diagEvents.length})
+        </Text>
+        <View style={[styles.card, { backgroundColor: colors.surface + '80', borderColor: colors.border }]}>
+          {diagEvents.length === 0 ? (
+            <Text style={[styles.emptyText, { color: colors.textTertiary }]}>
+              {simulating
+                ? 'No code-path failures detected — try navigating to Flashcards, Arena, or Notes.'
+                : 'Start simulation, then come back here.'}
+            </Text>
+          ) : (
+            diagEvents.map((e, i) => (
+              <View key={i} style={[styles.logRow, i < diagEvents.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border }]}>
+                <Text style={[styles.logIndex, { color: colors.textTertiary }]}>{i + 1}.</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.logTime, { color: colors.textSecondary }]}>
+                    {new Date(e.ts).toLocaleTimeString()}
+                  </Text>
+                  <Text style={[styles.logUrl, { color: colors.textPrimary, fontWeight: '800', fontSize: 11 }]}>{e.source}</Text>
+                  <Text style={[styles.logUrl, { color: e.event === 'offline_no_fallback' ? '#ef4444' : '#f59e0b', fontSize: 11 }]}>
+                    [{e.event}] {e.detail}
+                  </Text>
+                </View>
+              </View>
+            ))
+          )}
+        </View>
+
         {/* Test Instructions */}
         <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>HOW TO TEST</Text>
         <View style={[styles.card, { backgroundColor: colors.surface + '80', borderColor: colors.border }]}>
@@ -370,9 +436,10 @@ export default function OfflineDiagScreen() {
             2. Tap "Simulate Offline"{'\n'}
             3. Navigate to each tab: Home, PYQ, Flashcards, Notes, AI Search{'\n'}
             4. Note which screens show data vs. blank/error{'\n'}
-            5. Come back here — blocked calls are logged automatically{'\n'}
-            6. Tap "Stop Simulation" when done{'\n'}
-            7. Copy the report and share it
+            5. Come back here — blocked calls + DIAG events are logged automatically{'\n'}
+            6. DIAG Events show specific code paths that crash offline without fallback{'\n'}
+            7. Tap "Stop Simulation" when done{'\n'}
+            8. Copy the report and share it
           </Text>
         </View>
 

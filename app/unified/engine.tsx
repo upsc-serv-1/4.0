@@ -107,6 +107,7 @@ import { OfflineManager } from '../../src/services/OfflineManager';
 import { LocalQuery } from '../../src/services/LocalQuery';
 import { NetworkStatus } from '../../src/lib/networkStatus';
 import { useFlashcardAction } from '../../src/hooks/useFlashcardAction';
+import { logDiagEvent } from '../offline-diag';
 import { SharedQuestionCard } from '../../src/components/unified/SharedQuestionCard';
 import { MyVitaminEditorSheet } from '../../src/components/unified/MyVitaminEditorSheet';
 import {
@@ -482,13 +483,6 @@ export default function UnifiedQuizEngine() {
     setActiveAiQuestion(item);
     setAiChatTrigger(prev => prev + 1);
   }, []);
-
-  useEffect(() => {
-    const currentQ = questions[currentIndex];
-    if (currentQ) {
-      setActiveAiQuestion(currentQ);
-    }
-  }, [currentIndex, questions]);
 
   // Build the InstituteExplanation[] payload for AI prompts from the question's
   // _explanations array (already built by merger.ts at fetch time).
@@ -1528,6 +1522,7 @@ export default function UnifiedQuizEngine() {
     };
 
     let localFound = false;
+    let allFreshData: any[] = []; // Declare outside try block so catch block can access it
     try {
       // ──────── 1. FAST: Load from Local Cache First ────────
       console.log('[ENGINE-OFFLINE] Loading from local cache...');
@@ -1551,7 +1546,9 @@ export default function UnifiedQuizEngine() {
         }
       } else {
         // ──────── 1b. OFFLINE-FALLBACK: Filter all cached questions ────────
-        const allOffline = OfflineManager.getOfflineQuestionsAllSync() || [];
+        // Use enriched sync so that questions have their `tests` join populated
+        // (including `tests.institute`), enabling the institute filter to work offline.
+        const allOffline = OfflineManager.getOfflineQuestionsEnrichedSync() || [];
         console.log('[ENGINE-OFFLINE] Total offline questions available:', { count: allOffline.length });
         if (allOffline.length > 0) {
           let filtered = [...allOffline];
@@ -1569,8 +1566,8 @@ export default function UnifiedQuizEngine() {
           else if (pyqM === 'Non-PYQ' || pyqM === 'Non PYQ') filtered = filtered.filter((q: any) => !q.is_pyq);
 
           // Apply year range
-          if (params.year_start) filtered = filtered.filter((q: any) => q.exam_year >= params.year_start);
-          if (params.year_end) filtered = filtered.filter((q: any) => q.exam_year <= params.year_end);
+          if (params.year_start && Number(params.year_start)) filtered = filtered.filter((q: any) => q.exam_year >= Number(params.year_start));
+          if (params.year_end && Number(params.year_end)) filtered = filtered.filter((q: any) => q.exam_year <= Number(params.year_end));
 
           // Apply micro_topic
           const mt = params.microTopics || params.microtopic;
@@ -1668,7 +1665,12 @@ export default function UnifiedQuizEngine() {
       }
 
       // ──────── 2. FRESH: Background fetch from Server (Chunked to bypass limits) ────────
-      let allFreshData: any[] = [];
+      if (NetworkStatus.isOffline()) {
+        logDiagEvent('Engine.loadQuestions', 'offline_skip_network',
+          'Skipping network fetch path — local cache already loaded. ' +
+          `localFound=${localFound}, testId=${params.testId || 'none'}`);
+      }
+      // allFreshData already declared above (outside try block)
       let from = 0;
       const CHUNK = 1000;
       const MAX_TOTAL = 10000; // Safety cap to prevent memory issues
@@ -3229,7 +3231,12 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
             </TouchableOpacity>
           )}
 
-          {/* FIX #16: Removed duplicate Arena Index button (already in left button state) */}
+          {/* Arena Index button — moved to left side next to back button */}
+          {!showIndex && (
+            <TouchableOpacity onPress={() => setShowIndexPanel(true)} style={styles.headerBtn} testID="engine-arena-index-btn">
+              <ListIcon size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
+            </TouchableOpacity>
+          )}
 
           <View style={styles.headerTitleContainer}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -3324,11 +3331,6 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                 <Text style={{ color: isZenMode ? '#433422' : colors.textSecondary, fontSize: 10, fontWeight: '800' }}>{formatTime(seconds)}</Text>
               )}
             </TouchableOpacity>
-            {!showIndex && (
-              <TouchableOpacity onPress={() => setShowIndexPanel(true)} style={styles.headerBtn}>
-                <ListIcon size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
-              </TouchableOpacity>
-            )}
             <TouchableOpacity onPress={() => setShowQuickMenu(!showQuickMenu)} style={styles.headerBtn}>
               <MoreVertical size={20} color={isZenMode ? '#433422' : colors.textPrimary} />
             </TouchableOpacity>
@@ -3974,14 +3976,14 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                 onPress={() => setShowIndexPanel(false)}
                 style={{ flex: 1, backgroundColor: 'transparent' }}
               />
-              {/* Index panel (right 40%) — card format matches Search Results panel exactly */}
-              <View style={{ width: '40%', backgroundColor: colors.surface, borderLeftWidth: 1, borderLeftColor: colors.border }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+              {/* Index panel (right 30%) — fixed width prevents animation flicker */}
+              <View style={{ width: Math.min(width * 0.4, 400), backgroundColor: colors.surface, borderLeftWidth: 1, borderLeftColor: colors.border, height: '100%' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16, paddingTop: Platform.OS === 'ios' ? 20 : 16, borderBottomWidth: 1, borderBottomColor: colors.border }}>
                   <View>
                     <Text style={{ fontSize: 13, fontWeight: '900', color: colors.textPrimary }}>Arena Index</Text>
                     <Text style={{ fontSize: 10, fontWeight: '700', color: colors.textTertiary }}>{questions.length} questions</Text>
                   </View>
-                  <TouchableOpacity onPress={() => setShowIndexPanel(false)} style={{ padding: 6 }}>
+                  <TouchableOpacity onPress={() => setShowIndexPanel(false)} style={{ padding: 8, marginTop: Platform.OS === 'ios' ? 0 : 4 }}>
                     <X size={20} color={colors.textTertiary} />
                   </TouchableOpacity>
                 </View>

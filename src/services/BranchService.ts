@@ -15,6 +15,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { safeSetItem } from '../lib/safeAsyncStorage';
 import { supabase } from '../lib/supabase';
 import { OfflineManager } from './OfflineManager';
+import { NetworkStatus } from '../lib/networkStatus';
+import { logDiagEvent } from '../../app/offline-diag';
 
 export interface Branch {
   id: string;
@@ -55,6 +57,21 @@ export class BranchSvc {
   // ─── CRUD ───────────────────────────────────────────────────────────────
   static async listAll(userId: string, opts: { includeArchived?: boolean } = {}): Promise<Branch[]> {
     const cacheKey = `flashcard_branches_${userId}`;
+
+    // OFFLINE: return cached data immediately without hitting Supabase
+    if (NetworkStatus.isOffline()) {
+      const filterRows2 = (rows: Branch[]) => {
+        const base = rows.filter((r) => !r.is_deleted);
+        const visible = opts.includeArchived ? base : base.filter((r) => !r.is_archived);
+        return [...visible].sort((a, b) => (a.sort_order - b.sort_order) || a.name.localeCompare(b.name));
+      };
+      try {
+        const cached = OfflineManager.getCollectionSync('flashcard_branches') as any[] || [];
+        if (cached.length > 0) {
+          return filterRows2(cached as Branch[]);
+        }
+      } catch {}
+    }
 
     const sortRows = (rows: Branch[]) =>
       [...rows].sort((a, b) => (a.sort_order - b.sort_order) || a.name.localeCompare(b.name));
@@ -347,6 +364,20 @@ export class BranchSvc {
   }
 
   static async listCardIdsInBranch(branchId: string, opts: { recursive?: boolean; userId?: string } = {}): Promise<string[]> {
+    // OFFLINE: read from OfflineManager cache
+    if (NetworkStatus.isOffline()) {
+      try {
+        const allLinks = OfflineManager.getCollectionSync('flashcard_branch_cards') as any[] || [];
+        const filtered = allLinks.filter((r: any) => r.branch_id === branchId).map((r: any) => r.card_id);
+        logDiagEvent('BranchService.listCardIdsInBranch', 'offline_cache_hit',
+          `Returning ${filtered.length} card IDs from cache for branch=${branchId}`);
+        return filtered;
+      } catch (e) {
+        logDiagEvent('BranchService.listCardIdsInBranch', 'offline_cache_error',
+          `Cache read failed: ${(e as Error).message}`);
+        return [];
+      }
+    }
     if (!opts.recursive) {
       const { data, error } = await supabase
         .from('flashcard_branch_cards')
@@ -375,6 +406,87 @@ export class BranchSvc {
    * Runs 3 queries total (branches, branch_cards, user_cards) — everything else is in-memory aggregation.
    */
   static async buildTree(userId: string): Promise<BranchNode[]> {
+    // OFFLINE: Return tree from cache immediately (no network calls)
+    if (NetworkStatus.isOffline()) {
+      const branches = await this.listAll(userId);
+      const offlineLinks = OfflineManager.getCollectionSync('flashcard_branch_cards', userId) as any[] || [];
+      const offlineUserCards = OfflineManager.getCollectionSync('user_cards', userId) as any[] || [];
+
+      const branchCardMap = new Map<string, Set<string>>();
+      const allCardIds = new Set<string>();
+      (offlineLinks || []).forEach((l: any) => {
+        if (!branchCardMap.has(l.branch_id)) branchCardMap.set(l.branch_id, new Set());
+        branchCardMap.get(l.branch_id)!.add(l.card_id);
+        allCardIds.add(l.card_id);
+      });
+
+      const cardStateMap = new Map<string, { learning_status: string; status: string; next_review: string | null }>();
+      (offlineUserCards || []).forEach((uc: any) => {
+        if (allCardIds.has(uc.card_id)) {
+          cardStateMap.set(uc.card_id, {
+            learning_status: uc.learning_status || '',
+            status: uc.status || '',
+            next_review: uc.next_review || null,
+          });
+        }
+      });
+
+      // Build tree from cache data (same logic as inline below)
+      const now = Date.now();
+      const directCounts2 = (branchId: string) => {
+        let due = 0, new_ = 0, learning = 0, mastered = 0, total = 0, direct = 0;
+        const ids = branchCardMap.get(branchId);
+        if (!ids) return { due, new_, learning, mastered, total, direct };
+        ids.forEach(cardId => {
+          const st = cardStateMap.get(cardId);
+          if (!st || st.status !== 'active') return;
+          direct += 1; total += 1;
+          const ls = st.learning_status;
+          if (ls === 'not_studied' || ls === 'new') { new_ += 1; }
+          else if (ls === 'mastered') { mastered += 1; }
+          else if (ls === 'learning' || ls === 'review' || ls === 'leech') {
+            learning += 1;
+            if (st.next_review && new Date(st.next_review).getTime() <= now) due += 1;
+          }
+        });
+        return { due, new_, learning, mastered, total, direct };
+      };
+      const nodeMap2 = new Map<string, any>();
+      branches.forEach((b: any) => {
+        const c = directCounts2(b.id);
+        nodeMap2.set(b.id, { ...b, path: b.name, depth: 0, children: [],
+          due_count: c.due, new_count: c.new_, learning_count: c.learning,
+          mastered_count: c.mastered, total_count: c.total, direct_card_count: c.direct });
+      });
+      const roots2: any[] = [];
+      nodeMap2.forEach((node: any) => {
+        if (node.parent_id && nodeMap2.has(node.parent_id)) {
+          nodeMap2.get(node.parent_id)!.children.push(node);
+        } else { roots2.push(node); }
+      });
+      // Set depth + path
+      const assignPath2 = (nodes: any[], depth: number, parentPath: string) => {
+        nodes.forEach(n => {
+          n.depth = depth; n.path = parentPath ? `${parentPath} / ${n.title || n.name}` : (n.title || n.name);
+          assignPath2(n.children, depth + 1, n.path);
+        });
+      };
+      assignPath2(roots2, 0, '');
+      // Roll up aggregates
+      const rollup2 = (nodes: any[]): any => {
+        return nodes.map(n => {
+          n.children = rollup2(n.children);
+          n.children.forEach(c => {
+            n.due_count += c.due_count; n.new_count += c.new_count;
+            n.learning_count += c.learning_count; n.mastered_count += c.mastered_count;
+            n.total_count += c.total_count;
+          });
+          return n;
+        });
+      };
+      return rollup2(roots2);
+    }
+
     // 1. All branches
     const branches = await this.listAll(userId);
 

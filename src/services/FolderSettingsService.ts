@@ -9,6 +9,8 @@
  */
 
 import { supabase } from '../lib/supabase';
+import { NetworkStatus } from '../lib/networkStatus';
+import { OfflineManager } from './OfflineManager';
 import { AlgorithmSettings, DEFAULT_SETTINGS } from './sm2';
 
 export type FolderKey = string; // e.g. "" (global) | "Polity" | "Polity|Preamble" | "Polity|Preamble|Key Terms"
@@ -45,13 +47,24 @@ export class FolderSettingsSvc {
     const hit = memCache.get(userId);
     if (hit && Date.now() - hit.at < CACHE_TTL) return hit.rows;
 
+    // OFFLINE: read from OfflineManager cache
+    if (NetworkStatus.isOffline()) {
+      try {
+        const cached = OfflineManager.getCollectionSync('folder_algorithm_settings', userId) as any[];
+        if (cached && cached.length > 0) {
+          const rows = cached as FolderSettingsRow[];
+          memCache.set(userId, { at: Date.now(), rows });
+          return rows;
+        }
+      } catch {}
+    }
+
     const { data, error } = await supabase
       .from('folder_algorithm_settings')
       .select('user_id, folder_key, settings, inherit, updated_at')
       .eq('user_id', userId);
 
     if (error) {
-      // Table might not exist yet — treat as empty.
       console.warn('[FolderSettings] listAll error:', error.message);
       memCache.set(userId, { at: Date.now(), rows: [] });
       return [];

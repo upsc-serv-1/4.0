@@ -16,19 +16,19 @@ The repo already has an offline scaffold (`OfflineManager`, `LocalQuery`, `SyncQ
 
 ## Step-by-step status
 
-| # | Title | Status | Commit |
-|---|-------|--------|--------|
-| 1 | Add NetworkStatus singleton + progress sheet | ⏳ in progress | — |
-| 2 | Wire diagnostic Simulate Offline into NetworkStatus | ☐ | — |
-| 3 | Supabase customFetch — fast-fail when offline | ☐ | — |
-| 4 | Extend OfflineManager full-sync (tags, syllabus, prompts, folder settings) | ☐ | — |
-| 5 | Gate (tabs)/index.tsx background refresh on online flag | ☐ | — |
-| 6 | Make pilotV2Repo offline-first (KVStore reads + SyncQueue writes) | ☐ | — |
-| 7 | Pilot V2 note content writes through SyncQueue | ☐ | — |
-| 8 | app/notes/index.tsx — offline-aware notebook listing & ops | ☐ | — |
-| 9 | Audit remaining call sites (WidgetService, AIPromptManager, BranchService) | ☐ | — |
-| 10 | Enhance offline-diag UI (real NetInfo + per-table cache stats) | ☐ | — |
-| 11 | Verify 0 blocked calls in diagnostic flow | ☐ | — |
+| # | Title | Status | Notes |
+|---|-------|--------|-------|
+| 1 | Add NetworkStatus singleton + progress sheet | ✅ Done | `src/lib/networkStatus.ts` — singleton with isOnline/isOffline |
+| 2 | Wire diagnostic Simulate Offline into NetworkStatus | ✅ Done | `app/offline-diag.tsx` calls `NetworkStatus.setSimulatedOffline()` |
+| 3 | Supabase customFetch — fast-fail when offline | ✅ Done | `src/lib/supabase.ts` — interceptor short-circuits when offline |
+| 4 | Extend OfflineManager full-sync (tags, syllabus, prompts, folder settings) | ✅ Done | All tables cached including user_tags, syllabus_progress, prompt_templates |
+| 5 | Gate (tabs)/index.tsx background refresh on online flag | ✅ Done | Line 186-208 reads from OfflineManager cache; onPullRefresh gates on NetworkStatus |
+| 6 | Make pilotV2Repo offline-first (KVStore reads + SyncQueue writes) | ✅ Done | Has NetworkStatus gates + KVStore fallback |
+| 7 | Pilot V2 note content writes through SyncQueue | ✅ Done | PilotV2SyncQueue handles offline writes |
+| 8 | app/notes/index.tsx — offline-aware notebook listing & ops | ⚠️ Partial | Reads from cache but some create/rename/archive ops still call Supabase directly |
+| 9 | Audit remaining call sites (WidgetService, AIPromptManager, BranchService) | ⚠️ Partial | AIPromptManager ✅. BranchService ❌ — `listCardIdsInBranch` has NO offline fallback. WidgetService ✅ |
+| 10 | Enhance offline-diag UI (real NetInfo + per-table cache stats) | ✅ Done | Shows sync status, per-table counts, blocked calls |
+| 11 | Verify 0 blocked calls in diagnostic flow | ❌ Not yet | BranchService.listCardIdsInBranch and engine.tsx fetchQuestions still hit Supabase without offline fallbacks |
 
 ## How to continue this work (if context is lost)
 

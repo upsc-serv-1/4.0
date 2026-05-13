@@ -10,15 +10,34 @@ const QuestionsPage = lazy(() => import('./components/questions/QuestionsPage'))
 const TestsPage = lazy(() => import('./components/tests/TestsPage'));
 const FlashcardsPage = lazy(() => import('./components/flashcards/FlashcardsPage'));
 const UsersPage = lazy(() => import('./components/users/UsersPage'));
-const AnalyticsPage = lazy(() => import('./components/analytics/AnalyticsPage'));
-const DataHealthPage = lazy(() => import('./components/data-health/DataHealthPage'));
-const BulkOperationsPage = lazy(() => import('./components/bulk-operations/BulkOperationsPage'));
-const TaxonomyPage = lazy(() => import('./components/taxonomy/TaxonomyPage'));
-const DedupManager = lazy(() => import('./components/dedup/DedupManager'));
-const SoftNotesAdminPage = lazy(() => import('./components/softnotes/SoftNotesAdminPage'));
-const NotesAdminPage = lazy(() => import('./components/notes/NotesAdminPage'));
-const QuestionStatesPage = lazy(() => import('./components/analytics/QuestionStatesPage'));
-const AdminSettingsPage = lazy(() => import('./components/settings/AdminSettingsPage'));
+const DedupManager = lazy(() => import('./pages/DedupManager'));
+
+// Placeholders for missing files
+function PlaceholderPage({ name }: { name: string }) {
+  return (
+    <div className="p-8">
+      <h1 className="text-2xl font-black mb-4 flex items-center gap-2">
+        <div className="w-3 h-8 bg-primary rounded"></div>
+        {name}
+      </h1>
+      <div className="bg-panel border border-border border-dashed rounded-xl p-12 text-center">
+        <div className="text-lg font-bold mb-2">Under Construction</div>
+        <p className="text-muted max-w-md mx-auto text-sm">
+          This page component is referenced in navigation but currently has no implementation file in the source tree.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+const AnalyticsPage = () => <PlaceholderPage name="Analytics" />;
+const DataHealthPage = () => <PlaceholderPage name="Data Health" />;
+const BulkOperationsPage = () => <PlaceholderPage name="Bulk Operations" />;
+const TaxonomyPage = () => <PlaceholderPage name="Taxonomy" />;
+const SoftNotesAdminPage = () => <PlaceholderPage name="Soft Notes" />;
+const NotesAdminPage = () => <PlaceholderPage name="Notes" />;
+const QuestionStatesPage = () => <PlaceholderPage name="Question States" />;
+const AdminSettingsPage = () => <PlaceholderPage name="Settings" />;
 
 function Loading() {
   return (

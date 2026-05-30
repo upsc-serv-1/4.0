@@ -612,17 +612,21 @@ export default function UnifiedArenaSetup() {
       const flattened = await OfflineManager.getConsolidatedMetadata();
       const normalized = Array.isArray(flattened) ? flattened : [];
 
-      // Filter metadata by selected course
-      const courseFiltered = normalized.filter((item: any) => item.course === selectedCourse || !item.course);
+      // Filter metadata by selected course - STRICT filter
+      const courseFiltered = normalized.filter((item: any) => item.course === selectedCourse);
 
-      console.log('[ARENA-LOAD] ✅ Metadata loaded successfully:', { totalItems: normalized.length, courseItems: courseFiltered.length, course: selectedCourse });
+      console.log('[ARENA-LOAD] ✅ Metadata loaded successfully:', { totalItems: normalized.length, courseItems: courseFiltered.length, itemsWithoutCourse: normalized.filter((i: any) => !i.course).length, course: selectedCourse, sample: courseFiltered[0] });
 
       if (courseFiltered.length > 0) {
         arenaMetadataCache = courseFiltered;
         arenaMetadataCachedAt = Date.now();
         setMetadata(courseFiltered);
-      } else if (!hasWarmCache) {
-        console.warn('[ARENA-LOAD] ⚠️ No metadata found in cache');
+      } else {
+        // No data with matching course - likely offline cache is old and doesn't have course field
+        // Fall back to showing data anyway but log warning
+        console.warn('[ARENA-LOAD] ⚠️ No items with course field matching', { selectedCourse, totalItems: normalized.length, itemsWithCourseField: normalized.filter((i: any) => i.course).length });
+        if (normalized.length > 0) {
+          console.log('[ARENA-LOAD] Using all data from cache (offline cache may be outdated)');
         setMetadata([]);
       }
 

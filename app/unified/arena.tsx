@@ -612,30 +612,71 @@ export default function UnifiedArenaSetup() {
       const flattened = await OfflineManager.getConsolidatedMetadata();
       const normalized = Array.isArray(flattened) ? flattened : [];
 
-      // Filter metadata by selected course - STRICT filter
-      const courseFiltered = normalized.filter((item: any) => item.course === selectedCourse);
+      // Filter metadata by selected course
+      const courseFiltered = normalized.filter((item: any) => item.course === selectedCourse || !item.course);
 
-      console.log('[ARENA-LOAD] ✅ Metadata loaded successfully:', { totalItems: normalized.length, courseItems: courseFiltered.length, itemsWithoutCourse: normalized.filter((i: any) => !i.course).length, course: selectedCourse, sample: courseFiltered[0] });
+      console.log('[ARENA-LOAD] ✅ Metadata loaded from offline:', { totalItems: normalized.length, courseItems: courseFiltered.length, course: selectedCourse });
 
       if (courseFiltered.length > 0) {
         arenaMetadataCache = courseFiltered;
         arenaMetadataCachedAt = Date.now();
         setMetadata(courseFiltered);
       } else {
-        // No data with matching course - likely offline cache is old and doesn't have course field
-        // Fall back to showing data anyway but log warning
-        console.warn('[ARENA-LOAD] ⚠️ No items with course field matching', { selectedCourse, totalItems: normalized.length, itemsWithCourseField: normalized.filter((i: any) => i.course).length });
-        if (normalized.length > 0) {
-          console.log('[ARENA-LOAD] Using all data from cache (offline cache may be outdated)');
-          setMetadata(normalized);
-        } else {
-          setMetadata([]);
-        }
+        // Offline cache empty or no matching data - show empty state
+        console.log('[ARENA-LOAD] No offline data available, showing empty state');
+        setMetadata([]);
       }
 
       if (session?.user?.id) {
         await fetchUserTags();
       }
+
+      // Background sync: Fetch from Supabase to update/add remaining data (non-blocking)
+      // This happens AFTER UI is updated with offline data
+      setTimeout(async () => {
+        try {
+          console.log('[ARENA-SYNC] Starting background sync for course:', selectedCourse);
+          const { data: supabaseQuestions, error } = await supabase
+            .from('questions')
+            .select('course, subject, section_group, micro_topic, sub_topic, id')
+            .eq('course', selectedCourse)
+            .not('subject', 'is', null)
+            .limit(5000);
+
+          if (error) throw error;
+          if (supabaseQuestions?.length) {
+            const grouped: any = {};
+            supabaseQuestions.forEach((q: any) => {
+              const subj = q.subject;
+              const sg = q.section_group || 'General';
+              const mt = q.micro_topic || 'Other';
+              const st = q.sub_topic || 'Other';
+              
+              if (!grouped[subj]) grouped[subj] = { course: selectedCourse, subject: subj };
+              if (!grouped[subj][sg]) grouped[subj][sg] = {};
+              if (!grouped[subj][sg][mt]) grouped[subj][sg][mt] = {};
+              
+              const key = `${mt}|${st}`;
+              if (!grouped[subj][sg][mt][key]) grouped[subj][sg][mt][key] = [];
+              grouped[subj][sg][mt][key].push(q);
+            });
+
+            const syncedData = Object.values(grouped);
+            console.log('[ARENA-SYNC] ✅ Synced from Supabase:', { items: supabaseQuestions.length, grouped: syncedData.length, course: selectedCourse });
+            
+            // Only update UI if we have more data than what was offline
+            if (syncedData.length > courseFiltered.length) {
+              arenaMetadataCache = syncedData;
+              arenaMetadataCachedAt = Date.now();
+              setMetadata(syncedData);
+              console.log('[ARENA-SYNC] Updated UI with synced data');
+            }
+          }
+        } catch (syncErr) {
+          console.log('[ARENA-SYNC] Background sync failed (non-blocking):', syncErr);
+          // Not critical - offline data already shown to user
+        }
+      }, 500); // Small delay to show offline data first
     } catch (err) {
       console.error('[ARENA-LOAD] ❌ Metadata fetch error:', { error: err, timestamp: new Date().toISOString() });
     } finally {

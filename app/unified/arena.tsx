@@ -252,8 +252,11 @@ export default function UnifiedArenaSetup() {
   }, [session?.user?.id]);
 
   useEffect(() => {
+    // Reset metadata when course changes
+    arenaMetadataCache = [];
+    arenaMetadataCachedAt = 0;
     fetchMetadata();
-  }, []);
+  }, [selectedCourse]);
 
   useFocusEffect(
     useCallback(() => {
@@ -609,12 +612,15 @@ export default function UnifiedArenaSetup() {
       const flattened = await OfflineManager.getConsolidatedMetadata();
       const normalized = Array.isArray(flattened) ? flattened : [];
 
-      console.log('[ARENA-LOAD] ✅ Metadata loaded successfully:', { itemCount: normalized.length });
+      // Filter metadata by selected course
+      const courseFiltered = normalized.filter((item: any) => item.course === selectedCourse || !item.course);
 
-      if (normalized.length > 0) {
-        arenaMetadataCache = normalized;
+      console.log('[ARENA-LOAD] ✅ Metadata loaded successfully:', { totalItems: normalized.length, courseItems: courseFiltered.length, course: selectedCourse });
+
+      if (courseFiltered.length > 0) {
+        arenaMetadataCache = courseFiltered;
         arenaMetadataCachedAt = Date.now();
-        setMetadata(normalized);
+        setMetadata(courseFiltered);
       } else if (!hasWarmCache) {
         console.warn('[ARENA-LOAD] ⚠️ No metadata found in cache');
         setMetadata([]);

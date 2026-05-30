@@ -828,9 +828,12 @@ export default function AISearchTab() {
     const allQuestions = OfflineManager.getOfflineQuestionsEnrichedSync() ?? [];
     if (allQuestions.length === 0) return [];
 
+    // Filter by selected course first
+    let results = allQuestions.filter((q: any) => q.course === selectedCourse);
+
     // Filter: any question matching ANY search term in ANY selected field (OR expansion)
     const termSet = new Set(searchTerms.map(t => t.toLowerCase()));
-    let results = allQuestions.filter((q: any) => {
+    results = results.filter((q: any) => {
       // For each question, check if ANY search term appears in ANY selected field
       for (const field of fields) {
         const text = String(q[field] ?? '').toLowerCase();
@@ -906,7 +909,7 @@ export default function AISearchTab() {
     }
 
     return results;
-  }, []);
+  }, [selectedCourse]);
 
   // ── Core search — handles AI / Matching / Exact modes ──────────────────────
 

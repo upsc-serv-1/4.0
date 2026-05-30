@@ -615,68 +615,102 @@ export default function UnifiedArenaSetup() {
       // Filter metadata by selected course
       const courseFiltered = normalized.filter((item: any) => item.course === selectedCourse || !item.course);
 
-      console.log('[ARENA-LOAD] ✅ Metadata loaded from offline:', { totalItems: normalized.length, courseItems: courseFiltered.length, course: selectedCourse });
+      console.log('[ARENA-LOAD] Offline data:', { totalItems: normalized.length, courseItems: courseFiltered.length, course: selectedCourse });
 
-      if (courseFiltered.length > 0) {
-        arenaMetadataCache = courseFiltered;
-        arenaMetadataCachedAt = Date.now();
-        setMetadata(courseFiltered);
+      let dataToShow = courseFiltered;
+
+      // If offline cache is completely empty, fetch from Supabase SYNCHRONOUSLY
+      if (courseFiltered.length === 0) {
+        console.log('[ARENA-LOAD] Offline cache empty, fetching from Supabase for:', selectedCourse);
+        const { data: supabaseQuestions, error } = await supabase
+          .from('questions')
+          .select('course, subject, section_group, micro_topic, sub_topic, id')
+          .eq('course', selectedCourse)
+          .not('subject', 'is', null)
+          .limit(5000);
+
+        if (error) throw error;
+        if (supabaseQuestions?.length) {
+          const grouped: any = {};
+          supabaseQuestions.forEach((q: any) => {
+            const subj = q.subject;
+            const sg = q.section_group || 'General';
+            const mt = q.micro_topic || 'Other';
+            const st = q.sub_topic || 'Other';
+            
+            if (!grouped[subj]) grouped[subj] = { course: selectedCourse, subject: subj };
+            if (!grouped[subj][sg]) grouped[subj][sg] = {};
+            if (!grouped[subj][sg][mt]) grouped[subj][sg][mt] = {};
+            
+            const key = `${mt}|${st}`;
+            if (!grouped[subj][sg][mt][key]) grouped[subj][sg][mt][key] = [];
+            grouped[subj][sg][mt][key].push(q);
+          });
+
+          dataToShow = Object.values(grouped);
+          console.log('[ARENA-LOAD] ✅ Fetched from Supabase:', { items: supabaseQuestions.length, grouped: dataToShow.length, course: selectedCourse });
+        } else {
+          console.log('[ARENA-LOAD] No data found in Supabase for:', selectedCourse);
+          dataToShow = [];
+        }
       } else {
-        // Offline cache empty or no matching data - show empty state
-        console.log('[ARENA-LOAD] No offline data available, showing empty state');
-        setMetadata([]);
+        console.log('[ARENA-LOAD] ✅ Using offline cache');
       }
+
+      arenaMetadataCache = dataToShow;
+      arenaMetadataCachedAt = Date.now();
+      setMetadata(dataToShow);
 
       if (session?.user?.id) {
         await fetchUserTags();
       }
 
-      // Background sync: Fetch from Supabase to update/add remaining data (non-blocking)
-      // This happens AFTER UI is updated with offline data
-      setTimeout(async () => {
-        try {
-          console.log('[ARENA-SYNC] Starting background sync for course:', selectedCourse);
-          const { data: supabaseQuestions, error } = await supabase
-            .from('questions')
-            .select('course, subject, section_group, micro_topic, sub_topic, id')
-            .eq('course', selectedCourse)
-            .not('subject', 'is', null)
-            .limit(5000);
+      // Background sync: Only if offline cache had data, try to get more from Supabase (non-blocking)
+      if (courseFiltered.length > 0) {
+        setTimeout(async () => {
+          try {
+            console.log('[ARENA-SYNC] Starting background sync for course:', selectedCourse);
+            const { data: supabaseQuestions, error } = await supabase
+              .from('questions')
+              .select('course, subject, section_group, micro_topic, sub_topic, id')
+              .eq('course', selectedCourse)
+              .not('subject', 'is', null)
+              .limit(5000);
 
-          if (error) throw error;
-          if (supabaseQuestions?.length) {
-            const grouped: any = {};
-            supabaseQuestions.forEach((q: any) => {
-              const subj = q.subject;
-              const sg = q.section_group || 'General';
-              const mt = q.micro_topic || 'Other';
-              const st = q.sub_topic || 'Other';
-              
-              if (!grouped[subj]) grouped[subj] = { course: selectedCourse, subject: subj };
-              if (!grouped[subj][sg]) grouped[subj][sg] = {};
-              if (!grouped[subj][sg][mt]) grouped[subj][sg][mt] = {};
-              
-              const key = `${mt}|${st}`;
-              if (!grouped[subj][sg][mt][key]) grouped[subj][sg][mt][key] = [];
-              grouped[subj][sg][mt][key].push(q);
-            });
+            if (error) throw error;
+            if (supabaseQuestions?.length) {
+              const grouped: any = {};
+              supabaseQuestions.forEach((q: any) => {
+                const subj = q.subject;
+                const sg = q.section_group || 'General';
+                const mt = q.micro_topic || 'Other';
+                const st = q.sub_topic || 'Other';
+                
+                if (!grouped[subj]) grouped[subj] = { course: selectedCourse, subject: subj };
+                if (!grouped[subj][sg]) grouped[subj][sg] = {};
+                if (!grouped[subj][sg][mt]) grouped[subj][sg][mt] = {};
+                
+                const key = `${mt}|${st}`;
+                if (!grouped[subj][sg][mt][key]) grouped[subj][sg][mt][key] = [];
+                grouped[subj][sg][mt][key].push(q);
+              });
 
-            const syncedData = Object.values(grouped);
-            console.log('[ARENA-SYNC] ✅ Synced from Supabase:', { items: supabaseQuestions.length, grouped: syncedData.length, course: selectedCourse });
-            
-            // Only update UI if we have more data than what was offline
-            if (syncedData.length > courseFiltered.length) {
-              arenaMetadataCache = syncedData;
-              arenaMetadataCachedAt = Date.now();
-              setMetadata(syncedData);
-              console.log('[ARENA-SYNC] Updated UI with synced data');
+              const syncedData = Object.values(grouped);
+              console.log('[ARENA-SYNC] ✅ Synced from Supabase:', { items: supabaseQuestions.length, grouped: syncedData.length, course: selectedCourse });
+              
+              // Only update UI if we have more data than what was offline
+              if (syncedData.length > courseFiltered.length) {
+                arenaMetadataCache = syncedData;
+                arenaMetadataCachedAt = Date.now();
+                setMetadata(syncedData);
+                console.log('[ARENA-SYNC] Updated UI with synced data');
+              }
             }
+          } catch (syncErr) {
+            console.log('[ARENA-SYNC] Background sync failed (non-blocking):', syncErr);
           }
-        } catch (syncErr) {
-          console.log('[ARENA-SYNC] Background sync failed (non-blocking):', syncErr);
-          // Not critical - offline data already shown to user
-        }
-      }, 500); // Small delay to show offline data first
+        }, 500);
+      }
     } catch (err) {
       console.error('[ARENA-LOAD] ❌ Metadata fetch error:', { error: err, timestamp: new Date().toISOString() });
     } finally {

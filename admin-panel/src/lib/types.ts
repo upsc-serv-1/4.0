@@ -21,6 +21,9 @@ export interface QuestionFull {
   is_pyq: boolean;
   is_ncert: boolean;
   is_upsc_cse: boolean;
+  is_upsc_cms: boolean;
+  is_neetpg: boolean;
+  is_inicet: boolean;
   is_allied: boolean;
   is_others: boolean;
   is_cancelled: boolean;
@@ -361,3 +364,7 @@ export interface ImportSchema {
     default?: any;
   }[];
 }
+
+// ── TYPE ALIASES FOR CONVENIENCE ──
+export type Question = QuestionFull;
+export type Test = TestFull;

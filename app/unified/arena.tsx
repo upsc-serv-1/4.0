@@ -742,9 +742,12 @@ export default function UnifiedArenaSetup() {
         ncertFilter === 'All';
 
       if (isDefaultAllQuestions) {
-        const meta = await OfflineManager.getMetadata();
-        if (meta.totalQuestions > 0) {
-          setQuestionCount(meta.totalQuestions);
+        // Count questions for the selected course only (not all courses)
+        const { count, error } = await LocalQuery.from('questions')
+          .select('id', { count: 'exact', head: true })
+          .eq('course', selectedCourse);
+        if (!error && count && count > 0) {
+          setQuestionCount(count);
           setCalculatingCount(false);
           return;
         }
@@ -784,7 +787,7 @@ export default function UnifiedArenaSetup() {
         return;
       }
 
-      let query = LocalQuery.from('questions').select('id', { count: 'exact', head: true });
+      let query = LocalQuery.from('questions').select('id', { count: 'exact', head: true }).eq('course', selectedCourse);
 
       if (activeTab === 'topic') {
         if (selectedSubjects.length > 0) query = query.in('subject', selectedSubjects);
@@ -839,7 +842,7 @@ export default function UnifiedArenaSetup() {
         }
 
         if (deferredSelectedInstitutes.length > 0 || selectedPrograms.length > 0) {
-          let tQuery = LocalQuery.from('tests').select('id');
+          let tQuery = LocalQuery.from('tests').select('id').eq('course', selectedCourse);
           if (deferredSelectedInstitutes.length > 0) tQuery = tQuery.in('institute', deferredSelectedInstitutes);
           if (selectedPrograms.length > 0) tQuery = tQuery.in('program_name', selectedPrograms);
           const { data: testRows } = await tQuery;

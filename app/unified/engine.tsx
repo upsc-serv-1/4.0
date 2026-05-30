@@ -94,7 +94,7 @@ import { PageWrapper } from '../../src/components/PageWrapper';
 import { supabase } from '../../src/lib/supabase';
 import { useAuth } from '../../src/context/AuthContext';
 import { useCourse } from '../../src/context/CourseContext';
-import { useQuizStore } from '../../src/store/quizStore';
+import { useQuizStore, cancelSyncTimeout } from '../../src/store/quizStore';
 import { useTagStore } from '../../src/store/tagStore';
 import { mergeQuestions } from '../../src/utils/merger';
 import Markdown from 'react-native-markdown-display';
@@ -1555,6 +1555,15 @@ export default function UnifiedQuizEngine() {
         console.log('[ENGINE-OFFLINE] Total offline questions available:', { count: allOffline.length });
         if (allOffline.length > 0) {
           let filtered = [...allOffline];
+          
+          // Apply course filter — only show questions for the selected course
+          if (selectedCourse) {
+            const beforeCourse = filtered.length;
+            filtered = filtered.filter((q: any) => q.course === selectedCourse || !q.course);
+            if (filtered.length < beforeCourse) {
+              console.log('[ENGINE-OFFLINE] Filtered by course:', { selectedCourse, before: beforeCourse, after: filtered.length });
+            }
+          }
 
           // Apply subject filter
           const subs = params.subjects || params.subject;
@@ -2400,6 +2409,15 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
     // Auto-save test attempt for Quiz Mode
     if (session?.user?.id && sessionTestId) {
        try {
+         // CRITICAL FIX: Cancel ALL pending debounced sync timeouts BEFORE submitting.
+         // These stale auto-sync writes have OLD attemptId captured from store.get()
+         // and would overwrite our fresh submit writes if they fire after.
+         cancelSyncTimeout();
+
+         // Drain any stale question_state entries from the pending queue
+         const questionIds = questions.map(q => q.id);
+         await StudentSync.drainPendingForQuestionIds(questionIds);
+
          // 1. Prepare Version 2 attempt_payload
          const attemptQuestions = buildAttemptQuestions();
          const attempted = attemptQuestions.filter(row => row.selected_answer !== null).length;
@@ -2438,15 +2456,15 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
          const attemptId = await StudentSync.submitAttemptNow({
            userId: session.user.id,
            testId: sessionTestId,
-           attempt: { 
+           attempt: {
              score: correct,
-             attempt_payload, 
+             attempt_payload,
              started_at: new Date(sessionStartRef.current).toISOString(),
              submitted_at: new Date().toISOString(),
            }
          });
 
-         // 3. Per-question question_state writes (with real attemptId)
+         // 3. Per-question question_state writes (with real attemptId) — NO stale syncs
          questions.forEach(q => {
            const answerData = store.answers[q.id] || {};
            StudentSync.enqueue('question_state', {
@@ -2591,7 +2609,15 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
     setIsSavingAttempt(true);
     
     try {
-      questions.forEach(q => store.syncAnswer(q.id));
+      // CRITICAL FIX: Cancel ALL pending debounced sync timeouts FIRST.
+      // This prevents stale auto-sync writes (with old attemptId/patch data)
+      // from firing AFTER we submit with the new attemptId.
+      const questionIds = questions.map(q => q.id);
+      cancelSyncTimeout(); // Cancel all pending debounced syncs
+      
+      // Drain stale question_state entries from the pending queue for these questions
+      await StudentSync.drainPendingForQuestionIds(questionIds);
+      
       const submissionTime = new Date().toISOString();
       const testId = params.testId || (questions[0]?.test_id) || `unified_${Date.now()}`;
       
@@ -2635,7 +2661,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
         } as any
       });
 
-      // Per-question state sync (with real attemptId)
+      // Per-question state sync (with real attemptId) — NO MORE stale syncAnswer() calls
       questions.forEach(q => {
         const answerData = store.answers[q.id] || {};
         StudentSync.enqueue('question_state', {

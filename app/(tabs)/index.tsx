@@ -73,16 +73,18 @@ const WIDGET_LABELS: Record<string, string> = {
   study_heatmap: 'Daily Consistency Heatmap'
 };
 
+// Pre-built avatar lookup map for O(1) access instead of Array.find
+const AVATAR_MAP = Object.fromEntries(AVATARS.map(a => [a.id, a.uri]));
 // Memoized avatar component to prevent flicker on navigation
 const AvatarDisplay = memo(function AvatarDisplay({ avatarId, name, colors }: any) {
-  const avatarSource = useMemo(() => AVATARS.find(a => a.id === avatarId)?.uri, [avatarId]);
+  const avatarSource = useMemo(() => avatarId ? AVATAR_MAP[avatarId] : undefined, [avatarId]);
   
   return (
     <LinearGradient colors={[colors.primary, colors.primary + 'CC']} style={[styles.avatarWrap, { overflow: 'hidden' }]}>
       {avatarId && avatarSource ? (
-        <Image 
+        <Image
           source={avatarSource}
-          style={{ width: '100%', height: '100%' }} 
+          style={{ width: '100%', height: '100%' }}
         />
       ) : (
         <Text style={styles.avatarTxt}>{(name[0] || 'A').toUpperCase()}</Text>

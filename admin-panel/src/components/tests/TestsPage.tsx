@@ -5,6 +5,7 @@ import { DataTable } from '../shared/DataTable';
 import { FilterBar } from '../shared/FilterBar';
 import { DetailModal } from '../shared/DetailModal';
 import { ConfirmDialog } from '../shared/ConfirmDialog';
+import { JsonUploadWidget } from './JsonUploadWidget';
 import { usePagination } from '../../hooks/usePagination';
 import { useDebounce } from '../../hooks/useDebounce';
 import { buildTestQuery, TEST_FILTERS } from '../../lib/queryUtils';
@@ -78,6 +79,14 @@ export default function TestsPage() {
         onChange={(k, v) => { setFilters(p => ({ ...p, [k]: v })); pagination.setPage(1); }}
         onReset={() => { setFilters({}); pagination.setPage(1); }}
       />
+
+      <div className="mb-8 bg-panel border border-border rounded-xl p-6">
+        <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <div className="w-2 h-5 bg-primary rounded"></div>
+          Import JSON Question Papers
+        </h2>
+        <JsonUploadWidget onUploadComplete={load} />
+      </div>
 
       <DataTable
         columns={columns} data={rows} keyField="id" loading={loading}

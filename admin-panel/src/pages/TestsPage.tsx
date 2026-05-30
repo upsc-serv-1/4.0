@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Plus, Trash2, Edit3, Save, X } from 'lucide-react';
-import type { Test } from '../lib/types';
+import type { TestFull } from '../lib/types';
+import { JsonUploadWidget } from '../components/tests/JsonUploadWidget';
 
-const empty: Partial<Test> = { title: '', provider: '', institute: '', program_name: '', question_count: 0, default_minutes: 60 };
+const empty: Partial<TestFull> = { title: '', provider: '', institute: '', program_name: '', question_count: 0, default_minutes: 60 };
 
 export default function TestsPage() {
-  const [rows, setRows] = useState<Test[]>([]);
-  const [editing, setEditing] = useState<Partial<Test> | null>(null);
+  const [rows, setRows] = useState<TestFull[]>([]);
+  const [editing, setEditing] = useState<Partial<TestFull> | null>(null);
 
   const load = async () => {
     const { data } = await supabase.from('tests').select('*').order('created_at', { ascending: false });
@@ -27,6 +28,12 @@ export default function TestsPage() {
       <div className="flex justify-between items-center mb-6">
         <div><h1 className="text-3xl font-black">Test Papers</h1><p className="text-muted">{rows.length} tests</p></div>
         <button onClick={() => setEditing(empty)} className="flex items-center gap-2 bg-primary text-black font-bold px-4 py-2 rounded"><Plus size={16} /> New</button>
+      </div>
+
+      {/* JSON Upload Section */}
+      <div className="mb-8 bg-panel border border-border rounded-xl p-6">
+        <h2 className="text-xl font-bold mb-4">Import JSON Question Papers</h2>
+        <JsonUploadWidget onUploadComplete={load} />
       </div>
 
       <div className="bg-panel border border-border rounded-xl overflow-hidden">

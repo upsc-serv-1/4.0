@@ -657,8 +657,11 @@ class OfflineManagerService {
       const flattened: any[] = [];
       for (const t of tests) {
         const questions = await this.getOfflineQuestions(t.id);
+        // Determine course from test or fallback to first question's course
+        const testCourse = t.course || 'UPSC CSE';
         if (questions.length === 0) {
           flattened.push({
+            course: testCourse,
             subject: null, section_group: null, micro_topic: null,
             is_ncert: null,
             test_id: t.id, institute: t.institute, program_name: t.program_name,
@@ -667,6 +670,7 @@ class OfflineManagerService {
         } else {
           for (const q of questions) {
             flattened.push({
+              course: q.course || testCourse,
               subject: q.subject || null,
               section_group: q.section_group || null,
               micro_topic: q.micro_topic || null,

@@ -35,6 +35,23 @@ interface QuizState {
 // Map to track debounced sync timeouts per question
 const syncTimeouts: Record<string, NodeJS.Timeout> = {};
 
+/**
+ * Cancel any pending debounced sync for a specific question,
+ * or if no questionId is given, cancel ALL pending syncs.
+ * This prevents stale auto-sync writes from overwriting final submit data.
+ */
+export const cancelSyncTimeout = (questionId?: string) => {
+  if (questionId) {
+    if (syncTimeouts[questionId]) {
+      clearTimeout(syncTimeouts[questionId]);
+      delete syncTimeouts[questionId];
+    }
+  } else {
+    Object.values(syncTimeouts).forEach(clearTimeout);
+    Object.keys(syncTimeouts).forEach(key => delete syncTimeouts[key]);
+  }
+};
+
 export const useQuizStore = create<QuizState>((set, get) => ({
   activeTestId: null,
   activeAttemptId: null,

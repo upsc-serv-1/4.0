@@ -78,6 +78,9 @@ def import_all():
                 # Fetch boolean flags and detailed exam info
                 is_pyq = q.get("isPyq") or q.get("is_pyq") or False
                 is_upsc_cse = False
+                is_upsc_cms = False
+                is_neetpg = False
+                is_inicet = False
                 is_allied = False
                 is_others = False
                 
@@ -88,6 +91,9 @@ def import_all():
                 # Deep extraction from exam_info
                 is_pyq = is_pyq or ei.get("isPyq", False) or ei.get("is_pyq", False)
                 is_upsc_cse = ei.get("is_upsc_cse") or ei.get("is_upsc_csc") or False
+                is_upsc_cms = ei.get("is_upsc_cms") or False
+                is_neetpg = ei.get("is_neetpg") or ei.get("is_neet_pg") or False
+                is_inicet = ei.get("is_inicet") or ei.get("is_ini_cet") or False
                 is_allied = ei.get("is_allied") or False
                 is_others = ei.get("is_others") or False
                 
@@ -121,6 +127,9 @@ def import_all():
                     "is_pyq": is_pyq,
                     "is_ncert": bool(is_ncert),
                     "is_upsc_cse": is_upsc_cse,
+                    "is_upsc_cms": is_upsc_cms,
+                    "is_neetpg": is_neetpg,
+                    "is_inicet": is_inicet,
                     "is_allied": is_allied,
                     "is_others": is_others,
                     "is_cancelled": q.get("is_cancelled", False),

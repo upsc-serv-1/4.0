@@ -151,6 +151,20 @@ export function useTaggedVault(userId: string | undefined) {
     setLoading(true);
 
     try {
+      // COURSE-AWARE FIX: First fetch question IDs for the selected course,
+      // then filter question_states to only those belonging to the current course.
+      // This prevents "Unassigned" subjects from tagged UPSC questions when
+      // the user switches to Medical Science.
+      const { data: courseQuestions, error: courseQError } = await supabase
+        .from('questions')
+        .select('id')
+        .eq('course', selectedCourse)
+        .limit(50000);
+
+      if (courseQError) throw courseQError;
+
+      const courseQuestionIds = new Set((courseQuestions || []).map(q => q.id));
+
       // Force fresh fetch from Supabase to ensure Tags tab stays in sync
       const { data: states, error: fetchError } = await supabase
         .from('question_states')
@@ -160,7 +174,12 @@ export function useTaggedVault(userId: string | undefined) {
 
       if (fetchError) throw fetchError;
 
-      const filteredStates = (states || []).filter(row => parseReviewTags(row.review_tags).length > 0);
+      // Filter states to only those belonging to the selected course
+      const filteredStates = (states || [])
+        .filter(row => {
+          const tags = parseReviewTags(row.review_tags);
+          return tags.length > 0 && courseQuestionIds.has(row.question_id);
+        });
 
       if (filteredStates.length === 0) {
         setRawQuestions([]);
@@ -230,6 +249,9 @@ export function useTaggedVault(userId: string | undefined) {
           const qData = questionsById.get(mergedId) || questionsById.get(row.question_id);
           const tags = parseReviewTags(row.review_tags);
 
+          // Only include states that have matching questions in the current course
+          if (!qData) return null;
+
           return {
             id: row.question_id,
             testId: row.test_id || qData?.test_id,
@@ -250,6 +272,7 @@ export function useTaggedVault(userId: string | undefined) {
             createdAt: row.updated_at || new Date().toISOString(),
           };
         })
+        .filter(Boolean) as TaggedQuestion[]
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
       setRawQuestions(transformed);

@@ -6,7 +6,7 @@ import type { Question } from '../lib/types';
 const empty: Partial<Question> = {
   question_text: '', options: { a: '', b: '', c: '', d: '' }, correct_answer: 'a',
   explanation_markdown: '', subject: '', micro_topic: '', section_group: '', is_pyq: false,
-  is_upsc_cse: false, is_allied: false, is_others: false,
+  is_upsc_cse: false, is_upsc_cms: false, is_neetpg: false, is_inicet: false, is_allied: false, is_others: false,
 };
 
 export default function QuestionsPage() {
@@ -111,6 +111,9 @@ export default function QuestionsPage() {
               <div className="flex gap-4 flex-wrap">
                 <Toggle label="PYQ" v={!!editing.is_pyq} onChange={v => setEditing({ ...editing, is_pyq: v })} />
                 <Toggle label="UPSC CSE" v={!!editing.is_upsc_cse} onChange={v => setEditing({ ...editing, is_upsc_cse: v })} />
+                <Toggle label="UPSC CMS" v={!!editing.is_upsc_cms} onChange={v => setEditing({ ...editing, is_upsc_cms: v })} />
+                <Toggle label="NEET-PG" v={!!editing.is_neetpg} onChange={v => setEditing({ ...editing, is_neetpg: v })} />
+                <Toggle label="INI-CET" v={!!editing.is_inicet} onChange={v => setEditing({ ...editing, is_inicet: v })} />
                 <Toggle label="Allied" v={!!editing.is_allied} onChange={v => setEditing({ ...editing, is_allied: v })} />
                 <Toggle label="Others" v={!!editing.is_others} onChange={v => setEditing({ ...editing, is_others: v })} />
               </div>

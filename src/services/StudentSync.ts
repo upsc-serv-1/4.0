@@ -33,6 +33,28 @@ class StudentSyncService {
     ) as T;
   }
 
+  /**
+   * Drain (remove) any pending question_state writes for the given question IDs.
+   * This prevents stale auto-sync writes from overwriting final submit data.
+   * Call this BEFORE enqueuing fresh submit-time writes.
+   */
+  async drainPendingForQuestionIds(questionIds: string[]) {
+    const idSet = new Set(questionIds);
+    try {
+      const queue = await this.getQueue();
+      const remaining = queue.filter(item => {
+        if (item.kind !== 'question_state') return true;
+        return !idSet.has(item.payload.questionId);
+      });
+      if (remaining.length !== queue.length) {
+        await AsyncStorage.setItem(PENDING_WRITES_KEY, JSON.stringify(remaining));
+        console.log(`[Sync] Drained ${queue.length - remaining.length} stale question_state writes`);
+      }
+    } catch (err) {
+      console.warn('[Sync] Failed to drain pending writes', err);
+    }
+  }
+
   async enqueue(kind: WriteKind, payload: any) {
     const newWrite: PendingWrite = {
       id: Math.random().toString(36).substring(7),

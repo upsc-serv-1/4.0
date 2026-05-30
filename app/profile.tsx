@@ -54,6 +54,7 @@ import { useProfile } from '../src/context/ProfileContext';
 import { useCourse } from '../src/context/CourseContext';
 
 import { AVATARS } from '../src/constants/avatars';
+const AVATAR_MAP = Object.fromEntries(AVATARS.map(a => [a.id, a.uri]));
 
 
 
@@ -234,7 +235,7 @@ export default function Profile() {
         <View style={[styles.userCard, { backgroundColor: colors.surface + '80', borderColor: colors.border }]}>
           <TouchableOpacity onPress={() => {}} style={styles.avatarContainer}>
             {selectedAvatar ? (
-              <Image source={AVATARS.find(a => a.id === selectedAvatar)?.uri} style={styles.avatarImg} />
+              <Image source={AVATAR_MAP[selectedAvatar]} style={styles.avatarImg} />
             ) : (
               <View style={[styles.avatar, { backgroundColor: colors.primary }]}><Text style={styles.avatarText}>{initial}</Text></View>
             )}

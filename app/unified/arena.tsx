@@ -627,7 +627,10 @@ export default function UnifiedArenaSetup() {
         console.warn('[ARENA-LOAD] ⚠️ No items with course field matching', { selectedCourse, totalItems: normalized.length, itemsWithCourseField: normalized.filter((i: any) => i.course).length });
         if (normalized.length > 0) {
           console.log('[ARENA-LOAD] Using all data from cache (offline cache may be outdated)');
-        setMetadata([]);
+          setMetadata(normalized);
+        } else {
+          setMetadata([]);
+        }
       }
 
       if (session?.user?.id) {

@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Search, Layers, Database, Check, X, ChevronD
 import { radius } from '../src/theme';
 import { supabase } from '../src/lib/supabase';
 import { useTheme } from '../src/context/ThemeContext';
+import { useCourse } from '../src/context/CourseContext';
 import { PageWrapper } from '../src/components/PageWrapper';
 import { ThemeSwitcher } from '../src/components/ThemeSwitcher';
 
@@ -62,6 +63,7 @@ const SelectorCard = ({ label, value, placeholder, icon: Icon, onPress, disabled
 
 export default function PapersScreen() {
   const { colors } = useTheme();
+  const { selectedCourse } = useCourse();
   const [examStage, setExamStage] = useState<'Prelims' | 'Mains'>('Prelims');
   const [selectedInstitutes, setSelectedInstitutes] = useState<string[]>([]);
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
@@ -76,12 +78,13 @@ export default function PapersScreen() {
   const [subjects, setSubjects] = useState<string[]>(["All Subjects"]);
   const [sections, setSections] = useState<string[]>(["All Sections"]);
 
-  useEffect(() => { fetchDynamicFilters(); }, [examStage, selectedInstitutes, selectedPrograms]);
-  useEffect(() => { fetchPapers(); }, [examStage, selectedInstitutes, selectedPrograms, selectedSubject, selectedSection]);
+  useEffect(() => { fetchDynamicFilters(); }, [examStage, selectedInstitutes, selectedPrograms, selectedCourse]);
+  useEffect(() => { fetchPapers(); }, [examStage, selectedInstitutes, selectedPrograms, selectedSubject, selectedSection, selectedCourse]);
 
   const fetchDynamicFilters = async () => {
     const { data: testMeta } = await supabase.from('tests')
       .select('institute, program_name, subject, section_group')
+      .eq('course', selectedCourse)
       .ilike('series', `%${examStage}%`);
     
     if (testMeta) {
@@ -102,7 +105,7 @@ export default function PapersScreen() {
   const fetchPapers = async () => {
     setIsLoading(true);
     try {
-      let query = supabase.from('tests').select('*').ilike('series', `%${examStage}%`);
+      let query = supabase.from('tests').select('*').eq('course', selectedCourse).ilike('series', `%${examStage}%`);
       if (selectedInstitutes.length > 0) query = query.in('institute', selectedInstitutes);
       if (selectedPrograms.length > 0) query = query.in('program_name', selectedPrograms);
       if (selectedSubject !== "All Subjects") query = query.eq('subject', selectedSubject);

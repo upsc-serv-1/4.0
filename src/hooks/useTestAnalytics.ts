@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { safeSetItem } from '../lib/safeAsyncStorage';
 import { useAuth } from '../context/AuthContext';
+import { useCourse } from '../context/CourseContext';
 import { supabase } from '../lib/supabase';
 import { buildDecisionMetrics, computeScore, QuestionAttempt } from '../lib/analytics-utils';
 import {
@@ -98,7 +99,7 @@ const buildQuestionAttempts = (rows: AttemptPayloadQuestion[], questionsMeta: Re
     });
 };
 
-const fetchQuestionsMeta = async (questionIds: string[]) => {
+const fetchQuestionsMeta = async (questionIds: string[], selectedCourse: string) => {
   if (questionIds.length === 0) return {};
   
   const CHUNK_SIZE = 200;
@@ -109,6 +110,7 @@ const fetchQuestionsMeta = async (questionIds: string[]) => {
     const { data, error } = await supabase
       .from('questions')
       .select('id, subject, section_group, micro_topic, correct_answer, question_text, options, explanation_markdown, is_pyq, exam_year, exam_group, is_upsc_cse, is_allied, is_others, source')
+      .eq('course', selectedCourse)
       .in('id', chunk);
 
     if (error) throw error;
@@ -123,6 +125,7 @@ const fetchQuestionsMeta = async (questionIds: string[]) => {
 
 export function useSingleTestAnalytics(testAttemptId: string | null) {
   const { session } = useAuth();
+  const { selectedCourse } = useCourse();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [scoreData, setScoreData] = useState<{
@@ -194,7 +197,7 @@ export function useSingleTestAnalytics(testAttemptId: string | null) {
         }
 
         const questionIds = Array.from(new Set(payloadRows.map(row => String(row.question_id || row.questionId || '')).filter(Boolean)));
-        const questionsMeta = await fetchQuestionsMeta(questionIds);
+        const questionsMeta = await fetchQuestionsMeta(questionIds, selectedCourse);
         const questionsData = buildQuestionAttempts(payloadRows, questionsMeta, attempt.id);
 
         if (questionsData.length === 0) {
@@ -236,6 +239,7 @@ export function useSingleTestAnalytics(testAttemptId: string | null) {
 
 
 export function useAggregateTestAnalytics(userId: string | null) {
+  const { selectedCourse } = useCourse();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [trends, setTrends] = useState<{ historicalScores: any[]; negativeMarkingTrends: any[] } | null>(null);
@@ -322,7 +326,7 @@ export function useAggregateTestAnalytics(userId: string | null) {
               .filter(Boolean)
           )
         );
-        const questionsMeta = await fetchQuestionsMeta(questionIds);
+        const questionsMeta = await fetchQuestionsMeta(questionIds, selectedCourse);
 
         const allQuestions: QuestionAttempt[] = [];
         const attemptRowsForTrend: any[] = [];

@@ -6,6 +6,7 @@ import { ThemeProvider, useTheme } from '../src/context/ThemeContext';
 import { AuthProvider, useAuth } from '../src/context/AuthContext';
 import { ProfileProvider } from '../src/context/ProfileContext';
 import { NetworkProvider } from '../src/context/NetworkContext';
+import { CourseProvider } from '../src/context/CourseContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useOfflineBootstrap } from '../src/hooks/useOfflineBootstrap';
@@ -20,11 +21,13 @@ export default function RootLayout() {
         <AuthProvider>
           <ProfileProviderWrapper>
             <NetworkProvider>
-              <ThemeProvider>
-                <DownloadManagerProvider>
-                  <RootStack />
-                </DownloadManagerProvider>
-              </ThemeProvider>
+              <CourseProvider>
+                <ThemeProvider>
+                  <DownloadManagerProvider>
+                    <RootStack />
+                  </DownloadManagerProvider>
+                </ThemeProvider>
+              </CourseProvider>
             </NetworkProvider>
           </ProfileProviderWrapper>
         </AuthProvider>

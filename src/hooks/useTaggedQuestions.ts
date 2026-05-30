@@ -6,6 +6,7 @@ import { formatTagLabel, normalizeTag } from '../utils/tagUtils';
 import { useTagStore } from '../store/tagStore';
 import { autoCleanupQuestionState, batchCleanupEmptyStates } from '../utils/questionStateUtils';
 import { mergeQuestions } from '../utils/merger';
+import { useCourse } from '../context/CourseContext';
 
 // MASTER SUBJECT LIST (The Total Taxonomy)
 const MASTER_SUBJECTS = [
@@ -93,6 +94,7 @@ export function useTaggedVault(userId: string | undefined) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState('All');
   const [selectedSubject, setSelectedSubject] = useState('All');
+  const { selectedCourse } = useCourse();
 
   const cacheKey = useMemo(() => `tagged_vault_cache_${userId || 'anonymous'}`, [userId]);
   const tagCatalogKey = useMemo(() => `review_tag_catalog_${userId || 'anonymous'}`, [userId]);
@@ -171,6 +173,7 @@ export function useTaggedVault(userId: string | undefined) {
       const { data: questions, error: questionsError } = await supabase
         .from('questions')
         .select('id, test_id, subject, section_group, micro_topic, question_text, explanation_markdown, correct_answer, options, is_pyq, is_upsc_cse, exam_year, exam_group, tests(institute,program_name,series)')
+        .eq('course', selectedCourse)
         .in('id', questionIds as string[]);
 
       if (questionsError) throw questionsError;
@@ -193,6 +196,7 @@ export function useTaggedVault(userId: string | undefined) {
         const { data: siblings } = await supabase
           .from('questions')
           .select('id, test_id, subject, section_group, micro_topic, question_text, explanation_markdown, correct_answer, options, is_pyq, is_upsc_cse, exam_year, exam_group, tests(institute,program_name,series)')
+          .eq('course', selectedCourse)
           .in('exam_year', Array.from(upscPyqYears))
           .eq('is_pyq', true)
           .eq('is_upsc_cse', true)
@@ -215,6 +219,7 @@ export function useTaggedVault(userId: string | undefined) {
         const { data: tests } = await supabase
           .from('tests')
           .select('id, title')
+          .eq('course', selectedCourse)
           .in('id', testIds as string[]);
         testsById = new Map((tests || []).map(t => [t.id, t.title || '']));
       }
@@ -282,7 +287,7 @@ export function useTaggedVault(userId: string | undefined) {
     } finally {
       setLoading(false);
     }
-  }, [cacheKey, userId]);
+  }, [cacheKey, userId, selectedCourse]);
 
   // Use refs to store latest function references for realtime callbacks
   const fetchVaultDataRef = useRef<(() => Promise<void>) | null>(null);

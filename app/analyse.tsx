@@ -15,6 +15,7 @@ import Animated, {
 import { Swipeable } from 'react-native-gesture-handler';
 import { useAuth } from '../src/context/AuthContext';
 import { useTheme } from '../src/context/ThemeContext';
+import { useCourse } from '../src/context/CourseContext';
 import { PageWrapper } from '../src/components/PageWrapper';
 import { AnalyseSection } from '../src/components/unified/AnalyseSection';
 import { spacing, radius } from '../src/theme';
@@ -153,6 +154,7 @@ function AttemptCard({ item, colors, onDelete, onReport }: any) {
 export default function AnalyseTab() {
   const { session } = useAuth();
   const { colors } = useTheme();
+  const { selectedCourse } = useCourse();
   const router = useRouter();
   const [attempts, setAttempts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -212,6 +214,13 @@ export default function AnalyseTab() {
     try {
       let allAttempts: any[] = [];
       
+      // Fetch course tests first
+      const { data: courseTests } = await supabase
+        .from('tests')
+        .select('id')
+        .eq('course', selectedCourse);
+      const courseTestIds = new Set((courseTests || []).map((t: any) => t.id));
+      
       // 1. Fetch from Supabase (primary source)
       const { data, error } = await supabase
         .from('test_attempts')
@@ -222,15 +231,16 @@ export default function AnalyseTab() {
         .limit(1000);
 
       if (!error && data?.length > 0) {
-        allAttempts = data;
+        const filteredData = data.filter((a: any) => courseTestIds.has(a.test_id));
+        allAttempts = filteredData;
       }
 
       // 2. Merge with offline attempts that aren't yet synced
       const offline = await OfflineManager.getOfflineAttempts(session.user.id);
       if (offline?.length > 0) {
         const onlineIds = new Set(allAttempts.map(a => a.id));
-        const offlineOnly = offline.filter(a => !onlineIds.has(a.id));
-        allAttempts = [...allAttempts, ...offlineOnly];
+        const filteredOffline = offline.filter(a => !onlineIds.has(a.id) && courseTestIds.has(a.test_id));
+        allAttempts = [...allAttempts, ...filteredOffline];
       }
 
       // 3. Sort all attempts by date (newest first)

@@ -36,6 +36,7 @@ import { useTheme } from '../../src/context/ThemeContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
 import { supabase } from '../../src/lib/supabase';
 import { useAuth } from '../../src/context/AuthContext';
+import { useCourse } from '../../src/context/CourseContext';
 import { GlobalSearchBar } from '../../src/components/GlobalSearchBar';
 import { useQuizStore } from '../../src/store/quizStore';
 import { mergeQuestions } from '../../src/utils/merger';
@@ -178,6 +179,7 @@ const ToggleButton = ({ options, activeValue, onSelect, style }: any) => {
 export default function UnifiedArenaSetup() {
   const { colors } = useTheme();
   const { session } = useAuth();
+  const { selectedCourse } = useCourse();
   const params = useLocalSearchParams();
   const startTestStore = useQuizStore((state) => state.startTest);
 
@@ -410,7 +412,7 @@ export default function UnifiedArenaSetup() {
       }
 
       while (allFreshData.length < MAX_TOTAL) {
-        let query = supabase.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)');
+        let query = supabase.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)').eq('course', selectedCourse);
 
         if (term) {
           const words = term.split(/\s+/).filter(w => w.length > 1 || /\d/.test(w));
@@ -469,7 +471,7 @@ export default function UnifiedArenaSetup() {
         }
 
         if (sf.selectedInstitutes?.length > 0 || sf.selectedPrograms?.length > 0 || (sf.examStage && sf.examStage !== 'All')) {
-          let tQuery = supabase.from('tests').select('id');
+          let tQuery = supabase.from('tests').select('id').eq('course', selectedCourse);
           if (sf.selectedInstitutes?.length > 0) tQuery = tQuery.in('institute', sf.selectedInstitutes);
           if (sf.selectedPrograms?.length > 0) tQuery = tQuery.in('program_name', sf.selectedPrograms);
           if (sf.examStage && sf.examStage !== 'All') tQuery = tQuery.ilike('series', `%${sf.examStage}%`);
@@ -493,7 +495,7 @@ export default function UnifiedArenaSetup() {
               if (fields.includes('Explanations')) fuzzyPatterns.push(`explanation_markdown.ilike.%${pattern}%`);
             }
 
-            let fuzzyQ = supabase.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)').or(fuzzyPatterns.join(',')).limit(100);
+            let fuzzyQ = supabase.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)').eq('course', selectedCourse).or(fuzzyPatterns.join(',')).limit(100);
             if (sf.selectedSubjects?.length > 0) fuzzyQ = fuzzyQ.in('subject', sf.selectedSubjects);
             if (sf.selectedSections?.length > 0) {
               const fSections = sf.selectedSections.map((s: string) => s === 'General' ? null : s);
@@ -515,7 +517,7 @@ export default function UnifiedArenaSetup() {
             if (sf.ncertFilter === 'Non-NCERT') fuzzyQ = fuzzyQ.or('is_ncert.is.null,is_ncert.eq.false');
 
             if (sf.selectedInstitutes?.length > 0 || sf.selectedPrograms?.length > 0 || (sf.examStage && sf.examStage !== 'All')) {
-              let tfQuery = supabase.from('tests').select('id');
+              let tfQuery = supabase.from('tests').select('id').eq('course', selectedCourse);
               if (sf.selectedInstitutes?.length > 0) tfQuery = tfQuery.in('institute', sf.selectedInstitutes);
               if (sf.selectedPrograms?.length > 0) tfQuery = tfQuery.in('program_name', sf.selectedPrograms);
               if (sf.examStage && sf.examStage !== 'All') tfQuery = tfQuery.ilike('series', `%${sf.examStage}%`);

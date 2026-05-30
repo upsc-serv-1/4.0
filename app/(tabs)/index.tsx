@@ -12,6 +12,7 @@ import { useAuth } from '../../src/context/AuthContext';
 import { useProfile } from '../../src/context/ProfileContext';
 import { cacheGet, cacheSet } from '../../src/lib/cache';
 import { useTheme } from '../../src/context/ThemeContext';
+import { useCourse } from '../../src/context/CourseContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
 import { SyllabusService } from '../../src/services/SyllabusService';
 import { MICRO_SYLLABUS } from '../../src/data/syllabus';
@@ -92,6 +93,7 @@ const AvatarDisplay = memo(function AvatarDisplay({ avatarId, name, colors }: an
 
 export default function Home() {
   const { colors } = useTheme();
+  const { selectedCourse } = useCourse();
   const { session } = useAuth();
   const { width: windowWidth } = useWindowDimensions();
   const userId = session?.user.id;
@@ -395,7 +397,7 @@ export default function Home() {
       
       // If no offline tests, try Supabase
       if (testRows.length === 0) {
-        const { data, error } = await supabase.from('tests').select('id, title, launch_year, exam_year, institute, program_id, program_name, series').limit(5000);
+        const { data, error } = await supabase.from('tests').select('id, title, launch_year, exam_year, institute, program_id, program_name, series').eq('course', selectedCourse).limit(5000);
         if (error) throw error;
         testRows = data || [];
       }
@@ -416,6 +418,7 @@ export default function Home() {
       } else {
         const { data, error } = await supabase.from('questions')
           .select('id, test_id, is_pyq, subject, section_group, micro_topic, source')
+          .eq('course', selectedCourse)
           .in('test_id', Array.from(testIdSet)).eq('is_pyq', true).limit(12000);
         if (error) throw error;
         qRows = data || [];
@@ -427,7 +430,7 @@ export default function Home() {
       router.push({ pathname: '/unified/engine', params: { mode: 'exam', view: 'list', timer: 'countdown', resultIds: selected.join(','), title: `Random PYQ ${startYear}-${endYear}` } } as any);
       return true;
     } catch (e: any) { Alert.alert('Launch failed', e?.message || 'Error'); return false; }
-  }, []);
+  }, [selectedCourse]);
 
   const submitRandomPyqPicker = async () => {
     const startYear = Number(pyqStartYear);

@@ -51,6 +51,7 @@ import { DEFAULT_ANALYTICS_LAYOUT, loadAnalyticsLayout, moveLayoutItem, saveAnal
 import { OfflineManager, SyncProgress, OfflineMetadata } from '../src/services/OfflineManager';
 import { ThemeSwitcher } from '../src/components/ThemeSwitcher';
 import { useProfile } from '../src/context/ProfileContext';
+import { useCourse } from '../src/context/CourseContext';
 
 import { AVATARS } from '../src/constants/avatars';
 
@@ -94,6 +95,9 @@ export default function Profile() {
 
   const [aiProvider, setAiProvider] = useState<'gemini' | 'groq'>('gemini');
   const [showAppGuide, setShowAppGuide] = useState(false);
+  const [coursePickerVisible, setCoursePickerVisible] = useState(false);
+  const { selectedCourse, setSelectedCourse } = useCourse();
+  const AVAILABLE_COURSES = ['UPSC CSE', 'Medical Science'] as const;
 
   useEffect(() => {
     AsyncStorage.getItem('optional_choice').then(val => {
@@ -278,6 +282,12 @@ export default function Profile() {
         <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
           <Row 
             icon={<BookOpen color={colors.primary} size={20} />} 
+            label="Select Course" 
+            sub={selectedCourse} 
+            onPress={() => setCoursePickerVisible(true)}
+          />
+          <Row 
+            icon={<BookOpen color={colors.primary} size={20} />} 
             label="Optional Subject" 
             sub={optional} 
             onPress={showOptionalPicker}
@@ -412,6 +422,55 @@ export default function Profile() {
           <Text style={styles.logoutText}>Sign Out</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Course Picker Modal */}
+      <Modal
+        visible={coursePickerVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setCoursePickerVisible(false)}
+      >
+        <Pressable 
+          style={styles.modalOverlay} 
+          onPress={() => setCoursePickerVisible(false)}
+        >
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]} onStartShouldSetResponder={() => true}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Select Course</Text>
+              <TouchableOpacity onPress={() => setCoursePickerVisible(false)}>
+                <Text style={{ color: colors.primary, fontWeight: '700' }}>Done</Text>
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={AVAILABLE_COURSES}
+              keyExtractor={item => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity 
+                  style={[
+                    styles.pickerItem, 
+                    { borderBottomColor: colors.border },
+                    selectedCourse === item && { backgroundColor: colors.primary + '10' }
+                  ]}
+                  onPress={() => {
+                    setSelectedCourse(item);
+                    Alert.alert('Course Changed', `Switched to ${item}`);
+                    setCoursePickerVisible(false);
+                  }}
+                >
+                  <Text style={[
+                    styles.pickerText, 
+                    { color: colors.textPrimary },
+                    selectedCourse === item && { color: colors.primary, fontWeight: '800' }
+                  ]}>
+                    {item}
+                  </Text>
+                  {selectedCourse === item && <View style={[styles.check, { backgroundColor: colors.primary }]} />}
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </Pressable>
+      </Modal>
 
       {/* Optional Picker Modal */}
       <Modal

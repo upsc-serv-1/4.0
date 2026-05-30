@@ -91,7 +91,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PinchGestureHandler, State as GHState } from 'react-native-gesture-handler';
 import { useTheme } from '../../src/context/ThemeContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
-import { supabase } from '../../src/lib/supabase';import { useAuth } from '../../src/context/AuthContext';
+import { supabase } from '../../src/lib/supabase';
+import { useAuth } from '../../src/context/AuthContext';
+import { useCourse } from '../../src/context/CourseContext';
 import { useQuizStore } from '../../src/store/quizStore';
 import { useTagStore } from '../../src/store/tagStore';
 import { mergeQuestions } from '../../src/utils/merger';
@@ -441,6 +443,7 @@ export default function UnifiedQuizEngine() {
   };
   const router = useRouter();
   const { session } = useAuth();
+  const { selectedCourse } = useCourse();
   const store = useQuizStore();
   const navigation = useNavigation();
   const isNavigatingAway = useRef(false);
@@ -1676,7 +1679,7 @@ export default function UnifiedQuizEngine() {
       const MAX_TOTAL = 10000; // Safety cap to prevent memory issues
       
       while (from < MAX_TOTAL) {
-        let query = supabase.from('questions').select(SELECT_COLS);
+        let query = supabase.from('questions').select(SELECT_COLS).eq('course', selectedCourse);
         const resIds = getResultIds();
         
         if (resIds && resIds.length > 0) {
@@ -1691,6 +1694,7 @@ export default function UnifiedQuizEngine() {
           const { data: tgt } = await supabase
             .from('questions')
             .select(SELECT_COLS)
+            .eq('course', selectedCourse)
             .eq('id', params.questionId);
           const target: any = tgt && tgt[0];
           if (!target) break;
@@ -1702,6 +1706,7 @@ export default function UnifiedQuizEngine() {
             const { data: sibs } = await supabase
               .from('questions')
               .select(SELECT_COLS)
+              .eq('course', selectedCourse)
               .eq('exam_year', examYear)
               .eq('is_pyq', true)
               .eq('is_upsc_cse', true)
@@ -1756,7 +1761,7 @@ export default function UnifiedQuizEngine() {
                 (progs && progs !== 'All' && progs !== '' && progs !== '[]') ||
                 (stage && stage !== 'All' && stage !== '' && stage !== '[]')) {
               
-              let tQuery = LocalQuery.from('tests').select('id');
+              let tQuery = LocalQuery.from('tests').select('id').eq('course', selectedCourse);
               
               if (insts && insts !== 'All' && insts !== '' && insts !== '[]') {
                 const instList = typeof insts === 'string' ? insts.split(',').filter(Boolean) : [];
@@ -1935,13 +1940,13 @@ export default function UnifiedQuizEngine() {
                }
              }
              
-             let fuzzyQ = LocalQuery.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)').or(fuzzyPatterns.join(',')).limit(100);
+             let fuzzyQ = LocalQuery.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)').eq('course', selectedCourse).or(fuzzyPatterns.join(',')).limit(100);
              // Re-apply same filters
              const insts = params.institutes || params.institute;
              const progs = params.programs || params.program;
              const stage = params.stage || params.examStage || params.series;
              if ((insts && insts !== 'All' && insts !== '' && insts !== '[]') || (progs && progs !== 'All' && progs !== '' && progs !== '[]') || (stage && stage !== 'All' && stage !== '' && stage !== '[]')) {
-                let tQuery = LocalQuery.from('tests').select('id');
+                let tQuery = LocalQuery.from('tests').select('id').eq('course', selectedCourse);
                 if (insts && insts !== 'All' && insts !== '' && insts !== '[]') tQuery = tQuery.in('institute', insts.split(',').filter(Boolean));
                 if (progs && progs !== 'All' && progs !== '' && progs !== '[]') tQuery = tQuery.in('program_name', progs.split(',').filter(Boolean));
                 if (stage && stage !== 'All' && stage !== '' && stage !== '[]') tQuery = tQuery.ilike('series', '%' + stage + '%');
@@ -2025,6 +2030,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
             const { data: siblings } = await supabase
               .from('questions')
               .select(SELECT_COLS)
+              .eq('course', selectedCourse)
               .in('exam_year', years)
               .eq('is_pyq', true)
               .eq('is_upsc_cse', true)

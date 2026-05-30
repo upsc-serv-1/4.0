@@ -35,6 +35,7 @@ import {
 import { supabase } from '../src/lib/supabase';
 import { PieChart, LineChart } from '../src/components/Charts';
 import { useTheme } from '../src/context/ThemeContext';
+import { useCourse } from '../src/context/CourseContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { prelimsTaxonomy } from '../src/data/taxonomy';
 import { AnalysisExportSheet } from '../src/components/export/AnalysisExportSheet';
@@ -51,6 +52,25 @@ import { UndoToast, UndoSpec } from '../src/components/common/UndoToast';
 
 const { width } = Dimensions.get('window');
 
+// Course-specific stages and papers
+const STAGES_BY_COURSE = {
+  'UPSC CSE': ['Prelims', 'Mains'],
+  'Medical Science': ['INICET', 'NEET PG', 'UPSC CMS'],
+};
+
+const PAPERS_BY_COURSE = {
+  'UPSC CSE': {
+    Prelims: ['GS Paper 1', 'GS Paper 2 (CSAT)'],
+    Mains: ['GS Paper 1', 'GS Paper 2', 'GS Paper 3', 'GS Paper 4', 'Optional'],
+  },
+  'Medical Science': {
+    INICET: null,      // No papers for INICET
+    'NEET PG': null,   // No papers for NEET PG
+    'UPSC CMS': ['Paper 1', 'Paper 2'],
+  },
+};
+
+// Legacy constants (kept for backward compatibility)
 const EXAM_STAGES = ['Prelims', 'Mains'];
 const PAPERS = {
   Prelims: ['GS Paper 1', 'GS Paper 2 (CSAT)'],
@@ -323,7 +343,13 @@ function StickyHeatmapTable({
 
 export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean }) {
   const { colors } = useTheme();
+  const { selectedCourse } = useCourse();
   const insets = useSafeAreaInsets();
+  
+  // Get stages and papers for the selected course
+  const currentStages = STAGES_BY_COURSE[selectedCourse] || STAGES_BY_COURSE['UPSC CSE'];
+  const currentPapersByStage = PAPERS_BY_COURSE[selectedCourse] || PAPERS_BY_COURSE['UPSC CSE'];
+  
   const taxonomyMaps = useMemo(() => {
     const microToSubject: Record<string, string> = {};
     const sectionToSubject: Record<string, string> = {};
@@ -336,8 +362,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [examStage, setExamStage] = useState('Prelims');
-  const [selectedPaper, setSelectedPaper] = useState('GS Paper 1');
+  const [examStage, setExamStage] = useState(currentStages[0]);
+  const [selectedPaper, setSelectedPaper] = useState<string | null>(
+    currentPapersByStage[currentStages[0] as keyof typeof currentPapersByStage]?.[0] || null
+  );
   const [selectedRange, setSelectedRange] = useState('Last 10 Years');
   const [customYearStart, setCustomYearStart] = useState('2020');
   const [customYearEnd, setCustomYearEnd] = useState('2025');
@@ -421,9 +449,21 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   // Fade animation
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
+  // Reset stage and paper when course changes
+  useEffect(() => {
+    const newStages = STAGES_BY_COURSE[selectedCourse] || STAGES_BY_COURSE['UPSC CSE'];
+    const newStage = newStages[0];
+    setExamStage(newStage);
+    
+    const newPapersByStage = PAPERS_BY_COURSE[selectedCourse] || PAPERS_BY_COURSE['UPSC CSE'];
+    const newPapers = newPapersByStage[newStage as keyof typeof newPapersByStage];
+    const newPaper = newPapers?.[0] || null;
+    setSelectedPaper(newPaper);
+  }, [selectedCourse]);
+
   useEffect(() => {
     fetchPyqData();
-  }, [examStage, selectedPaper, selectedRange, customYearStart, customYearEnd]);
+  }, [examStage, selectedPaper, selectedRange, customYearStart, customYearEnd, selectedCourse]);
 
   useEffect(() => {
     if (!loading) {
@@ -529,6 +569,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         .from('questions')
         .select('*, tests(institute)')
         .in('test_id', testIds)
+        .eq('course', selectedCourse)
         .order('test_id', { ascending: true })
         .order('question_number', { ascending: true })
         .range(from, from + PYQ_PAGE_SIZE - 1);
@@ -569,7 +610,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       if (!tests || tests.length === 0) {
         const { data: networkTests, error: testError } = await supabase
           .from('tests')
-          .select('id, title, subject, level, paper_type, section_group, exam_year, launch_year, institute, program_id, program_name, series');
+          .select('id, title, subject, level, paper_type, section_group, exam_year, launch_year, institute, program_id, program_name, series')
+          .eq('course', selectedCourse);
         if (testError) throw testError;
         tests = networkTests || [];
       }
@@ -1314,7 +1356,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const handleSelect = (value: string) => {
     if (modalType === 'stage') {
       setExamStage(value);
-      setSelectedPaper(PAPERS[value as keyof typeof PAPERS][0]);
+      // Get papers for this stage from the current course
+      const papersForStage = currentPapersByStage[value as keyof typeof currentPapersByStage];
+      const firstPaper = papersForStage?.[0] || null;
+      setSelectedPaper(firstPaper);
     } else if (modalType === 'paper') {
       setSelectedPaper(value);
     } else if (modalType === 'range') {
@@ -1704,7 +1749,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         </style>
       </head>
       <body>
-        <h1>${esc(`${examStage} ${selectedPaper} PYQ Analysis`)}</h1>
+        <h1>${esc(`${examStage}${selectedPaper ? ' ' + selectedPaper : ''} PYQ Analysis`)}</h1>
         <div class="meta">Range: ${esc(selectedRange)}${selectedRange === 'Custom Range' ? ` (${esc(customYearStart)} - ${esc(customYearEnd)})` : ''}</div>
         <div class="meta">Questions fetched: ${rawQuestions.length} | Subjects: ${distributionData.length} | Years: ${years.join(', ')}</div>
         ${blocks.join('')}
@@ -2330,7 +2375,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         <View style={[styles.filterWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           {[
             { label: 'Stage', value: examStage, type: 'stage' as const },
-            { label: 'Paper', value: selectedPaper, type: 'paper' as const },
+            ...(selectedPaper ? [{ label: 'Paper', value: selectedPaper, type: 'paper' as const }] : []),
             { label: 'Years', value: selectedRange, type: 'range' as const },
           ].map(item => (
             <TouchableOpacity key={item.label} style={[styles.selector, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} onPress={() => openModal(item.type)}>
@@ -2359,7 +2404,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         <ActiveFiltersBar
           filters={[
             { id: 'stage', label: examStage },
-            { id: 'paper', label: selectedPaper },
+            ...(selectedPaper ? [{ id: 'paper', label: selectedPaper }] : []),
             { id: 'range', label: selectedRange },
             ...selSubjects.map((s) => ({ id: `sub-${s}`, label: s, onRemove: () => setSelSubjects((p) => p.filter((x) => x !== s)) })),
             ...selSections.map((s) => ({ id: `sec-${s}`, label: s, onRemove: () => setSelSections((p) => p.filter((x) => x !== s)) })),
@@ -2854,7 +2899,12 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
               <TouchableOpacity onPress={() => setModalVisible(false)}><X size={22} color={colors.textPrimary} /></TouchableOpacity>
             </View>
             <ScrollView>
-              {(modalType === 'stage' ? EXAM_STAGES : modalType === 'paper' ? PAPERS[examStage as keyof typeof PAPERS] : RANGE_OPTIONS).map(item => (
+              {(modalType === 'stage' 
+                ? currentStages 
+                : modalType === 'paper' 
+                  ? (currentPapersByStage[examStage as keyof typeof currentPapersByStage] || []).filter(Boolean)
+                  : RANGE_OPTIONS
+              ).map(item => (
                 <TouchableOpacity key={item} style={[styles.modalItem, { borderBottomColor: colors.border }]} onPress={() => handleSelect(item)}>
                   <Text style={[styles.modalItemText, { color: colors.textPrimary }]}>{item}</Text>
                 </TouchableOpacity>

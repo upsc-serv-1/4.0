@@ -22,6 +22,7 @@ import { useFlashcardAction } from '../src/hooks/useFlashcardAction';
 import { supabase } from '../src/lib/supabase';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
+import { useCourse } from '../src/context/CourseContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { aiExpandSearchQuery, aiExplainQuestion, aiImproveAnswer, type AIInferredFilters } from '../src/services/GeminiService';
 import { PageWrapper } from '../src/components/PageWrapper';
@@ -283,6 +284,7 @@ function getPYQChipStyle(pyq: ReturnType<typeof getPYQCategorization>) {
 export default function AISearchTab() {
   const { colors } = useTheme();
   const { session } = useAuth();
+  const { selectedCourse } = useCourse();
   const store = useQuizStore();
 
   // Zoom states - MOVED TO TOP for mdStyles dependency
@@ -759,19 +761,19 @@ export default function AISearchTab() {
   useEffect(() => {
     (async () => {
       const { data: subData } = await supabase
-        .from('questions').select('subject').not('subject', 'is', null).limit(1000);
+        .from('questions').select('subject').eq('course', selectedCourse).not('subject', 'is', null).limit(1000);
       if (subData) {
         const unique = [...new Set(subData.map((r: any) => r.subject).filter(Boolean))].sort() as string[];
         setSubjectOptions(unique);
       }
       const { data: instData } = await supabase
-        .from('tests').select('institute').not('institute', 'is', null).limit(300);
+        .from('tests').select('institute').eq('course', selectedCourse).not('institute', 'is', null).limit(300);
       if (instData) {
         const unique = [...new Set(instData.map((r: any) => r.institute).filter(Boolean))].sort() as string[];
         setInstituteOptions(unique);
       }
       const { data: progData } = await supabase
-        .from('tests').select('program_name').not('program_name', 'is', null).limit(300);
+        .from('tests').select('program_name').eq('course', selectedCourse).not('program_name', 'is', null).limit(300);
       if (progData) {
         const unique = [...new Set(progData.map((r: any) => r.program_name).filter(Boolean))].sort() as string[];
         setProgramOptions(unique);
@@ -783,6 +785,7 @@ export default function AISearchTab() {
       const { data: pyqData } = await supabase
         .from('questions')
         .select('subject, section_group, micro_topic, exam_year, is_pyq')
+        .eq('course', selectedCourse)
         .eq('is_pyq', true)
         .not('exam_year', 'is', null)
         .gte('exam_year', new Date().getFullYear() - 6)
@@ -793,30 +796,30 @@ export default function AISearchTab() {
         setPyqHotTopics(hots);
       }
     })();
-  }, []);
+  }, [selectedCourse]);
 
   // ── Load sections when subject changes ────────────────────────────────────
   useEffect(() => {
     const subs = pendingFilters.subjects !== 'All' ? pendingFilters.subjects.split(',').filter(Boolean) : [];
     if (subs.length === 0) { setSectionOptions([]); setMicrotopicOptions([]); return; }
-    supabase.from('questions').select('section_group, micro_topic').in('subject', subs).limit(2000).then(({ data }) => {
+    supabase.from('questions').select('section_group, micro_topic').eq('course', selectedCourse).in('subject', subs).limit(2000).then(({ data }) => {
       if (!data) return;
       const secs = [...new Set(data.map((r: any) => r.section_group).filter(Boolean))].sort() as string[];
       setSectionOptions(secs);
     });
-  }, [pendingFilters.subjects]);
+  }, [pendingFilters.subjects, selectedCourse]);
 
   // ── Load microtopics when section changes ─────────────────────────────────
   useEffect(() => {
     const subs = pendingFilters.subjects !== 'All' ? pendingFilters.subjects.split(',').filter(Boolean) : [];
     const secs = pendingFilters.sections !== 'All' ? pendingFilters.sections.split(',').filter(Boolean) : [];
     if (subs.length === 0 || secs.length === 0) { setMicrotopicOptions([]); return; }
-    supabase.from('questions').select('micro_topic').in('subject', subs).in('section_group', secs).not('micro_topic', 'is', null).limit(2000).then(({ data }) => {
+    supabase.from('questions').select('micro_topic').eq('course', selectedCourse).in('subject', subs).in('section_group', secs).not('micro_topic', 'is', null).limit(2000).then(({ data }) => {
       if (!data) return;
       const mts = [...new Set(data.map((r: any) => r.micro_topic).filter(Boolean))].sort() as string[];
       setMicrotopicOptions(mts);
     });
-  }, [pendingFilters.subjects, pendingFilters.sections]);
+  }, [pendingFilters.subjects, pendingFilters.sections, selectedCourse]);
 
   // ── Offline-first: search ALL 20k locally-downloaded questions ──────────────
   // Synchronous, instant, no limit. Then Supabase supplements new questions.
@@ -929,7 +932,7 @@ export default function AISearchTab() {
     try {
       // ── Helper: apply common hard filters to a DB query ───────────────────
       const applyFilters = async (dbQuery: any, af: Filters, yearOverride?: string | null): Promise<any> => {
-        let q2 = dbQuery;
+        let q2 = dbQuery.eq('course', selectedCourse);
         // PYQ
         if (af.pyqFilter === 'PYQ Only')  q2 = q2.eq('is_pyq', true);
         else if (af.pyqFilter === 'Non-PYQ') q2 = q2.eq('is_pyq', false);
@@ -977,7 +980,7 @@ export default function AISearchTab() {
         const instList = af.institutes !== 'All' ? af.institutes.split(',').filter(Boolean) : [];
         const progList = af.programs !== 'All' ? af.programs.split(',').filter(Boolean) : [];
         if (stageActive || instList.length > 0 || progList.length > 0) {
-          let testsQ = supabase.from('tests').select('id');
+          let testsQ = supabase.from('tests').select('id').eq('course', selectedCourse);
           if (stageActive) {
             const stageList = af.stage.split(',').filter(Boolean);
             if (stageList.length === 1) testsQ = testsQ.ilike('series', `%${af.stage}%`);

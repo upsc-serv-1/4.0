@@ -1118,6 +1118,10 @@ const getDiagramUri = (path: string | undefined | null): string => {
 const cleanMarkdownContent = (text: string | undefined | null): string => {
   if (!text) return '';
   let cleaned = text;
+
+  // 0. Strip leading empty bullet points (Issue 3 fix)
+  cleaned = cleaned.replace(/^\s*[-*•]\s*$/gm, '');
+
   // Replace HTML entities
   cleaned = cleaned.replace(/&nbsp;/gi, ' ');
   cleaned = cleaned.replace(/&rarr;/gi, '→');
@@ -1142,6 +1146,13 @@ const cleanMarkdownContent = (text: string | undefined | null): string => {
 
   // Normalize consecutive asterisks (e.g., **** -> **)
   cleaned = cleaned.replace(/\*{3,}/g, '**');
+
+  // Normalize leading horizontal spaces/&nbsp; to prevent markdown indented code block parsing (symmetric to cleanDataFactsMarkdown)
+  cleaned = cleaned.replace(/^(?:[ \t]|&nbsp;){8,}/gm, '    ');
+  cleaned = cleaned.replace(/^(?:[ \t]|&nbsp;){4,7}/gm, '  ');
+
+  // Collapse spaces between lists (Issue 3 & 4 fix)
+  cleaned = cleaned.replace(/\n+\s*(?=[-*•\d])/g, '\n');
 
   return cleaned.trim();
 };
@@ -1389,6 +1400,10 @@ const cleanDataFactsMarkdown = (text: string | undefined | null, item: any): str
   // 6. Replace 8 or more horizontal spaces/&nbsp; with a bullet (level 1 list item under the sub-theme heading)
   cleaned = cleaned.replace(/^(?:[ \t]|&nbsp;){8,11}\s*-\s*/gm, '- ');
 
+  // 6.1 Normalize leading horizontal spaces/&nbsp; to prevent markdown indented code block parsing
+  cleaned = cleaned.replace(/^(?:[ \t]|&nbsp;){8,}/gm, '    ');
+  cleaned = cleaned.replace(/^(?:[ \t]|&nbsp;){4,7}/gm, '  ');
+
   // 7. Replace any other remaining &nbsp; with spaces
   cleaned = cleaned.replace(/&nbsp;/gi, ' ');
 
@@ -1560,16 +1575,29 @@ function ValueAddCardBody({ item, colors, ethicsTab, onAddFlashcardClick }: { it
 
       {item.category === 'intro_conclusion' && (
         <View style={{ gap: 12 }}>
+          {item.quoteText && (
+            <View style={[styles.templateBox, { backgroundColor: '#fffbeb33', borderColor: '#fef3c7' }]}>
+              <Text style={[styles.subPartHeader, { color: '#d97706' }]}>QUOTE</Text>
+              <Markdown style={quoteTextMarkdownStyle} rules={markdownRules}>{"\"" + cleanMarkdownContent(item.quoteText) + "\""}</Markdown>
+              {item.author && <Text style={[styles.quoteAuthor, { color: colors.textTertiary, marginTop: 4 }]}>— {item.author}</Text>}
+            </View>
+          )}
           {item.introduction && (
             <View style={[styles.templateBox, { backgroundColor: '#eff6ff33', borderColor: '#dbeafe' }]}>
               <Text style={[styles.subPartHeader, { color: '#1d4ed8' }]}>INTRODUCTION TEMPLATE</Text>
-              <Markdown style={subPartBodyMarkdownStyle}>{cleanMarkdownContent(item.introduction)}</Markdown>
+              <Markdown style={subPartBodyMarkdownStyle} rules={markdownRules}>{cleanMarkdownContent(item.introduction)}</Markdown>
+            </View>
+          )}
+          {item.examples && (
+            <View style={[styles.templateBox, { backgroundColor: '#f5f3ff33', borderColor: '#ddd6fe' }]}>
+              <Text style={[styles.subPartHeader, { color: '#7c3aed' }]}>EXAMPLES / CASE STUDIES</Text>
+              <Markdown style={subPartBodyMarkdownStyle} rules={markdownRules}>{cleanMarkdownContent(item.examples)}</Markdown>
             </View>
           )}
           {item.conclusion && (
             <View style={[styles.templateBox, { backgroundColor: '#ecfdf533', borderColor: '#d1fae5' }]}>
               <Text style={[styles.subPartHeader, { color: '#047857' }]}>CONCLUSION TEMPLATE</Text>
-              <Markdown style={subPartBodyMarkdownStyle}>{cleanMarkdownContent(item.conclusion)}</Markdown>
+              <Markdown style={subPartBodyMarkdownStyle} rules={markdownRules}>{cleanMarkdownContent(item.conclusion)}</Markdown>
             </View>
           )}
         </View>
@@ -1728,11 +1756,11 @@ const markdownRules = {
       }
     }
 
-    const hasParents = (parentArray: any, type: string) => {
-      return Array.isArray(parentArray) && parentArray.some((el: any) => el.type === type);
-    };
+    const immediateParentType = Array.isArray(parent) && parent.length > 0
+      ? parent[parent.length - 1].type
+      : '';
 
-    if (hasParents(parent, 'bullet_list')) {
+    if (immediateParentType === 'bullet_list') {
       return (
         <View key={node.key} style={styles._VIEW_SAFE_list_item}>
           <Text
@@ -1750,7 +1778,7 @@ const markdownRules = {
       );
     }
 
-    if (hasParents(parent, 'ordered_list')) {
+    if (immediateParentType === 'ordered_list') {
       const orderedListIndex = parent.findIndex((el: any) => el.type === 'ordered_list');
       const orderedList = parent[orderedListIndex];
       let listItemNumber = node.index + 1;
@@ -1846,7 +1874,7 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
           >
             {item.category === 'data_facts' ? item.metric : item.title}
           </Text>
-          {item.source && item.category !== 'data_facts' && <Text style={styles.vCardSource}>{item.source}</Text>}
+          {item.source && item.category !== 'data_facts' && item.category !== 'intro_conclusion' && <Text style={styles.vCardSource}>{item.source}</Text>}
         </TouchableOpacity>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           <TouchableOpacity
@@ -2580,6 +2608,7 @@ interface HierarchyModalProps {
     subtopic?: string;
   };
   isMainsValueAdd?: boolean;
+  isIntroConclusion?: boolean;
 }
 
 function HierarchyModal({
@@ -2598,6 +2627,7 @@ function HierarchyModal({
   isTablet,
   columnLabels,
   isMainsValueAdd,
+  isIntroConclusion,
 }: HierarchyModalProps) {
   const labels = {
     paper: columnLabels?.paper || 'Paper',
@@ -2751,8 +2781,8 @@ function HierarchyModal({
                   <>
                     <ChevronRight size={12} color="#94a3b8" />
                     {filters.macrotags.split('|').map(val => (
-                      <View key={`modal-crumb-macro-${val}`} style={[styles.crumbBadge, { backgroundColor: isMainsValueAdd ? '#f3e8ff' : '#e0f7fa' }]}>
-                        <Text style={[styles.crumbText, { color: isMainsValueAdd ? '#6b21a8' : '#006064' }]}>{val}</Text>
+                      <View key={`modal-crumb-macro-${val}`} style={[styles.crumbBadge, { backgroundColor: isIntroConclusion ? '#d1fae5' : (isMainsValueAdd ? '#f3e8ff' : '#e0f7fa') }]}>
+                        <Text style={[styles.crumbText, { color: isIntroConclusion ? '#065f46' : (isMainsValueAdd ? '#6b21a8' : '#006064') }]}>{val}</Text>
                       </View>
                     ))}
                   </>
@@ -2844,7 +2874,7 @@ function HierarchyModal({
 
             {/* COLUMN 6: Macro tag / Sub-sub-theme */}
             {(!isMainsValueAdd || macrotagOptions.length > 0) && renderColumn(
-              isMainsValueAdd ? "Sub-sub-theme" : "Macro tag",
+              isIntroConclusion ? "Card Title" : (isMainsValueAdd ? "Sub-sub-theme" : "Macro tag"),
               filters.subtopics === 'All' ? [] : macrotagOptions,
               filters.macrotags,
               (mat) => {
@@ -2857,7 +2887,7 @@ function HierarchyModal({
                   ...(isRemoval ? { microtags: 'All' } : {})
                 });
               },
-              isMainsValueAdd ? '#8b5cf6' : '#06b6d4',
+              isIntroConclusion ? '#10b981' : (isMainsValueAdd ? '#8b5cf6' : '#06b6d4'),
               isTablet ? 250 : 200
             )}
 
@@ -3318,105 +3348,126 @@ function QuestionBankView({
                             {filters.paper !== 'All' && filters.paper.split('|').map(val => (
                               <View key={`crumb-paper-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#dbeafe', borderColor: '#bfdbfe' }]}>
                                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#1e40af' }}>{val}</Text>
-                                <TouchableOpacity onPress={() => {
-                                  const updated = filters.paper.split('|').filter(x => x !== val).join('|') || 'All';
-                                  setFilters(prev => ({ 
-                                    ...prev, 
-                                    paper: updated, 
-                                    subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                                  }));
-                                }} >
+                                <Pressable 
+                                  onPress={() => {
+                                    const updated = filters.paper.split('|').filter(x => x !== val).join('|') || 'All';
+                                    setFilters(prev => ({ 
+                                      ...prev, 
+                                      paper: updated, 
+                                      subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                                    }));
+                                  }}
+                                  style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+                                >
                                   <X size={10} color="#1e40af" style={{ marginLeft: 4 }} />
-                                </TouchableOpacity>
+                                </Pressable>
                               </View>
                             ))}
                             {filters.subjects !== 'All' && filters.subjects.split('|').map(val => (
                               <View key={`crumb-subject-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#f3e8ff', borderColor: '#e9d5ff' }]}>
                                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#6b21a8' }}>{val}</Text>
-                                <TouchableOpacity onPress={() => {
-                                  const updated = filters.subjects.split('|').filter(x => x !== val).join('|') || 'All';
-                                  setFilters(prev => ({ 
-                                    ...prev, 
-                                    subjects: updated, 
-                                    sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                                  }));
-                                }} >
+                                <Pressable 
+                                  onPress={() => {
+                                    const updated = filters.subjects.split('|').filter(x => x !== val).join('|') || 'All';
+                                    setFilters(prev => ({ 
+                                      ...prev, 
+                                      subjects: updated, 
+                                      sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                                    }));
+                                  }}
+                                  style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+                                >
                                   <X size={10} color="#6b21a8" style={{ marginLeft: 4 }} />
-                                </TouchableOpacity>
+                                </Pressable>
                               </View>
                             ))}
                             {filters.sections !== 'All' && filters.sections.split('|').map(val => (
                               <View key={`crumb-section-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#fef3c7', borderColor: '#fde68a' }]}>
                                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#92400e' }}>{val}</Text>
-                                <TouchableOpacity onPress={() => {
-                                  const updated = filters.sections.split('|').filter(x => x !== val).join('|') || 'All';
-                                  setFilters(prev => ({ 
-                                    ...prev, 
-                                    sections: updated, 
-                                    microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                                  }));
-                                }} >
+                                <Pressable 
+                                  onPress={() => {
+                                    const updated = filters.sections.split('|').filter(x => x !== val).join('|') || 'All';
+                                    setFilters(prev => ({ 
+                                      ...prev, 
+                                      sections: updated, 
+                                      microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                                    }));
+                                  }}
+                                  style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+                                >
                                   <X size={10} color="#92400e" style={{ marginLeft: 4 }} />
-                                </TouchableOpacity>
+                                </Pressable>
                               </View>
                             ))}
                             {filters.microtopics !== 'All' && filters.microtopics.split('|').map(val => (
                               <View key={`crumb-micro-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#d1fae5', borderColor: '#a7f3d0' }]}>
                                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#065f46' }}>{val}</Text>
-                                <TouchableOpacity onPress={() => {
-                                  const updated = filters.microtopics.split('|').filter(x => x !== val).join('|') || 'All';
-                                  setFilters(prev => ({ 
-                                    ...prev, 
-                                    microtopics: updated, 
-                                    subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                                  }));
-                                }} >
+                                <Pressable 
+                                  onPress={() => {
+                                    const updated = filters.microtopics.split('|').filter(x => x !== val).join('|') || 'All';
+                                    setFilters(prev => ({ 
+                                      ...prev, 
+                                      microtopics: updated, 
+                                      subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                                    }));
+                                  }}
+                                  style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+                                >
                                   <X size={10} color="#065f46" style={{ marginLeft: 4 }} />
-                                </TouchableOpacity>
+                                </Pressable>
                               </View>
                             ))}
                             {filters.subtopics !== 'All' && filters.subtopics.split('|').map(val => (
                               <View key={`crumb-sub-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#ffe4e6', borderColor: '#fecdd3' }]}>
                                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#be123c' }}>{val}</Text>
-                                <TouchableOpacity onPress={() => {
-                                  const updated = filters.subtopics.split('|').filter(x => x !== val).join('|') || 'All';
-                                  setFilters(prev => ({ 
-                                    ...prev, 
-                                    subtopics: updated, 
-                                    macrotags: 'All', microtags: 'All' 
-                                  }));
-                                }} >
+                                <Pressable 
+                                  onPress={() => {
+                                    const updated = filters.subtopics.split('|').filter(x => x !== val).join('|') || 'All';
+                                    setFilters(prev => ({ 
+                                      ...prev, 
+                                      subtopics: updated, 
+                                      macrotags: 'All', microtags: 'All' 
+                                    }));
+                                  }}
+                                  style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+                                >
                                   <X size={10} color="#be123c" style={{ marginLeft: 4 }} />
-                                </TouchableOpacity>
+                                </Pressable>
                               </View>
                             ))}
                             {filters.macrotags !== 'All' && filters.macrotags.split('|').map(val => (
                               <View key={`crumb-macro-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#e0f7fa', borderColor: '#b2ebf2' }]}>
                                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#006064' }}>{val}</Text>
-                                <TouchableOpacity onPress={() => {
-                                  const updated = filters.macrotags.split('|').filter(x => x !== val).join('|') || 'All';
-                                  setFilters(prev => ({ 
-                                    ...prev, 
-                                    macrotags: updated, 
-                                    microtags: 'All' 
-                                  }));
-                                }} >
+                                <Pressable 
+                                  onPress={() => {
+                                    const updated = filters.macrotags.split('|').filter(x => x !== val).join('|') || 'All';
+                                    setFilters(prev => ({ 
+                                      ...prev, 
+                                      macrotags: updated, 
+                                      microtags: 'All' 
+                                    }));
+                                  }}
+                                  style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+                                >
                                   <X size={10} color="#006064" style={{ marginLeft: 4 }} />
-                                </TouchableOpacity>
+                                </Pressable>
                               </View>
                             ))}
                             {filters.microtags !== 'All' && filters.microtags.split('|').map(val => (
                               <View key={`crumb-microtag-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#fce4ec', borderColor: '#f8bbd0' }]}>
                                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#880e4f' }}>{val}</Text>
-                                <TouchableOpacity onPress={() => {
-                                  const updated = filters.microtags.split('|').filter(x => x !== val).join('|') || 'All';
-                                  setFilters(prev => ({ 
-                                    ...prev, 
-                                    microtags: updated 
-                                  }));
-                                }} >
+                                <Pressable 
+                                  onPress={() => {
+                                    const updated = filters.microtags.split('|').filter(x => x !== val).join('|') || 'All';
+                                    setFilters(prev => ({ 
+                                      ...prev, 
+                                      microtags: updated 
+                                    }));
+                                  }}
+                                  style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+                                >
                                   <X size={10} color="#880e4f" style={{ marginLeft: 4 }} />
-                                </TouchableOpacity>
+                                </Pressable>
                               </View>
                             ))}
                           </View>
@@ -3695,6 +3746,9 @@ function ValueAdditionView({
         item.quoteText || '',
         item.usageGuide || '',
         item.mnemonicKeyword || '',
+        item.microtopic || '',
+        item.subtopic || '',
+        item.examples || '',
         parsedSubThemes.map(s => `${s.title} ${s.content}`).join(' ')
       ].join(' ').toLowerCase();
 
@@ -3759,45 +3813,61 @@ function ValueAdditionView({
       const matchPaper = paperFilter.length === 0 || paperFilter.includes(item.paper);
       const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(item.subject);
       const matchSection = sectionFilter.length === 0 || sectionFilter.includes(item.sectionGroup);
-      const themeName = item.category === 'data_facts' ? item.metric : item.title;
-      if (matchPaper && matchSubject && matchSection && themeName) {
-        mtSet.add(themeName);
+      if (matchPaper && matchSubject && matchSection) {
+        if (activeCategory === 'intro_conclusion') {
+          if (item.microtopic) mtSet.add(item.microtopic);
+        } else {
+          const themeName = item.category === 'data_facts' ? item.metric : item.title;
+          if (themeName) mtSet.add(themeName);
+        }
       }
     });
     return Array.from(mtSet).sort();
-  }, [activeCategoryItems, filters.paper, filters.subjects, filters.sections]);
+  }, [activeCategoryItems, filters.paper, filters.subjects, filters.sections, activeCategory]);
 
   const subtopicOptions = useMemo(() => {
     const selectedTheme = filters.microtopics !== 'All' ? filters.microtopics : null;
     if (!selectedTheme) return [];
     const stSet = new Set<string>();
     activeCategoryItems.forEach(item => {
-      const themeName = item.category === 'data_facts' ? item.metric : item.title;
-      if (themeName === selectedTheme) {
-        const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
-        subThemes.forEach((st: any) => {
-          if (st.title) stSet.add(st.title);
-        });
+      if (activeCategory === 'intro_conclusion') {
+        if (item.microtopic === selectedTheme) {
+          if (item.subtopic) stSet.add(item.subtopic);
+        }
+      } else {
+        const themeName = item.category === 'data_facts' ? item.metric : item.title;
+        if (themeName === selectedTheme) {
+          const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
+          subThemes.forEach((st: any) => {
+            if (st.title) stSet.add(st.title);
+          });
+        }
       }
     });
     return Array.from(stSet).sort();
-  }, [activeCategoryItems, filters.microtopics]);
+  }, [activeCategoryItems, filters.microtopics, activeCategory]);
 
   const macrotagOptions = useMemo(() => {
     const selectedSubTheme = filters.subtopics !== 'All' ? filters.subtopics : null;
     if (!selectedSubTheme) return [];
     const sstSet = new Set<string>();
     activeCategoryItems.forEach(item => {
-      const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
-      subThemes.forEach((st: any) => {
-        if (st.title === selectedSubTheme) {
-          const sstMatches = splitSubSubThemes(st.content);
-          sstMatches.forEach(sst => sstSet.add(sst));
+      if (activeCategory === 'intro_conclusion') {
+        if (item.subtopic === selectedSubTheme) {
+          if (item.title) sstSet.add(item.title);
         }
-      });
+      } else {
+        const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
+        subThemes.forEach((st: any) => {
+          if (st.title === selectedSubTheme) {
+            const sstMatches = splitSubSubThemes(st.content);
+            sstMatches.forEach(sst => sstSet.add(sst));
+          }
+        });
+      }
     });
     return Array.from(sstSet).sort();
-  }, [activeCategoryItems, filters.subtopics]);
+  }, [activeCategoryItems, filters.subtopics, activeCategory]);
 
   const microtagOptions: string[] = [];
 
@@ -3818,16 +3888,37 @@ function ValueAdditionView({
       const matchSubject = subjectFilter.length === 0 || (item.subject && subjectFilter.includes(item.subject));
       const matchSection = sectionFilter.length === 0 || (item.sectionGroup && sectionFilter.includes(item.sectionGroup));
       
-      const themeName = item.category === 'data_facts' ? item.metric : item.title;
-      const matchTheme = themeFilter.length === 0 || (themeName && themeFilter.includes(themeName));
-      
-      const matchSubTheme = subThemeFilter.length === 0 || (item.parsedSubThemes && item.parsedSubThemes.some((st: any) => 
-        subThemeFilter.includes(st.title)
-      ));
+      let matchTheme = true;
+      if (themeFilter.length > 0) {
+        if (activeCategory === 'intro_conclusion') {
+          matchTheme = !!item.microtopic && themeFilter.includes(item.microtopic);
+        } else {
+          const themeName = item.category === 'data_facts' ? item.metric : item.title;
+          matchTheme = !!themeName && themeFilter.includes(themeName);
+        }
+      }
 
-      const matchSubSubTheme = subSubThemeFilter.length === 0 || (item.parsedSubSubThemes && item.parsedSubSubThemes.some((sst: any) => 
-        subSubThemeFilter.includes(sst)
-      ));
+      let matchSubTheme = true;
+      if (subThemeFilter.length > 0) {
+        if (activeCategory === 'intro_conclusion') {
+          matchSubTheme = !!item.subtopic && subThemeFilter.includes(item.subtopic);
+        } else {
+          matchSubTheme = !!item.parsedSubThemes && item.parsedSubThemes.some((st: any) => 
+            subThemeFilter.includes(st.title)
+          );
+        }
+      }
+
+      let matchSubSubTheme = true;
+      if (subSubThemeFilter.length > 0) {
+        if (activeCategory === 'intro_conclusion') {
+          matchSubSubTheme = !!item.title && subSubThemeFilter.includes(item.title);
+        } else {
+          matchSubSubTheme = !!item.parsedSubSubThemes && item.parsedSubSubThemes.some((sst: any) => 
+            subSubThemeFilter.includes(sst)
+          );
+        }
+      }
 
       return matchCat && matchSearch && matchPaper && matchSubject && matchSection && matchTheme && matchSubTheme && matchSubSubTheme;
     });
@@ -4146,8 +4237,8 @@ function ValueAdditionView({
                           </View>
                         ))}
                         {filters.macrotags !== 'All' && filters.macrotags.split('|').map(val => (
-                          <View key={`crumb-macro-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#f3e8ff', borderColor: '#e9d5ff' }]}>
-                            <Text style={{ fontSize: 10, fontWeight: '700', color: '#6b21a8' }}>{val}</Text>
+                          <View key={`crumb-macro-${val}`} style={[styles.breadcrumbChip, { backgroundColor: activeCategory === 'intro_conclusion' ? '#d1fae5' : '#f3e8ff', borderColor: activeCategory === 'intro_conclusion' ? '#bbf7d0' : '#e9d5ff' }]}>
+                            <Text style={{ fontSize: 10, fontWeight: '700', color: activeCategory === 'intro_conclusion' ? '#166534' : '#6b21a8' }}>{val}</Text>
                             <Pressable 
                               onPress={() => {
                                 const updated = filters.macrotags.split('|').filter(x => x !== val).join('|') || 'All';
@@ -4339,11 +4430,13 @@ function ValueAdditionView({
         macrotagOptions={macrotagOptions}
         microtagOptions={microtagOptions}
         isTablet={isTablet}
-        columnLabels={{
-          microtopic: 'Theme',
-          subtopic: 'Sub-theme'
-        }}
+        columnLabels={
+          activeCategory === 'intro_conclusion'
+            ? { microtopic: 'Microtopic', subtopic: 'Subtopic' }
+            : { microtopic: 'Theme', subtopic: 'Sub-theme' }
+        }
         isMainsValueAdd={true}
+        isIntroConclusion={activeCategory === 'intro_conclusion'}
       />
     </View>
   );
@@ -5825,105 +5918,126 @@ function MainsAISearchView({
                       {filters.paper !== 'All' && filters.paper.split('|').map(val => (
                         <View key={`crumb-paper-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#dbeafe', borderColor: '#bfdbfe' }]}>
                           <Text style={{ fontSize: 10, fontWeight: '700', color: '#1e40af' }}>{val}</Text>
-                          <TouchableOpacity onPress={() => {
-                            const updated = filters.paper.split('|').filter(x => x !== val).join('|') || 'All';
-                            handleUpdateFilters({ 
-                              ...filters, 
-                              paper: updated, 
-                              subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                            });
-                          }} >
+                          <Pressable 
+                            onPress={() => {
+                              const updated = filters.paper.split('|').filter(x => x !== val).join('|') || 'All';
+                              handleUpdateFilters({ 
+                                ...filters, 
+                                paper: updated, 
+                                subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                              });
+                            }}
+                            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+                          >
                             <X size={10} color="#1e40af" style={{ marginLeft: 4 }} />
-                          </TouchableOpacity>
+                          </Pressable>
                         </View>
                       ))}
                       {filters.subjects !== 'All' && filters.subjects.split('|').map(val => (
                         <View key={`crumb-subject-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#f3e8ff', borderColor: '#e9d5ff' }]}>
                           <Text style={{ fontSize: 10, fontWeight: '700', color: '#6b21a8' }}>{val}</Text>
-                          <TouchableOpacity onPress={() => {
-                            const updated = filters.subjects.split('|').filter(x => x !== val).join('|') || 'All';
-                            handleUpdateFilters({ 
-                              ...filters, 
-                              subjects: updated, 
-                              sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                            });
-                          }} >
+                          <Pressable 
+                            onPress={() => {
+                              const updated = filters.subjects.split('|').filter(x => x !== val).join('|') || 'All';
+                              handleUpdateFilters({ 
+                                ...filters, 
+                                subjects: updated, 
+                                sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                              });
+                            }}
+                            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+                          >
                             <X size={10} color="#6b21a8" style={{ marginLeft: 4 }} />
-                          </TouchableOpacity>
+                          </Pressable>
                         </View>
                       ))}
                       {filters.sections !== 'All' && filters.sections.split('|').map(val => (
                         <View key={`crumb-section-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#fef3c7', borderColor: '#fde68a' }]}>
                           <Text style={{ fontSize: 10, fontWeight: '700', color: '#92400e' }}>{val}</Text>
-                          <TouchableOpacity onPress={() => {
-                            const updated = filters.sections.split('|').filter(x => x !== val).join('|') || 'All';
-                            handleUpdateFilters({ 
-                              ...filters, 
-                              sections: updated, 
-                              microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                            });
-                          }} >
+                          <Pressable 
+                            onPress={() => {
+                              const updated = filters.sections.split('|').filter(x => x !== val).join('|') || 'All';
+                              handleUpdateFilters({ 
+                                ...filters, 
+                                sections: updated, 
+                                microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                              });
+                            }}
+                            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+                          >
                             <X size={10} color="#92400e" style={{ marginLeft: 4 }} />
-                          </TouchableOpacity>
+                          </Pressable>
                         </View>
                       ))}
                       {filters.microtopics !== 'All' && filters.microtopics.split('|').map(val => (
                         <View key={`crumb-micro-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#d1fae5', borderColor: '#a7f3d0' }]}>
                           <Text style={{ fontSize: 10, fontWeight: '700', color: '#065f46' }}>{val}</Text>
-                          <TouchableOpacity onPress={() => {
-                            const updated = filters.microtopics.split('|').filter(x => x !== val).join('|') || 'All';
-                            handleUpdateFilters({ 
-                              ...filters, 
-                              microtopics: updated, 
-                              subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                            });
-                          }} >
+                          <Pressable 
+                            onPress={() => {
+                              const updated = filters.microtopics.split('|').filter(x => x !== val).join('|') || 'All';
+                              handleUpdateFilters({ 
+                                ...filters, 
+                                microtopics: updated, 
+                                subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                              });
+                            }}
+                            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+                          >
                             <X size={10} color="#065f46" style={{ marginLeft: 4 }} />
-                          </TouchableOpacity>
+                          </Pressable>
                         </View>
                       ))}
                       {filters.subtopics !== 'All' && filters.subtopics.split('|').map(val => (
                         <View key={`crumb-sub-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#ffe4e6', borderColor: '#fecdd3' }]}>
                           <Text style={{ fontSize: 10, fontWeight: '700', color: '#be123c' }}>{val}</Text>
-                          <TouchableOpacity onPress={() => {
-                            const updated = filters.subtopics.split('|').filter(x => x !== val).join('|') || 'All';
-                            handleUpdateFilters({ 
-                              ...filters, 
-                              subtopics: updated, 
-                              macrotags: 'All', microtags: 'All' 
-                            });
-                          }} >
+                          <Pressable 
+                            onPress={() => {
+                              const updated = filters.subtopics.split('|').filter(x => x !== val).join('|') || 'All';
+                              handleUpdateFilters({ 
+                                ...filters, 
+                                subtopics: updated, 
+                                macrotags: 'All', microtags: 'All' 
+                              });
+                            }}
+                            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+                          >
                             <X size={10} color="#be123c" style={{ marginLeft: 4 }} />
-                          </TouchableOpacity>
+                          </Pressable>
                         </View>
                       ))}
                       {filters.macrotags !== 'All' && filters.macrotags.split('|').map(val => (
                         <View key={`crumb-macro-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#e0f7fa', borderColor: '#b2ebf2' }]}>
                           <Text style={{ fontSize: 10, fontWeight: '700', color: '#006064' }}>{val}</Text>
-                          <TouchableOpacity onPress={() => {
-                            const updated = filters.macrotags.split('|').filter(x => x !== val).join('|') || 'All';
-                            handleUpdateFilters({ 
-                              ...filters, 
-                              macrotags: updated, 
-                              microtags: 'All' 
-                            });
-                          }} >
+                          <Pressable 
+                            onPress={() => {
+                              const updated = filters.macrotags.split('|').filter(x => x !== val).join('|') || 'All';
+                              handleUpdateFilters({ 
+                                ...filters, 
+                                macrotags: updated, 
+                                microtags: 'All' 
+                              });
+                            }}
+                            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+                          >
                             <X size={10} color="#006064" style={{ marginLeft: 4 }} />
-                          </TouchableOpacity>
+                          </Pressable>
                         </View>
                       ))}
                       {filters.microtags !== 'All' && filters.microtags.split('|').map(val => (
                         <View key={`crumb-microtag-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#fce4ec', borderColor: '#f8bbd0' }]}>
                           <Text style={{ fontSize: 10, fontWeight: '700', color: '#880e4f' }}>{val}</Text>
-                          <TouchableOpacity onPress={() => {
-                            const updated = filters.microtags.split('|').filter(x => x !== val).join('|') || 'All';
-                            handleUpdateFilters({ 
-                              ...filters, 
-                              microtags: updated 
-                            });
-                          }} >
+                          <Pressable 
+                            onPress={() => {
+                              const updated = filters.microtags.split('|').filter(x => x !== val).join('|') || 'All';
+                              handleUpdateFilters({ 
+                                ...filters, 
+                                microtags: updated 
+                              });
+                            }}
+                            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+                          >
                             <X size={10} color="#880e4f" style={{ marginLeft: 4 }} />
-                          </TouchableOpacity>
+                          </Pressable>
                         </View>
                       ))}
                     </View>

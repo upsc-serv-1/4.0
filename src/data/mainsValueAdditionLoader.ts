@@ -123,8 +123,11 @@ const mappedIntroConclusions: ValueAdditionItem[] = introConclusions.map((item, 
   title: item.card_title,
   introduction: item.introduction || undefined,
   conclusion: item.conclusion || undefined,
+  quoteText: item.quote_text || undefined,
+  author: item.quote_author || undefined,
+  examples: item.examples || undefined,
   source: 'Ready-made Intro/Conclusion',
-  rawContent: item.introduction || item.conclusion
+  rawContent: [item.quote_text || '', item.introduction || '', item.examples || '', item.conclusion || ''].filter(Boolean).join('\n\n')
 }));
 
 const mappedEssayValueAdd: ValueAdditionItem[] = essayValueAdd.map((item, idx) => ({
@@ -265,8 +268,11 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     title: item.card_title,
     introduction: item.introduction || undefined,
     conclusion: item.conclusion || undefined,
+    quoteText: item.quote_text || undefined,
+    author: item.quote_author || undefined,
+    examples: item.examples || undefined,
     source: 'Ready-made Intro/Conclusion',
-    rawContent: item.introduction || item.conclusion
+    rawContent: [item.quote_text || '', item.introduction || '', item.examples || '', item.conclusion || ''].filter(Boolean).join('\n\n')
   }));
 
   const mappedEssayValueAdd: ValueAdditionItem[] = (esRes.data || []).map((item, idx) => ({

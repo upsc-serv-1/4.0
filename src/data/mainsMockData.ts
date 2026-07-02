@@ -58,6 +58,7 @@ export interface ValueAdditionItem {
   };
   rawContent?: string;
   diagramImagePath?: string;
+  examples?: string;
 }
 
 export const mockQuestions: Question[] = [

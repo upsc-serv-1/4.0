@@ -11,7 +11,8 @@ import {
   useWindowDimensions,
   Platform,
   ActivityIndicator,
-  Clipboard
+  Clipboard,
+  BackHandler
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -40,7 +41,115 @@ interface Message {
 // Global session-level cache to guarantee conversation histories are 100% persistent across question swaps
 const globalHistoryCache: Record<string, Message[]> = {};
 
-export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse, externalOpenTrigger, onOpenVitaminEditor }: PilotV2AIChatProps) {
+const DEFAULT_MAINS_TEMPLATES: PromptTemplate[] = [
+  {
+    template_name: 'Concept Explanation',
+    template_key: 'concept_explain',
+    button_label: 'Explain',
+    button_emoji: '📚',
+    prompt_text: `Explain the core concept behind this UPSC Mains question completely.
+
+QUESTION:
+{{question}}
+
+MODEL ANSWERS CONTEXT:
+{{correct_answer}}
+
+Provide:
+1. Clear explanation of the core concept.
+2. Key background info and theoretical underpinnings.
+3. Why this matters for the UPSC Mains exam.`,
+    category: 'quiz',
+    is_active: true,
+    display_order: 0,
+  },
+  {
+    template_name: 'Critique & Arguments',
+    template_key: 'critique_args',
+    button_label: 'Critique',
+    button_emoji: '⚖️',
+    prompt_text: `Provide a critical analysis and arguments for and against the core issue raised in this question.
+
+QUESTION:
+{{question}}
+
+MODEL ANSWERS CONTEXT:
+{{correct_answer}}
+
+Focus on:
+1. Arguments in favor (Pros / Strengths)
+2. Arguments against (Cons / Challenges)
+3. Forward-looking way forward (Balanced conclusion)`,
+    category: 'quiz',
+    is_active: true,
+    display_order: 1,
+  },
+  {
+    template_name: 'Mains Answer Structure',
+    template_key: 'mains_structure',
+    button_label: 'Structure',
+    button_emoji: '🏗️',
+    prompt_text: `Suggest a premium answer writing structure/skeleton for this UPSC Mains question.
+
+QUESTION:
+{{question}}
+
+MODEL ANSWERS CONTEXT:
+{{correct_answer}}
+
+Provide a detailed skeleton:
+1. Introduction: Hook, definition, or key context (ideal word count: 20-30 words).
+2. Body paragraphs: Heading suggestions, bullet-point outlines, and what flow charts/diagrams to draw.
+3. Conclusion: Optimistic way forward, constitutional references, or committee recommendations.`,
+    category: 'quiz',
+    is_active: true,
+    display_order: 2,
+  },
+  {
+    template_name: 'Current Context & Links',
+    template_key: 'current_links',
+    button_label: 'Current Link',
+    button_emoji: '🌍',
+    prompt_text: `Link this UPSC Mains topic to recent current affairs, news events (2024-2026), reports, committees, or case studies.
+
+QUESTION:
+{{question}}
+
+MODEL ANSWERS CONTEXT:
+{{correct_answer}}
+
+Provide:
+1. Key recent news linkages or developments.
+2. Relevant committee recommendations, indexes, or stats to cite.
+3. Real-world case studies or success stories in India.`,
+    category: 'quiz',
+    is_active: true,
+    display_order: 3,
+  },
+  {
+    template_name: 'Key Points Summary',
+    template_key: 'points_summary',
+    button_label: 'Summary',
+    button_emoji: '🔑',
+    prompt_text: `Summarize the key arguments, facts, and takeaways from the compiled model answers for fast revision.
+
+QUESTION:
+{{question}}
+
+MODEL ANSWERS CONTEXT:
+{{correct_answer}}
+
+Summarize into:
+1. 5 key factual pointers to memorize.
+2. Essential keywords and terms to write.
+3. Simple diagrammatic description (if applicable).`,
+    category: 'quiz',
+    is_active: true,
+    display_order: 4,
+  },
+];
+
+export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse, externalOpenTrigger, onOpenVitaminEditor, isMains }: PilotV2AIChatProps) {
   const { colors } = useTheme();
   const { session } = useAuth();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -48,7 +157,7 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [templates, setTemplates] = useState<PromptTemplate[]>(DEFAULT_QUIZ_TEMPLATES);
+  const [templates, setTemplates] = useState<PromptTemplate[]>(isMains ? DEFAULT_MAINS_TEMPLATES : DEFAULT_QUIZ_TEMPLATES);
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
   const { currentNote } = usePilotV2();
@@ -94,8 +203,12 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
 
   // Load custom templates if available, ensuring 100% uniformity with the Quiz section
   useEffect(() => {
-    loadTemplates();
-  }, [session?.user?.id]);
+    if (isMains) {
+      setTemplates(DEFAULT_MAINS_TEMPLATES);
+    } else {
+      loadTemplates();
+    }
+  }, [session?.user?.id, isMains]);
 
   const loadTemplates = async () => {
     if (!session?.user?.id) return;
@@ -107,6 +220,12 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
 
   // Sync and load/save messages from globalHistoryCache when activeQuestion changes
   useEffect(() => {
+    // Synchronously reset messages to initial state to prevent flash of previous question's content
+    const initial: Message[] = [
+      { role: 'assistant', content: 'Hello! I am Dr. UPSC, your personal tutor. Ask me anything or choose a preset mode above!' }
+    ];
+    setMessages(initial);
+
     if (activeQuestion?.id && session?.user?.id) {
       // Always clear cache entry when switching questions to ensure fresh conversations for each question
       delete globalHistoryCache[activeQuestion.id];
@@ -118,17 +237,11 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
             setMessages(history);
             globalHistoryCache[activeQuestion.id] = history;
           } else {
-            const initial: Message[] = [
-              { role: 'assistant', content: 'Hello! I am Dr. UPSC, your personal tutor. Ask me anything or choose a preset mode above!' }
-            ];
             setMessages(initial);
             globalHistoryCache[activeQuestion.id] = initial;
           }
         })
         .catch(() => {
-          const initial: Message[] = [
-            { role: 'assistant', content: 'Hello! I am Dr. UPSC, your personal tutor. Ask me anything or choose a preset mode above!' }
-          ];
           setMessages(initial);
           globalHistoryCache[activeQuestion.id] = initial;
         });
@@ -141,6 +254,27 @@ export function PilotV2AIChat({ isOtherPopupOpen, activeQuestion, onSaveResponse
       duration: 360,
       easing: Easing.out(Easing.quad)
     });
+  }, [isOpen]);
+
+  // Close chatbot when activeQuestion is falsy
+  useEffect(() => {
+    if (!activeQuestion) {
+      setIsOpen(false);
+    }
+  }, [activeQuestion]);
+
+  // Hardware back button handler to close/minimize chatbot
+  useEffect(() => {
+    const handleBackButton = () => {
+      if (isOpen) {
+        setIsOpen(false);
+        return true;
+      }
+      return false;
+    };
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+    return () => subscription.remove();
   }, [isOpen]);
 
   // Auto-minimize when other sheets are open
@@ -734,6 +868,7 @@ interface PilotV2AIChatProps {
   onSaveResponse?: (text: string) => void;
   externalOpenTrigger?: number;
   onOpenVitaminEditor?: (text: string) => void;
+  isMains?: boolean;
 }
 
 const styles = StyleSheet.create({

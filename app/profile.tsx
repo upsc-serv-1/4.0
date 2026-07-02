@@ -12,11 +12,11 @@ import {
   Modal,
   FlatList,
   Pressable,
-  Image,
   TextInput,
   ActivityIndicator,
   Platform,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { 
   Palette, 
   BarChart3, 
@@ -38,6 +38,7 @@ import {
   Wifi,
   WifiOff,
   Brain,
+  Users,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -52,6 +53,10 @@ import { OfflineManager, SyncProgress, OfflineMetadata } from '../src/services/O
 import { ThemeSwitcher } from '../src/components/ThemeSwitcher';
 import { useProfile } from '../src/context/ProfileContext';
 import { useCourse } from '../src/context/CourseContext';
+import { AvatarPicker } from '../src/components/AvatarPicker';
+import { useAccessControl } from '../src/context/AccessControlContext';
+import { emitShowSubscription } from '../src/utils/subscriptionEvents';
+import { Crown } from 'lucide-react-native';
 
 import { AVATARS } from '../src/constants/avatars';
 const AVATAR_MAP = Object.fromEntries(AVATARS.map(a => [a.id, a.uri]));
@@ -73,6 +78,7 @@ export default function Profile() {
   const { colors } = useTheme();
   const { session, signOut } = useAuth();
   const { displayName, avatarId, updateProfile: updateProfileContext } = useProfile();
+  const { hasAccess, featureMap } = useAccessControl();
   const router = useRouter();
   const email = session?.user.email || '';
   const initial = (displayName[0] || 'A').toUpperCase();
@@ -86,6 +92,96 @@ export default function Profile() {
   const [analyticsLayout, setAnalyticsLayout] = useState(DEFAULT_ANALYTICS_LAYOUT);
   const isAnalyticsAdmin = email.toLowerCase() === 'your@email.com';
 
+  // ── Subscription Admin State ──────────────────────────────
+  const [userSubAdminVisible, setUserSubAdminVisible] = useState(false);
+  const [adminUsers, setAdminUsers] = useState<any[]>([]);
+  const [adminPlans, setAdminPlans] = useState<any[]>([]);
+  const [adminSubs, setAdminSubs] = useState<Record<string, any>>({});
+  const [adminLoading, setAdminLoading] = useState(false);
+  const [adminSearch, setAdminSearch] = useState('');
+  const [selectedAdminUser, setSelectedAdminUser] = useState<any>(null);
+  const [selectedPlanIdForUser, setSelectedPlanIdForUser] = useState<string>('free');
+  const [savingAdminSub, setSavingAdminSub] = useState(false);
+
+  const loadAdminUserData = async () => {
+    setAdminLoading(true);
+    try {
+      const { data: plansData, error: plansErr } = await supabase
+        .from('access_plans')
+        .select('*')
+        .order('sort_order');
+      if (plansErr) throw plansErr;
+      setAdminPlans(plansData || []);
+
+      const { data: usersData, error: usersErr } = await supabase
+        .from('users')
+        .select('*')
+        .order('email');
+      if (usersErr) throw usersErr;
+      setAdminUsers(usersData || []);
+
+      const { data: subsData, error: subsErr } = await supabase
+        .from('user_subscriptions')
+        .select('*, access_plans(name)')
+        .eq('is_active', true);
+      if (subsErr) throw subsErr;
+
+      const subsMap: Record<string, any> = {};
+      (subsData || []).forEach(sub => {
+        subsMap[sub.user_id] = sub;
+      });
+      setAdminSubs(subsMap);
+    } catch (err: any) {
+      console.error('Admin Load Error:', err);
+    } finally {
+      setAdminLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (userSubAdminVisible) {
+      loadAdminUserData();
+    }
+  }, [userSubAdminVisible]);
+
+  const saveUserSubscription = async () => {
+    if (!selectedAdminUser) return;
+    setSavingAdminSub(true);
+    try {
+      const targetUserId = selectedAdminUser.id;
+      
+      // 1. Deactivate any existing active subscriptions for this user
+      const { error: deactivateErr } = await supabase
+        .from('user_subscriptions')
+        .update({ is_active: false })
+        .eq('user_id', targetUserId)
+        .eq('is_active', true);
+      
+      if (deactivateErr) throw deactivateErr;
+
+      if (selectedPlanIdForUser && selectedPlanIdForUser !== 'free') {
+        // 2. Insert new active subscription
+        const { error: insertErr } = await supabase
+          .from('user_subscriptions')
+          .insert({
+            user_id: targetUserId,
+            plan_id: selectedPlanIdForUser,
+            is_active: true,
+            expires_at: new Date('2035-12-31T23:59:59Z').toISOString()
+          });
+        if (insertErr) throw insertErr;
+      }
+
+      Alert.alert('Success', 'User subscription updated successfully!');
+      setSelectedAdminUser(null);
+      await loadAdminUserData();
+    } catch (err: any) {
+      Alert.alert('Error Saving Subscription', err.message || 'Something went wrong.');
+    } finally {
+      setSavingAdminSub(false);
+    }
+  };
+
   // ── Offline Mode State ────────────────────────────────────
   const [offlineMeta, setOfflineMeta] = useState<OfflineMetadata | null>(null);
   const [syncModalVisible, setSyncModalVisible] = useState(false);
@@ -98,7 +194,7 @@ export default function Profile() {
   const [showAppGuide, setShowAppGuide] = useState(false);
   const [coursePickerVisible, setCoursePickerVisible] = useState(false);
   const { selectedCourse, setSelectedCourse } = useCourse();
-  const AVAILABLE_COURSES = ['UPSC CSE', 'Medical Science'] as const;
+  const AVAILABLE_COURSES = ['Civil Services', 'Medical Science'] as const;
 
   useEffect(() => {
     AsyncStorage.getItem('optional_choice').then(val => {
@@ -214,6 +310,10 @@ export default function Profile() {
     setPickerVisible(true);
   };
 
+  const handleSelectAvatar = useCallback((avatarId: string) => {
+    setSelectedAvatar(avatarId);
+  }, []);
+
   const confirmLogout = () => {
     Alert.alert('Sign out?', 'You will need to sign in again.', [
       { text: 'Cancel', style: 'cancel' },
@@ -235,7 +335,10 @@ export default function Profile() {
         <View style={[styles.userCard, { backgroundColor: colors.surface + '80', borderColor: colors.border }]}>
           <TouchableOpacity onPress={() => {}} style={styles.avatarContainer}>
             {selectedAvatar ? (
-              <Image source={AVATAR_MAP[selectedAvatar]} style={styles.avatarImg} />
+              <Image 
+                source={AVATAR_MAP[selectedAvatar]} 
+                style={styles.avatarImg}
+              />
             ) : (
               <View style={[styles.avatar, { backgroundColor: colors.primary }]}><Text style={styles.avatarText}>{initial}</Text></View>
             )}
@@ -263,21 +366,11 @@ export default function Profile() {
         </View>
 
         <Text style={[styles.small, { color: colors.textTertiary, marginTop: 12, marginBottom: 12 }]}>CHOOSE AVATAR</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.avatarList}>
-          {AVATARS.map(av => (
-            <TouchableOpacity 
-              key={av.id} 
-              onPress={() => setSelectedAvatar(av.id)}
-              style={[
-                styles.avatarPickerItem, 
-                { borderColor: selectedAvatar === av.id ? colors.primary : colors.border },
-                selectedAvatar === av.id && { backgroundColor: colors.primary + '10' }
-              ]}
-            >
-              <Image source={av.uri} style={styles.avatarPickerImg} />
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+        <AvatarPicker 
+          selectedAvatar={selectedAvatar}
+          onSelectAvatar={handleSelectAvatar}
+          colors={colors}
+        />
 
         <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>COURSE PREFERENCES</Text>
         <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
@@ -295,6 +388,37 @@ export default function Profile() {
             isLast
           />
         </View>
+
+        {/* ── SUBSCRIPTION SECTION ───────────────────────────── */}
+        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>SUBSCRIPTION</Text>
+        <TouchableOpacity
+          onPress={emitShowSubscription}
+          style={[styles.settingsGroup, {
+            backgroundColor: colors.surface + '50',
+            borderColor: colors.border,
+            flexDirection: 'row', alignItems: 'center',
+            padding: 16, gap: 12,
+          }]}
+        >
+          <Crown size={20} color={colors.primary} />
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 15, fontWeight: '700', color: colors.textPrimary }}>
+              View Plans & Subscription
+            </Text>
+            <Text style={{ fontSize: 12, color: colors.textTertiary, marginTop: 2 }}>
+              {featureMap.pyq ? 'Pro plan active' : 'Free tier — upgrade for more'}
+            </Text>
+          </View>
+          <View style={{
+            backgroundColor: featureMap.pyq ? colors.primary + '20' : colors.surfaceStrong,
+            borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2,
+          }}>
+            <Text style={{ fontSize: 9, fontWeight: '900', color: featureMap.pyq ? colors.primary : colors.textTertiary }}>
+              {featureMap.pyq ? 'ACTIVE' : 'FREE'}
+            </Text>
+          </View>
+          <ChevronRight size={16} color={colors.textTertiary} />
+        </TouchableOpacity>
 
         <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>APP GUIDE</Text>
         <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
@@ -329,7 +453,16 @@ export default function Profile() {
             }} 
           />
           {isAnalyticsAdmin ? (
-            <Row testID="profile-analytics-layout" icon={<BarChart3 color={colors.primary} size={20} />} label="Analytics Layout Admin" sub="Arrange review and overall cards" onPress={() => setLayoutAdminVisible(true)} />
+            <>
+              <Row 
+                testID="profile-user-subscriptions" 
+                icon={<Users color={colors.primary} size={20} />} 
+                label="Subscription Admin" 
+                sub="Manage user plans & subscriptions in Supabase" 
+                onPress={() => setUserSubAdminVisible(true)} 
+              />
+              <Row testID="profile-analytics-layout" icon={<BarChart3 color={colors.primary} size={20} />} label="Analytics Layout Admin" sub="Arrange review and overall cards" onPress={() => setLayoutAdminVisible(true)} />
+            </>
           ) : null}
           <Row testID="profile-reset" icon={<UserIcon color={colors.primary} size={20} />} label="Reset Password" sub="Send reset link to email" onPress={requestPasswordReset} />
           <Row testID="profile-identity" icon={<UserIcon color={colors.textPrimary} size={20} />} label="Account" sub={email} onPress={() => {}} isLast />
@@ -414,6 +547,192 @@ export default function Profile() {
             </View>
           </View>
         ) : null}
+
+      {/* User Subscription Admin Modal */}
+      <Modal
+        visible={userSubAdminVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => {
+          if (!savingAdminSub) {
+            setUserSubAdminVisible(false);
+            setSelectedAdminUser(null);
+          }
+        }}
+      >
+        <View style={styles.syncOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface, width: '100%', height: '90%', borderTopLeftRadius: 28, borderTopRightRadius: 28 }]}>
+            <View style={styles.modalHeader}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Crown size={22} color={colors.primary} />
+                <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Subscription Admin</Text>
+              </View>
+              <TouchableOpacity 
+                disabled={savingAdminSub}
+                onPress={() => {
+                  setUserSubAdminVisible(false);
+                  setSelectedAdminUser(null);
+                }}
+              >
+                <X size={24} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            {adminLoading ? (
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color={colors.primary} />
+                <Text style={{ marginTop: 12, color: colors.textSecondary }}>Loading users & plans...</Text>
+              </View>
+            ) : selectedAdminUser ? (
+              <View style={{ flex: 1, justifyContent: 'space-between', paddingVertical: 10 }}>
+                <ScrollView>
+                  <Text style={[styles.small, { color: colors.textTertiary, marginBottom: 8 }]}>EDITING SUBSCRIPTION FOR</Text>
+                  <Text style={{ fontSize: 18, fontWeight: '800', color: colors.textPrimary, marginBottom: 4 }}>
+                    {selectedAdminUser.email}
+                  </Text>
+                  <Text style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 24 }}>
+                    ID: {selectedAdminUser.id}
+                  </Text>
+
+                  <Text style={[styles.small, { color: colors.textTertiary, marginBottom: 12 }]}>SELECT SUBSCRIPTION PLAN</Text>
+                  
+                  <TouchableOpacity
+                    style={[
+                      styles.planOptionRow,
+                      {
+                        borderColor: colors.border,
+                        backgroundColor: selectedPlanIdForUser === 'free' ? colors.primary + '10' : colors.surface + '40',
+                      }
+                    ]}
+                    onPress={() => setSelectedPlanIdForUser('free')}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 15, fontWeight: '700', color: colors.textPrimary }}>Free Tier</Text>
+                      <Text style={{ fontSize: 12, color: colors.textTertiary, marginTop: 2 }}>No active paid subscription</Text>
+                    </View>
+                    <View style={[styles.checkCircle, { borderColor: selectedPlanIdForUser === 'free' ? colors.primary : colors.border, backgroundColor: selectedPlanIdForUser === 'free' ? colors.primary : 'transparent' }]}>
+                      {selectedPlanIdForUser === 'free' && <View style={[styles.checkInner, { backgroundColor: '#fff' }]} />}
+                    </View>
+                  </TouchableOpacity>
+
+                  {adminPlans.map(plan => {
+                    const isSelected = selectedPlanIdForUser === plan.id;
+                    return (
+                      <TouchableOpacity
+                        key={plan.id}
+                        style={[
+                          styles.planOptionRow,
+                          {
+                            borderColor: colors.border,
+                            backgroundColor: isSelected ? colors.primary + '10' : colors.surface + '40',
+                            marginTop: 10,
+                          }
+                        ]}
+                        onPress={() => setSelectedPlanIdForUser(plan.id)}
+                      >
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontSize: 15, fontWeight: '700', color: colors.textPrimary }}>{plan.name}</Text>
+                          <Text style={{ fontSize: 12, color: colors.textTertiary, marginTop: 2 }}>
+                            {plan.description || `Price: ${plan.currency} ${plan.price}/${plan.interval}`}
+                          </Text>
+                        </View>
+                        <View style={[styles.checkCircle, { borderColor: isSelected ? colors.primary : colors.border, backgroundColor: isSelected ? colors.primary : 'transparent' }]}>
+                          {isSelected && <View style={[styles.checkInner, { backgroundColor: '#fff' }]} />}
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+
+                <View style={{ flexDirection: 'row', gap: 12, marginTop: 20 }}>
+                  <TouchableOpacity
+                    disabled={savingAdminSub}
+                    style={[styles.adminBtn, { backgroundColor: colors.surfaceStrong, flex: 1 }]}
+                    onPress={() => setSelectedAdminUser(null)}
+                  >
+                    <Text style={{ color: colors.textPrimary, fontWeight: '700', textAlign: 'center' }}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    disabled={savingAdminSub}
+                    style={[styles.adminBtn, { backgroundColor: colors.primary, flex: 1 }]}
+                    onPress={saveUserSubscription}
+                  >
+                    {savingAdminSub ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <Text style={{ color: '#fff', fontWeight: '800', textAlign: 'center' }}>Save Changes</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ) : (
+              <View style={{ flex: 1 }}>
+                <View style={[styles.searchContainer, { borderColor: colors.border, backgroundColor: colors.surfaceStrong + '50' }]}>
+                  <TextInput
+                    style={{ flex: 1, color: colors.textPrimary, fontSize: 15, paddingVertical: 8, paddingHorizontal: 12 }}
+                    placeholder="Search user email..."
+                    placeholderTextColor={colors.textTertiary}
+                    value={adminSearch}
+                    onChangeText={setAdminSearch}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                  {adminSearch.length > 0 && (
+                    <TouchableOpacity onPress={() => setAdminSearch('')} style={{ padding: 8 }}>
+                      <X size={16} color={colors.textSecondary} />
+                    </TouchableOpacity>
+                  )}
+                </View>
+
+                <FlatList
+                  data={adminUsers.filter(u => u.email?.toLowerCase().includes(adminSearch.toLowerCase()))}
+                  keyExtractor={item => item.id}
+                  contentContainerStyle={{ paddingBottom: 40 }}
+                  renderItem={({ item }) => {
+                    const activeSub = adminSubs[item.id];
+                    const planName = activeSub?.access_plans?.name || 'Free';
+                    return (
+                      <View style={[styles.userListItem, { borderColor: colors.border, backgroundColor: colors.surface + '40' }]}>
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontSize: 14, fontWeight: '700', color: colors.textPrimary }}>{item.email}</Text>
+                          <Text style={{ fontSize: 10, color: colors.textTertiary, marginTop: 2 }}>ID: {item.id}</Text>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 }}>
+                            <Crown size={12} color={activeSub ? colors.primary : colors.textTertiary} />
+                            <Text style={{ fontSize: 12, fontWeight: '600', color: activeSub ? colors.primary : colors.textSecondary }}>
+                              Plan: {planName}
+                            </Text>
+                            {activeSub?.expires_at && (
+                              <Text style={{ fontSize: 10, color: colors.textTertiary }}>
+                                (Expires: {new Date(activeSub.expires_at).toLocaleDateString()})
+                              </Text>
+                            )}
+                          </View>
+                        </View>
+                        <TouchableOpacity
+                          style={{ backgroundColor: colors.primary + '15', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 }}
+                          onPress={() => {
+                            setSelectedAdminUser(item);
+                            setSelectedPlanIdForUser(activeSub?.plan_id || 'free');
+                          }}
+                        >
+                          <Text style={{ color: colors.primary, fontSize: 12, fontWeight: '700' }}>Manage</Text>
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  }}
+                  ListEmptyComponent={
+                    <View style={{ padding: 30, alignItems: 'center' }}>
+                      <Text style={{ color: colors.textTertiary, textAlign: 'center' }}>
+                        {adminUsers.length === 0 ? 'No registered users found in database.' : 'No matching users found.'}
+                      </Text>
+                    </View>
+                  }
+                />
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
 
       {/* App Guide Modal */}
       <AppInfoGuide visible={showAppGuide} onClose={() => setShowAppGuide(false)} />
@@ -678,4 +997,46 @@ const styles = StyleSheet.create({
   syncDoneDetail: { fontSize: 12, textAlign: 'center', lineHeight: 18, marginBottom: 24 },
   syncCloseBtn: { paddingVertical: 14, paddingHorizontal: 40, borderRadius: 16 },
   syncCloseBtnText: { fontSize: 15, fontWeight: '900' },
+  planOptionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderWidth: 1,
+    borderRadius: 14,
+  },
+  checkCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  userListItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 14,
+    borderWidth: 1,
+    borderRadius: 14,
+    marginBottom: 10,
+  },
+  adminBtn: {
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

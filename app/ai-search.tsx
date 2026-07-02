@@ -3,6 +3,7 @@
  * Gemini expands the user's query into keywords, then searches Supabase.
  * All filters use FLAT BOOLEAN COLUMNS on the questions table — never JSONB.
  */
+import FeatureGate from '../src/components/FeatureGate';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -12,7 +13,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
-  Brain, Search, SlidersHorizontal, X, ChevronRight,
+  Brain, Search, SlidersHorizontal, X, ChevronRight, ChevronLeft,
   Sparkles, Filter, Clock, ChevronUp, ChevronDown, BookOpen, Target, Zap,
   TrendingUp, BarChart2, Flame, Bold, Italic, Underline, Highlighter,
 } from 'lucide-react-native';
@@ -349,6 +350,9 @@ export default function AISearchTab() {
 
   // Fix #2 — sidebar subject filter (separate from filters.subjects)
   const [sidebarSubjectFilter, setSidebarSubjectFilter] = useState<string | null>(null);
+
+  // Sidebar collapse state for iPad/tablet view
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Fix #4 — search history
   const HISTORY_KEY = 'ai_search_history';
@@ -1000,7 +1004,7 @@ export default function AISearchTab() {
 
       const BASE_SELECT = `id,question_text,correct_answer,options,explanation_markdown,
         subject,section_group,micro_topic,
-        is_pyq,is_ncert,is_upsc_cse,is_allied,is_others,exam_year,exam_group,exam_stage,
+        is_pyq,is_ncert,is_upsc_cse,is_upsc_cms,is_neetpg,is_inicet,is_allied,is_others,exam_year,exam_group,exam_stage,
         test_id,tests(institute,series,program_name)`;
 
       // ─────────────────────────────────────────────────────────────────────
@@ -2541,8 +2545,8 @@ export default function AISearchTab() {
 
         {IS_IPAD ? (
           <View style={styles.ipadBody}>
-            <View style={{ width: 260, overflow: 'hidden' }}>
-            {LeftPanel}
+            <View style={{ width: sidebarCollapsed ? 0 : 260, overflow: 'hidden' }}>
+              {LeftPanel}
             </View>
             <View style={{ flex: 1 }}>
               {hasSearched && ResultsHeader}
@@ -2564,6 +2568,35 @@ export default function AISearchTab() {
                 />
               ) : renderEmptyState()}
             </View>
+
+            {/* Floating Sidebar Toggle Button (similar to pilot v2) */}
+            <TouchableOpacity
+              testID="ai-search-show-sidebar"
+              onPress={() => setSidebarCollapsed(!sidebarCollapsed)}
+              style={{
+                position: 'absolute',
+                bottom: 24,
+                left: 24,
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: !sidebarCollapsed ? colors.textSecondary : '#7c3aed',
+                alignItems: 'center',
+                justifyContent: 'center',
+                shadowColor: '#7c3aed',
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                shadowOffset: { width: 0, height: 4 },
+                elevation: 5,
+                zIndex: 9999,
+              }}
+            >
+              {!sidebarCollapsed ? (
+                <ChevronLeft size={20} color="#fff" />
+              ) : (
+                <ChevronRight size={20} color="#fff" />
+              )}
+            </TouchableOpacity>
           </View>
         ) : (
           <FlatList

@@ -16,6 +16,7 @@ export interface PlacementHint {
   subject?: string | null;
   section_group?: string | null;
   microtopic?: string | null;
+  isMains?: boolean;
 }
 
 export class BranchPlacement {
@@ -56,6 +57,7 @@ export class BranchPlacement {
     subject: string,
     section: string,
     micro: string,
+    rootParentId: string | null = null,
   ): Promise<Branch | null> {
     const norm = (s: string) => (s || '').trim().toLowerCase();
     const wantMicro = norm(micro);
@@ -78,6 +80,9 @@ export class BranchPlacement {
       let depth = 0;
       while (cur && depth < 10) {
         names.push(norm(cur.name));
+        if (rootParentId && cur.parent_id === rootParentId) {
+          break;
+        }
         if (!cur.parent_id) break;
         cur = byId[cur.parent_id];
         depth++;
@@ -89,6 +94,38 @@ export class BranchPlacement {
     // anywhere up the chain. Falls back to micro-only match if hierarchy is sparse.
     const leafMatches = (data as Branch[]).filter((b) => norm(b.name) === wantMicro);
     for (const leaf of leafMatches) {
+      // Validate root parent constraint
+      if (rootParentId) {
+        let belongs = false;
+        let cur: Branch | undefined = leaf;
+        let depth = 0;
+        while (cur && depth < 10) {
+          if (cur.parent_id === rootParentId) {
+            belongs = true;
+            break;
+          }
+          if (!cur.parent_id) break;
+          cur = byId[cur.parent_id];
+          depth++;
+        }
+        if (!belongs) continue;
+      } else {
+        // Non-mains cards should NOT go inside the mains folder
+        let belongsToMains = false;
+        let cur: Branch | undefined = leaf;
+        let depth = 0;
+        while (cur && depth < 10) {
+          if (norm(cur.name) === 'mains') {
+            belongsToMains = true;
+            break;
+          }
+          if (!cur.parent_id) break;
+          cur = byId[cur.parent_id];
+          depth++;
+        }
+        if (belongsToMains) continue;
+      }
+
       const names = ancestorNames(leaf);
       const hasSection = names.includes(wantSection);
       const hasSubject = names.includes(wantSubject);
@@ -96,7 +133,7 @@ export class BranchPlacement {
     }
     // If no perfect hierarchy match but exactly one leaf with this name exists,
     // use it (covers cases where user flattened the structure).
-    if (leafMatches.length === 1) return leafMatches[0];
+    if (leafMatches.length === 1 && !rootParentId) return leafMatches[0];
     return null;
   }
 
@@ -114,15 +151,21 @@ export class BranchPlacement {
     const section = (hint.section_group || 'General').trim() || 'General';
     const micro   = (hint.microtopic || 'General').trim() || 'General';
 
+    let rootParentId: string | null = null;
+    if (hint.isMains) {
+      const mainsRootBranch = await this.ensureBranch(userId, null, 'mains');
+      rootParentId = mainsRootBranch.id;
+    }
+
     // 1) Try to find an existing leaf with matching semantic hierarchy.
-    const existingLeaf = await this.findExistingLeaf(userId, subject, section, micro);
+    const existingLeaf = await this.findExistingLeaf(userId, subject, section, micro, rootParentId);
     if (existingLeaf) {
       await BranchSvc.addCardToBranch(userId, existingLeaf.id, cardId);
       return existingLeaf;
     }
 
     // 2) Fallback: build the canonical Subject -> Section -> Microtopic path.
-    const subjectBranch = await this.ensureBranch(userId, null, subject);
+    const subjectBranch = await this.ensureBranch(userId, rootParentId, subject);
     const sectionBranch = await this.ensureBranch(userId, subjectBranch.id, section);
     const leaf = await this.ensureBranch(userId, sectionBranch.id, micro);
 

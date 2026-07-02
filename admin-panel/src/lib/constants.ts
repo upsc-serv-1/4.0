@@ -82,5 +82,6 @@ export const NAV_ITEMS = [
   { key: 'softnotes', label: 'Soft Notes', icon: 'BookOpen' },
   { key: 'notes', label: 'Notes', icon: 'StickyNote' },
   { key: 'question-states', label: 'Q States', icon: 'BrainCircuit' },
+  { key: 'access-control', label: 'Access Control', icon: 'ShieldCheck' },
   { key: 'settings', label: 'Settings', icon: 'Settings' },
 ] as const;

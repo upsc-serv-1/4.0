@@ -10,6 +10,7 @@ const ALL_TABS: { key: TabKey; title: string; icon: any }[] = [
   { key: 'index', title: 'Home', icon: Home },
   { key: 'arena', title: 'Arena', icon: Target },
   { key: 'analyse', title: 'Analyse', icon: BarChart2 },
+  { key: 'mains', title: 'Mains', icon: PenTool },
   { key: 'pyq', title: 'PYQs', icon: BarChart3 },
   { key: 'flashcards', title: 'Cards', icon: Layers },
   { key: 'tags', title: 'Tags', icon: Tag },

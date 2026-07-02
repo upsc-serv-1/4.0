@@ -15,6 +15,7 @@ import {
   Animated,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 import { KVStore } from '../src/lib/kvStore';
 import { OfflineManager } from '../src/services/OfflineManager';
 import { router } from 'expo-router';
@@ -317,15 +318,15 @@ function StickyHeatmapTable({
                               { 
                                 backgroundColor: bgColor, 
                                 opacity,
-                                borderRadius: 6,
-                                margin: 1,
-                                width: finalCellWidth - 2,
-                                height: finalRowHeight - 2,
+                                borderRadius: 12,
+                                margin: 1.5,
+                                width: finalCellWidth - 3,
+                                height: finalRowHeight - 3,
                               }
                             ]}
                             onPress={() => onCellPress?.(row.label, year)}
                           >
-                            <Text style={[styles.heatCellText, { color: textColor, fontSize: 11, fontWeight: '800' }]}>{count || ''}</Text>
+                            <Text style={[styles.heatCellText, { color: textColor, fontSize: 12, fontWeight: '800' }]}>{count || ''}</Text>
                           </TouchableOpacity>
                         );
                       })}
@@ -2368,17 +2369,42 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
   return (
     <View style={[styles.container, { backgroundColor: isEmbedded ? 'transparent' : colors.bg }]}>
+      {!isDark && !isEmbedded && (
+        <LinearGradient
+          colors={['#e0f2fe', '#fef3c7', '#fce7f3', '#d1fae5']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFillObject}
+        />
+      )}
+
       {renderHeader()}
 
       <ScrollView ref={mainScrollRef} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* Filter chips scroll away with content */}
-        <View style={[styles.filterWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <View style={[
+          styles.filterWrap, 
+          { 
+            backgroundColor: !isDark ? 'rgba(255, 255, 255, 0.45)' : 'rgba(30, 41, 59, 0.45)', 
+            borderColor: !isDark ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.15)' 
+          }
+        ]}>
           {[
             { label: 'Stage', value: examStage, type: 'stage' as const },
             ...(selectedPaper ? [{ label: 'Paper', value: selectedPaper, type: 'paper' as const }] : []),
             { label: 'Years', value: selectedRange, type: 'range' as const },
           ].map(item => (
-            <TouchableOpacity key={item.label} style={[styles.selector, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} onPress={() => openModal(item.type)}>
+            <TouchableOpacity 
+              key={item.label} 
+              style={[
+                styles.selector, 
+                { 
+                  borderColor: !isDark ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.15)', 
+                  backgroundColor: !isDark ? 'rgba(255, 255, 255, 0.65)' : 'rgba(15, 23, 42, 0.45)' 
+                }
+              ]} 
+              onPress={() => openModal(item.type)}
+            >
               <Text style={[styles.selectorLabel, { color: colors.textTertiary }]}>{item.label}</Text>
               <View style={styles.selectorValue}>
                 <Text style={[styles.selectorText, { color: colors.textPrimary }]} numberOfLines={1}>{item.value}</Text>
@@ -2389,7 +2415,13 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         </View>
 
         {selectedRange === 'Custom Range' ? (
-          <View style={[styles.rangeBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <View style={[
+            styles.rangeBox, 
+            { 
+              backgroundColor: !isDark ? 'rgba(255, 255, 255, 0.45)' : 'rgba(30, 41, 59, 0.45)', 
+              borderColor: !isDark ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.15)' 
+            }
+          ]}>
             <View style={styles.rangeInputWrap}>
               <Text style={[styles.rangeLabel, { color: colors.textTertiary }]}>From</Text>
               <TextInput value={customYearStart} onChangeText={setCustomYearStart} keyboardType="number-pad" maxLength={4} style={[styles.yearInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} />
@@ -2921,18 +2953,18 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14, paddingBottom: 12, borderBottomWidth: 1 },
-  headerTitle: { fontSize: 20, fontWeight: '900' },
-  headerIcon: { width: 34, height: 34, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
-  filterWrap: { flexDirection: 'row', gap: 10, marginHorizontal: 12, marginTop: 12, padding: 12, borderRadius: 16, borderWidth: 1 },
-  selector: { flex: 1, borderRadius: 12, borderWidth: 1, padding: 10 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingBottom: 14, borderBottomWidth: 0.5 },
+  headerTitle: { fontSize: 22, fontWeight: '900' },
+  headerIcon: { width: 40, height: 40, borderRadius: 14, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+  filterWrap: { flexDirection: 'row', gap: 10, marginHorizontal: 12, marginTop: 12, padding: 12, borderRadius: 20, borderWidth: 1 },
+  selector: { flex: 1, borderRadius: 14, borderWidth: 1, padding: 10 },
   selectorLabel: { fontSize: 10, fontWeight: '800', textTransform: 'uppercase' },
   selectorValue: { marginTop: 6, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 6 },
   selectorText: { fontSize: 12, fontWeight: '700', flex: 1 },
-  rangeBox: { marginHorizontal: 12, marginTop: 10, borderRadius: 16, borderWidth: 1, padding: 12, flexDirection: 'row', gap: 12 },
+  rangeBox: { marginHorizontal: 12, marginTop: 10, borderRadius: 20, borderWidth: 1, padding: 12, flexDirection: 'row', gap: 12 },
   rangeInputWrap: { flex: 1 },
   rangeLabel: { fontSize: 10, fontWeight: '800', textTransform: 'uppercase', marginBottom: 6 },
-  yearInput: { borderRadius: 10, borderWidth: 1, padding: 8, fontSize: 13, fontWeight: '700', textAlign: 'center' },
+  yearInput: { borderRadius: 12, borderWidth: 1, padding: 10, fontSize: 14, fontWeight: '700', textAlign: 'center' },
   content: { paddingBottom: 100 },
   blockGap: { gap: 16, padding: 12 },
   topCardRow: { flexDirection: 'row', gap: 10 },

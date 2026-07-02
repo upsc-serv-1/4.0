@@ -5,7 +5,7 @@ import type { Question } from '../lib/types';
 
 const empty: Partial<Question> = {
   question_text: '', options: { a: '', b: '', c: '', d: '' }, correct_answer: 'a',
-  explanation_markdown: '', subject: '', micro_topic: '', section_group: '', is_pyq: false,
+  explanation_markdown: '', subject: '', micro_topic: '', section_group: '', sub_topic: '', is_pyq: false,
   is_upsc_cse: false, is_upsc_cms: false, is_neetpg: false, is_inicet: false, is_allied: false, is_others: false,
 };
 
@@ -104,8 +104,9 @@ export default function QuestionsPage() {
                   </select>
                 </Field>
                 <Field label="Subject"><input className="w-full bg-bg border border-border rounded p-2" value={editing.subject || ''} onChange={e => setEditing({ ...editing, subject: e.target.value })} /></Field>
-                <Field label="Micro topic"><input className="w-full bg-bg border border-border rounded p-2" value={editing.micro_topic || ''} onChange={e => setEditing({ ...editing, micro_topic: e.target.value })} /></Field>
                 <Field label="Section group"><input className="w-full bg-bg border border-border rounded p-2" value={editing.section_group || ''} onChange={e => setEditing({ ...editing, section_group: e.target.value })} /></Field>
+                <Field label="Micro topic"><input className="w-full bg-bg border border-border rounded p-2" value={editing.micro_topic || ''} onChange={e => setEditing({ ...editing, micro_topic: e.target.value })} /></Field>
+                <Field label="Sub topic"><input className="w-full bg-bg border border-border rounded p-2" value={editing.sub_topic || ''} onChange={e => setEditing({ ...editing, sub_topic: e.target.value })} /></Field>
               </div>
               <Field label="Explanation (markdown)"><textarea rows={5} className="w-full bg-bg border border-border rounded p-3 font-mono text-sm" value={editing.explanation_markdown || ''} onChange={e => setEditing({ ...editing, explanation_markdown: e.target.value })} /></Field>
               <div className="flex gap-4 flex-wrap">

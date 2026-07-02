@@ -43,6 +43,16 @@ def import_all():
             # 1. TEST METADATA (Aligned with Website Columns)
             test_id = data.get("id") or filename.replace(".json", "")
             
+            # Determine course with fallback to Civil Services
+            inferred_course = "Civil Services"
+            if "course" in data:
+                inferred_course = data["course"]
+            else:
+                prog_id = (data.get("program_id") or "").lower()
+                prog_name = (data.get("program_name") or "").lower()
+                if any(k in prog_id or k in prog_name for k in ["medical", "neet", "cms", "inicet"]):
+                    inferred_course = "Medical Science"
+
             test_payload = {
                 "id": test_id,
                 "title": data.get("title") or test_id,
@@ -62,7 +72,8 @@ def import_all():
                 "default_minutes": data.get("defaultMinutes"),
                 "source_mode": data.get("sourceMode"),
                 "is_demo_available": data.get("is_demo_available", False),
-                "exam_year": data.get("launch_year")
+                "exam_year": data.get("launch_year"),
+                "course": inferred_course
             }
             
             resp = requests.post(f"{SUPABASE_URL}/rest/v1/tests", json=test_payload, headers=headers)
@@ -124,6 +135,7 @@ def import_all():
                     "subject": q.get("subject"),
                     "section_group": q.get("sectionGroup"),
                     "micro_topic": q.get("microTopic"),
+                    "sub_topic": q.get("subtopic"),
                     "is_pyq": is_pyq,
                     "is_ncert": bool(is_ncert),
                     "is_upsc_cse": is_upsc_cse,
@@ -139,7 +151,8 @@ def import_all():
                     "exam_category": q.get("exam_category") or (ei.get("exam_category") if isinstance(ei, dict) else None),
                     "specific_exam": q.get("specific_exam") or (ei.get("specific_exam") if isinstance(ei, dict) else None),
                     "exam_stage": q.get("exam_stage") or ei.get("stage") or data.get("exam_stage") or "Prelims",
-                    "exam_paper": q.get("exam_paper") or ei.get("paper")
+                    "exam_paper": q.get("exam_paper") or ei.get("paper"),
+                    "course": q.get("course") or ("Medical Science" if (is_upsc_cms or is_neetpg or is_inicet) else inferred_course)
                 }
                 question_rows.append(row)
 

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from
 import { Layers, StickyNote, Tag, Layout, ChevronRight, Book, Database, BarChart3, FileText, Sparkles } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { useTheme } from '../../src/context/ThemeContext';
+import FeatureGate from '../../src/components/FeatureGate';
 import { useAuth } from '../../src/context/AuthContext';
 import { radius, spacing } from '../../src/theme';
 import { ThemeSwitcher } from '../../src/components/ThemeSwitcher';
@@ -12,7 +13,7 @@ import { MICRO_SYLLABUS } from '../../src/data/syllabus';
 
 const { width } = Dimensions.get('window');
 
-export default function ReviseTab() {
+function ReviseTab() {
   const { colors } = useTheme();
   const { session } = useAuth();
   const userId = session?.user.id;
@@ -202,6 +203,14 @@ function RepoItem({ icon, label, colors, isLast }: any) {
       <Text style={[s.repoLabel, { color: colors.textPrimary }]}>{label}</Text>
       <ChevronRight color={colors.textTertiary} size={16} />
     </TouchableOpacity>
+  );
+}
+
+export default function ReviseScreen() {
+  return (
+    <FeatureGate feature="revision" featureLabel="Revision">
+      <ReviseTab />
+    </FeatureGate>
   );
 }
 

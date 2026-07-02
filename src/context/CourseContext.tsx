@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type CourseType = 'UPSC CSE' | 'Medical Science';
+export type CourseType = 'Civil Services' | 'Medical Science';
 
 interface CourseContextType {
   selectedCourse: CourseType;
@@ -12,7 +12,7 @@ interface CourseContextType {
 const CourseContext = createContext<CourseContextType | undefined>(undefined);
 
 export const CourseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [selectedCourse, setSelectedCourseState] = useState<CourseType>('UPSC CSE');
+  const [selectedCourse, setSelectedCourseState] = useState<CourseType>('Civil Services');
   const [isLoading, setIsLoading] = useState(true);
 
   // Load course preference on mount

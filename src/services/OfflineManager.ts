@@ -164,15 +164,45 @@ class OfflineManagerService {
   // ── Cancel support ────────────────────────────────────────────
   cancelSync() { this._cancelled = true; this.currentSyncProgress = null; }
 
+  // ── Multi-listener support ────────────────────────────────────
+  private _syncListeners: Set<(p: SyncProgress) => void> = new Set();
+
+  /** Subscribe to sync progress updates. Returns an unsubscribe function. */
+  onSyncProgress(cb: (p: SyncProgress) => void): () => void {
+    this._syncListeners.add(cb);
+    return () => { this._syncListeners.delete(cb); };
+  }
+
+  private _notifyListeners(p: SyncProgress) {
+    this._syncListeners.forEach((cb) => { try { cb(p); } catch {} });
+  }
+
   // ── FULL SYNC ─────────────────────────────────────────────────
   async syncAllContent(
     userId: string,
-    onProgress: (p: SyncProgress) => void
+    onProgress?: (p: SyncProgress) => void
   ) {
-    if (this._fullSyncPromise) return this._fullSyncPromise;
+    // If a sync is already in progress, subscribe the new listener and return the existing promise
+    if (this._fullSyncPromise) {
+      if (onProgress) {
+        const unsub = this.onSyncProgress(onProgress);
+        // Send current progress immediately so the UI doesn't show stale state
+        if (this.currentSyncProgress) {
+          try { onProgress(this.currentSyncProgress); } catch {}
+        }
+        this._fullSyncPromise.finally(unsub);
+      }
+      return this._fullSyncPromise;
+    }
 
-    this._fullSyncPromise = this.runFullSync(userId, onProgress).finally(() => {
+    if (onProgress) this._syncListeners.add(onProgress);
+
+    this._fullSyncPromise = this.runFullSync(userId, (p) => {
+      this.currentSyncProgress = p;
+      this._notifyListeners(p);
+    }).finally(() => {
       this._fullSyncPromise = null;
+      this._syncListeners.clear();
     });
     return this._fullSyncPromise;
   }
@@ -658,7 +688,7 @@ class OfflineManagerService {
       for (const t of tests) {
         const questions = await this.getOfflineQuestions(t.id);
         // Determine course from test or fallback to first question's course
-        const testCourse = t.course || 'UPSC CSE';
+        const testCourse = t.course || 'Civil Services';
         if (questions.length === 0) {
           flattened.push({
             course: testCourse,

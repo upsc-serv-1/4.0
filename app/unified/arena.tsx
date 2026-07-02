@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef, useDeferredValue } from 'react';
+import FeatureGate from '../../src/components/FeatureGate';
 import {
   View,
   Text,
@@ -176,7 +177,7 @@ const ToggleButton = ({ options, activeValue, onSelect, style }: any) => {
 
 // --- Main Component ---
 
-export default function UnifiedArenaSetup() {
+function UnifiedArenaSetup() {
   const { colors } = useTheme();
   const { session } = useAuth();
   const { selectedCourse } = useCourse();
@@ -228,6 +229,7 @@ export default function UnifiedArenaSetup() {
   const [metadata, setMetadata] = useState<any[]>(() => arenaMetadataCache || []);
   const [loading, setLoading] = useState(!arenaMetadataCache);
   const [refreshingMetadata, setRefreshingMetadata] = useState(false);
+  const [syncProgress, setSyncProgress] = useState<{ phase: string; current: number; total: number; detail: string } | null>(null);
   const [userTags, setUserTags] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState<number | null>(null);
   const [calculatingCount, setCalculatingCount] = useState(false);
@@ -358,7 +360,8 @@ export default function UnifiedArenaSetup() {
     searchQuery,
     searchFilters,
     ncertFilter,
-    metadata
+    metadata,
+    session,
   ]);
 
   useEffect(() => {
@@ -415,7 +418,7 @@ export default function UnifiedArenaSetup() {
       }
 
       while (allFreshData.length < MAX_TOTAL) {
-        let query = supabase.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)').eq('course', selectedCourse);
+        let query = supabase.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_upsc_cms, is_neetpg, is_inicet, is_allied, is_others, source, test_id, tests(*)').eq('course', selectedCourse);
 
         if (term) {
           const words = term.split(/\s+/).filter(w => w.length > 1 || /\d/.test(w));
@@ -498,7 +501,7 @@ export default function UnifiedArenaSetup() {
               if (fields.includes('Explanations')) fuzzyPatterns.push(`explanation_markdown.ilike.%${pattern}%`);
             }
 
-            let fuzzyQ = supabase.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)').eq('course', selectedCourse).or(fuzzyPatterns.join(',')).limit(100);
+            let fuzzyQ = supabase.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_upsc_cms, is_neetpg, is_inicet, is_allied, is_others, source, test_id, tests(*)').eq('course', selectedCourse).or(fuzzyPatterns.join(',')).limit(100);
             if (sf.selectedSubjects?.length > 0) fuzzyQ = fuzzyQ.in('subject', sf.selectedSubjects);
             if (sf.selectedSections?.length > 0) {
               const fSections = sf.selectedSections.map((s: string) => s === 'General' ? null : s);
@@ -619,39 +622,49 @@ export default function UnifiedArenaSetup() {
 
       let dataToShow = courseFiltered;
 
-      // If offline cache is completely empty, fetch from Supabase SYNCHRONOUSLY
+      // If offline cache is completely empty, fetch from Supabase immediately
+      // and start background sync without blocking the UI
       if (courseFiltered.length === 0) {
-        console.log('[ARENA-LOAD] Offline cache empty, fetching from Supabase for:', selectedCourse);
-        const { data: supabaseQuestions, error } = await supabase
-          .from('questions')
-          .select('course, subject, section_group, micro_topic, sub_topic, id')
-          .eq('course', selectedCourse)
-          .not('subject', 'is', null)
-          .limit(5000);
+        console.log('[ARENA-LOAD] Offline cache empty, fetching metadata from Supabase directly (course:', selectedCourse, ')');
+        
+        try {
+          // Fetch metadata directly from Supabase — don't wait for sync
+          const { data: supabaseQuestions, error } = await supabase
+            .from('questions')
+            .select('course, subject, section_group, micro_topic, sub_topic, test_id, id')
+            .eq('course', selectedCourse)
+            .not('subject', 'is', null)
+            .limit(5000);
 
-        if (error) throw error;
-        if (supabaseQuestions?.length) {
-          const grouped: any = {};
-          supabaseQuestions.forEach((q: any) => {
-            const subj = q.subject;
-            const sg = q.section_group || 'General';
-            const mt = q.micro_topic || 'Other';
-            const st = q.sub_topic || 'Other';
-            
-            if (!grouped[subj]) grouped[subj] = { course: selectedCourse, subject: subj };
-            if (!grouped[subj][sg]) grouped[subj][sg] = {};
-            if (!grouped[subj][sg][mt]) grouped[subj][sg][mt] = {};
-            
-            const key = `${mt}|${st}`;
-            if (!grouped[subj][sg][mt][key]) grouped[subj][sg][mt][key] = [];
-            grouped[subj][sg][mt][key].push(q);
+          if (!error && supabaseQuestions?.length) {
+            dataToShow = supabaseQuestions.map((q: any) => ({
+              course: q.course || selectedCourse,
+              subject: q.subject || null,
+              section_group: q.section_group || null,
+              micro_topic: q.micro_topic || null,
+              test_id: q.test_id || null,
+              id: q.id,
+            }));
+            console.log('[ARENA-LOAD] ✅ Metadata from Supabase:', { items: supabaseQuestions.length, course: selectedCourse });
+          } else {
+            console.log('[ARENA-LOAD] No data from Supabase for:', selectedCourse, error || '');
+          }
+        } catch (fetchErr) {
+          console.warn('[ARENA-LOAD] Supabase direct fetch failed:', fetchErr);
+        }
+
+        // Start background sync (non-blocking — don't await)
+        if (session?.user?.id) {
+          setSyncProgress({ phase: 'tests', current: 0, total: 1, detail: 'Starting download...' });
+          OfflineManager.syncAllContent(session.user.id, (progress) => {
+            setSyncProgress(progress);
+          }).then(() => {
+            console.log('[ARENA-LOAD] ✅ Background sync completed');
+            setSyncProgress(null);
+          }).catch((syncErr: any) => {
+            console.warn('[ARENA-LOAD] Background sync failed:', syncErr);
+            setSyncProgress(null);
           });
-
-          dataToShow = Object.values(grouped);
-          console.log('[ARENA-LOAD] ✅ Fetched from Supabase:', { items: supabaseQuestions.length, grouped: dataToShow.length, course: selectedCourse });
-        } else {
-          console.log('[ARENA-LOAD] No data found in Supabase for:', selectedCourse);
-          dataToShow = [];
         }
       } else {
         console.log('[ARENA-LOAD] ✅ Using offline cache');
@@ -723,11 +736,12 @@ export default function UnifiedArenaSetup() {
     setCalculatingCount(true);
     const sf = searchFilters || {};
     try {
-      if (!session?.user.id) return;
       if (activeTab === 'search') {
         setCalculatingCount(false);
         return;
       }
+
+      const useOffline = OfflineManager.getOfflineQuestionsAllSync().length > 0;
 
       const isDefaultAllQuestions =
         activeTab === 'topic' &&
@@ -743,7 +757,8 @@ export default function UnifiedArenaSetup() {
 
       if (isDefaultAllQuestions) {
         // Count questions for the selected course only (not all courses)
-        const { count, error } = await LocalQuery.from('questions')
+        const qSource = useOffline ? LocalQuery : supabase;
+        const { count, error } = await qSource.from('questions')
           .select('id', { count: 'exact', head: true })
           .eq('course', selectedCourse);
         if (!error && count && count > 0) {
@@ -787,7 +802,7 @@ export default function UnifiedArenaSetup() {
         return;
       }
 
-      let query = LocalQuery.from('questions').select('id', { count: 'exact', head: true }).eq('course', selectedCourse);
+      let query = (useOffline ? LocalQuery : supabase).from('questions').select('id', { count: 'exact', head: true }).eq('course', selectedCourse);
 
       if (activeTab === 'topic') {
         if (selectedSubjects.length > 0) query = query.in('subject', selectedSubjects);
@@ -826,8 +841,11 @@ export default function UnifiedArenaSetup() {
         }
 
         if (selectedTags.length > 0) {
+          if (!session?.user?.id) {
+            setQuestionCount(0); setCalculatingCount(false); return;
+          }
           const orQuery = selectedTags.map(t => `review_tags.cs.["${t}"]`).join(',');
-          const { data: tagIds, error: tagErr } = await LocalQuery.from('question_states')
+          const { data: tagIds, error: tagErr } = await (useOffline ? LocalQuery : supabase).from('question_states')
             .select('question_id')
             .eq('user_id', session.user.id)
             .or(orQuery);
@@ -842,7 +860,7 @@ export default function UnifiedArenaSetup() {
         }
 
         if (deferredSelectedInstitutes.length > 0 || selectedPrograms.length > 0) {
-          let tQuery = LocalQuery.from('tests').select('id').eq('course', selectedCourse);
+          let tQuery = (useOffline ? LocalQuery : supabase).from('tests').select('id').eq('course', selectedCourse);
           if (deferredSelectedInstitutes.length > 0) tQuery = tQuery.in('institute', deferredSelectedInstitutes);
           if (selectedPrograms.length > 0) tQuery = tQuery.in('program_name', selectedPrograms);
           const { data: testRows } = await tQuery;
@@ -870,7 +888,9 @@ export default function UnifiedArenaSetup() {
         if (first) cache.delete(first);
       }
     } catch (err) {
-      console.error('Count update error:', err);
+      console.error('[ARENA-COUNT] ❌ Error calculating question count:', err);
+      // Set to 0 on error, but log it so we can debug
+      setQuestionCount(0);
     } finally {
       setCalculatingCount(false);
     }
@@ -1213,10 +1233,29 @@ export default function UnifiedArenaSetup() {
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
-          {(loading || refreshingMetadata) && (
+          {(loading || refreshingMetadata || syncProgress) && (
             <View style={[styles.metadataRefreshBanner, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}>
               <ActivityIndicator size="small" color={colors.primary} />
-              <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: '700' }}>Syncing filters…</Text>
+              <View style={{ flex: 1, marginLeft: 4 }}>
+                <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: '700' }}>
+                  {syncProgress ? 'Downloading questions…' : 'Syncing filters…'}
+                </Text>
+                {syncProgress && (
+                  <Text style={{ color: colors.textTertiary, fontSize: 10, fontWeight: '600', marginTop: 2 }} numberOfLines={1}>
+                    {syncProgress.phase === 'tests' ? `Finding tests…` :
+                     syncProgress.phase === 'questions' ? `${syncProgress.detail} (${syncProgress.current}/${syncProgress.total})` :
+                     syncProgress.phase === 'done' ? 'Saving…' :
+                     syncProgress.detail}
+                  </Text>
+                )}
+              </View>
+              {syncProgress && syncProgress.total > 0 && (
+                <View style={{ width: 60 }}>
+                  <View style={{ height: 4, borderRadius: 2, backgroundColor: colors.border, overflow: 'hidden' }}>
+                    <View style={{ height: '100%', width: `${Math.min(100, Math.round((syncProgress.current / syncProgress.total) * 100))}%`, backgroundColor: colors.primary, borderRadius: 2 }} />
+                  </View>
+                </View>
+              )}
             </View>
           )}
 
@@ -1506,12 +1545,12 @@ export default function UnifiedArenaSetup() {
           <View style={{ flex: 1.2 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Text style={[styles.countText, { color: colors.textPrimary }]}>
-                {questionCount || 0}
+                {loading || refreshingMetadata || syncProgress ? '...' : (questionCount || 0)}
               </Text>
-              {calculatingCount && <ActivityIndicator size="small" color={colors.textTertiary} />}
+              {(calculatingCount || loading || refreshingMetadata || syncProgress) && <ActivityIndicator size="small" color={colors.textTertiary} />}
             </View>
             <Text style={[styles.countLabel, { color: colors.textTertiary }]} numberOfLines={2}>
-              Targeted Questions{"\n"}(Pre-Dedupe)
+              {syncProgress ? 'Downloading...' : (loading || refreshingMetadata ? 'Syncing Filters' : 'Targeted Questions\n(Pre-Dedupe)')}
             </Text>
           </View>
 
@@ -1519,19 +1558,19 @@ export default function UnifiedArenaSetup() {
             <TouchableOpacity
               style={[styles.launchBtn, { backgroundColor: colors.surfaceStrong, borderColor: colors.primary, borderWidth: 1 }]}
               onPress={() => { handleLaunch('learning'); }}
-              disabled={questionCount === 0}
+              disabled={questionCount === 0 || loading || refreshingMetadata || !!syncProgress}
             >
-              <BookOpen size={16} color={colors.primary} />
-              <Text style={[styles.launchBtnText, { color: colors.primary, fontSize: 14 }]}>Learn</Text>
+              <BookOpen size={16} color={syncProgress ? colors.textTertiary : colors.primary} />
+              <Text style={[styles.launchBtnText, { color: syncProgress ? colors.textTertiary : colors.primary, fontSize: 14 }]}>Learn</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.launchBtn, { backgroundColor: colors.primary }]}
+              style={[styles.launchBtn, { backgroundColor: syncProgress ? colors.surfaceStrong : colors.primary }]}
               onPress={() => { setArenaMode('exam'); setShowExamModal(true); }}
-              disabled={questionCount === 0}
+              disabled={questionCount === 0 || loading || refreshingMetadata || !!syncProgress}
             >
-              <Target size={16} color="#fff" />
-              <Text style={[styles.launchBtnText, { color: '#fff', fontSize: 14 }]}>Exam</Text>
+              <Target size={16} color={syncProgress ? colors.textTertiary : '#fff'} />
+              <Text style={[styles.launchBtnText, { color: syncProgress ? colors.textTertiary : '#fff', fontSize: 14 }]}>Exam</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1642,3 +1681,11 @@ const styles = StyleSheet.create({
   toggleTrack: { width: 44, height: 24, borderRadius: 12, padding: 2, justifyContent: 'center' },
   toggleThumb: { width: 20, height: 20, borderRadius: 10, position: 'absolute' },
 });
+
+export default function ArenaScreen() {
+  return (
+    <FeatureGate feature="quiz_arena" featureLabel="Quiz Arena">
+      <UnifiedArenaSetup />
+    </FeatureGate>
+  );
+}

@@ -214,7 +214,7 @@ export function useTaggedVault(userId: string | undefined) {
       if (upscPyqYears.size > 0) {
         const { data: siblings } = await supabase
           .from('questions')
-          .select('id, test_id, subject, section_group, micro_topic, question_text, explanation_markdown, correct_answer, options, is_pyq, is_upsc_cse, exam_year, exam_group, tests(institute,program_name,series)')
+          .select('id, test_id, subject, section_group, micro_topic, question_text, explanation_markdown, correct_answer, options, is_pyq, is_upsc_cse, is_upsc_cms, is_neetpg, is_inicet, exam_year, exam_group, tests(institute,program_name,series)')
           .eq('course', selectedCourse)
           .in('exam_year', Array.from(upscPyqYears))
           .eq('is_pyq', true)
@@ -272,8 +272,9 @@ export function useTaggedVault(userId: string | undefined) {
             createdAt: row.updated_at || new Date().toISOString(),
           };
         })
-        .filter(Boolean) as TaggedQuestion[]
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        .filter(Boolean) as TaggedQuestion[];
+
+      transformed.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
       setRawQuestions(transformed);
 

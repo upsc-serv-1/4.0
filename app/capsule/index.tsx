@@ -6,6 +6,7 @@
  *   • (Glance/editor lives at /capsule/glance/[id] etc — Step 6+)
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import FeatureGate from '../../src/components/FeatureGate';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl,
   ActivityIndicator, useWindowDimensions, Modal,
@@ -56,7 +57,7 @@ const NEW_LABEL: Record<CapsuleNodeType, string> = {
   notebook: '+ New Notebook',
 };
 
-export default function CapsuleHome() {
+function CapsuleHome() {
   const { colors } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
@@ -856,3 +857,11 @@ const glanceStyles = StyleSheet.create({
   title: { fontSize: 26, fontWeight: '700', marginBottom: 24 },
   eog: { textAlign: 'center', marginTop: 48, fontSize: 13, fontStyle: 'italic' },
 });
+
+export default function CapsuleScreen() {
+  return (
+    <FeatureGate feature="capsules" featureLabel="Capsules">
+      <CapsuleHome />
+    </FeatureGate>
+  );
+}

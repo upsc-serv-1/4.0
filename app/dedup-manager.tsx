@@ -47,7 +47,7 @@ export default function DedupManagerScreen() {
     setRunning(true); setClusters([]); setStats(null);
     try {
       let q = supabase.from('questions')
-        .select('id, question_text, explanation_markdown, correct_answer, subject, exam_year, source, test_id, is_pyq, is_upsc_cse, tests(institute)')
+        .select('id, question_text, explanation_markdown, correct_answer, subject, exam_year, source, test_id, is_pyq, is_upsc_cse, is_upsc_cms, is_neetpg, is_inicet, tests(institute)')
         .eq('is_pyq', true).eq('is_upsc_cse', true).limit(10000);
       if (subjects.length) q = q.in('subject', subjects);
       if (yearStart) q = q.gte('exam_year', yearStart);

@@ -924,6 +924,9 @@ export default function UnifiedQuizEngine() {
       exam_year: q.exam_year,
       is_pyq: q.is_pyq,
       is_upsc_cse: q.is_upsc_cse,
+      is_upsc_cms: q.is_upsc_cms,
+      is_neetpg: q.is_neetpg,
+      is_inicet: q.is_inicet,
       is_allied: q.is_allied,
       is_others: q.is_others,
       exam_group: q.exam_group,
@@ -1374,7 +1377,7 @@ export default function UnifiedQuizEngine() {
     });
     
     let tagList: string[] = [];
-    const SELECT_COLS = 'id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)';
+    const SELECT_COLS = 'id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_upsc_cms, is_neetpg, is_inicet, is_allied, is_others, source, test_id, tests(*)';
     
     // Helper to process results
     const processResults = (data: any[], originalTestIds?: Set<string>) => {
@@ -1569,7 +1572,16 @@ export default function UnifiedQuizEngine() {
           const subs = params.subjects || params.subject;
           if (subs && subs !== 'All' && subs !== '' && subs !== '[]') {
             const subList = typeof subs === 'string' ? subs.split(',').filter(Boolean) : [];
-            if (subList.length > 0) filtered = filtered.filter((q: any) => subList.includes(q.subject));
+            if (subList.length > 0) {
+              const beforeSubject = filtered.length;
+              filtered = filtered.filter((q: any) => subList.includes(q.subject));
+              console.log('[ENGINE-OFFLINE] Filtered by subject:', { 
+                subjects: subList, 
+                before: beforeSubject, 
+                after: filtered.length,
+                uniqueSubjectsAvailable: Array.from(new Set(filtered.map((q: any) => q.subject)))
+              });
+            }
           }
 
           // Apply pyq filter
@@ -1949,7 +1961,7 @@ export default function UnifiedQuizEngine() {
                }
              }
              
-             let fuzzyQ = LocalQuery.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_allied, is_others, source, test_id, tests(*)').eq('course', selectedCourse).or(fuzzyPatterns.join(',')).limit(100);
+             let fuzzyQ = LocalQuery.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_upsc_cms, is_neetpg, is_inicet, is_allied, is_others, source, test_id, tests(*)').eq('course', selectedCourse).or(fuzzyPatterns.join(',')).limit(100);
              // Re-apply same filters
              const insts = params.institutes || params.institute;
              const progs = params.programs || params.program;
@@ -3780,6 +3792,9 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                               group: q.exam_group,
                               year: q.exam_year ?? (q.exam_info?.year),
                               is_upsc_cse: q.is_upsc_cse,
+                              is_upsc_cms: q.is_upsc_cms,
+                              is_neetpg: q.is_neetpg,
+                              is_inicet: q.is_inicet,
                               is_allied: q.is_allied,
                               is_others: q.is_others,
                             };
@@ -3892,7 +3907,16 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
               </Pressable>
             </Modal>
 
-            {showIndex ? renderQuestionIndex() : (
+            {showIndex ? renderQuestionIndex() : questions.length === 0 ? (
+              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, paddingTop: 80 }}>
+                <Text style={{ color: colors.textTertiary, fontSize: 16, fontWeight: '600', textAlign: 'center', marginBottom: 12 }}>
+                  No questions found
+                </Text>
+                <Text style={{ color: colors.textSecondary, fontSize: 13, textAlign: 'center' }}>
+                  {loading ? 'Loading...' : 'Try selecting a different filter or topic.'}
+                </Text>
+              </View>
+            ) : (
               <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
               <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
                 <View style={{ flex: 1 }}>
@@ -4066,6 +4090,9 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                               group: q.exam_group,
                               year: q.exam_year ?? (q.exam_info?.year),
                               is_upsc_cse: q.is_upsc_cse,
+                              is_upsc_cms: q.is_upsc_cms,
+                              is_neetpg: q.is_neetpg,
+                              is_inicet: q.is_inicet,
                               is_allied: q.is_allied,
                               is_others: q.is_others,
                             };

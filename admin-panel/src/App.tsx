@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { Shell } from './components/layout/Shell';
 import { useAdminAuth } from './hooks/useAdminAuth';
 import Login from './components/auth/Login';
+import AccessControlPage from './pages/AccessControlPage';
 
 // Lazy-loaded page components
 const Dashboard = lazy(() => import('./components/dashboard/Dashboard'));
@@ -11,6 +12,8 @@ const TestsPage = lazy(() => import('./components/tests/TestsPage'));
 const FlashcardsPage = lazy(() => import('./components/flashcards/FlashcardsPage'));
 const UsersPage = lazy(() => import('./components/users/UsersPage'));
 const DedupManager = lazy(() => import('./pages/DedupManager'));
+
+const AdminSettingsPage = () => <PlaceholderPage name="Settings" />;
 
 // Placeholders for missing files
 function PlaceholderPage({ name }: { name: string }) {
@@ -37,7 +40,6 @@ const TaxonomyPage = () => <PlaceholderPage name="Taxonomy" />;
 const SoftNotesAdminPage = () => <PlaceholderPage name="Soft Notes" />;
 const NotesAdminPage = () => <PlaceholderPage name="Notes" />;
 const QuestionStatesPage = () => <PlaceholderPage name="Question States" />;
-const AdminSettingsPage = () => <PlaceholderPage name="Settings" />;
 
 function Loading() {
   return (
@@ -95,6 +97,7 @@ function AuthenticatedApp() {
           <Route path="/dedup" element={<DedupManager />} />
           <Route path="/softnotes" element={<SoftNotesAdminPage />} />
           <Route path="/notes" element={<NotesAdminPage />} />
+          <Route path="/access-control" element={<AccessControlPage />} />
           <Route path="/settings" element={<AdminSettingsPage />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

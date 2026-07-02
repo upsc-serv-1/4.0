@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import FeatureGate from '../src/components/FeatureGate';
 import {
   View,
   Text,
@@ -62,7 +63,7 @@ import { PageWrapper } from '../src/components/PageWrapper';
 import { useTheme } from '../src/context/ThemeContext';
 import { loadAIPromptsFromServer, saveAllAIPrompts } from '../src/services/UserAIPromptService';
 
-export default function AISettings() {
+function AISettings() {
   const SAVE_SHEET_AI_PROMPT_KEY = 'pilot-v2:save-sheet:ai-preset-prompt';
   const { colors } = useTheme();
   const router = useRouter();
@@ -861,3 +862,11 @@ const styles = StyleSheet.create({
   saveBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16, borderRadius: 14 },
   saveBtnText: { fontSize: 15, fontWeight: '900', color: '#fff' },
 });
+
+export default function AISettingsScreen() {
+  return (
+    <FeatureGate feature="ai_settings" featureLabel="AI Settings">
+      <AISettings />
+    </FeatureGate>
+  );
+}

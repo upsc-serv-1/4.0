@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
+import FeatureGate from '../src/components/FeatureGate';
+import {
   View, 
   Text, 
   StyleSheet, 
@@ -87,7 +88,7 @@ type Mode = 'prelims' | 'mains' | 'optional';
 type CoverageMode = 'equal' | 'weighted';
 type WeightedYearMode = 'all' | 'single' | 'range';
 
-export default function SyllabusTracker() {
+function SyllabusTracker() {
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
@@ -1070,3 +1071,11 @@ const s = StyleSheet.create({
   aiModeText: { fontSize: 10, fontWeight: '800' },
   aiFab: { backgroundColor: '#7c3aed', paddingHorizontal: 14, paddingVertical: 9, borderRadius: 999 },
 });
+
+export default function TrackerScreen() {
+  return (
+    <FeatureGate feature="tracker" featureLabel="Syllabus Tracker">
+      <SyllabusTracker />
+    </FeatureGate>
+  );
+}

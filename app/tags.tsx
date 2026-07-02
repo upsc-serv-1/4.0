@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import FeatureGate from '../src/components/FeatureGate';
 import {
   View,
   Text,
@@ -81,7 +82,7 @@ type ExportConfig = {
   pagination: PaginationMode;
 };
 
-export default function TaggedRepoScreen() {
+function TaggedRepoScreen() {
   const { colors } = useTheme();
   const { session } = useAuth();
   const {
@@ -1290,3 +1291,11 @@ const styles = StyleSheet.create({
   exportFooter: { marginTop: 8, borderTopWidth: 1, paddingTop: 14, paddingBottom: 26, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   exportBtn: { paddingHorizontal: 14, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 });
+
+export default function TagsScreen() {
+  return (
+    <FeatureGate feature="tags" featureLabel="Tags">
+      <TaggedRepoScreen />
+    </FeatureGate>
+  );
+}

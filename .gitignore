@@ -1,6 +1,12 @@
 node_modules/
+admin-panel/node_modules/
 .metro-cache/
 .expo/
 dist/
 .env.local
 *.log
+android/
+ios/
+.gradle/
+.idea/
+*.tsbuildinfo

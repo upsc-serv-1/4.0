@@ -294,7 +294,7 @@ export const enrichWithCrossInstituteExplanations = async (
     while (true) {
       const { data, error } = await supabaseClient
         .from('questions')
-        .select('id, question_text, explanation_markdown, correct_answer, subject, exam_year, test_id, is_pyq, is_upsc_cse, tests(institute, program_name, series)')
+        .select('id, question_text, explanation_markdown, correct_answer, subject, exam_year, test_id, is_pyq, is_upsc_cse, is_upsc_cms, is_neetpg, is_inicet, tests(institute, program_name, series)')
         .eq('is_pyq', true)
         .eq('is_upsc_cse', true)
         .eq('exam_year', year)

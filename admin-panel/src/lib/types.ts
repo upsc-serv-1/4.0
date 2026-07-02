@@ -18,6 +18,7 @@ export interface QuestionFull {
   subject: string | null;
   section_group: string | null;
   micro_topic: string | null;
+  sub_topic: string | null;
   is_pyq: boolean;
   is_ncert: boolean;
   is_upsc_cse: boolean;
@@ -34,6 +35,7 @@ export interface QuestionFull {
   specific_exam: string | null;
   exam_stage: string | null;
   exam_paper: string | null;
+  course: string | null;
   updated_at: string;
 }
 
@@ -58,6 +60,7 @@ export interface TestFull {
   source_mode: string | null;
   is_demo_available: boolean;
   exam_year: number | null;
+  course: string | null;
   updated_at: string;
 }
 
@@ -327,7 +330,8 @@ export type AdminTabKey =
   | 'taxonomy'
   | 'dedup'
   | 'notes'
-  | 'settings';
+  | 'settings'
+  | 'access-control';
 
 export interface AdminNavItem {
   key: AdminTabKey;
@@ -368,3 +372,87 @@ export interface ImportSchema {
 // ── TYPE ALIASES FOR CONVENIENCE ──
 export type Question = QuestionFull;
 export type Test = TestFull;
+
+// ── ACCESS CONTROL ──
+export interface AccessFeature {
+  id: string;
+  key: string;
+  name: string;
+  description: string;
+  category: 'feature' | 'institute' | 'course' | 'test';
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface AccessPlan {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  currency: string;
+  interval: 'month' | 'year' | 'lifetime' | 'one_time';
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface PlanFeature {
+  id: string;
+  plan_id: string;
+  feature_id: string;
+  is_granted: boolean;
+  max_count: number | null;
+}
+
+export interface PlanInstitute {
+  id: string;
+  plan_id: string;
+  institute_name: string;
+}
+
+export interface PlanCourse {
+  id: string;
+  plan_id: string;
+  course_name: string;
+}
+
+export interface UserSubscription {
+  id: string;
+  user_id: string;
+  plan_id: string;
+  plan_name?: string;
+  user_email?: string;
+  is_active: boolean;
+  starts_at: string;
+  expires_at: string | null;
+  auto_renew: boolean;
+  payment_ref: string;
+  notes: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserFeatureOverride {
+  id: string;
+  user_id: string;
+  feature_key: string;
+  is_granted: boolean;
+  reason: string;
+  created_at: string;
+}
+
+export interface AccessControlTab {
+  key: 'features' | 'plans' | 'subscriptions' | 'overrides' | 'audit';
+  label: string;
+}
+
+export interface AccessAuditLog {
+  id: string;
+  actor_id: string | null;
+  action: string;
+  target_type: string;
+  target_id: string | null;
+  details: Record<string, any>;
+  created_at: string;
+}

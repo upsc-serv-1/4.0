@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import FeatureGate from '../src/components/FeatureGate';
 import {
   View, Text, StyleSheet, ActivityIndicator, ScrollView,
   TouchableOpacity, Modal, TextInput, Alert, FlatList, RefreshControl, Pressable,
@@ -31,7 +32,7 @@ import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet'
 import type { ExportPayload, ExportFlashcard } from '../src/lib/unifiedExportEngine';
 import { BranchColors, DEFAULT_BRANCH_COLORS } from '../src/lib/branchColors';
 
-export default function FlashcardsHub() {
+function FlashcardsHub() {
   const { colors } = useTheme();
   const { session } = useAuth();
   const uid = session?.user?.id;
@@ -893,5 +894,13 @@ function AddMenuItem({ icon, title, sub, onPress }: { icon: any, title: string, 
       </View>
       <ChevronRight size={20} color={colors.border} />
     </TouchableOpacity>
+  );
+}
+
+export default function FlashcardsScreen() {
+  return (
+    <FeatureGate feature="flashcards" featureLabel="Flashcards">
+      <FlashcardsHub />
+    </FeatureGate>
   );
 }

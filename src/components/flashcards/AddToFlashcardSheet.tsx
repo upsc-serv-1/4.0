@@ -101,7 +101,8 @@ export function AddToFlashcardSheet(props: AddToFlashcardSheetProps) {
     const subject = (hint.subject || 'General').trim();
     const section = (hint.section_group || 'General').trim();
     const micro = (hint.microtopic || 'General').trim();
-    return `${subject} \u2192 ${section} \u2192 ${micro}`;
+    const prefix = hint.isMains ? 'mains \u2192 ' : '';
+    return `${prefix}${subject} \u2192 ${section} \u2192 ${micro}`;
   }, [hint]);
 
   const doAutoPlace = async () => {

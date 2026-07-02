@@ -9,6 +9,7 @@
  *   Points  →  items inside a Note (text, checklist, stroke, base_layer)
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import FeatureGate from '../../src/components/FeatureGate';
 import {
   View,
   Text,
@@ -32,7 +33,7 @@ import { HardnotesService, HardNode, HardNote, isFolder, isLeaf } from '../../sr
 import { HardnotesSidebar } from '../../src/components/hardnotes/HardnotesSidebar';
 import { NotesGrid } from '../../src/components/hardnotes/NotesGrid';
 
-export default function Hardnotes() {
+function Hardnotes() {
   const { colors } = useTheme();
   const { session } = useAuth();
   const userId = session?.user?.id;
@@ -491,3 +492,11 @@ const styles = StyleSheet.create({
   },
   modalCtaTxt: { fontSize: 14, fontWeight: '900' },
 });
+
+export default function HardnotesScreen() {
+  return (
+    <FeatureGate feature="hard_notes" featureLabel="Hard Notes">
+      <Hardnotes />
+    </FeatureGate>
+  );
+}

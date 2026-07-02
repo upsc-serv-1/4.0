@@ -7,6 +7,7 @@ export interface FlashcardHint {
   subject: string;
   section_group: string;
   microtopic: string;
+  isMains?: boolean;
 }
 
 export interface FlashcardFlowState {
@@ -24,7 +25,7 @@ export function useFlashcardAction(userId: string | undefined) {
     hint: { subject: 'General', section_group: 'General', microtopic: 'General' },
   });
 
-  const handleAddToFlashcards = async (q: any, activeAnswerText?: string) => {
+  const handleAddToFlashcards = async (q: any, activeAnswerText?: string, isMains = false) => {
     if (!userId) {
       Alert.alert('Error', 'User not authenticated');
       return;
@@ -49,6 +50,7 @@ export function useFlashcardAction(userId: string | undefined) {
           subject: q.subject || 'General',
           section_group: q.section_group || q.sectionGroup || 'General',
           microtopic: q.micro_topic || q.microtopic || q.microTopic || 'General',
+          isMains,
         },
       });
       

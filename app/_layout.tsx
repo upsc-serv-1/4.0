@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, StyleSheet } from 'react-native';
@@ -12,7 +13,10 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useOfflineBootstrap } from '../src/hooks/useOfflineBootstrap';
 import { OfflineBanner } from '../src/components/OfflineBanner';
 import { DownloadManagerProvider } from '../src/context/DownloadManagerContext';
+import { AccessControlProvider } from '../src/context/AccessControlContext';
 import { DownloadManager } from '../src/components/pyq/DownloadManager';
+import SubscriptionSheet from '../src/components/SubscriptionSheet';
+import { onShowSubscription } from '../src/utils/subscriptionEvents';
 
 export default function RootLayout() {
   return (
@@ -24,7 +28,9 @@ export default function RootLayout() {
               <CourseProvider>
                 <ThemeProvider>
                   <DownloadManagerProvider>
-                    <RootStack />
+                    <AccessControlProvider>
+                      <RootStack />
+                    </AccessControlProvider>
                   </DownloadManagerProvider>
                 </ThemeProvider>
               </CourseProvider>
@@ -43,6 +49,10 @@ function ProfileProviderWrapper({ children }: { children: React.ReactNode }) {
 
 function RootStack() {
   const { isDark, colors } = useTheme();
+  const [showSubscription, setShowSubscription] = useState(false);
+
+  // Listen for global "show subscription" events from FeatureGate
+  useEffect(() => onShowSubscription(setShowSubscription), []);
   // Wire offline-first behaviour: auto-sync on login, background queue drain.
   useOfflineBootstrap();
   
@@ -59,6 +69,8 @@ function RootStack() {
         end={{ x: 0, y: 1 }}
       />
       <StatusBar style={statusBarStyle} translucent backgroundColor="transparent" />
+      {/* Global subscription sheet — accessible from any screen */}
+      <SubscriptionSheet visible={showSubscription} onClose={() => setShowSubscription(false)} />
       <OfflineBanner />
       <Stack screenOptions={{ 
         headerShown: false, 

@@ -7,6 +7,7 @@
  * Spec: file 5 §"Home screen (Notebooks Hub)" + file 3 §"Notebook list".
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import FeatureGate from '../../src/components/FeatureGate';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Alert,
   useWindowDimensions, Platform, Modal, ActivityIndicator,
@@ -21,7 +22,7 @@ import { Notebook } from '../../src/softnotes/types';
 
 const COVER_PALETTE = ['#fde68a', '#fca5a5', '#a7f3d0', '#93c5fd', '#d8b4fe', '#fdba74', '#67e8f9', '#f9a8d4'];
 
-export default function SoftNotesHub() {
+function SoftNotesHub() {
   const router = useRouter();
   const { colors } = useTheme();
   const { session } = useAuth();
@@ -323,3 +324,11 @@ const styles = StyleSheet.create({
   menuRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 12 },
   menuRowLabel: { fontSize: 14, fontWeight: '700' },
 });
+
+export default function SoftNotesScreen() {
+  return (
+    <FeatureGate feature="soft_notes" featureLabel="Soft Notes">
+      <SoftNotesHub />
+    </FeatureGate>
+  );
+}

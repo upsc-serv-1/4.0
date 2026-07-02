@@ -27,7 +27,7 @@ export const extractYearFromText = (value: any): string => {
 
 export const normalizeProgramLabel = (p: string) => {
   const raw = String(p || '').trim();
-  if (raw.toLowerCase() === 'upsc') return 'UPSC CSE';
+  if (raw.toLowerCase() === 'upsc') return 'Civil Services';
   return raw.toUpperCase();
 };
 
@@ -136,7 +136,7 @@ export const getPYQCategorization = (item: any) => {
     isAllied,
     isOther,
     isGenericPYQ: !isUPSC && !isAllied && !isOther,
-    groupName: rawGroup || (isUPSC ? 'UPSC CSE' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ'),
+    groupName: rawGroup || (isUPSC ? 'Civil Services' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ'),
     year,
   };
 };

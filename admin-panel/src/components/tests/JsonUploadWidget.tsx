@@ -8,6 +8,7 @@ interface UploadResult {
   testId?: string;
   questionsUploaded?: number;
   error?: string;
+  message?: string;
 }
 
 export function JsonUploadWidget({ onUploadComplete }: { onUploadComplete: () => void }) {
@@ -36,7 +37,8 @@ export function JsonUploadWidget({ onUploadComplete }: { onUploadComplete: () =>
         success: result.success,
         testId: result.testId,
         questionsUploaded: result.questionsUploaded,
-        error: result.error
+        error: result.error,
+        message: result.message
       });
       setResults([...uploadResults]); // Update results in real-time
     }
@@ -131,7 +133,11 @@ export function JsonUploadWidget({ onUploadComplete }: { onUploadComplete: () =>
                 <p className="font-semibold text-fg break-words">{result.filename}</p>
                 {result.success ? (
                   <p className="text-sm text-muted mt-1">
-                    ✓ Test <span className="font-mono">{result.testId}</span> • {result.questionsUploaded} questions uploaded
+                    {result.message || (
+                      <>
+                        ✓ Test <span className="font-mono">{result.testId}</span> • {result.questionsUploaded} questions uploaded
+                      </>
+                    )}
                   </p>
                 ) : (
                   <div className="text-sm text-danger mt-1 break-words whitespace-pre-wrap">

@@ -168,6 +168,9 @@ export interface ExportQuestion {
   _explanations?: Array<{ source: string; text: string; year?: string }>;
   // PYQ categorization fields (used for proper chip rendering matching SharedQuestionCard)
   is_upsc_cse?: boolean;
+  is_upsc_cms?: boolean;
+  is_neetpg?: boolean;
+  is_inicet?: boolean;
   is_allied?: boolean;
   is_others?: boolean;
   exam_group?: string;

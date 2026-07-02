@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import FeatureGate from '../src/components/FeatureGate';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
   Modal, Alert, FlatList, ActivityIndicator, Pressable,
@@ -151,7 +152,7 @@ function AttemptCard({ item, colors, onDelete, onReport }: any) {
 }
 
 /* ─── main screen ─── */
-export default function AnalyseTab() {
+function AnalyseTab() {
   const { session } = useAuth();
   const { colors } = useTheme();
   const { selectedCourse } = useCourse();
@@ -639,3 +640,11 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
 });
+
+export default function AnalyseScreen() {
+  return (
+    <FeatureGate feature="analytics" featureLabel="Analytics">
+      <AnalyseTab />
+    </FeatureGate>
+  );
+}

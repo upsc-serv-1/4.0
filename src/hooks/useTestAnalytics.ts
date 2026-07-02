@@ -109,7 +109,7 @@ const fetchQuestionsMeta = async (questionIds: string[], selectedCourse: string)
     const chunk = questionIds.slice(i, i + CHUNK_SIZE);
     const { data, error } = await supabase
       .from('questions')
-      .select('id, subject, section_group, micro_topic, correct_answer, question_text, options, explanation_markdown, is_pyq, exam_year, exam_group, is_upsc_cse, is_allied, is_others, source')
+      .select('id, subject, section_group, micro_topic, correct_answer, question_text, options, explanation_markdown, is_pyq, exam_year, exam_group, is_upsc_cse, is_upsc_cms, is_neetpg, is_inicet, is_allied, is_others, source')
       .eq('course', selectedCourse)
       .in('id', chunk);
 

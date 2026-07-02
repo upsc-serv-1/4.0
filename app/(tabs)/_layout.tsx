@@ -6,7 +6,7 @@ import { useTheme } from '../../src/context/ThemeContext';
 import { useState, useEffect, useCallback } from 'react';
 import { TabConfigService, TabKey } from '../../src/services/TabConfigService';
 
-const DEFAULT_TAB_ORDER: TabKey[] = ['index', 'arena', 'analyse', 'pyq', 'flashcards', 'tags', 'pilot-v2', 'browser', 'revise', 'tracker'];
+const DEFAULT_TAB_ORDER: TabKey[] = ['index', 'arena', 'analyse', 'mains', 'pyq', 'flashcards', 'tags', 'pilot-v2', 'browser', 'revise', 'tracker'];
 
 export default function TabsLayout() {
   const { colors } = useTheme();
@@ -60,6 +60,7 @@ export default function TabsLayout() {
     index: '#6366f1',       // Indigo
     arena: '#ef4444',       // Red
     analyse: '#14b8a6',     // Teal
+    mains: '#f43f5e',       // Rose
     pyq: '#f59e0b',         // Amber
     flashcards: '#8b5cf6',  // Purple
     tags: '#06b6d4',        // Cyan
@@ -78,6 +79,7 @@ export default function TabsLayout() {
     index: { title: 'Home', icon: Home },
     arena: { title: 'Arena', icon: Target },
     analyse: { title: 'Analyse', icon: BarChart2 },
+    mains: { title: 'Mains', icon: PenTool },
     pyq: { title: 'PYQ Analysis', icon: BarChart3 },
     flashcards: { title: 'Flashcards', icon: Layers },
     tags: { title: 'Tags', icon: Tag },

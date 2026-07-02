@@ -8,6 +8,7 @@
  * Steps 4-9 will replace each `<Placeholder>` with the real screen component.
  * For now the route resolves so the bottom-tab bar can navigate here.
  */
+import FeatureGate from '../../src/components/FeatureGate';
 import React, { useEffect, useMemo, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
@@ -220,7 +221,7 @@ function PilotV2Inner() {
   );
 }
 
-export default function PilotV2Route() {
+function PilotV2Route() {
   return (
     <PilotV2Provider>
       <PilotV2Inner />
@@ -241,3 +242,11 @@ const styles = StyleSheet.create({
   brand: { flex: 1, textAlign: 'center', fontSize: 14, fontWeight: '700', letterSpacing: 0.3 },
   workspace: { flex: 1, flexDirection: 'row' },
 });
+
+export default function PilotV2Screen() {
+  return (
+    <FeatureGate feature="pilot_v2" featureLabel="Pilot V2">
+      <PilotV2Route />
+    </FeatureGate>
+  );
+}

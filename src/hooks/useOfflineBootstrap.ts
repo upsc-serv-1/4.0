@@ -51,13 +51,23 @@ export function useOfflineBootstrap() {
       // Start background queue worker (idempotent)
       startSyncQueueWorker(30_000);
 
-      // First sync for this user? Do a full one, non-blocking.
+      // Check if questions are actually cached (not just metadata).
+      // This handles the case where the user cleared the download cache: even if
+      // metadata.lastFullSync is set, the actual question data is gone, so we must
+      // re-run a full sync to repopulate MMKV.
       try {
         const meta = await OfflineManager.getMetadata();
-        if (!meta.lastFullSync && !fullSyncInFlight.current) {
+        const cachedQuestions = OfflineManager.getOfflineQuestionsAllSync();
+        const hasQuestions = cachedQuestions.length > 0;
+
+        if ((!meta.lastFullSync || !hasQuestions) && !fullSyncInFlight.current) {
           fullSyncInFlight.current = true;
+          console.log('[OfflineBootstrap] Starting full sync', { 
+            reason: !meta.lastFullSync ? 'no lastFullSync' : 'no cached questions',
+            cachedCount: cachedQuestions.length 
+          });
           // fire-and-forget — progress is surfaced by any screen that cares
-          OfflineManager.syncAllContent(userId, () => {})
+          OfflineManager.syncAllContent(userId)
             .catch((e) => console.warn('[OfflineBootstrap] initial full sync failed', e))
             .finally(() => {
               fullSyncInFlight.current = false;

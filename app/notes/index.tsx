@@ -57,7 +57,7 @@ type RawNode = {
 
 const ALL_TAG = 'All';
 
-export default function NotesIndex() {
+function NotesIndex() {
   const { colors } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
@@ -1482,5 +1482,13 @@ function AddMenuItem({ icon, title, sub, onPress }: { icon: any, title: string, 
       </View>
       <ChevronRight size={20} color={colors.border} />
     </TouchableOpacity>
+  );
+}
+
+export default function NotesScreen() {
+  return (
+    <FeatureGate feature="notes" featureLabel="Notes">
+      <NotesIndex />
+    </FeatureGate>
   );
 }

@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import {
   LayoutDashboard, FileQuestion, FileText, Layers, Users, BarChart2,
   Activity, Zap, TreePine, Scan, BookOpen, StickyNote, BrainCircuit,
-  Settings, LogOut, ChevronLeft, ChevronRight
+  Settings, ShieldCheck, LogOut, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { useState } from 'react';
 import { NAV_ITEMS } from '../../lib/constants';
@@ -42,7 +42,7 @@ export function Sidebar() {
         {NAV_ITEMS.map((item) => {
           const Icon = ICON_MAP[item.icon] || LayoutDashboard;
           // Restrict super_admin-only items
-          if (!isSuperAdmin && ['settings', 'users', 'analytics'].includes(item.key)) return null;
+          if (!isSuperAdmin && ['settings', 'users', 'analytics', 'access-control'].includes(item.key)) return null;
 
           return (
             <NavLink

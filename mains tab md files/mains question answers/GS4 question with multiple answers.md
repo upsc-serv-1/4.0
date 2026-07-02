@@ -84,7 +84,7 @@ There is need to shift from "Environmental Clearance" to **"Environmental Integr
 
 **Ethical Dilemmas Involved:**
 
-<p align="center"><img src="images/ethics_theoretical_questions_q2_img1.webp" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/ethics_theoretical_questions_q2_img1.webp" alt="Image" /></p>
 
 -
 
@@ -182,7 +182,7 @@ Border areas in India, such as the Himalayas or North-East, are both ecologicall
 
 Development projects like roads, tunnels, hydropower, and defence infrastructure are essential for national security, but they often clash with environmental concerns. This creates complex ethical dilemmas for policymakers and public servants.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q72_img1.png" alt="Ethical dilemma between competing interests" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q72_img1.png" alt="Ethical dilemma between competing interests" /></p>
 
 Ethical dilemma between competing interests
 
@@ -231,7 +231,7 @@ The crisis of climate change is fundamentally a **crisis of values.** It is the 
 | and Environment |  |
 | Global Level- Systemic Harmonization |  |
 
-<p align="center"><img src="images/page_18_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_18_diagram_1.png" alt="Diagram" /></p>
 
 - **Decarbonization of Global Trade-**
 
@@ -395,7 +395,7 @@ By applying the **Precautionary Principle** to our technology and **Intergenerat
 
 Global warming, the continuing rise in Earth's average temperature, and climate change, the broader shifts in weather patterns over extended periods, pose a severe threat to life on Earth. The ethical dilemma lies in balancing human development with environmental sustainability, demanding a shift from greed-driven progress to responsible stewardship.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q142_img1.png" alt="Sustainability Venn diagram of three pillars" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q142_img1.png" alt="Sustainability Venn diagram of three pillars" /></p>
 
 Sustainability Venn diagram of three pillars
 
@@ -584,7 +584,7 @@ By adopting a rational policy that takes into account the interests of all stake
 Abraham Lincoln's wisdom emphasizes utilitarian calculus in decision-making, advocating for choices based on net positive outcomes rather than absolute moral purity, particularly relevant in contemporary governance dilemmas.
 **Question ID: 2018-gs4-q96-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q625_img1.png" alt="Governmental Power shown on balance scale" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q625_img1.png" alt="Governmental Power shown on balance scale" /></p>
 
 Governmental Power shown on balance scale
 
@@ -650,9 +650,9 @@ Environmental ethics is a field of study that explores the ethical and moral dim
 
 It involves examining the relationships between humans and nature, considering how human actions impact the natural world, and reflecting on what we owe to future generations and to non-human species.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q237_img1.webp" alt="Environmental ethics " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q237_img1.webp" alt="Environmental ethics " /></p>
 
-<p align="center"><img src="images/pw_ethics_case_studies_q241_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q241_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -745,7 +745,7 @@ social media has acted as a **double-edged sword.**
 
 2. **Spread of Misinformation-** The "viral" nature of social media allows "Fake News" to spread six times faster than the truth.
 
-<p align="center"><img src="images/page_16_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_16_diagram_1.png" alt="Diagram" /></p>
 
 3. **Algorithmic Echo Chambers** creating polarized "digital silos". **(India Hate Lab report)**
 
@@ -890,7 +890,7 @@ Social media embodies both **opportunities** and **dilemmas**. It is not technol
 
 Social media has emerged as a powerful tool for communication, information dissemination, and civic participation. While it democratizes access to voice and ideas, it simultaneously poses serious ethical challenges, blurring the boundaries between freedom of expression, responsibility, and accountability.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q69_img1.png" alt="Social Media and Ethical Dilemmas" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q69_img1.png" alt="Social Media and Ethical Dilemmas" /></p>
 
 Social Media and Ethical Dilemmas
 
@@ -1083,7 +1083,7 @@ The application of **Artificial Intelligence** in administrative decision-making
 
 Artificial Intelligence (AI) is increasingly being used in governance and administration for tasks such as predictive policing, welfare delivery, tax compliance, and healthcare monitoring. However, whether AI can be considered a dependable source of input for administrative rational decision-making raises serious ethical concerns.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q149_img1.png" alt="AI Inputs through Ethical Filters" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q149_img1.png" alt="AI Inputs through Ethical Filters" /></p>
 
 AI Inputs through Ethical Filters
 
@@ -1324,7 +1324,7 @@ Hence online methodology must be used with ethical principles like 'Ganghiji's T
 
 The adoption of online methods in administration, education, and healthcare—especially post-COVID-19—has transformed service delivery. While it enhances efficiency and accessibility, it also raises critical ethical concerns, particularly for vulnerable groups like the poor, elderly, women, disabled, and rural populations.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q301_img1.png" alt="Ethical Issues in Online Methods Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q301_img1.png" alt="Ethical Issues in Online Methods Diagram" /></p>
 
 Ethical Issues in Online Methods Diagram
 
@@ -1567,7 +1567,7 @@ The digital technology can provide information but objectivity of decisions is a
 Digital technology as a decision-making tool embodies Kant's categorical imperative of rational deliberation, yet raises concerns about algorithmic bias and human agency in ethical governance.
 **Question ID: 2021-gs4-q58-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q384_img1.png" alt="Digital Technology Inputs Flowchart Starts Here" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q384_img1.png" alt="Digital Technology Inputs Flowchart Starts Here" /></p>
 
 Digital Technology Inputs Flowchart Starts Here
 
@@ -1733,7 +1733,7 @@ By striking a balance between traditional and emerging cultural values, we can h
 Hatred, as Aristotle noted, represents the antithesis of practical wisdom (phronesis), corrupting rational judgment and moral conscience, ultimately undermining both individual character and collective national ethos.
 **Question ID: 2020-gs4-q71-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q466_img1.png" alt="Vertical Flowchart of Individual Sequential Steps" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q466_img1.png" alt="Vertical Flowchart of Individual Sequential Steps" /></p>
 
 Vertical Flowchart of Individual Sequential Steps
 
@@ -1882,7 +1882,7 @@ The trust of the people in the government is maintained through public administr
 
 Adherence to ethics is essential for the smooth functioning of any organization or system. Ethics seeks to promote moral values and principles that guide human behavior towards what is good and right. It emphasizes the importance of honesty, integrity, fairness, responsibility, respect, and compassion in human life.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q671_img1.webp" alt="ethics in human life" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q671_img1.webp" alt="ethics in human life" /></p>
 
 ### Body
 
@@ -1974,7 +1974,7 @@ Decision-making is always a contentious job, but if the decision involves fundam
 
 Ethics refers to a set of moral principles that guide human behavior towards what is right, fair, and just. In both personal and professional spheres, ethics ensures that individuals act responsibly, fostering trust and harmony in society. In organizations, adherence to ethics promotes credibility, transparency, and effectiveness.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q300_img1.png" alt="Ethical Conflict Resolution Process Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q300_img1.png" alt="Ethical Conflict Resolution Process Flowchart" /></p>
 
 Ethical Conflict Resolution Process Flowchart
 
@@ -2172,7 +2172,7 @@ Ethics and values are essential in enhancing the components of CNP. By promoting
 Nietzsche's concept of will to power represents the fundamental drive for dominance and self-assertion, which Kant's categorical imperative and dharmic principles can potentially regulate through moral reasoning.
 **Question ID: 2020-gs4-q67-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q457_img1.png" alt="Conceptual triangle diagram with three nodes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q457_img1.png" alt="Conceptual triangle diagram with three nodes" /></p>
 
 Conceptual triangle diagram with three nodes
 
@@ -2296,7 +2296,7 @@ Furthermore, it is crucial that these policies are implemented in a transparent 
 Economic growth without distributive justice creates moral hazards, as Rawls' difference principle suggests benefits should reach the least advantaged sections of society.
 **Question ID: 2017-gs4-q110-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q701_img1.png" alt="2017 Lorenz Curve of Population Distribution" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q701_img1.png" alt="2017 Lorenz Curve of Population Distribution" /></p>
 
 2017 Lorenz Curve of Population Distribution
 
@@ -2397,7 +2397,7 @@ By upholding ethical principles, we can create a more just and equitable society
 Impartiality and non-partisanship represent the cornerstone of ethical governance, ensuring equal treatment and objective decision-making in public administration, as emphasized by Max Weber's bureaucratic theory.
 **Question ID: 2016-gs4-q119-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q779_img1.png" alt="Structural Pillar Diagram on Solid Foundation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q779_img1.png" alt="Structural Pillar Diagram on Solid Foundation" /></p>
 
 Structural Pillar Diagram on Solid Foundation
 
@@ -2511,7 +2511,7 @@ In conclusion, a lack of trust can have significant consequences for personal an
 Kant's categorical imperative emphasizes treating humans as ends-in-themselves, possessing inherent dignity and rational autonomy, never merely as instruments for achieving goals.
 **Question ID: 2014-gs4-q143-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q943_img1.png" alt="Kant's Formula of Humanity Comparative Framework" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q943_img1.png" alt="Kant's Formula of Humanity Comparative Framework" /></p>
 
 Kant's Formula of Humanity Comparative Framework
 
@@ -2706,7 +2706,7 @@ Justice must constantly evolve with societal, technological, and moral changes t
 
 The idea of justice is not static as it evolves with social values, awareness, legal frameworks, and moral progress. What is considered just or fair at one point in time may be reevaluated as unjust. This dynamic nature of justice makes critical reflection and continuous ethical scrutiny essential to prevent failure of justice system.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q151_img1.png" alt="Evolving Social Norms and Justice" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q151_img1.png" alt="Evolving Social Norms and Justice" /></p>
 
 Evolving Social Norms and Justice
 
@@ -2761,7 +2761,7 @@ Ethics is a branch of philosophy that involves systematizing, defending, and rec
 &nbsp;&nbsp;&nbsp;&nbsp;- **Distributive Justice-** Focuses on the fair allocation of rewards and burdens. Eg- Equal Remuneration Act<br>
 &nbsp;&nbsp;&nbsp;&nbsp;- **Procedural Justice-** Ensures transparency and fairness in decision making.<br>
 
-<p align="center"><img src="images/page_4_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_4_diagram_1.png" alt="Diagram" /></p>
 
 2. **The Accountability Dimension -** promotes "fiduciary duty" towards stakeholders and prevents the "systemic rot" caused by secrecy. EgInfosys whistleblower policy
 
@@ -2900,7 +2900,7 @@ Ethics refers to the principles that guides individuals and organizations in mak
 
 Ethical behaviour is shaped by several key dimensions that influence human actions and decisions.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q141_img1.png" alt="Branches of Ethics" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q141_img1.png" alt="Branches of Ethics" /></p>
 
 Branches of Ethics
 
@@ -3019,7 +3019,7 @@ It is therefore crucial for individuals and institutions to promote and uphold e
 Moral values serve as the foundational bedrock upon which institutional frameworks operate, as emphasized by philosophers like Amartya Sen and John Rawls through their theories of justice and capability approach.
 **Question ID: 2017-gs4-q113-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q705_img1.png" alt="Structural Pillar with Common Foundation Block" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q705_img1.png" alt="Structural Pillar with Common Foundation Block" /></p>
 
 Structural Pillar with Common Foundation Block
 
@@ -3128,7 +3128,7 @@ The conclusion is that values can and do change, though certain core values may 
 Values represent fundamental beliefs guiding human behavior, with philosophers like Kant advocating universal moral principles while cultural relativists emphasize contextual variations in ethical frameworks.
 **Question ID: 2013-gs4-q153-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q1040_img1.png" alt="Concentric circle diagram labeled Universal Et" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q1040_img1.png" alt="Concentric circle diagram labeled Universal Et" /></p>
 
 Concentric circle diagram labeled Universal Et
 
@@ -3322,7 +3322,7 @@ Overall, the role of ethics in formulating laws and rules is crucial in ensuring
 
 Laws represent **formal legal frameworks** enacted by sovereign authorities, while rules constitute **specific guidelines** within organizational or institutional contexts, both requiring **ethical foundations** for legitimacy and effectiveness.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q458_img1.png" alt="Three Tier Pyramid of Ethical Foundation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q458_img1.png" alt="Three Tier Pyramid of Ethical Foundation" /></p>
 
 Three Tier Pyramid of Ethical Foundation
 
@@ -3423,7 +3423,7 @@ It is clear that ethics and politics are intimately connected. Political decisio
 Politics and ethics represent a complex relationship where Machiavellian realpolitik often conflicts with moral imperatives, yet ethical governance remains essential for legitimate democratic functioning and sustainable public welfare.
 **Question ID: 2013-gs4-q152-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q1038_img1.png" alt="Politics Power Statecraft Venn Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q1038_img1.png" alt="Politics Power Statecraft Venn Diagram" /></p>
 
 Politics Power Statecraft Venn Diagram
 
@@ -3531,7 +3531,7 @@ In conclusion, patriotism in everyday civil life involves a sense of love, loyal
 
 Trust, as **Fukuyama** defines it, represents the social capital essential for societal functioning, while **Gandhi** emphasized that trust forms the foundation of **satyagraha** and ethical governance.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q936_img1.png" alt="Perso concentric circle diagram with layers" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q936_img1.png" alt="Perso concentric circle diagram with layers" /></p>
 
 Perso concentric circle diagram with layers
 
@@ -3603,7 +3603,7 @@ Building trustworthiness requires embodying **dharmic principles** in daily cond
 
 Ethics seeks to promote principles of right and wrong, fairness, justice, and responsibility in human life. It provides a moral framework for decision-making, behavior, and relationships, and helps to ensure that individuals and organizations act in accordance with values that are important for human flourishing and well-being.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q162_img1.webp" alt="Ethics in Public admin" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q162_img1.webp" alt="Ethics in Public admin" /></p>
 
 ### Body
 
@@ -3652,7 +3652,7 @@ Ethical frameworks can also guide decision-making in the face of complex moral d
 Ethical competence represents the capacity to navigate moral dilemmas through principled decision-making, combining Aristotelian virtue ethics with practical wisdom (phronesis) essential for public service.
 **Question ID: 2014-gs4-q148-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q948_img1.png" alt="Cyclical Flowchart of Ethical Considerations" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q948_img1.png" alt="Cyclical Flowchart of Ethical Considerations" /></p>
 
 Cyclical Flowchart of Ethical Considerations
 
@@ -3747,7 +3747,7 @@ The principle of the good of an individual being contained in the good of all is
 
 This statement reflects **Mahatma Gandhi's philosophy** of **Sarvodaya** (welfare of all), emphasizing that individual well-being is intrinsically linked to collective prosperity and cannot be achieved in isolation.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q1041_img1.png" alt="Concentric circles Individual Goals diagram 2013" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q1041_img1.png" alt="Concentric circles Individual Goals diagram 2013" /></p>
 
 Concentric circles Individual Goals diagram 2013
 
@@ -3810,7 +3810,7 @@ Ethics is a system of moral principles that helps us differentiate between right
 
 Values are the individual principles or qualities that guide judgment and behavior of a person or a group.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q78_img1.webp" alt="Significs of ethics" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q78_img1.webp" alt="Significs of ethics" /></p>
 
 
 ### Body
@@ -3879,7 +3879,7 @@ It is very important to be ethical in the performance of one's duty. An unethica
 Values represent fundamental beliefs guiding behavior, while ethics constitute moral principles governing conduct. Aristotle's virtue ethics and Kant's categorical imperative emphasize their foundational role in human character.
 **Question ID: 2013-gs4-q157-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q1044_img1.png" alt="Professional competence in a 2x2 matrix" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q1044_img1.png" alt="Professional competence in a 2x2 matrix" /></p>
 
 Professional competence in a 2x2 matrix
 
@@ -4062,7 +4062,7 @@ In conclusion, while the ends and means are both important in evaluating the mor
 
 Ethical dilemmas in public administration involve conflicts between competing moral principles where administrators must choose between equally valid but contradictory values like **efficiency versus equity** or **transparency versus confidentiality**.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q632_img1.png" alt="Vertical Flowchart with Five Sequential Boxes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q632_img1.png" alt="Vertical Flowchart with Five Sequential Boxes" /></p>
 
 Vertical Flowchart with Five Sequential Boxes
 
@@ -4178,7 +4178,7 @@ In conclusion, the principle of treating individuals as ends in themselves has s
 Patriotism in civil life transcends mere nationalism, embodying Mahatma Gandhi's vision of "Sarvodaya" - welfare of all, where citizens actively contribute to national progress through ethical conduct and social responsibility.
 **Question ID: 2014-gs4-q139-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q934_img1.png" alt="Everyday Civil Patriotism Spoke Wheel Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q934_img1.png" alt="Everyday Civil Patriotism Spoke Wheel Diagram" /></p>
 
 Everyday Civil Patriotism Spoke Wheel Diagram
 
@@ -4232,7 +4232,7 @@ True patriotism in civil life manifests through **constructive citizenship** and
 
 **Examples**
 
-<p align="center"><img src="images/page_7_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_7_diagram_1.png" alt="Diagram" /></p>
 
 1. **Moral Intuition**  
    &nbsp;&nbsp;&nbsp;&nbsp;a. **The "Railway Track" Heroism by Nicholas Winton**<br>
@@ -4341,7 +4341,7 @@ Thus, it can be said that moral intuitions may inform moral reasoning, and moral
 
 Moral intuition and moral reasoning are distinct yet interconnected processes guiding ethical decision-making. They often interplay, shaping our judgments and actions in morally complex situations. This essay will differentiate between the two using various parameters.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q222_img1.png" alt="Moral Dilemma, Intuition, Reasoning, Judgment" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q222_img1.png" alt="Moral Dilemma, Intuition, Reasoning, Judgment" /></p>
 
 Moral Dilemma, Intuition, Reasoning, Judgment
 
@@ -4445,7 +4445,7 @@ In the realm of governance and public affairs, certain concepts and principles p
 
 It refers to adherence to the core values and principles enshrined in the Constitution—justice, liberty, equality, and fraternity—over personal beliefs or majoritarian impulses. **Example:** Example: In Navtej Singh Johar v. Union of India (2018), the Supreme Court upheld constitutional morality over social morality by decriminalizing homosexuality under Section 377 IPC.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q314_img1.png" alt="Venn Diagram of Public and Duty" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q314_img1.png" alt="Venn Diagram of Public and Duty" /></p>
 
 Venn Diagram of Public and Duty
 
@@ -4511,7 +4511,7 @@ In the context of civil service, several key values are crucial for the efficien
 
 **Transparency, accountability, fairness and justice, courage of conviction**, **and the spirit of service** are all highly relevant in upholding the principles of good governance, public trust, and the delivery of quality services
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q328_img1.webp" alt="fundamental value of public servant" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q328_img1.webp" alt="fundamental value of public servant" /></p>
 
 ### Body
 
@@ -4553,7 +4553,7 @@ In the context of civil service, several key values are crucial for the efficien
 Transparency, accountability, fairness, courage of conviction, and spirit of service form the ethical foundation of civil service, ensuring democratic governance and public trust as emphasized by Max Weber's bureaucratic ideals.
 **Question ID: 2017-gs4-q106-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q697_img1.png" alt="Ethical Civil Service Hub and Spoke" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q697_img1.png" alt="Ethical Civil Service Hub and Spoke" /></p>
 
 Ethical Civil Service Hub and Spoke
 
@@ -4630,7 +4630,7 @@ These principles collectively ensure that civil service functions as an effectiv
 ---
 #### Answer from PWOnlyIAS
 
-<p align="center"><img src="images/pw_ethics_case_studies_q240_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q240_img1.webp" alt="stakeholder" /></p>
 
 **Answer:**
 
@@ -4689,9 +4689,9 @@ Public service is a noble and essential undertaking that requires individuals to
 
 Integrity, perseverance, spirit of service, commitment, and courage of conviction are five key terms that hold particular significance in the context of public service
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q75_img2.webp" alt="COMMITMENT" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q75_img2.webp" alt="COMMITMENT" /></p>
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q75_img1.webp" alt="Integrity" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q75_img1.webp" alt="Integrity" /></p>
 
 
 ### Body
@@ -4736,7 +4736,7 @@ Integrity, perseverance, spirit of service, commitment, and courage of convictio
 Integrity, perseverance, spirit of service, commitment, and courage of conviction form the ethical foundation of public administration, embodying Aristotelian virtues essential for effective governance.
 **Question ID: 2013-gs4-q155-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q1042_img1.png" alt="Public Service radial hub and spoke diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q1042_img1.png" alt="Public Service radial hub and spoke diagram" /></p>
 
 Public Service radial hub and spoke diagram
 
@@ -4818,7 +4818,7 @@ Corruption is the abuse of entrusted power for private gain, resulting in distor
 
 1. **Erosion of integrity**
 
-<p align="center"><img src="images/page_61_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_61_diagram_1.png" alt="Diagram" /></p>
 
 2. **Decline of responsibility**
 
@@ -5008,7 +5008,7 @@ Corruption represents a systemic erosion of core societal values and when these 
 
 ## Core Values Whose Failure Breeds Corruption
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q221_img1.png" alt="Socialization: Influences on Individual Core Values" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q221_img1.png" alt="Socialization: Influences on Individual Core Values" /></p>
 
 Socialization: Influences on Individual Core Values
 
@@ -5116,7 +5116,7 @@ The crisis of ethical values in modern times is a complex issue that requires a 
 Aristotle's concept of eudaimonia emphasizes holistic well-being beyond material success, while modern society's narrow focus on wealth and status creates ethical vacuum in contemporary life.
 **Question ID: 2017-gs4-q112-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q704_img1.png" alt="Vertical Flowchart with Three Rectangular Boxes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q704_img1.png" alt="Vertical Flowchart with Three Rectangular Boxes" /></p>
 
 Vertical Flowchart with Three Rectangular Boxes
 
@@ -5180,7 +5180,7 @@ Reclaiming ethical values requires expanding our understanding of good life beyo
 
 Sexual violence against women is a pervasive issue in many countries, including India. Increasing number of incidences of sexual violence is due to inbuilt patriarchal attitude of society which believes in women carrying traditional role of mothers, sisters and wife and be bearer of family and community name and honour. This attitude has manifested in seeing working women as ‘easy’ and of lower moral character hence objectifying them.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q174_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q174_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -5218,7 +5218,7 @@ Such measures can help create a safe and secure environment for women in the cou
 
 Sexual violence against women represents a grave violation of **human dignity** and **fundamental rights**, reflecting deeper societal failures in upholding **gender justice** and **constitutional values** of equality.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q945_img1.png" alt="Innovative Measures Against Sexual Violence Hub" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q945_img1.png" alt="Innovative Measures Against Sexual Violence Hub" /></p>
 
 Innovative Measures Against Sexual Violence Hub
 
@@ -5349,7 +5349,7 @@ This statement highlights the role of education in promoting the holistic develo
 
 The New Education Policy, 2020 (NEP, 2020) aims to address the gaps and challenges in the Indian education system and aligns with this statement.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q499_img1.webp" alt="role education in inculcating values" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q499_img1.webp" alt="role education in inculcating values" /></p>
 
 
 ### Body
@@ -5431,7 +5431,7 @@ By focusing on these aspects, the NEP, 2020 can transform the Indian education s
 Comprehensive National Power (CNP) represents a nation's total strength encompassing military, economic, diplomatic, and cultural dimensions. Kautilya's Arthashastra and Joseph Nye's soft power theory emphasize that sustainable national strength emerges from ethical foundations and value-based governance.
 **Question ID: 2020-gs4-q69-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q459_img1.png" alt="Ethics and Values structural pillar diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q459_img1.png" alt="Ethics and Values structural pillar diagram" /></p>
 
 Ethics and Values structural pillar diagram
 
@@ -5506,7 +5506,7 @@ The debate between social values and economic values has been ongoing for years.
 
 However, in the context of inclusive growth of a nation, it is important to prioritize social values over economic values. Inclusive growth aims to create an environment in which all individuals have equal access to economic opportunities and benefits, regardless of their social background.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q214_img1.webp" alt="elements of inclusive growth" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q214_img1.webp" alt="elements of inclusive growth" /></p>
 
 
 ### Body
@@ -5652,7 +5652,7 @@ Ultimately, happiness is subjective and can be influenced by a range of factors,
 Mahatma Gandhi's philosophy of Satyagraha and Ahimsa represents the pinnacle of ethical conduct, demonstrating how truth and non-violence can transform both individual character and societal structures.
 **Question ID: 2014-gs4-q138-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q933_img1.png" alt="Vertical Flowchart of Teaching Process Steps" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q933_img1.png" alt="Vertical Flowchart of Teaching Process Steps" /></p>
 
 Vertical Flowchart of Teaching Process Steps
 
@@ -5785,7 +5785,7 @@ Hence, with intellectual competency and moral qualities, a person can take ratio
 
 These qualities help civil servants to understand the needs and concerns of the people they serve, and to develop policies and programs that are more responsive to those needs.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q636_img1.webp" alt="Empathy and compassion" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q636_img1.webp" alt="Empathy and compassion" /></p>
 
 
 ### Body
@@ -5889,7 +5889,7 @@ Empathetic officers are the need of the hour in modern day administration target
 
 Civil servants are the backbone of governance, requiring not only intellectual acumen and moral uprightness but also emotional intelligence. While intellectual competency and ethical integrity ensure rationality and justice, empathy and compassion add the much-needed human touch to administration, enabling inclusive and sensitive governance.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q298_img1.png" alt="Venn Diagram of Intellectual Overlap Circles" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q298_img1.png" alt="Venn Diagram of Intellectual Overlap Circles" /></p>
 
 Venn Diagram of Intellectual Overlap Circles
 
@@ -6087,7 +6087,7 @@ These traits help fulfil the social contract and promise of the constitution.
 Integrity forms the cornerstone of ethical governance, as emphasized by Mahatma Gandhi's principle that means must justify ends in public administration.
 **Question ID: 2021-gs4-q56-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q382_img1.png" alt="2021 Five Axis Radar Chart Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q382_img1.png" alt="2021 Five Axis Radar Chart Diagram" /></p>
 
 2021 Five Axis Radar Chart Diagram
 
@@ -6199,7 +6199,7 @@ Effective public service is built on the foundation of the **"Spirit of Service"
 
 Public servants hold a critical role in serving the interests of the public, promoting the common good, and upholding the principles of good governance. To be effective in their roles, public servants must possess a set of essential values that guide their actions and decisions.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q602_img1.webp" alt="essential values of public servant " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q602_img1.webp" alt="essential values of public servant " /></p>
 
 ### Body
 
@@ -6335,7 +6335,7 @@ c) Developing administrative processes and practices which promote ethical value
 Integrity, accountability, and transparency form the cornerstone of effective public service, as emphasized by Mahatma Gandhi's principle of satyagraha and Chanakya's governance philosophy.
 **Question ID: 2021-gs4-q57-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q383_img1.png" alt="Strategy to Prevent Unethical Behavior Framework" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q383_img1.png" alt="Strategy to Prevent Unethical Behavior Framework" /></p>
 
 Strategy to Prevent Unethical Behavior Framework
 
@@ -6385,7 +6385,7 @@ Effective public service requires integrating **dharmic governance principles** 
 #### Answer from Civilsdaily
 A **public servant** is an individual entrusted by the state to exercise authority and perform functions on behalf of society in order to implement laws, deliver public services and protect citizens’ rights and welfare.
 
-<p align="center"><img src="images/page_45_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_45_diagram_1.png" alt="Diagram" /></p>
 
 "A public official is a fiduciary of the public’s interest." - **Paul H. Douglas**
 
@@ -6473,7 +6473,7 @@ The term "public servant" typically refers to an individual who is employed by t
 
 ###**Role of the Public Servant**
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q328_img1.webp" alt="fundamental value of public servant" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q328_img1.webp" alt="fundamental value of public servant" /></p>
 
 - **Serving the Public**: Public servants are expected to prioritize the interests and welfare of the public they serve. They should strive to provide efficient and effective public services, address the needs of citizens, and ensure the fair distribution of resources.
 
@@ -6541,7 +6541,7 @@ By fulfilling their expected roles, public servants can help build a strong and 
 
 A **public servant** represents individuals employed in government service, dedicated to serving citizens and upholding **public interest** through ethical governance, as emphasized by **Max Weber's** bureaucratic ideals and **Kautilya's Arthashastra**.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q547_img1.png" alt="Public Servant Hub and Spoke Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q547_img1.png" alt="Public Servant Hub and Spoke Diagram" /></p>
 
 Public Servant Hub and Spoke Diagram
 
@@ -6674,7 +6674,7 @@ One of the most comprehensive statements of what constitutes principles of publi
 
 The basic principles of public life, also known as the Seven Principles of Public Life, were first established by the UK Committee on Standards in Public Life in 1995. These principles apply to individuals who hold public office or are involved in public service, and include:
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q472_img1.webp" alt="Nolan committee" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q472_img1.webp" alt="Nolan committee" /></p>
 
 ### Body
 
@@ -6717,7 +6717,7 @@ Overall, adherence to these principles helps to promote trust in government and 
 Public life principles, established by the Nolan Committee (1995), form the ethical foundation for governance, ensuring integrity and accountability in democratic institutions.
 **Question ID: 2019-gs4-q83-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q545_img1.png" alt="Nolan Committee Principles of Public Life" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q545_img1.png" alt="Nolan Committee Principles of Public Life" /></p>
 
 Nolan Committee Principles of Public Life
 
@@ -6773,7 +6773,7 @@ These principles, rooted in **Kantian categorical imperative** and **Gandhian sa
 &nbsp;&nbsp;&nbsp;&nbsp;- **Importance-**<br>
 &nbsp;&nbsp;&nbsp;&nbsp;- Prevents corruption and misuse of public office.<br>
 
-<p align="center"><img src="images/page_40_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_40_diagram_1.png" alt="Diagram" /></p>
 
 - Builds citizens’ trust in institutions.
 - Protects fairness in decision-making.
@@ -6852,7 +6852,7 @@ The three basic values that are considered universal in nature in the context of
 
 - **Professionalism**: Refers to the level of competence, expertise, and efficiency that civil servants bring to their work. It involves maintaining high standards of work, being responsive to the needs of citizens, and continuously improving skills and knowledge.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q328_img1.webp" alt="fundamental value of public servant" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q328_img1.webp" alt="fundamental value of public servant" /></p>
 
 ### Body
 
@@ -6894,7 +6894,7 @@ Upholding these values promotes good governance, social justice, and economic gr
 
 The **Right to Information Act, 2005** transcends mere citizen empowerment, fundamentally transforming governance by establishing **proactive transparency** and **answerability** as core administrative principles, redefining traditional accountability mechanisms.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q624_img1.png" alt="RTI Act Flowchart and Parallel Branches" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q624_img1.png" alt="RTI Act Flowchart and Parallel Branches" /></p>
 
 RTI Act Flowchart and Parallel Branches
 
@@ -7014,7 +7014,7 @@ These qualities foster trust, drive positive change, and ensure the delivery of 
 Empathy and Adaptability represent crucial attributes for effective public service, complementing traditional virtues like integrity and accountability in contemporary governance challenges.
 **Question ID: 2013-gs4-q151-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q1037_img1.png" alt="Building structural diagram foundation pillars roof" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q1037_img1.png" alt="Building structural diagram foundation pillars roof" /></p>
 
 Building structural diagram foundation pillars roof
 
@@ -7187,7 +7187,7 @@ In fact it is the corrosion of these values which has led to corruption, injusti
 Impartiality and non-partisanship represent foundational virtues for civil servants, embodying Weberian bureaucratic neutrality and ensuring constitutional governance remains insulated from political vicissitudes.
 **Question ID: 2021-gs4-q62-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q389_img1.png" alt="Constitutional Values: A Pillar Diagram Foundation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q389_img1.png" alt="Constitutional Values: A Pillar Diagram Foundation" /></p>
 
 Constitutional Values: A Pillar Diagram Foundation
 
@@ -7258,7 +7258,7 @@ However, political neutrality is no longer regarded as the accepted norm with ma
 
 Impartiality and non-partisanship are foundational values in public services because they promote fairness, neutrality, and equality in decision-making processes. In the present-day socio-political context, where political polarization and partisan divisions are widespread, these values are particularly important in maintaining public trust and confidence in government institutions.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q307_img1.webp" alt="impartiality and non-partisanship" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q307_img1.webp" alt="impartiality and non-partisanship" /></p>
 
 ### Body
 
@@ -7291,7 +7291,7 @@ Upholding these values in the administration of elections, the selection and pro
 Governance represents the exercise of authority and decision-making processes within institutions, while good governance emphasizes effectiveness, transparency, and accountability as outlined by World Bank principles.
 **Question ID: 2016-gs4-q125-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q788_img1.png" alt="Governance Decision Making Circle Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q788_img1.png" alt="Governance Decision Making Circle Diagram" /></p>
 
 Governance Decision Making Circle Diagram
 
@@ -7343,7 +7343,7 @@ Ethical governance synthesizes **Kantian duty-based ethics** with **utilitarian 
 #### Answer from Civilsdaily
 Integrity is the alignment of **Manasa (Thought), Vacha (Word), and Karmana (Action).** In the words of **C. S. Lewis,** “Integrity is doing the right thing even when no one is watching.”
 
-<p align="center"><img src="images/page_8_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_8_diagram_1.png" alt="Diagram" /></p>
 
 ### Role of integrity in empowers human being
 
@@ -7473,7 +7473,7 @@ Integrity helps an individual to resolve the conflict between one's desires on o
 Integrity, defined by Aristotle as alignment between one's values and actions, represents the categorical imperative of moral consistency that Kant emphasized, empowering individuals to transcend external pressures and act authentically.
 **Question ID: 2021-gs4-q60-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q386_img1.png" alt="Integrity Alignment of Thought Word Action" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q386_img1.png" alt="Integrity Alignment of Thought Word Action" /></p>
 
 Integrity Alignment of Thought Word Action
 
@@ -7540,7 +7540,7 @@ Integrity is the quality of being honest, ethical, and morally upright. A person
 
 **One of the tests of integrity is the complete refusal to be compromised, which means that a person with integrity will not compromise their principles or values for personal gain or convenience, even if it means facing negative consequences.**
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q75_img1.webp" alt="Integrity" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q75_img1.webp" alt="Integrity" /></p>
 
 ### Body
 
@@ -7587,7 +7587,7 @@ In all these cases, the individuals refused to compromise their principles or va
 Integrity, as defined by Aristotle's virtue ethics, represents unwavering adherence to moral principles despite external pressures, forming the cornerstone of ethical governance and public service.
 **Question ID: 2017-gs4-q111-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q702_img1.png" alt="Integrity Core Values and Three Arrows" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q702_img1.png" alt="Integrity Core Values and Three Arrows" /></p>
 
 Integrity Core Values and Three Arrows
 
@@ -7641,7 +7641,7 @@ Integrity Core Values and Three Arrows
 
 The given statement by Samuel Johnson depicts the intrinsic relation among integrity and information, both of which can be critical components of governance. Integrity is the integration of beliefs, convictions, standards, beliefs and behaviors.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q75_img1.webp" alt="Integrity" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q75_img1.webp" alt="Integrity" /></p>
 
 ### Body
 
@@ -7699,7 +7699,7 @@ Thus, knowledge and integrity are balancing wheels of the same cart. One shows t
 
 Ethics, as defined by **Aristotle**, seeks to promote **eudaimonia** (human flourishing) through virtuous conduct and moral reasoning. It establishes frameworks for distinguishing right from wrong, fostering **dignity**, **justice**, and **well-being** in human interactions.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q937_img1.png" alt="Ethics in Public Administration Radial Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q937_img1.png" alt="Ethics in Public Administration Radial Diagram" /></p>
 
 Ethics in Public Administration Radial Diagram
 
@@ -7742,7 +7742,7 @@ Ethics in public administration transforms governance from mere rule-following t
 
 Integrity without knowledge is weak and useless, and knowledge without integrity is dangerous and dreadful -
 
-<p align="center"><img src="images/page_9_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_9_diagram_1.png" alt="Diagram" /></p>
 
 **Samuel Johnson**
 
@@ -7876,7 +7876,7 @@ Therefore, individuals, especially those in positions of authority, must strive 
 Kant's deontological ethics emphasizes categorical imperative where moral worth lies in duty and intention, while consequentialism judges actions by outcomes and utilitarian calculus.
 **Question ID: 2018-gs4-q94-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q621_img1.png" alt="Ethical Action Anatomy Flowchart 2018" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q621_img1.png" alt="Ethical Action Anatomy Flowchart 2018" /></p>
 
 Ethical Action Anatomy Flowchart 2018
 
@@ -8172,7 +8172,7 @@ Holistic development requires civil servants to transition from regulatory gatek
 - **Empathy and Emotional Intelligence**: Developing **Daniel Goleman's emotional intelligence framework** to understand citizen perspectives and ground realities.
 - **Continuous Learning Culture**: Embracing the culture of regular skill upgradation and **cross-sector exposure programs**.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q77_img1.png" alt="Civil servant role in governance landscape" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q77_img1.png" alt="Civil servant role in governance landscape" /></p>
 
 Civil servant role in governance landscape
 
@@ -8286,7 +8286,7 @@ Governance should prioritise **substantive justice** over rigid formalism, ensur
 
 In public service, rules, procedures, and guidelines (Form) are essential for consistency and accountability. However, when followed mechanically, without regard to their purpose or ethical foundation (Substance), they may lead to outcomes that are technically correct but morally unjust. The statement highlights the need for civil servants to interpret rules in light of their true intent, not merely their letter..
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q145_img1.png" alt="Civil Servant Decision Making " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q145_img1.png" alt="Civil Servant Decision Making " /></p>
 
 Civil Servant Decision Making 
 
@@ -8300,7 +8300,7 @@ Civil Servant Decision Making
 
 ### Role of Civil Servant in such circumstances - Upholding Rule of Law’s Spirit to ensure justice not just procedural compliance.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q145_img1.png" alt="Civil Servant Decision Making " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q145_img1.png" alt="Civil Servant Decision Making " /></p>
 
 Civil Servant Decision Making **Example:** TN Sheshan to prevent exploitation of grey areas in law enforced MCC beyond routine interpretations to ensure fairness in election process. 
 
@@ -8473,7 +8473,7 @@ Values, attitude and conscience are more important guides and behaviour of civil
 
 The effectiveness of a civil servant isn't solely determined by rules and regulations, but significantly by their mindset. This difference in interpretation and application often separates successful implementation from missed opportunities. The core ethical dilemma lies in navigating the spirit and letter of the law while upholding ethical principles.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q305_img1.png" alt="Standard Rules Regulations Diverging Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q305_img1.png" alt="Standard Rules Regulations Diverging Flowchart" /></p>
 
 Standard Rules Regulations Diverging Flowchart
 
@@ -8517,7 +8517,7 @@ The difference between **effective and ineffective governance** lies not in the 
 
 **well you do it."**
 
-<p align="center"><img src="images/page_29_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_29_diagram_1.png" alt="Diagram" /></p>
 
 ### Importance of Attitude in the Development of Humans
 
@@ -8606,7 +8606,7 @@ Public servants are the representatives of the government. A positive attitude i
 
 Attitude is indeed a crucial component in the development of any individual, especially for public servants who serve as representatives of the government and are responsible for serving the public.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q483_img1.webp" alt="importance of good attiude" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q483_img1.webp" alt="importance of good attiude" /></p>
 
 
 ### Body
@@ -8723,7 +8723,7 @@ A public servant, who has the responsibility of the governance of the nation nee
 Attitude, as defined by Gordon Allport, represents a mental disposition influencing responses to situations. For public servants, cultivating the right attitude through value-based training and experiential learning becomes crucial for effective governance.
 **Question ID: 2021-gs4-q54-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q380_img1.png" alt="CAB Model of Attitude Triangular Framework" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q380_img1.png" alt="CAB Model of Attitude Triangular Framework" /></p>
 
 CAB Model of Attitude Triangular Framework
 
@@ -8826,7 +8826,7 @@ A positive attitude refers to a mental and emotional state characterized by opti
 
 **Here are some factors that contribute to a positive attitude:**
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q483_img1.webp" alt="importance of good attiude" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q483_img1.webp" alt="importance of good attiude" /></p>
 
 
 - **Self-awareness and mindfulness**: Understanding one's own emotions, values, and goals can help a person develop a positive outlook and cope with stress. Mindfulness practices, such as meditation and yoga, can also be helpful in promoting a positive attitude.
@@ -8869,7 +8869,7 @@ Positive attitude is essential for civil servants to effectively serve the publi
 
 Buddha's teachings emphasize **compassion**, **mindfulness**, and the **Middle Path**, offering timeless wisdom for addressing contemporary global challenges through ethical living and mental well-being.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q456_img1.png" alt="Noble Eightfold Path Classification Chart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q456_img1.png" alt="Noble Eightfold Path Classification Chart" /></p>
 
 Noble Eightfold Path Classification Chart
 
@@ -9045,7 +9045,7 @@ Cultivating socio-ethical values in civil servants requires a sustained effort f
 Anger, as Aristotle noted, represents a departure from the golden mean of emotional balance. Buddha's teachings emphasize anger as one of the three poisons that cloud judgment and impede righteous conduct.
 **Question ID: 2016-gs4-q123-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q784_img1.png" alt="Trigger comparison flowchart beginning with trigger" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q784_img1.png" alt="Trigger comparison flowchart beginning with trigger" /></p>
 
 Trigger comparison flowchart beginning with trigger
 
@@ -9111,7 +9111,7 @@ The attitudes they exhibit towards their work can have a profound impact on the 
 
 Two contrasting attitudes commonly observed among public servants are the bureaucratic attitude and the democratic attitude.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q231_img1.webp" alt="bureaucratic attitude" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q231_img1.webp" alt="bureaucratic attitude" /></p>
 
 
 ### Body
@@ -9352,7 +9352,7 @@ It is essential to recognize the destructive nature of hatred and to work toward
 
 Education transcends mere instruction, embodying **Dewey's philosophy** of experiential learning and **Gandhi's Nai Talim** concept, serving as a catalyst for **holistic human development** and **societal metamorphosis**.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q460_img1.png" alt="NEP 2020 hierarchical framework diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q460_img1.png" alt="NEP 2020 hierarchical framework diagram" /></p>
 
 NEP 2020 hierarchical framework diagram
 
@@ -9515,7 +9515,7 @@ By using these strategies, we can prevent anger from causing harm to our persona
 Max Weber's concept of bureaucratic morality distinguishes between personal ethics and administrative responsibility, emphasizing that public servants operate within institutional frameworks requiring specialized ethical considerations beyond individual conscience.
 **Question ID: 2016-gs4-q115-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q775_img1.png" alt="Comparative framework with titled boxes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q775_img1.png" alt="Comparative framework with titled boxes" /></p>
 
 Comparative framework with titled boxes
 
@@ -9571,7 +9571,7 @@ Weber's framework provides valuable insights into **administrative professionali
 
 The formation of a person's attitude towards social problems can be influenced by several factors, including personal experiences, cultural and societal norms, education, and media exposure.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q163_img1.webp" alt=" formation of attitude" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q163_img1.webp" alt=" formation of attitude" /></p>
 
 ### Body
 
@@ -9630,7 +9630,7 @@ In conclusion, the formation of attitudes towards social problems is complex and
 Attitude formation involves complex psychological and sociological processes shaped by cognitive frameworks and environmental influences, as emphasized by Leon Festinger's cognitive dissonance theory and Bandura's social learning theory.
 **Question ID: 2014-gs4-q149-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q949_img1.png" alt="Attitude Formation Radial Diagram With Arrows" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q949_img1.png" alt="Attitude Formation Radial Diagram With Arrows" /></p>
 
 Attitude Formation Radial Diagram With Arrows
 
@@ -9772,7 +9772,7 @@ Overall, motivating young people with ethical conduct to come forward and join a
 #### Answer from Superkalam
 Ethical conduct represents Aristotelian virtue ethics in practice, emphasizing moral character and integrity in public service, essential for democratic governance and transparent administration.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q711_img1.png" alt="Converging Arrows Pointing to a Central Circle" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q711_img1.png" alt="Converging Arrows Pointing to a Central Circle" /></p>
 
 Converging Arrows Pointing to a Central Circle
 
@@ -9949,7 +9949,7 @@ Organisation should refrain from negative tactics like coercion and undue influe
 
 Workplace coercion and undue influence undermine ethical conduct and fair decision-making. Both involve pressuring individuals, but they differ significantly in their nature and intensity. This distinction is crucial for fostering a healthy and productive work environment.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q224_img1.png" alt="Coercion vs Undue Influence" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q224_img1.png" alt="Coercion vs Undue Influence" /></p>
 
 Coercion vs Undue Influence
 
@@ -10053,7 +10053,7 @@ Therefore, it is crucial for organizations to strike a balance between maintaini
 #### Answer from Superkalam
 Discipline, as conceptualized by Max Weber's bureaucratic theory, emphasizes hierarchical order and rule-following, yet Aristotle's golden mean suggests balance between rigid compliance and creative autonomy for organizational effectiveness.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q696_img1.png" alt="Inverted U Curve and Discipline Level" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q696_img1.png" alt="Inverted U Curve and Discipline Level" /></p>
 
 Inverted U Curve and Discipline Level
 
@@ -10101,7 +10101,7 @@ Inverted U Curve and Discipline Level
 #### Answer from Civilsdaily
 Social re-engineering refers to the deliberate attempt to **transform social structures, behaviors, and cultural norms** to achieve a more **equitable society.** Civil servants act as a **“facilitator”** of this change.
 
-<p align="center"><img src="images/page_58_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_58_diagram_1.png" alt="Diagram" /></p>
 
 ######
 
@@ -10222,7 +10222,7 @@ Social re-engineering refers to bringing about transformative changes in societa
 
 To ensure long-term impact, they must go beyond mechanical implementation and apply reasoned judgment, critical thinking, and ethical values such as empathy, equity, and justice.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q64_img1.png" alt="Venn Diagram of Social Re-engineering Factors" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q64_img1.png" alt="Venn Diagram of Social Re-engineering Factors" /></p>
 
 Venn Diagram of Social Re-engineering Factors
 
@@ -10306,13 +10306,13 @@ Persuasive messages via television, radio, Internet or face-to-face communicatio
 
 **Swachh Bharat Abhiyan**(Clean India Mission) is a national campaign launched by the Indian government in 2014 to promote cleanliness, hygiene, and sanitation across the country. The success of this campaign relies on various factors, including social influence and persuasion.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q271_img1.webp" alt="social influence" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q271_img1.webp" alt="social influence" /></p>
 
 ### Body
 
 **Here are some ways in which social influence and persuasion can contribute to the success of Swachh Bharat Abhiyan:**
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q271_img2.webp" alt="agents of persuasion" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q271_img2.webp" alt="agents of persuasion" /></p>
 
 - **Normative influence:** People are influenced by what they perceive as the social norms of their community. Therefore, highlighting the social norm of cleanliness and hygiene can be an effective way to encourage people to participate in Swachh Bharat Abhiyan.
 
@@ -10347,7 +10347,7 @@ By leveraging social norms, accurate information, and persuasion techniques, the
 Law and ethics serve as fundamental regulatory mechanisms, with law providing external coercion through state machinery while ethics offers internal moral guidance through conscience and social values.
 **Question ID: 2016-gs4-q120-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q780_img1.png" alt="Law and External Control Venn Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q780_img1.png" alt="Law and External Control Venn Diagram" /></p>
 
 Law and External Control Venn Diagram
 
@@ -10396,7 +10396,7 @@ Effective governance requires **synergistic integration** of legal frameworks wi
 #### Answer from Civilsdaily
 A **crisis of conscience** arises when a person faces a conflict between personal values, professional duties, social pressures and moral principles. **EI** can play decisive role in navigating this crisis.
 
-<p align="center"><img src="images/page_33_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_33_diagram_1.png" alt="Diagram" /></p>
 
 ### Role of EI in overcoming crisis of conscience
 
@@ -10459,7 +10459,7 @@ Thus, EI is **value-neutral** and a **"means" to an "end."** It needs a strong *
 
 Emotional intelligence can certainly help individuals navigate a crisis of conscience without compromising their ethical or moral stand. Emotional intelligence refers to the ability to recognize, understand, and manage one's own emotions, as well as the emotions of others.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q605_img1.webp" alt="Emotional intelligence" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q605_img1.webp" alt="Emotional intelligence" /></p>
 
 ### Body
 
@@ -10531,7 +10531,7 @@ Despite being important, sometimes, EI may not be sufficient in resolving crisis
 Emotional intelligence, defined by Daniel Goleman as the ability to recognize and manage emotions, serves as a crucial tool during conscience crises where personal values conflict with external pressures.
 **Question ID: 2021-gs4-q59-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q385_img1.png" alt="Four Box Vertical Flowchart Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q385_img1.png" alt="Four Box Vertical Flowchart Diagram" /></p>
 
 Four Box Vertical Flowchart Diagram
 
@@ -10606,7 +10606,7 @@ To summarize emotional skills have gained foothold in the public administration 
 
 Emotional intelligence refers to the ability to understand and manage one's own emotions and those of others. Emotional intelligence can be a valuable tool in administrative practices, as it can help administrators to effectively manage interpersonal relationships and to make decisions that are sensitive to the emotional needs of stakeholders.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q339_img1.webp" alt="components of EI" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q339_img1.webp" alt="components of EI" /></p>
 
 ### Body
 
@@ -10639,7 +10639,7 @@ By applying emotional intelligence in their administrative practices, civil serv
 Emotional intelligence, defined by Daniel Goleman as the ability to recognize and manage emotions effectively, is crucial for administrative excellence and public service delivery.
 **Question ID: 2017-gs4-q108-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q699_img1.png" alt="Emotional Intelligence Framework 2x2 Matrix Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q699_img1.png" alt="Emotional Intelligence Framework 2x2 Matrix Diagram" /></p>
 
 Emotional Intelligence Framework 2x2 Matrix Diagram
 
@@ -10761,13 +10761,13 @@ Thus, Emotional Intelligence is not innate or fixed. It is **learnable, trainabl
 
 Emotional Intelligence (EI) refers to the ability to understand and manage one's emotions and those of others. It is a critical skill that can lead to better personal and professional relationships, effective communication, and successful leadership.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q339_img1.webp" alt="components of EI" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q339_img1.webp" alt="components of EI" /></p>
 
 ### Body
 
 **The main components of EI are as follows:**
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q551_img1.webp" alt="developing EI" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q551_img1.webp" alt="developing EI" /></p>
 
 - **Self-Awareness**: This involves recognizing and understanding one's own emotions, including their strengths and weaknesses, and how they affect others. Self-awareness helps individuals to regulate their emotions and respond to situations in a more controlled manner.
 
@@ -10824,7 +10824,7 @@ Through consistent practice and application of these skills, individuals can bui
 Positive attitude, as emphasized by Swami Vivekananda's philosophy of self-confidence and A.P.J. Abdul Kalam's optimistic leadership, represents a constructive mindset essential for effective public service delivery.
 **Question ID: 2020-gs4-q73-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q468_img1.png" alt="Positive Attitude Radial Hub and Spoke" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q468_img1.png" alt="Positive Attitude Radial Hub and Spoke" /></p>
 
 Positive Attitude Radial Hub and Spoke
 
@@ -10870,7 +10870,7 @@ Cultivating positive attitude through **Aristotelian virtue ethics** and **India
 
 ### Self-awareness
 
-<p align="center"><img src="images/page_31_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_31_diagram_1.png" alt="Diagram" /></p>
 
 - **Recognising emotions** before they control behaviour helps manage anger and frustration
 
@@ -10974,7 +10974,7 @@ Thus, E.I. helps in curbing the randomness and extremity of emotions. This furth
 
 Emotional intelligence refers to the ability to recognize and manage one's emotions and the emotions of others effectively. It involves the ability to use emotions to guide thoughts and behavior and to handle interpersonal relationships skillfully.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q339_img1.webp" alt="components of EI" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q339_img1.webp" alt="components of EI" /></p>
 
 ### Body
 
@@ -11011,7 +11011,7 @@ Emotional intelligence is a vital skill that can help individuals and organizati
 Emotional Intelligence represents the capacity to recognize, understand, and manage emotions effectively, transforming them from potential obstacles into strategic assets for personal and professional success.
 **Question ID: 2019-gs4-q79-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q537_img1.png" alt="Emotional Intelligence Framework in a Matrix" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q537_img1.png" alt="Emotional Intelligence Framework in a Matrix" /></p>
 
 Emotional Intelligence Framework in a Matrix
 
@@ -11067,7 +11067,7 @@ Emotional intelligence is the ability to channelize emotions for constructive pu
 
 **How Emotional intelligence be developed?**
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q82_img1.webp" alt="developed EI" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q82_img1.webp" alt="developed EI" /></p>
 
 
 - **Effective Communication:** An effective communication can help people to develop better strategies and increase their efficiency by synchronizing their efforts. By motivating others to communicate how they feel, can help them to know themselves better.
@@ -11114,7 +11114,7 @@ In the civil services, therefore, emotional intelligence is beneficial to manage
 Emotional intelligence, as conceptualized by Daniel Goleman, refers to the ability to recognize, understand, and manage emotions effectively. It encompasses self-awareness, self-regulation, empathy, and social skills, forming the foundation for ethical decision-making in personal and professional contexts.
 **Question ID: 2013-gs4-q161-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q1048_img1.png" alt="Emotional Intelligence a 2x2 Matrix" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q1048_img1.png" alt="Emotional Intelligence a 2x2 Matrix" /></p>
 
 Emotional Intelligence a 2x2 Matrix
 
@@ -11330,7 +11330,7 @@ EQ plays a critical role in shaping an individual’s success, character, happin
 
 While IQ may help a person get into a good college or understand complex theories, EQ determines how they manage themselves, their relationships, and real-life challenges.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q233_img1.png" alt="Emotional Intelligence Components: Recognition & Regulation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q233_img1.png" alt="Emotional Intelligence Components: Recognition & Regulation" /></p>
 
 Emotional Intelligence Components: Recognition & Regulation
 
@@ -11470,7 +11470,7 @@ By promoting ethical behavior and instilling moral values, we can create a more 
 
 Dr. Kalam’s words highlight a truth often missed in anti‑corruption debates: laws and enforcement can punish graft, but only value‑centric upbringing can prevent it. The quotation emphasises that the first line of defence against corruption is ethical socialisation inside families and classrooms. Fathers, mothers, and teachers are therefore the “ethical architects” who mould young minds long before they enter public life.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q310_img1.png" alt="Child's Value System Triad Framework Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q310_img1.png" alt="Child's Value System Triad Framework Diagram" /></p>
 
 Child's Value System Triad Framework Diagram
 
@@ -11624,7 +11624,7 @@ The quote by A.P.J. Abdul Kalam highlights the importance of individual morality
 
 This profound quotation by **A.P.J. Abdul Kalam** illustrates the **cascading effect of individual virtue** on collective well-being, emphasizing how personal **righteousness (dharma)** forms the foundation of global peace through progressive moral transformation.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q550_img1.png" alt="Concentric circles diagram with Heart at center" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q550_img1.png" alt="Concentric circles diagram with Heart at center" /></p>
 
 Concentric circles diagram with Heart at center
 
@@ -11805,7 +11805,7 @@ Gandhiji was influenced by his parents in early childhood. Shivaji's mother insp
 A.P.J. Abdul Kalam emphasizes the foundational role of primary socializing agents in shaping ethical consciousness, reflecting Aristotelian virtue ethics where character formation begins in formative years through moral exemplars.
 **Question ID: 2017-gs4-q109-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q700_img1.png" alt="Child Beautiful Mind Triad Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q700_img1.png" alt="Child Beautiful Mind Triad Diagram" /></p>
 
 Child Beautiful Mind Triad Diagram
 
@@ -12034,7 +12034,7 @@ In all these cases, power can reveal a person's true character. Some people may 
 
 Lincoln's profound observation highlights that **power serves as the ultimate crucible for moral character**, revealing one's true ethical foundation more than suffering ever could.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q1046_img1.png" alt="Individual Diverging Flowchart with Two Arrows" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q1046_img1.png" alt="Individual Diverging Flowchart with Two Arrows" /></p>
 
 Individual Diverging Flowchart with Two Arrows
 
@@ -12132,7 +12132,7 @@ In all these cases, the common theme is that the person must overcome their own 
 Aristotle's assertion emphasizes that self-mastery represents the highest form of courage, surpassing physical bravery in conquering external adversaries.
 **Question ID: 2013-gs4-q158-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q1045_img1.png" alt="Dimensions of Bravery comparative framework diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q1045_img1.png" alt="Dimensions of Bravery comparative framework diagram" /></p>
 
 Dimensions of Bravery comparative framework diagram
 
@@ -12271,7 +12271,7 @@ Erik Eriksen has said that, “Life doesn't make any sense without interdependen
 
 In a world that equates success with power, wealth, or fame, the Dalai Lama’s quote urges a deeper introspection: True success must be measured not just by outcomes, but by the ethical and personal costs incurred in achieving them. It calls for an evaluation of **means**, **sacrifices**, and **trade-offs**, emphasizing integrity and balance over blind ambition.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q311_img1.png" alt="Iceberg diagram showing visible and hidden parts" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q311_img1.png" alt="Iceberg diagram showing visible and hidden parts" /></p>
 
 Iceberg diagram showing visible and hidden parts
 
@@ -12406,7 +12406,7 @@ Internal peace brings greater spirit of charity. Cohesion, cooperation and socia
 
 The **Dalai Lama's** wisdom emphasizes that external harmony stems from **inner tranquility**, reflecting **Buddhist philosophy** and **Gandhian principles** of self-purification before societal transformation.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q394_img1.png" alt="Four layers to achieve inner peace" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q394_img1.png" alt="Four layers to achieve inner peace" /></p>
 
 Four layers to achieve inner peace
 
@@ -12592,7 +12592,7 @@ History, culture, ecology and development are all interdependent. Global warming
 Erik Erikson's quote emphasizes interdependence as fundamental to human existence, reflecting Ubuntu philosophy ("I am because we are") and Vasudhaiva Kutumbakam (world as one family), essential for collaborative governance and sustainable development.
 **Question ID: 2021-gs4-q64-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q393_img1.png" alt="2021 Network Diagram with Three Nodes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q393_img1.png" alt="2021 Network Diagram with Three Nodes" /></p>
 
 2021 Network Diagram with Three Nodes
 
@@ -12779,7 +12779,7 @@ The distinction between **legal** and **ethical guilt** highlights the broader *
 
 This quote by Kant draws a powerful distinction between legal and moral responsibility. It emphasizes that while the law punishes external actions, ethics concerns itself with a person’s internal intentions and conscience. Ethics demands a higher moral standard—one that operates even in the absence of external enforcement.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q155_img1.png" alt="Law and Ethics " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q155_img1.png" alt="Law and Ethics " /></p>
 
 Law and Ethics 
 
@@ -12952,7 +12952,7 @@ Thus it is clear that the awakening of women can help in progress at the nationa
 
 This quote by Jawaharlal Nehru highlights the **transformational role of women** in social, economic, and ethical development. It reflects the belief that true progress begins with **empowering women**, who serve as the primary influencers of values, education, health, and culture within families and communities.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q232_img1.png" alt="Empowered Woman's Expanding Ripple Effect" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q232_img1.png" alt="Empowered Woman's Expanding Ripple Effect" /></p>
 
 Empowered Woman's Expanding Ripple Effect
 
@@ -13059,7 +13059,7 @@ By emphasizing the fair distribution of social goods and resources, as well as e
 Public Services Code represents Kant's categorical imperative applied to governance, establishing universal moral principles for civil servants as recommended by the 2nd Administrative Reforms Commission (ARC-II) under Veerappa Moily.
 **Question ID: 2016-gs4-q302-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q774_img1.png" alt="Public Services Code 2nd ARC Hub Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q774_img1.png" alt="Public Services Code 2nd ARC Hub Diagram" /></p>
 
 Public Services Code 2nd ARC Hub Diagram
 
@@ -13130,9 +13130,9 @@ To check this, he prescribed a strict vigil over the superintendents of governme
 
 This quote highlights Kautilya's view that corruption is an inherent problem in public service, and that without proper checks and balances, officials will be tempted to misuse public resources for personal gain.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q230_img1.webp" alt="monopoly" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q230_img1.webp" alt="monopoly" /></p>
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q250_img1.webp" alt="corruption" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q250_img1.webp" alt="corruption" /></p>
 
 ### Body
 
@@ -13177,7 +13177,7 @@ To address these challenges, Kautilya's views on the importance of promoting eth
 Social influence involves changing attitudes through social proof and peer pressure, while persuasion employs cognitive and emotional appeals to modify behavior, as theorized by Robert Cialdini and Leon Festinger.
 **Question ID: 2016-gs4-q116-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q776_img1.png" alt="Social Input Flowchart with Three Stages" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q776_img1.png" alt="Social Input Flowchart with Three Stages" /></p>
 
 Social Input Flowchart with Three Stages
 
@@ -13420,7 +13420,7 @@ By internalising and spreading goodwill through action, we can build a just soci
 
 Gandhi's quote emphasizes the profound impact of genuine, everyday acts of kindness over symbolic displays of piety. It highlights the ethical dilemma of prioritizing performative religiosity over tangible actions that alleviate suffering and promote well-being, a concern particularly relevant in our present context where social media often amplifies symbolic gestures while overlooking substantive action.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q231_img1.png" alt="Contrasting Paths to Societal Impact" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q231_img1.png" alt="Contrasting Paths to Societal Impact" /></p>
 
 Contrasting Paths to Societal Impact
 
@@ -13566,7 +13566,7 @@ These examples illustrate how individuals in India have found purpose and meanin
 
 Gandhi's profound wisdom emphasizes **self-realization** through **selfless service**, reflecting the philosophical concept of **seva** where individual fulfillment emerges from dedicating oneself to collective welfare and societal betterment.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q472_img1.png" alt="Four Step Circular Cycle Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q472_img1.png" alt="Four Step Circular Cycle Diagram" /></p>
 
 Four Step Circular Cycle Diagram
 
@@ -13712,7 +13712,7 @@ This quotation emphasizes the importance of our thoughts and beliefs in shaping 
 
 Gandhi's profound assertion emphasizes the **transformative power of thoughts** in shaping human character and destiny, reflecting the **Vedantic principle** that consciousness creates reality.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q548_img1.png" alt="Linear flowchart with four sequential boxes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q548_img1.png" alt="Linear flowchart with four sequential boxes" /></p>
 
 Linear flowchart with four sequential boxes
 
@@ -13888,7 +13888,7 @@ In all these examples, anger and intolerance hinder our ability to listen to oth
 
 The quote "The weak can never forgive; forgiveness is the attribute of strong" is a powerful statement about the nature of forgiveness and the strength it requires. Forgiveness is not an easy process, and it often takes significant strength and courage to forgive someone who has wronged us.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q226_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q226_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -14011,7 +14011,7 @@ By prioritizing the needs of all individuals and communities and avoiding excess
 Gandhi's wisdom emphasizes sustainable consumption over excessive accumulation, highlighting the distinction between necessity and luxury in resource distribution.
 **Question ID: 2013-gs4-q160-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q1047_img1.png" alt="Resource consumption over time analysis" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q1047_img1.png" alt="Resource consumption over time analysis" /></p>
 
 Resource consumption over time analysis
 
@@ -14065,7 +14065,7 @@ Resource consumption over time analysis
 
 This quote by Plato speaks to the idea that it is natural for children to be afraid of the dark, as it is an unknown and potentially dangerous environment. However, it is a tragedy when adults are afraid of knowledge, truth, and understanding, as it limits their potential for personal growth and societal progress.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q207_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q207_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -14259,7 +14259,7 @@ The right thing to do can also be judged by the “Veil of ignorance” concept 
 
 This quote by Potter Stewart highlights the distinction between legal rights and moral obligations. While laws provide a framework for what is permissible, ethics guides what is appropriate, just, and fair. It underscores that legality does not always equate to morality, and that ethical conduct often requires going beyond mere legal compliance.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q309_img1.png" alt="Law Venn Diagram with Overlapping Circles" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q309_img1.png" alt="Law Venn Diagram with Overlapping Circles" /></p>
 
 Law Venn Diagram with Overlapping Circles
 
@@ -14402,7 +14402,7 @@ Patel unified 562 states by combining his **faith** in a single India with the *
 
 This quotation highlights the vital interplay between **inner conviction (faith)** and **outer capacity (strength)**. One without the other is inadequate. In today’s world - marked by complex challenges - this message is particularly relevant to individuals, leaders, and nations alike.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q154_img1.png" alt="Faith Strength and Great Work" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q154_img1.png" alt="Faith Strength and Great Work" /></p>
 
 Faith Strength and Great Work
 
@@ -14666,7 +14666,7 @@ The quotation by Socrates emphasizes the importance of examining one's life in o
 Socrates' assertion emphasizes that self-reflection and critical inquiry are fundamental to human dignity and meaningful existence, forming the cornerstone of ethical living.
 **Question ID: 2019-gs4-q87-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q549_img1.png" alt="Life experiences introspection quest circular cycle" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q549_img1.png" alt="Life experiences introspection quest circular cycle" /></p>
 
 Life experiences introspection quest circular cycle
 
@@ -14837,7 +14837,7 @@ Swami Vivekananda’s quote underscores that **society’s true strength** lies 
 Swami Vivekananda's quote emphasizes that the foundation of a truly strong and just society lies not merely in rules and punishments, but in the inner moral compass of its citizens. Laws may regulate behavior, but it is morality that sustains trust, harmony, and long-term stability.
 **Question ID: 2025-gs4-q5-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q66_img1.png" alt="Society's Strength External and Internal Controls" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q66_img1.png" alt="Society's Strength External and Internal Controls" /></p>
 
 Society's Strength External and Internal Controls
 
@@ -15027,7 +15027,7 @@ Thus, Kant's insight encourages us to cultivate a sense of moral responsibility 
 
 This quote emphasizes the value of **openness** to learning while maintaining cultural and personal **identity**. In today’s interconnected and globalized world, it holds profound ethical, professional, and societal significance.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q156_img1.png" alt="Processing Values through Rationality" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q156_img1.png" alt="Processing Values through Rationality" /></p>
 
 Processing Values through Rationality
 
@@ -15247,7 +15247,7 @@ The future lies in building bonds of care and trust, uplifting humanity. We must
 
 Swami Vivekananda’s statement is a timeless ethical insight rooted in the law of moral reciprocity—that our emotions and actions create a cycle which ultimately return to us. In today's world of increasing polarization, violence, social media outrage, and distrust, this quote emphasizes the ethical value of compassion, emotional restraint, and universal brotherhood.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q230_img1.png" alt="Virtuous and Vicious Cycles of Emotion" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q230_img1.png" alt="Virtuous and Vicious Cycles of Emotion" /></p>
 
 Virtuous and Vicious Cycles of Emotion
 
@@ -15401,7 +15401,7 @@ Right values, commitment, emotional intelligence must be developed, which is req
 Swami Vivekananda's quote emphasizes perseverance as the cornerstone of success, reflecting the Vedantic principle that sustained effort (tapasya) transforms obstacles into opportunities for growth and eventual triumph.
 **Question ID: 2021-gs4-q63-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q392_img1.png" alt="Sequential Horizontal Flowchart With Four Boxes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q392_img1.png" alt="Sequential Horizontal Flowchart With Four Boxes" /></p>
 
 Sequential Horizontal Flowchart With Four Boxes
 
@@ -15557,7 +15557,7 @@ Swami Vivekananda's quote encourages us to be compassionate and helpful towards 
 #### Answer from Superkalam
 Swami Vivekananda's quote embodies compassionate non-judgment and constructive engagement, reflecting the principle of ahimsa and seva in public service.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q471_img1.png" alt="Condemn None Decision-Making Flowchart Process" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q471_img1.png" alt="Condemn None Decision-Making Flowchart Process" /></p>
 
 Condemn None Decision-Making Flowchart Process
 
@@ -15731,7 +15731,7 @@ Thiruvalluvar’s wisdom is a reminder that our inner state molds how we address
 ---
 ---
 #### Answer from Superkalam
-Thiruvalluvar, the Tamil saint-poet, emphasises virtues of resilience, composure, and inner strength. The quotation conveys that a person who remains calm and undisturbed in times of adversity is able to overcome challenges effortlessly, as their equanimity itself weakens the problem. <p align="center"><img src="images/superkalam_ethics_theoretical_questions_q67_img1.png" alt="Overcoming adversity through calmness and action" /></p>
+Thiruvalluvar, the Tamil saint-poet, emphasises virtues of resilience, composure, and inner strength. The quotation conveys that a person who remains calm and undisturbed in times of adversity is able to overcome challenges effortlessly, as their equanimity itself weakens the problem. <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q67_img1.png" alt="Overcoming adversity through calmness and action" /></p>
 **Question ID: 2025-gs4-q6-superkalam**
 
 Overcoming adversity through calmness and action
@@ -15875,7 +15875,7 @@ Overall, the quote emphasizes the complexity of ethical decision-making and the 
 Tirukkural's assertion reflects consequentialist ethics where outcomes justify means, challenging Kantian categorical imperative that prohibits deception regardless of consequences.
 **Question ID: 2018-gs4-q100-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q629_img1.png" alt="Horizontal flowchart with three sequential boxes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q629_img1.png" alt="Horizontal flowchart with three sequential boxes" /></p>
 
 Horizontal flowchart with three sequential boxes
 
@@ -16065,7 +16065,7 @@ William James’ quote highlights the power of **individual agency** in transfor
 William James, the father of modern psychology, emphasizes the transformative power of attitudinal change in shaping human destiny, reflecting the core principle of self-determination and personal agency.
 **Question ID: 2025-gs4-q4-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q65_img1.png" alt="Attitude Shapes Behavior and Life Outcomes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q65_img1.png" alt="Attitude Shapes Behavior and Life Outcomes" /></p>
 
 Attitude Shapes Behavior and Life Outcomes
 
@@ -16137,7 +16137,7 @@ In an age of rapid technological and economic change, his message of **ethical s
 
 **Major Teachings & Contemporary Relevance:**
 
-<p align="center"><img src="images/ethics_theoretical_questions_q4_img1.webp" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/ethics_theoretical_questions_q4_img1.webp" alt="Image" /></p>
 
 - Ahimsa (Non-violence): Mahavira considered non-violence the highest virtue, extending it to thoughts, words, and deeds. It promotes compassion not only towards humans but also animals and the environment.
 
@@ -16273,7 +16273,7 @@ Lord Mahavir, the **24th Tirthankara of Jainism (6th century BCE)**, was a conte
 
 His teachings form the foundation of **Jain ethics**, centered on **non-violence, self-restraint, and truth**. Though ancient, these principles remain profoundly relevant in today’s complex, conflict-ridden world.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q79_img1.png" alt="Pancha Mahavratas The Five Great Vows" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q79_img1.png" alt="Pancha Mahavratas The Five Great Vows" /></p>
 
 Pancha Mahavratas The Five Great Vows
 
@@ -16457,7 +16457,7 @@ In a time when there is a religious disconnect in life of people, Guru Nanak's t
 
 Guru Nanak's philosophy, emphasizing universal love and oneness, emerged during a time of societal division. His teachings offer profound ethical guidance even today, addressing issues like religious intolerance and social inequality.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q234_img1.png" alt="Teachings of Guru Nanak" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q234_img1.png" alt="Teachings of Guru Nanak" /></p>
 
 Teachings of Guru Nanak
 
@@ -16682,7 +16682,7 @@ Phule's work laid the foundation for the women's rights movement in India and in
 
 Gender inequality represents systematic discrimination based on gender roles, perpetuating **patriarchal structures** that limit women's opportunities and rights in society.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q469_img1.png" alt="Factors of Gender Inequality Radial Framework" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q469_img1.png" alt="Factors of Gender Inequality Radial Framework" /></p>
 
 Factors of Gender Inequality Radial Framework
 
@@ -16851,7 +16851,7 @@ Overall, Buddha's teachings continue to inspire and guide people towards a more 
 Socrates advocates for absolute moral truths over subjective emotional judgments, emphasizing that genuine morality requires rational foundations rather than fleeting feelings or cultural relativism.
 **Question ID: 2020-gs4-q77-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q473_img1.png" alt="Basis of Morality Comparative Flowchart 2020" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q473_img1.png" alt="Basis of Morality Comparative Flowchart 2020" /></p>
 
 Basis of Morality Comparative Flowchart 2020
 
@@ -16985,7 +16985,7 @@ The principles that guide a leader are critical in determining the success or fa
 Napoleon Bonaparte's assertion highlights ambition as a double-edged sword - capable of creating profound societal transformation or devastating destruction, depending on the moral compass guiding it.
 **Question ID: 2017-gs4-q301-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q698_img1.png" alt="Great Ambition Divergence Flowchart Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q698_img1.png" alt="Great Ambition Divergence Flowchart Diagram" /></p>
 
 Great Ambition Divergence Flowchart Diagram
 
@@ -17063,7 +17063,7 @@ True religion is based on spirituality, love, compassion, understanding, and app
 
 Mahatma Gandhi's concept of the seven sins, also known as the "Seven Social Sins" or the "Seven Blunders of the World," are a set of principles that he believed could undermine human progress and happiness.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q255_img1.webp" alt="gandhi's 7 sins" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q255_img1.webp" alt="gandhi's 7 sins" /></p>
 
 ### Body
 
@@ -17114,7 +17114,7 @@ By recognizing and avoiding these seven sins, we can strive towards a more just 
 John Rawls's social justice emphasizes fairness through the "veil of ignorance" and difference principle, advocating for institutional arrangements that benefit society's least advantaged members.
 **Question ID: 2016-gs4-q303-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q777_img1.png" alt="Rawls's Principles of Justice Bipartite Mapping" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q777_img1.png" alt="Rawls's Principles of Justice Bipartite Mapping" /></p>
 
 Rawls's Principles of Justice Bipartite Mapping
 
@@ -17229,7 +17229,7 @@ His teachings center around the themes of Vedas and Upanishads, which are releva
 Probity represents integrity, honesty, and moral uprightness in public service, embodying Aristotelian virtue ethics and Gandhian principles of truth and transparency.
 **Question ID: 2014-gs4-q150-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q950_img1.png" alt="Structural Framework Diagram of a Building" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q950_img1.png" alt="Structural Framework Diagram of a Building" /></p>
 
 Structural Framework Diagram of a Building
 
@@ -17419,7 +17419,7 @@ A whistleblower is a person, often an employee, who reveals information about ac
 
 Whistleblowers play a crucial ethical role in exposing corruption, fraud, and maladministration. However, they often face threats, retaliation, and isolation. Strengthening their protection is not only a matter of safety but also a prerequisite for a transparent and just governance system.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q312_img1.png" alt="Whistleblower Protection Mechanism Hub and Spoke Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q312_img1.png" alt="Whistleblower Protection Mechanism Hub and Spoke Diagram" /></p>
 
 Whistleblower Protection Mechanism Hub and Spoke Diagram
 
@@ -17523,7 +17523,7 @@ While poverty can be a contributing factor to corruption, corruption can be foun
 Corruption stems from complex psychological, institutional, and moral factors transcending economic boundaries. Aristotle's concept of moral virtue and Chanakya's warnings in Arthashastra highlight how character deficits, not just poverty, drive corrupt behavior.
 **Question ID: 2014-gs4-q142-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q938_img1.png" alt="The Corruption Triangle Opportunity Potential" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q938_img1.png" alt="The Corruption Triangle Opportunity Potential" /></p>
 
 The Corruption Triangle Opportunity Potential
 
@@ -17660,13 +17660,13 @@ A Citizen Charter cannot be an end in itself, it is rather a means to an end- a 
 
 The Citizens' Charter movement is a tool for promoting good governance and public service delivery that emphasizes transparency, accountability, and citizen participation. It provides a framework for improving public service delivery and enhancing citizen engagement, making it an essential tool for promoting good governance.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q478_img1.webp" alt="citizen charter" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q478_img1.webp" alt="citizen charter" /></p>
 
 ### Body
 
 **Basic principles of citizens charter movement:**
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q478_img2.webp" alt="citizens charter " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q478_img2.webp" alt="citizens charter " /></p>
 
 - **Service delivery**: Citizens have the right to access quality public services in a timely and efficient manner.
 
@@ -17707,7 +17707,7 @@ The Citizens' Charter movement has gained significant importance in recent years
 Citizens' Charter represents a social contract between government and citizens, embodying Rawlsian principles of justice and Gandhian ideals of responsive governance for transparent public service delivery.
 **Question ID: 2019-gs4-q80-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q538_img1.png" alt="Citizens Charter Principles Radial Diagram 2019" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q538_img1.png" alt="Citizens Charter Principles Radial Diagram 2019" /></p>
 
 Citizens Charter Principles Radial Diagram 2019
 
@@ -17953,7 +17953,7 @@ A well-implemented **Code of Ethics**, supported by a strong **Code of Conduct**
 Ethical governance requires both rules-based compliance and values-based judgment.
 While India has a **Code of Conduct** (The All India Services (Conduct) Rules, 1968) it lacks a formal **Code of Ethics** that defines the moral compass of civil servants. This gap can lead to technically correct but morally inappropriate decisions.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q150_img1.png" alt="Pillars of Ethical Governance and Trust" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q150_img1.png" alt="Pillars of Ethical Governance and Trust" /></p>
 
 Pillars of Ethical Governance and Trust
 
@@ -18140,7 +18140,7 @@ Both codes are crucial in maintaining public trust and ensuring compliance with 
 Public interest represents the collective welfare and common good of society, transcending individual or sectoral benefits. Rousseau's concept of general will and Bentham's utilitarian principle of "greatest good for greatest number" form its philosophical foundation.
 **Question ID: 2018-gs4-q91-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q616_img1.png" alt="Pillar diagram of public interest structure" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q616_img1.png" alt="Pillar diagram of public interest structure" /></p>
 
 Pillar diagram of public interest structure
 
@@ -18287,7 +18287,7 @@ By adhering to the principles outlined in the code, public servants can contribu
 Corruption represents the abuse of entrusted power for private gain, fundamentally undermining dharma and rajadharma as envisioned by Kautilya in the Arthashastra.
 **Question ID: 2016-gs4-q118-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q778_img1.png" alt="Kautilya's View on Impact of Corruption" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q778_img1.png" alt="Kautilya's View on Impact of Corruption" /></p>
 
 Kautilya's View on Impact of Corruption
 
@@ -18352,7 +18352,7 @@ Mission Karmayogi, launched in 2020 is a **National Programme for Civil Services
 
 - The program focuses on **developing critical skills and ethical standards** through a competency framework that aligns training with **career goals, ensuring civil servants are both effective and accountable.**
 
-<p align="center"><img src="images/ethics_theoretical_questions_q12_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/ethics_theoretical_questions_q12_img1.png" alt="Image" /></p>
 
 **Enhancing Service Delivery at the Grassroots Level:**
 
@@ -18476,7 +18476,7 @@ Achieving gender equality in public service is crucial for the holistic developm
 
 Indian culture and value traditionally promotes ideals of equality and dignity for all, as echoed in the Constitutional values of justice and equality (Articles 14–16). Over the years, women's representation in public services has increased like the proportion of women recruited directly to IAS has risen from 15% in the 1970s to 34% in 2024.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q143_img1.png" alt="Indian Values versus Current Challenges" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q143_img1.png" alt="Indian Values versus Current Challenges" /></p>
 
 Indian Values versus Current Challenges
 
@@ -18666,7 +18666,7 @@ Probity refers to the quality of having strong moral principles like honesty, in
 
 In a democracy like India, where governance intersects with the needs of millions, probity ensures rule of law, responsible decision-making, and people-centric development.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q227_img1.png" alt="Probity leads to Socio-Economic Development" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q227_img1.png" alt="Probity leads to Socio-Economic Development" /></p>
 
 Probity leads to Socio-Economic Development
 
@@ -18801,7 +18801,7 @@ Apart from laws and policies, the government should also focus on bringing **beh
 
 Probity in governance refers to the adherence to high ethical and moral standards in the conduct of public affairs. It encompasses principles such as transparency, accountability, integrity, honesty, and fairness. Ensuring probity in government is crucial to building public trust, promoting good governance, and combating corruption.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q159_img1.webp" alt="Probity in governance" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q159_img1.webp" alt="Probity in governance" /></p>
 
 ### Body
 
@@ -18846,7 +18846,7 @@ By continuing to strengthen measures to ensure probity in governance, India can 
 Probity in governance refers to integrity, uprightness, and honesty in public administration, emphasizing moral rectitude and ethical conduct by public officials as advocated by Kautilya's Arthashastra.
 **Question ID: 2019-gs4-q84-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q546_img1.png" alt="Probity in Governance Measures Hub and Spoke" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q546_img1.png" alt="Probity in Governance Measures Hub and Spoke" /></p>
 
 Probity in Governance Measures Hub and Spoke
 
@@ -18915,7 +18915,7 @@ Probity in governance requires **systemic reforms combining institutional mechan
 
 Probity in public life refers to the quality of being honest, transparent, and having high moral principles and integrity in the conduct of public affairs. It is an essential aspect of good governance and is critical for building public trust in government institutions.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q159_img1.webp" alt="Probity in governance" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q159_img1.webp" alt="Probity in governance" /></p>
 
 ### Body
 
@@ -18965,7 +18965,7 @@ A person should always strive for probity on their own end. Moral education and 
 Happiness represents the ultimate human goal, as articulated by Aristotle's concept of eudaimonia and Mill's utilitarian principle of greatest happiness for the greatest number.
 **Question ID: 2014-gs4-q146-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q946_img1.png" alt="Five Level Pyramid Diagram Physiological Needs" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q946_img1.png" alt="Five Level Pyramid Diagram Physiological Needs" /></p>
 
 Five Level Pyramid Diagram Physiological Needs
 
@@ -19158,7 +19158,7 @@ Mission Karmayogi, launched in 2020, is a national programme for civil services 
 
 ### Features of Mission Karmayogi
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q146_img1.png" alt="Mission Karmayogi " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q146_img1.png" alt="Mission Karmayogi " /></p>
 
 Mission Karmayogi 
 
@@ -19229,7 +19229,7 @@ Eg- encroachment demolitions without rehabilitation plan.
 
 1. **Adopting the "Karmayogi" Mindset-** "solution-providers" rather than "file-pushers".
 
-<p align="center"><img src="images/page_57_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_57_diagram_1.png" alt="Diagram" /></p>
 
 2. **Institutionalizing Social Audits-** Eg- Meghalaya social audit law
 
@@ -19361,7 +19361,7 @@ The peripheral issues must be dealt using values of core issues. One reinforces 
 
 Wisdom, particularly in governance, lies not just in knowledge but in discernment—the ability to focus on what truly matters. Bureaucrats often find themselves engaged in procedural, cosmetic, or symbolic tasks, neglecting structural or core issues that affect the common citizen. Such misplaced priorities can have grave consequences for justice, service delivery, and governance outcomes.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q313_img1.png" alt="Core Issues Strategic Target Diagram Layers" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q313_img1.png" alt="Core Issues Strategic Target Diagram Layers" /></p>
 
 Core Issues Strategic Target Diagram Layers
 
@@ -19551,7 +19551,7 @@ While the OSA can be seen as an obstacle to the implementation of the RTI Act, i
 Official Secrets Act (OSA) represents state security imperatives while Right to Information (RTI) embodies democratic transparency, creating inherent tension between national security and citizen empowerment.
 **Question ID: 2019-gs4-q82-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q544_img1.png" alt="Official Sec versus Opposing Block Comparison" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q544_img1.png" alt="Official Sec versus Opposing Block Comparison" /></p>
 
 Official Sec versus Opposing Block Comparison
 
@@ -19585,7 +19585,7 @@ The RTI Act, 2005, is celebrated as the **"Sunshine Legislation"** aims to promo
 
 1. **Direct Questioning of Power**
 
-<p align="center"><img src="images/page_62_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_62_diagram_1.png" alt="Diagram" /></p>
 
 2. **Rights based approach**
 
@@ -19671,13 +19671,13 @@ In doing so, the Right to Information Act not only empowers citizens but also re
 
 The Right to Information Act (RTI), passed by the Indian Parliament in 2005, is a landmark legislation that provides citizens with the right to access information held by public authorities. The act has been hailed as a major step towards transparency and accountability in Indian democracy.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q430_img1.webp" alt="RTI" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q430_img1.webp" alt="RTI" /></p>
 
 ### Body
 
 **How the Right to Information Act (RTI) redefines the concept of accountability?**
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q430_img2.webp" alt="Right to Information Act " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q430_img2.webp" alt="Right to Information Act " /></p>
 
 - **Transparency and Accountability:**
 
@@ -19738,7 +19738,7 @@ The act has been instrumental in exposing corruption, ensuring good governance, 
 Warren Buffett's statement emphasizes that integrity forms the foundational virtue for effective leadership, as intelligence and energy without moral grounding become destructive forces in organizational and societal contexts.
 **Question ID: 2018-gs4-q97-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q626_img1.png" alt="Venn Diagram of Integrity Intelligence Energy" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q626_img1.png" alt="Venn Diagram of Integrity Intelligence Energy" /></p>
 
 Venn Diagram of Integrity Intelligence Energy
 
@@ -19933,7 +19933,7 @@ Ethical diplomacy, exemplified by leaders like **Dag Hammarskjöld** and **Nelso
 
 Corruption continues to pose a persistent challenge in many societies, despite the implementation of various measures aimed at curbing it. Measures such as prescribing codes of conduct, establishing vigilance cells/commissions, promoting the Right to Information (RTI), engaging an active media, and strengthening legal mechanisms have been put in place to combat corrupt practices.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q230_img1.webp" alt="monopoly" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q230_img1.webp" alt="monopoly" /></p>
 
 ### Body
 
@@ -20022,7 +20022,7 @@ Resource stewardship is the hallmark of **good governance** and is essential for
 
 ### Reasons for Under-Utilization
 
-<p align="center"><img src="images/page_79_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_79_diagram_1.png" alt="Diagram" /></p>
 
 1. **Administrative Red Tapism-** Lengthy approval processes for tenders and contracts.
 
@@ -20167,7 +20167,7 @@ To ensure the **proper utilisation** of public funds, it is crucial to implement
 Accountability is both a legal obligation and a moral imperative. It reflects Kautilya's principle of responsible stewardship, Max Weber's bureaucratic efficiency, and Gandhian trusteeship, ensuring public funds are treated as a trust for citizens’ welfare.
 **Question ID: 2025-gs4-q8-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q70_img1.png" alt="Efficient Fund Utilization for Economic Target" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q70_img1.png" alt="Efficient Fund Utilization for Economic Target" /></p>
 
 Efficient Fund Utilization for Economic Target
 
@@ -20206,7 +20206,7 @@ Resource stewardship is the hallmark of **good governance** and is essential for
 
 ### Importance of Effective Utilization of Public Funds
 
-<p align="center"><img src="images/page_78_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_78_diagram_1.png" alt="Diagram" /></p>
 
 1. **Achieving Social Justice-** Tribal sub plan funds reducing historical inequality.
 
@@ -20445,7 +20445,7 @@ Efforts must be made to improve the bureaucratic processes, enhance transparency
 Public fund utilization reflects the state's fiduciary responsibility toward citizens, embodying Rawls' distributive justice and Chanakya's principle of Rajadharma.
 **Question ID: 2019-gs4-q78-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q536_img1.png" alt="Public Fund Utilization Issues Flowchart Analysis" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q536_img1.png" alt="Public Fund Utilization Issues Flowchart Analysis" /></p>
 
 Public Fund Utilization Issues Flowchart Analysis
 
@@ -20559,7 +20559,7 @@ Overall, public servants have a great responsibility to serve the public interes
 
 This statement by **Samuel Johnson** emphasizes the symbiotic relationship between **integrity** and **knowledge**, highlighting that both are essential for ethical leadership and effective governance in civil services.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q944_img1.png" alt="2x2 Matrix Diagram of Knowledge Axes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q944_img1.png" alt="2x2 Matrix Diagram of Knowledge Axes" /></p>
 
 2x2 Matrix Diagram of Knowledge Axes
 
@@ -20767,7 +20767,7 @@ Creating a **value-based** and **compliance-driven work culture** requires a **s
 Code of ethics establishes foundational principles for organizational behavior, as emphasized by Aristotle's virtue ethics and Gandhi's satyagraha, ensuring integrity and accountability in workplace conduct.
 **Question ID: 2025-gs4-q9-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q71_img1.png" alt="Ethical Work Culture Structure with Pillars" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q71_img1.png" alt="Ethical Work Culture Structure with Pillars" /></p>
 
 Ethical Work Culture Structure with Pillars
 
@@ -20968,7 +20968,7 @@ For public servants, constitutional morality is **the foundation of ethical admi
 Constitutional morality refers to the commitment of citizens, especially public servants, to uphold the core values and principles enshrined in the Constitution—such as justice, equality, liberty, dignity, and fraternity.
 **Question ID: 2025-gs4-q2-superkalam**
 
-As **Dr. B.R. Ambedkar** remarked, **it is not innate but cultivated through civic education, respect for institutions, and adherence to the rule of law.** <p align="center"><img src="images/superkalam_ethics_theoretical_questions_q63_img1.png" alt="Constitutional Morality Diagram Showing Key Aspects" /></p>
+As **Dr. B.R. Ambedkar** remarked, **it is not innate but cultivated through civic education, respect for institutions, and adherence to the rule of law.** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q63_img1.png" alt="Constitutional Morality Diagram Showing Key Aspects" /></p>
 
 Constitutional Morality Diagram Showing Key Aspects
 
@@ -21012,7 +21012,7 @@ According to political scientist **Robert Putnam,** social capital consists of t
 
 - **Bridging Social Capital-** Links between people from different groups.
 
-<p align="center"><img src="images/page_54_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_54_diagram_1.png" alt="Diagram" /></p>
 
 ### Role of Social Capital in Enhancing Good Governance
 
@@ -21176,7 +21176,7 @@ Social capital provides a moral foundation for good governance. It realises mora
 
 Social capital refers to the network of relationships, shared norms, trust, and values that exist among individuals and communities, enabling them to work together effectively for mutual benefit. It includes interpersonal trust, community engagement, civic participation, and a sense of social responsibility.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q223_img1.png" alt="Social Capital Leading to Good Governance" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q223_img1.png" alt="Social Capital Leading to Good Governance" /></p>
 
 Social Capital Leading to Good Governance
 
@@ -21299,7 +21299,7 @@ The state must tackle the digital divide to ensure technology remains an inclusi
 
 Good governance refers to the effective and efficient management of public resources, institutions, and services to ensure that they are transparent, accountable, and responsive to the needs of the citizens. It involves a combination of sound policies, efficient public administration, and active participation of citizens in decision-making processes.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q301_img1.webp" alt="good governance" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q301_img1.webp" alt="good governance" /></p>
 
 ### Body
 
@@ -21384,7 +21384,7 @@ e-Governance is getting momentum in India, but public awareness and the digital 
 
 Good governance refers to the effective, accountable, transparent, and participatory management of public affairs and resources for the common good. It ensures that the voices of the most vulnerable are heard in decision-making and that public institutions conduct public affairs in a manner that is free from corruption and abuse of power.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q308_img1.png" alt="Good Governance Radial Diagram and Boxes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q308_img1.png" alt="Good Governance Radial Diagram and Boxes" /></p>
 
 Good Governance Radial Diagram and Boxes
 
@@ -21505,7 +21505,7 @@ Even though social audit has been of great importance, it still needs awareness 
 
 **Social audit** is a process of assessing, monitoring and evaluating the performance of public services and programs by involving citizens and civil society organizations. It is an important tool for promoting transparency, accountability, and good governance.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q562_img1.webp" alt="Social audit cycle" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q562_img1.webp" alt="Social audit cycle" /></p>
 
 
 ### Body
@@ -21596,7 +21596,7 @@ However, Social audit has not achieved its objectives due to lack of awareness, 
 Social audit represents Bentham's utilitarian principle of transparency, ensuring public institutions serve the greatest good through systematic performance evaluation and accountability mechanisms.
 **Question ID: 2021-gs4-q53-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q379_img1.png" alt="Social Audit Cycle Five Sequential Nodes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q379_img1.png" alt="Social Audit Cycle Five Sequential Nodes" /></p>
 
 Social Audit Cycle Five Sequential Nodes
 
@@ -21731,7 +21731,7 @@ This ethical governance model promotes social responsibility and social impact i
 Mahatma Gandhi's seven sins represent fundamental ethical violations that corrupt individual character and societal fabric, emphasizing the interconnection between personal morality and social justice.
 **Question ID: 2016-gs4-q124-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q787_img1.png" alt="Gandhi's Seven Social Sins Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q787_img1.png" alt="Gandhi's Seven Social Sins Diagram" /></p>
 
 Gandhi's Seven Social Sins Diagram
 
@@ -21833,7 +21833,7 @@ The implementation of these measures can help to ensure that public servants are
 Accountability in public service refers to the obligation of civil servants to answer for their decisions and actions to the public, as emphasized by Max Weber's bureaucratic theory and Kautilya's Arthashastra.
 **Question ID: 2014-gs4-q147-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q947_img1.png" alt="Public Servant Three Directional Arrow Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q947_img1.png" alt="Public Servant Three Directional Arrow Diagram" /></p>
 
 Public Servant Three Directional Arrow Diagram
 
@@ -21963,7 +21963,7 @@ A potential conflict of interest arises where an interest or obligation, whether
 
 Conflict of interest refers to a situation where an individual's personal interests or financial interests may influence their ability to make impartial decisions in their professional capacity.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q431_img1.webp" alt="COI" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q431_img1.webp" alt="COI" /></p>
 
 ### Body
 
@@ -22017,7 +22017,7 @@ In each of these situations, the individual's personal interests could potential
 
 This statement reflects **consequentialist ethics** where noble intentions justify flexible means, contrasting with **Kant's categorical imperative** that emphasizes absolute moral duties regardless of outcomes.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q630_img1.png" alt="Concentric circles diagram administrative action representation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q630_img1.png" alt="Concentric circles diagram administrative action representation" /></p>
 
 Concentric circles diagram administrative action representation
 
@@ -22141,7 +22141,7 @@ Overall, the key to addressing conflict of interest in the public sector is to e
 Conflict of interest represents situations where personal interests compromise professional judgment, violating Nolan's principles of public life and undermining administrative integrity.
 **Question ID: 2017-gs4-q104-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q694_img1.png" alt="Three Circle Venn Diagram of Duties" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q694_img1.png" alt="Three Circle Venn Diagram of Duties" /></p>
 
 Three Circle Venn Diagram of Duties
 
@@ -22199,7 +22199,7 @@ Effective resolution requires combining **Aristotelian virtue ethics** with robu
 
 Conflict of interest occurs when an individual's personal interest or bias interferes with their ability to make impartial decisions or perform their duties objectively. In the context of public service, it refers to situations where a public servant's private interests, financial or personal relationships, or affiliations could interfere with their ability to perform their duties in the best interest of the public.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q210_img1.webp" alt="Ethical dilemma" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q210_img1.webp" alt="Ethical dilemma" /></p>
 
 ### Body
 
@@ -22437,7 +22437,7 @@ Thus, it is clear that Moral integrity and Professional Efficiency are crucial t
 
 Corporate governance, as defined by the Cadbury Committee (1992), is **“the system by which companies are directed and controlled.”** In the Indian context, sound corporate governance rests on the twin pillars of **moral integrity** and **professional efficiency** ## Moral Integrity in Corporate Governance
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q229_img1.png" alt="Moral integrity and professional efficiency matrix" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q229_img1.png" alt="Moral integrity and professional efficiency matrix" /></p>
 
 Moral integrity and professional efficiency matrix
 
@@ -22588,7 +22588,7 @@ Corporate Social Responsibility (CSR) is a voluntary initiative undertaken by co
 
 While CSR has gained momentum in recent years, the question remains whether it is efficient and sufficient enough to fulfill the social roles and responsibilities needed in the corporate world.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q669_img1.webp" alt="corporate governance" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q669_img1.webp" alt="corporate governance" /></p>
 
 ### Body
 
@@ -22657,7 +22657,7 @@ Business without morality is a sin as per Gandhiji. Companies must go beyond CSR
 
 Corporate Social Responsibility (CSR) is a self-regulating business model that helps a company be socially accountable — to itself, its stakeholders, and the public. The increasing corporate footprint raises ethical dilemmas regarding environmental damage and societal well-being, questioning CSR's efficacy in addressing these concerns.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q299_img1.png" alt="Economic Profit Venn Diagram with Three Circles" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q299_img1.png" alt="Economic Profit Venn Diagram with Three Circles" /></p>
 
 Economic Profit Venn Diagram with Three Circles
 
@@ -22736,7 +22736,7 @@ Therefore, by ensuring brand loyalty and consumer patronage, CSR can ensure that
 
 Corporate Social Responsibility (CSR) refers to the practice of companies taking responsibility for their impact on society and the environment. It involves adopting business practices that are sustainable, ethical, and socially responsible. While some companies may view CSR as an added cost, research shows that companies that embrace CSR are more profitable and sustainable in the long run.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q319_img1.webp" alt="Corporate Social Responsibility " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q319_img1.webp" alt="Corporate Social Responsibility " /></p>
 
 ### Body
 
@@ -22777,7 +22777,7 @@ CSR can make companies more profitable and sustainable by enhancing their reputa
 Corporate Social Responsibility (CSR) represents companies' commitment to contribute positively to society while pursuing business objectives, as mandated under Section 135 of Companies Act 2013.
 **Question ID: 2017-gs4-q105-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q695_img1.png" alt="Four Node Circular Flowchart Loop" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q695_img1.png" alt="Four Node Circular Flowchart Loop" /></p>
 
 Four Node Circular Flowchart Loop
 
@@ -22951,7 +22951,7 @@ Wars may still serve **political ends**, but in an age where humanity bears the 
 
 While this was apt in the 19th–20th centuries, the complexities of 21st-century geopolitics demand a critical re-examination of this view.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q62_img1.png" alt="Escalation from Diplomacy to Conventional War" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q62_img1.png" alt="Escalation from Diplomacy to Conventional War" /></p>
 
 Escalation from Diplomacy to Conventional War
 
@@ -23137,7 +23137,7 @@ To truly address global conflicts, powerful nations must balance their economic 
 
 The quote, by Eleanor Roosevelt, emphasizes that **ethical intent** must translate into **ethical action**. This is particularly relevant in today’s world where powerful nations often speak of peace but simultaneously support arms trade and proxy wars for strategic or economic gains.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q144_img1.png" alt="Military industrial complex influencing government policy" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q144_img1.png" alt="Military industrial complex influencing government policy" /></p>
 
 Military industrial complex influencing government policy
 
@@ -23361,7 +23361,7 @@ International aid, the voluntary transfer of resources from one country to anoth
 
 ## Ethical Issue Observed in International Aid Distribution
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q225_img1.png" alt="International Aid Ethical Ideals and Concerns" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q225_img1.png" alt="International Aid Ethical Ideals and Concerns" /></p>
 
 International Aid Ethical Ideals and Concerns
 
@@ -23562,7 +23562,7 @@ Friedrich Nietzsche has glorified the war and takes it as an agent of change and
 
 War is often seen as a failure of diplomacy, where political objectives override humanitarian concerns. The Russia-Ukraine war, now ongoing for over seven months, presents not only a geopolitical crisis but also raises profound ethical questions related to justice, sovereignty, human rights, and global responsibility. Ethical scrutiny is vital to assess not just the causes of war, but also its means and its consequences.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q306_img1.png" alt="Just War Theory Three Part Framework" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q306_img1.png" alt="Just War Theory Three Part Framework" /></p>
 
 Just War Theory Three Part Framework
 
@@ -23776,7 +23776,7 @@ More efforts can be put in skill development of refugees so that they can contri
 
 The principle of **non-refoulement**, enshrined in international law, prohibits returning refugees to territories where they face persecution, reflecting **Kant's categorical imperative** of treating humans as ends in themselves.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q388_img1.png" alt="Ethical Violations of Refoulement Hub Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q388_img1.png" alt="Ethical Violations of Refoulement Hub Diagram" /></p>
 
 Ethical Violations of Refoulement Hub Diagram
 
@@ -23967,7 +23967,7 @@ While the will to power may exist, it is ultimately the ability to tame and guid
 Emotional Intelligence, conceptualized by Daniel Goleman, encompasses the ability to recognize, understand, and manage emotions effectively in oneself and others, forming a crucial competency for ethical leadership and administrative excellence.
 **Question ID: 2020-gs4-q72-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q467_img1.png" alt="Emotional Intelligence Matrix Four Component Model" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q467_img1.png" alt="Emotional Intelligence Matrix Four Component Model" /></p>
 
 Emotional Intelligence Matrix Four Component Model
 
@@ -24032,7 +24032,7 @@ Security is derived from having strength. Strength in international relations is
 
 International relations refer to the interactions between nations, including diplomatic relations, trade agreements, and military alliances. These interactions are guided by various principles, or pillars, that define the relationships between nations. Three fundamental pillars of international relations are strength, peace, and security.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q360_img1.webp" alt=" pillar of IR" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q360_img1.webp" alt=" pillar of IR" /></p>
 
 ### Body
 
@@ -24084,7 +24084,7 @@ As nations become more interconnected and interdependent, they will need to work
 #### Answer from Superkalam
 Strength, peace, and security form the foundational trinity of international relations, as conceptualized by realist theorists like Hans Morgenthau and liberal institutionalists like Joseph Nye.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q703_img1.png" alt="Classical Temple Structural Pillar Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q703_img1.png" alt="Classical Temple Structural Pillar Diagram" /></p>
 
 Classical Temple Structural Pillar Diagram
 
@@ -24443,7 +24443,7 @@ The effective resolution of these ethical dilemmas also showcases a person's str
 Innovativeness and creativity represent the ability to devise novel solutions beyond conventional approaches, essential for public officials facing complex ethical dilemmas where standard protocols may prove inadequate.
 **Question ID: 2021-gs4-q55-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q381_img1.png" alt="Venn Diagram of Domain Knowledge Innovation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q381_img1.png" alt="Venn Diagram of Domain Knowledge Innovation" /></p>
 
 Venn Diagram of Domain Knowledge Innovation
 
@@ -24485,7 +24485,7 @@ Venn Diagram of Domain Knowledge Innovation
 #### Answer from Civilsdaily
 An **ethical dilemma** in public administration occurs when a public official is faced with a choice between two or more competing values or interests.
 
-<p align="center"><img src="images/page_44_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_44_diagram_1.png" alt="Diagram" /></p>
 
 ### Ethical Dilemmas in Civil Services
 
@@ -24571,7 +24571,7 @@ Public administration is a field that often presents complex ethical dilemmas du
 
 - A public official must decide whether to disclose confidential information that could prevent a serious crime from occurring.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q432_img1.webp" alt="ethical dilemmas" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q432_img1.webp" alt="ethical dilemmas" /></p>
 
 - A public servant must choose between honoring a superior's orders and upholding the law.
 
@@ -24627,7 +24627,7 @@ By following this process, public servants can make decisions that are in the be
 
 Gandhi's wisdom emphasizes that **emotional reactivity** and **rigid mindsets** obstruct rational judgment and **empathetic understanding**, essential for effective governance and social harmony.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q619_img1.png" alt="Sequential Flowchart With Box Labels" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q619_img1.png" alt="Sequential Flowchart With Box Labels" /></p>
 
 Sequential Flowchart With Box Labels
 
@@ -24764,7 +24764,7 @@ The **Bharatiya Nyaya Sanhita (BNS)** marks a monumental shift in India's judici
 
 The recent introduction of **Bharatiya Nyaya Sanhita (BNS)**, 2023 marks a significant paradigm shift in India's approach to criminal justice. While the IPC was largely based on the doctrine of punishment and deterrence, the BNS emphasizes justice, fairness, and Indian cultural ethos aligning the legal system more closely with ethical values and constitutional morality.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q152_img1.png" alt="IPC to BNS Paradigm Shift" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q152_img1.png" alt="IPC to BNS Paradigm Shift" /></p>
 
 IPC to BNS Paradigm Shift
 
@@ -24795,7 +24795,7 @@ The BNS marks a transition from the colonial concept of justice as punishment to
 
 ### Conscience as a Reliable Guide
 
-<p align="center"><img src="images/page_66_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_66_diagram_1.png" alt="Diagram" /></p>
 
 1. Conscience addresses the **"spirit" of justice** where the "letter" of the law may be silent, outdated, or inhumane. Eg- Civil disobedience movement by **Gandhiji**
 
@@ -24992,7 +24992,7 @@ Conscience refers to the inner moral compass that helps individuals distinguish 
 
 Laws, rules, and regulations, on the other hand, are externally imposed standards that ensure uniformity, order, and justice in society.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q226_img1.png" alt="Ethical Decision" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q226_img1.png" alt="Ethical Decision" /></p>
 
 Ethical Decision
 
@@ -25029,7 +25029,7 @@ In governance, a well-developed conscience guided by constitutional morality and
 #### Answer from Civilsdaily
 A **crisis of conscience** is a situation where an individual experiences an intense internal conflict between their deep-seated moral values and the actions they are pressured to take or have already taken.
 
-<p align="center"><img src="images/page_65_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_65_diagram_1.png" alt="Diagram" /></p>
 
 ### Manifestation in the Public Domain
 
@@ -25174,7 +25174,7 @@ It is important to recognize the importance of personal and professional ethics 
 Crisis of conscience refers to the internal moral conflict experienced when one's ethical principles clash with external pressures or institutional demands. Aristotle's concept of moral distress and Gandhi's emphasis on satyagraha highlight the tension between dharma and adharma in decision-making.
 **Question ID: 2019-gs4-q90-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q552_img1.png" alt="Crisis of Conscience Conceptual Framework Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q552_img1.png" alt="Crisis of Conscience Conceptual Framework Diagram" /></p>
 
 Crisis of Conscience Conceptual Framework Diagram
 
@@ -25328,7 +25328,7 @@ Public conscience, moral order and constitutional morality- ethics of politician
 
 Constitutional morality refers to the adherence of individuals, institutions, and governments to the principles and values enshrined in the constitution of a country. It is the belief that the constitution is the supreme law of the land, and all citizens and institutions must respect and uphold its provisions.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q476_img1.webp" alt="Constitutional morality" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q476_img1.webp" alt="Constitutional morality" /></p>
 
 ### Body
 
@@ -25375,7 +25375,7 @@ These examples illustrate how upholding constitutional morality is essential for
 Constitutional morality represents the spirit of constitutionalism - adherence to constitutional values, principles, and democratic ethos beyond mere legal compliance, as emphasized by Dr. B.R. Ambedkar during the Constituent Assembly debates.
 **Question ID: 2019-gs4-q89-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q551_img1.png" alt="Constitutional Morality Hub and Spoke Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q551_img1.png" alt="Constitutional Morality Hub and Spoke Diagram" /></p>
 
 Constitutional Morality Hub and Spoke Diagram
 
@@ -25481,7 +25481,7 @@ Law and ethics play complementary roles in controlling human conduct to make it 
 Attitude formation occurs through socialization processes where family and social environments unconsciously shape our worldview. Aristotle's virtue ethics emphasizes that character development requires conscious cultivation of desirable traits to overcome inherited biases.
 **Question ID: 2016-gs4-q121-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q782_img1.png" alt="Individual Attitude Values and Interconnected Nodes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q782_img1.png" alt="Individual Attitude Values and Interconnected Nodes" /></p>
 
 Individual Attitude Values and Interconnected Nodes
 
@@ -25539,7 +25539,7 @@ Individual Attitude Values and Interconnected Nodes
 
 A mere compliance with law is not enough for a public servant to effectively discharge their duties. They must also possess a well-developed sensibility to ethical issues. Ethics is concerned with the principles of right and wrong behavior, while the law is concerned with rules and regulations. A public servant who is only concerned with complying with the law may not always act in the best interest of the public.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q176_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q176_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -25699,7 +25699,7 @@ A voice of sense of right and wrong that is each nicely old-fashioned (formed by
 Voice of conscience represents the inner moral compass guiding ethical decision-making, as Kant's categorical imperative suggests acting according to universal moral laws, while Gandhi emphasized satyagraha as following one's inner truth.
 **Question ID: 2013-gs4-q156-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q1043_img1.png" alt="Circular Flowchart with Four Sequential Nodes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q1043_img1.png" alt="Circular Flowchart with Four Sequential Nodes" /></p>
 
 Circular Flowchart with Four Sequential Nodes
 
@@ -25801,7 +25801,7 @@ Crisis of conscience occurs when personal values clash with a decision or action
 Crisis of conscience represents the internal moral conflict between duty and personal values, as described by Kant's categorical imperative versus situational ethics, creating psychological tension requiring ethical resolution.
 **Question ID: 2013-gs4-q162-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q1049_img1.png" alt="Crisis of Conscience: A Conceptual Framework Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q1049_img1.png" alt="Crisis of Conscience: A Conceptual Framework Diagram" /></p>
 
 Crisis of Conscience: A Conceptual Framework Diagram
 
@@ -25881,7 +25881,7 @@ The statement reflects the idea of **Karma-Yoga** - that sincere devotion to one
 
 6. **Building Social Capital and Respect.** Eg- **Prashant Nair** (IAS) being called "Collector Bro" by the youth of Kozhikode
 
-<p align="center"><img src="images/page_47_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_47_diagram_1.png" alt="Diagram" /></p>
 
 7. **Resilience-** Devotion provides the "buffer" against the frustrations of transfers or political interference.
 
@@ -25937,7 +25937,7 @@ Devotion to duty is the **"alchemy"** that turns a bureaucrat into a public serv
 
 The **Sevottam Model** can be followed by the civil servants which is a framework developed by the Department of Administrative Reforms and Public Grievances (DARPG) to improve the quality of public service delivery.
 
-<p align="center"><img src="images/ethics_theoretical_questions_q5_img1.webp" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/ethics_theoretical_questions_q5_img1.webp" alt="Image" /></p>
 
 The transformation of the civil servant from a regulator to an enabler is crucial for India to achieve its development goals. By focusing on **citizen empowerment, leveraging technology for transparency** and efficiency, and building collaborative partnerships, civil servants can become the architects of a new, developed India. Committees like the **2nd ARC, Hota Committee (2004), and Surinder Nath Committee (2003)** emphasized that civil servants should act as **facilitators of development rather than mere regulators.**
 
@@ -26023,7 +26023,7 @@ The highest perfection in life, as a civil servant, comes not from personal acco
 Duty represents the moral obligation to act according to one's role and responsibilities, as emphasized by Kant's categorical imperative and the Bhagavad Gita's concept of dharma.
 **Question ID: 2025-gs4-q11-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q74_img1.png" alt="Civil Servant's Journey to Personal Fulfillment" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q74_img1.png" alt="Civil Servant's Journey to Personal Fulfillment" /></p>
 
 Civil Servant's Journey to Personal Fulfillment
 
@@ -26069,7 +26069,7 @@ Conventionally, corruption is viewed as the "misuse of public office for private
 
 1. **Breach of the "Social Contract" -** The public pays taxes in exchange for services. Non-performance is a unilateral breach of this trust.
 
-<p align="center"><img src="images/page_46_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_46_diagram_1.png" alt="Diagram" /></p>
 
 2. **Theft of Public Salary-** Taking a salary while deliberately avoiding work is "financial fraud" against the taxpayer. Eg- "Ghost employees" in various municipal bodies
 
@@ -26142,7 +26142,7 @@ Therefore, it is essential for every civil servant to perform their duty as mand
 
 The non-performance of duty by a public servant can be seen as a form of corruption because it violates the fundamental principle of accountability and results in a breach of public trust. When a public servant fails to perform their duty, they not only fail to serve the public interest but also deny the public of their rightful entitlements. Therefore, I agree with the view that non-performance of duty by a public servant is a form of corruption.
 
-<p align="center"><img src="images/pw_ethics_theoretical_questions_q475_img1.webp" alt="non-performance of duty" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_theoretical_questions_q475_img1.webp" alt="non-performance of duty" /></p>
 
 ### Body
 
@@ -26187,7 +26187,7 @@ Non-performance of duty by civil servants is a form of corruption that has signi
 Non-performance of duty represents a breach of public trust and constitutes corruption as defined by Transparency International and CVC guidelines.
 **Question ID: 2019-gs4-q81-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q543_img1.png" alt="Top-down flowchart with sequential rectangular boxes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q543_img1.png" alt="Top-down flowchart with sequential rectangular boxes" /></p>
 
 Top-down flowchart with sequential rectangular boxes
 
@@ -26243,7 +26243,7 @@ This statement reflects the principle of **Administrative Discretion** and **Inn
 
 Fundamental Rights. Eg- unauthorized phone tapping.
 
-<p align="center"><img src="images/page_55_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_55_diagram_1.png" alt="Diagram" /></p>
 
 2. **Financial Propriety-** Eg- following **due process** in tender allocation
 
@@ -26356,7 +26356,7 @@ The examples provided show that civil servants who prioritize integrity, intelli
 Rational policy for dam construction requires balancing developmental imperatives with environmental sustainability and tribal rights, guided by Rawls' veil of ignorance and Gandhi's sarvodaya principles.
 **Question ID: 2018-gs4-q93-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q620_img1.png" alt="Adaptive Management Framework for Infrastructure Projects" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q620_img1.png" alt="Adaptive Management Framework for Infrastructure Projects" /></p>
 
 Adaptive Management Framework for Infrastructure Projects
 
@@ -26535,7 +26535,7 @@ In conclusion, acting in the public interest is a fundamental principle of civil
 Conflict of interest occurs when personal interests compromise professional duties, as defined by Bentham's utilitarian ethics - where private gain undermines public good in decision-making processes.
 **Question ID: 2018-gs4-q102-superkalam**
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q631_img1.png" alt="Venn Diagram of Public Duty and Right" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q631_img1.png" alt="Venn Diagram of Public Duty and Right" /></p>
 
 Venn Diagram of Public Duty and Right
 
@@ -26653,7 +26653,7 @@ Weber's argument that public administration should be judged by a different mora
 
 Ethics, as defined by **Aristotle**, is the science of character and conduct that guides human behavior toward **eudaimonia** (flourishing). It serves as the foundation for creating harmonious societies and promoting individual well-being through moral principles and virtues.
 
-<p align="center"><img src="images/superkalam_ethics_theoretical_questions_q783_img1.png" alt="Concentric Circles Centered on Individual E" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_theoretical_questions_q783_img1.png" alt="Concentric Circles Centered on Individual E" /></p>
 
 Concentric Circles Centered on Individual E
 
@@ -26715,7 +26715,7 @@ Ethics creates a virtuous cycle where individual moral development strengthens s
 
 The case study involves discrimination against a Dalit cook in a primary school, leading to half of the children from higher castes being denied meals and a sharp decline in school attendance.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q241_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q241_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -26935,7 +26935,7 @@ The district of Rampura faces extreme backwardness and poverty, with a tribal po
 
 The migration of youth and the exploitation of minor girls in cotton farms highlight the challenges in the area. NGOs and welfare programs have been ineffective, exacerbating the situation.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q532_img1.webp" alt="stakeholders" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q532_img1.webp" alt="stakeholders" /></p>
 
 
 ### Body
@@ -27071,7 +27071,7 @@ The path of righteousness demands unwavering commitment to constitutional values
 
 The case study highlights the unethical use of child labor in the firecracker industry and the deceptive practices employed to evade legal norms. It calls for immediate action to protect the rights and well-being of children and strengthen enforcement of labor laws in the industry.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q50_img1.webp" alt="Picture59" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q50_img1.webp" alt="Picture59" /></p>
 
 ### Body
 
@@ -27120,7 +27120,7 @@ By taking these actions, a comprehensive approach can be adopted to address the 
 The case presents a classic **conflict between institutional integrity and administrative expediency**, where external pressure threatens the **merit-based selection process** in a premier technical institute. This situation exemplifies the challenge of maintaining ethical standards while managing institutional dependencies on government funding. **Stakeholders** - **Primary Stakeholders**: Institute head, interview panel members, all candidates, students, faculty
 - **Secondary Stakeholders**: Government functionary, PS, institute administration, academic community, society
 
-<p align="center"><img src="images/superkalam_ethics_case_studies_q1039_img1.png" alt="Institute head stakeholder diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q1039_img1.png" alt="Institute head stakeholder diagram" /></p>
 
 Institute head stakeholder diagram
 
@@ -27340,7 +27340,7 @@ The third option is suitable as it would be better to bring the situation under 
 
 The case involves a worker's death on duty, with the company denying compensation due to the worker's intoxication. This leads to a strike by the workers demanding compensation for the deceased worker's family.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q383_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q383_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -27517,7 +27517,7 @@ The reasons that could be attributed to such incidence on regular basis are disc
 
 The incident of a building collapse due to unauthorized extension highlights several issues. Such incidents occur across the country due to corruption, lax enforcement of regulations, and lack of safety measures. Migrant laborers are often exploited in these situations.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q311_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q311_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -27996,7 +27996,7 @@ Hence, to ensure the neutrality and efficacy of civil servants, there is a need 
 
 This case study highlights the ethical dilemma of a civil servant caught between upholding professional ethics and succumbing to political pressure, reminiscent of the Satyendra Dubey case involving corruption in highway construction.
 
-### Stakeholder Identification <p align="center"><img src="images/superkalam_ethics_case_studies_q228_img1.png" alt="Stakeholders in the case" /></p>
+### Stakeholder Identification <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q228_img1.png" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -28232,7 +28232,7 @@ Raman must balance law enforcement with ethical responsibility, protecting vulne
 
 This case highlights the ethical dilemma of balancing national security with individual freedoms in the digital age. The central ethical dilemma revolves around balancing the right to freedom of expression with the need to prevent radicalization and maintain national security.
 
-### Stakeholder Identification <p align="center"><img src="images/superkalam_ethics_case_studies_q147_img1.jpg" alt="Stakeholders in the case" /></p>
+### Stakeholder Identification <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q147_img1.jpg" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -28489,7 +28489,7 @@ India is a democratic country and media is said to be the 4th pillar of democrac
 
 The case involves illegal stone mining, corruption, and the pursuit of justice. It follows a determined SP and an investigative journalist as they uncover a nexus of corruption involving the stone mining mafia, officials, and politicians. The TV channel CMD faces an ethical dilemma when presented with the investigative report. This case highlights the challenges in fighting corruption and emphasizes the importance of transparency and ethics in addressing such issues for the betterment of society.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q690_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q690_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -28551,7 +28551,7 @@ Ashok should seek legal counsel and protection to ensure the safety of the evide
 
 This case highlights the precarious balance between journalistic integrity, political pressure, and the pursuit of justice in the context of illegal mining, mirroring the ongoing environmental and ethical challenges faced in regions like the Aravalli Hills. The central ethical dilemma revolves around Ashok's choice between personal gain and upholding the public trust doctrine, echoing the conflict between duty and morality.
 
-## Stakeholder Identification <p align="center"><img src="images/superkalam_ethics_case_studies_q307_img1.png" alt="Ashok Stakeholder diagram" /></p>
+## Stakeholder Identification <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q307_img1.png" alt="Ashok Stakeholder diagram" /></p>
 
 Ashok Stakeholder diagram
 
@@ -28729,7 +28729,7 @@ The company's CSR initiatives positively impacted the community, and its adheren
 
 Despite challenges like the fire incident and the COVID-19 lockdown, APW demonstrated resilience and commitment to its employees and the village.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q527_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q527_img1.webp" alt="stakeholder" /></p>
 
 
 ### Body
@@ -28868,7 +28868,7 @@ As the Head of the Budget Division, Rajesh Kumar is at the intersection of **dis
 
 11. Any perception of arbitrary diversion can erode **citizens’ trust in governance.**
 
-<p align="center"><img src="images/page_177_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_177_diagram_1.png" alt="Diagram" /></p>
 
 ### Options Available to Rajesh Kumar
 
@@ -28949,7 +28949,7 @@ Lastly, resigning cannot be considered a good idea. Resigning may reflect the es
 
 Rajesh Kumar, a senior public servant, faces the dilemma of re-appropriating funds from a welfare project to developmental projects. The re-appropriation of funds raises ethical concerns and comprises the National Housing Scheme's intended purpose. It can lead to financial implications, political sensitivity, and potential backlash from stakeholders.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q530_img1.webp" alt="stakeholders" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q530_img1.webp" alt="stakeholders" /></p>
 
 ### Body
 
@@ -29092,7 +29092,7 @@ Blockade always arises due to lack of faith and doubt on the intentions of the c
 
 The case study involves a large transnational company planning to establish a new plant in an underdeveloped area. The company's expansion aligns with government policies but raises concerns about social and economic disruption for the residents.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q244_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q244_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -29262,7 +29262,7 @@ A transparent, rule-based process combined with principled resistance to undue p
 | Approach: <br>› Frame the case as a conflict of interest between personal/family pressures and public duty. <br>› Identify ethical issues like nepotism, insider misuse, and probity in governance. <br>› Evaluate options-yielding to son/minister vs resisting pressures and using institutional safeguards. <br>› Conclude that resisting influence and upholding integrity is the most ethical path, consistent with constitutional values and codes of conduct. |
 | --- |
 
-<p align="center"><img src="images/ethics_case_studies_q3_img1.webp" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/ethics_case_studies_q3_img1.webp" alt="Image" /></p>
 
 **Introduction:**
 
@@ -29386,7 +29386,7 @@ The case presents a complex web of **conflicts of interest** and **abuse of publ
 
 This scenario reflects common challenges in public administration where **family relationships** and **political pressures** test an officer's commitment to ethical governance.
 
-### Stakeholders <p align="center"><img src="images/superkalam_ethics_case_studies_q76_img1.png" alt="Stakeholders in the case" /></p>
+### Stakeholders <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q76_img1.png" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -29529,7 +29529,7 @@ By integrating **technological transparency** with **social accountability,** I 
 | Approach: <br>› Recognise mismanagement in MGNREGA as a breach of accountability and social justice. <br>› Take immediate corrective steps like audits, DBT, and grievance redressal. <br>› Implement targeted measures such as biometric muster rolls, geo-tagging, and strict inquiries. <br>› Involve Gram Sabhas, build capacity of officials, and reinforce transparency and integrity in governance. |
 | --- |
 
-<p align="center"><img src="images/ethics_case_studies_q5_img1.webp" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/ethics_case_studies_q5_img1.webp" alt="Image" /></p>
 
 **Introduction:**
 
@@ -29660,7 +29660,7 @@ The mismanagement of MGNREGA is not just financial malpractice but a moral betra
 
 The case presents a severe **administrative and ethical crisis** involving systematic **MGNREGA fraud** under previous leadership. This situation demands immediate corrective action to restore program integrity and protect vulnerable rural beneficiaries' constitutional right to work under **Article 41**.
 
-### Stakeholders <p align="center"><img src="images/superkalam_ethics_case_studies_q73_img1.png" alt="Stakeholders in the case" /></p>
+### Stakeholders <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q73_img1.png" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -29884,7 +29884,7 @@ By implementing these solutions, civil services can create a more balanced and s
 
 This case highlights the classic ethical dilemma of work-life balance, particularly poignant for women in demanding professional roles. The central ethical dilemma revolves around Rashika’s struggle between her professional duty and her personal moral responsibility towards her family.
 
-### Stakeholder Identification <p align="center"><img src="images/superkalam_ethics_case_studies_q220_img1.png" alt="Stakeholders in the case" /></p>
+### Stakeholder Identification <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q220_img1.png" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -30098,7 +30098,7 @@ In today’s digital age, social media has become a powerful tool for communicat
 
 The case highlights how online spaces can be weaponized to harass, defame, and spread misinformation, especially involving vulnerable individuals like children. It also raises critical ethical questions around privacy, truth, and responsible digital conduct.
 
-### Stakeholder Identification <p align="center"><img src="images/superkalam_ethics_case_studies_q237_img1.png" alt="Stakeholders in the case" /></p>
+### Stakeholder Identification <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q237_img1.png" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -30265,7 +30265,7 @@ Although Prabhat is single earner in his family of two school going children and
 
 The case study presents a challenging situation for Prabhat, the Vice President of Marketing at Sterling Electric Ltd. Several ethical issues arise as Prabhat contemplates the offer made by Subhash Verma to provide stolen bid documents in exchange for employment.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q677_img1.webp" alt="stakeholders" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q677_img1.webp" alt="stakeholders" /></p>
 
 ### Body
 
@@ -30315,7 +30315,7 @@ Reporting the incident ensures that appropriate actions are taken against Subhas
 
 This case highlights the precarious position of Prabhat, torn between professional duty and personal exigencies. The central ethical dilemma revolves around Prabhat's choice between accepting stolen information for personal and company gain versus upholding ethical conduct and professional integrity.
 
-## Stakeholder Identification <p align="center"><img src="images/superkalam_ethics_case_studies_q302_img1.png" alt="Prabhat Stakeholder diagram" /></p>
+## Stakeholder Identification <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q302_img1.png" alt="Prabhat Stakeholder diagram" /></p>
 
 Prabhat Stakeholder diagram
 
@@ -30580,7 +30580,7 @@ I will go by the second option. Even though, it might bring a bad name to the co
 
 In the given case study, the Vice Principal of a college is faced with an ethical dilemma involving unfair means during examinations and the involvement of a senior lecturer who has close connections with influential individuals.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q634_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q634_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -30671,7 +30671,7 @@ While this option may entail risks and potential conflicts, it aligns with profe
 The case presents a complex **institutional integrity crisis** where academic ethics clash with administrative pressures and vested interests. The Vice Principal faces conflicting loyalties between upholding educational standards and maintaining institutional relationships that ensure college sustainability. **Stakeholders** - **Primary Stakeholders**: Vice Principal, Senior lecturer, Two students, Flying squad, College management, Student union
 - **Secondary Stakeholders**: University, Local politician, Businessman, College faculty, Other students, Community
 
-<p align="center"><img src="images/superkalam_ethics_case_studies_q395_img1.png" alt="Vice Principal stakeholder diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q395_img1.png" alt="Vice Principal stakeholder diagram" /></p>
 
 Vice Principal stakeholder diagram
 
@@ -30831,7 +30831,7 @@ The decision making of the civil servant is predominantly guided by the ethical 
 
 The case study involves the collapse of a mall construction resulting in the death of laborers, corruption, negligence, and influence peddling. The ethical issues include corruption, compromised integrity, exploitation of labor, and disregard for public safety.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q525_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q525_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -30975,7 +30975,7 @@ Government and its official through NGOs and their personnels must ensure that t
 
 The case study highlights the challenges faced by well-meaning individuals and NGOs in undertaking social service projects due to cumbersome government procedures, delays, and corruption.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q287_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q287_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -31075,7 +31075,7 @@ The vision of **"Minimum Government, Maximum Governance"** can only be realized 
 
 The case involves the discovery of irregularities in the acquisition of a plot for a school, which is part of a heritage fort.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q240_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q240_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -31257,9 +31257,9 @@ The ethical imperative demands protecting both **cultural heritage** and **child
 
 The CEO faces the choice of giving a bribe to secure a government order or refusing and risking the loss of the order. Balancing financial gain and ethical integrity is crucial in deciding the course of action.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q139_img1.webp" alt="Picture54" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q139_img1.webp" alt="Picture54" /></p>
 
-<p align="center"><img src="images/pw_ethics_case_studies_q129_img1.webp" alt="Picture51" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q129_img1.webp" alt="Picture51" /></p>
 
 ### Body
 
@@ -31686,7 +31686,7 @@ This case highlights the conflict between empathy and fiduciary duty within a fi
 
 The central ethical dilemma revolves around the bank manager's decision to use funds from a dormant account for a colleague's personal emergency, resembling instances of unauthorized access to customer funds reported in recent banking scandals.
 
-### Stakeholder Identification <p align="center"><img src="images/superkalam_ethics_case_studies_q235_img1.png" alt="Stakeholders in the case" /></p>
+### Stakeholder Identification <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q235_img1.png" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -31738,7 +31738,7 @@ While saving a life is noble, institutional integrity and rule of law cannot be 
 
 ### Ethical Issues in the Current Migrant Crisis
 
-<p align="center"><img src="images/page_170_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_170_diagram_1.png" alt="Diagram" /></p>
 
 1. **Violation of Human Dignity -** Migrants walking hundreds of kilometres reflected erosion of basic human dignity and compassion.
 
@@ -31838,7 +31838,7 @@ While monitoring the District Disaster Relief Force, I witnessed certain ethical
 
 The case study highlights the challenges faced by migrant workers during the pandemic-induced lockdown. It raises ethical concerns related to the rights of migrant workers, their dignity, equitable access to resources, humanitarian responsibility, and vulnerability to exploitation.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q522_img1.webp" alt="stakeholders" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q522_img1.webp" alt="stakeholders" /></p>
 
 ### Body
 
@@ -32105,7 +32105,7 @@ The disaster-prone state faces severe flooding and landslides, trapping thousand
 
 **As a civil services officer in a disaster-prone state, the order in which I would prioritize the rescue of people would be as follows:**
 
-<p align="center"><img src="images/pw_ethics_case_studies_q226_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q226_img1.webp" alt="stakeholder" /></p>
 
 
 - **Patients in hospitals:** Saving lives should be the top priority, and patients in hospitals are likely to be in critical condition and in need of immediate medical attention and care.
@@ -32277,7 +32277,7 @@ As the **Supreme Court** noted in the **T.N. Godavarman** case, the "Precautiona
 | Approach: <br>› Frame the case as a conflict between housing rights and forest protection. <br>› Assess ethical justification of deforestation using intergenerational justice and trusteeship. <br>› Highlight key socio-economic, administrative, and ethical challenges. <br>› Suggest sustainable alternatives and policy interventions. <br>› Conclude by stressing sustainable development as the ethical path. |
 | --- |
 
-<p align="center"><img src="images/ethics_case_studies_q2_img1.webp" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/ethics_case_studies_q2_img1.webp" alt="Image" /></p>
 
 **Introduction:**
 
@@ -32585,7 +32585,7 @@ True welfare must be sustainable. Ethical governance requires protecting both **
 
 1. **Green AI R&D-** Mandate that 20% of compute goes toward environmental research. Eg- NVIDIA’s Earth-2 digital twin.
 
-<p align="center"><img src="images/page_115_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_115_diagram_1.png" alt="Diagram" /></p>
 
 2. **Circular Economy for E-Waste-** 100% recycling of hardware. EgApple’s Daisy robot.
 
@@ -32625,7 +32625,7 @@ As CEO of ABC Incorporated, my immediate actions will focus on assessing emissio
 
 ### Body:
 
-<p align="center"><img src="images/ethics_case_studies_q7_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/ethics_case_studies_q7_img1.png" alt="Image" /></p>
 
 **(a). As CEO of ABC Incorporated, my immediate actions would include:**
 
@@ -32704,7 +32704,7 @@ As the **CEO** and **majority shareholder** of **ABC** Incorporated, headquarter
 
 This case highlights the tension between Business profitability, technological innovation and environmental sustainability.
 
-### Stakeholder Identification <p align="center"><img src="images/superkalam_ethics_case_studies_q153_img1.jpg" alt="Stakeholders in the case" /></p>
+### Stakeholder Identification <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q153_img1.jpg" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -32906,9 +32906,9 @@ The decision prioritizes substantive justice over procedural rigidity, ensuring 
 
 The case study highlights the conflict between economic development and environmental degradation.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q129_img1.webp" alt="Picture51" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q129_img1.webp" alt="Picture51" /></p>
 
-<p align="center"><img src="images/pw_ethics_case_studies_q139_img1.webp" alt="Picture54" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q139_img1.webp" alt="Picture54" /></p>
 
 ### Body
 
@@ -33290,7 +33290,7 @@ At the same time I would also engage with my senior to help change his mindset b
 
 The case study presents a dilemma where a young employee discovers that their boss engages in domestic violence at home.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q310_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q310_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -33418,7 +33418,7 @@ The situation demands balancing professional obligations with fundamental human 
 
 The case study presents a conflict between the elders of a rural village who oppose girls' education and the younger generation advocating for equal opportunities. The situation escalates when an incident of molestation occurs, leading to clashes and a law-and-order problem.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q242_img1.webp" alt="Picture50" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q242_img1.webp" alt="Picture50" /></p>
 
 ### Body
 
@@ -33507,9 +33507,9 @@ The case presents a complex socio-cultural conflict where **traditional patriarc
 
 In this case study, an honest officer is facing indiscipline and disruption from a section of employees. The troublemakers instigate a sexual harassment complaint against the officer.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q174_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q174_img1.webp" alt="stakeholder" /></p>
 
-<p align="center"><img src="images/pw_ethics_case_studies_q130_img1.webp" alt="Picture55" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q130_img1.webp" alt="Picture55" /></p>
 
 ### Body
 
@@ -33800,7 +33800,7 @@ Prompt action must be taken to address the complaint of harassment and inappropr
 The case presents a **conflict between transparency obligations and self-preservation** where a Public Information Officer faces potential disciplinary action for disclosing information about his own questionable decisions under the **RTI Act**. This dilemma tests the fundamental principles of administrative accountability versus personal consequences in public service. **Stakeholders** - **Primary Stakeholders**: PIO, RTI applicant, colleagues involved in decisions, superior officers
 - **Secondary Stakeholders**: Public at large, RTI system integrity, department reputation
 
-<p align="center"><img src="images/superkalam_ethics_case_studies_q1051_img1.png" alt="PIO stakeholder diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q1051_img1.png" alt="PIO stakeholder diagram" /></p>
 
 PIO stakeholder diagram
 
@@ -33933,7 +33933,7 @@ The case study presents a scenario where a manager of Company A, during a critic
 
 The manager faces dilemmas regarding whether to provide an honest account of the incident, which could jeopardize the deal and potentially lead to legal consequences for the manager of Company B.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q384_img1.webp" alt="stakeholders" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q384_img1.webp" alt="stakeholders" /></p>
 
 
 ### Body
@@ -34288,7 +34288,7 @@ Ashok must strike a balance between **humanitarian compassion and national secur
 | Approach: <br>› Frame the case as a clash between humanitarian duty and national security. <br>› Present options: allow all, deny all, admit only civilians, give border aid, or involve Army. <br>› Highlight dilemmas: compassion vs law, sovereignty vs refugee rights, urgency vs hierarchy. <br>› Recommend balanced action like aid civilians, disarm and detain soldiers, inform higher authorities |
 | --- |
 
-<p align="center"><img src="images/ethics_case_studies_q6_img1.webp" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/ethics_case_studies_q6_img1.webp" alt="Image" /></p>
 
 **Introduction:**
 
@@ -34443,7 +34443,7 @@ This case presents a **humanitarian crisis** at an international border where Di
 
 The situation involves vulnerable civilians fleeing conflict alongside armed military personnel, creating complex legal and ethical challenges requiring immediate action without higher authority guidance.
 
-### Stakeholders <p align="center"><img src="images/superkalam_ethics_case_studies_q61_img1.png" alt="Stakeholders in the case" /></p>
+### Stakeholders <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q61_img1.png" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -34597,7 +34597,7 @@ While doubling exports is a valid economic goal, it must be governed by a **Nati
 
 BML, a missile manufacturer, receives a request to increase production for potential arms exports. The Chairman reflects on the government's focus on self-reliance. The defense minister aims to double weapons exports to support indigenous development. Ethical factors include responsible arms trade and adherence to international norms. The decision to sell arms requires careful consideration of risks, consultation with experts, transparency, and promoting responsible use.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q536_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q536_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -35377,7 +35377,7 @@ Maintaining ethical standards, even under pressure, is critical. It preserves lo
 
 This case highlights the ethical dilemma of balancing the urgency of public health needs with the stringent ethical requirements of scientific research. The central ethical dilemma lies in choosing between expediting a potentially life-saving drug through unethical shortcuts versus upholding the integrity of scientific research.
 
-### Stakeholder Identification <p align="center"><img src="images/superkalam_ethics_case_studies_q140_img1.jpg" alt="Stakeholders in the case" /></p>
+### Stakeholder Identification <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q140_img1.jpg" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -35729,7 +35729,7 @@ If any extreme case, committee decision is not in favour of deceased family then
 
 The case presents a complex situation involving the death of a bus driver during an altercation, leading to a strike by the drivers' union and a standoff between the union, the deceased driver's family, and the City Transport Department management. Rakesh, as the Joint Commissioner, is faced with the task of resolving the situation. The analysis will focus on the stakeholders involved and their interests.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q678_img1.webp" alt="stakeholders " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q678_img1.webp" alt="stakeholders " /></p>
 
 ### Body
 
@@ -35855,7 +35855,7 @@ Rakesh should adopt a comprehensive approach that includes reviewing the compens
 
 This case highlights the conflict between upholding organizational policy and ensuring social justice for a bereaved family. The central ethical dilemma lies in balancing the City Transport Department's seemingly justified refusal of compensation against the deceased driver's family's desperate need, reflecting the tension between duty and morality.
 
-## Stakeholder Identification. <p align="center"><img src="images/superkalam_ethics_case_studies_q303_img1.png" alt="Rakesh Stakeholder diagram" /></p>
+## Stakeholder Identification. <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q303_img1.png" alt="Rakesh Stakeholder diagram" /></p>
 
 Rakesh Stakeholder diagram
 
@@ -36054,7 +36054,7 @@ Serving as administrator either in public or private hospital will give me an op
 
 The case study highlights the challenges faced by a hospital administrator during the COVID-19 pandemic in India.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q616_img1.webp" alt="stakeholders" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q616_img1.webp" alt="stakeholders" /></p>
 
 ### Body
 
@@ -36103,7 +36103,7 @@ Ensure staff safety, allocate resources effectively, collaborate with stakeholde
 The COVID-19 pandemic exposed critical vulnerabilities in India's healthcare system, creating unprecedented ethical challenges for hospital administrators. With **56,342 positive cases** by May 2020 and severe resource constraints including shortages of hospital beds, oxygen cylinders, and staff, administrators faced life-and-death decisions daily. This crisis demanded balancing **duty of care** with **staff safety** while ensuring equitable treatment amid overwhelming demand. **Stakeholders** - **Primary Stakeholders**: COVID-19 patients, clinical staff (doctors, nurses), non-clinical staff, hospital administrator
 - **Secondary Stakeholders**: Patients' families, community, government health authorities, medical associations
 
-<p align="center"><img src="images/superkalam_ethics_case_studies_q391_img1.png" alt="Covid patients stakeholder diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q391_img1.png" alt="Covid patients stakeholder diagram" /></p>
 
 Covid patients stakeholder diagram
 
@@ -36160,7 +36160,7 @@ Politicization of bureaucracy refers to a situation where civil servants act bas
 1. **Administrative Consequences**
 &nbsp;&nbsp;&nbsp;&nbsp;- **Distorted Policy Priorities** - schemes driven by electoral calculus (loan waivers, sub-quotas) over developmental rationality.<br>
 
-<p align="center"><img src="images/page_188_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_188_diagram_1.png" alt="Diagram" /></p>
 
 - **Decision Paralysis** - officers hesitate to take bold decisions, fearing punitive transfers.
 
@@ -36369,7 +36369,7 @@ The politicization of bureaucracy ultimately transforms the administrative appar
 
 This case echoes the **Adarsh Society scam and the Karnataka mining cases** - situations where insider information and political position created irresistible private-gain opportunities, with public cost.
 
-<p align="center"><img src="images/page_197_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_197_diagram_1.png" alt="Diagram" /></p>
 
 ### Stakeholders
 
@@ -36677,7 +36677,7 @@ It is essential to maintain a high standard of ethical conduct and avoid succumb
 This case presents a critical conflict between **official duty** and **hierarchical pressure**, involving potential misuse of confidential government information for private gain. The situation tests the officer's commitment to **public trust** and **administrative integrity** against loyalty to superiors and established relationships. **Stakeholders** - **Primary Stakeholders**: Senior Finance Ministry officer, immediate superior, builder, general public, government
 - **Secondary Stakeholders**: Housing industry, other builders, media, anti-corruption agencies
 
-<p align="center"><img src="images/superkalam_ethics_case_studies_q1050_img1.png" alt="Finance Ministry stakeholder diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q1050_img1.png" alt="Finance Ministry stakeholder diagram" /></p>
 
 Finance Ministry stakeholder diagram
 
@@ -36748,7 +36748,7 @@ This approach balances **administrative hierarchy** with **constitutional obliga
 | Approach: <br>› Introduce the case as a conflict between personal duty and professional responsibility. <br>› List ethical dilemmas such as personal vs professional duty, emotional vs rational choice, and short-term vs long-term consequences. <br>› Critically evaluate all available options with their pros and cons. <br>› Conclude by justifying the most ethical option. |
 | --- |
 
-<p align="center"><img src="images/ethics_case_studies_q1_img1.webp" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/ethics_case_studies_q1_img1.webp" alt="Image" /></p>
 
 **Introduction:**
 
@@ -37217,7 +37217,7 @@ There can be the following consequences of overlooking the observations raised b
 
 The case presents a dilemma for the protagonist, who must decide whether to comply with the top management's order to clear a poor-quality consignment or to raise concerns about the potential damage to the company's reputation. The available options include compliance, refusal to sign off, seeking guidance, or reporting anonymously.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q707_img1.webp" alt="stakeholders" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q707_img1.webp" alt="stakeholders" /></p>
 
 ### Body
 
@@ -37291,7 +37291,7 @@ It is crucial to consider these potential consequences and make decisions that a
 
 This case study highlights the conflict between professional ethics and economic pressures faced by a young manager.The central ethical dilemma lies in choosing between professional integrity, potentially losing his job, and complying with the management's directive to approve substandard products, jeopardizing consumer safety.
 
-## Stakeholder Identification. <p align="center"><img src="images/superkalam_ethics_case_studies_q316_img1.png" alt="Product inspector Stakeholder diagram" /></p>
+## Stakeholder Identification. <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q316_img1.png" alt="Product inspector Stakeholder diagram" /></p>
 
 Product inspector Stakeholder diagram
 
@@ -37566,7 +37566,7 @@ The presented case study exhibits the case of abuse of authority, lack of emoti
 
 The case study involves Pawan, an officer facing harassment and humiliation from his senior officer, resulting in negative impacts on his personal and professional life.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q611_img1.webp" alt="stakeholders" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q611_img1.webp" alt="stakeholders" /></p>
 
 ### Body
 
@@ -37655,7 +37655,7 @@ By investing in these training programs, government offices can foster a healthi
 This case presents a **workplace harassment scenario** where Pawan faces systematic humiliation and belittlement by his senior officer, creating a toxic work environment that severely impacts his mental health, family relationships, and overall well-being. The situation reflects broader issues of **administrative ethics**, **workplace dignity**, and **psychological safety** in government offices. **Stakeholders** - **Primary Stakeholders**: Pawan, Senior Officer, Pawan's family members, Other office colleagues
 - **Secondary Stakeholders**: Department administration, Government employees' welfare associations, Citizens receiving services
 
-<p align="center"><img src="images/superkalam_ethics_case_studies_q387_img1.png" alt="Pawan stakeholder diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q387_img1.png" alt="Pawan stakeholder diagram" /></p>
 
 Pawan stakeholder diagram
 
@@ -37754,7 +37754,7 @@ The above actions, on one hand, will ensure timely medical attention for the acc
 
 This case study revolves around a situation faced by an aspiring IAS officer on the day of their personal interview. While en route to the interview venue, they come across a distressing accident involving their relatives, a mother and child, who are in critical condition and urgently require assistance.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q382_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q382_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -37913,7 +37913,7 @@ Thus, authorities must act decisively to deter misconduct, while companies must 
 
 The food company's violation of domestic food standards and selling rejected export products in the domestic market has resulted in damage to its reputation and profitability.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q560_img1.webp" alt="stakeholders" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q560_img1.webp" alt="stakeholders" /></p>
 
 ### Body
 
@@ -37976,7 +37976,7 @@ The food company's violation of domestic food standards and selling rejected exp
 This case presents a serious breach of **food safety standards** and **consumer trust** where a reputed company compromised domestic product quality while maintaining export standards. The **dual standard approach** reflects deeper ethical failures in corporate governance, similar to recent cases where companies exported quality products while selling substandard variants domestically, endangering public health and violating regulatory compliance. **Stakeholders** - **Primary Stakeholders**: Food company, domestic consumers, competent regulatory authority, employees
 - **Secondary Stakeholders**: Export partners, competitors, food industry, public health system
 
-<p align="center"><img src="images/superkalam_ethics_case_studies_q377_img1.png" alt="Food company stakeholder diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q377_img1.png" alt="Food company stakeholder diagram" /></p>
 
 Food company stakeholder diagram
 
@@ -38036,7 +38036,7 @@ The case demonstrates how **utilitarian ethics** demands prioritizing greatest g
 
 The Executive Engineer faces a dilemma of addressing serious deviations in a flyover construction.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q94_img1.webp" alt="Picture58 1" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q94_img1.webp" alt="Picture58 1" /></p>
 
 ### Body
 
@@ -38157,7 +38157,7 @@ The Executive Engineer faces a dilemma of addressing serious deviations in a fly
 The case presents a complex ethical dilemma involving **child labor exploitation** disguised as household-based work in Sivakasi's firecracker industry. This situation exemplifies the tension between economic development and child welfare, where **regulatory loopholes** enable systematic violation of children's rights while supporting local livelihoods. **Stakeholders** - **Primary Stakeholders**: Children below 14 years, unit owner, parents/families of children, local community
 - **Secondary Stakeholders**: Government authorities, labor inspectors, NGOs, consumers, international organizations
 
-<p align="center"><img src="images/superkalam_ethics_case_studies_q1052_img1.png" alt="Child labour exploitation stakeholder diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q1052_img1.png" alt="Child labour exploitation stakeholder diagram" /></p>
 
 Child labour exploitation stakeholder diagram
 
@@ -38240,7 +38240,7 @@ This case study illustrates the classic **"Seniority-Integrity Trap."** Rajesh f
 
 ### Most appropriate course of action
 
-<p align="center"><img src="images/page_109_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_109_diagram_1.png" alt="Diagram" /></p>
 
 | Ethical principle | How the action satisfies it |
 | --- | --- |
@@ -38267,7 +38267,7 @@ By standing firm on the GFR, he demonstrates the **Fortitude.** True competence 
 | Approach: <br>› Present the case as a conflict between career concerns and financial propriety under GFRs. <br>› Identify ethical issues like integrity vs career progression, conflict of interest, and transparency vs conformity. <br>› Analyse possible options <br>› Conclude by highlighting compliance with GFRs, transparency, and accountability |
 | --- |
 
-<p align="center"><img src="images/ethics_case_studies_q4_img1.webp" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/ethics_case_studies_q4_img1.webp" alt="Image" /></p>
 
 **Introduction:**
 
@@ -38386,7 +38386,7 @@ Rajesh must act with the spirit of Rama’s rajdharma, Nachiketa’s truthfulnes
 
 The case presents a classic **administrative dilemma** where Rajesh faces conflict between career aspirations and procedural compliance. The **splitting of expenditure** practice violates **GFR provisions** while his superior expects swift procurement action, creating pressure on his upcoming **ACR assessment** and **JAG promotion**.
 
-### Stakeholders <p align="center"><img src="images/superkalam_ethics_case_studies_q75_img1.png" alt="Stakeholders in the case" /></p>
+### Stakeholders <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q75_img1.png" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -38611,7 +38611,7 @@ In recent years, despite significant **collaborative efforts** by Central and St
 
 The central ethical dilemma revolves around Rohit's choice between upholding the law by detaining captured Naxalites and maintaining public order by potentially releasing them, mirroring the 2021 Chhattisgarh Naxal attack where similar tensions arose between security forces and local communities.
 
-### Stakeholder Identification <p align="center"><img src="images/superkalam_ethics_case_studies_q157_img1.jpg" alt="Stakeholders in the case" /></p>
+### Stakeholder Identification <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q157_img1.jpg" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -38941,7 +38941,7 @@ To ensure long-term water sustainability, the **District Collector** must adopt 
 
 The central ethical dilemma lies in ensuring equitable distribution of a scarce resource (water) amidst competing demands from farmers, industry, and domestic needs, with allegations of corruption exacerbating the situation.
 
-### Stakeholder Identification. <p align="center"><img src="images/superkalam_ethics_case_studies_q158_img1.jpg" alt="Stakeholders in the case" /></p>
+### Stakeholder Identification. <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q158_img1.jpg" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -39362,7 +39362,7 @@ This case highlights a critical ethical dilemma concerning workplace harassment 
 
 Similar to the #MeToo movement, which exposed widespread workplace harassment, this case underscores the urgent need for ethical leadership.
 
-### Stakeholder Identification <p align="center"><img src="images/superkalam_ethics_case_studies_q236_img1.png" alt="Stakeholders in the case" /></p>
+### Stakeholder Identification <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q236_img1.png" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -39602,7 +39602,7 @@ The ethical dilemma which I will face is between the completion of duty and comp
 
 The situation involves the enforcement of environmental compliance in a region with numerous small and medium industries. The industries are found to be violating environmental regulations, leading to health issues for the local population. The officer in charge is facing opposition from industrial units, vested interest groups, and politicians, while receiving support from colleagues and NGOs.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q706_img1.webp" alt="stakeholders" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q706_img1.webp" alt="stakeholders" /></p>
 
 ### Body
 
@@ -39754,7 +39754,7 @@ The case study highlights the challenges of environmental compliance and involve
 
 This case highlights the conflict between economic development and environmental conservation, echoing the contemporary debate surrounding sustainable industrial practices. The central ethical dilemma revolves around balancing the need for employment and economic stability against the detrimental environmental and health impacts of polluting industries.
 
-## Stakeholder Identification <p align="center"><img src="images/superkalam_ethics_case_studies_q315_img1.png" alt="Me as Officer stakeholder diagram" /></p>
+## Stakeholder Identification <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q315_img1.png" alt="Me as Officer stakeholder diagram" /></p>
 
 Me as Officer stakeholder diagram
 
@@ -40184,7 +40184,7 @@ A scientist discovers a potential cure for an incurable liver disease prevalent 
 
 The CEO faces the dilemma of whether to invest Rs. 50 crores in developing the drug variant despite limited market prospects.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q207_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q207_img1.webp" alt="stakeholder" /></p>
 
 
 ### Body
@@ -40337,7 +40337,7 @@ In an unethical environment, balancing pragmatism with ethical principles is cru
 
 A small minority practicing ethics can still make a difference, and economic progress should not compromise ethical considerations.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q138_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q138_img1.webp" alt="stakeholder" /></p>
 
 
 ### Body
@@ -40471,9 +40471,9 @@ This approach transforms individual ethical dilemma into collective action for s
 
 In the given case study, Rameshwar, a civil services officer, discovers several malpractices in his department and seeks advice on how to address the situation.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q130_img1.webp" alt="Picture55" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q130_img1.webp" alt="Picture55" /></p>
 
-<p align="center"><img src="images/pw_ethics_case_studies_q117_img1.webp" alt="Picture56" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q117_img1.webp" alt="Picture56" /></p>
 
 ### Body
 
@@ -40782,7 +40782,7 @@ The above case is about the contemporary issue of illegal sand mining, exploitat
 
 In this case study, Sunil, a young civil servant, is assigned the task of combating illegal sand mining in a tribal-dominated district. He discovers the deep-rooted nexus between the mafia, local functionaries, and tribal musclemen. Sunil takes decisive action, conducting raids and targeting the mafia's operations. However, this leads to threats, harassment, and surveillance of his family.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q615_img1.webp" alt="stakeholders" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q615_img1.webp" alt="stakeholders" /></p>
 
 ### Body
 
@@ -40837,7 +40837,7 @@ By reaching out to higher authorities and anti-corruption agencies, he can gain 
 The case presents a **critical ethical dilemma** where civil servant **Sunil** faces life-threatening opposition while combating illegal sand mining mafia in a tribal district. This situation exemplifies the conflict between **administrative duty** and **personal safety**, testing the limits of bureaucratic courage. The **death threat** referencing a predecessor's murder and **family surveillance** escalate this beyond routine administrative challenges, demanding careful strategic response. **Stakeholders** - **Primary Stakeholders**: Sunil, his family, tribal community, local administration, sand mining mafia
 - **Secondary Stakeholders**: State government, judiciary, media, civil society, future officers
 
-<p align="center"><img src="images/superkalam_ethics_case_studies_q390_img1.png" alt="Sunil Stakeholder diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q390_img1.png" alt="Sunil Stakeholder diagram" /></p>
 
 Sunil Stakeholder diagram
 
@@ -40939,7 +40939,7 @@ The above steps will help in segregating genuine applications from the non genui
 
 The presence of non-genuine RTI applications and extortion attempts by RTI activists has adversely affected the functioning of the administration and jeopardizes the credibility of genuine applications seeking justice.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q380_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q380_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -41072,7 +41072,7 @@ As **Mahatma Gandhi** emphasized, "Be the change you wish to see in the world" -
 
 The Public Information Officer (PIO) is faced with an ethical dilemma regarding disclosing information that may lead to disciplinary action against him and his colleagues.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q2_img1.webp" alt="Picture57" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q2_img1.webp" alt="Picture57" /></p>
 
 ### Body
 
@@ -41127,7 +41127,7 @@ The Public Information Officer (PIO) is faced with an ethical dilemma regarding 
 The case presents a critical **public safety dilemma** where an Executive Engineer discovers serious structural deviations in a flyover construction that could compromise safety, while facing pressure from superiors to ignore the issues and complete the project on time. **Stakeholders** - **Primary Stakeholders**: Executive Engineer, Chief Engineer, Junior Engineers, contractor, general public using the flyover
 - **Secondary Stakeholders**: Municipal Corporation, traffic management authorities, media, political leadership
 
-<p align="center"><img src="images/superkalam_ethics_case_studies_q1035_img1.png" alt="Executive Engineer stakeholder diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q1035_img1.png" alt="Executive Engineer stakeholder diagram" /></p>
 
 Executive Engineer stakeholder diagram
 
@@ -41233,7 +41233,7 @@ Such displacements straight away violate the right to life of the dwellers of su
 
 The case study highlights the displacement of marginalized communities for large-scale projects, with inadequate and delayed compensation. The unjust distribution of costs and benefits favors industries and urban communities.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q279_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q279_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -41460,7 +41460,7 @@ My action would provide the benefit of scheme to old women and would not keep he
 
 The officer faces a dilemma when an old and destitute woman lacks the necessary documents for a social service scheme.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q288_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q288_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -41565,7 +41565,7 @@ The socio-economic factors contributing to this issue include limited employment
 
 Additionally, emotional and attitudinal factors such as the perception of cities as centers of opportunities, social status, and the desire for improved education and healthcare also play a role.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q117_img1.webp" alt="Picture56" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q117_img1.webp" alt="Picture56" /></p>
 
 
 ### Body
@@ -41798,7 +41798,7 @@ Thus, by upholding truth, integrity, I can ensure **quality** public infrastruct
 
 In this case study, the project manager faces an ethical dilemma when a minor crack is noticed in one of the piers of an elevated corridor under construction. The chief engineer, driven by political pressure and personal interests, orders the manager to overlook the crack and continue working at the same speed. The project manager strongly believes that the crack will adversely affect the bridge's health and safety.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q561_img1.webp" alt="stakeholders" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q561_img1.webp" alt="stakeholders" /></p>
 
 ### Body
 
@@ -41871,7 +41871,7 @@ Project managers must choose between prioritizing safety and meeting political d
 The case presents a critical **infrastructure safety dilemma** where a project manager faces pressure to compromise structural integrity for political deadlines. The **elevated corridor project** involves potential public safety risks due to structural defects, creating conflict between professional duty and administrative pressure. This mirrors real-world scenarios where civil engineers face similar pressures in mega infrastructure projects. **Stakeholders** - **Primary Stakeholders**: Project manager, Chief Engineer, Minister, Chief Minister, Contractor, Future users of corridor
 - **Secondary Stakeholders**: Inspecting team, Construction workers, State government, General public, Political parties
 
-<p align="center"><img src="images/superkalam_ethics_case_studies_q378_img1.png" alt="Project manager stakeholder diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q378_img1.png" alt="Project manager stakeholder diagram" /></p>
 
 Project manager stakeholder diagram
 
@@ -42171,7 +42171,7 @@ There is high chance of her loosing the job, so simultaneously she can start loo
 
 The engineering graduate faces an ethical dilemma of whether to prioritize her job security or the well-being of downstream villagers affected by toxic waste discharge. She must weigh the potential consequences and make a decision that aligns with her moral values and responsibilities.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q243_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q243_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 
@@ -42411,7 +42411,7 @@ If the situation persists, seeking guidance from a higher authority or ethics co
 The case presents a critical **workplace sexual harassment** dilemma where exceptional professional performance conflicts with serious misconduct allegations, requiring immediate ethical intervention to protect organizational integrity and employee safety. **Stakeholders** - **Primary Stakeholders**: Mrs. X (complainant), Mr. A (accused), female colleagues, Executive Director, company employees
 - **Secondary Stakeholders**: Company shareholders, clients, industry reputation, future employees
 
-<p align="center"><img src="images/superkalam_ethics_case_studies_q1036_img1.png" alt="Mrs X stakeholder Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q1036_img1.png" alt="Mrs X stakeholder Diagram" /></p>
 
 Mrs X stakeholder Diagram
 
@@ -42500,7 +42500,7 @@ This case highlights the "Conflict of Interest" in private sector procurement. W
 
 ### Justification
 
-<p align="center"><img src="images/page_121_diagram_1.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/page_121_diagram_1.png" alt="Diagram" /></p>
 
 1. **Fiduciary Duty-** Her primary loyalty is to the hospital's stakeholders and patients, not her family’s business.
 
@@ -42728,7 +42728,7 @@ In navigating this ethical dilemma, Sneha’s commitment to **integrity**, **tra
 
 Sneha, as a Senior Manager and head of procurement, is entrusted with ensuring fairness, transparency, and accountability in vendor selection. However, the participation of her brother, who is financially unstable, introduces a conflict of interest that may compromise the hospital’s standards and her own integrity.
 
-### Stakeholder Identification <p align="center"><img src="images/superkalam_ethics_case_studies_q148_img1.jpg" alt="Stakeholders in the case" /></p>
+### Stakeholder Identification <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q148_img1.jpg" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -42975,7 +42975,7 @@ This case highlights the conflict between established medical protocols and the 
 
 The central ethical dilemma lies in balancing the established protocol of procuring blood from recognized blood banks (deontological approach) against the immediate need to save a life in a disaster-stricken area (utilitarian approach).
 
-### Stakeholder Identification <p align="center"><img src="images/superkalam_ethics_case_studies_q219_img1.png" alt="Stakeholders in the case" /></p>
+### Stakeholder Identification <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q219_img1.png" alt="Stakeholders in the case" /></p>
 
 Stakeholders in the case
 
@@ -43261,7 +43261,7 @@ The given case study pertains to a seemingly recurring issue that the officers i
 
 The case study revolves around Ramesh, the Director of the Home Department in a bordering state, who uncovers the infiltration of illegal migrants with the connivance of security personnel. However, he faces pressure from the Additional Home Secretary to withdraw his comprehensive report on the matter.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q679_img1.webp" alt="stakeholders" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q679_img1.webp" alt="stakeholders" /></p>
 
 ### Body
 
@@ -43325,7 +43325,7 @@ These measures should be implemented in a comprehensive and coordinated manner t
 
 This case study highlights the conflict between duty and personal gain, echoing the ethical challenges faced by civil servants like Ashok Khemka. The central ethical dilemma revolves around Ramesh's choice between upholding his duty to report illegal immigration, a critical aspect of national security and protecting his career and family's well-being.
 
-## Stakeholder Identification <p align="center"><img src="images/superkalam_ethics_case_studies_q304_img1.png" alt="Ramesh Stakeholder Diagram" /></p>
+## Stakeholder Identification <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ethics_case_studies_q304_img1.png" alt="Ramesh Stakeholder Diagram" /></p>
 
 Ramesh Stakeholder Diagram
 
@@ -43433,7 +43433,7 @@ Ramesh’s situation reflects a classic clash between ethics and convenience, in
 
 The case study involves a private company facing a violent mob demanding jobs. As the CEO, immediate actions should focus on ensuring employee safety, engaging in dialogue, and seeking legal intervention if necessary.
 
-<p align="center"><img src="images/pw_ethics_case_studies_q176_img1.webp" alt="stakeholder" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ethics_case_studies_q176_img1.webp" alt="stakeholder" /></p>
 
 ### Body
 

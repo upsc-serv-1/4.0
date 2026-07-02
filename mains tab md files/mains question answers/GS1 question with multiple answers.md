@@ -33,7 +33,7 @@ Eg- **Khavda Hybrid Park** in the Rann of Kutch
 
 8. **Protection of Glacial Regions - Eg-** Solar projects in **Ladakh (13 GW planned)** can reduce black carbon deposits on glaciers, which otherwise accelerate melting.
 
-<p align="center"><img src="images/civilsdaily_p69_img35.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p69_img35.png" alt="Diagram" /></p>
 
 **Economic Benefits**
 
@@ -202,7 +202,7 @@ Solar energy in India reduces emissions, conserves resources, and ensures **ener
 
 India's solar capacity crossed **136 GW in 2025**, making it the world's third-largest solar energy producer while delivering significant ecological and economic dividends.
 
-<p align="center"><img src="images/superkalam_geography_q8_img1.png" alt="India's solar power potential and parks" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q8_img1.png" alt="India's solar power potential and parks" /></p>
 
 India's solar power potential and parks
 
@@ -237,7 +237,7 @@ Solar energy transformation exemplifies India's commitment to sustainable develo
 
 are found in **sedimentary basins,** where organic matter is trapped under pressure. Offshore reserves account for **~30% of global crude oil** production. Their distribution is linked to **continental shelf geology, passive margins, and deep-water basins.**
 
-<p align="center"><img src="images/civilsdaily_p72_img38.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p72_img38.png" alt="Diagram" /></p>
 
 **Geographical distribution**
 
@@ -345,7 +345,7 @@ The **geography of offshore oil reserves** shows their concentration in **contin
 **Oil reserves** are formed in **sedimentary basins** where organic matter is trapped and transformed over geological time. Offshore oil reserves, found beneath **continental shelves** and **oceanic basins**, have emerged as key resources shaping the geography of **global energy distribution**. 
 
 ### Body
-<p align="center"><img src="images/pw_geography_q892_img1.jpg" alt="Screenshot 2025 09 13 142242" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q892_img1.jpg" alt="Screenshot 2025 09 13 142242" /></p>
 
 **Geographical Explanation for the Distribution of Offshore Oil Reserves**
 - **Continental Shelves:** Broad and shallow shelves favour thick deposition of marine sediments rich in organic matter, which, under pressure convert into **hydrocarbons**.
@@ -391,7 +391,7 @@ The distribution of offshore oil reserves underlines geography’s role in **glo
 
 Onshore oil reserves are those found on land, such as the Cambay Basin and Assam fields in India, while offshore oil reserves lie beneath the seabed, like the Mumbai High and KG-D6 basins. As onshore fields mature and deplete, offshore reserves are increasingly important for meeting global and national energy demands.
 
-<p align="center"><img src="images/superkalam_geography_q9_img1.png" alt="Major offshore oil provinces around world" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q9_img1.png" alt="Major offshore oil provinces around world" /></p>
 
 Major offshore oil provinces around world
 
@@ -431,7 +431,7 @@ As India rapidly expands deepwater energy security via **OALP Round-X (2025)**, 
 
 India is the 4th **largest wind power producer** in the world. Wind energy constitutes around 25% of total renewable energy production in India.
 
-<p align="center"><img src="images/civilsdaily_p70_img36.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p70_img36.png" alt="Diagram" /></p>
 
 **Wind energy potential in India**
 
@@ -532,7 +532,7 @@ The wind is used to produce electricity using the kinetic energy created by air 
 
 India is the world’s fourth largest country in terms of total wind installations after China, the USA and Germany. India has a manufacturing base of about 10 GW per annum. The total installed wind capacity in India is 40.8 GW as of June 30, 2022. States like Tamil Nadu, Gujarat, Karnataka, and Maharashtra were the leading markets for wind, accounting for 72.3% of the cumulative capacity.
 
-<p align="center"><img src="images/pw_geography_q660_img1.webp" alt="wind power installation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q660_img1.webp" alt="wind power installation" /></p>
 
 
 
@@ -603,7 +603,7 @@ Therefore, steps to harness offshore winds, Increase hub height, deploy larger t
 
 India has the **4th largest installed wind power capacity** in the world (~45 GW as of 2024, MNRE data). Its long coastline (~7,500 km) and high-wind inland plateaus provide significant renewable energy opportunities, aligning with India’s **National Wind-Solar Hybrid Policy** and **Net Zero 2070 target**.
 
-<p align="center"><img src="images/superkalam_geography_q247_img1.png" alt="India wind energy potential outline map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q247_img1.png" alt="India wind energy potential outline map" /></p>
 
 India wind energy potential outline map
 
@@ -641,7 +641,7 @@ India’s **wind energy potential is immense** but geographically uneven. Achiev
 
 Mineral oil (petroleum) is a **strategic, exhaustible, and unevenly distributed resource,** with major reserves concentrated in regions such as the **Middle East, Russia, and North America.**
 
-<p align="center"><img src="images/civilsdaily_p71_img37.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p71_img37.png" alt="Diagram" /></p>
 
 **Implications of uneven distribution of mineral oils in the world**
 
@@ -781,7 +781,7 @@ Because of these factors, the countries which have traditionally low levels of m
 
 Uneven mineral oil distribution creates complex global dynamics affecting geopolitics, economics, and environmental patterns. Recent data shows **70% of proven reserves** concentrated in just 10 countries, fundamentally reshaping international relations.
 
-<p align="center"><img src="images/superkalam_geography_q323_img1.png" alt="Global Mineral Oil Distribution and Trade" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q323_img1.png" alt="Global Mineral Oil Distribution and Trade" /></p>
 
 Global Mineral Oil Distribution and Trade
 
@@ -807,7 +807,7 @@ Global Mineral Oil Distribution and Trade
 
 ## Environmental and Technological Implications
 
-<p align="center"><img src="images/superkalam_geography_q323_img2.png" alt="Global Oil Distribution showing concentration in Middle East, Americas, and Russia with environmental impact zones" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q323_img2.png" alt="Global Oil Distribution showing concentration in Middle East, Americas, and Russia with environmental impact zones" /></p>
 
 Global Oil Distribution showing concentration in Middle East, Americas, and Russia with environmental impact zones
 
@@ -832,7 +832,7 @@ The uneven mineral oil distribution continues reshaping global dynamics, with **
 
 India has emerged as a global leader in solar energy with over **140 GW of installed solar capacity (Nov 2025)** and ranks **3rd in the world in solar capacity and generation.**
 
-<p align="center"><img src="images/civilsdaily_p68_img34.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p68_img34.png" alt="Diagram" /></p>
 
 **India's Immense Potential**
 
@@ -960,7 +960,7 @@ The Indian government has taken several initiatives and policies to propel the s
 
 India's abundant solar potential is transforming its energy landscape, with the country receiving approximately **4-7 kWh per square meter daily** of solar radiation across different regions.
 
-<p align="center"><img src="images/superkalam_geography_q407_img1.png" alt="India solar energy potential outline map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q407_img1.png" alt="India solar energy potential outline map" /></p>
 
 India solar energy potential outline map
 
@@ -1063,7 +1063,7 @@ India's **National Solar Mission 2.0** and initiatives like **PM-KUSUM** for agr
 
 India's pursuit of energy security has led to increased focus on unconventional hydrocarbon resources. According to recent estimates by the US Energy Information Administration, India possesses **96 trillion cubic feet of recoverable shale gas and 3.8 billion barrels of shale oil**, potentially meeting energy needs for decades.
 
-<p align="center"><img src="images/superkalam_geography_q968_img1.png" alt="India's Major Shale Gas Basins Highlighted" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q968_img1.png" alt="India's Major Shale Gas Basins Highlighted" /></p>
 
 India's Major Shale Gas Basins Highlighted
 
@@ -1140,7 +1140,7 @@ India needs strategic technology partnerships with countries like the **USA**, s
 
 **The increasing scarcity of fossil fuels has led to a greater reliance on nuclear energy worldwide, and India is no exception. It is crucial to examine the availability of raw materials required for the generation of atomic energy both in India and globally.**
 
-<p align="center"><img src="images/pw_geography_q89_img1.webp" alt="fossil fuels" /></p> 
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q89_img1.webp" alt="fossil fuels" /></p> 
 
 **Uranium reserves:**
 
@@ -1178,7 +1178,7 @@ India has significant reserves of uranium, it still relies on imports to meet it
 
 With fossil fuel depletion accelerating globally, India's atomic energy program has emerged as a crucial pillar for sustainable energy security and climate commitments.
 
-<p align="center"><img src="images/superkalam_geography_q980_img1.png" alt="India atomic mineral reserves uranium locations" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q980_img1.png" alt="India atomic mineral reserves uranium locations" /></p>
 
 India atomic mineral reserves uranium locations
 
@@ -1352,7 +1352,7 @@ The Ganga River Basin, covering about **27% of India’s geographical area** acr
 
 ### Body 
 
-<p align="center"><img src="images/pw_geography_q874_img1.jpg" alt="Picture12" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q874_img1.jpg" alt="Picture12" /></p>
 
 **Fig: Ganga River Basin**
 
@@ -1411,7 +1411,7 @@ The Ganga Basin’s dense population thrives on fertile soils, flat land, and pe
 
 The **Ganga River Basin** sustains over **600 million people**, making it the world's most **densely populated river basin** due to its unique convergence of land, soil, and water resources.
 
-<p align="center"><img src="images/superkalam_geography_q3_img1.png" alt="Ganga River Basin Population Density Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q3_img1.png" alt="Ganga River Basin Population Density Map" /></p>
 
 Ganga River Basin Population Density Map
 
@@ -1459,7 +1459,7 @@ India’s coastline, extending approximately **7,517 km** (with high-resolution 
 
 - 1.    **Marine Fisheries-** India is the world’s **2nd largest fish producer**. With the 2025-26 production hitting **19.5 million tonnes**, the coastline supports over 30 million livelihoods.
 
-<img src="images/GS20120Geography20Model20Answers20%282018-2025%29-31.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120Geography20Model20Answers20%282018-2025%29-31.jpg">
 
 2. **Deep-Sea Mineral Wealth-** The Exclusive Economic Zone (EEZ) contains vast deposits of polymetallic nodules and crusts rich in cobalt, nickel, and manganese.
 
@@ -1744,7 +1744,7 @@ India has a coastline of **11,098.81 km**, touching **13 states and UTs**, with 
 
 ## Status of Natural Hazard Preparedness in Coastal Regions India’s coastline is vulnerable to cyclones, tsunamis, storm surges, coastal erosion, and sea-level rise due to climate change.
 
-<p align="center"><img src="images/superkalam_geography_q161_img1.jpg" alt="Hazard Prone zones in Coastal Regions" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q161_img1.jpg" alt="Hazard Prone zones in Coastal Regions" /></p>
 
 Hazard Prone zones in Coastal Regions
 
@@ -1881,7 +1881,7 @@ Deccan Trap is a large region of thick basaltic rock located in west-central Ind
 
 The Deccan Trap is a large volcanic feature located in west-central India. It has several natural resources that are economically valuable.
 
-<p align="center"><img src="images/pw_geography_q648_img1.webp" alt="Deccan volcanic " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q648_img1.webp" alt="Deccan volcanic " /></p>
 
 
 
@@ -1951,7 +1951,7 @@ Despite all these resources, the true potential of these resources has not been 
 
 The **Deccan Trap** is a vast volcanic province formed during the late Cretaceous (~66 million years ago), covering ~5 lakh sq. km across Maharashtra, Madhya Pradesh, Gujarat, and parts of Andhra Pradesh. Its basaltic lava flows and lateritic soils offer rich **geological, agricultural, and mineral resources**.
 
-<p align="center"><img src="images/superkalam_geography_q244_img1.png" alt="Deccan Traps Location Diagram on Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q244_img1.png" alt="Deccan Traps Location Diagram on Map" /></p>
 
 Deccan Traps Location Diagram on Map
 
@@ -2093,7 +2093,7 @@ According to the Ministry of External Affairs, India’s interests in Arctic Oce
 
 India’s interest in the Arctic region is motivated by economic, strategic, scientific, and diplomatic factors. The region’s resource exploration potential, new trade routes, climate change impact, scientific research opportunities, and diplomatic engagement make it an attractive area for India.
 
-<p align="center"><img src="images/pw_geography_q390_img1.webp" alt=" Arctic region " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q390_img1.webp" alt=" Arctic region " /></p>
 
 
 
@@ -2202,7 +2202,7 @@ India’s engagement with Africa is expected to continue to deepen as it seeks t
 
 India views Africa as a transformative economic partner, leveraging the continent's abundant natural resources to fuel its own growth while establishing a development-oriented partnership model that contrasts with traditional resource extraction approaches.
 
-<p align="center"><img src="images/superkalam_geography_q876_img1.png" alt="India-Africa Bilateral Exchange Framework Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q876_img1.png" alt="India-Africa Bilateral Exchange Framework Diagram" /></p>
 
 India-Africa Bilateral Exchange Framework Diagram
 
@@ -2453,7 +2453,7 @@ AI, drones, GIS, and RS techniques have transformed locational and areal plannin
 
 Projects like the **Survey of India’s SVAMITVA initiative**, which mapped **6.62 lakh villages**, demonstrate the power of these technologies in improving land management and planning.
 
-<p align="center"><img src="images/superkalam_geography_q11_img1.png" alt="Use of Technology in Smart Planning Process" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q11_img1.png" alt="Use of Technology in Smart Planning Process" /></p>
 
 Use of Technology in Smart Planning Process
 
@@ -2677,7 +2677,7 @@ Non-farm primary activities refer to those economic activities that are directly
 
 Non-farm primary activities extract resources without crop cultivation (e.g., mining). Crucially, India's coal output crossed 1 billion tonnes in 2024.
 
-<p align="center"><img src="images/superkalam_geography_q19_img1.png" alt="Non Farm Economic Activities Across India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q19_img1.png" alt="Non Farm Economic Activities Across India" /></p>
 
 Non Farm Economic Activities Across India
 
@@ -2853,7 +2853,7 @@ This can be done by increasing competitiveness by agricultural diversification, 
 
 In the 1960s, India faced recurring famines and food shortages, leading to dependence on imports like PL-480 wheat from the US. However, by 2022–23, India had become the **2nd largest producer of rice and wheat** and a significant **net exporter of foodgrains**, reflecting a structural transformation in its agricultural economy.
 
-<p align="center"><img src="images/superkalam_geography_q168_img1.png" alt="Trade Balance Shift: 1960 to 2023" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q168_img1.png" alt="Trade Balance Shift: 1960 to 2023" /></p>
 
 Trade Balance Shift: 1960 to 2023
 
@@ -2862,7 +2862,7 @@ Trade Balance Shift: 1960 to 2023
     - Introduction of High Yielding Variety (HYV) seeds, chemical fertilizers, and irrigation in Punjab, Haryana, and western UP.
     - Wheat production grew from **11 million tonnes (1960s)** to **over 110 million tonnes (2022)**.
 
-<p align="center"><img src="images/superkalam_geography_q168_img2.jpg" alt="Food production in India 1950s vs 2020s" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q168_img2.jpg" alt="Food production in India 1950s vs 2020s" /></p>
 
 Food production in India 1950s vs 2020s
 
@@ -2904,7 +2904,7 @@ India’s transition from food insecurity to food surplus is a testament to visi
 
 Natural rubber is a **tropical plantation crop** that requires **high temperature (25°-35°C), heavy rainfall (>200 cm), and well-drained lateritic soils**. Its production is highly concentrated in the **humid equatorial and tropical monsoon regions.**
 
-<img src="images/GS20120Geography20Model20Answers20%282018-2025%29-25.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120Geography20Model20Answers20%282018-2025%29-25.jpg">
 
 ### Distribution of Rubber Producing Countries
 
@@ -3007,7 +3007,7 @@ Increasing demand of rubber due to industrial expansion, the sustainable cultiva
 
 **Natural rubber is a polymer of isoprene, an organic compound. Thailand is the largest producer of rubber in the world followed by Indonesia, Vietnam, Brazil, India and China. These nations are located in** tropical regions **. Their climate is warm and humid which is ideal for growing rubber trees.**
 
-<p align="center"><img src="images/pw_geography_q642_img1.webp" alt="tropical regions" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q642_img1.webp" alt="tropical regions" /></p>
 
 
 
@@ -3076,7 +3076,7 @@ Therefore focus must be given to grow rubber trees on low-quality, degraded land
 
 Natural rubber is obtained mainly from the latex of *Hevea brasiliensis*, a tropical tree requiring hot, humid conditions. Its production is concentrated in the humid tropics between **5°N and 10°S latitude**, especially in Southeast Asia.
 
-## Distribution of Rubber-Producing Countries <p align="center"><img src="images/superkalam_geography_q241_img1.png" alt="Major Rubber Producing Countries World Map" /></p>
+## Distribution of Rubber-Producing Countries <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q241_img1.png" alt="Major Rubber Producing Countries World Map" /></p>
 
 Major Rubber Producing Countries World Map
 
@@ -3245,7 +3245,7 @@ Despite being a part of Gondwana land, rich in providing minerals such as coal, 
 **Reasons for low contribution:**
 - **Modernization and technological advancements:** The mining industry in India is predominantly carried out by small-scale miners who use outdated technology and equipment, resulting in low productivity and efficiency. The lack of modernization and technology also hinders the exploration and extraction of minerals in the country.E.g J
 
-<p align="center"><img src="images/pw_geography_q579_img1.webp" alt=" mining sector in India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q579_img1.webp" alt=" mining sector in India" /></p>
 
 - **Labour laws framework:** The mining industry in India is subject to various regulations, including environmental and labor laws, which can make it difficult for companies to operate efficiently.
 - **Complex regulatory framework:** Obtaining permits and approvals for mining activities can be a cumbersome and time-consuming process, leading to delays and reduced productivity.
@@ -3299,7 +3299,7 @@ In this regard, the government initiatives like Star rating of mining leases, mi
 
 Despite India's **Gondwanaland heritage** providing rich mineral deposits, the mining sector contributes only **0.9% to GDP** (2023-24), significantly lower than Australia (10%) or South Africa (8%).
 
-<p align="center"><img src="images/superkalam_geography_q320_img1.png" alt="Gondwana Mineral Belts of India Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q320_img1.png" alt="Gondwana Mineral Belts of India Map" /></p>
 
 Gondwana Mineral Belts of India Map
 
@@ -3311,7 +3311,7 @@ Gondwana Mineral Belts of India Map
 - **Rare Earth Elements**: Significant **thorium, uranium** deposits along **Kerala, Tamil Nadu** coasts
 - **Bauxite Resources**: Second-largest global reserves concentrated in **Eastern Ghats** region
 
-<p align="center"><img src="images/superkalam_geography_q320_img2.png" alt="Gondwanaland India Mineral Distribution showing coal fields, iron ore belts, and metamorphic zones" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q320_img2.png" alt="Gondwanaland India Mineral Distribution showing coal fields, iron ore belts, and metamorphic zones" /></p>
 
 Gondwanaland India Mineral Distribution showing coal fields, iron ore belts, and metamorphic zones
 
@@ -3418,7 +3418,7 @@ Coal mining has been a crucial part of global energy production for centuries, b
 
 ### Body
 
-<p align="center"><img src="images/pw_geography_q343_img1.webp" alt="India Coal Reserve" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q343_img1.webp" alt="India Coal Reserve" /></p>
 
 **Inevitability of Coal Mining:**
 - **Energy Security and needs:** Coal is the most abundant and widely used fossil fuel. It provides a reliable and affordable source of energy that is essential for economic growth and development.
@@ -3453,7 +3453,7 @@ Coal mining is still inevitable for development, but its negative impacts cannot
 
 Despite environmental concerns, coal mining remains crucial for development due to energy security needs and economic imperatives, creating a complex sustainability challenge.
 
-<p align="center"><img src="images/superkalam_geography_q641_img1.png" alt="India's Power Capacity Mix Pie Chart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q641_img1.png" alt="India's Power Capacity Mix Pie Chart" /></p>
 
 India's Power Capacity Mix Pie Chart
 
@@ -3558,7 +3558,7 @@ The cultivation of pulses has several advantages, including their high nutrition
 
 Recent global malnutrition statistics show that **828 million people faced hunger in 2021**, highlighting the critical importance of nutrient-dense crops like pulses in achieving food security.
 
-<p align="center"><img src="images/superkalam_geography_q644_img1.png" alt="Legume root system botanical diagram with nodules" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q644_img1.png" alt="Legume root system botanical diagram with nodules" /></p>
 
 Legume root system botanical diagram with nodules
 
@@ -3618,7 +3618,7 @@ The **UN's Pulse Agenda** promotes sustainable intensification of pulse producti
 
 ### Body
 
-**<p align="center"><img src="images/pw_geography_q166_img1.webp" alt="British planters" /></p>**
+**<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q166_img1.webp" alt="British planters" /></p>**
 
 **Reasons for this disparity:**
 - **Geography:** The geography of the Darjeeling region plays a crucial role in the success of tea cultivation. The area is situated at an altitude of **2,000 to 7,000 feet** above sea level, which provides the perfect conditions for growing high-quality tea.
@@ -3653,7 +3653,7 @@ British planters established tea gardens along the Shivaliks and lesser Himalaya
 
 The unique geographical and ecological conditions of the Darjeeling region created an ideal microclimate that the British could not replicate elsewhere in the Himalayan belt.
 
-<p align="center"><img src="images/superkalam_geography_q889_img1.png" alt="Himalayan Mountain Range in Northern India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q889_img1.png" alt="Himalayan Mountain Range in Northern India" /></p>
 
 Himalayan Mountain Range in Northern India
 
@@ -3750,7 +3750,7 @@ Despite the availability of fertile soil and water resources, the Green Revoluti
 
 The Green Revolution's selective impact represents a critical policy challenge, where India's eastern region remained largely untouched despite possessing ideal agricultural conditions. Understanding these barriers provides insights into comprehensive rural development requirements.
 
-<p align="center"><img src="images/superkalam_geography_q891_img1.png" alt="North Western India Map Outline and Shade" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q891_img1.png" alt="North Western India Map Outline and Shade" /></p>
 
 North Western India Map Outline and Shade
 
@@ -3872,7 +3872,7 @@ Iron and Steel Industry, not located near the source of raw materials, are less 
 - **Market Based Location:** it is generally found in countries where coal and iron ore deposits are rare. E.g. Japan is deficient in almost all raw materials that are to be imported from other countries.
 - **Government policies:** Governments often provide incentives to industries that set up in certain areas, such as tax exemptions and subsidies, which can influence their location decisions. E.g. Tata Iron and Steel Company **(TISCO)** in Jamshedpur.
 
-<p align="center"><img src="images/pw_geography_q486_img1.webp" alt="iron and steel industries " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q486_img1.webp" alt="iron and steel industries " /></p>
 
 
 
@@ -3896,7 +3896,7 @@ The location factors for iron and steel industries have evolved over time, with 
 
 The accelerating melting of Himalayan glaciers, containing the world's third-largest ice reserves after the poles, threatens to fundamentally reshape India's water security across multiple dimensions.
 
-<p align="center"><img src="images/superkalam_geography_q397_img1.png" alt="Melting Himalayan Glaciers Hierarchical Flowchart Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q397_img1.png" alt="Melting Himalayan Glaciers Hierarchical Flowchart Diagram" /></p>
 
 Melting Himalayan Glaciers Hierarchical Flowchart Diagram
 
@@ -4043,7 +4043,7 @@ The overall development of the country can happen only by securing a balanced an
 
 India's regional resource-based manufacturing strategy can significantly boost employment by leveraging local advantages and creating sustainable industrial ecosystems. Recent data shows **manufacturing employment grew by 12.1% in 2023-24**, indicating strong potential for this approach.
 
-<p align="center"><img src="images/superkalam_geography_q478_img1.png" alt="Local Regional Resources Flowchart Top Down" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q478_img1.png" alt="Local Regional Resources Flowchart Top Down" /></p>
 
 Local Regional Resources Flowchart Top Down
 
@@ -4099,7 +4099,7 @@ Regional resource-based manufacturing holds immense potential for employment gen
 
 ### Factors responsible for localisation of agro-based food processing industries of North-West India
 
-<img src="images/agro_processing_localisation.png">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/agro_processing_localisation.png">
 
 1. **Raw Material Abundance ("Granary of India")**
    - Punjab and Haryana produce roughly **19% of India’s wheat** and **70% of its basmati rice**, leading to a concentration of rice mills and flour-based industries.
@@ -4177,7 +4177,7 @@ The initiatives taken at the Union level like permitting 100% FDI through the au
 
 India's North-West region has emerged as a leading hub for agro-based food processing industries, driven by favorable agricultural conditions and supportive infrastructure.
 
-<p align="center"><img src="images/superkalam_geography_q480_img1.png" alt="North West India 2019 Thematic Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q480_img1.png" alt="North West India 2019 Thematic Map" /></p>
 
 North West India 2019 Thematic Map
 
@@ -4244,7 +4244,7 @@ The convergence of abundant raw materials, robust infrastructure, favorable poli
 
 7. **Export Promotion** - Port-linked corridors enable export-oriented industries. Eg- Visakhapatnam-Chennai Industrial Corridor (VCIC).
 
-<img src="images/GS20120Geography20Model20Answers20%282018-2025%29-23.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120Geography20Model20Answers20%282018-2025%29-23.jpg">
 
 8. **Ancillary industrial growth and MSME Cluster Development** - Eg- Auto and electronics clusters along Chennai Bangalore Industrial Corridor.
 
@@ -4363,7 +4363,7 @@ Industrial Corridors (ICs) are stretches across the country allocated to a speci
 - **Promote industrialization:** Industrial corridors provide an opportunity for the government to develop new industrial clusters, which will promote industrialization and economic growth.
 - **Infrastructure development:** These corridors also focus on the development of modern infrastructure facilities, such as power, water supply, and transportation, which are essential for the growth of industries.
 
-<p align="center"><img src="images/pw_geography_q399_img1.webp" alt="Industrial Corridors in India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q399_img1.webp" alt="Industrial Corridors in India" /></p>
 
 - **Job creation:** The development of industrial corridors will lead to the creation of new jobs, both directly and indirectly, thereby reducing unemployment in the country.
 - **Foreign investment:** The development of industrial corridors will also attract foreign investment, which will help in the transfer of technology and knowledge, leading to the growth of industries.
@@ -4496,7 +4496,7 @@ The location of petroleum refineries in developing countries away from crude oil
 
 Petroleum refineries in developing countries are strategically positioned away from crude oil sources due to economic and logistical considerations, creating significant implications for national development.
 
-<p align="center"><img src="images/superkalam_geography_q645_img1.png" alt="Petroleum Refinery Locations Spatial Model Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q645_img1.png" alt="Petroleum Refinery Locations Spatial Model Diagram" /></p>
 
 Petroleum Refinery Locations Spatial Model Diagram
 
@@ -4589,7 +4589,7 @@ The spatial pattern of the iron and steel industry in the world has changed due 
 
 The Indonesian and Philippines archipelagos, containing over 17,000 and 7,640 islands respectively, formed through complex geological processes driven by intense tectonic activity in the Pacific Ring of Fire.
 
-<p align="center"><img src="images/superkalam_geography_q868_img1.png" alt="Ocean Plate Subduction Convergence Cross Section" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q868_img1.png" alt="Ocean Plate Subduction Convergence Cross Section" /></p>
 
 Ocean Plate Subduction Convergence Cross Section
 
@@ -4686,7 +4686,7 @@ The decentralization of the cotton textile industry in India is influenced by fa
 
 India's cotton textile industry demonstrates remarkable decentralization, with the sector contributing significantly to employment and exports. Recent data shows India as the world's second-largest textile exporter, with this spatial distribution driven by multiple interconnected factors.
 
-<p align="center"><img src="images/superkalam_geography_q954_img1.png" alt="India's Decentralized Cotton Textile Centers Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q954_img1.png" alt="India's Decentralized Cotton Textile Centers Map" /></p>
 
 India's Decentralized Cotton Textile Centers Map
 
@@ -4764,7 +4764,7 @@ This decentralized pattern ensures resilient supply chains and balanced regional
 
 Recent industrial data from 2024-25 suggests a **mixed trend** regarding new sugar mill establishment in Southern India, requiring careful analysis of regional patterns.
 
-<p align="center"><img src="images/superkalam_geography_q965_img1.png" alt="India's Traditional Sugar Belt Uttar Pradesh Bihar" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q965_img1.png" alt="India's Traditional Sugar Belt Uttar Pradesh Bihar" /></p>
 
 India's Traditional Sugar Belt Uttar Pradesh Bihar
 
@@ -4819,7 +4819,7 @@ Future growth depends on addressing **water management**, **sustainable agricult
 
 **Straits** are narrow natural waterways connecting two larger water bodies, while an **isthmus** is a narrow strip of land connecting two larger landmasses and separating two seas.
 
-<img src="images/GS20120Geography20Model20Answers20%282018-2025%29-26.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120Geography20Model20Answers20%282018-2025%29-26.jpg">
 
 ### Significance of Straits in International Trade
 
@@ -4976,11 +4976,11 @@ Despite all these significances, it must be understood that these areas are ecol
 
 Straits and isthmuses are key geographical features that influence **maritime trade, shipping routes, and global connectivity**. Understanding them helps explain the strategic and economic importance of certain global chokepoints.
 
-<p align="center"><img src="images/superkalam_geography_q252_img1.png" alt="Strait and Isthmus Schematic Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q252_img1.png" alt="Strait and Isthmus Schematic Diagram" /></p>
 
 Strait and Isthmus Schematic Diagram
 
-## Straits and Isthmuses: Meaning and Examples <p align="center"><img src="images/superkalam_geography_q252_img2.jpeg" alt="Schematic Diagram showing strait and Isthamus" /></p>
+## Straits and Isthmuses: Meaning and Examples <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q252_img2.jpeg" alt="Schematic Diagram showing strait and Isthamus" /></p>
 
 Schematic Diagram showing strait and Isthamus **a) Straits:** A strait is a **narrow waterway that connects two larger bodies of water**, often seas or oceans.
 
@@ -5191,7 +5191,7 @@ Restoring the mountain ecosystem from the negative impact of development initiat
 
 Recent studies show that mountain ecosystems face a **15% biodiversity loss** due to unregulated development and tourism, requiring immediate restoration interventions to preserve these critical ecological zones.
 
-<p align="center"><img src="images/superkalam_geography_q486_img1.png" alt="Restoring Mountain Ecosystems: A Central Approach" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q486_img1.png" alt="Restoring Mountain Ecosystems: A Central Approach" /></p>
 
 Restoring Mountain Ecosystems: A Central Approach
 
@@ -5403,7 +5403,7 @@ IRNSS is a critical technological development for India as it enhances the effic
 
 India's indigenous navigation system **IRNSS (Indian Regional Navigation Satellite System)**, also known as **NavIC (Navigation with Indian Constellation)**, addresses critical strategic and technological requirements while reducing dependency on foreign systems like GPS.
 
-<p align="center"><img src="images/superkalam_geography_q572_img1.png" alt="Spatial Diagram of Earth Indian Subcontinent" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q572_img1.png" alt="Spatial Diagram of Earth Indian Subcontinent" /></p>
 
 Spatial Diagram of Earth Indian Subcontinent
 
@@ -5498,7 +5498,7 @@ India should cash on its huge inland river network by addressing the above probl
 
 India's inland water transport system, utilizing 14,500 km of navigable waterways across rivers, canals, and backwaters, offers immense potential for sustainable cargo movement. With **5 National Waterways** declared and cargo traffic reaching **108 million tonnes** in 2023-24, this sector presents both significant challenges and promising opportunities.
 
-<p align="center"><img src="images/superkalam_geography_q716_img1.png" alt="India's National Waterways map and outline" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q716_img1.png" alt="India's National Waterways map and outline" /></p>
 
 India's National Waterways map and outline
 
@@ -5580,7 +5580,7 @@ India's inland water transport sector, supported by the **National Waterway Act 
 
 Recent studies indicate that Himalayan states are experiencing unprecedented tourist influx, with Uttarakhand receiving **4.5 crore visitors** in 2023, raising critical concerns about ecological sustainability.
 
-<p align="center"><img src="images/superkalam_geography_q806_img1.png" alt="Tourist Footprint Over Time Line Graph" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q806_img1.png" alt="Tourist Footprint Over Time Line Graph" /></p>
 
 Tourist Footprint Over Time Line Graph
 
@@ -5644,7 +5644,7 @@ Average rate OF RISE ANNUALLY
 
 2. **Coastal erosion** - Wave action and storm surges remove shoreline. Eg- Shoreline retreat in the Maldives.
 
-<img src="images/GS20120Geography20Model20Answers20%282018-2025%29-28.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120Geography20Model20Answers20%282018-2025%29-28.jpg">
 
 3. Salinisation of freshwater lenses - Sea water enters groundwater and contaminates wells leading to drinking water shortage.
 
@@ -5818,7 +5818,7 @@ Safeguarding island nations **requires** climate resilience **through** coastal 
 
 The **WMO Global Climate Report (2024/2025)** notes sea-level rise has doubled to **4.7 mm/year**, severely threatening the existence of Small Island Developing States (SIDS).
 
-<p align="center"><img src="images/superkalam_geography_q10_img1.png" alt="Coastal Island Sea Level Rise Impact" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q10_img1.png" alt="Coastal Island Sea Level Rise Impact" /></p>
 
 Coastal Island Sea Level Rise Impact
 
@@ -6069,7 +6069,7 @@ Interventions such as climate resilient agriculture, enhancing per capita income
 
 Climate change poses an unprecedented threat to **food security** in tropical countries, with rising temperatures and extreme weather events disrupting agricultural patterns and food production systems. The **Intergovernmental Panel on Climate Change (IPCC)** reports indicate severe impacts on tropical regions due to their geographical vulnerability and limited adaptive capacity.
 
-<p align="center"><img src="images/superkalam_geography_q162_img1.png" alt="Climate Change Impact on Tropical Agriculture" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q162_img1.png" alt="Climate Change Impact on Tropical Agriculture" /></p>
 
 Climate Change Impact on Tropical Agriculture
 
@@ -6290,7 +6290,7 @@ Desertification, which goes beyond normal climate boundaries, is a great example
 
 Recent **UNCCD** reports indicate that desertification affects 1.5 billion people globally across diverse climatic zones, demonstrating its universal nature beyond traditional arid boundaries.
 
-<p align="center"><img src="images/superkalam_geography_q414_img1.png" alt="World Map of Desertification Across Climates" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q414_img1.png" alt="World Map of Desertification Across Climates" /></p>
 
 World Map of Desertification Across Climates
 
@@ -6484,7 +6484,7 @@ If emissions continue to rise unchecked, the Arctic could be ice-free in the sum
 
 Recent studies show polar ice loss has accelerated to **428 billion tons annually** (2024), with Arctic and Antarctic regions showing distinctly different impacts on global systems.
 
-<p align="center"><img src="images/superkalam_geography_q327_img1.png" alt="Polar Ice Melting Comparative Flowchart Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q327_img1.png" alt="Polar Ice Melting Comparative Flowchart Diagram" /></p>
 
 Polar Ice Melting Comparative Flowchart Diagram
 
@@ -6760,7 +6760,7 @@ The report from the Kathmandu-based International Centre for Integrated Mountain
 
 River interlinking aims to redistribute India's uneven water resources by connecting surplus and deficit basins through an extensive network of canals and reservoirs.
 
-<p align="center"><img src="images/superkalam_geography_q406_img1.png" alt="India River Interlinking Project Outline Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q406_img1.png" alt="India River Interlinking Project Outline Map" /></p>
 
 India River Interlinking Project Outline Map
 
@@ -6856,7 +6856,7 @@ The cryosphere is highly vulnerable to global warming. Therefore, any change in 
 - **Albedo:** The cryosphere has a high albedo, which means it reflects a significant amount of the sun’s energy [80-90%] back into space. This reflected energy helps to cool the Earth’s surface and atmosphere, and it plays a critical role in regulating the Earth’s temperature. Like
 
 **In 2019, Greenland experienced its largest-ever ice melt, resulting in a significant decrease in its albedo.**
-- **Sea level rise:** As glaciers and ice sheets melt, they contribute to sea level rise, which can have far-reaching impacts on global climate patterns. Sea level rise can alter ocean currents, change precipitation patterns, and impact coastal ecosystems and communities. Like **The small island nation of Kiribati in the Pacific Ocean is particularly vulnerable to sea level rise.** <p align="center"><img src="images/pw_geography_q337_img1.webp" alt="Global Cryosphere " /></p>
+- **Sea level rise:** As glaciers and ice sheets melt, they contribute to sea level rise, which can have far-reaching impacts on global climate patterns. Sea level rise can alter ocean currents, change precipitation patterns, and impact coastal ecosystems and communities. Like **The small island nation of Kiribati in the Pacific Ocean is particularly vulnerable to sea level rise.** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q337_img1.webp" alt="Global Cryosphere " /></p>
 - **Permafrost thawing:** Permafrost is frozen soil that covers nearly a quarter of the land in the Northern Hemisphere. As permafrost thaws, it releases large amounts of methane and carbon dioxide into the atmosphere, which can contribute to the warming of the planet. Like
 
 **In Alaska, the thawing of permafrost has caused infrastructure damage and forced some communities to relocate.**
@@ -6884,7 +6884,7 @@ Changes to the cryosphere can have significant implications for the planet’s c
 
 The cryosphere, Earth's frozen water reservoir including glaciers, ice sheets, sea ice, and permafrost, serves as a critical regulator of global climate through complex feedback mechanisms and energy balance processes.
 
-<p align="center"><img src="images/superkalam_geography_q639_img1.png" alt="Ice Albedo Feedback Comparative Thematic Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q639_img1.png" alt="Ice Albedo Feedback Comparative Thematic Diagram" /></p>
 
 Ice Albedo Feedback Comparative Thematic Diagram
 
@@ -6955,7 +6955,7 @@ The cryosphere's destabilization threatens global climate stability, emphasizing
 
 The **Himalayan glaciers**, often called the "Third Pole," serve as critical indicators of climate change, with their rapid retreat directly correlating with escalating climate symptoms across the Indian subcontinent.
 
-<p align="center"><img src="images/superkalam_geography_q869_img1.png" alt="Climate Change Black Carbon Temperature Rise" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q869_img1.png" alt="Climate Change Black Carbon Temperature Rise" /></p>
 
 Climate Change Black Carbon Temperature Rise
 
@@ -7148,7 +7148,7 @@ Natural vegetation in India spans a wide spectrum of plant cover that flourishes
 **Manas Wildlife Sanctuary serves as an example.**
 - **Ecological Balance:** Wildlife sanctuaries in rainforest regions play a pivotal role in maintaining ecological balance, crucial for processes like carbon sequestration, oxygen production, and climate regulation, ensuring the overall health and stability of these vital ecosystems.
 
-<p align="center"><img src="images/pw_geography_q743_img1.webp" alt="Natural vegetation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q743_img1.webp" alt="Natural vegetation" /></p>
 
 - **Preservation of Traditional Knowledge:** Many rainforest sanctuaries **like Wayanad Wildlife Sanctuary,** encompass regions inhabited by indigenous communities, enabling the integration of their traditional knowledge and sustainable practices into conservation efforts.
 - **Research and Education:** Rainforest sanctuaries provide opportunities for research and scientific study of unique ecosystems. They also serve as educational platforms, raising awareness about rainforest conservation and the importance of biodiversity. **The Agumbe Rainforest Research Station in Karnataka serves as a prime example.**
@@ -7219,7 +7219,7 @@ Thus, protected areas like wildlife sanctuaries and national parks are essential
 
 India's natural vegetation is marked by rich diversity, ranging from alpine meadows of the Himalayas to tropical rainforests of the Western Ghats and Andaman Islands. This diversity results from a unique confluence of **geographic, climatic, and edaphic** (soil-related) factors.
 
-<p align="center"><img src="images/superkalam_geography_q171_img1.png" alt="India's Forest Types and Vegetation Cover" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q171_img1.png" alt="India's Forest Types and Vegetation Cover" /></p>
 
 India's Forest Types and Vegetation Cover
 
@@ -7279,7 +7279,7 @@ According to the **Global Forest Resources Assessment (GFRA) 2025**, India now r
 
 - 1.    **Total Green Cover-** India’s forest and tree cover spans **8,27,357 sq. km**, accounting for **25.17%** of the country's geographical area.
 
-<img src="images/GS20120Geography20Model20Answers20%282018-2025%29-30.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120Geography20Model20Answers20%282018-2025%29-30.jpg">
 
 2. India contributes approximately **2% of the world's total forest area**. It has emerged as the **5th largest global carbon sink**, removing roughly **150 Mt of CO2** annually during the 2021-2025 period.
 
@@ -7423,7 +7423,7 @@ India’s forest resources play a crucial role in mitigating climate change and 
 
 Modern iron and steel industries have increasingly shifted away from raw material sources, driven by technological advancement and changing economic dynamics. This locational transformation reflects the evolution from traditional **resource-based** to **market-oriented** industrial patterns.
 
-<p align="center"><img src="images/superkalam_geography_q403_img1.png" alt="Iron and Steel Industry Location Scenarios" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q403_img1.png" alt="Iron and Steel Industry Location Scenarios" /></p>
 
 Iron and Steel Industry Location Scenarios
 
@@ -7627,7 +7627,7 @@ Global warming impacts on coral life are significant and complex, threatening ec
 
 Recent studies reveal that ocean temperatures have risen by 0.6°C since 1969, triggering unprecedented stress on coral ecosystems worldwide. Global warming represents the most significant threat to coral reef systems, which support 25% of marine biodiversity.
 
-<p align="center"><img src="images/superkalam_geography_q476_img1.png" alt="Coral Bleaching Three Stage Process Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q476_img1.png" alt="Coral Bleaching Three Stage Process Diagram" /></p>
 
 Coral Bleaching Three Stage Process Diagram
 
@@ -7686,7 +7686,7 @@ Current warming trends indicate that **50% of coral reefs may disappear by 2030*
 **Mangroves** are **coastal ecosystems** composed of **salt-tolerant trees and shrubs** that thrive in **intertidal zones of tropical** and **subtropical regions**.
 As per the latest **India State of Forest Report (ISFR) 2023** and **2025-26** updates, India's mangrove cover stands at approximately **4,992 sq km** (0.15% of total land area).
 
-<img src="images/india_mangroves.png">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/india_mangroves.png">
 
 ### Causes of Depletion of Mangroves
 
@@ -7785,7 +7785,7 @@ Given their importance, strict enforcement of the coastal regulation measures, s
 
 Mangroves are an important part of coastal ecosystems, providing a range of ecological, economic, and cultural benefits. Despite their importance, mangroves have been subject to significant depletion in recent decades, with estimates suggesting that up to 50% of mangrove forests have been lost globally.
 
-<p align="center"><img src="images/pw_geography_q438_img1.webp" alt="Mangroves cover state" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q438_img1.webp" alt="Mangroves cover state" /></p>
 
 
 
@@ -7828,7 +7828,7 @@ Mangroves are vital, but threatened ecosystems. Depletion caused by human activi
 
 Recent satellite data reveals that **India has lost 40% of its mangrove cover** since 1980s, highlighting an urgent ecological crisis threatening coastal stability.
 
-<p align="center"><img src="images/superkalam_geography_q479_img1.png" alt="Coastal Mangrove Ecosystem Cross Section Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q479_img1.png" alt="Coastal Mangrove Ecosystem Cross Section Diagram" /></p>
 
 Coastal Mangrove Ecosystem Cross Section Diagram
 
@@ -7951,7 +7951,7 @@ The Juno Mission has provided significant insights into Jupiter’s composition,
 
 NASA's **Juno Mission** launched in 2011 provides crucial insights into Earth's formation by studying Jupiter's composition, structure, and evolution as our solar system's largest planet.
 
-<p align="center"><img src="images/superkalam_geography_q640_img1.png" alt="Jupiter's Interior Structure Cross Section Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q640_img1.png" alt="Jupiter's Interior Structure Cross Section Diagram" /></p>
 
 Jupiter's Interior Structure Cross Section Diagram
 
@@ -8035,7 +8035,7 @@ While geopolitics indicates geographical relations with politics, it also has st
 
 The South China Sea has emerged as one of the world's most contested maritime regions, with overlapping territorial claims, strategic waterways, and vast economic resources creating unprecedented geopolitical tensions in contemporary international relations.
 
-<p align="center"><img src="images/superkalam_geography_q727_img1.png" alt="South China Sea Map Coastlines Outlined" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q727_img1.png" alt="South China Sea Map Coastlines Outlined" /></p>
 
 South China Sea Map Coastlines Outlined
 
@@ -8137,7 +8137,7 @@ Mumbai, Delhi, and Kolkata face significant air pollution challenges, Delhi’s 
 
 Delhi's air pollution crisis significantly exceeds Mumbai and Kolkata's levels due to unique geographical and meteorological disadvantages. Understanding these factors reveals why Delhi consistently ranks among the world's most polluted cities.
 
-<p align="center"><img src="images/superkalam_geography_q803_img1.png" alt="India's Major Cities Map: Delhi Mumbai Kolkata" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q803_img1.png" alt="India's Major Cities Map: Delhi Mumbai Kolkata" /></p>
 
 India's Major Cities Map: Delhi Mumbai Kolkata
 
@@ -8388,7 +8388,7 @@ To safeguard India’s food security, **immediate** and **collaborative efforts*
 
 The Indo-Gangetic Plain, India's agricultural backbone, is confronting an existential water crisis. According to the **UN Interconnected Disaster Risks Report 2023**, the basin has crossed the "groundwater depletion risk tipping point," threatening the collapse of entire food production systems.
 
-<p align="center"><img src="images/superkalam_geography_q89_img1.png" alt="Groundwater depletion in India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q89_img1.png" alt="Groundwater depletion in India" /></p>
 
 Groundwater depletion in India
 
@@ -8628,7 +8628,7 @@ Thus, steps like identifying new water resources, improving efficiency of water 
 
 Freshwater constitutes **only 2.5% of the total water on Earth**, and **less than 1%** is easily accessible. Yet, demand for water has **tripled in the last 50 years** due to population growth, urbanisation, and industrialisation, leading to a freshwater **crisis both in terms of availability and access**.
 
-<p align="center"><img src="images/superkalam_geography_q178_img1.png" alt="Global freshwater crisis causes and effects" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q178_img1.png" alt="Global freshwater crisis causes and effects" /></p>
 
 Global freshwater crisis causes and effects
 
@@ -8700,7 +8700,7 @@ The freshwater crisis reflects a complex interplay of **natural and anthropogeni
 
 7. **Groundwater Recharge** - Increased surface water availability can reduce the "blind pumping" of aquifers.
 
-<img src="images/GS20120Geography20Model20Answers20%282018-2025%29-29.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120Geography20Model20Answers20%282018-2025%29-29.jpg">
 
 8. **Agricultural Intensity-** Allows for multiple cropping seasons (Kharif, Rabi, and Zaid) in previously single-crop areas. Eg- in Bundelkhand and Marathwada regions
 
@@ -8807,7 +8807,7 @@ The necessity and feasibility of river-interlinking should be seen on case to ca
 - **Improved Water Management:** Interlinking of rivers aims to improve the management of water resources in India, reducing water scarcity and ensuring better utilization of water. **Example** the **Ken-Betwa river interlinking project** in Madhya Pradesh aims to transfer water from the Ken river basin to the Betwa river basin, providing irrigation facilities to farmers in the water-scarce region.
 - **Hydroelectric Power:** Interlinking of rivers will provide an opportunity to generate hydropower, renewable and clean sources of energy. **Example** the **Damanganga-Pinjal river interlinking project** in Maharashtra and Gujarat aims to generate 1,775 MW of hydropower.
 
-<p align="center"><img src="images/pw_geography_q540_img1.webp" alt="Water transfer links" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q540_img1.webp" alt="Water transfer links" /></p>
 
 - **Agriculture:** Interlinking of rivers aims to provide irrigation facilities to farmers, leading to increased agricultural production and better crop yields. **Example** the **Godavari-Cauvery river interlinking project** in southern India aims to provide irrigation facilities to over 35 million hectares of land.
 - **Navigation:** Interlinking of rivers will improve the navigability of rivers and promote inland waterways transportation. **Example** the proposed National Waterway 4 will connect the Godavari and Krishna rivers, improving transportation and promoting trade.
@@ -8841,7 +8841,7 @@ Interlinking of rivers is a complex and contentious issue. It has the potential 
 
 India's forests play a critical role in climate regulation and carbon sequestration. Current **forest and tree cover stands at 827,357 sq km (25.17% of geographical area)**, showing gradual progress toward environmental sustainability goals.
 
-<p align="center"><img src="images/superkalam_geography_q413_img1.png" alt="Forest Climate Change Feedback Loop Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q413_img1.png" alt="Forest Climate Change Feedback Loop Flowchart" /></p>
 
 Forest Climate Change Feedback Loop Flowchart
 
@@ -9041,7 +9041,7 @@ This indicates that India is going through **water emergency**. However, there i
 
 Water stress represents a critical challenge for India's sustainable development, with the **NITI Aayog 2024** reporting that 40% of India's population will lack access to drinking water by 2030.
 
-<p align="center"><img src="images/superkalam_geography_q493_img1.png" alt="India Water Stress Regional Thematic Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q493_img1.png" alt="India Water Stress Regional Thematic Map" /></p>
 
 India Water Stress Regional Thematic Map
 
@@ -9242,7 +9242,7 @@ Effective implementation of water harvesting systems in urban areas can go a lon
 
 India faces a critical groundwater crisis with **water levels declining by 0.3 meters annually**, making rainwater harvesting essential for sustainable urban water management.
 
-<p align="center"><img src="images/superkalam_geography_q566_img1.png" alt="Urban Rooftop Rainwater Harvesting System Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q566_img1.png" alt="Urban Rooftop Rainwater Harvesting System Diagram" /></p>
 
 Urban Rooftop Rainwater Harvesting System Diagram
 
@@ -9322,7 +9322,7 @@ The methods stated above, can go a long way in solving various water woes of Ind
 
 ### Body
 
-<p align="center"><img src="images/pw_geography_q345_img1.webp" alt="Flood prone area" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q345_img1.webp" alt="Flood prone area" /></p>
 
 **Converted into a sustainable source of irrigation and all-weather inland navigation in India:**
 
@@ -9357,7 +9357,7 @@ The power of floods for irrigation and inland navigation can be an effective way
 
 India's geographic diversity presents both challenges and opportunities in water management, particularly in converting destructive floods into productive resources for irrigation and navigation.
 
-<p align="center"><img src="images/superkalam_geography_q643_img1.png" alt="India river basins Ganga Brahmaputra" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q643_img1.png" alt="India river basins Ganga Brahmaputra" /></p>
 
 India river basins Ganga Brahmaputra
 
@@ -9497,7 +9497,7 @@ Micro-watershed development projects have proven to be effective in conserving w
 
 Micro-watershed development projects serve as integrated water management systems that enhance water security and agricultural resilience in India's drought-prone regions covering approximately 68% of cultivated land.
 
-<p align="center"><img src="images/superkalam_geography_q720_img1.png" alt="Micro Watershed Ridge to Valley Cross Section" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q720_img1.png" alt="Micro Watershed Ridge to Valley Cross Section" /></p>
 
 Micro Watershed Ridge to Valley Cross Section
 
@@ -9596,7 +9596,7 @@ Hence, before taking a decision on such an important international treaty with h
 
 ### Body
 
-**<p align="center"><img src="images/pw_geography_q284_img1.webp" alt="Division of river" /></p>**
+**<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q284_img1.webp" alt="Division of river" /></p>**
 
 - **Ecological Implications:** The Indus Water Treaty has had significant ecological implications, particularly for the downstream areas in Pakistan. The construction of **dams and barrages** by India has resulted in reduced water flows downstream, leading to degradation of ecosystems, loss of biodiversity, and **reduced fish populations.**
 - **Economic Implications:** The treaty has also had significant economic implications for both India and Pakistan. The treaty’s provisions have enabled the development of **hydroelectric power projects**, which have provided India with significant electricity generation capacity. However, the treaty has also resulted in disputes over the sharing of the river waters, which has impacted economic growth and development in the region.
@@ -9624,7 +9624,7 @@ The Indus Water Treaty has played a significant role in managing the water resou
 
 The **Indus Water Treaty (1960)**, mediated by the World Bank, remains one of the world's most successful transboundary water agreements despite evolving India-Pakistan relations and contemporary challenges.
 
-<p align="center"><img src="images/superkalam_geography_q723_img1.png" alt="Indus River System Geographical Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q723_img1.png" alt="Indus River System Geographical Map" /></p>
 
 Indus River System Geographical Map
 
@@ -9707,7 +9707,7 @@ The twin problems of recurrent drought in Maharashtra- Telangana region resultin
 
 Recent data from **Ministry of Jal Shakti (2024)** shows **193 districts** face water scarcity while **32% of India's land** is degraded, highlighting the urgent need for effective resource management to reduce human suffering.
 
-<p align="center"><img src="images/superkalam_geography_q725_img1.png" alt="Vertical Flowchart with Three Sequential Blocks" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q725_img1.png" alt="Vertical Flowchart with Three Sequential Blocks" /></p>
 
 Vertical Flowchart with Three Sequential Blocks
 
@@ -9800,7 +9800,7 @@ India has abundant freshwater resources, the country’s water scarcity problem 
 
 Despite receiving **4,000 billion cubic meters** of annual precipitation, India faces acute water scarcity due to systemic management failures and growing demand pressures.
 
-<p align="center"><img src="images/superkalam_geography_q799_img1.png" alt="Map of India Showing Western Regions" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q799_img1.png" alt="Map of India Showing Western Regions" /></p>
 
 Map of India Showing Western Regions
 
@@ -9871,7 +9871,7 @@ The **troposphere** is the lowermost layer of the atmosphere, extending from the
 
 1. **Troposphere-** (0-18 km) Weather-active layer. Holds 75% of atmospheric mass.
 
-<p align="center"><img src="images/civilsdaily_p46_img17.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p46_img17.png" alt="Diagram" /></p>
 
 2. **Stratosphere-** (18-50 km) Home to the ozone layer. Temperature increases with height.
 
@@ -9970,7 +9970,7 @@ Troposphere thus is an important layer in Earth's Atmosphere, as it is the layer
 
 The **troposphere** is the lowest layer of the atmosphere, extending from the Earth’s surface up to **8–18 km** depending on latitude and season. Containing **75–80% of the atmospheric mass** and almost all water vapour, it is the most dynamic layer, directly influencing weather and climate.
 
-## Significance of the Troposphere in Weather Processes <p align="center"><img src="images/superkalam_geography_q254_img1.png" alt="Diagram Earth's Atmosphere Structure" /></p>
+## Significance of the Troposphere in Weather Processes <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q254_img1.png" alt="Diagram Earth's Atmosphere Structure" /></p>
 
 Diagram Earth's Atmosphere Structure
 
@@ -10068,7 +10068,7 @@ There are four categories of air masses: arctic, tropical, polar and equatorial.
 
 Air masses are large bodies of air that acquire uniform temperature and humidity characteristics from extensive source regions. Understanding their behavior is crucial for comprehending regional and global climate dynamics.
 
-<p align="center"><img src="images/superkalam_geography_q713_img1.png" alt="Global Air Mass Source Regions Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q713_img1.png" alt="Global Air Mass Source Regions Map" /></p>
 
 Global Air Mass Source Regions Map
 
@@ -10160,7 +10160,7 @@ Air masses serve as the atmosphere's primary mechanism for redistributing heat a
 
 The world's fold mountain systems are predominantly located along continental margins due to tectonic processes, creating zones of intense seismic and volcanic activity that shape Earth's dynamic landscape.
 
-<p align="center"><img src="images/superkalam_geography_q879_img1.png" alt="Oceanic Continental Plate Convergence Geological Cross-Section" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q879_img1.png" alt="Oceanic Continental Plate Convergence Geological Cross-Section" /></p>
 
 Oceanic Continental Plate Convergence Geological Cross-Section
 
@@ -10221,7 +10221,7 @@ This intricate relationship between tectonics, seismicity, and volcanism makes f
 
 **Temperature inversion can occur due to several factors such as radiation cooling, subsidence of air, advection of warm air, and the presence of an inversion layer.**
 
-<p align="center"><img src="images/pw_geography_q71_img1.webp" alt="Thermal inversion" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q71_img1.webp" alt="Thermal inversion" /></p>
 
 **Significant effects on weather and environment:**
 - **Air pollution:** Temperature inversion can trap pollutants in the lower atmosphere and cause smog and poor air quality, leading to respiratory problems.
@@ -10254,11 +10254,11 @@ Temperature inversion is a complex meteorological phenomenon that can have serio
 
 Temperature inversion is an atmospheric phenomenon where warm air overlies cooler air, reversing the normal temperature gradient. 
 
-<p align="center"><img src="images/superkalam_geography_q977_img1.png" alt="Temperature Inversion Mechanism showing warm air layer above cool surface air with trapped pollutants" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q977_img1.png" alt="Temperature Inversion Mechanism showing warm air layer above cool surface air with trapped pollutants" /></p>
 
 Temperature Inversion Mechanism showing warm air layer above cool surface air with trapped pollutants
 
-<p align="center"><img src="images/superkalam_geography_q977_img2.png" alt="Comparative 2D cross section diagram panels" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q977_img2.png" alt="Comparative 2D cross section diagram panels" /></p>
 
 Comparative 2D cross section diagram panels
 
@@ -10319,7 +10319,7 @@ Temperature inversion significantly impacts both meteorological patterns and hum
 
 ### Body
 
-**<p align="center"><img src="images/pw_geography_q42_img1.webp" alt="hot deserts in the northern" /></p>**
+**<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q42_img1.webp" alt="hot deserts in the northern" /></p>**
 
 **Various factors of geographical location:**
 - **Global Wind Patterns:** The Earth’s atmospheric circulation pattern, also known as **the Hadley Cell**, plays a crucial role in the formation of deserts. The hot, moist air rises at the equator and travels towards the poles, then cools and descends around **20-30 degrees** north and south of the equator, creating arid conditions in those regions. E.g Azizia, Libya.
@@ -10349,11 +10349,11 @@ The location of major hot deserts in the northern hemisphere is a result of comp
 
 The formation of major hot deserts in the northern hemisphere between 20-30°N latitude on the western continental margins is a result of complex atmospheric and oceanic interactions.
 
-<p align="center"><img src="images/superkalam_geography_q970_img1.jpeg" alt="Showing deserts on world map in 20-30 degree N latitude" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q970_img1.jpeg" alt="Showing deserts on world map in 20-30 degree N latitude" /></p>
 
 Showing deserts on world map in 20-30 degree N latitude
 
-<p align="center"><img src="images/superkalam_geography_q970_img2.png" alt="Generalized Continent Diagram Landmass between Degrees" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q970_img2.png" alt="Generalized Continent Diagram Landmass between Degrees" /></p>
 
 Generalized Continent Diagram Landmass between Degrees
 
@@ -10402,7 +10402,7 @@ The **Theory of Plate Tectonics,** developed in the late 1960s, is based on earl
 
 1. Divergent Plate Movement - Increase in ocean basin size and breakup of continents.
 
-<p align="center"><img src="images/civilsdaily_p60_img27.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p60_img27.png" alt="Diagram" /></p>
 
    - Plates move apart → **magma rises and solidifies to form a new oceanic crust.**
    - Causes **seafloor spreading** and widening of oceans.EgExpansion of the **Atlantic Ocean** along the Mid-Atlantic Ridge. **(2.5 cm per year.)**
@@ -10414,7 +10414,7 @@ b. **Formation of Linear Seas-** Eg- **Red Sea** due to drifting of Arabian Plat
 
 2. Convergent Plate Movement - Shrinking of oceans and enlargement/upliftment of continents.
 
-<p align="center"><img src="images/civilsdaily_p60_img28.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p60_img28.png" alt="Diagram" /></p>
 
 a) **Ocean-Continent Convergence**
 
@@ -10428,7 +10428,7 @@ c. Eg- Nazca Plate subducting under the South American Plate to form the **Andes
 
 d. **The Pacific Ocean** is currently shrinking due to subduction along the "Ring of Fire".
 
-<p align="center"><img src="images/civilsdaily_p60_img29.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p60_img29.png" alt="Diagram" /></p>
 
 b) **Continent-Continent Convergence -** Collision causes **fold mountain formation and crustal thickening.** Eg- **Himalayas** formed after closure of the **Tethys Sea.**
 
@@ -10495,17 +10495,17 @@ The constant movement of tectonic plates is fundamental in shaping the Earth's s
 - **Divergent Boundaries (Rifting and Continental Break-up):** When continental crust is pulled apart, rift valleys develop, which eventually split landmasses. This leads to fragmentation and change in continental outlines.
   - **Eg:** The **East African Rift** may split Africa into two separate continental blocks.
 
-<p align="center"><img src="images/pw_geography_q872_img1.jpg" alt="1" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q872_img1.jpg" alt="1" /></p>
 
 - **Convergent Boundaries (Collision and Mountain Building):** When two continental plates collide, intervening seas close, and the crust folds and uplifts into mountains. This reshapes continents by enlarging landmass thickness.
   - **Eg:** The collision of the **Indian** and **Eurasian plates** formed the Himalayas and Tibetan Plateau.
 
-<p align="center"><img src="images/pw_geography_q872_img2.jpg" alt="2" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q872_img2.jpg" alt="2" /></p>
 
 - **Transform Boundaries (Lateral Displacements):** Strike-slip or transverse movements shift landmasses sideways, displacing continental margins and coastlines.
   - **Eg:** **San Andreas Fault**: , a transform boundary, causes horizontal displacement, shifting California along the Pacific Plate margin.
 
-<p align="center"><img src="images/pw_geography_q872_img3.jpg" alt="Picture10" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q872_img3.jpg" alt="Picture10" /></p>
 
 - **Isostatic Adjustments (Vertical Re-shaping):** Removal or addition of weight (erosion, ice melt, sediment load) causes crust to rise or sink, changing continental relief.
   - **Eg:** Post-glacial rebound in Scandinavia has uplifted land, altering coastal shapes.
@@ -10545,7 +10545,7 @@ Recent **GPS measurements** show the Himalayas rising 5mm annually. **Plate tect
 
 ## Tectonic Movements Affecting Continental Shape and Size
 
-<p align="center"><img src="images/superkalam_geography_q2_img1.png" alt="Plate tectonics causing seafloor spreading subduction" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q2_img1.png" alt="Plate tectonics causing seafloor spreading subduction" /></p>
 
 Plate tectonics causing seafloor spreading subduction
 
@@ -10565,7 +10565,7 @@ Plate tectonics causing seafloor spreading subduction
 - **Subduction Effects**: Oceanic plates subduct beneath continental plates, shrinking ocean basins.**Example:** Andes Mountains formation through **Nazca Plate subduction** beneath South American Plate
 - **Volcanic Addition**: Japan's land area expansion through **volcanic island arc** formation
 
-<p align="center"><img src="images/superkalam_geography_q2_img2.jpg" alt="Divergent and Convergent Plates" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q2_img2.jpg" alt="Divergent and Convergent Plates" /></p>
 
 Divergent and Convergent Plates
 
@@ -10600,7 +10600,7 @@ Modern **satellite geodesy** and **GPS technology** confirm these ongoing proces
 
 A **fjord** is a **long, narrow, and deep sea inlet with steep cliffed sides,** formed due to **glacial erosion and subsequent marine submergence.**
 
-<p align="center"><img src="images/civilsdaily_p65_img33.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p65_img33.png" alt="Diagram" /></p>
 
 **Formation of fjords**
 
@@ -10645,7 +10645,7 @@ Fjords represent classic **glacio-fluvial and marine interaction.** They also se
 
 Fjords are long, narrow, and deep inlets of the sea that are surrounded by steep cliffs or mountains. They are formed by the erosion of glacial ice, and are found in regions where the sea level has risen after the ice age.
 
-<p align="center"><img src="images/geography_q18_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/geography_q18_img1.png" alt="Image" /></p>
 
 Some countries that have fjords are Norway, Chile, New Zealand, and the U.S. state of Alaska.
 
@@ -10686,7 +10686,7 @@ A fjord is a narrow, deep inlet of seawater bordered by steep cliffs or mountain
 - **Glacial Erosion:** Fjords took shape during ice ages when massive glaciers carved out deep U-shaped valleys as they moved, eroding the landscape.
 
 **For instance, Norway’s Sognefjord was created through this glacial activity.**
-- **Isostatic Rebound:** As glaciers advance and weigh down the Earth’s crust, the land sinks or subsides under the pressure. When the glaciers retreat, the crust slowly rebounds or rises in response, creating the fjord’s characteristic deep, narrow shape. An example of isostatic rebound is observed in **Drammensfjorden.** <p align="center"><img src="images/pw_geography_q740_img1.webp" alt="Fjords coasts" /></p>
+- **Isostatic Rebound:** As glaciers advance and weigh down the Earth’s crust, the land sinks or subsides under the pressure. When the glaciers retreat, the crust slowly rebounds or rises in response, creating the fjord’s characteristic deep, narrow shape. An example of isostatic rebound is observed in **Drammensfjorden.** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q740_img1.webp" alt="Fjords coasts" /></p>
 - **Sea-Level Rise:** Rising sea levels, often associated with the melting of glaciers and the end of ice ages, lead to the submergence of the glacially carved valleys. This submersion fills the valleys with seawater, forming the fjord.
 
 **Milford Sound fjord in New Zealand was formed when the sea inundated a glacial valley.**
@@ -10774,7 +10774,7 @@ Fjords, with their origin rooted in glacial activities and their unparalleled be
  **Fjords** are long, narrow, deep inlets of the sea between high cliffs or steep slopes, formed by **glacial activity** during the last Ice Age. They are known for their dramatic landscapes and are considered among the most scenic natural formations globally.
 **Question ID: 2023-gs1-q189-superkalam**
 
-## Formation of Fjords <p align="center"><img src="images/superkalam_geography_q169_img1.png" alt="Fjord Formation Diagram With Definitions." /></p>
+## Formation of Fjords <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q169_img1.png" alt="Fjord Formation Diagram With Definitions." /></p>
 
 Fjord Formation Diagram With Definitions.
 
@@ -10844,7 +10844,7 @@ Fjords are nature’s masterpieces shaped by the slow but powerful force of glac
 
 **Rocks**
 
-<p align="center"><img src="images/civilsdaily_p65_img32.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p65_img32.png" alt="Diagram" /></p>
 
 **Based on Mode of Occurrence**
 
@@ -10990,7 +10990,7 @@ These primary rocks can help us to study the earth's interior and have high econ
 
 Primary rocks, also known as **Igneous rocks**, are the **first-formed rocks of the Earth’s crust**, originating from the cooling and solidification of molten magma or lava. They are called "primary" because they are the **parent material** from which sedimentary and metamorphic rocks are derived.
 
-<p align="center"><img src="images/superkalam_geography_q240_img1.png" alt="Geological Cross Section of Earth's Crust" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q240_img1.png" alt="Geological Cross Section of Earth's Crust" /></p>
 
 Geological Cross Section of Earth's Crust
 
@@ -11055,7 +11055,7 @@ A **mountain range** is a long chain or system of mountains formed primarily due
 
 ### Himalayas (East-West Alignment)
 
-<p align="center"><img src="images/civilsdaily_p57_img25.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p57_img25.png" alt="Diagram" /></p>
 
 1. **Barrier to cold winds** - Blocks Siberian winds from entering India.
 
@@ -11243,7 +11243,7 @@ The mountain ranges of the world provide essential ecosystem-based services to g
 
 The major mountain ranges of the world are aligned along tectonic plate boundaries, where the movement of the Earth’s crust has resulted in the formation of large mountainous regions. The alignment of these mountain ranges can have a significant impact on local weather conditions, influencing temperature, precipitation, and wind patterns.
 
-<p align="center"><img src="images/pw_geography_q570_img1.webp" alt="major mountain ranges " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q570_img1.webp" alt="major mountain ranges " /></p>
 
 
 
@@ -11314,7 +11314,7 @@ While shaping diverse natural environments, the world's mountain ranges make cer
 
 Recent climate studies show mountain ranges control over 60% of global precipitation patterns, making their alignment crucial for understanding weather systems worldwide.
 
-<p align="center"><img src="images/superkalam_geography_q318_img1.png" alt="Orographic effect on a mountain cross section" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q318_img1.png" alt="Orographic effect on a mountain cross section" /></p>
 
 Orographic effect on a mountain cross section
 
@@ -11453,7 +11453,7 @@ While powerful displays of nature, volcanic eruptions can devastate communities 
 
 India is classified as a subcontinent due to its distinct geological formation and unique geographical characteristics that set it apart from the rest of Asia.
 
-<p align="center"><img src="images/superkalam_geography_q336_img1.png" alt="Indian Subcontinent physical map and landmass" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q336_img1.png" alt="Indian Subcontinent physical map and landmass" /></p>
 
 Indian Subcontinent physical map and landmass
 
@@ -11463,7 +11463,7 @@ Indian Subcontinent physical map and landmass
 - **Ongoing Geological Activity**: Recent 2024 studies show continued crustal delamination beneath the Himalayas
 - **Distinct Geological History**: India's geological evolution differs significantly from mainland Asia due to its northward drift from Gondwana
 
-<p align="center"><img src="images/superkalam_geography_q336_img2.png" alt="Indian Plate Movement and Collision with Eurasian Plate showing formation of Himalayas and India's geological boundaries" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q336_img2.png" alt="Indian Plate Movement and Collision with Eurasian Plate showing formation of Himalayas and India's geological boundaries" /></p>
 
 Indian Plate Movement and Collision with Eurasian Plate showing formation of Himalayas and India's geological boundaries
 
@@ -11507,7 +11507,7 @@ India's subcontinental status reflects its geological independence, comprehensiv
 
 The Circum-Pacific Zone, popularly known as the **"Ring of Fire,"** is a 40,000 km horseshoe-shaped belt encircling the Pacific Ocean.
 
-<p align="center"><img src="images/civilsdaily_p61_img30.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p61_img30.png" alt="Diagram" /></p>
 
 **Major Geophysical Characteristics**
 
@@ -11619,7 +11619,7 @@ The Circum-Pacific Zone's geophysical features show how strong the natural force
 
 The **Circum-Pacific Zone** or "Ring of Fire" forms a 40,000 km belt around the Pacific Ocean, representing Earth's most geologically active region with 90% of global earthquakes and 75% of active volcanoes.
 
-<p align="center"><img src="images/superkalam_geography_q400_img1.png" alt="Pacific Ring of Fire Map 2020" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q400_img1.png" alt="Pacific Ring of Fire Map 2020" /></p>
 
 Pacific Ring of Fire Map 2020
 
@@ -11692,7 +11692,7 @@ A **mantle plume** is a narrow, localized column of abnormally hot, buoyant rock
 
 4. **Stationary relative to moving plates** - Forms volcanic chains.
 
-<p align="center"><img src="images/civilsdaily_p59_img26.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p59_img26.png" alt="Diagram" /></p>
 
 5. **Basalts** derived from plumes show **distinct isotopic and chemical signatures** compared to mid-ocean ridge basalts. Eg- high MgO concentrations
 
@@ -11761,7 +11761,7 @@ Mantle plume is an upwelling of abnormally hot rock within the earth's mantle wh
 
 A **mantle plume** is a column of hot, buoyant rock rising from Earth's deep mantle, creating hotspot volcanism and significantly influencing plate tectonic processes.
 
-<p align="center"><img src="images/superkalam_geography_q556_img1.png" alt="2018 Mantle plume geological cross section" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q556_img1.png" alt="2018 Mantle plume geological cross section" /></p>
 
 2018 Mantle plume geological cross section
 
@@ -11843,7 +11843,7 @@ Mantle plumes serve as **deep Earth's thermal engines**, driving plate reorganiz
 **g The Andes.**
 - **Compression and Uplift:** The compression and uplift of rock layers occur along the margins of continents due to the convergence of tectonic plates. These forces cause the crust to fold and uplift, creating mountainous topography.
 
-<p align="center"><img src="images/pw_geography_q169_img1.webp" alt="continental convergence" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q169_img1.webp" alt="continental convergence" /></p>
 
 - **Association Between Fold Mountains and Earthquakes:** Fold mountains are formed as a result of the collision of two tectonic plates. The movement and collision of these plates can cause earthquakes, as the plates grind against each other or one plate is forced beneath the other in a process known as subduction.
 - **Examples:** The Himalayas are located at the boundary between the Indian Plate and the Eurasian Plate and are one of the most seismically active regions in the world.
@@ -11872,7 +11872,7 @@ The concentration of fold mountain systems along the margins of continents can b
 
 The world's oceans contain vast untapped resources that could significantly address global resource scarcity. With initiatives like India's **Deep Ocean Mission** (2021) and the UN's **Blue Economy** framework gaining momentum, oceanic resource utilization has become increasingly strategic.
 
-<p align="center"><img src="images/superkalam_geography_q890_img1.png" alt="Ocean floor resource distribution cross section" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q890_img1.png" alt="Ocean floor resource distribution cross section" /></p>
 
 Ocean floor resource distribution cross section
 
@@ -11967,7 +11967,7 @@ The absence of deltas in Western Ghats rivers could be due to the steep gradient
 
 Rivers of the Western Ghats do not form deltas due to their unique geographical setting and hydrological characteristics. This phenomenon results from distinct physical factors that prevent sediment accumulation at river mouths.
 
-<p align="center"><img src="images/superkalam_geography_q975_img1.png" alt="Peninsular India West to East Cross Section" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q975_img1.png" alt="Peninsular India West to East Cross Section" /></p>
 
 Peninsular India West to East Cross Section
 
@@ -12021,7 +12021,7 @@ This unique combination explains why Western Ghat rivers create distinctive coas
 
 ### Body
 
-**Theory based on evidence:** <p align="center"><img src="images/pw_geography_q73_img1.webp" alt="continental drift" /></p>
+**Theory based on evidence:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q73_img1.webp" alt="continental drift" /></p>
 
 - **Fit of the continents:** The coastlines of many continents fit together like puzzle pieces, suggesting that they were once part of a larger landmass. **Example**: - South American and African plate.
 - **Fossil evidence:** Fossils of the same species have been found on opposite sides of oceans, indicating that the continents were once connected. **Example**: - Gold reserves in South America and Western Africa.
@@ -12051,7 +12051,7 @@ The prominent evidence in support of the theory include the matching coastlines,
 
 The theory of continental drift, proposed by **Alfred Wegener** in 1912, suggests that continents were once united in a supercontinent called **Pangaea** and have since drifted to their present positions. This revolutionary concept transformed our understanding of Earth's dynamic crustal movements.
 
-<p align="center"><img src="images/superkalam_geography_q978_img1.png" alt="South America and Africa coastline fitting" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q978_img1.png" alt="South America and Africa coastline fitting" /></p>
 
 South America and Africa coastline fitting
 
@@ -12131,7 +12131,7 @@ South America and Africa coastline fitting
 - **The Role of Plate Tectonics:** The islands of Indonesia and the Philippines are located along the Pacific Ring of Fire, a region characterized by active volcanoes and frequent earthquakes. This region is also the site of intense plate tectonic activity, where several tectonic plates collide and interact with each other.
 - **The Subduction Process:** The islands of Indonesia and the Philippines are situated on the boundaries of several tectonic plates, including the Eurasian Plate, the Philippine Sea Plate, the Pacific Plate, and the Indo-Australian Plate. The interaction of these plates has created a zone of subduction, where the denser oceanic plate is forced beneath the less dense continental plate.
 
-<p align="center"><img src="images/pw_geography_q107_img1.webp" alt="pacific ring of fire" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q107_img1.webp" alt="pacific ring of fire" /></p>
 
 - **Volcanic Eruptions:** The subduction of the oceanic plate results in the melting of rock in the Earth’s mantle, which generates magma that rises to the surface and forms volcanoes. Over time, repeated volcanic eruptions can result in the accumulation of volcanic material, which can build up and eventually create new islands.
 
@@ -12165,7 +12165,7 @@ The formation of islands in the Indonesian and Philippine archipelagos is the re
 
 Recent data shows these three basins account for **over 65% of global tropical cyclone activity**, with specific meteorological and geographical factors creating ideal storm-forming conditions.
 
-<p align="center"><img src="images/superkalam_geography_q873_img1.png" alt="Thematic World Map of Latitudes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q873_img1.png" alt="Thematic World Map of Latitudes" /></p>
 
 Thematic World Map of Latitudes
 
@@ -12214,7 +12214,7 @@ The **Monsoon** is a seasonal reversal of winds accompanied by corresponding cha
 
 1. **Bay of Bengal Branch branch** monsoon winds hit the **Purvanchal Himalayas** and are deflected westward into the Ganga Plains.
 
-<p align="center"><img src="images/civilsdaily_p47_img18.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p47_img18.png" alt="Diagram" /></p>
 
 2. **Coriolis Effect and Meghalaya Plateau** help "turn" the southwestern winds into a westward-flowing stream before they reach Bhojpur.
 
@@ -12277,7 +12277,7 @@ Therefore, **Purvaiya** winds are essential to Bhojpur’s culture, shaping its 
 
 The South-West Monsoon is a seasonal wind system that typically originates from the southwest direction and brings heavy rainfall during the summer months, thus significantly impacting the socio-economic landscape of the Indian subcontinent. It is recognized by various names across India, **such as “Varsha Ritu” in Hindi and “Edavappathi” in Malayalam.** In the **Bhojpur Region**, it is referred to **as ‘Purvaiya (** easterly),’ owing to the following reasons:
 
-<p align="center"><img src="images/pw_geography_q779_img1.webp" alt="South West Monsoon in India " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q779_img1.webp" alt="South West Monsoon in India " /></p>
 
 
 
@@ -12322,7 +12322,7 @@ The South-West Monsoon is a seasonal wind system that typically originates from 
 
 The **South-West monsoon**, though generally westerly in origin, is locally referred to as **‘Purvaiya’ (easterly)** in the **Bhojpur region** of Bihar and eastern Uttar Pradesh. This nomenclature is a reflection of **local perception** shaped by geography and wind direction relative to the region.
 
-## Why South-West Monsoon is Called 'Purvaiya' in Bhojpur Region <p align="center"><img src="images/superkalam_geography_q177_img1.png" alt="Indian Monsoon and Topography Interaction Diagram" /></p>
+## Why South-West Monsoon is Called 'Purvaiya' in Bhojpur Region <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q177_img1.png" alt="Indian Monsoon and Topography Interaction Diagram" /></p>
 
 Indian Monsoon and Topography Interaction Diagram
 
@@ -12412,7 +12412,7 @@ The role of monsoon is vital in the economy of major parts of the world because 
 **Characteristics of monsoon climate:**
 - **Seasonal rainfall:** One of the defining features of monsoon climate is the seasonal rainfall patterns. During the wet season, which typically lasts from June to September, monsoon Asia experiences heavy rainfall, which can be as high as 90% of the region’s annual precipitation. This rainfall is critical for supporting agricultural production and replenishing water resources, which are essential for food security.
 
-<p align="center"><img src="images/pw_geography_q376_img1.webp" alt="monsoon climate" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q376_img1.webp" alt="monsoon climate" /></p>
 
 - The monsoon climate in India is characterized by **distinct seasons**, which facilitate the cultivation of various types of crops. The movement of the sun between the Tropic of Cancer and Capricorn results in these distinct seasons.
 - The **Cool Dry Season** occurs during October to February, as the North-East Monsoon brings out blowing dry winds that result in little or no rain across the Indian subcontinent.
@@ -12445,7 +12445,7 @@ The unique characteristics of monsoon climate, including seasonal rainfall patte
 
 Recent studies show that monsoon regions support over 3.8 billion people, making the monsoon climate system crucial for global food security and agricultural sustainability.
 
-<p align="center"><img src="images/superkalam_geography_q650_img1.png" alt="Arrows show influence from Indian Ocean" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q650_img1.png" alt="Arrows show influence from Indian Ocean" /></p>
 
 Arrows show influence from Indian Ocean
 
@@ -12517,7 +12517,7 @@ The monsoon climate's predictable seasonality, abundant rainfall, and supporting
 
 Recent meteorological data and climate studies indicate a significant correlation between landscape modifications and changing monsoon behavior, though the extent varies regionally across India.
 
-<p align="center"><img src="images/superkalam_geography_q798_img1.png" alt="Humanizing Landscape Impact on Indian Monsoon" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q798_img1.png" alt="Humanizing Landscape Impact on Indian Monsoon" /></p>
 
 Humanizing Landscape Impact on Indian Monsoon
 
@@ -12731,7 +12731,7 @@ Ocean currents and water masses are both important components of the marine envi
 
 Recent studies show that 80% of marine species depend on specific water conditions, highlighting how ocean currents and water masses create distinct impacts on marine ecosystems and coastal environments.
 
-<p align="center"><img src="images/superkalam_geography_q487_img1.png" alt="Coastal Ocean Environment Cross Section Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q487_img1.png" alt="Coastal Ocean Environment Cross Section Diagram" /></p>
 
 Coastal Ocean Environment Cross Section Diagram
 
@@ -12885,7 +12885,7 @@ It is clear that the spread of dead zones can affect most marine ecosystems and 
 
 The expansion of marine 'Dead Zones' - hypoxic areas with dissolved oxygen below 2mg/L - poses severe threats to ocean ecosystems, with over 700 documented zones globally as of 2024.
 
-<p align="center"><img src="images/superkalam_geography_q568_img1.png" alt="Coastal Dead Zone Formation in Marine Ecosystem" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q568_img1.png" alt="Coastal Dead Zone Formation in Marine Ecosystem" /></p>
 
 Coastal Dead Zone Formation in Marine Ecosystem
 
@@ -12949,7 +12949,7 @@ Dead zones represent critical marine degradation requiring urgent action through
 
 Recent oceanographic studies reveal that ocean salinity variations significantly impact global climate systems, marine ecosystems, and coastal economies worldwide. Understanding these variations is crucial for climate prediction and marine resource management.
 
-<p align="center"><img src="images/superkalam_geography_q633_img1.png" alt="Ocean salinity versus latitude line graph" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q633_img1.png" alt="Ocean salinity versus latitude line graph" /></p>
 
 Ocean salinity versus latitude line graph
 
@@ -13048,7 +13048,7 @@ Advanced monitoring systems including SMAP and Aquarius satellites continue enha
 
 Ocean currents, driven by multiple natural forces, significantly influence global climate patterns and human maritime activities.
 
-<p align="center"><img src="images/superkalam_geography_q795_img1.png" alt="World Map of Major Ocean Currents" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q795_img1.png" alt="World Map of Major Ocean Currents" /></p>
 
 World Map of Major Ocean Currents
 
@@ -13138,7 +13138,7 @@ Understanding ocean current dynamics through modern technologies like **Argo flo
 
 El Niño significantly influences global climate patterns, but attributing all unusual climatic events solely to this phenomenon oversimplifies Earth's complex climate system.
 
-<p align="center"><img src="images/superkalam_geography_q870_img1.png" alt="El Nino Pacific Ocean Cross Section Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q870_img1.png" alt="El Nino Pacific Ocean Cross Section Diagram" /></p>
 
 El Nino Pacific Ocean Cross Section Diagram
 
@@ -13197,7 +13197,7 @@ While El Niño remains a crucial climate driver affecting billions globally, the
 
 1. **Upwelling zones increase productivity** - Bring nutrient-rich deep water to the surface. Eg- Peru (Humboldt Current) world’s major anchovy fishery.
 
-<p align="center"><img src="images/civilsdaily_p49_img20.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p49_img20.png" alt="Diagram" /></p>
 
 2. **Convergence of warm and cold currents** - Enhances plankton growth. Eg- Grand Banks (Labrador + Gulf Stream).
 
@@ -13278,7 +13278,7 @@ Although ocean current is the main player in creating fishing zones, the use of 
 
 Ocean currents are the continuous, directed movements of seawater. They play an essential role in the earth’s climate and weather patterns, as well as in the distribution of marine life.
 
-<p align="center"><img src="images/pw_geography_q693_img1.webp" alt="warm & cold currents" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q693_img1.webp" alt="warm & cold currents" /></p>
 
 
 
@@ -13352,7 +13352,7 @@ However, in addition to this, other factors like the availability of vast shelve
 
 Ocean currents are **large-scale horizontal movements of seawater** that distribute heat, nutrients, and marine life across the globe. They are driven by a combination of atmospheric, geographical, and astronomical forces, and play a crucial role in regulating climate and sustaining global fisheries.
 
-## Forces Influencing Ocean Currents <p align="center"><img src="images/superkalam_geography_q255_img1.png" alt="World Map Showing Different Ocean Currents" /></p>
+## Forces Influencing Ocean Currents <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q255_img1.png" alt="World Map Showing Different Ocean Currents" /></p>
 
 World Map Showing Different Ocean Currents
 
@@ -13436,7 +13436,7 @@ a. The Sun's corona constantly releases a stream of **protons and electrons** at
 
 b. **Coronal Mass Ejections** launch billions of tons of plasma toward Earth.
 
-<p align="center"><img src="images/civilsdaily_p48_img19.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p48_img19.png" alt="Diagram" /></p>
 
 2. These particles hit the **Magnetosphere** (Earth’s magnetic shield), which deflects most of them.
 
@@ -13556,7 +13556,7 @@ The majestic **Aurora Borealis** (Northern Lights) and **Aurora Australis** (Sou
 
 These natural light shows have captivated scientists and sky-watchers alike, particularly during the current **solar maximum period (2024-2026)**.
 
-<p align="center"><img src="images/superkalam_geography_q92_img1.png" alt="Aurora Formation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q92_img1.png" alt="Aurora Formation" /></p>
 
 Aurora Formation
 
@@ -13604,7 +13604,7 @@ IMD defines cloudburst as an extreme weather event involving **very high-intensi
 
 **1.** Orographic Uplift
 
-<p align="center"><img src="images/civilsdaily_p56_img24.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p56_img24.png" alt="Diagram" /></p>
 
 - Moist air masses are **forced to rise abruptly** when they encounter **steep mountain slopes.**
 
@@ -13672,7 +13672,7 @@ Cloudbursts are **intense rainfall events, exceeding 100 mm/h, over a small area
 
 ### Body
 
-**Mechanism of Cloudburst** <p align="center"><img src="images/geography_q11_img1.png" alt="Image" /></p>
+**Mechanism of Cloudburst** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/geography_q11_img1.png" alt="Image" /></p>
 
 Cloudbursts happen when warm, moist air rapidly rises due to various factors like:
 
@@ -13748,7 +13748,7 @@ Indian Meteorological Department (IMD) defines cloud burst as an extreme, locali
 
 ### Understanding the Phenomenon of Cloudbursts
 
-<p align="center"><img src="images/superkalam_geography_q97_img1.png" alt="Cloudburst" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q97_img1.png" alt="Cloudburst" /></p>
 
 Cloudburst
 
@@ -13757,7 +13757,7 @@ Cloudburst
 3. **Clausius-Clapeyron Effect:** Global warming intensifies this mechanism, as every 1°C temperature rise allows the atmosphere to hold 7% more moisture.
 4. **Geographical Expansion:** The phenomenon is spreading beyond the Himalayas to the orographically lifted Western Ghats, contributing to catastrophes like the **Wayanad landslides (2024)**.
 
-<p align="center"><img src="images/superkalam_geography_q97_img2.jpg" alt="Formation of Cloudburst" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q97_img2.jpg" alt="Formation of Cloudburst" /></p>
 
 Formation of Cloudburst
 
@@ -13808,7 +13808,7 @@ Mitigating cloudbursts requires transitioning from reactive rescue to proactive 
 
 1. Expansion of the **geographic area and the seasons** during which this threshold is met.
 
-<p align="center"><img src="images/civilsdaily_p52_img21.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p52_img21.png" alt="Diagram" /></p>
 
 a. Cyclones in **South Atlantic** and higher latitudes of the Pacific
 
@@ -13860,7 +13860,7 @@ Addressing this challenge requires a **multi-layered climate and disaster strate
 
 **Sea Surface Temperature (SST)** is defined as the temperature of the uppermost layer of the ocean. The rise in sea surface temperature is primarily driven by human-induced climate change, with significant contributions from greenhouse gas emissions. **SST** plays a crucial role in influencing weather patterns, especially in the formation of tropical cyclones.
 
-<p align="center"><img src="images/geography_q9_img1.jpg" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/geography_q9_img1.jpg" alt="Image" /></p>
 
 ### Body
 
@@ -13876,7 +13876,7 @@ Addressing this challenge requires a **multi-layered climate and disaster strate
 
 - **Frequency:** Rising global temperatures may increase the frequency and intensity of tropical cyclones by raising sea surface temperatures.
 
-- **Changing Tracks:** As SSTs rise globally, tropical cyclones may form in new regions or shift their paths, affecting areas previously unaffected. <p align="center"><img src="images/geography_q9_img2.png" alt="Image" /></p>
+- **Changing Tracks:** As SSTs rise globally, tropical cyclones may form in new regions or shift their paths, affecting areas previously unaffected. <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/geography_q9_img2.png" alt="Image" /></p>
 
 ### Conclusion
 
@@ -13935,7 +13935,7 @@ The rise in sea surface temperatures significantly challenges us by increasing t
 
 The **sea surface temperature (SST)** represents the temperature of the ocean's upper layer, which has experienced significant warming due to anthropogenic climate change and natural variability. Oceans absorb nearly 90% of the excess heat trapped by greenhouse gases, leading to a steady increase in sea surface temperatures.
 
-<p align="center"><img src="images/superkalam_geography_q95_img1.png" alt="Tropical Cyclone structure and formation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q95_img1.png" alt="Tropical Cyclone structure and formation" /></p>
 
 Tropical Cyclone structure and formation
 
@@ -14089,7 +14089,7 @@ In Cyclone prone areas, the IMD issues cyclone warnings to state government offi
 
 ### Body
 
-**Color-coded warnings issued by the IMD for cyclones:** <p align="center"><img src="images/pw_geography_q647_img1.webp" alt="IMD for cyclones" /></p>
+**Color-coded warnings issued by the IMD for cyclones:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q647_img1.webp" alt="IMD for cyclones" /></p>
 
 - **Green (All is well):** This is the least **severe warning** and indicates that there is no immediate danger. It is issued when a cyclone is expected to form in the coming days but is not yet close to the affected area.
 - **Yellow (Be Aware):** This warning is issued when **a cyclone is likely to hit the affected area in the next few days**. It indicates that people should be cautious and take necessary precautions.
@@ -14135,7 +14135,7 @@ These warnings are mainly meant for administrators to keep ready and position th
 
 The **India Meteorological Department (IMD)** issues **colour-coded weather warnings** to alert authorities and the public about upcoming severe weather events, especially in **cyclone-prone coastal areas**. These warnings are designed to indicate the **severity of the situation** and the **level of preparedness required** for safeguarding life and property.
 
-<p align="center"><img src="images/superkalam_geography_q243_img1.png" alt="Four Tier Pyramid Weather Warning System" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q243_img1.png" alt="Four Tier Pyramid Weather Warning System" /></p>
 
 Four Tier Pyramid Weather Warning System
 
@@ -14200,7 +14200,7 @@ IMD’s colour-coded cyclone warnings serve as a **simple yet effective tool** f
 
 ### Body
 
-**<p align="center"><img src="images/pw_geography_q156_img1.webp" alt="Tropical cyclones" /></p>**
+**<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q156_img1.webp" alt="Tropical cyclones" /></p>**
 
 **Important of geographic limitation:**
 - **Warm sea surface temperature [SST]:** Tropical cyclones require warm ocean waters of at least 26.5°C to develop and strengthen. **The South China Sea, Bay of Bengal, and Gulf of Mexico** have warm sea surface temperatures throughout the year, making them ideal regions for the formation and strengthening of tropical cyclones.
@@ -14231,7 +14231,7 @@ The geographic confinement of tropical cyclones to the South China Sea, Bay of B
 
 The Iron and Steel industry has experienced dramatic spatial transformation globally, shifting from traditional Western centers to emerging Asian economies, driven by technological innovation and changing economic dynamics.
 
-<p align="center"><img src="images/superkalam_geography_q886_img1.png" alt="Iron and steel industry location changes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q886_img1.png" alt="Iron and steel industry location changes" /></p>
 
 Iron and steel industry location changes
 
@@ -14309,7 +14309,7 @@ The spatial transformation reflects the industry's evolution from resource-based
 
 ### Body
 
-**Tropical cyclones are named across the world:** <p align="center"><img src="images/pw_geography_q61_img1.webp" alt="Tropical cyclones " /></p>
+**Tropical cyclones are named across the world:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q61_img1.webp" alt="Tropical cyclones " /></p>
 
 - **Bay of Bengal and Arabian Sea:** The India Meteorological Department **[IMD]** names tropical cyclones in the Bay of Bengal and the Arabian Sea. They use a list of names that rotate every few years and include names contributed by **13 countries**.
 - **North Atlantic:** The National Hurricane Center **[NHC]** in the United States names tropical storms and hurricanes in the North Atlantic basin. They use a list of names that rotate every six years, and each year, they use names starting from the next letter in the alphabet, Like **Q, U, X, Y, and Z**.
@@ -14337,7 +14337,7 @@ The spatial transformation reflects the industry's evolution from resource-based
 
 The naming of tropical cyclones follows a systematic global framework coordinated by international meteorological organizations to ensure effective disaster communication and preparedness.
 
-<p align="center"><img src="images/superkalam_geography_q974_img1.png" alt="World Map of Tropical Cyclone Basins" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q974_img1.png" alt="World Map of Tropical Cyclone Basins" /></p>
 
 World Map of Tropical Cyclone Basins
 
@@ -14461,7 +14461,7 @@ Terrace farming should be encouraged in the north-eastern hill states where Jhum
 
 A landslide is a natural disaster that occurs when a mass of earth or rock suddenly moves downhill under the influence of gravity. It is common in many regions around the world, including the Himalayan region and the Western Ghats of India.
 
-<p align="center"><img src="images/pw_geography_q580_img1.webp" alt="location of field sampling plots" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q580_img1.webp" alt="location of field sampling plots" /></p>
 
 
 
@@ -14520,7 +14520,7 @@ The causes behind landslides might vary from region to region, the increasing im
 
 Recent landslide disasters in Wayanad (2024) and Kedarnath highlight the distinct causative factors affecting India's two major mountain systems.
 
-<p align="center"><img src="images/superkalam_geography_q321_img1.png" alt="India map showing the Himalayan region" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q321_img1.png" alt="India map showing the Himalayan region" /></p>
 
 India map showing the Himalayan region
 
@@ -14613,7 +14613,7 @@ Above measures, if integrated in development and planning of Himalayan states wi
 
 The Himalayas experience approximately **15% of global landslides**, with recent cloudbursts in Himachal Pradesh and Uttarakhand (2023-24) highlighting their extreme vulnerability to mass wasting events.
 
-<p align="center"><img src="images/superkalam_geography_q726_img1.png" alt="Steep Mountain Slope Landslide Causes Mitigation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q726_img1.png" alt="Steep Mountain Slope Landslide Causes Mitigation" /></p>
 
 Steep Mountain Slope Landslide Causes Mitigation
 
@@ -14737,7 +14737,7 @@ The Himalayas and Western Ghats are two prominent mountain ranges in India. Alth
 
 Recent landslide data shows the Himalayas recording over 4,600 incidents in Uttarakhand alone (2015-2024), significantly higher than Western Ghats regions. This disparity stems from distinct geological, climatic, and anthropogenic factors.
 
-<p align="center"><img src="images/superkalam_geography_q955_img1.png" alt="India Landslide Hazard Zones Himalayan Arc" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q955_img1.png" alt="India Landslide Hazard Zones Himalayan Arc" /></p>
 
 India Landslide Hazard Zones Himalayan Arc
 
@@ -14792,7 +14792,7 @@ A **tsunami** is a series of large ocean waves generated by the **sudden displac
 
 6. Waves strike land with great force, causing flooding and destruction.
 
-<p align="center"><img src="images/civilsdaily_p54_img23.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p54_img23.png" alt="Diagram" /></p>
 
 **Consequences of Tsunamis**
 
@@ -14921,7 +14921,7 @@ Tsunamis are series of **large sea waves** generated by **sudden displacement of
 - **Mediterranean and Atlantic:** Smaller but destructive tsunamis from submarine quakes and landslides (Lisbon 1755 earthquake).
 - **Polar Regions:** Glacial collapses in Greenland and Alaska sometimes trigger local tsunamis.
 
-<p align="center"><img src="images/pw_ancient_history_and_art__culture_q936_img1.jpg" alt="Screenshot 2025 09 13 132209" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ancient_history_and_art__culture_q936_img1.jpg" alt="Screenshot 2025 09 13 132209" /></p>
 
 **Fig: Tsunami Zones**
 
@@ -14961,7 +14961,7 @@ The **2004 Indian Ocean Tsunami** highlighted the devastating power of these oce
 
 ## How and Where are Tsunamis Formed?
 
-<p align="center"><img src="images/superkalam_geography_q20_img1.png" alt="Tsunami formation and coastal inundation process" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q20_img1.png" alt="Tsunami formation and coastal inundation process" /></p>
 
 Tsunami formation and coastal inundation process
 
@@ -15020,7 +15020,7 @@ Tsunami formation and coastal inundation process
 
 A **twister** is the common term for a **tornado** - a **narrow, violently rotating column of air that extends from the base of a thunderstorm to the ground.**
 
-<p align="center"><img src="images/civilsdaily_p53_img22.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p53_img22.png" alt="Diagram" /></p>
 
 **Key Features of a Twister**
 
@@ -15171,7 +15171,7 @@ These natural phenomena represent one of nature's most intense and destructive a
 
 ## Formation of Twisters
 
-<p align="center"><img src="images/superkalam_geography_q93_img1.png" alt="Tornado Alley Air Mass Interactions" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q93_img1.png" alt="Tornado Alley Air Mass Interactions" /></p>
 
 Tornado Alley Air Mass Interactions
 
@@ -15220,7 +15220,7 @@ The combination of these geographical and meteorological factors makes the Gulf 
 
 Volcanic eruptions are major **endogenic geomorphic processes** associated with plate boundaries and hotspots.
 
-<p align="center"><img src="images/civilsdaily_p63_img31.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p63_img31.png" alt="Diagram" /></p>
 
 **Impact on Regional Environment**
 
@@ -15303,7 +15303,7 @@ Most of the active volcanoes on earth occur on the Circum-Pacific Belt, also ref
 
 Volcanic eruptions are a natural phenomenon that can have significant impacts on the environment and society. In 2021, several volcanic eruptions occurred around the world, which had varying impacts on the regional environment.
 
-<p align="center"><img src="images/pw_geography_q610_img1.webp" alt="natural phenomenon" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q610_img1.webp" alt="natural phenomenon" /></p>
 
 **Body**
 
@@ -15377,7 +15377,7 @@ However some of the effects of volcanism are also beneficial. For example releas
 
 Recent volcanic activity demonstrates Earth's dynamic geological processes and their far-reaching environmental consequences. The year 2021 marked a particularly active period for global volcanism with significant regional impacts.
 
-<p align="center"><img src="images/superkalam_geography_q329_img1.png" alt="2021 World Map of Major Volcanic Eruptions" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q329_img1.png" alt="2021 World Map of Major Volcanic Eruptions" /></p>
 
 2021 World Map of Major Volcanic Eruptions
 
@@ -15444,7 +15444,7 @@ The Bhakti movement originated in South India in the 7th century and from the 13
 
 2. **Development of Regional Languages** - Eg- Growth of **Tamil, Marathi, Hindi, Bengali** literature.
 
-<img src="images/GS20120History20Model20Answers20%282018-2025%29-16.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120History20Model20Answers20%282018-2025%29-16.jpg">
 
 3. Fostered **inter-caste and inter-religious dialogue**. Eg- Baba Farid’s composition included in Guru Granth Sahib
 
@@ -15559,7 +15559,7 @@ Bhakti Literature’s nature is characterized by its intense emotional appeal, s
 
 Bhakti Literature emerged as a transformative spiritual movement in 6th century CE South India, fundamentally reshaping India's religious and cultural landscape through vernacular devotional expression.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q324_img1.png" alt="Bhakti Literature Hierarchical Flowchart Explained" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q324_img1.png" alt="Bhakti Literature Hierarchical Flowchart Explained" /></p>
 
 Bhakti Literature Hierarchical Flowchart Explained
 
@@ -15637,7 +15637,7 @@ While the Bhakti movement originated in South India in the 7th century, the adve
 
  2.    He elevated **Radha-Krishna worship** as the supreme spiritual ideal. **Radha-bhava** symbolised the deepest emotional bond between devotee and God.
 
-<img src="images/GS20120History20Model20Answers20%282018-2025%29-15.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120History20Model20Answers20%282018-2025%29-15.jpg">
 
 3. Chaitanya was a **Saguna bhakti proponent**, worshipping a personal God with attributes.Encouraged **kirtans, singing, dancing, and ecstatic devotion** as legitimate spiritual paths.
 
@@ -15721,7 +15721,7 @@ The advent of Sri Chaitanya Mahaprabhu significantly impacted the Bhakti movemen
 
 Sri Chaitanya Mahaprabhu's emergence in the 15th-16th century revolutionized the Bhakti movement, transforming it from individual devotional practices to a mass spiritual renaissance that reshaped medieval Indian society.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q564_img1.png" alt="Sri Chaitanya's Bhakti Reorientation Hub and Spoke" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q564_img1.png" alt="Sri Chaitanya's Bhakti Reorientation Hub and Spoke" /></p>
 
 Sri Chaitanya's Bhakti Reorientation Hub and Spoke
 
@@ -15829,7 +15829,7 @@ While Sufis and medieval mystic saints significantly impacted religious thought 
 
 Recent scholarship on medieval Indian mysticism reveals that while Sufis and mystic saints created significant cultural bridges, their structural impact on society remained constrained by institutional orthodoxy.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q880_img1.png" alt="Hindu Society Venn Diagram Overlap" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q880_img1.png" alt="Hindu Society Venn Diagram Overlap" /></p>
 
 Hindu Society Venn Diagram Overlap
 
@@ -15995,7 +15995,7 @@ Gandhara art serves as a testament to the rich cultural exchanges and blending o
 
 The Gandhara school of art, flourishing between **1st century BCE to 7th century CE**, represents a remarkable synthesis of multiple artistic traditions, particularly incorporating elements from Central Asian and Greco-Bactrian styles, creating a unique aesthetic vocabulary in ancient Indian art.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q485_img1.png" alt="Gandhara Bodhisattva Sculpture Line Drawing" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q485_img1.png" alt="Gandhara Bodhisattva Sculpture Line Drawing" /></p>
 
 Gandhara Bodhisattva Sculpture Line Drawing
 
@@ -16088,7 +16088,7 @@ In this way Buddhist stupa-art successfully expounds Buddhist ideals.
 
 Krishnadeva Raya (1509-1529 CE) epitomized the ideal of a scholar-king, combining personal literary excellence with magnificent royal patronage to create the golden age of South Indian culture and learning.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q715_img1.png" alt="Literary Contributions of Krishnadeva Raya" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q715_img1.png" alt="Literary Contributions of Krishnadeva Raya" /></p>
 
 Literary Contributions of Krishnadeva Raya
 
@@ -16153,7 +16153,7 @@ Krishnadeva Raya's dual role as scholar and patron created a unique model of enl
 
 Recent archaeological discoveries in Peshawar Museum highlight Gandhara sculpture as a unique synthesis of Greco-Roman artistic traditions with Buddhist iconography.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q874_img1.png" alt="Greek Influence Venn Diagram Circles" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q874_img1.png" alt="Greek Influence Venn Diagram Circles" /></p>
 
 Greek Influence Venn Diagram Circles
 
@@ -16207,7 +16207,7 @@ The architecture of the Indus Valley Civilization (Harappan Culture) represents 
 1. **Grid-Based Town Planning**
    - **The Layout:** rectangular **grid system**, where streets and lanes intersected at right angles, cutting the settlement into neat blocks.
 
-<p align="center"><img src="images/civilsdaily_p25_img12.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p25_img12.png" alt="Diagram" /></p>
 
    - **The Arteries:** Main avenues were exceptionally wide, running systematically from north-to-south and east-to-west to maximize natural ventilation.
 
@@ -16269,7 +16269,7 @@ The **Harappan Civilization (c. 2500–1900 BCE)**, also known as the Indus Vall
 
 - Numerous **public and private wells** were constructed throughout the cities. **Dholavira**, in particular, showed remarkable **water conservation techniques** through reservoirs.
 
-<p align="center"><img src="images/ancient_history_and_art__culture_q1_img1.jpg" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/ancient_history_and_art__culture_q1_img1.jpg" alt="Image" /></p>
 
 - **Construction Materials and Techniques:** Besides burnt bricks, **wood and stone** were also used selectively. Buildings were often aligned with **cardinal directions**, suggesting **astronomical awareness.**
 
@@ -16299,7 +16299,7 @@ The architecture of the Harappan Civilization reveals a **highly evolved urban c
 
 Long before the modern world envisioned smart cities, the Harappans sculpted an urban symphony out of baked earth. Reaffirmed by recent **ASI excavations at Rakhigarhi (2022-24)**, their architecture remains a timeless masterclass where precise geometry, civic grace, and climate resilience danced in perfect harmony.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q4_img1.png" alt="Town Planning in Indus Valley Civilisation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q4_img1.png" alt="Town Planning in Indus Valley Civilisation" /></p>
 
 Town Planning in Indus Valley Civilisation
 
@@ -16446,7 +16446,7 @@ The shift from the Rig Vedic to the later Vedic period saw society evolve from a
 
 The transition from **Rig Vedic (1500-1000 BCE)** to **Later Vedic period (1000-600 BCE)** marked significant transformations in Indian society and economy. The period witnessed the gradual shift from pastoral-nomadic to settled agricultural life in the **Indo-Gangetic plains**.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q91_img1.png" alt="Vedic Period Economy and Society Transition" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q91_img1.png" alt="Vedic Period Economy and Society Transition" /></p>
 
 Vedic Period Economy and Society Transition
 
@@ -16693,7 +16693,7 @@ The continuity in the features of Vedic society and religion up to even our time
 
 The Vedic period (c. 1500 BCE – 600 BCE), divided into **Early Vedic (Rigvedic)** and **Later Vedic** phases, laid the socio-religious foundations of ancient Indian civilization. The **Vedas**, the earliest literary compositions of the Indo-Aryans, offer insights into the **social structure, religious beliefs, and cultural practices** of that time.
 
-## Main Features of Vedic Society <p align="center"><img src="images/superkalam_indian_society_q172_img1.png" alt="Indian Varna System social hierarchy pyramid" /></p>
+## Main Features of Vedic Society <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q172_img1.png" alt="Indian Varna System social hierarchy pyramid" /></p>
 
 Indian Varna System social hierarchy pyramid
 
@@ -16812,7 +16812,7 @@ These factors have enabled the Indian subcontinent to maintain its unique cultur
 
 The Indian subcontinent's ancient civilization uniquely demonstrates unbroken cultural continuity spanning over 5,000 years, unlike Egypt, Mesopotamia, and Greece where ancient traditions largely disappeared. This remarkable preservation distinguishes India as the world's only surviving ancient civilization.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q805_img1.png" alt="Comparative timeline with single horizontal arrow" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q805_img1.png" alt="Comparative timeline with single horizontal arrow" /></p>
 
 Comparative timeline with single horizontal arrow
 
@@ -16904,7 +16904,7 @@ The Indus Valley Civilization’s urban planning and culture have had a lasting 
 
 The Indus Valley Civilization's sophisticated urban planning principles continue to influence contemporary urbanization through sustainable practices and systematic city design.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q885_img1.png" alt="Indus Valley Civilization city layout plan" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q885_img1.png" alt="Indus Valley Civilization city layout plan" /></p>
 
 Indus Valley Civilization city layout plan
 
@@ -17091,7 +17091,7 @@ The need for protecting Indian art heritage is undeniably pressing. It is impera
 
 India's artistic heritage, spanning over 5,000 years of cultural evolution, faces unprecedented threats in the modern era, making immediate safeguarding measures essential for preserving our civilizational identity.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q563_img1.png" alt="Safeguarding Indian Art Heritage Pillar Framework" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q563_img1.png" alt="Safeguarding Indian Art Heritage Pillar Framework" /></p>
 
 Safeguarding Indian Art Heritage Pillar Framework
 
@@ -17187,7 +17187,7 @@ The Tandava dance, extensively documented in early Indian inscriptions, represen
 - **Rashtrakuta Inscriptions** (8th-10th century CE): Kannada records from Ellora and Elephanta caves detailing Tandava iconography
 - **Eastern Chalukya Documents** (7th-12th century CE): Telugu inscriptions connecting Tandava with royal patronage and temple endowments
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q963_img1.png" alt="Nataraja Iconography Representing the Tandava Dance" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q963_img1.png" alt="Nataraja Iconography Representing the Tandava Dance" /></p>
 
 Nataraja Iconography Representing the Tandava Dance
 
@@ -17340,7 +17340,7 @@ Indian philosophy and tradition have been instrumental in shaping the country’
 
 Rock-cut architecture represents a revolutionary artistic and architectural tradition that provides unprecedented insights into ancient Indian civilization. These monuments, carved directly from living rock, serve as invaluable historical documents preserving cultural, religious, and artistic evolution.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q408_img1.png" alt="India Rock Cut Architecture Sites Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q408_img1.png" alt="India Rock Cut Architecture Sites Map" /></p>
 
 India Rock Cut Architecture Sites Map
 
@@ -17398,7 +17398,7 @@ Chandella rulers (**9th-13th century CE)** of **Bundelkhand**, with **Khajuraho*
 
 - 1.    **Dynamic Human Expression** - Eg- **Expressive Apsaras** writing a letter, adorning themselves, removing a thorn, or gazing into a mirror (Parsvanatha temple).
 
-<img src="images/GS20120History20Model20Answers20%282018-2025%29-8.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120History20Model20Answers20%282018-2025%29-8.jpg">
 
 2. **Varied Moods** - Sculptures capture joy, anxiety, indolence, and self-admiration, showing psychological depth.
 
@@ -17437,7 +17437,7 @@ Chandella artists created a universe in stone, best described by Banabhatta’s 
 **Key Aspects of the Sculptural Art of the Chandellas**
 
 - **Dynamism and Movement in Sculpture: Their sculptures are often portrayed in graceful, rhythmic postures, which infuse the figures with a sense of life and vitality.:** For example, in the Kandariya Mahadeva Temple, appears to pulsate with a dynamic rhythm, effectively capturing the spirit of motion in stone.
-<p align="center"><img src="images/ancient_history_and_art__culture_q3_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/ancient_history_and_art__culture_q3_img1.png" alt="Image" /></p>
 
 - **Religious and Mythological Themes:** Chandella sculptures are profoundly influenced by Hindu mythology, figures of Shiva, Vishnu, Brahma, and Kali were carved with incredible depth, adding layers to the spiritual narrative.
   - The **temple walls** are adorned with scenes from **mythology** and **epic tales**, such as the **Mahabharata** and **Ramayana**, for example, the **Khajuraho temples** are particularly noted for their **kama**, **artha**, and **dharma** representations in sculpture.
@@ -17467,7 +17467,7 @@ The **fusion of dynamic human forms,** intricate detailing, religious themes, an
 
 The **Chandella dynasty (9th–13th century CE),** ruling Bundelkhand with **Khajuraho** as their cultural capital, left behind one of the finest legacies of medieval Indian temple architecture. Their sculptors infused stone with **movement, vitality,** and **human emotion,** creating a unique blend of spirituality and naturalism. The Khajuraho temples, now a **UNESCO World Heritage site,** epitomize this vigor and life-like breadth.
 
-<p align="center"><img src="images/pw_ancient_history_and_art__culture_q925_img1.jpg" alt="Picture2" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_ancient_history_and_art__culture_q925_img1.jpg" alt="Picture2" /></p>
 
 **Fig:** Territory of Chandelas (1025 C.E.)
 
@@ -17511,7 +17511,7 @@ By capturing movement, emotion, and symbolism, Chandella sculptors turned **ston
 
 Renowned art historian **Devangana Desai** noted that Chandella art (10th–12th century CE) transcended mere stone-carving, capturing life's fluidity. The recent **ASI Digital Documentation (2023)** of Khajuraho’s UNESCO monuments further highlights how these sculptors infused unparalleled vitality and thematic diversity.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q17_img1.png" alt="Khajuraho Temple Architecture" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q17_img1.png" alt="Khajuraho Temple Architecture" /></p>
 
 Khajuraho Temple Architecture
 
@@ -17551,7 +17551,7 @@ The **Pallavas of Kanchi (275-897 CE)** laid the foundations of **Dravidian temp
 1. **Evolution of Dravidian Temple Architecture**
    - Pallavas pioneered the transition from **rock-cut to structural temples**. Eg- **Shore Temple, Mahabalipuram**.
 
-<img src="images/GS20120History20Model20Answers20%282018-2025%29-9.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120History20Model20Answers20%282018-2025%29-9.jpg">
 
    - Established key architectural elements like **vimana, mandapa, and gopura**.
 
@@ -17619,7 +17619,7 @@ The Pallavas ruled from the 3rd to the 9th century CE. They were feudatories of 
 
 - **Sculpture:** The Pallavas significantly advanced sculpture like Open Art Gallery at Mamallapuram and Descent of the Ganges.
 
-  - The Paintings at the caves of Sittannavasal belonged to them. <p align="center"><img src="images/ancient_history_and_art__culture_q5_img1.png" alt="Image" /></p>
+  - The Paintings at the caves of Sittannavasal belonged to them. <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/ancient_history_and_art__culture_q5_img1.png" alt="Image" /></p>
 
 ### Pallavas' Contributions to Literature
 
@@ -17688,7 +17688,7 @@ The Pallavas of Kanchi (275-897 CE) were great patrons of art, architecture, and
 
 ## Architectural Contributions
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q83_img1.png" alt="Pallava Architecture: Evolution of Temple Styles" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q83_img1.png" alt="Pallava Architecture: Evolution of Temple Styles" /></p>
 
 Pallava Architecture: Evolution of Temple Styles
 
@@ -17733,7 +17733,7 @@ In the words of **James Fergusson,** "the Chola artists (**9th-13th century CE**
 
 - 1.    **Mastery in Bronze Sculpture** - Cholas perfected the **lost-wax (cire perdue) technique**. Eg- Iconic **Nataraja (Cosmic Dancer)** image symbolising rhythm of the universe.
 
-<img src="images/GS20120History20Model20Answers20%282018-2025%29-10.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120History20Model20Answers20%282018-2025%29-10.jpg">
 
 2. **Dynamic Expression** - Sculptures exhibit **grace, movement, and spiritual symbolism**. Eg- Tribhanga posture in Chola bronzes.
 
@@ -17752,7 +17752,7 @@ In the words of **James Fergusson,** "the Chola artists (**9th-13th century CE**
 
 1. **Zenith of Dravidian Temple Architecture** - Eg- **Brihadeeswara Temple, Thanjavur** by **Rajaraja Chola I**.
 
-<img src="images/GS20120History20Model20Answers20%282018-2025%29-11.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120History20Model20Answers20%282018-2025%29-11.jpg">
 
 DRAVIDA STYLE OF TEMPLE ARCHITECTURE
 
@@ -17896,7 +17896,7 @@ The **Cholas**, through their unparalleled contributions to **art and architectu
 
 The installation of the historic **Sengol** in India's new Parliament and the **27-foot Ashtadhatu Nataraja** at the 2023 G20 Summit highlight how the **Chola dynasty (848–1279 CE)** remains a vibrant symbol of India’s civilizational pride and architectural supremacy.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q90_img1.png" alt="South Indian Temple Architectural" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q90_img1.png" alt="South Indian Temple Architectural" /></p>
 
 South Indian Temple Architectural
 
@@ -17916,7 +17916,7 @@ South Indian Temple Architectural
 4. **Sculptural fluidity**: Stone sculptures like *Ardhanarishvara* shifted from rigid Pallava postures to dynamic, highly emotive expressions.
 5. **Performing arts integration**: Temple walls act as stone encyclopedias, with the 108 *Karanas* (dance postures) of **Bharatanatyam** meticulously carved at Chidambaram.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q90_img2.jpg" alt="Outline of Dravidian temple architecture" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q90_img2.jpg" alt="Outline of Dravidian temple architecture" /></p>
 
 Outline of Dravidian temple architecture
 
@@ -17949,7 +17949,7 @@ The **Delhi Sultanate (1206-1526 CE)** was established by **Qutbuddin Aibak** af
    - **Persian wheel (saqiya)** improved irrigation efficiency and water lifting. Led to expansion of cultivation in **Punjab and Doab regions**.
    - **Improved iron tools and ploughs** enhanced productivity.
 
-<img src="images/GS20120History20Model20Answers20%282018-2025%29-7.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120History20Model20Answers20%282018-2025%29-7.jpg">
 
    - Introduction of **new crops** from West and Central Asia. Eg- **Spinach, carrot, watermelon, pomegranate**.
 
@@ -18176,7 +18176,7 @@ The new techniques introduced in Sultanate time had deep and permanent impact on
 
 The **Delhi Sultanate period (1206–1526 CE)** marked the advent of new political, cultural, and technological influences in the Indian subcontinent. The ruling elites, of **Turko-Afghan and Persian** origin, introduced a variety of **technological innovations**, especially in the fields of **military, agriculture, architecture, textiles, and metallurgy**, which had a long-lasting impact on Indian society.
 
-## Major Technological Changes Introduced <p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q174_img1.png" alt="Sultanate Period Technological Changes" /></p>
+## Major Technological Changes Introduced <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q174_img1.png" alt="Sultanate Period Technological Changes" /></p>
 
 Sultanate Period Technological Changes
 
@@ -18245,7 +18245,7 @@ The Gupta period (**320-550 CE**) is referred to as the **Golden Age of India.**
 1. **Religion and Philosophy**
    - **Compilation and codification of Puranas and epics** strengthened Brahmanical traditions. Eg- Vishnu Purana, Bhagavata Purana.
 
-<img src="images/GS20120History20Model20Answers20%282018-2025%29-5.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120History20Model20Answers20%282018-2025%29-5.jpg">
 
    - **Vaishnavism and Shaivism** received royal patronage, while Buddhism and Jainism continued to flourish.
 
@@ -18281,7 +18281,7 @@ The Gupta period (**320-550 CE**) is referred to as the **Golden Age of India.**
    - Zenith of **Dravidian temple architecture** with monumental vimanas. Eg- **Brihadeeswara Temple, Thanjavur** and **Gangaikonda Cholapuram**.
    - Temples served as **religious, economic, and cultural centres**.
 
-<img src="images/GS20120History20Model20Answers20%282018-2025%29-6.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120History20Model20Answers20%282018-2025%29-6.jpg">
 
 Garbhagriha
 
@@ -18384,7 +18384,7 @@ The Gupta and Chola periods left significant marks on Indian heritage and cultur
 
 The Gupta (4th–6th CE) and Chola (9th–13th CE) periods represent two high points in India’s cultural history. While the Guptas ushered in a classical age of Sanskrit literature, scientific advancements, and refined art, the Cholas epitomized the grandeur of Dravidian architecture, maritime power, and Tamil literary efflorescence. Together, they shaped the composite heritage of India.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q242_img1.png" alt="Nagara and Dravida Temple Architectural Comparison" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q242_img1.png" alt="Nagara and Dravida Temple Architectural Comparison" /></p>
 
 Nagara and Dravida Temple Architectural Comparison
 
@@ -18462,7 +18462,7 @@ The **Pala period (c. 8th-12th centuries CE)** in eastern India marked the **las
 
 - 1.    The Pala era represents the **final organised and state-supported phase** of Buddhism in India before its decline after 12th century invasions.
 
-<img src="images/GS20120History20Model20Answers20%282018-2025%29-4.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120History20Model20Answers20%282018-2025%29-4.jpg">
 
 2. **Royal Patronage** - Eg- **Dharmapala and Devapala** patronised monasteries and scholars.
 
@@ -18553,7 +18553,7 @@ The Pala period was a highly significant phase in the history of Buddhism in Ind
 
 The Pala period (8th-12th century CE) represents Buddhism's final golden age in India, transforming Bengal-Bihar into the global center of Buddhist learning and culture.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q410_img1.png" alt="Eastern India Pala Buddhist Mahavihara Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q410_img1.png" alt="Eastern India Pala Buddhist Mahavihara Map" /></p>
 
 Eastern India Pala Buddhist Mahavihara Map
 
@@ -18637,7 +18637,7 @@ In the post-Gupta period, not only the quality of gold coins fell, but also the 
 
 The Gupta period (320-550 CE) represents the pinnacle of Indian numismatic artistry, with a level of excellence that remained unmatched in subsequent eras due to declining craftsmanship and changing political circumstances.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q638_img1.png" alt="Ancient Indian coins side by side comparison" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q638_img1.png" alt="Ancient Indian coins side by side comparison" /></p>
 
 Ancient Indian coins side by side comparison
 
@@ -18739,7 +18739,7 @@ The Chola temples remain an important part of India’s rich cultural heritage a
 
 The Chola dynasty (9th-13th century CE) marked a golden age in South Indian temple architecture, establishing architectural innovations that remain unmatched in their engineering precision and artistic grandeur.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q957_img1.png" alt="Chola Dravidian temple architectural elevation line drawing" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q957_img1.png" alt="Chola Dravidian temple architectural elevation line drawing" /></p>
 
 Chola Dravidian temple architectural elevation line drawing
 
@@ -18755,7 +18755,7 @@ Chola Dravidian temple architectural elevation line drawing
 
 - **Material Innovation**: Pioneered use of **local granite** quarried from nearby hills, transported using innovative rolling techniques over distances exceeding 50 kilometers.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q957_img2.jpeg" alt="Chola Temple Structure - Cross-section showing vimana construction, mandapa layout, and foundation engineering with granite block arrangement" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q957_img2.jpeg" alt="Chola Temple Structure - Cross-section showing vimana construction, mandapa layout, and foundation engineering with granite block arrangement" /></p>
 
 Chola Temple Structure - Cross-section showing vimana construction, mandapa layout, and foundation engineering with granite block arrangement
 
@@ -18923,7 +18923,7 @@ Akbar’s religious syncretism, despite limited mass acceptance, fostered **incl
 
 Akbar’s reign (1556–1605) witnessed religious syncretism pioneered the ethos of *Sarva Dharma Sambhava*, transitioning the Mughal state from an orthodox theocracy toward a secular, inclusive empire.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q7_img1.png" alt="Akbar's Sulh-i-Kul Policy and Reforms" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q7_img1.png" alt="Akbar's Sulh-i-Kul Policy and Reforms" /></p>
 
 Akbar's Sulh-i-Kul Policy and Reforms
 
@@ -19035,7 +19035,7 @@ Domingo Paes and Duarte Barbosa, the Portuguese travelers, visited the Vijayanag
 
 Early Buddhist stupa art masterfully transformed local folk traditions into vehicles for Buddhist teachings, creating an accessible visual language that communicated profound spiritual concepts through familiar cultural motifs.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q721_img1.png" alt="Buddhist Stupa Architectural Elevation Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q721_img1.png" alt="Buddhist Stupa Architectural Elevation Diagram" /></p>
 
 Buddhist Stupa Architectural Elevation Diagram
 
@@ -19199,7 +19199,7 @@ Persian literary sources of medieval India played a pivotal role in capturing th
 
 Indian philosophy and tradition have served as the foundational blueprint for India's monumental architecture, creating a distinctive synthesis where spiritual concepts transform into tangible artistic expressions.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q411_img1.png" alt="Hindu Temple and Buddhist Stupa Comparison" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q411_img1.png" alt="Hindu Temple and Buddhist Stupa Comparison" /></p>
 
 Hindu Temple and Buddhist Stupa Comparison
 
@@ -19302,7 +19302,7 @@ The works of the first two Sangams except **Tolkappiyam** (2nd Sangam work) have
 
 Though Sangam literature lacks chronological political narratives, it provides an extraordinary portrayal of early South Indian society's social fabric and economic dynamism.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q976_img1.png" alt="Sangam Socio Economic Landscape Framework Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q976_img1.png" alt="Sangam Socio Economic Landscape Framework Diagram" /></p>
 
 Sangam Socio Economic Landscape Framework Diagram
 
@@ -19347,7 +19347,7 @@ The Sangam corpus remains invaluable for reconstructing **socio-economic history
 
 - **1.    Evolution of Architectural Forms-** reveal the **transition from timber-based to stone architecture**. Eg- **Barabar caves**.
 
-<img src="images/GS20120History20Model20Answers20%282018-2025%29-17.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120History20Model20Answers20%282018-2025%29-17.jpg">
 
 2. **Source of Chronological History**
 
@@ -19452,7 +19452,7 @@ Rock-cut architecture has not only contributed to the artistic and cultural heri
 
 Persian literary sources in medieval India served as vibrant mirrors reflecting the socio-cultural, political, and religious dynamics of their times, documenting the composite culture that emerged through Indo-Islamic synthesis.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q415_img1.png" alt="Persian Literary Sources Hub and Spoke Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q415_img1.png" alt="Persian Literary Sources Hub and Spoke Diagram" /></p>
 
 Persian Literary Sources Hub and Spoke Diagram
 
@@ -19516,7 +19516,7 @@ Persian literary sources in medieval India, despite elite bias, remain invaluabl
 
 The Mesolithic rock cut architecture of India represents a remarkable artistic legacy that bridges prehistoric creativity with contemporary aesthetic sensibilities, demonstrating sophisticated cultural expression during 10,000-5,000 BCE.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q802_img1.png" alt="Mesolithic Rock Art Thematic Framework Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q802_img1.png" alt="Mesolithic Rock Art Thematic Framework Diagram" /></p>
 
 Mesolithic Rock Art Thematic Framework Diagram
 
@@ -19713,7 +19713,7 @@ Medieval Indian temple sculptures offer a visual record of social life, reflecti
 
 Medieval Indian temples were not only religious centres but also **repositories of art, culture, and social history**. The sculptures adorning these temples often depicted themes from daily life, economy, festivals, and customs, thereby serving as **visual documents of contemporary society**.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q251_img1.png" alt="Medieval Temple Sculptures Spoke Diagram Analysis" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q251_img1.png" alt="Medieval Temple Sculptures Spoke Diagram Analysis" /></p>
 
 Medieval Temple Sculptures Spoke Diagram Analysis
 
@@ -19918,7 +19918,7 @@ Both animals symbolize strength, power, and prosperity and have been used extens
     - In Buddhism, the lion symbolizes **Shakyamuni’s royal ancestry** and the **Lion’s Roar**—fearless proclamation of the Dharma.
     - In Jainism, the lion is linked to **Mahavira**.
 
-2. **Symbol of Power and Sovereignty** <p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q245_img1.png" alt="Asokan Lion Capital" /><br><em>Asokan Lion Capital</em></p>
+2. **Symbol of Power and Sovereignty** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q245_img1.png" alt="Asokan Lion Capital" /><br><em>Asokan Lion Capital</em></p>
     - Adopted by **Mauryan Emperor Ashoka** in the Sarnath Lion Capital (3rd century BCE).
     - Represents courage, leadership, and righteous rule; chosen as India’s **National Emblem** in 1950.
 
@@ -20084,7 +20084,7 @@ The accounts of Chinese and Arab travelers have played a crucial role in the rec
 
 Chinese and Arab travellers' accounts provide crucial external perspectives for reconstructing India's history, serving as independent primary sources that complement indigenous records.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q554_img1.png" alt="Foreign Accounts Impacting Indian History" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q554_img1.png" alt="Foreign Accounts Impacting Indian History" /></p>
 
 Foreign Accounts Impacting Indian History
 
@@ -20127,7 +20127,7 @@ These travellers' meticulous observations remain fundamental to understanding In
 
 Colonial rule profoundly altered tribal life by disrupting their **autonomy, economy, culture, and customary institutions**, leading to sustained resistance across India.
 
-<img src="images/GS20120History20Model20Answers20%282018-2025%29-2.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120History20Model20Answers20%282018-2025%29-2.jpg">
 
 ### Impact of colonial rule on tribals
 
@@ -20336,7 +20336,7 @@ Rise of colonial interference in the tribal regions across India gave rise to th
 
 The tribal communities of India, with their distinct socio-economic and cultural systems, were deeply affected by colonial rule from the late 18th century onward. British policies disrupted their **traditional livelihoods, land rights, autonomy**, and **cultural identity**, leading to **widespread resentment** and **rebellions** across regions.
 
-## Impact of Colonial Rule on Tribals <p align="center"><img src="images/superkalam_modern_history_q170_img1.png" alt="Indian Revolts and Uprisings" /></p>
+## Impact of Colonial Rule on Tribals <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_modern_history_q170_img1.png" alt="Indian Revolts and Uprisings" /></p>
 
 Indian Revolts and Uprisings
 
@@ -20612,7 +20612,7 @@ Under British rule, India **experienced an unprecedented frequency of famines (3
 
 ### Reasons for sudden spurt in famines in colonial India
 
-<img src="images/GS20120History20Model20Answers20%282018-2025%29-3.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120History20Model20Answers20%282018-2025%29-3.jpg">
 
 1. **Commercialisation of agriculture - Shift from food crops to cash crops** reduced local food availability. Eg-Expansion of **indigo, cotton, and opium** cultivation under Company pressure.
 
@@ -21293,7 +21293,7 @@ The intellectual discourse between **Mahatma Gandhi** and **Rabindranath Tagore*
 
 While both were towering personalities who shaped India's freedom struggle, their approaches differed significantly on various aspects of nation-building and educational philosophy during the period of **1915-1941**.
 
-<p align="center"><img src="images/superkalam_modern_history_q173_img1.png" alt="Gandhi and Tagore a comparison diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_modern_history_q173_img1.png" alt="Gandhi and Tagore a comparison diagram" /></p>
 
 Gandhi and Tagore a comparison diagram
 
@@ -21946,7 +21946,7 @@ While the events at Meerut provided the immediate spark, the 1857 Revolt was the
 
 ### Peasant Movements
 
-<img src="images/GS20120History20Model20Answers20%282018-2025%29-1.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120History20Model20Answers20%282018-2025%29-1.jpg">
 
 - **Sanyasi-Fakir Rebellion (1763-1800)** in Bengal as a reaction to restrictive pilgrim taxes and the devastating famine of 1770.
 
@@ -22781,7 +22781,7 @@ Phule’s writings and reforms addressed nearly every subaltern group, making hi
 
 Jyotirao Govindrao Phule (1827–1890), known as Mahatma Phule, was India’s first comprehensive **subaltern rights advocate**. Recent celebrations of his 197th birth anniversary (2024) highlight his enduring relevance in shaping the discourse on equality, education, and social justice.
 
-<p align="center"><img src="images/superkalam_modern_history_q14_img1.png" alt="Mahatma Phule's Social Reforms Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_modern_history_q14_img1.png" alt="Mahatma Phule's Social Reforms Diagram" /></p>
 
 Mahatma Phule's Social Reforms Diagram
 
@@ -24403,7 +24403,7 @@ The **Quit India Movement** of **1942** marked a critical **turning point** in I
 
 The **Quit India Movement** of 1942 emerged as a watershed moment in India's freedom struggle, sparked by multiple national and international developments. The immediate trigger was the failure of the **Cripps Mission** and growing discontent against British colonial rule during World War II.
 
-<p align="center"><img src="images/superkalam_modern_history_q98_img1.png" alt="Quit India Movement" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_modern_history_q98_img1.png" alt="Quit India Movement" /></p>
 
 Quit India Movement
 
@@ -24432,7 +24432,7 @@ Quit India Movement
 - **Immediate Impact**:
 
     - Unprecedented mass participation including students, workers, peasants, and government officials.
-    - Formation of **parallel governments** in Satara (Maharashtra), Tamluk (Bengal), and Ballia (UP). <p align="center"><img src="images/superkalam_modern_history_q98_img2.jpg" alt="Parallel Govts during Quit India Movement" /><br><em>Parallel Govts during Quit India Movement</em></p>
+    - Formation of **parallel governments** in Satara (Maharashtra), Tamluk (Bengal), and Ballia (UP). <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_modern_history_q98_img2.jpg" alt="Parallel Govts during Quit India Movement" /><br><em>Parallel Govts during Quit India Movement</em></p>
     - Brutal British suppression with over **100,000 arrests** and use of military force.
 
 - **Long-term Consequences**:
@@ -26014,7 +26014,7 @@ India’s early years after independence (1947–1964) were marked by the urgent
 
 Guided by leaders like **Nehru** and **Patel**, the country pursued a vision of inclusive governance, planned economic development, educational expansion, and a balanced foreign policy.
 
-<p align="center"><img src="images/superkalam_post_independent_india_q18_img1.png" alt="National Consolidation during the Nehruvian Era" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_post_independent_india_q18_img1.png" alt="National Consolidation during the Nehruvian Era" /></p>
 
 National Consolidation during the Nehruvian Era
 
@@ -26366,7 +26366,7 @@ The New Economic Policy of 1921 undeniably influenced India's economic framework
 
 Lenin's New Economic Policy (1921) provided a pragmatic blueprint that significantly influenced India's post-independence economic framework, though adapted to suit democratic governance and specific developmental needs.
 
-<p align="center"><img src="images/superkalam_world_history_q883_img1.png" alt="Lenin's NEP 1921 comparative flowchart diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_world_history_q883_img1.png" alt="Lenin's NEP 1921 comparative flowchart diagram" /></p>
 
 Lenin's NEP 1921 comparative flowchart diagram
 
@@ -27618,7 +27618,7 @@ The Revolution’s true legacy lies not in its excesses but in its ideals of **m
 
 The **French Revolution (1789–1799)** was a watershed moment that radically transformed ideas of governance, citizenship, and social order. Its enduring influence is visible in **democratic governance**, **codified legal systems**, **human rights charters**, and movements for **social justice and equality**.
 
-<p align="center"><img src="images/superkalam_world_history_q16_img1.png" alt="French Revolution's Values Shape Modern World" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_world_history_q16_img1.png" alt="French Revolution's Values Shape Modern World" /></p>
 
 French Revolution's Values Shape Modern World
 
@@ -27885,7 +27885,7 @@ Despite their groundbreaking contributions, both revolutions had their shadows. 
 
 The American Revolution (1775-1783) and French Revolution (1789-1799) fundamentally transformed global political, social, and economic structures, establishing the ideological and institutional foundations of the modern democratic world.
 
-<p align="center"><img src="images/superkalam_world_history_q484_img1.png" alt="Convergence Flowchart with Two Boxes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_world_history_q484_img1.png" alt="Convergence Flowchart with Two Boxes" /></p>
 
 Convergence Flowchart with Two Boxes
 
@@ -28780,7 +28780,7 @@ The Industrial Revolution in England was a primary factor in the **decline** of 
 
 The decline of Indian handicrafts and cottage industries during the colonial period was intricately linked to the **Industrial Revolution** in England (1760-1840). The mechanization of production in Britain, coupled with colonial policies, dealt a severe blow to India's traditional manufacturing sector, transforming the subcontinent from a major exporter to an importer of finished goods.
 
-<p align="center"><img src="images/superkalam_world_history_q86_img1.png" alt="British Economic Exploitation of India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_world_history_q86_img1.png" alt="British Economic Exploitation of India" /></p>
 
 British Economic Exploitation of India
 
@@ -29333,7 +29333,7 @@ Due to its rich cultural diversity & economic prosperity Indians also made signi
 
 The development of Ancient India was profoundly shaped by its diverse geographical features, which influenced settlement patterns, economic activities, and cultural evolution from the **Indus Valley Civilization** to the **Medieval Period**.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q166_img1.png" alt="Indian Subcontinent physical features and landmarks" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q166_img1.png" alt="Indian Subcontinent physical features and landmarks" /></p>
 
 Indian Subcontinent physical features and landmarks
 
@@ -29402,7 +29402,7 @@ Ancient India's geographical diversity shaped both its material and spiritual cu
 
 Taxila, strategically positioned at the crossroads of ancient trade routes, emerged as a prominent center of learning that attracted scholars from across the known world, yet its educational model differed fundamentally from the structured university system epitomized by Nalanda.
 
-<p align="center"><img src="images/superkalam_ancient_history_and_art__culture_q881_img1.png" alt="Northern Indian Subcontinent Line Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_ancient_history_and_art__culture_q881_img1.png" alt="Northern Indian Subcontinent Line Map" /></p>
 
 Northern Indian Subcontinent Line Map
 
@@ -29636,7 +29636,7 @@ The introduction of railways in the 19th century marked a revolutionary transfor
 
 The **Industrial Revolution** catalyzed this development, with **Great Britain** pioneering the world's first intercity railway in **1830** between Liverpool and Manchester, setting a precedent for global railway expansion.
 
-<p align="center"><img src="images/superkalam_world_history_q159_img1.png" alt="Social Economic Effects of Introducing Railway" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_world_history_q159_img1.png" alt="Social Economic Effects of Introducing Railway" /></p>
 
 Social Economic Effects of Introducing Railway
 
@@ -29681,7 +29681,7 @@ Railways played a pivotal role in **nineteenth-century globalization**, transfor
 
 The indentured labour system (1834-1920) was described as a **'new system of slavery'** that transported over 1.5 million Indians to British colonies across the world.
 
-<img src="images/GS20120History20Model20Answers20%282018-2025%29-18.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120History20Model20Answers20%282018-2025%29-18.jpg">
 
 ### Why indentured labour was taken from India
 
@@ -29967,7 +29967,7 @@ The Suez Crisis, beyond its immediate geopolitical ramifications, symbolized the
 
 The 1956 Suez Crisis marked Egypt's assertion of sovereignty and exposed Britain's declining imperial authority in the post-war world.
 
-<p align="center"><img src="images/superkalam_world_history_q887_img1.png" alt="2014 Map of the Suez Canal" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_world_history_q887_img1.png" alt="2014 Map of the Suez Canal" /></p>
 
 2014 Map of the Suez Canal
 
@@ -30179,7 +30179,7 @@ The **First World War (1914-1918)** emerged from complex geopolitical tensions, 
 - Formation of rival alliance systems
 - **Triple Alliance** (Germany, Austria-Hungary, Italy) and **Triple Entente** (Britain, France, Russia) - created a delicate balance that ultimately proved unstable.
 
-<p align="center"><img src="images/superkalam_world_history_q85_img1.png" alt="World War-I Alliances " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_world_history_q85_img1.png" alt="World War-I Alliances " /></p>
 
 World War-I Alliances 
 
@@ -30378,7 +30378,7 @@ Overall, the inter-war phase saw the rise of anti-democratic forces that added f
 
 The interwar period (1919-1939) witnessed unprecedented challenges to democratic governance as economic turmoil and ideological extremism destabilized democratic institutions across Europe and beyond.
 
-<p align="center"><img src="images/superkalam_world_history_q330_img1.png" alt="Democratic State System Concept Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_world_history_q330_img1.png" alt="Democratic State System Concept Map" /></p>
 
 Democratic State System Concept Map
 
@@ -30678,7 +30678,7 @@ Addressing disparities requires **cooperative federalism, targeted infrastructur
 
 - **Skewed Impact on Migration:** As of 2011 census, Uttar Pradesh and Bihar were the largest source of inter-state migrants while Maharashtra and Delhi were the largest receiver states.
 
-<p align="center"><img src="images/indian_society_q10_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/indian_society_q10_img1.png" alt="Image" /></p>
 
 ### Conclusion
 
@@ -30749,7 +30749,7 @@ An EAC-PM paper (October 2024) notes Delhi’s per capita income is 250.8% of th
 
 ### What is Regional Disparity?
 
-<p align="center"><img src="images/superkalam_indian_society_q94_img1.png" alt="India's Development: Regional Disparities" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q94_img1.png" alt="India's Development: Regional Disparities" /></p>
 
 India's Development: Regional Disparities
 
@@ -30937,7 +30937,7 @@ While there is evidence that **cultural diversity** can lead to **socio-economic
 
 India's cultural mosaic, while celebrated for its richness, often intersects with socio-economic disparities, creating complex patterns of marginalization. The **Global Gender Gap Index 2025** ranking of India at **131st position** with a **64.1% parity score** reflects how cultural factors influence socio-economic outcomes.
 
-<p align="center"><img src="images/superkalam_indian_society_q80_img1.png" alt="Cycle of Social Exclusion and Poverty" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q80_img1.png" alt="Cycle of Social Exclusion and Poverty" /></p>
 
 Cycle of Social Exclusion and Poverty
 
@@ -31822,7 +31822,7 @@ India’s **tribal communities,** constituting **8.6% of the population (Census 
 
 Recent data shows **60 million people** displaced since independence, with **40% being tribals**, highlighting how displacement-rehabilitation axis dominates India's tribal development discourse.
 
-<p align="center"><img src="images/superkalam_indian_society_q6_img1.png" alt="Tribal development axis of displacement rehabilitation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q6_img1.png" alt="Tribal development axis of displacement rehabilitation" /></p>
 
 Tribal development axis of displacement rehabilitation
 
@@ -31874,7 +31874,7 @@ India’s **110 million** tribal population (8.6%) comprise over **705 distinct 
 
 1. **Linguistic Variation- Austro-Asiatic** (Santhali, Munda), **Tibeto-Burman** (Naga, Bodo), **Dravidian** (Gond, Oraon), and **Indo-Aryan** (Bhil).
 
-<p align="center"><img src="images/civilsdaily_p133_img55.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p133_img55.png" alt="Diagram" /></p>
 
 2. **Ethnic and Racial - Negrito** (Andamanese) and **Proto-Australoid** (Central Indian tribes) to **Mongoloid** (Northeast tribes).
 
@@ -32372,7 +32372,7 @@ While **inter-caste marriages** have increased, especially among castes with soc
 
 The dynamics of intercaste and interfaith marriages in India reflect deeply embedded social structures and evolving socio-economic realities. Recent data from **National Family Health Survey (NFHS)** indicates a gradual increase in inter-caste marriages from **10% in 2011 to 12.6% in 2023**, while interfaith marriages remain stagnant at approximately **2.1-2.6%**.
 
-<p align="center"><img src="images/superkalam_indian_society_q88_img1.png" alt="Inter-caste vs Inter-religious Marriage Comparison" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q88_img1.png" alt="Inter-caste vs Inter-religious Marriage Comparison" /></p>
 
 Inter-caste vs Inter-religious Marriage Comparison
 
@@ -32559,7 +32559,7 @@ Childhood is a critical phase for **primary socialization**, where children lear
 
 In recent times, **mobile phones and digital devices have increasingly substituted for parental interaction**. This shift has significant implications for the **cognitive, emotional, and social development** of children.
 
-<p align="center"><img src="images/superkalam_indian_society_q160_img1.png" alt="Traditional versus contemporary child socialization" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q160_img1.png" alt="Traditional versus contemporary child socialization" /></p>
 
 Traditional versus contemporary child socialization
 
@@ -32762,7 +32762,7 @@ Marriage in India is experiencing a dynamic interplay between tradition and mode
 
 Marriage, in the Indian tradition, is often seen as a **sacrament (Sanskara)** — a sacred, lifelong bond marked by religious rites and duties, not just a legal or social contract. However, the **institution of marriage is undergoing rapid transformation** in modern India due to social, economic, and legal changes.
 
-## Arguments Suggesting Marriage as a Sacrament is Losing Its Traditional Value <p align="center"><img src="images/superkalam_indian_society_q164_img1.png" alt="Marriage: From Sacrament to Social Contract" /></p>
+## Arguments Suggesting Marriage as a Sacrament is Losing Its Traditional Value <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q164_img1.png" alt="Marriage: From Sacrament to Social Contract" /></p>
 
 Marriage: From Sacrament to Social Contract
 
@@ -33617,7 +33617,7 @@ India's spirit of tolerance remains vital for achieving **SDG 16** goals and mai
 
 2. **Rising proportion of elderly** due to low births and higher life expectancy. Eg- 30% in Japan
 
-<img src="images/GS20120Society20Model20Answers20%282018-2025%29-5.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120Society20Model20Answers20%282018-2025%29-5.jpg">
 
 3. **Decline in the working-age population.**
 
@@ -33777,7 +33777,7 @@ The global narrative is rapidly shifting from fears of a "population explosion" 
 2. **Structural Shift:** It creates an inverted, "top-heavy" population pyramid where a shrinking working-age base must support an expanding elderly demographic.
 3. **Root Causes:** Driven by delayed marriages, high urban living costs, and what the **UNFPA** terms "unmet reproductive aspirations" due to financial constraints.
 
-<p align="center"><img src="images/superkalam_indian_society_q96_img1.png" alt="Population Pyramid Showing Aging Population Structure" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q96_img1.png" alt="Population Pyramid Showing Aging Population Structure" /></p>
 
 Population Pyramid Showing Aging Population Structure
 
@@ -33824,7 +33824,7 @@ Eg- service sector contributes 55% of GDP but employs only 30% of workforce
 
 a. **Healthcare** - low public spending (2.1% of GDP) and high out of pocket expenditure (40%)
 
-<p align="center"><img src="images/civilsdaily_p126_img53.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p126_img53.png" alt="Diagram" /></p>
 
 b. **Education** - low public investment **(2.9% of GDP)** lead to “quality crisis” and high dropout rates at secondary and higher levels
 
@@ -34003,7 +34003,7 @@ Amartya Sen advocates 6% of GDP allocation each to education and health as the w
 
 While India has emerged as the **world’s fifth-largest economy (2024)** in terms of nominal GDP, its performance on **human development indicators (HDIs)** has remained suboptimal. According to the **UNDP Human Development Report 2023**, India ranked **134 out of 193 countries**, reflecting a gap between **economic growth and human development**.
 
-<p align="center"><img src="images/superkalam_geography_q175_img1.png" alt="Economic growth versus human development barriers" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q175_img1.png" alt="Economic growth versus human development barriers" /></p>
 
 Economic growth versus human development barriers
 
@@ -34634,7 +34634,7 @@ Gender equality, gender equity, and women’s empowerment are critical to achiev
 
 With India ranking 129th in the WEF Global Gender Gap Report 2024, achieving gender justice requires moving beyond formal equality toward targeted equity and holistic empowerment.
 
-<p align="center"><img src="images/superkalam_indian_society_q82_img1.png" alt="Gender Equity to Gender Equality diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q82_img1.png" alt="Gender Equity to Gender Equality diagram" /></p>
 
 Gender Equity to Gender Equality diagram
 
@@ -34828,7 +34828,7 @@ Effective solutions require focus on care economy, legislation against martial r
 
 As per the **NCRB's "Accidental Deaths and Suicides in India" (ADSI) 2022**, **women in the age group of 18–30 account for nearly 40%** of all female suicide cases. This disturbing trend reflects deeper socio-economic, cultural, and psychological challenges faced by young women in India.
 
-## Reasons Behind Rising Suicide Rates Among Young Women <p align="center"><img src="images/superkalam_indian_society_q167_img1.png" alt="Causes of Suicide Among Young Women" /></p>
+## Reasons Behind Rising Suicide Rates Among Young Women <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q167_img1.png" alt="Causes of Suicide Among Young Women" /></p>
 
 Causes of Suicide Among Young Women
 
@@ -35100,7 +35100,7 @@ The gig economy represents a significant opportunity for women's empowerment in 
 
 - 1.    **Inverse Correlation of Education and TFR -** According to **NFHS-5 (2021-23)**, women with no schooling have a TFR of **2.8**, while those with 12+ years of schooling have a TFR of **1.8**.
 
-<img src="images/GS20120Society20Model20Answers20%282018-2025%29-4.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120Society20Model20Answers20%282018-2025%29-4.jpg">
 
 2. The **"Kerala Model"** shows that high female literacy leads to **low Infant Mortality Rates (IMR)**, reducing the need for "extra" children as insurance.
 
@@ -36121,7 +36121,7 @@ Male membership in women's organizations, when strategically implemented, can ac
 
 2. **Displacement** due to Environmental Projects. Eg- **Baiga and Gond tribes** displaced from **Kanha Tiger Reserve (Madhya Pradesh)**
 
-<p align="center"><img src="images/civilsdaily_p129_img54.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p129_img54.png" alt="Diagram" /></p>
 
 3. **Environmental bans** affect subsistence livelihoods. Eg- ban on single-use plastics has disproportionately impacted street vendors
 
@@ -36293,7 +36293,7 @@ In India, poverty alleviation and environmental protection are often seen in con
 
 With 14.96% of Indians remaining multidimensionally poor (**NITI Aayog MPI 2023**), achieving environmental sustainability often conflicts with survival needs, creating a complex socio-economic dilemma for inclusive growth.
 
-<p align="center"><img src="images/superkalam_indian_society_q1_img1.png" alt="Sustainability Tension Triangle Economic Growth Livelihoods" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q1_img1.png" alt="Sustainability Tension Triangle Economic Growth Livelihoods" /></p>
 
 Sustainability Tension Triangle Economic Growth Livelihoods
 
@@ -36430,7 +36430,7 @@ A collaborative model involving multi-stakeholder engagement between the Governm
 
 - **Private Sector and NGOs:** Contributing to Social Development through Corporate Social Responsibility (CSR), Infosys collaborates with Akshaya Patra to provide mid-day meals to school children.
 
-<p align="center"><img src="images/indian_society_q9_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/indian_society_q9_img1.png" alt="Image" /></p>
 
 ### Conclusion
 
@@ -36487,7 +36487,7 @@ Addressing socio-economic issues requires a **collaborative approach** where the
 
 The success of initiatives like **Swachh Bharat Mission** demonstrates the power of multi-stakeholder partnerships in achieving developmental goals.
 
-<p align="center"><img src="images/superkalam_indian_society_q87_img1.png" alt="Sustainable Socio-Economic Development" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q87_img1.png" alt="Sustainable Socio-Economic Development" /></p>
 
 Sustainable Socio-Economic Development
 
@@ -37255,7 +37255,7 @@ Though **24.82 crore people** escaped multidimensional poverty between 2013-14 a
 1. **Jobless growth** due to shift from agriculture to service led growth instead of manufacturing led growth. Eg- service sector contributes 55% of GDP but employs only 30% of workforce
 
 2. **Governance issues**
-<p align="center"><img src="images/civilsdaily_p123_img52.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p123_img52.png" alt="Diagram" /></p>
 
    - a. Corruption in PDS
    - b. Ghost beneficiaries (10 lakh in Ayushman Bharat as per CAG)
@@ -37711,7 +37711,7 @@ Despite constitutional mandates, the **World Inequality Lab (2024)** reveals tha
 2. **Protective laws:** The Prevention of Atrocities Act shields vulnerable communities from caste-based violence, enabling them to exercise their rights safely.
 3. **Targeted upliftment:** The recent ₹24,104 crore **PM-JANMAN** scheme specifically intervenes for Particularly Vulnerable Tribal Groups (PVTGs) who historically missed broader ST quotas.
 
-<p align="center"><img src="images/superkalam_indian_society_q81_img1.png" alt="Benefits to underprivileged people" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q81_img1.png" alt="Benefits to underprivileged people" /></p>
 
 Benefits to underprivileged people
 
@@ -38259,7 +38259,7 @@ Globalization is a **double-edged process**: while it fuels consumption, it also
 
 India's e-retail market reaching **US$60 billion in 2024** exemplifies globalization's profound impact. However, globalization extends far beyond creating aggressive consumer culture, encompassing diverse socio-economic transformations.
 
-<p align="center"><img src="images/superkalam_indian_society_q5_img1.png" alt="Consumerism and Socio Economic Benefits Impacting Development" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q5_img1.png" alt="Consumerism and Socio Economic Benefits Impacting Development" /></p>
 
 Consumerism and Socio Economic Benefits Impacting Development
 
@@ -38483,7 +38483,7 @@ The growth of fast food in India reflects urban lifestyle shifts but also **risi
 
 India's **ultra-processed food (UPF)** market has surged to **$38 billion**, creating a paradox against an escalating national metabolic crisis.
 
-<p align="center"><img src="images/superkalam_indian_society_q12_img1.png" alt="Fast Food Growth Drivers in India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q12_img1.png" alt="Fast Food Growth Drivers in India" /></p>
 
 Fast Food Growth Drivers in India
 
@@ -38692,7 +38692,7 @@ Urban migration among **skilled, young, unmarried women** has transformed their 
 
 The phenomenon of **female-led migration** has emerged as a significant trend in contemporary India, driven by economic liberalization and globalization. Recent studies indicate that around **40% of urban migrants** are now women, with a substantial portion being young, educated professionals seeking better opportunities and personal autonomy in cities.
 
-<p align="center"><img src="images/superkalam_indian_society_q84_img1.png" alt="Urban Migration Impact on Skilled Women" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q84_img1.png" alt="Urban Migration Impact on Skilled Women" /></p>
 
 Urban Migration Impact on Skilled Women
 
@@ -39929,7 +39929,7 @@ Caste can be defined as a localized, hereditary, and endogamous group characteri
 
 1. **Enduring Endogamy** - **NFHS-5 (2023-24)** data confirms that over **90% of marriages** remain intra-caste
 
-<img src="images/GS20120Society20Model20Answers20%282018-2025%29-3.jpg">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/GS20120Society20Model20Answers20%282018-2025%29-3.jpg">
 
 2. Caste remains a basis for **welfare and representation**. Eg- **Reservations for SCs, STs, and OBCs**.
 
@@ -40058,7 +40058,7 @@ Thus, caste identity is enduring through the sands of time in different forms in
 
 Caste in India is a deeply embedded socio-cultural institution. It is described as both **static** and **fluid** due to its evolving manifestations through mobility, legal safeguards, and socio-economic transformations. This paradox reflects how caste adapts to changing circumstances without completely losing its foundational structure.
 
-<p align="center"><img src="images/superkalam_indian_society_q176_img1.png" alt="Static and Fluid Elements of Caste" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q176_img1.png" alt="Static and Fluid Elements of Caste" /></p>
 
 Static and Fluid Elements of Caste
 
@@ -40388,7 +40388,7 @@ Caste can be defined as a localized, hereditary, and endogamous group characteri
 
 **8.**    **Sanskritisation (M.N. Srinivas) -** Lower castes adopting practices of upper castes to achieve upward mobility.
 
-<img src="images/caste_system_pyramid.png">
+<img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/caste_system_pyramid.png">
 
 Basic Structure of Caste System
 
@@ -40798,7 +40798,7 @@ Ethnic identities and communalism are often more about concerns of relative depr
 
 India’s **economic liberalisation in 1991** initiated far-reaching reforms—privatisation, globalisation, deregulation—which transformed the Indian economy. However, these changes also had **profound effects on India's social fabric**, particularly in terms of **ethnic identity assertion** and **communal tensions**.
 
-<p align="center"><img src="images/superkalam_indian_society_q163_img1.png" alt="Post Liberal Economy Flowchart Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q163_img1.png" alt="Post Liberal Economy Flowchart Diagram" /></p>
 
 Post Liberal Economy Flowchart Diagram
 
@@ -40871,7 +40871,7 @@ While economic liberalisation enhanced India's **global stature and economic per
 
 In the Indian context, communalism refers to a **political ideology** that uses religious identity to mobilize groups for secular ends. As per **T.K. Oommen,** it is the **"politicization of religious identity."**
 
-<p align="center"><img src="images/civilsdaily_p160_img57.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p160_img57.png" alt="Diagram" /></p>
 
 **Power Struggle Leading to** **Communalism**
 
@@ -41256,7 +41256,7 @@ The ethos of the Indian civil service blends professionalism with nationalistic 
 
 Civil services in India embody a distinctive ethos shaped by two complementary pillars: **professionalism**, rooted in merit, efficiency, and impartiality, and **nationalistic consciousness**, rooted in constitutional values and the vision of nation-building. The strength of the Indian civil services lies in combining these traits, ensuring governance that is both competent and committed to public welfare.
 
-<p align="center"><img src="images/pw_indian_society_q918_img1.jpg" alt="Picture5" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_indian_society_q918_img1.jpg" alt="Picture5" /></p>
 
 
 
@@ -41299,7 +41299,7 @@ The ethos of the Indian civil service does not separate professionalism from nat
 
 Civil services in India are the **backbone of the administrative machinery** and are expected to uphold the values enshrined in the Constitution. Their **ethos** is shaped by a fine balance between **professional competence** and a **deep-rooted nationalistic consciousness**, aimed at serving the people and preserving the unity and integrity of India.
 
-<p align="center"><img src="images/superkalam_indian_society_q15_img1.png" alt="Mission Karmayogi Diagram Transformative Governance Success" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q15_img1.png" alt="Mission Karmayogi Diagram Transformative Governance Success" /></p>
 
 Mission Karmayogi Diagram Transformative Governance Success
 
@@ -43252,7 +43252,7 @@ The Urban Heat Island [UHI] effect refers to the observable occurrence of marked
 
 **Causes of Urban Heat Island effect:**
 
-<p align="center"><img src="images/pw_geography_q11_img1.webp" alt="heat island effect" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_geography_q11_img1.webp" alt="heat island effect" /></p>
 
 - **Heat-absorbing surfaces:** Urban areas have a higher percentage of heat-absorbing surfaces, such as concrete and asphalt, which absorb and retain heat during the day and release it at night, leading to a warmer environment. E.g., in downtown areas of Phoenix, Arizona, and Las Vegas, Nevada, the prevalence of concrete and asphalt results in temperatures that can be up to 10 degrees Fahrenheit (5.6 degrees Celsius) warmer than surrounding rural areas.
 - **Reduced vegetation:** Urban areas have fewer trees and vegetation compared to rural areas, which results in less shade and reduced cooling effects through evapotranspiration. E.g., the lack of trees and green spaces in urban areas like New York City's concrete jungle can result in temperatures up to 7 degrees Fahrenheit (3.9 degrees Celsius) warmer than surrounding suburban or rural areas.
@@ -43280,7 +43280,7 @@ UHI can cause various environmental and health issues and its causes include ant
 
 Urban heat islands have emerged as a critical environmental challenge, with cities experiencing temperatures 2-5°C higher than surrounding areas. This phenomenon results from multiple interconnected factors transforming urban microclimates.
 
-<p align="center"><img src="images/superkalam_geography_q956_img1.png" alt="Urban Heat Island Cross Section Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q956_img1.png" alt="Urban Heat Island Cross Section Diagram" /></p>
 
 Urban Heat Island Cross Section Diagram
 
@@ -43503,7 +43503,7 @@ A well-developed urban mass transport system can be a game-changer for India’s
 
 India's rapid urbanization with **70% population expected in cities by 2050** makes efficient and affordable urban mass transport crucial for economic development by enhancing productivity, reducing costs, and enabling sustainable growth.
 
-<p align="center"><img src="images/superkalam_geography_q488_img1.png" alt="Efficient Affo Circular Flowchart With Four Nodes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q488_img1.png" alt="Efficient Affo Circular Flowchart With Four Nodes" /></p>
 
 Efficient Affo Circular Flowchart With Four Nodes
 
@@ -44059,7 +44059,7 @@ Smart cities hold the potential to redefine India’s urban future not just with
 
 India’s **Smart Cities Mission (SCM)**, launched in 2015, aims to promote sustainable and inclusive urban development by leveraging technology, urban planning, and citizen participation. While its core focus is infrastructure and service delivery, the mission also indirectly addresses urban poverty and the principle of distributive justice.
 
-<p align="center"><img src="images/superkalam_indian_society_q13_img1.png" alt="Smart City Interventions for Distributive Justice" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q13_img1.png" alt="Smart City Interventions for Distributive Justice" /></p>
 
 Smart City Interventions for Distributive Justice
 
@@ -44180,9 +44180,9 @@ Migration is the movement of people from one place to another in pursuit of impr
 
 - **Cultural and Social Amenities:** The availability of cultural, recreational, and social amenities in cities like the **internet and increased exposure** to social media enhances the overall living experience, making urban areas more attractive.
 
-<p align="center"><img src="images/geography_q10_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/geography_q10_img1.png" alt="Image" /></p>
 
-<p align="center"><img src="images/geography_q10_img2.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/geography_q10_img2.png" alt="Image" /></p>
 
 ### Conclusion
 
@@ -44242,7 +44242,7 @@ To address the overwhelming influx of migrants to large cities in developing cou
 
 Migration to large cities in developing countries is driven by both **push and pull factors**, as evidenced by the **Periodic Labour Force Survey (PLFS) 2020-21** which shows an urban migration rate of **34.9%** in India.
 
-<p align="center"><img src="images/superkalam_indian_society_q99_img1.png" alt="Rural to Urban Migration Push-Pull Factors" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q99_img1.png" alt="Rural to Urban Migration Push-Pull Factors" /></p>
 
 Rural to Urban Migration Push-Pull Factors
 
@@ -44494,7 +44494,7 @@ Thus, in the spirit of New Urban Agenda India should plan for Right to City as t
 
 Urbanization, while often associated with economic growth and modernization, has also contributed to **increased segregation and marginalization** of the urban poor in India’s metropolises. Rapid, unplanned urban expansion frequently overlooks the needs of low-income populations, leading to their exclusion from both physical spaces and socio-economic opportunities.
 
-<p align="center"><img src="images/superkalam_indian_society_q165_img1.png" alt="Urban Structure and Spatial Inequality" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_indian_society_q165_img1.png" alt="Urban Structure and Spatial Inequality" /></p>
 
 Urban Structure and Spatial Inequality
 
@@ -44712,7 +44712,7 @@ As a result, governments and civil society organizations should work together to
 
 Water body reclamation for urban development has intensified environmental degradation, with **Mumbai losing 40% of its water bodies since 1970s**, creating cascading ecological and climatic disruptions across Indian cities.
 
-<p align="center"><img src="images/superkalam_geography_q333_img1.png" alt="2021 Before Reclamation Cross Section Comparison" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q333_img1.png" alt="2021 Before Reclamation Cross Section Comparison" /></p>
 
 2021 Before Reclamation Cross Section Comparison
 
@@ -44737,7 +44737,7 @@ Water body reclamation for urban development has intensified environmental degra
 - **Sewage Overflow**: Inadequate infrastructure causes mixing with clean water sources
 - **Reduced Dilution Capacity**: Concentrated pollution in remaining water bodies exceeds self-purification capacity
 
-<p align="center"><img src="images/superkalam_geography_q333_img2.png" alt="Water Body Reclamation Impact Chain - showing drainage disruption, heat island formation, and biodiversity loss" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q333_img2.png" alt="Water Body Reclamation Impact Chain - showing drainage disruption, heat island formation, and biodiversity loss" /></p>
 
 Water Body Reclamation Impact Chain - showing drainage disruption, heat island formation, and biodiversity loss
 
@@ -44756,7 +44756,7 @@ Sustainable solutions require implementing **blue-green infrastructure** and enf
 
 Urban flooding is defined as the **inundation of property** in a built environment, caused by rainfall overwhelming the capacity of drainage systems. As per **NDMA,** it is distinct from rural flooding, as developed catchments increase **flood peaks by 1.8 to 8 times and flood volumes by up to 6 times.**
 
-<p align="center"><img src="images/civilsdaily_p137_img56.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p137_img56.png" alt="Diagram" /></p>
 
 **Reasons Behind Urban Flooding**
 
@@ -44999,7 +44999,7 @@ Apart from above measures, robust implementation of Sendai framework for Disaste
 
 Major cities across India are increasingly experiencing severe flooding, transforming from occasional inconveniences to annual disasters. This vulnerability stems from a dangerous combination of climate change impacts and poor urban planning practices.
 
-<p align="center"><img src="images/superkalam_geography_q722_img1.png" alt="Discharge Over Time Bell Shaped Curves" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_geography_q722_img1.png" alt="Discharge Over Time Bell Shaped Curves" /></p>
 
 Discharge Over Time Bell Shaped Curves
 

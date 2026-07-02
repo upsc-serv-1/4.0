@@ -7,7 +7,7 @@ MD_DIR = r"C:\Users\Dr. Yogesh\Videos\APP FOLDER - V1 - Copy\app\frontend-noji-2
 JSON_OUTPUT_DIR = r"C:\Users\Dr. Yogesh\Videos\APP FOLDER - V1 - Copy\app\frontend-noji-2.6.2\3\pilot pro 10.2\mains json files"
 
 # Regexes
-Q_HEADER_RE = re.compile(r'^##\s+Q(\d+)\s+\[Year:\s*(\d+)\]\s+\[Marks:\s*(\d+)\]', re.IGNORECASE)
+Q_HEADER_RE = re.compile(r'^##\s+Q(\d+)\s+\[Year:\s*(\d+)\]\s+\[Marks:\s*([^\]]+)\]', re.IGNORECASE)
 Q_TEXT_RE = re.compile(r'^\*\*Question:\*\*\s*(.*)', re.IGNORECASE)
 TAXONOMY_RE = re.compile(r'^\*\*Subject:\*\*\s*(.*?)\s*\|\s*\*\*Section Group:\*\*\s*(.*?)\s*\|\s*\*\*Microtopic:\*\*\s*(.*?)\s*\|\s*\*\*Subtopic:\*\*\s*(.*)', re.IGNORECASE)
 METADATA_LINE_RE = re.compile(r'^\*Metadata:\s*(.*)\*', re.IGNORECASE)
@@ -70,7 +70,18 @@ def parse_md_file(file_path):
                 
             q_num = int(q_match.group(1))
             year = int(q_match.group(2))
-            marks = int(q_match.group(3))
+            
+            marks_raw = q_match.group(3)
+            num_match = re.search(r'[\d\.]+', marks_raw)
+            if num_match:
+                try:
+                    marks = float(num_match.group(0))
+                    if marks.is_integer():
+                        marks = int(marks)
+                except ValueError:
+                    marks = 0
+            else:
+                marks = 0
             
             current_q = {
                 "id": "",

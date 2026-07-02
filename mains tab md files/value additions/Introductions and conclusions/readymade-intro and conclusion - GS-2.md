@@ -48,7 +48,7 @@
     *   SC upheld EWS quota as a reasonable classification under Art. 15(6)
 *   **Conclusion:**
     *   Amendments must be tools of inclusion, not instruments of impulse guided by reason, data, and the Constitution’s spirit of justice.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs2/images/diagram_p4.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs2/images/diagram_p4.png" alt="Diagram" width="450" /></p>
 
 ---
 ##### Subtopic: Case Laws
@@ -348,7 +348,7 @@
     *   15th Finance Commission incentivised performance-based panchayat grants
 *   **Conclusion:**
     *   Strong democracies grow bottom-up by building institutions that localise delivery, voice, and accountability.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs2/images/diagram_p6.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs2/images/diagram_p6.png" alt="Diagram" width="450" /></p>
 ###### Card 2: PANCHAYATI RAJ INSTITUTIONS (Pris)
 *   **Quote:**
     > **"Future of India lies in its villages." — Gandhiji**
@@ -396,7 +396,7 @@
     *   MoHUA enabled urban funds linked to SDG localisation
 *   **Conclusion:**
     *   India’s unity will depend on **"Sahyog se Samriddhi**", not just legal boundaries but fiscal trust and cooperative temperament.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs2/images/diagram_p5.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs2/images/diagram_p5.png" alt="Diagram" width="450" /></p>
 ###### Card 2: FEDERALISM
 *   **Quote:**
     > **"Cooperative federalism will be the key to sustain India's unity, integrity & socio-economic development in the future." — Punchhi Commission**
@@ -1163,7 +1163,7 @@
     *   Tribal Ministry scaled Van Dhan Vikas Kendras through SHGs
 *   **Conclusion:**
     *   When civil society and state co-create, development becomes durable, inclusive, and democratic—from policy drafting to service delivery.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs2/images/diagram_p8.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs2/images/diagram_p8.png" alt="Diagram" width="450" /></p>
 ###### Card 2: Social Capital & Community Development
 *   **Quote:**
     > **"Communities are not beneficiaries they are architects of change." — Ministry of Rural Development**
@@ -1211,7 +1211,7 @@
     *   MoHFW launched dashboard for PM-ABHIM convergence
 *   **Conclusion:**
     *   Development policy must pivot from expenditure to empowerment— backed by citizen data, local feedback, and outcomes, not outlays.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs2/images/diagram_p7.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs2/images/diagram_p7.png" alt="Diagram" width="450" /></p>
 ###### Card 2: Government Policies & Implementation Challenges
 *   **Quote:**
     > **"Good policies fail with bad implementation; bad policies fail faster." – Second ARC**
@@ -1409,7 +1409,7 @@
     *   UDISE+ data integrated internet access indicators in school rankings
 *   **Conclusion:**
     *   Tech is the new tool of social mobility digital Bharat must mean dignified Bharat.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs2/images/diagram_p12.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs2/images/diagram_p12.png" alt="Diagram" width="450" /></p>
 ###### Card 2: EDUCATION
 *   **Introduction:**
     *   (To be filled)
@@ -1571,7 +1571,7 @@
     *   SC upheld 10% EWS quota citing reasonable classification under Art. 15(6)
 *   **Conclusion:**
     *   Laws without empathy and institutions without teeth serve neither equity nor efficiency. Accountability must drive the rights architecture forward.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs2/images/diagram_p10.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs2/images/diagram_p10.png" alt="Diagram" width="450" /></p>
 ###### Card 4: Transgender Rights & Inclusion
 *   **Quote:**
     > **"Everyone has the right to be who they are, without apology." — Supreme Court (NALSA, 2014)**
@@ -1849,7 +1849,7 @@
     *   Diaspora diplomacy enabled faster evacuation from Sudan (Operation Kaveri)
 *   **Conclusion:**
     *   Engaging the diaspora must transcend celebration into co-creation of India’s global aspirations.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs2/images/diagram_p15.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs2/images/diagram_p15.png" alt="Diagram" width="450" /></p>
 ###### Card 2: INDIAN DIASPORA
 *   **Introduction:**
     *   Indian diaspora = People **currently living outside India** (temporarily or permanently) who trace their origin to India (**NRI + OCI**).
@@ -1888,7 +1888,7 @@
     *   WTO negotiations saw India defend Global South on agricultural subsidies
 *   **Conclusion:**
     *   Reimagining institutions is not disruption it’s inclusion, ensuring equity in global rule-making.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs2/images/diagram_p16.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs2/images/diagram_p16.png" alt="Diagram" width="450" /></p>
 ###### Card 2: GLOBAL GROUPINGS (UN / WTO / IMF — COMMON)
 *   **Quote:**
     > **"3Ts: Trust, Transparency and Timeliness." — PM Modi**

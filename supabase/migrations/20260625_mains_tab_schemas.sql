@@ -103,12 +103,7 @@ CREATE TABLE IF NOT EXISTS public.mains_intro_conclusions (
   microtopic TEXT,
   subtopic TEXT,
   card_title TEXT NOT NULL,
-  quote_text TEXT,
-  quote_author TEXT,
-  introduction TEXT,
-  examples TEXT,
-  conclusion TEXT,
-  data_points TEXT,
+  body TEXT NOT NULL,
   hierarchy_path TEXT[],
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

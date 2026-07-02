@@ -121,13 +121,14 @@ const mappedIntroConclusions: ValueAdditionItem[] = introConclusions.map((item, 
   microtopic: item.microtopic,
   subtopic: item.subtopic,
   title: item.card_title,
-  introduction: item.introduction || undefined,
-  conclusion: item.conclusion || undefined,
-  quoteText: item.quote_text || undefined,
-  author: item.quote_author || undefined,
-  examples: item.examples || undefined,
+  introduction: item.body || undefined,
+  conclusion: undefined,
+  quoteText: undefined,
+  author: undefined,
+  examples: undefined,
+  data_points: undefined,
   source: 'Ready-made Intro/Conclusion',
-  rawContent: [item.quote_text || '', item.introduction || '', item.examples || '', item.conclusion || ''].filter(Boolean).join('\n\n')
+  rawContent: item.body || ''
 }));
 
 const mappedEssayValueAdd: ValueAdditionItem[] = essayValueAdd.map((item, idx) => ({
@@ -139,10 +140,11 @@ const mappedEssayValueAdd: ValueAdditionItem[] = essayValueAdd.map((item, idx) =
   microtopic: item.microtopic,
   title: item.title,
   quoteText: item.content,
-  author: item.category || 'Essay Theme',
-  usageGuide: `Category: ${item.category}`,
+  author: item.author || undefined,
+  usageGuide: item.usage_guide || undefined,
   source: 'Essay Value Add',
-  rawContent: item.content
+  rawContent: item.content,
+  entry_type: item.entry_type || 'quote',
 }));
 
 const mappedMnemonics: ValueAdditionItem[] = mnemonics.map((item, idx) => ({
@@ -169,7 +171,13 @@ const mappedFrameworks: ValueAdditionItem[] = frameworks.map((item, idx) => ({
   frameworkGuide: item.breakdown_markdown,
   source: 'Writing Frameworks',
   rawContent: item.breakdown_markdown,
-  diagramImagePath: item.diagram_image_path
+  diagramImagePath: item.diagram_image_path,
+  hierarchies: item.hierarchies || [],
+  hierarchy_1_path: item.hierarchy_1_path || null,
+  hierarchy_2_path: item.hierarchy_2_path || null,
+  hierarchy_3_path: item.hierarchy_3_path || null,
+  hierarchy_4_path: item.hierarchy_4_path || null,
+  hierarchy_5_path: item.hierarchy_5_path || null
 }));
 
 const mappedEthics: ValueAdditionItem[] = ethicsValueAdd.map((item, idx) => {
@@ -266,13 +274,14 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     microtopic: item.microtopic,
     subtopic: item.subtopic,
     title: item.card_title,
-    introduction: item.introduction || undefined,
-    conclusion: item.conclusion || undefined,
-    quoteText: item.quote_text || undefined,
-    author: item.quote_author || undefined,
-    examples: item.examples || undefined,
+    introduction: item.body || undefined,
+    conclusion: undefined,
+    quoteText: undefined,
+    author: undefined,
+    examples: undefined,
+    data_points: undefined,
     source: 'Ready-made Intro/Conclusion',
-    rawContent: [item.quote_text || '', item.introduction || '', item.examples || '', item.conclusion || ''].filter(Boolean).join('\n\n')
+    rawContent: item.body || ''
   }));
 
   const mappedEssayValueAdd: ValueAdditionItem[] = (esRes.data || []).map((item, idx) => ({
@@ -284,10 +293,11 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     microtopic: item.microtopic,
     title: item.title,
     quoteText: item.content,
-    author: item.category || 'Essay Theme',
-    usageGuide: item.usage_guide || `Category: ${item.category}`,
+    author: item.author || undefined,
+    usageGuide: item.usage_guide || undefined,
     source: 'Essay Value Add',
-    rawContent: item.content
+    rawContent: item.content,
+    entry_type: item.entry_type || 'quote',
   }));
 
   const mappedMnemonics: ValueAdditionItem[] = (mnRes.data || []).map((item, idx) => ({
@@ -314,7 +324,13 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     frameworkGuide: item.breakdown_markdown,
     source: 'Writing Frameworks',
     rawContent: item.breakdown_markdown,
-    diagramImagePath: item.diagram_image_path
+    diagramImagePath: item.diagram_image_path,
+    hierarchies: item.hierarchies || [],
+    hierarchy_1_path: item.hierarchy_1_path || null,
+    hierarchy_2_path: item.hierarchy_2_path || null,
+    hierarchy_3_path: item.hierarchy_3_path || null,
+    hierarchy_4_path: item.hierarchy_4_path || null,
+    hierarchy_5_path: item.hierarchy_5_path || null
   }));
 
   const mappedEthics: ValueAdditionItem[] = (etRes.data || []).map((item, idx) => {

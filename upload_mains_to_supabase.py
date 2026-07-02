@@ -21,11 +21,26 @@ def upload_batch(table_name, rows):
     
     for i in range(0, len(rows), batch_size):
         batch = rows[i:i+batch_size]
-        resp = requests.post(url, json=batch, headers=HEADERS)
-        if resp.status_code not in [200, 201]:
-            print(f"  [ERROR] Uploading to {table_name} batch starting at {i}: {resp.status_code} - {resp.text}")
+        # Align keys in batch to prevent PGRST102 "All object keys must match" error
+        all_keys = set()
+        for r in batch:
+            all_keys.update(r.keys())
+        padded_batch = [{k: r.get(k, None) for k in all_keys} for r in batch]
+        
+        for attempt in range(5):
+            try:
+                resp = requests.post(url, json=padded_batch, headers=HEADERS, timeout=30)
+                if resp.status_code not in [200, 201]:
+                    print(f"  [ERROR] Uploading to {table_name} batch starting at {i}: {resp.status_code} - {resp.text}")
+                    break
+                else:
+                    success_count += len(batch)
+                    break
+            except Exception as e:
+                print(f"  [RETRY] Attempt {attempt+1}/5 failed with error: {e}. Retrying in 3 seconds...")
+                time.sleep(3)
         else:
-            success_count += len(batch)
+            print(f"  [FATAL] Failed to upload batch starting at {i} after 5 attempts.")
             
     print(f"  [SUCCESS] Uploaded {success_count}/{len(rows)} rows to public.{table_name}")
     time.sleep(0.05)
@@ -61,11 +76,18 @@ def upload_mains_questions_answers():
         for q in data.get("questions", []):
             # Question table mapping
             q_id = q.get("id")
+            marks_val = q.get("marks")
+            if marks_val is not None:
+                try:
+                    marks_val = int(round(float(marks_val)))
+                except (ValueError, TypeError):
+                    marks_val = None
+
             all_questions.append({
                 "id": q_id,
                 "question_number": q.get("questionNumber"),
                 "question_text": q.get("questionText"),
-                "marks": q.get("marks"),
+                "marks": marks_val,
                 "exam_year": q.get("year"),
                 "paper": paper_name,
                 "subject": q.get("subject"),

@@ -1,4 +1,10 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import MainsDataFactsCard from '../src/components/mains/MainsDataFactsCard';
+import MainsIntroConclusionCard from '../src/components/mains/MainsIntroConclusionCard';
+import MainsQuotesCard from '../src/components/mains/MainsQuotesCard';
+import MainsMnemonicsCard from '../src/components/mains/MainsMnemonicsCard';
+import MainsFrameworksCard from '../src/components/mains/MainsFrameworksCard';
+import MainsEthicsCard from '../src/components/mains/MainsEthicsCard';
 import {
   View,
   Text,
@@ -75,6 +81,98 @@ import { PilotV2SaveSheet } from '../src/components/pilot-v2/PilotV2SaveSheet';
 import { MyVitaminEditorSheet } from '../src/components/unified/MyVitaminEditorSheet';
 import { fetchBestAnswer, saveBestAnswer, deleteBestAnswer, BestAnswer } from '../src/services/BestAnswerService';
 import { markdownToHtml } from '../src/utils/textUtils';
+
+const naturalCompare = (() => {
+  const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+  return (a: string, b: string) => collator.compare(a, b);
+})();
+
+/**
+ * Returns markdown-display rules with theme-aware table / image renderers.
+ * Call once per component with the current colors + isDark values.
+ */
+export const getMarkdownRules = (colors: any, isDark: boolean) => ({
+  table: (node: any, children: any) => (
+    <View
+      key={node.key}
+      style={{
+        marginVertical: 10,
+        borderWidth: 1,
+        borderColor: isDark ? '#374151' : '#d1d5db',
+        borderRadius: 6,
+        overflow: 'hidden',
+        width: '100%',
+      }}
+    >
+      {children}
+    </View>
+  ),
+  thead: (node: any, children: any) => (
+    <View key={node.key} style={{ backgroundColor: isDark ? '#1e2a3a' : '#f0f4ff' }}>
+      {children}
+    </View>
+  ),
+  tbody: (node: any, children: any) => (
+    <View key={node.key}>{children}</View>
+  ),
+  th: (node: any, children: any) => (
+    <View
+      key={node.key}
+      style={{
+        flex: 1,
+        padding: 10,
+        borderRightWidth: 1,
+        borderColor: isDark ? '#374151' : '#d1d5db',
+        justifyContent: 'flex-start',
+      }}
+    >
+      {children}
+    </View>
+  ),
+  td: (node: any, children: any) => (
+    <View
+      key={node.key}
+      style={{
+        flex: 1,
+        padding: 10,
+        borderRightWidth: 1,
+        borderColor: isDark ? '#374151' : '#d1d5db',
+        justifyContent: 'flex-start',
+      }}
+    >
+      {children}
+    </View>
+  ),
+  tr: (node: any, children: any) => (
+    <View
+      key={node.key}
+      style={{
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderColor: isDark ? '#374151' : '#d1d5db',
+        width: '100%',
+      }}
+    >
+      {children}
+    </View>
+  ),
+  image: (node: any) => {
+    const src = node.attributes?.src || '';
+    if (!src) return null;
+    return (
+      <View key={node.key} style={{ width: '100%', alignItems: 'center', marginVertical: 12 }}>
+        <Image
+          source={{ uri: src }}
+          style={{ width: '100%', height: Dimensions.get('window').width >= 768 ? 320 : 220 }}
+          resizeMode="contain"
+        />
+      </View>
+    );
+  },
+});
+
+/** @deprecated use getMarkdownRules(colors, isDark) */
+export const markdownRules = getMarkdownRules({ border: '#d1d5db' }, false);
 
 import {
   mainsConsolidatedQuestions,
@@ -638,11 +736,11 @@ export default function MainsScreen() {
     }
   };
 
-  const handleCopy = async (id: string, text: string) => {
+  const handleCopy = useCallback(async (id: string, text: string) => {
     await Clipboard.setStringAsync(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 1500);
-  };
+  }, []);
 
   const Provider = PilotV2Provider as any;
   return (
@@ -1067,27 +1165,10 @@ const cleanMarkdown = (text: string) => {
   if (!text) return '';
   const r2BaseUrl = 'https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev';
   
-  // Replace <br> tags with line breaks
-  let cleaned = text.replace(/<br\s*\/?>/gi, '\n');
+  // Clean all HTML entities, standard markdown images, bullet points and bold/italics
+  let cleaned = cleanMarkdownContent(text);
   
-  // 1. Convert HTML img tags to Markdown image syntax pointing to Cloudflare R2
-  cleaned = cleaned.replace(/<img\s+[^>]*src=["']([^"']+)["'][^>]*>/gi, (match, src) => {
-    const altMatch = match.match(/alt=["']([^"']+)["']/i);
-    const alt = altMatch ? altMatch[1] : 'Diagram';
-    
-    let cleanSrc = src.trim();
-    if (cleanSrc.startsWith('/')) {
-      cleanSrc = cleanSrc.substring(1);
-    }
-    
-    if (cleanSrc.startsWith('http://') || cleanSrc.startsWith('https://') || cleanSrc.startsWith('data:')) {
-      return `\n\n![${alt}](${cleanSrc})\n\n`;
-    }
-    
-    return `\n\n![${alt}](${r2BaseUrl}/${cleanSrc})\n\n`;
-  });
-  
-  // 2. Also replace relative Markdown images if any exist pointing to Cloudflare R2
+  // Replace relative Markdown images to point to R2 Bucket
   cleaned = cleaned.replace(/!\[(.*?)\]\(((?!https?:\/\/|data:)[^\)]+)\)/gi, (match, alt, path) => {
     let cleanPath = path.trim();
     if (cleanPath.startsWith('/')) {
@@ -1096,13 +1177,11 @@ const cleanMarkdown = (text: string) => {
     return `![${alt}](${r2BaseUrl}/${cleanPath})`;
   });
 
-  // 3. Remove centering wrappers but keep content
-  cleaned = cleaned.replace(/<p[^>]*align=["']center["'][^>]*>/gi, '').replace(/<\/p>/gi, '');
   return cleaned;
 };
 
 // Helper to clean and build image URIs for R2 bucket
-const getDiagramUri = (path: string | undefined | null): string => {
+export const getDiagramUri = (path: string | undefined | null): string => {
   if (!path) return '';
   const r2BaseUrl = 'https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev';
   let cleanPath = path.trim();
@@ -1115,9 +1194,74 @@ const getDiagramUri = (path: string | undefined | null): string => {
   return `${r2BaseUrl}/${cleanPath}`;
 };
 
-const cleanMarkdownContent = (text: string | undefined | null): string => {
+/**
+ * Strip <br> tags from ALL table rows (lines starting with |) and merge
+ * any continuation lines that don't end with |.  This must run BEFORE
+ * the global <br> → \n replacement so that cells like
+ *   | Technology<br>requirement | … |
+ * don't get split into multiple rows.
+ */
+const preProcessMarkdownTables = (text: string): string => {
   if (!text) return '';
-  let cleaned = text;
+  const lines = text.split(/\r?\n/);
+  const result: string[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    const trimmed = line.trim();
+
+    // Detect table row: starts with | (or separator like |---|)
+    const isTableRow =
+      trimmed.startsWith('|') ||
+      (i > 0 && result[result.length - 1]?.trim().startsWith('|') && trimmed.includes('|'));
+
+    if (isTableRow) {
+      // Strip ALL <br> tags in this line → replace with a single space
+      line = line.replace(/<br\s*\/?>/gi, ' ');
+
+      // If the row doesn't close with |, merge subsequent continuation lines
+      if (!line.trim().endsWith('|')) {
+        while (i + 1 < lines.length) {
+          const nextLine = lines[i + 1];
+          const nextTrimmed = nextLine.trim();
+
+          // Stop at a separator row or a row that is already complete
+          if (
+            nextTrimmed.startsWith('|') &&
+            (nextTrimmed.match(/^\|[\s\-:]+\|/) || nextTrimmed.endsWith('|'))
+          ) {
+            break;
+          }
+
+          const cleanedNext = nextTrimmed.replace(/<br\s*\/?>/gi, ' ');
+          line = line.trimEnd() + ' ' + cleanedNext;
+          i++;
+
+          if (cleanedNext.endsWith('|')) break;
+        }
+      }
+    }
+
+    result.push(line);
+  }
+  return result.join('\n');
+};
+
+export const cleanMarkdownContent = (text: string | undefined | null): string => {
+  if (!text) return '';
+  let cleaned = preProcessMarkdownTables(text);
+
+  // Convert HTML img tags to Markdown image syntax (react-native-markdown-display compatible)
+  cleaned = cleaned.replace(/<img([\s\S]*?)src=["']([^"']+)["']([\s\S]*?)\/?>/gi, (match, before, src, after) => {
+    const altMatch = /alt=["']([^"']+)["']/i.exec(before) || /alt=["']([^"']+)["']/i.exec(after);
+    const alt = altMatch ? altMatch[1] : 'Diagram';
+    return `![${alt}](${src})`;
+  });
+
+  // Strip align wrappers around standard markdown/converted markdown images
+  cleaned = cleaned.replace(/<p\s+align=["']center["']>\s*(!\[[^\]]*\]\([^)]+\))\s*<\/p>/gi, '$1');
+  cleaned = cleaned.replace(/<p[^>]*>/gi, '');
+  cleaned = cleaned.replace(/<\/p>/gi, '\n');
 
   // 0. Strip leading empty bullet points (Issue 3 fix)
   cleaned = cleaned.replace(/^\s*[-*•]\s*$/gm, '');
@@ -1152,7 +1296,7 @@ const cleanMarkdownContent = (text: string | undefined | null): string => {
   cleaned = cleaned.replace(/^(?:[ \t]|&nbsp;){4,7}/gm, '  ');
 
   // Collapse spaces between lists (Issue 3 & 4 fix)
-  cleaned = cleaned.replace(/\n+\s*(?=[-*•\d])/g, '\n');
+  cleaned = cleaned.replace(/\n{2,}(\s*)(?=[-*•\d])/g, '\n$1');
 
   return cleaned.trim();
 };
@@ -1179,7 +1323,7 @@ const splitSubThemes = (text: string | undefined | null) => {
   if (!text) return [];
   const parts = text.split(/<!--\s*Sub-Theme:\s*([^-]+?)\s*-->/i);
   const subThemes: { title: string; content: string }[] = [];
-  
+
   const firstPreamble = parts[0]?.trim();
   if (firstPreamble && parts.length > 1) {
     subThemes.push({ title: '', content: firstPreamble });
@@ -1187,10 +1331,14 @@ const splitSubThemes = (text: string | undefined | null) => {
 
   for (let i = 1; i < parts.length; i += 2) {
     const title = parts[i].trim();
-    const content = parts[i + 1] || '';
+    let content = parts[i + 1] || '';
+    // Strip duplicate leading title
+    const titleEscaped = title.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    const regex = new RegExp(`^(?:<br\\s*/?>|\\s)*(?:[•-]\\s*)?(?:<b><u>|<u><b>|\\*\\*|<b>|<u>)?(${titleEscaped})(?:</u></b>|</b></u>|\\*\\*|</b>|</u>)?(?:<br\\s*/?>|\\s)*`, 'i');
+    content = content.replace(regex, '');
     subThemes.push({ title, content });
   }
-  
+
   if (subThemes.length === 0 && text) {
     subThemes.push({ title: '', content: text });
   }
@@ -1213,7 +1361,7 @@ const splitSubSubThemeBlocks = (text: string | undefined | null) => {
   if (!text) return [];
   const parts = text.split(/<!--\s*Sub-Sub-Theme:\s*([^-]+?)\s*-->/i);
   const blocks: { title: string; content: string }[] = [];
-  
+
   const firstPreamble = parts[0]?.trim();
   if (firstPreamble && parts.length > 1) {
     blocks.push({ title: '', content: firstPreamble });
@@ -1221,15 +1369,63 @@ const splitSubSubThemeBlocks = (text: string | undefined | null) => {
 
   for (let i = 1; i < parts.length; i += 2) {
     const title = parts[i].trim();
-    const content = parts[i + 1] || '';
+    let content = parts[i + 1] || '';
+    // Strip duplicate leading sub-sub-theme title
+    const titleEscaped = title.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    const regex = new RegExp(`^(?:<br\\s*/?>|\\s)*(?:[•-]\\s*)?(?:<b><u>|<u><b>|\\*\\*|<b>|<u>)?(${titleEscaped})(?:</u></b>|</b></u>|\\*\\*|</b>|</u>)?(?:<br\\s*/?>|\\s)*`, 'i');
+    content = content.replace(regex, '');
     blocks.push({ title, content });
   }
-  
+
   if (blocks.length === 0 && text) {
     blocks.push({ title: '', content: text });
   }
   return blocks;
 };
+
+const getFrameworkPaths = (item: any): any[] => {
+  const paths: any[] = [];
+  if (Array.isArray(item.hierarchies)) {
+    item.hierarchies.forEach((h: any) => {
+      if (h) {
+        paths.push({
+          paper: h.paper || '',
+          subject: h.subject || '',
+          sectionGroup: h.sectionGroup || h.section_group || '',
+          microtopic: h.microtopic || '',
+          subtopic: h.subtopic || ''
+        });
+      }
+    });
+  }
+  for (let idx = 1; idx <= 5; idx++) {
+    const path = item[`hierarchy_${idx}_path`];
+    if (path && Array.isArray(path) && path.length > 0) {
+      paths.push({
+        paper: path[0] || '',
+        subject: path[1] || '',
+        sectionGroup: path[2] || '',
+        microtopic: path[3] || '',
+        subtopic: path[4] || ''
+      });
+    }
+  }
+  return paths;
+};
+
+const getItemPaths = (item: any): any[] => {
+  if (item.category === 'frameworks') {
+    return getFrameworkPaths(item);
+  }
+  return [{
+    paper: item.paper || '',
+    subject: item.subject || '',
+    sectionGroup: item.sectionGroup || '',
+    microtopic: item.microtopic || '',
+    subtopic: item.subtopic || ''
+  }];
+};
+
 
 const getFilteredContext = (item: any, searchWord: string, subThemeFilter: string, subSubThemeFilter: string) => {
   const activeSubThemes = subThemeFilter && subThemeFilter !== 'All' ? subThemeFilter.split('|') : [];
@@ -1369,7 +1565,7 @@ const parseIntroductoryBox = (rawText: string | undefined | null) => {
   };
 };
 
-const cleanDataFactsMarkdown = (text: string | undefined | null, item: any): string => {
+export const cleanDataFactsMarkdown = (text: string | undefined | null, item: any): string => {
   if (!text) return '';
   let cleaned = text;
 
@@ -1438,371 +1634,164 @@ const cleanDataFactsMarkdown = (text: string | undefined | null, item: any): str
   return cleaned.trim();
 };
 
-function ValueAddCardBody({ item, colors, ethicsTab, onAddFlashcardClick }: { item: any; colors: any; ethicsTab?: string; onAddFlashcardClick?: (front: string, back: string) => void }) {
-  const { isDark } = useTheme();
+interface MarkdownSection {
+  heading: string;
+  content: string;
+}
 
-  const customMarkdownStyles = {
-    ...getMarkdownStyles(colors),
-    body: {
-      color: colors.textSecondary,
-      fontSize: 13,
-      lineHeight: 18,
-      fontWeight: '600',
-    },
-    heading3: {
-      color: '#3b82f6',
-      fontSize: 15,
-      fontWeight: '800',
-      marginTop: 14,
-      marginBottom: 6,
-    },
-    heading4: {
-      color: '#8b5cf6', // purple color for sub-sub-themes
-      fontSize: 13.5,
-      fontWeight: '800',
-      marginTop: 12,
-      marginBottom: 4,
+const parseMarkdownToSections = (text: string | undefined | null): MarkdownSection[] => {
+  if (!text) return [];
+  const sections: MarkdownSection[] = [];
+  const regex = /(?:^|\n)(?:\*\s*)?\*\*([^*]+?):\*\*/g;
+  
+  let match;
+  let lastIndex = 0;
+  let currentHeading = '';
+  
+  while ((match = regex.exec(text)) !== null) {
+    if (lastIndex > 0 || currentHeading) {
+      const content = text.slice(lastIndex, match.index).trim();
+      if (content || currentHeading) {
+        sections.push({ heading: currentHeading || 'General', content });
+      }
     }
-  };
+    currentHeading = match[1].trim();
+    lastIndex = regex.lastIndex;
+  }
+  
+  const content = text.slice(lastIndex).trim();
+  if (content || currentHeading) {
+    sections.push({ heading: currentHeading || 'General', content });
+  }
+  
+  return sections;
+};
 
-  const subPartBodyMarkdownStyle = {
-    ...getMarkdownStyles(colors),
-    body: {
-      color: colors.textSecondary,
-      fontSize: 12,
-      lineHeight: 18,
-      fontWeight: '600',
-    }
+const getThemeForHeading = (heading: string, colors: any) => {
+  const h = heading.toLowerCase();
+  if (h.includes('quote')) {
+    return {
+      textColor: '#d97706',
+      bgColor: 'rgba(251, 191, 36, 0.08)',
+      borderColor: '#fef3c7',
+      label: 'QUOTE'
+    };
+  }
+  if (h.includes('intro') || h.includes('concept')) {
+    return {
+      textColor: '#1d4ed8',
+      bgColor: 'rgba(59, 130, 246, 0.08)',
+      borderColor: '#dbeafe',
+      label: 'INTRODUCTION'
+    };
+  }
+  if (h.includes('example') || h.includes('practice') || h.includes('case study') || h.includes('case studies')) {
+    return {
+      textColor: '#7c3aed',
+      bgColor: 'rgba(139, 92, 246, 0.08)',
+      borderColor: '#ddd6fe',
+      label: 'EXAMPLES / CASE STUDIES'
+    };
+  }
+  if (h.includes('conclusion') || h.includes('way forward')) {
+    return {
+      textColor: '#047857',
+      bgColor: 'rgba(16, 185, 129, 0.08)',
+      borderColor: '#d1fae5',
+      label: 'CONCLUSION'
+    };
+  }
+  if (h.includes('data') || h.includes('fact')) {
+    return {
+      textColor: '#0d9488',
+      bgColor: 'rgba(20, 184, 166, 0.08)',
+      borderColor: '#ccfbf1',
+      label: 'DATA & FACTS'
+    };
+  }
+  return {
+    textColor: '#475569',
+    bgColor: 'rgba(100, 116, 139, 0.08)',
+    borderColor: '#e2e8f0',
+    label: heading.toUpperCase()
   };
+};
 
-  const quoteTextMarkdownStyle = {
-    ...getMarkdownStyles(colors),
-    body: {
-      color: colors.textPrimary,
-      fontSize: 15,
-      fontStyle: 'italic',
-      lineHeight: 20,
-      fontWeight: '700',
-    }
-  };
-
-  const comparePointsMarkdownStyle = {
-    ...getMarkdownStyles(colors),
-    body: {
-      color: colors.textSecondary,
-      fontSize: 12,
-      lineHeight: 16,
-      fontWeight: '600',
-      marginLeft: 8,
-    }
-  };
-
-  const type = ethicsTab 
-    ? (ethicsTab === 'diagrams' ? 'diagram' :
-       ethicsTab === 'dimensions' ? 'dimension' :
-       ethicsTab === 'comparisons' ? 'comparison' :
-       ethicsTab === 'innovations' ? 'innovation' :
-       ethicsTab === 'pyq_quotes' ? 'pyq_quote' :
-       ethicsTab === 'keywords' ? 'keyword' : ethicsTab)
-    : item.ethicsType;
+function ValueAddCardBody({
+  item,
+  colors,
+  ethicsTab,
+  templateFilter,
+  onAddFlashcardClick,
+  zoomScale
+}: {
+  item: any;
+  colors: any;
+  ethicsTab?: string;
+  templateFilter?: string;
+  onAddFlashcardClick?: (front: string, back: string) => void;
+  zoomScale?: number;
+}) {
+  const scale = zoomScale || 1.0;
 
   return (
     <View style={styles.vCardBody}>
-      {item.category === 'data_facts' && (() => {
-        const contextToSplit = item.cleanedContext || item.context || '';
-        const subThemes = splitSubThemes(contextToSplit);
-
-        return (
-          <View style={{ gap: 10 }}>
-            {subThemes.map((st: any, stIdx: number) => {
-              const sstBlocks = splitSubSubThemeBlocks(st.content);
-              const hasSubSub = sstBlocks.some((b: any) => b.title);
-
-              return (
-                <View key={`st-${stIdx}`} style={{ gap: 4 }}>
-                  {st.title ? (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginTop: stIdx > 0 ? 10 : 2, marginBottom: 2 }}>
-                      <Text style={{ color: '#3b82f6', fontSize: 14.5, fontWeight: '800' }}>{st.title}</Text>
-                      <TouchableOpacity
-                        onPress={() => onAddFlashcardClick?.(
-                          `Sub-Theme: ${st.title} (${item.metric || item.title || ''})`,
-                          cleanDataFactsMarkdown(st.content, item)
-                        )}
-                        style={{ padding: 4, borderRadius: 6, backgroundColor: '#3b82f612' }}
-                      >
-                        <Layers size={12} color="#3b82f6" />
-                      </TouchableOpacity>
-                    </View>
-                  ) : null}
-
-                  {hasSubSub ? (
-                    <View style={{ gap: 8 }}>
-                      {sstBlocks.map((sst: any, sstIdx: number) => {
-                        return (
-                          <View key={`sst-${sstIdx}`} style={{ gap: 2 }}>
-                            {sst.title ? (
-                              <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 4, marginBottom: 2 }}>
-                                <Text style={{ color: '#8b5cf6', fontSize: 13, fontWeight: '800' }}>{sst.title}</Text>
-                                <TouchableOpacity
-                                  onPress={() => onAddFlashcardClick?.(
-                                    `Sub-Sub-Theme: ${sst.title} (${st.title || item.metric || item.title || ''})`,
-                                    cleanDataFactsMarkdown(sst.content, item)
-                                  )}
-                                  style={{ padding: 3, borderRadius: 5, backgroundColor: '#8b5cf612' }}
-                                >
-                                  <Layers size={10} color="#8b5cf6" />
-                                </TouchableOpacity>
-                              </View>
-                            ) : null}
-                            <Markdown style={subPartBodyMarkdownStyle} rules={markdownRules}>
-                              {cleanDataFactsMarkdown(sst.content, item)}
-                            </Markdown>
-                          </View>
-                        );
-                      })}
-                    </View>
-                  ) : (
-                    <Markdown style={customMarkdownStyles} rules={markdownRules}>
-                      {cleanDataFactsMarkdown(st.content, item)}
-                    </Markdown>
-                  )}
-                </View>
-              );
-            })}
-          </View>
-        );
-      })()}
+      {item.category === 'data_facts' && (
+        <MainsDataFactsCard
+          item={item}
+          colors={colors}
+          filters={DEFAULT_MAINS_FILTERS}
+          search=""
+          zoomScale={scale}
+        />
+      )}
 
       {item.category === 'intro_conclusion' && (
-        <View style={{ gap: 12 }}>
-          {item.quoteText && (
-            <View style={[styles.templateBox, { backgroundColor: '#fffbeb33', borderColor: '#fef3c7' }]}>
-              <Text style={[styles.subPartHeader, { color: '#d97706' }]}>QUOTE</Text>
-              <Markdown style={quoteTextMarkdownStyle} rules={markdownRules}>{"\"" + cleanMarkdownContent(item.quoteText) + "\""}</Markdown>
-              {item.author && <Text style={[styles.quoteAuthor, { color: colors.textTertiary, marginTop: 4 }]}>— {item.author}</Text>}
-            </View>
-          )}
-          {item.introduction && (
-            <View style={[styles.templateBox, { backgroundColor: '#eff6ff33', borderColor: '#dbeafe' }]}>
-              <Text style={[styles.subPartHeader, { color: '#1d4ed8' }]}>INTRODUCTION TEMPLATE</Text>
-              <Markdown style={subPartBodyMarkdownStyle} rules={markdownRules}>{cleanMarkdownContent(item.introduction)}</Markdown>
-            </View>
-          )}
-          {item.examples && (
-            <View style={[styles.templateBox, { backgroundColor: '#f5f3ff33', borderColor: '#ddd6fe' }]}>
-              <Text style={[styles.subPartHeader, { color: '#7c3aed' }]}>EXAMPLES / CASE STUDIES</Text>
-              <Markdown style={subPartBodyMarkdownStyle} rules={markdownRules}>{cleanMarkdownContent(item.examples)}</Markdown>
-            </View>
-          )}
-          {item.conclusion && (
-            <View style={[styles.templateBox, { backgroundColor: '#ecfdf533', borderColor: '#d1fae5' }]}>
-              <Text style={[styles.subPartHeader, { color: '#047857' }]}>CONCLUSION TEMPLATE</Text>
-              <Markdown style={subPartBodyMarkdownStyle} rules={markdownRules}>{cleanMarkdownContent(item.conclusion)}</Markdown>
-            </View>
-          )}
-        </View>
+        <MainsIntroConclusionCard
+          item={item}
+          colors={colors}
+          templateFilter={templateFilter || 'All'}
+          zoomScale={scale}
+        />
       )}
 
       {item.category === 'quotes' && (
-        <View>
-          <Markdown style={quoteTextMarkdownStyle}>{"\"" + cleanMarkdownContent(item.quoteText) + "\""}</Markdown>
-          <Text style={[styles.quoteAuthor, { color: colors.textTertiary }]}>— {item.author}</Text>
-          {item.usageGuide && (
-            <View style={styles.usageWrapper}>
-              <Text style={styles.usageTitle}>USAGE GUIDE</Text>
-              <Markdown style={subPartBodyMarkdownStyle}>{cleanMarkdownContent(item.usageGuide)}</Markdown>
-            </View>
-          )}
-        </View>
+        <MainsQuotesCard
+          item={item}
+          colors={colors}
+          zoomScale={scale}
+        />
       )}
 
       {item.category === 'mnemonics' && (
-        <View>
-          <View style={styles.mnemonicKeywordRow}>
-            <Text style={styles.mnemonicLabel}>KEYWORD:</Text>
-            <Text style={styles.mnemonicValue}>{item.mnemonicKeyword}</Text>
-          </View>
-          <View style={styles.expansionList}>
-            {item.mnemonicExpansion?.map((ex: any, i: number) => (
-              <View key={i} style={styles.expansionRow}>
-                <View style={styles.letterWrapper}>
-                  <Text style={styles.letterText}>{ex.letter}</Text>
-                </View>
-                <View style={{ flex: 1, marginLeft: 10 }}>
-                  <Text style={[styles.exMeaning, { color: colors.textPrimary }]}>{ex.meaning}</Text>
-                  {ex.detail && <Markdown style={subPartBodyMarkdownStyle}>{cleanMarkdownContent(ex.detail)}</Markdown>}
-                </View>
-              </View>
-            ))}
-          </View>
-        </View>
+        <MainsMnemonicsCard
+          item={item}
+          colors={colors}
+          zoomScale={scale}
+        />
       )}
 
       {item.category === 'frameworks' && (
-        <View style={{ gap: 10 }}>
-          {item.diagramImagePath && (
-            <View style={{ marginVertical: 8, borderRadius: 12, overflow: 'hidden', backgroundColor: 'rgba(255,255,255,0.2)', padding: 6, borderColor: colors.border, borderWidth: 1 }}>
-              <Image
-                source={{ uri: getDiagramUri(item.diagramImagePath) }}
-                style={{ width: '100%', height: 200 }}
-                resizeMode="contain"
-              />
-            </View>
-          )}
-          {item.frameworkBoxes?.map((fb: any, i: number) => (
-            <View key={i} style={[styles.fwBox, { borderColor: 'rgba(255,255,255,0.7)', backgroundColor: 'rgba(255,255,255,0.3)' }]}>
-              <Text style={styles.fwBoxLabel}>{fb.label}</Text>
-              <Markdown style={subPartBodyMarkdownStyle}>{cleanMarkdownContent(fb.description)}</Markdown>
-            </View>
-          ))}
-        </View>
+        <MainsFrameworksCard
+          item={item}
+          colors={colors}
+          zoomScale={scale}
+        />
       )}
 
-      {item.category === 'ethics' && item.ethicsData && (
-        <View style={{ gap: 8 }}>
-          {(type === 'diagram' || type === 'diagrams') && (
-            <View style={[styles.templateBox, { backgroundColor: '#0f172acc', borderColor: '#334155' }]}>
-              {item.diagramImagePath && (
-                <View style={{ marginVertical: 8, borderRadius: 8, overflow: 'hidden', backgroundColor: '#1e293b', padding: 6, borderColor: '#475569', borderWidth: 1 }}>
-                  <Image
-                    source={{ uri: getDiagramUri(item.diagramImagePath) }}
-                    style={{ width: '100%', height: 200 }}
-                    resizeMode="contain"
-                  />
-                </View>
-              )}
-              <Text style={[styles.subPartBody, { color: '#ffffff', fontFamily: 'monospace' }]}>
-                {item.ethicsData.diagramDescription}
-              </Text>
-              <Text style={styles.diagLabel}>Diagram Type: {item.ethicsData.diagramType}</Text>
-            </View>
-          )}
-          {(type === 'dimension' || type === 'dimensions') && (
-            <View style={{ gap: 6 }}>
-              {item.ethicsData.dimensionsList?.map((dim: string, i: number) => (
-                <Markdown key={i} style={subPartBodyMarkdownStyle}>{cleanMarkdownContent(dim)}</Markdown>
-              ))}
-            </View>
-          )}
-          {(type === 'comparison' || type === 'comparisons') && (
-            <View style={{ gap: 10 }}>
-              {item.ethicsData.comparisonPoints?.map((cp: any, i: number) => (
-                <View key={i} style={[styles.compareRow, { borderBottomColor: colors.border }]}>
-                  <Text style={[styles.compareCriteria, { color: '#06b6d4' }]}>{cp.criteria}</Text>
-                  <Markdown style={comparePointsMarkdownStyle}>{cleanMarkdownContent(cp.termA)}</Markdown>
-                  <Markdown style={comparePointsMarkdownStyle}>{cleanMarkdownContent(cp.termB)}</Markdown>
-                </View>
-              ))}
-            </View>
-          )}
-          {(type === 'innovation' || type === 'innovations') && (
-            <View style={[styles.templateBox, { backgroundColor: '#ecfeff33', borderColor: '#a5f3fc', gap: 6 }]}>
-              <Text style={styles.ethicsOfficer}>{item.ethicsData.officerName}</Text>
-              <Markdown style={subPartBodyMarkdownStyle}>{"Initiative: " + cleanMarkdownContent(item.ethicsData.initiative)}</Markdown>
-              <Markdown style={subPartBodyMarkdownStyle}>{"Impact: " + cleanMarkdownContent(item.ethicsData.impact)}</Markdown>
-              <Text style={styles.ethicsValues}>Values: {item.ethicsData.values}</Text>
-            </View>
-          )}
-          {(type === 'pyq_quote' || type === 'pyq_quotes') && (
-            <View style={[styles.templateBox, { backgroundColor: '#f0fdf433', borderColor: '#bbf7d0', gap: 4 }]}>
-              <Markdown style={subPartBodyMarkdownStyle}>{cleanMarkdownContent(item.ethicsData.keywordDefinition)}</Markdown>
-              {item.ethicsData.keywordExample && (
-                <Markdown style={subPartBodyMarkdownStyle}>{cleanMarkdownContent(item.ethicsData.keywordExample)}</Markdown>
-              )}
-            </View>
-          )}
-          {(type === 'keyword' || type === 'keywords') && (
-            <View style={[styles.templateBox, { backgroundColor: '#fff7ed33', borderColor: '#ffedd5', gap: 4 }]}>
-              <Markdown style={subPartBodyMarkdownStyle}>{cleanMarkdownContent(item.ethicsData.keywordDefinition)}</Markdown>
-              {item.ethicsData.keywordExample && (
-                <Markdown style={subPartBodyMarkdownStyle}>{cleanMarkdownContent(item.ethicsData.keywordExample)}</Markdown>
-              )}
-            </View>
-          )}
-        </View>
+      {item.category === 'ethics' && (
+        <MainsEthicsCard
+          item={item}
+          colors={colors}
+          ethicsTab={ethicsTab || ''}
+          zoomScale={scale}
+        />
       )}
     </View>
   );
 }
 
-const markdownRules = {
-  list_item: (node: any, children: any, parent: any, styles: any, inheritedStyles = {}) => {
-    const bulletListDepth = Array.isArray(parent) 
-      ? parent.filter((el: any) => el.type === 'bullet_list').length 
-      : 1;
 
-    let bulletIcon = '\u2022'; // level 1: filled circle
-    if (bulletListDepth === 2) {
-      bulletIcon = '\u25E6'; // level 2: hollow circle
-    } else if (bulletListDepth >= 3) {
-      bulletIcon = '\u25AA'; // level 3: small square
-    }
-
-    const refStyle = {
-      ...inheritedStyles,
-      ...StyleSheet.flatten(styles.list_item),
-    };
-
-    const textStyleProps = [
-      'color', 'fontSize', 'fontStyle', 'fontWeight', 'lineHeight', 
-      'textAlign', 'textDecorationLine', 'textShadowColor', 
-      'textShadowOffset', 'textShadowRadius', 'fontFamily'
-    ];
-    
-    const modifiedInheritedStylesObj: any = {};
-    for (const key of Object.keys(refStyle)) {
-      if (textStyleProps.includes(key)) {
-        modifiedInheritedStylesObj[key] = refStyle[key];
-      }
-    }
-
-    const immediateParentType = Array.isArray(parent) && parent.length > 0
-      ? parent[parent.length - 1].type
-      : '';
-
-    if (immediateParentType === 'bullet_list') {
-      return (
-        <View key={node.key} style={styles._VIEW_SAFE_list_item}>
-          <Text
-            style={[
-              modifiedInheritedStylesObj, 
-              styles.bullet_list_icon,
-              { marginRight: 8, fontSize: bulletListDepth === 2 ? 14 : 12 }
-            ]}
-            accessible={false}
-          >
-            {bulletIcon}
-          </Text>
-          <View style={styles._VIEW_SAFE_bullet_list_content}>{children}</View>
-        </View>
-      );
-    }
-
-    if (immediateParentType === 'ordered_list') {
-      const orderedListIndex = parent.findIndex((el: any) => el.type === 'ordered_list');
-      const orderedList = parent[orderedListIndex];
-      let listItemNumber = node.index + 1;
-      if (orderedList?.attributes?.start) {
-        listItemNumber = orderedList.attributes.start + node.index;
-      }
-      return (
-        <View key={node.key} style={styles._VIEW_SAFE_list_item}>
-          <Text style={[modifiedInheritedStylesObj, styles.ordered_list_icon]}>
-            {listItemNumber}
-            {node.markup}
-          </Text>
-          <View style={styles._VIEW_SAFE_ordered_list_content}>{children}</View>
-        </View>
-      );
-    }
-
-    return (
-      <View key={node.key} style={styles._VIEW_SAFE_list_item}>
-        {children}
-      </View>
-    );
-  }
-};
 
 const ValueAdditionCard = React.memo(function ValueAdditionCard({
   item,
@@ -1814,6 +1803,8 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
   ethicsTab,
   forceExpandCollapse = null,
   onAddFlashcardClick,
+  templateFilter,
+  zoomScale,
 }: {
   item: any;
   colors: any;
@@ -1824,6 +1815,8 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
   ethicsTab?: string;
   forceExpandCollapse?: 'expand' | 'collapse' | null;
   onAddFlashcardClick?: (item: any, front: string, back: string) => void;
+  templateFilter?: string;
+  zoomScale?: number;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const isCopied = copiedId === item.id;
@@ -1854,7 +1847,7 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
           backgroundColor: isDark ? 'rgba(30, 41, 59, 0.65)' : 'rgba(255, 255, 255, 0.65)',
           borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.85)',
           marginBottom: 12,
-          width: width,
+          width: width as any,
         }
       ]}
     >
@@ -1874,7 +1867,7 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
           >
             {item.category === 'data_facts' ? item.metric : item.title}
           </Text>
-          {item.source && item.category !== 'data_facts' && item.category !== 'intro_conclusion' && <Text style={styles.vCardSource}>{item.source}</Text>}
+          {item.source && item.category !== 'data_facts' && item.category !== 'intro_conclusion' && item.category !== 'quotes' && item.category !== 'mnemonics' && item.category !== 'frameworks' && <Text style={styles.vCardSource}>{item.source}</Text>}
         </TouchableOpacity>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           <TouchableOpacity
@@ -1907,7 +1900,9 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
             item={item}
             colors={colors}
             ethicsTab={ethicsTab}
+            templateFilter={templateFilter}
             onAddFlashcardClick={(front, back) => onAddFlashcardClick?.(item, front, back)}
+            zoomScale={zoomScale}
           />
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10, paddingRight: 4, gap: 8 }}>
             <TouchableOpacity
@@ -1944,7 +1939,7 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
   );
 });
 
-const getMarkdownStyles = (colors: any): any => ({
+export const getMarkdownStyles = (colors: any): any => ({
   body: {
     color: colors.textSecondary,
     fontSize: 14.5,
@@ -2022,9 +2017,23 @@ const getMarkdownStyles = (colors: any): any => ({
     padding: 10,
     backgroundColor: colors.surface + 'cc',
     fontWeight: '800',
+    flex: 1,
+    minWidth: 110,
+    flexShrink: 1,
+    flexWrap: 'wrap',
   },
   td: {
     padding: 10,
+    flex: 1,
+    minWidth: 110,
+    flexShrink: 1,
+    flexWrap: 'wrap',
+  },
+  image: {
+    width: '100%',
+    height: 220,
+    resizeMode: 'contain',
+    marginVertical: 12,
   },
 });
 
@@ -2103,6 +2112,7 @@ function MainsLeftPanel({
   onCloseSidebar,
 }: MainsLeftPanelProps) {
   const { isDark } = useTheme();
+  const isOptional = filters.paper !== 'All' && !filters.paper.split('|').some(p => ['GS1', 'GS2', 'GS3', 'GS4', 'Essay'].includes(p));
 
   return (
     <ScrollView
@@ -2270,7 +2280,7 @@ function MainsLeftPanel({
       {/* Section Selector */}
       {filters.subjects !== 'All' && sectionOptions.length > 0 && (
         <View style={{ marginVertical: 8 }}>
-          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>SECTION / CHAPTER</Text>
+          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>{isOptional ? 'OPTIONAL PAPER' : 'SECTION / CHAPTER'}</Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
             <TouchableOpacity
               onPress={() => onUpdateFilters({ ...filters, sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' })}
@@ -2308,7 +2318,7 @@ function MainsLeftPanel({
       {/* Microtopic Selector */}
       {filters.subjects !== 'All' && filters.sections !== 'All' && microtopicOptions.length > 0 && (
         <View style={{ marginVertical: 8 }}>
-          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>MICROTOPIC</Text>
+          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>{isOptional ? 'UNIT' : 'MICROTOPIC'}</Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
             <TouchableOpacity
               onPress={() => onUpdateFilters({ ...filters, microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' })}
@@ -2345,7 +2355,7 @@ function MainsLeftPanel({
       {/* Sub-topic Selector */}
       {filters.subjects !== 'All' && filters.sections !== 'All' && filters.microtopics !== 'All' && subtopicOptions.length > 0 && (
         <View style={{ marginVertical: 8 }}>
-          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>SUB-TOPIC</Text>
+          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>{isOptional ? 'MICROTOPIC' : 'SUB-TOPIC'}</Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
             <TouchableOpacity
               onPress={() => onUpdateFilters({ ...filters, subtopics: 'All', macrotags: 'All', microtags: 'All' })}
@@ -2609,6 +2619,10 @@ interface HierarchyModalProps {
   };
   isMainsValueAdd?: boolean;
   isIntroConclusion?: boolean;
+  isQuotes?: boolean;
+  isMnemonics?: boolean;
+  activeCategoryItems?: any[];
+  activeCategory?: string;
 }
 
 function HierarchyModal({
@@ -2628,13 +2642,141 @@ function HierarchyModal({
   columnLabels,
   isMainsValueAdd,
   isIntroConclusion,
+  isQuotes,
+  isMnemonics,
+  activeCategoryItems,
+  activeCategory,
 }: HierarchyModalProps) {
+  const [localFilters, setLocalFilters] = React.useState<MainsFilters>(filters);
+
+  React.useEffect(() => {
+    if (visible) {
+      setLocalFilters(filters);
+    }
+  }, [visible, filters]);
+
+  const localSubjectOptions = React.useMemo(() => {
+    if (!activeCategoryItems) return [];
+    const paperFilter = localFilters.paper !== 'All' ? localFilters.paper.split('|') : [];
+    const subSet = new Set<string>();
+    activeCategoryItems.forEach(item => {
+      getItemPaths(item).forEach(path => {
+        if (paperFilter.length === 0 || paperFilter.includes(path.paper)) {
+          if (path.subject) subSet.add(path.subject);
+        }
+      });
+    });
+    return Array.from(subSet).sort();
+  }, [activeCategoryItems, localFilters.paper]);
+
+  const localSectionOptions = React.useMemo(() => {
+    if (!activeCategoryItems) return [];
+    const paperFilter = localFilters.paper !== 'All' ? localFilters.paper.split('|') : [];
+    const subjectFilter = localFilters.subjects !== 'All' ? localFilters.subjects.split('|') : [];
+    const secSet = new Set<string>();
+    activeCategoryItems.forEach(item => {
+      getItemPaths(item).forEach(path => {
+        const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
+        const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
+        if (matchPaper && matchSubject && path.sectionGroup) {
+          secSet.add(path.sectionGroup);
+        }
+      });
+    });
+    return Array.from(secSet).sort(naturalCompare);
+  }, [activeCategoryItems, localFilters.paper, localFilters.subjects]);
+
+  const localMicrotopicOptions = React.useMemo(() => {
+    if (!activeCategoryItems) return [];
+    const paperFilter = localFilters.paper !== 'All' ? localFilters.paper.split('|') : [];
+    const subjectFilter = localFilters.subjects !== 'All' ? localFilters.subjects.split('|') : [];
+    const sectionFilter = localFilters.sections !== 'All' ? localFilters.sections.split('|') : [];
+    const mtSet = new Set<string>();
+    activeCategoryItems.forEach(item => {
+      getItemPaths(item).forEach(path => {
+        const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
+        const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
+        const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
+        if (matchPaper && matchSubject && matchSection) {
+          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+            if (path.microtopic) mtSet.add(path.microtopic);
+          } else {
+            const themeName = item.category === 'data_facts' ? item.metric : item.title;
+            if (themeName) mtSet.add(themeName);
+          }
+        }
+      });
+    });
+    return Array.from(mtSet).sort(naturalCompare);
+  }, [activeCategoryItems, localFilters.paper, localFilters.subjects, localFilters.sections, activeCategory]);
+
+  const localSubtopicOptions = React.useMemo(() => {
+    if (!activeCategoryItems) return [];
+    const selectedMicrotopic = localFilters.microtopics !== 'All' ? localFilters.microtopics : null;
+    if (!selectedMicrotopic) return [];
+    const stSet = new Set<string>();
+    activeCategoryItems.forEach(item => {
+      getItemPaths(item).forEach(path => {
+        if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+          if (path.microtopic && selectedMicrotopic.split('|').includes(path.microtopic)) {
+            if (path.subtopic) stSet.add(path.subtopic);
+          }
+        } else {
+          const themeName = item.category === 'data_facts' ? item.metric : item.title;
+          if (themeName === selectedMicrotopic) {
+            const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
+            subThemes.forEach((st: any) => {
+              if (st.title) stSet.add(st.title);
+            });
+          }
+        }
+      });
+    });
+    return Array.from(stSet).sort(naturalCompare);
+  }, [activeCategoryItems, localFilters.microtopics, activeCategory]);
+
+  const localMacrotagOptions = React.useMemo(() => {
+    if (!activeCategoryItems) return [];
+    const selectedSubTheme = localFilters.subtopics !== 'All' ? localFilters.subtopics : null;
+    if (!selectedSubTheme) return [];
+    const sstSet = new Set<string>();
+    activeCategoryItems.forEach(item => {
+      getItemPaths(item).forEach(path => {
+        if (activeCategory === 'intro_conclusion') {
+          if (path.subtopic && selectedSubTheme.split('|').includes(path.subtopic)) {
+            if (item.title) sstSet.add(item.title);
+          }
+        } else if (activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+          if (path.subtopic && selectedSubTheme.split('|').includes(path.subtopic)) {
+            if (item.title) sstSet.add(item.title);
+          }
+        } else {
+          const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
+          subThemes.forEach((st: any) => {
+            if (st.title === selectedSubTheme) {
+              const sstMatches = splitSubSubThemes(st.content);
+              sstMatches.forEach(sst => sstSet.add(sst));
+            }
+          });
+        }
+      });
+    });
+    return Array.from(sstSet).sort();
+  }, [activeCategoryItems, localFilters.subtopics, activeCategory]);
+
+  const subjects = activeCategoryItems ? localSubjectOptions : subjectOptions;
+  const sections = activeCategoryItems ? localSectionOptions : sectionOptions;
+  const microtopics = activeCategoryItems ? localMicrotopicOptions : microtopicOptions;
+  const subtopics = activeCategoryItems ? localSubtopicOptions : subtopicOptions;
+  const macrotags = activeCategoryItems ? localMacrotagOptions : macrotagOptions;
+
+  const isOptional = localFilters.paper !== 'All' && !localFilters.paper.split('|').some(p => ['GS1', 'GS2', 'GS3', 'GS4', 'Essay'].includes(p));
   const labels = {
     paper: columnLabels?.paper || 'Paper',
     subject: columnLabels?.subject || 'Subject',
-    section: columnLabels?.section || 'Section Group',
-    microtopic: columnLabels?.microtopic || 'Microtopic',
-    subtopic: columnLabels?.subtopic || 'Sub-topic',
+    section: isOptional ? 'Optional Paper' : (columnLabels?.section || 'Section Group'),
+    microtopic: isOptional ? 'Unit' : (columnLabels?.microtopic || 'Microtopic'),
+    subtopic: isOptional ? 'Microtopic' : (columnLabels?.subtopic || 'Sub-topic'),
   };
 
   const renderColumn = (
@@ -2680,6 +2822,11 @@ function HierarchyModal({
     );
   };
 
+  const handleApply = () => {
+    onUpdateFilters(localFilters);
+    onClose();
+  };
+
   return (
     <Modal
       visible={visible}
@@ -2695,6 +2842,7 @@ function HierarchyModal({
             alignItems: 'flex-start',
             paddingTop: isTablet ? 120 : 80,
             paddingLeft: isTablet ? 24 : 10,
+            paddingRight: isTablet ? 24 : 10,
           }
         ]} 
         onPress={onClose}
@@ -2722,21 +2870,22 @@ function HierarchyModal({
                 contentContainerStyle={{ alignItems: 'center', gap: 6 }}
                 style={{ flex: 1 }}
               >
-                {/* Path Breadcrumbs */}
-                {filters.paper !== 'All' ? (
-                  filters.paper.split('|').map(val => (
+                {/* Paper breadcrumb — only for non-quotes */}
+                {!isQuotes && (localFilters.paper !== 'All' ? (
+                  localFilters.paper.split('|').map(val => (
                     <View key={`modal-crumb-paper-${val}`} style={[styles.crumbBadge, { backgroundColor: '#dbeafe' }]}>
                       <Text style={[styles.crumbText, { color: '#1e40af' }]}>{val}</Text>
                     </View>
                   ))
                 ) : (
                   <Text style={{ fontSize: 11, color: colors.textTertiary, fontStyle: 'italic' }}>Select paper to begin</Text>
-                )}
+                ))}
 
-                {filters.subjects !== 'All' && (
+                {/* Subject breadcrumb */}
+                {!isQuotes && localFilters.subjects !== 'All' && (
                   <>
                     <ChevronRight size={12} color="#94a3b8" />
-                    {filters.subjects.split('|').map(val => (
+                    {localFilters.subjects.split('|').map(val => (
                       <View key={`modal-crumb-subject-${val}`} style={[styles.crumbBadge, { backgroundColor: '#f3e8ff' }]}>
                         <Text style={[styles.crumbText, { color: '#6b21a8' }]}>{val}</Text>
                       </View>
@@ -2744,10 +2893,21 @@ function HierarchyModal({
                   </>
                 )}
 
-                {filters.sections !== 'All' && (
+                {/* Quotes: Subject shown as first breadcrumb */}
+                {isQuotes && (localFilters.subjects !== 'All' ? (
+                  localFilters.subjects.split('|').map(val => (
+                    <View key={`modal-crumb-subject-${val}`} style={[styles.crumbBadge, { backgroundColor: '#f3e8ff' }]}>
+                      <Text style={[styles.crumbText, { color: '#6b21a8' }]}>{val}</Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text style={{ fontSize: 11, color: colors.textTertiary, fontStyle: 'italic' }}>Select subject to begin</Text>
+                ))}
+
+                {!isQuotes && localFilters.sections !== 'All' && (
                   <>
                     <ChevronRight size={12} color="#94a3b8" />
-                    {filters.sections.split('|').map(val => (
+                    {localFilters.sections.split('|').map(val => (
                       <View key={`modal-crumb-section-${val}`} style={[styles.crumbBadge, { backgroundColor: '#fef3c7' }]}>
                         <Text style={[styles.crumbText, { color: '#92400e' }]}>{val}</Text>
                       </View>
@@ -2755,10 +2915,21 @@ function HierarchyModal({
                   </>
                 )}
 
-                {filters.microtopics !== 'All' && (
+                {isQuotes && localFilters.sections !== 'All' && (
                   <>
                     <ChevronRight size={12} color="#94a3b8" />
-                    {filters.microtopics.split('|').map(val => (
+                    {localFilters.sections.split('|').map(val => (
+                      <View key={`modal-crumb-section-${val}`} style={[styles.crumbBadge, { backgroundColor: '#fef3c7' }]}>
+                        <Text style={[styles.crumbText, { color: '#92400e' }]}>{val}</Text>
+                      </View>
+                    ))}
+                  </>
+                )}
+
+                {localFilters.microtopics !== 'All' && (
+                  <>
+                    <ChevronRight size={12} color="#94a3b8" />
+                    {localFilters.microtopics.split('|').map(val => (
                       <View key={`modal-crumb-micro-${val}`} style={[styles.crumbBadge, { backgroundColor: '#d1fae5' }]}>
                         <Text style={[styles.crumbText, { color: '#065f46' }]}>{val}</Text>
                       </View>
@@ -2766,10 +2937,10 @@ function HierarchyModal({
                   </>
                 )}
 
-                {filters.subtopics !== 'All' && (
+                {localFilters.subtopics !== 'All' && (
                   <>
                     <ChevronRight size={12} color="#94a3b8" />
-                    {filters.subtopics.split('|').map(val => (
+                    {localFilters.subtopics.split('|').map(val => (
                       <View key={`modal-crumb-sub-${val}`} style={[styles.crumbBadge, { backgroundColor: '#ffe4e6' }]}>
                         <Text style={[styles.crumbText, { color: '#be123c' }]}>{val}</Text>
                       </View>
@@ -2777,10 +2948,10 @@ function HierarchyModal({
                   </>
                 )}
 
-                {filters.macrotags !== 'All' && (
+                {localFilters.macrotags !== 'All' && (
                   <>
                     <ChevronRight size={12} color="#94a3b8" />
-                    {filters.macrotags.split('|').map(val => (
+                    {localFilters.macrotags.split('|').map(val => (
                       <View key={`modal-crumb-macro-${val}`} style={[styles.crumbBadge, { backgroundColor: isIntroConclusion ? '#d1fae5' : (isMainsValueAdd ? '#f3e8ff' : '#e0f7fa') }]}>
                         <Text style={[styles.crumbText, { color: isIntroConclusion ? '#065f46' : (isMainsValueAdd ? '#6b21a8' : '#006064') }]}>{val}</Text>
                       </View>
@@ -2788,10 +2959,10 @@ function HierarchyModal({
                   </>
                 )}
 
-                {!isMainsValueAdd && filters.microtags !== 'All' && (
+                {!isMainsValueAdd && localFilters.microtags !== 'All' && (
                   <>
                     <ChevronRight size={12} color="#94a3b8" />
-                    {filters.microtags.split('|').map(val => (
+                    {localFilters.microtags.split('|').map(val => (
                       <View key={`modal-crumb-microtag-${val}`} style={[styles.crumbBadge, { backgroundColor: '#fce4ec' }]}>
                         <Text style={[styles.crumbText, { color: '#880e4f' }]}>{val}</Text>
                       </View>
@@ -2812,77 +2983,77 @@ function HierarchyModal({
             contentContainerStyle={{ paddingVertical: 12 }}
             style={{ flex: 1 }}
           >
-            {/* COLUMN 1: Paper */}
-            {renderColumn(labels.paper, ['GS1', 'GS2', 'GS3', 'GS4'], filters.paper, (p) => {
-              const currentVal = filters.paper;
+            {/* COLUMN 1: Paper (hidden for quotes since all entries are Essay paper) */}
+            {!isQuotes && renderColumn(labels.paper, ['GS1', 'GS2', 'GS3', 'GS4'], localFilters.paper, (p) => {
+              const currentVal = localFilters.paper;
               const nextVal = toggleFilterValue(currentVal, p);
               const isRemoval = nextVal === 'All' || (currentVal !== 'All' && nextVal.split('|').length < currentVal.split('|').length);
-              onUpdateFilters({
-                ...filters,
+              setLocalFilters({
+                ...localFilters,
                 paper: nextVal,
                 ...(isRemoval ? { subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' } : {})
               });
             }, '#3b82f6', isTablet ? 120 : 100)}
 
-            {/* COLUMN 2: Subject */}
-            {renderColumn(labels.subject, filters.paper === 'All' ? [] : subjectOptions, filters.subjects, (sub) => {
-              const currentVal = filters.subjects;
+            {/* COLUMN 2: Subject — for quotes shows all subjects; for others requires paper selection */}
+            {renderColumn(labels.subject, isQuotes ? subjects : (localFilters.paper === 'All' ? [] : subjects), localFilters.subjects, (sub) => {
+              const currentVal = localFilters.subjects;
               const nextVal = toggleFilterValue(currentVal, sub);
               const isRemoval = nextVal === 'All' || (currentVal !== 'All' && nextVal.split('|').length < currentVal.split('|').length);
-              onUpdateFilters({
-                ...filters,
+              setLocalFilters({
+                ...localFilters,
                 subjects: nextVal,
                 ...(isRemoval ? { sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' } : {})
               });
             }, '#8b5cf6', isTablet ? 180 : 140)}
 
-            {/* COLUMN 3: Section Group */}
-            {renderColumn(labels.section, filters.subjects === 'All' ? [] : sectionOptions, filters.sections, (sec) => {
-              const currentVal = filters.sections;
+            {/* COLUMN 3: Section Group — for quotes: always show all options; for others: requires subject selection */}
+            {renderColumn(labels.section, (isQuotes || isMnemonics) ? sections : (localFilters.subjects === 'All' ? [] : sections), localFilters.sections, (sec) => {
+              const currentVal = localFilters.sections;
               const nextVal = toggleFilterValue(currentVal, sec);
               const isRemoval = nextVal === 'All' || (currentVal !== 'All' && nextVal.split('|').length < currentVal.split('|').length);
-              onUpdateFilters({
-                ...filters,
+              setLocalFilters({
+                ...localFilters,
                 sections: nextVal,
                 ...(isRemoval ? { microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' } : {})
               });
             }, '#f59e0b', isTablet ? 250 : 200)}
 
             {/* COLUMN 4: Microtopic / Theme */}
-            {renderColumn(labels.microtopic, filters.sections === 'All' ? [] : microtopicOptions, filters.microtopics, (mt) => {
-              const currentVal = filters.microtopics;
+            {renderColumn(labels.microtopic, localFilters.sections === 'All' ? [] : microtopics, localFilters.microtopics, (mt) => {
+              const currentVal = localFilters.microtopics;
               const nextVal = toggleFilterValue(currentVal, mt);
               const isRemoval = nextVal === 'All' || (currentVal !== 'All' && nextVal.split('|').length < currentVal.split('|').length);
-              onUpdateFilters({
-                ...filters,
+              setLocalFilters({
+                ...localFilters,
                 microtopics: nextVal,
                 ...(isRemoval ? { subtopics: 'All', macrotags: 'All', microtags: 'All' } : {})
               });
             }, '#10b981', isTablet ? 320 : 250)}
 
             {/* COLUMN 5: Sub-topic / Sub-theme */}
-            {renderColumn(labels.subtopic, filters.microtopics === 'All' ? [] : subtopicOptions, filters.subtopics, (st) => {
-              const currentVal = filters.subtopics;
+            {renderColumn(labels.subtopic, localFilters.microtopics === 'All' ? [] : subtopics, localFilters.subtopics, (st) => {
+              const currentVal = localFilters.subtopics;
               const nextVal = toggleFilterValue(currentVal, st);
               const isRemoval = nextVal === 'All' || (currentVal !== 'All' && nextVal.split('|').length < currentVal.split('|').length);
-              onUpdateFilters({
-                ...filters,
+              setLocalFilters({
+                ...localFilters,
                 subtopics: nextVal,
                 ...(isRemoval ? { macrotags: 'All', microtags: 'All' } : {})
               });
             }, '#f43f5e', isTablet ? 250 : 200)}
 
             {/* COLUMN 6: Macro tag / Sub-sub-theme */}
-            {(!isMainsValueAdd || macrotagOptions.length > 0) && renderColumn(
-              isIntroConclusion ? "Card Title" : (isMainsValueAdd ? "Sub-sub-theme" : "Macro tag"),
-              filters.subtopics === 'All' ? [] : macrotagOptions,
-              filters.macrotags,
+            {(!isMainsValueAdd || macrotags.length > 0) && renderColumn(
+              isIntroConclusion ? "Card Title" : (isQuotes ? "Title" : (isMnemonics ? "Mnemonic Title" : (isMainsValueAdd ? "Sub-sub-theme" : "Macro tag"))),
+              localFilters.subtopics === 'All' ? [] : macrotags,
+              localFilters.macrotags,
               (mat) => {
-                const currentVal = filters.macrotags;
+                const currentVal = localFilters.macrotags;
                 const nextVal = toggleFilterValue(currentVal, mat);
                 const isRemoval = nextVal === 'All' || (currentVal !== 'All' && nextVal.split('|').length < currentVal.split('|').length);
-                onUpdateFilters({
-                  ...filters,
+                setLocalFilters({
+                  ...localFilters,
                   macrotags: nextVal,
                   ...(isRemoval ? { microtags: 'All' } : {})
                 });
@@ -2892,10 +3063,10 @@ function HierarchyModal({
             )}
 
             {/* COLUMN 7: Micro tag */}
-            {!isMainsValueAdd && renderColumn("Micro tag", filters.macrotags === 'All' ? [] : microtagOptions, filters.microtags, (mit) => {
-              onUpdateFilters({
-                ...filters,
-                microtags: toggleFilterValue(filters.microtags, mit)
+            {!isMainsValueAdd && renderColumn("Micro tag", localFilters.macrotags === 'All' ? [] : microtagOptions, localFilters.microtags, (mit) => {
+              setLocalFilters({
+                ...localFilters,
+                microtags: toggleFilterValue(localFilters.microtags, mit)
               });
             }, '#ec4899', isTablet ? 200 : 160)}
           </ScrollView>
@@ -2903,15 +3074,16 @@ function HierarchyModal({
           {/* Footer */}
           <View style={[styles.popupFooter, { borderTopColor: colors.border, justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }]}>
             <TouchableOpacity
-              onPress={() => onUpdateFilters({ ...filters, paper: 'All', subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' })}
+              onPress={() => setLocalFilters({ ...DEFAULT_MAINS_FILTERS })}
               style={{ paddingVertical: 8, paddingHorizontal: 12 }}
             >
               <Text style={{ fontSize: 12, color: '#ef4444', fontWeight: '600' }}>Clear Selection</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity onPress={onClose} style={[styles.applyBtn, { backgroundColor: '#3b82f6', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 8 }]}>
+            <TouchableOpacity onPress={handleApply} style={[styles.applyBtn, { backgroundColor: '#3b82f6', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 8 }]}>
               <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>Apply</Text>
             </TouchableOpacity>
+
           </View>
         </Pressable>
       </Pressable>
@@ -3009,7 +3181,7 @@ function QuestionBankView({
         secSet.add(sGroup);
       }
     });
-    return Array.from(secSet).sort();
+    return Array.from(secSet).sort(naturalCompare);
   }, [questions, filters.paper, filters.subjects]);
 
   const microtopicOptions = useMemo(() => {
@@ -3026,7 +3198,7 @@ function QuestionBankView({
         mtSet.add(micro);
       }
     });
-    return Array.from(mtSet).sort();
+    return Array.from(mtSet).sort(naturalCompare);
   }, [questions, filters.paper, filters.subjects, filters.sections]);
 
   const subtopicOptions = useMemo(() => {
@@ -3045,7 +3217,7 @@ function QuestionBankView({
         subSet.add(sub);
       }
     });
-    return Array.from(subSet).sort();
+    return Array.from(subSet).sort(naturalCompare);
   }, [questions, filters.paper, filters.subjects, filters.sections, filters.microtopics]);
 
   const macrotagOptions = useMemo(() => {
@@ -3604,7 +3776,7 @@ function QuestionBankView({
                                 return (
                                   <View style={{ marginTop: 8 }}>
                                     <ApproachBox content={parsed.body} title={parsed.title} colors={colors} zoomFontSize={14} isDark={isDark} />
-                                    <Markdown style={getMarkdownStyles(colors)}>
+                                    <Markdown style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
                                       {cleanMarkdown(activeAnswer.answerText.replace(parsed.rawMatch, '').trim())}
                                     </Markdown>
                                   </View>
@@ -3612,7 +3784,7 @@ function QuestionBankView({
                               }
                               return (
                                 <View style={{ marginTop: 8 }}>
-                                  <Markdown style={getMarkdownStyles(colors)}>
+                                  <Markdown style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
                                     {cleanMarkdown(activeAnswer.answerText)}
                                   </Markdown>
                                 </View>
@@ -3702,9 +3874,46 @@ function ValueAdditionView({
   const { isDark } = useTheme();
   const [search, setSearch] = useState('');
   const [ethicsTab, setEthicsTab] = useState<'diagrams' | 'dimensions' | 'comparisons' | 'innovations' | 'pyq_quotes' | 'keywords'>('diagrams');
+  const [templateFilter, setTemplateFilter] = useState<'All' | 'Templates' | 'IntroConclusionOnly'>('All');
+  const [quotesEntryTypeTab, setQuotesEntryTypeTab] = useState<'All' | 'quote' | 'anecdote'>('All');
+
+  // Pinch-to-zoom state for Value Additions (ranges from 12 to 32, default 16, representing font size base)
+  const [zoomFontSize, setZoomFontSize] = useState<number>(16);
+  const baseFontSizeRef = React.useRef<number>(16);
+  const [showZoomIndicator, setShowZoomIndicator] = useState(false);
+  const zoomTimerRef = React.useRef<any>(null);
+
+  const onPinchGestureEvent = (event: any) => {
+    const scale = event.nativeEvent.scale;
+    let next = baseFontSizeRef.current * scale;
+    next = Math.max(12, Math.min(32, next));
+    setZoomFontSize(Math.round(next));
+    setShowZoomIndicator(true);
+    if (zoomTimerRef.current) clearTimeout(zoomTimerRef.current);
+    zoomTimerRef.current = setTimeout(() => setShowZoomIndicator(false), 1200);
+  };
+
+  const onPinchHandlerStateChange = (event: any) => {
+    if (event.nativeEvent.state === GHState.END || event.nativeEvent.state === GHState.CANCELLED) {
+      baseFontSizeRef.current = zoomFontSize;
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    }
+  };
+
+  const zoomScale = zoomFontSize / 16;
   
-  // Hierarchy Filters state (borrowed from Question Bank)
-  const [filters, setFilters] = useState<MainsFilters>(DEFAULT_MAINS_FILTERS);
+  // Per-category Hierarchy Filters state — each tab maintains its own independent filters
+  const [categoryFilters, setCategoryFilters] = useState<Record<string, MainsFilters>>({});
+  const _catKey: string = activeCategory ?? 'root';
+  const filters: MainsFilters = categoryFilters[_catKey] || DEFAULT_MAINS_FILTERS;
+  const setFilters = (updater: MainsFilters | ((prev: MainsFilters) => MainsFilters)) => {
+    setCategoryFilters(prev => {
+      const current = prev[_catKey] || DEFAULT_MAINS_FILTERS;
+      const next = typeof updater === 'function' ? (updater as (p: MainsFilters) => MainsFilters)(current) : updater;
+      return { ...prev, [_catKey]: next };
+    });
+  };
+
   const [hierarchyModalVisible, setHierarchyModalVisible] = useState(false);
   
   // Layout columns state (1 or 2 columns on Tablet)
@@ -3769,7 +3978,11 @@ function ValueAdditionView({
 
   const allPapers = useMemo(() => {
     const paperSet = new Set<string>();
-    activeCategoryItems.forEach(item => { if (item.paper) paperSet.add(item.paper); });
+    activeCategoryItems.forEach(item => {
+      getItemPaths(item).forEach(path => {
+        if (path.paper) paperSet.add(path.paper);
+      });
+    });
     return Array.from(paperSet).sort();
   }, [activeCategoryItems]);
 
@@ -3783,9 +3996,11 @@ function ValueAdditionView({
     const paperFilter = filters.paper !== 'All' ? filters.paper.split('|') : [];
     const subSet = new Set<string>();
     activeCategoryItems.forEach(item => {
-      if (paperFilter.length === 0 || paperFilter.includes(item.paper)) {
-        if (item.subject) subSet.add(item.subject);
-      }
+      getItemPaths(item).forEach(path => {
+        if (paperFilter.length === 0 || paperFilter.includes(path.paper)) {
+          if (path.subject) subSet.add(path.subject);
+        }
+      });
     });
     return Array.from(subSet).sort();
   }, [activeCategoryItems, filters.paper]);
@@ -3795,13 +4010,15 @@ function ValueAdditionView({
     const subjectFilter = filters.subjects !== 'All' ? filters.subjects.split('|') : [];
     const secSet = new Set<string>();
     activeCategoryItems.forEach(item => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(item.paper);
-      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(item.subject);
-      if (matchPaper && matchSubject && item.sectionGroup) {
-        secSet.add(item.sectionGroup);
-      }
+      getItemPaths(item).forEach(path => {
+        const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
+        const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
+        if (matchPaper && matchSubject && path.sectionGroup) {
+          secSet.add(path.sectionGroup);
+        }
+      });
     });
-    return Array.from(secSet).sort();
+    return Array.from(secSet).sort(naturalCompare);
   }, [activeCategoryItems, filters.paper, filters.subjects]);
 
   const microtopicOptions = useMemo(() => {
@@ -3810,41 +4027,45 @@ function ValueAdditionView({
     const sectionFilter = filters.sections !== 'All' ? filters.sections.split('|') : [];
     const mtSet = new Set<string>();
     activeCategoryItems.forEach(item => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(item.paper);
-      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(item.subject);
-      const matchSection = sectionFilter.length === 0 || sectionFilter.includes(item.sectionGroup);
-      if (matchPaper && matchSubject && matchSection) {
-        if (activeCategory === 'intro_conclusion') {
-          if (item.microtopic) mtSet.add(item.microtopic);
-        } else {
-          const themeName = item.category === 'data_facts' ? item.metric : item.title;
-          if (themeName) mtSet.add(themeName);
+      getItemPaths(item).forEach(path => {
+        const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
+        const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
+        const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
+        if (matchPaper && matchSubject && matchSection) {
+          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+            if (path.microtopic) mtSet.add(path.microtopic);
+          } else {
+            const themeName = item.category === 'data_facts' ? item.metric : item.title;
+            if (themeName) mtSet.add(themeName);
+          }
         }
-      }
+      });
     });
-    return Array.from(mtSet).sort();
+    return Array.from(mtSet).sort(naturalCompare);
   }, [activeCategoryItems, filters.paper, filters.subjects, filters.sections, activeCategory]);
 
   const subtopicOptions = useMemo(() => {
-    const selectedTheme = filters.microtopics !== 'All' ? filters.microtopics : null;
-    if (!selectedTheme) return [];
+    const selectedMicrotopic = filters.microtopics !== 'All' ? filters.microtopics : null;
+    if (!selectedMicrotopic) return [];
     const stSet = new Set<string>();
     activeCategoryItems.forEach(item => {
-      if (activeCategory === 'intro_conclusion') {
-        if (item.microtopic === selectedTheme) {
-          if (item.subtopic) stSet.add(item.subtopic);
+      getItemPaths(item).forEach(path => {
+        if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+          if (path.microtopic && selectedMicrotopic.split('|').includes(path.microtopic)) {
+            if (path.subtopic) stSet.add(path.subtopic);
+          }
+        } else {
+          const themeName = item.category === 'data_facts' ? item.metric : item.title;
+          if (themeName === selectedMicrotopic) {
+            const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
+            subThemes.forEach((st: any) => {
+              if (st.title) stSet.add(st.title);
+            });
+          }
         }
-      } else {
-        const themeName = item.category === 'data_facts' ? item.metric : item.title;
-        if (themeName === selectedTheme) {
-          const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
-          subThemes.forEach((st: any) => {
-            if (st.title) stSet.add(st.title);
-          });
-        }
-      }
+      });
     });
-    return Array.from(stSet).sort();
+    return Array.from(stSet).sort(naturalCompare);
   }, [activeCategoryItems, filters.microtopics, activeCategory]);
 
   const macrotagOptions = useMemo(() => {
@@ -3852,24 +4073,31 @@ function ValueAdditionView({
     if (!selectedSubTheme) return [];
     const sstSet = new Set<string>();
     activeCategoryItems.forEach(item => {
-      if (activeCategory === 'intro_conclusion') {
-        if (item.subtopic === selectedSubTheme) {
-          if (item.title) sstSet.add(item.title);
-        }
-      } else {
-        const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
-        subThemes.forEach((st: any) => {
-          if (st.title === selectedSubTheme) {
-            const sstMatches = splitSubSubThemes(st.content);
-            sstMatches.forEach(sst => sstSet.add(sst));
+      getItemPaths(item).forEach(path => {
+        if (activeCategory === 'intro_conclusion') {
+          if (path.subtopic && selectedSubTheme.split('|').includes(path.subtopic)) {
+            if (item.title) sstSet.add(item.title);
           }
-        });
-      }
+        } else if (activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+          if (path.subtopic && selectedSubTheme.split('|').includes(path.subtopic)) {
+            if (item.title) sstSet.add(item.title);
+          }
+        } else {
+          const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
+          subThemes.forEach((st: any) => {
+            if (st.title === selectedSubTheme) {
+              const sstMatches = splitSubSubThemes(st.content);
+              sstMatches.forEach(sst => sstSet.add(sst));
+            }
+          });
+        }
+      });
     });
     return Array.from(sstSet).sort();
   }, [activeCategoryItems, filters.subtopics, activeCategory]);
 
   const microtagOptions: string[] = [];
+
 
   const filteredItems = useMemo(() => {
     const paperFilter = filters.paper !== 'All' ? filters.paper.split('|') : [];
@@ -3881,72 +4109,86 @@ function ValueAdditionView({
 
     return uniqueValueAddItems.filter(item => {
       const matchCat = !activeCategory || item.category === activeCategory;
-      
       const matchSearch = !search || item.searchableText.includes(search.toLowerCase());
 
-      const matchPaper = paperFilter.length === 0 || (item.paper && paperFilter.includes(item.paper));
-      const matchSubject = subjectFilter.length === 0 || (item.subject && subjectFilter.includes(item.subject));
-      const matchSection = sectionFilter.length === 0 || (item.sectionGroup && sectionFilter.includes(item.sectionGroup));
-      
-      let matchTheme = true;
-      if (themeFilter.length > 0) {
-        if (activeCategory === 'intro_conclusion') {
-          matchTheme = !!item.microtopic && themeFilter.includes(item.microtopic);
-        } else {
-          const themeName = item.category === 'data_facts' ? item.metric : item.title;
-          matchTheme = !!themeName && themeFilter.includes(themeName);
+      const paths = getItemPaths(item);
+      const matchesAnyPath = paths.some(path => {
+        const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
+        const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
+        const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
+        
+        let matchTheme = true;
+        if (themeFilter.length > 0) {
+          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+            matchTheme = !!path.microtopic && themeFilter.includes(path.microtopic);
+          } else {
+            const themeName = item.category === 'data_facts' ? item.metric : item.title;
+            matchTheme = !!themeName && themeFilter.includes(themeName);
+          }
+        }
+
+        let matchSubTheme = true;
+        if (subThemeFilter.length > 0) {
+          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+            matchSubTheme = !!path.subtopic && subThemeFilter.includes(path.subtopic);
+          } else {
+            matchSubTheme = !!item.parsedSubThemes && item.parsedSubThemes.some((st: any) => 
+              subThemeFilter.includes(st.title)
+            );
+          }
+        }
+
+        let matchSubSubTheme = true;
+        if (subSubThemeFilter.length > 0) {
+          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+            matchSubSubTheme = !!item.title && subSubThemeFilter.includes(item.title);
+          } else {
+            matchSubSubTheme = !!item.parsedSubSubThemes && item.parsedSubSubThemes.some((sst: any) => 
+              subSubThemeFilter.includes(sst)
+            );
+          }
+        }
+
+        return matchPaper && matchSubject && matchSection && matchTheme && matchSubTheme && matchSubSubTheme;
+      });
+
+      let matchTemplate = true;
+      if (activeCategory === 'intro_conclusion') {
+        const titleLower = (item.title || '').toLowerCase();
+        if (templateFilter === 'Templates') {
+          matchTemplate = titleLower.includes('template');
+        } else if (templateFilter === 'IntroConclusionOnly') {
+          matchTemplate = !titleLower.includes('template');
         }
       }
 
-      let matchSubTheme = true;
-      if (subThemeFilter.length > 0) {
-        if (activeCategory === 'intro_conclusion') {
-          matchSubTheme = !!item.subtopic && subThemeFilter.includes(item.subtopic);
-        } else {
-          matchSubTheme = !!item.parsedSubThemes && item.parsedSubThemes.some((st: any) => 
-            subThemeFilter.includes(st.title)
-          );
-        }
-      }
-
-      let matchSubSubTheme = true;
-      if (subSubThemeFilter.length > 0) {
-        if (activeCategory === 'intro_conclusion') {
-          matchSubSubTheme = !!item.title && subSubThemeFilter.includes(item.title);
-        } else {
-          matchSubSubTheme = !!item.parsedSubSubThemes && item.parsedSubSubThemes.some((sst: any) => 
-            subSubThemeFilter.includes(sst)
-          );
-        }
-      }
-
-      return matchCat && matchSearch && matchPaper && matchSubject && matchSection && matchTheme && matchSubTheme && matchSubSubTheme;
+      return matchCat && matchSearch && matchesAnyPath && matchTemplate;
     });
-  }, [activeCategory, search, uniqueValueAddItems, filters]);
+  }, [activeCategory, search, uniqueValueAddItems, filters, templateFilter]);
+
 
   const ethicsMappedItems = useMemo(() => {
     const list = filteredItems.filter(item => {
-      if (activeCategory !== 'ethics') return true;
-      const mappedTab = 
-        ethicsTab === 'diagrams' ? 'diagram' :
-        ethicsTab === 'dimensions' ? 'dimension' :
-        ethicsTab === 'comparisons' ? 'comparison' :
-        ethicsTab === 'innovations' ? 'innovation' :
-        ethicsTab === 'pyq_quotes' ? 'pyq_quote' :
-        ethicsTab === 'keywords' ? 'keyword' : ethicsTab;
-      return item.ethicsType === mappedTab;
+      if (activeCategory === 'ethics') {
+        const mappedTab = 
+          ethicsTab === 'diagrams' ? 'diagram' :
+          ethicsTab === 'dimensions' ? 'dimension' :
+          ethicsTab === 'comparisons' ? 'comparison' :
+          ethicsTab === 'innovations' ? 'innovation' :
+          ethicsTab === 'pyq_quotes' ? 'pyq_quote' :
+          ethicsTab === 'keywords' ? 'keyword' : ethicsTab;
+        return item.ethicsType === mappedTab;
+      }
+      if (activeCategory === 'quotes') {
+        if (quotesEntryTypeTab !== 'All') {
+          return item.entry_type === quotesEntryTypeTab;
+        }
+      }
+      return true;
     });
 
-    return list.map(item => {
-      if (item.context) {
-        return {
-          ...item,
-          cleanedContext: getFilteredContext(item, search, filters.subtopics, filters.macrotags)
-        };
-      }
-      return item;
-    });
-  }, [filteredItems, activeCategory, ethicsTab, search, filters.subtopics, filters.macrotags]);
+    return list;
+  }, [filteredItems, activeCategory, ethicsTab, quotesEntryTypeTab]);
 
   // Split data into two columns for masonry
   const leftCol: any[] = [];
@@ -3961,8 +4203,24 @@ function ValueAdditionView({
 
   return (
     <View style={styles.subContainer}>
+      {showZoomIndicator && (
+        <View style={{
+          position: 'absolute',
+          top: insets.top + 12,
+          alignSelf: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          paddingHorizontal: 12,
+          paddingVertical: 6,
+          borderRadius: 20,
+          zIndex: 1000,
+        }}>
+          <Text style={{ color: '#fff', fontSize: 11, fontWeight: '800' }}>ZOOM: {Math.round((zoomFontSize / 16) * 100)}%</Text>
+        </View>
+      )}
+
       {activeCategory ? (
-        <FlatList
+        <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
+          <FlatList
           key={layoutColumns}
           numColumns={1}
           data={layoutColumns === 2 ? [1] : visibleItems}
@@ -4092,38 +4350,133 @@ function ValueAdditionView({
 
                       <View style={{ width: 1, height: 16, backgroundColor: colors.border }} />
 
-                      {/* Paper pills */}
-                      {['All', ...allPapers].map(p => {
-                        const isActive = p === 'All' 
-                          ? filters.paper === 'All' 
-                          : filters.paper.split('|').includes(p);
+                      {/* Progressive selector replacing simple paper pills */}
+                      {(() => {
+                        let options: string[] = [];
+                        let selectFn: (val: string) => void = () => {};
+                        let backFn: (() => void) | null = null;
+                        let layerLabel = 'Paper';
+
+                        const isQuotes = activeCategory === 'quotes';
+
+                        if (isQuotes) {
+                          if (filters.subjects === 'All') {
+                            options = subjectOptions;
+                            layerLabel = 'Subject';
+                            selectFn = (val) => setFilters(prev => ({ ...prev, subjects: val }));
+                          } else if (filters.sections === 'All') {
+                            options = sectionOptions;
+                            layerLabel = 'Section Group';
+                            selectFn = (val) => setFilters(prev => ({ ...prev, sections: val }));
+                            backFn = () => setFilters(prev => ({ ...prev, subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All' }));
+                          } else if (filters.microtopics === 'All') {
+                            options = microtopicOptions;
+                            layerLabel = 'Microtopic';
+                            selectFn = (val) => setFilters(prev => ({ ...prev, microtopics: val }));
+                            backFn = () => setFilters(prev => ({ ...prev, sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All' }));
+                          } else if (filters.subtopics === 'All') {
+                            options = subtopicOptions;
+                            layerLabel = 'Category';
+                            selectFn = (val) => setFilters(prev => ({ ...prev, subtopics: val }));
+                            backFn = () => setFilters(prev => ({ ...prev, microtopics: 'All', subtopics: 'All', macrotags: 'All' }));
+                          } else if (filters.macrotags === 'All') {
+                            options = macrotagOptions;
+                            layerLabel = 'Title';
+                            selectFn = (val) => setFilters(prev => ({ ...prev, macrotags: val }));
+                            backFn = () => setFilters(prev => ({ ...prev, subtopics: 'All', macrotags: 'All' }));
+                          } else {
+                            return null;
+                          }
+                        } else {
+                          if (filters.paper === 'All') {
+                            options = allPapers;
+                            layerLabel = 'Paper';
+                            selectFn = (p) => setFilters(prev => ({ ...prev, paper: p }));
+                          } else if (filters.subjects === 'All') {
+                            options = subjectOptions;
+                            layerLabel = 'Subject';
+                            selectFn = (sub) => setFilters(prev => ({ ...prev, subjects: sub }));
+                            backFn = () => setFilters(prev => ({ ...prev, paper: 'All', subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All' }));
+                          } else if (filters.sections === 'All') {
+                            options = sectionOptions;
+                            layerLabel = 'Section Group';
+                            selectFn = (sec) => setFilters(prev => ({ ...prev, sections: sec }));
+                            backFn = () => setFilters(prev => ({ ...prev, subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All' }));
+                          } else if (filters.microtopics === 'All') {
+                            options = microtopicOptions;
+                            layerLabel = activeCategory === 'data_facts' ? 'Theme' : 'Microtopic';
+                            selectFn = (mt) => setFilters(prev => ({ ...prev, microtopics: mt }));
+                            backFn = () => setFilters(prev => ({ ...prev, sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All' }));
+                          } else if (filters.subtopics === 'All') {
+                            options = subtopicOptions;
+                            layerLabel = activeCategory === 'data_facts' ? 'Sub-theme' : 'Subtopic';
+                            selectFn = (st) => setFilters(prev => ({ ...prev, subtopics: st }));
+                            backFn = () => setFilters(prev => ({ ...prev, microtopics: 'All', subtopics: 'All', macrotags: 'All' }));
+                          } else if (filters.macrotags === 'All') {
+                            options = macrotagOptions;
+                            layerLabel = activeCategory === 'mnemonics' ? 'Mnemonic Title' : (activeCategory === 'intro_conclusion' ? 'Card Title' : 'Title');
+                            selectFn = (mat) => setFilters(prev => ({ ...prev, macrotags: mat }));
+                            backFn = () => setFilters(prev => ({ ...prev, subtopics: 'All', macrotags: 'All' }));
+                          } else {
+                            return null;
+                          }
+                        }
+
                         return (
-                          <Pressable
-                            key={p}
-                            onPress={() => {
-                              if (p === 'All') {
-                                setFilters(prev => ({ ...prev, paper: 'All', subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' }));
-                              } else {
-                                setFilters(prev => ({ 
-                                  ...prev, 
-                                  paper: toggleFilterValue(prev.paper, p)
-                                }));
-                              }
-                            }}
-                            style={({ pressed }) => [
-                              styles.tabFilterPill,
-                              isActive
-                                ? { backgroundColor: '#6366f1', borderColor: '#6366f1' }
-                                : { backgroundColor: colors.surface + 'b3', borderColor: colors.border },
-                              { opacity: pressed ? 0.6 : 1 }
-                            ]}
-                          >
-                            <Text style={[styles.tabFilterPillText, isActive ? { color: '#ffffff' } : { color: colors.textSecondary }]}>
-                              {p}
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                            {backFn && (
+                              <Pressable
+                                onPress={backFn}
+                                style={({ pressed }) => [
+                                  styles.tabFilterPill,
+                                  { backgroundColor: colors.surfaceStrong, borderColor: colors.border },
+                                  { opacity: pressed ? 0.6 : 1, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8 }
+                                ]}
+                              >
+                                <ChevronLeft size={12} color={colors.textSecondary} style={{ marginRight: 2 }} />
+                                <Text style={[styles.tabFilterPillText, { color: colors.textSecondary, fontWeight: '700' }]}>
+                                  Back
+                                </Text>
+                              </Pressable>
+                            )}
+
+                            <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary, textTransform: 'uppercase', marginRight: 4 }}>
+                              {layerLabel}:
                             </Text>
-                          </Pressable>
+
+                            {options.slice(0, 15).map(p => (
+                              <Pressable
+                                key={p}
+                                onPress={() => selectFn(p)}
+                                style={({ pressed }) => [
+                                  styles.tabFilterPill,
+                                  { backgroundColor: colors.surface + 'b3', borderColor: colors.border },
+                                  { opacity: pressed ? 0.6 : 1 }
+                                ]}
+                              >
+                                <Text style={[styles.tabFilterPillText, { color: colors.textSecondary }]}>
+                                  {p}
+                                </Text>
+                              </Pressable>
+                            ))}
+                            {options.length > 15 && (
+                              <Pressable
+                                onPress={() => setHierarchyModalVisible(true)}
+                                style={({ pressed }) => [
+                                  styles.tabFilterPill,
+                                  { backgroundColor: colors.surfaceStrong, borderColor: '#3b82f6', borderWidth: 0.5 },
+                                  { opacity: pressed ? 0.6 : 1 }
+                                ]}
+                              >
+                                <Text style={[styles.tabFilterPillText, { color: '#3b82f6', fontWeight: '700' }]}>
+                                  + {options.length - 15} More
+                                </Text>
+                              </Pressable>
+                            )}
+                          </View>
                         );
-                      })}
+                      })()}
+
 
                       {hasHierarchyActive && (
                         <>
@@ -4144,121 +4497,186 @@ function ValueAdditionView({
                     </ScrollView>
 
                     {/* Active Breadcrumb Badges */}
+                    {/* Active Breadcrumb Badges */}
                     {hasHierarchyActive && (
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingTop: 4, paddingBottom: 2 }}>
                         {filters.paper !== 'All' && filters.paper.split('|').map(val => (
-                          <View key={`crumb-paper-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#dbeafe', borderColor: '#bfdbfe' }]}>
+                          <Pressable 
+                            key={`crumb-paper-${val}`} 
+                            onPress={() => {
+                              const updated = filters.paper.split('|').filter(x => x !== val).join('|') || 'All';
+                              setFilters(prev => ({ 
+                                ...prev, 
+                                paper: updated, 
+                                subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                              }));
+                            }}
+                            style={({ pressed }) => [
+                              styles.breadcrumbChip, 
+                              { backgroundColor: '#dbeafe', borderColor: '#bfdbfe', opacity: pressed ? 0.6 : 1 }
+                            ]}
+                          >
                             <Text style={{ fontSize: 10, fontWeight: '700', color: '#1e40af' }}>{val}</Text>
-                            <Pressable 
-                              onPress={() => {
-                                const updated = filters.paper.split('|').filter(x => x !== val).join('|') || 'All';
-                                setFilters(prev => ({ 
-                                  ...prev, 
-                                  paper: updated, 
-                                  subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                                }));
-                              }}
-                              style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                            >
-                              <X size={10} color="#1e40af" style={{ marginLeft: 4 }} />
-                            </Pressable>
-                          </View>
+                            <X size={10} color="#1e40af" style={{ marginLeft: 4 }} />
+                          </Pressable>
                         ))}
                         {filters.subjects !== 'All' && filters.subjects.split('|').map(val => (
-                          <View key={`crumb-subject-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#f3e8ff', borderColor: '#e9d5ff' }]}>
+                          <Pressable 
+                            key={`crumb-subject-${val}`} 
+                            onPress={() => {
+                              const updated = filters.subjects.split('|').filter(x => x !== val).join('|') || 'All';
+                              setFilters(prev => ({ 
+                                ...prev, 
+                                subjects: updated, 
+                                sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                              }));
+                            }}
+                            style={({ pressed }) => [
+                              styles.breadcrumbChip, 
+                              { backgroundColor: '#f3e8ff', borderColor: '#e9d5ff', opacity: pressed ? 0.6 : 1 }
+                            ]}
+                          >
                             <Text style={{ fontSize: 10, fontWeight: '700', color: '#6b21a8' }}>{val}</Text>
-                            <Pressable 
-                              onPress={() => {
-                                const updated = filters.subjects.split('|').filter(x => x !== val).join('|') || 'All';
-                                setFilters(prev => ({ 
-                                  ...prev, 
-                                  subjects: updated, 
-                                  sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                                }));
-                              }}
-                              style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                            >
-                              <X size={10} color="#6b21a8" style={{ marginLeft: 4 }} />
-                            </Pressable>
-                          </View>
+                            <X size={10} color="#6b21a8" style={{ marginLeft: 4 }} />
+                          </Pressable>
                         ))}
                         {filters.sections !== 'All' && filters.sections.split('|').map(val => (
-                          <View key={`crumb-section-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#e0f2fe', borderColor: '#bae6fd' }]}>
+                          <Pressable 
+                            key={`crumb-section-${val}`} 
+                            onPress={() => {
+                              const updated = filters.sections.split('|').filter(x => x !== val).join('|') || 'All';
+                              setFilters(prev => ({ 
+                                ...prev, 
+                                sections: updated, 
+                                microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                              }));
+                            }}
+                            style={({ pressed }) => [
+                              styles.breadcrumbChip, 
+                              { backgroundColor: '#e0f2fe', borderColor: '#bae6fd', opacity: pressed ? 0.6 : 1 }
+                            ]}
+                          >
                             <Text style={{ fontSize: 10, fontWeight: '700', color: '#0369a1' }}>{val}</Text>
-                            <Pressable 
-                              onPress={() => {
-                                const updated = filters.sections.split('|').filter(x => x !== val).join('|') || 'All';
-                                setFilters(prev => ({ 
-                                  ...prev, 
-                                  sections: updated, 
-                                  microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                                }));
-                              }}
-                              style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                            >
-                              <X size={10} color="#0369a1" style={{ marginLeft: 4 }} />
-                            </Pressable>
-                          </View>
+                            <X size={10} color="#0369a1" style={{ marginLeft: 4 }} />
+                          </Pressable>
                         ))}
                         {filters.microtopics !== 'All' && filters.microtopics.split('|').map(val => (
-                          <View key={`crumb-micro-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#f0fdf4', borderColor: '#bbf7d0' }]}>
+                          <Pressable 
+                            key={`crumb-micro-${val}`} 
+                            onPress={() => {
+                              const updated = filters.microtopics.split('|').filter(x => x !== val).join('|') || 'All';
+                              setFilters(prev => ({ 
+                                ...prev, 
+                                microtopics: updated, 
+                                subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                              }));
+                            }}
+                            style={({ pressed }) => [
+                              styles.breadcrumbChip, 
+                              { backgroundColor: '#f0fdf4', borderColor: '#bbf7d0', opacity: pressed ? 0.6 : 1 }
+                            ]}
+                          >
                             <Text style={{ fontSize: 10, fontWeight: '700', color: '#166534' }}>{val}</Text>
-                            <Pressable 
-                              onPress={() => {
-                                const updated = filters.microtopics.split('|').filter(x => x !== val).join('|') || 'All';
-                                setFilters(prev => ({ 
-                                  ...prev, 
-                                  microtopics: updated, 
-                                  subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                                }));
-                              }}
-                              style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                            >
-                              <X size={10} color="#166534" style={{ marginLeft: 4 }} />
-                            </Pressable>
-                          </View>
+                            <X size={10} color="#166534" style={{ marginLeft: 4 }} />
+                          </Pressable>
                         ))}
                         {filters.subtopics !== 'All' && filters.subtopics.split('|').map(val => (
-                          <View key={`crumb-sub-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#ffe4e6', borderColor: '#fecdd3' }]}>
+                          <Pressable 
+                            key={`crumb-sub-${val}`} 
+                            onPress={() => {
+                              const updated = filters.subtopics.split('|').filter(x => x !== val).join('|') || 'All';
+                              setFilters(prev => ({ 
+                                ...prev, 
+                                subtopics: updated, 
+                                macrotags: 'All', microtags: 'All' 
+                              }));
+                            }}
+                            style={({ pressed }) => [
+                              styles.breadcrumbChip, 
+                              { backgroundColor: '#ffe4e6', borderColor: '#fecdd3', opacity: pressed ? 0.6 : 1 }
+                            ]}
+                          >
                             <Text style={{ fontSize: 10, fontWeight: '700', color: '#be123c' }}>{val}</Text>
-                            <Pressable 
-                              onPress={() => {
-                                const updated = filters.subtopics.split('|').filter(x => x !== val).join('|') || 'All';
-                                setFilters(prev => ({ 
-                                  ...prev, 
-                                  subtopics: updated, 
-                                  macrotags: 'All', microtags: 'All' 
-                                }));
-                              }}
-                              style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                            >
-                              <X size={10} color="#be123c" style={{ marginLeft: 4 }} />
-                            </Pressable>
-                          </View>
+                            <X size={10} color="#be123c" style={{ marginLeft: 4 }} />
+                          </Pressable>
                         ))}
                         {filters.macrotags !== 'All' && filters.macrotags.split('|').map(val => (
-                          <View key={`crumb-macro-${val}`} style={[styles.breadcrumbChip, { backgroundColor: activeCategory === 'intro_conclusion' ? '#d1fae5' : '#f3e8ff', borderColor: activeCategory === 'intro_conclusion' ? '#bbf7d0' : '#e9d5ff' }]}>
+                          <Pressable 
+                            key={`crumb-macro-${val}`} 
+                            onPress={() => {
+                              const updated = filters.macrotags.split('|').filter(x => x !== val).join('|') || 'All';
+                              setFilters(prev => ({ 
+                                ...prev, 
+                                macrotags: updated, 
+                                microtags: 'All' 
+                              }));
+                            }}
+                            style={({ pressed }) => [
+                              styles.breadcrumbChip, 
+                              { backgroundColor: activeCategory === 'intro_conclusion' ? '#d1fae5' : '#f3e8ff', borderColor: activeCategory === 'intro_conclusion' ? '#bbf7d0' : '#e9d5ff', opacity: pressed ? 0.6 : 1 }
+                            ]}
+                          >
                             <Text style={{ fontSize: 10, fontWeight: '700', color: activeCategory === 'intro_conclusion' ? '#166534' : '#6b21a8' }}>{val}</Text>
-                            <Pressable 
-                              onPress={() => {
-                                const updated = filters.macrotags.split('|').filter(x => x !== val).join('|') || 'All';
-                                setFilters(prev => ({ 
-                                  ...prev, 
-                                  macrotags: updated, 
-                                  microtags: 'All' 
-                                }));
-                              }}
-                              style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                            >
-                              <X size={10} color="#6b21a8" style={{ marginLeft: 4 }} />
-                            </Pressable>
-                          </View>
+                            <X size={10} color={activeCategory === 'intro_conclusion' ? '#166534' : '#6b21a8'} style={{ marginLeft: 4 }} />
+                          </Pressable>
                         ))}
                       </View>
                     )}
                   </View>
                 );
               })()}
+
+              {/* Template filter bar for Intro/Conclusion tab — 3 chips */}
+              {activeCategory === 'intro_conclusion' && (
+                <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8, paddingVertical: 4 }}>
+                  {[
+                    { id: 'All' as const, label: 'All Entries' },
+                    { id: 'Templates' as const, label: 'Templates' },
+                    { id: 'IntroConclusionOnly' as const, label: 'Intro-Conclusion' },
+                  ].map(tab => (
+                    <TouchableOpacity
+                      key={tab.id}
+                      onPress={() => setTemplateFilter(tab.id)}
+                      style={[
+                        styles.tabFilterPill,
+                        templateFilter === tab.id
+                          ? { backgroundColor: '#10b981', borderColor: '#10b981' }
+                          : { backgroundColor: colors.surface + 'b3', borderColor: colors.border },
+                      ]}
+                    >
+                      <Text style={[styles.tabFilterPillText, templateFilter === tab.id ? { color: '#ffffff' } : { color: colors.textSecondary }]}>
+                        {tab.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+
+              {/* Entry-type filter bar for Quotes & Anecdotes tab */}
+              {activeCategory === 'quotes' && (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 8 }} contentContainerStyle={{ alignItems: 'center', gap: 6, paddingVertical: 4 }}>
+                  {[
+                    { id: 'All', label: 'All Entries' },
+                    { id: 'quote', label: 'Quotes Only' },
+                    { id: 'anecdote', label: 'Anecdotes Only' },
+                  ].map(tab => (
+                    <TouchableOpacity
+                      key={tab.id}
+                      onPress={() => setQuotesEntryTypeTab(tab.id as any)}
+                      style={[
+                        styles.tabFilterPill,
+                        quotesEntryTypeTab === tab.id
+                          ? { backgroundColor: '#8b5cf6', borderColor: '#8b5cf6' }
+                          : { backgroundColor: colors.surface + 'b3', borderColor: colors.border },
+                      ]}
+                    >
+                      <Text style={[styles.tabFilterPillText, quotesEntryTypeTab === tab.id ? { color: '#ffffff' } : { color: colors.textSecondary }]}>
+                        {tab.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              )}
 
               {/* Special sub-navigation for Ethics */}
               {activeCategory === 'ethics' && (
@@ -4312,6 +4730,8 @@ function ValueAdditionView({
                         ethicsTab={ethicsTab}
                         forceExpandCollapse={forceExpandCollapse}
                         onAddFlashcardClick={onAddFlashcardClick}
+                        templateFilter={templateFilter}
+                        zoomScale={zoomScale}
                       />
                     ))}
                   </View>
@@ -4328,6 +4748,8 @@ function ValueAdditionView({
                         ethicsTab={ethicsTab}
                         forceExpandCollapse={forceExpandCollapse}
                         onAddFlashcardClick={onAddFlashcardClick}
+                        templateFilter={templateFilter}
+                        zoomScale={zoomScale}
                       />
                     ))}
                   </View>
@@ -4346,12 +4768,15 @@ function ValueAdditionView({
                 ethicsTab={ethicsTab}
                 forceExpandCollapse={forceExpandCollapse}
                 onAddFlashcardClick={onAddFlashcardClick}
+                templateFilter={templateFilter}
+                zoomScale={zoomScale}
               />
             );
           }}
           onEndReached={() => setVisibleLimit(prev => prev + 20)}
           onEndReachedThreshold={0.5}
         />
+        </PinchGestureHandler>
       ) : (
         <ScrollView contentContainerStyle={styles.listScroll} showsVerticalScrollIndicator={false}>
           {/* Spacer for floating back button */}
@@ -4431,13 +4856,22 @@ function ValueAdditionView({
         microtagOptions={microtagOptions}
         isTablet={isTablet}
         columnLabels={
-          activeCategory === 'intro_conclusion'
-            ? { microtopic: 'Microtopic', subtopic: 'Subtopic' }
+          activeCategory === 'quotes'
+            ? { paper: 'Paper', subject: 'Subject', section: 'Section Group', microtopic: 'Microtopic', subtopic: 'Category' }
+            : activeCategory === 'mnemonics'
+            ? { paper: 'Paper', subject: 'Subject', section: 'Section Group', microtopic: 'Microtopic', subtopic: 'Subtopic' }
+            : activeCategory === 'intro_conclusion'
+            ? { paper: 'Paper', subject: 'Subject', section: 'Section Group', microtopic: 'Microtopic', subtopic: 'Subtopic' }
             : { microtopic: 'Theme', subtopic: 'Sub-theme' }
         }
         isMainsValueAdd={true}
         isIntroConclusion={activeCategory === 'intro_conclusion'}
+        isQuotes={activeCategory === 'quotes'}
+        isMnemonics={activeCategory === 'mnemonics'}
+        activeCategory={activeCategory || undefined}
+        activeCategoryItems={activeCategoryItems || []}
       />
+
     </View>
   );
 }
@@ -4749,7 +5183,7 @@ function MainsAISearchView({
         secSet.add(vaSec);
       }
     });
-    return Array.from(secSet).sort();
+    return Array.from(secSet).sort(naturalCompare);
   }, [questions, valueAddItems, pendingFilters.paper, pendingFilters.subjects]);
 
   const microtopicOptions = useMemo(() => {
@@ -4775,7 +5209,7 @@ function MainsAISearchView({
         mtSet.add(micro);
       }
     });
-    return Array.from(mtSet).sort();
+    return Array.from(mtSet).sort(naturalCompare);
   }, [questions, valueAddItems, pendingFilters.paper, pendingFilters.subjects, pendingFilters.sections]);
 
   const subtopicOptions = useMemo(() => {
@@ -4804,7 +5238,7 @@ function MainsAISearchView({
         subSet.add(sub);
       }
     });
-    return Array.from(subSet).sort();
+    return Array.from(subSet).sort(naturalCompare);
   }, [questions, valueAddItems, pendingFilters.paper, pendingFilters.subjects, pendingFilters.sections, pendingFilters.microtopics]);
 
   const macrotagOptions = useMemo(() => {
@@ -5087,11 +5521,37 @@ function MainsAISearchView({
       if (showValueAdd && searchValAdd) {
         valueAddItems.forEach(item => {
           // Hard Filters
-          if (activeFilters.paper !== 'All' && !activeFilters.paper.split('|').includes(item.paper || '')) return;
-          if (activeFilters.subjects !== 'All' && !activeFilters.subjects.split('|').includes(item.subject || '')) return;
-          if (activeFilters.sections !== 'All' && !activeFilters.sections.split('|').includes(getValueAddSection(item))) return;
-          if (activeFilters.microtopics !== 'All' && !activeFilters.microtopics.split('|').includes(getValueAddMicro(item))) return;
-          if (activeFilters.subtopics !== 'All' && !activeFilters.subtopics.split('|').includes(getValueAddSub(item))) return;
+          if (item.category === 'frameworks') {
+            const fwHierarchies = item.hierarchies || [];
+            const parsedHiers = [...fwHierarchies];
+            for (let idx = 1; idx <= 5; idx++) {
+              const path = item[`hierarchy_${idx}_path`];
+              if (path && Array.isArray(path) && path.length > 0) {
+                parsedHiers.push({
+                  paper: path[0] || '',
+                  subject: path[1] || '',
+                  sectionGroup: path[2] || '',
+                  microtopic: path[3] || '',
+                  subtopic: path[4] || ''
+                });
+              }
+            }
+            if (parsedHiers.length > 0) {
+              if (activeFilters.paper !== 'All' && !parsedHiers.some((h: any) => h.paper && activeFilters.paper.split('|').includes(h.paper))) return;
+              if (activeFilters.subjects !== 'All' && !parsedHiers.some((h: any) => h.subject && activeFilters.subjects.split('|').includes(h.subject))) return;
+              if (activeFilters.sections !== 'All' && !parsedHiers.some((h: any) => (h.sectionGroup || h.section_group) && activeFilters.sections.split('|').includes(h.sectionGroup || h.section_group))) return;
+              if (activeFilters.microtopics !== 'All' && !parsedHiers.some((h: any) => h.microtopic && activeFilters.microtopics.split('|').includes(h.microtopic))) return;
+              if (activeFilters.subtopics !== 'All' && !parsedHiers.some((h: any) => h.subtopic && activeFilters.subtopics.split('|').includes(h.subtopic))) return;
+            } else {
+              if (activeFilters.paper !== 'All' || activeFilters.subjects !== 'All' || activeFilters.sections !== 'All' || activeFilters.microtopics !== 'All' || activeFilters.subtopics !== 'All') return;
+            }
+          } else {
+            if (activeFilters.paper !== 'All' && !activeFilters.paper.split('|').includes(item.paper || '')) return;
+            if (activeFilters.subjects !== 'All' && !activeFilters.subjects.split('|').includes(item.subject || '')) return;
+            if (activeFilters.sections !== 'All' && !activeFilters.sections.split('|').includes(getValueAddSection(item))) return;
+            if (activeFilters.microtopics !== 'All' && !activeFilters.microtopics.split('|').includes(getValueAddMicro(item))) return;
+            if (activeFilters.subtopics !== 'All' && !activeFilters.subtopics.split('|').includes(getValueAddSub(item))) return;
+          }
           if (activeFilters.revisionTags !== 'All') return;
           if (activeFilters.macrotags !== 'All') return;
           if (activeFilters.microtags !== 'All') return; // value additions have no custom tags in public states
@@ -5290,6 +5750,8 @@ function MainsAISearchView({
       </View>
     );
   };
+
+  const isOptionalSearch = pendingFilters.paper !== 'All' && !pendingFilters.paper.split('|').some(p => ['GS1', 'GS2', 'GS3', 'GS4', 'Essay'].includes(p));
 
   const FilterPopup = (
     <Modal
@@ -5544,7 +6006,7 @@ function MainsAISearchView({
             {/* Section Selector */}
             {pendingFilters.paper !== 'All' && pendingFilters.subjects !== 'All' && sectionOptions.length > 0 && (
               <View style={styles.filterGroup}>
-                <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>SECTION / CHAPTER</Text>
+                <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>{isOptionalSearch ? 'OPTIONAL PAPER' : 'SECTION / CHAPTER'}</Text>
                 <View style={styles.chipsWrap}>
                   <TouchableOpacity
                     onPress={() => setPendingFilters(p => ({ ...p, sections: 'All', microtopics: 'All' }))}
@@ -5580,7 +6042,7 @@ function MainsAISearchView({
             {/* Microtopic Selector */}
             {pendingFilters.paper !== 'All' && pendingFilters.subjects !== 'All' && pendingFilters.sections !== 'All' && microtopicOptions.length > 0 && (
               <View style={styles.filterGroup}>
-                <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>MICROTOPIC</Text>
+                <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>{isOptionalSearch ? 'UNIT' : 'MICROTOPIC'}</Text>
                 <View style={styles.chipsWrap}>
                   <TouchableOpacity
                     onPress={() => setPendingFilters(p => ({ ...p, microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' }))}
@@ -5617,7 +6079,7 @@ function MainsAISearchView({
             {/* Sub-topic Selector */}
             {pendingFilters.paper !== 'All' && pendingFilters.subjects !== 'All' && pendingFilters.sections !== 'All' && pendingFilters.microtopics !== 'All' && subtopicOptions.length > 0 && (
               <View style={styles.filterGroup}>
-                <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>SUB-TOPIC</Text>
+                <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>{isOptionalSearch ? 'MICROTOPIC' : 'SUB-TOPIC'}</Text>
                 <View style={styles.chipsWrap}>
                   <TouchableOpacity
                     onPress={() => setPendingFilters(p => ({ ...p, subtopics: 'All', macrotags: 'All', microtags: 'All' }))}
@@ -6309,7 +6771,7 @@ function MainsAISearchView({
                                     return (
                                       <View style={{ marginTop: 8 }}>
                                         <ApproachBox content={parsed.body} title={parsed.title} colors={colors} zoomFontSize={14} isDark={isDark} />
-                                        <Markdown style={getMarkdownStyles(colors)}>
+                                        <Markdown style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
                                           {cleanMarkdown(activeAnswer.answerText.replace(parsed.rawMatch, '').trim())}
                                         </Markdown>
                                       </View>
@@ -6317,7 +6779,7 @@ function MainsAISearchView({
                                   }
                                   return (
                                     <View style={{ marginTop: 8 }}>
-                                      <Markdown style={getMarkdownStyles(colors)}>
+                                      <Markdown style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
                                         {cleanMarkdown(activeAnswer.answerText)}
                                       </Markdown>
                                     </View>
@@ -7592,7 +8054,7 @@ function ApproachBox({ content, title = 'APPROACH', colors, zoomFontSize, isDark
         <Sparkles size={14} color="#3b82f6" />
         <Text style={{ fontSize: 11, fontWeight: '800', color: '#3b82f6', letterSpacing: 1 }}>{title}</Text>
       </View>
-      <Markdown style={approachMarkdownStyles}>
+      <Markdown style={approachMarkdownStyles} rules={getMarkdownRules(colors, isDark)}>
         {cleaned}
       </Markdown>
     </View>
@@ -7932,7 +8394,7 @@ function DetailedQuestionView({
             ) : null}
 
             {/* Model Answer Body */}
-            <Markdown style={dynamicMarkdownStyles}>
+            <Markdown style={dynamicMarkdownStyles} rules={getMarkdownRules(colors, isDark)}>
               {cleanMarkdown(remainingAnswerText)}
             </Markdown>
           </View>
@@ -8252,3 +8714,4 @@ function DetailedQuestionView({
     </View>
   );
 }
+

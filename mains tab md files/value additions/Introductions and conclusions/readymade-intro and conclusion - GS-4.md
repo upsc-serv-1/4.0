@@ -128,7 +128,7 @@ w
 *   **Conclusion:**
 *   Ethics humanizes authority and anchors public behavior in moral legitimacy, ensuring that decisions are not just lawful but also righteous.
 
-<p align="center"><img src="images/diagram_p4_img1.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p4_img1.png" alt="Diagram" width="450" /></p>
 
 ---
 
@@ -158,13 +158,13 @@ w
 *   **Concept:**
     *   Diagram linkages showing **Righteousness** leading to World Peace, Order in Nation, Harmony in Home, and Good Character.
 
-<p align="center"><img src="images/diagram_righteousness.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_righteousness.png" alt="Diagram" width="450" /></p>
 
 ###### Card 8: CONSTITUTIONAL MORALITY DIAGRAM
 *   **Concept:**
     *   **Constitutional Morality**: Sovereignty, Welfare State, Justice, Democracy, Equality, Secularism, Rule of law.
 
-<p align="center"><img src="images/diagram_constitutional_morality.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_constitutional_morality.png" alt="Diagram" width="450" /></p>
 
 ---
 
@@ -244,7 +244,7 @@ w
 *   **Conclusion:**
 *   **Ethical maturity lies in harmonizing these dimensions**, ensuring that personal virtue and social duty coexist meaningfully.
 
-<p align="center"><img src="images/diagram_p5_img2.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p5_img2.png" alt="Diagram" width="450" /></p>
 
 ---
 
@@ -295,7 +295,7 @@ w
 *   **Conclusion:**
 *   Law without ethics is coercion, and ethics without law is vulnerability—together they ensure justice with conscience and accountability.
 
-<p align="center"><img src="images/diagram_p7_img3.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p7_img3.png" alt="Diagram" width="450" /></p>
 
 ---
 
@@ -443,7 +443,7 @@ w
 *   **Conclusion:**
 *   **A just society nurtures ethical reflexes**, making moral action the norm not the exception across public and private life.
 
-<p align="center"><img src="images/diagram_p9_img5.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p9_img5.png" alt="Diagram" width="450" /></p>
 
 ---
 
@@ -664,7 +664,7 @@ w
 *   **Conclusion:**
 *   **Impartiality and non-partisanship uphold the Constitution above convenience**, ensuring justice is served without fear, favor, or faction.
 
-<p align="center"><img src="images/diagram_p14_img8.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p14_img8.png" alt="Diagram" width="450" /></p>
 
 ---
 
@@ -745,7 +745,7 @@ w
     *   Congruence of all the 3 **values** positively: IIT IIM students designed a **low cost ventilator**.
     *   **Taj Mahal palace** employees safely evacuated all the hostages during the 26/11 attack.
 
-<p align="center"><img src="images/diagram_integrity_intelligence_energy.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_integrity_intelligence_energy.png" alt="Diagram" width="450" /></p>
 
 ---
 
@@ -858,7 +858,7 @@ w
 *   **Conclusion:**
 *   **Dissecting attitude structure enables targeted reforms**, addressing not just what people think, but also how they feel and act.                 **
 
-<p align="center"><img src="images/diagram_p11_img6.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p11_img6.png" alt="Diagram" width="450" /></p>
 
 ###### Card 3: Functions of Attitude
 *   **Quote:**
@@ -986,7 +986,7 @@ w
 *   **Conclusion:**
 *   **Effective persuasion respects autonomy while inspiring transformation**, making it a cornerstone of ethical governance and citizen engagement.                    **
 
-<p align="center"><img src="images/diagram_p13_img7.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p13_img7.png" alt="Diagram" width="450" /></p>
 
 ---
 
@@ -997,7 +997,7 @@ w
     *   **Logos** (Logic and Reason)
     *   **Ethos**, **pathos** and **logos** are the three categories of persuasive advertising techniques.
 
-<p align="center"><img src="images/diagram_persuasive_ads.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_persuasive_ads.png" alt="Diagram" width="450" /></p>
 
 ###### Card 4: BIHAR GOVT NUDGE CAMPAIGN
 *   **Examples:**
@@ -1018,7 +1018,7 @@ w
     *   **TELOS** — APPEAL TO PURPOSE
     *   **KAIROS** — APPEAL TO TIMELINESS
 
-<p align="center"><img src="images/diagram_rhetorical_appeals.avif" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_rhetorical_appeals.avif" alt="Diagram" width="450" /></p>
 
 ---
 
@@ -1074,7 +1074,7 @@ w
 *   **Conclusion:**
 *   **EI enhances the emotional** **architecture of governance**, where decisions are humane, not just procedural.
 
-<p align="center"><img src="images/diagram_p18_img13.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p18_img13.png" alt="Diagram" width="450" /></p>
 
 ###### Card 2: Building EI in Civil Services
 *   **Quote:**
@@ -1144,7 +1144,7 @@ w
 *   **Conclusion:**
 *   **Emotional intelligence creates** **emotionally stable institutions**, where empathy and ethics inform governance beyond rigid procedures.
 
-<p align="center"><img src="images/diagram_p16_img9.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p16_img9.png" alt="Diagram" width="450" /></p>
 
 ###### Card 2: Self-awareness
 *   **Quote:**
@@ -1194,7 +1194,7 @@ w
 *   **Conclusion:**
 *   **Motivated public servants convert vision into action**, sustaining reforms even in adversity or institutional inertia.
 
-<p align="center"><img src="images/diagram_p17_img12.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p17_img12.png" alt="Diagram" width="450" /></p>
 
 ###### Card 5: Empathy
 *   **Quote:**
@@ -1264,7 +1264,7 @@ w
 *   **Diagram:**
     *   Can use **Goleman's components** and **present Mayor & Salovey model** as diagram.
 
-<p align="center"><img src="images/diagram_ei_models.jpg" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_ei_models.jpg" alt="Diagram" width="450" /></p>
 
 ###### Card 13: THE DUAL NATURE OF EMOTIONS
 *   **Concept:**
@@ -1624,7 +1624,7 @@ w
 *   **Conclusion:**
 *   Reformers inject ethics into history, turning personal conviction into collective transformation through values- driven activism.
 
-<p align="center"><img src="images/diagram_p8_img4.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p8_img4.png" alt="Diagram" width="450" /></p>
 
 ###### Card 3: Lessons from Administrators
 *   **Quote:**
@@ -1671,7 +1671,7 @@ w
 *   **Conclusion:**
 *   **Tagore gave Indian ethics a global voice**, rooted in beauty, freedom, and emotional universality.
 
-<p align="center"><img src="images/diagram_p20_img15.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p20_img15.png" alt="Diagram" width="450" /></p>
 
 ###### Card 6: Contributions of Gautama Buddha
 *   **Quote:**
@@ -1805,7 +1805,7 @@ w
     *   Hobbes presents the **social contract** between the citizens and the govt as follows
     *   Govt <-> Citizens (Powers <-> Rights)
 
-<p align="center"><img src="images/diagram_hobbes_social_contract.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_hobbes_social_contract.png" alt="Diagram" width="450" /></p>
 
 ###### Card 30: ROLE MODELS OF SELFLESS SERVICE
 *   **Examples:**
@@ -1848,7 +1848,7 @@ w
 *   **Conclusion:**
 *   **Corruption is not merely a legal failure but a moral collapse**, demanding reform, transparency, and inner restraint.
 
-<p align="center"><img src="images/diagram_p28_img19.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p28_img19.png" alt="Diagram" width="450" /></p>
 
 ###### Card 2: POPE FRANCIS ON CORRUPTION
 *   **Quote:**
@@ -1879,13 +1879,13 @@ w
 *   **Concept:**
     *   Corruption is a blanket term that covers malpractices related to abuse/ misuse of position/ power or authority reposed in an individual/ entity
 
-<p align="center"><img src="images/diagram_corruption_equation.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_corruption_equation.png" alt="Diagram" width="450" /></p>
 
 ###### Card 8: THE VICIOUS CYCLE OF CORRUPTION
 *   **Concept:**
     *   Diagram showing the vicious cycle between **corruption**, **probity**, and political will.
 
-<p align="center"><img src="images/diagram_vicious_cycle_corruption.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_vicious_cycle_corruption.png" alt="Diagram" width="450" /></p>
 
 ###### Card 9: ELECTORAL SPENDING AND PROTEST CULTURE
 *   **Data:**
@@ -2046,7 +2046,7 @@ w
 *   **Conclusion:**
 *   **Service quality transforms citizens from beneficiaries to stakeholders**, deepening both inclusion and trust.
 
-<p align="center"><img src="images/diagram_p27_img18.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p27_img18.png" alt="Diagram" width="450" /></p>
 
 ---
 
@@ -2122,7 +2122,7 @@ w
 *   **Concept:**
     *   Diagram showing the flow: Communication, Openness, **Accountability** → **Transparency** → **Ethical** Gov, Participative Gov → GOOD GOVERNANCE.
 
-<p align="center"><img src="images/diagram_transparency_good_governance.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_transparency_good_governance.png" alt="Diagram" width="450" /></p>
 
 ---
 
@@ -2226,7 +2226,7 @@ w
 *   **Conclusion:**
 *   **A government is only as ethical as its daily conduct**, not merely its constitutional promises or public declarations.
 
-<p align="center"><img src="images/diagram_p22_img16.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p22_img16.png" alt="Diagram" width="450" /></p>
 
 ###### Card 2: Accountability and Ethical Governance
 *   **Quote:**
@@ -2264,7 +2264,7 @@ w
 *   **Concept:**
     *   Answerability + Enforceability + Responsiveness → **Accountability**.
 
-<p align="center"><img src="images/diagram_accountability.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_accountability.png" alt="Diagram" width="450" /></p>
 
 ###### Card 5: SOCIAL AUDIT AND ACCOUNTABILITY
 *   **Examples:**
@@ -2384,7 +2384,7 @@ w
 *   **Conclusion:**
 *   **Ethical diplomacy earns global trust**, especially when morality aligns with strategic clarity.                       **
 
-<p align="center"><img src="images/diagram_p24_img17.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs4/images/diagram_p24_img17.png" alt="Diagram" width="450" /></p>
 
 ---
 

@@ -29,7 +29,7 @@ export function normalizePaper(paper: string | null | undefined): string {
   if (p.includes('GS3') || p.includes('GS-3') || p === 'GS-III' || p === 'GSIII') return 'GS3';
   if (p.includes('GS4') || p.includes('GS-4') || p === 'GS-IV' || p === 'GSIV') return 'GS4';
   if (p.includes('ESSAY')) return 'Essay';
-  if (p.includes('OPTIONAL')) return 'Optional';
+  if (p.includes('OPTIONAL') || p.includes('ANTHRO') || p === 'ANTHRO1') return 'Optional';
   return paper;
 }
 
@@ -75,13 +75,31 @@ try {
   console.log('[MainsLoader] Anthro1 consolidated JSON not found or failed to load:', e);
 }
 
+export function resolvePaper(q: any): string {
+  const norm = normalizePaper(q.paper || 'GS1');
+  if (norm === 'Optional') return 'Optional';
+  if (q.hierarchy_path && q.hierarchy_path.length > 0) {
+    const first = q.hierarchy_path[0];
+    if (first === 'Anthropology' || first === 'Anthro1' || first.toUpperCase().includes('ANTHRO') || first.toUpperCase().includes('OPTIONAL')) {
+      return 'Optional';
+    } else {
+      const second = q.hierarchy_path[1];
+      if (second && (second === 'Anthropology' || second.toUpperCase().includes('ANTHRO') || second.toUpperCase().includes('OPTIONAL'))) {
+        return 'Optional';
+      }
+      return normalizePaper(first);
+    }
+  }
+  return norm;
+}
+
 // Standardize and export
 export const mainsConsolidatedQuestions: ConsolidatedQuestion[] = [
-  ...gs1Questions.map((q: any) => ({ ...q, paper: normalizePaper(q.hierarchy_path?.[0] || 'GS1') })),
-  ...gs2Questions.map((q: any) => ({ ...q, paper: normalizePaper(q.hierarchy_path?.[0] || 'GS2') })),
-  ...gs3Questions.map((q: any) => ({ ...q, paper: normalizePaper(q.hierarchy_path?.[0] || 'GS3') })),
-  ...gs4Questions.map((q: any) => ({ ...q, paper: normalizePaper(q.hierarchy_path?.[0] || 'GS4') })),
-  ...anthro1Questions.map((q: any) => ({ ...q, paper: normalizePaper(q.hierarchy_path?.[0] || 'Anthro1') })),
+  ...gs1Questions.map((q: any) => ({ ...q, paper: resolvePaper(q) })),
+  ...gs2Questions.map((q: any) => ({ ...q, paper: resolvePaper(q) })),
+  ...gs3Questions.map((q: any) => ({ ...q, paper: resolvePaper(q) })),
+  ...gs4Questions.map((q: any) => ({ ...q, paper: resolvePaper(q) })),
+  ...anthro1Questions.map((q: any) => ({ ...q, paper: resolvePaper(q) })),
 ];
 
 import { supabase } from '../lib/supabase';
@@ -108,7 +126,7 @@ export async function fetchMainsQuestionsFromSupabase(): Promise<ConsolidatedQue
     macrotag: q.macrotag,
     microtag: q.microtag,
     hierarchy_path: q.hierarchy_path || [],
-    paper: normalizePaper(q.hierarchy_path?.[0] || q.paper || 'GS1'),
+    paper: resolvePaper(q),
     answers: (q.answers || []).map((ans: any) => ({
       id: ans.id,
       institute: ans.institute,

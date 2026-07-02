@@ -281,10 +281,10 @@ def parse_md_file(file_path):
         
     # Post-process questions to build hierarchy_path and source_attribution_label
     for q in questions:
-        # Build hierarchy_path: [Paper, Subject, Section Group, Microtopic, Subtopic]
+        # Build hierarchy_path: [Subject, Paper, Section Group, Microtopic, Subtopic]
         q["hierarchy_path"] = [
-            "Anthro1",
             "Anthropology",
+            "Anthro - 1",
             q["sectionGroup"],
             q["microTopic"],
             q["subTopic"]
@@ -302,7 +302,7 @@ def parse_md_file(file_path):
             "exam_category": "cse",
             "specific_exam": None,
             "stage": "mains",
-            "paper": "mains_anthro1"
+            "paper": "mains_anthro_1"
         }
         
     return questions
@@ -326,11 +326,11 @@ def run_conversion():
         "program_id": "cse",
         "program_name": "CSE",
         "series": "Mains (Official)",
-        "level": "Anthro1",
+        "level": "Anthro - 1",
         "paperType": "mains-paper",
         "defaultMinutes": 180,
         "sourceMode": "md-sol",
-        "paper": "Anthro1",
+        "paper": "Anthro - 1",
         "questions": all_questions
     }
     

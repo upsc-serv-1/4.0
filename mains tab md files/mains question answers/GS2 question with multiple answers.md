@@ -172,7 +172,7 @@ Increasing role of money and muscle power in elections, has resulted in parliame
 
 The Preamble of the Indian Constitution serves as the guiding light for the nation, setting forth its fundamental principles and values. Among these principles, India is declared as a “Sovereign Socialist Secular Democratic Republic,” representing the key features of the country’s political and social fabric. These adjectives reflect the aspirations of the founding fathers and continue to guide India’s development and progress.
 
-<p align="center"><img src="images/pw_polity_q253_img1.webp" alt="value of preamble" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q253_img1.webp" alt="value of preamble" /></p>
 
 ### Body
 
@@ -262,7 +262,7 @@ These adjectives remain **defendable** through robust constitutional framework, 
 #### Answer from Civilsdaily
 
 The **Indian Constitution,** under **Article 368,** confers the power of amendment on **Parliament.** However, this power is **neither absolute nor unlimited,** being subject to **procedural** and **substantive limitations.**
-<p align="center"><img src="images/civilsdaily_p30_img66.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p30_img66.png" alt="Diagram" /></p>
 
 **Procedural Limitations**
 
@@ -419,7 +419,7 @@ Thus, the **Indian Constitution** adopts a **middle path**, neither rigid like t
 
 CJI D.Y. Chandrachud recently called the Basic Structure Doctrine the "North Star" guiding India. With 106 successful amendments, Article 368 balances legislative agility with strict procedural and substantive hurdles.
 
-<p align="center"><img src="images/superkalam_polity_q33_img1.png" alt="Article 368: Limitations on Amending Power" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q33_img1.png" alt="Article 368: Limitations on Amending Power" /></p>
 
 Article 368: Limitations on Amending Power
 
@@ -460,7 +460,7 @@ By anchoring legislative power to the basic structure, India ensures its Constit
 **Basic Structure Doctrine,** has clarified that while Parliament can amend any part of the Constitution, it **cannot alter**
 
 **or destroy its essential features.**
-<p align="center"><img src="images/civilsdaily_p29_img65.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p29_img65.png" alt="Diagram" /></p>
 
 **Limitations on the Amending Power of Parliament**
 
@@ -553,7 +553,7 @@ Thus, Parliament is restricted in its power to amend the Constitution so that th
 
 Parliament's power to amend the Constitution remains fundamentally limited by the Basic Structure Doctrine, preventing transformation of India's constitutional democracy into an unlimited amending authority.
 
-<p align="center"><img src="images/superkalam_polity_q502_img1.png" alt="Concentric Circle Diagram with Three Layers" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q502_img1.png" alt="Concentric Circle Diagram with Three Layers" /></p>
 
 Concentric Circle Diagram with Three Layers
 
@@ -643,7 +643,7 @@ Any new reform is expected to experience a few teething problems. Since it is ex
 
 ### Body
 
-<p align="center"><img src="images/pw_polity_q330_img1.webp" alt="GST" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q330_img1.webp" alt="GST" /></p>
 
 **The amendment’s salient features include:**
 - **Dual GST structure:** This includes Central GST (CGST) and State GST (SGST) or Union Territory GST (UTGST) depending on the transaction type.
@@ -885,7 +885,7 @@ Only constitutional protection will not be able to achieve the goals of gender e
 
 Gender justice refers to the fair treatment of all genders, ensuring equality, dignity, and freedom from discrimination. The Indian Constitution, as a **living document**, upholds the vision of gender justice through its **Fundamental Rights, Directive Principles of State Policy (DPSP), and constitutional morality**.
 
-<p align="center"><img src="images/superkalam_social_justice_q187_img1.png" alt="Pillars of Gender Justice and Equality" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_social_justice_q187_img1.png" alt="Pillars of Gender Justice and Equality" /></p>
 
 Pillars of Gender Justice and Equality
 
@@ -1334,7 +1334,7 @@ The Supreme Court in Government of NCT of Delhi vs. Union of India (2018) emphas
 
 - It elevates the Constitution above individual will, thus acting as a moral compass.
 
-<p align="center"><img src="images/polity_q6_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/polity_q6_img1.png" alt="Image" /></p>
 
 **Application to Judicial Independence and Accountability**
 
@@ -1404,7 +1404,7 @@ Constitutional morality ensures that the judiciary remains strong and impartial,
 
 The Supreme Court in *NCT of Delhi v. Union of India (2018)* highlighted that **constitutional morality is the fulcrum restraining unbridled power**. It ensures that governance must rest on trust, accommodation, and adherence to constitutional values. While judicial independence is vital for democracy, constitutional morality ensures it coexists with accountability, preventing judicial overreach.
 
-<p align="center"><img src="images/superkalam_polity_q24_img1.png" alt="Judicial Balance Between Independence and Accountability" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q24_img1.png" alt="Judicial Balance Between Independence and Accountability" /></p>
 
 Judicial Balance Between Independence and Accountability
 
@@ -1537,7 +1537,7 @@ Constitutional morality is crucial for constitutional laws to be effective. With
 
 ### Body
 
-**Constitutional Morality: presence in the constitution** <p align="center"><img src="images/pw_polity_q574_img1.webp" alt="Constitutional Morality" /></p>
+**Constitutional Morality: presence in the constitution** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q574_img1.webp" alt="Constitutional Morality" /></p>
 
 **Constitutional Morality: presence in the constitution** 
 
@@ -1913,7 +1913,7 @@ As Kerala High Court held, “ **Privacy is the ultimate expression of the sanct
 
 The right to privacy, recognized as a fundamental right through the landmark **Justice K.S. Puttaswamy case (2017)**, has become increasingly significant in the era of technological advancement and genetic testing. The Supreme Court's interpretation of Article 21 has evolved to encompass various dimensions of personal liberty, including privacy and bodily autonomy.
 
-<p align="center"><img src="images/superkalam_polity_q111_img1.png" alt="Right to Privacy Three-Fold Test" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q111_img1.png" alt="Right to Privacy Three-Fold Test" /></p>
 
 Right to Privacy Three-Fold Test
 
@@ -2148,7 +2148,7 @@ Article 21 is not merely confined to animal existence or survival, but also incl
 
 The Constitution of India is a dynamic document, designed to evolve with time. Dr. B.R. Ambedkar described it as a **flexible yet firm** framework that could adapt to societal changes. Its progressive character is most evident in the **expanding interpretation of Article 21**, which guarantees the Right to Life and Personal Liberty.
 
-<p align="center"><img src="images/superkalam_polity_q193_img1.png" alt="Article 21: Life and Personal Liberty" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q193_img1.png" alt="Article 21: Life and Personal Liberty" /></p>
 
 Article 21: Life and Personal Liberty
 
@@ -2388,7 +2388,7 @@ However it should not be forgotten that no fundamental rights are absolute in In
 
 ### Body
 
-* **The Puttaswamy case or the Right to Privacy judgment has had broad implications on the scope of Fundamental Rights in India**: <p align="center"><img src="images/pw_polity_q329_img1.webp" alt="scope of Fundamental Rights in India" /></p>
+* **The Puttaswamy case or the Right to Privacy judgment has had broad implications on the scope of Fundamental Rights in India**: <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q329_img1.webp" alt="scope of Fundamental Rights in India" /></p>
 
 * **The Puttaswamy case or the Right to Privacy judgment has had broad implications on the scope of Fundamental Rights in India**: 
 - **Expansion of Article 21:** The Right to Privacy judgment reaffirms the expansive interpretation of Article 21, which encompasses not just the right to life but also the right to live with dignity, personal liberty, and privacy.
@@ -2961,7 +2961,7 @@ The 21st century demography demands a new outlook of aging population as drivers
 
 **In the recent past President Biden granted clemency to almost 1,500 people in 2024-25, highlighting the active use of pardoning powers globally.** The power to pardon is an essential facet of executive clemency, serving as a humanitarian check on the judiciary. In India, this power is vested in the President under **Article 72** of the Constitution, while in the USA, it is granted by Article II, Section 2 of the U.S. Constitution.
 
-<p align="center"><img src="images/superkalam_polity_q23_img1.png" alt="India and USA Pardon Power Comparison" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q23_img1.png" alt="India and USA Pardon Power Comparison" /></p>
 
 India and USA Pardon Power Comparison
 
@@ -3208,7 +3208,7 @@ India's **collegium system** governs the appointment and transfer of judges in t
 
 Unlike the Indian system, the US model is rooted in executive nomination and legislative confirmation. Both aim to balance judicial independence with accountability, but through very different mechanisms.
 
-<p align="center"><img src="images/superkalam_polity_q26_img1.png" alt="India vs USA Judicial Appointment Models" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q26_img1.png" alt="India vs USA Judicial Appointment Models" /></p>
 
 India vs USA Judicial Appointment Models
 
@@ -3322,7 +3322,7 @@ The concept of secularism in India and the United States differs significantly i
 
 **India as a Secular State:**
 
-<p align="center"><img src="images/polity_q15_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/polity_q15_img1.png" alt="Image" /></p>
 
 **Comparative Analysis of Secularism in India and United States:**
 | **Aspect** | **India** | **United States** |
@@ -3395,7 +3395,7 @@ Both India and the US encounter challenges in managing the interplay between rel
 
 India's secular framework, enshrined in the **42nd Constitutional Amendment**, presents a unique model of state-religion relationship that differs significantly from the American conception of secularism, reflecting the diverse socio-cultural fabric of both nations.
 
-<p align="center"><img src="images/superkalam_polity_q102_img1.png" alt="State-Religion Relationship Models and Dynamics" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q102_img1.png" alt="State-Religion Relationship Models and Dynamics" /></p>
 
 State-Religion Relationship Models and Dynamics
 
@@ -3574,7 +3574,7 @@ There are many similarities in Parliamentary functioning of India and Britain bu
 
 Parliamentary sovereignty is a fundamental concept shaping governance structures in both **British and Indian constitutional systems**. While both nations share common parliamentary heritage, their approaches to **legislative supremacy** differ significantly due to their unique historical contexts and constitutional frameworks.
 
-<p align="center"><img src="images/superkalam_polity_q180_img1.png" alt="Sovereignty Comparison UK and India Powers" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q180_img1.png" alt="Sovereignty Comparison UK and India Powers" /></p>
 
 Sovereignty Comparison UK and India Powers
 
@@ -3944,7 +3944,7 @@ Despite differences in understanding, both countries have successfully ensured e
 
 The concepts of equality in the US and Indian Constitutions reflect their distinct historical experiences and social realities. Both constitutions share fundamental commitments to equality while adopting different approaches to achieve this ideal.
 
-<p align="center"><img src="images/superkalam_international_relations_q337_img1.png" alt="USA Constitution and the 14th Amendment" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q337_img1.png" alt="USA Constitution and the 14th Amendment" /></p>
 
 USA Constitution and the 14th Amendment
 
@@ -4266,7 +4266,7 @@ By adopting elements of India’s secularism, France could better address the ch
 
 India's GDP growth averaging 6-7% annually contrasts sharply with its HDI rank of 134th (2023), highlighting the growth-development paradox that demands urgent attention.
 
-<p align="center"><img src="images/superkalam_polity_q513_img1.png" alt="Barriers to Inclusive Development Radial Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q513_img1.png" alt="Barriers to Inclusive Development Radial Diagram" /></p>
 
 Barriers to Inclusive Development Radial Diagram
 
@@ -4391,7 +4391,7 @@ Though the US and Indian political systems are similar in many respects, yet the
 
 India and the USA represent two of the world's largest democracies, each founded on distinct constitutional principles shaped by their unique historical experiences.
 
-<p align="center"><img src="images/superkalam_polity_q583_img1.png" alt="India and Parl Venn Diagram Overlap" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q583_img1.png" alt="India and Parl Venn Diagram Overlap" /></p>
 
 India and Parl Venn Diagram Overlap
 
@@ -4544,7 +4544,7 @@ The reduced usage of Article 356 by application of various political and legal m
 
 **Judicial Pronouncements:** The **S.R. Bommai case (1994)** stands as a cornerstone in structuring the application of Article 356. As it laid down that the power of the President to dissolve a state. Article 356 use:
 
-<p align="center"><img src="images/pw_polity_q709_img1.webp" alt="Article 356" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q709_img1.webp" alt="Article 356" /></p>
 
 - Legislative assembly is subject to **judicial review**.
 - **Doctrine of Constitutional Mandate:** Over the years, the courts have emphasized the federal structure, **advocating for autonomous state governance** while respecting the doctrine of constitutional mandate, encouraging a more circumscribed application of Article 356.
@@ -4631,7 +4631,7 @@ Apex court regarding the issue of 'federalism' held in Bommai case, that the Con
 
 The significant decline in the invocation of **Article 356** since the mid-1990s can be attributed to a watershed moment in Indian constitutional history - the **S.R. Bommai judgment (1994)**. This landmark case fundamentally transformed the federal dynamics between the Union and States by establishing robust safeguards against the arbitrary imposition of President's Rule.
 
-<p align="center"><img src="images/superkalam_polity_q179_img1.png" alt="Factors Reducing Frequency of Article 356" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q179_img1.png" alt="Factors Reducing Frequency of Article 356" /></p>
 
 Factors Reducing Frequency of Article 356
 
@@ -4754,7 +4754,7 @@ Till now, the Financial Emergency has never been invoked in India.
 
 **As per Article 360,** the President of India can proclaim a Financial Emergency if they are satisfied that the financial stability or the credit of India or any part thereof is threatened.
 
-<p align="center"><img src="images/pw_polity_q402_img1.webp" alt="Consequences of Financial Emergency" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q402_img1.webp" alt="Consequences of Financial Emergency" /></p>
 
 **Consequences of Financial Emergency:**
 - **Executive authority:** The executive authority of the Center extends to directing any state to observe canons of financial propriety, and the President may give any other necessary direction to the state.
@@ -4783,7 +4783,7 @@ Understanding the provisions of Financial Emergency and their implications is cr
 
 Financial Emergency under Article 360 serves as a constitutional safeguard to address severe economic crises threatening India's financial stability.
 
-<p align="center"><img src="images/superkalam_polity_q589_img1.png" alt="Financial Emergency Article 360 Tree Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q589_img1.png" alt="Financial Emergency Article 360 Tree Diagram" /></p>
 
 Financial Emergency Article 360 Tree Diagram
 
@@ -5048,7 +5048,7 @@ Resolving this conflict requires balancing national energy security with constit
 
    - **NITI Aayog replaced the Planning Commission** and adopted a consultative approach.
 
-<p align="center"><img src="images/civilsdaily_p19_img59.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p19_img59.png" alt="Diagram" /></p>
 
    - **GST (2017) introduced pooled sovereignty** and created a shared tax regime.
 
@@ -5218,7 +5218,7 @@ Centre-State financial relations in India, provided under **Articles 264–293**
 
 ## Evolution of Centre-State Financial Relations in Planned Development
 
-<p align="center"><img src="images/superkalam_polity_q30_img1.png" alt="Economic reforms Pre and Post Niti Aayog" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q30_img1.png" alt="Economic reforms Pre and Post Niti Aayog" /></p>
 
 Economic reforms Pre and Post Niti Aayog **Centralised Planning Era (1950–1991):** - **Planning Commission** dominated fiscal relations, allocating resources through the **Gadgil formula**.
 - States remained dependent on discretionary central transfers and loans under **Article 282**.
@@ -5370,7 +5370,7 @@ As per **Granville Austin,** India is a **“cooperative federalism” model,** 
 
 Centre-state relations in India involve the distribution of powers and responsibilities between central and state governments, forming the backbone of Indian democracy. This framework is outlined in Part XI of the Constitution.
 
-<p align="center"><img src="images/governance_q13_img1.jpg" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/governance_q13_img1.jpg" alt="Image" /></p>
 
 ### Body
 
@@ -5477,7 +5477,7 @@ India’s federal structure requires constant nurturing through mutual trust and
 
 Dr. B.R. Ambedkar envisioned Indian federalism as a flexible mechanism, unitary in emergencies and federal in peace. Today, as India targets *Viksit Bharat 2047*, this balance is rapidly evolving through new fiscal, administrative, and judicial paradigms.
 
-<p align="center"><img src="images/superkalam_polity_q119_img1.png" alt="Measures to Strengthen Federalism" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q119_img1.png" alt="Measures to Strengthen Federalism" /></p>
 
 Measures to Strengthen Federalism
 
@@ -5521,7 +5521,7 @@ The **101st Constitutional Amendment Act, 2016** introduced the **Goods and Serv
 
 1. As per **N. K. Singh,** the recent rationalisation under **GST 2.0 has potential to trigger a virtuous cycle and** strengthens India’s image as a **predictable and reform-oriented** economy.
 
-<p align="center"><img src="images/civilsdaily_p18_img58.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p18_img58.png" alt="Diagram" /></p>
 
 2. **Unified Taxation System** - Subsumed **17 central & state taxes and 23 cesses,** removing cascading effects.
 
@@ -5700,7 +5700,7 @@ However, despite some concerns GST marks a new dawn in economic federalism of th
 
 The **101st Constitutional Amendment Act** represents a landmark reform in India's fiscal federalism through the introduction of **Goods and Services Tax (GST)**, marking a paradigm shift from the complex multi-layered indirect tax system to a unified tax regime.
 
-<p align="center"><img src="images/superkalam_polity_q188_img1.png" alt="GST Council: Voting Weightage Distribution Process" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q188_img1.png" alt="GST Council: Voting Weightage Distribution Process" /></p>
 
 GST Council: Voting Weightage Distribution Process
 
@@ -6255,7 +6255,7 @@ When there is a conflict between the statue’s provisions between the union and
 
 India's unique approach to secularism, emphasizing "positive secularism" over strict separation, offers valuable lessons for France's laïcité model in managing contemporary religious diversity challenges.
 
-<p align="center"><img src="images/superkalam_polity_q497_img1.png" alt="Two Models of Secularism Compared Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q497_img1.png" alt="Two Models of Secularism Compared Diagram" /></p>
 
 Two Models of Secularism Compared Diagram
 
@@ -6608,7 +6608,7 @@ The failure stems from both structural design flaws and process implementation g
 
 The reorganization and bifurcation of administrative areas have been ongoing processes in India since independence, aimed at improving governance and administrative efficiency. While the bifurcation of districts and talukas is a common practice at the local level, the creation of smaller states is a much-debated topic in India’s political and administrative discourse.
 
-<p align="center"><img src="images/pw_governance_q44_img1.webp" alt="image 2023 12 29T151125.069" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_governance_q44_img1.webp" alt="image 2023 12 29T151125.069" /></p>
 
 ### Body
 
@@ -6834,7 +6834,7 @@ J&K’s Assembly can make local laws but key areas stay with the LG and Parliame
 
 The **Jammu and Kashmir Reorganization Act, 2019** transformed the state into a Union Territory with legislature, creating a unique constitutional entity following Article 370's abrogation.This marked a fundamental change in the political and constitutional status of the region.
 
-<p align="center"><img src="images/superkalam_polity_q27_img1.png" alt="Nature of Jammu and Kashmir Legislature after Reorganisation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q27_img1.png" alt="Nature of Jammu and Kashmir Legislature after Reorganisation" /></p>
 
 Nature of Jammu and Kashmir Legislature after Reorganisation
 
@@ -7075,7 +7075,7 @@ Local bodies are the **cornerstones of participatory democracy** and good govern
 
 The Constitution of India establishes local self-governance through the **73rd and 74th Amendments (1992)**, creating **Panchayats for rural areas and Municipalities** for urban areas, including Village, Intermediate, and District Panchayats, along with Municipal Corporations and Municipalities.
 
-<p align="center"><img src="images/governance_q9_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/governance_q9_img1.png" alt="Image" /></p>
 
 ### Body
 
@@ -7162,7 +7162,7 @@ Empowered by the 73rd and 74th Amendments, India’s 2.6 lakh local bodies are v
 3. **Digital Transparency:** Platforms like **eGramSwaraj** and AI-driven *SabhaSaar* auto-generate meeting minutes, curbing local corruption and ensuring accountability.
 4. **Asset Monetisation:** The **SVAMITVA** scheme uses drone mapping to issue property cards, resolving land boundary disputes and unlocking rural credit.
 
-<p align="center"><img src="images/superkalam_polity_q100_img1.png" alt="District Planning Committee" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q100_img1.png" alt="District Planning Committee" /></p>
 
 District Planning Committee
 
@@ -7369,7 +7369,7 @@ Praja Foundation, 'Urban Governance Index” initiative is the right way to make
 
 The 74th Constitutional Amendment Act (1992) provided constitutional status to Urban Local Bodies (ULBs) and aimed to promote democratic decentralization. Despite this, **states remain reluctant to devolve adequate functional and financial powers** to ULBs, hampering urban governance.
 
-<p align="center"><img src="images/superkalam_polity_q196_img1.png" alt="Devolution bottleneck from state" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q196_img1.png" alt="Devolution bottleneck from state" /></p>
 
 Devolution bottleneck from state
 
@@ -7513,7 +7513,7 @@ For Local bodies and Panchayats to play a bigger role in human capital intervent
 
 The decentralization of power in India has significantly changed the governance landscape at the grassroots level. The 73rd and 74th Constitutional Amendments in 1992, which formalized the Panchayati Raj system and urban local bodies, respectively, have been instrumental in this process.
 
-<p align="center"><img src="images/pw_governance_q691_img1.webp" alt="decentralization" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_governance_q691_img1.webp" alt="decentralization" /></p>
 
 ### Body
 
@@ -7770,7 +7770,7 @@ Local institutions have been able to strengthen democracy at the root level. But
 
 The evolution of local institutions in India has witnessed a significant transition from their formative phase, which was primarily focused on ‘Functions, Functionaries, and Funds,’ to the contemporary stage emphasizing ‘Functionality.’ This shift underscores the importance of effective and efficient governance, service delivery, and responsiveness to the needs of local communities.
 
-<p align="center"><img src="images/pw_polity_q196_img1.webp" alt="significance of LSG " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q196_img1.webp" alt="significance of LSG " /></p>
 
 ### Body
 
@@ -7985,7 +7985,7 @@ The reservation of women at the local level has had various social and developme
 
 The 73rd and 74th Constitutional Amendments (1992) mandating 33% women's reservation in Panchayati Raj Institutions represented a significant democratic reform. However, despite electing over 1.4 million women representatives, patriarchal structures continue to limit transformative political change.
 
-<p align="center"><img src="images/superkalam_polity_q508_img1.png" alt="Constitutional Mandate Versus Ground Reality Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q508_img1.png" alt="Constitutional Mandate Versus Ground Reality Flowchart" /></p>
 
 Constitutional Mandate Versus Ground Reality Flowchart
 
@@ -8136,7 +8136,7 @@ However, the decisions as to which taxes, duties, tolls and fees should be assig
 **implementation of various government schemes and projects, contributing to local development in areas like education, health, sanitation, and infrastructure.**
 - **Social Justice:** Panchayats help **promote social justice by ensuring the representation of marginalized groups,** such as women, Scheduled Castes, and Scheduled Tribes, in local governance.
 
-<p align="center"><img src="images/pw_governance_q410_img1.webp" alt="image 2023 12 29T124522.336" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_governance_q410_img1.webp" alt="image 2023 12 29T124522.336" /></p>
 
 **Alternative financing sources for Panchayats:**
 - **Local Taxes:** Panchayats can generate revenue through the collection of local taxes, such as property tax, market fees, and professional tax.
@@ -8169,7 +8169,7 @@ The Panchayat system serves as the backbone of India’s local governance, empow
 
 India's Panchayati Raj system, institutionalized through the **73rd Constitutional Amendment Act, 1992**, represents the cornerstone of grassroots democracy, embodying Gandhi's vision of village self-rule.
 
-<p align="center"><img src="images/superkalam_polity_q576_img1.png" alt="Panchayat Finance Sources Tree Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q576_img1.png" alt="Panchayat Finance Sources Tree Diagram" /></p>
 
 Panchayat Finance Sources Tree Diagram
 
@@ -8259,7 +8259,7 @@ The LSGs are dependent on the states for:
 
 **The local self-government system in India, including Panchayati Raj Institutions and Urban Local Bodies, was established to promote participatory democracy, decentralized governance, and address local concerns.** Despite the 73rd and 74th Constitutional Amendments providing a legal framework, **the effectiveness of these institutions in governance continues to be debated.**
 
-<p align="center"><img src="images/pw_polity_q196_img1.webp" alt="significance of LSG" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q196_img1.webp" alt="significance of LSG" /></p>
 
 ### Body
 
@@ -8359,7 +8359,7 @@ Despite structural challenges, successful models like **Kerala's Kudumbashree** 
 - **Capacity building:** Education and organization are essential for capacity building of local representatives, enabling them to effectively carry out their responsibilities and address the needs of their communities.
 - **Decision-making:** A well-educated and organized local governance system facilitates informed decision-making, leading to better policies and programs that cater to local needs.
 
-- **Accountability:** Education and organization empower local representatives to hold higher authorities accountable and ensure that resources are utilized efficiently and transparently. <p align="center"><img src="images/pw_polity_q196_img1.webp" alt="significance of LSG" /></p>
+- **Accountability:** Education and organization empower local representatives to hold higher authorities accountable and ensure that resources are utilized efficiently and transparently. <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q196_img1.webp" alt="significance of LSG" /></p>
 
 - **Accountability:** Education and organization empower local representatives to hold higher authorities accountable and ensure that resources are utilized efficiently and transparently. 
 
@@ -8559,7 +8559,7 @@ The **Cabinet system,** a legacy of the **British parliamentary model,** is base
 1. The Cabinet, commanding majority in the Lok Sabha, **controls the legislative agenda,** reducing Parliament to a **rubber stamp.**
 2. **Party Whip curtails independence of MPs,** limiting free deliberation.
 
-<p align="center"><img src="images/civilsdaily_p22_img60.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p22_img60.png" alt="Diagram" /></p>
 
 3. **Ordinance Power (Articles 123 & 213)** bypasses **legislative scrutiny.**
 4. **Prime Ministerial Supremacy** due to centralisation of authority in PMO.
@@ -8672,7 +8672,7 @@ As **Walter Bagehot** remarked, **“The cabinet system is a hyphen which joins,
 
 The Indian parliamentary system is based on the **Westminster model**, where the **executive is responsible to the legislature**, and Parliament is considered **supreme** in making laws and holding the government accountable. However, over the years, the growth of cabinet government in practice, **executive dominance** has considerably weakened the **oversight role of Parliament**, thereby marginalizing its supremacy.
 
-<p align="center"><img src="images/superkalam_polity_q116_img1.png" alt="Concentration of Power with Prime Minister" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q116_img1.png" alt="Concentration of Power with Prime Minister" /></p>
 
 Concentration of Power with Prime Minister
 
@@ -8934,7 +8934,7 @@ The Governor’s legislative role is **largely ceremonial but constitutionally s
 
 The **Parliament of India** is the **supreme instrument of democratic accountability.** Under **Article 75(3)** of the Constitution, the **Council of**
 
-<p align="center"><img src="images/civilsdaily_p25_img61.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p25_img61.png" alt="Diagram" /></p>
 
 **Ministers is collectively responsible to the Lok Sabha**
 
@@ -8966,7 +8966,7 @@ The **Parliament of India** is the **supreme instrument of democratic accountabi
 
 1. **Reduced Scrutiny by Parliamentary Committees-** While 60% of the Bills in 14th LS and 71% in 15th LS were referred to DRSCs concerned, this proportion came down to 25% in 16th LS and 17% in 17th LS.
 
-<p align="center"><img src="images/civilsdaily_p25_img62.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p25_img62.png" alt="Diagram" /></p>
 
 2. **Decline in the number of sittings-** The 17th Lok Sabha sat for only 55 days
 
@@ -8978,7 +8978,7 @@ The **Parliament of India** is the **supreme instrument of democratic accountabi
 
 6. **Inadequate Discussion-** 58% of the Bills were passed within two weeks of their introduction in 17th LS. Eg- J&K Reorganisation Bill, 2019, and the Women’s Reservation Bill, 2023 were passed within two days
 
-<p align="center"><img src="images/civilsdaily_p25_img63.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p25_img63.png" alt="Diagram" /></p>
 
 7. About 31% of the total functioning time in Lok Sabha, and 32% in Rajya Sabha was spent on **discussions other than legislation and budgets.** Eg- President’s Address to Parliament, matters of public importance, and trust votes.
 
@@ -9053,7 +9053,7 @@ To ensure complete accountability of the Executive to the Parliament, some steps
 
 **In 2019, the calling attention motion was moved in Rajya Sabha by opposition MPs to discuss the issue of air pollution and climate change.**
 
-- **Debates and Discussions:** The Parliament engages in debates and discussions on various issues, bills, and policy decisions, allowing MPs to voice their opinions and hold the executive accountable. **An example would be the extensive debate in Parliament over the Citizenship (Amendment) Act, 2019,** wherein MPs voiced their support, concerns, and objections, leading to nationwide discussion on the topic. **However, certain factors may limit the Parliament’s effectiveness in ensuring executive accountability:** <p align="center"><img src="images/pw_polity_q625_img1.webp" alt="Parliament's effectiveness" /></p>
+- **Debates and Discussions:** The Parliament engages in debates and discussions on various issues, bills, and policy decisions, allowing MPs to voice their opinions and hold the executive accountable. **An example would be the extensive debate in Parliament over the Citizenship (Amendment) Act, 2019,** wherein MPs voiced their support, concerns, and objections, leading to nationwide discussion on the topic. **However, certain factors may limit the Parliament’s effectiveness in ensuring executive accountability:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q625_img1.webp" alt="Parliament's effectiveness" /></p>
 
 - **Debates and Discussions:** The Parliament engages in debates and discussions on various issues, bills, and policy decisions, allowing MPs to voice their opinions and hold the executive accountable. **An example would be the extensive debate in Parliament over the Citizenship (Amendment) Act, 2019,** wherein MPs voiced their support, concerns, and objections, leading to nationwide discussion on the topic. **However, certain factors may limit the Parliament’s effectiveness in ensuring executive accountability:** 
 - **Frequent disruptions:** Disruptions and adjournments in the Parliament can limit the time available for scrutinizing the executive’s actions.
@@ -9267,7 +9267,7 @@ The Supreme Court judgment of July 2018 offers a legal framework clarifying the 
 
 The July 2018 Supreme Court judgment in *Government of NCT of Delhi vs Union of India* attempted to resolve the constitutional deadlock but has shown limited success in completely settling the political tussle between Delhi's Lieutenant Governor and elected government.
 
-<p align="center"><img src="images/superkalam_polity_q592_img1.png" alt="Division of Powers under Article 239AA" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q592_img1.png" alt="Division of Powers under Article 239AA" /></p>
 
 Division of Powers under Article 239AA
 
@@ -9880,7 +9880,7 @@ Thus, the Indian Constitution provides various provisions for judicial independe
 
 Judicial independence is the doctrine that the judiciary must be free from interference or influence of the executive, legislature, or any external pressure while discharging its functions. The Indian Constitution incorporates several provisions to safeguard judicial independence, making it central to democratic functioning.
 
-<p align="center"><img src="images/superkalam_polity_q181_img1.png" alt="Checks and Balances in a Democracy" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q181_img1.png" alt="Checks and Balances in a Democracy" /></p>
 
 Checks and Balances in a Democracy
 
@@ -9991,7 +9991,7 @@ Indian constitution have meticulously defined powers and functions of the differ
 
 The Central Administrative Tribunal (CAT) has evolved significantly since its establishment in 1985, transforming from a mere grievance redressal mechanism to a robust quasi-judicial authority exercising independent judicial powers in administrative matters.
 
-<p align="center"><img src="images/superkalam_polity_q496_img1.png" alt="Central Administration Appellate Structure Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q496_img1.png" alt="Central Administration Appellate Structure Flowchart" /></p>
 
 Central Administration Appellate Structure Flowchart
 
@@ -10640,7 +10640,7 @@ Even though the ups and downs of Indian politics, the Rajya Sabha has remained a
 - **Checks and Balances:** The Rajya Sabha serves as an essential check on the actions and policies of the Lok Sabha (lower house) and the executive. By scrutinizing bills and legislation, the Rajya Sabha ensures that the government’s decisions are well-considered, and minority voices are not suppressed.
 - For instance, **In 2015, the Rajya Sabha blocked the controversial Land Acquisition Bill proposed by the Lok Sabha and the executive.** The bill was widely criticized for being anti-farmer and for not providing adequate compensation to those whose lands were acquired.
 
-<p align="center"><img src="images/pw_polity_q531_img1.webp" alt="Role of Rajya Sabha" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q531_img1.webp" alt="Role of Rajya Sabha" /></p>
 
 - **Representation of States:** Rajya Sabha’s members are elected by the members of the State Legislative Assemblies, ensuring that each state has equal representation irrespective of its population size. This balanced representation allows the Rajya Sabha to uphold federalism and protect the interests of the states in the legislative process.
 - **A notable example is the Goods and Services Tax (GST) Bill, passed in 2016.:** This bill impacted all states, and the Rajya Sabha, with its balanced representation, played a vital role in considering the interests of all states before passing the bill.
@@ -10766,7 +10766,7 @@ Dowry Prohibition Act, 1960, Banking Service Commission Act, 1977 and POTA, 2002
 - **Deadlock on a non-money bill:** If a non-money bill is passed by one house and rejected by the other house or if both houses fail to agree on the amendments to be made in the bill, a joint session can be convened. The President of India can summon a joint session.
 - **Bill pending for more than six months:** If a bill passed by one house is sent to the other house and remains pending for more than six months without any decision, the President can call a joint session. **In both cases mentioned above, the joint session is presided over by the Speaker of the Lok Sabha** or, in their absence, the Deputy Speaker or, if both are absent, a person determined by the President.
 
-<p align="center"><img src="images/pw_polity_q363_img1.webp" alt="joint session" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q363_img1.webp" alt="joint session" /></p>
 
 **Occasions when a joint session cannot be held:**
 - **Money bills:** Joint sessions cannot be called for money bills, as the Rajya Sabha’s powers are limited in this context.
@@ -10875,7 +10875,7 @@ According to LS speaker Om Birla, **Parliamentary Committees** are the **"backbo
 
 2. **Low attendance of members-** In 17th, average attendance for subject committee meetings was only 47%.
 
-<p align="center"><img src="images/civilsdaily_p28_img64.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p28_img64.png" alt="Diagram" /></p>
 
 3. **Fewer bills referred-** In the 15th Lok Sabha -71%, 16th Lok Sabha -27% and in 17th Lok Sabha -16% of the bills introduced were referred to the committees.
 
@@ -11450,7 +11450,7 @@ Parliamentary committees, including the Estimates Committee, play a crucial role
 
 Parliamentary committees serve as specialized bodies that enable detailed examination of complex legislative and administrative matters. The Estimates Committee exemplifies how committees enhance parliamentary effectiveness through focused financial oversight.
 
-<p align="center"><img src="images/superkalam_polity_q593_img1.png" alt="Estimates Committee Structural Framework Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q593_img1.png" alt="Estimates Committee Structural Framework Diagram" /></p>
 
 Estimates Committee Structural Framework Diagram
 
@@ -11901,7 +11901,7 @@ Thus, best practices such as the principle of once a speaker always a speaker fr
 
 The presiding officers of state legislatures serve as the guardians of **parliamentary democracy** and play a pivotal role in upholding democratic traditions and legislative decorum. Their multifaceted responsibilities encompass maintaining order, ensuring impartiality, and fostering democratic best practices in the conduct of legislative business.
 
-<p align="center"><img src="images/superkalam_polity_q184_img1.png" alt="Role of Presiding Officer in Parliament" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q184_img1.png" alt="Role of Presiding Officer in Parliament" /></p>
 
 Role of Presiding Officer in Parliament
 
@@ -12044,7 +12044,7 @@ The Vice-President of India has been clothed with a dual capacity as the second 
 
 **The Vice-President of India is the second-highest constitutional office in the country, provisioned under** Art.66 of constitution **and one of their key responsibilities is to serve as the ex-officio Chairman of the Rajya Sabha, the Upper House of the Parliament of India. This role is crucial to ensuring the smooth functioning of the Rajya Sabha and maintaining the dignity and decorum of the House.**
 
-<p align="center"><img src="images/pw_polity_q652_img1.webp" alt="Role of vice president" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q652_img1.webp" alt="Role of vice president" /></p>
 
 ### Body
 
@@ -12259,7 +12259,7 @@ It is time to ensure impartiality and transparency in the office of the Speaker 
 
 ### Body
 
-**However, it is essential to examine the potential implications of this practice for the robust functioning of parliamentary business in India:** <p align="center"><img src="images/pw_polity_q524_img1.webp" alt=" parliamentary business" /></p> **Potential Benefits:**
+**However, it is essential to examine the potential implications of this practice for the robust functioning of parliamentary business in India:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q524_img1.webp" alt=" parliamentary business" /></p> **Potential Benefits:**
 
 **However, it is essential to examine the potential implications of this practice for the robust functioning of parliamentary business in India:**  **Potential Benefits:**
 - **Impartiality:** Adopting this practice would reinforce the impartiality of the Speaker, as they would not be beholden to any political party during or after their term.
@@ -12379,7 +12379,7 @@ A. Legislative Function
 - **Marginalization of Private Members’ Bills** - Only **14 passed since 1952.**
 - **Decreasing referral of bills to parliamentary committees-** Only 27% in the 16th Lok Sabha and 16% in the 17th Lok Sabha.
 
-<p align="center"><img src="images/civilsdaily_p32_img67.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p32_img67.png" alt="Diagram" /></p>
 
 - **Lack of thorough scrutiny of bills-** During the term of the 17th LS, 58% of the Bills introduced were passed within two weeks of their introduction. Eg- the J&K Reorganisation Bill, 2019
 
@@ -12534,7 +12534,7 @@ It is crucial to recognize and address this issue in order to maintain the integ
 
 The diminishing role of individual parliamentarians in lawmaking represents a critical challenge to India's parliamentary democracy, significantly undermining legislative quality and democratic deliberation.
 
-<p align="center"><img src="images/superkalam_polity_q500_img1.png" alt="Anti Defection Law Top-Down Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q500_img1.png" alt="Anti Defection Law Top-Down Flowchart" /></p>
 
 Anti Defection Law Top-Down Flowchart
 
@@ -12601,7 +12601,7 @@ Revitalizing individual parliamentarians' legislative role requires comprehensiv
 
 The Anti-Defection Law was introduced via the 52nd amendment to the Indian Constitution in 1985, which added the 10th Schedule to the Indian Constitution. The aim of this law was to curb political defections, which were causing instability in the government and undermining the faith of the electorate. The law prohibits elected members from defecting to another party after elections, and if they do, they are liable to be disqualified from their position.
 
-<p align="center"><img src="images/pw_polity_q62_img1.webp" alt="responsibilities of MP" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q62_img1.webp" alt="responsibilities of MP" /></p>
 
 ### Body
 
@@ -12830,7 +12830,7 @@ The Attorney General ensures that the Union Government functions within the lega
 
 The Attorney General of India (AGI), established under **Article 76** of the Constitution, is the highest law officer of the country. As the chief legal advisor to the Union Government, the AGI ensures that governance is conducted within the framework of the Constitution and the law.
 
-<p align="center"><img src="images/superkalam_polity_q35_img1.png" alt="Attorney General of India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q35_img1.png" alt="Attorney General of India" /></p>
 
 Attorney General of India
 
@@ -12985,7 +12985,7 @@ Despite certain limitations, the Attorney-General remains an essential figure in
 
 The Attorney General of India (AGI), appointed under **Article 76** of the Constitution, serves as the highest law officer and primary legal advisor to the Government of India, embodying constitutional expertise and legal leadership.
 
-<p align="center"><img src="images/superkalam_polity_q503_img1.png" alt="Attorney General of India Article 76 Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q503_img1.png" alt="Attorney General of India Article 76 Diagram" /></p>
 
 Attorney General of India Article 76 Diagram
 
@@ -13359,7 +13359,7 @@ Both **Lok Adalats** and **Arbitration Tribunals** play vital roles in providing
 
 Alternative Dispute Resolution (ADR) mechanisms operationalize **Article 39A** (equal justice and free legal aid). Their effectiveness is evident as National Lok Adalats disposed of a staggering **14.84 crore cases** in 2025-26, drastically reducing judicial pendency.
 
-<p align="center"><img src="images/superkalam_polity_q106_img1.png" alt="Alternative Dispute Resolution" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q106_img1.png" alt="Alternative Dispute Resolution" /></p>
 
 Alternative Dispute Resolution
 
@@ -13614,7 +13614,7 @@ Justice administration is a core responsibility of state. Apex court has linked 
  **Article 39A** of the Constitution mandates the State to ensure equal justice and provide free legal aid to the weaker sections. To operationalize this, **the Legal Services Authorities Act, 1987** was enacted to bridge the gap between the law and the marginalized by institutionalizing free legal aid across the country.
 **Question ID: 2023-gs2-q181-superkalam**
 
-<p align="center"><img src="images/superkalam_social_justice_q198_img1.png" alt="Legal Services Authorities Hierarchy in India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_social_justice_q198_img1.png" alt="Legal Services Authorities Hierarchy in India" /></p>
 
 Legal Services Authorities Hierarchy in India
 
@@ -13950,7 +13950,7 @@ The Supreme Court of India, through the innovative use of PIL, has become a powe
  **Subject:** Indian Polity **Public Interest Litigation (PIL)**, relaxing traditional locus standi, secures justice for the marginalized. Reflecting its scale, the Supreme Court (SC) admitted a record 570 new PILs in 2025.
 **Question ID: 2024-gs2-q15-superkalam**
 
-<p align="center"><img src="images/superkalam_polity_q107_img1.png" alt="Expansion of Judicial Power and Review" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q107_img1.png" alt="Expansion of Judicial Power and Review" /></p>
 
 Expansion of Judicial Power and Review
 
@@ -14448,7 +14448,7 @@ Administrative tribunals are needed for faster and simpler decisions in technica
 
 With 4.53 crore pending cases in Indian courts (India Justice Report 2025), quasi-judicial tribunals established under Articles 323A and 323B are indispensable for swift grievance redressal.
 
-<p align="center"><img src="images/superkalam_polity_q22_img1.png" alt="Traditional Courts versus Administrative Tribunals comparison" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q22_img1.png" alt="Traditional Courts versus Administrative Tribunals comparison" /></p>
 
 Traditional Courts versus Administrative Tribunals comparison
 
@@ -14785,7 +14785,7 @@ Environmental protection and development must **go hand in hand.** Open decision
 
 Environmental pressure groups are civil society coalitions that utilize research and public mobilization to balance development with ecology. As the **State of India's Environment 2024** report notes extreme weather on 318 days in 2023, their democratic role is indispensable.
 
-<p align="center"><img src="images/superkalam_polity_q38_img1.png" alt="Environmental Pressure Groups and their Functions" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q38_img1.png" alt="Environmental Pressure Groups and their Functions" /></p>
 
 Environmental Pressure Groups and their Functions
 
@@ -14828,7 +14828,7 @@ To achieve **Net-Zero 2070**, India must view these groups as essential trustees
 
 **Pressure groups** are organized associations that seek to influence government policies without contesting elections.
 
-<p align="center"><img src="images/civilsdaily_p100_img72.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p100_img72.png" alt="Diagram" /></p>
 
 **Samuel H. Finer** calls them “Invisible empires”
 
@@ -15128,7 +15128,7 @@ While the effectiveness of these methods depends on several factors, farmers’ 
 
 Recent judicial interpretations of legislative power distribution have established federal supremacy and harmonious construction as cornerstone principles for resolving Union-State conflicts while maintaining constitutional balance.
 
-<p align="center"><img src="images/superkalam_polity_q512_img1.png" alt="Judicial Resolution of Legislative Conflicts Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q512_img1.png" alt="Judicial Resolution of Legislative Conflicts Flowchart" /></p>
 
 Judicial Resolution of Legislative Conflicts Flowchart
 
@@ -15221,7 +15221,7 @@ Both of these movements were informal, not associated to any identities or entit
 
 Pressure groups are vital to the Indian political process, influencing decisions, shaping public opinion, and advocating for specific causes. Formal pressure groups are structured entities, such as trade unions and NGOs, while informal pressure groups are more loosely organized, including social movements and online communities. Both types of pressure groups contribute to a vibrant democracy by ensuring diverse voices are heard in policy-making.
 
-<p align="center"><img src="images/pw_polity_q335_img1.webp" alt="features of Pressure groups" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q335_img1.webp" alt="features of Pressure groups" /></p>
 
 ### Body
 
@@ -15380,7 +15380,7 @@ Informal pressure groups represent a democratic evolution, complementing formal 
 - **Public Education:** They often undertake public education and awareness campaigns to inform the public about specific issues and build support for their cause.
 - **For instance, environmental groups like Greenpeace India:** run campaigns to raise awareness about climate change and other environmental issues.
 
-- **Representation:** Pressure groups provide a platform for marginalized and underrepresented groups to voice their concerns and interests. <p align="center"><img src="images/pw_governance_q47_img1.webp" alt="image 2023 12 29T151515.671" /></p> 
+- **Representation:** Pressure groups provide a platform for marginalized and underrepresented groups to voice their concerns and interests. <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_governance_q47_img1.webp" alt="image 2023 12 29T151515.671" /></p> 
 
 **Examples:**
 
@@ -15617,7 +15617,7 @@ The **Representation of the People Acts** keep elections **free and fair** by st
 
 The Representation of the People Act (RPA), 1951 lays down provisions to ensure free and fair elections in India. **Section 123** of the Act explicitly defines “corrupt practices” by candidates and their agents, which, if proved, can result in disqualification and even annulment of election results.
 
-<p align="center"><img src="images/superkalam_polity_q25_img1.png" alt="Corrupt practices in Indian elections" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q25_img1.png" alt="Corrupt practices in Indian elections" /></p>
 
 Corrupt practices in Indian elections
 
@@ -16154,7 +16154,7 @@ The Act of 1951 has laid down certain **criteria for disqualifications**. Accord
 
 ### Body
 
-**Listed below are the key grounds for disqualification:** <p align="center"><img src="images/pw_polity_q451_img1.webp" alt="grounds for disqualification" /></p>
+**Listed below are the key grounds for disqualification:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q451_img1.webp" alt="grounds for disqualification" /></p>
 
 **Listed below are the key grounds for disqualification:** 
 
@@ -16193,7 +16193,7 @@ This Act plays a crucial role in maintaining the integrity of the electoral proc
 
 The Representation of People Act (RPA), 1951, establishes comprehensive grounds for disqualification of elected representatives to maintain electoral integrity and democratic standards.
 
-<p align="center"><img src="images/superkalam_polity_q501_img1.png" alt="RPA 1951 Disqualification Grounds Hierarchy Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q501_img1.png" alt="RPA 1951 Disqualification Grounds Hierarchy Diagram" /></p>
 
 RPA 1951 Disqualification Grounds Hierarchy Diagram
 
@@ -16387,7 +16387,7 @@ The implementation of **One Nation-One Election** holds the potential to strengt
 
 The 2024 Lok Sabha elections, costing an estimated ₹1.35 lakh crore according to the Centre for Media Studies, underscore the urgent need for electoral reforms, particularly the **"One Nation, One Election" (ONOE)** principle.
 
-<p align="center"><img src="images/superkalam_polity_q105_img1.png" alt="Need for One Nation One Election" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q105_img1.png" alt="Need for One Nation One Election" /></p>
 
 Need for One Nation One Election
 
@@ -16397,7 +16397,7 @@ Need for One Nation One Election
 2. Decriminalisation: The **244th Law Commission** stressed disqualifying candidates immediately upon the framing of serious charges to cleanse legislative integrity.
 3. Institutional autonomy: The **2nd ARC's** push for an independent selection collegium for the Election Commission culminated in the **CEC Appointment Act, 2023**.
 
-<p align="center"><img src="images/superkalam_polity_q105_img2.jpg" alt="Committees which recommended electoral reforms" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q105_img2.jpg" alt="Committees which recommended electoral reforms" /></p>
 
 Committees which recommended electoral reforms
 
@@ -16530,7 +16530,7 @@ EVMs have brought a structure to the electoral process that did not exist during
 
 Recent EVM controversies have intensified debates about electoral integrity. The Election Commission of India faces multifaceted challenges in maintaining public trust and ensuring credible elections.
 
-<p align="center"><img src="images/superkalam_polity_q581_img1.png" alt="Challenges Before Election Commission of India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q581_img1.png" alt="Challenges Before Election Commission of India" /></p>
 
 Challenges Before Election Commission of India
 
@@ -16634,7 +16634,7 @@ Electoral reform basically aims at introducing an electoral system of conducting
 
 - **Inclusion of special categories:** The ECI recommended measures to facilitate the voting process for special categories of voters, such as Non-Resident Indians (NRIs), persons with disabilities, and migrant workers.
 
-<p align="center"><img src="images/pw_polity_q369_img1.webp" alt="Electoral reforms" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q369_img1.webp" alt="Electoral reforms" /></p>
 
 - **Inclusion of special categories:** The ECI recommended measures to facilitate the voting process for special categories of voters, such as **Non-Resident Indians (NRIs)**, **persons with disabilities**, and **migrant workers**.
 
@@ -16769,7 +16769,7 @@ Simultaneous elections are desirable provided they are juxtaposed with certain r
 
 ### Body
 
-<p align="center"><img src="images/pw_polity_q358_img1.webp" alt="simultaneous elections" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q358_img1.webp" alt="simultaneous elections" /></p>
 
 **Advantages of simultaneous elections:**
 - **Saving resources:** Conducting simultaneous elections can save a significant amount of financial and administrative resources, as well as time spent in electioneering.
@@ -16976,7 +16976,7 @@ Model Code of Conduct does not have any statutory backing, it has come to acquir
 ### Body
 
 **Role of the Election Commission of India in the Evolution of the Model Code of Conduct:**
-<p align="center"><img src="images/pw_polity_q650_img1.webp" alt="Election Commission" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q650_img1.webp" alt="Election Commission" /></p>
 
 **Role of the Election Commission of India in the Evolution of the Model Code of Conduct:**
 
@@ -17623,7 +17623,7 @@ The **Comptroller and Auditor General** plays a vital role in maintaining **fina
 
 The **Comptroller and Auditor General (CAG)** serves as India's supreme audit institution, functioning as a watchdog over public finances and ensuring accountability in governance. The role extends beyond mere financial compliance to encompass comprehensive scrutiny of government expenditure.
 
-<p align="center"><img src="images/superkalam_polity_q115_img1.png" alt="CAG's Audit of Expenditure: Type of Audits" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q115_img1.png" alt="CAG's Audit of Expenditure: Type of Audits" /></p>
 
 CAG's Audit of Expenditure: Type of Audits
 
@@ -17757,7 +17757,7 @@ Thus, NCBC is an important commission for social progress. It should be gender s
 
 The National Commission for Backward Classes (NCBC) was initially established as a statutory body under the National Commission for Backward Classes Act, 1993. In 2018, with the 102nd Constitutional Amendment Act, the NCBC was granted constitutional status, becoming an essential institution for safeguarding the interests of the socially and educationally backward classes in India.
 
-<p align="center"><img src="images/pw_polity_q651_img1.webp" alt="NCBC" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q651_img1.webp" alt="NCBC" /></p>
 
 ### Body
 Evolution and Expansion of NCBC: From Statutory to Constitutional
@@ -17938,7 +17938,7 @@ The Finance Commission recommendations will reform the State finances which will
 
 ### Body
 
-**Increased devolution of central taxes:** <p align="center"><img src="images/pw_polity_q599_img1.webp" alt="14th FCI recommendations " /></p>
+**Increased devolution of central taxes:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q599_img1.webp" alt="14th FCI recommendations " /></p>
 
 **Increased devolution of central taxes:** 
 
@@ -18218,7 +18218,7 @@ By addressing the financial needs of both the Union and State governments, the C
 
 The Finance Commission serves as a constitutional bridge ensuring equitable fiscal federalism between Union and States in India's federal structure.
 
-<p align="center"><img src="images/superkalam_polity_q580_img1.png" alt="Finance Commission Constitution Organizational Chart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q580_img1.png" alt="Finance Commission Constitution Organizational Chart" /></p>
 
 Finance Commission Constitution Organizational Chart
 
@@ -18360,7 +18360,7 @@ Its role as the highest auditing authority is intrinsically linked to the effica
 
 The Comptroller and Auditor General (CAG) serves as India's supreme audit institution, functioning as the constitutional guardian of public finances and ensuring transparency in governance.
 
-<p align="center"><img src="images/superkalam_polity_q588_img1.png" alt="Comptroller and Auditor General Structural Framework" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q588_img1.png" alt="Comptroller and Auditor General Structural Framework" /></p>
 
 Comptroller and Auditor General Structural Framework
 
@@ -18503,7 +18503,7 @@ While the NCSC plays a crucial role in safeguarding the rights of Scheduled Cast
 
 Recent constitutional debates highlight the complex intersection between minority rights and SC reservation policies. The NCSC's enforcement authority in minority institutions remains constitutionally limited yet evolving.
 
-<p align="center"><img src="images/superkalam_polity_q591_img1.png" alt="Article 15 SC Reservations Block Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q591_img1.png" alt="Article 15 SC Reservations Block Diagram" /></p>
 
 Article 15 SC Reservations Block Diagram
 
@@ -18578,7 +18578,7 @@ The institution of CAG is no longer that of only auditors as it was probably 50 
 
 **While the CAG is mandated to scrutinize the accounts and financial transactions of the government, the question arises whether the audit of government policy implementation could amount to overstepping its jurisdiction.**
 
-<p align="center"><img src="images/pw_polity_q264_img1.webp" alt="CAG Reports" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q264_img1.webp" alt="CAG Reports" /></p>
 
 - **To discuss this, it is essential to understand the nature of the CAG’s audits:**
 
@@ -19057,7 +19057,7 @@ Thus, it can be fairly argued that the tribunal which was formed for grievance a
 
 Recent farmer movements, particularly the 2020-21 protests, have demonstrated the significant influence of agrarian organizations in India's policy-making process. These organizations employ diverse strategies ranging from traditional protests to modern advocacy techniques.
 
-<p align="center"><img src="images/superkalam_polity_q504_img1.png" alt="Farmer Organizations Radial Diagram With Arrows" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q504_img1.png" alt="Farmer Organizations Radial Diagram With Arrows" /></p>
 
 Farmer Organizations Radial Diagram With Arrows
 
@@ -19246,7 +19246,7 @@ The constitutional validity of tribunals is established under Articles 323A and 
 
 The establishment of tribunals as specialized judicial bodies has sparked ongoing debates about their constitutional validity and impact on India's traditional court system.
 
-<p align="center"><img src="images/superkalam_polity_q579_img1.png" alt="2018 Hierarchical flowchart with three boxes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q579_img1.png" alt="2018 Hierarchical flowchart with three boxes" /></p>
 
 2018 Hierarchical flowchart with three boxes
 
@@ -19331,7 +19331,7 @@ Send To My Bookmarks
 - **National Green Tribunal (NGT):** Established under the National Green Tribunal Act, 2010, NGT is a specialized body that deals with environmental disputes involving the enforcement of legal rights related to the environment, pollution control, and conservation of natural resources.
   - The NGT is empowered to hear civil cases involving substantial questions related to the environment and impose penalties on violators.
 
-<p align="center"><img src="images/pw_polity_q302_img1.webp" alt="quasi-judicial bodies" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q302_img1.webp" alt="quasi-judicial bodies" /></p>
 
 - **Competition Commission of India (CCI):** The CCI is a statutory body set up under the Competition Act, 2002, to prevent practices that have an adverse effect on competition, promote and sustain competition, protect consumer interests, and ensure freedom of trade.
   - The CCI has the authority to investigate anti-competitive practices, impose penalties, and issue orders to regulate market competition.
@@ -19652,7 +19652,7 @@ Recent developments in India's financial sector show increasing convergence betw
 - **Pension Products**: Market-linked pension schemes blur boundaries between insurance and securities regulation
 - **Regulatory Confusion**: The 2010 ULIP controversy demonstrated how dual regulation creates market uncertainty
 
-<p align="center"><img src="images/superkalam_social_justice_q998_img1.jpeg" alt="Financial Product Convergence showing overlap between securities, insurance, and banking products" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_social_justice_q998_img1.jpeg" alt="Financial Product Convergence showing overlap between securities, insurance, and banking products" /></p>
 
 Financial Product Convergence showing overlap between securities, insurance, and banking products
 
@@ -19897,7 +19897,7 @@ These steps bring laws, apps, and families together for child‑first online saf
 
 The **National Commission for Protection of Child Rights (NCPCR)** faces unprecedented challenges as **95% of Indian children** now access internet, with cyber crimes against minors rising by **400% since 2020**.
 
-<p align="center"><img src="images/superkalam_polity_q36_img1.png" alt="NCPCR Digital Safety Framework Core Components" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q36_img1.png" alt="NCPCR Digital Safety Framework Core Components" /></p>
 
 NCPCR Digital Safety Framework Core Components
 
@@ -20083,7 +20083,7 @@ The 2023 amendment to the Competition Act has further expanded the scope of CCI 
 
 The Competition Commission of India (CCI), established under the Competition Act, 2002, is a statutory body tasked with promoting fair competition in Indian markets. One of its key responsibilities is to prevent the abuse of dominant position by enterprises, including Multi-National Corporations (MNCs), to protect consumer interests and ensure a level playing field.
 
-<p align="center"><img src="images/superkalam_governance_q185_img1.png" alt="Abuse of dominant position and intervention" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_governance_q185_img1.png" alt="Abuse of dominant position and intervention" /></p>
 
 Abuse of dominant position and intervention
 
@@ -20745,7 +20745,7 @@ The Human Rights Commission (unified)needs to be given more teeth in terms of in
 
 Recent overlapping between the National Commission for Women and National Human Rights Commission in handling gender-based violence cases highlights the need for structural reform in India's human rights architecture.
 
-<p align="center"><img src="images/superkalam_polity_q585_img1.png" alt="Comparative structural diagram: Current section" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q585_img1.png" alt="Comparative structural diagram: Current section" /></p>
 
 Comparative structural diagram: Current section
 
@@ -21195,7 +21195,7 @@ The **PM Gati Shakti National Master Plan (2021)** aims to transform India’s i
 
 PM Gati-Shakti is a transformative approach for economic growth and sustainable development. The approach is driven by 7 engines, namely: Railways, Roads, Ports, Waterways, Airports, Mass Transport, Logistics Infrastructure.
 
-<p align="center"><img src="images/polity_q17_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/polity_q17_img1.png" alt="Image" /></p>
 
 The approach is powered by Clean Energy and Sabka Prayas - the efforts of the Central Government, the state governments, and the private sector together - Leading to huge jobs and entrepreneurial opportunities for all.
 
@@ -21246,7 +21246,7 @@ The projects pertaining to these 7 engines in the “National Infrastructure Pip
 
 **The Gati-Shakti Yojana, also known as the National Master Plan for Multi-modal Connectivity, is an ambitious initiative by the Indian government aimed at enhancing infrastructure development and providing seamless connectivity across various modes of transportation. The plan envisions a holistic approach to infrastructure development by integrating road, rail, air, and water transport networks, which is crucial for the nation’s economic growth and regional development.**
 
-<p align="center"><img src="images/pw_governance_q682_img1.webp" alt="gati shakti " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_governance_q682_img1.webp" alt="gati shakti " /></p>
 
 ### Body
 
@@ -21573,7 +21573,7 @@ Connectivity thus forms the backbone of PURA by creating an ecosystem where rura
 
 Development is most effective when **decisions are taken close to where problems occur (Principle of Subsidiarity).** However, **centralized and technocratic development models** separate **decision-making** from **execution,** leading to inefficiencies, alienation, and weak accountability.
 
-<p align="center"><img src="images/civilsdaily_p111_img74.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p111_img74.png" alt="Diagram" /></p>
 
 **Contemporary development models**
 
@@ -21760,7 +21760,7 @@ Centralised templates help align standards and scale, but they often miss local 
 
 Recent data from **NITI Aayog's SDG Index 2023** reveals significant inter-state disparities, highlighting how centralized development models often fail to address local realities and needs.
 
-<p align="center"><img src="images/superkalam_governance_q31_img1.png" alt="Top-Down vs Bottom-Up Approaches Of Decision Making" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_governance_q31_img1.png" alt="Top-Down vs Bottom-Up Approaches Of Decision Making" /></p>
 
 Top-Down vs Bottom-Up Approaches Of Decision Making
 
@@ -22722,7 +22722,7 @@ A **“light but tight” regulatory framework, as suggested by Vijay Kuma** r *
 
 Civil Society Organizations (CSOs) are non-State, voluntary groups that operate independently to promote social, economic, environmental, or political causes. Ideally, they function as non-State actors working with or alongside the government to ensure democratic accountability. However, recent **FCRA cancellations affecting over 6,000 NGOs in 2023** highlight the complex state-CSO relationship dynamics in India.
 
-<p align="center"><img src="images/superkalam_governance_q21_img1.png" alt="State, Civil Society, Market Trinity" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_governance_q21_img1.png" alt="State, Civil Society, Market Trinity" /></p>
 
 State, Civil Society, Market Trinity
 
@@ -22934,7 +22934,7 @@ In summary, Indian civil society organizations actively advocate for greater rep
 
 Women constitute nearly 50% of India’s population but remain severely underrepresented in legislative bodies, especially in State Assemblies. Civil society groups (CSGs) have played a critical role in addressing structural, social, and political barriers that hinder women's participation in politics.
 
-<p align="center"><img src="images/superkalam_social_justice_q183_img1.png" alt="Women's Representation in State Legislature Initiatives" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_social_justice_q183_img1.png" alt="Women's Representation in State Legislature Initiatives" /></p>
 
 Women's Representation in State Legislature Initiatives
 
@@ -22971,7 +22971,7 @@ The collaborative efforts of civil society groups have been instrumental in crea
 
 **CSO and NGOs** are the **connective tissue** between state intent and citizen impact. They serve as non-state actors that **deliver essential services,** advocate for rights, and fill governance gaps.
 
-<p align="center"><img src="images/civilsdaily_p101_img73.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p101_img73.png" alt="Diagram" /></p>
 
 **Role of Civil Society and**
 
@@ -23063,7 +23063,7 @@ Civil society and NGOs can be made an integral part of the development process b
 
 **Civil Society Organizations (CSOs) and Non-Governmental Organizations (NGOs) play a pivotal role in India’s socio-economic landscape. They supplement and complement government efforts across various sectors, bridging gaps in public service delivery with innovative, grassroots-based solutions.** As per a 2019 report by the Ministry of Statistics and Programme Implementation, India houses approximately 3.2 million NGOs, outnumbering schools and health centers, underlining their significant role.
 
-**<p align="center"><img src="images/pw_social_justice_q572_img1.webp" alt="image 2023 12 29T160545.886" /></p>**
+**<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_social_justice_q572_img1.webp" alt="image 2023 12 29T160545.886" /></p>**
 
 
 ### Body
@@ -23366,7 +23366,7 @@ The **Supreme Court's validation** of 2020 FCRA amendments in 2022 confirmed the
 
 ### Body
 
-**However, their potential can be further harnessed through the following ways**: <p align="center"><img src="images/pw_social_justice_q191_img1.webp" alt="image 2023 12 29T172210.904" /></p>
+**However, their potential can be further harnessed through the following ways**: <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_social_justice_q191_img1.webp" alt="image 2023 12 29T172210.904" /></p>
 
 **However, their potential can be further harnessed through the following ways**: 
 
@@ -23559,7 +23559,7 @@ Though microfinancing of women SHGs can help overcome challenges like malnutriti
 
 Microfinancing of women Self-Help Groups (SHGs) has emerged as a powerful tool for empowering women and addressing various socio-economic challenges, such as gender inequality, poverty, and malnutrition. By providing women with access to financial resources and promoting economic independence, microfinancing can play a significant role in breaking the vicious cycle.
 
-<p align="center"><img src="images/pw_social_justice_q573_img1.webp" alt="image 2023 12 29T155821.331 1" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_social_justice_q573_img1.webp" alt="image 2023 12 29T155821.331 1" /></p>
 
 ### Body
 
@@ -23752,7 +23752,7 @@ For equitable and sustainable development in rural India, financial inclusion su
 
 Micro-finance has emerged as a powerful instrument for poverty reduction, asset creation, and income security in developing countries, including India. Self Help Groups (SHGs) have been instrumental in providing microfinance services to rural poor, especially women.
 
-<p align="center"><img src="images/pw_social_justice_q521_img1.webp" alt="image 2023 12 29T162141.093" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_social_justice_q521_img1.webp" alt="image 2023 12 29T162141.093" /></p>
 
 ### Body
 
@@ -23876,7 +23876,7 @@ Given the important role SHGs play in development activities, the government sho
 
 The emergence of Self Help Groups (SHGs) in contemporary times has significantly contributed to developmental activities in India, particularly in rural areas. While it may be argued that the growth of SHGs indicates a slow withdrawal of the state from developmental activities, it can also be seen as a complementary strategy to empower communities and promote sustainable development.
 
-<p align="center"><img src="images/pw_governance_q362_img1.webp" alt="image 2023 12 29T130744.720" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_governance_q362_img1.webp" alt="image 2023 12 29T130744.720" /></p>
 
 ### Body
 * **Role of SHGs in developmental activities**
@@ -24089,7 +24089,7 @@ Effective environmental governance requires empowered NGOs working alongside gov
 
 Self Help Groups (SHGs), formed on the premise of collective effort and shared responsibility, have emerged as a pivotal social innovation for promoting participatory development, particularly in the rural context. By catalyzing small-scale entrepreneurship, enhancing financial literacy, and fostering economic inclusion, SHGs have the potential to address the socio-economic gaps that persist in rural areas.
 
-<p align="center"><img src="images/pw_governance_q145_img1.webp" alt="image 2023 12 29T140011.366" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_governance_q145_img1.webp" alt="image 2023 12 29T140011.366" /></p>
 
 ### Body
 
@@ -24424,7 +24424,7 @@ Public charitable trusts are uniquely positioned to fill gaps in public service 
 
 Public Charitable Trusts (PCTs) bridge private wealth and public welfare. As per the **India Philanthropy Report 2024**, private philanthropy reached ₹1.2 lakh crore in FY23, demonstrating their immense potential to drive inclusive development.
 
-<p align="center"><img src="images/superkalam_governance_q110_img1.png" alt="Public Charitable Trusts and Inclusive Development" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_governance_q110_img1.png" alt="Public Charitable Trusts and Inclusive Development" /></p>
 
 Public Charitable Trusts and Inclusive Development
 
@@ -24852,7 +24852,7 @@ The **Citizen's Charter**, introduced in 1997 as part of the "**Action Plan for 
 
 Despite being a landmark initiative, the Citizen’s Charter has not yet delivered on its full promise of ensuring citizen-centric governance.
 
-<p align="center"><img src="images/superkalam_governance_q113_img1.png" alt="Citizen Centric Administration Model" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_governance_q113_img1.png" alt="Citizen Centric Administration Model" /></p>
 
 Citizen Centric Administration Model
 
@@ -24882,7 +24882,7 @@ Citizen Centric Administration Model
 
 - Implementation of **Sevottam Model** for service delivery excellence.
 
-<p align="center"><img src="images/superkalam_governance_q113_img2.jpg" alt="Sevottam Model of Governance" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_governance_q113_img2.jpg" alt="Sevottam Model of Governance" /></p>
 
 Sevottam Model of Governance
 - Regular updating of service standards based on citizen feedback and changing needs.
@@ -24960,7 +24960,7 @@ The **Citizen’s Charter,** introduced in India in **1997 (DARPG)** following t
 
 1. Enact a **Citizen’s Charter Act** with **penalties for non-compliance,** similar to **Right to Public Services Acts** in MP and Bihar.
 
-<p align="center"><img src="images/civilsdaily_p84_img68.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p84_img68.png" alt="Diagram" /></p>
 
 2. Involve **civil society, user groups, and local bodies** in designing realistic and demand-driven service standards.
 
@@ -25105,7 +25105,7 @@ The transformation of Citizen's Charters from symbolic documents to effective go
 
 Introduced in India in 1997, Citizen’s Charters aimed to enhance governance by stipulating service delivery standards for public sector organizations. However, despite being in operation for over two decades, their impact on augmenting citizen satisfaction and improving service quality hasn’t been significantly substantial.
 
-<p align="center"><img src="images/pw_governance_q67_img1.webp" alt="image 2023 12 29T180011.587" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_governance_q67_img1.webp" alt="image 2023 12 29T180011.587" /></p>
 
 ### Body
 * **This could be attributed to several reasons**
@@ -25289,7 +25289,7 @@ In order to combat the rising incidents of question paper leaks and malpractices
 
 **Aims and Objectives of the Act**
 
-<p align="center"><img src="images/governance_q14_img1.jpg" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/governance_q14_img1.jpg" alt="Image" /></p>
 
 - The act aims to deter unfair means in public examinations by addressing organized cheating and malpractices.
 
@@ -25366,7 +25366,7 @@ The Public Examination (Prevention of Unfair Means) Act, 2024, is a landmark ste
 
 Enacted into law, the **Public Examinations (Prevention of Unfair Means) Act, 2024**, responds to repeated incidents such as NEET‑UG paper leaks that shattered public trust. It seeks to restore credibility, fairness, and transparency in recruitment and entrance examinations conducted at the national level.
 
-<p align="center"><img src="images/superkalam_governance_q118_img1.png" alt="Public Examination Act 2024 Overview" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_governance_q118_img1.png" alt="Public Examination Act 2024 Overview" /></p>
 
 Public Examination Act 2024 Overview
 
@@ -25693,7 +25693,7 @@ The 2nd ARC held that RTI is the master key to governance as it checks the misus
 
 The Right to Information (RTI) Act was enacted in India in 2005 to promote transparency and accountability in the functioning of the government. The Information Commission, an independent institution, plays a crucial role in adjudicating on complaints and appeals filed under the RTI Act.
 
-<p align="center"><img src="images/pw_polity_q533_img1.webp" alt="RTI" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_polity_q533_img1.webp" alt="RTI" /></p>
 
 ### Body
 
@@ -26179,7 +26179,7 @@ The amendment risks creating a **"protection paradox"** where those meant to be 
 
 The Satyam Scandal, often referred to as “India’s Enron,” was a corporate scandal affecting India-based company Satyam Computer Services in 2009, where the chairman Ramalinga Raju confessed that the company’s accounts had been falsified.
 
-<p align="center"><img src="images/pw_governance_q197_img1.webp" alt="image 2023 12 29T135123.917" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_governance_q197_img1.webp" alt="image 2023 12 29T135123.917" /></p>
 
 ### Body
 
@@ -26441,7 +26441,7 @@ These issues can be overcome by putting people first. Offer services in regional
 
 E-governance aims to make government services **efficient, transparent, and accessible** using digital technologies. However, in India, many e-governance projects have been designed with a **technology-first approach**, often emphasizing **IT infrastructure and data integration** over the needs and ease-of-use for end users, especially citizens from marginalized sections.
 
-<p align="center"><img src="images/superkalam_governance_q28_img1.png" alt="Tech-Driven vs User-Led Approach" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_governance_q28_img1.png" alt="Tech-Driven vs User-Led Approach" /></p>
 
 Tech-Driven vs User-Led Approach
 
@@ -26511,7 +26511,7 @@ Successful e-governance requires balancing technological robustness with user-ce
 
 **Interactive service model**
 
-<p align="center"><img src="images/civilsdaily_p92_img69.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p92_img69.png" alt="Diagram" /></p>
 
 **UN e-Government Survey (2022)** defines interactive e-services as “a two-way digital interface enabling citizens to engage, transact, and participate in governance.”
 
@@ -26578,7 +26578,7 @@ This can transform e-Governance into a **trust-based, citizen-driven, and partic
 
 The **interactive service model of e-governance** transforms **one-way service delivery** into a dialogue, allowing citizens to voice concerns and participate in decision-making.
 
-<p align="center"><img src="images/governance_q7_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/governance_q7_img1.png" alt="Image" /></p>
 
 ### Body
 
@@ -26673,7 +26673,7 @@ E-governance, particularly through the Interactive Service Model, holds the pote
 
 The advent of **Digital India Mission** has transformed governance from mere computerization to an interactive ecosystem fostering transparency and accountability through multi-stakeholder engagement. The **Interactive Service Model (ISM)** represents a paradigm shift from traditional one-way service delivery to dynamic citizen-government interactions.
 
-<p align="center"><img src="images/superkalam_governance_q104_img1.png" alt="Government interacting with multiple entities model" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_governance_q104_img1.png" alt="Government interacting with multiple entities model" /></p>
 
 Government interacting with multiple entities model
 
@@ -26958,7 +26958,7 @@ Thus, the realise the full potential of e-governance government is taking steps 
 
 E-governance refers to the use of information and communication technologies (ICT) for delivering government services, enhancing interaction with citizens, businesses, and other arms of government. In India, initiatives like **Digital India, MyGov, and UMANG** have strengthened transparency, efficiency, and accountability.
 
-<p align="center"><img src="images/superkalam_governance_q186_img1.png" alt="Inadequacies in e-Governance: Key Challenges" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_governance_q186_img1.png" alt="Inadequacies in e-Governance: Key Challenges" /></p>
 
 Inadequacies in e-Governance: Key Challenges
 
@@ -27017,7 +27017,7 @@ As per **UNDP (2022),** Digital access is now a core dimension of human developm
 
 **Impact of Digital Illiteracy and Poor ICT Access on**
 
-<p align="center"><img src="images/civilsdaily_p95_img71.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p95_img71.png" alt="Diagram" /></p>
 
 **Socio-Economic Development**
 
@@ -27319,7 +27319,7 @@ Industrial Revolution 4.0 brings with it immense potential to improve governance
 
 **These innovations have led to the widespread adoption of e-Governance, integrating technology into the functioning of governments worldwide. The adoption of e-Governance as an integral part of government has several implications:**
 
-<p align="center"><img src="images/pw_governance_q538_img1.webp" alt="E-governance" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_governance_q538_img1.webp" alt="E-governance" /></p>
 
 - **Improved efficiency and effectiveness:** e-Governance enables governments to streamline their processes, reduce bureaucracy, and make better use of resources.
 - **Enhanced transparency and accountability:** By making information and data easily accessible through digital platforms, e-Governance promotes transparency in government operations.
@@ -27384,7 +27384,7 @@ NEP 2020 demonstrates strong conceptual alignment with **SDG-4's transformative 
 
 ICT in governance refers to the strategic use of information technology to enhance administrative efficiency, transparency, and service accessibility.
 
-<p align="center"><img src="images/civilsdaily_p93_img70.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p93_img70.png" alt="Diagram" /></p>
 
 **Fact File**
 
@@ -27645,7 +27645,7 @@ Therefore, the focus of e- governance should not only be limited to efficiently 
 
 E-governance refers to the application of information and communication technology (ICT) to deliver government services, exchange information, facilitate communication, and improve the overall efficiency, transparency, and accountability of government processes.
 
-<p align="center"><img src="images/pw_governance_q405_img1.webp" alt="image 2023 12 29T122229.181" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_governance_q405_img1.webp" alt="image 2023 12 29T122229.181" /></p>
 
 ### Body
 * **While the use of new technology is certainly a key aspect of e-governance, it is also crucial to recognize the importance of the ‘use value’ of information.**
@@ -27952,7 +27952,7 @@ As emphasised in **Kautilya’s Saptanga Theory**, the **Amatya** (civil servant
 
 The Doctrine of Democratic Governance rests on public consent and trust. However, India's 91st rank in the **Corruption Perceptions Index 2025** indicates a trust deficit, making absolute positive perception of civil servants a democratic necessity.
 
-<p align="center"><img src="images/superkalam_governance_q114_img1.png" alt="Virtuous Cycle: Democratic Governance and Trust" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_governance_q114_img1.png" alt="Virtuous Cycle: Democratic Governance and Trust" /></p>
 
 Virtuous Cycle: Democratic Governance and Trust
 
@@ -28093,7 +28093,7 @@ Sardar Patel considered the civil service “the steel frame of government machi
 
 ### Body
 
-**To strengthen democracy and enhance the performance of the civil service, several reforms can be suggested:** <p align="center"><img src="images/pw_governance_q518_img1.webp" alt="civil service reforms" /></p>
+**To strengthen democracy and enhance the performance of the civil service, several reforms can be suggested:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_governance_q518_img1.webp" alt="civil service reforms" /></p>
 
 **To strengthen democracy and enhance the performance of the civil service, several reforms can be suggested:** 
 
@@ -28340,7 +28340,7 @@ With the opening up of the economy with the 1991 reforms, things have gradually 
 - **Resistance to change:** 
 - **For instance, the slow adoption of e-governance initiatives and digitization of government processes:** has led to inefficiencies in public service delivery and has not been able to fully harness the potential of information technology in improving governance.
 
-<p align="center"><img src="images/pw_governance_q298_img1.webp" alt="image 2023 12 29T133256.290" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_governance_q298_img1.webp" alt="image 2023 12 29T133256.290" /></p>
 
 ### Conclusion
 
@@ -28706,7 +28706,7 @@ True inclusion demands a **“whole-of-society” approach-one** that blends pol
 
 The Right to Persons with Disability Act came into force on 19th April 2017 to give an effect to the United Nations Conventions on Rights with Persons with Disability. With this the focus on disabilities has been shifted from the individual to society, i.e., from a medical model of disability to a social or human rights model of disability.
 
-<p align="center"><img src="images/governance_q5_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/governance_q5_img1.png" alt="Image" /></p>
 
 ### Challenges Associated with RPD Act, 2016
 
@@ -29153,7 +29153,7 @@ The perception of discrimination in these schemes depends on context. While they
 
 Development and welfare schemes for vulnerable sections are undertaken to account for historic injustice and to ensure equity. Thus they are, by their nature, not discriminatory but rather affirmative and corrective in approach. However, this **apparent discrimination** must be understood in a constitutional and socio-economic context.
 
-<p align="center"><img src="images/superkalam_governance_q182_img1.png" alt="Formal vs Substantive Equality" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_governance_q182_img1.png" alt="Formal vs Substantive Equality" /></p>
 
 Formal vs Substantive Equality
 
@@ -29715,7 +29715,7 @@ By fostering solidarity and awareness, women’s social capital serves as a powe
 
 Social capital networks of shared trust and solidarity acts as a transformative catalyst. Today, over 9 crore women mobilized into 83 lakh SHGs under **DAY-NRLM** exemplify this collective power.
 
-<p align="center"><img src="images/superkalam_social_justice_q40_img1.png" alt="Inclusive Social Change" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_social_justice_q40_img1.png" alt="Inclusive Social Change" /></p>
 
 Inclusive Social Change
 
@@ -30630,7 +30630,7 @@ The Fourth Industrial Revolution has established e-Governance as an integral gov
 
 The quality of higher education in India is a matter of concern as highlighted by various international rankings like the QS World University Rankings and Times Higher Education World University Rankings, where Indian universities often rank low.
 
-<p align="center"><img src="images/pw_social_justice_q222_img1.webp" alt="image 2023 12 29T172639.773" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_social_justice_q222_img1.webp" alt="image 2023 12 29T172639.773" /></p>
 
 ### Body
 
@@ -30960,7 +30960,7 @@ The public healthcare system in India, especially at the grassroots level, remai
 
 With **out-of-pocket expenditure accounting for over 48% of total health spending (NHA, 2022-23)**, the poor and marginalized are disproportionately impacted. In such a scenario, the State’s proactive intervention is essential to protect public health as a public good rather than a market commodity.
 
-<p align="center"><img src="images/superkalam_social_justice_q108_img1.png" alt="Healthcare System Levels in India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_social_justice_q108_img1.png" alt="Healthcare System Levels in India" /></p>
 
 Healthcare System Levels in India
 
@@ -31121,7 +31121,7 @@ As recognized in the 2018 Astana Declaration, the Primary Health Care approach i
 - **Economic productivity:** Primary health care, by ensuring access to essential health services, helps create a healthy and productive workforce, which is critical for sustainable development.
 - **Social cohesion and stability:** Primary health care promotes social cohesion and stability by addressing the health needs of all citizens, including vulnerable and marginalized populations.
 
-<p align="center"><img src="images/pw_social_justice_q568_img1.webp" alt="image 2023 12 29T154823.229" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_social_justice_q568_img1.webp" alt="image 2023 12 29T154823.229" /></p>
 
 ### Conclusion
 
@@ -31589,7 +31589,7 @@ A traditional approach has been to segment the beneficiaries on the basis of geo
 
 The Water, Sanitation, and Hygiene (WASH) scheme aims to improve public health and well-being by providing access to clean water, adequate sanitation facilities, and promoting good hygiene practices. Ensuring effective implementation of policies addressing WASH needs requires synchronizing the identification of beneficiary segments with the anticipated outcomes.
 
-<p align="center"><img src="images/pw_social_justice_q370_img1.webp" alt="image 2023 12 29T165115.243" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_social_justice_q370_img1.webp" alt="image 2023 12 29T165115.243" /></p>
 
 ### Body
 
@@ -32042,7 +32042,7 @@ To further strengthen the linkages, the Government of India has created a Minist
 
 India, with a **demographic dividend** of over 65% population below 35 years, holds **immense potential for productive human capital**. However, **the trinity of education, skill, and employment remains** loosely connected. Skill development programmes attempt to bridge this gap by making the workforce industry-ready.
 
-<p align="center"><img src="images/superkalam_governance_q192_img1.png" alt="Skills Education and Economic Growth Cycle" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_governance_q192_img1.png" alt="Skills Education and Economic Growth Cycle" /></p>
 
 Skills Education and Economic Growth Cycle
 
@@ -32228,7 +32228,7 @@ Human resources development is not just a fundamental component of the developme
 
 While India has made **significant strides** in GDP growth, infrastructure, and digital transformation, Human Resource Development (HRD) — the backbone of inclusive and sustainable development — has often **received insufficient and uneven attention**. This has led to skill gaps, poor health indicators, and underutilised demographic dividend.
 
-<p align="center"><img src="images/superkalam_governance_q194_img1.png" alt="Human Resource Development and Economic Growth" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_governance_q194_img1.png" alt="Human Resource Development and Economic Growth" /></p>
 
 Human Resource Development and Economic Growth
 
@@ -32317,7 +32317,7 @@ India is **Fastest Growing Economy** in the world **(IMF)** but **low HDI rank (
 
 3. **Regional Imbalances: BIMARU states** lag in literacy and health indicators.
 
-<p align="center"><img src="images/civilsdaily_p123_img76.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p123_img76.png" alt="Diagram" /></p>
 
 **Social Factors**
 
@@ -32477,7 +32477,7 @@ By tackling these challenges and adopting a more equitable and inclusive approac
 
 Recent data reveals a troubling disconnect between India's poverty reduction achievements and persistent hunger levels, largely attributed to shrinking social expenditure forcing households to prioritize non-food essentials over nutrition.
 
-<p align="center"><img src="images/superkalam_polity_q495_img1.png" alt="Poor household expenditure comparative stacked bar chart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q495_img1.png" alt="Poor household expenditure comparative stacked bar chart" /></p>
 
 Poor household expenditure comparative stacked bar chart
 
@@ -32874,7 +32874,7 @@ While **extreme poverty fell to 2.35% (World Bank, 2024), undernourishment (12%)
 
 1. **Health expenditure:** **~1.9% of GDP (2024),** far below the WHO’s 6% recommendation.
    
-   <p align="center"><img src="images/civilsdaily_p133_img78.png" alt="Diagram" /></p>
+   <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p133_img78.png" alt="Diagram" /></p>
 
 2. **Education expenditure:** **~2.9% of GDP** (NEP recommendation 2020).
 3. **Decline in allocation for MGNREGA**
@@ -32945,7 +32945,7 @@ Economists Amartya Sen and Jean Dreze distinguish two aspects of social security
 
 India's constitutional framework deliberately rejects strict separation of powers, instead adopting an innovative system of checks and balances that ensures collaborative governance while preventing authoritarian concentration of power.
 
-<p align="center"><img src="images/superkalam_polity_q510_img1.png" alt="Three branches of US government triangle" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_polity_q510_img1.png" alt="Three branches of US government triangle" /></p>
 
 Three branches of US government triangle
 
@@ -33016,7 +33016,7 @@ Despite being the **largest foodgrain producer (73 million tonnes of buffer stoc
 
 These initiatives have ensured **food availability and calorie security,** but they **focus on quantity, not**
 
-<p align="center"><img src="images/civilsdaily_p132_img77.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p132_img77.png" alt="Diagram" /></p>
 
 **quality-** addressing **hunger as a food supply issue** rather than a **human capability issue.** This has led to
 
@@ -33094,7 +33094,7 @@ Ending hunger and malnutrition will not be achieved by focusing on food security
 
 **The 2022 Global Hunger Index ranks India 107th out of 121 countries, highlighting a critical hunger issue. With the world’s highest child wasting rate at 19.3%,** the problem extends beyond food scarcity. It’s a complex interplay of socio-economic factors, health and sanitation issues, and the effectiveness of human development policies. Therefore, a comprehensive approach is vital to address India’s hunger challenge holistically.
 
-<p align="center"><img src="images/pw_social_justice_q411_img1.webp" alt="image 2023 12 29T164522.675" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_social_justice_q411_img1.webp" alt="image 2023 12 29T164522.675" /></p>
 
 ### Body
 * **Impact of ineffective human development policies**
@@ -33185,7 +33185,7 @@ The persistence of malnutrition despite India being the **world's largest rice e
 
 **Twin Objectives of MDM**:
 
-* **<p align="center"><img src="images/pw_social_justice_q54_img1.webp" alt="image 2023 12 29T153145.387" /></p>**:
+* **<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_social_justice_q54_img1.webp" alt="image 2023 12 29T153145.387" /></p>**:
 
 - **Enhancing Nutritional Intake:** The MDM aims to improve the nutritional status of children in government and government-aided schools across the country.
   - It does so by providing free, nutritious meals to children, thus ensuring at least one balanced meal a day.
@@ -33327,7 +33327,7 @@ But the challenges still remain. According to the latest Global Hunger Index (20
 
 ### Introduction
 
-**Despite India’s economic progress, it grapples with severe hunger and poverty issues.** The 2022 Global Hunger Index places India at 107 out of 121 countries, with the world’s highest child wasting rate at 19.3%. **Concurrently,** although poverty rates have decreased over the years, the pandemic’s impact suggests a potential rise, **with a significant portion of the population still living in extreme poverty. These persistent challenges underscore the need for comprehensive and inclusive policies.** <p align="center"><img src="images/pw_social_justice_q340_img1.webp" alt="image 2023 12 29T170206.454" /></p>
+**Despite India’s economic progress, it grapples with severe hunger and poverty issues.** The 2022 Global Hunger Index places India at 107 out of 121 countries, with the world’s highest child wasting rate at 19.3%. **Concurrently,** although poverty rates have decreased over the years, the pandemic’s impact suggests a potential rise, **with a significant portion of the population still living in extreme poverty. These persistent challenges underscore the need for comprehensive and inclusive policies.** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_social_justice_q340_img1.webp" alt="image 2023 12 29T170206.454" /></p>
 
 ### Body
 
@@ -33427,7 +33427,7 @@ The **“paradox of poverty”** refers to the coexistence of **abundant resourc
 **Paradox of poverty**
 
 1. **Growth with Poverty** - India is the **5th largest economy,** yet **16.4% population lives in multidimensional poverty (NITI Aayog, 2023).**
-<p align="center"><img src="images/civilsdaily_p136_img80.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p136_img80.png" alt="Diagram" /></p>
 
 2. **Food Surplus vs Malnutrition** - India produces record food grain surpluses, but **NFHS-5 shows 35.5% of children are stunted.**
 3. **Urban Prosperity vs Slums** - Cities contribute over **60% of GDP,** but **65 million people live in urban slums.**
@@ -33503,7 +33503,7 @@ Abundant Resources + Unequal Ownership + Weak Institutions -> Paradox of Poverty
 
 **Key Aspects of the Paradox of Poverty**
 
-<p align="center"><img src="images/social_justice_q2_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/social_justice_q2_img1.png" alt="Image" /></p>
 
 **Inequality in Ownership of Resources**
 
@@ -33614,7 +33614,7 @@ The **"paradox of poverty"** refers to the coexistence of resource abundance alo
 
 Recent data shows India's richest 1% own 73% of the country's wealth, highlighting the stark **paradox of poverty** amid economic growth.
 
-<p align="center"><img src="images/superkalam_social_justice_q34_img1.png" alt="Resource Abundance Fails the Marginalized Poor" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_social_justice_q34_img1.png" alt="Resource Abundance Fails the Marginalized Poor" /></p>
 
 Resource Abundance Fails the Marginalized Poor
 
@@ -33660,7 +33660,7 @@ Addressing resource ownership inequality through **Land Acquisition Act amendmen
 
 **Human capital formation** refers to the development of people’s abilities and skills through **education, health, and nutrition,** enabling them to contribute productively to the economy. However, **Poverty and malnutrition** create an intergenerational underdevelopment trap.
 
-<p align="center"><img src="images/civilsdaily_p135_img79.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p135_img79.png" alt="Diagram" /></p>
 
 **Impact of poverty and malnutrition on Human**
 
@@ -33718,7 +33718,7 @@ Addressing resource ownership inequality through **Land Acquisition Act amendmen
 
 Human capital refers to the skills and knowledge of individuals that enhance productivity. **Poverty and malnutrition hinder human capital** **formation** by causing poor education outcomes, health issues, and limited opportunities, perpetuating a cycle of intergenerational poverty and reduced economic potential.
 
-<p align="center"><img src="images/social_justice_q5_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/social_justice_q5_img1.png" alt="Image" /></p>
 
 ### Body
 
@@ -33790,7 +33790,7 @@ To tackle poverty and malnutrition, a multifaceted approach is essential, combin
 
 The **The State of Food Security and Nutrition in the World (SOFI) Report 2024** shows 55.6% of Indians cannot afford a healthy diet. This fuels a vicious cycle with poverty, heavily impeding human capital formation.
 
-<p align="center"><img src="images/superkalam_social_justice_q109_img1.png" alt="Poverty: the Cycle of Malnutrition and Insecurity" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_social_justice_q109_img1.png" alt="Poverty: the Cycle of Malnutrition and Insecurity" /></p>
 
 Poverty: the Cycle of Malnutrition and Insecurity
 
@@ -33866,7 +33866,7 @@ The **Indian Constitution envisions a Welfare State under the DPSP (Articles 36-
 2. **Informalisation:** Around **90% of India’s workforce** remains in the informal sector, lacking job security or social protection.
 3. **Poverty Persists - 12.9% Indians** still multidimensionally poor (NITI Aayog, 2023).
    
-   <p align="center"><img src="images/civilsdaily_p114_img75.png" alt="Diagram" /></p>
+   <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p114_img75.png" alt="Diagram" /></p>
 
 4. **Gender Disparity:** Female **LFPR,** though improved to **41% (2022-23),** still trails male LFPR (78%) and Global Average (48%).
 5. **Welfare Dependency:** Lack of stable income pushes people to rely on welfare transfers, which creates **fiscal burden** and undermines **self-reliance.**
@@ -34220,7 +34220,7 @@ The MPI methodology shows aspects in which the poor are deprived and helps to re
 
 **The United Nations Multidimensional Poverty Index (MPI) goes beyond income-based measures of poverty to assess various aspects of well-being and deprivation. The MPI evaluates three key dimensions – health, education, and standard of living – through ten indicators.**
 
-<p align="center"><img src="images/pw_social_justice_q539_img1.webp" alt="image 2023 12 29T161524.618" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_social_justice_q539_img1.webp" alt="image 2023 12 29T161524.618" /></p>
 
 ### Body
 
@@ -34352,7 +34352,7 @@ As things stand, many of those living in poverty today will continue to remain p
 
 India, in its pursuit of inclusive growth, continues to be plagued by the longstanding challenges of poverty and inequality. While numerous poverty alleviation programs are in place, their effectiveness is often curtailed, partially due to insufficient political commitment. **According to the World Bank data, by 2021, there had been a gradual decline in poverty rates in India. However, the COVID-19 pandemic has likely intensified these issues.** This scenario underscores the urgent necessity for robust political commitment and systemic reforms to alleviate poverty.
 
-<p align="center"><img src="images/pw_social_justice_q357_img1.webp" alt="image 2023 12 29T170616.078" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_social_justice_q357_img1.webp" alt="image 2023 12 29T170616.078" /></p>
 
 ### Body
 
@@ -34676,7 +34676,7 @@ Such a support can play a crucial role in ironing out the existing issues like i
 
 India and Sri Lanka share **civilizational, cultural, and historical ties** spanning over 2,500 years. As the closest maritime neighbor, India has consistently supported Sri Lanka, whether during the **2004 tsunami, the 2009 civil war rehabilitation**, or the recent **economic crisis of 2022**. The crisis once again highlighted India’s role as a reliable friend and first responder.
 
-<p align="center"><img src="images/superkalam_international_relations_q269_img1.png" alt="India's Assistance to Sri Lanka Hub" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q269_img1.png" alt="India's Assistance to Sri Lanka Hub" /></p>
 
 India's Assistance to Sri Lanka Hub
 
@@ -34753,7 +34753,7 @@ Project Mausam aims to promote India’s soft power in the Indian Ocean region b
 
 Project Mausam represents India's cultural diplomacy initiative launched in 2014 to revive ancient maritime connections across the Indian Ocean Region. This **Ministry of Culture** project strategically combines historical heritage with contemporary geopolitical objectives.
 
-<p align="center"><img src="images/superkalam_international_relations_q819_img1.png" alt="Thematic map of Indian Ocean Region" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q819_img1.png" alt="Thematic map of Indian Ocean Region" /></p>
 
 Thematic map of Indian Ocean Region
 
@@ -34837,7 +34837,7 @@ Sports and cultural exchanges can improve India-Pakistan relations by promoting 
 
 Recent terrorist incidents and diplomatic tensions have strained India-Pakistan relations, but soft power through sports and cultural exchanges offers promising avenues for rebuilding trust and fostering people-to-people connections.
 
-<p align="center"><img src="images/superkalam_international_relations_q821_img1.png" alt="Multi Track Diplomacy Pyramid Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q821_img1.png" alt="Multi Track Diplomacy Pyramid Diagram" /></p>
 
 Multi Track Diplomacy Pyramid Diagram
 
@@ -34934,7 +34934,7 @@ As India-Maldives relations evolve, India must navigate concerns over political 
 
 The Maldives has experienced significant political shifts since 2022, with new leadership bringing changes in foreign policy orientation that have strategic implications for India's regional interests.
 
-<p align="center"><img src="images/superkalam_international_relations_q986_img1.png" alt="2013 Map of the Indian Ocean Region" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q986_img1.png" alt="2013 Map of the Indian Ocean Region" /></p>
 
 2013 Map of the Indian Ocean Region
 
@@ -35003,7 +35003,7 @@ The Maldives has experienced significant political shifts since 2022, with new l
 
 India-Sri Lanka relations demonstrate how domestic politics significantly shape foreign policy decisions. Recent developments, including Sri Lanka's **2022 economic crisis** and India's **$4 billion assistance package**, highlight this dynamic interplay.
 
-<p align="center"><img src="images/superkalam_international_relations_q990_img1.png" alt="Tamil Nadu and Sri Lanka Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q990_img1.png" alt="Tamil Nadu and Sri Lanka Map" /></p>
 
 Tamil Nadu and Sri Lanka Map
 
@@ -35089,7 +35089,7 @@ The protests in Shahbag Square highlighted the clash between secular and Islamis
 
 The **Shahbag Square protests** in 2013, demanding capital punishment for war criminals from Bangladesh's 1971 Liberation War, exposed deep ideological fissures between secular-nationalist and Islamist forces, creating significant implications for India's regional security and diplomatic interests.
 
-<p align="center"><img src="images/superkalam_international_relations_q1000_img1.png" alt="2013 Thematic Map of Bangladesh and India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q1000_img1.png" alt="2013 Thematic Map of Bangladesh and India" /></p>
 
 2013 Thematic Map of Bangladesh and India
 
@@ -35185,7 +35185,7 @@ The Gujral Doctrine represents a set of principles aimed at promoting peaceful a
 
 India's foreign policy framework includes several doctrines, with the Gujral Doctrine representing a significant approach toward regional diplomacy in the post-Cold War era.
 
-<p align="center"><img src="images/superkalam_international_relations_q1006_img1.png" alt="Gujral Doctrine Five Arrows Radial Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q1006_img1.png" alt="Gujral Doctrine Five Arrows Radial Diagram" /></p>
 
 Gujral Doctrine Five Arrows Radial Diagram
 
@@ -35378,7 +35378,7 @@ This India- Africa partnership exemplifies **Global South–South cooperation, f
 
 India-Africa digital partnership gained momentum with the **2024 India-Africa ICT Expo**, demonstrating technological cooperation that prioritizes African sovereignty while fostering shared digital growth.
 
-<p align="center"><img src="images/superkalam_international_relations_q32_img1.png" alt="Africa and India Partnership " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q32_img1.png" alt="Africa and India Partnership " /></p>
 
 Africa and India Partnership 
 
@@ -35503,7 +35503,7 @@ Maldives – a key part of India’s neighbourhood first policy – is strategic
 
 - **Terrorism:** **Anti-Indian sentiment** and Maldives' focus on **Islamic values raise** concerns about terrorism, potentially destabilising the region and threatening India's security.
 
-<p align="center"><img src="images/international_relations_q8_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/international_relations_q8_img1.png" alt="Image" /></p>
 
 ### Conclusion
 
@@ -35572,7 +35572,7 @@ India’s proactive engagement with the Maldives remains crucial for ensuring re
 
 India's relationship with Maldives holds paramount importance due to its strategic location along vital maritime trade routes in the **Indian Ocean Region (IOR)**. The recent diplomatic tensions and increasing Chinese presence have brought renewed focus on this crucial partnership.
 
-<p align="center"><img src="images/superkalam_international_relations_q103_img1.png" alt="India and the Indian Ocean routes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q103_img1.png" alt="India and the Indian Ocean routes" /></p>
 
 India and the Indian Ocean routes
 
@@ -35596,7 +35596,7 @@ India and the Indian Ocean routes
  - **Chokepoint Security**: The Maldives is near the Eight Degree Channel, a vital route for India’s energy imports and international trade.
  - **Naval Outreach**: The archipelago serves as a natural outpost for India’s maritime domain awareness (MDA) in the western Indian Ocean.
 
-<p align="center"><img src="images/superkalam_international_relations_q103_img2.jpg" alt="Geographic positions of India and Maldives" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q103_img2.jpg" alt="Geographic positions of India and Maldives" /></p>
 
 Geographic positions of India and Maldives
 
@@ -35783,7 +35783,7 @@ Indo-US defence deals offer technological superiority, enhanced interoperability
 
 Recent geopolitical shifts have elevated the strategic importance of Indo-US defense cooperation over traditional Indo-Russian partnerships, particularly for maintaining Indo-Pacific stability.
 
-<p align="center"><img src="images/superkalam_international_relations_q434_img1.png" alt="2020 Comparative Block Diagram of Indo" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q434_img1.png" alt="2020 Comparative Block Diagram of Indo" /></p>
 
 2020 Comparative Block Diagram of Indo
 
@@ -35946,7 +35946,7 @@ Japan can prove to be a development multiplier in India. Therefore, India should
 
 UNESCO faces existential challenges due to severe funding shortfalls and escalating political polarization, exemplified by the US withdrawal over alleged anti-Israel bias accusations.
 
-<p align="center"><img src="images/superkalam_international_relations_q509_img1.png" alt="UNESCO Institutional Crisis Politicization and Bias" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q509_img1.png" alt="UNESCO Institutional Crisis Politicization and Bias" /></p>
 
 UNESCO Institutional Crisis Politicization and Bias
 
@@ -36079,7 +36079,7 @@ Moreover, the USA’s National Defense Strategy 2018 marked Russia and China as 
 
 India and Japan's partnership has evolved into a **Special Strategic and Global Partnership**, reflecting shared democratic values and strategic interests in maintaining Indo-Pacific stability.
 
-<p align="center"><img src="images/superkalam_international_relations_q514_img1.png" alt="India Japan Strategic Global Partnership Framework" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q514_img1.png" alt="India Japan Strategic Global Partnership Framework" /></p>
 
 India Japan Strategic Global Partnership Framework
 
@@ -36244,7 +36244,7 @@ India’s relations with Israel have acquired a depth and diversity that cannot 
 
 India-Israel relations have transformed from cautious engagement to a comprehensive strategic partnership that spans defense, technology, agriculture, and economic cooperation. The relationship's multifaceted nature ensures its durability beyond temporary political shifts.
 
-<p align="center"><img src="images/superkalam_international_relations_q584_img1.png" alt="India Israel Strategic Partnership Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q584_img1.png" alt="India Israel Strategic Partnership Diagram" /></p>
 
 India Israel Strategic Partnership Diagram
 
@@ -36346,7 +36346,7 @@ India’s increasing interest in Africa presents several opportunities for both 
 
 India's engagement with Africa has transformed from historical anti-colonial solidarity to a comprehensive strategic partnership encompassing economic, political, and security dimensions.
 
-<p align="center"><img src="images/superkalam_international_relations_q823_img1.png" alt="India Africa Engagement Comparative Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q823_img1.png" alt="India Africa Engagement Comparative Flowchart" /></p>
 
 India Africa Engagement Comparative Flowchart
 
@@ -36449,7 +36449,7 @@ India and China’s bilateral issues in the South China Sea region have become a
 
 Recent South China Sea tensions and China's growing assertiveness have significantly impacted India-China bilateral relations, creating new challenges for maritime security and regional stability.
 
-<p align="center"><img src="images/superkalam_international_relations_q911_img1.png" alt="Indo Pacific Region Map and Straits" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q911_img1.png" alt="Indo Pacific Region Map and Straits" /></p>
 
 Indo Pacific Region Map and Straits
 
@@ -36534,7 +36534,7 @@ The India-China bilateral maritime relationship reflects broader geopolitical co
 - **Intellectual Property Rights (IPR):** Japan has been concerned about the lack of effective IPR protection in India. India has been accused of not doing enough to protect foreign investors’ IPR, which has led to a lack of confidence among Japanese investors.
 - **Infrastructure:** India’s infrastructure is not up to the mark, and this is a major constraint for Japanese investors. Japan has been investing in India’s infrastructure, but the progress has been slow due to bureaucratic hurdles.
 
-<p align="center"><img src="images/pw_international_relations_q26_img1.webp" alt="Indo-Japan relation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_international_relations_q26_img1.webp" alt="Indo-Japan relation" /></p>
 
 ### Conclusion
 
@@ -36556,7 +36556,7 @@ These constraints and unlock the full potential of their economic ties, India an
 
 India-Japan economic partnership, despite reaching **$22.85 billion bilateral trade in FY 2023-24**, remains significantly underutilized compared to its strategic potential.
 
-<p align="center"><img src="images/superkalam_international_relations_q988_img1.png" alt="Policy Constraints in India and Japan" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q988_img1.png" alt="Policy Constraints in India and Japan" /></p>
 
 Policy Constraints in India and Japan
 
@@ -36836,7 +36836,7 @@ From looking west to secure energy interests, the approach has expanded to think
 
 The formation of the **I2U2 grouping in July 2022** (also termed the “West Asian Quad”) brings together India, Israel, the UAE, and the USA. It is aimed at promoting **joint investments in infrastructure, technology, food security, and clean energy**. Unlike traditional security alliances, it is an **issue-based, geo-economic platform**. For India, this grouping enhances both its **strategic depth and global positioning**.
 
-<p align="center"><img src="images/superkalam_international_relations_q268_img1.png" alt="Interconnected Circular Nodes in Diamond Shape" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q268_img1.png" alt="Interconnected Circular Nodes in Diamond Shape" /></p>
 
 Interconnected Circular Nodes in Diamond Shape
 
@@ -36991,7 +36991,7 @@ India and Africa offer a lot of opportunities for each other in coming times lik
 
 The last few decades have seen extraordinary growth of Asian countries, particularly China, India, Japan, and South Korea. The paradigm is now tilting towards Africa.
 
-<p align="center"><img src="images/pw_international_relations_q603_img1.webp" alt="India- Africa" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_international_relations_q603_img1.webp" alt="India- Africa" /></p>
 
 ### Body
 
@@ -37074,7 +37074,7 @@ To further boost its presence India should focus on investments in Human Capital
 
 India's engagement with Africa has transformed from historical anti-colonial solidarity to a robust partnership driven by economic cooperation, development assistance, and shared aspirations for South-South collaboration.
 
-<p align="center"><img src="images/superkalam_international_relations_q349_img1.png" alt="India's Influence in Africa Hub Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q349_img1.png" alt="India's Influence in Africa Hub Diagram" /></p>
 
 India's Influence in Africa Hub Diagram
 
@@ -37189,7 +37189,7 @@ Thus, though AUKUS offers the advantage of balance of power, strategic autonomy,
 
 The recent announcement of the trilateral security partnership between Australia, the United Kingdom, and the United States, known as AUKUS, has drawn attention for its potential impact on the Indo-Pacific region. AUKUS aims to counter China’s growing influence in the region and has already sparked controversy.
 
-<p align="center"><img src="images/pw_international_relations_q618_img1.webp" alt="Aukus" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_international_relations_q618_img1.webp" alt="Aukus" /></p>
 
 ### Body
 
@@ -37273,7 +37273,7 @@ With India's reluctance to join any military alliance, AUKUS by Augmenting Quad'
 
 The **AUKUS partnership** between Australia, UK, and US, formed in September 2021, represents a significant defense alliance aimed at countering China's growing assertiveness in the Indo-Pacific through advanced military technology sharing and strategic cooperation.
 
-<p align="center"><img src="images/superkalam_international_relations_q352_img1.png" alt="AUKUS Venn Diagram and its Components" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q352_img1.png" alt="AUKUS Venn Diagram and its Components" /></p>
 
 AUKUS Venn Diagram and its Components
 
@@ -37435,7 +37435,7 @@ QUAD’s shift from a military alliance towards a trade bloc is a significant de
 
 The Indian diaspora, comprising over **32 million people globally**, has emerged as a pivotal force in Western democracies, leveraging their professional success and cultural integration to influence both political processes and economic growth in America and Europe.
 
-<p align="center"><img src="images/superkalam_international_relations_q425_img1.png" alt="Indian Diaspora in US and Europe" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q425_img1.png" alt="Indian Diaspora in US and Europe" /></p>
 
 Indian Diaspora in US and Europe
 
@@ -37557,7 +37557,7 @@ India has significantly increased its diplomatic, economic and strategic relatio
 
   - India maintains military bases in **Tajikistan** and conducts joint exercises with **Uzbekistan.**
 
-<p align="center"><img src="images/international_relations_q6_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/international_relations_q6_img1.png" alt="Image" /></p>
 
 **Critical Analysis:**
 
@@ -37636,7 +37636,7 @@ India’s engagement with the Central Asian Republics offers great potential to 
 
 Central Asia anchors India’s "Extended Neighbourhood," evolving into deep strategic integration via the **Connect Central Asia Policy**.
 
-<p align="center"><img src="images/superkalam_international_relations_q101_img1.png" alt="Chabahar Port Central Asia Connectivity" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q101_img1.png" alt="Chabahar Port Central Asia Connectivity" /></p>
 
 Chabahar Port Central Asia Connectivity
 
@@ -37833,7 +37833,7 @@ India should adopt a constructivist approach, seeking common ground and focusing
 
 The Shanghai Cooperation Organisation (SCO), a key Eurasian grouping, is increasingly strained by intra-member conflicts, particularly India-China and India-Pakistan tensions. These frictions hamper its consensus-based functioning. In this context, India plays a vital role in steering the SCO towards cooperation and constructive engagement.
 
-<p align="center"><img src="images/superkalam_international_relations_q197_img1.png" alt="India's SECURE strategy for SCO explained" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q197_img1.png" alt="India's SECURE strategy for SCO explained" /></p>
 
 India's SECURE strategy for SCO explained
 
@@ -38044,7 +38044,7 @@ Both the platforms are relevant to India's strategic interests and can complemen
 
 BIMSTEC (Bay of Bengal Initiative for Multi-Sectoral Technical and Economic Cooperation), established in **1997**, connects **South and Southeast Asian countries** around the Bay of Bengal. While it appears similar to SAARC in promoting regional cooperation, BIMSTEC functions as a **more India-centric and focused platform**, complementing rather than duplicating SAARC.
 
-<p align="center"><img src="images/superkalam_international_relations_q267_img1.png" alt="SAARC Venn Diagram of Member Overlap" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q267_img1.png" alt="SAARC Venn Diagram of Member Overlap" /></p>
 
 SAARC Venn Diagram of Member Overlap
 
@@ -38291,7 +38291,7 @@ SCO is part of India's stated policy of pursuing “multi-alignments”. SCO can
 
 The **Shanghai Cooperation Organisation (SCO)**, established in 2001, represents a significant multilateral platform for Eurasian cooperation focusing on security, economic development, and regional stability.
 
-<p align="center"><img src="images/superkalam_international_relations_q342_img1.png" alt="Eurasia map showing Shanghai Cooperation Organisation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q342_img1.png" alt="Eurasia map showing Shanghai Cooperation Organisation" /></p>
 
 Eurasia map showing Shanghai Cooperation Organisation
 
@@ -38411,7 +38411,7 @@ Tensions and disagreements between India and Pakistan have hampered SAARC’s ef
 
 Recent terrorist attacks like the **2024 Jammu attacks** and Pakistan's continued interference highlight persistent challenges threatening SAARC's viability as a regional cooperation platform.
 
-<p align="center"><img src="images/superkalam_international_relations_q743_img1.png" alt="Flowchart of Pakistan in 2016" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q743_img1.png" alt="Flowchart of Pakistan in 2016" /></p>
 
 Flowchart of Pakistan in 2016
 
@@ -38516,7 +38516,7 @@ India’s Look East Policy has been a significant success, both in terms of econ
 
 India's Look East Policy, launched in 1991 and upgraded to Act East Policy in 2014, represents a strategic pivot towards Southeast and East Asia in response to post-Cold War multipolarity and economic liberalization.
 
-<p align="center"><img src="images/superkalam_international_relations_q737_img1.png" alt="Geopolitical Map of India and ASEAN" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q737_img1.png" alt="Geopolitical Map of India and ASEAN" /></p>
 
 Geopolitical Map of India and ASEAN
 
@@ -38742,7 +38742,7 @@ Keep strong ties with Gulf suppliers for steady oil, add new partners, and grow 
 
 India's energy import dependence of **85% crude oil** necessitates strategic energy diplomacy, particularly with Middle Eastern nations accounting for over **60% of imports**.
 
-<p align="center"><img src="images/superkalam_international_relations_q29_img1.png" alt="India's Energy Security Foreign Policy Factors" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q29_img1.png" alt="India's Energy Security Foreign Policy Factors" /></p>
 
 India's Energy Security Foreign Policy Factors
 
@@ -38993,7 +38993,7 @@ Thus, India is playing a leading role in Climate negotiations on all the importa
 
 Clean energy has emerged as both a **developmental imperative and geopolitical tool**. India, once seen as a reluctant actor in climate negotiations, has gradually repositioned itself as a **proactive leader of Global South voices** while balancing developmental needs with climate responsibility.
 
-<p align="center"><img src="images/superkalam_international_relations_q259_img1.png" alt="Timeline flowchart with sequential connected blocks" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q259_img1.png" alt="Timeline flowchart with sequential connected blocks" /></p>
 
 Timeline flowchart with sequential connected blocks
 
@@ -39099,7 +39099,7 @@ India’s energy policy engagement with the West Asian region is also related to
 
 India's energy security represents a cornerstone of economic development, with West Asian cooperation being pivotal given the region's 40% contribution to India's crude oil imports worth $157.5 billion in FY 2024-25.
 
-<p align="center"><img src="images/superkalam_international_relations_q669_img1.png" alt="Map showing West Asia and India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q669_img1.png" alt="Map showing West Asia and India" /></p>
 
 Map showing West Asia and India
 
@@ -39272,7 +39272,7 @@ The post-Cold War era was marked by the rise of globalization, characterized by 
 
 As a result, the world is witnessing a resurgence of sovereign nationalism where states prioritize national interests, borders, and identities over global cooperation.
 
-<p align="center"><img src="images/superkalam_international_relations_q39_img1.png" alt="The Shift From Globalization to Nationalism" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q39_img1.png" alt="The Shift From Globalization to Nationalism" /></p>
 
 The Shift From Globalization to Nationalism
 
@@ -39455,7 +39455,7 @@ The West’s focus on fostering India as an alternative to China in both supply 
 
 The evolving global geopolitical landscape has positioned **India as a crucial alternative** to China, marked by the West's strategic pivot towards New Delhi as evidenced by increasing economic partnerships and defense cooperation.
 
-<p align="center"><img src="images/superkalam_international_relations_q117_img1.png" alt="Western Economies' Approaches to China and India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q117_img1.png" alt="Western Economies' Approaches to China and India" /></p>
 
 Western Economies' Approaches to China and India
 
@@ -39670,7 +39670,7 @@ Thus, India should realise that it is still in the state-building stage (middle-
 
 The **renewed strength of NATO** and the deepening **US-Europe strategic partnership**, especially after the Russia-Ukraine conflict, have reshaped global geopolitics. Though not a member, India stands to **gain strategically and diplomatically** from this evolving alignment.
 
-<p align="center"><img src="images/superkalam_international_relations_q195_img1.png" alt="NATO, US-Europe Benefits, Strategic Security for India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q195_img1.png" alt="NATO, US-Europe Benefits, Strategic Security for India" /></p>
 
 NATO, US-Europe Benefits, Strategic Security for India
 
@@ -39849,7 +39849,7 @@ India’s shift towards Realpolitik marks a departure from its traditional ideal
 
 The evolving India-US relationship, despite strategic convergence, faces friction points that highlight Washington's challenge in accommodating India's aspirations for strategic autonomy and great power status.
 
-<p align="center"><img src="images/superkalam_international_relations_q505_img1.png" alt="US Strategic Vision Venn Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q505_img1.png" alt="US Strategic Vision Venn Diagram" /></p>
 
 US Strategic Vision Venn Diagram
 
@@ -39995,7 +39995,7 @@ Ashgabat Agreement - A multimodal international agreement aiming at the establis
 
 China's **Belt and Road Initiative** and Russia's military presence through **CSTO** have significantly increased external influence in Central Asia, prompting India's strategic engagement through the **Ashgabat Agreement** in 2018.
 
-<p align="center"><img src="images/superkalam_international_relations_q574_img1.png" alt="Ashgabat Agreement transit corridor in Asia" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q574_img1.png" alt="Ashgabat Agreement transit corridor in Asia" /></p>
 
 Ashgabat Agreement transit corridor in Asia
 
@@ -40057,7 +40057,7 @@ The US withdrawal from the **JCPOA (Joint Comprehensive Plan of Action)** in 201
 A. **Energy Security**
 
 - **Sanctions** have forced India to diversify at higher costs, raising the **import bill and inflation.**
-<p align="center"><img src="images/civilsdaily_p141_img81.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p141_img81.png" alt="Diagram" /></p>
 
 - **Regional instability** inflates global oil prices, aggravating India’s **current account deficit and rupee depreciation.**
 
@@ -40161,7 +40161,7 @@ India’s relations with Iran are complex and go beyond geopolitical and geo-eco
 
 The US-Iran nuclear controversy, particularly following America's withdrawal from the JCPOA in 2018, significantly impacts India's multi-dimensional national interests and strategic calculations.
 
-<p align="center"><img src="images/superkalam_international_relations_q582_img1.png" alt="Geopolitical Map of South and West Asia" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q582_img1.png" alt="Geopolitical Map of South and West Asia" /></p>
 
 Geopolitical Map of South and West Asia
 
@@ -40285,7 +40285,7 @@ China’s rapid rise as an economic and military powerhouse poses significant ch
 
 China's strategy of converting economic dominance into military leverage poses significant challenges for India's regional security and strategic autonomy.
 
-<p align="center"><img src="images/superkalam_international_relations_q653_img1.png" alt="2017 Map of South Asia and India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q653_img1.png" alt="2017 Map of South Asia and India" /></p>
 
 2017 Map of South Asia and India
 
@@ -40376,7 +40376,7 @@ The withdrawal of ISAF from Afghanistan presents a potential security vacuum, wh
 
 The ISAF withdrawal from Afghanistan in 2014 created a significant security vacuum, fundamentally altering South Asian geopolitics and presenting India with complex strategic challenges requiring comprehensive policy responses.
 
-<p align="center"><img src="images/superkalam_international_relations_q999_img1.png" alt="Afghanistan-Centered Geopolitical Map of South Asia" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q999_img1.png" alt="Afghanistan-Centered Geopolitical Map of South Asia" /></p>
 
 Afghanistan-Centered Geopolitical Map of South Asia
 
@@ -40450,7 +40450,7 @@ India's approach must balance immediate security concerns with long-term strateg
 
 The “String of Pearls” is a term used to describe China’s strategic encirclement of India through the development of a network of ports and military bases in the Indian Ocean region. It refers to China’s efforts to establish a “string” of naval bases, commercial ports, and other facilities in countries surrounding India, Pakistan, Sri Lanka, Myanmar, and Bangladesh.
 
-<p align="center"><img src="images/pw_international_relations_q76_img1.webp" alt="String of Pearls" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_international_relations_q76_img1.webp" alt="String of Pearls" /></p>
 
 ### Body
 
@@ -40486,7 +40486,7 @@ India has been taking several steps to counter China’s ‘String of Pearls’ 
 
 China's expanding maritime presence through its 'String of Pearls' strategy has become a critical challenge for India's regional security and influence in the Indian Ocean.
 
-<p align="center"><img src="images/superkalam_international_relations_q1005_img1.png" alt="China's String of Pearls in Indian Ocean" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q1005_img1.png" alt="China's String of Pearls in Indian Ocean" /></p>
 
 China's String of Pearls in Indian Ocean
 
@@ -40688,7 +40688,7 @@ Thus, India and the US need to collaborate more effectively to counter the Chine
 
 Recent US intelligence assessments and strategic documents identify China as a **"strategic competitor"** requiring comprehensive policy responses. China's multifaceted challenge differs fundamentally from the Soviet Union's primarily ideological and military confrontation.
 
-<p align="center"><img src="images/superkalam_international_relations_q353_img1.png" alt="2021 Radar Chart of National Power" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q353_img1.png" alt="2021 Radar Chart of National Power" /></p>
 
 2021 Radar Chart of National Power
 
@@ -40915,7 +40915,7 @@ This dual role of diaspora communities underscores their vital contributions to 
 
 The Indian diaspora, particularly in the **Western nations** such as the USA, UK, Canada, and Australia, has emerged as a highly skilled, affluent, and politically active community. Their rising prominence offers **multiple economic and political advantages** to India, making them an essential component of India’s global strategy.
 
-<p align="center"><img src="images/superkalam_international_relations_q190_img1.png" alt="Indian Diaspora Benefits in the West" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q190_img1.png" alt="Indian Diaspora Benefits in the West" /></p>
 
 Indian Diaspora Benefits in the West
 
@@ -41053,7 +41053,7 @@ The Indian diaspora has gained new visibility as their political and financial c
 
 According to a Ministry of External Affairs report, there are 32 million NRIs and PIOs (inc. OCIs) residing outside India and overseas Indians comprise the world’s largest overseas diaspora. Every year 2.5 million (25 lakhs) Indians migrate overseas, which is the highest annual number of migrants in the world. India’s large diaspora is distributed across the United Arab Emirates (3.5 million), the United States of America (2.7 million) and Saudi Arabia (2.5 million). Other countries hosting large numbers of Indian migrants included Australia, Canada, Kuwait, Oman, Pakistan, Qatar and the United Kingdom.
 
-<p align="center"><img src="images/pw_international_relations_q348_img1.webp" alt="Indian Diaspora" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_international_relations_q348_img1.webp" alt="Indian Diaspora" /></p>
 
 - **Economic contributions:** 
 - **Investment and entrepreneurship:** The Indian diaspora in Europe and America has made substantial investments and established successful businesses, generating employment opportunities. **g**, Indian entrepreneurs in Silicon Valley have contributed to the growth of the tech industry.
@@ -41087,7 +41087,7 @@ The Indian diaspora has emerged as a powerful force, influencing the economic an
 
 The **Quadrilateral Security Dialogue (Quad)** is evolving from a security-focused grouping into a comprehensive economic partnership, reflecting changing Indo-Pacific geopolitical dynamics and member nations' strategic priorities.
 
-<p align="center"><img src="images/superkalam_international_relations_q430_img1.png" alt="Indo Pacific 2020 Map: India, Japan, Australia" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q430_img1.png" alt="Indo Pacific 2020 Map: India, Japan, Australia" /></p>
 
 Indo Pacific 2020 Map: India, Japan, Australia
 
@@ -41177,7 +41177,7 @@ Thus, the Indian Diaspora has been making significant contributions to the econo
 
 India and South East Asia have shared a long history of economic, cultural, and trading ties since the Chola period. The Indian diaspora in the region has contributed significantly to its economy and society. Moreover, India’s trade with South East Asia accounts for approximately 10.2% of all Indian trade, indicating the region’s economic and strategic importance.
 
-<p align="center"><img src="images/pw_international_relations_q348_img1.webp" alt="Indian Diaspora" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_international_relations_q348_img1.webp" alt="Indian Diaspora" /></p>
 
 ### Body
 
@@ -41209,7 +41209,7 @@ The Indian diaspora has played a crucial role in the economic and social develop
 
 The Indian diaspora in South-East Asia, comprising over **4 million individuals**, serves as a vital economic and social catalyst, strengthening bilateral ties through India's **Act East Policy** and **diaspora diplomacy** initiatives.
 
-<p align="center"><img src="images/superkalam_international_relations_q661_img1.png" alt="India and Southeast Asia Trade Routes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q661_img1.png" alt="India and Southeast Asia Trade Routes" /></p>
 
 India and Southeast Asia Trade Routes
 
@@ -41292,7 +41292,7 @@ India should carefully consider economic participation terms in foreign aid as t
 
 International funding agencies increasingly attach equipment sourcing conditions to aid packages, creating complex implications for recipient nations like India in the current global economic landscape.
 
-<p align="center"><img src="images/superkalam_international_relations_q899_img1.png" alt="Tied Aid Flowchart Mechanism Donor Agency" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q899_img1.png" alt="Tied Aid Flowchart Mechanism Donor Agency" /></p>
 
 Tied Aid Flowchart Mechanism Donor Agency
 
@@ -41392,7 +41392,7 @@ India should carefully consider economic participation terms in foreign aid as t
 
 International funding agencies increasingly attach equipment sourcing conditions to aid packages, creating complex implications for recipient nations like India in the current global economic landscape.
 
-<p align="center"><img src="images/superkalam_international_relations_q899_img1.png" alt="Tied Aid Flowchart Mechanism Donor Agency" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q899_img1.png" alt="Tied Aid Flowchart Mechanism Donor Agency" /></p>
 
 Tied Aid Flowchart Mechanism Donor Agency
 
@@ -41500,7 +41500,7 @@ The NDB and AIIB have different roles, with NDB emphasizing on sustainable devel
 
 India's membership in the **New Development Bank (NDB)** and **Asian Infrastructure Investment Bank (AIIB)** represents a paradigm shift toward multilateral development financing. These institutions offer India alternative funding mechanisms beyond traditional Western-dominated financial architecture.
 
-<p align="center"><img src="images/superkalam_international_relations_q896_img1.png" alt="Comparative Venn Diagram of New Development" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q896_img1.png" alt="Comparative Venn Diagram of New Development" /></p>
 
 Comparative Venn Diagram of New Development
 
@@ -41600,7 +41600,7 @@ The World Bank and the IMF are two important institutions in the global economic
 
 The **Bretton Woods Institutions**, established in 1944, remain fundamental pillars of global economic governance. Despite their shared origins and overlapping goals, the World Bank and IMF serve distinctly different functions in the international financial architecture.
 
-<p align="center"><img src="images/superkalam_international_relations_q1003_img1.png" alt="IMF Venn Diagram Overlapping Circles" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q1003_img1.png" alt="IMF Venn Diagram Overlapping Circles" /></p>
 
 IMF Venn Diagram Overlapping Circles
 
@@ -41870,7 +41870,7 @@ Progress should come through small, realistic steps. Add a few seats, clarify Co
 
 The United Nations, established in 1945, was designed to maintain international peace, security, and cooperation. Over time, the need for reform—particularly of the Security Council—has become urgent to reflect contemporary global realities.
 
-<p align="center"><img src="images/superkalam_international_relations_q37_img1.png" alt="Stalled UN Reforms between Western and Eastern Blocs" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q37_img1.png" alt="Stalled UN Reforms between Western and Eastern Blocs" /></p>
 
 Stalled UN Reforms between Western and Eastern Blocs
 
@@ -42115,7 +42115,7 @@ The global fight against terrorism must combine stringent security measures with
 
 The recent surge in **global terrorist activities**, with over 6,700 attacks reported in 2022, has highlighted the critical role of international cooperation through institutions like the **UN Counter Terrorism Committee (CTC)**. The committee, established through **UNSC Resolution 1373** after the **9/11 attacks**, serves as the cornerstone of global counter-terrorism efforts.
 
-<p align="center"><img src="images/superkalam_international_relations_q112_img1.png" alt="UN Security Council Counter-Terrorism Organization" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q112_img1.png" alt="UN Security Council Counter-Terrorism Organization" /></p>
 
 UN Security Council Counter-Terrorism Organization
 
@@ -42356,7 +42356,7 @@ The sea is a vital cosmic element, nurturing life and demanding protection. Safe
 
 The ocean, often symbolised as a cosmic sea, embodies primordial chaos and creation myths across cultures, representing interconnected ecosystems and the balance of the planet. It regulates Earth’s climate, sustains biodiversity, and drives global trade, making its protection critical to cosmic harmony
 
-<p align="center"><img src="images/superkalam_international_relations_q191_img1.png" alt="IMO's Three Pillars of Maritime Governance" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q191_img1.png" alt="IMO's Three Pillars of Maritime Governance" /></p>
 
 IMO's Three Pillars of Maritime Governance
 
@@ -42513,7 +42513,7 @@ The COVID-19 pandemic has highlighted the importance of global health security, 
 
 WHO faced unprecedented challenges during COVID-19, serving as the primary global health coordinator while navigating complex geopolitical tensions and resource constraints.
 
-<p align="center"><img src="images/superkalam_international_relations_q416_img1.png" alt="WHO hub and spoke diagram illustration" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q416_img1.png" alt="WHO hub and spoke diagram illustration" /></p>
 
 WHO hub and spoke diagram illustration
 
@@ -42628,7 +42628,7 @@ The fact is that UNESCO was all about solidarity and creating a climate for peac
 
 India's transformation from a champion of the developing world to a major global power reflects its evolving strategic priorities and growing economic capabilities in the 21st century.
 
-<p align="center"><img src="images/superkalam_international_relations_q511_img1.png" alt="Past Leader Transition Comparative Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q511_img1.png" alt="Past Leader Transition Comparative Flowchart" /></p>
 
 Past Leader Transition Comparative Flowchart
 
@@ -42754,7 +42754,7 @@ The United Nations Economic and Social Council (ECOSOC) is a critical organ of t
 
 ECOSOC coordinates global economic and social cooperation as one of the UN's six principal organs. It serves as the central platform for addressing international development challenges and implementing the 2030 Sustainable Development Agenda.
 
-<p align="center"><img src="images/superkalam_international_relations_q672_img1.png" alt="UN ECOSOC organizational chart hierarchy" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q672_img1.png" alt="UN ECOSOC organizational chart hierarchy" /></p>
 
 UN ECOSOC organizational chart hierarchy
 
@@ -42829,7 +42829,7 @@ Send To My Bookmarks
 
 The McBride Commission of UNESCO was established in 1977 to examine the relationship between the mass media and the process of development. The commission aimed to promote a new world information order that would prioritize the needs and interests of developing countries in the global media landscape.
 
-<p align="center"><img src="images/pw_international_relations_q300_img1.webp" alt="objective of UNESCO" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_international_relations_q300_img1.webp" alt="objective of UNESCO" /></p>
 
 ### Body
 
@@ -42862,7 +42862,7 @@ The UNESCO’s McBride Commission aimed to tackle media concentration and inform
 
 The McBride Commission, established by UNESCO in 1977, emerged from concerns about global communication imbalances between developed and developing nations. The commission aimed to democratize global information flow and reduce Western media dominance.
 
-<p align="center"><img src="images/superkalam_international_relations_q749_img1.png" alt="Status Quo Comparative Flow Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q749_img1.png" alt="Status Quo Comparative Flow Diagram" /></p>
 
 Status Quo Comparative Flow Diagram
 
@@ -42926,7 +42926,7 @@ India continues advocating for digital sovereignty and equitable information acc
 
 The United Nations Security Council (UNSC) plays a vital role in maintaining global peace and security, including authorizing the use of force, imposing sanctions, and establishing peacekeeping operations. Permanent membership on the UNSC is important because it grants a country a veto power, enabling it to block any UNSC resolution, and provides an opportunity to shape international policy, enhancing its influence and status in the global arena.
 
-<p align="center"><img src="images/pw_international_relations_q183_img1.webp" alt="Approach for UNSC" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_international_relations_q183_img1.webp" alt="Approach for UNSC" /></p>
 
 ### Body
 
@@ -42958,7 +42958,7 @@ India’s pursuit of a permanent seat in the UNSC has been hampered by several f
 
 India's quest for a permanent UNSC seat reflects its growing global stature, yet faces multiple structural and political barriers. Recent developments, including changing voting patterns on international issues, highlight the complexity of this diplomatic challenge.
 
-<p align="center"><img src="images/superkalam_international_relations_q810_img1.png" alt="India's UNSC Permanency Impediments Hub and Spoke" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q810_img1.png" alt="India's UNSC Permanency Impediments Hub and Spoke" /></p>
 
 India's UNSC Permanency Impediments Hub and Spoke
 
@@ -43004,7 +43004,7 @@ The **WTO,** established in **1995** under **Uruguay Round** of the **GATT,** wa
 
 1. Trade Wars and Protectionism - Eg- Trump Tariffs and MAGA
 
-<p align="center"><img src="images/civilsdaily_p154_img82.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p154_img82.png" alt="Diagram" /></p>
 
 2. Since 2019, WTO’s **dispute settlement system** has been defunct due to US blocking judge appointments.
 
@@ -43115,7 +43115,7 @@ India, as a prominent member of the WTO, has a significant stake in its continue
 
 The WTO faces existential challenges amid rising trade protectionism and great power competition. Recent US-China trade tensions and the organization's institutional paralysis demand urgent reforms to ensure multilateral trade governance remains viable.
 
-<p align="center"><img src="images/superkalam_international_relations_q590_img1.png" alt="Key Areas of WTO Reform Framework" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q590_img1.png" alt="Key Areas of WTO Reform Framework" /></p>
 
 Key Areas of WTO Reform Framework
 
@@ -43240,7 +43240,7 @@ India’s efforts to prevent the introduction of ‘new issues’ in the WTO, an
 
 The World Trade Organization (WTO), established in 1995, aims to create a rules-based multilateral trading system. However, the Doha Development Round, launched in 2001, remains stalled due to fundamental disagreements between developed and developing nations.
 
-<p align="center"><img src="images/superkalam_international_relations_q745_img1.png" alt="Doha Round Deadlock Structure Diagram Analysis" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q745_img1.png" alt="Doha Round Deadlock Structure Diagram Analysis" /></p>
 
 Doha Round Deadlock Structure Diagram Analysis
 
@@ -43350,7 +43350,7 @@ The Information Technology Agreement (ITA) has the potential to stimulate global
 
 Recent discussions around India's participation in Information Technology Agreements highlight critical trade-offs between global integration and domestic industry protection in the digital economy era.
 
-<p align="center"><img src="images/superkalam_international_relations_q901_img1.png" alt="Information Technology Agreement's impact on India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q901_img1.png" alt="Information Technology Agreement's impact on India" /></p>
 
 Information Technology Agreement's impact on India
 
@@ -43433,7 +43433,7 @@ The WTO is an essential international institution that plays a crucial role in r
 
 The **World Trade Organization (WTO)** stands as a critical global institution whose decisions profoundly impact international trade and domestic policies. India's recent assertive stance on food security negotiations highlights the complex interplay between global trade rules and national sovereignty.
 
-<p align="center"><img src="images/superkalam_international_relations_q912_img1.png" alt="WTO Agricultural Subsidy Boxes Comparative Chart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_international_relations_q912_img1.png" alt="WTO Agricultural Subsidy Boxes Comparative Chart" /></p>
 
 WTO Agricultural Subsidy Boxes Comparative Chart
 

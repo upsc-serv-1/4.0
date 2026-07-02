@@ -58,7 +58,15 @@ export interface ValueAdditionItem {
   };
   rawContent?: string;
   diagramImagePath?: string;
+  hierarchies?: any[];
+  hierarchy_1_path?: string[] | null;
+  hierarchy_2_path?: string[] | null;
+  hierarchy_3_path?: string[] | null;
+  hierarchy_4_path?: string[] | null;
+  hierarchy_5_path?: string[] | null;
+  [key: string]: any;
   examples?: string;
+  data_points?: string;
 }
 
 export const mockQuestions: Question[] = [

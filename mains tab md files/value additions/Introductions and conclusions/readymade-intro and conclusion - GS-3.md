@@ -62,7 +62,7 @@
     *   **Services exports became a major growth driver**, led by IT and finance.
 *   **Conclusion:**
     *   Future progress must combine **reform continuity with inclusive safety nets** to widen the benefits of liberalisation.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs3/images/diagram_p16.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs3/images/diagram_p16.png" alt="Diagram" width="450" /></p>
 
 ---
 ### Section Group: Macroeconomics & Fiscal Policy
@@ -85,7 +85,7 @@
     *   **16th Finance Commission** asked to review **FRBM targets**.
 *   **Conclusion:**
     *   A **calibrated fiscal framework** with an **independent fiscal council** can balance growth imperatives with discipline.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs3/images/diagram_p8.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs3/images/diagram_p8.png" alt="Diagram" width="450" /></p>
 ###### Card 2: Outcome & Performance Budgeting
 *   **Quote:**
     > **"You can’t manage what you can’t measure." – Peter Drucker**
@@ -126,7 +126,7 @@
     *   Rationalized **MGNREGS** outlay redirected toward durable assets.
 *   **Conclusion:**
     *   Linking welfare with **long-term capital assets** ensures **economic multipliers without fiscal stress**.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs3/images/diagram_p9.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs3/images/diagram_p9.png" alt="Diagram" width="450" /></p>
 ###### Card 3: Central & State Budget Interface
 *   **Quote:**
     > **"Cooperative federalism must reflect in cooperative fiscalism."**
@@ -196,7 +196,7 @@
     *   **FDI** norms liberalised in **space, semiconductor**, and **green energy** sectors.
 *   **Conclusion:**
     *   A dynamic resource mobilisation strategy ensures **fiscal strength**, attracts global trust, and powers the engine of **inclusive and self-reliant growth**.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs3/images/diagram_p6.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs3/images/diagram_p6.png" alt="Diagram" width="450" /></p>
 
 ---
 ##### Subtopic: Niti Aayog X Planning Commission
@@ -215,7 +215,7 @@
     *   Finance Commission incentivised states using performance-linked grants.
 *   **Conclusion:**
     *   Strategic planning must align **vision with execution**, ensuring economic reforms are **federal, future-ready, and inclusive**, building a roadmap for **Amrit Kaal**.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs3/images/diagram_p5.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs3/images/diagram_p5.png" alt="Diagram" width="450" /></p>
 ###### Card 2: NITI Aayog Strategy & Viksit Bharat
 *   **Quote:**
     > **"What India does today will shape the world of tomorrow." — Viksit Bharat Vision**
@@ -336,7 +336,7 @@
     *   **480+ air routes** opened under UDAN.
 *   **Conclusion:**
     *   **Smart design and affordability** should guide the mobility transition across Bharat and India.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs3/images/diagram_p18.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs3/images/diagram_p18.png" alt="Diagram" width="450" /></p>
 
 ---
 ##### Subtopic: Renewable Energy
@@ -555,7 +555,7 @@
     *   **Oilseed promotion** expanded in arid zones through targeted cluster development.
 *   **Conclusion:**
     *   Cropping choices must align with **climate, soil, and market linkages** to ensure resilient and sustainable agriculture.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs3/images/diagram_p10.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs3/images/diagram_p10.png" alt="Diagram" width="450" /></p>
 
 ---
 ##### Subtopic: Organic Farming
@@ -664,7 +664,7 @@
     *   NABARD supported **warehouse projects** through agri infra funds.
 *   **Conclusion:**
     *   Post-harvest infrastructure must be **localized, tech-integrated**, and aligned with farmer producer organizations.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs3/images/diagram_p11.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs3/images/diagram_p11.png" alt="Diagram" width="450" /></p>
 ###### Card 3: FPOs & Agri Startups
 *   **Quote:**
     > **"From marginal farmers to market makers—FPOs are rural India’s startups."**
@@ -936,7 +936,7 @@
     *   **IoT sensors** used in Jal Jeevan Mission for real-time monitoring.
 *   **Conclusion:**
     *   Scalable pilots and **ethical frameworks** must anchor India’s leap into emerging tech leadership.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs3/images/diagram_p21.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs3/images/diagram_p21.png" alt="Diagram" width="450" /></p>
 ###### Card 3: INDUSTRY REVOLUTION 4.0 (IR 4.0)
 *   **Quote:**
     > **"In the fourth industrial revolution, it's not about the big eating the small, it's about the fast eating the slow."**
@@ -1636,7 +1636,7 @@
     *   INDCs updated to include **45% emissions intensity cut**.
 *   **Conclusion:**
     *   Low-carbon growth must anchor India’s **development-climate alignment** in the coming decades.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs3/images/diagram_p23.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs3/images/diagram_p23.png" alt="Diagram" width="450" /></p>
 ###### Card 2: CLIMATE JUSTICE
 *   **Introduction:**
     *   **Pakistan floods** — cost **>$30 billion**, **1,700 casualties**.
@@ -1783,7 +1783,7 @@
     *   Over **200+ projects** modified based on ESZ impact assessments.
 *   **Conclusion:**
     *   **Transparent, science-led EIAs** must become the norm, not the exception.
-<p align="center"><img src="C:/Users/Dr. Yogesh/Desktop/mains/neet and upsc cms/upsc/syllabus hierarchy/gs3/images/diagram_p24.png" alt="Diagram" width="450" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/syllabus_hierarchy/gs3/images/diagram_p24.png" alt="Diagram" width="450" /></p>
 ###### Card 2: ENVIRONMENTAL LAWS — EIA
 *   **Introduction:**
     *   **Definition**:

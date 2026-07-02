@@ -26,6 +26,23 @@ def build_hierarchy_path(paper, subject, section_group, microtopic=None, subtopi
     if subtopic: path.append(subtopic)
     return path
 
+def get_paper_from_subject(subject, default_paper="GS1"):
+    if not subject:
+        return default_paper
+    sub_clean = subject.strip().upper()
+    if sub_clean in ["SOCIETY", "GEOGRAPHY", "HISTORY", "ART AND CULTURE", "WORLD HISTORY", "MODERN HISTORY", "HUMAN GEOGRAPHY", "PHYSICAL GEOGRAPHY"]:
+        return "GS1"
+    elif sub_clean in ["POLITY", "GOVERNANCE", "INTERNATIONAL RELATIONS", "SOCIAL JUSTICE", "NEIGHBORHOOD & BILATERAL ENGAGEMENTS"]:
+        return "GS2"
+    elif sub_clean in ["INDIAN ECONOMY", "DISASTER MANAGEMENT", "AGRICULTURE", "ENVIRONMENT", "SCIENCE & TECHNOLOGY", "SECURITY", "INTERNAL SECURITY"]:
+        return "GS3"
+    elif sub_clean in ["ETHICS, INTEGRITY & APTITUDE", "ETHICS"]:
+        return "GS4"
+    elif "ESSAY" in sub_clean:
+        return "Essay"
+    return default_paper
+
+
 # ==============================================================================
 # 1. PARSE DATA & FACTS
 # ==============================================================================
@@ -107,6 +124,22 @@ def parse_data_facts():
 # ==============================================================================
 # 2. PARSE INTRODUCTIONS & CONCLUSIONS
 # ==============================================================================
+def parse_card_body_to_dict(card_body):
+    body = '\n' + card_body
+    # Split by any root-level bullet bold heading: e.g. * **Heading:**
+    parts = re.split(r'\n\s*[\*\-]\s+\*\*(.+?):\*\*\s*', body)
+    
+    sections = {}
+    if len(parts) > 1:
+        for i in range(1, len(parts), 2):
+            h_name = parts[i].strip()
+            h_content = parts[i+1] if i+1 < len(parts) else ""
+            # Strip trailing separator belonging to next card/subtopic boundaries
+            h_content = h_content.split('\n---')[0].strip()
+            sections[h_name.lower()] = h_content
+            
+    return sections
+
 def parse_intro_conclusions():
     folder = os.path.join(VA_DIR, "Introductions and conclusions")
     results = []
@@ -150,29 +183,7 @@ def parse_intro_conclusions():
                 card_body = cards[i+1] if i+1 < len(cards) else ""
                 
                 # Split card body if there is a '---' separating subtopics
-                card_body = card_body.split('\n---')[0]
-                
-                # Parse fields inside card body: Quote, Introduction, Examples, Conclusion, Data
-                quote_match = re.search(r'\*\s+\*\*Quote:\*\*\s*\n\s*>\s*(.+?)(?=\n\*|\n---|\n######|$)', card_body, re.DOTALL)
-                intro_match = re.search(r'\*\s+\*\*Introduction:\*\*\s*\n(.+?)(?=\n\*|\n---|\n######|$)', card_body, re.DOTALL)
-                examples_match = re.search(r'\*\s+\*\*Examples:\*\*\s*\n(.+?)(?=\n\*|\n---|\n######|$)', card_body, re.DOTALL)
-                conclusion_match = re.search(r'\*\s+\*\*Conclusion:\*\*\s*\n(.+?)(?=\n\*|\n---|\n######|$)', card_body, re.DOTALL)
-                data_match = re.search(r'\*\s+\*\*Data:\*\*\s*\n(.+?)(?=\n\*|\n---|\n######|$)', card_body, re.DOTALL)
-                
-                quote_raw = strip_clean(quote_match.group(1)) if quote_match else None
-                quote_text, quote_author = None, None
-                if quote_raw:
-                    quote_raw = re.sub(r'^\*\*|\*\*$|^"|"$', '', quote_raw)
-                    if " – " in quote_raw:
-                        parts = quote_raw.split(" – ")
-                        quote_text = parts[0].strip(' "')
-                        quote_author = parts[1].strip(' *')
-                    elif " — " in quote_raw:
-                        parts = quote_raw.split(" — ")
-                        quote_text = parts[0].strip(' "')
-                        quote_author = parts[1].strip(' *')
-                    else:
-                        quote_text = quote_raw
+                card_body = card_body.split('\n---')[0].strip()
                 
                 hierarchy_path = build_hierarchy_path(default_paper, subject, section_group, microtopic, subtopic)
                 
@@ -183,12 +194,7 @@ def parse_intro_conclusions():
                     "microtopic": microtopic,
                     "subtopic": subtopic,
                     "card_title": card_title,
-                    "quote_text": quote_text,
-                    "quote_author": quote_author,
-                    "introduction": strip_clean(intro_match.group(1)) if intro_match else None,
-                    "examples": strip_clean(examples_match.group(1)) if examples_match else None,
-                    "conclusion": strip_clean(conclusion_match.group(1)) if conclusion_match else None,
-                    "data_points": strip_clean(data_match.group(1)) if data_match else None,
+                    "body": card_body,
                     "hierarchy_path": hierarchy_path
                 })
                 
@@ -211,51 +217,82 @@ def parse_essay_value_add():
     with open(filepath, 'r', encoding='utf-8') as f:
         content = f.read()
         
-    # Split by H4 microtopics
-    microtopics = re.split(r'\n####\s+Microtopic:\s*', content)
+    def clean_field_value(val):
+        if not val:
+            return ""
+        val_lines = val.splitlines()
+        if len(val_lines) == 1:
+            val = re.sub(r'^\s*[-\*•]\s*', '', val)
+        elif len(val_lines) > 1:
+            first_line = val_lines[0].strip()
+            if first_line.startswith('- ') or first_line.startswith('* '):
+                val_lines[0] = re.sub(r'^\s*[-\*•]\s*', '', val_lines[0])
+            val = "\n".join(val_lines)
+        return val.strip()
+
+    # Split by H3 section groups (ANECDOTES or QUOTES)
+    sections_parts = re.split(r'\n###\s+Section\s+Group:\s*(ANECDOTES|QUOTES)\n', content)
     
-    for mt_block in microtopics[1:]:
-        lines = mt_block.split('\n')
-        microtopic_name = strip_clean(lines[0])
+    for idx in range(1, len(sections_parts), 2):
+        sec_group = sections_parts[idx].strip()
+        sec_content = sections_parts[idx+1]
         
-        block_content = "\n".join(lines[1:])
+        # Split by H4 microtopics
+        microtopics = re.split(r'\n####\s+Microtopic:\s*', sec_content)
         
-        # Split cards by ###### Anecdote X: or ###### Quote X:
-        # We capture both the type (Anecdote or Quote) and the title
-        cards = re.split(r'\n######\s+(Anecdote|Quote)\s+\d+:\s*(.+?)\n', block_content)
-        
-        for i in range(1, len(cards), 3):
-            entry_type = strip_clean(cards[i]).lower() # 'anecdote' or 'quote'
-            title = strip_clean(cards[i+1])
-            card_body = cards[i+2] if i+2 < len(cards) else ""
+        for mt_block in microtopics[1:]:
+            lines = mt_block.split('\n')
+            microtopic_name = strip_clean(lines[0])
             
-            card_body = card_body.split('\n---')[0]
+            block_content = "\n".join(lines[1:])
             
-            # Extract category & content
-            cat_match = re.search(r'-\s*\*\*Category:\*\*\s*(.+?)(?=\n-|\n\*|\n---|\n######|$)', card_body, re.DOTALL)
-            content_match = re.search(r'-\s*\*\*Content:\*\*\s*(.+?)(?=\n-|\n\*|\n---|\n######|$)', card_body, re.DOTALL)
+            # Split cards by ###### Anecdote X: or ###### Quote X:
+            cards = re.split(r'\n######\s+(Anecdote|Quote)\s+\d+:\s*(.+?)\n', block_content)
             
-            category = strip_clean(cat_match.group(1)).replace("`", "") if cat_match else microtopic_name
-            anecdote_text = strip_clean(content_match.group(1)) if content_match else strip_clean(card_body)
-            
-            anecdote_text = re.sub(r'^\s*-\s*', '', anecdote_text)
-            
-            hierarchy_path = build_hierarchy_path("Essay", "Essay", "ANECDOTES", microtopic_name)
-            
-            results.append({
-                "paper": "Essay",
-                "subject": "Essay",
-                "section_group": "ANECDOTES",
-                "microtopic": microtopic_name,
-                "subtopic": None,
-                "title": title,
-                "category": category,
-                "entry_type": entry_type,
-                "content": anecdote_text,
-                "author": None,
-                "usage_guide": None,
-                "hierarchy_path": hierarchy_path
-            })
+            for i in range(1, len(cards), 3):
+                entry_type = strip_clean(cards[i]).lower() # 'anecdote' or 'quote'
+                title = strip_clean(cards[i+1])
+                card_body = cards[i+2] if i+2 < len(cards) else ""
+                card_body = card_body.split('\n---')[0].strip()
+                
+                # Parse fields inside card body dynamically
+                body = '\n' + card_body
+                parts = re.split(r'\n\s*[\*\-]\s+\*\*(.+?):\*\*\s*', body)
+                
+                fields = {}
+                if len(parts) > 1:
+                    for j in range(1, len(parts), 2):
+                        f_name = parts[j].strip().lower()
+                        f_val = parts[j+1].strip() if j+1 < len(parts) else ""
+                        fields[f_name] = f_val
+                
+                category = clean_field_value(fields.get('category')).replace("`", "") if fields.get('category') else microtopic_name
+                raw_content = clean_field_value(fields.get('content') or fields.get('quote'))
+                
+                hierarchy_path = build_hierarchy_path("Essay", "Essay", sec_group, microtopic_name)
+                
+                row = {
+                    "paper": "Essay",
+                    "subject": "Essay",
+                    "section_group": sec_group,
+                    "microtopic": microtopic_name,
+                    "subtopic": None,
+                    "title": title,
+                    "category": category,
+                    "entry_type": entry_type,
+                    "content": raw_content,
+                    "hierarchy_path": hierarchy_path
+                }
+                
+                author_val = clean_field_value(fields.get('author'))
+                if author_val:
+                    row["author"] = author_val
+                    
+                usage_val = clean_field_value(fields.get('usage guide') or fields.get('usage_guide'))
+                if usage_val:
+                    row["usage_guide"] = usage_val
+                    
+                results.append(row)
             
     out_path = os.path.join(OUT_DIR, "mains_essay_value_add.json")
     with open(out_path, 'w', encoding='utf-8') as out_f:
@@ -382,7 +419,7 @@ def parse_frameworks():
     with open(filepath, 'r', encoding='utf-8') as f:
         content = f.read()
         
-    frameworks = re.split(r'\n#\s+Framework\s+\d+:\s*', content)
+    frameworks = re.split(r'\n#\s+Framework\s+\d+:\s*', '\n' + content)
     
     for fw_block in frameworks[1:]:
         lines = fw_block.split('\n')
@@ -390,15 +427,24 @@ def parse_frameworks():
         
         block_content = "\n".join(lines[1:])
         
-        img_match = re.search(r'!\[.*?\]\((images/.+?)\)', block_content)
+        img_match = re.search(r'!\[.*?\]\(((?:https?://.+?/)?images/.+?)\)', block_content)
         diagram_image_path = img_match.group(1) if img_match else None
+        r2_image_path = None
+        if diagram_image_path:
+            if diagram_image_path.startswith("http"):
+                r2_image_path = diagram_image_path
+            else:
+                r2_image_path = f"https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/general/frameworks/{diagram_image_path}"
         
         hierarchies = []
         hierarchy_lines = re.findall(r'\[Hierarchy\s+\d+\]\s*(.+?)(?=\n|$)', fw_block)
         for h_line in hierarchy_lines:
             tags = extract_bracket_tags(h_line)
-            paper = tags.get('paper', 'GS-I/II/III')
             subject = tags.get('subject', '')
+            paper = tags.get('paper')
+            if not paper or paper == 'GS-I/II/III':
+                paper = get_paper_from_subject(subject, 'GS1')
+                
             section_group = tags.get('section_group', '')
             microtopic = tags.get('microtopic', '')
             subtopic = tags.get('subtopic', '')
@@ -415,11 +461,18 @@ def parse_frameworks():
         cleaned_body = re.sub(r'###\s+Hierarchy\n(?:\[Hierarchy \d+\].*?\n)+', '', block_content)
         cleaned_body = re.sub(r'###\s+Diagram:.*?\n!\[.*?\]\(images/.+?\)\n', '', cleaned_body)
         
+        h_paths = [h["path"] for h in hierarchies]
+        
         results.append({
             "framework_name": framework_title,
-            "diagram_image_path": diagram_image_path,
+            "diagram_image_path": r2_image_path,
             "breakdown_markdown": strip_clean(cleaned_body),
-            "hierarchies": hierarchies
+            "hierarchies": hierarchies,
+            "hierarchy_1_path": h_paths[0] if len(h_paths) > 0 else None,
+            "hierarchy_2_path": h_paths[1] if len(h_paths) > 1 else None,
+            "hierarchy_3_path": h_paths[2] if len(h_paths) > 2 else None,
+            "hierarchy_4_path": h_paths[3] if len(h_paths) > 3 else None,
+            "hierarchy_5_path": h_paths[4] if len(h_paths) > 4 else None,
         })
         
     out_path = os.path.join(OUT_DIR, "mains_frameworks.json")
@@ -560,6 +613,8 @@ def parse_ethics_value_add():
             
             img_match = re.search(r'!\[.*?\]\((x_factor_terms_images/.+?)\)', block_content)
             diagram_image_path = img_match.group(1) if img_match else None
+            if diagram_image_path:
+                diagram_image_path = f"https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/{diagram_image_path}"
             
             cleaned_text = re.sub(r'\[(Subject|Section Group|Microtopic|Subtopic|Category):\s*[^\]]+\]\n*', '', block_content)
             cleaned_text = re.sub(r'!\[.*?\]\(x_factor_terms_images/.+?\)\n*', '', cleaned_text)
@@ -618,6 +673,8 @@ def parse_ethics_value_add():
                 
                 img_match = re.search(r'!\[.*?\]\((x_factor_diagram_images/.+?)\)', sub_body)
                 diagram_image_path = img_match.group(1) if img_match else None
+                if diagram_image_path:
+                    diagram_image_path = f"https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/{diagram_image_path}"
                 
                 cleaned_sub_body = re.sub(r'!\[.*?\]\(x_factor_diagram_images/.+?\)\n*', '', sub_body)
                 

@@ -353,6 +353,21 @@ CREATE TABLE user_syllabus_progress (
   updated_at timestamp with time zone DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS public.mains_frameworks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  framework_name TEXT NOT NULL,
+  diagram_image_path TEXT,
+  breakdown_markdown TEXT NOT NULL, -- Verbatim breakdown text
+  hierarchies JSONB NOT NULL DEFAULT '[]'::jsonb, -- Array of hierarchy paths mapping to multiple subjects
+  hierarchy_1_path TEXT[],
+  hierarchy_2_path TEXT[],
+  hierarchy_3_path TEXT[],
+  hierarchy_4_path TEXT[],
+  hierarchy_5_path TEXT[],
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE user_widgets (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL,

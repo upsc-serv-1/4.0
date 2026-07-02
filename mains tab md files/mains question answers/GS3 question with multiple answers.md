@@ -287,7 +287,7 @@ The transformation has aligned with **Digital India** and **Atmanirbhar Bharat**
 
 The **Food Processing Industry (FPI)** in India acts as a bridge between agriculture and industry, adding value to raw farm produce and reducing post-harvest losses. With India being the **largest producer of milk, second in fruits and vegetables, and a major grain producer**, the FPI holds immense potential for employment, income generation, and export growth.
 
-<p align="center"><img src="images/superkalam_gs3_q67_img1.png" alt="Food Processing Value Chain Flowchart Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q67_img1.png" alt="Food Processing Value Chain Flowchart Diagram" /></p>
 
 Food Processing Value Chain Flowchart Diagram
 
@@ -639,7 +639,7 @@ The **Labour Codes** are ambitious reforms aimed at improving **ease of doing bu
 
 The recent consolidation of **29 central labour laws** into **four Labour Codes** marks a significant milestone in India's labour market reforms, aiming to balance worker welfare with ease of doing business.
 
-<p align="center"><img src="images/superkalam_gs3_q22_img1.png" alt="India's 4 New Labour Codes" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q22_img1.png" alt="India's 4 New Labour Codes" /></p>
 
 India's 4 New Labour Codes
 
@@ -788,7 +788,7 @@ The triumphant success of **Make in India** requires synchronized implementation
 7. **Employment Impact**- Labour-intensive sectors like textiles, gems, and automobiles face slowdown.
 
 
-<p align="center"><img src="images/civilsdaily_p11_img83.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p11_img83.png" alt="Diagram" /></p>
 
 
 ### Way Forward
@@ -941,7 +941,7 @@ A projected 0.2% decline in global trade in 2025 signals a decisive shift toward
 4. **Supply Disruption:** Global "friend-shoring" restricts India's access to critical tech, choking emerging sectors like semiconductors.
 5. **WTO Paralysis:** The dysfunctional WTO dispute mechanism leaves India vulnerable to arbitrary unilateral trade blockades.
 
-<p align="center"><img src="images/superkalam_gs3_q16_img1.png" alt="India's Strategy Against Global Protectionism" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q16_img1.png" alt="India's Strategy Against Global Protectionism" /></p>
 
 India's Strategy Against Global Protectionism
 
@@ -1086,7 +1086,7 @@ Since, protectionism and currency manipulations do not seem to halt in coming fu
 
 Both protectionism as well as currency manipulations are considered as trade distortion practices and are counterproductive to global free trade. In 2018-19, the global economy witnessed a spurt in both of these phenomena in global trade.
 
-<p align="center"><img src="images/pw_economic_development_q421_img1.webp" alt="tools of protectionism" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q421_img1.webp" alt="tools of protectionism" /></p>
 
 ### Body
 
@@ -1122,7 +1122,7 @@ Protectionism has a mixed impact on Indian macroeconomic stability because while
 
 The global resurgence of protectionism and currency manipulations in 2024-25 presents significant macroeconomic challenges for India, requiring strategic policy responses to maintain economic stability.
 
-<p align="center"><img src="images/superkalam_gs3_q151_img1.png" alt="Global Protectionism and Currency Manipulation Flow" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q151_img1.png" alt="Global Protectionism and Currency Manipulation Flow" /></p>
 
 Global Protectionism and Currency Manipulation Flow
 
@@ -1352,7 +1352,7 @@ By encouraging **disciplined, sustainable, and quality spending**, FHI can help 
 
 The Fiscal Health Index (FHI) initiative by NITI Aayog aims to evolve an understanding of the fiscal health of states in India. FHI is a valuable tool for assessing the fiscal performance of states by providing a clear, standardized measure of their financial health.
 
-<p align="center"><img src="images/economic_development_q3_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/economic_development_q3_img1.png" alt="Image" /></p>
 
 **Role of FHI in Assessing Fiscal Performance of States**
 
@@ -1441,7 +1441,7 @@ The **Fiscal Health Index (FHI) 2025**, developed by NITI Aayog, provides a comp
 
 Covering eighteen major states, it measures fiscal health through five key parameters using data from the Comptroller and Auditor General of India (CAG).
 
-<p align="center"><img src="images/superkalam_gs3_q6_img1.png" alt="Fiscal Health Index" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q6_img1.png" alt="Fiscal Health Index" /></p>
 
 Fiscal Health Index
 
@@ -1741,7 +1741,7 @@ This dual budgetary structure ensures balanced fiscal management while targeting
 5. Increased **Defence spending** due to External Threat. Eg- 5% increase in defence spending in 2025 than 2024.
 
 
-<p align="center"><img src="images/civilsdaily_p19_img86.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p19_img86.png" alt="Diagram" /></p>
 
 
 ### Way Forward for Effective Fiscal Policy in India
@@ -1859,7 +1859,7 @@ In the aftermath of LPG reforms, the nation’s per capita income increased, gov
 
 The transformation from Planning Commission to NITI Aayog in 2015 represents India's shift toward cooperative federalism and market-oriented development planning. This change reflects the evolving needs of a dynamic economy requiring decentralized governance.
 
-<p align="center"><img src="images/superkalam_gs3_q148_img1.png" alt="Planning Commission Top Down Comparative Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q148_img1.png" alt="Planning Commission Top Down Comparative Flowchart" /></p>
 
 Planning Commission Top Down Comparative Flowchart
 
@@ -1983,7 +1983,7 @@ A good taxation system should be “progressive” i.e. those with higher income
 
 The Union Budget 2018-19 introduced landmark reforms in capital gains and dividend taxation, fundamentally reshaping India's investment tax landscape and aligning it with global practices.
 
-<p align="center"><img src="images/superkalam_gs3_q143_img1.png" alt="Equity Taxation Changes Budget 2018 19" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q143_img1.png" alt="Equity Taxation Changes Budget 2018 19" /></p>
 
 Equity Taxation Changes Budget 2018 19
 
@@ -2671,7 +2671,7 @@ The PMJDY is playing its role in great manner by ensuring mass participation of 
 
 Dimensions of financial inclusion are bank penetration, credit penetration, deposit penetration for which **Pradhan Mantri Jan-Dhan Yojana (PMJDY)** is a major initiative. More than 46.25 crore beneficiaries have banked under PMJDY since inception.
 
-<p align="center"><img src="images/pw_economic_development_q283_img1.webp" alt="PMDY" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q283_img1.webp" alt="PMDY" /></p>
 
 ### Body
 
@@ -2934,7 +2934,7 @@ Public expenditure on social services is essential for **inclusive growth** and 
 
 Since the 1991 reforms, India has gradually shifted its fiscal policy to balance economic growth with social equity by expanding public spending on core social sectors—education, health, and welfare—aiming to support human development and inclusive growth.
 
-<p align="center"><img src="images/superkalam_gs3_q24_img1.png" alt="Public Spending on Social Services Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q24_img1.png" alt="Public Spending on Social Services Diagram" /></p>
 
 Public Spending on Social Services Diagram
 
@@ -2947,7 +2947,7 @@ Public Spending on Social Services Diagram
 
 ### 2. **Sectoral Composition**
 
-<p align="center"><img src="images/superkalam_gs3_q24_img2.jpg" alt="Trend of expenditure on social services" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q24_img2.jpg" alt="Trend of expenditure on social services" /></p>
 
 Trend of expenditure on social services
 
@@ -3045,7 +3045,7 @@ Child grows up
 5. **Fiscal Burden -** Unsustainable borrowing today limits fiscal space for future welfare and development spending.
 
 
-<p align="center"><img src="images/civilsdaily_p13_img84.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p13_img84.png" alt="Diagram" /></p>
 
 
 ### Way Forward
@@ -3344,7 +3344,7 @@ In the last few decades, India's growth story has been phenomenal but the outcom
 
 **As per OECD, inclusive growth is** economic growth that is distributed fairly across society and creates opportunities for all. **The UN Brundtland commission’s report ‘Our Common Future (1987)’ defined sustainable development as development that meets the needs of the present without compromising the ability of future generations to meet their own needs.**
 
-<p align="center"><img src="images/pw_economic_development_q464_img1.webp" alt="Inclusive growth" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q464_img1.webp" alt="Inclusive growth" /></p>
 
 ### Body
 
@@ -3494,7 +3494,7 @@ Through these measures inclusive growth can be ensured and the Gandhian dream of
 
 **As per OECD, inclusive growth is** economic growth that is distributed fairly across society and creates opportunities for all **. When economic growth of a country benefits all sections of the population, reduces poverty and creates employment opportunities for all, the growth is said to be inclusive.**
 
-<p align="center"><img src="images/pw_economic_development_q374_img1.webp" alt="inclusive growth" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q374_img1.webp" alt="inclusive growth" /></p>
 
 ### Body
 
@@ -3754,7 +3754,7 @@ Successful transformation requires coordinated efforts across skill development,
 
 **Capitalism is an economic system in which** most or all of the trade, industry, and means of production are owned by private people **and used to make money. Capitalism is based on private property, the accumulation of capital, a competitive market, and wages.**
 
-<p align="center"><img src="images/pw_economic_development_q99_img1.webp" alt="capitalism" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q99_img1.webp" alt="capitalism" /></p>
 
 ### Body
 
@@ -3788,7 +3788,7 @@ Capitalism needs to be regulated for delivery of greatest economic growth to gre
 
 A **market economy** is driven by private enterprise and competition, while **inclusive growth** implies growth that is sustainable, broad-based, and equitable. The challenge before India is whether a market-led growth model can deliver inclusivity for a diverse society with wide socio-economic disparities.
 
-<p align="center"><img src="images/superkalam_gs3_q70_img1.png" alt="Virtuous Cycle of Financial Inclusion Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q70_img1.png" alt="Virtuous Cycle of Financial Inclusion Flowchart" /></p>
 
 Virtuous Cycle of Financial Inclusion Flowchart
 
@@ -4074,7 +4074,7 @@ The above-mentioned strategies can contribute to meeting goals of SDG 1 (end pov
 
 The **care economy** refers to unpaid or underpaid work centered on caregiving and domestic activities, often performed by women within households. In contrast, the **monetized economy** comprises economic activities that are accounted for in GDP and involve market transactions.
 
-<p align="center"><img src="images/superkalam_gs3_q44_img1.png" alt="Iceberg Diagram of Care Economy vs GDP" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q44_img1.png" alt="Iceberg Diagram of Care Economy vs GDP" /></p>
 
 Iceberg Diagram of Care Economy vs GDP
 
@@ -4363,7 +4363,7 @@ Government has been focusing on digitalisation of Indian economy for accelerated
 
 India has emerged as a global leader in digital public infrastructure, with initiatives like **Aadhaar, UPI, and the India Stack** revolutionizing access to services. The digital economy contributes around **9% to GDP (MeitY, 2023)** and is projected to reach **20% by 2026**. Yet, full-scale digital transformation across sectors is hindered by several structural and institutional challenges.
 
-<p align="center"><img src="images/superkalam_gs3_q59_img1.png" alt="Transaction Volume Growth from 2018 to 2023" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q59_img1.png" alt="Transaction Volume Growth from 2018 to 2023" /></p>
 
 Transaction Volume Growth from 2018 to 2023
 
@@ -4679,7 +4679,7 @@ Government has been focusing on digitalisation of Indian economy for accelerated
 
 India has emerged as a global leader in digital public infrastructure, with initiatives like **Aadhaar, UPI, and the India Stack** revolutionizing access to services. The digital economy contributes around **9% to GDP (MeitY, 2023)** and is projected to reach **20% by 2026**. Yet, full-scale digital transformation across sectors is hindered by several structural and institutional challenges.
 
-<p align="center"><img src="images/superkalam_gs3_q59_img1.png" alt="Transaction Volume Growth from 2018 to 2023" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q59_img1.png" alt="Transaction Volume Growth from 2018 to 2023" /></p>
 
 Transaction Volume Growth from 2018 to 2023
 
@@ -4936,7 +4936,7 @@ According to the UNDP Human Development Report 2025, India’s HDI is 0.685, yet
 4. **Social barriers:** HDI ignores systemic inequities, whereas IHDI reflects the caste disparities that the Supreme Court's 2024 **Davinder Singh** judgment targets via substantive equality.
 5. **Policy targeting:** HDI rewards macro-spending, while IHDI heavily penalizes micro-level gaps, necessitating localized initiatives like the Aspirational Blocks Programme.
 
-<p align="center"><img src="images/superkalam_gs3_q2_img1.png" alt="Flow chart of Human Development Index" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q2_img1.png" alt="Flow chart of Human Development Index" /></p>
 
 Flow chart of Human Development Index
 
@@ -4996,7 +4996,7 @@ MSME sector contributes “nearly one-third to India’s GDP” and is a “key 
 7. **Udyam Registration** system to access **government benefits and schemes**.
 
 
-<p align="center"><img src="images/civilsdaily_p23_img87.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p23_img87.png" alt="Diagram" /></p>
 
 
 ### Issues
@@ -5499,7 +5499,7 @@ The potential GDP is often used as a benchmark to gauge the actual level of outp
 
 ### Body
 
-**Determinants of Potential GDP:** <p align="center"><img src="images/pw_economic_development_q492_img1.webp" alt="GDP" /></p>
+**Determinants of Potential GDP:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q492_img1.webp" alt="GDP" /></p>
 
  **Determinants of Potential GDP:** 
 
@@ -5978,7 +5978,7 @@ Source: Ministry of Finance
 6. Ease of Compliance - **lower rates under GST 2.0 combined with better compliance** can **increase GST collections** in the medium term.
 
 
-<p align="center"><img src="images/civilsdaily_p18_img85.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p18_img85.png" alt="Diagram" /></p>
 
 
 ### Challenges
@@ -6070,7 +6070,7 @@ At the **State** level, the following taxes have been subsumed in the GST:
 
 ### Body
 
-**The GST replaced the following taxes:** <p align="center"><img src="images/pw_economic_development_q457_img1.webp" alt="GST" /></p>
+**The GST replaced the following taxes:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q457_img1.webp" alt="GST" /></p>
 
 **The GST replaced the following taxes:** 
 
@@ -6185,7 +6185,7 @@ The GST regime has transformed India's indirect tax landscape, with monthly coll
 
 Goods and Services Tax (GST) is an indirect, comprehensive, multi-stage, destination-based tax that is levied on every value addition. GST replaced a host of indirect taxes being levied by the central and state governments, which has changed the taxation landscape.
 
-<p align="center"><img src="images/pw_economic_development_q23_img1.webp" alt="gst" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q23_img1.webp" alt="gst" /></p>
 
 ### Body
 
@@ -6351,7 +6351,7 @@ The **World Bank** defines infrastructure as "the basic physical and organizatio
 8. **Inadequate R&D expenditure (0.7% of GDP)** hinder the adoption of innovative solutions.
 
 
-<p align="center"><img src="images/civilsdaily_p29_img90.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p29_img90.png" alt="Diagram" /></p>
 
 
 ### Way Forward
@@ -7025,7 +7025,7 @@ According to CPI, in **August 2024**, food inflation was **5.66%,** with rural i
 
 **Causes of Persistent High Food Inflation In India**
 
-<p align="center"><img src="images/economic_development_q6_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/economic_development_q6_img1.png" alt="Image" /></p>
 
 ### Effectiveness of RBI's Monetary Policy in Controlling Food Inflation
 
@@ -7101,7 +7101,7 @@ Addressing persistent high food inflation is essential for ensuring **economic s
 
 India’s persistent **high food inflation** has been a recurring macroeconomic challenge, significantly impacting the **Consumer Price Index (CPI)** and household budgets. Although food inflation eased sharply from **over 9% in June 2024** to **below 2% in April 2025**, the underlying causes and policy responses remain crucial for long-term stability.
 
-<p align="center"><img src="images/superkalam_gs3_q33_img1.png" alt="Food Inflation: Causes and RBI Policy" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q33_img1.png" alt="Food Inflation: Causes and RBI Policy" /></p>
 
 Food Inflation: Causes and RBI Policy
 
@@ -7683,7 +7683,7 @@ The market economy despite being economically efficient is not the ideal system 
 
 As per OECD, inclusive growth is economic growth that is distributed fairly across society and creates opportunities for all. In a market economy, the production of goods and services is directed by the laws of supply and demand and is driven by profit with no government intervention.
 
-<p align="center"><img src="images/pw_economic_development_q670_img1.webp" alt="inclusive growth" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q670_img1.webp" alt="inclusive growth" /></p>
 
 ### Body
 
@@ -8053,7 +8053,7 @@ The experiences of developed countries have demonstrated that the growth of smal
 
 India aspires to become a **$5 trillion economy**, and for this, **manufacturing—especially MSMEs—must play a pivotal role**. The sector contributes around **17% to India's GDP** and employs over **11 crore people**, mostly through **Micro, Small, and Medium Enterprises (MSMEs)**. A stronger manufacturing base provides scale, jobs, innovation, and resilience to economic shocks.
 
-<p align="center"><img src="images/superkalam_gs3_q46_img1.png" alt="Government Policies to Faster Economic Growth" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q46_img1.png" alt="Government Policies to Faster Economic Growth" /></p>
 
 Government Policies to Faster Economic Growth
 
@@ -8287,7 +8287,7 @@ India’s Mobile Phone Export Growth
 6. **Exclusion of MSMEs** due to high eligibility thresholds
 
 
-<p align="center"><img src="images/civilsdaily_p26_img88.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p26_img88.png" alt="Diagram" /></p>
 
 
 ### Way Forward
@@ -8432,7 +8432,7 @@ By 2025, the PLI scheme has attracted ₹2 lakh crore in investments and generat
 
 ### Rationale of the PLI Scheme
 
-<p align="center"><img src="images/superkalam_gs3_q1_img1.png" alt="Production Linked Incentive" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q1_img1.png" alt="Production Linked Incentive" /></p>
 
 Production Linked Incentive
 
@@ -8521,7 +8521,7 @@ Semiconductor Market (InUSDBSon)
 7. **Focus on trusted supply chains** and strategic national security applications.
 
 
-<p align="center"><img src="images/civilsdaily_p27_img89.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p27_img89.png" alt="Diagram" /></p>
 
 
 ### Way Forward
@@ -8685,7 +8685,7 @@ While challenges are significant, ISM's financial support, skill development, ec
 
 India's semiconductor market, valued at **$38 billion in 2023**, is projected to reach **$100-110 billion by 2030**. The **India Semiconductor Mission (ISM)** represents India's strategic push towards technological sovereignty.
 
-<p align="center"><img src="images/superkalam_gs3_q10_img1.png" alt="Semiconductor manufacturing process from design to packaging" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q10_img1.png" alt="Semiconductor manufacturing process from design to packaging" /></p>
 
 Semiconductor manufacturing process from design to packaging
 
@@ -9085,7 +9085,7 @@ By adopting these suggested improvements, India can better understand and tackle
 
 India’s unemployment is predominantly **structural**, arising from deep-rooted issues such as a **mismatch between available skills and market demand, low productivity sectors, and informal employment**. Tackling this requires a clear understanding of how unemployment is measured and how data quality can be improved to formulate targeted policies.
 
-<p align="center"><img src="images/superkalam_gs3_q50_img1.png" alt="NSSO PLFS Approaches Usual Status" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q50_img1.png" alt="NSSO PLFS Approaches Usual Status" /></p>
 
 NSSO PLFS Approaches Usual Status
 
@@ -9346,7 +9346,7 @@ The above strategies would enable India to create more jobs and reap demographic
 
 India’s GDP growth in recent decades has been supported more by an **increase in labour activity** (expansion of workforce and informal employment) rather than by productivity-led job creation. This explains the **“job-poor” growth paradox** where more people are working, but output per worker remains low.
 
-<p align="center"><img src="images/superkalam_gs3_q66_img1.png" alt="Employment Structure and Desired Growth Comparison" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q66_img1.png" alt="Employment Structure and Desired Growth Comparison" /></p>
 
 Employment Structure and Desired Growth Comparison
 
@@ -9552,7 +9552,7 @@ It allows access to private sector financing to build complex infrastructural pr
 - PPPs provide incentives for private sector companies to innovate and find cost-effective solutions and put to use their expertise in developing and maintaining better quality of infrastructure.
 - Private sector collaboration ensures that the projects are completed on time.
 
-<p align="center"><img src="images/pw_economic_development_q106_img1.webp" alt="PPP" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q106_img1.webp" alt="PPP" /></p>
 
 **But in long gestation projects, there is a greater risk from PPPs. This can be seen as follows:**
 - **NPAs:** There is a greater scope for asset-liability mismatch given the long gestation period. This leads to rise in Non-Performing Assets (NPAs) of banks which provide funds to the private players. Most of these are public sector banks (PSBs) and hence the NPAs become a liability on the people.
@@ -9781,7 +9781,7 @@ All requisite steps are being taken to address the various challenges in this fi
 
 **Public-private partnerships (PPPs) are** formally established agreements between public and private parties **to share risks and benefits in the provision of public services and infrastructure. As per** World Bank **,** India **is one of the leading countries in terms of readiness for PPPs with** ~2000 PPP projects **in various stages of implementation.**
 
-<p align="center"><img src="images/pw_economic_development_q106_img1.webp" alt="PPP" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q106_img1.webp" alt="PPP" /></p>
 
 ### Body
 
@@ -9926,7 +9926,7 @@ integrates climate-resilient energy systems.
     - **Net Zero by 2070**.
 
 
-<p align="center"><img src="images/civilsdaily_p33_img91.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p33_img91.png" alt="Diagram" /></p>
 
 
 ### Challenges
@@ -9991,7 +9991,7 @@ According to Lawson, there is reduction in gender gap in India by half over the 
 
 Energy access is fundamental to achieving SDG 7 and broader sustainable development. India has demonstrated remarkable progress in expanding energy access while transitioning toward renewable sources, though regional disparities and reliability challenges remain.
 
-<p align="center"><img src="images/superkalam_gs3_q141_img1.png" alt="India's Progress on Sustainable Development Goal 7" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q141_img1.png" alt="India's Progress on Sustainable Development Goal 7" /></p>
 
 India's Progress on Sustainable Development Goal 7
 
@@ -10249,7 +10249,7 @@ Send To My Bookmarks
 
 India has emerged as a global leader in renewable energy transition, demonstrating remarkable progress in clean energy deployment while addressing energy security and climate commitments.
 
-<p align="center"><img src="images/superkalam_gs3_q185_img1.png" alt="Renewable Energy Status and Target Capacity" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q185_img1.png" alt="Renewable Energy Status and Target Capacity" /></p>
 
 Renewable Energy Status and Target Capacity
 
@@ -10508,7 +10508,7 @@ India's Green Energy Corridor represents a strategic infrastructure initiative t
   - Storage infrastructure development for 24/7 power supply
   - Land acquisition and environmental clearances
 
-<p align="center"><img src="images/superkalam_gs3_q268_img1.jpeg" alt="Green Energy Corridor Network showing renewable-rich states connected to demand centers through high-voltage transmission lines" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q268_img1.jpeg" alt="Green Energy Corridor Network showing renewable-rich states connected to demand centers through high-voltage transmission lines" /></p>
 
 Green Energy Corridor Network showing renewable-rich states connected to demand centers through high-voltage transmission lines
 
@@ -10612,9 +10612,9 @@ Addressing these concerns can ensure **efficient, seamless, congestion-free** hi
 
 - **ANPR (Automatic Number Plate Recognition):** Captures vehicle registration plates for seamless toll payments without stopping.
 
-<p align="center"><img src="images/science__technology_q6_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/science__technology_q6_img1.png" alt="Image" /></p>
 
-<p align="center"><img src="images/science__technology_q6_img2.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/science__technology_q6_img2.png" alt="Image" /></p>
 
 **Proposed Changes for a Seamless Process:**
 
@@ -10705,7 +10705,7 @@ The evolution of electronic toll collection technologies, such as **RFID and DSR
 
 Electronic toll collection (ETC) in India primarily uses **RFID-based FASTag technology** for cashless highway tolling. Over **6.5 crore FASTags** have been issued, with **97% of tolls** now collected electronically on national highways.
 
-<p align="center"><img src="images/superkalam_gs3_q38_img1.png" alt="RFID Toll Payment System" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q38_img1.png" alt="RFID Toll Payment System" /></p>
 
 RFID Toll Payment System
 
@@ -10713,7 +10713,7 @@ RFID Toll Payment System
 
 **FASTag System** uses Radio Frequency Identification (RFID) tags on vehicle windshields that communicate with toll plaza readers for automatic payment deduction. Emerging technologies include **Automatic Number Plate Recognition (ANPR)** and **GPS-based tolling systems**.
 
-<p align="center"><img src="images/superkalam_gs3_q38_img2.jpg" alt="Electronic toll collection process" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q38_img2.jpg" alt="Electronic toll collection process" /></p>
 
 Electronic toll collection process
 
@@ -10995,7 +10995,7 @@ UDAN (Ude Desh ka Aam Naagrik) was launched in 2016 under the National Civil Avi
 
 ## Features of UDAN Scheme
 
-<p align="center"><img src="images/superkalam_gs3_q36_img1.jpg" alt="Features of UDAN Scheme" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q36_img1.jpg" alt="Features of UDAN Scheme" /></p>
 
 Features of UDAN Scheme
 
@@ -11153,7 +11153,7 @@ PPPs offer the public sector potential cost, quality, and scale advantages in ac
 
 ### Body
 
-**Public Private Partnerships (PPP) is required in infrastructure projects because:** <p align="center"><img src="images/pw_economic_development_q703_img1.webp" alt="Need for PPP" /></p>
+**Public Private Partnerships (PPP) is required in infrastructure projects because:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q703_img1.webp" alt="Need for PPP" /></p>
 
 **Public Private Partnerships (PPP) is required in infrastructure projects because:** 
 
@@ -11232,7 +11232,7 @@ Going forward, recommendations of Kelkar Committee must be adopted to address ch
 
 Public infrastructure is the backbone of economic development, but financing and executing large projects often faces delays due to limited government resources, procedural bottlenecks, and inefficiencies. In this context, the **Public Private Partnership (PPP)** model becomes vital as it combines public sector oversight with private sector efficiency, innovation, and investment.
 
-<p align="center"><img src="images/superkalam_gs3_q80_img1.png" alt="Typical PPP model structural framework diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q80_img1.png" alt="Typical PPP model structural framework diagram" /></p>
 
 Typical PPP model structural framework diagram
 
@@ -11954,7 +11954,7 @@ To tackle water depletion and outdated infrastructure, India must adopt sustaina
 
 Recent cloudbursts in Uttarakhand, with the state recording **22% above-normal rainfall** in 2025, necessitate comprehensive mitigation strategies following **NDMA guidelines**.
 
-<p align="center"><img src="images/superkalam_gs3_q199_img1.png" alt="Steep Mountain Valley Cloudburst Mitigation Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q199_img1.png" alt="Steep Mountain Valley Cloudburst Mitigation Diagram" /></p>
 
 Steep Mountain Valley Cloudburst Mitigation Diagram
 
@@ -12071,7 +12071,7 @@ o Punjab and Haryana - **~1 metre annual groundwater decline**.
 7. **Not Suitable for all crops**- Eg- **Flood irrigation is preferred** for water-intensive crops like **paddy**
 
 
-<p align="center"><img src="images/civilsdaily_p60_img102.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p60_img102.png" alt="Diagram" /></p>
 
 
 ### **Government Initiatives**
@@ -12276,7 +12276,7 @@ India faces severe water stress with only 4% of global freshwater resources supp
 | Sprinkler System | 75-85% | 1,50,000-2,50,000 | 20-40% | 15-35% |
 | Flood Irrigation | 35-40% | 50,000-1,00,000 | Baseline | Baseline |
 
-<p align="center"><img src="images/superkalam_gs3_q92_img1.png" alt="Drip Irrigation System showing water source, filtration unit, main pipeline, sub-main lines, laterals, and emitters delivering precise water to plant root zones" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q92_img1.png" alt="Drip Irrigation System showing water source, filtration unit, main pipeline, sub-main lines, laterals, and emitters delivering precise water to plant root zones" /></p>
 
 Drip Irrigation System showing water source, filtration unit, main pipeline, sub-main lines, laterals, and emitters delivering precise water to plant root zones
 
@@ -12446,7 +12446,7 @@ India has **18%** of the world’s population but only **4%** of the freshwater 
 6. Strengthening **Community-Led Measures - Eg- Pani Panchayats** in Odisha.
 
 
-<p align="center"><img src="images/civilsdaily_p61_img103.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p61_img103.png" alt="Diagram" /></p>
 
 
 ### Demand-Side Management
@@ -13001,7 +13001,7 @@ Presently, some of these issues have been resolved through the temporary "Peace 
 
 Agricultural subsidies are financial or policy supports given to farmers to reduce their cost of production, ensure food security, and stabilize incomes. In India, they account for nearly **2% of GDP** (Economic Survey 2022–23). However, certain subsidies have been flagged by the WTO’s *Agreement on Agriculture* (AoA) for being trade-distorting.
 
-<p align="center"><img src="images/superkalam_gs3_q55_img1.png" alt="WTO Boxes Agricultural Support" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q55_img1.png" alt="WTO Boxes Agricultural Support" /></p>
 
 WTO Boxes Agricultural Support
 
@@ -13278,7 +13278,7 @@ Presently, some of these issues have been resolved through the temporary "Peace 
 
 Agricultural subsidies are financial or policy supports given to farmers to reduce their cost of production, ensure food security, and stabilize incomes. In India, they account for nearly **2% of GDP** (Economic Survey 2022–23). However, certain subsidies have been flagged by the WTO's *Agreement on Agriculture* (AoA) for being trade-distorting.
 
-<p align="center"><img src="images/superkalam_gs3_q55_img1.png" alt="WTO Boxes Agricultural Support" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q55_img1.png" alt="WTO Boxes Agricultural Support" /></p>
 
 WTO Boxes Agricultural Support
 
@@ -13420,7 +13420,7 @@ Under panchamrit Targets at COP26, India committed to achieving **50 percent** o
 6. **Global leadership -** Strengthens India’s position in **climate negotiations** and **green diplomacy**.
 
 
-<p align="center"><img src="images/civilsdaily_p36_img93.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p36_img93.png" alt="Diagram" /></p>
 
 
 ### Way Forward
@@ -13631,7 +13631,7 @@ India’s aspiration of deriving **50% of its energy needs from renewables by 20
 5. **Limited storage capacity** has resulted in huge piling of stocks in FCI warehouses.
 
 
-<p align="center"><img src="images/civilsdaily_p49_img98.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p49_img98.png" alt="Diagram" /></p>
 
 
 ### Way Forward
@@ -13687,7 +13687,7 @@ However, a lot is yet to be done as far as MSPs for different crops are concerne
 - Government agencies purchase the entire quantity offered by the farmers at the announced minimum price.
 - Thus, a farmer always has the option to sell the produce to the government if he can’t get remunerative prices from the open market.
 
-<p align="center"><img src="images/pw_economic_development_q415_img1.webp" alt="MSP" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q415_img1.webp" alt="MSP" /></p>
 
 **MSP help farmers from Low-income trap by:**
 - **Prevent distress sale:** MSP assures farmers of a minimum price for their crops when market prices fall below the MSP. This prevents distress sale by farmers i.e., selling the produce at throw away prices because of the need for money to buy inputs for next sowing season.
@@ -13723,7 +13723,7 @@ The objectives with which MSP was introduced has been only partially met. Hence,
 
 The Minimum Support Price (MSP) is a government intervention mechanism providing guaranteed minimum pricing and assured markets to protect farmers from price volatility and market exploitation.
 
-<p align="center"><img src="images/superkalam_gs3_q157_img1.png" alt="Price Quantity Relationship in Economics Graph" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q157_img1.png" alt="Price Quantity Relationship in Economics Graph" /></p>
 
 Price Quantity Relationship in Economics Graph
 
@@ -13913,7 +13913,7 @@ The successful transition requires strengthening digital infrastructure through 
 - **Direct farm subsidies:** are those subsidies that are directly provided to farmers and are generally paid in the form of a direct cash subsidy. Example: PM Kisan Scheme, PAHAL in LPG, Farm Loan Waivers.
 - **Indirect subsidies:** are those subsidies in which the cost of the product is set at a lower price than the market price. Examples: Irrigation subsidy, Power subsidy, Fertilizer subsidy, Credit subsidy, MSP (Minimum Support Price), etc.
 
-<p align="center"><img src="images/pw_economic_development_q70_img1.webp" alt="agriculture subsidies" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q70_img1.webp" alt="agriculture subsidies" /></p>
 
 **Issues created by subsidy regime in India:**
 
@@ -14332,7 +14332,7 @@ The choice of **high-value crops** is not merely an **economic decision** but al
 
 The shift from traditional foodgrains to high-value crops (HVCs) such as fruits, vegetables, spices, plantation crops, flowers, and medicinal plants has been a significant trend in Indian agriculture. Farmers’ decision to adopt these crops is shaped by a combination of economic, ecological, infrastructural, and policy-related factors.
 
-<p align="center"><img src="images/superkalam_gs3_q7_img1.png" alt="Factors Affecting High Value Crop Selection" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q7_img1.png" alt="Factors Affecting High Value Crop Selection" /></p>
 
 Factors Affecting High Value Crop Selection
 
@@ -14410,7 +14410,7 @@ A cropping pattern is the **distribution** of various crops within a specific ar
 12. **Infrastructural gaps -** Eg- cold storage can accommodate only 11% of total produce.
 
 
-<p align="center"><img src="images/civilsdaily_p67_img104.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p67_img104.png" alt="Diagram" /></p>
 
 
 ### Role of Emerging Technologies in promoting Crop Diversification
@@ -14813,7 +14813,7 @@ A cropping pattern is the **distribution** of various crops within a specific ar
     - Eastern India: Expansion of **vegetables + aquaculture**
 
 
-<p align="center"><img src="images/civilsdaily_p40_img94.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p40_img94.png" alt="Diagram" /></p>
 
 
 ### Changing Cropping Pattern due to Changing Marketing Conditions
@@ -14977,7 +14977,7 @@ This dynamic relationship between consumption, markets, and cropping patterns un
 
 Cropping patterns in India have undergone significant transformation in recent decades due to changes in **consumer preferences**, **urbanization**, and **market dynamics**. While traditionally dominated by food grains like rice and wheat, there is a growing shift towards **horticulture, pulses, oilseeds, and high-value crops**, driven by evolving **consumption and marketing conditions**.
 
-<p align="center"><img src="images/superkalam_gs3_q45_img1.png" alt="Factors affecting agricultural cropping patterns shift" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q45_img1.png" alt="Factors affecting agricultural cropping patterns shift" /></p>
 
 Factors affecting agricultural cropping patterns shift
 
@@ -15086,7 +15086,7 @@ The **rice-wheat system** emerged as the backbone of Indian agriculture after th
 9. **Climate Vulnerability -** Rice-wheat system is highly sensitive to **heatwaves, erratic rainfall and declining water availability**.
 
 
-<p align="center"><img src="images/civilsdaily_p41_img95.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p41_img95.png" alt="Diagram" /></p>
 
 
 ### Way Forward
@@ -15306,7 +15306,7 @@ Though high MSP for certain produces such as wheat and rice drives farmers to ta
 - **Minimum Selling Price (MSP):** The MSP provides a guaranteed minimum price for certain agricultural commodities, which can help small and marginal farmers receive a fair price for their produce, even if market prices are low.
 - **Food processing:** Food processing industries act as a fixed market for small farmers and improves profit by enabling them to add value to their products. By processing and packaging their produce, farmers can sell their products at higher prices and improve their financial stability.
 
-<p align="center"><img src="images/pw_economic_development_q336_img1.webp" alt="subsidies " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q336_img1.webp" alt="subsidies " /></p>
 
 ### Conclusion
 
@@ -15572,7 +15572,7 @@ By combining horticulture cultivation with traditional farming, agriculture in o
 
 The National Horticulture Mission (NHM), launched in 2005-06 under MIDH framework, aims to promote holistic growth of horticulture through area-based regionally differentiated strategies.
 
-<p align="center"><img src="images/superkalam_gs3_q142_img1.png" alt="National Horticulture Mission End to End Approach" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q142_img1.png" alt="National Horticulture Mission End to End Approach" /></p>
 
 National Horticulture Mission End to End Approach
 
@@ -15719,7 +15719,7 @@ Integrated Farming System (IFS) is an interdependent, interrelated often interlo
 
 **How is it helpful to Small and Marginal farmers:**
 
-<p align="center"><img src="images/agriculture_q11_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/agriculture_q11_img1.png" alt="Image" /></p>
 
 - **Utilising the by-products:** of one component of the farming system as an input in another to ensure supplementary and complementary enterprise relationship. Thus, effective input cost is reduced. For example, cattle dung mixed with crop residues and farm waste can be converted into nutrient-rich vermicompost.
 
@@ -15764,7 +15764,7 @@ The main goal of integrated farming is to optimize the use of resources, reduce 
 
 ### Body
 
-According to the Agricultural Census 2015, 86% of Indian farmers are small and marginal farmers. **Integrated Farming helps small and marginal farmers in the following ways:** <p align="center"><img src="images/pw_economic_development_q698_img1.webp" alt="Integrated Farming system" /></p>
+According to the Agricultural Census 2015, 86% of Indian farmers are small and marginal farmers. **Integrated Farming helps small and marginal farmers in the following ways:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q698_img1.webp" alt="Integrated Farming system" /></p>
 
 According to the Agricultural Census 2015, 86% of Indian farmers are small and marginal farmers. **Integrated Farming helps small and marginal farmers in the following ways:** 
 
@@ -15835,7 +15835,7 @@ Hence, IFS would help us achieve multi-faceted objectives - doubling farmers' in
 
 IFS is a **farm management approach** that integrates multiple agricultural enterprises such as **crops, livestock, horticulture, agroforestry, and mushroom cultivation** in a **synergistic and complementary manner**. The idea is to ensure **optimal utilisation of resources**, **waste recycling**, and **sustainable livelihood security**, especially for small and marginal farmers.
 
-<p align="center"><img src="images/superkalam_gs3_q78_img1.png" alt="Integrated Farming System Circular Network Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q78_img1.png" alt="Integrated Farming System Circular Network Diagram" /></p>
 
 Integrated Farming System Circular Network Diagram
 
@@ -15945,7 +15945,7 @@ Integrated farming system refers to the integration of **multiple components** o
 5. **Policy Gaps - Schemes operate in silos** rather than **landscape-based integrated planning**.
 
 
-<p align="center"><img src="images/civilsdaily_p44_img97.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p44_img97.png" alt="Diagram" /></p>
 
 
 ### Way Forward
@@ -16013,7 +16013,7 @@ IFS provides multiple benefits that are sustainable and can pave the way for cli
 
 **The main goal of integrated farming is to optimize the use of resources, reduce the need for external inputs, and increase the overall productivity and profitability of the farm along with year-round employment.**
 
-<p align="center"><img src="images/pw_economic_development_q459_img1.webp" alt="Integrated Farming System" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q459_img1.webp" alt="Integrated Farming System" /></p>
 
 **Integrated Farming System ensures sustainable agricultural production through:**
 - **Reduced use of fertilisers:** By reducing the use of chemical fertilisers and recycling nutrients, integrated farming helps reduce input cost and also reduces the chemical content in food as well as soil. IFS also helps in pest and weed control.
@@ -16259,11 +16259,11 @@ Millets are not only crucial for **nutritional security** but also for achieving
 
 The Economic Survey (2023-24) advocates transitioning from basic food security to nutritional security. Rebranded as "Shree Anna", millets, comprising over 42.7% of global production, are central to this paradigm shift.
 
-<p align="center"><img src="images/superkalam_gs3_q26_img1.png" alt="Millets: Nutritional Benefits" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q26_img1.png" alt="Millets: Nutritional Benefits" /></p>
 
 Millets: Nutritional Benefits
 
-<p align="center"><img src="images/superkalam_gs3_q26_img2.jpg" alt="Millet Map of India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q26_img2.jpg" alt="Millet Map of India" /></p>
 
 Millet Map of India
 
@@ -16349,7 +16349,7 @@ LOK MBHA UNSTARRED QUESTION NO. 335
 7. **Expansion in dryland states -** Increased area in **Rajasthan, Karnataka, Telangana, MP, Maharashtra**
 
 
-<p align="center"><img src="images/civilsdaily_p42_img96.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p42_img96.png" alt="Diagram" /></p>
 
 
 ### Emphasis on millet consumption
@@ -16410,7 +16410,7 @@ There is an unmet demand for rice and wheat which is met by millets. If consumer
 
 **Cropping pattern is the** proportion of area under various crops at a point of time **. The cropping patterns of a region are mainly influenced by the geo-climatic, socio-economic, historical and political factors.**
 
-<p align="center"><img src="images/pw_economic_development_q423_img1.webp" alt="Major crop area" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q423_img1.webp" alt="Major crop area" /></p>
 
 ### Body
 
@@ -16453,7 +16453,7 @@ India’s Millet Revolution is driven by growing awareness of the health and env
 
 India's agricultural landscape has witnessed significant transformations in cropping patterns, driven by policy interventions and climate resilience needs. The renewed focus on nutritionally-rich and climate-smart crops, particularly millets, exemplifies this strategic shift.
 
-<p align="center"><img src="images/superkalam_gs3_q150_img1.png" alt="Millets Shree Anna Triad Diagram Overview" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q150_img1.png" alt="Millets Shree Anna Triad Diagram Overview" /></p>
 
 Millets Shree Anna Triad Diagram Overview
 
@@ -16690,7 +16690,7 @@ Buffer stock is a reserve of commodities aimed at offsetting price fluctuations 
 
 **The importance of buffer stocks for stabilizing agricultural prices in India**
 
-<p align="center"><img src="images/agriculture_q6_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/agriculture_q6_img1.png" alt="Image" /></p>
 
 - **Food Security:** Ensures food grain availability for vulnerable populations during adverse conditions like droughts or floods.
 
@@ -16783,7 +16783,7 @@ The future of India’s buffer stock system lies in **modernization**, **digital
 
 Buffer stocks, managed primarily by the **Food Corporation of India (FCI)**, are strategic food reserves vital for ensuring nationwide food security and conducting open market interventions to stabilize agricultural prices.
 
-<p align="center"><img src="images/superkalam_gs3_q23_img1.png" alt="Indian Food Security" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q23_img1.png" alt="Indian Food Security" /></p>
 
 Indian Food Security
 
@@ -16954,7 +16954,7 @@ Regarded as a landmark legislation to ameliorate the conditions of the poor and 
 
 The National Food Security Act, 2013 aims to provide subsidized food grains to approximately two-third of the country’s population. The enactment of this landmark legislation, brought a paradigm shift in India’s approach to food security i.e., from welfare to rights-based approach.
 
-<p align="center"><img src="images/pw_economic_development_q631_img1.webp" alt="NFSA 20b" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q631_img1.webp" alt="NFSA 20b" /></p>
 
 ### Body
 
@@ -17603,7 +17603,7 @@ PDS is one of the biggest welfare programmes of the government. Strengthening of
 - **Corruption and leakages:** There have been widespread reports of corruption and leakages in the PDS, with middlemen and corrupt officials diverting subsidized goods for sale in the open market or selling them at higher prices to beneficiaries.
 - **Rising Subsidy and financial burden:** The cost of obtaining and shipping food grains is almost six times their retail price, which raises questions about the sustainability of the scheme.
 
-<p align="center"><img src="images/pw_economic_development_q466_img1.webp" alt="PDS" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q466_img1.webp" alt="PDS" /></p>
 
 - **Increased grain procurement,:** associated expenses, and other variables are expected to cause the **food subsidy to expand.**
 - **In this context, Shanta Kumar Committee** recommended that FCI hand over all procurement operations of wheat and paddy to states that have gained sufficient experience in this regard and have created reasonable infrastructure for procurement.
@@ -17664,7 +17664,7 @@ The above strategies would bring about reforms leading to twin objectives of - F
 
 The **Public Distribution System (PDS)**, one of the world’s largest food security programmes, ensures access to essential grains at subsidised prices. Covering more than **80 crore beneficiaries under the National Food Security Act (2013)**, it plays a crucial role in reducing hunger and poverty. However, issues such as **leakages, diversion of grains, and poor targeting** continue to weaken its efficiency and transparency.
 
-<p align="center"><img src="images/superkalam_gs3_q76_img1.png" alt="PDS Supply Chain Flowchart of 2022" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q76_img1.png" alt="PDS Supply Chain Flowchart of 2022" /></p>
 
 PDS Supply Chain Flowchart of 2022
 
@@ -17895,7 +17895,7 @@ Food security is crucial for reaping the benefits of demographic dividend and th
 
 **The Centre incurs a huge subsidy bill for implementing PDS, but still India suffers from a serious proportion of hunger. Inaccurate identification of households, leakages in the delivery system, lack of adequate scientific storage facilities, financially inefficient, etc are some of the major concerns. This shows that the PDS system has failed on many counts to meet its objectives.**
 
-<p align="center"><img src="images/pw_economic_development_q466_img1.webp" alt="PDS" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q466_img1.webp" alt="PDS" /></p>
 
 **Reformative steps taken by the Government to make food grain distribution system more effective:**
 - **End to end Computerization of Supply Chain Management:** The procurement, storage, transport, and distribution of food grains is entirely computerized.
@@ -18042,7 +18042,7 @@ The **agricultural supply chain** refers to activities involved in moving agricu
 4. **Low Digital Adoption:** Eg- only around 1500 APMCs integrated with APMCs
 
 
-<p align="center"><img src="images/civilsdaily_p55_img99.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p55_img99.png" alt="Diagram" /></p>
 
 
 ### **Strengthening supply chain management is key to ‘Doubling Farmers Income’. This can be done through**
@@ -18075,7 +18075,7 @@ The **agricultural supply chain** refers to activities involved in moving agricu
 
 Supply chain management (SCM) in agriculture involves producing and distributing agricultural products like vegetables, fruits, cereals, pulses, and animal-based items. Effective SCM ensures smooth transition from farm gate to retail, improving food security, reducing wastage, and enhancing the agricultural economy.
 
-<p align="center"><img src="images/agriculture_q2_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/agriculture_q2_img1.png" alt="Image" /></p>
 
 **Scope of Supply Chain Management of Agricultural Commodities in India**
 
@@ -18255,7 +18255,7 @@ The limited FDI response highlights structural issues in India's retail policy f
 9. **Low investment**- Private investment <1% Agri-GDP.
 
 
-<p align="center"><img src="images/civilsdaily_p57_img101.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p57_img101.png" alt="Diagram" /></p>
 
 
 ### Way Forward
@@ -18481,7 +18481,7 @@ Supermarkets are **organised retail chains** that procure, store and distribute 
 7. **Diverse products**- Gives greater choice for consumers and promotes crop diversification.
 
 
-<p align="center"><img src="images/civilsdaily_p57_img100.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p57_img100.png" alt="Diagram" /></p>
 
 
 ### Challenges faced by supermarkets
@@ -18575,7 +18575,7 @@ Direct sourcing, quality control measures, standardization, aggregation, and use
 
 India loses $18.5 billion annually to post-harvest inefficiencies (FAO 2024), making robust agricultural Supply Chain Management (SCM) critically important for the agrarian economy.
 
-<p align="center"><img src="images/superkalam_gs3_q3_img1.png" alt="Agricultural Food Supply Chain Stages" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q3_img1.png" alt="Agricultural Food Supply Chain Stages" /></p>
 
 Agricultural Food Supply Chain Stages
 
@@ -18918,7 +18918,7 @@ Going forward, there is a need to address the present challenges such as interne
 
 e-Technology has revolutionized agriculture in India by integrating digital tools in both **farm production and marketing processes**. It empowers farmers with timely information, access to inputs, precision tools, and broader markets—contributing to improved income and sustainability.
 
-<p align="center"><img src="images/superkalam_gs3_q48_img1.png" alt="Agricultural value chain: production to marketing" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q48_img1.png" alt="Agricultural value chain: production to marketing" /></p>
 
 Agricultural value chain: production to marketing
 
@@ -19175,7 +19175,7 @@ India’s food processing sector is projected to grow from **$307 billion (2023)
 11. **Negligible R&D (<0.5% of sectoral GVA) -** stall innovation in packaging and product design
 
 
-<p align="center"><img src="images/civilsdaily_p75_img107.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p75_img107.png" alt="Diagram" /></p>
 
 
 ### Measures taken by government
@@ -19319,7 +19319,7 @@ India’s food processing sector is one of the fastest-growing industries, poise
 
 The sector contributes significantly to the economy, accounting for **8.8% of GVA in manufacturing**, **8.39% in agriculture**, **13% of India’s exports**, and **6% of total industrial investment**.
 
-<p align="center"><img src="images/superkalam_gs3_q5_img1.png" alt="Mega Food Park supply chain diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q5_img1.png" alt="Mega Food Park supply chain diagram" /></p>
 
 Mega Food Park supply chain diagram
 
@@ -19418,7 +19418,7 @@ HmmNM
 6. **Nearly 70% of food processing units operate in the unorganised MSME sector - generate rural employment and entrepreneurship.**
 
 
-<p align="center"><img src="images/civilsdaily_p72_img105.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p72_img105.png" alt="Diagram" /></p>
 
 
 ### Significance of the Food Processing Industry
@@ -19527,7 +19527,7 @@ Industry, using processing methods, transforms agriculture product into food or 
 - **Nutritional value:** Food fortified with vitamins and minerals can reduce the nutritional gap in the population. Food processing can help improve the availability, accessibility, and affordability of food products, particularly in rural and remote areas.
 - **Export potential:** Smooth functioning of forward and backward linkages can enhance the export capacity of Indian trade in the international market and curb the food inflation in the domestic market.
 
-<p align="center"><img src="images/pw_economic_development_q657_img1.webp" alt="food processing sector" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q657_img1.webp" alt="food processing sector" /></p>
 
 ### Conclusion
 
@@ -19649,7 +19649,7 @@ To realise full potential of this sector, challenges such as dominance of inform
 6. **Nearly 70% of food processing units operate in the unorganised MSME sector -** generate rural employment and entrepreneurship.
 
 
-<p align="center"><img src="images/civilsdaily_p74_img106.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p74_img106.png" alt="Diagram" /></p>
 
 
 ### Increasing Farmers’ Income through Food Processing
@@ -19734,7 +19734,7 @@ Food processing has become an integral part of the food supply chain in the glob
 - **Large Consumption Economy:** With rising incomes and standard of living, demand for items immediately available to eat or cook and safe processed food
 - **High value addition:** The 10% of processed food in India is 1/3 of the total food market by value.
 
-- **Government support:** Government has taken various steps for the promotion of FPIs such as up to 100% FDI under the automatic route, incentives under PM Krishi Sampada Yojana, Mega Food Parks scheme and PLI in the FPI sector in India. **Challenges in food processing industry:** <p align="center"><img src="images/pw_economic_development_q467_img4.webp" alt="challenges for food processing sector" /></p>
+- **Government support:** Government has taken various steps for the promotion of FPIs such as up to 100% FDI under the automatic route, incentives under PM Krishi Sampada Yojana, Mega Food Parks scheme and PLI in the FPI sector in India. **Challenges in food processing industry:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q467_img4.webp" alt="challenges for food processing sector" /></p>
 
 - **Government support:** Government has taken various steps for the promotion of FPIs such as up to 100% FDI under the automatic route, incentives under PM Krishi Sampada Yojana, Mega Food Parks scheme and PLI in the FPI sector in India. **Challenges in food processing industry:** 
 - **Poor supply chain linkage:** Lack of mechanization, high seasonality, perishability, and lack of proper intermediation (supply chain) results in a lack of availability of raw material. Due to inadequate infrastructure, more than 30% of the produce from the farm gate is lost.
@@ -19987,15 +19987,15 @@ The food processing industry is critical to India's growth and the government sh
 
 The food processing industry encompasses a wide range of activities, including the processing, preservation, packaging, and distribution of food products. It also includes the process of value addition to produce food products through methods such as preservation, the addition of food additives, drying, etc.
 
-<p align="center"><img src="images/pw_economic_development_q467_img1.webp" alt=" food processing market" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q467_img1.webp" alt=" food processing market" /></p>
 
-<p align="center"><img src="images/pw_economic_development_q467_img2.webp" alt="state wise share food processing" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q467_img2.webp" alt="state wise share food processing" /></p>
 
-<p align="center"><img src="images/pw_economic_development_q467_img3.webp" alt="Indian food processing sector " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q467_img3.webp" alt="Indian food processing sector " /></p>
 
 ### Body
 
-**Challenges in food processing industry:** <p align="center"><img src="images/pw_economic_development_q467_img4.webp" alt="challenges for food processing sector" /></p>
+**Challenges in food processing industry:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q467_img4.webp" alt="challenges for food processing sector" /></p>
 
  **Challenges in food processing industry:** 
 
@@ -20037,7 +20037,7 @@ For unhindered growth, it becomes important to address the demand and supply-sid
 
 Left-Wing Extremism incidents have declined by **65.7% from 1,091 in 2014 to 374 in 2024**, yet the Government of India maintains a comprehensive multi-pronged strategy to address remaining challenges.
 
-<p align="center"><img src="images/superkalam_gs3_q153_img1.png" alt="GoI's Multi-pronged Approach to LWE" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q153_img1.png" alt="GoI's Multi-pronged Approach to LWE" /></p>
 
 GoI's Multi-pronged Approach to LWE
 
@@ -20438,7 +20438,7 @@ The Pink Revolution refers to India's transformation in meat and poultry product
 - **Processing Industry Growth**: Meat processing sector growing at 12% CAGR, attracting investments in cold chain and technology
 - **Foreign Exchange**: Reduces dependency on protein imports while boosting export revenues
 
-<p align="center"><img src="images/superkalam_gs3_q252_img1.jpeg" alt="Pink Revolution Value Chain - from livestock rearing to export markets showing employment and income generation at each stage" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q252_img1.jpeg" alt="Pink Revolution Value Chain - from livestock rearing to export markets showing employment and income generation at each stage" /></p>
 
 Pink Revolution Value Chain - from livestock rearing to export markets showing employment and income generation at each stage
 
@@ -20644,7 +20644,7 @@ Small farms are not suitable for using expensive technologies,
 - Irrigation becomes difficult, and
 - A lot of fertile agricultural land is wasted in providing boundaries. **Contract farming** can be defined as agricultural production carried out according to an agreement between a buyer and farmers, which establishes conditions for the production and marketing of a farm product.
 
-<p align="center"><img src="images/pw_economic_development_q198_img1.webp" alt="contract farming" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q198_img1.webp" alt="contract farming" /></p>
 
 **Advantages of Contract Farming:**
 - **It will bring more technology and modernization:** to agriculture as seeds and inputs are given by business houses.
@@ -20906,7 +20906,7 @@ Factors responsible for the poor implementation of land reforms in other parts:
 
 Land reforms in India have shown varied success across different states, with states like **Kerala** and **West Bengal** emerging as exemplars of effective implementation while others lagged behind. The success was driven by a combination of **political will**, **administrative efficiency**, and **social mobilization**.
 
-<p align="center"><img src="images/superkalam_gs3_q40_img1.png" alt="Factors for Successful Land Reforms" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q40_img1.png" alt="Factors for Successful Land Reforms" /></p>
 
 Factors for Successful Land Reforms
 
@@ -21166,7 +21166,7 @@ However, implementation of land ceiling laws was successful only in few states s
 
 Land reforms in post-independence India aimed at correcting the **agrarian structure**, ensuring **social justice**, and enhancing **agricultural productivity**. They were vital for rural equity and inclusive development.
 
-<p align="center"><img src="images/superkalam_gs3_q51_img1.png" alt="Farmer Category Share of Holdings Area" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q51_img1.png" alt="Farmer Category Share of Holdings Area" /></p>
 
 Farmer Category Share of Holdings Area
 
@@ -21320,7 +21320,7 @@ The pace of implementation of land reform measures has been slow but the objecti
 
 Land reform refers to efforts to reform ownership, operation, leasing, sales, and property rights of land in India. The Indian Government was committed to land reforms and to ensure distributive justice as was promised during the freedom struggle. Post Independent India has seen movements like Bhoodan and Gramdan which were persuasive in nature. Later, laws were passed by Governments for abolishing landlordism, distributing land through imposition of ceilings, protection of tenants and consolidation of land-holdings.
 
-<p align="center"><img src="images/pw_economic_development_q597_img1.webp" alt="objective of land reforms" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q597_img1.webp" alt="objective of land reforms" /></p>
 
 ### Body
 
@@ -21463,7 +21463,7 @@ Though the process of land reforms were not as successful as it was intended to 
 
 **Land reform refers to** efforts to reform ownership, operation, leasing, sales, and property rights of land in India. **The Indian Government was committed to land reforms and to ensure distributive justice as was promised during the freedom struggle. Post Independent India has seen movements like Bhoodan and Gramdan which were persuasive in nature. Later, laws were passed by Governments for abolishing landlordism, distributing land through imposition of ceilings, protection of tenants and consolidation of land-holdings.**
 
-<p align="center"><img src="images/pw_economic_development_q258_img1.webp" alt="land reforms" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_economic_development_q258_img1.webp" alt="land reforms" /></p>
 
 ### Body
 
@@ -21721,7 +21721,7 @@ Semiconductor Market (InUSDBSon)
 7. **Focus on trusted supply chains** and strategic national security applications.
 
 
-<p align="center"><img src="images/civilsdaily_p27_img89.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p27_img89.png" alt="Diagram" /></p>
 
 
 ### Way Forward
@@ -21891,7 +21891,7 @@ While challenges are significant, ISM’s financial support, skill development, 
 
 India's semiconductor market, valued at **$38 billion in 2023**, is projected to reach **$100-110 billion by 2030**. The **India Semiconductor Mission (ISM)** represents India's strategic push towards technological sovereignty.
 
-<p align="center"><img src="images/superkalam_gs3_q10_img1.png" alt="Semiconductor manufacturing process from design to packaging" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q10_img1.png" alt="Semiconductor manufacturing process from design to packaging" /></p>
 
 Semiconductor manufacturing process from design to packaging
 
@@ -22098,7 +22098,7 @@ To address privacy-concerns in AI healthcare, we need enhanced regulations, tran
 
 Artificial Intelligence (AI) refers to the simulation of **human intelligence by machines**, especially computer systems. It involves processes like **learning**, **reasoning**, **problem-solving**, and **decision-making**. In healthcare, AI is increasingly being used for **clinical diagnosis**, **treatment planning**, and **patient monitoring**.
 
-<p align="center"><img src="images/superkalam_gs3_q49_img1.png" alt="AI for healthcare: A security analysis" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q49_img1.png" alt="AI for healthcare: A security analysis" /></p>
 
 AI for healthcare: A security analysis
 
@@ -22303,7 +22303,7 @@ In a historic achievement, India's vaccination drive has surpassed the **200-Cro
 - These cells remember the pathogen and can mount a quick and effective response if the body encounters the actual pathogen in the future.
 - It’s like a fire drill preparing a fire department to react quickly and effectively in case of a real fire.
 
-<p align="center"><img src="images/pw_science__technology_q699_img1.webp" alt="Vaccines" /></p> *
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q699_img1.webp" alt="Vaccines" /></p> *
 
  *
 
@@ -22371,7 +22371,7 @@ The vaccine reduces the risk of complications and mortality following subsequent
 
 The development of vaccines stands as one of humanity's greatest scientific achievements in combating infectious diseases. The journey from disease identification to vaccine deployment involves complex scientific principles and rigorous testing protocols.
 
-<p align="center"><img src="images/superkalam_gs3_q79_img1.png" alt="Immunity System" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q79_img1.png" alt="Immunity System" /></p>
 
 Immunity System
 
@@ -22563,7 +22563,7 @@ Investing a little to engage the elderly in communities can improve their health
 
 India’s life expectancy has increased from **32 years in 1947 to approx. 70 years in 2023 (World Bank)**, reflecting improved healthcare and living standards. However, an ageing population brings with it **new health challenges**, especially the rising burden of **chronic diseases, geriatric care needs, and mental health issues**.
 
-<p align="center"><img src="images/superkalam_gs3_q73_img1.png" alt="Epidemiological Transition and Increasing Life Expectancy" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q73_img1.png" alt="Epidemiological Transition and Increasing Life Expectancy" /></p>
 
 Epidemiological Transition and Increasing Life Expectancy
 
@@ -22792,7 +22792,7 @@ Stem cell therapy, also known as regenerative medicine, is a revolutionary treat
 
 ### Body
 
-<p align="center"><img src="images/pw_science__technology_q359_img1.webp" alt="Stem Cell Therapy" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q359_img1.webp" alt="Stem Cell Therapy" /></p>
 
 **Advantages of Stem Cell Therapy:**
 - **Broad Application:** Stem cell therapy has potential applications across a wide spectrum of conditions, including leukemia, Thalassemia, cornea damage, and burns, extending beyond the reach of conventional treatments.
@@ -22825,7 +22825,7 @@ It’s important to note, however, that while stem cell therapy holds great pote
 
 India's healthcare landscape is witnessing a revolutionary transformation with stem cell therapy emerging as a game-changing treatment modality, offering new hope for patients with previously incurable conditions.
 
-<p align="center"><img src="images/superkalam_gs3_q175_img1.png" alt="Stem cell differentiation flowchart illustration" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q175_img1.png" alt="Stem cell differentiation flowchart illustration" /></p>
 
 Stem cell differentiation flowchart illustration
 
@@ -22904,7 +22904,7 @@ India's emergence as a global hub for stem cell research, supported by instituti
 
 ### Body
 
-**Contributors to Drug Resistance:** <p align="center"><img src="images/pw_science__technology_q98_img1.webp" alt="Drug Resistance" /></p>
+**Contributors to Drug Resistance:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q98_img1.webp" alt="Drug Resistance" /></p>
 
 **Contributors to Drug Resistance:** 
 
@@ -22946,7 +22946,7 @@ Overuse and free availability of antibiotics without a prescription are major co
 
 The unregulated use and easy availability of antibiotics in India has emerged as a critical public health concern, contributing significantly to antimicrobial resistance (AMR). According to recent data, India witnessed approximately **267,000 deaths directly attributable to AMR** in 2021, highlighting the severity of this crisis.
 
-<p align="center"><img src="images/superkalam_gs3_q221_img1.png" alt="Antimicrobial Resistance AMR Radial Flowchart Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q221_img1.png" alt="Antimicrobial Resistance AMR Radial Flowchart Diagram" /></p>
 
 Antimicrobial Resistance AMR Radial Flowchart Diagram
 
@@ -23038,7 +23038,7 @@ India's AMR crisis requires comprehensive reform through **stricter regulatory e
 - **For instance, TB treatment often uses FDCs for this reason.**
 - **Reduced Healthcare Costs:** FDCs can potentially lower costs by reducing the number of separate medications needed.
 
-<p align="center"><img src="images/pw_science__technology_q74_img1.webp" alt="FDC" /></p> **Demerits of FDCs:**
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q74_img1.webp" alt="FDC" /></p> **Demerits of FDCs:**
 
  **Demerits of FDCs:**
 - **Risk of Side Effects:** Combined drugs can increase the risk of adverse effects.
@@ -23070,7 +23070,7 @@ While FDCs offer significant benefits, their use must be carefully managed to mi
 
 Fixed-dose drug combinations (FDCs) are pharmaceutical formulations containing two or more active pharmaceutical ingredients combined in a fixed ratio within a single dosage form. The **Central Drugs Standard Control Organisation (CDSCO)** regulates these combinations to ensure therapeutic rationality and patient safety.
 
-<p align="center"><img src="images/superkalam_gs3_q262_img1.png" alt="Fixed Dose Combination Comparative Framework Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q262_img1.png" alt="Fixed Dose Combination Comparative Framework Diagram" /></p>
 
 Fixed Dose Combination Comparative Framework Diagram
 
@@ -23238,7 +23238,7 @@ Thus, we notice that during the COVID-19 period technology innovations helped in
 
 **The COVID-19 pandemic has had an unparalleled global impact. However, technology has emerged as a crucial ally in managing the crisis, facilitating everything from tracking the virus’s spread to delivering healthcare services remotely. India, along with other nations, has harnessed this potential to counter the pandemic’s challenges.**
 
-<p align="center"><img src="images/pw_science__technology_q489_img1.webp" alt="Technology aid" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q489_img1.webp" alt="Technology aid" /></p>
 
 ### Body
 
@@ -23279,7 +23279,7 @@ Technology has played an essential role in managing the COVID-19 pandemic, from 
 
 The COVID-19 pandemic accelerated unprecedented technological adoption across healthcare systems, demonstrating technology's critical role in crisis management and public health response.
 
-<p align="center"><img src="images/superkalam_gs3_q102_img1.png" alt="Technology in COVID-19 Management Hub" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q102_img1.png" alt="Technology in COVID-19 Management Hub" /></p>
 
 Technology in COVID-19 Management Hub
 
@@ -23341,7 +23341,7 @@ Cellulose, the main structural material in plant cell walls, is the Earth’s mo
 
 
 
-<p align="center"><img src="images/civilsdaily_p169_img154.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p169_img154.png" alt="Diagram" /></p>
 
 
 pYor) tf£
@@ -23467,7 +23467,7 @@ The chemical aspects of plant decomposition always involve the release of carbon
 
 Cellulose, the most abundant organic compound on Earth, is a **primary constituent of plant biomass**. Each year, vast amounts of it are deposited through leaf fall, crop residues, and dead plant material. In nature, cellulose undergoes **biogeochemical processes** that recycle carbon and nutrients back into the ecosystem.
 
-<p align="center"><img src="images/superkalam_gs3_q65_img1.png" alt="Cyclic Decomposition Process of Plant M" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q65_img1.png" alt="Cyclic Decomposition Process of Plant M" /></p>
 
 Cyclic Decomposition Process of Plant M
 
@@ -23546,7 +23546,7 @@ Thus, cellulose deposited on Earth undergoes **fragmentation, microbial hydrolys
 8. **Geological Potential in India**- Studies suggest India has **400-600 Gt CO**₂**storage capacity** in depleted oil & gas reservoirs and saline aquifers.
 
 
-<p align="center"><img src="images/civilsdaily_p105_img123.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p105_img123.png" alt="Diagram" /></p>
 
 
 ### **Challenges in Artificial Carbon Sinks**
@@ -23721,7 +23721,7 @@ India’s NITI Aayog projects a CCUS capacity requirement of 750 million tonnes 
 3. **Utilization process**: Captured carbon is transformed into economically valuable commodities like synthetic fuels, urea, and building materials.
 4. **Permanent storage**: Unused CO2 is securely injected into deep geological formations, capitalizing on India's vast mapped saline aquifers.
 
-<p align="center"><img src="images/superkalam_gs3_q18_img1.png" alt="Diagram of Carbon Capture and Storage" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q18_img1.png" alt="Diagram of Carbon Capture and Storage" /></p>
 
 Diagram of Carbon Capture and Storage
 
@@ -23773,7 +23773,7 @@ Establishing a robust domestic carbon market, as recommended by the PM-STIAC, wi
 - **Slicing:** The 3D model is then sliced into hundreds or thousands of horizontal layers using slicing software.
 - **Printing:** The 3D printer reads the sliced files and successively deposits layers of material to create the 3D object.
 
-<p align="center"><img src="images/pw_science__technology_q32_img1.webp" alt="3D printing" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q32_img1.webp" alt="3D printing" /></p>
 
 **Advantages of 3D Printing:**
 - **Customization:** It allows for easy customization of designs. For example, in India, 3D printing is being used to create personalized prosthetics.
@@ -23810,13 +23810,13 @@ While 3D printing is an innovative technology that offers numerous benefits, it 
 
 3D printing, or **Additive Manufacturing**, creates three-dimensional objects by depositing materials layer-by-layer from digital models. India's 3D printing market is projected to reach **$4.33 billion by 2033**, making it a crucial **Industry 4.0** technology.
 
-<p align="center"><img src="images/superkalam_gs3_q249_img1.png" alt="3D Printing Process Schematic Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q249_img1.png" alt="3D Printing Process Schematic Diagram" /></p>
 
 3D Printing Process Schematic Diagram
 
 ## Working Mechanism of 3D Printing
 
-<p align="center"><img src="images/superkalam_gs3_q249_img2.png" alt="Layer-by-Layer 3D Printing Process showing digital model to final object transformation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q249_img2.png" alt="Layer-by-Layer 3D Printing Process showing digital model to final object transformation" /></p>
 
 Layer-by-Layer 3D Printing Process showing digital model to final object transformation
 
@@ -23920,7 +23920,7 @@ Government initiatives like **Make in India** and **₹500 crore National Missio
 - **Adding the Matrix:** The matrix material is then added, which can be done via processes like hand lay-up, spray-up, pultrusion, filament winding, or injection moulding.
 - **Curing:** The composite is then left to cure, hardening into its final form.
 
-<p align="center"><img src="images/pw_science__technology_q79_img1.webp" alt="FRP Composites" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q79_img1.webp" alt="FRP Composites" /></p>
 
 
 **Applications in Aviation and Automobile Industry:**
@@ -23954,7 +23954,7 @@ FRP composites, with their unique characteristics, have found extensive applicat
 
 Recent advancements in materials science have positioned India as a key player in FRP composite manufacturing, with applications spanning aerospace and automotive sectors.
 
-<p align="center"><img src="images/superkalam_gs3_q265_img1.png" alt="Fiber Reinforced Polymer FRP Display Structure" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q265_img1.png" alt="Fiber Reinforced Polymer FRP Display Structure" /></p>
 
 Fiber Reinforced Polymer FRP Display Structure
 
@@ -24120,7 +24120,7 @@ Researchers are exploring other applications of LEDs as well like in transmittin
 
 ### Body
 
-**<p align="center"><img src="images/pw_science__technology_q619_img1.webp" alt="Blue LEDs " /></p>**
+**<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q619_img1.webp" alt="Blue LEDs " /></p>**
 
 **The 2014 Nobel Prize in Physics honoured Isamu Akasaki, Hiroshi Amano, and Shuji Nakamura for their pioneering invention of Blue Light Emitting Diodes (LEDs) in the 1990s. This technological breakthrough has had far-reaching implications, transforming various facets of human life globally and particularly in India.**
 
@@ -24192,7 +24192,7 @@ Use of LED is being encouraged by several schemes like UJJALA (Unnat Jyoti by Af
 
 The 2014 Nobel Prize-winning invention of Blue LEDs by Akasaki, Amano, and Nakamura revolutionized lighting technology, enabling white LED production that transformed global energy consumption and daily life.
 
-<p align="center"><img src="images/superkalam_gs3_q97_img1.png" alt="Red Green Blue LED Light Sources" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q97_img1.png" alt="Red Green Blue LED Light Sources" /></p>
 
 Red Green Blue LED Light Sources
 
@@ -24284,7 +24284,7 @@ While DRS has been a game-changer in cricket, ensuring higher accuracy of umpiri
 
 The **Umpire Decision Review System (DRS)** is a technological framework in cricket that allows teams to challenge on-field umpiring decisions using multiple technological tools. Introduced to enhance decision accuracy, DRS has become integral to modern cricket's fairness and precision.
 
-<p align="center"><img src="images/superkalam_gs3_q263_img1.png" alt="Cricket bat edge striking a ball" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q263_img1.png" alt="Cricket bat edge striking a ball" /></p>
 
 Cricket bat edge striking a ball
 
@@ -24358,10 +24358,10 @@ As per the report of the Global **Commission on the Economics of Water**, the wo
 7. **Global water crisis** could result in losses of up to **$8 trillion over the next 25 years** (Global Commission on the Economics of Water, 2024).
 
 
-<p align="center"><img src="images/civilsdaily_p86_img111.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p86_img111.png" alt="Diagram" /></p>
 
 
-<p align="center"><img src="images/civilsdaily_p86_img112.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p86_img112.png" alt="Diagram" /></p>
 
 
 ### Alternative Technologies That Can Solve the Freshwater Crisis
@@ -24538,13 +24538,13 @@ Tackling freshwater scarcity demands an integrated strategy combining innovative
 
 According to the United Nations World Water Development Report 2024, over 2.2 billion people lack access to safely managed drinking water, and by 2025, nearly two-thirds of the global population could be living under water-stressed conditions. The emergence of alternative technologies offers promising solutions to address this growing crisis.
 
-<p align="center"><img src="images/superkalam_gs3_q31_img1.png" alt="Alternative Water Technologies" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q31_img1.png" alt="Alternative Water Technologies" /></p>
 
 Alternative Water Technologies
 
 ## Alternative Technologies for Clean Water Generation
 
-<p align="center"><img src="images/superkalam_gs3_q31_img2.jpg" alt="Three Advanced Filtration Technologies" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q31_img2.jpg" alt="Three Advanced Filtration Technologies" /></p>
 
 Three Advanced Filtration Technologies
 
@@ -24687,9 +24687,9 @@ Addressing these concerns can ensure **efficient, seamless, congestion-free** hi
 
 - **ANPR (Automatic Number Plate Recognition):** Captures vehicle registration plates for seamless toll payments without stopping.
 
-<p align="center"><img src="images/science__technology_q6_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/science__technology_q6_img1.png" alt="Image" /></p>
 
-<p align="center"><img src="images/science__technology_q6_img2.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/science__technology_q6_img2.png" alt="Image" /></p>
 
 **Proposed Changes for a Seamless Process:**
 
@@ -24776,7 +24776,7 @@ The evolution of electronic toll collection technologies, such as **RFID and DSR
 
 Electronic toll collection (ETC) in India primarily uses **RFID-based FASTag technology** for cashless highway tolling. Over **6.5 crore FASTags** have been issued, with **97% of tolls** now collected electronically on national highways.
 
-<p align="center"><img src="images/superkalam_gs3_q38_img1.png" alt="RFID Toll Payment System" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q38_img1.png" alt="RFID Toll Payment System" /></p>
 
 RFID Toll Payment System
 
@@ -24784,7 +24784,7 @@ RFID Toll Payment System
 
 **FASTag System** uses Radio Frequency Identification (RFID) tags on vehicle windshields that communicate with toll plaza readers for automatic payment deduction. Emerging technologies include **Automatic Number Plate Recognition (ANPR)** and **GPS-based tolling systems**.
 
-<p align="center"><img src="images/superkalam_gs3_q38_img2.jpg" alt="Electronic toll collection process" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q38_img2.jpg" alt="Electronic toll collection process" /></p>
 
 Electronic toll collection process
 
@@ -24908,7 +24908,7 @@ Digital signatures play a crucial role in maintaining the integrity, authenticit
 
 A digital signature is a cryptographic authentication mechanism that ensures the authenticity, integrity, and non-repudiation of digital documents and transactions through mathematical algorithms and public key infrastructure.
 
-<p align="center"><img src="images/superkalam_gs3_q264_img1.png" alt="Digital Signature Creation and Verification Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q264_img1.png" alt="Digital Signature Creation and Verification Flowchart" /></p>
 
 Digital Signature Creation and Verification Flowchart
 
@@ -25096,7 +25096,7 @@ A balanced approach integrating cloud benefits with security imperatives will op
 - **Medical Field:** In response to the COVID-19 pandemic, robots like Mitra, developed by **Invento Robotics**, have been used in Indian hospitals to interact with patients, reducing the risk for healthcare workers.
 - **Agriculture:** Indian start-ups like **TartanSense and FarmRobotics** are developing robots for precision agriculture, automating tasks such as weeding and harvesting.
 
-<p align="center"><img src="images/pw_science__technology_q233_img1.webp" alt="Robots" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q233_img1.webp" alt="Robots" /></p>
 
 **Propelling Research Initiatives:**
 - **Collaborative Research:** The collaboration between IIT Madras and the Indian start-up **Genrobotics** led to the development of Bandicoot, a robot designed to clean sewers.
@@ -25244,7 +25244,7 @@ Even though buying S-400 from Russia attracted criticism from the US under the C
 
 ### Body
 
-**<p align="center"><img src="images/pw_science__technology_q600_img1.webp" alt="S-400 " /></p>**
+**<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q600_img1.webp" alt="S-400 " /></p>**
 
 **The S-400 Triumf, developed by Russia, is an advanced air defence system hailed globally for its superior technical capabilities. It is especially recognized for its extended range, versatility, advanced radar system, and ability to engage various targets.**
 
@@ -25322,7 +25322,7 @@ With India facing two inimical neighbors in its western and eastern borders, a p
 
 The S-400 Triumf represents a quantum leap in air defense technology, establishing itself as the world's most advanced long-range surface-to-air missile system through superior technical specifications and operational capabilities.
 
-<p align="center"><img src="images/superkalam_gs3_q94_img1.png" alt="2021 S-400 multi layered air defense" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q94_img1.png" alt="2021 S-400 multi layered air defense" /></p>
 
 2021 S-400 multi layered air defense
 
@@ -25405,7 +25405,7 @@ miles (530 kilometers) in diameter - to bodies that are less than 33 feet (10 me
 4. **No global policy framework or convention** to prevent asteroid impact
 
 
-<p align="center"><img src="images/civilsdaily_p117_img129.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p117_img129.png" alt="Diagram" /></p>
 
 
 ### **Strategies Developed to Prevent or Mitigate Asteroid Impact**
@@ -25539,7 +25539,7 @@ While the probability of a **life-extinguishing asteroid impact** is low, the se
 
 Asteroids are **rocky, airless remnants** left over from the Solar System’s formation ≈ 4.6 billion years ago. Ranging from meter-sized boulders to dwarf-planet–scale Ceres (≈940 km), most orbit in the **main belt between Mars and Jupiter**, though thousands follow Earth-crossing paths and are classified as **near-Earth objects (NEOs)**
 
-<p align="center"><img src="images/superkalam_gs3_q32_img1.png" alt="Deflecting Asteroid from Earth Trajectory" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q32_img1.png" alt="Deflecting Asteroid from Earth Trajectory" /></p>
 
 Deflecting Asteroid from Earth Trajectory
 
@@ -25618,7 +25618,7 @@ Continued investment in sky surveys, technology demonstration missions, and mult
         - ii. **LIBS (Laser Induced Breakdown Spectroscope):** Identifies the chemical elements present in the vicinity of the landing site.
 
 
-<p align="center"><img src="images/civilsdaily_p162_img153.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p162_img153.png" alt="Diagram" /></p>
 
 
 ### Role of the ‘Virtual Launch Control Centre’ (VLCC)
@@ -25726,7 +25726,7 @@ The **Virtual Launch Control Centre (VLCC)** at Vikram Sarabhai Space Centre (VS
 - **Resource Management:** By creating a virtual environment, the Centre **allows experts from various fields to contribute without being physically present** at the launch site. This collective expertise can be critical in addressing complex challenges.
 - **Technological Advancements:** The Centre incorporates cutting-edge technology for simulations and predictions. It **uses Machine Learning algorithms to predict potential issues** and offer solutions in real-time, significantly contributing to the successful launch of the mission.
 
-- **Improved Solar System Observation:** JWST will offer more comprehensive insights into our solar system’s celestial bodies, using its superior instruments **to explore multiple spectra for an in-depth understanding that surpasses Hubble’s contributions.** <p align="center"><img src="images/pw_science__technology_q673_img1.webp" alt="space" /></p>
+- **Improved Solar System Observation:** JWST will offer more comprehensive insights into our solar system’s celestial bodies, using its superior instruments **to explore multiple spectra for an in-depth understanding that surpasses Hubble’s contributions.** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q673_img1.webp" alt="space" /></p>
 
 ### Conclusion
 
@@ -25775,7 +25775,7 @@ With the success of Chandrayaan-3 Mission, India's future space missions like Ad
 
 India’s **third lunar mission, Chandrayaan-3**, launched on **14 July 2023** from Satish Dhawan Space Centre, Sriharikota, aimed to build upon Chandrayaan-1 (2008) and Chandrayaan-2 (2019). It marked a significant step in **ISRO’s planetary exploration programme** and in fulfilling an unfinished goal from Chandrayaan-2.
 
-<p align="center"><img src="images/superkalam_gs3_q58_img1.png" alt="Spacecraft with Lander Module and Rover" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q58_img1.png" alt="Spacecraft with Lander Module and Rover" /></p>
 
 Spacecraft with Lander Module and Rover
 
@@ -25794,7 +25794,7 @@ Spacecraft with Lander Module and Rover
 
 ## **Subsystems in Chandrayaan-3 Spacecraft**
 
-<p align="center"><img src="images/superkalam_gs3_q58_img2.jpg" alt="Chandrayaan-3 Modules" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q58_img2.jpg" alt="Chandrayaan-3 Modules" /></p>
 
 Chandrayaan-3 Modules
 
@@ -25978,7 +25978,7 @@ James Webb telescope is the successor of the Hubble Telescope. The characteristi
 
 **reaching back to the first galaxies and stars, even probing the era of reionization, a realm beyond Hubble’s capabilities.**
 
-- **Improved Solar System Observation:** JWST will offer more comprehensive insights into our solar system’s celestial bodies, using its superior instruments **to explore multiple spectra for an in-depth understanding that surpasses Hubble’s contributions.** <p align="center"><img src="images/pw_science__technology_q673_img1.webp" alt="space" /></p>
+- **Improved Solar System Observation:** JWST will offer more comprehensive insights into our solar system’s celestial bodies, using its superior instruments **to explore multiple spectra for an in-depth understanding that surpasses Hubble’s contributions.** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q673_img1.webp" alt="space" /></p>
 
 - **Improved Solar System Observation:** JWST will offer more comprehensive insights into our solar system’s celestial bodies, using its superior instruments **to explore multiple spectra for an in-depth understanding that surpasses Hubble’s contributions.** 
 
@@ -26052,7 +26052,7 @@ JWST is expected to reveal new and unexpected discoveries, and help humanity und
 
 Launched on **25th December 2021** by an **Ariane-5 rocket** from French Guiana, JWST is a joint project of **NASA, ESA, and CSA**. Positioned at **Lagrange Point 2 (L2)**, about 1.5 million km from Earth, it is the **most advanced space observatory** ever built, regarded as the successor to the **Hubble Space Telescope (1990)** and **Spitzer Space Telescope (2003)**.
 
-<p align="center"><img src="images/superkalam_gs3_q71_img1.png" alt="Sun Earth L2 Lagrange Point Alignment" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q71_img1.png" alt="Sun Earth L2 Lagrange Point Alignment" /></p>
 
 Sun Earth L2 Lagrange Point Alignment
 
@@ -26217,7 +26217,7 @@ India’s plan to establish its own space station, spearheaded by the Indian Spa
 - **Operational Phase:** Once fully assembled, the space station will be operational for an estimated 15 years. During this period, astronauts will be regularly transported to and from the space station for research missions.
 - **International Collaboration:** While the project is Indian, ISRO welcomes international partnerships, potentially extending to joint experiments and shared usage.
 
-<p align="center"><img src="images/pw_science__technology_q461_img1.webp" alt="space" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q461_img1.webp" alt="space" /></p>
 
 **Benefits to India’s Space Programme:**
 - **Scientific Research:** A dedicated space station provides a unique platform for conducting microgravity experiments, similar to how the International Space Station has facilitated diverse scientific investigations.
@@ -26252,7 +26252,7 @@ This venture, with its far-reaching implications in scientific discovery, techno
 
 India's ambitious space station project, part of the broader **Bharatiya Antariksh Station (BAS)** initiative, marks a transformative milestone in the nation's space capabilities following successful missions like **Chandrayaan-3** and **Aditya L-1**.
 
-<p align="center"><img src="images/superkalam_gs3_q139_img1.png" alt="Bharatiya Antariksha phased development timeline flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q139_img1.png" alt="Bharatiya Antariksha phased development timeline flowchart" /></p>
 
 Bharatiya Antariksha phased development timeline flowchart
 
@@ -26364,7 +26364,7 @@ Some scientists hold the view that private players have much more flexibility, f
 
 ### Body
 
-<p align="center"><img src="images/pw_science__technology_q347_img1.webp" alt="Mars Orbiter Mission " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q347_img1.webp" alt="Mars Orbiter Mission " /></p>
 
 **Technological Challenges:**
 
@@ -26414,7 +26414,7 @@ Despite these challenges, India has been making progress towards launching its f
 
 India's space program stands at a critical juncture, having achieved global recognition through cost-effective unmanned missions while preparing for its maiden human spaceflight venture.
 
-<p align="center"><img src="images/superkalam_gs3_q170_img1.png" alt="Prerequisites for Manned Space Mission Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q170_img1.png" alt="Prerequisites for Manned Space Mission Diagram" /></p>
 
 Prerequisites for Manned Space Mission Diagram
 
@@ -26490,7 +26490,7 @@ Apart from being a mighty achievement, these achievements have also helped in so
 
 ### Body
 
-<p align="center"><img src="images/pw_science__technology_q254_img1.webp" alt="Space Tech" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q254_img1.webp" alt="Space Tech" /></p>
 
 **Landmark Missions:**
 
@@ -26540,7 +26540,7 @@ The strides India has made in space science and technology have been transformat
 
 India's space journey from launching its first satellite Aryabhatta in 1975 to becoming a global space power demonstrates remarkable scientific advancement and innovation.
 
-<p align="center"><img src="images/superkalam_gs3_q183_img1.png" alt="Space Technology Applications Hub and Spoke" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q183_img1.png" alt="Space Technology Applications Hub and Spoke" /></p>
 
 Space Technology Applications Hub and Spoke
 
@@ -26868,7 +26868,7 @@ Biotechnology, through biofuels, biogas, and green hydrogen, can drive India’s
 
 India's renewable energy capacity has grown to **226.9 GW in 2025**, positioning it for energy independence through clean technology by 2047.
 
-<p align="center"><img src="images/superkalam_gs3_q8_img1.jpg" alt="India's Installed Power" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q8_img1.jpg" alt="India's Installed Power" /></p>
 
 India's Installed Power
 
@@ -27027,7 +27027,7 @@ Biotechnology is technology based on biology. Biotechnology generates cellular a
 ### Body
 
 
-**<p align="center"><img src="images/pw_science__technology_q630_img1.webp" alt="Biotechnology" /></p>** **“Transforming Lives through Biotechnological Advancements: A Focus on India’s Impoverished Communities”**
+**<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q630_img1.webp" alt="Biotechnology" /></p>** **“Transforming Lives through Biotechnological Advancements: A Focus on India’s Impoverished Communities”**
 
 **“Transforming Lives through Biotechnological Advancements: A Focus on India’s Impoverished Communities”**
 - **Healthcare Advancements:** Biotechnology has revolutionized healthcare with developments such as affordable biosimilar drugs, effectively reducing healthcare costs. **For instance, Biocon, an Indian biotech firm,** has developed affordable insulin.
@@ -27093,7 +27093,7 @@ As we have seen, many of the recent developments of biotechnology have helped in
 
 India's biotechnology sector has achieved significant breakthroughs, positioning itself as a global leader while creating pathways for inclusive development and poverty alleviation.
 
-<p align="center"><img src="images/superkalam_gs3_q99_img1.png" alt="Applied Biotechnology Hub and Spoke Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q99_img1.png" alt="Applied Biotechnology Hub and Spoke Diagram" /></p>
 
 Applied Biotechnology Hub and Spoke Diagram
 
@@ -27285,7 +27285,7 @@ The benefits of biotechnology are especially meaningful at a time when our globa
 - By inserting the Bacillus thuringiensis (Bt) gene into cotton, the plants gained resistance against bollworms, a common pest.
   - As a result, Bt cotton farmers have seen increased yields and reduced pesticide usage, improving their income and environmental sustainability.
 
-<p align="center"><img src="images/pw_science__technology_q469_img1.webp" alt="Bt cotton " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q469_img1.webp" alt="Bt cotton " /></p>
 
 - **Drought and Salinity Resistant Crops:** Biotechnology can help create crops resistant to extreme conditions like drought or salinity, which can be a boon in parts of India where water is scarce or soil is saline.
 - **For instance, research is ongoing on the development of a GM rice variety called “Saltol”:** for improved salt tolerance, which could significantly improve crop yield and farmer income in coastal areas with saline soils.
@@ -27318,7 +27318,7 @@ The deployment of biotechnology in agriculture, with its numerous advantages, ha
 
 Biotechnology offers transformative solutions to enhance farmers' living standards through scientific interventions and sustainable agricultural practices. Recent developments show significant potential for improving both productivity and profitability.
 
-<p align="center"><img src="images/superkalam_gs3_q129_img1.png" alt="Agricultural Biotechnology Hub and Spoke Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q129_img1.png" alt="Agricultural Biotechnology Hub and Spoke Diagram" /></p>
 
 Agricultural Biotechnology Hub and Spoke Diagram
 
@@ -27517,7 +27517,7 @@ Initiatives such i3 (Innovate in India); National Biopharma Mission and establis
   - **Institutions like the Indian Institute of Science exemplify this research prowess.**
 - **Market Potential:** India, with its large and diverse population, presents enormous potential for tailored healthcare solutions.
 
-- **The success of companies like Biocon in creating affordable biosimilars:** is a testament to this potential. **The surge in biotechnological advancements has significantly elevated the biopharma industry, particularly in areas such as:** <p align="center"><img src="images/pw_science__technology_q424_img1.webp" alt="biopharma industry" /></p>
+- **The success of companies like Biocon in creating affordable biosimilars:** is a testament to this potential. **The surge in biotechnological advancements has significantly elevated the biopharma industry, particularly in areas such as:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q424_img1.webp" alt="biopharma industry" /></p>
 
 - **The success of companies like Biocon in creating affordable biosimilars:** is a testament to this potential. **The surge in biotechnological advancements has significantly elevated the biopharma industry, particularly in areas such as:** 
 - **Advanced Therapeutics:** Biotechnology has propelled the development of novel treatments, such as gene and cell therapies.
@@ -27548,7 +27548,7 @@ The dynamic growth in India’s biotechnology sector is reshaping the landscape 
 
 India's biotechnology boom stems from strategic policy initiatives and robust market dynamics. The **National Biotechnology Development Strategy 2021-25** with a **Rs. 65,000 crore investment** has catalyzed unprecedented growth in this sector.
 
-<p align="center"><img src="images/superkalam_gs3_q159_img1.png" alt="Government Support DBT BIRAC Top Down Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q159_img1.png" alt="Government Support DBT BIRAC Top Down Flowchart" /></p>
 
 Government Support DBT BIRAC Top Down Flowchart
 
@@ -27781,7 +27781,7 @@ Intellectual Property Rights (IPRs) are vital for driving **innovation** and sec
 
 India’s intellectual property rights (IPR) regime, especially concerning **life materials** such as genes, seeds, and biotechnological innovations, is shaped by global trends and domestic challenges. Despite being the **second-largest patent filer globally**, India faces significant hurdles in commercializing these patents.
 
-<p align="center"><img src="images/superkalam_gs3_q37_img1.png" alt="Innovation Stages and Valley of Death" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q37_img1.png" alt="Innovation Stages and Valley of Death" /></p>
 
 Innovation Stages and Valley of Death
 
@@ -28014,7 +28014,7 @@ India's multi-dimensional approach through **TKDL**, **Biological Diversity Act*
 
 ### Body
 
-**<p align="center"><img src="images/pw_science__technology_q202_img1.webp" alt="Traditional Knowledge Digital Library " /></p>**
+**<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q202_img1.webp" alt="Traditional Knowledge Digital Library " /></p>**
 
 **India’s Traditional Knowledge Digital Library (TKDL) is a valuable repository of over 2 million medicinal formulations derived from traditional Indian systems of medicine. Making this database publicly available under open-source licensing could have both advantages and potential drawbacks.**
 
@@ -28150,7 +28150,7 @@ A balanced approach involving **graduated open access** with robust legal safegu
 
 ### Body
 
-**<p align="center"><img src="images/pw_science__technology_q116_img1.webp" alt="Intellectual property's rights" /></p>** Copyrights:
+**<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q116_img1.webp" alt="Intellectual property's rights" /></p>** Copyrights:
 
 **In the era of globalization, Intellectual Property Rights (IPRs) are pivotal in fostering innovation and creativity. As key constituents of IPRs, Copyrights, Patents, and Trade Secrets protect creators’ and innovators’ rights, stimulate fair competition, and propel economic growth, while often being a source of intricate legal disputes.**
 
@@ -28269,7 +28269,7 @@ The **National IPR Policy 2016** emphasizes balanced protection encouraging inno
 - **Evergreening of Patents:** The practice of “evergreening”- extending the lifespan of patents by making minor modifications to existing drugs without significant therapeutic improvement, was becoming prevalent. This trend was detrimental to generic drug production and needed urgent addressal.
 - **Boosting Domestic Pharmaceutical Industry:** The amendment sought to support India’s domestic generic pharmaceutical industry, which is renowned for producing affordable drugs. This industry’s survival was vital for both the country’s healthcare system and its economy.
 
-<p align="center"><img src="images/pw_science__technology_q12_img1.webp" alt="patent" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q12_img1.webp" alt="patent" /></p>
 
 **Section 3(d) Utilization in Novartis Glivec Case:**
 - **Evergreening Prevention:** Novartis’ new formulation of Glivec, a leukemia drug, was not granted a patent because it didn’t demonstrate increased efficacy, in accordance with Section 3(d).
@@ -28579,7 +28579,7 @@ Nanotechnology applies materials sized **1–100 nm** to enhance efficiency of a
 
 The **Department of Biotechnology’s 2020 Guidelines** classify such interventions as **Nano-Agri Input Products (NAIPs)** and **Nano-Agri Products (NAPs)**. These innovations are reshaping crop production, protection, and food systems.
 
-<p align="center"><img src="images/superkalam_gs3_q9_img1.png" alt="Nanotechnology's Applications in Modern Agriculture Practices" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q9_img1.png" alt="Nanotechnology's Applications in Modern Agriculture Practices" /></p>
 
 Nanotechnology's Applications in Modern Agriculture Practices
 
@@ -28665,7 +28665,7 @@ Send To My Bookmarks
 - **Environmental Science:** Nanotechnology can contribute to cleaner technologies that aid pollution control, waste management, and resource-efficient production processes.
 - **Information Technology:** The field of information technology can benefit from improved data storage capabilities, faster computing, and advanced display technology, all enabled by nanotechnology.
 
-<p align="center"><img src="images/pw_science__technology_q306_img1.webp" alt="nanotechnology" /></p> **Key Features of the Indian Government’s Mission on Nanoscience and Technology:** The Indian Government launched the “Nano Mission” in 2007, recognizing the potential of nanotechnology. The mission’s salient features include:
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q306_img1.webp" alt="nanotechnology" /></p> **Key Features of the Indian Government’s Mission on Nanoscience and Technology:** The Indian Government launched the “Nano Mission” in 2007, recognizing the potential of nanotechnology. The mission’s salient features include:
 
  **Key Features of the Indian Government’s Mission on Nanoscience and Technology:** The Indian Government launched the “Nano Mission” in 2007, recognizing the potential of nanotechnology. The mission’s salient features include:
 
@@ -28705,7 +28705,7 @@ Nanotechnology, as a frontier technology, can play a crucial role in India’s d
 
 Nanotechnology, manipulating matter at 1-100 nanometer scale, represents the convergence of physics, chemistry, and biology, enabling unprecedented control over material properties and opening revolutionary possibilities across multiple sectors.
 
-<p align="center"><img src="images/superkalam_gs3_q198_img1.png" alt="Nanotechnology Applications Hub and Spoke Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q198_img1.png" alt="Nanotechnology Applications Hub and Spoke Diagram" /></p>
 
 Nanotechnology Applications Hub and Spoke Diagram
 
@@ -28972,7 +28972,7 @@ Thus, there is still high scope of scaling-up of EV Manufacturing to reduce over
 
 Electric Vehicles (EVs) are vehicles propelled by electric motors powered through batteries or fuel cells. With the transport sector contributing **approx. 23% of global energy-related CO₂ emissions** (IEA, 2023), EV adoption is a crucial mitigation strategy under the **Paris Agreement (2015)** and **India’s net zero by 2070 goal**.
 
-<p align="center"><img src="images/superkalam_gs3_q52_img1.png" alt="ICE vs EV Vehicle Emissions Process" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q52_img1.png" alt="ICE vs EV Vehicle Emissions Process" /></p>
 
 ICE vs EV Vehicle Emissions Process
 
@@ -29154,7 +29154,7 @@ To increase contribution of Biofuels, government has amended the National Biofue
 
 With rising energy demands and the depletion of fossil fuels, there is a growing focus on **bio-based and renewable energy sources**. **Microorganisms** play a crucial role in **biofuel production**, offering sustainable alternatives to conventional fuels.
 
-<p align="center"><img src="images/superkalam_gs3_q43_img1.png" alt="Microorganism Based Biofuels" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q43_img1.png" alt="Microorganism Based Biofuels" /></p>
 
 Microorganism Based Biofuels
 
@@ -29266,7 +29266,7 @@ Non-Fossil Fuel Installed
 **states**
 
 
-<p align="center"><img src="images/civilsdaily_p34_img92.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p34_img92.png" alt="Diagram" /></p>
 
 
 ### State-level initiatives
@@ -29535,7 +29535,7 @@ Science is deeply interwoven with our lives, empowering us with capabilities pre
 
 Science has become inseparable from modern life, influencing every aspect from healthcare to communication. Agricultural transformation through science-based technologies demonstrates this integration most vividly.
 
-<p align="center"><img src="images/superkalam_gs3_q112_img1.png" alt="Science in Agriculture hub and spoke diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q112_img1.png" alt="Science in Agriculture hub and spoke diagram" /></p>
 
 Science in Agriculture hub and spoke diagram
 
@@ -29797,7 +29797,7 @@ One of the most dramatic effects of Bose-Einstein statistics is the prediction t
 
 ### Body
 
-**Bose-Einstein Statistics:** <p align="center"><img src="images/pw_science__technology_q417_img1.webp" alt="Bose-Einstein Statistics" /></p>
+**Bose-Einstein Statistics:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q417_img1.webp" alt="Bose-Einstein Statistics" /></p>
 
 **Bose-Einstein Statistics:** 
 
@@ -29838,7 +29838,7 @@ In essence, Prof. Satyendra Nath Bose’s path-breaking contribution to Bose-Ein
 
 Satyendra Nath Bose's groundbreaking work on quantum statistics fundamentally transformed modern physics by introducing a revolutionary statistical framework that governs particle behavior at quantum scales.
 
-<p align="center"><img src="images/superkalam_gs3_q146_img1.png" alt="Statistical mechanics models energy level comparison" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q146_img1.png" alt="Statistical mechanics models energy level comparison" /></p>
 
 Statistical mechanics models energy level comparison
 
@@ -29948,7 +29948,7 @@ While the attractiveness of alternative career paths plays a part in the decline
 
 Scientific research forms the backbone of national development, yet Indian universities face a concerning decline in research output. Recent data shows India's R&D expenditure at merely **0.64% of GDP**, significantly below global leaders like USA (3.5%) and China (2.4%).
 
-<p align="center"><img src="images/superkalam_gs3_q235_img1.png" alt="Declining scientific research vicious cycle flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q235_img1.png" alt="Declining scientific research vicious cycle flowchart" /></p>
 
 Declining scientific research vicious cycle flowchart
 
@@ -30041,7 +30041,7 @@ India's Installed Power Capacity Mix (Numbers In Gigawatt)
 5. **Cryolines:** Development of specialized pipelines to transport liquid helium at -269°C.
 
 
-<p align="center"><img src="images/civilsdaily_p174_img155.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p174_img155.png" alt="Diagram" /></p>
 
 
 ### Implications of Success for Future Global Energy
@@ -30180,7 +30180,7 @@ India’s contribution to ITER reflects its commitment to **clean energy leaders
 
 Fusion energy is transitioning from experimental physics to commercial reality, underscored by PM Modi’s 2025 visit to the ITER facility in France to reaffirm India's commitment to clean energy.
 
-<p align="center"><img src="images/superkalam_gs3_q14_img1.png" alt="Nuclear Fusion of Deuterium and Tritium" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q14_img1.png" alt="Nuclear Fusion of Deuterium and Tritium" /></p>
 
 Nuclear Fusion of Deuterium and Tritium
 
@@ -30342,7 +30342,7 @@ With Indian motto of 'atoms for peace', nuclear energy can act as a great cataly
 - **Low Greenhouse Gas Emissions:** As a low-carbon technology, **nuclear energy contributed a mere 5% to India’s total greenhouse gas emissions in 2019, per the World Nuclear Association,** while contributing 3.1% to India’s total electricity.
 - **Energy Security:** Nuclear energy, leveraging India’s domestic thorium reserves, can enhance the nation’s energy security, as manifested in the three-stage nuclear power program.
 
-<p align="center"><img src="images/pw_science__technology_q425_img1.webp" alt="Nuclear energy" /></p> **However, the journey isn’t devoid of concerns:**
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q425_img1.webp" alt="Nuclear energy" /></p> **However, the journey isn’t devoid of concerns:**
 
  **However, the journey isn’t devoid of concerns:**
 
@@ -30379,7 +30379,7 @@ The road to harnessing nuclear energy to satiate India’s energy needs and meet
 
 India's nuclear energy programme stands at a crucial juncture, requiring careful evaluation of strategic benefits against legitimate safety concerns. With rising energy demands and climate commitments, nuclear power presents both compelling opportunities and significant challenges.
 
-<p align="center"><img src="images/superkalam_gs3_q160_img1.png" alt="India's Three Stage Nuclear Programme" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q160_img1.png" alt="India's Three Stage Nuclear Programme" /></p>
 
 India's Three Stage Nuclear Programme
 
@@ -30488,7 +30488,7 @@ In FBRs, plutonium-239 undergoes fission to produce energy, while the uranium-23
 - **Stage Two – Fast Breeder Reactor (FBR):** The second stage utilizes plutonium-239, obtained from the first stage, as fuel in FBRs. These reactors breed more fuel than they consume. The bred material, a mix of plutonium and uranium, is reprocessed to extract plutonium for use in the next batch of fuel.
 - **Stage Three – Thorium Based Reactors:** In the final stage, thorium-232 is converted into uranium-233 in a reactor. The uranium-233 will then serve as fuel. Given that India has one of the largest reserves of thorium in the world, this stage will help achieve energy security.
 
-As of 2023, India is in the second stage of its nuclear power program, with **Fast Breeder Reactors** being developed and tested. The successful operation of these reactors is crucial for moving to the third stage. **Advantages of Fast Breeder Reactor Programme in India:** <p align="center"><img src="images/pw_science__technology_q332_img1.webp" alt="Fast Breeder Reactor Programme " /></p>
+As of 2023, India is in the second stage of its nuclear power program, with **Fast Breeder Reactors** being developed and tested. The successful operation of these reactors is crucial for moving to the third stage. **Advantages of Fast Breeder Reactor Programme in India:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_science__technology_q332_img1.webp" alt="Fast Breeder Reactor Programme " /></p>
 
 As of 2023, India is in the second stage of its nuclear power program, with **Fast Breeder Reactors** being developed and tested. The successful operation of these reactors is crucial for moving to the third stage. **Advantages of Fast Breeder Reactor Programme in India:** 
 
@@ -30518,7 +30518,7 @@ The development of nuclear science and technology in India, marked by remarkable
 
 India's nuclear science program represents a remarkable journey from modest beginnings to advanced technological capabilities, establishing the nation as a key player in global nuclear technology.
 
-<p align="center"><img src="images/superkalam_gs3_q167_img1.png" alt="India's Three Stage Nuclear Program Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q167_img1.png" alt="India's Three Stage Nuclear Program Flowchart" /></p>
 
 India's Three Stage Nuclear Program Flowchart
 
@@ -30606,7 +30606,7 @@ India's nuclear program exemplifies **Atmanirbhar Bharat** principles, with the 
 
 A run-of-the-river hydroelectricity project harnesses flowing water without creating large reservoirs, utilizing natural river flow to generate electricity through minimal intervention. This sustainable approach represents modern hydropower development that balances energy generation with environmental preservation.
 
-<p align="center"><img src="images/superkalam_gs3_q261_img1.png" alt="Comparative cross section of hydroelectric systems" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q261_img1.png" alt="Comparative cross section of hydroelectric systems" /></p>
 
 Comparative cross section of hydroelectric systems
 
@@ -30712,7 +30712,7 @@ Being one of the most vulnerable countries to climate change, it is high time th
 
 Climate change is a global problem that affects every country, including India. The changing climate patterns have caused severe impacts on the environment, economy, and society, and the effects are expected to worsen in the future.
 
-<p align="center"><img src="images/pw_environment_and_ecology_q317_img1.webp" alt="climate change" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_environment_and_ecology_q317_img1.webp" alt="climate change" /></p>
 
 ### Body
 
@@ -30746,7 +30746,7 @@ Climate change is a pressing issue that requires immediate attention in India. T
 
 Vulnerability represents the degree of susceptibility and inability of a community to withstand disaster impacts. Recent studies show that **74% of India's districts are multi-hazard prone**, emphasizing the critical need for comprehensive vulnerability assessment.
 
-<p align="center"><img src="images/superkalam_gs3_q137_img1.png" alt="Three Circle Venn Diagram Labeled Hazard" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q137_img1.png" alt="Three Circle Venn Diagram Labeled Hazard" /></p>
 
 Three Circle Venn Diagram Labeled Hazard
 
@@ -30889,10 +30889,10 @@ OF RISE ANNUALLY
 2. **Coral and Seagrass Restoration**- Eg- Andaman reef rehabilitation.
 
 
-<p align="center"><img src="images/civilsdaily_p103_img121.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p103_img121.png" alt="Diagram" /></p>
 
 
-<p align="center"><img src="images/civilsdaily_p104_img122.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p104_img122.png" alt="Diagram" /></p>
 
 
 ### Integrated Coastal Zone Management (ICZM)
@@ -31054,7 +31054,7 @@ Thus, there is a need to prevent adverse impact of sea level rise by immediate, 
 
 The **IPCC Sixth Assessment Report (2021)** projects a global mean sea level (GMSL) rise of **approx. 1 metre by 2100** under high-emission scenarios (SSP5-8.5). Causes include **thermal expansion of oceans, melting glaciers, and ice-sheet loss**. The **Indian Ocean region**—warming faster than the global average—is highly vulnerable due to its densely populated low-lying coastal zones and small island nations.
 
-<p align="center"><img src="images/superkalam_gs3_q53_img1.png" alt="Indian Ocean region with countries highlighted" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q53_img1.png" alt="Indian Ocean region with countries highlighted" /></p>
 
 Indian Ocean region with countries highlighted
 
@@ -31154,7 +31154,7 @@ A 1-metre sea level rise poses **multi-dimensional risks**—economic, ecologica
 11. Hotter, drier conditions raise **wildfire risks**- Eg - **Australian bushfires (2019-20)** and **California wildfires**
 
 
-<p align="center"><img src="images/civilsdaily_p102_img120.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p102_img120.png" alt="Diagram" /></p>
 
 
 ### Control Measures to Reduce GHGs (under Kyoto Protocol, 1997)
@@ -31230,7 +31230,7 @@ The Kyoto Protocol is based on the principle of common but differentiated respon
 
 Global warming is a pressing environmental issue that has far-reaching implications for the Earth’s climate system. It refers to the long-term increase in average temperatures due to the accumulation of greenhouse gasses (GHGs) in the atmosphere. This rise in temperature has several effects on global climate patterns, including increased frequency and intensity of extreme weather events, melting glaciers and polar ice caps, rising sea levels, and disruptions to ecosystems.
 
-<p align="center"><img src="images/pw_environment_and_ecology_q643_img1.webp" alt="global warming" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_environment_and_ecology_q643_img1.webp" alt="global warming" /></p>
 
 ### Body
  **GHG emission and promoting international cooperation:** To combat rising levels of GHGs and combat global warming, the Kyoto Protocol was adopted in 1997. The protocol aimed to reduce emissions of six primary GHGs, namely
@@ -31501,7 +31501,7 @@ COP26 of Glasgow is a promising start on emissions reduction, however, on the pa
 - **Infrastructure for Resilient Island States (IRIS):** India launched the IRIS initiative to develop the infrastructure of small island developing nations (SIDN). SIDNs face significant threats from climate change, and the initiative aims to provide timely information through data systems.
 - **One Sun One World One Grid Group (OSOWOG):** India and the United Kingdom initiated the OSOWOG to harness solar energy and enable its seamless transmission across borders.
 
-<p align="center"><img src="images/pw_environment_and_ecology_q577_img1.webp" alt="Climate Finance" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_environment_and_ecology_q577_img1.webp" alt="Climate Finance" /></p>
 
 **India’s Commitments in COP26:**
 - **Net-zero Emissions:** India committed to achieving net-zero emissions by 2070, indicating its dedication to long-term climate action.
@@ -32038,7 +32038,7 @@ Following is the updated NDC which aligns domestic policy (RE expansion, EV, hyd
 
 In a landmark 2024 judgment (*M.K. Ranjitsinh case*), the Supreme Court recognized the right against climate change under Article 21, elevating India's Paris commitments to a fundamental constitutional right.
 
-<p align="center"><img src="images/superkalam_gs3_q20_img1.png" alt="NDC Updated Targets and COP26 Commitment" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q20_img1.png" alt="NDC Updated Targets and COP26 Commitment" /></p>
 
 NDC Updated Targets and COP26 Commitment
 
@@ -32100,7 +32100,7 @@ With power demand projected to double by 2035, India must prioritise grid modern
 
 The pursuit of carbon credits and clean development mechanisms (CDM) established under the United Nations Framework Convention on Climate Change (UNFCCC) is a crucial step towards mitigating climate change. The decline in the value of carbon credits has raised questions about their effectiveness in promoting sustainable development and clean energy.
 
-<p align="center"><img src="images/pw_environment_and_ecology_q134_img1.webp" alt="carbon credit" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_environment_and_ecology_q134_img1.webp" alt="carbon credit" /></p>
 
 - **Benefits of Carbon Credits and CDMs:** Carbon credits and CDMs incentivize companies to reduce their carbon footprint, leading to a reduction in greenhouse gas emissions.
   - They provide a cost-effective way for developing countries to reduce their carbon emissions.
@@ -32310,7 +32310,7 @@ The organic status of Sikkim has not only led to a healthier environment with re
 
 Sikkim's achievement as India's first certified organic state in 2016 demonstrates how sustainable agricultural transformation can deliver comprehensive ecological and economic benefits while establishing a replicable model for sustainable development.
 
-<p align="center"><img src="images/superkalam_gs3_q154_img1.png" alt="Benefits of an Organic State Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q154_img1.png" alt="Benefits of an Organic State Flowchart" /></p>
 
 Benefits of an Organic State Flowchart
 
@@ -32408,7 +32408,7 @@ planet. India is recognized as one of the world’s 17 **mega-biodiverse countri
 3. **Benefit Sharing with Local Communities**
 
 
-<p align="center"><img src="images/civilsdaily_p81_img108.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p81_img108.png" alt="Diagram" /></p>
 
 
 ### Role of Biological Diversity Act, 2002 in Conservation of Flora and Fauna
@@ -32600,7 +32600,7 @@ The Act's success lies in balancing conservation with sustainable utilization, s
 4. **Selective Environmental Campaigning -** Eg- limited activism on urban infrastructure impacts.
 
 
-<p align="center"><img src="images/civilsdaily_p85_img110.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p85_img110.png" alt="Diagram" /></p>
 
 
 ### Four Major Examples with Important Details
@@ -32733,7 +32733,7 @@ Environmental Impact Assessment ( **EIA** ) is a vital process in India that ass
 
 Environmental NGOs and activists play a crucial role in influencing **Environmental Impact Assessment (EIA)** outcomes for major projects in India by ensuring transparency, accountability, and environmental protection in the decision-making process.
 
-<p align="center"><img src="images/superkalam_gs3_q39_img1.png" alt="EIA Process with NGO Intervention Steps" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q39_img1.png" alt="EIA Process with NGO Intervention Steps" /></p>
 
 EIA Process with NGO Intervention Steps
 
@@ -32867,7 +32867,7 @@ The new notification is being brought in order to make the process more transpar
 
 The draft Environment Impact Assessment (EIA) Notification, 2020 proposed by the Ministry of Environment, Forest, and Climate Change (MoEFCC) aims to replace the existing EIA Notification from 2006. The draft introduces significant changes that have sparked debates and concerns. Understanding the differences between the two notifications is crucial in assessing the potential implications on environmental governance and public participation.
 
-<p align="center"><img src="images/pw_environment_and_ecology_q508_img1.webp" alt="EIA" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_environment_and_ecology_q508_img1.webp" alt="EIA" /></p>
 
 - **Post-Facto Approval:** 
 - **Existing Notification:** Environmental clearances need to be obtained before the commencement of a project.
@@ -33064,7 +33064,7 @@ Carrying capacity refers to the maximum population size or level of resource use
 12. **Population Regulation**- Provides a scientific basis for **setting population targets** aligned with resource limits.
 
 
-<p align="center"><img src="images/civilsdaily_p82_img109.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p82_img109.png" alt="Diagram" /></p>
 
 
 ### Way Forward
@@ -33540,7 +33540,7 @@ Although the new Wetland Rules, 2017 has tried to address the issues adopting a 
 
 Wetlands, covering approx. 4.6% of India’s geographical area (MoEFCC, 2022), are critical for biodiversity, water purification, and climate resilience. Recognising rapid degradation, the **Government of India launched the National Wetland Conservation Programme (NWCP) in 1985–86** to conserve ecologically significant wetlands through integrated management and community participation.
 
-<p align="center"><img src="images/superkalam_gs3_q41_img1.png" alt="Important Indian lakes and national park" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q41_img1.png" alt="Important Indian lakes and national park" /></p>
 
 Important Indian lakes and national park
 
@@ -33567,7 +33567,7 @@ Important Indian lakes and national park
 
 ## **Wetlands of International Importance (Ramsar Sites)**
 
-<p align="center"><img src="images/superkalam_gs3_q41_img2.jpg" alt="Ramsar Sites in India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q41_img2.jpg" alt="Ramsar Sites in India" /></p>
 
 Ramsar Sites in India
 
@@ -33799,7 +33799,7 @@ Photochemical smog is a **secondary air pollutant** formed when sunlight reacts 
 6. **Air Quality Forecasting & Alerts**- Eg- GRAP-like measures during smog episodes.
 
 
-<p align="center"><img src="images/civilsdaily_p93_img117.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p93_img117.png" alt="Diagram" /></p>
 
 
 ### 1999 Gothenburg Protocol
@@ -33882,7 +33882,7 @@ Currently, the protocol is under negotiation for a revised protocol. It was upda
 
 Photochemical smog refers to a type of air pollution that is formed when sunlight interacts with pollutants, primarily nitrogen oxides (NOx) and volatile organic compounds (VOCs), in the presence of heat. This phenomenon is commonly observed in urban areas with high traffic and industrial activities.
 
-<p align="center"><img src="images/pw_environment_and_ecology_q644_img1.webp" alt="Photochemical smog " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_environment_and_ecology_q644_img1.webp" alt="Photochemical smog " /></p>
 
 ### Body
 
@@ -33956,7 +33956,7 @@ Photochemical smog is a type of **air pollution** that forms when **sunlight rea
 
 ## **Formation of Photochemical Smog** 
 
-<p align="center"><img src="images/superkalam_gs3_q62_img1.png" alt="Schematic diagram of Fog formation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q62_img1.png" alt="Schematic diagram of Fog formation" /></p>
 
 Schematic diagram of Fog formation
 
@@ -34404,7 +34404,7 @@ NCAP is envisaged to be dynamic although the targets appear less ambitious. Howe
 
 The National Clean Air Programme (NCAP), introduced by the Government of India, is a significant initiative aimed at combating air pollution and improving air quality across the country. This comprehensive program encompasses various measures and strategies to mitigate pollution sources and promote clean air for the well-being of citizens.
 
-<p align="center"><img src="images/pw_environment_and_ecology_q550_img1.webp" alt="NAPC" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_environment_and_ecology_q550_img1.webp" alt="NAPC" /></p>
 
 ### Body
 
@@ -34534,7 +34534,7 @@ Mineral resources form the **backbone of India’s industrial and economic growt
 9. Mining-induced displacement of tribal populations. Eg- **Niyamgiri Hills bauxite project**(Vedanta vs Dongria Kondh tribe).
 
 
-<p align="center"><img src="images/civilsdaily_p92_img116.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p92_img116.png" alt="Diagram" /></p>
 
 
 ### Remedial Measures Required
@@ -34675,7 +34675,7 @@ Mining must balance **economic needs** with **ecological stewardship** to ensure
 
 India's mining sector, contributing **12% to industrial GDP**, faces mounting environmental challenges requiring urgent remedial interventions.
 
-<p align="center"><img src="images/superkalam_gs3_q11_img1.png" alt="Mining and Remediation of Environmental Impact" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q11_img1.png" alt="Mining and Remediation of Environmental Impact" /></p>
 
 Mining and Remediation of Environmental Impact
 
@@ -34853,7 +34853,7 @@ Better spatial planning and reducing unnecessary construction, using green infra
 **Impact of Coastal Sand Mining along Indian Coasts:**
 - **Coastal Erosion:** Sand mining contributes to coastal erosion, leading to the loss of landmass along the coast. **E.g.** In Karnataka, rampant sand mining has caused significant coastal erosion, forcing the government to spend large sums of money to form barriers against erosion.
 
-<p align="center"><img src="images/pw_environment_and_ecology_q462_img1.webp" alt="coastal sand mining" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_environment_and_ecology_q462_img1.webp" alt="coastal sand mining" /></p>
 
 - **Deepening of Rivers and Estuaries:** Depletion of sand from coastal areas results in the deepening of rivers and estuaries, disrupting their natural flow patterns. **E.g:** Seawater intrusion, inundation of coastal land, and salinization of groundwater have been observed along the coasts of Kollam, Alappuzha, Pathanamthitta, Kottayam, and Ernakulam due to sand mining.
 - **Saline-Water Intrusion:** Coastal sand mining can lead to the intrusion of saline water from the nearby sea, impacting freshwater sources and ecosystems. **E.g:** In Periyasamypuram, Tamil Nadu, coastal sand mining has caused seawater to enter the village, resulting in dried-up palm trees, reduced fish catch, and brackish groundwater.
@@ -35230,7 +35230,7 @@ According to a report by **TERI**, India generates **62 million tonnes (MT) of w
 10. **Lack of Interagency co-ordination**- Eg- MoEFCC develop rules and guidelines while the Ministry of Housing and Urban Affairs oversees ground-level enforcement
 
 
-<p align="center"><img src="images/civilsdaily_p89_img115.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p89_img115.png" alt="Diagram" /></p>
 
 
 ### **Safe Removal of Toxic Wastes from the Environment**
@@ -35661,7 +35661,7 @@ This phenomenon occurs when **saltwater displaces freshwater in coastal aquifers
 
 ## Seawater Intrusion
 
-<p align="center"><img src="images/superkalam_gs3_q12_img1.png" alt="Saltwater Intrusion from Pumping Well Depression" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q12_img1.png" alt="Saltwater Intrusion from Pumping Well Depression" /></p>
 
 Saltwater Intrusion from Pumping Well Depression
 
@@ -35723,7 +35723,7 @@ India’s groundwater is under **severe stress** due to rising demand and supply
 
 1. **Agriculture** consumes **87%** of groundwater extraction. Eg- **Punjab and Haryana** show groundwater extraction rates above **150% of recharge**.
 
-<p align="center"><img src="images/civilsdaily_p87_img113.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p87_img113.png" alt="Diagram" /></p>
 
 2. **Fertilizer and Pesticide Runoff** from agriculture - **56% of India's districts have nitrates beyond the safe limit of 45 mg/L** in their groundwater.
 3. **Energy Subsidies** encouraging excess pumping and inefficient irrigation. Eg- in Punjab and Haryana.
@@ -35736,7 +35736,7 @@ India’s groundwater is under **severe stress** due to rising demand and supply
 10. **Unsustainable Mining Activities** lead to heavy metal contamination and aquifer depletion. Eg- Uranium and fluoride seepage in Rajasthan and Karnataka.
 11. **Saline Water Intrusion** into coastal aquifers due to over-pumping and rising sea levels.
 
-<p align="center"><img src="images/civilsdaily_p88_img114.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p88_img114.png" alt="Diagram" /></p>
 
 ### Steps Taken by the Government to Mitigate Depletion of Groundwater
 
@@ -35889,7 +35889,7 @@ Groundwater depletion in India leads to water scarcity, reduced agricultural pro
 
 Groundwater depletion has emerged as one of the most serious environmental risks for India, with the **UNU-EHS ranking it among the top six tipping points globally**. India is already the **largest user of groundwater in the world**, surpassing the combined usage of the USA and China. 
 
-<p align="center"><img src="images/superkalam_gs3_q4_img1.png" alt="India's Over-Exploited Groundwater Zones Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q4_img1.png" alt="India's Over-Exploited Groundwater Zones Map" /></p>
 
 India's Over-Exploited Groundwater Zones Map
 
@@ -35990,7 +35990,7 @@ As per **CPCB report on "Polluted River Stretches for Restoration of Water Quali
 8. **Strengthen Monitoring & Surveillance**- Use **drones, GIS, river basin audits** and citizen reporting tools.
 
 
-<p align="center"><img src="images/civilsdaily_p96_img119.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p96_img119.png" alt="Diagram" /></p>
 
 
 ### Government Initiatives
@@ -36127,7 +36127,7 @@ Tackling industrial pollution in India’s rivers is vital for safeguarding publ
 
 Industrial pollution of river water poses a critical environmental challenge in India, with **46% of 603 Indian rivers polluted** according to CPCB reports. The discharge of untreated industrial effluents containing heavy metals, toxic chemicals, and organic pollutants severely impacts water quality, aquatic ecosystems, and public health.
 
-<p align="center"><img src="images/superkalam_gs3_q29_img1.png" alt="Wastewater Treatment Process" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q29_img1.png" alt="Wastewater Treatment Process" /></p>
 
 Wastewater Treatment Process
 
@@ -36350,7 +36350,7 @@ It is imperative for India to have robust preventive measures, emergency respons
 
 **Oil pollution** refers to the contamination of marine and coastal environments due to the release of **petroleum or its by-products**, either through accidents (oil spills), operational discharges from ships, offshore drilling, or industrial run-off. This form of pollution is persistent, toxic, and spreads rapidly over vast areas.
 
-<p align="center"><img src="images/superkalam_gs3_q57_img1.png" alt="Effects of Oil Spill on Wildlife" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q57_img1.png" alt="Effects of Oil Spill on Wildlife" /></p>
 
 Effects of Oil Spill on Wildlife
 
@@ -36618,7 +36618,7 @@ The Jal Shakti Abhiyan, aligned with **SDG 6** and supported by the **73rd Const
   - The programme aims to clean and rejuvenate the Ganga river by constructing toilets and ensuring that sewage is treated before it is discharged into the river.
   - The programme also aims to create awareness among the public about the importance of keeping the river clean.
 
-<p align="center"><img src="images/pw_environment_and_ecology_q184_img1.webp" alt="namami gange" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_environment_and_ecology_q184_img1.webp" alt="namami gange" /></p>
 
 - **National Mission for Clean Ganga (NMCG):** The National Mission for Clean Ganga (NMCG) was launched in 2014 by the central government.
   - The mission aims to clean and rejuvenate the Ganga river by controlling pollution sources, treating sewage, and conserving biodiversity.
@@ -36831,11 +36831,11 @@ Disaster resilience is determined by several factors, including:
 
 **Four Elements of Resilience Framework:**
 
-<p align="center"><img src="images/disaster_management_q1_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/disaster_management_q1_img1.png" alt="Image" /></p>
 
 **Global Targets of Sendai Framework For Disaster Risk Reduction (2015-2030):** The Sendai Framework for Disaster Risk Reduction is a UN General Assembly-endorsed agreement that aims to reduce disaster risk and losses through a combination of **global targets and a shared responsibility** between governments and other stakeholders.
 
-<p align="center"><img src="images/disaster_management_q1_img2.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/disaster_management_q1_img2.png" alt="Image" /></p>
 
 **Priorities for Action:**
 
@@ -36927,7 +36927,7 @@ Strengthening disaster resilience is an ongoing process that requires **innovati
 
 **Disaster resilience** is the **ability of a community, system or society** exposed to hazards to **resist, absorb, accommodate, adapt to and recover** from their effects while preserving or restoring essential structures, functions and identity, and while minimising long-term losses. It is a **dynamic capacity** that grows through continuous learning, investment and adaptation.
 
-<p align="center"><img src="images/superkalam_gs3_q35_img1.png" alt="Disaster Resilience Management Cycle Model" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q35_img1.png" alt="Disaster Resilience Management Cycle Model" /></p>
 
 Disaster Resilience Management Cycle Model
 
@@ -37001,7 +37001,7 @@ As per **UNDRR,** disaster management refers to the organization, planning and a
 8. **Limited Community Preparedness**- Citizens were passive recipients of relief; evacuation plans rudimentary. Eg- high fatalities after Uttarakhand Floods
 
 
-<p align="center"><img src="images/civilsdaily_p108_img124.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p108_img124.png" alt="Diagram" /></p>
 
 
 ### **Recent Measures Highlighting the Shift from Reactive to Proactive Approach**
@@ -37109,7 +37109,7 @@ Nevertheless, in India, disaster management is yet to be seen as integral to dev
 
 Disaster management in India has traditionally been reactive, with the focus on response and relief operations after a disaster has occurred. The Government of India has taken several measures to shift the focus towards a more proactive approach to disaster management.
 
-<p align="center"><img src="images/pw_disaster_management_q34_img1.webp" alt="Disaster management" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_disaster_management_q34_img1.webp" alt="Disaster management" /></p>
 
 ### Body
 
@@ -37147,7 +37147,7 @@ The Government of India has initiated several measures to improve disaster manag
 
 Recent data shows India's disaster management approach has transformed from reactive relief-focused strategies to proactive risk reduction measures, aligning with global frameworks like the Sendai Framework.
 
-<p align="center"><img src="images/superkalam_gs3_q106_img1.png" alt="Disaster Management Cycle Circular Diagram Overview" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q106_img1.png" alt="Disaster Management Cycle Circular Diagram Overview" /></p>
 
 Disaster Management Cycle Circular Diagram Overview
 
@@ -37317,7 +37317,7 @@ India is the largest democracy which has adopted the Sendai framework for disast
 
 India's disaster management approach has evolved significantly, transitioning from reactive relief measures to proactive risk reduction strategies, especially after adopting international frameworks.
 
-<p align="center"><img src="images/superkalam_gs3_q145_img1.png" alt="Hyogo Framework comparative diagram 2018" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q145_img1.png" alt="Hyogo Framework comparative diagram 2018" /></p>
 
 Hyogo Framework comparative diagram 2018
 
@@ -37561,7 +37561,7 @@ India's response includes the **National Action Plan on Climate Change (NAPCC)**
 
 Vulnerability and risk assessment play a pivotal role in pre-disaster management, providing crucial insights into the potential impacts of disasters. By evaluating the vulnerabilities of communities, infrastructures, and ecosystems, and assessing the associated risks, administrators can effectively allocate resources and develop targeted strategies.
 
-<p align="center"><img src="images/pw_disaster_management_q34_img1.webp" alt="Disaster management" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_disaster_management_q34_img1.webp" alt="Disaster management" /></p>
 
 ### Body
 
@@ -37594,7 +37594,7 @@ Vulnerability and risk assessment form the foundation of a robust disaster manag
 
 Vulnerability and risk assessments serve as the foundation for effective pre-disaster management, enabling scientific identification of hazards and development of targeted mitigation strategies. Recent **NDMA data** shows that comprehensive risk assessments have reduced disaster mortality by **67%** in well-prepared states like Odisha.
 
-<p align="center"><img src="images/superkalam_gs3_q251_img1.png" alt="Disaster Management Cycle Circular Representation Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q251_img1.png" alt="Disaster Management Cycle Circular Representation Diagram" /></p>
 
 Disaster Management Cycle Circular Representation Diagram
 
@@ -37660,7 +37660,7 @@ Effective disaster management requires a paradigm shift from reactive response t
 IMD defines cloudburst as an extreme weather event involving **very high-intensity rainfall (often >100 mm/hour)** over a **small geographical area (** 20-30 sq. km.**)** within a **short duration**.
 
 
-<p align="center"><img src="images/civilsdaily_p115_img127.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p115_img127.png" alt="Diagram" /></p>
 
 
 ### Mechanism of Cloudburst
@@ -37826,7 +37826,7 @@ A **cloudburst** is an extreme rainfall event characterized by precipitation exc
 
 ## **Mechanism of Cloudburst**
 
-<p align="center"><img src="images/superkalam_gs3_q69_img1.png" alt="Cloudburst Mechanism Reference" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q69_img1.png" alt="Cloudburst Mechanism Reference" /></p>
 
 Cloudburst Mechanism Reference
 
@@ -37959,7 +37959,7 @@ Uttarakhand can strengthen its disaster management strategies and minimize the i
 
 Hazard zonation mapping provides scientific foundation for disaster preparedness by identifying vulnerable areas and enabling targeted mitigation strategies. This systematic approach is essential for reducing landslide risks in India's mountainous regions.
 
-<p align="center"><img src="images/superkalam_gs3_q124_img1.png" alt="India Landslide Hazard Zonation Himalayan Belt" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q124_img1.png" alt="India Landslide Hazard Zonation Himalayan Belt" /></p>
 
 India Landslide Hazard Zonation Himalayan Belt
 
@@ -38078,7 +38078,7 @@ Mullaperiyar Dam (130 year old)
     - Estimated **1,70,000 deaths**(direct and indirect)
 
 
-<p align="center"><img src="images/civilsdaily_p116_img128.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p116_img128.png" alt="Diagram" /></p>
 
 
 ### Initiatives Taken for Dam Safety in India
@@ -38183,7 +38183,7 @@ While dams remain indispensable to India’s developmental goals, safety cannot 
 
 Dams are vital for irrigation, power generation, and flood control, but their failure often causes large-scale destruction. In the 21st century, such failures have become more concerning due to **climate change**, **aging infrastructure**, and **unplanned urbanisation**.
 
-<p align="center"><img src="images/superkalam_gs3_q42_img1.png" alt="Types of Dam Failure" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q42_img1.png" alt="Types of Dam Failure" /></p>
 
 Types of Dam Failure
 
@@ -38301,7 +38301,7 @@ The September 2010 guidelines by the NDMA serve as a valuable resource for enhan
 
 Drought's recognition as a disaster reflects its extensive spatial coverage, prolonged duration, and severe impacts on vulnerable populations. The NDMA's September 2010 guidelines provide a comprehensive framework for drought preparedness, particularly addressing El Niño and La Niña impacts.
 
-<p align="center"><img src="images/superkalam_gs3_q224_img1.png" alt="India drought prone areas zone demarcation" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q224_img1.png" alt="India drought prone areas zone demarcation" /></p>
 
 India drought prone areas zone demarcation
 
@@ -38381,7 +38381,7 @@ India is among the **most earthquake-prone countries in the world**, with nearly
 7. Vulnerability of **critical infrastructure -** Disruption of **transport, power, water, and communication networks**.
 
 
-<p align="center"><img src="images/civilsdaily_p114_img126.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p114_img126.png" alt="Diagram" /></p>
 
 
 ### Examples of Major Earthquake Disasters in India (Last Three Decades)
@@ -38460,7 +38460,7 @@ India has come a long way on the road to earthquake safety. And yet, much remain
 
 **Vulnerability of India to Earthquake-Related Hazards:** India is located in a seismically active region, with several tectonic plates converging in the region. The country is divided into **four seismic zones**, and most of the northern and northeastern regions fall under **zone IV and V,** which are considered to be highly active seismic zones. These regions are prone to earthquakes of high magnitude, and the densely populated cities in these areas are highly vulnerable to the impact of earthquakes.
 
-<p align="center"><img src="images/pw_disaster_management_q581_img1.webp" alt="seismic zones in india" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_disaster_management_q581_img1.webp" alt="seismic zones in india" /></p>
 
 - **Examples of Major Disasters Caused by Earthquakes in India:**
 - **Latur Earthquake (1993):** The Latur earthquake was a 6.2 magnitude earthquake that struck Maharashtra on September 30, 1993. The earthquake caused significant damage to property and infrastructure in the region and claimed more than 9,000 lives.
@@ -38540,7 +38540,7 @@ The susceptibility of India to numerous seismic risks necessitates careful manag
 
 India faces significant earthquake vulnerability due to its location at the convergence of major tectonic plates. According to the Bureau of Indian Standards (BIS), approximately **59% of India's landmass** lies in moderate to high seismic risk zones.
 
-<p align="center"><img src="images/superkalam_gs3_q86_img1.png" alt="India Seismic Zones Map Based on BIS" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q86_img1.png" alt="India Seismic Zones Map Based on BIS" /></p>
 
 India Seismic Zones Map Based on BIS
 
@@ -38614,7 +38614,7 @@ The increased frequency of earthquakes in the Indian subcontinent can be attribu
 The Indian subcontinent has witnessed several major earthquakes in recent years, including the 2015 Nepal earthquake, the 2001 Bhuj earthquake and the 2004 Indian Ocean earthquake and tsunami.
 - These earthquakes caused widespread damage to infrastructure and loss of life, particularly in India’s coastal regions.
 
-<p align="center"><img src="images/pw_disaster_management_q219_img1.webp" alt="major earthquake area in india " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_disaster_management_q219_img1.webp" alt="major earthquake area in india " /></p>
 
 **Gaps in India’s Preparedness for Mitigating the Impact of Earthquakes**
 There are several gaps in the country’s ability to mitigate the impact of earthquakes, including the lack of building codes and seismic-resistant structures.
@@ -38855,7 +38855,7 @@ Slope movement occurs when forces acting downward (mainly due to gravity) exceed
 
 Landslides are one of the most destructive natural disasters, causing significant loss of life and property damage globally. They can be triggered by a range of factors, including human activities, geological and environmental conditions.
 
-<p align="center"><img src="images/pw_disaster_management_q578_img1.webp" alt="geological and environmental condition" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_disaster_management_q578_img1.webp" alt="geological and environmental condition" /></p>
 
 ### Body
 
@@ -38953,7 +38953,7 @@ After all of these action items have been handled on a priority basis with a fee
 
 Nanotechnology involves manipulating matter at the atomic scale (1-100 nanometers), creating materials with unique properties. This revolutionary field is transforming healthcare through precise interventions at the cellular level.
 
-<p align="center"><img src="images/superkalam_gs3_q120_img1.png" alt="Medical Nanocarrier Drug Payload Thematic Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q120_img1.png" alt="Medical Nanocarrier Drug Payload Thematic Diagram" /></p>
 
 Medical Nanocarrier Drug Payload Thematic Diagram
 
@@ -39045,7 +39045,7 @@ As per **UNDRR**, disaster preparedness refers to the knowledge and capacities d
 
 8. **Assists in Environmental Regulation - Eg-** Quarrying, mining, ban in Western Ghats (Madhav gadgil committee recommendation)
 
-<p align="center"><img src="images/civilsdaily_p112_img125.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p112_img125.png" alt="Diagram" /></p>
 
 
 **Landslide vulnerability of India**
@@ -39129,7 +39129,7 @@ Landslides and their consequences are still a great problem for many countries, 
 
 Disaster preparedness refers to measures taken in advance to minimize the impact of natural or man-made disasters on human life and property. Disaster preparedness is crucial for effective disaster management. Hazard zonation mapping is an important tool that can aid in disaster mitigation, especially in the case of landslides.
 
-<p align="center"><img src="images/pw_disaster_management_q471_img1.webp" alt="Disaster preparedness" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_disaster_management_q471_img1.webp" alt="Disaster preparedness" /></p>
 
 ### Body
 
@@ -39165,7 +39165,7 @@ Hazard zonation mapping can help in disaster mitigation by identifying high-risk
 
 Recent **Wayanad landslides (2024)** causing over 400 casualties highlight the urgent need for comprehensive landslide risk management in India's geologically sensitive regions.
 
-<p align="center"><img src="images/superkalam_gs3_q85_img1.png" alt="Typical Landslide Cross Section on Hill" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q85_img1.png" alt="Typical Landslide Cross Section on Hill" /></p>
 
 Typical Landslide Cross Section on Hill
 
@@ -39324,7 +39324,7 @@ Coastal Erosion refers to **breaking down and carrying away of materials by sea.
 9. **Beach cleanliness drives**- Eg- Blue Flag Certification
 
 
-<p align="center"><img src="images/civilsdaily_p94_img118.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p94_img118.png" alt="Diagram" /></p>
 
 
 ### Integrated Coastal Zone Management (ICZM)
@@ -39504,7 +39504,7 @@ Coastal management through legal mechanisms like Eco Sensitive Zones, Coastal re
 
 India has a coastline of **approx. 7,500 km**, supporting **250 million people** in coastal states and contributing significantly to trade, fisheries, and tourism. However, **coastal erosion** has emerged as a serious challenge, with a **2018 report by the National Centre for Coastal Research (NCCR)** noting that **almost 34% of India’s coastline is under varying degrees of erosion**.
 
-<p align="center"><img src="images/superkalam_gs3_q68_img1.png" alt="Coastal management techniques cross section diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q68_img1.png" alt="Coastal management techniques cross section diagram" /></p>
 
 Coastal management techniques cross section diagram
 
@@ -39625,7 +39625,7 @@ On December 26, 2004 the gigantic tsunami waves generated due to a great underse
 - **Submarine Earthquakes:** The 2004 tsunami was triggered by a severe undersea earthquake at the Indian-Burmese tectonic plates boundary.
 - **Water Displacement:** The earthquake’s vertical movement displaced massive water volumes, creating far-reaching waves.
 
-<p align="center"><img src="images/pw_disaster_management_q342_img1.webp" alt="Tsunami effected countries" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_disaster_management_q342_img1.webp" alt="Tsunami effected countries" /></p>
 
 **Effects on Life and Economy**
 - **Human Impact:** Over 230,000 people lost their lives globally, with India’s coastal regions like Tamil Nadu and the Andaman and Nicobar Islands suffering significantly.
@@ -39842,7 +39842,7 @@ Urban flooding, a climate-induced disaster, occurs when heavy rainfall overwhelm
 
   - **Improper Solid Waste Management:** Blocks drainage systems, causing overflow **during heavy rains and further complicating flooding risks** with the mixing of sewage and stormwater.
 
-<p align="center"><img src="images/disaster_management_q2_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/disaster_management_q2_img1.png" alt="Image" /></p>
 
 **Major Flood Events:**
 
@@ -39926,7 +39926,7 @@ Urban areas across India are becoming increasingly vulnerable to flooding, a sit
 
 Urban flooding has emerged as a critical climate-induced disaster, with **IPE Global and Esri India** forecasting a **43% increase in extreme rainfall events by 2030** in India, necessitating urgent attention and comprehensive management strategies.
 
-<p align="center"><img src="images/superkalam_gs3_q27_img1.png" alt="Urban vs Natural Catchment Hydrographs" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q27_img1.png" alt="Urban vs Natural Catchment Hydrographs" /></p>
 
 Urban vs Natural Catchment Hydrographs
 
@@ -40017,7 +40017,7 @@ To reduce these risk following measure can be taken:
 
 India’s urban population is projected to reach 40.76% by 2030, emphasizing the importance of urbanization for economic growth. Inadequate urban planning and climate change contribute to urban flooding, as witnessed in Hyderabad (2020), Chennai (2015), and Bengaluru (recently).
 
-<p align="center"><img src="images/pw_disaster_management_q292_img1.webp" alt="causes for urban flood" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_disaster_management_q292_img1.webp" alt="causes for urban flood" /></p>
 
 ### Body
 
@@ -40411,7 +40411,7 @@ Thus, a common approach to counterterrorism, through international coordination 
 
 Terrorism in India is sustained by complex financing networks that exploit both traditional and modern channels. Funds flow through hawala, narcotics, counterfeit currency, and cyber platforms, often with cross-border links. As per FATF, curbing these sources is essential to dismantle terror operations. India has adopted legal, technological, and diplomatic measures to choke such financial lifelines.
 
-<p align="center"><img src="images/superkalam_gs3_q47_img1.png" alt="Sources of Terror Funding" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q47_img1.png" alt="Sources of Terror Funding" /></p>
 
 Sources of Terror Funding
 
@@ -40596,7 +40596,7 @@ Thus, organised crime and terrorism share close linkages at both national and tr
 - **Drug Trafficking:** Illicit production, transportation, and distribution of narcotics, such as cocaine, heroin, and methamphetamine, for financial gain.
 - **Human Trafficking:** The illegal trade of humans, often involving forced labor, sexual exploitation, and other forms of modern-day slavery.
 
-<p align="center"><img src="images/pw_internal_security_q654_img1.webp" alt="Types of Organized Crime" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q654_img1.webp" alt="Types of Organized Crime" /></p>
 
 - **Arms Trafficking:** Illicit trade in firearms, ammunition, and military-grade weapons, supplying criminals, terrorists, and conflict zones.
 - **Money Laundering:** Concealing the origins of illicit funds through a series of complex transactions, making them appear legitimate.
@@ -40611,7 +40611,7 @@ Thus, organised crime and terrorism share close linkages at both national and tr
 - **Mutual Profiteering:** There can be mutual profiteering, as seen in Boko Haram’s collaboration with ivory traffickers.
 
 
-<p align="center"><img src="images/pw_internal_security_q654_img2.webp" alt="terrorists and organized crime " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q654_img2.webp" alt="terrorists and organized crime " /></p>
 
 **At the transnational level, these links are even more complex:**
 - **Illicit Trade:** Transnational networks enable illicit trade in arms, drugs, humans, leading to financing and operational support for terrorism.
@@ -40783,7 +40783,7 @@ India has been hit by terrorism since a long time, like, 1993 Bombay blasts, att
 - **Kidnapping and Ransom:** Kidnapping for ransom is another source of funds for several terrorist groups.
 - **State-Sponsored Terrorism:** Some terrorist organizations receive funding from states that support their objectives, further complicating the battle against terrorism.
 
-<p align="center"><img src="images/pw_internal_security_q366_img1.webp" alt="Source of funding" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q366_img1.webp" alt="Source of funding" /></p>
 
 ### Conclusion
 
@@ -40936,7 +40936,7 @@ Indian defenses.
 
 7. **Digital Connectivity-** Implementation of **e-Chaupals** and Wi-Fi hotspots
 
-<p align="center"><img src="images/civilsdaily_p152_img148.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p152_img148.png" alt="Diagram" /></p>
 
 
 ### Border Infrastructure and Management (BIM) Scheme
@@ -41083,7 +41083,7 @@ India’s borders with **China** and **Pakistan** present significant security c
 
 India’s northern and western frontiers—with China across the Line of Actual Control (LAC) and with Pakistan along the International Border and Line of Control—remain flashpoints where unresolved territorial claims, militarised rivalry and cross-border threats converge.
 
-<p align="center"><img src="images/superkalam_gs3_q28_img1.jpg" alt="Border disputes between India and China" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q28_img1.jpg" alt="Border disputes between India and China" /></p>
 
 Border disputes between India and China
 
@@ -41169,7 +41169,7 @@ UAVs have emerged as **"aerial dimension"** of **asymmetric warfare** along Indi
 9. **Small DJI-type drones** fly below 100 feet at night, exploiting the **"radar gap"** where traditional air defense is ineffective.
 
 
-<p align="center"><img src="images/civilsdaily_p153_img150.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p153_img150.png" alt="Diagram" /></p>
 
 
 ### Measures Taken to Tackle the Threat
@@ -41321,7 +41321,7 @@ The combination of technology, legal frameworks, interagency collaboration, publ
 
 In recent years, India has witnessed a significant rise in the use of **unmanned aerial vehicles** (UAVs) by adversaries, particularly across the India–Pakistan border. These drones are increasingly used to **ferry arms, ammunition, explosives, and narcotics**, thereby posing a **formidable internal security challenge** that blends terrorism, narco-trafficking, and asymmetric warfare.
 
-<p align="center"><img src="images/superkalam_gs3_q54_img1.png" alt="Counter-UAS: Detection, Command, Control, Neutralization" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q54_img1.png" alt="Counter-UAS: Detection, Command, Control, Neutralization" /></p>
 
 Counter-UAS: Detection, Command, Control, Neutralization
 
@@ -41484,7 +41484,7 @@ Without the development process, there will be no organic end of the causes of d
 - **Civic Action Programmes:** Initiatives like ‘Sadbhavana’ by the Indian Army help to bridge the trust deficit between locals and security forces.
 - **Strict Border Controls:** Effective management like fencing and technological solutions implemented at the Punjab-Pakistan border can deter cross-border militant activities.
 
-- **Conflict Resolution Mechanisms:** Mechanisms to resolve local grievances can reduce militant support, **similar to the Bodo Peace Accord in Assam.** <p align="center"><img src="images/pw_internal_security_q505_img1.webp" alt="border area management in India" /></p>
+- **Conflict Resolution Mechanisms:** Mechanisms to resolve local grievances can reduce militant support, **similar to the Bodo Peace Accord in Assam.** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q505_img1.webp" alt="border area management in India" /></p>
 
 - **Conflict Resolution Mechanisms:** Mechanisms to resolve local grievances can reduce militant support, **similar to the Bodo Peace Accord in Assam.** 
 
@@ -41516,7 +41516,7 @@ An amalgamation of proactive intelligence, developmental initiatives, cultural s
 
 Effective border area management requires a comprehensive strategy that simultaneously denies local support to militants while building trust and favorable perception among border communities through development and engagement initiatives.
 
-<p align="center"><img src="images/superkalam_gs3_q110_img1.png" alt="Virtuous Cycle of Border Area Management" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q110_img1.png" alt="Virtuous Cycle of Border Area Management" /></p>
 
 Virtuous Cycle of Border Area Management
 
@@ -41696,7 +41696,7 @@ India should endeavour to meaningfully engage with Myanmar and solicit its coope
 
 Internal security involves safeguarding the country’s stability, sovereignty, and integrity from threats **emanating within its borders** or **having internal implications of external linkages**. India’s unique **geostrategic position**, **ethno-religious diversity**, and **porous borders** make it vulnerable to a wide spectrum of internal security challenges.
 
-<p align="center"><img src="images/superkalam_gs3_q56_img1.png" alt="India's internal security challenges and threats" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q56_img1.png" alt="India's internal security challenges and threats" /></p>
 
 India's internal security challenges and threats
 
@@ -41853,7 +41853,7 @@ Owing to such peculiarities, having infrastructure and technology does not alone
 
 - **Infrastructure Deficiencies:** Lack of adequate infrastructure like roads, fencing, and surveillance equipment hinders effective border patrolling and monitoring.
 
-**Strategies for Effective Border Management:** <p align="center"><img src="images/pw_internal_security_q248_img1.webp" alt="Strategies for Effective Border Management" /></p>
+**Strategies for Effective Border Management:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q248_img1.webp" alt="Strategies for Effective Border Management" /></p>
 
 - **Infrastructure Deficiencies:** Lack of adequate infrastructure like roads, fencing, and surveillance equipment hinders effective border patrolling and monitoring.
 
@@ -41885,7 +41885,7 @@ Despite the challenges, effective border management is attainable through strate
 
 India's **15,106 km** land border with seven neighbors presents complex security challenges. Recent **Galwan clashes (2020)** and ongoing **cross-border terrorism** highlight the critical importance of robust border management strategies.
 
-<p align="center"><img src="images/superkalam_gs3_q181_img1.png" alt="India's Border Terrains and Challenges Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q181_img1.png" alt="India's Border Terrains and Challenges Map" /></p>
 
 India's Border Terrains and Challenges Map
 
@@ -42128,7 +42128,7 @@ Addressing the challenge of illegal trans-border migration requires a nuanced, m
 
 Illegal trans-border migration has emerged as a critical security challenge for India, with **2,601 apprehensions** recorded in 2024 along porous borders. This phenomenon threatens national security through demographic alterations, criminal infiltration, and resource strain.
 
-<p align="center"><img src="images/superkalam_gs3_q228_img1.png" alt="India Border Map with Neighboring Countries" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q228_img1.png" alt="India Border Map with Neighboring Countries" /></p>
 
 India Border Map with Neighboring Countries
 
@@ -42261,7 +42261,7 @@ Managing India’s porous borders is crucial to addressing its internal security
 
 **Narcoterrorism** has emerged as a critical national security challenge, representing the dangerous convergence of drug trafficking and terrorism financing across India.
 
-<p align="center"><img src="images/superkalam_gs3_q25_img1.png" alt="Map of Golden Crescent and Triangle" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q25_img1.png" alt="Map of Golden Crescent and Triangle" /></p>
 
 Map of Golden Crescent and Triangle
 
@@ -42271,7 +42271,7 @@ Map of Golden Crescent and Triangle
 
 - **Golden Crescent Proximity**: India's location between the **Golden Crescent** (Afghanistan-Pakistan-Iran) and **Golden Triangle** (Myanmar-Thailand-Laos) makes it a transit route for international drug trafficking
 
-<p align="center"><img src="images/superkalam_gs3_q17_img2.jpg" alt="Golden Crescent and Golden Triangle" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q17_img2.jpg" alt="Golden Crescent and Golden Triangle" /></p>
 
 Golden Crescent and Golden Triangle
 
@@ -42363,7 +42363,7 @@ Maritime security is the **"silent guardian"** of India’s economic prosperity.
 5. Silica-rich construction Sand- Estimated 745 million tons
 
 
-<p align="center"><img src="images/civilsdaily_p156_img152.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p156_img152.png" alt="Diagram" /></p>
 
 
 ### Maritime Security Challenges in India
@@ -42567,7 +42567,7 @@ India’s maritime security is the anchor of its growth and global role. With th
 
 India's **maritime trade worth $800 billion annually** faces escalating threats, with recent Houthi attacks disrupting Red Sea shipping routes affecting 12% of global trade.
 
-<p align="center"><img src="images/superkalam_gs3_q19_img1.png" alt="India's maritime security challenges and vulnerabilities" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q19_img1.png" alt="India's maritime security challenges and vulnerabilities" /></p>
 
 India's maritime security challenges and vulnerabilities
 
@@ -42669,7 +42669,7 @@ Integrated maritime security and proactive naval diplomacy will ensure the India
 - **Project 75I**- for more indigenous scorpian class submarine
 
 
-<p align="center"><img src="images/civilsdaily_p152_img149.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p152_img149.png" alt="Diagram" /></p>
 
 
 ### Procedural Initiatives
@@ -42972,7 +42972,7 @@ The IMO’s decision to shift the piracy high-risk area’s longitudinal marking
 
 The IMO's 2012 decision to extend the piracy high-risk zone from 65°E to 78°E significantly expanded maritime security challenges for India, bringing critical sea lanes closer to Indian territorial waters under threat assessment.
 
-<p align="center"><img src="images/superkalam_gs3_q230_img1.png" alt="Arabian Sea and Western India Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q230_img1.png" alt="Arabian Sea and Western India Map" /></p>
 
 Arabian Sea and Western India Map
 
@@ -43168,7 +43168,7 @@ The **Digital Personal Data Protection Act, 2023,** promises to robustly safegua
 
 The **Digital Personal Data Protection Act, 2023** represents India's first comprehensive data protection legislation, enacted on **August 11, 2023** after receiving Presidential assent. This landmark Act addresses the urgent need for robust data privacy regulations in India's rapidly digitizing economy.
 
-<p align="center"><img src="images/superkalam_gs3_q21_img1.png" alt="Data protection board structure in India" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q21_img1.png" alt="Data protection board structure in India" /></p>
 
 Data protection board structure in India
 
@@ -43183,7 +43183,7 @@ Data protection board structure in India
 
 ### **Legislative Journey**
 
-<p align="center"><img src="images/superkalam_gs3_q21_img2.jpg" alt="Evolution of Digital Personal Data Protection Act" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q21_img2.jpg" alt="Evolution of Digital Personal Data Protection Act" /></p>
 
 Evolution of Digital Personal Data Protection Act
 
@@ -43410,7 +43410,7 @@ Some of the Important Strengths and Weakness of the Report:
 
 Recent cyber frauds affecting **3.6 million Indians in 2024** with losses of **Rs 22,845 crore** highlight the urgent need for robust data protection. The **Justice B.N. Srikrishna Committee Report (2018)** provides a comprehensive framework for personal data protection in India's digital ecosystem.
 
-<p align="center"><img src="images/superkalam_gs3_q144_img1.png" alt="Data Protection Architecture Triangular Framework Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q144_img1.png" alt="Data Protection Architecture Triangular Framework Diagram" /></p>
 
 Data Protection Architecture Triangular Framework Diagram
 
@@ -43652,7 +43652,7 @@ Thus, with the changing nature of cybercrimes, India has also made efforts at me
 - **Increasing Cyber Threats:** The rise in internet usage amplifies the risk of cyberattacks, affecting individuals, businesses, and government infrastructure.
 - **Infrastructure Vulnerabilities:** The security of critical infrastructure can be compromised due to outdated systems and lack of proper security measures. **India’s National Cyber Security Strategy:**
 
-**Extent:** India’s Cyber Security Strategy **aims to address cyber threats and safeguard digital infrastructure, fostering international cooperation, capacity building, and cyber hygiene education.** <p align="center"><img src="images/pw_internal_security_q692_img1.webp" alt="cyber hygiene education" /></p> **Achievements:**
+**Extent:** India’s Cyber Security Strategy **aims to address cyber threats and safeguard digital infrastructure, fostering international cooperation, capacity building, and cyber hygiene education.** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q692_img1.webp" alt="cyber hygiene education" /></p> **Achievements:**
 
 **Extent:** India’s Cyber Security Strategy **aims to address cyber threats and safeguard digital infrastructure, fostering international cooperation, capacity building, and cyber hygiene education.**  **Achievements:**
 - **Secure Cyber Ecosystem:** The Policy has enhanced cybersecurity by conforming to international standards and strengthening legal frameworks.
@@ -44045,7 +44045,7 @@ To counter the Cyber security threats India needs to focus not just on defensive
 
 India faces escalating cross-border cyber threats as digital transformation accelerates, requiring comprehensive defensive strategies to safeguard national security and critical infrastructure.
 
-<p align="center"><img src="images/superkalam_gs3_q96_img1.png" alt="India's Cyber Security Institutional Framework Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q96_img1.png" alt="India's Cyber Security Institutional Framework Flowchart" /></p>
 
 India's Cyber Security Institutional Framework Flowchart
 
@@ -44258,7 +44258,7 @@ One of the highest numbers of cyber threats have been detected in India, and the
 - **Malware:** Malicious software, including viruses and ransomware, can cause widespread damage.
 - **Cyber Terrorism:** Acts of terrorism executed through the digital medium.
 
-<p align="center"><img src="images/pw_internal_security_q493_img1.webp" alt="cyber crime against women" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q493_img1.webp" alt="cyber crime against women" /></p>
 
 **To combat cyber crime, several measures are imperative:**
 - **Public Awareness:** Regularly disseminate information on new types of cyber crimes and prevention measures, much like Kerala Police’s Cyberdome project.
@@ -44289,7 +44289,7 @@ Cyber crime represents a significant threat in our interconnected world, capable
 
 India witnessed a **137% surge** in cybercrimes in 2023, with financial losses exceeding **₹10,319 crore**, highlighting the urgent need for comprehensive cybersecurity measures.
 
-<p align="center"><img src="images/superkalam_gs3_q105_img1.png" alt="Classification of Cybercrimes hierarchical flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q105_img1.png" alt="Classification of Cybercrimes hierarchical flowchart" /></p>
 
 Classification of Cybercrimes hierarchical flowchart
 
@@ -44453,7 +44453,7 @@ The Cyber Dome Project, with its multi-pronged approach towards cyber threats, h
 
 The **CyberDome Project**, initiated by Kerala Police in 2017, represents India's first comprehensive cybersecurity ecosystem integrating public-private partnerships to combat evolving cyber threats through advanced technology and collaborative intelligence sharing.
 
-<p align="center"><img src="images/superkalam_gs3_q140_img1.png" alt="CyberDome Project hub and spoke framework" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q140_img1.png" alt="CyberDome Project hub and spoke framework" /></p>
 
 CyberDome Project hub and spoke framework
 
@@ -44546,7 +44546,7 @@ NASSCOM and DSCI Cyber security Task Force have also launched a roadmap to devel
 - **Data Theft:** Cyber-attacks can result in breaches of personal and sensitive data, infringing upon individual privacy and potentially leading to identity theft or fraud. For example, the 2021 data breach at Air India, affecting 4.5 million customers worldwide, illustrates the risks of data theft.
 - **Disruption of Public Services:** Attacks on government systems can disrupt public services, causing inconvenience and potential chaos. F **or example, the 2020 cyberattack on the Ministry of Health** disrupted crucial public services amidst the COVID-19 pandemic.
 
-<p align="center"><img src="images/pw_internal_security_q322_img1.webp" alt="cyberspace" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q322_img1.webp" alt="cyberspace" /></p>
 
 **Security Framework to Prevent Cyber-attacks:**
 - **Legislative Measures:** The Information Technology Act, 2000 provides a legal framework to address cybercrimes. However, constant updates are required to keep pace with evolving cyber threats.
@@ -44665,7 +44665,7 @@ A multi-layered cybersecurity approach combining regulatory frameworks, technolo
 
 **In contemporary times, warfare is no longer confined to traditional battlefields.** The digital realm has emerged as the ‘Fourth Front’ of warfare – a domain where nations engage in cyber warfare. **This term refers to the strategic use of digital attacks by one nation-state against another, intending to disrupt, damage, or gain unauthorized access to critical infrastructures, computer systems, data, and networks, thereby causing substantial harm to the economy, security, and military capabilities.**
 
-<p align="center"><img src="images/pw_internal_security_q18_img1.webp" alt="traditional battlefields" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q18_img1.webp" alt="traditional battlefields" /></p>
 
 ### Body
 
@@ -44674,7 +44674,7 @@ A multi-layered cybersecurity approach combining regulatory frameworks, technolo
   - **For example, the reported breach in 2020 where personal details of 2.9 crore Indians were allegedly sold on the dark web, highlighting the severity of such threats.**
 - **Attacks on Critical Infrastructure:** India’s critical infrastructures are becoming increasingly vulnerable to cyber-attacks.
 
-- **For instance, in 2020, the power system in Mumbai faced an unexpected blackout, which, as per reports, was a suspected cyber-attack.:** <p align="center"><img src="images/pw_internal_security_q18_img2.webp" alt="critical information infrastructure" /></p>
+- **For instance, in 2020, the power system in Mumbai faced an unexpected blackout, which, as per reports, was a suspected cyber-attack.:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q18_img2.webp" alt="critical information infrastructure" /></p>
 
 - **For instance, in 2020, the power system in Mumbai faced an unexpected blackout, which, as per reports, was a suspected cyber-attack.:** 
 - **Cyber Espionage:** India has been a target of numerous state-sponsored cyber-espionage attacks.
@@ -44711,7 +44711,7 @@ While India has made strides in strengthening its cyber warfare preparedness, th
 
 Cyberwarfare has emerged as a dominant security threat, with defense analysts ranking it above traditional terrorism due to its potential to cripple entire nations through digital attacks on critical infrastructure and economic systems.
 
-<p align="center"><img src="images/superkalam_gs3_q243_img1.png" alt="India's Cyber Security Architecture Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q243_img1.png" alt="India's Cyber Security Architecture Flowchart" /></p>
 
 India's Cyber Security Architecture Flowchart
 
@@ -44843,7 +44843,7 @@ originator"
 2. Initiatives like **Cyber Swachhta Kendra** and the **1930 Helpline** promote "Digital Hygiene."
 
 
-<p align="center"><img src="images/civilsdaily_p146_img144.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p146_img144.png" alt="Diagram" /></p>
 
 
 ### Suggested Remedies to Address the Problem
@@ -44930,7 +44930,7 @@ The **proliferation of social media and encrypted messaging services** has revol
 
 **Other Remedies:**
 
-<p align="center"><img src="images/internal_security_q7_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/internal_security_q7_img1.png" alt="Image" /></p>
 
 ### Conclusion
 
@@ -44991,7 +44991,7 @@ Social media **and** encrypted messaging services **have fundamentally transform
 
 The rise of social media platforms and encrypted messaging services has created unprecedented security challenges, with over 43,797 complaints filed against WhatsApp alone in early 2024, highlighting the urgent need for comprehensive digital security measures.
 
-<p align="center"><img src="images/superkalam_gs3_q30_img1.png" alt="Secure Digital Ecosystem Pillar" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q30_img1.png" alt="Secure Digital Ecosystem Pillar" /></p>
 
 Secure Digital Ecosystem Pillar
 
@@ -45083,7 +45083,7 @@ Send To My Bookmarks
 - **Spreading Propaganda:** Social media has been a tool for disseminating extremist ideologies, fake news, and hate speech.
   - **Incidents like the Panchkula violence in India were exacerbated due to the spread of misinformation on social media.**
 
-- **Coordination of Activities:** Non-state actors have used encrypted communication to plan and coordinate attacks and subversive activities, **as observed in the Paris attacks of 2015.** <p align="center"><img src="images/pw_internal_security_q299_img1.webp" alt="Misuses of Internet and Social Media" /></p>
+- **Coordination of Activities:** Non-state actors have used encrypted communication to plan and coordinate attacks and subversive activities, **as observed in the Paris attacks of 2015.** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q299_img1.webp" alt="Misuses of Internet and Social Media" /></p>
 
 - **Coordination of Activities:** Non-state actors have used encrypted communication to plan and coordinate attacks and subversive activities, **as observed in the Paris attacks of 2015.** 
 
@@ -45115,7 +45115,7 @@ While the misuse of internet and social media by non-state actors poses a signif
 
 The internet and social media have become primary vectors for non-state actors to conduct subversive activities, threatening national security and social cohesion across democratic societies.
 
-<p align="center"><img src="images/superkalam_gs3_q194_img1.png" alt="Misuse of Social Media by Non State" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q194_img1.png" alt="Misuse of Social Media by Non State" /></p>
 
 Misuse of Social Media by Non State
 
@@ -45200,7 +45200,7 @@ Addressing online subversive activities requires balancing security imperatives 
 **ISIS and Its Mission:**
 - **ISIS (Islamic State of Iraq and Syria), also known as ISIL or Daesh,:** is a radical Islamist group that gained global prominence in 2014 when it drove Iraqi government forces out of key cities in its quest to establish a caliphate in the region.
 
-- **Its mission is to establish an ultra-conservative, Sunni Islamic state that rejects all political, social, and religious constructs viewed as un-Islamic.:** <p align="center"><img src="images/pw_internal_security_q212_img1.webp" alt="communal violence" /></p>
+- **Its mission is to establish an ultra-conservative, Sunni Islamic state that rejects all political, social, and religious constructs viewed as un-Islamic.:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q212_img1.webp" alt="communal violence" /></p>
 
 - **Its mission is to establish an ultra-conservative, Sunni Islamic state that rejects all political, social, and religious constructs viewed as un-Islamic.:** 
 
@@ -45328,7 +45328,7 @@ The persistent ISIS threat demands continuous adaptation of security strategies 
 - **Identity Theft:** SNS have increased the risk of identity theft.
 - **For example, the Pune Cyber Crime Cell’s investigation in 2020,:** where a criminal used LinkedIn to impersonate a company HR, thereby luring and defrauding job seekers.
 
-<p align="center"><img src="images/pw_internal_security_q85_img1.webp" alt="Social Networking Sites (SNS)" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q85_img1.webp" alt="Social Networking Sites (SNS)" /></p>
 
 - **Spread of Misinformation:** WhatsApp and Facebook have become channels for spreading misinformation.
   - **During the COVID-19 pandemic, these platforms witnessed a surge of misleading information about the virus in India, causing panic and confusion.**
@@ -45363,7 +45363,7 @@ While social networking sites have transformed communication and social interact
 
 Social networking sites are online platforms enabling users to create profiles, share content, and connect with others through digital communities. With **India having 462 million active social media users** as of 2024, these platforms have become integral to modern communication and information sharing.
 
-<p align="center"><img src="images/superkalam_gs3_q257_img1.png" alt="Security Implications of Social Networks" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q257_img1.png" alt="Security Implications of Social Networks" /></p>
 
 Security Implications of Social Networks
 
@@ -45484,7 +45484,7 @@ Therefore, there is need for comprehensive police reforms and efficient criminal
 - **Social Media Misinformation:** The spread of rumors and fake news through social media platforms can incite people and lead to mob violence. For example, 2018 WhatsApp lynchings in India, where baseless rumors of child kidnapping triggered several deadly mob violence incidents.
 - **Weak Law Enforcement:** Sometimes, the inability or reluctance of law enforcement agencies to act swiftly and decisively allows such situations to escalate. For example, the 2013 Muzaffarnagar riots in Uttar Pradesh.
 
-<p align="center"><img src="images/pw_internal_security_q212_img1.webp" alt="communal violence" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q212_img1.webp" alt="communal violence" /></p>
 
 **Consequences:**
 - **Loss of Lives and Property:** The immediate consequence is often the loss of lives and damage to property.
@@ -45627,7 +45627,7 @@ Addressing mob violence requires strengthening **community policing**, enhancing
 7. **Drug Trafficking-Cybercrime Nexus**- Eg- Use of **encrypted messaging apps and crypto wallets** for narcotics trade.
 
 
-<p align="center"><img src="images/civilsdaily_p133_img140.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p133_img140.png" alt="Diagram" /></p>
 
 
 ### Measures to Counter Narco-Terrorism
@@ -45702,7 +45702,7 @@ This drug problem is a serious menace giving impetus to various other crimes, so
 
 India's strategic location between the **Golden Crescent** (Afghanistan-Pakistan-Iran) and **Golden Triangle** (Myanmar-Thailand-Laos) makes it vulnerable to drug trafficking and associated crimes.
 
-<p align="center"><img src="images/superkalam_gs3_q152_img1.png" alt="Map of India and Neighboring Countries" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q152_img1.png" alt="Map of India and Neighboring Countries" /></p>
 
 Map of India and Neighboring Countries
 
@@ -45794,7 +45794,7 @@ As per **UNODC**, money laundering costs around **2-5% of global GDP**($2 to $5.
 7. **DeFi Platforms -** use mixers, decentralized exchanges (DEXs), and cross-chain bridges to obscure the origins of illicit funds. Eg- internationally sanctioned Tornado Cash
 
 
-<p align="center"><img src="images/civilsdaily_p135_img142.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p135_img142.png" alt="Diagram" /></p>
 
 
 ### Impact of Globalisation on Money Laundering
@@ -45910,7 +45910,7 @@ Money Laundering is a global menace which require global effort to curb it. Both
 - **Cryptocurrency:** Anonymity of transactions in cryptocurrencies like Bitcoin is often exploited for money laundering, for example in the 2020 Twitter Bitcoin scam.
 - **Digital Payment Systems:** Globalized digital payment systems can be misused for transferring illicit funds across borders, for example, in the Wirecard scandal.
 
-- **Offshore Banking:** Globalization has facilitated easier access to offshore banking, often used to hide illicit funds, **for example, the revelations from the Panama Papers.** <p align="center"><img src="images/pw_internal_security_q582_img1.webp" alt="Globalization to Money Laundering" /></p>
+- **Offshore Banking:** Globalization has facilitated easier access to offshore banking, often used to hide illicit funds, **for example, the revelations from the Panama Papers.** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q582_img1.webp" alt="Globalization to Money Laundering" /></p>
 
 - **Offshore Banking:** Globalization has facilitated easier access to offshore banking, often used to hide illicit funds, **for example, the revelations from the Panama Papers.** 
 
@@ -45998,7 +45998,7 @@ Money laundering poses a threat to the economic integrity of the country, hence 
 
 Recent data shows global money laundering accounts for **2-5% of global GDP ($800 billion-$2 trillion annually)**, with emerging technologies and globalization creating sophisticated channels for illicit financial flows.
 
-<p align="center"><img src="images/superkalam_gs3_q87_img1.png" alt="2021 Money Laundering Process Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q87_img1.png" alt="2021 Money Laundering Process Flowchart" /></p>
 
 2021 Money Laundering Process Flowchart
 
@@ -46085,7 +46085,7 @@ Effective anti-money laundering requires **continuous adaptation** to technologi
 - **Enhancing Surveillance and Intelligence:** Improve surveillance systems, and bolster the capabilities of organizations like the Enforcement Directorate (ED) and Financial Intelligence Unit (FIU-IND).
 - **International Cooperation:** Enhance cooperation with international bodies **like Financial Action Task Force (FATF)** and share intelligence with other nations to prevent cross-border money laundering.
 
-- **Promoting Financial Transparency:** Encourage the use of formal banking channels, **implement Know Your Customer (KYC) norms effectively, and promote digital transactions to increase transparency and traceability.** <p align="center"><img src="images/pw_internal_security_q45_img1.webp" alt="FATF's" /></p>
+- **Promoting Financial Transparency:** Encourage the use of formal banking channels, **implement Know Your Customer (KYC) norms effectively, and promote digital transactions to increase transparency and traceability.** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q45_img1.webp" alt="FATF's" /></p>
 
 - **Promoting Financial Transparency:** Encourage the use of formal banking channels, **implement Know Your Customer (KYC) norms effectively, and promote digital transactions to increase transparency and traceability.** 
 
@@ -46111,7 +46111,7 @@ While money laundering poses a serious threat to India’s economic sovereignty,
 
 Recent data shows India loses approximately **₹1.3 lakh crore annually** to money laundering, threatening the nation's economic sovereignty. Money laundering involves converting illegally obtained funds into legitimate assets through complex financial transactions.
 
-<p align="center"><img src="images/superkalam_gs3_q253_img1.png" alt="Money Laundering's Three Stages Flowchart" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q253_img1.png" alt="Money Laundering's Three Stages Flowchart" /></p>
 
 Money Laundering's Three Stages Flowchart
 
@@ -46229,10 +46229,10 @@ LWE refers to violent insurgency driven by **Maoist or Naxalite ideologies,** wi
 4. **Panchayat Extension To Scheduled Areas Act (PESA) and Forest Rights Act 2006** for strengthening tribal self-governance
 
 
-<p align="center"><img src="images/civilsdaily_p124_img136.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p124_img136.png" alt="Diagram" /></p>
 
 
-<p align="center"><img src="images/civilsdaily_p124_img137.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p124_img137.png" alt="Diagram" /></p>
 
 
 ### Progress anchored in justice and inclusion is the best antidote to extremism.
@@ -46324,7 +46324,7 @@ Left Wing Extremism ( **LWE** ), or **naxalism**, is a Maoist-inspired insurgenc
 - **Financial and Social Inclusion Infrastructure:** Efforts include the opening of more than *~5500 post offices, 1,007 bank branches, 49 skill centres,* and *178 Eklavya Model Residential Schools* to boost education and livelihoods.
 - **Civic Outreach Programmes:** Through **Civic Action Programmes (CAP)** and Tribal Youth Exchange Programs, the government promotes trust-building and social integration between security forces and local tribal communities.
 
-<p align="center"><img src="images/pw_internal_security_q921_img1.jpg" alt="Picture2 1" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q921_img1.jpg" alt="Picture2 1" /></p>
 
 | **Fig: Reduction in LWE impact in India. (Source: PIB)** |
 | --- |
@@ -46352,7 +46352,7 @@ Recent MHA data shows **85% decline in LWE violence** since 2010, with affected 
 
 ## Understanding Left Wing Extremism
 
-<p align="center"><img src="images/superkalam_gs3_q15_img1.png" alt="India Red Corridor LWE Affected Region" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q15_img1.png" alt="India Red Corridor LWE Affected Region" /></p>
 
 India Red Corridor LWE Affected Region
 **LWE refers to violent insurgency** by Maoist groups seeking to overthrow the state through armed revolution, exploiting socio-economic grievances in tribal areas.
@@ -46492,10 +46492,10 @@ LWE refers to violent insurgency driven by **Maoist or Naxalite ideologies,** wi
     - b. **Promotion of Tribal-Start-up Ecosystem in food processing - Eg- export of products like Mahua and wild honey**
 
 
-<p align="center"><img src="images/civilsdaily_p123_img134.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p123_img134.png" alt="Diagram" /></p>
 
 
-<p align="center"><img src="images/civilsdaily_p123_img135.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p123_img135.png" alt="Diagram" /></p>
 
 
 ### **Governance level**
@@ -46637,7 +46637,7 @@ India has made little success tackling Naxalism, but the root causes have not be
 | **Examples:** ● **Operation Green Hunt,** a large-scale operation against Naxals, demonstrated an increase in security measures. ● **The Integrated Action Plan (IAP)** for development in Naxal-hit areas addresses the development gap. ● **The Andhra Pradesh model successfully incorporated a combination of security,** development measures, and political engagement. |
 | --- |
 
-**Extent:** India’s Cyber Security Strategy **aims to address cyber threats and safeguard digital infrastructure, fostering international cooperation, capacity building, and cyber hygiene education.** <p align="center"><img src="images/pw_internal_security_q692_img1.webp" alt="cyber hygiene education" /></p> **Achievements:**
+**Extent:** India’s Cyber Security Strategy **aims to address cyber threats and safeguard digital infrastructure, fostering international cooperation, capacity building, and cyber hygiene education.** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q692_img1.webp" alt="cyber hygiene education" /></p> **Achievements:**
 
 ### Conclusion
 
@@ -46801,7 +46801,7 @@ LWE refers to violent insurgency driven by **Maoist or Naxalite ideologies,** wi
 
 1. **Naxal-affected districts slashed from 126 (2014) to only 11 (2025)**, with most-affected districts down from 36 to just 3.
 
-<p align="center"><img src="images/civilsdaily_p120_img130.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p120_img130.png" alt="Diagram" /></p>
 
 2. **In 2025 alone, 317 Naxals neutralised** (including top leadership), 800+ arrested, and nearly 2,000 surrendered.
 3. **From 2004-14 to 2014-24:**
@@ -46823,7 +46823,7 @@ LWE refers to violent insurgency driven by **Maoist or Naxalite ideologies,** wi
 1. **Operation Black Forest -** killing 27 Naxals, including the **top Maoist leader Nambala Keshav Rao**.
 2. **Specialised Forces -** Eg- **Greyhounds** in Andhra Pradesh and the **Bastariya Battalion** in Chhattisgarh.
 
-<p align="center"><img src="images/civilsdaily_p120_img131.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p120_img131.png" alt="Diagram" /></p>
 
 3. **Naxal’s Financial Choking -** Eg- NIA that seized assets worth over ₹40 crore, and the Enforcement Directorate attached ₹12 crore.
 4. **Security Related Expenditure (SRE) and Special Infrastructure Scheme (SIS)** for strengthening State Special Forces and Special Intelligence Branches.
@@ -46906,7 +46906,7 @@ The Government's approach is to deal with Left Wing Extremism in a holistic mann
 
 **who lost their lives in LWE incidents has dropped by 90% to 98 in 2022, compared to 1005 in 2010.**
 
-- **The number of LWE-affected districts has also halved, down to 45 from 90.:** <p align="center"><img src="images/pw_internal_security_q419_img1.webp" alt="Extremism " /></p>
+- **The number of LWE-affected districts has also halved, down to 45 from 90.:** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q419_img1.webp" alt="Extremism " /></p>
 
 - **The number of LWE-affected districts has also halved, down to 45 from 90.:** 
 
@@ -46949,7 +46949,7 @@ The progress achieved in curbing LWE underscores the efficacy of India’s multi
 
 Efficient irrigation management is crucial for India's agricultural productivity and water security. The country faces several challenges in its irrigation infrastructure, impacting both agricultural output and sustainable water usage.
 
-<p align="center"><img src="images/superkalam_gs3_q34_img1.png" alt="PMKSY and its associated components" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q34_img1.png" alt="PMKSY and its associated components" /></p>
 
 PMKSY and its associated components
 
@@ -47159,7 +47159,7 @@ The non-implementation of the Fifth Schedule provisions has inadvertently contri
 
 The constitutional provisions under Article 244's Fifth Schedule create a protective framework for tribal areas, but their inadequate implementation has inadvertently contributed to conditions favorable for Left Wing Extremism growth.
 
-<p align="center"><img src="images/superkalam_gs3_q242_img1.png" alt="Non Implementation of the 5th Schedule" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q242_img1.png" alt="Non Implementation of the 5th Schedule" /></p>
 
 Non Implementation of the 5th Schedule
 
@@ -47252,7 +47252,7 @@ Eg- proximity to **Golden Traingle**
     - c. **Myanmar -** destabilised border post **‘Spring Revolution’**
 
 
-<p align="center"><img src="images/civilsdaily_p125_img138.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p125_img138.png" alt="Diagram" /></p>
 
 
 ### Map of major peace accords
@@ -47300,7 +47300,7 @@ Peace in the North-East requires a **multipronged approach** involving negotiate
 
 The North-Eastern region of India, consisting of eight states (the Seven Sister States and Sikkim), is marked by its distinct geographical and cultural identity. Sharing borders with China, Nepal, Bhutan, Bangladesh, and Myanmar, this region holds strategic significance. However, the region has been subjected to several internal security challenges, the latest among them is violence between the Meitei and Kuki-Zo communities. Since May 2023, Manipur has witnessed violent clashes between the Meitei and Kuki-Zo communities, leading to over 250 deaths and the displacement of more than 60,000 people, fueled by ethnic, land, and political tensions.
 
-<p align="center"><img src="images/internal_security_q3_img1.png" alt="Image" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/drishti%20ias/images/internal_security_q3_img1.png" alt="Image" /></p>
 
 ### Body
 
@@ -47406,7 +47406,7 @@ The Government can add **citizen-centric policing** and **fast-track justice** f
 
 The **2023-24 Manipur ethnic violence** and cross-border infiltration have intensified Northeast India's security challenges despite multiple peace accords signed in the past decade.
 
-<p align="center"><img src="images/superkalam_gs3_q17_img1.png" alt="Northeast India Agreements and Border Settlements" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q17_img1.png" alt="Northeast India Agreements and Border Settlements" /></p>
 
 Northeast India Agreements and Border Settlements
 
@@ -47425,7 +47425,7 @@ Northeast India Agreements and Border Settlements
 - **1,643 km porous international border** with Myanmar, Bangladesh, and China.
 - Illegal arms trafficking through **Golden Triangle** drug routes.
 
-<p align="center"><img src="images/superkalam_gs3_q17_img2.jpg" alt="Golden Crescent and Golden Triangle" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q17_img2.jpg" alt="Golden Crescent and Golden Triangle" /></p>
 
 Golden Crescent and Golden Triangle
 - Cross-border movement of **ARSA militants** from Myanmar.
@@ -47828,7 +47828,7 @@ India has adopted security, developmental, and diplomatic measures against terro
 
 Ranked **14th** in the **Global Terrorism Index 2025**, India has drastically reduced terror incidents since 2019 through resolute state action.
 
-<p align="center"><img src="images/superkalam_gs3_q13_img1.png" alt="India's terrorism and insurgency map illustration" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q13_img1.png" alt="India's terrorism and insurgency map illustration" /></p>
 
 India's terrorism and insurgency map illustration
 
@@ -47888,7 +47888,7 @@ India must now address the **FATF’s** concern over pending terror-financing tr
 8. **Maritime security concerns**- drugs worth over ₹11000 crore were seized from seaports in last 5 years.
 
 
-<p align="center"><img src="images/civilsdaily_p131_img139.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p131_img139.png" alt="Diagram" /></p>
 
 
 ### Measures to Counter Narco-Terrorism
@@ -48000,7 +48000,7 @@ Effectively countering narco-terrorism requires strengthening law enforcement, a
 
 India's internal security challenges are intricately linked with border management, as the country's **15,106 km land borders** with seven neighbors create multiple vulnerabilities that directly impact domestic security.
 
-<p align="center"><img src="images/superkalam_gs3_q250_img1.png" alt="Outline Map of India and Neighbors" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q250_img1.png" alt="Outline Map of India and Neighbors" /></p>
 
 Outline Map of India and Neighbors
 
@@ -48178,9 +48178,9 @@ Though the government approach is to restore peace, stability, and development i
 - **Positive Media Narratives:** Community radio stations have risen as a powerful tool in shaping positive narratives, **fostering community development through programs** that encourage unity and highlight the rich cultural tapestry of the region.
 - **Connectivity Initiatives:** To enhance information flow and connectivity, the government embarked on infrastructural developments, **such as the installation of broadband and mobile networks,** connecting the once isolated areas and created opportunities for local people.
 
-<p align="center"><img src="images/pw_internal_security_q654_img1.webp" alt="Types of Organized Crime" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q654_img1.webp" alt="Types of Organized Crime" /></p>
 
-* **<p align="center"><img src="images/pw_internal_security_q654_img2.webp" alt="terrorists and organized crime " /></p>:**
+* **<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q654_img2.webp" alt="terrorists and organized crime " /></p>:**
 
 ### Conclusion
 
@@ -48255,7 +48255,7 @@ To further bring peace in J&K government should follow a two-track strategy of b
 
 Terrorism in Jammu & Kashmir (J&K) is not just a law-and-order issue but a **complex socio-political conflict**, requiring both hard and soft approaches. Winning the **"hearts and minds"** (WHAM) of the local population is critical to reducing alienation, countering radicalisation, and promoting long-term peace.
 
-<p align="center"><img src="images/superkalam_gs3_q60_img1.png" alt="Winning Hearts & Minds in J&K" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q60_img1.png" alt="Winning Hearts & Minds in J&K" /></p>
 
 Winning Hearts & Minds in J&K
 
@@ -48608,7 +48608,7 @@ The security threat posed by External state and Non - State actors is complex an
 
 India faces unprecedented internal security challenges from sophisticated external actors requiring comprehensive counter-strategies and technological modernization.
 
-<p align="center"><img src="images/superkalam_gs3_q82_img1.png" alt="India's External Security Threats Outline Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q82_img1.png" alt="India's External Security Threats Outline Map" /></p>
 
 India's External Security Threats Outline Map
 
@@ -48904,7 +48904,7 @@ Thus a multi-pronged approach is required which focuses on strengthening securit
 
 Terrorism has evolved into a multifaceted global threat with unprecedented complexity. Modern terror networks demonstrate sophisticated operational capabilities, leveraging technology and cross-border linkages to maximize destructive impact.
 
-<p align="center"><img src="images/superkalam_gs3_q81_img1.png" alt="Terrorism network and connected surrounding elements" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q81_img1.png" alt="Terrorism network and connected surrounding elements" /></p>
 
 Terrorism network and connected surrounding elements
 
@@ -49068,7 +49068,7 @@ However, Misuse of the legal provision in the random booking of youth on mere su
 
 The recent banning of Jamaat-e-Islami in J&K highlighted the critical threat posed by over-ground workers (OGWs) who form the backbone of terrorist operations while maintaining civilian facades.
 
-<p align="center"><img src="images/superkalam_gs3_q135_img1.png" alt="Over Ground Workers Hub and Spoke" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q135_img1.png" alt="Over Ground Workers Hub and Spoke" /></p>
 
 Over Ground Workers Hub and Spoke
 
@@ -49154,7 +49154,7 @@ The **CPEC** is a flagship connectivity and infrastructure project linking **Chi
 
 1. **Violation of Sovereignty -** CPEC passes through **Pakistan-occupied Kashmir (PoK)**. Eg- Infrastructure projects in **Gilgit-Baltistan**.
 
-<p align="center"><img src="images/civilsdaily_p134_img141.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p134_img141.png" alt="Diagram" /></p>
 
 
 2. **Strategic Encirclement Concerns (String of Pearls)**- Eg-Chinese control and presence at **Gwadar port**.
@@ -49223,7 +49223,7 @@ However, it should also be noted that India's concerns regarding sovereignty and
 
 The China-Pakistan Economic Corridor (CPEC) is a flagship infrastructure project launched in 2015 as part of China's **Belt and Road Initiative (BRI)**, with investments exceeding **$62 billion** for Pakistan's economic development.
 
-<p align="center"><img src="images/superkalam_gs3_q155_img1.png" alt="Northwestern India Pakistan and China Map" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q155_img1.png" alt="Northwestern India Pakistan and China Map" /></p>
 
 Northwestern India Pakistan and China Map
 
@@ -49346,7 +49346,7 @@ While ‘Hot Pursuit’ and ‘Surgical Strikes’ can be effective military res
 
 India's adoption of 'Hot Pursuit' and 'Surgical Strikes' represents a paradigm shift from defensive to proactive counter-terrorism strategy, demonstrating resolve while maintaining strategic restraint.
 
-<p align="center"><img src="images/superkalam_gs3_q193_img1.png" alt="Home Territory Divided by Border Line" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q193_img1.png" alt="Home Territory Divided by Border Line" /></p>
 
 Home Territory Divided by Border Line
 
@@ -49440,7 +49440,7 @@ Competition over establishing their ideologies all around the world has also ins
 - **Technological Advancement and Reach:** Technology, especially the internet, has allowed terror groups, like ISIS, to reach a wider audience, thus expanding their influence. In India, groups like Indian Mujahideen have used the internet for recruitment and propaganda.
 - **Financing and Profit-making:** Terrorism in India, like elsewhere, has evolved into a self-financing enterprise. Activities like drug trafficking, money laundering, and illicit trade are employed by these groups for fund generation, adding an economic dimension to their operations.
 
-<p align="center"><img src="images/pw_internal_security_q289_img1.webp" alt="Terrorism" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q289_img1.webp" alt="Terrorism" /></p>
 
 - **Competition Among Groups:** The rise of multiple terror outfits with different ideologies, objectives, and areas of operation within India has led to competition for resources, recruits, and prominence, thereby intensifying the complexity of the terrorism “industry.”
 - **State-Sponsored Terrorism:** India has also been a victim of state-sponsored terrorism, where certain countries allegedly support terror groups to further their strategic interests, adding an additional layer of competitiveness and complexity.
@@ -49467,7 +49467,7 @@ Indeed, terrorism has evolved into a form of “competitive industry” in India
 
 Terrorism has evolved from ideologically driven violence to a sophisticated **competitive industry** with complex financial networks, recruitment strategies, and market-driven operational models.
 
-<p align="center"><img src="images/superkalam_gs3_q191_img1.png" alt="Business Model of Modern Terrorism" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q191_img1.png" alt="Business Model of Modern Terrorism" /></p>
 
 Business Model of Modern Terrorism
 
@@ -49570,7 +49570,7 @@ India’s diversity, while making it susceptible to radicalism, also offers the 
 
 Recent intelligence reports indicate that **extremist ideologies** from neighboring regions have influenced domestic radicalization, with India recording over **800 communal incidents** in 2024, threatening our pluralistic social fabric.
 
-<p align="center"><img src="images/superkalam_gs3_q237_img1.png" alt="Counter Radicalization Strategy Framework Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q237_img1.png" alt="Counter Radicalization Strategy Framework Diagram" /></p>
 
 Counter Radicalization Strategy Framework Diagram
 
@@ -49671,7 +49671,7 @@ India's multi-dimensional approach combining **technological innovation**, **com
 
 **potentially bolstering Pakistan’s military capabilities.**
 
-- **Economic Empowerment of Pakistan:** CPEC, with projects like the $2.5 billion Lahore-Karachi Motorway and the $2.1 billion Karot Hydropower Station, **could greatly uplift Pakistan’s economy and indirectly fortify its military capabilities, possibly upsetting regional power dynamics.** <p align="center"><img src="images/pw_internal_security_q100_img1.webp" alt="passes through Pok" /></p>
+- **Economic Empowerment of Pakistan:** CPEC, with projects like the $2.5 billion Lahore-Karachi Motorway and the $2.1 billion Karot Hydropower Station, **could greatly uplift Pakistan’s economy and indirectly fortify its military capabilities, possibly upsetting regional power dynamics.** <p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q100_img1.webp" alt="passes through Pok" /></p>
 
 - **Economic Empowerment of Pakistan:** CPEC, with projects like the $2.5 billion Lahore-Karachi Motorway and the $2.1 billion Karot Hydropower Station, **could greatly uplift Pakistan’s economy and indirectly fortify its military capabilities, possibly upsetting regional power dynamics.** 
 - **Strengthening Pakistan’s Industrial Capacity:** Establishment of Special Economic Zones (SEZs) like the Rashakai Economic Zone and Dhabeji Economic Zone,
@@ -49707,7 +49707,7 @@ While the China-Pakistan Economic Corridor poses security challenges for India, 
 
 The China-Pakistan Economic Corridor (CPEC), valued at $62 billion under China's Belt and Road Initiative, poses multifaceted security challenges for India through strategic encirclement and territorial implications.
 
-<p align="center"><img src="images/superkalam_gs3_q223_img1.png" alt="Map of Pakistan India China Route" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q223_img1.png" alt="Map of Pakistan India China Route" /></p>
 
 Map of Pakistan India China Route
 
@@ -49891,7 +49891,7 @@ Thus, though the changes are required to meet the prevailing security environmen
 
 The 2019 amendments to UAPA and NIA Act reflect India's evolving counter-terrorism strategy amid rising security challenges, though they have sparked significant debate over civil liberties and human rights implications.
 
-<p align="center"><img src="images/superkalam_gs3_q133_img1.png" alt="UAPA Amendments 2019 Hierarchical Flowchart Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q133_img1.png" alt="UAPA Amendments 2019 Hierarchical Flowchart Diagram" /></p>
 
 UAPA Amendments 2019 Hierarchical Flowchart Diagram
 
@@ -50115,7 +50115,7 @@ India’s internal security landscape has become increasingly **complex**, chara
 6. **Directorate of Revenue Intelligence (DRI)-** India’s premier anti-smuggling agency. Monitors trafficking of gold, firearms, and counterfeit currency (FICN). Eg- Operation Molten Metal to bust gold smuggling racket
 
 
-<p align="center"><img src="images/civilsdaily_p154_img151.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p154_img151.png" alt="Diagram" /></p>
 
 
 ### **Investigative Agencies**
@@ -50284,7 +50284,7 @@ These agencies collectively contribute to India's efforts to address and mitigat
 
 Recent insurgent activities with **37 fatalities in 2025** highlight the complex security dynamics along India's 1,643-kilometer Myanmar border. The porous nature and difficult terrain make this frontier vulnerable to multiple security threats beyond traditional insurgency.
 
-<p align="center"><img src="images/superkalam_gs3_q122_img1.png" alt="India Myanmar Border and Northeast States" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q122_img1.png" alt="India Myanmar Border and Northeast States" /></p>
 
 India Myanmar Border and Northeast States
 
@@ -50442,10 +50442,10 @@ tri-junction zones.
 4. **Community Policing -** Initiatives like **Jan Maitri**, sports outreach, and anti-propaganda programmes.
 
 
-<p align="center"><img src="images/civilsdaily_p121_img132.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p121_img132.png" alt="Diagram" /></p>
 
 
-<p align="center"><img src="images/civilsdaily_p122_img133.png" alt="Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/images/civilsdaily_p122_img133.png" alt="Diagram" /></p>
 
 
 ### Progress anchored in justice and inclusion is the best antidote to extremism.
@@ -50507,7 +50507,7 @@ For the holistic last-mile development of "New India", it is necessary to get ri
 - **Poor Governance:** Lack of effective governance and corruption often exacerbate feelings of alienation and injustice, driving people towards extremism.
 - **Illiteracy and Unemployment:** These factors, evident in Odisha, contribute to the vulnerability of individuals to extremist ideologies.
 
-<p align="center"><img src="images/pw_internal_security_q549_img1.webp" alt="left-wing extremism" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q549_img1.webp" alt="left-wing extremism" /></p>
 
 **Strategies to counter the threat:**
 - **Inclusive Development:** Initiatives like **‘Aspirational Districts Programme’** aim to address socio-economic disparities and curb extremism.
@@ -50515,7 +50515,7 @@ For the holistic last-mile development of "New India", it is necessary to get ri
 - **Negotiations and Surrender Policies:** The Government has initiated peace talks and surrender policies, like in West Bengal, to encourage extremists to return to the mainstream.
 - **Improved Governance:** Efforts to tackle corruption and enhance public service delivery can help in reducing local support for extremism.
 
-| **SAMADHAN Strategy:** The Ministry of Home Affairs developed the comprehensive SAMADHAN strategy to counter left-wing extremism. **This strategy covers multiple aspects:** <br>• **Smart Leadership:** Encourages the development of astute leaders capable of making informed decisions to address the issue strategically. <br>• **Aggressive Strategy:** Involves adopting an assertive approach to tackle extremism, including proactive security operations and robust policy measures. ![Image](images/pw_internal_security_q549_img2.webp) <br>• **Motivation and Training:** Aims to boost the morale and skills of security forces and other stakeholders to effectively deal with extremism. <br>• **Actionable Intelligence:** Enhances intelligence capabilities to preemptively detect and neutralize threats. <br>• **Dashboard-Based KPIs and KRAs:** Incorporates performance metrics to monitor progress and improve accountability. <br>• **Harnessing Technology:** Utilizes modern technology for intelligence, surveillance, and operational efficiency. <br>• **Action Plan for Each Theatre:** Recognizes the unique challenges of different regions and devises customized action plans. <br>• **No Access to Financing:** Seeks to disrupt financial networks supporting extremist activities, thereby weakening their operational capacity. |
+| **SAMADHAN Strategy:** The Ministry of Home Affairs developed the comprehensive SAMADHAN strategy to counter left-wing extremism. **This strategy covers multiple aspects:** <br>• **Smart Leadership:** Encourages the development of astute leaders capable of making informed decisions to address the issue strategically. <br>• **Aggressive Strategy:** Involves adopting an assertive approach to tackle extremism, including proactive security operations and robust policy measures. ![Image](https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q549_img2.webp) <br>• **Motivation and Training:** Aims to boost the morale and skills of security forces and other stakeholders to effectively deal with extremism. <br>• **Actionable Intelligence:** Enhances intelligence capabilities to preemptively detect and neutralize threats. <br>• **Dashboard-Based KPIs and KRAs:** Incorporates performance metrics to monitor progress and improve accountability. <br>• **Harnessing Technology:** Utilizes modern technology for intelligence, surveillance, and operational efficiency. <br>• **Action Plan for Each Theatre:** Recognizes the unique challenges of different regions and devises customized action plans. <br>• **No Access to Financing:** Seeks to disrupt financial networks supporting extremist activities, thereby weakening their operational capacity. |
 
 | **SAMADHAN Strategy:** The Ministry of Home Affairs developed the comprehensive SAMADHAN strategy to counter left-wing extremism. **This strategy covers multiple aspects:** <br>• **Smart Leadership:** Encourages the development of astute leaders capable of making informed decisions to address the issue strategically. <br>• **Aggressive Strategy:** Involves adopting an assertive approach to tackle extremism, including proactive security operations and robust policy measures.  <br>• **Motivation and Training:** Aims to boost the morale and skills of security forces and other stakeholders to effectively deal with extremism. <br>• **Actionable Intelligence:** Enhances intelligence capabilities to preemptively detect and neutralize threats. <br>• **Dashboard-Based KPIs and KRAs:** Incorporates performance metrics to monitor progress and improve accountability. <br>• **Harnessing Technology:** Utilizes modern technology for intelligence, surveillance, and operational efficiency. <br>• **Action Plan for Each Theatre:** Recognizes the unique challenges of different regions and devises customized action plans. <br>• **No Access to Financing:** Seeks to disrupt financial networks supporting extremist activities, thereby weakening their operational capacity. |
 | --- |
@@ -50542,7 +50542,7 @@ For the holistic last-mile development of "New India", it is necessary to get ri
 
 Left Wing Extremism in eastern India poses significant security challenges, requiring comprehensive understanding of root causes and multi-dimensional response strategies.
 
-<p align="center"><img src="images/superkalam_gs3_q115_img1.png" alt="Integrated Counter LWE Strategy Tree Diagram" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q115_img1.png" alt="Integrated Counter LWE Strategy Tree Diagram" /></p>
 
 Integrated Counter LWE Strategy Tree Diagram
 
@@ -50752,7 +50752,7 @@ India should endeavor to meaningfully engage with Myanmar, Bangladesh and Pakist
 - **Infiltration of Counterfeit Currency:** This act, primarily via the India-Bangladesh and India-Nepal borders, aims to destabilize India’s economy.
 - **Maritime Security Threats:** The vast coastline of India is susceptible to threats **like the landing of terrorists (26/11 attack) and smuggling of goods and people.**
 
-<p align="center"><img src="images/pw_internal_security_q487_img1.webp" alt="Security threats " /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/pwonlyias/images/pw_internal_security_q487_img1.webp" alt="Security threats " /></p>
 
 **Role of Security Forces and Technological Initiatives:**
 - **Indian Army and Air Force:** They guard the LoC and International Border (IB) with Pakistan, responding to ceasefire violations and conducting anti-terror operations, including surgical strikes.
@@ -50784,7 +50784,7 @@ The multiplicity of threats across India’s vast and diverse borders necessitat
 
 India's border security architecture faces multifaceted challenges requiring coordinated responses from specialized security forces and enhanced technological integration.
 
-<p align="center"><img src="images/superkalam_gs3_q101_img1.png" alt="India Border Map with Pakistan Bangladesh" /></p>
+<p align="center"><img src="https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/superkalam/images/superkalam_gs3_q101_img1.png" alt="India Border Map with Pakistan Bangladesh" /></p>
 
 India Border Map with Pakistan Bangladesh
 

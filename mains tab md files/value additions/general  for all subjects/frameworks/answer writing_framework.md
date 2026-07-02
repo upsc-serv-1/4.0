@@ -9,7 +9,7 @@
 ## WOMENIST Framework: Globalisation Impact on Women
 
 ### Diagram: WOMENIST Framework
-![WOMENIST Framework: Globalisation Impact on Women](images/womenist_framework.png)
+![WOMENIST Framework: Globalisation Impact on Women](https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/general/frameworks/images/womenist_framework.png)
 
 ### Framework Breakdown
 - **W → Workforce Participation**:
@@ -56,7 +56,7 @@
 ## Bilateral Relations / International Organisations Framework
 
 ### Diagram: Bilateral Relations / International Organisations Framework
-![Bilateral Relations / International Organisations Framework](images/bilateral_relations_framework.png)
+![Bilateral Relations / International Organisations Framework](https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/general/frameworks/images/bilateral_relations_framework.png)
 
 ### Framework Breakdown
 - **Intro**: Most recent summit / conference / formation, background
@@ -87,7 +87,7 @@
 ## SHIELD Framework: Way Forward
 
 ### Diagram: SHIELD Framework
-![SHIELD Framework: Way Forward](images/shield_framework.png)
+![SHIELD Framework: Way Forward](https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/general/frameworks/images/shield_framework.png)
 
 ### Framework Breakdown
 - **S → Surveillance and Early Warning Systems**:
@@ -124,7 +124,7 @@
 ## Value Addition Frameworks for Mains Answers: Theme - Irrigation
 
 ### Diagram: WATER Framework
-![WATER Framework: Theme - Irrigation](images/irrigation_framework.png)
+![WATER Framework: Theme - Irrigation](https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/general/frameworks/images/irrigation_framework.png)
 
 ### Framework Breakdown
 - **W → Water Use Efficiency**:
@@ -157,7 +157,7 @@
 ## INTERNATIONAL RELATIONS - KEY DIMENSIONS
 
 ### Diagram: INTERNATIONAL RELATIONS - KEY DIMENSIONS
-![INTERNATIONAL RELATIONS - KEY DIMENSIONS](images/ir_key_dimensions.png)
+![INTERNATIONAL RELATIONS - KEY DIMENSIONS](https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/general/frameworks/images/ir_key_dimensions.png)
 
 ### Framework Breakdown
 - **1. Diplomatic Relations**: Visits, strategic dialogue, multilateral coordination
@@ -183,7 +183,7 @@
 ## IR Diagrams
 
 ### Diagram: IR Diagrams: Africa-India Relations
-![IR Diagrams: Africa-India Relations](images/ir_diagrams_africa_india.png)
+![IR Diagrams: Africa-India Relations](https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/general/frameworks/images/ir_diagrams_africa_india.png)
 
 ### Framework Breakdown
 - **1. Neighbourhood Map**
@@ -203,7 +203,7 @@
 ## IR Answer Writing Framework
 
 ### Diagram: IR Answer Writing Framework
-![IR Answer Writing Framework](images/ir_answer_writing_framework.png)
+![IR Answer Writing Framework](https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/general/frameworks/images/ir_answer_writing_framework.png)
 
 ### Framework Breakdown
 - **1. Intro :-**
@@ -234,7 +234,7 @@
 ## IR Key Words
 
 ### Diagram: IR Key Words
-![IR Key Words](images/ir_keywords.png)
+![IR Key Words](https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/general/frameworks/images/ir_keywords.png)
 
 ### Framework Breakdown
 - **1. International Ethics**: Moral values and rules governing state interactions

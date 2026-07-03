@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** Lateral entry into civil services is seen as a reformative step, yet it continues to attract criticism and  controversy. Discuss.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Governance] [Section Group: Accountability & Civil Services] [Micro Topic: Role of Civil Services in a democracy] [Sub Topic: Civil Services] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Lateral entry, Civil services]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about lateral entry into civil services. <br>• In the body, first bring out its reformative potential and then highlight the points of criticism and controversy that it attracts. <br>• Conclude by highlighting the need for accompanying reforms to improve governance. |
@@ -41,13 +41,13 @@ Recommended by the **first ARC** as far back as 1965, lateral entry is an import
 
 **Additional resources** Lateral Entry into Civil Services- Rationale and Criticisms- Explained pointwise |ForumIAS The need is for domain experts, but within the civil service - The Hindu Lateral entry in UPSC will further distance marginalised from centres of power | The Indian Express
 
-[Question ID: forum-mgp-2026-gs1-q1]
+[Question ID: forum-mgp-2026-csm26t09se-q01]
 
 ---
 
 ## Q2 [Year: 2026]
 **Question:** e-governance is not just about the routine application of digital technology in the service delivery  process. It is as much about multifarious interactions for ensuring transparency and accountability. In this  context evaluate the role of the ‘Interactive Service Model’ of e-governance.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Governance] [Section Group: Accountability & Civil Services] [Micro Topic: E-Governance (applications, models, successes, limitations, potential)] [Sub Topic: E-governance] [Macro Tag: Analytical, Applied] [Micro Tag: Evaluate, e-governance, Transparency, Accountability]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a brief description of the Interactive Service Model (ISM) of e- governance. <br>• In the body, first explain the role ISM plays in the service delivery process and in ensuring transparency and accountability. <br>• Then, identify the challenges inhibiting its successful adoption. <br>• Conclude by suggesting the use of emerging technologies to advance its adoption. |
@@ -90,13 +90,13 @@ The **Interactive Service Model** of e-governance holds immense potential to enh
 
 **Additional resources** Digital Governance in India |ForumIAS
 
-[Question ID: forum-mgp-2026-gs1-q2]
+[Question ID: forum-mgp-2026-csm26t09se-q02]
 
 ---
 
 ## Q3 [Year: 2026]
 **Question:** Discuss the role of industry and business associations in socio-economic development in India.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Polity] [Section Group: Organs of Government & Dispute Redressal] [Micro Topic: Pressure groups and formal/informal associations and their role in the Polity] [Sub Topic: Pressure Groups] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Industry associations, Socio-economic development, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief definition of industry and business association. <br>• In the body, discuss their role in the socio-economic development in India. <br>• Conclude by highlighting some challenges with them and suggest remedial measures. |
@@ -124,13 +124,13 @@ While these associations drive socio-economic development, they face challenges 
 
 **FIEO:** Federation of Indian Exporters’ Organizations; **DICCI:** Dalit Indian Chamber of Commerce and Industry; **SIAM:** Society of Indian Auto Manufacturers
 
-[Question ID: forum-mgp-2026-gs1-q3]
+[Question ID: forum-mgp-2026-csm26t09se-q03]
 
 ---
 
 ## Q4 [Year: 2026]
 **Question:** Public charitable trusts have the potential to make India's development more inclusive as they relate  to certain vital public issues. Comment.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Governance] [Section Group: Development Processes & Policies] [Micro Topic: Role of donors, charities, institutional and other external stakeholders] [Sub Topic: Donor Agencies] [Macro Tag: Analytical, Applied] [Micro Tag: Comment, Public charitable trusts, Development, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce by explaining about public charitable trusts. <br>• In the body, first elaborate upon their role in making India's development more inclusive. <br>• Next, mention the challenges associated with their functioning. <br>• Conclude by suggestions to aid the efforts of these trust towards India’s development. |
@@ -164,13 +164,13 @@ For public charitable trusts to **maximize their contribution** to inclusive dev
 
 **Additional resources** India’s rich are more willing to give: How philanthropy can tilt scales towards a more equitable society | The Indian Express
 
-[Question ID: forum-mgp-2026-gs1-q4]
+[Question ID: forum-mgp-2026-csm26t09se-q04]
 
 ---
 
 ## Q5 [Year: 2026]
 **Question:** “A law hailed as a sentinel of transparency and accountability is entangled in political and  administrative hurdles.” Discuss the statement in the context of the Right to Information Act.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Governance] [Section Group: Accountability & Civil Services] [Micro Topic: Transaparency and accountability (institutional and other measures); Citizens Charter] [Sub Topic: Transparency and Accountability] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Transparency, Accountability, RTI Act]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about the RTI Act. <br>• In the body, first underline the ways in which it promotes transparency and accountability. <br>• Next, discuss the political and administrative hurdles in its implementation. <br>• Conclude by suggesting measures to overcome these hurdles. |
@@ -212,13 +212,13 @@ Overcoming these hurdles requires a **multi-pronged strategy**. Apart from **tra
 
 **Additional resources** Right to Information Act |ForumIAS The RTI is now the ‘right to deny information’ - The Hindu Tracing the roots and impact of Right to Information Act | UPSC Current Affairs News - The Indian Express
 
-[Question ID: forum-mgp-2026-gs1-q5]
+[Question ID: forum-mgp-2026-csm26t09se-q05]
 
 ---
 
 ## Q6 [Year: 2026]
 **Question:** “The reliance of the public sector on external consultancy firms is increasing worldwide.” Critically  examine the implications of outsourcing strategic decision-making in the public sector enterprises in  India.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Governance] [Section Group: Accountability & Civil Services] [Micro Topic: Role of Civil Services in a democracy] [Sub Topic: Civil Services] [Macro Tag: Analytical, Applied] [Micro Tag: Critically examine, Public sector, External consultancy, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by providing a brief background on the increasing trend of public sector reliance on external consultancy firms globally and in India. <br>• In the body, first, examine the reasons for this reliance and the advantages it offers. <br>• Second, discuss the associated challenges and negative implications. <br>• Third, propose potential solutions to mitigate these challenges. <br>• Conclude with a summary. |
@@ -264,13 +264,13 @@ These measures can aid the PSEs in **developing strategies** that are aligned wi
 
 **Additional resources** Public sector reliance on consultancy firms raises accountability concerns |ForumIAS Consultant Raj: 1,500, including from Big 4, in 44 govt depts; annual spend Rs 302 crore | Express Investigations News
 
-[Question ID: forum-mgp-2026-gs1-q6]
+[Question ID: forum-mgp-2026-csm26t09se-q06]
 
 ---
 
 ## Q7 [Year: 2026]
 **Question:** What constitutes corrupt practices under the Representation of the People Act, 1951? Also, discuss  the challenges in curbing such malpractices and suggest remedial measures.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Polity] [Section Group: Elections & Political Dynamics] [Micro Topic: Salient features of the Representation of People's Act] [Sub Topic: Electoral reforms] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What constitutes, Discuss, Suggest, Corrupt practices, RPA 1951]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about the Representation of People Act,. <br>• In the body, first outline what constitutes corrupt practices under the Act. Next, discuss the challenges faced in curbing them. Lastly, suggest remedial measures. Conclude suitably. |
@@ -312,13 +312,13 @@ In order to overcome these challenges, following **remedial measures** can be ta
 
 **Evolving nature** of electoral malpractices (e.g. use of deep fakes) necessitate broad-based **amendments to** **RPA** to deal with them. This is crucial to uphold the **sanctity of the electoral process** and ensure **free and** **fair elections.** (***474 words***)
 
-[Question ID: forum-mgp-2026-gs1-q7]
+[Question ID: forum-mgp-2026-csm26t09se-q07]
 
 ---
 
 ## Q8 [Year: 2026]
 **Question:** While cooperatives in India play a crucial role in empowering local communities and driving  grassroots development, multiple factors hinder them from realising their full potential. Elaborate.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Governance] [Section Group: Development Processes & Policies] [Micro Topic: Development processes and the role of NGOs, Civil Society, and various groups and associations] [Sub Topic: Civil Society] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Elaborate, Cooperatives, Local communities, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about co-operatives in India. <br>• In the body, first bring out their role in empowering local communities and driving grassroots development. <br>• Next, outline the multiple factors that hinder them from realising their full potential. <br>• Conclude by providing some suggestions to improve their functions and achieve “Sahkar se Samriddhi”. |
@@ -359,13 +359,13 @@ However, the following **factors** **hinder** them from realizing their full pot
 
 **Additional resources:** Cooperative Societies: Benefits and Challenges - Explained, pointwise-ForumIAS Blog India’s Cooperative Movement: Driving Inclusive Growth
 
-[Question ID: forum-mgp-2026-gs1-q8]
+[Question ID: forum-mgp-2026-csm26t09se-q08]
 
 ---
 
 ## Q9 [Year: 2026]
 **Question:** Can the vicious cycle of gender inequality, poverty and malnutrition be broken through microfinancing  of women SHGs? Explain with examples.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Governance] [Section Group: Development Processes & Policies] [Micro Topic: Role of Self Help Groups (SHGs) and microfinancing in development activities] [Sub Topic: SHGs] [Macro Tag: Analytical, Applied] [Micro Tag: Explain, Microfinancing, Women SHGs, Gender inequality]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining microfinance. <br>• In the body, first highlight the potential of microfinancing of women SHGs in breaking the vicious cycle of gender inequality, poverty and malnutrition. <br>• Next, underline its limitations in this regard. <br>• Conclude by identifying the need for the structural reform measures to supplement microfinancing. |
@@ -397,13 +397,13 @@ To break the **gender-poverty-malnutrition cycle** effectively, SHG microfinanci
 
 **Additional resources** Women self-help groups: Funding alone does not work; the government needs to listen in-ForumIAS Blog Self Help Groups can help in widening women’s labour force participation: Economic Survey 2022-23 - The Hindu
 
-[Question ID: forum-mgp-2026-gs1-q9]
+[Question ID: forum-mgp-2026-csm26t09se-q09]
 
 ---
 
 ## Q10 [Year: 2026]
 **Question:** The Citizens' charter has been a landmark initiative in ensuring citizen-centric administration. But it  is yet to reach its full potential. Identify the factors hindering the realisation of its promise and suggest  measures to overcome them.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Governance] [Section Group: Accountability & Civil Services] [Micro Topic: Transaparency and accountability (institutional and other measures); Citizens Charter] [Sub Topic: Citizens Charter] [Macro Tag: Analytical, Applied] [Micro Tag: Identify, Suggest, Citizens' charter, Administration]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining Citizen’s Charter. <br>• In the body, first identify the various factors hindering the realization of its full promise. <br>• Next, suggest measures to overcome them. <br>• Conclude by emphasizing the need for better implementation of Citizen’ Charter. |
@@ -456,7 +456,7 @@ Investing in **continuous capacity building** for frontline officials, coupled w
 
 **Additional resources** Transparency and Accountability in Governance |ForumIAS
 
-[Question ID: forum-mgp-2026-gs1-q10]
+[Question ID: forum-mgp-2026-csm26t09se-q10]
 
 ---
 

@@ -310,6 +310,7 @@ export default function MainsScreen() {
     microtopic?: string;
     year?: string;
     initialScreen?: string;
+    from?: string;
   }>();
 
   // Navigation State
@@ -325,6 +326,11 @@ export default function MainsScreen() {
     if (!params.initialScreen) return null;
 
     const cleanParam = (val: string | undefined | null) => {
+      if (!val) return 'All';
+      return val;
+    };
+
+    const cleanYearsParam = (val: string | undefined | null) => {
       if (!val) return 'All';
       return val.replace(/,/g, '|');
     };
@@ -346,9 +352,10 @@ export default function MainsScreen() {
       subjects: cleanParam(params.subject),
       sections: cleanParam(params.section),
       microtopics: cleanParam(params.microtopic),
-      years: cleanParam(params.year),
+      subtopics: cleanParam(params.subtopic),
+      years: cleanYearsParam(params.year),
     };
-  }, [params.initialScreen, params.paper, params.subject, params.section, params.microtopic, params.year]);
+  }, [params.initialScreen, params.paper, params.subject, params.section, params.microtopic, params.subtopic, params.year]);
 
   const [previousScreen, setPreviousScreen] = useState<'questions' | 'search'>('questions');
   const [detailedQuestion, setDetailedQuestion] = useState<ConsolidatedQuestion | null>(null);
@@ -849,6 +856,8 @@ export default function MainsScreen() {
               onPress={() => {
                 if (currentScreen === 'value-add' && valueAddCategory !== null) {
                   setValueAddCategory(null);
+                } else if (currentScreen === 'questions' && params.from === 'pyq') {
+                  router.back();
                 } else {
                   setCurrentScreen('hub');
                 }
@@ -857,7 +866,9 @@ export default function MainsScreen() {
             >
               <ChevronLeft size={20} color={colors.textPrimary} />
               <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>
-                {currentScreen === 'value-add' && valueAddCategory !== null ? 'Back' : 'Hub'}
+                {currentScreen === 'value-add' && valueAddCategory !== null 
+                  ? 'Back' 
+                  : (currentScreen === 'questions' && params.from === 'pyq') ? 'Back' : 'Hub'}
               </Text>
             </TouchableOpacity>
           ) : null}
@@ -1150,7 +1161,10 @@ function HubView({
               activeOpacity={0.8}
               onPress={() => {
                 if (card.id === 'pyq-trends') {
-                  router.push('/pyq');
+                  router.push({
+                    pathname: '/pyq',
+                    params: { fromTab: 'mains' }
+                  });
                 } else {
                   onSelect(card.id);
                 }

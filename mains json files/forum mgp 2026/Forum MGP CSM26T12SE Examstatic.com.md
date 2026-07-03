@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** How can Digital Public Infrastructure (DPI) help developing countries mitigate and adapt to climate  change?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: Digitalization of Economy] [Macro Tag: Analytical, Applied] [Micro Tag: How can, Digital Public Infrastructure, Developing countries, Climate change]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining Digital Public Infrastructure and giving a brief background of its applications. <br>• In the body, discuss how it can help developing countries mitigate and adapt to climate change. <br>• Conclude by suggesting measures underlining the emerging challenges in its implementation and ways to address them. |
@@ -40,13 +40,13 @@ However, challenges related to **data fragmentation** and **protection, digital 
 
 **EIS:** Environment Information System**; G2P:** Government to People; **GST:** Global Stocktake**; ADeX:** Agricultural Data Exchange **SNSP:** Smart Nation Sensor Platform
 
-[Question ID: forum-mgp-2026-gs1-q1]
+[Question ID: forum-mgp-2026-csm26t12se-q01]
 
 ---
 
 ## Q2 [Year: 2026]
 **Question:** Explain the concept of ‘inclusive growth’ and outline the key measures taken by the government towards  achieving it.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Inclusive growth and issues arising from it] [Sub Topic: Inclusive Growth] [Macro Tag: Descriptive, Applied] [Micro Tag: Explain, Inclusive growth, Government]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce your answer by defining inclusive growth. <br>• In the body, first explain the concept by listing its key attributes. <br>• Next, outline the key measures taken by the government towards achieving it. <br>• Conclude the answer by highlighting the significance of inclusive growth in Amrit Kaal. |
@@ -85,13 +85,13 @@ The government has taken several **measures towards achieving it.** They are dis
 
 **TRIFED:** Tribal Co-operative Marketing Development Federation of India; **NFSA:** National Food Security Act; **POSHAN:** Prime Minister's Overarching Scheme for Holistic Nourishment; **RTE Act:** Right to Education Act; **SSA:** Sarva Shisha Abhiyan; **AB-PMJAY:** Ayushman Bharat- Pradhan Mantri Jan Aarogya Yojana; **NMHP:** National Mental Health Programme; **PMKVY:** Pradhan Mantri Kaushal Vikas Yojana; **ELI:** Employment-Linked Incentive**; MUDRA:** Micro Units Development and Refinancing Agency; **SHG-BLP:** Self Help Group- Bank Linkage Programme; **KCC:** Kisan Credit Card; **APY:** Atal Pension Yojana; **PMGSY:** Pradhan Mantri Gram Sadak Yojana; **DPI:** Digital Public Infrastructure**; UPI:** Unified Payment Interface; **RKVY:** Rashtriya Krishi Vikas Yojana; **JJM:** Jal Jeevan Mission**; PMAY:** Pradhan Mantri Awas Yojana
 
-[Question ID: forum-mgp-2026-gs1-q2]
+[Question ID: forum-mgp-2026-csm26t12se-q02]
 
 ---
 
 ## Q3 [Year: 2026]
 **Question:** Discuss the rationale behind the government’s decision to adopt the debt-to-GDP ratio as the primary  fiscal consolidation target from FY 2026-27.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Government Budgeting and fiscal management policies] [Sub Topic: Fiscal Policy] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Debt-to-GDP ratio, Government, Fiscal consolidation]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of the fiscal consolidation roadmap presented in the Union Budget 2025-26 and its shift towards “debt-to-GDP ratio” as the fiscal anchor. <br>• In the body, first discuss the rationale behind this shift. <br>• Next, highlight the concerns arising from the same. <br>• Conclude by suggesting a way forward. |
@@ -127,13 +127,13 @@ Adoption of debt-to-GDP ratio as the fiscal anchor **must be complemented with o
 
 **Additional Readings** **Union Budget 2025: Govt details roadmap for shift to debt-GDP ratio as fiscal anchor from FY 2026-27 | Business News - The Indian** **Express** **Embrace debt-to-GDP ratio, instead of rigid deficit targets - The Economic Times**
 
-[Question ID: forum-mgp-2026-gs1-q3]
+[Question ID: forum-mgp-2026-csm26t12se-q03]
 
 ---
 
 ## Q4 [Year: 2026]
 **Question:** Describe the significance of the Dedicated Freight Corridor (DFC) in enhancing logistics efficiency,  promoting infrastructure development, and driving economic growth.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Physical Infrastructure & Capital] [Micro Topic: Infrastructure systems connectivity: energy, ports, roads, airports, and railways] [Sub Topic: Transport] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Describe, Dedicated Freight Corridor, Logistics efficiency]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce with a brief description of DFC. <br>• In the body, describe its significance in enhancing logistics efficiency, promoting infrastructure development and driving economic growth. <br>• Conclude with underscoring the need for sustained efforts in utilizing its full potential. |
@@ -170,13 +170,13 @@ While the DFC marks a **transformative step** in India's logistics infrastructur
 
 **Additional reading:** **Make way for dedicated freight corridors - The Hindu** **On the growth track: How Dedicated Freight Corridors are adding to GDP, boosting Rail revenues | Explained News - The Indian** **Express**
 
-[Question ID: forum-mgp-2026-gs1-q4]
+[Question ID: forum-mgp-2026-csm26t12se-q04]
 
 ---
 
 ## Q5 [Year: 2026]
 **Question:** Distinguish between Capital Budget and Revenue Budget. Explain the components of both these Budgets.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Government Budgeting and fiscal management policies] [Sub Topic: Current Budget] [Macro Tag: Comparative, Descriptive] [Micro Tag: Distinguish, Explain, Capital Budget, Revenue Budget]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of the budget exercise in India and its parts. <br>• In the body, first distinguish between capital and revenue budget. <br>• Next, explain the components of both these budgets. <br>• Conclude by underlining the significance of this distinction. |
@@ -220,13 +220,13 @@ The **distinction** between capital and revenue budget is a **constitutional man
 
 **Additional Reading** **Union Budget 2025: Understanding Revenue Budget and Capital Budget | Budget 2024 News - Business Standard**
 
-[Question ID: forum-mgp-2026-gs1-q5]
+[Question ID: forum-mgp-2026-csm26t12se-q05]
 
 ---
 
 ## Q6 [Year: 2026]
 **Question:** Elaborate upon the various challenges faced by Indian Railways. What measures can be taken to address  them?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Physical Infrastructure & Capital] [Micro Topic: Infrastructure systems connectivity: energy, ports, roads, airports, and railways] [Sub Topic: Transport] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Elaborate, What measures, Indian Railways]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce by giving a brief background of the importance of Indian Railways. <br>• In the body, first discuss the various challenges faced by it. <br>• Next, suggest some measures to address them. <br>• Conclude by suggesting some reforms to improve the overall functioning of railways. |
@@ -278,13 +278,13 @@ Indian Railways needs to balance its legacy role with an urgent need for moderni
 
 **Additional reading:** **Railway Reforms -ForumIAS Blog** **The Issue of Indian Railway Safety- Explained Pointwise |ForumIAS**
 
-[Question ID: forum-mgp-2026-gs1-q6]
+[Question ID: forum-mgp-2026-csm26t12se-q06]
 
 ---
 
 ## Q7 [Year: 2026]
 **Question:** Despite increased allocations, gender budgeting has had limited impact on women’s empowerment in  the country. Analyze.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Government Budgeting and fiscal management policies] [Sub Topic: Gender Budgeting] [Macro Tag: Analytical, Applied] [Micro Tag: Analyze, Gender budgeting, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining gender budgeting and highlight the increased allocations therein. <br>• In the body, first identify the challenges hindering the effective implementation of gender-sensitive policies and schemes. <br>• Next, suggest some corrective measures. <br>• Conclude by highlighting the importance of implementing these measures. |
@@ -323,13 +323,13 @@ The following **corrective measures** can be taken to reform the process of gend
 
 **Additional reading** **The gender budget — bigger allocations, little impact - The Hindu** **Gender-Responsive Budgeting in India: A Stocktaking** **Gender Responsive Budgeting, as Fiscal Innovation: Evidence from India on “Processes” Lekha Chakraborty Working Paper No. 20**
 
-[Question ID: forum-mgp-2026-gs1-q7]
+[Question ID: forum-mgp-2026-csm26t12se-q07]
 
 ---
 
 ## Q8 [Year: 2026]
 **Question:** What is the need for expanding the regional air connectivity in India? In this context, discuss the  government's UDAN Scheme and its achievements.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Physical Infrastructure & Capital] [Micro Topic: Infrastructure systems connectivity: energy, ports, roads, airports, and railways] [Sub Topic: Airports X Infrastructure] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What is the need, Discuss, Air connectivity, UDAN Scheme, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a brief overview of the UDAN scheme. <br>• In the body, first discuss the need to expand regional air connectivity in India by highlighting its intended benefits. <br>• Next, outline the achievements of the UDAN scheme and its role in enhancing regional air connectivity. <br>• Conclude by suggesting ways to fully realize the scheme's potential. |
@@ -378,13 +378,13 @@ addressing the **safety challenges**, apart from those of **route utilization** 
 
 **Additional reading:** **UDAN |ForumIAS** **Turbulence hits UDAN scheme, 50% routes grounded - The Hindu**
 
-[Question ID: forum-mgp-2026-gs1-q8]
+[Question ID: forum-mgp-2026-csm26t12se-q08]
 
 ---
 
 ## Q9 [Year: 2026]
 **Question:** While MSMEs are a key driver of India's growth, they face numerous challenges in their operation and  expansion. Discuss. Also, suggest measures to support and strengthen the MSME sector.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Manufacturing Sector] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Suggest, MSMEs, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by providing a background of the MSMEs as the key driver of India’s growth. <br>• In the body of the answer, first discuss the hurdles they encounter in their operation and expansion. <br>• In the next part, suggest steps to support the growth of the MSME sector. <br>• Conclude the answer by highlighting the proposals of Union Budget 2025-26 for MSMEs and the significance of supporting them. |
@@ -436,13 +436,13 @@ addressing the **safety challenges**, apart from those of **route utilization** 
 
 **Additional reading:** MSME Industry in India- Explained Pointwise |ForumIAS Lack of access to credit, manpower shortage major challenges to MSMEs, shows SIDBI study - The Hindu Why India needs a homegrown AI model for its MSME sector - SME News | The Financial Express
 
-[Question ID: forum-mgp-2026-gs1-q9]
+[Question ID: forum-mgp-2026-csm26t12se-q09]
 
 ---
 
 ## Q10 [Year: 2026]
 **Question:** “Hybrid Annuity Model (HAM) in Public-Private Partnerships (PPPs) has emerged as a pragmatic model  for advancing infrastructure development in the country”. Comment.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Physical Infrastructure & Capital] [Micro Topic: Capital investment models and public-private frameworks] [Sub Topic: PPP X Infrastructure] [Macro Tag: Analytical, Applied] [Micro Tag: Comment, Hybrid Annuity Model, PPPs, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by briefly writing about Hybrid Annuity Model. <br>• In the body, describe how it has emerged as a pragmatic approach for advancing infrastructure development in the country. <br>• Next, suggest some improvements in the HAM model. <br>• Conclude by emphasizing the importance of HAM for infrastructure development in India. |
@@ -482,7 +482,7 @@ However, HAM model needs the below listed **improvements**:
 
 **Additional reading:** **What is HAM in India? - The Hindu BusinessLine** **HAM grows substantially in over 3 years, but some cracks are now surfacing on highways: Crisil | Business News - The Indian** **Express****.**
 
-[Question ID: forum-mgp-2026-gs1-q10]
+[Question ID: forum-mgp-2026-csm26t12se-q10]
 
 ---
 

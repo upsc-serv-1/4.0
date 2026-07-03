@@ -18,7 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { KVStore } from '../src/lib/kvStore';
 import { OfflineManager } from '../src/services/OfflineManager';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
@@ -352,6 +352,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const { colors, isDark } = useTheme();
   const { selectedCourse } = useCourse();
   const insets = useSafeAreaInsets();
+
+  const params = useLocalSearchParams<{ fromTab?: string }>();
   
   // Get stages and papers for the selected course
   const currentStages = STAGES_BY_COURSE[selectedCourse] || STAGES_BY_COURSE['UPSC CSE'];
@@ -367,18 +369,48 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     return { microToSubject, sectionToSubject };
   }, []);
 
+  const isFirstMount = useRef(true);
+
+  const initialStage = useMemo(() => {
+    const stages = STAGES_BY_COURSE[selectedCourse] || STAGES_BY_COURSE['UPSC CSE'];
+    if (params.fromTab === 'mains') {
+      const mainsIndex = stages.findIndex(s => s.toLowerCase() === 'mains');
+      if (mainsIndex !== -1) return stages[mainsIndex];
+    }
+    return stages[0];
+  }, [selectedCourse, params.fromTab]);
+
+  const initialPaper = useMemo(() => {
+    const papersByStage = PAPERS_BY_COURSE[selectedCourse] || PAPERS_BY_COURSE['UPSC CSE'];
+    const papers = papersByStage[initialStage as keyof typeof papersByStage];
+    return papers?.[0] || null;
+  }, [selectedCourse, initialStage]);
+
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [examStage, setExamStage] = useState(currentStages[0]);
-  const [selectedPaper, setSelectedPaper] = useState<string | null>(
-    currentPapersByStage[currentStages[0] as keyof typeof currentPapersByStage]?.[0] || null
-  );
+  const [examStage, setExamStage] = useState(initialStage);
+  const [selectedPaper, setSelectedPaper] = useState<string | null>(initialPaper);
+
+  useEffect(() => {
+    if (params.fromTab === 'mains') {
+      const mainsIndex = currentStages.findIndex(s => s.toLowerCase() === 'mains');
+      if (mainsIndex !== -1) {
+        const targetStage = currentStages[mainsIndex];
+        setExamStage(targetStage);
+        
+        const papersForStage = currentPapersByStage[targetStage as keyof typeof currentPapersByStage];
+        const firstPaper = papersForStage?.[0] || null;
+        setSelectedPaper(firstPaper);
+      }
+    }
+  }, [params.fromTab, currentStages, currentPapersByStage]);
   const [selectedRange, setSelectedRange] = useState('Last 10 Years');
   const [customYearStart, setCustomYearStart] = useState('2020');
   const [customYearEnd, setCustomYearEnd] = useState('2025');
   const [activeHub, setActiveHub] = useState<HubKey>('pilot');
   const [pilotSubject, setPilotSubject] = useState<string | null>(null);
   const [pilotSection, setPilotSection] = useState<string | null>(null);
+  const [pilotMicro, setPilotMicro] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'stage' | 'paper' | 'range' | null>(null);
   const [exportModalVisible, setExportModalVisible] = useState(false);
@@ -403,6 +435,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const [selSubjects, setSelSubjects] = useState<string[]>([]);
   const [selSections, setSelSections] = useState<string[]>([]);
   const [selMicros, setSelMicros] = useState<string[]>([]);
+  const [selSubtopics, setSelSubtopics] = useState<string[]>([]);
   
   const [focusSubject, setFocusSubject] = useState('All');
   const [focusSection, setFocusSection] = useState('All');
@@ -458,6 +491,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
   // Reset stage and paper when course changes
   useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      if (params.fromTab === 'mains') return;
+    }
     const newStages = STAGES_BY_COURSE[selectedCourse] || STAGES_BY_COURSE['UPSC CSE'];
     const newStage = newStages[0];
     setExamStage(newStage);
@@ -627,7 +664,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           // Query Supabase mains_questions with paper filter at DB level
           const { data, error: mainsErr } = await supabase
             .from('mains_questions')
-            .select('*, answers:mains_answers(*)')
+            .select('id, question_number, question_text, marks, exam_year, subject, section_group, microtopic, subtopic, macrotag, microtag, hierarchy_path, paper, is_pyq, source_attribution_label, exam_info, stage, exam, exam_group, is_upsc_cse, is_allied, is_others, exam_category, answers:mains_answers(id, institute)')
             .eq('paper', mappedPaper);
           
           if (mainsErr) throw mainsErr;
@@ -900,13 +937,16 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   // Single subject selection for the Distribution Donut (reusing existing logic for now)
   const [oneSub, setOneSub] = useState<string | null>(null);
   const [oneSec, setOneSec] = useState<string | null>(null);
+  const [oneMicro, setOneMicro] = useState<string | null>(null);
   const [sectionData, setSectionData] = useState<Array<{ name: string; value: number }>>([]);
   const [microTopicData, setMicroTopicData] = useState<Array<{ name: string; value: number }>>([]);
+  const [subTopicData, setSubTopicData] = useState<Array<{ name: string; value: number }>>([]);
 
   useEffect(() => {
     if (!oneSub) {
       setSectionData([]);
       setOneSec(null);
+      setOneMicro(null);
       return;
     }
     const sectionMap: Record<string, number> = {};
@@ -922,17 +962,38 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   useEffect(() => {
     if (!oneSub || !oneSec) {
       setMicroTopicData([]);
+      setOneMicro(null);
       return;
     }
     const microMap: Record<string, number> = {};
     rawQuestions
       .filter(q => getAnalyticsSubject(q) === oneSub && (q.section_group || 'General') === oneSec)
       .forEach(q => {
-        const micro = q.micro_topic || 'Other';
+        const micro = q.micro_topic || q.microTopic || 'Other';
         microMap[micro] = (microMap[micro] || 0) + 1;
       });
     setMicroTopicData(Object.entries(microMap).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value));
   }, [oneSub, oneSec, rawQuestions]);
+
+  useEffect(() => {
+    if (!oneSub || !oneSec || !oneMicro) {
+      setSubTopicData([]);
+      return;
+    }
+    const subMap: Record<string, number> = {};
+    rawQuestions
+      .filter(q => {
+        const sub = getAnalyticsSubject(q);
+        const sec = q.section_group || 'General';
+        const micro = q.micro_topic || q.microTopic || 'Other';
+        return sub === oneSub && sec === oneSec && micro === oneMicro;
+      })
+      .forEach(q => {
+        const subtopic = q.subTopic || q.sub_topic || 'Other';
+        subMap[subtopic] = (subMap[subtopic] || 0) + 1;
+      });
+    setSubTopicData(Object.entries(subMap).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value));
+  }, [oneSub, oneSec, oneMicro, rawQuestions]);
 
   const years = useMemo(() => {
     const questionYears = rawQuestions
@@ -1048,9 +1109,61 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         if (selSections.length > 0 && !selSections.includes(q.section_group || 'General')) return false;
         return true;
       })
-      .forEach(q => set.add(q.micro_topic || 'Other'));
+      .forEach(q => set.add(q.micro_topic || q.microTopic || 'Other'));
     return Array.from(set).sort();
   }, [rawQuestions, selSubjects, selSections]);
+
+  const allSubtopics = useMemo(() => {
+    if (selSubjects.length === 0) return [];
+    const set = new Set<string>();
+    rawQuestions
+      .filter(q => {
+        const sub = getAnalyticsSubject(q);
+        if (!selSubjects.includes(sub)) return false;
+        if (selSections.length > 0 && !selSections.includes(q.section_group || 'General')) return false;
+        const microVal = q.micro_topic || q.microTopic || 'Other';
+        if (selMicros.length > 0 && !selMicros.includes(microVal)) return false;
+        return true;
+      })
+      .forEach(q => {
+        const subtopic = q.subTopic || q.sub_topic;
+        if (subtopic) set.add(subtopic);
+      });
+    return Array.from(set).sort();
+  }, [rawQuestions, selSubjects, selSections, selMicros]);
+
+  const heatmapSubtopics = useMemo(() => {
+    if (selSubjects.length === 0) return [];
+    const map: Record<string, Record<string, number>> = {};
+    rawQuestions
+      .filter(q => {
+        const sub = getAnalyticsSubject(q);
+        if (!selSubjects.includes(sub)) return false;
+        if (selSections.length > 0 && !selSections.includes(q.section_group || 'General')) return false;
+        const microVal = q.micro_topic || q.microTopic || 'Other';
+        if (selMicros.length > 0 && !selMicros.includes(microVal)) return false;
+        return true;
+      })
+      .forEach(q => {
+        const subtopic = q.subTopic || q.sub_topic || 'Other';
+        const year = String(getAnalyticsYear(q) || '');
+        if (!year) return;
+        if (!map[subtopic]) map[subtopic] = {};
+        map[subtopic][year] = (map[subtopic][year] || 0) + 1;
+      });
+    return Object.entries(map)
+      .map(([name, byYear]) => ({ name, byYear, total: Object.values(byYear).reduce((sum, val) => sum + val, 0) }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 24);
+  }, [rawQuestions, selSubjects, selSections, selMicros, years]);
+
+  const subtopicHeatmapRows = useMemo<HeatmapRow[]>(() => {
+    return heatmapSubtopics.map(item => ({
+      key: `subtopic-${item.name}`,
+      label: item.name,
+      byYear: item.byYear,
+    }));
+  }, [heatmapSubtopics]);
 
   const trendColorMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -1407,8 +1520,9 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const breakdownData = useMemo(() => {
     if (!oneSub) return distributionData;
     if (!oneSec) return sectionData;
-    return microTopicData;
-  }, [distributionData, sectionData, microTopicData, oneSub, oneSec]);
+    if (!oneMicro) return microTopicData;
+    return subTopicData;
+  }, [distributionData, sectionData, microTopicData, subTopicData, oneSub, oneSec, oneMicro]);
 
   const donutData = useMemo(() => {
     const source = breakdownData.slice(0, 5);
@@ -1518,7 +1632,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     setModalVisible(false);
   };
 
-  const navigateToLearning = (opts: { subject?: string; subjects?: string[]; section?: string; sections?: string[]; micro?: string; micros?: string[]; year?: string; mode?: 'learning' | 'exam' | 'choice' }) => {
+  const navigateToLearning = (opts: { subject?: string; subjects?: string[]; section?: string; sections?: string[]; micro?: string; micros?: string[]; subtopic?: string; year?: string; mode?: 'learning' | 'exam' | 'choice' }) => {
     const s = opts.subjects?.join(',') || opts.subject || 'All';
     const sec = opts.sections?.join('|') || opts.section || '';
     const m = opts.micros?.join('|') || opts.micro || '';
@@ -1553,8 +1667,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           subject: s,
           section: sec,
           microtopic: m,
+          subtopic: opts.subtopic || '',
           year: yearParam,
           initialScreen: 'questions',
+          from: 'pyq',
         }
       });
     } else {
@@ -2069,12 +2185,13 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
             if (tag === 'Others') return;
             if (!oneSub) setOneSub(tag);
             else if (!oneSec) setOneSec(tag);
+            else if (!oneMicro && examStage?.toLowerCase() === 'mains') setOneMicro(tag);
           }}
         />
       </ScrollView>
     </ScrollView>
     <Text style={[styles.helperText, { color: colors.textSecondary, marginTop: 8 }]}>
-      Click on the chart to deep dive from subject to section group to micro topic.
+      Click on the chart to deep dive from subject to section group to micro topic{examStage?.toLowerCase() === 'mains' ? ' to sub topic' : ''}.
     </Text>
     <View style={[styles.tableWrap, { borderColor: colors.border }]}>
       {breakdownData.slice(0, 12).map((item, index) => (
@@ -2090,10 +2207,15 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
               setOneSec(item.name);
               return;
             }
+            if (!oneMicro && examStage?.toLowerCase() === 'mains') {
+              setOneMicro(item.name);
+              return;
+            }
             navigateToLearning({
               subject: oneSub || undefined,
               section: oneSec || undefined,
-              micro: item.name,
+              micro: oneMicro || item.name,
+              subtopic: oneMicro ? item.name : undefined,
             });
           }}
         >
@@ -2102,11 +2224,12 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         </TouchableOpacity>
       ))}
     </View>
-    {(oneSub || oneSec) ? (
+    {(oneSub || oneSec || oneMicro) ? (
       <TouchableOpacity
         style={[styles.backBtn, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}
         onPress={() => {
-          if (oneSec) setOneSec(null);
+          if (oneMicro) setOneMicro(null);
+          else if (oneSec) setOneSec(null);
           else setOneSub(null);
         }}
       >
@@ -2159,6 +2282,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                 });
                 setSelSections([]);
                 setSelMicros([]);
+                setSelSubtopics([]);
               }}
             >
             <Text style={[styles.filterChipText, { color: selSubjects.includes(item.name) ? '#FFFFFF' : colors.textSecondary }]}>{item.name}</Text>
@@ -2183,6 +2307,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     setSelSections(prev => prev.includes(sec) ? prev.filter(s => s !== sec) : [...prev, sec]);
                     setSelMicros([]);
+                    setSelSubtopics([]);
                   }}
                 >
                   <Text style={[styles.filterChipText, { color: selSections.includes(sec) ? '#FFFFFF' : colors.textSecondary }]}>{sec}</Text>
@@ -2208,6 +2333,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     setSelMicros(prev => prev.includes(m) ? prev.filter(s => s !== m) : [...prev, m]);
+                    setSelSubtopics([]);
                   }}
                 >
                   <Text style={[styles.filterChipText, { color: selMicros.includes(m) ? '#FFFFFF' : colors.textSecondary }]}>{m}</Text>
@@ -2217,8 +2343,33 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           </>
         )}
 
+        {examStage?.toLowerCase() === 'mains' && selMicros.length > 0 && allSubtopics.length > 0 && (
+          <>
+            <Text style={[styles.exportGroupLabel, { color: colors.textTertiary, marginLeft: 4, marginTop: 12, marginBottom: 8 }]}>FILTER BY SUB TOPICS</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+              {allSubtopics.map(subtopic => (
+                <TouchableOpacity
+                  key={`heat-subtopic-${subtopic}`}
+                  activeOpacity={0.7}
+                  style={[
+                    styles.filterChip,
+                    { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                    selSubtopics.includes(subtopic) && { backgroundColor: colors.primary, borderColor: colors.primaryDark }
+                  ]}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setSelSubtopics(prev => prev.includes(subtopic) ? prev.filter(s => s !== subtopic) : [...prev, subtopic]);
+                  }}
+                >
+                  <Text style={[styles.filterChipText, { color: selSubtopics.includes(subtopic) ? '#FFFFFF' : colors.textSecondary }]}>{subtopic}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </>
+        )}
+
         {selSubjects.length === 0 ? (
-          <Text style={[styles.helperText, { color: colors.textSecondary, marginTop: 16 }]}>Choose subjects to open section-group and micro-topic heatmaps.</Text>
+          <Text style={[styles.helperText, { color: colors.textSecondary, marginTop: 16 }]}>Choose subjects to open section-group, micro-topic, and subtopic heatmaps.</Text>
         ) : (
           <View style={{ marginTop: 20, gap: 20 }}>
             {selSections.length === 0 && (
@@ -2235,17 +2386,45 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
               />
             )}
 
-            <StickyHeatmapTable
-              title="Micro Topic x Year"
-              labelHeader="Micro Topic"
-              years={years}
-              rows={microHeatmapRows}
-              baseColor="#1d4ed8"
-              colors={colors}
-              heatmapPalette={heatmapPalette}
-              onCellPress={(micro, year) => handleHeatmapPress(micro, { subjects: selSubjects, sections: selSections, micro }, year)}
-              onRowPress={(micro) => handleHeatmapPress(micro, { subjects: selSubjects, sections: selSections, micro })}
-            />
+            {selMicros.length === 0 && (
+              <StickyHeatmapTable
+                title="Micro Topic x Year"
+                labelHeader="Micro Topic"
+                years={years}
+                rows={microHeatmapRows}
+                baseColor="#1d4ed8"
+                colors={colors}
+                heatmapPalette={heatmapPalette}
+                onCellPress={(micro, year) => {
+                  if (examStage?.toLowerCase() === 'mains') {
+                    setSelMicros([micro]);
+                  } else {
+                    handleHeatmapPress(micro, { subjects: selSubjects, sections: selSections, micro }, year);
+                  }
+                }}
+                onRowPress={(micro) => {
+                  if (examStage?.toLowerCase() === 'mains') {
+                    setSelMicros([micro]);
+                  } else {
+                    handleHeatmapPress(micro, { subjects: selSubjects, sections: selSections, micro });
+                  }
+                }}
+              />
+            )}
+
+            {examStage?.toLowerCase() === 'mains' && selMicros.length > 0 && (
+              <StickyHeatmapTable
+                title="Sub Topic x Year"
+                labelHeader="Sub Topic"
+                years={years}
+                rows={subtopicHeatmapRows}
+                baseColor="#4f46e5"
+                colors={colors}
+                heatmapPalette={heatmapPalette}
+                onCellPress={(subtopic, year) => handleHeatmapPress(subtopic, { subjects: selSubjects, sections: selSections, micros: selMicros, subtopic }, year)}
+                onRowPress={(subtopic) => handleHeatmapPress(subtopic, { subjects: selSubjects, sections: selSections, micros: selMicros, subtopic })}
+              />
+            )}
           </View>
         )}
       </View>
@@ -2280,6 +2459,23 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         label: m,
         byYear: years.reduce((acc, y) => {
           const count = filteredForMicro.filter(q => getAnalyticsYear(q) === parseInt(y, 10) && (q.micro_topic === m || q.microTopic === m || q.microtopic === m)).length;
+          if (count) acc[y] = count;
+          return acc;
+        }, {} as Record<string, number>)
+      }))
+      .sort((a, b) => Object.values(b.byYear).reduce((sum, v) => sum + v, 0) - Object.values(a.byYear).reduce((sum, v) => sum + v, 0));
+    
+    // Calculate Subtopic Rows for Pilot (Filtered by Subject AND Section AND Micro topic if selected)
+    const filteredForSubtopic = pilotMicro
+      ? filteredForMicro.filter(q => q.micro_topic === pilotMicro || q.microTopic === pilotMicro || q.microtopic === pilotMicro)
+      : filteredForMicro;
+
+    const pilotSubtopicRows = Array.from(new Set(filteredForSubtopic.map(q => q.subTopic || q.sub_topic || 'General')))
+      .map(sub => ({
+        key: `pilot-subtopic-${sub}`,
+        label: sub,
+        byYear: years.reduce((acc, y) => {
+          const count = filteredForSubtopic.filter(q => getAnalyticsYear(q) === parseInt(y, 10) && (q.subTopic === sub || q.sub_topic === sub)).length;
           if (count) acc[y] = count;
           return acc;
         }, {} as Record<string, number>)
@@ -2360,6 +2556,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
               setPilotSubject(subj);
               setPilotSection(null); // Reset section when subject changes
+              setPilotMicro(null); // Reset microtopic
             }}
             onLabelActionPress={(subj) => {
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -2382,10 +2579,14 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <View>
                 <Text style={[styles.panelTitle, { color: colors.textPrimary }]}>2. {pilotSubject} Deep-Dive</Text>
-                <Text style={[styles.helperText, { color: colors.textSecondary }]}>Sections and Micro-Topics for {pilotSubject}</Text>
+                <Text style={[styles.helperText, { color: colors.textSecondary }]}>Sections and Topics for {pilotSubject}</Text>
               </View>
               <TouchableOpacity 
-                onPress={() => setPilotSubject(null)}
+                onPress={() => {
+                  setPilotSubject(null);
+                  setPilotSection(null);
+                  setPilotMicro(null);
+                }}
                 style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border }}
               >
                 <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary }}>CLEAR</Text>
@@ -2406,6 +2607,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                 onRowPress={(sec) => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   setPilotSection(sec);
+                  setPilotMicro(null); // Reset microtopic
                 }}
                 onLabelActionPress={(sec) => {
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -2435,20 +2637,68 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                 heatmapPalette={heatmapPalette}
                 labelWidth={microWidth}
                 onRowPress={(m) => {
-                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                  navigateToLearning({ subject: pilotSubject, section: pilotSection || undefined, micro: m, mode: 'choice' });
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  if (examStage?.toLowerCase() === 'mains') {
+                    setPilotMicro(m);
+                  } else {
+                    navigateToLearning({ subject: pilotSubject, section: pilotSection || undefined, micro: m, mode: 'choice' });
+                  }
                 }}
                 onLabelActionPress={(m) => {
-                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                  handleHeatmapPress(m, { subject: pilotSubject, section: pilotSection || undefined, micro: m });
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  if (examStage?.toLowerCase() === 'mains') {
+                    setPilotMicro(m);
+                  } else {
+                    handleHeatmapPress(m, { subject: pilotSubject, section: pilotSection || undefined, micro: m });
+                  }
                 }}
                 onYearPress={(year) => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  handleHeatmapPress('', { subject: pilotSubject, section: pilotSection || undefined, year }, year);
+                  if (examStage?.toLowerCase() === 'mains') {
+                    // Do not navigate immediately for Mains
+                  } else {
+                    handleHeatmapPress('', { subject: pilotSubject, section: pilotSection || undefined, year }, year);
+                  }
                 }}
-                onCellPress={(m, year) => handleHeatmapPress(m, { subject: pilotSubject, section: pilotSection || undefined, micro: m }, year)}
+                onCellPress={(m, year) => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  if (examStage?.toLowerCase() === 'mains') {
+                    setPilotMicro(m);
+                  } else {
+                    handleHeatmapPress(m, { subject: pilotSubject, section: pilotSection || undefined, micro: m }, year);
+                  }
+                }}
               />
               </View>
+
+              {examStage?.toLowerCase() === 'mains' && pilotMicro && (
+                <View>
+                  <StickyHeatmapTable
+                    title={`4. ${pilotMicro} Sub-Topics`}
+                    labelHeader="Sub-Topic"
+                    years={years}
+                    rows={pilotSubtopicRows}
+                    baseColor={colors.primary}
+                    maxValue={6}
+                    colors={colors}
+                    heatmapPalette={heatmapPalette}
+                    labelWidth={microWidth}
+                    onRowPress={(sub) => {
+                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                      navigateToLearning({ subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro, subtopic: sub, mode: 'choice' });
+                    }}
+                    onLabelActionPress={(sub) => {
+                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                      handleHeatmapPress(sub, { subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro, subtopic: sub });
+                    }}
+                    onYearPress={(year) => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      handleHeatmapPress('', { subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro, year }, year);
+                    }}
+                    onCellPress={(sub, year) => handleHeatmapPress(sub, { subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro, subtopic: sub }, year)}
+                  />
+                </View>
+              )}
             </View>
           </View>
         ) : (

@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** India’s BioE3 Policy (Biotechnology for Economy, Environment, and Employment) is a strategic step towards building a sustainable bioeconomy. Examine the key mechanisms through which the policy seeks to strengthen the biomanufacturing ecosystem.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights] [Sub Topic: Bio-Technology] [Macro Tag: Analytical, Applied] [Micro Tag: Examine, BioE3 Policy, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce your answer by giving a brief background of the policy. <br>• In the body of your answer, examine important mechanisms intended to strengthen the biomanufacturing ecosystem. <br>• Conclude by highlighting the alignment of the policy with the broader national objectives. |
@@ -43,13 +43,13 @@ Extra marks/content differentiation:
 
 • Positioning the EU in the rapidly expanding international market for bio-based materials, biomanufacturing, biochemicals, and agri-food and biotech sectors. This will be done, in particular, by steering existing foreign policy mechanisms.
 
-[Question ID: forum-mgp-2026-gs1-q1]
+[Question ID: forum-mgp-2026-csm26t14se-q01]
 
 ---
 
 ## Q2 [Year: 2026]
 **Question:** Discuss the role of Dr. Verghese Kurien in revolutionising India’s dairy sector and empowering rural communities.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Agriculture] [Section Group: Agriculture & Farm Dynamics] [Micro Topic: Public Distribution System (PDS) management, buffer stock dynamics, food security missions, and economics of animal rearing] [Sub Topic: Revolutions and Missions] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Dr. Verghese Kurien, India's dairy sector]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce your answer by giving a brief description about Dr. <br>• Kurien’s legacy as the Father of India’s White Revolution. <br>• In the body, highlight the pivotal role played by him in revolutionizing India’s dairy sector and empowering rural communities. <br>• Conclude your answer by mentioning some of the accolades earned by him. |
@@ -97,13 +97,13 @@ Extra marks/content differentiation:
 
 • Nearly 70% of the workforce in dairy farming consists of women, yet their contribution often remains undervalued due to the unorganized nature of the sector. Women led dairy cooperatives have emerged as powerful tools for their empowerment.
 
-[Question ID: forum-mgp-2026-gs1-q2]
+[Question ID: forum-mgp-2026-csm26t14se-q02]
 
 ---
 
 ## Q3 [Year: 2026]
 **Question:** What is the present world scenario of intellectual property rights with respect to life materials? Although India is second in the world to file patents, still only a few have been commercialized. Explain the reasons behind this less commercialization.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights] [Sub Topic: Intellectual Property Rights] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What is, Explain, Intellectual property rights, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a definition of intellectual property rights. <br>• In the body, first highlight the present world scenario of IPR with respect to life materials. <br>• Next, explain the reasons behind the less commercialization of patents in India. <br>• Conclude by highlighting recent government initiatives. |
@@ -138,13 +138,13 @@ The recent passage of the Anusandhan National Research Foundation Act by the Par
 
 Additional reading: Intellectual Property Rights vs Right to Access Basic Healthcare Tweaks in drug formulations to extend copyrights is a public health challenge | The Indian Express
 
-[Question ID: forum-mgp-2026-gs1-q3]
+[Question ID: forum-mgp-2026-csm26t14se-q03]
 
 ---
 
 ## Q4 [Year: 2026]
 **Question:** Discuss how quantum technologies can optimize production processes and improve operational efficiency in the manufacturing sector.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of IT, Computers, and robotics] [Sub Topic: IT] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Quantum technologies, Manufacturing sector]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining quantum technologies. <br>• In the body, discuss how they can optimize production processes and improve efficiency in the manufacturing sector. <br>• Conclude the answer by highlighting some challenges in the deployment of quantum technologies and corrective measures. |
@@ -190,13 +190,13 @@ The National Quantum Mission (NQM) is one of the nine initiatives under the Prim
 
 ● Quantum Materials & Devices: Develop and synthesize next-generation quantum materials such as superconductors, novel semiconductor structures, and topological materials for the fabrication of qubits, single-photon sources/detectors, entangled photon sources, and quantum sensing/metrological devices for applications in computing and communication.
 
-[Question ID: forum-mgp-2026-gs1-q4]
+[Question ID: forum-mgp-2026-csm26t14se-q04]
 
 ---
 
 ## Q5 [Year: 2026]
 **Question:** “The Human spaceflight programme has both tangible and intangible benefits for the nation.” In light of this statement, bring out the likely benefits of ISRO's Gaganyaan programme.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of Space and Defence technologies] [Sub Topic: Space Technology] [Macro Tag: Analytical, Applied] [Micro Tag: Bring out, Human spaceflight, ISRO, Gaganyaan]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of ISRO’s Gaganyaan programme. <br>• In the body, bring out the tangible and intangible benefits of the Human spaceflight programme for the nation. <br>• Conclude by highlighting some challenges associated with the mission and emphasizing the importance of demonstration missions in addressing these challenges. |
@@ -225,13 +225,13 @@ Extra marks/content differentiation:
 
 The Axiom-04 mission will provide valuable inputs for ISRO's upcoming Gaganyaan mission. It offers hands-on experience in the nuances of international crew integration, medical and psychological preparation, real-time health telemetry, experiment execution, and crew–ground coordination. These insights will directly influence mission planning, safety validation, and astronaut readiness for India's first indigenous human spaceflight mission.
 
-[Question ID: forum-mgp-2026-gs1-q5]
+[Question ID: forum-mgp-2026-csm26t14se-q05]
 
 ---
 
 ## Q6 [Year: 2026]
 **Question:** What is gene therapy? What makes it a better treatment option than the conventional approaches?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Everyday Science & Innovations] [Micro Topic: Science and Technology- applications in health, industry, and crisis management] [Sub Topic: Medical and Health Technologies] [Macro Tag: Descriptive, Comparative] [Micro Tag: What is, What makes, Gene therapy, Conventional approaches]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief explanation about gene therapy. <br>• In the body, discuss its advantages over conventional approaches. <br>• Next, mention the associated concerns and challenges. <br>• Conclude by emphasizing the need for adherence to regulatory framework. |
@@ -277,13 +277,13 @@ evolutionary progress.” — Isaac Asimov
 
 2. Case study: Scientists from the CSIR-Institute of Genomics and Integrative Biology, New Delhi, have developed an enhanced genome-editing system that can modify DNA more precisely and more efficiently than existing CRISPR-based technologies. To enhance it without compromising its specificity, researchers led by Debojyoti Chakraborty and Souvik Maiti at CSIR-IGIB modified and engineered new versions of FnCas9. The researchers tinkered with amino acids in FnCas9 that recognise and interact with the PAM sequence on the host genome. By doing this, we increase the binding affinity of the Cas protein with the PAM sequence. The Cas9 can then sit on the DNA in a stronger configuration, and your gene editing becomes much more effective.The researchers also engineered the enhanced FnCas9 to be more flexible and edit regions of the genome that are otherwise harder to access.Experiments to measure enzyme activity showed that enhanced FnCas9 cut target DNA at a higher rate compared to unmodified FnCas9.
 
-[Question ID: forum-mgp-2026-gs1-q6]
+[Question ID: forum-mgp-2026-csm26t14se-q06]
 
 ---
 
 ## Q7 [Year: 2026]
 **Question:** How the application of Artificial Intelligence (AI) can help India in its socio-economic development? Identify the hurdles in its large-scale adoption and suggest corrective measures.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of IT, Computers, and robotics] [Sub Topic: Artificial Intelligence] [Macro Tag: Analytical, Applied] [Micro Tag: How, Identify, Suggest, Artificial Intelligence, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining AI and mentioning its potential in addressing India’s socio economic challenges. <br>• In the body, first discuss the applications of AI  in various sectors, next discuss the hurdles for its large- scale adoption and then suggest corrective measures. <br>• Conclude the answer by mentioning the national policy on the same. |
@@ -352,13 +352,13 @@ creation in Indian languages.
 
 ● Hanooman’s Everest 1.0: A multilingual AI system developed by SML, Everest 1.0 supports 35 Indian languages, with plans to expand to 90.
 
-[Question ID: forum-mgp-2026-gs1-q7]
+[Question ID: forum-mgp-2026-csm26t14se-q07]
 
 ---
 
 ## Q8 [Year: 2026]
 **Question:** “Nanotechnology offers innovative solutions to combat pollution and promote environmental sustainability.” Elucidate.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights] [Sub Topic: Nano Technology] [Macro Tag: Descriptive, Applied] [Micro Tag: Elucidate, Nanotechnology, Pollution, Environmental sustainability]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by providing a brief description of nanotechnology. <br>• In the body, elaborate on the innovative solutions it offers to combat pollution and promote environmental sustainability. <br>• Conclude by highlighting some challenges and measures to address those challenges. |
@@ -406,13 +406,13 @@ Extra marks/content differentiation:
 
 Case study: Scientists from the Indian Institute of Science, Bengaluru have developed a novel ‘reusable’ nano- composite material, with Cerium being the crucial compound in it, which can degrade microbes and chemical dyes that are among common effluents in rivers.Published in the Journal of Industrial and Engineering Chemistry Research recently, the scientists looked at ceria (CeO) a cheap rare earth oxide with properties that include a strong absorption of ultraviolet light (this property also sees it being widely used for UV-blocking and radiation shielding agent).It is this notion, that the compound can speed up the degradation of chemical dyes and the bacterium Escherichia coli (which forms a large chunk of organic waste in sewage) led the researchers to develop ceria nanoflakes, which combines ceria with silver salts. In this composite, ceria absorbs light across the spectrum (and not just UV light), while the silver salts (silver phosphate, and silver bromide) form photocatalysis agents, where chemical reactions are accelerated in the presence of lightThe results show that the composite material ended up generating large amounts of hydrogen peroxide (a strong oxidizing agent) that degrades the dyes and bacteria. Within 60 minutes, nearly all of methylene blue and methyl orange (both common chemical dyes) were degraded by the composite. In comparison, ceria-silver phosphate compound that had been synthesized previously, researchers managed to degrade the chemical dyes by 80 per cent in this time frame.Similarly, for E. coli bacterium, colony forming units (which are responsible for the explosion of bacterial population) per ml had reduced from nearly 200 million units to less than 100 units in 80 minutes when exposed to visible light.
 
-[Question ID: forum-mgp-2026-gs1-q8]
+[Question ID: forum-mgp-2026-csm26t14se-q08]
 
 ---
 
 ## Q9 [Year: 2026]
 **Question:** The world is facing an acute shortage of clean and safe freshwater. What are the alternative technologies which can solve this crisis? Briefly discuss any three such technologies citing their key merits and demerits.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Everyday Science & Innovations] [Micro Topic: Science and Technology- developments and their effects in everyday life] [Sub Topic: Tech solutions for daily challenges] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What are, Discuss, Freshwater, Alternative technologies]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by highlighting the problem of acute shortage of clean and safe freshwater in the world through statistics. <br>• In the body, discuss any three alternative technologies that can help solve this crisis, citing their key merits and demerits. <br>• Conclude by highlighting their significance to achieve SDGs. |
@@ -483,13 +483,13 @@ Extra marks/content differentiation:
 
 2. Quotes: "Water is life, and clean water means health." Audrey Hepburn
 
-[Question ID: forum-mgp-2026-gs1-q9]
+[Question ID: forum-mgp-2026-csm26t14se-q09]
 
 ---
 
 ## Q10 [Year: 2026]
 **Question:** “Brain-Computer Interface (BCI) technology promises transformative applications across domains, but it comes with its own set of risks and challenges.” Elaborate.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of IT, Computers, and robotics] [Sub Topic: IT] [Macro Tag: Descriptive, Analytical] [Micro Tag: Elaborate, Brain-Computer Interface, Risks]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief explanatory note on Brain-Computer Interface (BCI) technology. <br>• In the body, first discuss the promise of its transformative applications across domains with examples. <br>• Next, elaborate upon the risks and challenges associated with the technology. <br>• Conclude by suggesting measures to address the challenges associated with BCI technology. |
@@ -537,7 +537,7 @@ Extra marks/content differentiation:
 
 2. Quote: “Science without morality” is one of the seven Gandhian sins.
 
-[Question ID: forum-mgp-2026-gs1-q10]
+[Question ID: forum-mgp-2026-csm26t14se-q10]
 
 ---
 

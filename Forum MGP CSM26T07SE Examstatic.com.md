@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** What characteristics of the monsoon climate play a crucial role in sustaining agriculture in Monsoon  Asia?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Geography] [Section Group: Physical Geography & Geophysical Phenomena] [Micro Topic: Salient Features of World Physical Geography] [Sub Topic: Monsoon] [Macro Tag: Descriptive, Analytical] [Micro Tag: What characteristics, Monsoon climate, Agriculture, Monsoon Asia]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by briefly explaining the nature of monsoon climate. <br>• In the body, discuss its characteristics playing a crucial role in sustaining agriculture in monsoon Asia. <br>• Conclude by emphasizing its importance in the food security of the continent. |
@@ -28,13 +28,13 @@ The monsoon climate is characterized by **seasonal wind reversals** caused by **
 
 Sustaining agriculture in Monsoon Asia requires **efficient water management, climate-resilient crops,** **improved irrigation**, and **flood control**. With rising water stress, monsoon rains remain crucial for **supporting** **farming**, and ensuring **food security** for the world's most populous continent. ***(277 words)***
 
-[Question ID: forum-mgp-2026-gs1-q1]
+[Question ID: forum-mgp-2026-csm26t07se-q01]
 
 ---
 
 ## Q2 [Year: 2026]
 **Question:** Explain the theory of continental drift. Also highlight the prominent evidence in support of the theory.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Geography] [Section Group: Physical Geography & Geophysical Phenomena] [Micro Topic: Salient Features of World Physical Geography] [Sub Topic: Geomorphology] [Macro Tag: Descriptive] [Micro Tag: Explain, Highlight, Continental drift, Evidence]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a background on continental drift theory. <br>• In the body, first explain the theory and its processes. <br>• Then highlight the prominent evidence supporting the theory from different fields of science. <br>• Conclude by noting the limitations and significance of the theory. |
@@ -60,13 +60,13 @@ The **following evidences** supported the theory:
 
 Despite limitations such as **insufficient force calculations** (movement mechanism) and incomplete **coastline** **matching**, Continental Drift Theory revolutionized our understanding of **Earth's dynamic nature**, challenging the notion of permanency of continents and laying the **groundwork** for the more comprehensive plate tectonic theory. ***(315 words)***
 
-[Question ID: forum-mgp-2026-gs1-q2]
+[Question ID: forum-mgp-2026-csm26t07se-q02]
 
 ---
 
 ## Q3 [Year: 2026]
 **Question:** Discuss the factors that influence temperature distribution of the oceans.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Geography] [Section Group: Physical Geography & Geophysical Phenomena] [Micro Topic: Salient Features of World Physical Geography] [Sub Topic: Oceanography] [Macro Tag: Analytical] [Micro Tag: Discuss, Factors, Temperature distribution, Oceans]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by briefly explaining the variation in temperature of ocean water. <br>• In the body, discuss the factors that influence temperature distribution of the ocean. <br>• Conclude by mentioning some initiatives to deal with the rising ocean temperature. |
@@ -91,13 +91,13 @@ The temperature distribution of the world's oceans is influenced by a combinatio
 
 Human-caused ocean warming is **altering currents, depleting oxygen zones**, and **bleaching corals**. These changes demand urgent action with global collaboration.The **UN Ocean Decade (2021-2030)** and the **Global** **Ocean Alliance** (30 by 30 target) are welcome initiatives in this direction. ***(268 words)***
 
-[Question ID: forum-mgp-2026-gs1-q3]
+[Question ID: forum-mgp-2026-csm26t07se-q03]
 
 ---
 
 ## Q4 [Year: 2026]
 **Question:** Define mantle plume and elaborate on its role in plate tectonics.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Geography] [Section Group: Physical Geography & Geophysical Phenomena] [Micro Topic: Salient Features of World Physical Geography] [Sub Topic: Geomorphology] [Macro Tag: Descriptive] [Micro Tag: Define, Elaborate, Mantle plume, Plate tectonics]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by briefly explaining the mantle plume. <br>• In the body, elaborate on its role in plate tectonics. <br>• Conclude by highlighting its significance. |
@@ -123,13 +123,13 @@ The mantle plume plays the **following roles** in plate tectonics:
 
 Thus, mantle plumes are fundamental to Earth's **long-term geological evolution**. They drive volcanic activity and alter Earth’s crustal composition. Over time, they **significantly shape the planet’s surface** and impact the behaviour of plate tectonics. **(259 words)**
 
-[Question ID: forum-mgp-2026-gs1-q4]
+[Question ID: forum-mgp-2026-csm26t07se-q04]
 
 ---
 
 ## Q5 [Year: 2026]
 **Question:** Briefly explain the processes through which the earth-atmosphere system maintains heat balance.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Geography] [Section Group: Physical Geography & Geophysical Phenomena] [Micro Topic: Salient Features of World Physical Geography] [Sub Topic: Climatology] [Macro Tag: Descriptive] [Micro Tag: Explain, Processes, Earth-atmosphere, Heat balance]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining heat balance. <br>• In the body of the answer, explain in a step-by- step manner the mechanism through which the earth maintains its heat balance. <br>• Conclude by highlighting the significance of the heat budget in sustaining life on earth. |
@@ -144,13 +144,13 @@ The Earth-atmosphere heat balance refers to the **equilibrium** between **incomi
 
 The interplay of **radiative, convective, conductive**, and **latent heat processes** ensures a dynamic equilibrium in the Earth-atmosphere system. Disruptions (e.g., **increased greenhouse gases**) can destabilize this balance, leading to **climate change**. Understanding these mechanisms is critical for addressing **global environmental** **challenges.** ***(251 words)***
 
-[Question ID: forum-mgp-2026-gs1-q5]
+[Question ID: forum-mgp-2026-csm26t07se-q05]
 
 ---
 
 ## Q6 [Year: 2026]
 **Question:** What is temperature inversion? Discuss the suitable conditions for its occurrence and bring out its  impact on weather and the local population.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Geography] [Section Group: Physical Geography & Geophysical Phenomena] [Micro Topic: Salient Features of World Physical Geography] [Sub Topic: Climatology] [Macro Tag: Descriptive, Analytical] [Micro Tag: What is, Discuss, Bring out, Temperature inversion, Weather]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce by defining temperature inversion. <br>• In the body, first explain the conditions suitable for its occurrence. <br>• Next, discuss its impact on the weather and the inhabitants of. <br>• Conclude by highlighting its significance. |
@@ -177,13 +177,13 @@ Temperature inversion has **profound impact** on the weather and the inhabitants
 
 While temperature inversion is a **natural phenomenon**, its negative effects are **exacerbated by anthropogenic** **activities** (air pollution). However, they also provide **stable weather** that can **benefit agriculture** and **moderate temperature extremes**. ***(338 words)***
 
-[Question ID: forum-mgp-2026-gs1-q6]
+[Question ID: forum-mgp-2026-csm26t07se-q06]
 
 ---
 
 ## Q7 [Year: 2026]
 **Question:** Analyze the factors affecting the salinity of oceans. Also, discuss the multi-dimensional effects of  variations in oceanic salinity.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Geography] [Section Group: Physical Geography & Geophysical Phenomena] [Micro Topic: Salient Features of World Physical Geography] [Sub Topic: Oceanography] [Macro Tag: Analytical] [Micro Tag: Analyze, Discuss, Salinity of oceans, Effects]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a definition of Ocean salinity. <br>• In the body, provide the factor affecting the variation in ocean salinity. <br>• Then, bring out the multi-dimensional effects of the variation. <br>• Conclude by highlighting the need to monitor the variation. |
@@ -212,13 +212,13 @@ The variation in ocean salinity can have the following **multi-dimensional impac
 
 Ocean salinity variations result from **climatic, hydrological**, and **anthropogenic** factors (desalination plants, dams construction), with cascading effects on **marine life, climate systems,** and **human activities**. Monitoring salinity is crucial for **understanding climate change** and maintaining **ecological balance**. ***(361*** ***words)***
 
-[Question ID: forum-mgp-2026-gs1-q7]
+[Question ID: forum-mgp-2026-csm26t07se-q07]
 
 ---
 
 ## Q8 [Year: 2026]
 **Question:** Briefly explain the mechanism of orographic rainfall and highlight its significance in shaping the  climate of a region.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Geography] [Section Group: Physical Geography & Geophysical Phenomena] [Micro Topic: Salient Features of World Physical Geography] [Sub Topic: Climatology] [Macro Tag: Descriptive] [Micro Tag: Explain, Highlight, Orographic rainfall, Climate]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by providing a brief definition of orographic rainfall. <br>• In the body, first explain the mechanism of orographic rainfall, then highlight its significance in shaping regional climates. <br>• Conclude by summarizing the broader implications of orographic rainfall on climate patterns. |
@@ -251,13 +251,13 @@ The **significance of orographic rainfall** in shaping regional climates is disc
 
 Orographic rainfall is a key climate-shaping mechanism, creating **stark contrasts** between windward and leeward slopes. By generating **distinct precipitation** and **temperature zones**, it influences **ecosystems,** **agriculture,** and **human habitation patterns** worldwide. ***(371 words)***
 
-[Question ID: forum-mgp-2026-gs1-q8]
+[Question ID: forum-mgp-2026-csm26t07se-q08]
 
 ---
 
 ## Q9 [Year: 2026]
 **Question:** What are the factors that determine the pattern of planetary winds? Also, explain the tricellular model  of atmospheric circulation.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Geography] [Section Group: Physical Geography & Geophysical Phenomena] [Micro Topic: Salient Features of World Physical Geography] [Sub Topic: Climatology] [Macro Tag: Descriptive, Analytical] [Micro Tag: What are, Explain, Planetary winds, Tricellular model]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by briefly explaining planetary winds. <br>• In the body, first discuss the factors determining the pattern of planetary wind, then explain the tricellular model of atmospheric circulation. <br>• Conclude by highlighting their importance. |
@@ -293,13 +293,13 @@ Meridional circulation refers to the **large-scale atmospheric movement** in a n
 
 Planetary winds and the tricellular circulation model are essential for **balancing** Earth’s heat and moisture. They shape **weather patterns**, influence **climate zones**, and provide  a foundational understanding of Earth's climate system and its regional variations. ***(453 words)***
 
-[Question ID: forum-mgp-2026-gs1-q9]
+[Question ID: forum-mgp-2026-csm26t07se-q09]
 
 ---
 
 ## Q10 [Year: 2026]
 **Question:** Describe different types of weathering and discuss its geomorphic significance.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Geography] [Section Group: Physical Geography & Geophysical Phenomena] [Micro Topic: Salient Features of World Physical Geography] [Sub Topic: Geomorphology] [Macro Tag: Descriptive, Analytical] [Micro Tag: Describe, Discuss, Weathering, Geomorphic significance]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining weathering. <br>• In the body, first discuss the three major types of weathering. <br>• Next, elaborate on the geomorphic significance of weathering. <br>• Conclude by emphasizing the global relevance of the weathering process. |
@@ -333,7 +333,7 @@ Weathering holds immense **geomorphic significance** as:
 
 From shaping **iconic landforms** to regulating Earth’s **geochemical cycles**, weathering bridges **geology,** **ecology, and climatology**. Its study aids in predicting responses to **environmental shifts**, including climate change and **anthropogenic disturbances.** ***(330 Words)***
 
-[Question ID: forum-mgp-2026-gs1-q10]
+[Question ID: forum-mgp-2026-csm26t07se-q10]
 
 ---
 

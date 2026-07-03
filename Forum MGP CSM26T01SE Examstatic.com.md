@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** “The Indian Constitution is merely an amended version of Government of India Act 1935”. Do you  agree? Justify your answer.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Polity] [Section Group: Constitutional Framework & Evolution] [Micro Topic: Indian Constitution- historical underpinnings and evolution] [Sub Topic: Making of the Constitution] [Macro Tag: Analytical, Comparative] [Micro Tag: Justify, Agree, Government of India Act 1935]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce with a brief historical background of the 1935 Act. <br>• List out the common features between the 1935 Act and the Constitution. <br>• In the next part, highlight the fundamental differences between the two. <br>• Conclude by identifying administrative continuity as the reason for the borrowed features while underscoring the originality of the Indian Constitution. |
@@ -45,13 +45,13 @@ Despite these similarities, the Constitution **cannot be termed as merely its am
 
 While it has adopted the **administrative framework** of the 1935 Act, the **philosophy of the Constitution** makes it a ***sui-generis*** document to realize the **ideals of the freedom struggle** and meet **independent India's** **aspirations**. ***(447 words)***
 
-[Question ID: forum-mgp-2026-gs1-q1]
+[Question ID: forum-mgp-2026-csm26t01se-q01]
 
 ---
 
 ## Q2 [Year: 2026]
 **Question:** Explain the concept of residuary powers under the Indian Constitution. Why were they vested in the  Parliament?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Polity] [Section Group: Federal Structure & Local Governance] [Micro Topic: Issues and challenges pertaining to the federal structure] [Sub Topic: Federalism] [Macro Tag: Descriptive, Analytical] [Micro Tag: Explain, Residuary powers, Parliament]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by explaining briefly the concept of residuary powers. <br>• Next, bring out the reasons for granting the residuary powers to the Centre. <br>• Conclude by highlighting the judicial position and the recommendations of relevant commissions on the issue. |
@@ -72,13 +72,13 @@ Following are the reasons for vesting **residuary powers in the parliament**:
 
 Various judicial pronouncements (***Dhillon (1971), Sat Pal (1979)***) and **practical experience** have resulted in an expansion of residuary powers of the legislation in the favour of the Centre. It has also contributed to the federation to be **held together.** Nevertheless, the **Sarkaria Commission, Justice Venkatachaliah** **Commission and Justice Punchhi Commission** have recommended transfer of **residuary powers to the** **Concurrent List,** excluding those related to taxation. (***251 words***)
 
-[Question ID: forum-mgp-2026-gs1-q2]
+[Question ID: forum-mgp-2026-csm26t01se-q02]
 
 ---
 
 ## Q3 [Year: 2026]
 **Question:** “The expansive interpretation of Article 21 by the judiciary reflects its transformative role in  safeguarding not just life, but also various facets of human well-being." Elucidate this statement with the  help of relevant case laws.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Polity] [Section Group: Constitutional Framework & Evolution] [Micro Topic: Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.] [Sub Topic: Fundamental Rights] [Macro Tag: Descriptive, Applied] [Micro Tag: Elucidate, Article 21, Judiciary, Case laws]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by briefly writing about Article. <br>• In the body, elucidate its transformative role in safeguarding not just life, but also various facets of human well being through relevant case laws. Conclude by describing how the trend of expansive interpretation makes the constitution a living document. |
@@ -110,13 +110,13 @@ Described by the apex court as the “**soul of the Constitution**”, Article 2
 
 The scope of the right to life and liberty encompasses various **socio-economic rights** alongside **political rights**. Its **expansive interpretation** by the judiciary has allowed the Constitution to respond to the changing times and become a **living document** in the true sense of the term. *(****306 words****)*
 
-[Question ID: forum-mgp-2026-gs1-q3]
+[Question ID: forum-mgp-2026-csm26t01se-q03]
 
 ---
 
 ## Q4 [Year: 2026]
 **Question:** Why were the Directive Principles of State Policy (DPSP) made non-justiciable despite being  fundamental to the governance of the country?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Polity] [Section Group: Constitutional Framework & Evolution] [Micro Topic: Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.] [Sub Topic: DPSP] [Macro Tag: Analytical] [Micro Tag: DPSP, Non-justiciable, Governance]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of the Directive Principles of State Policy (DPSP). <br>• In the body, bring out the reasons for making them non-justiciable despite being fundamental to the governance of the country. <br>• Conclude by highlighting the significance of the DPSPs. |
@@ -136,13 +136,13 @@ The scope of the right to life and liberty encompasses various **socio-economic 
 
 The force behind the DPSPs is **primarily political rather than legal**. In a democracy, no government can afford to ignore these principles, as **public opinion and electoral accountability** serve as powerful checks, compelling governments to implement them. Despite being non-justiciable, several DPSPs are being progressively **realized** through **legislative action** (Right to Education Act (Article 45), **executive action** (Uttarakhand’s implementation of UCC (Article 44), and **judicial** **interpretation** (Olga Tellis Case, 1985). *(****308 words****)*
 
-[Question ID: forum-mgp-2026-gs1-q4]
+[Question ID: forum-mgp-2026-csm26t01se-q04]
 
 ---
 
 ## Q5 [Year: 2026]
 **Question:** Under what circumstances can the Financial Emergency be imposed by the President? What  consequences follow when such a declaration remains in force?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Polity] [Section Group: Federal Structure & Local Governance] [Micro Topic: Functions and responsibilities of the Union and the States] [Sub Topic: Emergency] [Macro Tag: Descriptive] [Micro Tag: Financial Emergency, President, Consequences]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by briefly outlining the constitutional provisions related to Financial Emergency and highlight the circumstances under which a financial emergency can be imposed by the President. <br>• Next, bring out the consequences that follow when such a declaration remains in force. <br>• Conclude by emphasizing the significance of the provisions for Financial Emergency. |
@@ -162,13 +162,13 @@ Imposition of a Financial Emergency has **far-reaching consequences** such as:
 
 Financial Emergency has **never been imposed in the history of independent Indi**a despite occasions that may have warranted its use (1991 financial crisis, COVID-19). Despite criticisms about the **over-centralization** that Financial Emergency entails, the provisions are significant as they allow the Union to **ward-off any threats to** **India’s sovereignty** from economic factors and help preserve the constitutional order. (***264 words***)
 
-[Question ID: forum-mgp-2026-gs1-q5]
+[Question ID: forum-mgp-2026-csm26t01se-q05]
 
 ---
 
 ## Q6 [Year: 2026]
 **Question:** While the Indian Constitution incorporates the principle of separation of powers, it is not 'water-tight'  and is based on the principle of 'checks and balances.' Elucidate.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Polity] [Section Group: Organs of Government & Dispute Redressal] [Micro Topic: Separation of powers between different organs] [Sub Topic: Separation of Powers] [Macro Tag: Descriptive, Analytical] [Micro Tag: Elucidate, Separation of powers, Checks and balances]*
 #### Answer from ForumIAS
 
 | **Approach:** • In the Introduction explain the doctrine of separation of power. <br>• In the body, discuss the separation of powers in the Indian constitution and discuss the functional overlapping of powers. <br>• Then bring out the principles of checks and balances in the constitution. <br>• In the conclusion, highlight exclusive and overlapping powers and functions of three organs of government. |
@@ -199,13 +199,13 @@ Also, there is system of **‘checks and balances’** to prevent **‘arbitrary
 
 Thus, separation of power in the Indian political system is **'not water-tight**' but rather based on the principle of **'checks and balances'** where the three organs of government have both **exclusive and overlapping** powers and functions. ***(324 words)***
 
-[Question ID: forum-mgp-2026-gs1-q6]
+[Question ID: forum-mgp-2026-csm26t01se-q06]
 
 ---
 
 ## Q7 [Year: 2026]
 **Question:** What are the essential conditions for the exercise of the legislative powers by the President? Also  discuss the legality of re-promulgation of ordinances without legislative scrutiny.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Polity] [Section Group: Organs of Government & Dispute Redressal] [Micro Topic: Structure, organization and functioning of the Executive] [Sub Topic: Union Executive] [Macro Tag: Descriptive, Analytical] [Micro Tag: Discuss, Legislative powers, President, Ordinances]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of the legislative powers of the President. <br>• In the body, first enumerate the essential conditions for the exercise of the same. <br>• Next, discuss the legality of the re-promulgation of ordinances by her without placing them before the Parliament. <br>• Conclude by underlining the significance of the power and the need for constitutional guardrails to prevent its misuse. |
@@ -231,13 +231,13 @@ There has been significant **debate** regarding the Ordinance making power of th
 
 The judgements indicate that while the executive may have **followed the legality and ensured governance** **continuity**, unchecked re-promulgation violates the norms of **constitutional mortality** (Bihar during 1967– 1981). **Mandatory legislative scrutiny** is crucial to prevent **executive overreach.** *(****423 words****)*
 
-[Question ID: forum-mgp-2026-gs1-q7]
+[Question ID: forum-mgp-2026-csm26t01se-q07]
 
 ---
 
 ## Q8 [Year: 2026]
 **Question:** Freedom of speech and expression guaranteed under the constitution goes well beyond spoken  words and written texts, but these rights are not absolute. Discuss.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Polity] [Section Group: Constitutional Framework & Evolution] [Micro Topic: Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.] [Sub Topic: Fundamental Rights] [Macro Tag: Analytical] [Micro Tag: Discuss, Freedom of speech and expression, Absolute rights]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce with constitutional provisions on freedom of speech and expression. <br>• In the body, first explain the diverse scope of this right followed by identifying the restrictions imposed on them. <br>• Conclude with underlining the balanced constitutional interpretation by the judiciary. |
@@ -276,13 +276,13 @@ However, recognizing the **need to balance** individual freedom with social resp
 
 The evolution of free speech jurisprudence emphasizes **balanced constitutional interpretation**. The judiciary's **proportionality doctrine** (Modern Dental College case) ensures restrictions serve **legitimate interests** while **preserving democratic** discourse, keeping constitutional values responsive to India's evolving needs. ***(349*** ***words)***
 
-[Question ID: forum-mgp-2026-gs1-q8]
+[Question ID: forum-mgp-2026-csm26t01se-q08]
 
 ---
 
 ## Q09 [Year: 2026]
 **Question:** Discuss the reasons for the limited success of Panchayati Raj Institutions in India. Also, recommend  measures to strengthen the functioning of these institutions.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Polity] [Section Group: Federal Structure & Local Governance] [Micro Topic: Devolution of powers and finances up to local levels and challenges therein] [Sub Topic: Local Self Government] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Recommend, Panchayati Raj Institutions, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce with a background on Panchayati Raj Institutions in India. <br>• In the body, identify the reasons for the ineffectiveness of the PRIs followed by measures to improve the functioning of these institutions. <br>• Conclude by underlining the vision of Atma nirbhar Panchayats. |
@@ -333,13 +333,13 @@ Addressing these systemic challenges requires a **multi-pronged approach**:
 
 By addressing these challenges through multipronged approaches, PRIs can truly **embody the vision** of **‘Atma** **Nirbhar Panchayats’**. *(399 words)*
 
-[Question ID: forum-mgp-2026-gs1-q09]
+[Question ID: forum-mgp-2026-csm26t01se-q09]
 
 ---
 
 ## Q10 [Year: 2026]
 **Question:** While the Inter-State Council holds considerable potential for addressing federal disputes, this  potential remains largely unrealized. Analyze.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Polity] [Section Group: Federal Structure & Local Governance] [Micro Topic: Issues and challenges pertaining to the federal structure] [Sub Topic: Federalism] [Macro Tag: Analytical] [Micro Tag: Analyze, Inter-State Council, Federal disputes]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by briefly elaborating on the constitutional status of the Inter-State Council. <br>• In the body, first highlight its potential for addressing federal disputes. <br>• Next, bring out the reasons for non-realization of this potential. <br>• Lastly, provide suggestions to improve its effectiveness. <br>• Conclude with the need for concerted efforts from all stakeholders to make Indian federalism more cooperative. |
@@ -373,7 +373,7 @@ Following **suggestions** can help improve the role of ISC:
 
 Enhancing the **Council's role,** providing it with more **resources,** ensuring a **time-bound resolution** process, and encouraging a **cooperative mindset** among all stakeholders can contribute to effective dispute resolution within the **cooperative federalism** framework in India***. (386 words)***
 
-[Question ID: forum-mgp-2026-gs1-q10]
+[Question ID: forum-mgp-2026-csm26t01se-q10]
 
 ---
 

@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** Bring out the factors responsible for growing salience of Africa in India’s foreign policy framework. Also,  highlight the contemporary areas of their bilateral engagement.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: International Relations] [Section Group: Global Geopolitics & Indian Diaspora] [Micro Topic: Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests] [Sub Topic: Bilateral Relations] [Macro Tag: Analytical, Descriptive] [Micro Tag: Bring out, Highlight, Africa, India's foreign policy]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a brief background about the India-Africa relations. <br>• In the body, first bring out the factors responsible for the growing salience of Africa in India’s foreign policy framework. <br>• Next, highlight the contemporary areas of their bilateral engagement. <br>• Conclude by suggesting a way forward for the future. |
@@ -45,13 +45,13 @@ The **ten guiding principles** enunciated by the Prime Minister in his address t
 
 **Additional resources:** Indo-African Relationship amid South-South Cooperation | ForumIAS India’s strategic focus on West Africa - The Hindu Why India must put Africa at the heart of its Global South vision | The Indian Express
 
-[Question ID: forum-mgp-2026-gs1-q1]
+[Question ID: forum-mgp-2026-csm26t11se-q01]
 
 ---
 
 ## Q2 [Year: 2026]
 **Question:** ‘The West is fostering India as an alternative to reduce dependence on China's supply chain and as a  strategic ally to counter China's political and economic dominance.’ Explain this statement with examples.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: International Relations] [Section Group: Global Geopolitics & Indian Diaspora] [Micro Topic: Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests] [Sub Topic: Geo-politics affecting India's Interest] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Explain, The West, India, China]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by highlighting the role of recent events in shifting Western focus towards India. <br>• In the body, first point out the steps taken to reduce the West’s dependence on China’s supply chain, followed by those taken to counter China’s political and economic dominance. <br>• Conclude by outlining the steps India can take to leverage this shifting preference. |
@@ -80,13 +80,13 @@ India should strive to enhance **infrastructure**, boost **financial inclusion**
 
 **Additional resources:** India’s national interest demands better China ties. Don't let West influence it India, China at 75 — a time for strategy, not sentiment - The Hindu Christophe Jaffrelot writes: The West, China, a world in flux — and where India stands | The Indian Express
 
-[Question ID: forum-mgp-2026-gs1-q2]
+[Question ID: forum-mgp-2026-csm26t11se-q02]
 
 ---
 
 ## Q3 [Year: 2026]
 **Question:** “While the Gulf region is a lucrative destination, it also presents significant challenges to the Indian  diaspora.” Elaborate.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: International Relations] [Section Group: Global Geopolitics & Indian Diaspora] [Micro Topic: Indian Diaspora: Economic, Political & Social Impact of the Indian Diaspora] [Sub Topic: Indian Diaspora] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Elaborate, Gulf region, Indian diaspora]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a brief background about the extent and nature of the Indian diaspora in the Gulf region. <br>• In the body, first illustrate how the region is a lucrative destination for the Indian diaspora. <br>• Next, analyse how despite these opportunities, the Indian diaspora faces significant challenges in the Gulf region. <br>• Conclude by suggesting some government steps to address these challenges. |
@@ -133,13 +133,13 @@ Overcoming these challenges requires government intervention in the direction of
 
 **Additional resources:** Why India is getting more remittances from Advanced Economies than the Gulf | Explained News - The Indian Express A regional divide in blue-collar worker migration from India: Data - The Hindu
 
-[Question ID: forum-mgp-2026-gs1-q3]
+[Question ID: forum-mgp-2026-csm26t11se-q03]
 
 ---
 
 ## Q4 [Year: 2026]
 **Question:** Explain the funding mechanisms of WHO and examine their implications for global health priorities. How  can developing nations contribute to making WHO more inclusive and effective?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: International Relations] [Section Group: International Organizations] [Micro Topic: International Institutions: Structure, Mandate & Functioning of Important Agencies & Fora] [Sub Topic: United Nations and its Agencies] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Explain, Examine, WHO, Developing nations]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by providing a brief background of the World Health Organization. <br>• In the body, first discuss the funding mechanisms of WHO, then examine their implications for global health priorities. <br>• Next, explore how developing nations can contribute to making WHO more inclusive and effective. <br>• Conclude by highlighting the significance of a reformed WHO funding structure for global health governance. |
@@ -182,13 +182,13 @@ The landmark **WHO Pandemic Agreement of April 2025** exemplifies how **reformed
 
 **Additional resources:** US withdrawal from the WHO and its potential impacts |ForumIAS The U.S.’s exit from WHO, a chance to reshape global health - The Hindu The WHO balance sheet: How it is funded, where it spends | Explained News - The Indian Express
 
-[Question ID: forum-mgp-2026-gs1-q4]
+[Question ID: forum-mgp-2026-csm26t11se-q04]
 
 ---
 
 ## Q5 [Year: 2026]
 **Question:** “ASEAN is the cornerstone of India's Act East Policy and its Indo-Pacific vision.” Elucidate.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: International Relations] [Section Group: Global Geopolitics & Indian Diaspora] [Micro Topic: Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests] [Sub Topic: Groupings involving Immediate and Extended neighbours] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Elucidate, ASEAN, India's Act East Policy, Indo-Pacific]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about ASEAN. <br>• In the body, elucidate how it is the cornerstone of India’s Act East Policy and its Indo-Pacific vision. <br>• Conclude by highlighting some challenges in India-ASEAN engagement and suggesting remedial measures. |
@@ -216,13 +216,13 @@ The landmark **WHO Pandemic Agreement of April 2025** exemplifies how **reformed
 
 **Additional resources:** India-ASEAN Relations- Cooperation and Challenges- Explained Pointwise |ForumIAS Address by External Affairs Minister, Dr. S. Jaishankar at the Chulalongkorn University on ''India’s Vision of the Indo- Pacific''
 
-[Question ID: forum-mgp-2026-gs1-q5]
+[Question ID: forum-mgp-2026-csm26t11se-q05]
 
 ---
 
 ## Q6 [Year: 2026]
 **Question:** BRICS and Quad may have different priorities, yet both have their salience in advancing India's strategic  interests. Discuss.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: International Relations] [Section Group: Global Geopolitics & Indian Diaspora] [Micro Topic: Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests] [Sub Topic: Groupings beyond South Asia] [Macro Tag: Analytical, Comparative, Applied] [Micro Tag: Discuss, BRICS, Quad, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce with a brief background of BRICS and Quad. <br>• In the body, elaborate how both the groupings advance India’ strategic interest, followed by challenges plaguing them. <br>• Conclude by highlighting the benefits of this dual engagement. |
@@ -272,13 +272,13 @@ While these challenges need to be addressed through **diplomatic engagement**, I
 
 **Additional resources:** India's strategic involvement in both the Quad and BRICS |ForumIAS The growing appeal of the Quad — and why China is worried about it | The Indian Express
 
-[Question ID: forum-mgp-2026-gs1-q6]
+[Question ID: forum-mgp-2026-csm26t11se-q06]
 
 ---
 
 ## Q7 [Year: 2026]
 **Question:** Critically analyse India's evolving diplomatic, economic and strategic relations with the Central Asian  Republics (CARs) highlighting their increasing significance in regional and global geopolitics.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: International Relations] [Section Group: Global Geopolitics & Indian Diaspora] [Micro Topic: Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests] [Sub Topic: Groupings involving Immediate and Extended neighbours] [Macro Tag: Analytical, Descriptive, Applied] [Micro Tag: Critically analyse, Highlighting, Central Asian Republics, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a brief background about CARs. <br>• In the body, first elaborate upon the evolving diplomatic, economic and strategic relations between India and CARs. <br>• Next, highlight the challenges in deeper engagement. <br>• Conclude with summarizing the benefits of engagement with CARs. |
@@ -319,13 +319,13 @@ CARs' strategic significance stems from their role as the nexus of **energy corr
 
 **Additional resources:** India’s Central Asia outreach -ForumIAS Blog Central Asian foreign policy multi-vectorism pays off - The Hindu Tracing the path of China’s diplomacy in Central Asia, and where India stands | Explained News - The Indian Express
 
-[Question ID: forum-mgp-2026-gs1-q7]
+[Question ID: forum-mgp-2026-csm26t11se-q07]
 
 ---
 
 ## Q8 [Year: 2026]
 **Question:** The changing geopolitical landscape poses challenges to India-Russia relationship, but it remains  resilient, anchored by deep-rooted trust and shared interests. Examine.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: International Relations] [Section Group: Global Geopolitics & Indian Diaspora] [Micro Topic: Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests] [Sub Topic: Bilateral Relations] [Macro Tag: Analytical, Applied] [Micro Tag: Examine, India-Russia relationship, Geopolitics]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce by giving a brief background about the strategic partnership between India and Russia. <br>• In the body, first examine how the changing geo-political landscape poses challenges to bilateral ties. <br>• Next, highlight how the relationship remains resilient. <br>• Conclude by suggesting measures to further deepen the relations. |
@@ -364,13 +364,13 @@ The **revival of the annual summit** between leaders after a two-year gap marks 
 
 **Additional resources:** India-Russia Relations- Significance and Challenges- Explained Pointwise |ForumIAS Russia’s geopolitical pivot to Asia, a new India chapter - The Hindu 5 ways in which India-Russia relationship will shape the world in 2025 | The Indian Express
 
-[Question ID: forum-mgp-2026-gs1-q8]
+[Question ID: forum-mgp-2026-csm26t11se-q08]
 
 ---
 
 ## Q9 [Year: 2026]
 **Question:** Bangladesh is a key pillar of India's Neighborhood First policy, but its recent political developments  threaten to disrupt the 'Sonali Adhyay' in bilateral relations. Analyze.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: International Relations] [Section Group: Neighborhood & Bilateral Engagements] [Micro Topic: Neighborhood Relations: India & its Neighborhood-Relations] [Sub Topic: Neighbourhood] [Macro Tag: Analytical, Applied] [Micro Tag: Analyze, Bangladesh, India, Neighborhood First]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief overview of India-Bangladesh ties. <br>• In the body, first discuss how Bangladesh is a key pillar of India’s Neighbourhood First Policy. <br>• Next, giving a brief background about the recent political developments in Bangladesh, bring out the challenges they pose for the bilateral relations. <br>• Conclude by suggesting measures to preserve the achievements of the Sonali Adhyaya. |
@@ -404,13 +404,13 @@ It is important that concrete steps (e.g. **Track 2 diplomacy, leadership summi*
 
 **Additional resources:** India and Bangladesh Relations-Explained pointwise |ForumIAS 1971 shapes India-Bangladesh history and future — not August 5 | The Indian Express Two to tango: On India-Bangladesh ties - The Hindu
 
-[Question ID: forum-mgp-2026-gs1-q9]
+[Question ID: forum-mgp-2026-csm26t11se-q09]
 
 ---
 
 ## Q10 [Year: 2026]
 **Question:** Discuss the possible implications of tariffs and trade barriers on India’s scientific and technological  enterprise. Also suggest policy responses to mitigate their impact on the broader knowledge economy.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: International Relations] [Section Group: Global Geopolitics & Indian Diaspora] [Micro Topic: Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests] [Sub Topic: Geo-politics affecting India's Interest] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Suggest, Tariffs, India, Trade barriers]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of India’s import dependence in scientific and technological enterprise. <br>• In the body, first discuss the possible implications of the same. <br>• Next, suggest policy responses to mitigate their impact on the broader knowledge economy. <br>• Conclude by suggesting a way forward. |
@@ -445,7 +445,7 @@ Instead of knee jerk reactions to trade barriers, India should use it as an oppo
 1. **The hidden costs of Trump’s tariffs on India’s knowledge economy | The Indian Express**
 2. **Science in the crossfire: How US tariffs threaten India’s research future**
 
-[Question ID: forum-mgp-2026-gs1-q10]
+[Question ID: forum-mgp-2026-csm26t11se-q10]
 
 ---
 

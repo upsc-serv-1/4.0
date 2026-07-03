@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** What are the key factors contributing to the ‘Missing Middle’ phenomenon in the country's  manufacturing sector?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Manufacturing Sector] [Macro Tag: Descriptive, Analytical] [Micro Tag: What are, Missing Middle, Manufacturing sector, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by explaining the ‘Missing Middle’ problem in Indian manufacturing. <br>• In the body, elaborate on the factors responsible for the same. <br>• Conclude by suggesting corrective measures. |
@@ -32,13 +32,13 @@ Along with the **‘Make in India’** initiative, **India also needs** to nurtu
 
 **IDR Act:** Industries (Development and Regulation) Act, 1951**; MRTP Act:** Monopolies and Restrictive Trade Practices Act
 
-[Question ID: forum-mgp-2026-gs1-q1]
+[Question ID: forum-mgp-2026-csm26t05se-q01]
 
 ---
 
 ## Q2 [Year: 2026]
 **Question:** Discuss the merits and demerits of the four ‘Labour Codes’ in the context of labour market reforms in  India.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Industrial Dynamics & Reforms] [Micro Topic: Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth] [Sub Topic: Labour Reform] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Labour Codes, Labour market reforms, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a brief background of the four labour codes. <br>• In the body, discuss their merits and demerits in the context of labour market reforms in India. <br>• Conclude by highlighting the need for further deliberations among stakeholders for its smooth implementation. |
@@ -94,13 +94,13 @@ industrial courts replaced with **labour tribunals)**. **laws** from their ambit
 
 The **progress** regarding the implementation of the codes has been **uneven** so far primarily due to **resistance** **from stakeholders**. Upholding the spirit of the **tripartite negotiation** framework with the vision of **“Shramev** **Jayate”** would go a long way in enabling their smooth implementation. ***(424 words)***
 
-[Question ID: forum-mgp-2026-gs1-q2]
+[Question ID: forum-mgp-2026-csm26t05se-q02]
 
 ---
 
 ## Q3 [Year: 2026]
 **Question:** What are Global Capability Centers (GCCs)? Discuss their significance for the country’s economic  landscape.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Economic Growth] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What are, Discuss, Global Capability Centers, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by explaining Global Capability Centers (GCCs). <br>• In the body, discuss their significance for India’s economic landscape, citing relevant data. <br>• Also, mention risks and challenges associated with them. <br>• Conclude with a way forward to strengthen India’s position as the "GCC capital of the world. <br>• ". |
@@ -134,13 +134,13 @@ However, there are also **challenges** and **risks** associated with GCCs:
 
 To address these challenges and cement India’s position as the **“GCC Capital of the World”**, an overarching policy framework for **streamlining** and **simplifying regulatory processes** is needed. **Maharashtra’s IT/ITES** **Policy 2023** is a step in the right direction that can be improved and replicated nationwide. *(****394 words****)*
 
-[Question ID: forum-mgp-2026-gs1-q3]
+[Question ID: forum-mgp-2026-csm26t05se-q03]
 
 ---
 
 ## Q4 [Year: 2026]
 **Question:** Amid global economic uncertainties, India’s Balance of Payments (BoP) has shown remarkable  resilience. Elaborate on the factors contributing to this stability.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Industrial Dynamics & Reforms] [Micro Topic: Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth] [Sub Topic: Balance of Payment] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Elaborate, Balance of Payments, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of global economic uncertainties and India’s external sector resilience. <br>• In the body, discuss the factors contributing to India’s Balance of Payments (BoP) stability. <br>• Conclude by providing suggestions to maintain this stability. |
@@ -168,13 +168,13 @@ Amid **uncertainties over global trade policies** (e.g., potential tariff wars u
 
 **RoDTEP:** Remission of Taxes and Duties on Exported Products**; SPR:** Strategic Petroleum Reserves**; NMEO-** **Oilseeds:** National Mission on Edible Oils- Oilseeds
 
-[Question ID: forum-mgp-2026-gs1-q4]
+[Question ID: forum-mgp-2026-csm26t05se-q04]
 
 ---
 
 ## Q5 [Year: 2026]
 **Question:** What is the ‘gig economy’? Examine the implications of its rise on the employment scenario in India.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Unemployment] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What is, Examine, Gig economy, Employment, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief description about the Gig economy. <br>• In the body, discuss both positive and negative implications of its rise on the employment scenario in India. <br>• Conclude with suggestions and mention the steps taken in this regard. |
@@ -209,13 +209,13 @@ However, its rise also has **negative implications**:
 
 Policymakers must **balance worker protection with innovation** by developing **regulations** that safeguard gig workers while maintaining economic flexibility. The **Rajasthan Platform-Based Gig Workers Act, 2023** and a similar **Karnataka** legislation represent important initial steps toward achieving this equilibrium. *(****366 words****)*
 
-[Question ID: forum-mgp-2026-gs1-q5]
+[Question ID: forum-mgp-2026-csm26t05se-q05]
 
 ---
 
 ## Q6 [Year: 2026]
 **Question:** The economic reforms of 1991 significantly reshaped India’s economic landscape. Elaborate on the  need for these reforms and their key objectives.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Industrial Dynamics & Reforms] [Micro Topic: Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth] [Sub Topic: LPG Reform and Impact] [Macro Tag: Descriptive, Analytical] [Micro Tag: Elaborate, Economic reforms 1991, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about the economic reforms of. <br>• In the body, first elaborate on the need for these reforms, and then discuss their key objectives. Conclude by highlighting the need for Reforms. |
@@ -252,13 +252,13 @@ The key **objectives** of the economic reforms of 1991:
 
 The economic reforms of 1991 laid the foundation for India's transformation, but the journey towards a **'Viksit** **Bharat by 2047'** requires another package of reforms. **Reforms 2.0** (technology upgradation, digitization, land reforms, etc.) need to aim at achieving structural overhaul of India’s economy and be guided by the principles of **inclusivity, sustainability** and **dynamism.** ***(407 words)***
 
-[Question ID: forum-mgp-2026-gs1-q6]
+[Question ID: forum-mgp-2026-csm26t05se-q06]
 
 ---
 
 ## Q7 [Year: 2026]
 **Question:** Distinguish between the Consumer Price Index (CPI) and the Wholesale Price Index (WPI). Why is CPI  preferred over WPI as a measure of inflation?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: Monetary policy] [Macro Tag: Comparative, Analytical] [Micro Tag: Distinguish, Why, CPI, WPI, Inflation]*
 #### Answer from ForumIAS
 
 | **Approach:** • Begin with a brief mention about CPI and WPI. <br>• In the body, first tabulate the differences between the two. <br>• Next, explain why CPI is preferred over WPI as a measure of inflation. <br>• Conclude the answer by highlighting their significance in providing a comprehensive assessment of inflation. |
@@ -295,13 +295,13 @@ Although they both measure inflation, **CPI is preferred over WPI** due to the f
 
 Due to their **differing methodologies** and **focus areas**, CPI and WPI may at times exhibit diverging trends (a phenomenon known as the **‘forking enigma**’). This underscores the **importance of both indices** in providing a **comprehensive assessment of inflation** across various levels of the economy. (***371 words***)
 
-[Question ID: forum-mgp-2026-gs1-q7]
+[Question ID: forum-mgp-2026-csm26t05se-q07]
 
 ---
 
 ## Q8 [Year: 2026]
 **Question:** Elaborate on the various policy instruments available to the Reserve Bank of India (RBI) for regulating  money supply in the economy. Also, explain why the RBI is known as the ‘lender of last resort’.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: Monetary policy] [Macro Tag: Descriptive, Analytical] [Micro Tag: Elaborate, Explain, RBI, Money supply]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a brief background about the RBI. <br>• In the body, elaborate on the various policy instruments available to RBI for regulating money supply in the economy. <br>• Next, explain why it is termed as the ‘lender of last resort’. <br>• Conclude by highlighting the significance of RBI in ensuring financial stability and safeguarding depositors' interests. |
@@ -333,13 +333,13 @@ RBI is termed as the '**lender of last resort**' because it can extend **credit 
 
 Thus, the RBI employs a **mix of quantitative and qualitative instruments** to regulate the money supply and ensure financial stability. As the **lender of last resort**, its role is to provide emergency **liquidity to solvent bank**s facing crises, safeguarding depositors’ interests and the banking system. ***(397 words)***
 
-[Question ID: forum-mgp-2026-gs1-q8]
+[Question ID: forum-mgp-2026-csm26t05se-q08]
 
 ---
 
 ## Q9 [Year: 2026]
 **Question:** Discuss the multi-dimensional implications of the depreciation of the Indian rupee. Also, suggest  policy measures to stabilize the currency.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Industrial Dynamics & Reforms] [Micro Topic: Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth] [Sub Topic: Balance of Payment] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Suggest, Depreciation, Indian rupee]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of the depreciation of the Indian Rupee. <br>• In the body, discuss its multi-dimensional implications for the economy. <br>• Next, suggest policy measures to stabilize the currency. <br>• Conclude by highlighting how the Indian economy remains on structurally strong foundations despite the depreciation. |
@@ -421,7 +421,7 @@ India’s economic trajectory **reflects** a **growing market orientation** whil
 
 **FEMA:** Foreign Exchange Management Act**; IPEF:** Indo-Pacific Economic Framework**; CCI:** Competition Commission of India**; FRA:** Forest Rights Act**; LARR Act:** Right to Fair Compensation and Transparency in Land Acquisition, Rehabilitation and Resettlement Act**; DPCO:** Drug Price Control Order**; NPPA:** National Pharmaceutical Pricing Authority**; NSAP:** National Social Assistance Programme; **RCEP**: Regional Comprehensive Economic Partnership
 
-[Question ID: forum-mgp-2026-gs1-q9]
+[Question ID: forum-mgp-2026-csm26t05se-q09]
 
 ---
 

@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** What do you understand by agroecology? Identify and discuss its key principles.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Agriculture] [Section Group: Agriculture & Farm Dynamics] [Micro Topic: Major Crops, cropping patterns, and regional agriculture production styles] [Sub Topic: Integrated Farming System] [Macro Tag: Descriptive, Analytical] [Micro Tag: What do you understand, Identify, Discuss, Agroecology]*
 #### Answer from ForumIAS
 
 | **Approach:** |
@@ -78,13 +78,13 @@ Additional reading:
 
 Overview | Agroecology Knowledge Hub | Food and Agriculture Organization of the United Nations
 
-[Question ID: forum-mgp-2026-gs1-q1]
+[Question ID: forum-mgp-2026-csm26t13se-q01]
 
 ---
 
 ## Q2 [Year: 2026]
 **Question:** Give a brief overview of the ‘Digital Agriculture Mission’. How can it benefit the agriculture sector?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Agriculture] [Section Group: Agriculture & Farm Dynamics] [Micro Topic: Storage, transport, and marketing of agricultural produce along with digital e-technology interventions] [Sub Topic: Tech in Farm Productivity and Income] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Give a brief overview, How can, Digital Agriculture Mission, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief description of Digital Agriculture Mission. <br>• In the body, outline its benefits to the agricultural sector. <br>• Conclude by highlighting some challenges with it and measures to address the same. |
@@ -112,13 +112,13 @@ However, its implementation faces challenges such as privacy concerns, rural dig
 
 Additional reading: Digital Agriculture Mission |ForumIAS. What is it in the Digital Farm Mission? - The Hindu BusinessLine Big plans for farms: What is in the Rs 2,800-crore Digital Agriculture Mission? | Explained News - The Indian Express
 
-[Question ID: forum-mgp-2026-gs1-q2]
+[Question ID: forum-mgp-2026-csm26t13se-q02]
 
 ---
 
 ## Q3 [Year: 2026]
 **Question:** “Water is life, water is food.” In this context, explain the importance of sustainable water management in Indian agriculture.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Agriculture] [Section Group: Agriculture & Farm Dynamics] [Micro Topic: Irrigation design, management, water efficiency, and conservation infrastructure] [Sub Topic: Water Conservation] [Macro Tag: Descriptive, Applied] [Micro Tag: Explain, Sustainable water management, Indian agriculture]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by providing some data related to water use in agriculture. <br>• In the body, first explain the importance of sustainable water management in Indian agriculture. <br>• Next, highlight the steps taken by the government in this regard. <br>• Conclude by underlining the importance of shifting from “land productivity” to “water productivity”. |
@@ -150,13 +150,13 @@ Additional reading: Water is food: Indian agriculture must be geared towards eff
 
 CGWB: Central Groundwater Board; PMKSY: PRadhan Mantri Krishi Sinchayee Yojana; PDMC: Per Drop More Crop; ABY: Atal Bhujal Yojana; NAQIM: National Aquifer Mapping and Management Programme; NMEO: National Mission on Edible Oils; NMM: National Millets Mission; PKVY:  Paramparagat Krishi Vikas Yojana; ZBNF: Zero Budget Natural Farming; JJM: Jal Jeevan Mission
 
-[Question ID: forum-mgp-2026-gs1-q3]
+[Question ID: forum-mgp-2026-csm26t13se-q03]
 
 ---
 
 ## Q4 [Year: 2026]
 **Question:** Examine the role of Primary Agricultural Credit Societies in uplifting rural communities and promoting inclusive economic growth in the country.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Agriculture] [Section Group: Agriculture & Farm Dynamics] [Micro Topic: Storage, transport, and marketing of agricultural produce along with digital e-technology interventions] [Sub Topic: Tech in Agriculture Credit] [Macro Tag: Analytical, Applied] [Micro Tag: Examine, Primary Agricultural Credit Societies, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a definition of PACS. <br>• In the body, first examine the role of PACS in uplifting rural communities and promoting inclusive economic growth in the country. <br>• Next, highlight the limitations of PACS in doing the same, followed by listing some recent government efforts for expanding the PACS network. <br>• Conclude with importance of PACS in line with the Sahkar se Samriddhi vision. |
@@ -205,13 +205,13 @@ Additional reading: Primary Agricultural Credit Societies (PACS)- Explained Poin
 
 PMKSK: Pradhan Mantri Kisan Samridhi Kendras; NAFSCOB: The National Federation of State Co-operative Banks Ltd.
 
-[Question ID: forum-mgp-2026-gs1-q4]
+[Question ID: forum-mgp-2026-csm26t13se-q04]
 
 ---
 
 ## Q5 [Year: 2026]
 **Question:** In what ways can nuclear technology be leveraged to enhance food security and promote agricultural sustainability?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Indigenous Tech & Achievements] [Micro Topic: Achievements of Indians in S&T; Indigenisation of technology & developing new technology] [Sub Topic: Nuclear Technology] [Macro Tag: Analytical, Applied] [Micro Tag: In what ways, Nuclear technology, Food security, Agricultural sustainability]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining nuclear technology. <br>• In the body, discuss how it can be leveraged in enhancing food security and agricultural sustainability. <br>• Next, highlight some challenges associated with it. <br>• Conclude highlighting the role of Atoms4Food initiative in enhancing food security and sustainable agri. <br>• practices. |
@@ -251,13 +251,13 @@ The Atoms4Food initiative provides the framework to strengthen international col
 
 Additional reading Nuclear technology as vital agri tool - The Hindu BusinessLine Five ways nuclear technology is improving agriculture and food security
 
-[Question ID: forum-mgp-2026-gs1-q5]
+[Question ID: forum-mgp-2026-csm26t13se-q05]
 
 ---
 
 ## Q6 [Year: 2026]
 **Question:** Despite its enormous significance, the Food Processing Industry (FPI) in the country is still underdeveloped. Discuss the statement and suggest corrective measures.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Agriculture] [Section Group: Food Processing Industry] [Micro Topic: Food processing and related industries (scope, significance, structural locations, and supply chain management)] [Sub Topic: Food Processing Sector] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Suggest, Food Processing Industry, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of food processing and its enormous significance. <br>• In the body, discuss the reasons for the underdeveloped status of the food processing industry in the country. <br>• Next, suggest corrective measures. <br>• Conclude by highlighting the opportunities for the growth of the sector and recent measures for the same. |
@@ -294,13 +294,13 @@ India’s status as a major producer of food (second largest producer of rice an
 
 Additional reading: Food processing potential-ForumIAS Blog Unlock India’s food processing potential - The Hindu Chirag Paswan writes: Food processing has become a force for grassroots transformation | The Indian Express
 
-[Question ID: forum-mgp-2026-gs1-q6]
+[Question ID: forum-mgp-2026-csm26t13se-q06]
 
 ---
 
 ## Q7 [Year: 2026]
 **Question:** What are the major challenges faced by Indian irrigation system in recent times? State the measures taken by the government for efficient irrigation management.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Agriculture] [Section Group: Agriculture & Farm Dynamics] [Micro Topic: Irrigation design, management, water efficiency, and conservation infrastructure] [Sub Topic: Irrigation system] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What are, State, Indian irrigation system, Government]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by providing the status of the irrigation coverage in India. <br>• In the body, discuss the major challenges faced by the Indian irrigation system in recent times. <br>• Next, state the measures taken by the government for efficient irrigation management. <br>• Conclude by emphasizing the need for a multipronged approach to increase the efficiency of irrigation systems. |
@@ -348,13 +348,13 @@ PMKSY-AIBP: Pradhan Mantri Krishi Sinchayee Yojana-Accelerated Irrigation Benefi
 
 Additional reading: Irrigation |ForumIAS A death that spotlights irrigation problems - The Hindu.
 
-[Question ID: forum-mgp-2026-gs1-q7]
+[Question ID: forum-mgp-2026-csm26t13se-q07]
 
 ---
 
 ## Q8 [Year: 2026]
 **Question:** “The agricultural subsidy regime in the country needs reforms to address the distortions it causes.” Comment.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Agriculture] [Section Group: Agriculture & Farm Dynamics] [Micro Topic: Issues related to direct and indirect farm subsidies and minimum support prices (MSP)] [Sub Topic: Agriculture Subsidy] [Macro Tag: Analytical, Applied] [Micro Tag: Comment, Agricultural subsidy, Reforms, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce by defining agriculture subsidies. <br>• In the body, first highlight the distortions caused by the agricultural subsidy regime in the country. <br>• Next, suggest comprehensive reforms to address these consequences. <br>• Conclude by underlining the need for increasing capital investments in agriculture. |
@@ -392,13 +392,13 @@ There is a need to enhance capital investment and rationalise the subsidy regime
 
 Additional reading: Farm Subsidies in India-ForumIAS Blog Reforming India’s agricultural subsidy framework - The Hindu BusinessLine
 
-[Question ID: forum-mgp-2026-gs1-q8]
+[Question ID: forum-mgp-2026-csm26t13se-q08]
 
 ---
 
 ## Q9 [Year: 2026]
 **Question:** State the objectives and measures of land reforms in India. Also identify the factors responsible for its successful implementation in some parts of the country.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Agriculture] [Section Group: Land Reforms] [Micro Topic: Land Reforms in India and legislative frameworks] [Sub Topic: Land Reforms] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: State, Identify, Land reforms, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief description of land reforms. <br>• In the body, first state the objectives and measures of land reforms in India. <br>• Next, identify the factors responsible for its successful implementation in some parts of the country. <br>• Conclude by highlighting the recent land reform initiatives undertaken by the government. |
@@ -434,13 +434,13 @@ In recent years, the government's land policy interventions have focused on the 
 
 Additional reading: Land Reforms in India- Explained Pointwise |ForumIAS In a new nation, when abolition of zamindari system was challenged in Supreme Court | Long Reads News - The Indian Express
 
-[Question ID: forum-mgp-2026-gs1-q9]
+[Question ID: forum-mgp-2026-csm26t13se-q09]
 
 ---
 
 ## Q10 [Year: 2026]
 **Question:** Elucidate the importance of buffer stocks for stabilizing agricultural prices in India. What are the challenges associated with the storage of buffer stock? Discuss.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Agriculture] [Section Group: Agriculture & Farm Dynamics] [Micro Topic: Public Distribution System (PDS) management, buffer stock dynamics, food security missions, and economics of animal rearing] [Sub Topic: Buffer stock & food security] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Elucidate, What are, Discuss, Buffer stocks, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a brief background about buffer stock. <br>• In the body, first elucidate the importance of buffer stocks for stabilizing agricultural prices in India. <br>• Next, discuss the challenges associated with the storage of buffer stock. <br>• Conclude by highlighting recent initiative in this regard. |
@@ -473,7 +473,7 @@ The Government has recently announced an increase in the authorized capital of F
 
 Additional reading: Buffer Stock |ForumIAS Why govt must create a buffer stock of all main food items | Explained News - The Indian Express
 
-[Question ID: forum-mgp-2026-gs1-q10]
+[Question ID: forum-mgp-2026-csm26t13se-q10]
 
 ---
 

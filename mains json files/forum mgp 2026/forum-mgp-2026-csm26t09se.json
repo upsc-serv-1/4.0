@@ -1,37 +1,32 @@
 {
   "course": "Civil Services",
-  "id": "forum-mgp-2026-gs2-csm26t09se",
-  "title": "Forum MGP 2026 GS2 - CSM26T09SE",
+  "id": "forum-mgp-2026-csm26t09se",
+  "title": "Forum MGP 2026 - CSM26T09SE",
   "launch_year": 2026,
   "institute": "Forum IAS",
   "program_id": "mgp",
   "program_name": "MGP",
   "series": "Test Series",
-  "level": "GS2",
+  "level": null,
   "paperType": "Sectional",
   "defaultMinutes": 180,
-  "sourceMode": "md-sol",
-  "paper": "GS2",
+  "sourceMode": "sol-only",
   "questions": [
     {
-      "id": "forum-mgp-2026-gs2-t09-q1",
+      "id": "forum-mgp-2026-csm26t09se-q01",
       "questionNumber": 1,
+      "subject": "Governance",
+      "sectionGroup": "Accountability & Civil Services",
+      "microTopic": "Role of Civil Services in a democracy",
+      "subTopic": "Civil Services",
+      "macrotag": "Analytical, Applied",
+      "microtag": "Discuss, Lateral entry, Civil services",
       "questionText": "Lateral entry into civil services is seen as a reformative step, yet it continues to attract criticism and  controversy. Discuss.",
       "marks": 10,
       "year": 2026,
-      "subject": "Polity",
-      "sectionGroup": null,
-      "microTopic": null,
-      "subTopic": null,
-      "macrotag": null,
-      "microtag": null,
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "answers": [
         {
-          "id": "forum-mgp-2026-gs2-t09-q1-forumias",
+          "id": "forum-mgp-2026-csm26t09se-q01-forumias",
           "institute": "ForumIAS",
           "answerText": "| **Approach:** • Introduce the answer by giving a brief background about lateral entry into civil services. <br>• In the body, first bring out its reformative potential and then highlight the points of criticism and controversy that it attracts. <br>• Conclude by highlighting the need for accompanying reforms to improve governance. |\n| --- |\n\nLateral entry refers to **recruiting individuals** from outside the **traditional civil service cadres** to fill **mid and** **senior-level positions** (Joint Secretary, Director) in government departments, typically on a **contractual basis.** They were formally **institutionalised** in 2018.\n\n**Executed through the UPSC**, they are seen as a **reformative step** due to the following reasons:\n1. **Emerging global polycrisis (**trade wars, climate change**)** will likely cause greater **complexity for** **governance.** Greater engagement of **specialists** and **domain experts** will allow systems to **bridge** **talent gaps** and tackle these challenges effectively. Eg., AI Governance.\n\n2. a) It can bring **performance-driven**, result-oriented leadership to improve delivery systems and can help overcome **bureaucratic inertia**;\n   b) lateral entry could **compensate for staff shortages,** highlighted by the **Baswan Committee (2016)**.\n\n3. a) Can induce a **healthy competition** between lateral entrants and career bureaucrats making governance more **efficient** and **citizen centric**;\n   b) may bring in **work ethics** of the corporate sector (data driven decision making, agile organisation).\n\n4. a) Lateral entrants can bring **innovation** and **new approaches** to governance through an **outsider’s** **perspective;**\n   b) this may help make governance more **participatory** and prevent it from **becoming** **isolated** from the challenges faced by **various stakeholders.**\n\nSome experts, however, consider the move as **controversial and criticise** it on the following grounds:\n1. a) While career civil servants are **trained within a constitutional framework** of welfarism and equity, lateral entrants from **corporate backgrounds** may sometimes **prioritize short-term goals** over inclusive development;\n   b) may lack the deep **institutional knowledge** and **administrative experience** that career officers acquire.\n\n2. a) **Risk of politicisation** arises if lateral hires are chosen based on **ideological alignment** rather than competence, potentially undermining the civil services’ **neutrality** and **non-partisanship**;\n   b) can generate **conflict of interest**, creating a **revolving door** between the **private sector and government**.\n\n3. a) **Entrenched bureaucratic strongholds,** with their possible **aversion to lateral entry,** may result in new hires encountering some **resistance or non-cooperation** from within departments;\n   b) **cultural** **shock** on shifting from the corporate world to a government department, can **impact work quality.**\n\n4. a) Very **short tenure** of service (just 3 to 5 years), makes it **difficult to measure performance,** **establish responsibility and ensure accountability**;\n   b) **non-application of reservation policy** likely violates the constitutional scheme of things **(**withdrawal of notification for recruitment in August 2024**).**\n\nRecommended by the **first ARC** as far back as 1965, lateral entry is an important reform. However, it needs to be complemented with other measures- **merit-based promotions, private sector deputations** etc. This will help realize the motto of ***Yogah Karmasu Kaushala,*** denoting **efficiency in action.** ***(402 words)***\n\n**Additional resources** Lateral Entry into Civil Services- Rationale and Criticisms- Explained pointwise |ForumIAS The need is for domain experts, but within the civil service - The Hindu Lateral entry in UPSC will further distance marginalised from centres of power | The Indian Express"
         }
@@ -40,37 +35,37 @@
       "exam_info": {
         "isPyq": false,
         "is_ncert": false,
-        "exam": "Mains",
-        "group": "UPSC CSE",
-        "year": 2026,
-        "is_upsc_cse": true,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
         "is_allied": false,
         "is_others": false,
         "exam_category": "cse",
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs2"
-      }
+      },
+      "hierarchy_path": [
+        "GS2",
+        "Governance"
+      ]
     },
     {
-      "id": "forum-mgp-2026-gs2-t09-q2",
+      "id": "forum-mgp-2026-csm26t09se-q02",
       "questionNumber": 2,
+      "subject": "Governance",
+      "sectionGroup": "Accountability & Civil Services",
+      "microTopic": "E-Governance (applications, models, successes, limitations, potential)",
+      "subTopic": "E-governance",
+      "macrotag": "Analytical, Applied",
+      "microtag": "Evaluate, e-governance, Transparency, Accountability",
       "questionText": "e-governance is not just about the routine application of digital technology in the service delivery  process. It is as much about multifarious interactions for ensuring transparency and accountability. In this  context evaluate the role of the ‘Interactive Service Model’ of e-governance.",
       "marks": 10,
       "year": 2026,
-      "subject": "Polity",
-      "sectionGroup": null,
-      "microTopic": null,
-      "subTopic": null,
-      "macrotag": null,
-      "microtag": null,
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "answers": [
         {
-          "id": "forum-mgp-2026-gs2-t09-q2-forumias",
+          "id": "forum-mgp-2026-csm26t09se-q02-forumias",
           "institute": "ForumIAS",
           "answerText": "| **Approach:** • Introduce the answer with a brief description of the Interactive Service Model (ISM) of e- governance. <br>• In the body, first explain the role ISM plays in the service delivery process and in ensuring transparency and accountability. <br>• Then, identify the challenges inhibiting its successful adoption. <br>• Conclude by suggesting the use of emerging technologies to advance its adoption. |\n| --- |\n\nInteractive Service Model (ISM) of e-governance is a **framework for public-service delivery through digital** **platforms (ICT)** that enable **two-way communication** between citizens and public authorities. Unlike traditional models that focus solely on providing services or information, the interactive model emphasizes **real-** **time engagement.**\n\nISM plays a **multifaceted role in service delivery process**, as discussed:\n1. a) Goes **beyond simply digitizing** existing services and **creates new channels** for engagement and collaboration facilitating **participatory governance** (e.g, MyGov.in);\n   b) facilitates **diverse interactions** aimed at enhancing access to multiple **government services** i.e. **G2C** (e.g. UMANG);\n   c) creates a **responsive government** i.e. **C2G** (e.g. e-Samvad).\n\n2. a) Increases **ease of doing business** i.e. **G2B** (e.g. MCA 21);\n   b) brings down the **inter-departmental** **communication** gap through **G2G interactions** (e.g. e-Office);\n   c) fosters **innovation** through interaction among governments, citizens and private sector in **co-creating solutions** (Digital-India Hackathon).\n\n3. a) **Enhances transparency** by providing **real-time updates** on government policies, processes, and decisions (PRAGATI platform);\n   b) ensures availability of **government data** to the public, allowing for **scrutiny and analysis** (OGD-Platform India);\n   c) facilitates **open decision-making processes** based on **objective criteria** e.g. online auction of government tenders (MSTC e-Commerce).\n\n4. a) **Improves accountability** by allowing citizens to **scrutinize government’s decisions** (RTI online);\n   b) empowers citizens through interactive platforms for **grievance redressal** (CPGRAMS);\n   c) creates **closed-loop** systems that encourage feedback on services and promote resolution (e.g. RailMadad).\n\n5. a) **Enhances service-delivery** through streamlined processes and improved response times (DigiLocker);\n   b) **bridges the digital divide** with **multi-channel access** (web, mobile, kiosks) to cater to different user preferences **(Common-Service-Centers)**.\n\nHowever, the successful implementation of the model faces the following **challenges**:\n1. a) Disparity in access** **to internet** resulting in a **rural-urban divide** (only 24% of rural-households in India have internet access compared to 66% urban households-NSSO);**\n   b) **digital gender divide** (only 33% women in India have ever used the internet, compared to more than half (57%) the men: NFHS-5);\n   c) **public hesitancy** over **privacy concerns,** fueled by frequent public data leaks (e.g. Angel one data breach, Feb 2025).\n\n2. a) High **digital-illiteracy** (only 24.7% household- NSS) and lack of **digital stewardship** among marginalised populations (e.g., disabled);\n   b) **multiplicity of feedback** creates information overload and subdues the government’s processing capability;\n   c) lackadaisical approach and **inertia from the** **bureaucracy,** hindering effective adoption.\n\nThe **Interactive Service Model** of e-governance holds immense potential to enhance **transparency,** **accountability,** and **service delivery**. However, overcoming challenges such as the digital divide and privacy concerns through emerging technologies (AI, ML, blockchain) is crucial to realizing the goal of **‘Minimum** **Government, Maximum Governance’.** ***(442 words)***\n\n**ICT:** Information and Communication Technology**; G2C:** Government to Citizens**; UMANG:** Unified Mobile Application for New-age Governance**; C2G:** Citizens to Government**; DISHA:** Digital Interaction To Seek Help Anytime**; G2B:** Government to Business**; G2G:** Government to Government**: PRAGATI:** Pro-Active Governance and Timely Implementation**; OGD:** Open Government Data**;CPGRAMS:** Centralized Public Grievance Redress and Monitoring System**; NSSO:** National Sample Survey Office**: NFHS:** National Family Health Survey**; NSS:** National Sample Survey\n\n**Additional resources** Digital Governance in India |ForumIAS"
         }
@@ -79,37 +74,37 @@
       "exam_info": {
         "isPyq": false,
         "is_ncert": false,
-        "exam": "Mains",
-        "group": "UPSC CSE",
-        "year": 2026,
-        "is_upsc_cse": true,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
         "is_allied": false,
         "is_others": false,
         "exam_category": "cse",
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs2"
-      }
+      },
+      "hierarchy_path": [
+        "GS2",
+        "Governance"
+      ]
     },
     {
-      "id": "forum-mgp-2026-gs2-t09-q3",
+      "id": "forum-mgp-2026-csm26t09se-q03",
       "questionNumber": 3,
+      "subject": "Polity",
+      "sectionGroup": "Organs of Government & Dispute Redressal",
+      "microTopic": "Pressure groups and formal/informal associations and their role in the Polity",
+      "subTopic": "Pressure Groups",
+      "macrotag": "Analytical, Applied",
+      "microtag": "Discuss, Industry associations, Socio-economic development, India",
       "questionText": "Discuss the role of industry and business associations in socio-economic development in India.",
       "marks": 10,
       "year": 2026,
-      "subject": "Polity",
-      "sectionGroup": null,
-      "microTopic": null,
-      "subTopic": null,
-      "macrotag": null,
-      "microtag": null,
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "answers": [
         {
-          "id": "forum-mgp-2026-gs2-t09-q3-forumias",
+          "id": "forum-mgp-2026-csm26t09se-q03-forumias",
           "institute": "ForumIAS",
           "answerText": "| **Approach:** • Introduce the answer by giving a brief definition of industry and business association. <br>• In the body, discuss their role in the socio-economic development in India. <br>• Conclude by highlighting some challenges with them and suggest remedial measures. |\n| --- |\n\n**Industry and business associations** are organizations formed by **commercial entities** within **specific** **sectors**. They range from **local** chambers of commerce (BCIC) to **national** chambers (e.g., FICCI) and **international** trade associations (e.g., ICC). Although primarily formed to **promote and protect the interests of their members**, they also play a crucial role in the **socio-economic development** in India:\n1. a) Help create **favorable business environments** through effective **policy advocacy**, bolstering economic growth (e.g. CII Task Force on Ease of Doing Business);\n   b) support **national developmental** **agenda** by **monitoring and guiding** industry performance with national goals (CII AtmaNirbhar Index).\n\n2. a) Create **collaborative environments** for innovation while facilitating **knowledge-sharing** (NASSCOM's SIFY programme, FICCI's Global Skills Summit);\n   b) bridge the **skills-employability divide** to help realize India’s **demographic dividend** (e.g. NASSCOM Future Skills Prime).\n\n3. Facilitates voluntary industry standards for **workplace safety**, fair **wages**, and **social security** while promoting **management-labor dialogue** (e.g., Employers' Federation of India's industrial relations framework, AIOE's labor compliance guidelines).\n\n4. a) Enable enterprises to collectively **address common challenges**, such as workforce development, supply chain logistics, and market expansion (PHDCCI’s Export Promotion Cell);\n   b) facilitate **entrepreneurship development** by providing **mentorship** support (e.g. PHDCCI’s MSME Facilitation Centre) and **visibility** to new businesses (e.g. StartUp Mahakumbh).\n\n5. a) Transform **social infrastructure** through coordinated **CSR** initiatives (e.g., Jewellers for Hope by GJEPC);\n   b) implement initiatives for **marginalized communities** and promote **inclusive growth** (e.g., FIEO SheTrades India Initiative, DICCI NextGen platform);\n   c) advance **sustainable business practices** and environmental stewardship (e.g., SIAM's Global Electrification Mobility Summit)\n\nWhile these associations drive socio-economic development, they face challenges including **urban bias,** **regional disparities** in representation (North Eastern states and **limited representation** of smaller enterprises. To maximize their potential, they must address **implementation gaps**, deepen **rural engagement**, and broaden their representation across business segments. (***284 words***)\n\n**BCIC:** Bangalore Chamber of Industry and Commerce; **FICCI:** Federation of Indian Chambers of Commerce & Industry**; ICC:** International Chamber of Commerce; **CII:** Confederation of Indian Industry**; NASSCOM:** National Association of Software and Services Companies**; AIOE:** All India Organisation of Employers**;** **PHDCCI:** PHD Chamber of Commerce and Industry**; GJEPC:** Gems and Jewellery Export Promotion Council;\n\n**FIEO:** Federation of Indian Exporters’ Organizations; **DICCI:** Dalit Indian Chamber of Commerce and Industry; **SIAM:** Society of Indian Auto Manufacturers"
         }
@@ -118,37 +113,37 @@
       "exam_info": {
         "isPyq": false,
         "is_ncert": false,
-        "exam": "Mains",
-        "group": "UPSC CSE",
-        "year": 2026,
-        "is_upsc_cse": true,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
         "is_allied": false,
         "is_others": false,
         "exam_category": "cse",
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs2"
-      }
-    },
-    {
-      "id": "forum-mgp-2026-gs2-t09-q4",
-      "questionNumber": 4,
-      "questionText": "Public charitable trusts have the potential to make India's development more inclusive as they relate  to certain vital public issues. Comment.",
-      "marks": 10,
-      "year": 2026,
-      "subject": "Polity",
-      "sectionGroup": null,
-      "microTopic": null,
-      "subTopic": null,
-      "macrotag": null,
-      "microtag": null,
+      },
       "hierarchy_path": [
         "GS2",
         "Polity"
-      ],
+      ]
+    },
+    {
+      "id": "forum-mgp-2026-csm26t09se-q04",
+      "questionNumber": 4,
+      "subject": "Governance",
+      "sectionGroup": "Development Processes & Policies",
+      "microTopic": "Role of donors, charities, institutional and other external stakeholders",
+      "subTopic": "Donor Agencies",
+      "macrotag": "Analytical, Applied",
+      "microtag": "Comment, Public charitable trusts, Development, India",
+      "questionText": "Public charitable trusts have the potential to make India's development more inclusive as they relate  to certain vital public issues. Comment.",
+      "marks": 10,
+      "year": 2026,
       "answers": [
         {
-          "id": "forum-mgp-2026-gs2-t09-q4-forumias",
+          "id": "forum-mgp-2026-csm26t09se-q04-forumias",
           "institute": "ForumIAS",
           "answerText": "| **Approach:** • Introduce by explaining about public charitable trusts. <br>• In the body, first elaborate upon their role in making India's development more inclusive. <br>• Next, mention the challenges associated with their functioning. <br>• Conclude by suggestions to aid the efforts of these trust towards India’s development. |\n| --- |\n\nPublic charitable trusts are **non-profit legal entities** established to provide **welfare** to the masses, such as education, healthcare, poverty relief, etc., They are usually governed by **state-specific legislation**, such as The Maharashtra Public Trust Act, 1950. They are mostly funded by **donations** and managed by **trustees.** As organizations working for the **welfare of the community,** they have the potential to make **India’s** **development more inclusive** in the following ways:\n1. a) Fill critical **gaps** in **healthcare**, **education**, and **basic services**, especially in rural and remote areas. E.g. Satya Bharti School Programme providing free quality education to underprivileged children**;**\n   b) focus on **marginalized communities** often overlooked by government programs.E.g., works of **Azim** **Premji Foundation** to provide last-mile health services in tribal belts of central India.\n\n2. a) Flexible approach** enables **targeted** **solutions**. E.g., Internet Saathi initiative by the **Tata Trusts** providing digital literacy to rural women;**\n   b) leverage significant **funding** from the private sector and philanthropic organizations. E.g., **Bill and Melinda Gates foundation;**\n   c) implement **innovative** **approaches to public welfare**. E.g., centralized kitchen model of **Akshaya Patra Foundation**.\n\n3. a) Enhance prospects of **quality of life** by equipping individuals with necessary **skills** (e.g. Reliance Foundation Skilling Academy);\n   b) work towards incorporation of **ecological sustainability** in development activities (e.g. adoption of green belts by DLF Foundation).\n\n4. a) Support **rural development** through **improvements in agriculture (**e.g. National Agro Foundation**);**\n   b) facilitate the mobilization of funds for **electoral politics** (electoral trusts);\n   c) **inspire** a general **culture of philanthropy and volunteerism** among the wider populace (e.g. PM-CARES fund).\n\nHowever, they also face certain **challenges** which are as follows:\n1. a) **Regulatory complexities** and compliance burdens (IT Act, FCRA) often constrain operational efficiency;\n   b) **geographical concentration** of trusts in urban and economically advanced regions exacerbates **development disparities**;\n   c) **limited transparency** and inadequate accountability mechanisms in some trusts **undermine public trust** in the sector.\n\n2. a) **Donor-driven agendas** may sometimes overshadow **community needs** and priorities;\n   b) **fragmented approaches** without coordination among trusts lead to **duplication of efforts**;\n   c) **sustainability concerns** arise from **dependence** on individual philanthropists or corporate funding cycles.\n\nFor public charitable trusts to **maximize their contribution** to inclusive development, **streamlining regulatory** **frameworks**, establishing **collaborative platforms** for coordinated action, and developing **robust impact** **measurement** systems are essential to ensure benefits reach all segments of society. ***(373 words)***\n\n**Additional resources** India’s rich are more willing to give: How philanthropy can tilt scales towards a more equitable society | The Indian Express"
         }
@@ -157,37 +152,37 @@
       "exam_info": {
         "isPyq": false,
         "is_ncert": false,
-        "exam": "Mains",
-        "group": "UPSC CSE",
-        "year": 2026,
-        "is_upsc_cse": true,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
         "is_allied": false,
         "is_others": false,
         "exam_category": "cse",
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs2"
-      }
+      },
+      "hierarchy_path": [
+        "GS2",
+        "Governance"
+      ]
     },
     {
-      "id": "forum-mgp-2026-gs2-t09-q5",
+      "id": "forum-mgp-2026-csm26t09se-q05",
       "questionNumber": 5,
+      "subject": "Governance",
+      "sectionGroup": "Accountability & Civil Services",
+      "microTopic": "Transaparency and accountability (institutional and other measures); Citizens Charter",
+      "subTopic": "Transparency and Accountability",
+      "macrotag": "Analytical, Applied",
+      "microtag": "Discuss, Transparency, Accountability, RTI Act",
       "questionText": "“A law hailed as a sentinel of transparency and accountability is entangled in political and  administrative hurdles.” Discuss the statement in the context of the Right to Information Act.",
       "marks": 10,
       "year": 2026,
-      "subject": "Polity",
-      "sectionGroup": null,
-      "microTopic": null,
-      "subTopic": null,
-      "macrotag": null,
-      "microtag": null,
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "answers": [
         {
-          "id": "forum-mgp-2026-gs2-t09-q5-forumias",
+          "id": "forum-mgp-2026-csm26t09se-q05-forumias",
           "institute": "ForumIAS",
           "answerText": "| **Approach:** • Introduce the answer by giving a brief background about the RTI Act. <br>• In the body, first underline the ways in which it promotes transparency and accountability. <br>• Next, discuss the political and administrative hurdles in its implementation. <br>• Conclude by suggesting measures to overcome these hurdles. |\n| --- |\n\n**RTI Act 2005** seeks to set up a practical regime of **right to information** for citizens to secure information under the control of **public authorities**. Succeeding the **Freedom of Information Act 2002,** it seeks to promote **transparency and accountability** in the following ways:\n1. Allows citizens to access any such **information** from government departments which can be **placed** **on the floor of the Parliament/State Legislature.** This ensures **accountability** of the government not only to the representatives, but **to the people** themselves.\n\n2. a) Facilitating access to **authenticated information** which fosters **informed public discourse** on issues of governance;\n   b) elaborate **appellate mechanisms** (up to the level of the CIC) ensure redressal in instances of **wrongful denial** of information (section 19);\n   c) **strict timelines** (reply within 30 days) fosters a general culture of **prioritizing citizen engagement.**\n\n3. a) Ensures **accountability of** **bureaucrats** towards the citizens;\n   b) by subjecting their decisions to **citizen examination,** establishes the foundations of **ethical governance**;\n   c) mandates i**mprovements in record keeping practices** (computerization under Section 4);\n   d) drives general **openness in governance** by promoting **suo-motu disclosures** of information (Section 4(2)).\n\n4. a) Breaks the **culture of secrecy** in government functioning by having an **overriding effect** over the provisions of the **Official Secrets Act 1923** (Section 22);\n   b) disclosures provide the **basis for** **whistleblowing and activism**, helping expose instances of wrongdoing (Adarsh Scam).\n\nHowever, the following **political and administrative hurdles** have arisen in its implementation over the last two decades.\n1. a) **High rates of pendency** (> 22000 appeals pending- November 2024);\n   b) **unfilled vacancies** in the Information Commissions (8 out of 10 sanctioned posts of Information Commissioners vacant- April 2025);\n   c) legislative actions threatening the **independence** of the Commissions (**RTI Amendment Act** **2019**).\n\n2. a) Low awareness**, especially among vulnerable communities and **insufficient efforts** by public authorities in this regard, despite legislative mandate (Section 26);**\n   b) **hurdles in filing applications** (glitches in RTI portal, unexplained emergency maintenance (March 2024)).\n\n3. a) **Non-cooperative attitude** of public authorities (inadequate training, double burden of work) and **quality of** information;\n   b) insufficient **voluntary disclosures** of information;\n   c) scarce use of punitive power by the Commissions to **enforce their decision**\n   s. \n\n4. a) Issues regarding the **safety of RTI activists (**e.g. Rajendra Prasad Singh murder**);**\n   b) **frivolous** **overuse** obstructing administrative work (Shishir Chand case- Delhi HC);\n   c) notable **exclusions from** **the jurisdiction** (deliberations of the SC collegium).\n\nOvercoming these hurdles requires a **multi-pronged strategy**. Apart from **training** the officials and securing **institutional independence** of the CIC, dedicated efforts at **awareness generation** are required. This will lead to an **informed citizenry**, capable of safeguarding democratic principles. ***(433 words)***\n\n**Additional resources** Right to Information Act |ForumIAS The RTI is now the ‘right to deny information’ - The Hindu Tracing the roots and impact of Right to Information Act | UPSC Current Affairs News - The Indian Express"
         }
@@ -196,37 +191,37 @@
       "exam_info": {
         "isPyq": false,
         "is_ncert": false,
-        "exam": "Mains",
-        "group": "UPSC CSE",
-        "year": 2026,
-        "is_upsc_cse": true,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
         "is_allied": false,
         "is_others": false,
         "exam_category": "cse",
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs2"
-      }
+      },
+      "hierarchy_path": [
+        "GS2",
+        "Governance"
+      ]
     },
     {
-      "id": "forum-mgp-2026-gs2-t09-q6",
+      "id": "forum-mgp-2026-csm26t09se-q06",
       "questionNumber": 6,
+      "subject": "Governance",
+      "sectionGroup": "Accountability & Civil Services",
+      "microTopic": "Role of Civil Services in a democracy",
+      "subTopic": "Civil Services",
+      "macrotag": "Analytical, Applied",
+      "microtag": "Critically examine, Public sector, External consultancy, India",
       "questionText": "“The reliance of the public sector on external consultancy firms is increasing worldwide.” Critically  examine the implications of outsourcing strategic decision-making in the public sector enterprises in  India.",
       "marks": 10,
       "year": 2026,
-      "subject": "Polity",
-      "sectionGroup": null,
-      "microTopic": null,
-      "subTopic": null,
-      "macrotag": null,
-      "microtag": null,
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "answers": [
         {
-          "id": "forum-mgp-2026-gs2-t09-q6-forumias",
+          "id": "forum-mgp-2026-csm26t09se-q06-forumias",
           "institute": "ForumIAS",
           "answerText": "| **Approach:** • Introduce the answer by providing a brief background on the increasing trend of public sector reliance on external consultancy firms globally and in India. <br>• In the body, first, examine the reasons for this reliance and the advantages it offers. <br>• Second, discuss the associated challenges and negative implications. <br>• Third, propose potential solutions to mitigate these challenges. <br>• Conclude with a summary. |\n| --- |\n\nThe public sector's reliance on external consultancies has **grown globally** and in India **post-1990s** **liberalization**, accelerating with **modernization drives**. France spent €1 billion (2021) and Australia A$21 billion (2021-22) on consultancies, reflecting a **global trend** that **India increasingly follows.** The outsourcing of strategic decisions-making in public sector enterprises in India, can have the following **positive implications**:\n1. a) Consultants bring in **contemporary global best practices** and **domain expertise** e.g., McKinsey’s role in drafting India’s National Infrastructure Pipeline (NIP);\n   b) **specialized knowledge** in emerging fields like digital transformation and AI, often lacked among PSEs.\n\n2. Consultancy firms provide **objective assessment** of organizational inefficiencies and offer **structural** **reforms** that internal stakeholders might resist due to **institutional inertia** e.g., BCG recommending workforce reduction for revival of BSNL.\n\n3. a) Overcomes the challenge of hiring **permanent specialized talent**, due to India's focus on **containing fiscal deficit**;\n   b) consultancies offer **flexible access** to high-caliber expertise without **long-term financial commitments** (pension, benefits).\n\n4. Major initiatives (GST implementation, infra projects) have **tight political timelines** that consultancies help meet through **parallel processing capabilities** and **ready-to-deploy frameworks**.\n\nHowever, this increased reliance has the following **adverse implications:**\n1. a) Consultants provide **strategic advice** but **bear no responsibility** for outcomes;\n   b) they are **rewarded regardless of results** while **taxpayers bear the costs** of failures, creating a fundamental **incentive misalignment**.\n\n2. a) The consultancy model inherently encourages **leaving some problems unsolved** to ensure future engagements;\n   b) this creates a **vicious cycle** where PSEs become increasingly dependent on **external** **advice** rather than developing self-sufficiency;\n   c) this leads to **loss of institutional knowledge** and strategic autonomy over time.\n\n3. a) Consultants wield **significant influence** over public policy and resource allocation without being subject to the same **democratic oversight** as public officials, creating a **governance deficit**;\n   b) the **profit-maximization perspective** of consultancy firms often conflicts with the **public service** **mandate** of PSEs.\n\n4. a) International consultants often promote **standardized solutions** that fail to account for **India-** **specific challenges** and socio-economic realities;\n   b) consultancy engagements often involve sharing **sensitive** organizational and citizen data, raising questions about **national security** and **data** **protection**.\n\nEngaging consultancies has its **merits and challenges** and thus requires a **balanced approach**, which can be achieved through the **following measures**:\n1. a) **Internal capability building** by investing in **recruiting and training top talent** within PSEs (lateral entry, Mission Karmyogi);\n   b) **fostering innovation culture** and **empowering employees** to take ownership of strategic direction (workforce reduction, fund raising) rather than defaulting to external solutions.\n\n2. a) Implementing **mandatory knowledge sharing protocols** in consultancy contracts (eOffice Knowledge Management System);\n   b) creating **internal centers of excellence** to institutionalize external expertise;\n   c) promoting **domestic consultancy firms** with deeper understanding of India's socio-economic landscape.\n\n3. a) Developing **contractual frameworks** that tie consultant compensation to **successful** **implementation** and **measurable outcomes** (New Zealand’s “Result Based Accountability” framework);\n   b) requiring **public disclosure** of major consultancy contract terms to enhance **transparency.**\n\nThese measures can aid the PSEs in **developing strategies** that are aligned with their **long-term goals** and **public service mandate**. This will also help them **reclaim their strategic autonomy.** ***(505 words)***\n\n**Additional resources** Public sector reliance on consultancy firms raises accountability concerns |ForumIAS Consultant Raj: 1,500, including from Big 4, in 44 govt depts; annual spend Rs 302 crore | Express Investigations News"
         }
@@ -235,37 +230,37 @@
       "exam_info": {
         "isPyq": false,
         "is_ncert": false,
-        "exam": "Mains",
-        "group": "UPSC CSE",
-        "year": 2026,
-        "is_upsc_cse": true,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
         "is_allied": false,
         "is_others": false,
         "exam_category": "cse",
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs2"
-      }
+      },
+      "hierarchy_path": [
+        "GS2",
+        "Governance"
+      ]
     },
     {
-      "id": "forum-mgp-2026-gs2-t09-q7",
+      "id": "forum-mgp-2026-csm26t09se-q07",
       "questionNumber": 7,
+      "subject": "Polity",
+      "sectionGroup": "Elections & Political Dynamics",
+      "microTopic": "Salient features of the Representation of People's Act",
+      "subTopic": "Electoral reforms",
+      "macrotag": "Descriptive, Analytical, Applied",
+      "microtag": "What constitutes, Discuss, Suggest, Corrupt practices, RPA 1951",
       "questionText": "What constitutes corrupt practices under the Representation of the People Act, 1951? Also, discuss  the challenges in curbing such malpractices and suggest remedial measures.",
       "marks": 10,
       "year": 2026,
-      "subject": "Polity",
-      "sectionGroup": null,
-      "microTopic": null,
-      "subTopic": null,
-      "macrotag": null,
-      "microtag": null,
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "answers": [
         {
-          "id": "forum-mgp-2026-gs2-t09-q7-forumias",
+          "id": "forum-mgp-2026-csm26t09se-q07-forumias",
           "institute": "ForumIAS",
           "answerText": "| **Approach:** • Introduce the answer by giving a brief background about the Representation of People Act,. <br>• In the body, first outline what constitutes corrupt practices under the Act. Next, discuss the challenges faced in curbing them. Lastly, suggest remedial measures. Conclude suitably. |\n| --- |\n\nThe Representation of the People Act (RPA), 1951, enacted under **Article 327** of the Constitution, lays down the **legal framework** for **conducting elections** to the Parliament and State Legislatures. Among its key provisions is the regulation and penalization of **electoral malpractices**, particularly under **Section 123**, which defines \"corrupt practices\" that can lead to **disqualification of candidates**. They are as follows:\n1. a) **Bribery** to induce or reward any behaviour of **other candidates** (e.g. decision to contest) or **voters** (e.g. choice of vote);\n   b) **undue influence** on free **exercise of electoral rights** (e.g. threatening voters with social ostracism for choice of vote);\n   c) deploying **vehicles** to provide f**ree conveyance for** **electors** to the polling station.\n\n2. a) Seeking votes by appealing to a person’s **social background** (religion, caste, language), **religious** **symbols** (e.g. places of worship) or **national symbols** (e.g. national flag, national emblem);\n   b) **promoting enmity or hatred** between citizens (on grounds of religion, caste, language) to further one’s electoral prospects;\n   c) propagation, glorification or commission of **Sati** to brighten one’s electoral chances.\n\n3. a) Publication of **false statements** regarding the personal character or conduct of a candidate to derail her election;\n   b) incurring **expenditures** in contravention of **prescribed norms** (under Section 77);\n   c) obtaining the assistance of **government officials** for one’s election;\n   d) **booth capturing** by a candidate, her agent or any other person.\n\nDespite the existence of these provisions, the following **challenges arise in curbing** these malpractices:\n1. a) Widespread **social acceptance** of corrupt practices (appeals to religion, language, caste) in election campaigning;\n   b) **lack of political** will due to alleged complexity across the political spectrum;\n   c) low levels of **reporting and challenging by voters** (due to societal power dynamics, voter apathy).\n\n2. a) Insufficient **institutional capacity** to take appropriate action on complaints;\n   b) challenges with the **criminal justice system** (political influence over police, judicial vacancies) affect **prosecution** and\n\nlead to **judgements** being delivered **after the term of office ends** (e.g. P Chidambaram case); c) **open-** **ended terms** (“undue influence”) create subjectivity in operationalization.\n\nIn order to overcome these challenges, following **remedial measures** can be taken:\n1. a) Equipping **ECI with the authority** to take strict action (e.g. debarment from contesting);\n   b) **engaging** **civil society, media** etc. for **educating voters** about the consequences of corrupt practices.\n\n2. a) Reforms in **political funding** (e.g. state funding) to enhance **traceability of campaign spending**;\n   b) transformation in internal functioning of political parties to improve **candidate selection and vetting**.\n\n3. a) Greater deployment of **manpower** (e.g. flying squads) and **technological tools** (e.g. drones, AI) to detect and monitor violations;\n   b) **specialized tribunals** to resolve cases related to corrupt practices.\n\n**Evolving nature** of electoral malpractices (e.g. use of deep fakes) necessitate broad-based **amendments to** **RPA** to deal with them. This is crucial to uphold the **sanctity of the electoral process** and ensure **free and** **fair elections.** (***474 words***)"
         }
@@ -274,37 +269,37 @@
       "exam_info": {
         "isPyq": false,
         "is_ncert": false,
-        "exam": "Mains",
-        "group": "UPSC CSE",
-        "year": 2026,
-        "is_upsc_cse": true,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
         "is_allied": false,
         "is_others": false,
         "exam_category": "cse",
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs2"
-      }
-    },
-    {
-      "id": "forum-mgp-2026-gs2-t09-q8",
-      "questionNumber": 8,
-      "questionText": "While cooperatives in India play a crucial role in empowering local communities and driving  grassroots development, multiple factors hinder them from realising their full potential. Elaborate.",
-      "marks": 10,
-      "year": 2026,
-      "subject": "Polity",
-      "sectionGroup": null,
-      "microTopic": null,
-      "subTopic": null,
-      "macrotag": null,
-      "microtag": null,
+      },
       "hierarchy_path": [
         "GS2",
         "Polity"
-      ],
+      ]
+    },
+    {
+      "id": "forum-mgp-2026-csm26t09se-q08",
+      "questionNumber": 8,
+      "subject": "Governance",
+      "sectionGroup": "Development Processes & Policies",
+      "microTopic": "Development processes and the role of NGOs, Civil Society, and various groups and associations",
+      "subTopic": "Civil Society",
+      "macrotag": "Descriptive, Analytical, Applied",
+      "microtag": "Elaborate, Cooperatives, Local communities, India",
+      "questionText": "While cooperatives in India play a crucial role in empowering local communities and driving  grassroots development, multiple factors hinder them from realising their full potential. Elaborate.",
+      "marks": 10,
+      "year": 2026,
       "answers": [
         {
-          "id": "forum-mgp-2026-gs2-t09-q8-forumias",
+          "id": "forum-mgp-2026-csm26t09se-q08-forumias",
           "institute": "ForumIAS",
           "answerText": "| **Approach:** • Introduce the answer by giving a brief background about co-operatives in India. <br>• In the body, first bring out their role in empowering local communities and driving grassroots development. <br>• Next, outline the multiple factors that hinder them from realising their full potential. <br>• Conclude by providing some suggestions to improve their functions and achieve “Sahkar se Samriddhi”. |\n| --- |\n\nAccording to **ILO**, a **cooperative** is a **jointly owned** and **democratically controlled** **autonomous** association. They unite v**oluntarily** to meet their **common economic, social and cultural needs** and aspirations. The **97th** **Amendment** granted them constitutional status (**Part IXB**). Placing “**people above profit”**, they play a crucial role in **empowering local communities and driving grassroots development** in the following ways: .\n1. a) Promote **financial inclusion** by providing credit to farmers and small entrepreneurs who may be unable to access formal banks (e.g. PACS, UCBs);\n   b) facilitate benefits of **large-scale farming** (e.g. lift irrigation co-operatives, pani panchayats).\n\n2. a) Support **small producers** by providing **input** (e.g. Haryana Handlooms) and **marketing** support (e.g. AMUL);\n   b) provide **consumer goods at reasonable prices**, eliminating middlemen by purchasing directly from producers.This helps in alleviating **rural poverty** (e.g. Kendriya Bhandar, Apna Bazar);\n   c) offer **affordable housing** by purchasing and developing land for members (e.g. Employees Housing Society).\n\n3. a) Provide financial and social **security to women**, helping improve their status (Shri Mahila Griha Udyog Lijjat Papad);\n   b) empower them by providing opportunities for **leadership and decision-making**;\n   c) challenge traditional gender roles and norms, promoting women's **agency in household and** **community matters (**ICNW**)**.\n\n4. a) Promote **participatory decision-making** through their democratic governance structure;\n   b) they foster **community solidarity** by bringing together individuals with **common economic interests**;\n   c) they serve as **platforms for skill development** and capacity building among rural populations.\n\nHowever, the following **factors** **hinder** them from realizing their full potential:\n1. a) **Resource constraints** with weak fund base;\n   b) **inadequately trained manpower, outdated** **technological base** that limits their productivity and operational efficiency. This makes it difficult for them to **compete** with the organized businesses.\n\n2. a) Weak **legal and regulatory framework** leading to **unfair practices and corruption** in the functioning of co-operatives. E.g., PMC Bank crisis;\n   b) complex hierarchy of bureaucratic power centers has led to **red-tapism** and **unnecessary governmental control** (E.g., IFFCO, land co-operatives).\n\n3. a) Inadequate **infrastructure** restricts market accessibility;\n   b) lack of **forward and backward linkages** hinders the scaling up of their operations.\n\n4. a) **Social inequality** often results in the **dominant group** cornering the lion’s share of benefits;\n   b) **politicization** of co-operatives leads to prioritization of political considerations in their functioning (E.g., Sugar Co-operatives in Maharashtra).\n\n**Liberalizing government contro**l, **policy support** and improvements in rural **infrastructure** (roads, power supply) need to be undertaken to improve the functioning of the co-operatives. Greater **awareness** generation among the rural populations is critical to realize the goal of “**Sahakar se Samriddhi**”, contributing to the nation’s overall growth. **(*****421 words*****)**\n\n**LAMPS:** Large Area Multi-Purpose Cooperative Society**; PACS:** Primary Agricultural Credit Society**; UCBs:** Urban Cooperative Banks**; ICNW:** Indian Cooperative Network for Women\n\n**Additional resources:** Cooperative Societies: Benefits and Challenges - Explained, pointwise-ForumIAS Blog India’s Cooperative Movement: Driving Inclusive Growth"
         }
@@ -313,37 +308,37 @@
       "exam_info": {
         "isPyq": false,
         "is_ncert": false,
-        "exam": "Mains",
-        "group": "UPSC CSE",
-        "year": 2026,
-        "is_upsc_cse": true,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
         "is_allied": false,
         "is_others": false,
         "exam_category": "cse",
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs2"
-      }
+      },
+      "hierarchy_path": [
+        "GS2",
+        "Governance"
+      ]
     },
     {
-      "id": "forum-mgp-2026-gs2-t09-q9",
+      "id": "forum-mgp-2026-csm26t09se-q09",
       "questionNumber": 9,
+      "subject": "Governance",
+      "sectionGroup": "Development Processes & Policies",
+      "microTopic": "Role of Self Help Groups (SHGs) and microfinancing in development activities",
+      "subTopic": "SHGs",
+      "macrotag": "Analytical, Applied",
+      "microtag": "Explain, Microfinancing, Women SHGs, Gender inequality",
       "questionText": "Can the vicious cycle of gender inequality, poverty and malnutrition be broken through microfinancing  of women SHGs? Explain with examples.",
       "marks": 10,
       "year": 2026,
-      "subject": "Polity",
-      "sectionGroup": null,
-      "microTopic": null,
-      "subTopic": null,
-      "macrotag": null,
-      "microtag": null,
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "answers": [
         {
-          "id": "forum-mgp-2026-gs2-t09-q9-forumias",
+          "id": "forum-mgp-2026-csm26t09se-q09-forumias",
           "institute": "ForumIAS",
           "answerText": "| **Approach:** • Introduce the answer by defining microfinance. <br>• In the body, first highlight the potential of microfinancing of women SHGs in breaking the vicious cycle of gender inequality, poverty and malnutrition. <br>• Next, underline its limitations in this regard. <br>• Conclude by identifying the need for the structural reform measures to supplement microfinancing. |\n| --- |\n\nAccording to the **World Bank, microfinance** is the provision of **financial services** to households (low-income, self-employed or informally employed individuals) and micro-enterprises that are **excluded from traditional** **commercial banking services**. Microfinancing of women SHGs can be an effective tool for **addressing gender inequality, poverty and** **malnutrition** in the following ways:\n1. a) Easy and affordable **access to capital** (collateral-free loans**)** allows women to engage in **income** **generating avenues** and come out of **inter-generational poverty,** e.g. SEWA Bank, NABARD’s SHG- BLP (Bank Linkage Programme)**;**\n   b) when women contribute financially, they gain respect and **decision-** **making** power within their families and communities, **reducing gender inequality**.\n\n2. a) SHG platforms serve as effective channels for **nutrition education** and **awareness campaigns** e.g., JEEViKA program (Bihar) incorporated nutrition messaging during SHG meetings;\n   b) facilitates **dietary** **diversification** for families through support for **livestock rearing, horticulture** etc. This raises their nutrient intake, helping tackle **malnutrition**.\n\n3. a) Microfinancing of women SHGs **empowers them** to undertake **poverty alleviation programmes,** **influence policies** and raise awareness about social issues like dowry, alcoholism, etc.;\n   b) enable women to advocate for their rights and access public services **(political empowerment)** as many women SHGs work in coordination with Panchayats, e.g. Kudumbashree Model of Kerala.\n\nHowever, microfinance faces the following **limitations i**n this regard:\n1. a) Inadequate **financial and business literacy** among members of women SHGs leading to **business** **failures**;\n   b) limited **profit margins** form the activities undertaken by SHGs, which are generally t**raditional and low-scale**. This can potentially lead to **debt traps and crises** in the microfinance sector (e.g. Andhra Pradesh microfinance crisis 2010).\n\n2. a) **No direct co-relation** found to exist between increased incomes and improved nutritional outcomes (NFHS-5);\n   b) **limited market access** in remote areas restricts **income-generating opportunities** despite credit availability.\n\n3. a) Limited impact of increased earnings on **entrenched patriarchal attitudes**, possibly resulting in **double-burden** on women;\n   b) can **divert focus** from **macro-scale solutions** (social safety, public health, universal education).\n\nTo break the **gender-poverty-malnutrition cycle** effectively, SHG microfinancing must be paired with targeted **nutrition training**, **market linkages**, and **gender transformative** approaches. Implementation should prioritize **graduated income support** and measurable **nutrition outcomes** rather than credit alone. (***383 words***)\n\n**SEWA**: Self Employed Women's Association; **NABARD**: National Bank for Agriculture and Rural Development; **NFHS**: National Family Health Survey\n\n**Additional resources** Women self-help groups: Funding alone does not work; the government needs to listen in-ForumIAS Blog Self Help Groups can help in widening women’s labour force participation: Economic Survey 2022-23 - The Hindu"
         }
@@ -352,37 +347,37 @@
       "exam_info": {
         "isPyq": false,
         "is_ncert": false,
-        "exam": "Mains",
-        "group": "UPSC CSE",
-        "year": 2026,
-        "is_upsc_cse": true,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
         "is_allied": false,
         "is_others": false,
         "exam_category": "cse",
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs2"
-      }
+      },
+      "hierarchy_path": [
+        "GS2",
+        "Governance"
+      ]
     },
     {
-      "id": "forum-mgp-2026-gs2-t09-q10",
+      "id": "forum-mgp-2026-csm26t09se-q10",
       "questionNumber": 10,
+      "subject": "Governance",
+      "sectionGroup": "Accountability & Civil Services",
+      "microTopic": "Transaparency and accountability (institutional and other measures); Citizens Charter",
+      "subTopic": "Citizens Charter",
+      "macrotag": "Analytical, Applied",
+      "microtag": "Identify, Suggest, Citizens' charter, Administration",
       "questionText": "The Citizens' charter has been a landmark initiative in ensuring citizen-centric administration. But it  is yet to reach its full potential. Identify the factors hindering the realisation of its promise and suggest  measures to overcome them.",
       "marks": 10,
       "year": 2026,
-      "subject": "Polity",
-      "sectionGroup": null,
-      "microTopic": null,
-      "subTopic": null,
-      "macrotag": null,
-      "microtag": null,
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "answers": [
         {
-          "id": "forum-mgp-2026-gs2-t09-q10-forumias",
+          "id": "forum-mgp-2026-csm26t09se-q10-forumias",
           "institute": "ForumIAS",
           "answerText": "| **Approach:** • Introduce the answer by defining Citizen’s Charter. <br>• In the body, first identify the various factors hindering the realization of its full promise. <br>• Next, suggest measures to overcome them. <br>• Conclude by emphasizing the need for better implementation of Citizen’ Charter. |\n| --- |\n\nCitizens' Charter (CC) represents the **commitment of an** **organization** towards the **standard, quality and time frame** of service delivery. Although a landmark initiative in ensuring citizen-centric administration, it is **yet to reach its full potential**. This is due to the following **factors:**\n1. a) Non-engagement** of staff, stakeholders and citizens in formulation, monitoring and review;**\n   b) lack of **awareness,** especially in rural areas, regarding the CC;\n   c) **“One size fits all”** approach leading to ignorance of local and organizational needs;\n   d) insufficient **grievance redressal** mechanisms (lack of specified timeframe for acknowledgment, response or redressal).\n\n2. a) Lack of periodic review** leads to **outdated charters** that fail to reflect the changing organization structure and citizen needs;**\n   b) absence of **legal enforcement** (non-binding nature) leads to **ad-** **hocism** in implementation (no charters in Central Ministries e.g. Ministry of Cooperation);\n   c) **non-** **justiciable** nature limits scope of judicial recourse in case of non-compliance.\n\n3. a) Absence of **performance indicators** (clear, measurable standards for service delivery) hinders accurate assessment and progress monitoring;\n   b) **resource constraints** (financial and human) and\n\n**lackadaisical attitude** of officers (perception of CC as a ritualistic framework); c) poor communication due to **language barrier** (not published in local language), limited **publicization** and **vague** **commitments** (ambiguous language, non-specific promises).\n\nThese hurdles can be overcome by implementing the following **measures**:\n1. a) C**omprehensive outreach programs** using various media to make citizens aware about their rights under the charters (e.g. DARPG’s Regional Seminars);\n   b) **i****mprove communication** and **outreach** by publication in local languages;\n   c) use of **visual and audio modes** of communication to reach non- literate populations;\n   d) **p****articipatory approach** involving citizens, civil society organizations, and other stakeholders in charter formulation and monitoring;\n   e) **clearly outlining commitments**, that the organization is dedicated to fulfilling.\n\n2. a) Provision of **ear-marked funds and trained personnel** for effective and timely implementation;\n   b) deployment of **robust grievance mechanisms** with efficient, time-bound complaint resolution systems and online tracking (CPGRAMS);\n   c) **reward and punishment**-based accountability mechanism to incentivize participation (e.g. Sevottam Certificate Scheme);\n   d) **statutory backing** on the lines of the United-Kingdom’s “Public Service Guarantee Act.”\n\n3. a) Development and publicization of clear metrics i.e. **key performance indicators** (KPIs) to measure service delivery performance;\n   b) **periodic third-party audits** of implementation and publishing results to enforce public accountability and transparency;\n   c) implementation of regular citizen satisfaction surveys and action on the **feedback** received;\n   d) creating platforms to **share best practices** (Abhinav Pahal Portal)**.**\n\nInvesting in **continuous capacity building** for frontline officials, coupled with **social audits** led by local communities, can operationalize **citizen-centric governance**. Such **Jan-Bhagidari**-driven oversight ensures Citizens Charters evolve from aspirational documents to **enforceable service guarantees**. ***(428 words)***\n\n**DARPG:** Department of Administrative Reforms and Public Grievances; **CPGRAMS:** Centralised Public Grievance Redress and Monitoring System\n\n**Additional information:** **SEVOTTAM (Service-Excellence) MODEL:** The model emphasizes three core components: **Service delivery,** **public-grievance redressal, and Public-private partnership.**  It includes **seven-steps for a citizen's-** **charter:**\n1. **Define the services** a department provides and identify the clients.\n2. **Set standards** and norms for each service.\n3. **Develop the capability** to meet the standards.\n4. **Perform** to meet the standards.\n5. **Monitor performance** against the standards.\n6. **Evaluate the impact** through an independent mechanism.\n7. **Continuously improve** based on the monitoring and evaluation results.\n\n**Additional resources** Transparency and Accountability in Governance |ForumIAS"
         }
@@ -391,17 +386,21 @@
       "exam_info": {
         "isPyq": false,
         "is_ncert": false,
-        "exam": "Mains",
-        "group": "UPSC CSE",
-        "year": 2026,
-        "is_upsc_cse": true,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
         "is_allied": false,
         "is_others": false,
         "exam_category": "cse",
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs2"
-      }
+      },
+      "hierarchy_path": [
+        "GS2",
+        "Governance"
+      ]
     }
   ]
 }

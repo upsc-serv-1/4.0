@@ -26,14 +26,8 @@ def parse_md_file(md_path, booklet_suffix):
         content = f.read()
         
     info = booklet_info.get(booklet_suffix, {"paper": "mains_gs1", "level": "GS1", "subject": "General"})
+    booklet_lower = booklet_suffix.lower()
     
-    # Extract booklet number, e.g. "CSM26T01SE" -> "t01"
-    booklet_match = re.search(r'CSM26T(\d+)SE', booklet_suffix)
-    if booklet_match:
-        t_num = f"t{int(booklet_match.group(1)):02d}"
-    else:
-        t_num = "t01"
-        
     parts = re.split(r'\n## Q', content)
     questions = []
     
@@ -77,21 +71,20 @@ def parse_md_file(md_path, booklet_suffix):
         if year_match:
             year = int(year_match.group(1))
             
-        q_id_val = f"forum-mgp-{year}-{info['level'].lower()}-{t_num}-q{q_num}"
+        q_id_val = f"forum-mgp-{year}-{booklet_lower}-q{q_num:02d}"
         
         q_obj = {
             "id": q_id_val,
             "questionNumber": q_num,
-            "questionText": q_text.strip(),
-            "marks": marks,
-            "year": year,
             "subject": info["subject"],
             "sectionGroup": None,
             "microTopic": None,
             "subTopic": None,
             "macrotag": None,
             "microtag": None,
-            "hierarchy_path": [info["level"], info["subject"]],
+            "questionText": q_text.strip(),
+            "marks": marks,
+            "year": year,
             "answers": [
                 {
                     "id": f"{q_id_val}-forumias",
@@ -127,9 +120,8 @@ def main():
     os.makedirs(forum_json_dir, exist_ok=True)
     
     booklets = [f"CSM26T{i:02d}SE" for i in range(1, 16)]
-    questions_by_paper = {"GS1": [], "GS2": [], "GS3": []}
     
-    print("Processing booklets and generating JSON files...\n")
+    print("Processing booklets and generating test-wise JSON files...\n")
     
     for booklet in booklets:
         md_name = f"Forum MGP {booklet} Examstatic.com.md"
@@ -145,59 +137,51 @@ def main():
         questions = parse_md_file(md_path, booklet)
         
         info = booklet_info.get(booklet, {"paper": "mains_gs1", "level": "GS1", "subject": "General"})
-        questions_by_paper[info["level"]].extend(questions)
+        booklet_lower = booklet.lower()
         
-        ind_json_name = f"Forum MGP {booklet} Examstatic.com.json"
+        ind_json_name = f"forum-mgp-2026-{booklet_lower}.json"
         ind_json_path = os.path.join(forum_json_dir, ind_json_name)
         
         ind_root = {
             "course": "Civil Services",
-            "id": f"forum-mgp-2026-{info['level'].lower()}-{booklet.lower()}",
-            "title": f"Forum MGP 2026 {info['level']} - {booklet}",
+            "id": f"forum-mgp-2026-{booklet_lower}",
+            "title": f"Forum MGP 2026 - {booklet}",
             "launch_year": 2026,
             "institute": "Forum IAS",
             "program_id": "mgp",
             "program_name": "MGP",
             "series": "Test Series",
-            "level": info["level"],
+            "level": None,
             "paperType": "Sectional",
             "defaultMinutes": 180,
-            "sourceMode": "md-sol",
-            "paper": info["level"],
+            "sourceMode": "sol-only",
             "questions": questions
         }
         
         with open(ind_json_path, 'w', encoding='utf-8') as f:
             json.dump(ind_root, f, ensure_ascii=False, indent=2)
-        print(f"[+] Generated individual JSON: {ind_json_name}")
+        print(f"[+] Generated test-wise JSON: {ind_json_name}")
         
-    # Generate consolidated JSON files for each GS paper
-    for level, questions in questions_by_paper.items():
-        if not questions:
-            continue
-        consolidated_json_path = os.path.join(json_dir, f"forum_mgp_2026_{level.lower()}_consolidated.json")
-        
-        consolidated_root = {
-            "course": "Civil Services",
-            "id": f"forum-mgp-2026-{level.lower()}-consolidated",
-            "title": f"Forum MGP 2026 {level} Consolidated Questions and Answers",
-            "launch_year": 2026,
-            "institute": "Forum IAS",
-            "program_id": "mgp",
-            "program_name": "MGP",
-            "series": "Test Series",
-            "level": level,
-            "paperType": "mains-paper",
-            "defaultMinutes": 180,
-            "sourceMode": "md-sol",
-            "paper": level,
-            "questions": questions
-        }
-        
-        with open(consolidated_json_path, 'w', encoding='utf-8') as f:
-            json.dump(consolidated_root, f, ensure_ascii=False, indent=2)
-        print(f"[+] Generated consolidated JSON file for {level}: {os.path.basename(consolidated_json_path)}")
-        
+    # Clean up consolidated files if they exist to keep directories clean
+    for filename in os.listdir(json_dir):
+        if filename.startswith("forum_mgp_2026_") and filename.endswith(".json"):
+            file_path = os.path.join(json_dir, filename)
+            try:
+                os.remove(file_path)
+                print(f"[+] Removed consolidated file: {filename}")
+            except Exception as e:
+                print(f"[-] Failed to remove {filename}: {e}")
+                
+    # Also clean up any older formatted JSON files in forum mgp 2026 folder
+    for filename in os.listdir(forum_json_dir):
+        if filename.startswith("Forum MGP ") and filename.endswith(".json"):
+            file_path = os.path.join(forum_json_dir, filename)
+            try:
+                os.remove(file_path)
+                print(f"[+] Cleaned up old format JSON: {filename}")
+            except Exception as e:
+                print(f"[-] Failed to clean up {filename}: {e}")
+                
     print("\nAll tasks completed successfully!")
 
 if __name__ == "__main__":

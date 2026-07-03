@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** Define potential GDP. What are the factors that prevent India from realizing its potential GDP? 10
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: GDP] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Define, Potential GDP, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining Potential GDP. <br>• In the body, discuss the factors that are preventing India from realizing its potential GDP. <br>• Next, suggest measures that need to be taken to realize potential GDP. <br>• Conclude by underlining the need for coordinated policy to realize potential GDP. |
@@ -44,13 +44,13 @@ Measures that can be taken **to realize potential GDP:**
 
 Bridging India's potential-actual **GDP gap** requires coordinated **short and long-term policies** that strengthen institutions and remove **structural barriers** to achieve sustainable economic transformation. (***413 words***)
 
-[Question ID: forum-mgp-2026-gs1-q1]
+[Question ID: forum-mgp-2026-csm26t04se-q01]
 
 ---
 
 ## Q2 [Year: 2026]
 **Question:** “Both the Employment Linked Incentive (ELI) and Production Linked Incentive (PLI) schemes are  intended to promote economic growth, yet they employ different approaches and focus on distinct  outcomes.” Elaborate.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Manufacturing Sector] [Macro Tag: Descriptive, Comparative, Applied] [Micro Tag: Elaborate, ELI, PLI, Economic growth]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of the ELI and PLI schemes. <br>• In the body, elaborate the different approaches they adopt to boost economic growth and achieve distinct outcomes. <br>• Conclude by highlighting the significance of the two schemes. |
@@ -76,13 +76,13 @@ Both schemes employ **different approaches** and focus on **distinct outcomes**:
 
 Thus, the **PLI** is an incentive for the economy to ‘**pour more into the top of a funnel’, while ELI** is an incentive to ‘**collect more at the bottom of the funnel’**. The transition from the PLI to the ELI seeks to address the **capital-labour imbalance**. Nevertheless, both the schemes seek job **creation** and enhanced **global** **competitiveness** of the economy and are critical in our journey towards a **$5 trillion economy**. (***279 words***)
 
-[Question ID: forum-mgp-2026-gs1-q2]
+[Question ID: forum-mgp-2026-csm26t04se-q02]
 
 ---
 
 ## Q3 [Year: 2026]
 **Question:** To what extent, in your opinion, is GDP the best measure of a country's development? 10
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: GDP] [Macro Tag: Analytical] [Micro Tag: To what extent, GDP, Development]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining GDP. <br>• In the body, first discuss why GDP is considered as the best measure of a country's development. <br>• Then, present the counter-arguments. <br>• Conclude by highlighting the need to supplement GDP with other metrics. |
@@ -109,13 +109,13 @@ However, critics argue that GDP has **significant limitations** as a development
 
 While GDP remains a valuable economic indicator, a **comprehensive development assessment** requires **supplementary metrics** like HDI, MPI, and SDG indicators. These measures provide a more holistic understanding of **social progress**, **environmental sustainability**, and overall well-being beyond economic production alone. ***(303 words)***
 
-[Question ID: forum-mgp-2026-gs1-q3]
+[Question ID: forum-mgp-2026-csm26t04se-q03]
 
 ---
 
 ## Q4 [Year: 2026]
 **Question:** The Female Labour Force Participation Rate (FLFPR) has seen a significant increase in recent years.  What are the reasons for this rise? Discuss the opportunities it creates for inclusive development.10
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Demographic Dividend] [Macro Tag: Analytical, Applied] [Micro Tag: What are the reasons, Discuss, FLFPR, Inclusive development]*
 #### Answer from ForumIAS
 
 | **Approach:** • Begin by defining Female Labour Force Participation Rate (FLFPR) and citing the latest data. <br>• In the body, highlight the reasons for the increase in the FLFPR. <br>• Then, discuss the opportunities it creates for sustainable development. <br>• Conclude by highlighting associated challenges and suggesting a way forward. |
@@ -158,13 +158,13 @@ This rise creates **opportunities** for inclusive development, as discussed:
 
 Despite these gains, **challenges persist**, such as the concentration of women in low-paying informal jobs, workplace discrimination, ‘dual burden’, etc. Addressing these requires **gender-sensitive policies**, improved skilling, and increased formal sector opportunities. A **holistic approach** can ensure sustained FLFPR growth, fostering both economic prosperity and **gender-inclusive development** **(SDG 5)**. (***422 words***)
 
-[Question ID: forum-mgp-2026-gs1-q4]
+[Question ID: forum-mgp-2026-csm26t04se-q04]
 
 ---
 
 ## Q5 [Year: 2026]
 **Question:** What do you understand by fiscal deficit? Why is it necessary for a country to keep its fiscal deficit  under check?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Government Budgeting and fiscal management policies] [Sub Topic: Fiscal Policy] [Macro Tag: Descriptive, Analytical] [Micro Tag: What do you understand, Fiscal deficit]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce by defining fiscal deficit. <br>• In the body, discuss the reasons that make it crucial for a country to control its fiscal deficit. <br>• Conclude with suggestions to improve fiscal management in the country. |
@@ -192,13 +192,13 @@ Fiscal deficit refers to the difference between the **government's total expendi
 
 Maintaining **fiscal discipline** through **FRBM targets** is essential for macroeconomic stability. The **N.K. Singh** **Committee's** recommendations for the establishment of a **Fiscal Council**, **debt-based rules**, and **escape** **clauses** provide a pragmatic framework to balance **fiscal prudence** with **growth imperatives**. ***( 266 words)***
 
-[Question ID: forum-mgp-2026-gs1-q5]
+[Question ID: forum-mgp-2026-csm26t04se-q05]
 
 ---
 
 ## Q6 [Year: 2026]
 **Question:** Distinguish between physical and human capital. How does human capital formation contribute to  the economic growth of a nation?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Economic Growth] [Macro Tag: Comparative, Descriptive, Analytical] [Micro Tag: Distinguish, Human capital, Economic growth]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by briefly explaining capital. <br>• In the body, first bring out the differences between the two. <br>• Next, discuss how human capital formation contributes to the economic growth of a nation. <br>• Conclude by highlighting its significance. |
@@ -240,13 +240,13 @@ While both are crucial, human capital formation plays a significant role in **dr
 
 Both human and physical capital drive economic growth, but **human capital formation** is **crucial** for **productivity, innovation**, and **social well-being**. Their synergy supports **SDG 3** (Health), **SDG 4** (Education), **SDG 8** (Decent Work), among others. **(*****429 words)***
 
-[Question ID: forum-mgp-2026-gs1-q6]
+[Question ID: forum-mgp-2026-csm26t04se-q06]
 
 ---
 
 ## Q7 [Year: 2026]
 **Question:** Bring out the causes of persistent high food inflation in India and suggest measures for ensuring long-  term price stability.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: Monetary policy] [Macro Tag: Analytical, Applied] [Micro Tag: Bring out, Suggest, Food inflation, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining inflation and giving a brief background of the persistent high food inflation in India. <br>• In the body, first bring out the causes for the same. <br>• Next, suggest measures for ensuring long term price stability. <br>• Conclude by emphasizing their synergy and link to SDGs. |
@@ -287,13 +287,13 @@ Ensuring **long-term price stability** India requires a mix of **following** mea
 
 Managing persistent high food inflation requires **comprehensive measures** including **supply-side** **interventions, market reforms**, and **sustainable agriculture** to balance consumer affordability with farm income stability. ***(401 words)***
 
-[Question ID: forum-mgp-2026-gs1-q7]
+[Question ID: forum-mgp-2026-csm26t04se-q07]
 
 ---
 
 ## Q8 [Year: 2026]
 **Question:** How does absolute poverty differ from relative poverty? Do you think the Multidimensional Poverty  Index (MPI) provides a more comprehensive measure of poverty?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Social Justice] [Section Group: Poverty & Hunger] [Micro Topic: Issues and Challenges relating to Poverty & Hunger] [Sub Topic: Poverty] [Macro Tag: Comparative, Analytical] [Micro Tag: Differ, Absolute poverty, Relative poverty, MPI]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining poverty. <br>• In the body, first distinguish between absolute poverty and relative poverty. <br>• Next, analyse whether the Multidimensional Poverty Index (MPI), provides a more comprehensive measure of poverty, giving arguments both in favour and against. <br>• Conclude by suggesting a way forward. |
@@ -340,13 +340,13 @@ Despite these advantages, some experts have argued that it **does not offer a co
 
 Though, MPI’s broader framework more accurately reflects the complex realities of poverty. Incorporating **other** **metrics such as income fluctuation** adjustments and the status of **environmental degradation** would make it a more **comprehensive tool** for monitoring and achieving sustainable development. ***(487 words).***
 
-[Question ID: forum-mgp-2026-gs1-q8]
+[Question ID: forum-mgp-2026-csm26t04se-q08]
 
 ---
 
 ## Q9 [Year: 2026]
 **Question:** “Fiscal policy can serve as a cornerstone for sustainable development”. In light of this statement,  discuss the significance of fiscal policy in a developing economy like India.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Government Budgeting and fiscal management policies] [Sub Topic: Fiscal Policy] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Fiscal policy, Sustainable development, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining fiscal policy. <br>• In the body, discuss the significance of fiscal policy in a developing economy like India. <br>• Conclude by highlighting the importance of deficit management and coordination with monetary policy for sustainable development. |
@@ -396,13 +396,13 @@ Fiscal policy refers to the government's use of **expenditure and revenue measur
 
 India's developmental journey (**Viksit Bharat 2047**) requires balancing **growth with equity**. Within a framework of **prudent deficit management** (FRBM Act), and complemented by appropriate **monetary policy**, fiscal measures create an **enabling environment** for **inclusive** and **sustainable development**. (***454 words***)
 
-[Question ID: forum-mgp-2026-gs1-q9]
+[Question ID: forum-mgp-2026-csm26t04se-q09]
 
 ---
 
 ## Q10 [Year: 2026]
 **Question:** Identify the reasons behind the significant growth of the services sector relative to the industrial  sector in the country. Also, elaborate on the importance of a strong industrial base for a ‘self-reliant India’.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Manufacturing Sector] [Macro Tag: Analytical, Applied] [Micro Tag: Identify, Elaborate, Services sector, Industrial sector, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce with data showing India's unique services-led growth pattern. <br>• In the body, first use a tabular comparison to analyze factors accelerating services versus constraining industry. <br>• Then, explain the importance of the industrial base for self-reliance. <br>• Conclude with suggestions for balanced growth. |
@@ -463,7 +463,7 @@ While the growth of the services sector is commendable, a **strong industrial ba
 
 Achieving **“Atmanirbhar Bharat”** requires **integrating service excellence** with **manufacturing strength**. Policies like **PLI schemes** and **industrial corridors** are steps forward, but success demands **sustained focus** on infrastructure, R&D investment, skill development and **EoDB-2 reforms**. ***(485 words)***
 
-[Question ID: forum-mgp-2026-gs1-q10]
+[Question ID: forum-mgp-2026-csm26t04se-q10]
 
 ---
 

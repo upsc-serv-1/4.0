@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** Highlight the differences in the approach of Bhagat Singh and Mahatma Gandhi in the struggle for  freedom.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Modern History] [Micro Topic: Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);] [Sub Topic: Gandhi X Indian Leaders of Freedom Struggle] [Macro Tag: Comparative, Descriptive] [Micro Tag: Highlight, Differences, Bhagat Singh, Mahatma Gandhi]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by highlighting the common objective of Bhagat Singh and Mahatma Gandhi. <br>• In the body, discuss the key differences in their approach towards the struggle for freedom in tabular format. <br>• Conclude by highlighting how both approaches, despite their differences, contributed to India's freedom movement. |
@@ -52,13 +52,13 @@ abolishing class, caste and religious divisions; c) supported **industrializatio
 
 Beyond rigid labels, **Singh evolved** to value non-violent resistance, while **Gandhi acknowledged** violence as preferable to inaction or submission. Moreover, these **complementary approaches** reflect how their different methods worked together in the freedom struggle, jointly weakening British colonial authority by **exerting pressure on multiple fronts**. **(348** **words)**
 
-[Question ID: forum-mgp-2026-gs1-q1]
+[Question ID: forum-mgp-2026-csm26t06se-q01]
 
 ---
 
 ## Q2 [Year: 2026]
 **Question:** Throw light on the strategies employed by the British East India Company to expand and strengthen  its territorial control in India during the 18th century.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Modern History] [Micro Topic: Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);] [Sub Topic: Colonial rule and impact] [Macro Tag: Descriptive] [Micro Tag: Throw light, Strategies, British East India Company, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce with a background of the arrival of EIC as a trading company in India. <br>• In the body, list various strategies deployed by the Company to expand its territorial control in India. <br>• Conclude by underlining how these strategies laid the foundation of the British Raj. |
@@ -91,13 +91,13 @@ The company employed a diverse range of **strategies to extend its territorial c
 
 The Company's **methodical approach** combining commercial exploitation with territorial acquisition created the **administrative and military infrastructure** that seamlessly evolved into the **British Raj** after 1858. ***(327*** ***words)***
 
-[Question ID: forum-mgp-2026-gs1-q2]
+[Question ID: forum-mgp-2026-csm26t06se-q02]
 
 ---
 
 ## Q3 [Year: 2026]
 **Question:** The history of independence would be incomplete without acknowledging the significant  contributions of Indian women. Substantiate.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Modern History] [Micro Topic: Freedom Struggle-various stages, important contributors/contributions from different parts of the country] [Sub Topic: Important contributors/contribution] [Macro Tag: Analytical] [Micro Tag: Substantiate, Contributions, Indian women, Independence]*
 #### Answer from ForumIAS
 
 | **Approach:** • Begin by highlighting women's overlooked yet essential role in the independence struggle. <br>• Then, discuss the instrumental role of Indian women in shaping the national freedom movement, citing examples. <br>• Conclude by highlighting the significance of evolution of women's resistance. |
@@ -123,13 +123,13 @@ The struggle for Indian independence **necessitated contributions** from **all s
 
 The Indian independence movement drew **critical momentum** from **women's organized resistance**, which strategically **expanded from domestic spheres into powerful political activism** that fundamentally altered the course of the struggle. ***(328 words)***
 
-[Question ID: forum-mgp-2026-gs1-q3]
+[Question ID: forum-mgp-2026-csm26t06se-q03]
 
 ---
 
 ## Q4 [Year: 2026]
 **Question:** How did the British education policy, designed to serve colonial interests, contribute to the rise of  Indian nationalism?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Modern History] [Micro Topic: Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);] [Sub Topic: Colonial rule and impact] [Macro Tag: Analytical] [Micro Tag: How did, British education policy, Indian nationalism]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by providing a brief background of British education policy in India. <br>• In the body, analyze how this policy fostered nationalist consciousness among Indians. <br>• Conclude by highlighting the irony of how a system meant to strengthen imperial rule actually accelerated its downfall. |
@@ -159,13 +159,13 @@ This education policy, designed to serve colonial interests, **contributed to th
 
 The British education policy, designed to produce **loyal subjects** and **efficient administrators**, ironically became the **catalyst for nationalist awakening**. By equipping Indians with **tools** to understand and challenge imperial domination, it **fostered a generation of leaders** who ultimately orchestrated the dismantling of the very empire that educated them. ***(362 words)***
 
-[Question ID: forum-mgp-2026-gs1-q4]
+[Question ID: forum-mgp-2026-csm26t06se-q04]
 
 ---
 
 ## Q5 [Year: 2026]
 **Question:** In what ways did the Civil Disobedience Movement (CDM) differ from the Non-Cooperation Movement  (NCM)?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Modern History] [Micro Topic: Freedom Struggle-various stages, important contributors/contributions from different parts of the country] [Sub Topic: Various stages of Freedom struggle] [Macro Tag: Comparative] [Micro Tag: In what ways, Differ, Civil Disobedience Movement, Non-Cooperation Movement]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by providing a brief historical context for both movements. <br>• In the body, compare the key differences between the Civil Disobedience Movement and Non-Cooperation Movement, in a tabular format. <br>• Conclude by highlighting their historical significance and impact on India's independence movement. |
@@ -196,13 +196,13 @@ The Non-Cooperation and Civil Disobedience Movements represented **two phases of
 
 While the Non-Cooperation Movement **pioneered mass mobilization techniques**, the Civil Disobedience Movement further **refined them**. They together established the **framework of mass resistance** that culminated in the **Quit India Movement** of 1942, ultimately leading to India’s independence in 1947. ***(252 words)***
 
-[Question ID: forum-mgp-2026-gs1-q5]
+[Question ID: forum-mgp-2026-csm26t06se-q05]
 
 ---
 
 ## Q6 [Year: 2026]
 **Question:** “The introduction of railways in colonial India served imperial interests while simultaneously creating  conditions for nationalist resistance.” Elaborate.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Modern History] [Micro Topic: Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);] [Sub Topic: Colonial rule and impact] [Macro Tag: Descriptive, Analytical] [Micro Tag: Elaborate, Railways, Colonial India, Nationalist resistance]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by stating the origin of railways in India. <br>• In the body, first discuss how the introduction of railways served imperial interests, then how it created conditions for nationalist resistance. <br>• Conclude by highlighting the transformational role of railways in both aspects. |
@@ -242,13 +242,13 @@ While serving imperial interests, the railways created favourable conditions for
 
 Despite British claims of railways as the “**light of civilization**” and **progress**, colonial railways served imperial interests, integrating India into British **free trade imperialism**. However, they unintentionally **sparked** **nationalist consciousness**, ultimately fueling India's struggle for independence. ***(442 words)***
 
-[Question ID: forum-mgp-2026-gs1-q6]
+[Question ID: forum-mgp-2026-csm26t06se-q06]
 
 ---
 
 ## Q7 [Year: 2026]
 **Question:** While revolutionaries significantly contributed to the nation’s freedom struggle, their efforts were  hindered by multiple constraints. Discuss with examples.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Modern History] [Micro Topic: Freedom Struggle-various stages, important contributors/contributions from different parts of the country] [Sub Topic: Various stages of Freedom struggle] [Macro Tag: Analytical] [Micro Tag: Discuss, Revolutionaries, Freedom struggle, Constraints]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce with a background of origin of revolutionary movement in India. <br>• In the body, first highlight their contributions to the Indian freedom movement. <br>• Substantiate the points with examples or facts. <br>• Next, mention the constraints that limited their efforts. <br>• Conclude by acknowledging their sustained legacy. |
@@ -285,13 +285,13 @@ However, their efforts were limited by the **following constraints**:
 
 While organizational weaknesses and British repression **limited their immediate impact**, revolutionaries expanded the **ideological horizons** of India's freedom movement through their **radical vision** and **selfless** **sacrifice**. Their legacy lives on in contemporary India's constitutional commitment to **sovereignty, secularism,** **and social justice**. ***(464 words)***
 
-[Question ID: forum-mgp-2026-gs1-q7]
+[Question ID: forum-mgp-2026-csm26t06se-q07]
 
 ---
 
 ## Q8 [Year: 2026]
 **Question:** Explain the factors that deepened communal divisions in Indian politics during the 1930s and 1940s.  What were its consequences for the freedom movement?
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Modern History] [Micro Topic: Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);] [Sub Topic: Colonial rule and impact] [Macro Tag: Descriptive, Analytical] [Micro Tag: Explain, Communal divisions, Indian politics, Freedom movement]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by briefly explaining communal divisions in British era Indian politics. <br>• In the body, first discuss the factors that deepened communal divisions in Indian politics during 1930’s and 1940’s, then discuss its consequences for the freedom movement. <br>• Conclude by highlighting its long-term implications. |
@@ -337,13 +337,13 @@ The deepening of communal divisions had the **following consequences** on the fr
 
 The rise of communalism during the 1930s-40s fundamentally **altered the freedom movement**, shifting its focus from anti-colonial resistance to communal negotiations. This **fragmented nationalist unity**, forced compromise on territorial integrity, and **culminated in the partition** that accompanied independence in 1947. **(445 words)**
 
-[Question ID: forum-mgp-2026-gs1-q8]
+[Question ID: forum-mgp-2026-csm26t06se-q08]
 
 ---
 
 ## Q9 [Year: 2026]
 **Question:** Analyze how the decline of traditional artisanal industry in colonial India crippled the rural economy.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Modern History] [Micro Topic: Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);] [Sub Topic: Colonial rule and impact] [Macro Tag: Analytical] [Micro Tag: Analyze, Artisanal industry, Colonial India, Rural economy]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by writing about the prosperous traditional artisanal industry. <br>• In the body, explain the ways in which the decline of traditional industry crippled the rural economy. <br>• Conclude by emphasizing how colonial deindustrialization created enduring structural inequalities. |
@@ -379,13 +379,13 @@ However, the colonial India witnessed a **decline** in these industries, crippli
 
 The British colonial policy **deliberately dismantled** India's artisanal industries, converting a manufacturing hub into a **raw material exporter** and a **captive market**. Such orchestrated deindustrialization created **structural** **inequalities** that hindered India's development long after independence. ***(426 words)***
 
-[Question ID: forum-mgp-2026-gs1-q9]
+[Question ID: forum-mgp-2026-csm26t06se-q09]
 
 ---
 
 ## Q10 [Year: 2026]
 **Question:** While the Marathas posed a formidable challenge to British expansion, several factors hindered  them from establishing a strong centralized authority in the country. Elaborate.
-*Metadata: [Year: 2026] [Institute: Forum] [Programme: MGP] [is_pyq: false] [Group: UPSC CSE] [Exam: Mains] [Stage: Mains] [Paper: Mains - GS 1]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Modern History] [Micro Topic: Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);] [Sub Topic: Colonial rule and impact] [Macro Tag: Descriptive, Analytical] [Micro Tag: Elaborate, Marathas, British expansion, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Begin with a brief introduction of the Maratha Empire and their confrontation with the British. <br>• In the body, provide the reasons for the Marathas posing a challenge to the British expansion. <br>• Next, discuss the factors that hindered them. <br>• Conclude by highlighting the significance of the Marathas confrontation with the British. |
@@ -422,7 +422,7 @@ Despite their military prowess and significant territorial control, they could *
 
 The dissolution of Maratha power revealed the **vulnerability of decentralized indigenous political systems** against the industrializing European imperial machinery. However the **Maratha resistance** to British rule inspired later Indian leaders and **freedom fighters** (e.g., Tantia Tope). ***(437 words)***
 
-[Question ID: forum-mgp-2026-gs1-q10]
+[Question ID: forum-mgp-2026-csm26t06se-q10]
 
 ---
 

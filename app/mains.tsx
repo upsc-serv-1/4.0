@@ -26,7 +26,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Clipboard from 'expo-clipboard';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import {
   Search,
   Bookmark,
@@ -208,6 +208,7 @@ interface MainsFilters {
   subtopics: string;
   macrotags: string;
   microtags: string;
+  years: string;
 }
 
 const DEFAULT_MAINS_FILTERS: MainsFilters = {
@@ -223,6 +224,7 @@ const DEFAULT_MAINS_FILTERS: MainsFilters = {
   subtopics: 'All',
   macrotags: 'All',
   microtags: 'All',
+  years: 'All',
 };
 
 // ─── SYLLABUS DATA ───
@@ -301,8 +303,53 @@ export default function MainsScreen() {
   const isTablet = width >= 768;
   const insets = useSafeAreaInsets();
 
+  const params = useLocalSearchParams<{
+    paper?: string;
+    subject?: string;
+    section?: string;
+    microtopic?: string;
+    year?: string;
+    initialScreen?: string;
+  }>();
+
   // Navigation State
   const [currentScreen, setCurrentScreen] = useState<'hub' | 'questions' | 'value-add' | 'syllabus' | 'search' | 'detailed-question'>('hub');
+
+  useEffect(() => {
+    if (params.initialScreen === 'questions') {
+      setCurrentScreen('questions');
+    }
+  }, [params.initialScreen]);
+
+  const initialFiltersFromParams = useMemo(() => {
+    if (!params.initialScreen) return null;
+
+    const cleanParam = (val: string | undefined | null) => {
+      if (!val) return 'All';
+      return val.replace(/,/g, '|');
+    };
+
+    let mappedPaper = 'All';
+    if (params.paper) {
+      const p = params.paper;
+      if (p === 'GS Paper 1') mappedPaper = 'GS1';
+      else if (p === 'GS Paper 2') mappedPaper = 'GS2';
+      else if (p === 'GS Paper 3') mappedPaper = 'GS3';
+      else if (p === 'GS Paper 4') mappedPaper = 'GS4';
+      else if (p === 'Optional') mappedPaper = 'Optional';
+      else mappedPaper = cleanParam(p);
+    }
+
+    return {
+      ...DEFAULT_MAINS_FILTERS,
+      paper: mappedPaper,
+      subjects: cleanParam(params.subject),
+      sections: cleanParam(params.section),
+      microtopics: cleanParam(params.microtopic),
+      years: cleanParam(params.year),
+    };
+  }, [params.initialScreen, params.paper, params.subject, params.section, params.microtopic, params.year]);
+
   const [previousScreen, setPreviousScreen] = useState<'questions' | 'search'>('questions');
   const [detailedQuestion, setDetailedQuestion] = useState<ConsolidatedQuestion | null>(null);
   const [valueAddCategory, setValueAddCategory] = useState<string | null>(null);
@@ -700,8 +747,31 @@ export default function MainsScreen() {
       try {
         const liveValueAdd = await fetchValueAdditionFromSupabase();
         if (liveValueAdd && liveValueAdd.length > 0) {
-          setValueAddItems(liveValueAdd);
-          console.log('[MainsScreen] Loaded live value additions from Supabase:', liveValueAdd.length);
+          const merged = liveValueAdd.map(item => {
+            if (item.category === 'ethics') {
+              const cleanText = (str: string) => (str || '').toLowerCase().replace(/[^a-z0-9]/g, '').trim();
+              const targetTitle = cleanText(item.title);
+              const localMatch = mainsConsolidatedValueAdd.find(
+                l => l.category === 'ethics' && cleanText(l.title) === targetTitle
+              );
+              if (localMatch) {
+                const nextItem = { ...item };
+                if (localMatch.diagramImagePath) {
+                  nextItem.diagramImagePath = localMatch.diagramImagePath;
+                }
+                if (localMatch.ethicsData?.diagramsList) {
+                  nextItem.ethicsData = {
+                    ...nextItem.ethicsData,
+                    diagramsList: localMatch.ethicsData.diagramsList
+                  };
+                }
+                return nextItem;
+              }
+            }
+            return item;
+          });
+          setValueAddItems(merged);
+          console.log('[MainsScreen] Loaded live value additions from Supabase (with offline diagram falls):', liveValueAdd.length);
         }
       } catch (err) {
         console.log('[MainsScreen] Failed to load live value additions, using offline fallback:', err);
@@ -812,6 +882,7 @@ export default function MainsScreen() {
                 setCurrentScreen('detailed-question');
               }}
               onActiveQuestionChange={handleActiveQuestionChange}
+              initialFilters={initialFiltersFromParams}
             />
           )}
           {currentScreen === 'value-add' && (
@@ -1867,7 +1938,7 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
           >
             {item.category === 'data_facts' ? item.metric : item.title}
           </Text>
-          {item.source && item.category !== 'data_facts' && item.category !== 'intro_conclusion' && item.category !== 'quotes' && item.category !== 'mnemonics' && item.category !== 'frameworks' && <Text style={styles.vCardSource}>{item.source}</Text>}
+          {item.source && item.category !== 'data_facts' && item.category !== 'intro_conclusion' && item.category !== 'quotes' && item.category !== 'mnemonics' && item.category !== 'frameworks' && item.category !== 'ethics' && <Text style={styles.vCardSource}>{item.source}</Text>}
         </TouchableOpacity>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           <TouchableOpacity
@@ -2079,6 +2150,7 @@ interface MainsLeftPanelProps {
   allPrograms?: string[];
   userTags?: string[];
   onCloseSidebar?: () => void;
+  allYears?: string[];
 }
 
 function MainsLeftPanel({
@@ -2110,6 +2182,7 @@ function MainsLeftPanel({
   allPrograms = [],
   userTags = [],
   onCloseSidebar,
+  allYears = [],
 }: MainsLeftPanelProps) {
   const { isDark } = useTheme();
   const isOptional = filters.paper !== 'All' && !filters.paper.split('|').some(p => ['GS1', 'GS2', 'GS3', 'GS4', 'Essay'].includes(p));
@@ -2559,6 +2632,40 @@ function MainsLeftPanel({
         </View>
       )}
 
+      {/* Years Selector */}
+      {allYears.length > 0 && (
+        <View style={{ marginVertical: 8 }}>
+          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>YEAR</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+            <TouchableOpacity
+              onPress={() => onUpdateFilters({ ...filters, years: 'All' })}
+              style={[styles.sidebarFchip, filters.years === 'All' && styles.sidebarFchipSel]}
+            >
+              <Text style={[styles.sidebarFchipText, { color: filters.years === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
+            </TouchableOpacity>
+            {allYears.map(yr => {
+              const isSelected = filters.years.split('|').includes(yr);
+              return (
+                <TouchableOpacity
+                  key={yr}
+                  onPress={() => {
+                    const list = filters.years === 'All' ? [] : filters.years.split('|').filter(Boolean);
+                    const next = isSelected ? list.filter(y => y !== yr) : [...list, yr];
+                    onUpdateFilters({
+                      ...filters,
+                      years: next.length ? next.join('|') : 'All'
+                    });
+                  }}
+                  style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
+                >
+                  <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]} numberOfLines={1}>{yr}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      )}
+
       {/* Search Subject list client-side filter */}
       {isSearchView && allSearchSubjects.length >= 1 && (
         <View style={{ marginTop: 14 }}>
@@ -2698,7 +2805,7 @@ function HierarchyModal({
         const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
         const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
         if (matchPaper && matchSubject && matchSection) {
-          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
             if (path.microtopic) mtSet.add(path.microtopic);
           } else {
             const themeName = item.category === 'data_facts' ? item.metric : item.title;
@@ -2717,7 +2824,7 @@ function HierarchyModal({
     const stSet = new Set<string>();
     activeCategoryItems.forEach(item => {
       getItemPaths(item).forEach(path => {
-        if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+        if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
           if (path.microtopic && selectedMicrotopic.split('|').includes(path.microtopic)) {
             if (path.subtopic) stSet.add(path.subtopic);
           }
@@ -3103,6 +3210,7 @@ function QuestionBankView({
   userTags,
   userQuestionStates,
   onActiveQuestionChange,
+  initialFilters,
 }: {
   colors: any;
   savedIds: string[];
@@ -3114,6 +3222,7 @@ function QuestionBankView({
   userTags: string[];
   userQuestionStates: Record<string, { reviewTags: string[], confidence: string | null, difficulty: string | null }>;
   onActiveQuestionChange?: (q: ConsolidatedQuestion | null, activeInst?: string) => void;
+  initialFilters?: MainsFilters | null;
 }) {
   const { isDark } = useTheme();
   const [search, setSearch] = useState('');
@@ -3136,7 +3245,16 @@ function QuestionBankView({
     return () => onActiveQuestionChange?.(null);
   }, [expandedId, selectedInstitutes, questions, onActiveQuestionChange]);
 
-  const [filters, setFilters] = useState<MainsFilters>(DEFAULT_MAINS_FILTERS);
+  const [filters, setFilters] = useState<MainsFilters>(() => {
+    return initialFilters || DEFAULT_MAINS_FILTERS;
+  });
+
+  useEffect(() => {
+    if (initialFilters) {
+      setFilters(initialFilters);
+    }
+  }, [initialFilters]);
+
   const [hierarchyModalVisible, setHierarchyModalVisible] = useState(false);
 
   const [sidebarOpen, setSidebarOpen] = useState(isTablet);
@@ -3149,6 +3267,15 @@ function QuestionBankView({
       });
     });
     return Array.from(instSet).sort();
+  }, [questions]);
+
+  const allYears = useMemo(() => {
+    const yearSet = new Set<string>();
+    questions.forEach(q => {
+      const yr = q.year;
+      if (yr) yearSet.add(String(yr));
+    });
+    return Array.from(yearSet).sort((a, b) => Number(b) - Number(a));
   }, [questions]);
 
 
@@ -3312,7 +3439,10 @@ function QuestionBankView({
       const microFilter = filters.microtags !== 'All' ? filters.microtags.split('|') : [];
       const matchMicroTag = microFilter.length === 0 || (q.microtag || '').split(',').map(t => t.trim()).some(t => microFilter.includes(t));
 
-      return matchSearch && matchPaper && matchSubject && matchSection && matchMicrotopic && matchSubtopic && matchMacro && matchMicroTag;
+      const yearFilter = filters.years !== 'All' ? filters.years.split('|') : [];
+      const matchYear = yearFilter.length === 0 || yearFilter.includes(String(q.year || ''));
+
+      return matchSearch && matchPaper && matchSubject && matchSection && matchMicrotopic && matchSubtopic && matchMacro && matchMicroTag && matchYear;
     });
   }, [search, filters, questions, userQuestionStates]);
 
@@ -3340,6 +3470,7 @@ function QuestionBankView({
               allPrograms={[]}
               userTags={userTags}
               onCloseSidebar={() => setSidebarOpen(false)}
+              allYears={allYears}
             />
           </View>
         )}
@@ -3873,9 +4004,15 @@ function ValueAdditionView({
 }) {
   const { isDark } = useTheme();
   const [search, setSearch] = useState('');
-  const [ethicsTab, setEthicsTab] = useState<'diagrams' | 'dimensions' | 'comparisons' | 'innovations' | 'pyq_quotes' | 'keywords'>('diagrams');
+  const [ethicsTab, setEthicsTab] = useState<'diagrams' | 'dimensions' | 'comparisons' | 'innovations' | 'pyq_quotes' | 'keywords' | 'khemka_toolkit'>('diagrams');
+  const [khemkaSubTab, setKhemkaSubTab] = useState<'skeleton' | 'rules' | 'toolkit' | 'cases'>('cases');
+  // Actual filter states — used in filteredItems useMemo (may trigger heavy recompute)
   const [templateFilter, setTemplateFilter] = useState<'All' | 'Templates' | 'IntroConclusionOnly'>('All');
   const [quotesEntryTypeTab, setQuotesEntryTypeTab] = useState<'All' | 'quote' | 'anecdote'>('All');
+
+  // Immediate chip UI states — update instantly on press so chip appears selected without waiting for filteredItems recompute
+  const [chipTemplateFilter, setChipTemplateFilter] = useState<'All' | 'Templates' | 'IntroConclusionOnly'>('All');
+  const [chipQuotesEntryTypeTab, setChipQuotesEntryTypeTab] = useState<'All' | 'quote' | 'anecdote'>('All');
 
   // Pinch-to-zoom state for Value Additions (ranges from 12 to 32, default 16, representing font size base)
   const [zoomFontSize, setZoomFontSize] = useState<number>(16);
@@ -3973,8 +4110,45 @@ function ValueAdditionView({
 
   // Dynamic Options extraction for HierarchyModal based on value addition items
   const activeCategoryItems = useMemo(() => {
-    return uniqueValueAddItems.filter(item => item.category === activeCategory);
-  }, [uniqueValueAddItems, activeCategory]);
+    return uniqueValueAddItems.filter(item => {
+      if (item.category !== activeCategory) return false;
+
+      // If we are in Ethics, filter by the active sub-tab (or Khemka sub-tab) to only show relevant hierarchy options
+      if (activeCategory === 'ethics') {
+        if (ethicsTab === 'khemka_toolkit') {
+          if (khemkaSubTab === 'skeleton') {
+            return item.title === "Khemka Sir's 5 Step Answer Skeleton (GS-4)";
+          }
+          if (khemkaSubTab === 'rules') {
+            return item.title.toLowerCase().startsWith('rule ') || item.title === "khemka ethical rules";
+          }
+          if (khemkaSubTab === 'toolkit') {
+            return item.title === "1. Keyword Toolkit for Answers";
+          }
+          if (khemkaSubTab === 'cases') {
+            return item.ethicsType === 'situation';
+          }
+          return false;
+        }
+        const mappedTab = 
+          ethicsTab === 'diagrams' ? 'diagram' :
+          ethicsTab === 'dimensions' ? 'dimension' :
+          ethicsTab === 'comparisons' ? 'comparison' :
+          ethicsTab === 'innovations' ? 'innovation' :
+          ethicsTab === 'pyq_quotes' ? 'pyq_quote' :
+          ethicsTab === 'keywords' ? 'keyword' : ethicsTab;
+        return item.ethicsType === mappedTab;
+      }
+
+      if (activeCategory === 'quotes') {
+        if (quotesEntryTypeTab !== 'All') {
+          return item.entry_type === quotesEntryTypeTab;
+        }
+      }
+
+      return true;
+    });
+  }, [uniqueValueAddItems, activeCategory, ethicsTab, khemkaSubTab, quotesEntryTypeTab]);
 
   const allPapers = useMemo(() => {
     const paperSet = new Set<string>();
@@ -4032,7 +4206,7 @@ function ValueAdditionView({
         const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
         const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
         if (matchPaper && matchSubject && matchSection) {
-          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
             if (path.microtopic) mtSet.add(path.microtopic);
           } else {
             const themeName = item.category === 'data_facts' ? item.metric : item.title;
@@ -4050,7 +4224,7 @@ function ValueAdditionView({
     const stSet = new Set<string>();
     activeCategoryItems.forEach(item => {
       getItemPaths(item).forEach(path => {
-        if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+        if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
           if (path.microtopic && selectedMicrotopic.split('|').includes(path.microtopic)) {
             if (path.subtopic) stSet.add(path.subtopic);
           }
@@ -4119,7 +4293,7 @@ function ValueAdditionView({
         
         let matchTheme = true;
         if (themeFilter.length > 0) {
-          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
             matchTheme = !!path.microtopic && themeFilter.includes(path.microtopic);
           } else {
             const themeName = item.category === 'data_facts' ? item.metric : item.title;
@@ -4129,7 +4303,7 @@ function ValueAdditionView({
 
         let matchSubTheme = true;
         if (subThemeFilter.length > 0) {
-          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
             matchSubTheme = !!path.subtopic && subThemeFilter.includes(path.subtopic);
           } else {
             matchSubTheme = !!item.parsedSubThemes && item.parsedSubThemes.some((st: any) => 
@@ -4140,7 +4314,7 @@ function ValueAdditionView({
 
         let matchSubSubTheme = true;
         if (subSubThemeFilter.length > 0) {
-          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
             matchSubSubTheme = !!item.title && subSubThemeFilter.includes(item.title);
           } else {
             matchSubSubTheme = !!item.parsedSubSubThemes && item.parsedSubSubThemes.some((sst: any) => 
@@ -4170,6 +4344,21 @@ function ValueAdditionView({
   const ethicsMappedItems = useMemo(() => {
     const list = filteredItems.filter(item => {
       if (activeCategory === 'ethics') {
+        if (ethicsTab === 'khemka_toolkit') {
+          if (khemkaSubTab === 'skeleton') {
+            return item.title === "Khemka Sir's 5 Step Answer Skeleton (GS-4)";
+          }
+          if (khemkaSubTab === 'rules') {
+            return item.title.toLowerCase().startsWith('rule ') || item.title === "khemka ethical rules";
+          }
+          if (khemkaSubTab === 'toolkit') {
+            return item.title === "1. Keyword Toolkit for Answers";
+          }
+          if (khemkaSubTab === 'cases') {
+            return item.ethicsType === 'situation';
+          }
+          return false;
+        }
         const mappedTab = 
           ethicsTab === 'diagrams' ? 'diagram' :
           ethicsTab === 'dimensions' ? 'dimension' :
@@ -4188,7 +4377,88 @@ function ValueAdditionView({
     });
 
     return list;
-  }, [filteredItems, activeCategory, ethicsTab, quotesEntryTypeTab]);
+  }, [filteredItems, activeCategory, ethicsTab, quotesEntryTypeTab, khemkaSubTab]);
+
+  // Calculate counts for Khemka sub-tabs dynamically based on current hierarchy/search filters
+  const khemkaTabCounts = useMemo(() => {
+    const counts = {
+      skeleton: 0,
+      rules: 0,
+      toolkit: 0,
+      cases: 0,
+    };
+    
+    filteredItems.forEach(item => {
+      if (item.category === 'ethics') {
+        if (item.title === "Khemka Sir's 5 Step Answer Skeleton (GS-4)") counts.skeleton++;
+        else if (item.title.toLowerCase().startsWith('rule ') || item.title === "khemka ethical rules") counts.rules++;
+        else if (item.title === "1. Keyword Toolkit for Answers") counts.toolkit++;
+        else if (item.ethicsType === 'situation') counts.cases++;
+      }
+    });
+    
+    return counts;
+  }, [filteredItems]);
+
+  // Calculate counts for each ethics tab based on the current hierarchy/search filters (filteredItems)
+  const ethicsTabCounts = useMemo(() => {
+    const counts = {
+      diagrams: 0,
+      dimensions: 0,
+      comparisons: 0,
+      innovations: 0,
+      pyq_quotes: 0,
+      keywords: 0,
+      khemka_toolkit: 0,
+    };
+    
+    filteredItems.forEach(item => {
+      if (item.category === 'ethics') {
+        // Check other tabs
+        if (item.ethicsType === 'diagram') counts.diagrams++;
+        if (item.ethicsType === 'dimension') counts.dimensions++;
+        if (item.ethicsType === 'comparison') counts.comparisons++;
+        if (item.ethicsType === 'innovation') counts.innovations++;
+        if (item.ethicsType === 'pyq_quote') counts.pyq_quotes++;
+        if (item.ethicsType === 'keyword') counts.keywords++;
+      }
+    });
+
+    // Khemka toolkit total count is the sum of its individual sub-tabs
+    counts.khemka_toolkit = khemkaTabCounts.skeleton + khemkaTabCounts.rules + khemkaTabCounts.toolkit + khemkaTabCounts.cases;
+    
+    return counts;
+  }, [filteredItems, khemkaTabCounts]);
+
+  // Automatically switch to the first main tab that has >0 matching items if the current tab is empty
+  useEffect(() => {
+    if (activeCategory === 'ethics') {
+      const currentCount = ethicsTabCounts[ethicsTab] || 0;
+      if (currentCount === 0) {
+        const tabsOrder: (keyof typeof ethicsTabCounts)[] = [
+          'diagrams', 'dimensions', 'comparisons', 'innovations', 'pyq_quotes', 'keywords', 'khemka_toolkit'
+        ];
+        const firstActiveTab = tabsOrder.find(t => ethicsTabCounts[t] > 0);
+        if (firstActiveTab) {
+          setEthicsTab(firstActiveTab);
+        }
+      }
+    }
+  }, [ethicsTabCounts, activeCategory, ethicsTab]);
+
+  // Automatically switch to the first Khemka sub-tab that has >0 items if current sub-tab is empty
+  useEffect(() => {
+    if (activeCategory === 'ethics' && ethicsTab === 'khemka_toolkit') {
+      const currentCount = khemkaTabCounts[khemkaSubTab] || 0;
+      if (currentCount === 0) {
+        const subTabsOrder: (keyof typeof khemkaTabCounts)[] = ['cases', 'rules', 'toolkit', 'skeleton'];
+        const firstActiveSubTab = subTabsOrder.find(t => khemkaTabCounts[t] > 0);
+        if (firstActiveSubTab) {
+          setKhemkaSubTab(firstActiveSubTab);
+        }
+      }
+    }
+  }, [khemkaTabCounts, activeCategory, ethicsTab, khemkaSubTab]);
 
   // Split data into two columns for masonry
   const leftCol: any[] = [];
@@ -4636,15 +4906,20 @@ function ValueAdditionView({
                   ].map(tab => (
                     <TouchableOpacity
                       key={tab.id}
-                      onPress={() => setTemplateFilter(tab.id)}
+                      onPress={() => {
+                        // Update chip UI immediately, defer heavy filteredItems recompute
+                        setChipTemplateFilter(tab.id);
+                        setTimeout(() => setTemplateFilter(tab.id), 0);
+                      }}
+                      activeOpacity={0.8}
                       style={[
                         styles.tabFilterPill,
-                        templateFilter === tab.id
+                        chipTemplateFilter === tab.id
                           ? { backgroundColor: '#10b981', borderColor: '#10b981' }
                           : { backgroundColor: colors.surface + 'b3', borderColor: colors.border },
                       ]}
                     >
-                      <Text style={[styles.tabFilterPillText, templateFilter === tab.id ? { color: '#ffffff' } : { color: colors.textSecondary }]}>
+                      <Text style={[styles.tabFilterPillText, chipTemplateFilter === tab.id ? { color: '#ffffff' } : { color: colors.textSecondary }]}>
                         {tab.label}
                       </Text>
                     </TouchableOpacity>
@@ -4662,15 +4937,20 @@ function ValueAdditionView({
                   ].map(tab => (
                     <TouchableOpacity
                       key={tab.id}
-                      onPress={() => setQuotesEntryTypeTab(tab.id as any)}
+                      onPress={() => {
+                        // Update chip UI immediately, defer heavy filteredItems recompute
+                        setChipQuotesEntryTypeTab(tab.id as any);
+                        setTimeout(() => setQuotesEntryTypeTab(tab.id as any), 0);
+                      }}
+                      activeOpacity={0.8}
                       style={[
                         styles.tabFilterPill,
-                        quotesEntryTypeTab === tab.id
+                        chipQuotesEntryTypeTab === tab.id
                           ? { backgroundColor: '#8b5cf6', borderColor: '#8b5cf6' }
                           : { backgroundColor: colors.surface + 'b3', borderColor: colors.border },
                       ]}
                     >
-                      <Text style={[styles.tabFilterPillText, quotesEntryTypeTab === tab.id ? { color: '#ffffff' } : { color: colors.textSecondary }]}>
+                      <Text style={[styles.tabFilterPillText, chipQuotesEntryTypeTab === tab.id ? { color: '#ffffff' } : { color: colors.textSecondary }]}>
                         {tab.label}
                       </Text>
                     </TouchableOpacity>
@@ -4680,40 +4960,178 @@ function ValueAdditionView({
 
               {/* Special sub-navigation for Ethics */}
               {activeCategory === 'ethics' && (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.ethicsTabsScroll} contentContainerStyle={{ paddingBottom: 12 }}>
-                  {[
-                    { id: 'diagrams', label: 'Diagrams' },
-                    { id: 'dimensions', label: 'Dimensions' },
-                    { id: 'comparisons', label: 'Comparisons' },
-                    { id: 'innovations', label: 'Innovations' },
-                    { id: 'pyq_quotes', label: 'PYQ Quotes' },
-                    { id: 'keywords', label: 'Keywords' }
-                  ].map(tab => (
-                    <TouchableOpacity
-                      key={tab.id}
-                      onPress={() => setEthicsTab(tab.id as any)}
-                      style={[
-                        styles.tabFilterPill,
-                        ethicsTab === tab.id
-                          ? { backgroundColor: '#06b6d4' }
-                          : { backgroundColor: 'rgba(255,255,255,0.5)', borderColor: 'rgba(255,255,255,0.6)' },
-                      ]}
-                    >
-                      <Text
+                <View style={{ gap: 4 }}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.ethicsTabsScroll} contentContainerStyle={{ paddingBottom: 8 }}>
+                    {[
+                      { id: 'diagrams', label: 'Diagrams' },
+                      { id: 'dimensions', label: 'Dimensions' },
+                      { id: 'comparisons', label: 'Comparisons' },
+                      { id: 'innovations', label: 'Innovations' },
+                      { id: 'pyq_quotes', label: 'PYQ Quotes' },
+                      { id: 'keywords', label: 'Keywords' },
+                      { id: 'khemka_toolkit', label: "Khemka Sir's Hub" }
+                    ].map(tab => (
+                      <TouchableOpacity
+                        key={tab.id}
+                        onPress={() => setEthicsTab(tab.id as any)}
+                        activeOpacity={1}
                         style={[
-                          styles.tabFilterPillText,
-                          ethicsTab === tab.id ? { color: '#ffffff' } : { color: colors.textSecondary },
+                          styles.tabFilterPill,
+                          ethicsTab === tab.id
+                            ? { backgroundColor: '#06b6d4', borderColor: '#06b6d4' }
+                            : { backgroundColor: 'rgba(255,255,255,0.5)', borderColor: 'rgba(255,255,255,0.6)' },
                         ]}
                       >
-                        {tab.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
+                        <Text
+                          style={[
+                            styles.tabFilterPillText,
+                            ethicsTab === tab.id ? { color: '#ffffff' } : { color: colors.textSecondary },
+                          ]}
+                        >
+                          {`${tab.label} (${ethicsTabCounts[tab.id as keyof typeof ethicsTabCounts] || 0})`}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+
+                  {/* Option 6: Secondary sub-tabs bar when Khemka Sir's Hub is active */}
+                  {ethicsTab === 'khemka_toolkit' && (
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }} contentContainerStyle={{ gap: 6, paddingVertical: 4 }}>
+                      {[
+                        { id: 'skeleton', label: 'Answer Skeleton' },
+                        { id: 'rules', label: 'Ethical Rules' },
+                        { id: 'toolkit', label: 'Keyword Toolkit' },
+                        { id: 'cases', label: 'Case Situations' }
+                      ].map(tab => (
+                        <TouchableOpacity
+                          key={tab.id}
+                          onPress={() => setKhemkaSubTab(tab.id as any)}
+                          activeOpacity={1}
+                          style={[
+                            styles.tabFilterPill,
+                            khemkaSubTab === tab.id
+                              ? { backgroundColor: '#8b5cf6', borderColor: '#8b5cf6' }
+                              : { backgroundColor: colors.surface + 'b3', borderColor: colors.border },
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              styles.tabFilterPillText,
+                              khemkaSubTab === tab.id ? { color: '#ffffff' } : { color: colors.textSecondary },
+                            ]}
+                          >
+                            {`${tab.label} (${khemkaTabCounts[tab.id as keyof typeof khemkaTabCounts] || 0})`}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  )}
+                </View>
               )}
+
+              {/* Issue 4 Fix: Subtopic-grouped Innovations Tables (matches MD file structure) */}
+              {activeCategory === 'ethics' && ethicsTab === 'innovations' && (() => {
+                if (visibleItems.length === 0) {
+                  return (
+                    <View style={{ padding: 24, alignItems: 'center' }}>
+                      <Text style={{ color: colors.textSecondary, fontSize: 13 * zoomScale }}>No innovations match current filters.</Text>
+                    </View>
+                  );
+                }
+                // Group visibleItems by subtopic preserving order
+                const groups: { subtopic: string; items: any[] }[] = [];
+                const seenSubtopics: Map<string, number> = new globalThis.Map();
+                visibleItems.forEach(item => {
+                  const sub = item.subtopic || item.sectionGroup || 'General';
+                  if (!seenSubtopics.has(sub)) {
+                    seenSubtopics.set(sub, groups.length);
+                    groups.push({ subtopic: sub, items: [] });
+                  }
+                  groups[seenSubtopics.get(sub)!].items.push(item);
+                });
+
+                return groups.map((group, gIdx) => (
+                  <View key={group.subtopic} style={{ marginBottom: gIdx < groups.length - 1 ? 16 : 0 }}>
+                    {/* Subtopic header label */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10, marginTop: gIdx > 0 ? 12 : 4 }}>
+                      <View style={{ width: 4, height: 20, borderRadius: 2, backgroundColor: '#0891b2' }} />
+                      <Text style={{ color: colors.textPrimary, fontSize: 16 * zoomScale, fontWeight: '800', letterSpacing: 0.3 }}>
+                        {group.subtopic}
+                      </Text>
+                    </View>
+
+                    {/* Per-subtopic table */}
+                    <View style={{
+                      backgroundColor: colors.isDark ? '#0f172acc' : '#ffffff',
+                      borderColor: colors.border,
+                      borderRadius: 14,
+                      overflow: 'hidden',
+                      borderWidth: 1.5,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: colors.isDark ? 0.25 : 0.04,
+                      shadowRadius: 8,
+                      elevation: 3
+                    }}>
+                      {/* Table Header */}
+                      <View style={{ flexDirection: 'row', backgroundColor: colors.isDark ? '#1e293b' : '#f8fafc', borderBottomColor: colors.border, borderBottomWidth: 1.5 }}>
+                        <Text style={{ flex: 2, color: colors.textPrimary, fontSize: 11 * zoomScale, fontWeight: '900', paddingVertical: 10, paddingHorizontal: 6 }}>Officer</Text>
+                        <Text style={{ flex: 2.5, color: colors.textPrimary, fontSize: 11 * zoomScale, fontWeight: '900', borderLeftColor: colors.border, borderLeftWidth: 1, paddingVertical: 10, paddingHorizontal: 8 }}>Initiative</Text>
+                        <Text style={{ flex: 3.5, color: colors.textPrimary, fontSize: 11 * zoomScale, fontWeight: '900', borderLeftColor: colors.border, borderLeftWidth: 1, paddingVertical: 10, paddingHorizontal: 8 }}>Impact</Text>
+                        <Text style={{ flex: 2, color: colors.textPrimary, fontSize: 11 * zoomScale, fontWeight: '900', borderLeftColor: colors.border, borderLeftWidth: 1, paddingVertical: 10, paddingHorizontal: 8 }}>Values</Text>
+                        <Text style={{ flex: 1.5, color: colors.textPrimary, fontSize: 11 * zoomScale, fontWeight: '900', borderLeftColor: colors.border, borderLeftWidth: 1, paddingVertical: 10, paddingHorizontal: 8 }}>PYQs</Text>
+                      </View>
+
+                      {/* Table Body Rows */}
+                      {group.items.map((item: any, idx: number) => (
+                        <View
+                          key={item.id}
+                          style={{
+                            flexDirection: 'row',
+                            backgroundColor: idx % 2 === 0
+                              ? (colors.isDark ? 'rgba(255,255,255,0.015)' : 'rgba(248,250,252,0.5)')
+                              : 'transparent',
+                            borderBottomColor: colors.border,
+                            borderBottomWidth: idx === (group.items.length - 1) ? 0 : 1
+                          }}
+                        >
+                          <View style={{ flex: 2, paddingVertical: 10, paddingHorizontal: 6, justifyContent: 'center' }}>
+                            <Text style={{ fontWeight: '800', color: colors.textPrimary, fontSize: 11 * zoomScale }}>
+                              {item.ethicsData?.officerName || 'N/A'}
+                            </Text>
+                          </View>
+                          <View style={{ flex: 2.5, borderLeftWidth: 1, borderLeftColor: colors.border, paddingVertical: 10, paddingHorizontal: 8, justifyContent: 'center' }}>
+                            <Text style={{ color: colors.textSecondary, fontSize: 11 * zoomScale, fontWeight: '600' }}>
+                              {item.ethicsData?.initiative || 'N/A'}
+                            </Text>
+                          </View>
+                          <View style={{ flex: 3.5, borderLeftWidth: 1, borderLeftColor: colors.border, paddingVertical: 10, paddingHorizontal: 8, justifyContent: 'center' }}>
+                            <Text style={{ color: colors.textSecondary, fontSize: 11 * zoomScale, lineHeight: 15 * zoomScale }}>
+                              {item.ethicsData?.impact || 'N/A'}
+                            </Text>
+                          </View>
+                          <View style={{ flex: 2, borderLeftWidth: 1, borderLeftColor: colors.border, paddingVertical: 10, paddingHorizontal: 8, justifyContent: 'center' }}>
+                            <Text style={{ color: '#0891b2', fontSize: 10 * zoomScale, fontWeight: '700' }}>
+                              {item.ethicsData?.values || 'N/A'}
+                            </Text>
+                          </View>
+                          <View style={{ flex: 1.5, borderLeftWidth: 1, borderLeftColor: colors.border, paddingVertical: 10, paddingHorizontal: 8, justifyContent: 'center' }}>
+                            <Text style={{ color: '#0284c7', fontSize: 10 * zoomScale, fontWeight: '800' }}>
+                              {item.pyqs && item.pyqs.length > 0 ? item.pyqs.join(', ') : 'None'}
+                            </Text>
+                          </View>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                ));
+              })()}
             </View>
           }
           renderItem={({ item }) => {
+            if (activeCategory === 'ethics' && ethicsTab === 'innovations') {
+              return null;
+            }
             if (layoutColumns === 2) {
               return (
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
@@ -5100,6 +5518,15 @@ function MainsAISearchView({
 
   // Sidebar specific subject filter (client-side)
   const [sidebarSubjectFilter, setSidebarSubjectFilter] = useState<string | null>(null);
+
+  const allYears = useMemo(() => {
+    const yearSet = new Set<string>();
+    questions.forEach(q => {
+      const yr = q.year;
+      if (yr) yearSet.add(String(yr));
+    });
+    return Array.from(yearSet).sort((a, b) => Number(b) - Number(a));
+  }, [questions]);
 
   // User Revision Tags (passed as props)
 
@@ -6228,6 +6655,7 @@ function MainsAISearchView({
               allPrograms={allPrograms}
               userTags={userTags}
               onCloseSidebar={() => setSidebarOpen(false)}
+              allYears={allYears}
             />
           </View>
         )}

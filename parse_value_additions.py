@@ -645,56 +645,166 @@ def parse_ethics_value_add():
         with open(diagrams_file, 'r', encoding='utf-8') as f:
             content = f.read()
             
-        diag_sections = re.split(r'\n##\s+\d+\.\s*', content)
-        for section in diag_sections[1:]:
-            lines = section.split('\n')
-            category_title = strip_clean(lines[0])
+        diag_sections = re.split(r'\n## (?=\d)', content)
+        for section in diag_sections:
+            sec_trimmed = section.strip()
+            if not sec_trimmed:
+                continue
+            if '# X-Factor 2026 Ethics Diagrams' in sec_trimmed and '## 1.' not in sec_trimmed:
+                continue
+
+            lines = sec_trimmed.split('\n')
+            heading = lines[0].strip()
+            # Clean heading
+            heading_match = re.match(r'^\d+\.\s*(.*)$', heading)
+            diagram_type = heading_match.group(1).strip() if heading_match else heading
+
+            subject = 'ETHICS, INTEGRITY & APTITUDE'
+            section_group = 'Ethics & Human Values'
+            microtopic = ''
+            subtopic = ''
             
-            block_content = "\n".join(lines[1:])
+            intro_lines = []
+            use_cases_lines = []
+            pyq_lines = []
+            diagrams_list = []
             
-            subsections = re.split(r'\n###\s+Diagram:\s*', block_content)
+            current_block = 'intro'
             
-            meta_block = subsections[0]
-            tags = extract_bracket_tags(meta_block)
-            
-            subject = tags.get('subject', 'ETHICS, INTEGRITY & APTITUDE')
-            section_group = tags.get('section_group', 'Applied Ethics')
-            microtopic = tags.get('microtopic', 'Ethics and Human Interface')
-            subtopic = tags.get('subtopic', None)
-            
-            pyqs_list = re.findall(r'\[(\d{4})\]', meta_block)
-            
+            i = 1
+            while i < len(lines):
+                line = lines[i].replace('\r', '')
+                # Clean encoding issue
+                line = line.replace('\uFFFD', '—')
+                trimmed = line.strip()
+                if not trimmed:
+                    i += 1
+                    continue
+                
+                if trimmed.startswith('[Subject:'):
+                    subject = trimmed[9:-1].strip()
+                    i += 1
+                    continue
+                if trimmed.startswith('[Section Group:'):
+                    section_group = trimmed[15:-1].strip()
+                    i += 1
+                    continue
+                if trimmed.startswith('[Microtopic:'):
+                    microtopic = trimmed[12:-1].strip()
+                    i += 1
+                    continue
+                if trimmed.startswith('[Subtopic:'):
+                    subtopic = trimmed[10:-1].strip()
+                    i += 1
+                    continue
+                
+                if trimmed.lower().startswith('### use cases'):
+                    current_block = 'usecase'
+                    i += 1
+                    continue
+                if trimmed.lower().startswith('### pyqs') or trimmed.lower().startswith('### pyq'):
+                    current_block = 'pyq'
+                    i += 1
+                    continue
+                
+                if trimmed.lower().startswith('### diagram:'):
+                    diag_name = trimmed[12:].strip()
+                    image_path = ''
+                    # Look ahead for image
+                    j = i + 1
+                    while j < min(i + 5, len(lines)):
+                        next_line = lines[j].strip()
+                        img_match = re.search(r'!\[.*?\]\((.*?)\)', next_line)
+                        if img_match:
+                            image_path = img_match.group(1).strip()
+                            break
+                        j += 1
+                    diagrams_list.append({
+                        "title": diag_name,
+                        "imagePath": image_path
+                    })
+                    i += 1
+                    continue
+                
+                if trimmed.startswith('!['):
+                    i += 1
+                    continue
+                
+                if current_block == 'intro':
+                    intro_lines.append(line)
+                elif current_block == 'usecase':
+                    use_cases_lines.append(line)
+                elif current_block == 'pyq':
+                    pyq_lines.append(line)
+                i += 1
+
+            pyq_text = "\n".join(pyq_lines)
+            pyq_years = list(set(re.findall(r'\[(20\d{2})\]', pyq_text)))
+
+            intro_part = "\n".join(intro_lines).strip()
+            use_case_part = "\n".join(use_cases_lines).strip()
+            pyq_part = "\n".join(pyq_lines).strip()
+
+            markdown_body = ""
+            if intro_part:
+                markdown_body += intro_part + "\n\n"
+            if use_case_part:
+                markdown_body += f"### Use Cases\n{use_case_part}\n\n"
+            if pyq_part:
+                markdown_body += f"### PYQs\n{pyq_part}"
+            markdown_body = markdown_body.strip()
+
+            if not diagrams_list:
+                # Fallback scan for any image tags in the section
+                img_matches = re.findall(r'!\[.*?\]\((.*?)\)', sec_trimmed)
+                for path in img_matches:
+                    diagrams_list.append({
+                        "title": "",
+                        "imagePath": path.strip()
+                    })
+
+            mapped_diagrams = []
+            for d in diagrams_list:
+                clean_img_path = d["imagePath"].replace('\\', '/')
+                full_img_url = f"https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/{clean_img_path}" if clean_img_path else ""
+                if full_img_url:
+                    mapped_diagrams.append({
+                        "title": d["title"],
+                        "imagePath": full_img_url
+                    })
+
+            diagram_image_path = ",".join([d["imagePath"] for d in mapped_diagrams])
+
             hierarchy_path = build_hierarchy_path("GS-IV", subject, section_group, microtopic, subtopic)
-            
-            for sub in subsections[1:]:
-                sub_lines = sub.split('\n')
-                diag_title = strip_clean(sub_lines[0])
-                sub_body = "\n".join(sub_lines[1:])
-                
-                img_match = re.search(r'!\[.*?\]\((x_factor_diagram_images/.+?)\)', sub_body)
-                diagram_image_path = img_match.group(1) if img_match else None
-                if diagram_image_path:
-                    diagram_image_path = f"https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/civilsdaily/{diagram_image_path}"
-                
-                cleaned_sub_body = re.sub(r'!\[.*?\]\(x_factor_diagram_images/.+?\)\n*', '', sub_body)
-                
-                results.append({
-                    "ethics_type": "diagram",
-                    "paper": "GS-IV",
-                    "subject": subject,
-                    "section_group": section_group,
-                    "microtopic": microtopic,
-                    "subtopic": subtopic,
-                    "title": f"{category_title} - {diag_title}",
-                    "content_markdown": strip_clean(cleaned_sub_body),
-                    "diagram_image_path": diagram_image_path,
-                    "officer_name": None,
-                    "initiative": None,
-                    "impact": None,
-                    "core_values": None,
-                    "pyqs": pyqs_list,
-                    "hierarchy_path": hierarchy_path
-                })
+
+            results.append({
+                "ethics_type": "diagram",
+                "paper": "GS-IV",
+                "subject": subject,
+                "section_group": section_group,
+                "microtopic": microtopic,
+                "subtopic": subtopic,
+                "title": diagram_type,
+                "content_markdown": markdown_body,
+                "diagram_image_path": diagram_image_path if diagram_image_path else None,
+                "officer_name": None,
+                "initiative": None,
+                "impact": None,
+                "core_values": None,
+                "pyqs": pyq_years,
+                "hierarchy_path": hierarchy_path,
+                "ethicsData": {
+                    "diagramType": diagram_type,
+                    "diagramDescription": markdown_body,
+                    "diagramsList": mapped_diagrams,
+                    "dimensionsList": [],
+                    "comparisonPoints": [],
+                    "columnHeaders": { "col1": "Aspect", "col2": "Term A", "col3": "Term B" },
+                    "comparisonNonTableContent": "",
+                    "keywordDefinition": markdown_body,
+                    "keywordExample": ""
+                }
+            })
 
     # File 5: Quotes from UPSC PYQ.md
     quotes_file = os.path.join(folder, "Quotes from UPSC PYQ.md")
@@ -820,15 +930,19 @@ def parse_ethics_value_add():
             sit_text_match = re.search(r'\*\s+\*\*Situation:\*\*\s*(.+?)(?=\n\*|\n---|$)', block_content, re.DOTALL)
             resp_match = re.search(r'\*\s+\*\*Khemka Sir’s Response:\*\*\s*(.+?)(?=\n\*|\n---|$)', block_content, re.DOTALL)
             principle_match = re.search(r'\*\s+\*\*Principle:\*\*\s*(.+?)(?=\n\*|\n---|$)', block_content, re.DOTALL)
+            sit_type_match = re.search(r'\*\*\s*Situation\s+Type:\s*\*\*\s*`([^`]+)`', block_content, re.IGNORECASE)
             
             theme = strip_clean(theme_match.group(1)) if theme_match else ""
             situation_text = strip_clean(sit_text_match.group(1)) if sit_text_match else ""
             response_text = strip_clean(resp_match.group(1)) if resp_match else ""
             principle = strip_clean(principle_match.group(1)) if principle_match else ""
+            situation_type = strip_clean(sit_type_match.group(1)) if sit_type_match else ""
             
             title = f"Case Study Situation - {sit_id}"
             
             formatted_markdown = f"**ID**: {sit_id} ({year})\n**Theme**: {theme}\n**Situation**: {situation_text}\n**Khemka Sir's Response**: {response_text}\n**Principle**: {principle}"
+            if situation_type:
+                formatted_markdown += f"\n**Situation Type**: {situation_type}"
             
             hierarchy_path = build_hierarchy_path("GS-IV", subject, section_group, microtopic, subtopic)
             
@@ -849,6 +963,16 @@ def parse_ethics_value_add():
                 "pyqs": [year] if year else [],
                 "hierarchy_path": hierarchy_path
             })
+            
+    out_path = os.path.join(OUT_DIR, "mains_ethics_value_add.json")
+    with open(out_path, 'w', encoding='utf-8') as out_f:
+        json.dump(results, out_f, indent=2, ensure_ascii=False)
+    
+    # Also write to admin-panel/mains-json/mains_ethics_value_add.json
+    out_path_admin = r"c:\Users\Dr. Yogesh\Videos\APP FOLDER - V1 - Copy\app\frontend-noji-2.6.2\3\pilot pro 10.2\admin-panel\mains-json\mains_ethics_value_add.json"
+    with open(out_path_admin, 'w', encoding='utf-8') as out_f:
+        json.dump(results, out_f, indent=2, ensure_ascii=False)
+    print(f"Parsed {len(results)} Ethics cards to {out_path} and {out_path_admin}")
 
     # File 8: General Khemka Sir files
     for other_khemka_file in ["khemka_ethical_rules.md", "khemka_keyword_toolkit.md", "Khemka_Sir's_5_Step_Answer_Skeleton.md"]:

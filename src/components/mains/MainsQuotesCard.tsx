@@ -41,33 +41,66 @@ export default function MainsQuotesCard({
   const isQuote = item.entry_type === 'quote' || !item.entry_type;
   const isAnecdote = item.entry_type === 'anecdote';
 
+  // ----- Old-format content parser ----------------------------------------
+  // Some entries have content in the legacy markdown format:
+  //   **Category:** `Theme`
+  //   - **Quote:**
+  //     - "Actual quote text"
+  //   - **Author:**
+  //     - Author Name
+  // Extract the plain quote and author so we don't render those headings.
+  const rawText = item.quoteText || item.rawContent || '';
+  const hasOldFormat = /\*\*Quote:\*\*|\*\*Author:\*\*/i.test(rawText);
+
+  let displayQuoteText = rawText;
+  let displayAuthor = item.author || '';
+
+  if (hasOldFormat) {
+    // Old format pattern:  "- **Quote:**\n  - \u201cActual text.\u201d"
+    // The inner bullet uses 2-space indent and Unicode curly/smart quotes
+    const quoteMatch = rawText.match(
+      /\*\*Quote:\*\*\s*\n\s*[-\u2022]\s*[\u201c\u201d"]?([^\n]+?)[\u201c\u201d"]?\s*(?=\n|$)/i
+    );
+    if (quoteMatch) {
+      // Strip any surrounding smart/straight quotes from extracted text
+      displayQuoteText = quoteMatch[1].trim()
+        .replace(/^[\u201c"]+/, '')
+        .replace(/[\u201d"]+$/, '');
+    }
+    // Extract author from old format only if not already set
+    if (!displayAuthor) {
+      const authorMatch = rawText.match(/\*\*Author:\*\*\s*\n\s*[-\u2022]\s*([^\n]+)/i);
+      if (authorMatch) displayAuthor = authorMatch[1].trim();
+    }
+  }
+  // -------------------------------------------------------------------------
+
   return (
     <View>
-      {/* Section + Topic classification badges */}
-      {(item.sectionGroup || item.microtopic) && (
-        <View style={localStyles.badgeRow}>
-          {item.sectionGroup && (
-            <View style={[
-              localStyles.badge, 
-              { 
-                backgroundColor: isAnecdote ? 'rgba(139,92,246,0.08)' : 'rgba(217,119,6,0.08)', 
-                borderColor: isAnecdote ? 'rgba(139,92,246,0.3)' : 'rgba(217,119,6,0.3)' 
-              }
-            ]}>
-              <Text style={[localStyles.badgeText, { color: isAnecdote ? '#8b5cf6' : '#d97706', fontSize: 9 * zoomScale }]}>
-                {item.sectionGroup}
-              </Text>
-            </View>
-          )}
-          {item.microtopic && (
-            <View style={[localStyles.badge, { backgroundColor: 'rgba(100,116,139,0.05)', borderColor: colors.border }]}>
-              <Text style={[localStyles.badgeText, { color: colors.textTertiary, fontSize: 9 * zoomScale }]}>
-                {item.microtopic}
-              </Text>
-            </View>
-          )}
+      {/* Entry type + Section Group + Topic classification badges */}
+      <View style={localStyles.badgeRow}>
+        {/* Primary label: QUOTE or ANECDOTE based on entry_type */}
+        <View style={[
+          localStyles.badge,
+          {
+            backgroundColor: isAnecdote ? 'rgba(139,92,246,0.12)' : 'rgba(217,119,6,0.1)',
+            borderColor: isAnecdote ? 'rgba(139,92,246,0.35)' : 'rgba(217,119,6,0.35)'
+          }
+        ]}>
+          <Text style={[localStyles.badgeText, { color: isAnecdote ? '#8b5cf6' : '#d97706', fontSize: 9 * zoomScale }]}>
+            {isAnecdote ? 'ANECDOTE' : 'QUOTE'}
+          </Text>
         </View>
-      )}
+
+        {/* Microtopic / theme tag */}
+        {item.microtopic && (
+          <View style={[localStyles.badge, { backgroundColor: 'rgba(100,116,139,0.05)', borderColor: colors.border }]}>
+            <Text style={[localStyles.badgeText, { color: colors.textTertiary, fontSize: 9 * zoomScale }]}>
+              {item.microtopic}
+            </Text>
+          </View>
+        )}
+      </View>
 
       {/* Quote or Anecdote body */}
       {isQuote ? (
@@ -79,10 +112,12 @@ export default function MainsQuotesCard({
           }
         ]}>
           <Text style={[localStyles.quoteMark, { color: colors.isDark ? 'rgba(245,158,11,0.15)' : 'rgba(180,83,9,0.1)' }]}>“</Text>
-          <Markdown style={quoteTextMarkdownStyle}>{cleanMarkdownContent(item.quoteText || item.rawContent || '')}</Markdown>
+          <Markdown style={quoteTextMarkdownStyle}>
+            {cleanMarkdownContent(displayQuoteText)}
+          </Markdown>
           
-          {/* Author line center-aligned inside the quote card */}
-          {item.author && (
+          {/* Author line center-aligned inside the quote card formatted as - <author name> */}
+          {displayAuthor ? (
             <Text style={[
               localStyles.quoteAuthor, 
               { 
@@ -90,16 +125,18 @@ export default function MainsQuotesCard({
                 fontSize: 12 * zoomScale 
               }
             ]}>
-              — {item.author}
+              - {displayAuthor}
             </Text>
-          )}
+          ) : null}
         </View>
       ) : (
         <View style={{ marginVertical: 4 }}>
-          <Markdown style={anecdoteMarkdownStyle}>{cleanMarkdownContent(item.quoteText || item.rawContent || '')}</Markdown>
+          <Markdown style={anecdoteMarkdownStyle}>
+            {cleanMarkdownContent(displayQuoteText)}
+          </Markdown>
           
-          {/* Author line at the bottom for anecdotes */}
-          {item.author && (
+          {/* Author line at the bottom for anecdotes formatted as - <author name> */}
+          {displayAuthor ? (
             <Text style={[
               localStyles.anecdoteAuthor, 
               { 
@@ -107,9 +144,9 @@ export default function MainsQuotesCard({
                 fontSize: 12 * zoomScale 
               }
             ]}>
-              — {item.author}
+              - {displayAuthor}
             </Text>
-          )}
+          ) : null}
         </View>
       )}
 
@@ -166,10 +203,17 @@ const localStyles = StyleSheet.create({
     marginTop: 10,
     textAlign: 'center',
   },
+  quoteCategory: {
+    fontWeight: '600',
+    textAlign: 'center',
+  },
   anecdoteAuthor: {
     fontWeight: '700',
     fontStyle: 'italic',
     marginTop: 6,
+  },
+  anecdoteCategory: {
+    fontWeight: '600',
   },
   usageWrapper: {
     marginTop: 12,

@@ -54,19 +54,25 @@ import { UndoToast, UndoSpec } from '../src/components/common/UndoToast';
 const { width } = Dimensions.get('window');
 
 // Course-specific stages and papers
-const STAGES_BY_COURSE = {
+// Note: CourseContext uses 'Civil Services', so both keys are needed for backward compatibility
+const STAGES_BY_COURSE: Record<string, string[]> = {
+  'Civil Services': ['Prelims', 'Mains'],
   'UPSC CSE': ['Prelims', 'Mains'],
   'Medical Science': ['INICET', 'NEET PG', 'UPSC CMS'],
 };
 
-const PAPERS_BY_COURSE = {
+const PAPERS_BY_COURSE: Record<string, Record<string, string[] | null>> = {
+  'Civil Services': {
+    Prelims: ['GS Paper 1', 'GS Paper 2 (CSAT)'],
+    Mains: ['GS Paper 1', 'GS Paper 2', 'GS Paper 3', 'GS Paper 4', 'Optional'],
+  },
   'UPSC CSE': {
     Prelims: ['GS Paper 1', 'GS Paper 2 (CSAT)'],
     Mains: ['GS Paper 1', 'GS Paper 2', 'GS Paper 3', 'GS Paper 4', 'Optional'],
   },
   'Medical Science': {
-    INICET: null,      // No papers for INICET
-    'NEET PG': null,   // No papers for NEET PG
+    INICET: null,
+    'NEET PG': null,
     'UPSC CMS': ['Paper 1', 'Paper 2'],
   },
 };
@@ -343,7 +349,7 @@ function StickyHeatmapTable({
 }
 
 export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean }) {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const { selectedCourse } = useCourse();
   const insets = useSafeAreaInsets();
   
@@ -595,7 +601,6 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           setRawQuestions(cached.questions || []);
           setTestsMetaById(cached.testsMeta || {});
           processAnalytics(cached.questions || []);
-          // Optional: skip network if cache is very fresh (e.g. < 24h)
         } else {
           setLoading(true);
         }
@@ -605,6 +610,145 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     }
 
     try {
+      // CourseContext uses 'Civil Services' but legacy code also uses 'UPSC CSE'
+      const isUpscCseCourse = selectedCourse === 'UPSC CSE' || selectedCourse === 'Civil Services';
+      if (stageNorm === 'mains' && isUpscCseCourse) {
+        try {
+          // Map UI paper labels to DB paper column values (mains_questions.paper)
+          let mappedPaper = 'GS1';
+          if (targetPaperGroup === 'GS Paper 1') mappedPaper = 'GS1';
+          else if (targetPaperGroup === 'GS Paper 2') mappedPaper = 'GS2';
+          else if (targetPaperGroup === 'GS Paper 3') mappedPaper = 'GS3';
+          else if (targetPaperGroup === 'GS Paper 4') mappedPaper = 'GS4';
+          else if (targetPaperGroup === 'Optional') mappedPaper = 'Optional';
+          
+          console.log(`[MainsFetch] Querying mains_questions for paper: ${mappedPaper}, stage: ${examStage}`);
+          
+          // Query Supabase mains_questions with paper filter at DB level
+          const { data, error: mainsErr } = await supabase
+            .from('mains_questions')
+            .select('*, answers:mains_answers(*)')
+            .eq('paper', mappedPaper);
+          
+          if (mainsErr) throw mainsErr;
+          
+          const mainsQs: any[] = data || [];
+          console.log('[MainsFetch] Fetched from Supabase:', mainsQs.length, 'questions for paper:', mappedPaper);
+          
+          if (mainsQs.length === 0) {
+            console.warn(`[MainsFetch] No questions found for paper=${mappedPaper} in mains_questions table`);
+            clearComputedState();
+            setRawQuestions([]);
+            setTestsMetaById({});
+            setLoading(false);
+            return;
+          }
+          
+          // Normalize Supabase column names to match the analytics code expectations
+          const allMainsQuestions = mainsQs.map((q: any) => ({
+            id: q.id,
+            questionNumber: q.question_number,
+            questionText: q.question_text,
+            marks: q.marks,
+            year: q.exam_year,
+            subject: q.subject,
+            sectionGroup: q.section_group,
+            microTopic: q.microtopic,
+            subTopic: q.subtopic,
+            macrotag: q.macrotag,
+            microtag: q.microtag,
+            hierarchy_path: q.hierarchy_path || [],
+            paper: q.paper || mappedPaper,
+            is_pyq: q.is_pyq,
+            source_attribution_label: q.source_attribution_label,
+            exam_info: q.exam_info,
+            stage: q.stage,
+            exam: q.exam,
+            exam_group: q.exam_group,
+            is_upsc_cse: q.is_upsc_cse,
+            is_allied: q.is_allied,
+            is_others: q.is_others,
+            exam_category: q.exam_category,
+            answers: (q.answers || []).map((ans: any) => ({
+              id: ans.id,
+              institute: ans.institute,
+              answerText: ans.answer_text,
+            }))
+          }));
+
+          const visibleQs = allMainsQuestions.filter((q: any) => {
+            const yr = q.year;
+            return matchesYearRange(yr);
+          });
+
+          if (visibleQs.length === 0) {
+            console.warn(`[MainsFetch] No questions match year range for paper=${mappedPaper}`);
+          }
+
+          const mockTestsMeta: Record<string, any> = {};
+          const formattedQs = visibleQs.map((q: any) => {
+            const mockTestId = `mains-${mappedPaper.toLowerCase()}-${q.year}`;
+            if (!mockTestsMeta[mockTestId]) {
+              mockTestsMeta[mockTestId] = {
+                id: mockTestId,
+                title: `${q.year} - Mains - ${targetPaperGroup} - UPSC`,
+                series: 'Mains (Official)',
+                level: targetPaperGroup,
+                launch_year: q.year,
+                exam_year: q.year,
+                institute: 'UPSC',
+                program_id: 'cse',
+                program_name: 'CSE',
+              };
+            }
+            
+            return {
+              id: q.id,
+              question_text: q.questionText,
+              question_number: q.questionNumber,
+              marks: q.marks,
+              year: q.year,
+              exam_year: q.year,
+              subject: q.subject,
+              section_group: q.sectionGroup,
+              micro_topic: q.microTopic,
+              sub_topic: q.subTopic,
+              macrotag: q.macrotag,
+              microtag: q.microtag,
+              hierarchy_path: q.hierarchy_path || [],
+              paper: q.paper,
+              test_id: mockTestId,
+              _institute: 'UPSC',
+              _explanations: (q.answers || []).map((ans: any) => ({
+                id: ans.id,
+                institute: ans.institute,
+                explanationText: ans.answerText,
+              })),
+              _institutes: (q.answers || []).map((ans: any) => ans.institute).filter(Boolean),
+            };
+          });
+
+          setRawQuestions(formattedQs);
+          setTestsMetaById(mockTestsMeta);
+          processAnalytics(formattedQs);
+
+          KVStore.setJson(cacheKey, {
+            questions: formattedQs,
+            testsMeta: mockTestsMeta,
+            timestamp: Date.now()
+          });
+          setLoading(false);
+          return;
+        } catch (err) {
+          console.error('[MainsFetch] Error loading mains questions from Supabase:', err);
+          clearComputedState();
+          setRawQuestions([]);
+          setTestsMetaById({});
+          setLoading(false);
+          return;
+        }
+      }
+
       // OFFLINE-FIRST: use cached tests metadata first.
       let tests: any[] = (OfflineManager as any).getOfflineTestsSync?.() || [];
 
@@ -624,11 +768,16 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         const series = String(test.series || '').trim().toLowerCase();
         const paperType = String(test.paper_type || '').trim().toLowerCase();
 
-        if (institute !== 'upsc') return false;
-        if (programId !== 'cse' && programName !== 'cse') return false;
-        if (series !== 'prelims (official)') return false;
+        if (isUpscCseCourse) {
+          if (institute !== 'upsc') return false;
+          if (programId !== 'cse' && programName !== 'cse') return false;
+          const targetSeries = stageNorm === 'prelims' ? 'prelims (official)' : 'mains (official)';
+          if (series !== targetSeries) return false;
+        } else {
+          if (stageNorm && !series.includes(stageNorm)) return false;
+        }
+
         if (paperType && !['test-paper', 'question bank'].includes(paperType)) return false;
-        if (stageNorm !== 'prelims') return false;
         return resolveTestPaperGroup(test) === targetPaperGroup;
       });
       const visibleTests = relevantTests.filter((test: any) => matchesYearRange(getTestYear(test)));
@@ -1391,22 +1540,51 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       }
     }
 
-    router.push({
-      pathname: '/unified/engine',
-      params: {
+    // When stage is Mains, navigate to the dedicated Mains screen which loads
+    // all mains data from Supabase and has its own filter UI (paper/subject/section)
+    const isMainsStage = examStage?.toLowerCase() === 'mains';
+    const isPrelimsStage = examStage?.toLowerCase() === 'prelims';
+
+    if (isMainsStage) {
+      router.push({
+        pathname: '/mains',
+        params: {
+          paper: selectedPaper || '',
+          subject: s,
+          section: sec,
+          microtopic: m,
+          year: yearParam,
+          initialScreen: 'questions',
+        }
+      });
+    } else {
+      // Build params that match exactly what the pyq analysis heatmap counted:
+      // - pyqFilter: 'PYQ Only' to get only is_pyq=true questions
+      // - pyqCategory: 'UPSC CSE' to filter only UPSC CSE (not allied)
+      // - stage: examStage so tests are filtered by series (prelims/mains)
+      // - year_start/year_end: year range for exact match
+      // - subject/section/microtopic: filters from heatmap cell click
+      const engineParams: Record<string, string> = {
         mode: (opts.mode && opts.mode !== 'choice') ? opts.mode : 'learning',
         view: 'list',
         pyqFilter: 'PYQ Only',
-        pyqSource: 'UPSC',
+        examCategory: 'UPSC CSE',
         subject: s,
-        section: sec,
-        microtopic: m,
         year_start: yearStart,
         year_end: yearEnd,
-        stage: examStage,   // Add the active Stage filter
-        paper: selectedPaper, // Add the active Paper filter
-      },
-    });
+        stage: examStage,
+        paper: selectedPaper || '',
+      };
+      
+      // Only add section/microtopic if they have actual values (not 'All')
+      if (sec && sec !== 'All') engineParams.section = sec;
+      if (m && m !== 'All') engineParams.microtopic = m;
+
+      router.push({
+        pathname: '/unified/engine',
+        params: engineParams,
+      });
+    }
   };
 
   const handleHeatmapPress = (label: string, opts: any, targetYear?: string) => {

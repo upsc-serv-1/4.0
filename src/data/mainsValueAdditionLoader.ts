@@ -32,24 +32,125 @@ const parseDimensions = (text: string): string[] => {
     .map(line => line.replace(/^[-*\d\.\s]+/, ''));
 };
 
+// Helper to pre-process markdown tables by merging multi-line rows (caused by cell newlines) into single rows
+const preprocessMarkdownTable = (text: string): string => {
+  if (!text) return '';
+  const lines = text.split('\n');
+  const processedLines: string[] = [];
+  let inTable = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith('|')) {
+      inTable = true;
+      processedLines.push(line);
+    } else if (inTable) {
+      // Check if we hit a blank line followed by a heading/metadata (table finished)
+      if (trimmed === '' && i + 1 < lines.length && (lines[i+1].trim().startsWith('#') || lines[i+1].trim() === '')) {
+        inTable = false;
+        processedLines.push(line);
+      } else if (trimmed.startsWith('#') || trimmed.startsWith('---') || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+        inTable = false;
+        processedLines.push(line);
+      } else if (trimmed !== '') {
+        // Multi-line table cell contents, merge it with the last row using <br> instead of newline
+        const lastIdx = processedLines.length - 1;
+        if (lastIdx >= 0) {
+          processedLines[lastIdx] = processedLines[lastIdx] + ' <br> ' + line;
+        } else {
+          processedLines.push(line);
+        }
+      } else {
+        processedLines.push(line);
+      }
+    } else {
+      processedLines.push(line);
+    }
+  }
+  return processedLines.join('\n');
+};
+
+// Helper to extract the dynamic column headers from the markdown table header row
+const parseComparisonHeaders = (text: string): { col1: string; col2: string; col3: string } => {
+  if (!text) return { col1: 'Aspect', col2: 'Term A', col3: 'Term B' };
+  const preprocessed = preprocessMarkdownTable(text);
+  const lines = preprocessed.split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith('|') || trimmed.includes('---') || trimmed.includes(':---')) continue;
+    const parts = trimmed.split('|').map(p => p.trim().replace(/\*\*/g, '')).filter(Boolean);
+    if (parts.length >= 3) {
+      // The header row is the first non-separator row that starts with |
+      return { col1: parts[0], col2: parts[1], col3: parts[2] };
+    }
+  }
+  return { col1: 'Aspect', col2: 'Term A', col3: 'Term B' };
+};
+
+// Helper to extract non-table content (intro paragraph + PYQs) from comparison markdown
+const parseComparisonNonTableContent = (text: string): string => {
+  if (!text) return '';
+  const preprocessed = preprocessMarkdownTable(text);
+  const lines = preprocessed.split('\n');
+  const nonTableLines: string[] = [];
+  let inTable = false;
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('|')) {
+      inTable = true;
+      continue;
+    }
+    if (inTable && !trimmed.startsWith('|')) {
+      inTable = false;
+    }
+    // Skip metadata lines like [Subject: ...]
+    if (trimmed.startsWith('[') && trimmed.endsWith(']')) continue;
+    // Skip diagram image lines (already shown separately)
+    if (trimmed.startsWith('![')) continue;
+    // Skip section headings that are just "### Aspect Comparison Table"
+    if (trimmed.toLowerCase().includes('comparison table')) continue;
+    nonTableLines.push(line);
+  }
+  return nonTableLines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+};
+
 // Helper to parse Markdown comparison tables
 const parseComparisonPoints = (text: string): { criteria: string; termA: string; termB: string }[] => {
   if (!text) return [];
-  const lines = text.split('\n');
+  const preprocessed = preprocessMarkdownTable(text);
+  const lines = preprocessed.split('\n');
   const points: { criteria: string; termA: string; termB: string }[] = [];
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed.startsWith('|') || trimmed.includes('---') || trimmed.toLowerCase().includes('criteria') || trimmed.toLowerCase().includes('basis') || trimmed.toLowerCase().includes('aspect')) {
+  let headerRowIndex = -1;
+  let separatorRowIndex = -1;
+  
+  // First, identify the positions of the header and separator rows to skip them properly
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+    if (!trimmed.startsWith('|')) continue;
+    if (trimmed.includes(':---') || trimmed.includes('---')) {
+      separatorRowIndex = i;
       continue;
     }
-    const parts = trimmed.split('|').map(p => p.trim()).filter(Boolean);
-    if (parts.length >= 3) {
-      points.push({
-        criteria: parts[0],
-        termA: parts[1],
-        termB: parts[2]
-      });
+    if (headerRowIndex === -1) {
+      headerRowIndex = i;
     }
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    if (i === headerRowIndex || i === separatorRowIndex) continue;
+    const trimmed = lines[i].trim();
+    if (!trimmed.startsWith('|')) continue;
+    
+    const parts = trimmed.split('|').map(p => p.trim()).filter(Boolean);
+    if (parts.length < 3) continue;
+    
+    points.push({
+      criteria: parts[0],
+      termA: parts[1],
+      termB: parts[2]
+    });
   }
   return points;
 };
@@ -180,41 +281,141 @@ const mappedFrameworks: ValueAdditionItem[] = frameworks.map((item, idx) => ({
   hierarchy_5_path: item.hierarchy_5_path || null
 }));
 
-const mappedEthics: ValueAdditionItem[] = ethicsValueAdd.map((item, idx) => {
+const mappedEthics: ValueAdditionItem[] = ethicsValueAdd.flatMap((item, idx) => {
   let ethicsType: any = 'keyword';
+  let subject = item.subject;
+  let title = item.title;
+  let author = item.author || undefined;
+
   if (item.ethics_type === 'diagram') ethicsType = 'diagram';
   else if (item.ethics_type === 'dimension') ethicsType = 'dimension';
   else if (item.ethics_type === 'comparison') ethicsType = 'comparison';
   else if (item.ethics_type === 'innovation') ethicsType = 'innovation';
   else if (item.ethics_type === 'pyq_quote') ethicsType = 'pyq_quote';
-  else if (item.ethics_type === 'situation') ethicsType = 'innovation'; // Map situations under innovations
+  else if (item.ethics_type === 'situation') {
+    ethicsType = 'situation';
+    subject = "Khemka Sir's Case Studies";
+  }
 
-  return {
+  if (item.ethics_type === 'situation' && item.content_markdown) {
+    const lines = item.content_markdown.split('\n');
+    let themeValue = '';
+    let situationType = '';
+    const cleanLines = [];
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('**ID**:') || trimmed.startsWith('ID:')) {
+        continue;
+      }
+      if (trimmed.startsWith('**Theme**:') || trimmed.startsWith('Theme:')) {
+        themeValue = trimmed.replace(/^\s*\*\*Theme\*\*:\s*/i, '').replace(/^\s*Theme:\s*/i, '').trim();
+      }
+      if (trimmed.startsWith('**Situation Type**:') || trimmed.startsWith('Situation Type:')) {
+        situationType = trimmed.replace(/^\s*\*\*Situation\s+Type\*\*:\s*/i, '').replace(/^\s*Situation\s+Type:\s*/i, '').trim();
+      }
+      cleanLines.push(line);
+    }
+    if (situationType && themeValue) {
+      title = `${situationType} (${themeValue})`;
+    } else if (situationType) {
+      title = situationType;
+    } else if (themeValue) {
+      title = themeValue;
+    }
+    item.content_markdown = cleanLines.filter(l => !l.trim().startsWith('**ID**:') && !l.trim().startsWith('ID:')).join('\n');
+  }
+
+  if (item.ethics_type === 'pyq_quote' && item.content_markdown) {
+    const lines = item.content_markdown.split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('>') && (trimmed.includes('—') || trimmed.includes('-'))) {
+        const match = trimmed.match(/>\s*[-—]\s*(?:\*\*Attributed to:\*\*|\*\*Author:\*\*|Attributed to:|Author:)?\s*\*\*([^*]+)\*\*\s*(?:\*\(([^)]+)\)\*|\(([^)]+)\))/i);
+        if (match) {
+          const authorName = match[1].trim();
+          const themeDesc = (match[2] || match[3] || '').trim();
+          if (themeDesc) {
+            title = themeDesc;
+          }
+          author = authorName;
+        }
+      }
+    }
+  }
+
+  if (item.title === 'khemka ethical rules' && item.content_markdown) {
+    const parts = item.content_markdown.split(/\n---+\s*\n/);
+    const rulesList: ValueAdditionItem[] = [];
+    let ruleIdx = 1;
+    for (const part of parts) {
+      const trimmedPart = part.trim();
+      if (!trimmedPart) continue;
+      if (trimmedPart.startsWith('# Khemka Sir\'s') && !trimmedPart.includes('### Rule')) {
+        continue;
+      }
+      const titleMatch = trimmedPart.match(/###\s*(Rule\s+\d+:\s*[^\n]+)/i);
+      const ruleTitle = titleMatch ? titleMatch[1].trim() : `Rule ${ruleIdx}`;
+      const cleanContent = trimmedPart.replace(/###\s*Rule\s+\d+:\s*[^\n]+/i, '').trim();
+
+      rulesList.push({
+        id: `va-et-${idx}-rule-${ruleIdx}`,
+        category: 'ethics',
+        paper: normalizePaper(item.paper),
+        subject: item.subject,
+        sectionGroup: item.section_group,
+        microtopic: item.microtopic,
+        subtopic: item.subtopic,
+        title: ruleTitle,
+        ethicsType: 'keyword',
+        ethicsData: {
+          diagramType: ruleTitle,
+          diagramDescription: cleanContent,
+          dimensionsList: [],
+          comparisonPoints: [],
+          columnHeaders: { col1: 'Aspect', col2: 'Term A', col3: 'Term B' },
+          comparisonNonTableContent: '',
+          keywordDefinition: cleanContent,
+          keywordExample: ''
+        },
+        source: 'Ethics Hub',
+        rawContent: cleanContent,
+        diagramImagePath: undefined
+      });
+      ruleIdx++;
+    }
+    return rulesList;
+  }
+
+  return [{
     id: `va-et-${idx}`,
     category: 'ethics',
     paper: normalizePaper(item.paper),
-    subject: item.subject,
+    subject: subject,
     sectionGroup: item.section_group,
     microtopic: item.microtopic,
     subtopic: item.subtopic,
-    title: item.title,
+    title: title,
+    author: author,
     ethicsType,
     ethicsData: {
       diagramType: item.title,
       diagramDescription: item.content_markdown,
       dimensionsList: parseDimensions(item.content_markdown),
       comparisonPoints: parseComparisonPoints(item.content_markdown),
+      columnHeaders: parseComparisonHeaders(item.content_markdown),
+      comparisonNonTableContent: parseComparisonNonTableContent(item.content_markdown),
       officerName: item.officer_name || undefined,
       initiative: item.initiative || undefined,
       impact: item.impact || undefined,
       values: item.core_values || undefined,
       keywordDefinition: item.content_markdown,
-      keywordExample: item.content_markdown
+      keywordExample: item.content_markdown,
+      diagramsList: item.ethicsData?.diagramsList || []
     },
     source: 'Ethics Hub',
     rawContent: item.content_markdown,
     diagramImagePath: item.diagram_image_path
-  };
+  }];
 });
 
 export const mainsConsolidatedValueAdd: ValueAdditionItem[] = [
@@ -228,6 +429,32 @@ export const mainsConsolidatedValueAdd: ValueAdditionItem[] = [
 
 import { supabase } from '../lib/supabase';
 
+// Helper to fetch all rows page-by-page to bypass PostgREST's 1000-row cap
+async function fetchAllRows(tableName: string): Promise<{ data: any[]; error: any }> {
+  let allData: any[] = [];
+  let from = 0;
+  const step = 1000;
+  while (true) {
+    const { data, error } = await supabase
+      .from(tableName)
+      .select('*')
+      .range(from, from + step - 1);
+    
+    if (error) {
+      return { data: [], error };
+    }
+    if (!data || data.length === 0) {
+      break;
+    }
+    allData = [...allData, ...data];
+    if (data.length < step) {
+      break;
+    }
+    from += step;
+  }
+  return { data: allData, error: null };
+}
+
 export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionItem[]> {
   const [
     dfRes,
@@ -237,12 +464,12 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     mnRes,
     fwRes
   ] = await Promise.all([
-    supabase.from('mains_data_facts').select('*'),
-    supabase.from('mains_intro_conclusions').select('*'),
-    supabase.from('mains_essay_value_add').select('*'),
-    supabase.from('mains_ethics_value_add').select('*'),
-    supabase.from('mains_mnemonics').select('*'),
-    supabase.from('mains_frameworks').select('*')
+    fetchAllRows('mains_data_facts'),
+    fetchAllRows('mains_intro_conclusions'),
+    fetchAllRows('mains_essay_value_add'),
+    fetchAllRows('mains_ethics_value_add'),
+    fetchAllRows('mains_mnemonics'),
+    fetchAllRows('mains_frameworks')
   ]);
 
   if (dfRes.error) throw dfRes.error;
@@ -333,41 +560,141 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     hierarchy_5_path: item.hierarchy_5_path || null
   }));
 
-  const mappedEthics: ValueAdditionItem[] = (etRes.data || []).map((item, idx) => {
+  const mappedEthics: ValueAdditionItem[] = (etRes.data || []).flatMap((item, idx) => {
     let ethicsType: any = 'keyword';
+    let subject = item.subject;
+    let title = item.title;
+    let author = item.author || undefined;
+
     if (item.ethics_type === 'diagram') ethicsType = 'diagram';
     else if (item.ethics_type === 'dimension') ethicsType = 'dimension';
     else if (item.ethics_type === 'comparison') ethicsType = 'comparison';
     else if (item.ethics_type === 'innovation') ethicsType = 'innovation';
     else if (item.ethics_type === 'pyq_quote') ethicsType = 'pyq_quote';
-    else if (item.ethics_type === 'situation') ethicsType = 'innovation';
+    else if (item.ethics_type === 'situation') {
+      ethicsType = 'situation';
+      subject = "Khemka Sir's Case Studies";
+    }
 
-    return {
+    if (item.ethics_type === 'situation' && item.content_markdown) {
+      const lines = item.content_markdown.split('\n');
+      let themeValue = '';
+      let situationType = '';
+      const cleanLines = [];
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('**ID**:') || trimmed.startsWith('ID:')) {
+          continue;
+        }
+        if (trimmed.startsWith('**Theme**:') || trimmed.startsWith('Theme:')) {
+          themeValue = trimmed.replace(/^\s*\*\*Theme\*\*:\s*/i, '').replace(/^\s*Theme:\s*/i, '').trim();
+        }
+        if (trimmed.startsWith('**Situation Type**:') || trimmed.startsWith('Situation Type:')) {
+          situationType = trimmed.replace(/^\s*\*\*Situation\s+Type\*\*:\s*/i, '').replace(/^\s*Situation\s+Type:\s*/i, '').trim();
+        }
+        cleanLines.push(line);
+      }
+      if (situationType && themeValue) {
+        title = `${situationType} (${themeValue})`;
+      } else if (situationType) {
+        title = situationType;
+      } else if (themeValue) {
+        title = themeValue;
+      }
+      item.content_markdown = cleanLines.filter(l => !l.trim().startsWith('**ID**:') && !l.trim().startsWith('ID:')).join('\n');
+    }
+
+    if (item.ethics_type === 'pyq_quote' && item.content_markdown) {
+      const lines = item.content_markdown.split('\n');
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('>') && (trimmed.includes('—') || trimmed.includes('-'))) {
+          const match = trimmed.match(/>\s*[-—]\s*(?:\*\*Attributed to:\*\*|\*\*Author:\*\*|Attributed to:|Author:)?\s*\*\*([^*]+)\*\*\s*(?:\*\(([^)]+)\)\*|\(([^)]+)\))/i);
+          if (match) {
+            const authorName = match[1].trim();
+            const themeDesc = (match[2] || match[3] || '').trim();
+            if (themeDesc) {
+              title = themeDesc;
+            }
+            author = authorName;
+          }
+        }
+      }
+    }
+
+    if (item.title === 'khemka ethical rules' && item.content_markdown) {
+      const parts = item.content_markdown.split(/\n---+\s*\n/);
+      const rulesList: ValueAdditionItem[] = [];
+      let ruleIdx = 1;
+      for (const part of parts) {
+        const trimmedPart = part.trim();
+        if (!trimmedPart) continue;
+        if (trimmedPart.startsWith('# Khemka Sir\'s') && !trimmedPart.includes('### Rule')) {
+          continue;
+        }
+        const titleMatch = trimmedPart.match(/###\s*(Rule\s+\d+:\s*[^\n]+)/i);
+        const ruleTitle = titleMatch ? titleMatch[1].trim() : `Rule ${ruleIdx}`;
+        const cleanContent = trimmedPart.replace(/###\s*Rule\s+\d+:\s*[^\n]+/i, '').trim();
+
+        rulesList.push({
+          id: `${item.id || `va-et-${idx}`}-rule-${ruleIdx}`,
+          category: 'ethics',
+          paper: normalizePaper(item.paper),
+          subject: item.subject,
+          sectionGroup: item.section_group,
+          microtopic: item.microtopic,
+          subtopic: item.subtopic,
+          title: ruleTitle,
+          ethicsType: 'keyword',
+          ethicsData: {
+            diagramType: ruleTitle,
+            diagramDescription: cleanContent,
+            dimensionsList: [],
+            comparisonPoints: [],
+            columnHeaders: { col1: 'Aspect', col2: 'Term A', col3: 'Term B' },
+            comparisonNonTableContent: '',
+            keywordDefinition: cleanContent,
+            keywordExample: ''
+          },
+          source: 'Ethics Hub',
+          rawContent: cleanContent,
+          diagramImagePath: undefined
+        });
+        ruleIdx++;
+      }
+      return rulesList;
+    }
+
+    return [{
       id: item.id || `va-et-${idx}`,
       category: 'ethics',
       paper: normalizePaper(item.paper),
-      subject: item.subject,
+      subject: subject,
       sectionGroup: item.section_group,
       microtopic: item.microtopic,
       subtopic: item.subtopic,
-      title: item.title,
+      title: title,
+      author: author,
       ethicsType,
       ethicsData: {
         diagramType: item.title,
         diagramDescription: item.content_markdown,
         dimensionsList: parseDimensions(item.content_markdown),
         comparisonPoints: parseComparisonPoints(item.content_markdown),
+        columnHeaders: parseComparisonHeaders(item.content_markdown),
+        comparisonNonTableContent: parseComparisonNonTableContent(item.content_markdown),
         officerName: item.officer_name || undefined,
         initiative: item.initiative || undefined,
         impact: item.impact || undefined,
         values: item.core_values || undefined,
         keywordDefinition: item.content_markdown,
-        keywordExample: item.content_markdown
+        keywordExample: item.content_markdown,
+        diagramsList: item.ethics_data?.diagramsList || []
       },
       source: 'Ethics Hub',
       rawContent: item.content_markdown,
       diagramImagePath: item.diagram_image_path
-    };
+    }];
   });
 
   return [

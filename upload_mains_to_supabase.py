@@ -19,8 +19,16 @@ def upload_batch(table_name, rows):
     batch_size = 50
     success_count = 0
     
-    for i in range(0, len(rows), batch_size):
-        batch = rows[i:i+batch_size]
+    # Clean frontend-only columns that do not exist in the database table
+    cleaned_rows = []
+    for r in rows:
+        c_row = r.copy()
+        c_row.pop("ethicsData", None)
+        c_row.pop("ethics_data", None)
+        cleaned_rows.append(c_row)
+
+    for i in range(0, len(cleaned_rows), batch_size):
+        batch = cleaned_rows[i:i+batch_size]
         # Align keys in batch to prevent PGRST102 "All object keys must match" error
         all_keys = set()
         for r in batch:
@@ -83,6 +91,31 @@ def upload_mains_questions_answers():
                 except (ValueError, TypeError):
                     marks_val = None
 
+            # Extract is_pyq and other sub-fields from exam_info if present
+            exam_info_val = q.get("exam_info")
+            is_pyq_val = True
+            stage_val = "mains"
+            exam_val = "Mains"
+            group_val = "UPSC CSE"
+            is_upsc_cse_val = True
+            is_allied_val = False
+            is_others_val = False
+            exam_category_val = "cse"
+
+            if isinstance(exam_info_val, dict):
+                if "isPyq" in exam_info_val:
+                    is_pyq_val = bool(exam_info_val["isPyq"])
+                stage_val = exam_info_val.get("stage", stage_val)
+                exam_val = exam_info_val.get("exam", exam_val)
+                group_val = exam_info_val.get("group", group_val)
+                if "is_upsc_cse" in exam_info_val:
+                    is_upsc_cse_val = bool(exam_info_val["is_upsc_cse"])
+                if "is_allied" in exam_info_val:
+                    is_allied_val = bool(exam_info_val["is_allied"])
+                if "is_others" in exam_info_val:
+                    is_others_val = bool(exam_info_val["is_others"])
+                exam_category_val = exam_info_val.get("exam_category", exam_category_val)
+
             all_questions.append({
                 "id": q_id,
                 "question_number": q.get("questionNumber"),
@@ -96,7 +129,17 @@ def upload_mains_questions_answers():
                 "subtopic": q.get("subTopic"),
                 "macrotag": q.get("macrotag"),
                 "microtag": q.get("microtag"),
-                "hierarchy_path": q.get("hierarchy_path")
+                "hierarchy_path": q.get("hierarchy_path"),
+                "is_pyq": is_pyq_val,
+                "source_attribution_label": q.get("source_attribution_label"),
+                "exam_info": exam_info_val,
+                "stage": stage_val,
+                "exam": exam_val,
+                "exam_group": group_val,
+                "is_upsc_cse": is_upsc_cse_val,
+                "is_allied": is_allied_val,
+                "is_others": is_others_val,
+                "exam_category": exam_category_val
             })
             
             # Answer table mapping

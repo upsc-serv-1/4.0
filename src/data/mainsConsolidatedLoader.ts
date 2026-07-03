@@ -19,6 +19,16 @@ export interface ConsolidatedQuestion {
   hierarchy_path: string[];
   answers: ConsolidatedAnswer[];
   paper: string; // Dynamic field mapped from hierarchy_path[0]
+  is_pyq?: boolean;
+  source_attribution_label?: string | null;
+  exam_info?: any;
+  stage?: string;
+  exam?: string;
+  exam_group?: string;
+  is_upsc_cse?: boolean;
+  is_allied?: boolean;
+  is_others?: boolean;
+  exam_category?: string;
 }
 
 export function normalizePaper(paper: string | null | undefined): string {
@@ -127,6 +137,16 @@ export async function fetchMainsQuestionsFromSupabase(): Promise<ConsolidatedQue
     microtag: q.microtag,
     hierarchy_path: q.hierarchy_path || [],
     paper: resolvePaper(q),
+    is_pyq: q.is_pyq,
+    source_attribution_label: q.source_attribution_label,
+    exam_info: q.exam_info,
+    stage: q.stage,
+    exam: q.exam,
+    exam_group: q.exam_group,
+    is_upsc_cse: q.is_upsc_cse,
+    is_allied: q.is_allied,
+    is_others: q.is_others,
+    exam_category: q.exam_category,
     answers: (q.answers || []).map((ans: any) => ({
       id: ans.id,
       institute: ans.institute,

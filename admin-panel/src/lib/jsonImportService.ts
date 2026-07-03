@@ -277,6 +277,27 @@ export async function importJsonFile(file: File): Promise<ImportResult> {
       for (const q of data.questions) {
         const qId = q.id || `mains-${paperName.toLowerCase()}-q${q.questionNumber}`;
         
+        const examInfoVal = q.exam_info || null;
+        let isPyqVal = true;
+        let stageVal = "mains";
+        let examVal = "Mains";
+        let groupVal = "UPSC CSE";
+        let isUpscCseVal = true;
+        let isAlliedVal = false;
+        let isOthersVal = false;
+        let examCategoryVal = "cse";
+
+        if (examInfoVal && typeof examInfoVal === 'object') {
+          if ('isPyq' in examInfoVal) isPyqVal = Boolean(examInfoVal.isPyq);
+          if ('stage' in examInfoVal) stageVal = String(examInfoVal.stage);
+          if ('exam' in examInfoVal) examVal = String(examInfoVal.exam);
+          if ('group' in examInfoVal) groupVal = String(examInfoVal.group);
+          if ('is_upsc_cse' in examInfoVal) isUpscCseVal = Boolean(examInfoVal.is_upsc_cse);
+          if ('is_allied' in examInfoVal) isAlliedVal = Boolean(examInfoVal.is_allied);
+          if ('is_others' in examInfoVal) isOthersVal = Boolean(examInfoVal.is_others);
+          if ('exam_category' in examInfoVal) examCategoryVal = String(examInfoVal.exam_category);
+        }
+
         questions.push({
           id: qId,
           question_number: q.questionNumber || null,
@@ -290,7 +311,17 @@ export async function importJsonFile(file: File): Promise<ImportResult> {
           subtopic: q.subTopic || null,
           macrotag: q.macrotag || null,
           microtag: q.microtag || null,
-          hierarchy_path: q.hierarchy_path || null
+          hierarchy_path: q.hierarchy_path || null,
+          is_pyq: isPyqVal,
+          source_attribution_label: q.source_attribution_label || null,
+          exam_info: examInfoVal,
+          stage: stageVal,
+          exam: examVal,
+          exam_group: groupVal,
+          is_upsc_cse: isUpscCseVal,
+          is_allied: isAlliedVal,
+          is_others: isOthersVal,
+          exam_category: examCategoryVal
         });
 
         if (q.answers && Array.isArray(q.answers)) {

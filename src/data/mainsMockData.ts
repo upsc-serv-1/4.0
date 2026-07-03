@@ -49,12 +49,15 @@ export interface ValueAdditionItem {
     diagramDescription?: string;
     dimensionsList?: string[];
     comparisonPoints?: { criteria: string; termA: string; termB: string }[];
+    columnHeaders?: { col1: string; col2: string; col3: string };
+    comparisonNonTableContent?: string;
     officerName?: string;
     initiative?: string;
     impact?: string;
     values?: string;
     keywordDefinition?: string;
     keywordExample?: string;
+    diagramsList?: { title: string; imagePath: string }[];
   };
   rawContent?: string;
   diagramImagePath?: string;

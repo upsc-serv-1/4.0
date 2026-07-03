@@ -1701,12 +1701,11 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
     secondaryHeatmapLabel,
   } = input;
 
-  const includeAll = !!selectedReports.full_report;
-  const includeMomentum = includeAll || !!selectedReports.subject_momentum;
-  const includeDistribution = includeAll || !!selectedReports.subject_distribution;
-  const includeHeatmaps = includeAll || !!selectedReports.heatmaps;
-  const includeFocused = includeAll || !!selectedReports.focused_trend;
-  const includeForecast = includeAll || !!selectedReports.forecast;
+  const includeMomentum = !!selectedReports.subject_momentum;
+  const includeDistribution = !!selectedReports.subject_distribution;
+  const includeHeatmaps = !!selectedReports.heatmaps;
+  const includeFocused = !!selectedReports.focused_trend;
+  const includeForecast = !!selectedReports.forecast;
 
   const sections: string[] = [];
 

@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** Define potential GDP. What are the factors that prevent India from realizing its potential GDP? 10
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: GDP] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Define, Potential GDP, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: GDP] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Define, Potential GDP, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining Potential GDP. <br>• In the body, discuss the factors that are preventing India from realizing its potential GDP. <br>• Next, suggest measures that need to be taken to realize potential GDP. <br>• Conclude by underlining the need for coordinated policy to realize potential GDP. |
@@ -50,7 +50,7 @@ Bridging India's potential-actual **GDP gap** requires coordinated **short and l
 
 ## Q2 [Year: 2026]
 **Question:** “Both the Employment Linked Incentive (ELI) and Production Linked Incentive (PLI) schemes are  intended to promote economic growth, yet they employ different approaches and focus on distinct  outcomes.” Elaborate.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Manufacturing Sector] [Macro Tag: Descriptive, Comparative, Applied] [Micro Tag: Elaborate, ELI, PLI, Economic growth]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Manufacturing Sector] [Macro Tag: Descriptive, Comparative, Applied] [Micro Tag: Elaborate, ELI, PLI, Economic growth]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of the ELI and PLI schemes. <br>• In the body, elaborate the different approaches they adopt to boost economic growth and achieve distinct outcomes. <br>• Conclude by highlighting the significance of the two schemes. |
@@ -82,7 +82,7 @@ Thus, the **PLI** is an incentive for the economy to ‘**pour more into the top
 
 ## Q3 [Year: 2026]
 **Question:** To what extent, in your opinion, is GDP the best measure of a country's development? 10
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: GDP] [Macro Tag: Analytical] [Micro Tag: To what extent, GDP, Development]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: GDP] [Macro Tag: Analytical] [Micro Tag: To what extent, GDP, Development]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining GDP. <br>• In the body, first discuss why GDP is considered as the best measure of a country's development. <br>• Then, present the counter-arguments. <br>• Conclude by highlighting the need to supplement GDP with other metrics. |
@@ -115,7 +115,7 @@ While GDP remains a valuable economic indicator, a **comprehensive development a
 
 ## Q4 [Year: 2026]
 **Question:** The Female Labour Force Participation Rate (FLFPR) has seen a significant increase in recent years.  What are the reasons for this rise? Discuss the opportunities it creates for inclusive development.10
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Demographic Dividend] [Macro Tag: Analytical, Applied] [Micro Tag: What are the reasons, Discuss, FLFPR, Inclusive development]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Demographic Dividend] [Macro Tag: Analytical, Applied] [Micro Tag: What are the reasons, Discuss, FLFPR, Inclusive development]*
 #### Answer from ForumIAS
 
 | **Approach:** • Begin by defining Female Labour Force Participation Rate (FLFPR) and citing the latest data. <br>• In the body, highlight the reasons for the increase in the FLFPR. <br>• Then, discuss the opportunities it creates for sustainable development. <br>• Conclude by highlighting associated challenges and suggesting a way forward. |
@@ -164,7 +164,7 @@ Despite these gains, **challenges persist**, such as the concentration of women 
 
 ## Q5 [Year: 2026]
 **Question:** What do you understand by fiscal deficit? Why is it necessary for a country to keep its fiscal deficit  under check?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Government Budgeting and fiscal management policies] [Sub Topic: Fiscal Policy] [Macro Tag: Descriptive, Analytical] [Micro Tag: What do you understand, Fiscal deficit]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Government Budgeting and fiscal management policies] [Sub Topic: Fiscal Policy] [Macro Tag: Descriptive, Analytical] [Micro Tag: What do you understand, Fiscal deficit]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce by defining fiscal deficit. <br>• In the body, discuss the reasons that make it crucial for a country to control its fiscal deficit. <br>• Conclude with suggestions to improve fiscal management in the country. |
@@ -198,7 +198,7 @@ Maintaining **fiscal discipline** through **FRBM targets** is essential for macr
 
 ## Q6 [Year: 2026]
 **Question:** Distinguish between physical and human capital. How does human capital formation contribute to  the economic growth of a nation?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Economic Growth] [Macro Tag: Comparative, Descriptive, Analytical] [Micro Tag: Distinguish, Human capital, Economic growth]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Economic Growth] [Macro Tag: Comparative, Descriptive, Analytical] [Micro Tag: Distinguish, Human capital, Economic growth]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by briefly explaining capital. <br>• In the body, first bring out the differences between the two. <br>• Next, discuss how human capital formation contributes to the economic growth of a nation. <br>• Conclude by highlighting its significance. |
@@ -246,7 +246,7 @@ Both human and physical capital drive economic growth, but **human capital forma
 
 ## Q7 [Year: 2026]
 **Question:** Bring out the causes of persistent high food inflation in India and suggest measures for ensuring long-  term price stability.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: Monetary policy] [Macro Tag: Analytical, Applied] [Micro Tag: Bring out, Suggest, Food inflation, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: Monetary policy] [Macro Tag: Analytical, Applied] [Micro Tag: Bring out, Suggest, Food inflation, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining inflation and giving a brief background of the persistent high food inflation in India. <br>• In the body, first bring out the causes for the same. <br>• Next, suggest measures for ensuring long term price stability. <br>• Conclude by emphasizing their synergy and link to SDGs. |
@@ -293,7 +293,7 @@ Managing persistent high food inflation requires **comprehensive measures** incl
 
 ## Q8 [Year: 2026]
 **Question:** How does absolute poverty differ from relative poverty? Do you think the Multidimensional Poverty  Index (MPI) provides a more comprehensive measure of poverty?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Social Justice] [Section Group: Poverty & Hunger] [Micro Topic: Issues and Challenges relating to Poverty & Hunger] [Sub Topic: Poverty] [Macro Tag: Comparative, Analytical] [Micro Tag: Differ, Absolute poverty, Relative poverty, MPI]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: SOCIAL JUSTICE] [Section Group: Poverty & Hunger] [Micro Topic: Issues and Challenges relating to Poverty & Hunger] [Sub Topic: Poverty] [Macro Tag: Comparative, Analytical] [Micro Tag: Differ, Absolute poverty, Relative poverty, MPI]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining poverty. <br>• In the body, first distinguish between absolute poverty and relative poverty. <br>• Next, analyse whether the Multidimensional Poverty Index (MPI), provides a more comprehensive measure of poverty, giving arguments both in favour and against. <br>• Conclude by suggesting a way forward. |
@@ -346,7 +346,7 @@ Though, MPI’s broader framework more accurately reflects the complex realities
 
 ## Q9 [Year: 2026]
 **Question:** “Fiscal policy can serve as a cornerstone for sustainable development”. In light of this statement,  discuss the significance of fiscal policy in a developing economy like India.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Government Budgeting and fiscal management policies] [Sub Topic: Fiscal Policy] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Fiscal policy, Sustainable development, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Government Budgeting and fiscal management policies] [Sub Topic: Fiscal Policy] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Fiscal policy, Sustainable development, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining fiscal policy. <br>• In the body, discuss the significance of fiscal policy in a developing economy like India. <br>• Conclude by highlighting the importance of deficit management and coordination with monetary policy for sustainable development. |
@@ -402,7 +402,7 @@ India's developmental journey (**Viksit Bharat 2047**) requires balancing **grow
 
 ## Q10 [Year: 2026]
 **Question:** Identify the reasons behind the significant growth of the services sector relative to the industrial  sector in the country. Also, elaborate on the importance of a strong industrial base for a ‘self-reliant India’.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Indian Economy] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Manufacturing Sector] [Macro Tag: Analytical, Applied] [Micro Tag: Identify, Elaborate, Services sector, Industrial sector, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Manufacturing Sector] [Macro Tag: Analytical, Applied] [Micro Tag: Identify, Elaborate, Services sector, Industrial sector, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce with data showing India's unique services-led growth pattern. <br>• In the body, first use a tabular comparison to analyze factors accelerating services versus constraining industry. <br>• Then, explain the importance of the industrial base for self-reliance. <br>• Conclude with suggestions for balanced growth. |

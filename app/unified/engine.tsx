@@ -1495,6 +1495,24 @@ export default function UnifiedQuizEngine() {
         });
       }
 
+      // Post-merge examCategory filter: ensure merged results respect examCategory
+      // This catches any non-UPSC questions that may have been merged in from variants
+      const pyqCatPost = params.examCategory || params.pyqCategory;
+      if (pyqCatPost && pyqCatPost !== 'All' && pyqCatPost !== '' && pyqCatPost !== '[]') {
+        const catsPost = typeof pyqCatPost === 'string' ? pyqCatPost.split(',').filter(Boolean) : [];
+        if (catsPost.includes('UPSC CSE') || catsPost.includes('UPSC')) {
+          const before = finalQs.length;
+          finalQs = finalQs.filter((q: any) => {
+            if (q.is_upsc_cse) return true;
+            const src = String(q?.source?.group || q?.exam_group || q?.tests?.series || q?.tests?.title || '').toUpperCase();
+            return src.includes('UPSC CSE') || src.includes('IAS') || src.includes('CIVIL SERVICES');
+          });
+          if (finalQs.length < before) {
+            console.log(`[PostMerge] Filtered out ${before - finalQs.length} non-UPSC questions after merge`);
+          }
+        }
+      }
+
       setQuestions(finalQs);
       
       // 🐛 FIX #41: Direct question navigation - use Card Mode as default during jump
@@ -1586,8 +1604,24 @@ export default function UnifiedQuizEngine() {
 
           // Apply pyq filter
           const pyqM = params.pyqMaster || params.pyqFilter;
-          if (pyqM === 'PYQ Only') filtered = filtered.filter((q: any) => q.is_pyq);
-          else if (pyqM === 'Non-PYQ' || pyqM === 'Non PYQ') filtered = filtered.filter((q: any) => !q.is_pyq);
+          if (pyqM === 'PYQ Only') {
+            filtered = filtered.filter((q: any) => q.is_pyq);
+            // Also apply examCategory filter (e.g. 'UPSC CSE') to match PYQ analysis counts
+            const pyqCat = params.examCategory || params.pyqCategory;
+            if (pyqCat && pyqCat !== 'All' && pyqCat !== '' && pyqCat !== '[]') {
+              const cats = typeof pyqCat === 'string' ? pyqCat.split(',').filter(Boolean) : [];
+              if (cats.includes('UPSC CSE') || cats.includes('UPSC')) {
+                filtered = filtered.filter((q: any) => q.is_upsc_cse ||
+                  String(q?.source?.group || q?.exam_group || q?.tests?.series || q?.tests?.title || '').toUpperCase().includes('UPSC'));
+              } else if (cats.includes('Allied Exams') || cats.includes('Allied')) {
+                filtered = filtered.filter((q: any) => q.is_allied);
+              } else if (cats.includes('Others')) {
+                filtered = filtered.filter((q: any) => q.is_others);
+              }
+            }
+          } else if (pyqM === 'Non-PYQ' || pyqM === 'Non PYQ') {
+            filtered = filtered.filter((q: any) => !q.is_pyq);
+          }
 
           // Apply year range
           if (params.year_start && Number(params.year_start)) filtered = filtered.filter((q: any) => q.exam_year >= Number(params.year_start));
@@ -1678,6 +1712,33 @@ export default function UnifiedQuizEngine() {
                 return progList.includes(prog);
               });
             }
+          }
+
+          // Apply stage filter (e.g. "Prelims" / "Mains") — matches online path which uses tests.series.ilike
+          const stage = params.stage || params.examStage || params.series;
+          if (stage && stage !== 'All' && stage !== '' && stage !== '[]') {
+            const stagePattern = stage.toLowerCase();
+            filtered = filtered.filter((q: any) => {
+              const tests = Array.isArray(q?.tests) ? q.tests[0] : q?.tests;
+              const series = String(tests?.series || q?.series || '').toLowerCase();
+              return series.includes(stagePattern);
+            });
+          }
+
+          // Apply paper filter (e.g. "GS Paper 1") — matches online path which uses tests.title/paper_type
+          const paper = params.paper;
+          if (paper && paper !== 'All' && paper !== '' && paper !== '[]') {
+            const paperNorm = paper.replace('GS ', '');
+            filtered = filtered.filter((q: any) => {
+              const tests = Array.isArray(q?.tests) ? q.tests[0] : q?.tests;
+              const title = String(tests?.title || q?.title || '').toLowerCase();
+              const series = String(tests?.series || q?.series || '').toLowerCase();
+              const level = String(tests?.level || q?.level || '').toLowerCase();
+              // Match by title, series, or level containing the paper name
+              return title.includes(paper.toLowerCase()) || title.includes(paperNorm.toLowerCase()) ||
+                     series.includes(paper.toLowerCase()) || series.includes(paperNorm.toLowerCase()) ||
+                     level.includes(paper.toLowerCase()) || level.includes(paperNorm.toLowerCase());
+            });
           }
 
           if (filtered.length > 0) {

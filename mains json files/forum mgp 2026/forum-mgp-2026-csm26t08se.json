@@ -15,7 +15,7 @@
     {
       "id": "forum-mgp-2026-csm26t08se-q01",
       "questionNumber": 1,
-      "subject": "History",
+      "subject": "HISTORY",
       "sectionGroup": "Art and Culture",
       "microTopic": "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
       "subTopic": "Civilizations & Highlights",
@@ -49,12 +49,17 @@
       "hierarchy_path": [
         "GS1",
         "History"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t08se-q02",
       "questionNumber": 2,
-      "subject": "History",
+      "subject": "HISTORY",
       "sectionGroup": "Art and Culture",
       "microTopic": "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
       "subTopic": "Miscellaneous",
@@ -88,12 +93,17 @@
       "hierarchy_path": [
         "GS1",
         "History"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t08se-q03",
       "questionNumber": 3,
-      "subject": "History",
+      "subject": "HISTORY",
       "sectionGroup": "Art and Culture",
       "microTopic": "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
       "subTopic": "Buddhism",
@@ -127,12 +137,17 @@
       "hierarchy_path": [
         "GS1",
         "History"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t08se-q04",
       "questionNumber": 4,
-      "subject": "Geography",
+      "subject": "GEOGRAPHY",
       "sectionGroup": "Economic & Resource Geography",
       "microTopic": "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
       "subTopic": "Tertiary sector",
@@ -166,12 +181,17 @@
       "hierarchy_path": [
         "GS1",
         "Geography"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t08se-q05",
       "questionNumber": 5,
-      "subject": "Geography",
+      "subject": "GEOGRAPHY",
       "sectionGroup": "Physical Geography & Geophysical Phenomena",
       "microTopic": "Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,",
       "subTopic": "Landslides",
@@ -205,12 +225,17 @@
       "hierarchy_path": [
         "GS1",
         "Geography"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t08se-q06",
       "questionNumber": 6,
-      "subject": "History",
+      "subject": "HISTORY",
       "sectionGroup": "Art and Culture",
       "microTopic": "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
       "subTopic": "Kingdoms & Highlights",
@@ -244,12 +269,17 @@
       "hierarchy_path": [
         "GS1",
         "History"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t08se-q07",
       "questionNumber": 7,
-      "subject": "History",
+      "subject": "HISTORY",
       "sectionGroup": "Art and Culture",
       "microTopic": "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
       "subTopic": "Kingdoms & Highlights",
@@ -283,12 +313,17 @@
       "hierarchy_path": [
         "GS1",
         "History"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t08se-q08",
       "questionNumber": 8,
-      "subject": "History",
+      "subject": "HISTORY",
       "sectionGroup": "Art and Culture",
       "microTopic": "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
       "subTopic": "Kingdoms & Highlights",
@@ -322,12 +357,17 @@
       "hierarchy_path": [
         "GS1",
         "History"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t08se-q09",
       "questionNumber": 9,
-      "subject": "Geography",
+      "subject": "GEOGRAPHY",
       "sectionGroup": "Physical Geography & Geophysical Phenomena",
       "microTopic": "Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,",
       "subTopic": "Twisters",
@@ -361,12 +401,17 @@
       "hierarchy_path": [
         "GS1",
         "Geography"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t08se-q10",
       "questionNumber": 10,
-      "subject": "Geography",
+      "subject": "GEOGRAPHY",
       "sectionGroup": "Environmental Geography & Climate Dynamics",
       "microTopic": "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
       "subTopic": "Climate change",
@@ -400,7 +445,13 @@
       "hierarchy_path": [
         "GS1",
         "Geography"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     }
-  ]
+  ],
+  "paper": "GS1"
 }

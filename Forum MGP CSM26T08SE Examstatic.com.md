@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** Underline the changes in the field of society and economy from the Rig Vedic to the later Vedic Period.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Art and Culture] [Micro Topic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.] [Sub Topic: Civilizations & Highlights] [Macro Tag: Comparative, Descriptive] [Micro Tag: Underline, Changes, Society, Economy, Vedic Period]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: HISTORY] [Section Group: Art and Culture] [Micro Topic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.] [Sub Topic: Civilizations & Highlights] [Macro Tag: Comparative, Descriptive] [Micro Tag: Underline, Changes, Society, Economy, Vedic Period]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of the Rig Vedic Age and the later Vedic age. <br>• In the body, underline the changes in society and economy from the former to the latter. <br>• Conclude by highlighting how the Vedic socio-economic structure continues to have an impact today. |
@@ -31,7 +31,7 @@ Certain elements of Vedic society, such as the **patriarchal family structure, t
 
 ## Q2 [Year: 2026]
 **Question:** Compare and contrast the Hindustani and Carnatic streams of music.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Art and Culture] [Micro Topic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.] [Sub Topic: Miscellaneous] [Macro Tag: Comparative] [Micro Tag: Compare, Contrast, Hindustani, Carnatic, Music]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: HISTORY] [Section Group: Art and Culture] [Micro Topic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.] [Sub Topic: Miscellaneous] [Macro Tag: Comparative] [Micro Tag: Compare, Contrast, Hindustani, Carnatic, Music]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of the musical tradition in India. <br>• In the body, first describe the similarities between the two. <br>• Then, highlight their differences. <br>• Conclude by discussing the folk traditions of music. |
@@ -82,7 +82,7 @@ The rich tapestry of Indian music is further embellished by the presence of **mu
 
 ## Q3 [Year: 2026]
 **Question:** Both Buddhism and Jainism have played a significant role in conceiving and shaping the monuments  and their art in the Indian subcontinent. Elucidate.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Art and Culture] [Micro Topic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.] [Sub Topic: Buddhism] [Macro Tag: Descriptive, Analytical] [Micro Tag: Elucidate, Buddhism, Jainism, Monuments, Indian subcontinent]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: HISTORY] [Section Group: Art and Culture] [Micro Topic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.] [Sub Topic: Buddhism] [Macro Tag: Descriptive, Analytical] [Micro Tag: Elucidate, Buddhism, Jainism, Monuments, Indian subcontinent]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about the advent of Buddhism and Jainism. <br>• In the body, elucidate their role in conceiving and shaping the monuments and their art in the Indian subcontinent. <br>• Conclude suitably. |
@@ -130,7 +130,7 @@ Both traditions employed **architecture as a medium** to instill their **spiritu
 
 ## Q4 [Year: 2026]
 **Question:** What is green tourism? Explain its relevance for sustainable development of the mountain ecosystem  in India.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Geography] [Section Group: Economic & Resource Geography] [Micro Topic: Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).] [Sub Topic: Tertiary sector] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What is, Explain, Green tourism, Sustainable development, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: GEOGRAPHY] [Section Group: Economic & Resource Geography] [Micro Topic: Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).] [Sub Topic: Tertiary sector] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What is, Explain, Green tourism, Sustainable development, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining green tourism. <br>• In the body, explain its relevance for sustainable development of the mountain ecosystem in India. <br>• Conclude by highlighting the significance of sustainable tourism. |
@@ -170,7 +170,7 @@ Promotion of sustainable tourism is the central pillar of the Government’s tou
 
 ## Q5 [Year: 2026]
 **Question:** The Western Ghats are highly prone to landslides. Discuss the causes and suggest suitable measures  of mitigation.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Geography] [Section Group: Physical Geography & Geophysical Phenomena] [Micro Topic: Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,] [Sub Topic: Landslides] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Suggest, Western Ghats, Landslides, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: GEOGRAPHY] [Section Group: Physical Geography & Geophysical Phenomena] [Micro Topic: Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,] [Sub Topic: Landslides] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Suggest, Western Ghats, Landslides, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief definition of landslides. <br>• In the body, first discuss the causes of landslides in the Western Ghats. <br>• Next, suggest suitable measures for mitigation. <br>• Conclude by underlining the need for mitigation and post disaster recovery in line with the Sendai Framework. |
@@ -220,7 +220,7 @@ Vulnerability of the Western Ghats to landslides is **exacerbated** due to clima
 
 ## Q6 [Year: 2026]
 **Question:** “The Gupta Age is the golden age of ancient India.” Critically examine.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Art and Culture] [Micro Topic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.] [Sub Topic: Kingdoms & Highlights] [Macro Tag: Analytical] [Micro Tag: Critically examine, Gupta Age, Ancient India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: HISTORY] [Section Group: Art and Culture] [Micro Topic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.] [Sub Topic: Kingdoms & Highlights] [Macro Tag: Analytical] [Micro Tag: Critically examine, Gupta Age, Ancient India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about the Gupta rule in ancient India. <br>• In the body, examine whether the Gupta Age was a golden age of ancient India, providing both positive and negative aspects of the same. <br>• Conclude by highlighting the enduring influences of the Gupta empire. |
@@ -269,7 +269,7 @@ Despite its debated status as the ‘Golden Age of Ancient India’, the Gupta a
 
 ## Q7 [Year: 2026]
 **Question:** Indo-Persian culture flourished during the era of the Delhi Sultanate. Discuss with reference to  developments in the fields of art, architecture and literature.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Art and Culture] [Micro Topic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.] [Sub Topic: Kingdoms & Highlights] [Macro Tag: Analytical, Descriptive] [Micro Tag: Discuss, Indo-Persian culture, Delhi Sultanate, Art, Architecture]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: HISTORY] [Section Group: Art and Culture] [Micro Topic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.] [Sub Topic: Kingdoms & Highlights] [Macro Tag: Analytical, Descriptive] [Micro Tag: Discuss, Indo-Persian culture, Delhi Sultanate, Art, Architecture]*
 #### Answer from ForumIAS
 
 | **Approach:** • Begin by providing a brief overview of the Delhi Sultanate period. <br>• In the body, discuss how this era witnessed the emergence of Indo-Persian culture, with reference to developments in literature, art, and architecture. <br>• Conclude by emphasizing how this cultural synthesis created a unique legacy that continued to evolve over time. |
@@ -320,7 +320,7 @@ By facilitating Indo-Persian interactions, the Sultanate **institutionalized cul
 
 ## Q8 [Year: 2026]
 **Question:** “Though the great Cholas are no more, their name is still remembered with great pride because of  their highest achievements in the domain of art and architecture.” Comment.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: History] [Section Group: Art and Culture] [Micro Topic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.] [Sub Topic: Kingdoms & Highlights] [Macro Tag: Analytical] [Micro Tag: Comment, Cholas, Art, Architecture]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: HISTORY] [Section Group: Art and Culture] [Micro Topic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.] [Sub Topic: Kingdoms & Highlights] [Macro Tag: Analytical] [Micro Tag: Comment, Cholas, Art, Architecture]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a brief background of the great Cholas. <br>• In the body, highlight their achievements in the domain of art and architecture. <br>• Conclude by highlighting the other achievements of the Chola empire. |
@@ -361,7 +361,7 @@ The achievements of Cholas were **not limited** to the sphere of art and archite
 
 ## Q9 [Year: 2026]
 **Question:** Explain the process of formation of twisters. Why are the majority of twisters observed in areas around  the Gulf of Mexico?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Geography] [Section Group: Physical Geography & Geophysical Phenomena] [Micro Topic: Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,] [Sub Topic: Twisters] [Macro Tag: Descriptive, Analytical] [Micro Tag: Explain, Why, Twisters, Gulf of Mexico]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: GEOGRAPHY] [Section Group: Physical Geography & Geophysical Phenomena] [Micro Topic: Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,] [Sub Topic: Twisters] [Macro Tag: Descriptive, Analytical] [Micro Tag: Explain, Why, Twisters, Gulf of Mexico]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with the definition of twister. <br>• In the body, first explain the process of formation of twisters. <br>• Then, analyze the reasons for the occurrence of the majority of twisters in regions around the Gulf of Mexico. <br>• Conclude with highlighting the measures taken to prevent disastrous impacts of twisters. |
@@ -393,7 +393,7 @@ While twisters are formed through complex meteorological processes, their preval
 
 ## Q10 [Year: 2026]
 **Question:** “The tropical Indian Ocean is likely to be in a near-permanent heatwave state”. Discuss the factors  responsible for the rapid warming of the Indian Ocean along with its multi-dimensional impacts.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Geography] [Section Group: Environmental Geography & Climate Dynamics] [Micro Topic: Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.] [Sub Topic: Climate change] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Indian Ocean, Rapid warming, Impacts]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: GEOGRAPHY] [Section Group: Environmental Geography & Climate Dynamics] [Micro Topic: Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.] [Sub Topic: Climate change] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Indian Ocean, Rapid warming, Impacts]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about the rapid warming of the Indian Ocean. <br>• In the body, first discuss the factors responsible for its rapid warming. <br>• Next, bring out the multi- dimensional impacts of the same. <br>• Conclude by outlining some remedial measures and the significance of the UN High Seas Treaty in this regard. |

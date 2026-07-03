@@ -15,7 +15,7 @@
     {
       "id": "forum-mgp-2026-csm26t15se-q01",
       "questionNumber": 1,
-      "subject": "Environment",
+      "subject": "ENVIRONMENT",
       "sectionGroup": "Conservation & Ecosystems",
       "microTopic": "Conservation and environmental impact assessment",
       "subTopic": "EIA",
@@ -49,12 +49,17 @@
       "hierarchy_path": [
         "GS3",
         "Environment"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS3"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q02",
       "questionNumber": 2,
-      "subject": "Environment",
+      "subject": "ENVIRONMENT",
       "sectionGroup": "Pollution & Degradation",
       "microTopic": "Environmental pollution and degradation",
       "subTopic": "Water Pollution and Related Issues",
@@ -88,12 +93,17 @@
       "hierarchy_path": [
         "GS3",
         "Environment"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS3"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q03",
       "questionNumber": 3,
-      "subject": "Environment",
+      "subject": "ENVIRONMENT",
       "sectionGroup": "Conservation & Ecosystems",
       "microTopic": "Conservation and environmental impact assessment",
       "subTopic": "Environment",
@@ -127,12 +137,17 @@
       "hierarchy_path": [
         "GS3",
         "Environment"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS3"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q04",
       "questionNumber": 4,
-      "subject": "Environment",
+      "subject": "ENVIRONMENT",
       "sectionGroup": "Conservation & Ecosystems",
       "microTopic": "Conservation and environmental impact assessment",
       "subTopic": "Sustainable Development",
@@ -166,12 +181,17 @@
       "hierarchy_path": [
         "GS3",
         "Environment"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS3"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q05",
       "questionNumber": 5,
-      "subject": "Environment",
+      "subject": "ENVIRONMENT",
       "sectionGroup": "Climate Change",
       "microTopic": "Global warming, climate change, and international frameworks",
       "subTopic": "Climate Change",
@@ -205,12 +225,17 @@
       "hierarchy_path": [
         "GS3",
         "Environment"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS3"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q06",
       "questionNumber": 6,
-      "subject": "Disaster Management",
+      "subject": "DISASTER MANAGEMENT",
       "sectionGroup": "Specific Disasters & Hazards",
       "microTopic": "Disasters: Specific natural and man-made hazards",
       "subTopic": "Urban floods",
@@ -244,12 +269,17 @@
       "hierarchy_path": [
         "GS3",
         "Disaster Management"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS3"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q07",
       "questionNumber": 7,
-      "subject": "Disaster Management",
+      "subject": "DISASTER MANAGEMENT",
       "sectionGroup": "Frameworks & Preparedness",
       "microTopic": "Disaster Management: Preparedness, resilience, and vulnerability frameworks",
       "subTopic": "Disaster Preparedness and Resilience",
@@ -283,12 +313,17 @@
       "hierarchy_path": [
         "GS3",
         "Disaster Management"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS3"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q08",
       "questionNumber": 8,
-      "subject": "Environment",
+      "subject": "ENVIRONMENT",
       "sectionGroup": "Conservation & Ecosystems",
       "microTopic": "Conservation and environmental impact assessment",
       "subTopic": "Sustainable Development",
@@ -322,12 +357,17 @@
       "hierarchy_path": [
         "GS3",
         "Environment"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS3"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q09",
       "questionNumber": 9,
-      "subject": "Disaster Management",
+      "subject": "DISASTER MANAGEMENT",
       "sectionGroup": "Specific Disasters & Hazards",
       "microTopic": "Disasters: Specific natural and man-made hazards",
       "subTopic": "Miscellaneous (Disasters)",
@@ -361,12 +401,17 @@
       "hierarchy_path": [
         "GS3",
         "Disaster Management"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS3"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q10",
       "questionNumber": 10,
-      "subject": "Disaster Management",
+      "subject": "DISASTER MANAGEMENT",
       "sectionGroup": "Frameworks & Preparedness",
       "microTopic": "Disaster Management: Preparedness, resilience, and vulnerability frameworks",
       "subTopic": "Disaster Preparedness and Resilience",
@@ -400,7 +445,13 @@
       "hierarchy_path": [
         "GS3",
         "Disaster Management"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS3"
     }
-  ]
+  ],
+  "paper": "GS3"
 }

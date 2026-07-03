@@ -217,7 +217,8 @@ const DEFAULT_MAINS_FILTERS: MainsFilters = {
   revisionTags: 'All',
   institutes: 'All',
   program: 'All',
-  paper: 'All',
+  // Default to GS papers only — Optional questions should only show when explicitly selected
+  paper: 'GS1|GS2|GS3|GS4',
   subjects: 'All',
   sections: 'All',
   microtopics: 'All',
@@ -2122,18 +2123,198 @@ export const getMarkdownStyles = (colors: any): any => ({
   },
 });
 
-const toggleFilterValue = (currentVal: string, valueToToggle: string): string => {
+const toggleFilterValue = (currentVal: string, valueToToggle: string, delimiter: string = '|'): string => {
   if (!currentVal || currentVal === 'All') {
     return valueToToggle;
   }
-  const parts = currentVal.split('|');
+  const parts = currentVal.split(delimiter);
   if (parts.includes(valueToToggle)) {
     const updated = parts.filter(p => p !== valueToToggle);
-    return updated.length === 0 ? 'All' : updated.join('|');
+    return updated.length === 0 ? 'All' : updated.join(delimiter);
   } else {
-    return [...parts, valueToToggle].join('|');
+    return [...parts, valueToToggle].join(delimiter);
   }
 };
+
+/**
+ * Reusable sidebar filter row — mirrors arena's FilterRow but styled for the mains sidebar.
+ * Supports both pipe-delimited and comma-delimited values via the `delimiter` prop.
+ */
+interface SidebarFilterRowProps {
+  label: string;
+  items: string[];
+  selected: string;          // current filter string, e.g. 'GS1|GS2' or 'All'
+  onSelect: (val: string) => void;
+  colors: any;
+  delimiter?: string;        // '|' (default) or ',' for flat fields
+  showSelectAll?: boolean;
+  showAll?: boolean;
+  visible?: boolean;
+  itemPrefix?: string;       // e.g. '#' for tags
+}
+
+function SidebarFilterRow({
+  label, items, selected, onSelect, colors,
+  delimiter = '|', showSelectAll = false, showAll = true,
+  visible = true, itemPrefix = '',
+}: SidebarFilterRowProps) {
+  const [expanded, setExpanded] = useState(false);
+
+  if (!visible || !items || items.length === 0) return null;
+
+  const selectedList = selected === 'All' ? [] : selected.split(delimiter).filter(Boolean);
+  const isAll = selectedList.length === 0;
+  const allSelected = items.length > 0 && selectedList.length === items.length;
+
+  // Compact summary of active selections when collapsed
+  const activeLabel = isAll
+    ? null
+    : selectedList.length <= 2
+      ? selectedList.map(s => `${itemPrefix}${s}`).join(', ')
+      : `${selectedList.map(s => `${itemPrefix}${s}`).slice(0, 2).join(', ')} +${selectedList.length - 2}`;
+
+  return (
+    <View style={{ marginVertical: 2 }}>
+      {/* Collapsible Header */}
+      <TouchableOpacity
+        onPress={() => setExpanded(!expanded)}
+        activeOpacity={0.7}
+        style={[
+          styles.sidebarSectionHeader,
+          (expanded || !isAll) && styles.sidebarSectionHeaderActive,
+        ]}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 8 }}>
+          {/* Label */}
+          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10, marginBottom: 0, letterSpacing: 1 }]}>
+            {label}
+          </Text>
+          {/* Badge count */}
+          <View style={{ backgroundColor: isAll ? colors.border + '60' : '#7c3aed20', borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1 }}>
+            <Text style={{ fontSize: 9, fontWeight: '800', color: isAll ? colors.textTertiary : '#7c3aed' }}>
+              {isAll ? items.length : `${selectedList.length}/${items.length}`}
+            </Text>
+          </View>
+        </View>
+
+        {/* Active label + chevron */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 0, marginLeft: 8 }}>
+          {activeLabel && (
+            <Text style={styles.sidebarBadge} numberOfLines={1}>
+              {activeLabel}
+            </Text>
+          )}
+          <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: expanded ? '#7c3aed15' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+            {expanded
+              ? <ChevronUp size={13} color={colors.textSecondary} />
+              : <ChevronDown size={13} color={colors.textTertiary} />
+            }
+          </View>
+        </View>
+      </TouchableOpacity>
+
+      {/* Expandable Content */}
+      {expanded && (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5, paddingTop: 8, paddingBottom: 6, paddingHorizontal: 2 }}>
+          {showAll && (
+            <TouchableOpacity
+              onPress={() => onSelect('All')}
+              activeOpacity={0.8}
+              style={[styles.sidebarFchip, isAll && styles.sidebarFchipSel]}
+            >
+              <Text style={[styles.sidebarFchipText, { color: isAll ? '#fff' : colors.textSecondary }]}>All</Text>
+            </TouchableOpacity>
+          )}
+          {showSelectAll && items.length > 1 && (
+            <TouchableOpacity
+              onPress={() => onSelect(allSelected ? 'All' : items.join(delimiter))}
+              activeOpacity={0.8}
+              style={[styles.sidebarFchip, allSelected && styles.sidebarFchipSel]}
+            >
+              <Text style={[styles.sidebarFchipText, { color: allSelected ? '#fff' : colors.textSecondary }]}>Select All</Text>
+            </TouchableOpacity>
+          )}
+          {items.map(item => {
+            const isSelected = selectedList.includes(item);
+            return (
+              <TouchableOpacity
+                key={item}
+                onPress={() => onSelect(toggleFilterValue(selected, item, delimiter))}
+                activeOpacity={0.8}
+                style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
+              >
+                <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]} numberOfLines={1}>
+                  {itemPrefix}{item}
+                </Text>
+                {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      )}
+    </View>
+  );
+}
+
+/** PYQ filter with collapse/expand — separate because it's single-select, not chip-based multi */
+function SidebarPYQFilter({ filters, onUpdateFilters, colors }: { filters: MainsFilters; onUpdateFilters: (f: MainsFilters) => void; colors: any }) {
+  const [expanded, setExpanded] = useState(false);
+  const activeLabel = filters.pyqFilter !== 'All' ? filters.pyqFilter : null;
+
+  return (
+    <View style={{ marginVertical: 2 }}>
+      <TouchableOpacity
+        onPress={() => setExpanded(!expanded)}
+        activeOpacity={0.7}
+        style={[
+          styles.sidebarSectionHeader,
+          (expanded || !!activeLabel) && styles.sidebarSectionHeaderActive,
+        ]}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10, marginBottom: 0, letterSpacing: 1 }]}>
+            PYQ FILTER
+          </Text>
+          <View style={{ backgroundColor: activeLabel ? '#7c3aed20' : colors.border + '60', borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1 }}>
+            <Text style={{ fontSize: 9, fontWeight: '800', color: activeLabel ? '#7c3aed' : colors.textTertiary }}>
+              {activeLabel ? '1/3' : '3'}
+            </Text>
+          </View>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          {activeLabel && (
+            <Text style={styles.sidebarBadge} numberOfLines={1}>
+              {activeLabel}
+            </Text>
+          )}
+          <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: expanded ? '#7c3aed15' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+            {expanded
+              ? <ChevronUp size={13} color={colors.textSecondary} />
+              : <ChevronDown size={13} color={colors.textTertiary} />
+            }
+          </View>
+        </View>
+      </TouchableOpacity>
+      {expanded && (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5, paddingTop: 8, paddingBottom: 6, paddingHorizontal: 2 }}>
+          {(['All', 'PYQ Only', 'Non-PYQ'] as const).map(opt => {
+            const isSelected = filters.pyqFilter === opt;
+            return (
+              <TouchableOpacity
+                key={opt}
+                onPress={() => onUpdateFilters({ ...filters, pyqFilter: opt })}
+                activeOpacity={0.8}
+                style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
+              >
+                <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      )}
+    </View>
+  );
+}
 
 interface MainsLeftPanelProps {
   colors: any;
@@ -2256,429 +2437,185 @@ function MainsLeftPanel({
         </View>
       )}
 
-      {/* Hierarchical Drilldown Filters */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 14, borderBottomWidth: 0.5, borderBottomColor: colors.border, paddingBottom: 4 }}>
-        <Text style={[styles.panelLabel, { color: colors.textPrimary, marginBottom: 0 }]}>
-          QUICK FILTERS
-        </Text>
+      {/* ── HEADER ── */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 14, marginBottom: 6, paddingHorizontal: 4 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <View style={{ width: 3, height: 16, borderRadius: 2, backgroundColor: '#7c3aed' }} />
+          <Text style={[styles.panelLabel, { color: colors.textPrimary, marginBottom: 0, fontSize: 11 }]}>
+            FILTERS
+          </Text>
+          <View style={{ backgroundColor: colors.border + '60', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 }}>
+            <Text style={{ fontSize: 9, fontWeight: '800', color: colors.textTertiary }}>{totalCount}</Text>
+          </View>
+        </View>
         {onCloseSidebar && (
-          <TouchableOpacity onPress={onCloseSidebar} style={{ padding: 4 }}>
-            <ChevronLeft size={18} color={colors.textSecondary} />
+          <TouchableOpacity onPress={onCloseSidebar} style={{ padding: 4, borderRadius: 6, backgroundColor: colors.surfaceStrong }}>
+            <ChevronLeft size={16} color={colors.textSecondary} />
           </TouchableOpacity>
         )}
       </View>
 
-      {/* PYQ FILTER */}
-      <View style={{ marginVertical: 8 }}>
-        <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>PYQ FILTER</Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-          {(['All', 'PYQ Only', 'Non-PYQ'] as const).map(opt => {
-            const isSelected = filters.pyqFilter === opt;
-            return (
-              <TouchableOpacity
-                key={opt}
-                onPress={() => onUpdateFilters({ ...filters, pyqFilter: opt })}
-                style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
-              >
-                <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+      {/* ── GROUP: SOURCE ── */}
+      <View style={{ marginBottom: 4, marginTop: 2 }}>
+        <Text style={{ fontSize: 8, fontWeight: '900', color: colors.textTertiary + '80', letterSpacing: 1.5, paddingHorizontal: 4, marginBottom: 2 }}>
+          SOURCE
+        </Text>
+        <SidebarPYQFilter filters={filters} onUpdateFilters={onUpdateFilters} colors={colors} />
       </View>
 
-      {/* Paper Selector */}
-      <View style={{ marginVertical: 8 }}>
-        <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>STAGE/PAPER</Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-          <TouchableOpacity
-            onPress={() => onUpdateFilters({ ...filters, paper: 'All', subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' })}
-            style={[styles.sidebarFchip, filters.paper === 'All' && styles.sidebarFchipSel]}
-          >
-            <Text style={[styles.sidebarFchipText, { color: filters.paper === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
-          </TouchableOpacity>
-          {allPapers.map(pName => {
-            const isSelected = filters.paper.split('|').includes(pName);
-            return (
-              <TouchableOpacity
-                key={pName}
-                onPress={() => {
-                  const list = filters.paper === 'All' ? [] : filters.paper.split('|').filter(Boolean);
-                  const next = isSelected ? list.filter(p => p !== pName) : [...list, pName];
-                  onUpdateFilters({
-                    ...filters,
-                    paper: next.length ? next.join('|') : 'All',
-                    subjects: 'All',
-                    sections: 'All',
-                    microtopics: 'All',
-                    subtopics: 'All',
-                    macrotags: 'All',
-                    microtags: 'All'
-                  });
-                }}
-                style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
-              >
-                <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{pName}</Text>
-              </TouchableOpacity>
-            );
+      {/* ── GROUP: HIERARCHY ── */}
+      <View style={{ marginBottom: 4, marginTop: 8 }}>
+        <Text style={{ fontSize: 8, fontWeight: '900', color: colors.textTertiary + '80', letterSpacing: 1.5, paddingHorizontal: 4, marginBottom: 2 }}>
+          SYLLABUS
+        </Text>
+
+        <SidebarFilterRow
+          label="PAPER"
+          items={allPapers}
+          selected={filters.paper}
+          onSelect={(val) => onUpdateFilters({
+            ...filters,
+            paper: val,
+            subjects: 'All',
+            sections: 'All',
+            microtopics: 'All',
+            subtopics: 'All',
+            macrotags: 'All',
+            microtags: 'All',
           })}
-        </View>
+          colors={colors}
+        />
+
+        <SidebarFilterRow
+          label="SUBJECT"
+          items={subjectOptions}
+          selected={filters.subjects}
+          onSelect={(val) => onUpdateFilters({
+            ...filters,
+            subjects: val,
+            sections: 'All',
+            microtopics: 'All',
+            subtopics: 'All',
+            macrotags: 'All',
+            microtags: 'All',
+          })}
+          colors={colors}
+          visible={filters.paper !== 'All'}
+        />
+
+        <SidebarFilterRow
+          label={isOptional ? 'OPTIONAL PAPER' : 'SECTION / CHAPTER'}
+          items={sectionOptions}
+          selected={filters.sections}
+          onSelect={(val) => onUpdateFilters({
+            ...filters,
+            sections: val,
+            microtopics: 'All',
+            subtopics: 'All',
+            macrotags: 'All',
+            microtags: 'All',
+          })}
+          colors={colors}
+          visible={filters.subjects !== 'All'}
+        />
+
+        <SidebarFilterRow
+          label={isOptional ? 'UNIT' : 'MICROTOPIC'}
+          items={microtopicOptions}
+          selected={filters.microtopics}
+          onSelect={(val) => onUpdateFilters({
+            ...filters,
+            microtopics: val,
+            subtopics: 'All',
+            macrotags: 'All',
+            microtags: 'All',
+          })}
+          colors={colors}
+          visible={filters.subjects !== 'All' && filters.sections !== 'All'}
+        />
+
+        <SidebarFilterRow
+          label={isOptional ? 'MICROTOPIC' : 'SUB-TOPIC'}
+          items={subtopicOptions}
+          selected={filters.subtopics}
+          onSelect={(val) => onUpdateFilters({
+            ...filters,
+            subtopics: val,
+            macrotags: 'All',
+            microtags: 'All',
+          })}
+          colors={colors}
+          visible={filters.subjects !== 'All' && filters.sections !== 'All' && filters.microtopics !== 'All'}
+        />
       </View>
 
-      {/* Subject Selector */}
-      {filters.paper !== 'All' && subjectOptions.length > 0 && (
-        <View style={{ marginVertical: 8 }}>
-          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>SUBJECT</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-            <TouchableOpacity
-              onPress={() => onUpdateFilters({ ...filters, subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' })}
-              style={[styles.sidebarFchip, filters.subjects === 'All' && styles.sidebarFchipSel]}
-            >
-              <Text style={[styles.sidebarFchipText, { color: filters.subjects === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
-            </TouchableOpacity>
-            {subjectOptions.map(subName => {
-              const isSelected = filters.subjects.split('|').includes(subName);
-              return (
-                <TouchableOpacity
-                  key={subName}
-                  onPress={() => {
-                    const list = filters.subjects === 'All' ? [] : filters.subjects.split('|').filter(Boolean);
-                    const next = isSelected ? list.filter(s => s !== subName) : [...list, subName];
-                    onUpdateFilters({
-                      ...filters,
-                      subjects: next.length ? next.join('|') : 'All',
-                      sections: 'All',
-                      microtopics: 'All',
-                      subtopics: 'All',
-                      macrotags: 'All',
-                      microtags: 'All'
-                    });
-                  }}
-                  style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
-                >
-                  <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]} numberOfLines={1}>{subName}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
-      )}
+      {/* ── GROUP: TAGS ── */}
+      <View style={{ marginBottom: 4, marginTop: 8 }}>
+        <Text style={{ fontSize: 8, fontWeight: '900', color: colors.textTertiary + '80', letterSpacing: 1.5, paddingHorizontal: 4, marginBottom: 2 }}>
+          TAGS
+        </Text>
 
-      {/* Section Selector */}
-      {filters.subjects !== 'All' && sectionOptions.length > 0 && (
-        <View style={{ marginVertical: 8 }}>
-          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>{isOptional ? 'OPTIONAL PAPER' : 'SECTION / CHAPTER'}</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-            <TouchableOpacity
-              onPress={() => onUpdateFilters({ ...filters, sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' })}
-              style={[styles.sidebarFchip, filters.sections === 'All' && styles.sidebarFchipSel]}
-            >
-              <Text style={[styles.sidebarFchipText, { color: filters.sections === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
-            </TouchableOpacity>
-            {sectionOptions.map(secName => {
-              const isSelected = filters.sections.split('|').includes(secName);
-              return (
-                <TouchableOpacity
-                  key={secName}
-                  onPress={() => {
-                    const list = filters.sections === 'All' ? [] : filters.sections.split('|').filter(Boolean);
-                    const next = isSelected ? list.filter(s => s !== secName) : [...list, secName];
-                    onUpdateFilters({
-                      ...filters,
-                      sections: next.length ? next.join('|') : 'All',
-                      microtopics: 'All',
-                      subtopics: 'All',
-                      macrotags: 'All',
-                      microtags: 'All'
-                    });
-                  }}
-                  style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
-                >
-                  <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]} numberOfLines={1}>{secName}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
-      )}
+        <SidebarFilterRow
+          label="MACRO TAG"
+          items={macrotagOptions}
+          selected={filters.macrotags}
+          onSelect={(val) => onUpdateFilters({ ...filters, macrotags: val, microtags: 'All' })}
+          colors={colors}
+          itemPrefix="#"
+        />
 
-      {/* Microtopic Selector */}
-      {filters.subjects !== 'All' && filters.sections !== 'All' && microtopicOptions.length > 0 && (
-        <View style={{ marginVertical: 8 }}>
-          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>{isOptional ? 'UNIT' : 'MICROTOPIC'}</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-            <TouchableOpacity
-              onPress={() => onUpdateFilters({ ...filters, microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' })}
-              style={[styles.sidebarFchip, filters.microtopics === 'All' && styles.sidebarFchipSel]}
-            >
-              <Text style={[styles.sidebarFchipText, { color: filters.microtopics === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
-            </TouchableOpacity>
-            {microtopicOptions.map(mtName => {
-              const isSelected = filters.microtopics.split('|').includes(mtName);
-              return (
-                <TouchableOpacity
-                  key={mtName}
-                  onPress={() => {
-                    const list = filters.microtopics === 'All' ? [] : filters.microtopics.split('|').filter(Boolean);
-                    const next = isSelected ? list.filter(m => m !== mtName) : [...list, mtName];
-                    onUpdateFilters({
-                      ...filters,
-                      microtopics: next.length ? next.join('|') : 'All',
-                      subtopics: 'All',
-                      macrotags: 'All',
-                      microtags: 'All'
-                    });
-                  }}
-                  style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
-                >
-                  <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]} numberOfLines={1}>{mtName}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
-      )}
+        <SidebarFilterRow
+          label="MICRO TAG"
+          items={microtagOptions}
+          selected={filters.microtags}
+          onSelect={(val) => onUpdateFilters({ ...filters, microtags: val })}
+          colors={colors}
+          itemPrefix="#"
+          visible={filters.macrotags !== 'All'}
+        />
 
-      {/* Sub-topic Selector */}
-      {filters.subjects !== 'All' && filters.sections !== 'All' && filters.microtopics !== 'All' && subtopicOptions.length > 0 && (
-        <View style={{ marginVertical: 8 }}>
-          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>{isOptional ? 'MICROTOPIC' : 'SUB-TOPIC'}</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-            <TouchableOpacity
-              onPress={() => onUpdateFilters({ ...filters, subtopics: 'All', macrotags: 'All', microtags: 'All' })}
-              style={[styles.sidebarFchip, filters.subtopics === 'All' && styles.sidebarFchipSel]}
-            >
-              <Text style={[styles.sidebarFchipText, { color: filters.subtopics === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
-            </TouchableOpacity>
-            {subtopicOptions.map(stName => {
-              const isSelected = filters.subtopics.split('|').includes(stName);
-              return (
-                <TouchableOpacity
-                  key={stName}
-                  onPress={() => {
-                    const list = filters.subtopics === 'All' ? [] : filters.subtopics.split('|').filter(Boolean);
-                    const next = isSelected ? list.filter(s => s !== stName) : [...list, stName];
-                    onUpdateFilters({
-                      ...filters,
-                      subtopics: next.length ? next.join('|') : 'All',
-                      macrotags: 'All',
-                      microtags: 'All'
-                    });
-                  }}
-                  style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
-                >
-                  <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]} numberOfLines={1}>{stName}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
-      )}
+        <SidebarFilterRow
+          label="REVISION TAGS"
+          items={userTags}
+          selected={filters.revisionTags}
+          onSelect={(val) => onUpdateFilters({ ...filters, revisionTags: val })}
+          colors={colors}
+          delimiter=","
+        />
+      </View>
 
-      {/* Macro Tags */}
-      {macrotagOptions.length > 0 && (
-        <View style={{ marginVertical: 8 }}>
-          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>MACRO TAG</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-            <TouchableOpacity
-              onPress={() => onUpdateFilters({ ...filters, macrotags: 'All', microtags: 'All' })}
-              style={[styles.sidebarFchip, filters.macrotags === 'All' && styles.sidebarFchipSel]}
-            >
-              <Text style={[styles.sidebarFchipText, { color: filters.macrotags === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
-            </TouchableOpacity>
-            {macrotagOptions.map(tagName => {
-              const isSelected = filters.macrotags.split('|').includes(tagName);
-              return (
-                <TouchableOpacity
-                  key={tagName}
-                  onPress={() => {
-                    const list = filters.macrotags === 'All' ? [] : filters.macrotags.split('|').filter(Boolean);
-                    const next = isSelected ? list.filter(t => t !== tagName) : [...list, tagName];
-                    onUpdateFilters({
-                      ...filters,
-                      macrotags: next.length ? next.join('|') : 'All',
-                      microtags: 'All'
-                    });
-                  }}
-                  style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
-                >
-                  <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]} numberOfLines={1}>#{tagName}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
-      )}
+      {/* ── GROUP: INSTITUTE ── */}
+      <View style={{ marginBottom: 4, marginTop: 8 }}>
+        <Text style={{ fontSize: 8, fontWeight: '900', color: colors.textTertiary + '80', letterSpacing: 1.5, paddingHorizontal: 4, marginBottom: 2 }}>
+          INSTITUTE
+        </Text>
 
-      {/* Micro Tags */}
-      {filters.macrotags !== 'All' && microtagOptions.length > 0 && (
-        <View style={{ marginVertical: 8 }}>
-          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>MICRO TAG</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-            <TouchableOpacity
-              onPress={() => onUpdateFilters({ ...filters, microtags: 'All' })}
-              style={[styles.sidebarFchip, filters.microtags === 'All' && styles.sidebarFchipSel]}
-            >
-              <Text style={[styles.sidebarFchipText, { color: filters.microtags === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
-            </TouchableOpacity>
-            {microtagOptions.map(tagName => {
-              const isSelected = filters.microtags.split('|').includes(tagName);
-              return (
-                <TouchableOpacity
-                  key={tagName}
-                  onPress={() => {
-                    const list = filters.microtags === 'All' ? [] : filters.microtags.split('|').filter(Boolean);
-                    const next = isSelected ? list.filter(t => t !== tagName) : [...list, tagName];
-                    onUpdateFilters({
-                      ...filters,
-                      microtags: next.length ? next.join('|') : 'All'
-                    });
-                  }}
-                  style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
-                >
-                  <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]} numberOfLines={1}>#{tagName}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
-      )}
+        <SidebarFilterRow
+          label="INSTITUTE"
+          items={allInstitutes}
+          selected={filters.institutes}
+          onSelect={(val) => onUpdateFilters({ ...filters, institutes: val })}
+          colors={colors}
+          delimiter=","
+        />
 
-      {/* Institutes Selector */}
-      {allInstitutes.length > 0 && (
-        <View style={{ marginVertical: 8 }}>
-          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>INSTITUTE</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-            <TouchableOpacity
-              onPress={() => onUpdateFilters({ ...filters, institutes: 'All' })}
-              style={[styles.sidebarFchip, filters.institutes === 'All' && styles.sidebarFchipSel]}
-            >
-              <Text style={[styles.sidebarFchipText, { color: filters.institutes === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
-            </TouchableOpacity>
-            {allInstitutes.map(inst => {
-              const isSelected = filters.institutes.split(',').includes(inst);
-              return (
-                <TouchableOpacity
-                  key={inst}
-                  onPress={() => {
-                    const list = filters.institutes === 'All' ? [] : filters.institutes.split(',').filter(Boolean);
-                    const next = isSelected ? list.filter(i => i !== inst) : [...list, inst];
-                    onUpdateFilters({
-                      ...filters,
-                      institutes: next.length ? next.join(',') : 'All'
-                    });
-                  }}
-                  style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
-                >
-                  <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]} numberOfLines={1}>{inst}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
-      )}
+        <SidebarFilterRow
+          label="PROGRAMMES"
+          items={allPrograms}
+          selected={filters.program}
+          onSelect={(val) => onUpdateFilters({ ...filters, program: val })}
+          colors={colors}
+          delimiter=","
+        />
 
-      {/* Programs Selector */}
-      {allPrograms.length > 0 && (
-        <View style={{ marginVertical: 8 }}>
-          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>PROGRAMMES</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-            <TouchableOpacity
-              onPress={() => onUpdateFilters({ ...filters, program: 'All' })}
-              style={[styles.sidebarFchip, filters.program === 'All' && styles.sidebarFchipSel]}
-            >
-              <Text style={[styles.sidebarFchipText, { color: filters.program === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
-            </TouchableOpacity>
-            {allPrograms.map(prog => {
-              const isSelected = filters.program.split(',').includes(prog);
-              return (
-                <TouchableOpacity
-                  key={prog}
-                  onPress={() => {
-                    const list = filters.program === 'All' ? [] : filters.program.split(',').filter(Boolean);
-                    const next = isSelected ? list.filter(p => p !== prog) : [...list, prog];
-                    onUpdateFilters({
-                      ...filters,
-                      program: next.length ? next.join(',') : 'All'
-                    });
-                  }}
-                  style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
-                >
-                  <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]} numberOfLines={1}>{prog}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
-      )}
-
-      {/* Revision Tags Selector */}
-      {userTags.length > 0 && (
-        <View style={{ marginVertical: 8 }}>
-          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>REVISION TAGS</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-            <TouchableOpacity
-              onPress={() => onUpdateFilters({ ...filters, revisionTags: 'All' })}
-              style={[styles.sidebarFchip, filters.revisionTags === 'All' && styles.sidebarFchipSel]}
-            >
-              <Text style={[styles.sidebarFchipText, { color: filters.revisionTags === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
-            </TouchableOpacity>
-            {userTags.map(tag => {
-              const isSelected = filters.revisionTags.split(',').includes(tag);
-              return (
-                <TouchableOpacity
-                  key={tag}
-                  onPress={() => {
-                    const list = filters.revisionTags === 'All' ? [] : filters.revisionTags.split(',').filter(Boolean);
-                    const next = isSelected ? list.filter(t => t !== tag) : [...list, tag];
-                    onUpdateFilters({
-                      ...filters,
-                      revisionTags: next.length ? next.join(',') : 'All'
-                    });
-                  }}
-                  style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
-                >
-                  <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]} numberOfLines={1}>{tag}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
-      )}
-
-      {/* Years Selector */}
-      {allYears.length > 0 && (
-        <View style={{ marginVertical: 8 }}>
-          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10 }]}>YEAR</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-            <TouchableOpacity
-              onPress={() => onUpdateFilters({ ...filters, years: 'All' })}
-              style={[styles.sidebarFchip, filters.years === 'All' && styles.sidebarFchipSel]}
-            >
-              <Text style={[styles.sidebarFchipText, { color: filters.years === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
-            </TouchableOpacity>
-            {allYears.map(yr => {
-              const isSelected = filters.years.split('|').includes(yr);
-              return (
-                <TouchableOpacity
-                  key={yr}
-                  onPress={() => {
-                    const list = filters.years === 'All' ? [] : filters.years.split('|').filter(Boolean);
-                    const next = isSelected ? list.filter(y => y !== yr) : [...list, yr];
-                    onUpdateFilters({
-                      ...filters,
-                      years: next.length ? next.join('|') : 'All'
-                    });
-                  }}
-                  style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
-                >
-                  <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]} numberOfLines={1}>{yr}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
-      )}
+        <SidebarFilterRow
+          label="YEAR"
+          items={allYears}
+          selected={filters.years}
+          onSelect={(val) => onUpdateFilters({ ...filters, years: val })}
+          colors={colors}
+        />
+      </View>
 
       {/* Search Subject list client-side filter */}
       {isSearchView && allSearchSubjects.length >= 1 && (
@@ -3263,6 +3200,15 @@ function QuestionBankView({
     return initialFilters || DEFAULT_MAINS_FILTERS;
   });
 
+  const setFiltersDeferred = useCallback((updater: MainsFilters | ((prev: MainsFilters) => MainsFilters)) => {
+    setTimeout(() => {
+      setFilters(prev => {
+        const next = typeof updater === 'function' ? (updater as Function)(prev) : updater;
+        return next;
+      });
+    }, 16);
+  }, []);
+
   useEffect(() => {
     if (initialFilters) {
       setFilters(initialFilters);
@@ -3271,17 +3217,34 @@ function QuestionBankView({
 
   const [hierarchyModalVisible, setHierarchyModalVisible] = useState(false);
 
-  const [sidebarOpen, setSidebarOpen] = useState(isTablet);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const allInstitutes = useMemo(() => {
     const instSet = new Set<string>();
     questions.forEach(q => {
-      (q.answers || []).forEach(ans => {
-        if (ans.institute) instSet.add(ans.institute.trim());
-      });
+      if (q.institute) {
+        instSet.add(q.institute.trim());
+      } else if (q.is_pyq) {
+        instSet.add('UPSC');
+      }
     });
     return Array.from(instSet).sort();
   }, [questions]);
+
+  const allPrograms = useMemo(() => {
+    if (filters.institutes === 'All') return [];
+    const progSet = new Set<string>();
+    const selectedInsts = filters.institutes.split(',');
+    questions.forEach(q => {
+      const instName = q.institute || (q.is_pyq ? 'UPSC' : '');
+      if (instName && selectedInsts.includes(instName)) {
+        if (q.program_name) {
+          progSet.add(q.program_name.trim());
+        }
+      }
+    });
+    return Array.from(progSet).sort();
+  }, [questions, filters.institutes]);
 
   const allYears = useMemo(() => {
     const yearSet = new Set<string>();
@@ -3406,58 +3369,137 @@ function QuestionBankView({
 
   const papers = ['All', ...allPapers];
 
-  const filteredQuestions = useMemo(() => {
-    return questions.filter(q => {
-      // PYQ Filter
-      if (filters.pyqFilter === 'Non-PYQ') return false; // Consolidated questions are only PYQs
+  // ─── ASYNC FILTER ENGINE ───
+  // The naive useMemo blocks React rendering for 40+ seconds on large question sets.
+  // Instead we run filtering asynchronously and show chip visual feedback instantly.
+  const [filteredQuestions, setFilteredQuestions] = useState<ConsolidatedQuestion[]>([]);
+  const filterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const filterVersionRef = useRef(0);
 
-      // Institute filter
-      if (filters.institutes !== 'All') {
-        const selectedInsts = filters.institutes.split(',');
-        const hasMatch = (q.answers || []).some(ans => selectedInsts.includes(ans.institute));
-        if (!hasMatch) return false;
-      }
+  useEffect(() => {
+    const version = ++filterVersionRef.current;
+    
+    // Clear any pending filter
+    if (filterTimerRef.current) clearTimeout(filterTimerRef.current);
+    
+    // Schedule filter on next frame so chip UI updates immediately
+    filterTimerRef.current = setTimeout(() => {
+      const startTs = Date.now();
 
-      // Revision tags local filter
-      if (filters.revisionTags !== 'All') {
-        const selectedTags = filters.revisionTags.split(',');
-        const tagsForQ = userQuestionStates[q.id]?.reviewTags || [];
-        const hasMatch = selectedTags.some(t => tagsForQ.includes(t));
-        if (!hasMatch) return false;
-      }
-
-      const subtopicVal = getQuestionSub(q);
-      const matchSearch =
-        (q.questionText?.toLowerCase() || '').includes(search.toLowerCase()) ||
-        (subtopicVal.toLowerCase() || '').includes(search.toLowerCase()) ||
-        (q.subject?.toLowerCase() || '').includes(search.toLowerCase());
-
+      // Optimize: Extract filter split operations outside the inner loop!
       const paperFilter = filters.paper !== 'All' ? filters.paper.split('|') : [];
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
-
       const subjectFilter = filters.subjects !== 'All' ? filters.subjects.split('|') : [];
-      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
-
       const sectionFilter = filters.sections !== 'All' ? filters.sections.split('|') : [];
-      const matchSection = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
-
       const microtopicFilter = filters.microtopics !== 'All' ? filters.microtopics.split('|') : [];
-      const matchMicrotopic = microtopicFilter.length === 0 || microtopicFilter.includes(getQuestionMicro(q));
-
       const subtopicFilter = filters.subtopics !== 'All' ? filters.subtopics.split('|') : [];
-      const matchSubtopic = subtopicFilter.length === 0 || subtopicFilter.includes(subtopicVal);
-
       const macroFilter = filters.macrotags !== 'All' ? filters.macrotags.split('|') : [];
-      const matchMacro = macroFilter.length === 0 || (q.macrotag || '').split(',').map(t => t.trim()).some(t => macroFilter.includes(t));
-
       const microFilter = filters.microtags !== 'All' ? filters.microtags.split('|') : [];
-      const matchMicroTag = microFilter.length === 0 || (q.microtag || '').split(',').map(t => t.trim()).some(t => microFilter.includes(t));
-
       const yearFilter = filters.years !== 'All' ? filters.years.split('|') : [];
-      const matchYear = yearFilter.length === 0 || yearFilter.includes(String(q.year || ''));
+      
+      const selectedInsts = filters.institutes !== 'All' ? filters.institutes.split(',') : null;
+      const selectedProgs = filters.program !== 'All' ? filters.program.split(',') : null;
+      const selectedTags = filters.revisionTags !== 'All' ? filters.revisionTags.split(',') : null;
+      const searchLower = search.trim().toLowerCase();
 
-      return matchSearch && matchPaper && matchSubject && matchSection && matchMicrotopic && matchSubtopic && matchMacro && matchMicroTag && matchYear;
-    });
+      const result = questions.filter(q => {
+        if (version !== filterVersionRef.current) return false; // stale, abort early
+
+        // PYQ Filter
+        if (filters.pyqFilter === 'PYQ Only' && !q.is_pyq) return false;
+        if (filters.pyqFilter === 'Non-PYQ' && q.is_pyq) return false;
+
+        // Institute filter
+        if (selectedInsts) {
+          const instName = q.institute || (q.is_pyq ? 'UPSC' : '');
+          if (!instName || !selectedInsts.includes(instName)) return false;
+        }
+
+        // Program filter
+        if (selectedProgs) {
+          if (!q.program_name || !selectedProgs.includes(q.program_name)) return false;
+        }
+
+        // Revision tags local filter
+        if (selectedTags) {
+          const tagsForQ = userQuestionStates[q.id]?.reviewTags || [];
+          const hasMatch = selectedTags.some(t => tagsForQ.includes(t));
+          if (!hasMatch) return false;
+        }
+
+        const subtopicVal = getQuestionSub(q);
+        const matchSearch = !searchLower ||
+          (q.questionText?.toLowerCase() || '').includes(searchLower) ||
+          (subtopicVal.toLowerCase() || '').includes(searchLower) ||
+          (q.subject?.toLowerCase() || '').includes(searchLower);
+
+        if (!matchSearch) return false;
+
+        // 1. by default dont show optional question unless chose optional in stage filter in sidebar
+        const matchPaper = paperFilter.length === 0
+          ? q.paper !== 'Optional'
+          : paperFilter.includes(q.paper);
+        if (!matchPaper) return false;
+
+        const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
+        if (!matchSubject) return false;
+
+        const matchSection = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
+        if (!matchSection) return false;
+
+        const matchMicrotopic = microtopicFilter.length === 0 || microtopicFilter.includes(getQuestionMicro(q));
+        if (!matchMicrotopic) return false;
+
+        const matchSubtopic = subtopicFilter.length === 0 || subtopicFilter.includes(subtopicVal);
+        if (!matchSubtopic) return false;
+
+        const matchMacro = macroFilter.length === 0 || (q.macrotag || '').split(',').map(t => t.trim()).some(t => macroFilter.includes(t));
+        if (!matchMacro) return false;
+
+        const matchMicroTag = microFilter.length === 0 || (q.microtag || '').split(',').map(t => t.trim()).some(t => microFilter.includes(t));
+        if (!matchMicroTag) return false;
+
+        const matchYear = yearFilter.length === 0 || yearFilter.includes(String(q.year || ''));
+        if (!matchYear) return false;
+
+        return true;
+      });
+
+      if (version === filterVersionRef.current) {
+        const elapsed = Date.now() - startTs;
+        if (elapsed > 100) {
+          console.log(`[QuestionBank] filter took ${elapsed}ms for ${questions.length} questions → ${result.length} results`);
+        }
+        // Sort: PYQ first → Non-PYQ, year descending, GS1→GS2→GS3→GS4, same-subject together
+        const paperOrder: Record<string, number> = { GS1: 0, GS2: 1, GS3: 2, GS4: 3, Essay: 4, Optional: 5 };
+        result.sort((a, b) => {
+          // 1. PYQ before Non-PYQ
+          if (a.is_pyq && !b.is_pyq) return -1;
+          if (!a.is_pyq && b.is_pyq) return 1;
+          // 2. Year descending
+          const yearA = a.year || 0;
+          const yearB = b.year || 0;
+          if (yearA !== yearB) return yearB - yearA;
+          // 3. GS paper order
+          const orderA = paperOrder[a.paper] ?? 99;
+          const orderB = paperOrder[b.paper] ?? 99;
+          if (orderA !== orderB) return orderA - orderB;
+          // 4. Same subject together
+          const subA = a.subject || '';
+          const subB = b.subject || '';
+          if (subA !== subB) return subA.localeCompare(subB);
+          // 5. Same section together
+          const secA = getQuestionSection(a);
+          const secB = getQuestionSection(b);
+          if (secA !== secB) return secA.localeCompare(secB);
+          return 0;
+        });
+        setFilteredQuestions(result);
+      }
+    }, 0); // defer to next frame
+
+    return () => {
+      if (filterTimerRef.current) clearTimeout(filterTimerRef.current);
+    };
   }, [search, filters, questions, userQuestionStates]);
 
   return (
@@ -3470,7 +3512,7 @@ function QuestionBankView({
               insets={insets}
               isTablet={isTablet}
               filters={filters}
-              onUpdateFilters={setFilters}
+              onUpdateFilters={setFiltersDeferred}
               allPapers={allPapers}
               subjectOptions={subjectOptions}
               sectionOptions={sectionOptions}
@@ -3481,7 +3523,7 @@ function QuestionBankView({
               isSearchView={false}
               totalCount={filteredQuestions.length}
               allInstitutes={allInstitutes}
-              allPrograms={[]}
+              allPrograms={allPrograms}
               userTags={userTags}
               onCloseSidebar={() => setSidebarOpen(false)}
               allYears={allYears}
@@ -3561,9 +3603,9 @@ function QuestionBankView({
                                 key={p}
                                 onPress={() => {
                                   if (p === 'All') {
-                                    setFilters(prev => ({ ...prev, paper: 'All', subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' }));
+                                    setFiltersDeferred(prev => ({ ...prev, paper: 'All', subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' }));
                                   } else {
-                                    setFilters(prev => ({ 
+                                    setFiltersDeferred(prev => ({ 
                                       ...prev, 
                                       paper: toggleFilterValue(prev.paper, p)
                                     }));
@@ -3593,7 +3635,7 @@ function QuestionBankView({
                                   <TouchableOpacity
                                     key={`macro-${tag}`}
                                     onPress={() => {
-                                      setFilters(prev => ({
+                                      setFiltersDeferred(prev => ({
                                         ...prev,
                                         macrotags: toggleFilterValue(prev.macrotags, tag)
                                       }));
@@ -3624,7 +3666,7 @@ function QuestionBankView({
                                   <TouchableOpacity
                                     key={`micro-${tag}`}
                                     onPress={() => {
-                                      setFilters(prev => ({
+                                      setFiltersDeferred(prev => ({
                                         ...prev,
                                         microtags: toggleFilterValue(prev.microtags, tag)
                                       }));
@@ -3649,7 +3691,7 @@ function QuestionBankView({
                             <>
                               <View style={{ width: 1, height: 16, backgroundColor: colors.border }} />
                               <TouchableOpacity
-                                onPress={() => setFilters({ ...DEFAULT_MAINS_FILTERS })}
+                                onPress={() => setFiltersDeferred({ ...DEFAULT_MAINS_FILTERS })}
                                 style={[styles.filterPill, { backgroundColor: '#fee2e2', borderColor: '#fca5a5' }]}
                               >
                                 <X size={12} color="#ef4444" style={{ marginRight: 4 }} />
@@ -3659,133 +3701,133 @@ function QuestionBankView({
                           )}
                         </ScrollView>
 
-                        {/* Active Breadcrumb Badges */}
+                        {/* Active Breadcrumb Badges — tap anywhere on chip to remove that layer */}
                         {hasHierarchyActive && (
                           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingTop: 4, paddingBottom: 2 }}>
                             {filters.paper !== 'All' && filters.paper.split('|').map(val => (
-                              <View key={`crumb-paper-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#dbeafe', borderColor: '#bfdbfe' }]}>
+                              <TouchableOpacity
+                                key={`crumb-paper-${val}`}
+                                onPress={() => {
+                                  const updated = filters.paper.split('|').filter(x => x !== val).join('|') || 'All';
+                                  setFiltersDeferred(prev => ({ 
+                                    ...prev, 
+                                    paper: updated, 
+                                    subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                                  }));
+                                }}
+                                activeOpacity={0.7}
+                                style={[styles.breadcrumbChip, { backgroundColor: '#dbeafe', borderColor: '#bfdbfe' }]}
+                              >
                                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#1e40af' }}>{val}</Text>
-                                <Pressable 
-                                  onPress={() => {
-                                    const updated = filters.paper.split('|').filter(x => x !== val).join('|') || 'All';
-                                    setFilters(prev => ({ 
-                                      ...prev, 
-                                      paper: updated, 
-                                      subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                                    }));
-                                  }}
-                                  style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                                >
-                                  <X size={10} color="#1e40af" style={{ marginLeft: 4 }} />
-                                </Pressable>
-                              </View>
+                                <X size={10} color="#1e40af" style={{ marginLeft: 4 }} />
+                              </TouchableOpacity>
                             ))}
                             {filters.subjects !== 'All' && filters.subjects.split('|').map(val => (
-                              <View key={`crumb-subject-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#f3e8ff', borderColor: '#e9d5ff' }]}>
+                              <TouchableOpacity
+                                key={`crumb-subject-${val}`}
+                                onPress={() => {
+                                  const updated = filters.subjects.split('|').filter(x => x !== val).join('|') || 'All';
+                                  setFiltersDeferred(prev => ({ 
+                                    ...prev, 
+                                    subjects: updated, 
+                                    sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                                  }));
+                                }}
+                                activeOpacity={0.7}
+                                style={[styles.breadcrumbChip, { backgroundColor: '#f3e8ff', borderColor: '#e9d5ff' }]}
+                              >
                                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#6b21a8' }}>{val}</Text>
-                                <Pressable 
-                                  onPress={() => {
-                                    const updated = filters.subjects.split('|').filter(x => x !== val).join('|') || 'All';
-                                    setFilters(prev => ({ 
-                                      ...prev, 
-                                      subjects: updated, 
-                                      sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                                    }));
-                                  }}
-                                  style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                                >
-                                  <X size={10} color="#6b21a8" style={{ marginLeft: 4 }} />
-                                </Pressable>
-                              </View>
+                                <X size={10} color="#6b21a8" style={{ marginLeft: 4 }} />
+                              </TouchableOpacity>
                             ))}
                             {filters.sections !== 'All' && filters.sections.split('|').map(val => (
-                              <View key={`crumb-section-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#fef3c7', borderColor: '#fde68a' }]}>
+                              <TouchableOpacity
+                                key={`crumb-section-${val}`}
+                                onPress={() => {
+                                  const updated = filters.sections.split('|').filter(x => x !== val).join('|') || 'All';
+                                  setFiltersDeferred(prev => ({ 
+                                    ...prev, 
+                                    sections: updated, 
+                                    microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                                  }));
+                                }}
+                                activeOpacity={0.7}
+                                style={[styles.breadcrumbChip, { backgroundColor: '#fef3c7', borderColor: '#fde68a' }]}
+                              >
                                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#92400e' }}>{val}</Text>
-                                <Pressable 
-                                  onPress={() => {
-                                    const updated = filters.sections.split('|').filter(x => x !== val).join('|') || 'All';
-                                    setFilters(prev => ({ 
-                                      ...prev, 
-                                      sections: updated, 
-                                      microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                                    }));
-                                  }}
-                                  style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                                >
-                                  <X size={10} color="#92400e" style={{ marginLeft: 4 }} />
-                                </Pressable>
-                              </View>
+                                <X size={10} color="#92400e" style={{ marginLeft: 4 }} />
+                              </TouchableOpacity>
                             ))}
                             {filters.microtopics !== 'All' && filters.microtopics.split('|').map(val => (
-                              <View key={`crumb-micro-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#d1fae5', borderColor: '#a7f3d0' }]}>
+                              <TouchableOpacity
+                                key={`crumb-micro-${val}`}
+                                onPress={() => {
+                                  const updated = filters.microtopics.split('|').filter(x => x !== val).join('|') || 'All';
+                                  setFiltersDeferred(prev => ({ 
+                                    ...prev, 
+                                    microtopics: updated, 
+                                    subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                                  }));
+                                }}
+                                activeOpacity={0.7}
+                                style={[styles.breadcrumbChip, { backgroundColor: '#d1fae5', borderColor: '#a7f3d0' }]}
+                              >
                                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#065f46' }}>{val}</Text>
-                                <Pressable 
-                                  onPress={() => {
-                                    const updated = filters.microtopics.split('|').filter(x => x !== val).join('|') || 'All';
-                                    setFilters(prev => ({ 
-                                      ...prev, 
-                                      microtopics: updated, 
-                                      subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                                    }));
-                                  }}
-                                  style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                                >
-                                  <X size={10} color="#065f46" style={{ marginLeft: 4 }} />
-                                </Pressable>
-                              </View>
+                                <X size={10} color="#065f46" style={{ marginLeft: 4 }} />
+                              </TouchableOpacity>
                             ))}
                             {filters.subtopics !== 'All' && filters.subtopics.split('|').map(val => (
-                              <View key={`crumb-sub-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#ffe4e6', borderColor: '#fecdd3' }]}>
+                              <TouchableOpacity
+                                key={`crumb-sub-${val}`}
+                                onPress={() => {
+                                  const updated = filters.subtopics.split('|').filter(x => x !== val).join('|') || 'All';
+                                  setFiltersDeferred(prev => ({ 
+                                    ...prev, 
+                                    subtopics: updated, 
+                                    macrotags: 'All', microtags: 'All' 
+                                  }));
+                                }}
+                                activeOpacity={0.7}
+                                style={[styles.breadcrumbChip, { backgroundColor: '#ffe4e6', borderColor: '#fecdd3' }]}
+                              >
                                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#be123c' }}>{val}</Text>
-                                <Pressable 
-                                  onPress={() => {
-                                    const updated = filters.subtopics.split('|').filter(x => x !== val).join('|') || 'All';
-                                    setFilters(prev => ({ 
-                                      ...prev, 
-                                      subtopics: updated, 
-                                      macrotags: 'All', microtags: 'All' 
-                                    }));
-                                  }}
-                                  style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                                >
-                                  <X size={10} color="#be123c" style={{ marginLeft: 4 }} />
-                                </Pressable>
-                              </View>
+                                <X size={10} color="#be123c" style={{ marginLeft: 4 }} />
+                              </TouchableOpacity>
                             ))}
                             {filters.macrotags !== 'All' && filters.macrotags.split('|').map(val => (
-                              <View key={`crumb-macro-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#e0f7fa', borderColor: '#b2ebf2' }]}>
+                              <TouchableOpacity
+                                key={`crumb-macro-${val}`}
+                                onPress={() => {
+                                  const updated = filters.macrotags.split('|').filter(x => x !== val).join('|') || 'All';
+                                  setFiltersDeferred(prev => ({ 
+                                    ...prev, 
+                                    macrotags: updated, 
+                                    microtags: 'All' 
+                                  }));
+                                }}
+                                activeOpacity={0.7}
+                                style={[styles.breadcrumbChip, { backgroundColor: '#e0f7fa', borderColor: '#b2ebf2' }]}
+                              >
                                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#006064' }}>{val}</Text>
-                                <Pressable 
-                                  onPress={() => {
-                                    const updated = filters.macrotags.split('|').filter(x => x !== val).join('|') || 'All';
-                                    setFilters(prev => ({ 
-                                      ...prev, 
-                                      macrotags: updated, 
-                                      microtags: 'All' 
-                                    }));
-                                  }}
-                                  style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                                >
-                                  <X size={10} color="#006064" style={{ marginLeft: 4 }} />
-                                </Pressable>
-                              </View>
+                                <X size={10} color="#006064" style={{ marginLeft: 4 }} />
+                              </TouchableOpacity>
                             ))}
                             {filters.microtags !== 'All' && filters.microtags.split('|').map(val => (
-                              <View key={`crumb-microtag-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#fce4ec', borderColor: '#f8bbd0' }]}>
+                              <TouchableOpacity
+                                key={`crumb-microtag-${val}`}
+                                onPress={() => {
+                                  const updated = filters.microtags.split('|').filter(x => x !== val).join('|') || 'All';
+                                  setFiltersDeferred(prev => ({ 
+                                    ...prev, 
+                                    microtags: updated 
+                                  }));
+                                }}
+                                activeOpacity={0.7}
+                                style={[styles.breadcrumbChip, { backgroundColor: '#fce4ec', borderColor: '#f8bbd0' }]}
+                              >
                                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#880e4f' }}>{val}</Text>
-                                <Pressable 
-                                  onPress={() => {
-                                    const updated = filters.microtags.split('|').filter(x => x !== val).join('|') || 'All';
-                                    setFilters(prev => ({ 
-                                      ...prev, 
-                                      microtags: updated 
-                                    }));
-                                  }}
-                                  style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                                >
-                                  <X size={10} color="#880e4f" style={{ marginLeft: 4 }} />
-                                </Pressable>
-                              </View>
+                                <X size={10} color="#880e4f" style={{ marginLeft: 4 }} />
+                              </TouchableOpacity>
                             ))}
                           </View>
                         )}
@@ -3954,10 +3996,10 @@ function QuestionBankView({
           style={{
             position: 'absolute',
             top: insets.top + 70,
-            left: 12,
-            width: 40,
-            height: 40,
-            borderRadius: 20,
+            left: 6,
+            width: 36,
+            height: 36,
+            borderRadius: 18,
             backgroundColor: '#7c3aed',
             alignItems: 'center',
             justifyContent: 'center',
@@ -3969,7 +4011,7 @@ function QuestionBankView({
             zIndex: 9999,
           }}
         >
-          <ChevronRight size={20} color="#fff" />
+          <ChevronRight size={18} color="#fff" />
         </TouchableOpacity>
       )}
 
@@ -5569,7 +5611,7 @@ function MainsAISearchView({
   // PYQ Widget — hot topics from predictive analysis
   const [pyqHotTopics, setPyqHotTopics] = useState<any[]>([]);
 
-  const [sidebarOpen, setSidebarOpen] = useState(isTablet);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const allSearchSubjects = useMemo(() => {
     const subjects = new Set<string>();
@@ -5728,20 +5770,29 @@ function MainsAISearchView({
   const allInstitutes = useMemo(() => {
     const instSet = new Set<string>();
     questions.forEach(q => {
-      (q.answers || []).forEach(ans => {
-        if (ans.institute) instSet.add(ans.institute.trim());
-      });
+      if (q.institute) {
+        instSet.add(q.institute.trim());
+      } else if (q.is_pyq) {
+        instSet.add('UPSC');
+      }
     });
     return Array.from(instSet).sort();
   }, [questions]);
 
   const allPrograms = useMemo(() => {
+    if (pendingFilters.institutes === 'All') return [];
     const progSet = new Set<string>();
-    valueAddItems.forEach(item => {
-      if (item.source) progSet.add(item.source.trim());
+    const selectedInsts = pendingFilters.institutes.split(',');
+    questions.forEach(q => {
+      const instName = q.institute || (q.is_pyq ? 'UPSC' : '');
+      if (instName && selectedInsts.includes(instName)) {
+        if (q.program_name) {
+          progSet.add(q.program_name.trim());
+        }
+      }
     });
     return Array.from(progSet).sort();
-  }, [valueAddItems]);
+  }, [questions, pendingFilters.institutes]);
 
   const activeFilterCount = useMemo(() => countActiveMainsFilters(filters), [filters]);
 
@@ -5904,8 +5955,14 @@ function MainsAISearchView({
           // Institute filter
           if (activeFilters.institutes !== 'All') {
             const selectedInsts = activeFilters.institutes.split(',');
-            const hasMatch = (q.answers || []).some(ans => selectedInsts.includes(ans.institute));
-            if (!hasMatch) return;
+            const instName = q.institute || (q.is_pyq ? 'UPSC' : '');
+            if (!instName || !selectedInsts.includes(instName)) return;
+          }
+
+          // Program filter
+          if (activeFilters.program !== 'All') {
+            const selectedProgs = activeFilters.program.split(',');
+            if (!q.program_name || !selectedProgs.includes(q.program_name)) return;
           }
 
           // Match keywords
@@ -6816,133 +6873,133 @@ function MainsAISearchView({
                     )}
                   </ScrollView>
 
-                  {/* Active Breadcrumb Badges */}
+                  {/* Active Breadcrumb Badges — tap anywhere on chip to remove that layer */}
                   {hasHierarchyActive && (
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingTop: 4, paddingBottom: 2 }}>
                       {filters.paper !== 'All' && filters.paper.split('|').map(val => (
-                        <View key={`crumb-paper-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#dbeafe', borderColor: '#bfdbfe' }]}>
+                        <TouchableOpacity
+                          key={`crumb-paper-${val}`}
+                          onPress={() => {
+                            const updated = filters.paper.split('|').filter(x => x !== val).join('|') || 'All';
+                            handleUpdateFilters({ 
+                              ...filters, 
+                              paper: updated, 
+                              subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                            });
+                          }}
+                          activeOpacity={0.7}
+                          style={[styles.breadcrumbChip, { backgroundColor: '#dbeafe', borderColor: '#bfdbfe' }]}
+                        >
                           <Text style={{ fontSize: 10, fontWeight: '700', color: '#1e40af' }}>{val}</Text>
-                          <Pressable 
-                            onPress={() => {
-                              const updated = filters.paper.split('|').filter(x => x !== val).join('|') || 'All';
-                              handleUpdateFilters({ 
-                                ...filters, 
-                                paper: updated, 
-                                subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                              });
-                            }}
-                            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                          >
-                            <X size={10} color="#1e40af" style={{ marginLeft: 4 }} />
-                          </Pressable>
-                        </View>
+                          <X size={10} color="#1e40af" style={{ marginLeft: 4 }} />
+                        </TouchableOpacity>
                       ))}
                       {filters.subjects !== 'All' && filters.subjects.split('|').map(val => (
-                        <View key={`crumb-subject-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#f3e8ff', borderColor: '#e9d5ff' }]}>
+                        <TouchableOpacity
+                          key={`crumb-subject-${val}`}
+                          onPress={() => {
+                            const updated = filters.subjects.split('|').filter(x => x !== val).join('|') || 'All';
+                            handleUpdateFilters({ 
+                              ...filters, 
+                              subjects: updated, 
+                              sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                            });
+                          }}
+                          activeOpacity={0.7}
+                          style={[styles.breadcrumbChip, { backgroundColor: '#f3e8ff', borderColor: '#e9d5ff' }]}
+                        >
                           <Text style={{ fontSize: 10, fontWeight: '700', color: '#6b21a8' }}>{val}</Text>
-                          <Pressable 
-                            onPress={() => {
-                              const updated = filters.subjects.split('|').filter(x => x !== val).join('|') || 'All';
-                              handleUpdateFilters({ 
-                                ...filters, 
-                                subjects: updated, 
-                                sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                              });
-                            }}
-                            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                          >
-                            <X size={10} color="#6b21a8" style={{ marginLeft: 4 }} />
-                          </Pressable>
-                        </View>
+                          <X size={10} color="#6b21a8" style={{ marginLeft: 4 }} />
+                        </TouchableOpacity>
                       ))}
                       {filters.sections !== 'All' && filters.sections.split('|').map(val => (
-                        <View key={`crumb-section-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#fef3c7', borderColor: '#fde68a' }]}>
+                        <TouchableOpacity
+                          key={`crumb-section-${val}`}
+                          onPress={() => {
+                            const updated = filters.sections.split('|').filter(x => x !== val).join('|') || 'All';
+                            handleUpdateFilters({ 
+                              ...filters, 
+                              sections: updated, 
+                              microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                            });
+                          }}
+                          activeOpacity={0.7}
+                          style={[styles.breadcrumbChip, { backgroundColor: '#fef3c7', borderColor: '#fde68a' }]}
+                        >
                           <Text style={{ fontSize: 10, fontWeight: '700', color: '#92400e' }}>{val}</Text>
-                          <Pressable 
-                            onPress={() => {
-                              const updated = filters.sections.split('|').filter(x => x !== val).join('|') || 'All';
-                              handleUpdateFilters({ 
-                                ...filters, 
-                                sections: updated, 
-                                microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                              });
-                            }}
-                            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                          >
-                            <X size={10} color="#92400e" style={{ marginLeft: 4 }} />
-                          </Pressable>
-                        </View>
+                          <X size={10} color="#92400e" style={{ marginLeft: 4 }} />
+                        </TouchableOpacity>
                       ))}
                       {filters.microtopics !== 'All' && filters.microtopics.split('|').map(val => (
-                        <View key={`crumb-micro-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#d1fae5', borderColor: '#a7f3d0' }]}>
+                        <TouchableOpacity
+                          key={`crumb-micro-${val}`}
+                          onPress={() => {
+                            const updated = filters.microtopics.split('|').filter(x => x !== val).join('|') || 'All';
+                            handleUpdateFilters({ 
+                              ...filters, 
+                              microtopics: updated, 
+                              subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                            });
+                          }}
+                          activeOpacity={0.7}
+                          style={[styles.breadcrumbChip, { backgroundColor: '#d1fae5', borderColor: '#a7f3d0' }]}
+                        >
                           <Text style={{ fontSize: 10, fontWeight: '700', color: '#065f46' }}>{val}</Text>
-                          <Pressable 
-                            onPress={() => {
-                              const updated = filters.microtopics.split('|').filter(x => x !== val).join('|') || 'All';
-                              handleUpdateFilters({ 
-                                ...filters, 
-                                microtopics: updated, 
-                                subtopics: 'All', macrotags: 'All', microtags: 'All' 
-                              });
-                            }}
-                            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                          >
-                            <X size={10} color="#065f46" style={{ marginLeft: 4 }} />
-                          </Pressable>
-                        </View>
+                          <X size={10} color="#065f46" style={{ marginLeft: 4 }} />
+                        </TouchableOpacity>
                       ))}
                       {filters.subtopics !== 'All' && filters.subtopics.split('|').map(val => (
-                        <View key={`crumb-sub-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#ffe4e6', borderColor: '#fecdd3' }]}>
+                        <TouchableOpacity
+                          key={`crumb-sub-${val}`}
+                          onPress={() => {
+                            const updated = filters.subtopics.split('|').filter(x => x !== val).join('|') || 'All';
+                            handleUpdateFilters({ 
+                              ...filters, 
+                              subtopics: updated, 
+                              macrotags: 'All', microtags: 'All' 
+                            });
+                          }}
+                          activeOpacity={0.7}
+                          style={[styles.breadcrumbChip, { backgroundColor: '#ffe4e6', borderColor: '#fecdd3' }]}
+                        >
                           <Text style={{ fontSize: 10, fontWeight: '700', color: '#be123c' }}>{val}</Text>
-                          <Pressable 
-                            onPress={() => {
-                              const updated = filters.subtopics.split('|').filter(x => x !== val).join('|') || 'All';
-                              handleUpdateFilters({ 
-                                ...filters, 
-                                subtopics: updated, 
-                                macrotags: 'All', microtags: 'All' 
-                              });
-                            }}
-                            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                          >
-                            <X size={10} color="#be123c" style={{ marginLeft: 4 }} />
-                          </Pressable>
-                        </View>
+                          <X size={10} color="#be123c" style={{ marginLeft: 4 }} />
+                        </TouchableOpacity>
                       ))}
                       {filters.macrotags !== 'All' && filters.macrotags.split('|').map(val => (
-                        <View key={`crumb-macro-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#e0f7fa', borderColor: '#b2ebf2' }]}>
+                        <TouchableOpacity
+                          key={`crumb-macro-${val}`}
+                          onPress={() => {
+                            const updated = filters.macrotags.split('|').filter(x => x !== val).join('|') || 'All';
+                            handleUpdateFilters({ 
+                              ...filters, 
+                              macrotags: updated, 
+                              microtags: 'All' 
+                            });
+                          }}
+                          activeOpacity={0.7}
+                          style={[styles.breadcrumbChip, { backgroundColor: '#e0f7fa', borderColor: '#b2ebf2' }]}
+                        >
                           <Text style={{ fontSize: 10, fontWeight: '700', color: '#006064' }}>{val}</Text>
-                          <Pressable 
-                            onPress={() => {
-                              const updated = filters.macrotags.split('|').filter(x => x !== val).join('|') || 'All';
-                              handleUpdateFilters({ 
-                                ...filters, 
-                                macrotags: updated, 
-                                microtags: 'All' 
-                              });
-                            }}
-                            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                          >
-                            <X size={10} color="#006064" style={{ marginLeft: 4 }} />
-                          </Pressable>
-                        </View>
+                          <X size={10} color="#006064" style={{ marginLeft: 4 }} />
+                        </TouchableOpacity>
                       ))}
                       {filters.microtags !== 'All' && filters.microtags.split('|').map(val => (
-                        <View key={`crumb-microtag-${val}`} style={[styles.breadcrumbChip, { backgroundColor: '#fce4ec', borderColor: '#f8bbd0' }]}>
+                        <TouchableOpacity
+                          key={`crumb-microtag-${val}`}
+                          onPress={() => {
+                            const updated = filters.microtags.split('|').filter(x => x !== val).join('|') || 'All';
+                            handleUpdateFilters({ 
+                              ...filters, 
+                              microtags: updated 
+                            });
+                          }}
+                          activeOpacity={0.7}
+                          style={[styles.breadcrumbChip, { backgroundColor: '#fce4ec', borderColor: '#f8bbd0' }]}
+                        >
                           <Text style={{ fontSize: 10, fontWeight: '700', color: '#880e4f' }}>{val}</Text>
-                          <Pressable 
-                            onPress={() => {
-                              const updated = filters.microtags.split('|').filter(x => x !== val).join('|') || 'All';
-                              handleUpdateFilters({ 
-                                ...filters, 
-                                microtags: updated 
-                              });
-                            }}
-                            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                          >
-                            <X size={10} color="#880e4f" style={{ marginLeft: 4 }} />
-                          </Pressable>
-                        </View>
+                          <X size={10} color="#880e4f" style={{ marginLeft: 4 }} />
+                        </TouchableOpacity>
                       ))}
                     </View>
                   )}
@@ -7261,10 +7318,10 @@ function MainsAISearchView({
           style={{
             position: 'absolute',
             top: insets.top + 70,
-            left: 12,
-            width: 40,
-            height: 40,
-            borderRadius: 20,
+            left: 6,
+            width: 36,
+            height: 36,
+            borderRadius: 18,
             backgroundColor: '#7c3aed',
             alignItems: 'center',
             justifyContent: 'center',
@@ -8193,26 +8250,61 @@ const styles = StyleSheet.create({
     maxWidth: 260,
     flexGrow: 0,
     borderRightWidth: 0.5,
-    padding: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
     overflow: 'hidden',
   },
   sidebarFchip: {
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.08)',
     backgroundColor: 'rgba(255,255,255,0.45)',
     marginBottom: 4,
     marginRight: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
   },
   sidebarFchipSel: {
     backgroundColor: '#7c3aed',
     borderColor: '#7c3aed',
+    shadowColor: '#7c3aed',
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
   sidebarFchipText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '700',
+  },
+  sidebarSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+    borderRadius: 8,
+  },
+  sidebarSectionHeaderActive: {
+    backgroundColor: 'rgba(124,58,237,0.06)',
+  },
+  sidebarBadge: {
+    fontSize: 9,
+    fontWeight: '600',
+    color: '#7c3aed',
+    backgroundColor: 'rgba(124,58,237,0.1)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    overflow: 'hidden',
+    maxWidth: 140,
   },
   phoneKeywordsPanel: {
     paddingHorizontal: 14,

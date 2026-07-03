@@ -139,7 +139,11 @@ def upload_mains_questions_answers():
                 "is_upsc_cse": is_upsc_cse_val,
                 "is_allied": is_allied_val,
                 "is_others": is_others_val,
-                "exam_category": exam_category_val
+                "exam_category": exam_category_val,
+                "course": q.get("course", "Civil Services"),
+                "institute": q.get("institute", "UPSC"),
+                "program_id": q.get("program_id", "cse"),
+                "program_name": q.get("program_name", "CSE")
             })
             
             # Answer table mapping

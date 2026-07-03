@@ -29,6 +29,10 @@ export interface ConsolidatedQuestion {
   is_allied?: boolean;
   is_others?: boolean;
   exam_category?: string;
+  course?: string;
+  institute?: string;
+  program_id?: string;
+  program_name?: string;
 }
 
 export function normalizePaper(paper: string | null | undefined): string {
@@ -115,15 +119,32 @@ export const mainsConsolidatedQuestions: ConsolidatedQuestion[] = [
 import { supabase } from '../lib/supabase';
 
 export async function fetchMainsQuestionsFromSupabase(): Promise<ConsolidatedQuestion[]> {
-  const { data, error } = await supabase
-    .from('mains_questions')
-    .select('*, answers:mains_answers(*)');
+  let allData: any[] = [];
+  let from = 0;
+  const step = 1000;
   
-  if (error) {
-    throw error;
+  while (true) {
+    const { data, error } = await supabase
+      .from('mains_questions')
+      .select('*, answers:mains_answers(*)')
+      .range(from, from + step - 1);
+      
+    if (error) {
+      throw error;
+    }
+    
+    if (!data || data.length === 0) {
+      break;
+    }
+    
+    allData = allData.concat(data);
+    if (data.length < step) {
+      break;
+    }
+    from += step;
   }
   
-  return (data || []).map((q: any) => ({
+  return allData.map((q: any) => ({
     id: q.id,
     questionNumber: q.question_number,
     questionText: q.question_text,
@@ -147,6 +168,10 @@ export async function fetchMainsQuestionsFromSupabase(): Promise<ConsolidatedQue
     is_allied: q.is_allied,
     is_others: q.is_others,
     exam_category: q.exam_category,
+    course: q.course,
+    institute: q.institute,
+    program_id: q.program_id,
+    program_name: q.program_name,
     answers: (q.answers || []).map((ans: any) => ({
       id: ans.id,
       institute: ans.institute,

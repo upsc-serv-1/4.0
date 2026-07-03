@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** “Skill India Mission needs to be strengthened to bridge the gap between vocational education and  employability.” Comment
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Social Justice] [Section Group: Social Sector & Human Development] [Micro Topic: Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources] [Sub Topic: Human Resources] [Macro Tag: Analytical, Applied] [Micro Tag: Comment, Skill India Mission, Vocational education]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: SOCIAL JUSTICE] [Section Group: Social Sector & Human Development] [Micro Topic: Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources] [Sub Topic: Human Resources] [Macro Tag: Analytical, Applied] [Micro Tag: Comment, Skill India Mission, Vocational education]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief account of the Skill India Mission. <br>• In the body, first highlight the factors responsible for the gap between vocational education and employability. <br>• Then, point out the successful interventions by the mission. <br>• Conclude by, suggesting reforms for strengthening the mission. |
@@ -51,7 +51,7 @@ Reality/Virtual Reality**; RPL:** Recognition of Prior Learning
 
 ## Q2 [Year: 2026]
 **Question:** Analyze the benefits and challenges associated with the entry and operation of foreign higher  educational institutions in the country.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Social Justice] [Section Group: Social Sector & Human Development] [Micro Topic: Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources] [Sub Topic: Education] [Macro Tag: Analytical, Applied] [Micro Tag: Analyze, Foreign higher educational institutions, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: SOCIAL JUSTICE] [Section Group: Social Sector & Human Development] [Micro Topic: Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources] [Sub Topic: Education] [Macro Tag: Analytical, Applied] [Micro Tag: Analyze, Foreign higher educational institutions, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about the establishment of foreign higher educational institutions (FHEI) in the country and UGC guidelines for the same. <br>• In the body, analyze the benefits and challenges associated with their entry and operation. <br>• Conclude with appropriate suggestions and best practices to be followed. |
@@ -96,7 +96,7 @@ will help India transform into a **knowledge economy** and strengthen its positi
 
 ## Q3 [Year: 2026]
 **Question:** Poverty and malnutrition create a vicious cycle, adversely affecting human capital formation. What  steps can be taken to break the cycle?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Social Justice] [Section Group: Poverty & Hunger] [Micro Topic: Issues and Challenges relating to Poverty & Hunger] [Sub Topic: Poverty] [Macro Tag: Analytical, Applied] [Micro Tag: What steps, Poverty, Malnutrition, Human capital]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: SOCIAL JUSTICE] [Section Group: Poverty & Hunger] [Micro Topic: Issues and Challenges relating to Poverty & Hunger] [Sub Topic: Poverty] [Macro Tag: Analytical, Applied] [Micro Tag: What steps, Poverty, Malnutrition, Human capital]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by explaining interplay of poverty and malnutrition. <br>• In the body, suggest comprehensive steps to break this vicious cycle. <br>• Conclude by highlighting the SDGs associated with poverty and malnutrition. |
@@ -153,7 +153,7 @@ against women (Sashakt Nari – Viksit Bharat programme; Strengthening legal fra
 
 ## Q4 [Year: 2026]
 **Question:** Amid the recent controversy over alleged electoral roll related-malpractices, the debate on  mandatory Aadhaar-Voter ID linkage has regained attention. What is your opinion in this regard? Justify  your answer.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Polity] [Section Group: Elections & Political Dynamics] [Micro Topic: Salient features of the Representation of People's Act] [Sub Topic: Electoral reforms] [Macro Tag: Analytical, Applied] [Micro Tag: What is your opinion, Justify, Aadhaar-Voter ID linkage, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: POLITY] [Section Group: Elections & Political Dynamics] [Micro Topic: Salient features of the Representation of People's Act] [Sub Topic: Electoral reforms] [Macro Tag: Analytical, Applied] [Micro Tag: What is your opinion, Justify, Aadhaar-Voter ID linkage, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about the recent controversies over alleged electoral roll related-malpractices and the proposal for Aadhar-Voter ID linkage. <br>• In the body, provide your opinion over the proposal and justify the same with valid arguments. <br>• Conclude by suggesting a way forward. |
@@ -192,7 +192,7 @@ While there are **multiple benefits** of Voter ID-Aadhar linkage, the **disadvan
 
 ## Q5 [Year: 2026]
 **Question:** Assess the role of Pradhan Mantri Jan Dhan Yojana (PMJDY) over the past decade in promoting  financial inclusion and empowering marginalized communities.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Social Justice] [Section Group: Vulnerable Sections & Welfare] [Micro Topic: Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies] [Sub Topic: Efficacy of Welfare and Development Schemes] [Macro Tag: Analytical, Applied] [Micro Tag: Assess, PMJDY, Financial inclusion, Marginalized communities]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: SOCIAL JUSTICE] [Section Group: Vulnerable Sections & Welfare] [Micro Topic: Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies] [Sub Topic: Efficacy of Welfare and Development Schemes] [Macro Tag: Analytical, Applied] [Micro Tag: Assess, PMJDY, Financial inclusion, Marginalized communities]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a brief background about the PMJDY. <br>• In the body, assess its role over the past decade in promoting financial inclusion and empowering marginalized communities, highlighting both achievements and shortcomings. <br>• Conclude by suggesting measures to overcome these shortcomings. |
@@ -240,7 +240,7 @@ These shortcomings can be overcome by expanding **financial literacy programmes 
 
 ## Q6 [Year: 2026]
 **Question:** “The Transgender Persons (Protection of Rights) Act, 2019 remains merely a legal document due to  inadequate sensitization of government functionaries and citizens regarding challenges faced by  transgender persons.” Comment.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Social Justice] [Section Group: Vulnerable Sections & Welfare] [Micro Topic: Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies] [Sub Topic: Efficacy of Welfare and Development Schemes] [Macro Tag: Analytical, Applied] [Micro Tag: Comment, Transgender Persons Act 2019, Sensitization]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: SOCIAL JUSTICE] [Section Group: Vulnerable Sections & Welfare] [Micro Topic: Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies] [Sub Topic: Efficacy of Welfare and Development Schemes] [Macro Tag: Analytical, Applied] [Micro Tag: Comment, Transgender Persons Act 2019, Sensitization]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about the 2019 Act and defining transgender persons. <br>• In the body, first discuss how the Act remains merely a legal document due to inadequate sensitization of government functionaries and citizens regarding transgender issues. <br>• Next, outline some corrective measures to address this situation. <br>• Conclude by emphasizing the better implementation of the Act to ensure "Sabka Sath, Sabka Vikas. |
@@ -285,7 +285,7 @@ The **Act** is undoubtedly a significant step in the direction of recognition of
 
 ## Q7 [Year: 2026]
 **Question:** Despite steady economic growth and self-sufficiency in food production, India continues to grapple  with the issues of hunger and food insecurity. Examine the factors responsible for this paradox and  suggest policy measures to address them.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Social Justice] [Section Group: Poverty & Hunger] [Micro Topic: Issues and Challenges relating to Poverty & Hunger] [Sub Topic: Hunger] [Macro Tag: Analytical, Applied] [Micro Tag: Examine, Suggest, Hunger, Food insecurity, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: SOCIAL JUSTICE] [Section Group: Poverty & Hunger] [Micro Topic: Issues and Challenges relating to Poverty & Hunger] [Sub Topic: Hunger] [Macro Tag: Analytical, Applied] [Micro Tag: Examine, Suggest, Hunger, Food insecurity, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by highlighting through data the challenges of hunger and malnutrition in India despite steady economic growth and self-sufficiency in food production. <br>• In the body, first examine the factors responsible for this paradox. <br>• Next, suggest policy measures to address them. <br>• Conclude by emphasizing the significance of combating hunger and food insecurity. |
@@ -344,7 +344,7 @@ Kalyan Anna Yojana**; SBM:** Swachch Bharat Mission**; PMMVY:** Pradhan Mantri M
 
 ## Q8 [Year: 2026]
 **Question:** In a crucial domain like the public healthcare system the Indian State should play a vital role to  contain the adverse impact of marketisation of the system. Suggest some measures through which the  State can enhance the reach of public healthcare at the grassroots level.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Social Justice] [Section Group: Social Sector & Human Development] [Micro Topic: Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources] [Sub Topic: Health] [Macro Tag: Analytical, Applied] [Micro Tag: Suggest, Public healthcare, Indian State, Marketisation]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: SOCIAL JUSTICE] [Section Group: Social Sector & Human Development] [Micro Topic: Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources] [Sub Topic: Health] [Macro Tag: Analytical, Applied] [Micro Tag: Suggest, Public healthcare, Indian State, Marketisation]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by highlighting the driving factor behind the marketization of the public healthcare system. <br>• In the body, first list the potential adverse impacts of marketization. <br>• Next, suggest measures to enhance the reach of public healthcare at the grassroots level. <br>• Conclude with suggesting a balanced approach leveraging the efficiencies of marketization. |
@@ -393,7 +393,7 @@ By **balancing market forces with robust public health policies**, India can wor
 
 ## Q9 [Year: 2026]
 **Question:** Bring out the criticisms and concerns raised by some states regarding the Centrally Sponsored  Schemes (CSS) and suggest corrective measures.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Governance] [Section Group: Development Processes & Policies] [Micro Topic: Government Policies & Interventions for development of various sectors (issues in their design, implementation)] [Sub Topic: Government Schemes and Policies] [Macro Tag: Analytical, Applied] [Micro Tag: Bring out, Suggest, Centrally Sponsored Schemes, States]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: GOVERNANCE] [Section Group: Development Processes & Policies] [Micro Topic: Government Policies & Interventions for development of various sectors (issues in their design, implementation)] [Sub Topic: Government Schemes and Policies] [Macro Tag: Analytical, Applied] [Micro Tag: Bring out, Suggest, Centrally Sponsored Schemes, States]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief account of Centrally Sponsored Schemes. <br>• In the body, first bring out the criticism and concerns raised by some states regarding them. <br>• Next, suggest measures to address these concerns. <br>• Conclude by emphasizing the need to adopt these measures to promote competitive cooperative federalism. |
@@ -431,7 +431,7 @@ The evolving landscape of cooperative federalism demands a **dynamic reimagining
 
 ## Q10 [Year: 2026]
 **Question:** “Universal Basic Income (UBI) is a viable solution to eradicate extreme poverty in India.” Critically  discuss the statement.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: Social Justice] [Section Group: Poverty & Hunger] [Micro Topic: Issues and Challenges relating to Poverty & Hunger] [Sub Topic: Poverty] [Macro Tag: Analytical, Applied] [Micro Tag: Critically discuss, Universal Basic Income, Poverty, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: SOCIAL JUSTICE] [Section Group: Poverty & Hunger] [Micro Topic: Issues and Challenges relating to Poverty & Hunger] [Sub Topic: Poverty] [Macro Tag: Analytical, Applied] [Micro Tag: Critically discuss, Universal Basic Income, Poverty, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by briefly explaining the concept of Universal Basic Income. <br>• In the body, critically discuss its viability as the solution to eradicate extreme poverty in India. <br>• Conclude by highlighting other measures for eliminating extreme poverty in India. |

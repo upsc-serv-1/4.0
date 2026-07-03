@@ -15,7 +15,7 @@
     {
       "id": "forum-mgp-2026-csm26t04se-q01",
       "questionNumber": 1,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Macroeconomics & Fiscal Policy",
       "microTopic": "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
       "subTopic": "GDP",
@@ -49,12 +49,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t04se-q02",
       "questionNumber": 2,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Macroeconomics & Fiscal Policy",
       "microTopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
       "subTopic": "Manufacturing Sector",
@@ -88,12 +93,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t04se-q03",
       "questionNumber": 3,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Macroeconomics & Fiscal Policy",
       "microTopic": "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
       "subTopic": "GDP",
@@ -127,12 +137,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t04se-q04",
       "questionNumber": 4,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Macroeconomics & Fiscal Policy",
       "microTopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
       "subTopic": "Demographic Dividend",
@@ -166,12 +181,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t04se-q05",
       "questionNumber": 5,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Macroeconomics & Fiscal Policy",
       "microTopic": "Government Budgeting and fiscal management policies",
       "subTopic": "Fiscal Policy",
@@ -205,12 +225,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t04se-q06",
       "questionNumber": 6,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Macroeconomics & Fiscal Policy",
       "microTopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
       "subTopic": "Economic Growth",
@@ -244,12 +269,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t04se-q07",
       "questionNumber": 7,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Macroeconomics & Fiscal Policy",
       "microTopic": "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
       "subTopic": "Monetary policy",
@@ -283,12 +313,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t04se-q08",
       "questionNumber": 8,
-      "subject": "Social Justice",
+      "subject": "SOCIAL JUSTICE",
       "sectionGroup": "Poverty & Hunger",
       "microTopic": "Issues and Challenges relating to Poverty & Hunger",
       "subTopic": "Poverty",
@@ -322,12 +357,17 @@
       "hierarchy_path": [
         "GS3",
         "Social Justice"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS2"
     },
     {
       "id": "forum-mgp-2026-csm26t04se-q09",
       "questionNumber": 9,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Macroeconomics & Fiscal Policy",
       "microTopic": "Government Budgeting and fiscal management policies",
       "subTopic": "Fiscal Policy",
@@ -361,12 +401,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t04se-q10",
       "questionNumber": 10,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Macroeconomics & Fiscal Policy",
       "microTopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
       "subTopic": "Manufacturing Sector",
@@ -400,7 +445,13 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     }
-  ]
+  ],
+  "paper": "GS1"
 }

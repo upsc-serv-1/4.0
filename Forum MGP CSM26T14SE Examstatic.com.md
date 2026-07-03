@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** India’s BioE3 Policy (Biotechnology for Economy, Environment, and Employment) is a strategic step towards building a sustainable bioeconomy. Examine the key mechanisms through which the policy seeks to strengthen the biomanufacturing ecosystem.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights] [Sub Topic: Bio-Technology] [Macro Tag: Analytical, Applied] [Micro Tag: Examine, BioE3 Policy, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: SCIENCE & TECHNOLOGY] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights] [Sub Topic: Bio-Technology] [Macro Tag: Analytical, Applied] [Micro Tag: Examine, BioE3 Policy, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce your answer by giving a brief background of the policy. <br>• In the body of your answer, examine important mechanisms intended to strengthen the biomanufacturing ecosystem. <br>• Conclude by highlighting the alignment of the policy with the broader national objectives. |
@@ -49,7 +49,7 @@ Extra marks/content differentiation:
 
 ## Q2 [Year: 2026]
 **Question:** Discuss the role of Dr. Verghese Kurien in revolutionising India’s dairy sector and empowering rural communities.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Agriculture] [Section Group: Agriculture & Farm Dynamics] [Micro Topic: Public Distribution System (PDS) management, buffer stock dynamics, food security missions, and economics of animal rearing] [Sub Topic: Revolutions and Missions] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Dr. Verghese Kurien, India's dairy sector]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: AGRICULTURE] [Section Group: Agriculture & Farm Dynamics] [Micro Topic: Public Distribution System (PDS) management, buffer stock dynamics, food security missions, and economics of animal rearing] [Sub Topic: Revolutions and Missions] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Dr. Verghese Kurien, India's dairy sector]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce your answer by giving a brief description about Dr. <br>• Kurien’s legacy as the Father of India’s White Revolution. <br>• In the body, highlight the pivotal role played by him in revolutionizing India’s dairy sector and empowering rural communities. <br>• Conclude your answer by mentioning some of the accolades earned by him. |
@@ -103,7 +103,7 @@ Extra marks/content differentiation:
 
 ## Q3 [Year: 2026]
 **Question:** What is the present world scenario of intellectual property rights with respect to life materials? Although India is second in the world to file patents, still only a few have been commercialized. Explain the reasons behind this less commercialization.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights] [Sub Topic: Intellectual Property Rights] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What is, Explain, Intellectual property rights, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: SCIENCE & TECHNOLOGY] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights] [Sub Topic: Intellectual Property Rights] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What is, Explain, Intellectual property rights, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a definition of intellectual property rights. <br>• In the body, first highlight the present world scenario of IPR with respect to life materials. <br>• Next, explain the reasons behind the less commercialization of patents in India. <br>• Conclude by highlighting recent government initiatives. |
@@ -144,7 +144,7 @@ Additional reading: Intellectual Property Rights vs Right to Access Basic Health
 
 ## Q4 [Year: 2026]
 **Question:** Discuss how quantum technologies can optimize production processes and improve operational efficiency in the manufacturing sector.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of IT, Computers, and robotics] [Sub Topic: IT] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Quantum technologies, Manufacturing sector]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: SCIENCE & TECHNOLOGY] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of IT, Computers, and robotics] [Sub Topic: IT] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Quantum technologies, Manufacturing sector]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining quantum technologies. <br>• In the body, discuss how they can optimize production processes and improve efficiency in the manufacturing sector. <br>• Conclude the answer by highlighting some challenges in the deployment of quantum technologies and corrective measures. |
@@ -196,7 +196,7 @@ The National Quantum Mission (NQM) is one of the nine initiatives under the Prim
 
 ## Q5 [Year: 2026]
 **Question:** “The Human spaceflight programme has both tangible and intangible benefits for the nation.” In light of this statement, bring out the likely benefits of ISRO's Gaganyaan programme.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of Space and Defence technologies] [Sub Topic: Space Technology] [Macro Tag: Analytical, Applied] [Micro Tag: Bring out, Human spaceflight, ISRO, Gaganyaan]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: SCIENCE & TECHNOLOGY] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of Space and Defence technologies] [Sub Topic: Space Technology] [Macro Tag: Analytical, Applied] [Micro Tag: Bring out, Human spaceflight, ISRO, Gaganyaan]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of ISRO’s Gaganyaan programme. <br>• In the body, bring out the tangible and intangible benefits of the Human spaceflight programme for the nation. <br>• Conclude by highlighting some challenges associated with the mission and emphasizing the importance of demonstration missions in addressing these challenges. |
@@ -231,7 +231,7 @@ The Axiom-04 mission will provide valuable inputs for ISRO's upcoming Gaganyaan 
 
 ## Q6 [Year: 2026]
 **Question:** What is gene therapy? What makes it a better treatment option than the conventional approaches?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Everyday Science & Innovations] [Micro Topic: Science and Technology- applications in health, industry, and crisis management] [Sub Topic: Medical and Health Technologies] [Macro Tag: Descriptive, Comparative] [Micro Tag: What is, What makes, Gene therapy, Conventional approaches]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: SCIENCE & TECHNOLOGY] [Section Group: Everyday Science & Innovations] [Micro Topic: Science and Technology- applications in health, industry, and crisis management] [Sub Topic: Medical and Health Technologies] [Macro Tag: Descriptive, Comparative] [Micro Tag: What is, What makes, Gene therapy, Conventional approaches]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief explanation about gene therapy. <br>• In the body, discuss its advantages over conventional approaches. <br>• Next, mention the associated concerns and challenges. <br>• Conclude by emphasizing the need for adherence to regulatory framework. |
@@ -283,7 +283,7 @@ evolutionary progress.” — Isaac Asimov
 
 ## Q7 [Year: 2026]
 **Question:** How the application of Artificial Intelligence (AI) can help India in its socio-economic development? Identify the hurdles in its large-scale adoption and suggest corrective measures.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of IT, Computers, and robotics] [Sub Topic: Artificial Intelligence] [Macro Tag: Analytical, Applied] [Micro Tag: How, Identify, Suggest, Artificial Intelligence, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: SCIENCE & TECHNOLOGY] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of IT, Computers, and robotics] [Sub Topic: Artificial Intelligence] [Macro Tag: Analytical, Applied] [Micro Tag: How, Identify, Suggest, Artificial Intelligence, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining AI and mentioning its potential in addressing India’s socio economic challenges. <br>• In the body, first discuss the applications of AI  in various sectors, next discuss the hurdles for its large- scale adoption and then suggest corrective measures. <br>• Conclude the answer by mentioning the national policy on the same. |
@@ -358,7 +358,7 @@ creation in Indian languages.
 
 ## Q8 [Year: 2026]
 **Question:** “Nanotechnology offers innovative solutions to combat pollution and promote environmental sustainability.” Elucidate.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights] [Sub Topic: Nano Technology] [Macro Tag: Descriptive, Applied] [Micro Tag: Elucidate, Nanotechnology, Pollution, Environmental sustainability]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: SCIENCE & TECHNOLOGY] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights] [Sub Topic: Nano Technology] [Macro Tag: Descriptive, Applied] [Micro Tag: Elucidate, Nanotechnology, Pollution, Environmental sustainability]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by providing a brief description of nanotechnology. <br>• In the body, elaborate on the innovative solutions it offers to combat pollution and promote environmental sustainability. <br>• Conclude by highlighting some challenges and measures to address those challenges. |
@@ -412,7 +412,7 @@ Case study: Scientists from the Indian Institute of Science, Bengaluru have deve
 
 ## Q9 [Year: 2026]
 **Question:** The world is facing an acute shortage of clean and safe freshwater. What are the alternative technologies which can solve this crisis? Briefly discuss any three such technologies citing their key merits and demerits.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Everyday Science & Innovations] [Micro Topic: Science and Technology- developments and their effects in everyday life] [Sub Topic: Tech solutions for daily challenges] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What are, Discuss, Freshwater, Alternative technologies]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: SCIENCE & TECHNOLOGY] [Section Group: Everyday Science & Innovations] [Micro Topic: Science and Technology- developments and their effects in everyday life] [Sub Topic: Tech solutions for daily challenges] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What are, Discuss, Freshwater, Alternative technologies]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by highlighting the problem of acute shortage of clean and safe freshwater in the world through statistics. <br>• In the body, discuss any three alternative technologies that can help solve this crisis, citing their key merits and demerits. <br>• Conclude by highlighting their significance to achieve SDGs. |
@@ -489,7 +489,7 @@ Extra marks/content differentiation:
 
 ## Q10 [Year: 2026]
 **Question:** “Brain-Computer Interface (BCI) technology promises transformative applications across domains, but it comes with its own set of risks and challenges.” Elaborate.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Science & Technology] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of IT, Computers, and robotics] [Sub Topic: IT] [Macro Tag: Descriptive, Analytical] [Micro Tag: Elaborate, Brain-Computer Interface, Risks]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: SCIENCE & TECHNOLOGY] [Section Group: Frontier Technologies & IPR] [Micro Topic: Awareness in the fields of IT, Computers, and robotics] [Sub Topic: IT] [Macro Tag: Descriptive, Analytical] [Micro Tag: Elaborate, Brain-Computer Interface, Risks]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief explanatory note on Brain-Computer Interface (BCI) technology. <br>• In the body, first discuss the promise of its transformative applications across domains with examples. <br>• Next, elaborate upon the risks and challenges associated with the technology. <br>• Conclude by suggesting measures to address the challenges associated with BCI technology. |

@@ -15,7 +15,7 @@
     {
       "id": "forum-mgp-2026-csm26t01se-q01",
       "questionNumber": 1,
-      "subject": "Polity",
+      "subject": "POLITY",
       "sectionGroup": "Constitutional Framework & Evolution",
       "microTopic": "Indian Constitution- historical underpinnings and evolution",
       "subTopic": "Making of the Constitution",
@@ -49,12 +49,17 @@
       "hierarchy_path": [
         "GS2",
         "Polity"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS2"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q02",
       "questionNumber": 2,
-      "subject": "Polity",
+      "subject": "POLITY",
       "sectionGroup": "Federal Structure & Local Governance",
       "microTopic": "Issues and challenges pertaining to the federal structure",
       "subTopic": "Federalism",
@@ -88,12 +93,17 @@
       "hierarchy_path": [
         "GS2",
         "Polity"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS2"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q03",
       "questionNumber": 3,
-      "subject": "Polity",
+      "subject": "POLITY",
       "sectionGroup": "Constitutional Framework & Evolution",
       "microTopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
       "subTopic": "Fundamental Rights",
@@ -127,12 +137,17 @@
       "hierarchy_path": [
         "GS2",
         "Polity"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS2"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q04",
       "questionNumber": 4,
-      "subject": "Polity",
+      "subject": "POLITY",
       "sectionGroup": "Constitutional Framework & Evolution",
       "microTopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
       "subTopic": "DPSP",
@@ -166,12 +181,17 @@
       "hierarchy_path": [
         "GS2",
         "Polity"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS2"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q05",
       "questionNumber": 5,
-      "subject": "Polity",
+      "subject": "POLITY",
       "sectionGroup": "Federal Structure & Local Governance",
       "microTopic": "Functions and responsibilities of the Union and the States",
       "subTopic": "Emergency",
@@ -205,12 +225,17 @@
       "hierarchy_path": [
         "GS2",
         "Polity"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS2"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q06",
       "questionNumber": 6,
-      "subject": "Polity",
+      "subject": "POLITY",
       "sectionGroup": "Organs of Government & Dispute Redressal",
       "microTopic": "Separation of powers between different organs",
       "subTopic": "Separation of Powers",
@@ -244,12 +269,17 @@
       "hierarchy_path": [
         "GS2",
         "Polity"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS2"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q07",
       "questionNumber": 7,
-      "subject": "Polity",
+      "subject": "POLITY",
       "sectionGroup": "Organs of Government & Dispute Redressal",
       "microTopic": "Structure, organization and functioning of the Executive",
       "subTopic": "Union Executive",
@@ -283,12 +313,17 @@
       "hierarchy_path": [
         "GS2",
         "Polity"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS2"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q08",
       "questionNumber": 8,
-      "subject": "Polity",
+      "subject": "POLITY",
       "sectionGroup": "Constitutional Framework & Evolution",
       "microTopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
       "subTopic": "Fundamental Rights",
@@ -322,12 +357,17 @@
       "hierarchy_path": [
         "GS2",
         "Polity"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS2"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q09",
       "questionNumber": 9,
-      "subject": "Polity",
+      "subject": "POLITY",
       "sectionGroup": "Federal Structure & Local Governance",
       "microTopic": "Devolution of powers and finances up to local levels and challenges therein",
       "subTopic": "Local Self Government",
@@ -361,12 +401,17 @@
       "hierarchy_path": [
         "GS2",
         "Polity"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS2"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q10",
       "questionNumber": 10,
-      "subject": "Polity",
+      "subject": "POLITY",
       "sectionGroup": "Federal Structure & Local Governance",
       "microTopic": "Issues and challenges pertaining to the federal structure",
       "subTopic": "Federalism",
@@ -400,7 +445,13 @@
       "hierarchy_path": [
         "GS2",
         "Polity"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS2"
     }
-  ]
+  ],
+  "paper": "GS2"
 }

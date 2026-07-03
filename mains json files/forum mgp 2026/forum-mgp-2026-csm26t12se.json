@@ -15,7 +15,7 @@
     {
       "id": "forum-mgp-2026-csm26t12se-q01",
       "questionNumber": 1,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Macroeconomics & Fiscal Policy",
       "microTopic": "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
       "subTopic": "Digitalization of Economy",
@@ -49,12 +49,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t12se-q02",
       "questionNumber": 2,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Macroeconomics & Fiscal Policy",
       "microTopic": "Inclusive growth and issues arising from it",
       "subTopic": "Inclusive Growth",
@@ -88,12 +93,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t12se-q03",
       "questionNumber": 3,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Macroeconomics & Fiscal Policy",
       "microTopic": "Government Budgeting and fiscal management policies",
       "subTopic": "Fiscal Policy",
@@ -127,12 +137,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t12se-q04",
       "questionNumber": 4,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Physical Infrastructure & Capital",
       "microTopic": "Infrastructure systems connectivity: energy, ports, roads, airports, and railways",
       "subTopic": "Transport",
@@ -166,12 +181,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t12se-q05",
       "questionNumber": 5,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Macroeconomics & Fiscal Policy",
       "microTopic": "Government Budgeting and fiscal management policies",
       "subTopic": "Current Budget",
@@ -205,12 +225,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t12se-q06",
       "questionNumber": 6,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Physical Infrastructure & Capital",
       "microTopic": "Infrastructure systems connectivity: energy, ports, roads, airports, and railways",
       "subTopic": "Transport",
@@ -244,12 +269,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t12se-q07",
       "questionNumber": 7,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Macroeconomics & Fiscal Policy",
       "microTopic": "Government Budgeting and fiscal management policies",
       "subTopic": "Gender Budgeting",
@@ -283,12 +313,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t12se-q08",
       "questionNumber": 8,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Physical Infrastructure & Capital",
       "microTopic": "Infrastructure systems connectivity: energy, ports, roads, airports, and railways",
       "subTopic": "Airports X Infrastructure",
@@ -322,12 +357,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t12se-q09",
       "questionNumber": 9,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Macroeconomics & Fiscal Policy",
       "microTopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
       "subTopic": "Manufacturing Sector",
@@ -361,12 +401,17 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     },
     {
       "id": "forum-mgp-2026-csm26t12se-q10",
       "questionNumber": 10,
-      "subject": "Indian Economy",
+      "subject": "INDIAN ECONOMY",
       "sectionGroup": "Physical Infrastructure & Capital",
       "microTopic": "Capital investment models and public-private frameworks",
       "subTopic": "PPP X Infrastructure",
@@ -400,7 +445,13 @@
       "hierarchy_path": [
         "GS3",
         "Indian Economy"
-      ]
+      ],
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP",
+      "paper": "GS1"
     }
-  ]
+  ],
+  "paper": "GS1"
 }

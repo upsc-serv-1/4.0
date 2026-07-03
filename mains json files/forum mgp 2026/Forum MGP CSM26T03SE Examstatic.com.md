@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** What is delimitation, and why is it important? What challenges are associated with the delimitation  exercise in India?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Polity] [Section Group: Elections & Political Dynamics] [Micro Topic: Salient features of the Representation of People's Act] [Sub Topic: Electoral reforms] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What is, Challenges, Delimitation, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: POLITY] [Section Group: Elections & Political Dynamics] [Micro Topic: Salient features of the Representation of People's Act] [Sub Topic: Electoral reforms] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What is, Challenges, Delimitation, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining delimitation. <br>• In the body, first highlight its importance. <br>• Next, discuss challenges associated with the delimitation exercise in India. <br>• Conclude by underlining the need for consensus in the impending delimitation exercise. |
@@ -44,7 +44,7 @@ As per **Article 82,** the **next delimitation exercise** is supposed to be unde
 
 ## Q2 [Year: 2026]
 **Question:** Examine the role of the Securities and Exchange Board of India (SEBI) in regulating the securities  market and protecting investors' interests. Cite recent examples.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Governance] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Statutory, Regulatory and Quasi-judicial bodies] [Sub Topic: Sectoral Regulatory Bodies] [Macro Tag: Analytical, Applied] [Micro Tag: Examine, SEBI, Securities market, Investors]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: GOVERNANCE] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Statutory, Regulatory and Quasi-judicial bodies] [Sub Topic: Sectoral Regulatory Bodies] [Macro Tag: Analytical, Applied] [Micro Tag: Examine, SEBI, Securities market, Investors]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a brief description about SEBI. <br>• In the body, examine its role in regulating the securities market and protecting investors’ interests, highlighting both successes and shortcomings. <br>• Conclude by suggesting improvements. |
@@ -90,7 +90,7 @@ Despite these credible achievements, the following **shortcomings** have been ob
 
 ## Q3 [Year: 2026]
 **Question:** “Various structural and practical limitations hinder the National Human Rights Commission (NHRC)  from effectively promoting and protecting human rights in the country.” Discuss this statement and  suggest measures to improve its functioning.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Governance] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Statutory, Regulatory and Quasi-judicial bodies] [Sub Topic: Statutory Bodies] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Suggest, NHRC, Human rights, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: GOVERNANCE] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Statutory, Regulatory and Quasi-judicial bodies] [Sub Topic: Statutory Bodies] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Suggest, NHRC, Human rights, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Give an introduction providing a brief background about the National Human Rights Commission (NHRC). <br>• In the body, first discuss various limitations that hinder it from effectively promoting and protecting human rights. <br>• Next, suggest measures to improve its functioning. <br>• Conclude by highlighting the significance of these reforms. |
@@ -133,7 +133,7 @@ Implementing these reforms will better equip the Commission to perform its role 
 
 ## Q4 [Year: 2026]
 **Question:** Explain and distinguish between the Finance Commission of India and the GST Council. Do their  overlapping jurisdictions create challenges in fiscal governance?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Governance] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Appointment to various Constitutional posts; Constitutional Bodies (powers, functions and responsibilities)] [Sub Topic: Constitutional Bodies] [Macro Tag: Descriptive, Comparative, Analytical] [Micro Tag: Explain, Distinguish, Finance Commission, GST Council, Fiscal governance]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: GOVERNANCE] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Appointment to various Constitutional posts; Constitutional Bodies (powers, functions and responsibilities)] [Sub Topic: Constitutional Bodies] [Macro Tag: Descriptive, Comparative, Analytical] [Micro Tag: Explain, Distinguish, Finance Commission, GST Council, Fiscal governance]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by briefly explaining about the Finance Commission and GST Council. <br>• In the body, bring out the differences between the two bodies. <br>• Next, answer whether their overlapping jurisdictions create challenges in fiscal governance. <br>• Conclude by highlighting the need for coordination between them. |
@@ -173,7 +173,7 @@ As a matter of prudence, it is important to put in place a **co-ordination mecha
 
 ## Q5 [Year: 2026]
 **Question:** Discuss the role of farmer associations in influencing public policies and governance in India.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Polity] [Section Group: Organs of Government & Dispute Redressal] [Micro Topic: Pressure groups and formal/informal associations and their role in the Polity] [Sub Topic: Pressure Groups] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Farmer associations, Public policies, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: POLITY] [Section Group: Organs of Government & Dispute Redressal] [Micro Topic: Pressure groups and formal/informal associations and their role in the Polity] [Sub Topic: Pressure Groups] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Farmer associations, Public policies, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about farmer associations in India. <br>• In the body, discuss their role in influencing public policies and governance in India. <br>• Next, bring out their shortcomings. <br>• Conclude by emphasizing their crucial role in governance and policy formulation. |
@@ -216,7 +216,7 @@ Overall, farmers' associations have **played a significant role** in shaping pol
 
 ## Q6 [Year: 2026]
 **Question:** “Granting statutory backing to the Model Code of Conduct (MCC) shall empower the Election  Commission of India (ECI) with the much-needed legal authority to conduct free and fair elections.”  Comment.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Polity] [Section Group: Elections & Political Dynamics] [Micro Topic: Salient features of the Representation of People's Act] [Sub Topic: MCC] [Macro Tag: Analytical] [Micro Tag: Comment, Statutory backing, MCC, ECI]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: POLITY] [Section Group: Elections & Political Dynamics] [Micro Topic: Salient features of the Representation of People's Act] [Sub Topic: MCC] [Macro Tag: Analytical] [Micro Tag: Comment, Statutory backing, MCC, ECI]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief account of the Model Code of Conduct (MCC) and highlight recent instances of its breach. <br>• In the body, first mention the arguments in favour of giving statutory backing to MCC. <br>• Next, discuss challenges it may entail. <br>• Conclude with suggesting a way forward. |
@@ -253,7 +253,7 @@ Though MCC has no statutory backing it carries significant **moral weight.** Giv
 
 ## Q7 [Year: 2026]
 **Question:** What steps are required for the constitutionalization of a Commission? Do you think granting  constitutional status to the Central Information Commission (CIC) would strengthen the RTI regime in  India? Give reasons.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Governance] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Statutory, Regulatory and Quasi-judicial bodies] [Sub Topic: Statutory Bodies] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What steps, Reasons, Constitutionalization, CIC, RTI]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: GOVERNANCE] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Statutory, Regulatory and Quasi-judicial bodies] [Sub Topic: Statutory Bodies] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What steps, Reasons, Constitutionalization, CIC, RTI]*
 #### Answer from ForumIAS
 
 | **Approach:** • Give an introduction explaining the term constitutionalization. <br>• In the body, first list the steps needed for constitutionalization of a commission. <br>• Next, discuss the ways in which constitutionalization of the Central Information Commission could strengthen the RTI regime. <br>• Lastly, bring out the challenges of constitutionalization. <br>• Conclude by highlighting the need to take other measures to strengthen the RTI regime. |
@@ -299,7 +299,7 @@ While granting constitutional status to the **CIC could strengthen its authority
 
 ## Q8 [Year: 2026]
 **Question:** How effective has the National Commission for Women (NCW) been in addressing gender issues in  the country?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Governance] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Statutory, Regulatory and Quasi-judicial bodies] [Sub Topic: Statutory Bodies] [Macro Tag: Analytical] [Micro Tag: How effective, NCW, Gender issues, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: GOVERNANCE] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Statutory, Regulatory and Quasi-judicial bodies] [Sub Topic: Statutory Bodies] [Macro Tag: Analytical] [Micro Tag: How effective, NCW, Gender issues, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief description about NCW. <br>• In the body, first highlight its key achievements in addressing gender issues in the country. <br>• Next, bring out the issues where the Commission has faced challenges. <br>• Conclude by suggesting measures to make the NCW more effective. |
@@ -341,7 +341,7 @@ Strengthening the **autonomy** of the NCW, granting it **constitutional status,*
 
 ## Q9 [Year: 2026]
 **Question:** Describe the functions and powers of the National Commission for Scheduled Castes (NCSC). Can it  enforce the implementation of constitutional reservations for the Scheduled Castes in religious minority  institutions?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Governance] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Appointment to various Constitutional posts; Constitutional Bodies (powers, functions and responsibilities)] [Sub Topic: Constitutional Bodies] [Macro Tag: Descriptive, Analytical] [Micro Tag: Describe, NCSC, Constitutional reservations, Minority institutions]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: GOVERNANCE] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Appointment to various Constitutional posts; Constitutional Bodies (powers, functions and responsibilities)] [Sub Topic: Constitutional Bodies] [Macro Tag: Descriptive, Analytical] [Micro Tag: Describe, NCSC, Constitutional reservations, Minority institutions]*
 #### Answer from ForumIAS
 
 | **Approach:** • Give an introduction providing a brief background about the NCSC. <br>• In the body, first mention its functions and powers, then explain whether it can enforce the implementation of reservations for Scheduled Caste in religious minority institutions. <br>• Conclude by suggesting a way forward. |
@@ -375,7 +375,7 @@ Although it cannot enforce reservations in minority educational institutions, th
 
 ## Q10 [Year: 2026]
 **Question:** What factors contributed to the establishment of the National Green Tribunal? To what extent, in  your opinion, has it been successful in fulfilling its intended objectives?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: Governance] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Statutory, Regulatory and Quasi-judicial bodies] [Sub Topic: Statutory Bodies] [Macro Tag: Descriptive, Analytical] [Micro Tag: What factors, To what extent, National Green Tribunal]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: GOVERNANCE] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Statutory, Regulatory and Quasi-judicial bodies] [Sub Topic: Statutory Bodies] [Macro Tag: Descriptive, Analytical] [Micro Tag: What factors, To what extent, National Green Tribunal]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about NGT. <br>• In the body, first bring out the factors that led to its establishment. <br>• Next, provide your opinion on the extent of its success in fulfilling its intended objectives. <br>• Conclude with suggestions for improvement. |

@@ -522,24 +522,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   }, [loading]);
 
   const getAnalyticsSubject = (q: any) => {
-    const micro = String(q.micro_topic || '').trim();
-    const section = String(q.section_group || '').trim();
-    const rawSubject = String(q.subject || '').trim();
-    const lowerSubject = rawSubject.toLowerCase();
-
-    if (micro && taxonomyMaps.microToSubject[micro.toLowerCase()]) {
-      return taxonomyMaps.microToSubject[micro.toLowerCase()];
-    }
-    if (section && taxonomyMaps.sectionToSubject[section.toLowerCase()]) {
-      return taxonomyMaps.sectionToSubject[section.toLowerCase()];
-    }
-
-    const isCsat = /(^|\b)(csat|aptitude|comprehension|logical reasoning|maths|numeracy|paper\s*ii|paper\s*2)(\b|$)/i.test(`${rawSubject} ${section}`);
-    if (isCsat) return 'CSAT';
-    if (rawSubject && taxonomyMaps.sectionToSubject[lowerSubject]) {
-      return taxonomyMaps.sectionToSubject[lowerSubject];
-    }
-    return rawSubject || 'Miscellaneous';
+    return String(q.subject || '').trim().toUpperCase() || 'MISCELLANEOUS';
   };
 
   const getAnalyticsYear = (q: any) => {
@@ -661,11 +644,12 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           
           console.log(`[MainsFetch] Querying mains_questions for paper: ${mappedPaper}, stage: ${examStage}`);
           
-          // Query Supabase mains_questions with paper filter at DB level
+          // Query Supabase mains_questions with paper filter and is_pyq=true at DB level
           const { data, error: mainsErr } = await supabase
             .from('mains_questions')
             .select('id, question_number, question_text, marks, exam_year, subject, section_group, microtopic, subtopic, macrotag, microtag, hierarchy_path, paper, is_pyq, source_attribution_label, exam_info, stage, exam, exam_group, is_upsc_cse, is_allied, is_others, exam_category, answers:mains_answers(id, institute)')
-            .eq('paper', mappedPaper);
+            .eq('paper', mappedPaper)
+            .eq('is_pyq', true);
           
           if (mainsErr) throw mainsErr;
           
@@ -759,7 +743,9 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
               _explanations: (q.answers || []).map((ans: any) => ({
                 id: ans.id,
                 institute: ans.institute,
+                source: ans.institute,
                 explanationText: ans.answerText,
+                text: ans.answerText,
               })),
               _institutes: (q.answers || []).map((ans: any) => ans.institute).filter(Boolean),
             };
@@ -1923,23 +1909,30 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       const qns = rawQuestions.filter(q => getAnalyticsSubject(q) === subject);
       const sectionMap: Record<string, number> = {};
       const microMap: Record<string, number> = {};
+      const subtopicMap: Record<string, number> = {};
       const sectionYearMap: Record<string, Record<string, number>> = {};
       const microYearMap: Record<string, Record<string, number>> = {};
+      const subtopicYearMap: Record<string, Record<string, number>> = {};
 
       qns.forEach(q => {
         const year = String(getAnalyticsYear(q) || '');
         if (!year) return;
         const section = q.section_group || 'General';
-        const micro = q.micro_topic || 'Other';
+        const micro = q.micro_topic || q.microTopic || 'Other';
+        const subtopic = q.subTopic || q.sub_topic || 'Other';
 
         sectionMap[section] = (sectionMap[section] || 0) + 1;
         microMap[micro] = (microMap[micro] || 0) + 1;
+        subtopicMap[subtopic] = (subtopicMap[subtopic] || 0) + 1;
 
         if (!sectionYearMap[section]) sectionYearMap[section] = {};
         sectionYearMap[section][year] = (sectionYearMap[section][year] || 0) + 1;
 
         if (!microYearMap[micro]) microYearMap[micro] = {};
         microYearMap[micro][year] = (microYearMap[micro][year] || 0) + 1;
+
+        if (!subtopicYearMap[subtopic]) subtopicYearMap[subtopic] = {};
+        subtopicYearMap[subtopic][year] = (subtopicYearMap[subtopic][year] || 0) + 1;
       });
 
       const sectionRows = Object.entries(sectionMap)
@@ -1948,8 +1941,13 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       const microRows = Object.entries(microMap)
         .map(([name, value]) => ({ name, value, byYear: microYearMap[name] || {} }))
         .sort((a, b) => b.value - a.value);
+      const subtopicRows = Object.entries(subtopicMap)
+        .map(([name, value]) => ({ name, value, byYear: subtopicYearMap[name] || {} }))
+        .sort((a, b) => b.value - a.value);
 
       const subjectSeries = [{ label: subject, values: years.map(year => heatmapData[year]?.[subject] || 0) }];
+
+      const isMains = examStage?.toLowerCase() === 'mains';
 
       return `
         <div class="page-break"></div>
@@ -1957,8 +1955,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         ${renderLineChart(`${subject} Momentum`, years, subjectSeries, ['#2563eb'])}
         ${renderBarChart(`${subject} Section Distribution`, sectionRows.slice(0, 14).map(item => ({ name: item.name, value: item.value })), '#2563eb')}
         ${renderBarChart(`${subject} Micro Topic Distribution`, microRows.slice(0, 20).map(item => ({ name: item.name, value: item.value })), '#1d4ed8')}
+        ${isMains ? renderBarChart(`${subject} Sub Topic Distribution`, subtopicRows.slice(0, 20).map(item => ({ name: item.name, value: item.value })), '#4f46e5') : ''}
         ${renderHeatmap(`${subject} Section Group x Year Heatmap`, 'Section', sectionRows.slice(0, 14).map(item => ({ key: `sec-${item.name}`, label: item.name, byYear: item.byYear })), '#2563eb', 8)}
         ${renderHeatmap(`${subject} Micro Topic x Year Heatmap`, 'Micro Topic', microRows.slice(0, 20).map(item => ({ key: `micro-${item.name}`, label: item.name, byYear: item.byYear })), '#1d4ed8', 8)}
+        ${isMains ? renderHeatmap(`${subject} Sub Topic x Year Heatmap`, 'Sub Topic', subtopicRows.slice(0, 20).map(item => ({ key: `subtopic-${item.name}`, label: item.name, byYear: item.byYear })), '#4f46e5', 8) : ''}
       `;
     };
 
@@ -1984,6 +1984,12 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     if (includeAll || mode === 'heatmaps') {
       blocks.push(renderHeatmap('Subject x Year Heatmap', 'Subject', subjectHeatmapRows, '#2563eb', 14));
       blocks.push(renderHeatmap('Top 20 Topics x Year Heatmap', 'Topic', topicHeatmapRows, '#1d4ed8', 10));
+    }
+
+    if (includeAll) {
+      exportSubjects.forEach(subject => {
+        blocks.push(buildSubjectDeepDive(subject));
+      });
     }
 
     if (mode === 'subject_one') {
@@ -2520,12 +2526,6 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
             onPress={() => setHeatmapPalette('forest')}
           >
             <Text style={[styles.paletteChipText, { color: heatmapPalette === 'forest' ? '#fff' : colors.textSecondary }]}>Forest</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.paletteChip, { backgroundColor: colors.primary, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }]}
-            onPress={() => router.push('/dedup-manager')}
-          >
-            <Text style={[styles.paletteChipText, { color: '#fff', fontWeight: '800', fontSize: 11 }]}>🔄 Dedup</Text>
           </TouchableOpacity>
         </View>
 

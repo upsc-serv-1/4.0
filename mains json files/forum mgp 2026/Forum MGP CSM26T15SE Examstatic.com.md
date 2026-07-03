@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** What role do environmental NGOs and activists play in influencing Environmental Impact Assessment (EIA) outcomes for major projects in India? Discuss with examples.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Environment] [Section Group: Conservation & Ecosystems] [Micro Topic: Conservation and environmental impact assessment] [Sub Topic: EIA] [Macro Tag: Analytical, Applied] [Micro Tag: What role, Discuss, Environmental NGOs, EIA, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: ENVIRONMENT] [Section Group: Conservation & Ecosystems] [Micro Topic: Conservation and environmental impact assessment] [Sub Topic: EIA] [Macro Tag: Analytical, Applied] [Micro Tag: What role, Discuss, Environmental NGOs, EIA, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining EIA. <br>• In the body, discuss the role of environmental NGOs and activists in influencing EIA outcomes for major projects in India, with examples. <br>• Conclude by highlighting the significance of their contribution. |
@@ -47,7 +47,7 @@ Extra marks/content differentiation:
 
 ## Q2 [Year: 2026]
 **Question:** Bring out the reasons for rising groundwater contamination in the country. Suggest remedial measures and mention the government initiatives in this regard.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Environment] [Section Group: Pollution & Degradation] [Micro Topic: Environmental pollution and degradation] [Sub Topic: Water Pollution and Related Issues] [Macro Tag: Analytical, Applied] [Micro Tag: Bring out, Suggest, Mention, Groundwater contamination, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: ENVIRONMENT] [Section Group: Pollution & Degradation] [Micro Topic: Environmental pollution and degradation] [Sub Topic: Water Pollution and Related Issues] [Macro Tag: Analytical, Applied] [Micro Tag: Bring out, Suggest, Mention, Groundwater contamination, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of rising groundwater contamination in the country through some data. <br>• In the body, first bring out the reasons for the same. <br>• Next, suggest some remedial measures. <br>• Lastly, mention the government initiatives in this regard. <br>• Conclude by emphasizing the significance of these measures and initiatives. |
@@ -125,7 +125,7 @@ Extra marks/content differentiation:
 
 ## Q3 [Year: 2026]
 **Question:** India’s current environmental governance model needs to be more integrated with health. In this context, argue the case for setting up a centralized Environmental Health Regulatory Agency (EHRA).
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Environment] [Section Group: Conservation & Ecosystems] [Micro Topic: Conservation and environmental impact assessment] [Sub Topic: Environment] [Macro Tag: Analytical, Applied] [Micro Tag: Argue, Environmental governance, India, EHRA]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: ENVIRONMENT] [Section Group: Conservation & Ecosystems] [Micro Topic: Conservation and environmental impact assessment] [Sub Topic: Environment] [Macro Tag: Analytical, Applied] [Micro Tag: Argue, Environmental governance, India, EHRA]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by highlighting the growing inter-connectedness between environment and human health and the lack of institutional framework to deal with it in India. <br>• In the body, substantiate the need for setting up an EHRA by highlighting the overlapping issues of climate, environment, health and economy and the need for an integrated approach. <br>• Conclude the answer by highlighting its significance. |
@@ -168,7 +168,7 @@ Extra marks/ Content Differentiation: The mission of EPA is to protect human hea
 
 ## Q4 [Year: 2026]
 **Question:** In light of the various challenges posed by overtourism, discuss how carrying capacity-based planning can aid in promoting sustainable tourism in India.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Environment] [Section Group: Conservation & Ecosystems] [Micro Topic: Conservation and environmental impact assessment] [Sub Topic: Sustainable Development] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Overtourism, Carrying capacity, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: ENVIRONMENT] [Section Group: Conservation & Ecosystems] [Micro Topic: Conservation and environmental impact assessment] [Sub Topic: Sustainable Development] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Overtourism, Carrying capacity, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by a brief introduction about overtourism and the challenges posed by it. <br>• In the body, discuss how carrying capacity based planning can promote sustainable tourism in India. <br>• Conclude by highlighting its significance. |
@@ -205,7 +205,7 @@ Extra marks/ Content Differentiation:
 
 ## Q5 [Year: 2026]
 **Question:** What are marine heat waves? Throw light on its impact on marine ecosystem and coastal communities.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Environment] [Section Group: Climate Change] [Micro Topic: Global warming, climate change, and international frameworks] [Sub Topic: Climate Change] [Macro Tag: Descriptive, Analytical] [Micro Tag: What are, Throw light, Marine heat waves, Ecosystem]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: ENVIRONMENT] [Section Group: Climate Change] [Micro Topic: Global warming, climate change, and international frameworks] [Sub Topic: Climate Change] [Macro Tag: Descriptive, Analytical] [Micro Tag: What are, Throw light, Marine heat waves, Ecosystem]*
 #### Answer from ForumIAS
 
 | **Approach:** • In the introduction, explain marine heat waves briefly. <br>• In the body, throw light on their impact on marine ecosystems and coastal communities. <br>• Conclude by highlighting some measures for mitigation and adaptation. |
@@ -245,7 +245,7 @@ Extra marks/content differentiation: Previous studies have shown that the Indian
 
 ## Q6 [Year: 2026]
 **Question:** Flooding in urban areas is an emerging climate-induced disaster. Discuss the causes of this disaster. Mention the features of two such major floods in the last two decades in India. Describe the policies and frameworks in India that aim at tackling such floods.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Disaster Management] [Section Group: Specific Disasters & Hazards] [Micro Topic: Disasters: Specific natural and man-made hazards] [Sub Topic: Urban floods] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Discuss, Mention, Describe, Flooding, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: DISASTER MANAGEMENT] [Section Group: Specific Disasters & Hazards] [Micro Topic: Disasters: Specific natural and man-made hazards] [Sub Topic: Urban floods] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Discuss, Mention, Describe, Flooding, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a definition of urban floods. <br>• In the body, discuss the causes of urban floods. <br>• Next, mention the features of two such major floods in the last two decades in India. <br>• Lastly, describe the policies and frameworks in India that aim at tackling such floods. <br>• Conclude by highlighting the need to develop sponge cities and blue-green infrastructure. |
@@ -295,7 +295,7 @@ four cities (Bengaluru, Hyderabad, Ahmedabad and Pune) with fund allocation of R
 
 ## Q7 [Year: 2026]
 **Question:** What are the major provisions of the Disaster Management (Amendment) Act, 2025? To what extent, in your opinion, will it strengthen disaster risk governance in the country?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Disaster Management] [Section Group: Frameworks & Preparedness] [Micro Topic: Disaster Management: Preparedness, resilience, and vulnerability frameworks] [Sub Topic: Disaster Preparedness and Resilience] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What are, To what extent, Disaster Management (Amendment) Act 2025, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: DISASTER MANAGEMENT] [Section Group: Frameworks & Preparedness] [Micro Topic: Disaster Management: Preparedness, resilience, and vulnerability frameworks] [Sub Topic: Disaster Preparedness and Resilience] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What are, To what extent, Disaster Management (Amendment) Act 2025, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by stating the objective of the recent amendments to the Disaster Management (Amendment) Act,. <br>• In the body, highlighting the major provisions of the Act, discuss how it would help strengthen the disaster management framework in the country. Next, provide a counter view-point. Conclude by suggesting a way forward. |
@@ -348,7 +348,7 @@ Extra marks/ Content Differentiation:
 
 ## Q8 [Year: 2026]
 **Question:** ‘Agrivoltaics offers a promising synergy between India’s agriculture and renewable energy sectors.’ Discuss its potential benefits and state the challenges impeding its large-scale adoption.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Environment] [Section Group: Conservation & Ecosystems] [Micro Topic: Conservation and environmental impact assessment] [Sub Topic: Sustainable Development] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, State, Agrivoltaics, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: ENVIRONMENT] [Section Group: Conservation & Ecosystems] [Micro Topic: Conservation and environmental impact assessment] [Sub Topic: Sustainable Development] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, State, Agrivoltaics, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by defining agrivoltaics. <br>• In the body, discuss its potential benefits. <br>• Next, state the challenges impeding its large-scale adoption. <br>• Conclude by suggesting some remedial measures. |
@@ -410,7 +410,7 @@ Extra marks/content differentiation:
 
 ## Q9 [Year: 2026]
 **Question:** Discuss the causes and multidimensional impacts of forest fires. Also suggest measures for their prevention, mitigation and management.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Disaster Management] [Section Group: Specific Disasters & Hazards] [Micro Topic: Disasters: Specific natural and man-made hazards] [Sub Topic: Miscellaneous (Disasters)] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Suggest, Forest fires]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: DISASTER MANAGEMENT] [Section Group: Specific Disasters & Hazards] [Micro Topic: Disasters: Specific natural and man-made hazards] [Sub Topic: Miscellaneous (Disasters)] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Suggest, Forest fires]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce by describing forest fires and highlight the vulnerability of different forest types to the same. <br>• In the body, first discuss the causes of forest fires. <br>• Next, highlight their multidimensional impacts. <br>• Lastly, suggest measures for their prevention, mitigation and management. <br>• Conclude by highlighting recent figures about reduced incidence of forest fires and the need to sustain the same. |
@@ -492,7 +492,7 @@ Extra marks/content differentiation:
 
 ## Q10 [Year: 2026]
 **Question:** What is disaster resilience? How is it determined? Describe various elements of a resilience framework. Also mention the global targets of Sendai Framework for Disaster Risk Reduction (2015-2030).
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: Disaster Management] [Section Group: Frameworks & Preparedness] [Micro Topic: Disaster Management: Preparedness, resilience, and vulnerability frameworks] [Sub Topic: Disaster Preparedness and Resilience] [Macro Tag: Descriptive, Analytical] [Micro Tag: What is, How, Describe, Mention, Disaster resilience, Sendai Framework]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 3] [Subject: DISASTER MANAGEMENT] [Section Group: Frameworks & Preparedness] [Micro Topic: Disaster Management: Preparedness, resilience, and vulnerability frameworks] [Sub Topic: Disaster Preparedness and Resilience] [Macro Tag: Descriptive, Analytical] [Micro Tag: What is, How, Describe, Mention, Disaster resilience, Sendai Framework]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a brief definition of disaster resilience. <br>• In the body, first explain how it is determined. <br>• Next, describe the various elements of a resilience framework. <br>• Lastly, mention the global targets of Sendai Framework for Disaster Risk Reduction (2015-30). <br>• Conclude by highlighting the significance of recent changes in the Disaster Management Act for disaster resilience. |

@@ -68,7 +68,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q11",
@@ -125,7 +131,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q30",
@@ -182,7 +194,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q50",
@@ -239,7 +257,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q51",
@@ -311,7 +335,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q82",
@@ -368,7 +398,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q101",
@@ -425,7 +461,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q107",
@@ -482,7 +524,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q131",
@@ -539,7 +587,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q149",
@@ -596,7 +650,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q158",
@@ -653,7 +713,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q167",
@@ -710,7 +776,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q176",
@@ -767,7 +839,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q190",
@@ -824,7 +902,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q196",
@@ -881,7 +965,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q197",
@@ -938,7 +1028,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q230",
@@ -995,7 +1091,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q249",
@@ -1052,7 +1154,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q254",
@@ -1109,7 +1217,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2025-q256",
@@ -1166,7 +1280,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q6",
@@ -1223,7 +1343,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q21",
@@ -1280,7 +1406,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q42",
@@ -1332,7 +1464,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q64",
@@ -1399,7 +1537,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q65",
@@ -1456,7 +1600,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q70",
@@ -1513,7 +1663,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q91",
@@ -1570,7 +1726,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q94",
@@ -1627,7 +1789,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q116",
@@ -1684,7 +1852,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q136",
@@ -1741,7 +1915,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q142",
@@ -1798,7 +1978,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q153",
@@ -1855,7 +2041,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q180",
@@ -1912,7 +2104,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q198",
@@ -1969,7 +2167,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q202",
@@ -2026,7 +2230,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q217",
@@ -2083,7 +2293,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q222",
@@ -2140,7 +2356,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q233",
@@ -2196,7 +2418,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q241",
@@ -2253,7 +2481,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2024-q257",
@@ -2310,7 +2544,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q27",
@@ -2372,7 +2612,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q28",
@@ -2449,7 +2695,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q31",
@@ -2511,7 +2763,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q53",
@@ -2573,7 +2831,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q75",
@@ -2650,7 +2914,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q85",
@@ -2712,7 +2982,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q105",
@@ -2774,7 +3050,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q117",
@@ -2836,7 +3118,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q122",
@@ -2898,7 +3186,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q143",
@@ -2960,7 +3254,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q160",
@@ -3022,7 +3322,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q161",
@@ -3084,7 +3390,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q172",
@@ -3146,7 +3458,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q185",
@@ -3208,7 +3526,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q199",
@@ -3270,7 +3594,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q209",
@@ -3327,7 +3657,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q219",
@@ -3389,7 +3725,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q223",
@@ -3451,7 +3793,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q258",
@@ -3513,7 +3861,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2023-q269",
@@ -3575,7 +3929,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q46",
@@ -3637,7 +3997,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q54",
@@ -3699,7 +4065,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q66",
@@ -3761,7 +4133,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q77",
@@ -3818,7 +4196,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q89",
@@ -3880,7 +4264,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q99",
@@ -3942,7 +4332,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q102",
@@ -4004,7 +4400,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q108",
@@ -4061,7 +4463,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q123",
@@ -4123,7 +4531,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q124",
@@ -4180,7 +4594,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q130",
@@ -4237,7 +4657,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q144",
@@ -4299,7 +4725,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q173",
@@ -4361,7 +4793,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q187",
@@ -4423,7 +4861,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q207",
@@ -4485,7 +4929,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q215",
@@ -4547,7 +4997,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q220",
@@ -4609,7 +5065,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q231",
@@ -4671,7 +5133,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q235",
@@ -4733,7 +5201,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2022-q250",
@@ -4795,7 +5269,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q12",
@@ -4857,7 +5337,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q32",
@@ -4919,7 +5405,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q38",
@@ -4981,7 +5473,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q47",
@@ -5038,7 +5536,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q71",
@@ -5100,7 +5604,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q83",
@@ -5157,7 +5667,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q95",
@@ -5219,7 +5735,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q118",
@@ -5281,7 +5803,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q134",
@@ -5343,7 +5871,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q141",
@@ -5405,7 +5939,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q150",
@@ -5467,7 +6007,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q174",
@@ -5529,7 +6075,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q175",
@@ -5591,7 +6143,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q188",
@@ -5653,7 +6211,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q211",
@@ -5715,7 +6279,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q213",
@@ -5777,7 +6347,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q236",
@@ -5839,7 +6415,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q247",
@@ -5901,7 +6483,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q259",
@@ -5963,7 +6551,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2021-q260",
@@ -6025,7 +6619,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q22",
@@ -6082,7 +6682,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q33",
@@ -6139,7 +6745,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q35",
@@ -6196,7 +6808,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q39",
@@ -6253,7 +6871,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q67",
@@ -6310,7 +6934,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q73",
@@ -6362,7 +6992,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q86",
@@ -6419,7 +7055,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q109",
@@ -6476,7 +7118,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q125",
@@ -6528,7 +7176,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q129",
@@ -6585,7 +7239,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q162",
@@ -6637,7 +7297,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q163",
@@ -6694,7 +7360,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q181",
@@ -6751,7 +7423,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q189",
@@ -6808,7 +7486,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q200",
@@ -6865,7 +7549,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q203",
@@ -6922,7 +7612,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q224",
@@ -6979,7 +7675,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q237",
@@ -7036,7 +7738,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q270",
@@ -7093,7 +7801,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2020-q271",
@@ -7150,7 +7864,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q13",
@@ -7207,7 +7927,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q23",
@@ -7264,7 +7990,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q36",
@@ -7321,7 +8053,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q43",
@@ -7378,7 +8116,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q74",
@@ -7435,7 +8179,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q90",
@@ -7492,7 +8242,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q100",
@@ -7549,7 +8305,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q110",
@@ -7606,7 +8368,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q145",
@@ -7663,7 +8431,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q151",
@@ -7720,7 +8494,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q154",
@@ -7777,7 +8557,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q164",
@@ -7829,7 +8615,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q183",
@@ -7886,7 +8678,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q191",
@@ -7943,7 +8741,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q205",
@@ -7995,7 +8799,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q214",
@@ -8052,7 +8862,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q225",
@@ -8104,7 +8920,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q238",
@@ -8156,7 +8978,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q261",
@@ -8208,7 +9036,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2019-q267",
@@ -8260,7 +9094,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q9",
@@ -8317,7 +9157,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q14",
@@ -8369,7 +9215,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q45",
@@ -8426,7 +9278,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q59",
@@ -8478,7 +9336,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q78",
@@ -8535,7 +9399,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q88",
@@ -8592,7 +9462,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q92",
@@ -8649,7 +9525,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q103",
@@ -8706,7 +9588,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q152",
@@ -8763,7 +9651,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q165",
@@ -8820,7 +9714,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q168",
@@ -8877,7 +9777,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q178",
@@ -8934,7 +9840,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q179",
@@ -8991,7 +9903,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q186",
@@ -9043,7 +9961,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q194",
@@ -9095,7 +10019,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q204",
@@ -9147,7 +10077,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q234",
@@ -9199,7 +10135,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q246",
@@ -9251,7 +10193,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q251",
@@ -9308,7 +10256,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2018-q262",
@@ -9360,7 +10314,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q15",
@@ -9412,7 +10372,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q24",
@@ -9469,7 +10435,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q34",
@@ -9526,7 +10498,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q40",
@@ -9583,7 +10561,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q52",
@@ -9640,7 +10624,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q58",
@@ -9697,7 +10687,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q84",
@@ -9754,7 +10750,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q87",
@@ -9811,7 +10813,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q96",
@@ -9868,7 +10876,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q111",
@@ -9925,7 +10939,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q126",
@@ -9982,7 +11002,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q146",
@@ -10039,7 +11065,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q169",
@@ -10096,7 +11128,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q171",
@@ -10153,7 +11191,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q193",
@@ -10210,7 +11254,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q216",
@@ -10267,7 +11317,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q221",
@@ -10324,7 +11380,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q239",
@@ -10381,7 +11443,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q245",
@@ -10438,7 +11506,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2017-q255",
@@ -10495,7 +11569,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q2",
@@ -10552,7 +11632,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q16",
@@ -10609,7 +11695,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q20",
@@ -10666,7 +11758,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q25",
@@ -10723,7 +11821,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q60",
@@ -10780,7 +11884,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q61",
@@ -10832,7 +11942,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q68",
@@ -10884,7 +12000,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q72",
@@ -10936,7 +12058,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q81",
@@ -10993,7 +12121,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q93",
@@ -11045,7 +12179,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q119",
@@ -11102,7 +12242,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q147",
@@ -11159,7 +12305,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q159",
@@ -11216,7 +12368,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q184",
@@ -11273,7 +12431,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q208",
@@ -11330,7 +12494,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q218",
@@ -11387,7 +12557,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q226",
@@ -11444,7 +12620,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q242",
@@ -11501,7 +12683,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q263",
@@ -11558,7 +12746,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2016-q264",
@@ -11615,7 +12809,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q1",
@@ -11667,7 +12867,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q7",
@@ -11719,7 +12925,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q10",
@@ -11776,7 +12988,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q48",
@@ -11833,7 +13051,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q62",
@@ -11890,7 +13114,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q79",
@@ -11947,7 +13177,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q98",
@@ -12004,7 +13240,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q106",
@@ -12061,7 +13303,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q112",
@@ -12118,7 +13366,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q115",
@@ -12175,7 +13429,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q139",
@@ -12232,7 +13492,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q140",
@@ -12289,7 +13555,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q148",
@@ -12346,7 +13618,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q155",
@@ -12403,7 +13681,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q201",
@@ -12460,7 +13744,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q212",
@@ -12517,7 +13807,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q243",
@@ -12574,7 +13870,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q252",
@@ -12631,7 +13933,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q268",
@@ -12688,7 +13996,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2015-q272",
@@ -12745,7 +14059,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q26",
@@ -12802,7 +14122,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q41",
@@ -12859,7 +14185,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q44",
@@ -12916,7 +14248,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q49",
@@ -12973,7 +14311,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q55",
@@ -13030,7 +14374,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q56",
@@ -13087,7 +14437,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q69",
@@ -13144,7 +14500,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q104",
@@ -13201,7 +14563,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q114",
@@ -13258,7 +14626,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q127",
@@ -13315,7 +14689,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q156",
@@ -13372,7 +14752,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q166",
@@ -13429,7 +14815,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q177",
@@ -13486,7 +14878,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q182",
@@ -13543,7 +14941,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q210",
@@ -13600,7 +15004,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q227",
@@ -13657,7 +15067,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q228",
@@ -13714,7 +15130,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q232",
@@ -13771,7 +15193,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q265",
@@ -13828,7 +15256,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2014-q266",
@@ -13885,7 +15319,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q3",
@@ -13937,7 +15377,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q4",
@@ -13989,7 +15435,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q5",
@@ -14046,7 +15498,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q17",
@@ -14103,7 +15561,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q18",
@@ -14160,7 +15624,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q19",
@@ -14217,7 +15687,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q37",
@@ -14274,7 +15750,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q57",
@@ -14331,7 +15813,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q63",
@@ -14388,7 +15876,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q80",
@@ -14445,7 +15939,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q97",
@@ -14502,7 +16002,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q113",
@@ -14559,7 +16065,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q120",
@@ -14616,7 +16128,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q128",
@@ -14673,7 +16191,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q132",
@@ -14730,7 +16254,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q133",
@@ -14787,7 +16317,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q135",
@@ -14844,7 +16380,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q138",
@@ -14901,7 +16443,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q157",
@@ -14958,7 +16506,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q170",
@@ -15010,7 +16564,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q192",
@@ -15067,7 +16627,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q195",
@@ -15124,7 +16690,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q206",
@@ -15181,7 +16753,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q229",
@@ -15238,7 +16816,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q240",
@@ -15295,7 +16879,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q244",
@@ -15352,7 +16942,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q248",
@@ -15409,7 +17005,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     },
     {
       "id": "mains-gs3-2013-q253",
@@ -15466,7 +17068,13 @@
         "specific_exam": null,
         "stage": "mains",
         "paper": "mains_gs3"
-      }
+      },
+      "course": "Civil Services",
+      "institute": "UPSC",
+      "program_id": "cse",
+      "program_name": "CSE",
+      "paper": "GS3",
+      "is_pyq": true
     }
   ]
 }

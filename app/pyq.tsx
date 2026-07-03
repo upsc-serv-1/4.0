@@ -523,7 +523,29 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   }, [loading]);
 
   const getAnalyticsSubject = (q: any) => {
-    return String(q.subject || '').trim().toUpperCase() || 'MISCELLANEOUS';
+    const isMains = examStage?.toLowerCase() === 'mains' || String(q.stage || '').toLowerCase() === 'mains';
+    if (isMains) {
+      return String(q.subject || '').trim() || 'Miscellaneous';
+    }
+
+    const micro = String(q.micro_topic || '').trim();
+    const section = String(q.section_group || '').trim();
+    const rawSubject = String(q.subject || '').trim();
+    const lowerSubject = rawSubject.toLowerCase();
+
+    if (micro && taxonomyMaps.microToSubject[micro.toLowerCase()]) {
+      return taxonomyMaps.microToSubject[micro.toLowerCase()];
+    }
+    if (section && taxonomyMaps.sectionToSubject[section.toLowerCase()]) {
+      return taxonomyMaps.sectionToSubject[section.toLowerCase()];
+    }
+
+    const isCsat = /(^|\b)(csat|aptitude|comprehension|logical reasoning|maths|numeracy|paper\s*ii|paper\s*2)(\b|$)/i.test(`${rawSubject} ${section}`);
+    if (isCsat) return 'CSAT';
+    if (rawSubject && taxonomyMaps.sectionToSubject[lowerSubject]) {
+      return taxonomyMaps.sectionToSubject[lowerSubject];
+    }
+    return rawSubject || 'Miscellaneous';
   };
 
   const getAnalyticsYear = (q: any) => {

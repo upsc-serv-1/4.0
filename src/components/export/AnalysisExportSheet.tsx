@@ -34,6 +34,7 @@ import { X, FileDown, Layout, ChevronDown, ChevronRight, Settings, Check } from 
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../../context/ThemeContext';
 import { useResponsive } from '../../hooks/useResponsive';
+import { supabase } from '../../lib/supabase';
 import {
   ExportOptions, ExportPayload, ExportQuestion,
   defaultExportOptions, exportToPdf,
@@ -50,7 +51,6 @@ export interface AnalysisReportToggles {
   subject_momentum: boolean;
   subject_distribution: boolean;
   heatmaps: boolean;
-  focused_trend: boolean;
   forecast: boolean;
   trajectory_graph: boolean;
   score_history_table: boolean;
@@ -70,6 +70,7 @@ export interface AnalysisExportQuestion {
   subject?: string;
   section_group?: string;
   micro_topic?: string;
+  sub_topic?: string;
   exam_year?: number | string;
   is_pyq?: boolean;
   is_ncert?: boolean;
@@ -183,7 +184,6 @@ const ANALYTICS_REPORT_TOGGLES: Array<{ key: keyof AnalysisReportToggles; label:
   { key: 'heatmaps', label: 'Mastery Heatmaps (Drill-down)' },
   { key: 'subject_momentum', label: 'Subject Momentum' },
   { key: 'subject_distribution', label: 'Subject Distribution (Donut)' },
-  { key: 'focused_trend', label: 'Focused Trend' },
   { key: 'forecast', label: 'Probable 2026 Topics (Forecast)' },
   { key: 'raw_data_csv', label: 'Export Raw Data (CSV)' },
 ];
@@ -192,7 +192,6 @@ const PYQ_REPORT_TOGGLES: Array<{ key: keyof AnalysisReportToggles; label: strin
   { key: 'subject_momentum', label: 'Subject momentum' },
   { key: 'subject_distribution', label: 'Subject distribution' },
   { key: 'heatmaps', label: 'Heatmap' },
-  { key: 'focused_trend', label: 'Focus trend' },
   { key: 'forecast', label: 'Forecast' },
 ];
 
@@ -201,7 +200,6 @@ const defaultReports: AnalysisReportToggles = {
   subject_momentum: true,
   subject_distribution: true,
   heatmaps: true,
-  focused_trend: true,
   forecast: true,
   trajectory_graph: true,
   score_history_table: true,
@@ -231,7 +229,18 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
   const [selectedMicros, setSelectedMicros] = useState<string[]>([]);
   const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>([]);
   const [selectedRevisionTags, setSelectedRevisionTags] = useState<string[]>([]);
-  const [selectedInstitutes, setSelectedInstitutes] = useState<string[]>([]);
+  const [selectedInstitutes, setSelectedInstitutes] = useState<string[]>(() => {
+    const set = new Set<string>();
+    questions.forEach((q) => {
+      if (Array.isArray((q as any)._institutes)) {
+        (q as any)._institutes.forEach((inst: string) => {
+          const value = String(inst || '').trim();
+          if (value) set.add(value);
+        });
+      }
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  });
   const [selectedGroupingLevels, setSelectedGroupingLevels] = useState<Array<'subject' | 'section_group' | 'microtopic'>>([]);
   const [yearMode, setYearMode] = useState<'all' | 'single' | 'range'>('all');
   const [singleYear, setSingleYear] = useState<string>('');
@@ -257,7 +266,19 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
       setSelectedMicros([]);
       setSelectedDifficulties([]);
       setSelectedRevisionTags([]);
-      setSelectedInstitutes([]);
+      const allInsts = (() => {
+        const set = new Set<string>();
+        questions.forEach((q) => {
+          if (Array.isArray((q as any)._institutes)) {
+            (q as any)._institutes.forEach((inst: string) => {
+              const value = String(inst || '').trim();
+              if (value) set.add(value);
+            });
+          }
+        });
+        return Array.from(set).sort((a, b) => a.localeCompare(b));
+      })();
+      setSelectedInstitutes(allInsts);
       setSelectedGroupingLevels([]);
       setYearMode('all');
       setSingleYear('');
@@ -272,7 +293,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
       setIsExporting(false);
       setShowAdvanced(false);
     }
-  }, [visible, title]);
+  }, [visible, title, questions]);
 
   const includeReport = scope === 'report_only' || scope === 'report_with_pyqs';
   const includePyqs = scope === 'report_with_pyqs' || scope === 'pyqs_only';
@@ -482,6 +503,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
       subject: q.subject || 'General',
       section_group: q.section_group || 'General',
       micro_topic: q.micro_topic || 'Other',
+      sub_topic: q.sub_topic || q.subtopic || (q as any).subTopic || '',
       exam_year: q.exam_year,
       is_pyq: !!q.is_pyq,
       is_upsc_cse: !!(q as any).is_upsc_cse,
@@ -506,6 +528,20 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
     setOpts(prev => ({ ...prev, [k]: v }));
   };
 
+  const cleanAnswerText = (txt: string): string => {
+    if (!txt) return '';
+    let cleaned = txt;
+    // Replace HTML img tags with a clean placeholder link
+    cleaned = cleaned.replace(/<img[^>]+src=["']([^"']+)["'][^>]*>/gi, (match, src) => {
+      return `<div style="margin: 4px 0; padding: 6px; background: #F1F5F9; border-radius: 4px; font-size: 8.5pt; display: inline-block;"><a href="${src}" target="_blank" style="color: #2563EB; font-weight: 700; text-decoration: underline;">[View Image / Diagram]</a></div>`;
+    });
+    // Replace Markdown image links with the same
+    cleaned = cleaned.replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, src) => {
+      return `<div style="margin: 4px 0; padding: 6px; background: #F1F5F9; border-radius: 4px; font-size: 8.5pt; display: inline-block;"><a href="${src}" target="_blank" style="color: #2563EB; font-weight: 700; text-decoration: underline;">[View Image / Diagram: ${alt || 'Link'}]</a></div>`;
+    });
+    return cleaned;
+  };
+
   const hasAnyReport = Object.values(reports).some(Boolean);
 
   const runExport = async (columns: 1 | 2) => {
@@ -522,6 +558,60 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
     setIsExporting(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
 
+    // Prepare final payload rows and fetch missing answer texts from Supabase
+    let payloadRows = pyqPayload ? [...(pyqPayload.rows as ExportQuestion[])] : [];
+    if (includePyqs && payloadRows.length > 0) {
+      try {
+        const questionIds = payloadRows.map(r => r.id);
+        const chunkSize = 200;
+        let allAnswers: any[] = [];
+        for (let i = 0; i < questionIds.length; i += chunkSize) {
+          const chunkIds = questionIds.slice(i, i + chunkSize).map(id => Number(id));
+          
+          const queryPromise = supabase
+            .from('mains_answers')
+            .select('id, question_id, institute, answer_text')
+            .in('question_id', chunkIds);
+            
+          const timeoutPromise = new Promise<{ data: null; error: any }>((_, reject) =>
+            setTimeout(() => reject(new Error('Supabase fetch timeout')), 8000)
+          );
+          
+          const response = await Promise.race([queryPromise, timeoutPromise]);
+          const { data, error } = response as { data: any[] | null; error: any };
+          
+          if (!error && data) {
+            allAnswers = allAnswers.concat(data);
+          }
+        }
+
+        const answersByQuestionId: Record<string, any[]> = {};
+        allAnswers.forEach(ans => {
+          if (!answersByQuestionId[ans.question_id]) {
+            answersByQuestionId[ans.question_id] = [];
+          }
+          const cleanedText = cleanAnswerText(ans.answer_text);
+          answersByQuestionId[ans.question_id].push({
+            id: ans.id,
+            institute: ans.institute,
+            source: ans.institute,
+            answerText: cleanedText,
+            text: cleanedText,
+          });
+        });
+
+        payloadRows = payloadRows.map(row => {
+          const mergedExpls = answersByQuestionId[row.id] || [];
+          return {
+            ...row,
+            _explanations: mergedExpls.length > 0 ? mergedExpls : row._explanations || [],
+          };
+        });
+      } catch (err) {
+        console.warn('[Export] Failed to load explanations from Supabase:', err);
+      }
+    }
+
     // Specialized CSV Export for Trends — runs inline, no heavy PDF work
     if (reports.raw_data_csv) {
       try {
@@ -534,7 +624,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
 
     // Capture all export data into local constants
     const prependHtml = includeReport ? buildAnalysisHtml() : '';
-    const payload = pyqPayload as ExportPayload | null;
+    const payload: ExportPayload | null = pyqPayload ? { kind: 'questions', rows: payloadRows } : null;
     const exportOptions = {
       ...opts,
       groupingLevels: selectedGroupingLevels.length > 0 ? selectedGroupingLevels : undefined,
@@ -1144,7 +1234,7 @@ async function printStandaloneReport(fragmentHtml: string, o: ExportOptions): Pr
     const { uri } = await Promise.race([
       Print.printToFileAsync({ html, base64: false }),
       new Promise<{ uri: string }>((_, reject) => 
-        setTimeout(() => reject(new Error('Print timeout')), 30000) // 30s timeout
+        setTimeout(() => reject(new Error('Print timeout')), 90000) // 90s timeout
       ),
     ]);
     
@@ -1346,7 +1436,6 @@ function buildSummaryFromFilteredQuestions(
       subject_momentum: reports.subject_momentum,
       subject_distribution: reports.subject_distribution,
       heatmaps: reports.heatmaps,
-      focused_trend: reports.focused_trend,
       forecast: reports.forecast,
     },
     examStage: pyqMeta?.examStage || 'Analysis',

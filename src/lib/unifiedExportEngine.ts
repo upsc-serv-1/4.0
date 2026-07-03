@@ -1396,13 +1396,14 @@ export interface BuildPyqAnalysisSummaryInput {
   years: string[];
   distributionData: Array<{ name: string; value: number }>;
   overviewSeries: Array<{ label: string; values: number[]; color?: string }>;
-  focusTrendSeries: Array<{ label: string; values: number[]; color?: string }>;
   focusSubject: string;
   focusSection: string;
   focusMicro: string;
   subjectHeatmapRows: PyqHeatmapRow[];
   topicHeatmapRows: PyqHeatmapRow[];
   subtopicHeatmapRows?: PyqHeatmapRow[];
+  filteredQuestionsForSummary?: any[];
+  selectedSubjectsList?: string[];
   heatmapPalette: PyqHeatmapPalette;
   momentumTitle?: string;
   distributionTitle?: string;
@@ -1497,7 +1498,14 @@ const renderPyqLineChartSvg = (
     const color = normalizeHex(item.color, idx % 2 === 0 ? '#2563EB' : '#0EA5E9');
     const points = item.values.map((value, index) => `${x(index)},${y(value)}`).join(' ');
     const dots = item.values
-      .map((value, index) => `<circle cx="${x(index)}" cy="${y(value)}" r="3" fill="${color}" fill-opacity="1" stroke="#FFFFFF" stroke-width="1" />`)
+      .map((value, index) => {
+        const cx = x(index);
+        const cy = y(value);
+        return `
+          <circle cx="${cx}" cy="${cy}" r="3.5" fill="${color}" fill-opacity="1" stroke="#FFFFFF" stroke-width="1.5" />
+          <text x="${cx}" y="${cy - 8}" text-anchor="middle" font-size="9.5" font-weight="700" fill="${color}" fill-opacity="1">${value}</text>
+        `;
+      })
       .join('');
     return `<polyline fill="none" fill-opacity="1" stroke="${color}" stroke-width="3" points="${points}"/>${dots}`;
   }).join('');
@@ -1696,7 +1704,6 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
     years,
     distributionData,
     overviewSeries,
-    focusTrendSeries,
     focusSubject,
     focusSection,
     focusMicro,
@@ -1706,17 +1713,17 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
     heatmapPalette,
     momentumTitle,
     distributionTitle,
-    focusedTitle,
     primaryHeatmapTitle,
     primaryHeatmapLabel,
     secondaryHeatmapTitle,
     secondaryHeatmapLabel,
+    filteredQuestionsForSummary,
+    selectedSubjectsList,
   } = input;
 
   const includeMomentum = !!selectedReports.subject_momentum;
   const includeDistribution = !!selectedReports.subject_distribution;
   const includeHeatmaps = !!selectedReports.heatmaps;
-  const includeFocused = !!selectedReports.focused_trend;
   const includeForecast = !!selectedReports.forecast;
 
   const sections: string[] = [];
@@ -1729,30 +1736,81 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
     sections.push(renderPyqDonutSvg(distributionTitle || 'Subject Distribution (Donut)', distributionData));
   }
 
+  const subjectsToRender = selectedSubjectsList && selectedSubjectsList.length > 0
+    ? selectedSubjectsList
+    : [];
+
   if (includeHeatmaps) {
-    if (subjectHeatmapRows.length > 0) {
-      sections.push(renderPyqHeatmapSvg(primaryHeatmapTitle || 'Subject × Year Heatmap', primaryHeatmapLabel || 'Subject', subjectHeatmapRows, years, heatmapPalette));
+    if (subjectsToRender.length > 1) {
+      // Global overview: only show Subject × Year Heatmap (shows counts per subject)
+      if (subjectHeatmapRows.length > 0) {
+        sections.push(renderPyqHeatmapSvg(primaryHeatmapTitle || 'Subject × Year Heatmap', primaryHeatmapLabel || 'Subject', subjectHeatmapRows, years, heatmapPalette));
+      }
     }
-    if (topicHeatmapRows.length > 0) {
-      sections.push(renderPyqHeatmapSvg(secondaryHeatmapTitle || 'Top 20 Topics × Year Heatmap', secondaryHeatmapLabel || 'Topic', topicHeatmapRows, years, heatmapPalette));
+    
+    // Subject-by-subject detailed heatmaps (renders Geography detailed heatmaps, History detailed heatmaps, etc.)
+    if (filteredQuestionsForSummary && filteredQuestionsForSummary.length > 0) {
+      subjectsToRender.forEach(subj => {
+        const qns = filteredQuestionsForSummary.filter(q => (q.subject || '').toLowerCase().trim() === subj.toLowerCase().trim());
+        if (qns.length === 0) return;
+        
+        const secTotals: Record<string, number> = {};
+        const secByYear: Record<string, Record<string, number>> = {};
+        const micTotals: Record<string, number> = {};
+        const micByYear: Record<string, Record<string, number>> = {};
+        const subTotals: Record<string, number> = {};
+        const subByYear: Record<string, Record<string, number>> = {};
+        
+        qns.forEach(q => {
+          const yearNum = Number(q.exam_year);
+          if (!Number.isFinite(yearNum)) return;
+          const year = String(yearNum);
+          const section = q.section_group || 'General';
+          const micro = q.micro_topic || q.microtopic || 'Other';
+          const subtopic = q.sub_topic || q.subtopic || 'Other';
+          
+          secTotals[section] = (secTotals[section] || 0) + 1;
+          if (!secByYear[section]) secByYear[section] = {};
+          secByYear[section][year] = (secByYear[section][year] || 0) + 1;
+          
+          micTotals[micro] = (micTotals[micro] || 0) + 1;
+          if (!micByYear[micro]) micByYear[micro] = {};
+          micByYear[micro][year] = (micByYear[micro][year] || 0) + 1;
+          
+          subTotals[subtopic] = (subTotals[subtopic] || 0) + 1;
+          if (!subByYear[subtopic]) subByYear[subtopic] = {};
+          subByYear[subtopic][year] = (subByYear[subtopic][year] || 0) + 1;
+        });
+        
+        const secRows = Object.entries(secTotals)
+          .sort((a, b) => b[1] - a[1])
+          .map(([name]) => ({ key: `sec-${name}`, label: name, byYear: secByYear[name] || {} }));
+          
+        const micRows = Object.entries(micTotals)
+          .sort((a, b) => b[1] - a[1])
+          .map(([name]) => ({ key: `micro-${name}`, label: name, byYear: micByYear[name] || {} }));
+          
+        const subRows = Object.entries(subTotals)
+          .sort((a, b) => b[1] - a[1])
+          .filter(([name]) => name && name !== 'Other' && name !== 'undefined' && name !== 'null')
+          .map(([name]) => ({ key: `subtopic-${name}`, label: name, byYear: subByYear[name] || {} }));
+          
+        sections.push(`
+          <div class="page-break"></div>
+          <h2 style="font-size: 15pt; color: #1E40AF; margin-top: 6mm; margin-bottom: 4mm; border-bottom: 2px solid #1E40AF; padding-bottom: 4px;">${escapeHtml(subj)} Detailed Trends</h2>
+        `);
+        
+        if (secRows.length > 0) {
+          sections.push(renderPyqHeatmapSvg(`${subj} Section Group × Year Heatmap`, 'Section Group', secRows, years, heatmapPalette));
+        }
+        if (micRows.length > 0) {
+          sections.push(renderPyqHeatmapSvg(`${subj} Micro Topic × Year Heatmap`, 'Micro Topic', micRows, years, heatmapPalette));
+        }
+        if (subRows.length > 0 && examStage?.toLowerCase() === 'mains') {
+          sections.push(renderPyqHeatmapSvg(`${subj} Subtopic × Year Heatmap`, 'Subtopic', subRows, years, heatmapPalette));
+        }
+      });
     }
-    if (subtopicHeatmapRows && subtopicHeatmapRows.length > 0 && examStage?.toLowerCase() === 'mains') {
-      sections.push(renderPyqHeatmapSvg('Top 20 Sub Topics × Year Heatmap', 'Sub Topic', subtopicHeatmapRows, years, heatmapPalette));
-    }
-  }
-
-  if (includeFocused && focusTrendSeries.length > 0) {
-    const focusedLabel = focusMicro !== 'All'
-      ? focusMicro
-      : focusSection !== 'All'
-        ? `${focusSubject} / ${focusSection}`
-        : focusSubject !== 'All'
-          ? focusSubject
-          : 'All PYQ';
-
-    const series = focusTrendSeries.map((row, index) => ({ ...row, color: row.color || (index === 0 ? '#2563EB' : '#14B8A6') }));
-    const focusHeading = focusedTitle || 'Focused Trend';
-    sections.push(renderPyqLineChartSvg(`${focusHeading} · ${focusedLabel}`, years, series));
   }
 
   if (includeForecast && input.forecastRows && input.forecastRows.length > 0) {
@@ -1780,9 +1838,12 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
       .analysis-summary .donut-legend { flex: 1; }
       .analysis-summary .donut-legend-row { display: flex; align-items: center; justify-content: space-between; font-size: 11px; padding: 4px 0; color: #334155; }
       .analysis-summary .donut-legend-dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; margin-right: 7px; }
-      .analysis-summary .analysis-heatmap-table { width: 100%; border-collapse: collapse; margin-top: 2mm; }
+      .analysis-summary .analysis-heatmap-table { width: 100%; border-collapse: collapse; margin-top: 2mm; table-layout: fixed; }
       .analysis-summary .analysis-heatmap-table th,
-      .analysis-summary .analysis-heatmap-table td { border: 1px solid #CBD5E1; padding: 6px 7px; font-size: 9pt; text-align: left; }
+      .analysis-summary .analysis-heatmap-table td { border: 1px solid #CBD5E1; padding: 3px 5px; font-size: 7.5pt; line-height: 1.2; text-align: left; overflow: hidden; text-overflow: ellipsis; }
+      .analysis-summary .analysis-heatmap-table td:first-child { width: 32%; font-weight: 600; white-space: normal; overflow-wrap: break-word; word-break: break-word; }
+      .analysis-summary .analysis-heatmap-table th:not(:first-child),
+      .analysis-summary .analysis-heatmap-table td:not(:first-child) { text-align: center; }
       .analysis-summary .analysis-heatmap-table th { background: #E2E8F0; font-weight: 800; }
       .analysis-summary table,
       .analysis-summary tr,
@@ -1864,7 +1925,7 @@ export async function exportToPdf(payload: ExportPayload, options: ExportOptions
     try {
       const printResult = await Promise.race<any>([
         Print.printToFileAsync({ html, base64: false }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Print timeout after 30s')), 30000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Print timeout after 90s')), 90000))
       ]);
       uri = printResult.uri;
     } catch (printError) {

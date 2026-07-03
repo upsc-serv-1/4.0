@@ -60,7 +60,8 @@ import {
   Tag,
   PenTool,
   Flag,
-  Clock
+  Clock,
+  Palette
 } from 'lucide-react-native';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
@@ -723,6 +724,9 @@ export default function MainsScreen() {
   const [completedSubtopics, setCompletedSubtopics] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  // Theme state: 'gradient' or 'white'
+  const [mainsTheme, setMainsTheme] = useState<'gradient' | 'white'>('gradient');
+
   // Live Supabase synced states (fallback to local constants instantly)
   const [questions, setQuestions] = useState<ConsolidatedQuestion[]>(mainsConsolidatedQuestions);
   const [valueAddItems, setValueAddItems] = useState<ValueAdditionItem[]>(mainsConsolidatedValueAdd);
@@ -736,6 +740,9 @@ export default function MainsScreen() {
 
         const savedS = await AsyncStorage.getItem('mains_completed_syllabus');
         if (savedS) setCompletedSubtopics(JSON.parse(savedS));
+
+        const savedTheme = await AsyncStorage.getItem('mains_theme');
+        if (savedTheme === 'white') setMainsTheme('white');
       } catch (err) {
         console.error('Failed to load saved states:', err);
       }
@@ -814,6 +821,16 @@ export default function MainsScreen() {
     }
   };
 
+  const toggleMainsTheme = async () => {
+    try {
+      const nextTheme = mainsTheme === 'gradient' ? 'white' : 'gradient';
+      setMainsTheme(nextTheme);
+      await AsyncStorage.setItem('mains_theme', nextTheme);
+    } catch (err) {
+      console.error('Failed to save mains theme:', err);
+    }
+  };
+
   const handleCopy = useCallback(async (id: string, text: string) => {
     await Clipboard.setStringAsync(text);
     setCopiedId(id);
@@ -824,7 +841,7 @@ export default function MainsScreen() {
   return (
     <Provider>
       <View style={[styles.container, { backgroundColor: colors.bg }]}>
-        {!isDark && (
+        {!isDark && mainsTheme === 'gradient' && (
           <LinearGradient
             colors={['#e0f2fe', '#fef3c7', '#fce7f3', '#d1fae5']}
             start={{ x: 0, y: 0 }}
@@ -850,7 +867,22 @@ export default function MainsScreen() {
                   <Text style={styles.premiumText}>PREMIUM</Text>
                 </View>
               </View>
-              <View style={{ width: 60 }} />
+              <TouchableOpacity
+                onPress={toggleMainsTheme}
+                style={[
+                  styles.backButton,
+                  {
+                    backgroundColor: colors.surface + '88',
+                    borderColor: colors.border,
+                    paddingHorizontal: 10,
+                  }
+                ]}
+              >
+                <Palette size={16} color={mainsTheme === 'gradient' ? colors.primary : colors.textSecondary} />
+                <Text style={[styles.backButtonText, { color: mainsTheme === 'gradient' ? colors.primary : colors.textSecondary, marginLeft: 4 }]}>
+                  {mainsTheme === 'gradient' ? 'Theme 1' : 'Theme 2'}
+                </Text>
+              </TouchableOpacity>
             </View>
           ) : currentScreen !== 'detailed-question' ? (
             <TouchableOpacity

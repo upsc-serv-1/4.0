@@ -6,7 +6,7 @@ import { useTheme } from '../../src/context/ThemeContext';
 import { useState, useEffect, useCallback } from 'react';
 import { TabConfigService, TabKey } from '../../src/services/TabConfigService';
 
-const DEFAULT_TAB_ORDER: TabKey[] = ['index', 'arena', 'analyse', 'mains', 'pyq', 'flashcards', 'tags', 'pilot-v2', 'browser', 'revise', 'tracker'];
+const DEFAULT_TAB_ORDER: TabKey[] = ['index', 'arena', 'prelims', 'analyse', 'mains', 'pyq', 'flashcards', 'tags', 'pilot-v2', 'browser', 'revise', 'tracker'];
 
 export default function TabsLayout() {
   const { colors } = useTheme();
@@ -59,6 +59,7 @@ export default function TabsLayout() {
   const TAB_COLORS: Record<string, string> = {
     index: '#6366f1',       // Indigo
     arena: '#ef4444',       // Red
+    prelims: '#7c3aed',     // Purple
     analyse: '#14b8a6',     // Teal
     mains: '#f43f5e',       // Rose
     pyq: '#f59e0b',         // Amber
@@ -78,6 +79,7 @@ export default function TabsLayout() {
   const TAB_DEFINITIONS: Record<TabKey, { title: string; icon: any }> = {
     index: { title: 'Home', icon: Home },
     arena: { title: 'Arena', icon: Target },
+    prelims: { title: 'Prelims', icon: Target },
     analyse: { title: 'Analyse', icon: BarChart2 },
     mains: { title: 'Mains', icon: PenTool },
     pyq: { title: 'PYQ Analysis', icon: BarChart3 },
@@ -125,7 +127,12 @@ function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs,
     tabKey !== 'notes' && 
     tabKey !== 'hardnotes' && 
     tabKey !== 'softnotes' &&
-    tabKey !== 'capsule'
+    tabKey !== 'capsule' &&
+    tabKey !== 'arena' &&
+    tabKey !== 'analyse' &&
+    tabKey !== 'pyq' &&
+    tabKey !== 'tracker' &&
+    tabKey !== 'ai-search'
   );
   const tabletItemWidth = isTablet
     ? Math.max(74, Math.floor((Math.max(width, 768) - 20) / Math.max(1, visibleOrder.length)))

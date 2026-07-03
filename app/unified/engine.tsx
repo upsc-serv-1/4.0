@@ -1611,8 +1611,7 @@ export default function UnifiedQuizEngine() {
             if (pyqCat && pyqCat !== 'All' && pyqCat !== '' && pyqCat !== '[]') {
               const cats = typeof pyqCat === 'string' ? pyqCat.split(',').filter(Boolean) : [];
               if (cats.includes('UPSC CSE') || cats.includes('UPSC')) {
-                filtered = filtered.filter((q: any) => q.is_upsc_cse ||
-                  String(q?.source?.group || q?.exam_group || q?.tests?.series || q?.tests?.title || '').toUpperCase().includes('UPSC'));
+                filtered = filtered.filter((q: any) => q.is_upsc_cse === true);
               } else if (cats.includes('Allied Exams') || cats.includes('Allied')) {
                 filtered = filtered.filter((q: any) => q.is_allied);
               } else if (cats.includes('Others')) {
@@ -1721,6 +1720,7 @@ export default function UnifiedQuizEngine() {
             filtered = filtered.filter((q: any) => {
               const tests = Array.isArray(q?.tests) ? q.tests[0] : q?.tests;
               const series = String(tests?.series || q?.series || '').toLowerCase();
+              if (pyqM === 'PYQ Only' && series.includes('pyq book')) return true;
               return series.includes(stagePattern);
             });
           }
@@ -1856,7 +1856,12 @@ export default function UnifiedQuizEngine() {
               }
 
               if (stage && stage !== 'All' && stage !== '' && stage !== '[]') {
-                tQuery = tQuery.ilike('series', `%${stage}%`);
+                const pyqM = params.pyqMaster || params.pyqFilter;
+                if (pyqM === 'PYQ Only') {
+                  tQuery = tQuery.or(`series.ilike.%${stage}%,series.eq.PYQ Book`);
+                } else {
+                  tQuery = tQuery.ilike('series', `%${stage}%`);
+                }
               }
 
               if (paper && paper !== 'All' && paper !== '' && paper !== '[]') {
@@ -1865,7 +1870,32 @@ export default function UnifiedQuizEngine() {
                 tQuery = tQuery.or(`title.ilike.%${paper}%,title.ilike.%${paperNorm}%,series.ilike.%${paper}%`);
               }
               
-              const { data: testRows } = await tQuery;
+              let { data: testRows } = await tQuery;
+              if ((!testRows || testRows.length === 0) && NetworkStatus.isOnline()) {
+                let sQuery = supabase.from('tests').select('id').eq('course', selectedCourse);
+                if (insts && insts !== 'All' && insts !== '' && insts !== '[]') {
+                  const instList = typeof insts === 'string' ? insts.split(',').filter(Boolean) : [];
+                  if (instList.length > 0) sQuery = sQuery.in('institute', instList);
+                }
+                if (progs && progs !== 'All' && progs !== '' && progs !== '[]') {
+                  const progList = typeof progs === 'string' ? progs.split(',').filter(Boolean) : [];
+                  if (progList.length > 0) sQuery = sQuery.in('program_name', progList);
+                }
+                if (stage && stage !== 'All' && stage !== '' && stage !== '[]') {
+                  const pyqM = params.pyqMaster || params.pyqFilter;
+                  if (pyqM === 'PYQ Only') {
+                    sQuery = sQuery.or(`series.ilike.%${stage}%,series.eq.PYQ Book`);
+                  } else {
+                    sQuery = sQuery.ilike('series', `%${stage}%`);
+                  }
+                }
+                if (paper && paper !== 'All' && paper !== '' && paper !== '[]') {
+                  const paperNorm = paper.replace('GS ', '');
+                  sQuery = sQuery.or(`title.ilike.%${paper}%,title.ilike.%${paperNorm}%,series.ilike.%${paper}%`);
+                }
+                const res = await sQuery;
+                testRows = res.data;
+              }
               const tIds = (testRows || []).map((t: any) => t.id);
               if (tIds.length > 0) query = query.in('test_id', tIds);
               else break;
@@ -2031,8 +2061,30 @@ export default function UnifiedQuizEngine() {
                 let tQuery = LocalQuery.from('tests').select('id').eq('course', selectedCourse);
                 if (insts && insts !== 'All' && insts !== '' && insts !== '[]') tQuery = tQuery.in('institute', insts.split(',').filter(Boolean));
                 if (progs && progs !== 'All' && progs !== '' && progs !== '[]') tQuery = tQuery.in('program_name', progs.split(',').filter(Boolean));
-                if (stage && stage !== 'All' && stage !== '' && stage !== '[]') tQuery = tQuery.ilike('series', '%' + stage + '%');
-                const { data: tRows } = await tQuery;
+                if (stage && stage !== 'All' && stage !== '' && stage !== '[]') {
+                  const pyqM = params.pyqMaster || params.pyqFilter;
+                  if (pyqM === 'PYQ Only') {
+                    tQuery = tQuery.or(`series.ilike.%${stage}%,series.eq.PYQ Book`);
+                  } else {
+                    tQuery = tQuery.ilike('series', `%${stage}%`);
+                  }
+                }
+                let { data: tRows } = await tQuery;
+                if ((!tRows || tRows.length === 0) && NetworkStatus.isOnline()) {
+                  let sQuery = supabase.from('tests').select('id').eq('course', selectedCourse);
+                  if (insts && insts !== 'All' && insts !== '' && insts !== '[]') sQuery = sQuery.in('institute', insts.split(',').filter(Boolean));
+                  if (progs && progs !== 'All' && progs !== '' && progs !== '[]') sQuery = sQuery.in('program_name', progs.split(',').filter(Boolean));
+                  if (stage && stage !== 'All' && stage !== '' && stage !== '[]') {
+                    const pyqM = params.pyqMaster || params.pyqFilter;
+                    if (pyqM === 'PYQ Only') {
+                      sQuery = sQuery.or(`series.ilike.%${stage}%,series.eq.PYQ Book`);
+                    } else {
+                      sQuery = sQuery.ilike('series', `%${stage}%`);
+                    }
+                  }
+                  const res = await sQuery;
+                  tRows = res.data;
+                }
                 const tIds = (tRows || []).map((t: any) => t.id);
                 if (tIds.length > 0) fuzzyQ = fuzzyQ.in('test_id', tIds);
                 else fuzzyQ = fuzzyQ.in('test_id', ['__NO_MATCH__']);

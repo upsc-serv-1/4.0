@@ -32,6 +32,7 @@ import {
   TrendingUp,
   X,
   FileStack,
+  HelpCircle,
 } from 'lucide-react-native';
 import { supabase } from '../src/lib/supabase';
 import { PieChart, LineChart } from '../src/components/Charts';
@@ -2110,9 +2111,22 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         </TouchableOpacity>
       ) : <View style={styles.headerIcon} />}
       <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>PYQ Analysis</Text>
-      <TouchableOpacity onPress={() => setQuestionExportVisible(true)} style={[styles.headerIcon, { borderColor: colors.border, backgroundColor: colors.surface }]}>
-        <Download color={colors.primary} size={18} />
-      </TouchableOpacity>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <TouchableOpacity 
+          onPress={() => {
+            Alert.alert(
+              "How to Use Heatmap",
+              "• Tap a row label (left) to open deep-dive sections & micro-topics.\n\n• Tap any cell number to directly open those questions in Learn Mode.\n\n• Tap the 📚 question-bank icon on a row to open all questions for that topic."
+            );
+          }} 
+          style={[styles.headerIcon, { borderColor: colors.border, backgroundColor: colors.surface }]}
+        >
+          <HelpCircle color={colors.primary} size={18} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setQuestionExportVisible(true)} style={[styles.headerIcon, { borderColor: colors.border, backgroundColor: colors.surface }]}>
+          <Download color={colors.primary} size={18} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -2529,13 +2543,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           </TouchableOpacity>
         </View>
 
-        {/* How-to instructions for the heatmap */}
-        <View style={{ backgroundColor: colors.primary + '08', borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: colors.primary + '20' }}>
-          <Text style={{ color: colors.primary, fontSize: 11, fontWeight: '800', letterSpacing: 0.5, marginBottom: 4 }}>HOW TO USE THIS HEATMAP</Text>
-          <Text style={{ color: colors.textSecondary, fontSize: 11, fontWeight: '600', lineHeight: 17 }}>
-            {'• Tap a row label (left) to open deep-dive sections & micro-topics.\n• Tap any cell number to directly open those questions in Learn Mode.\n• Tap the 📚 question-bank icon on a row to open all questions for that topic.'}
-          </Text>
-        </View>
+
 
         {/* TOP HALF: Global Subject Heatmap */}
         <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border, paddingBottom: 20 }]}>
@@ -3296,7 +3304,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         visible={questionExportVisible}
         onClose={() => setQuestionExportVisible(false)}
         reportVariant="pyq"
-        title="PYQ Unified Export"
+        title="Dr. UPSC PYQ Analysis"
         questions={rawQuestions.map((q: any) => ({
           id: String(q.id),
           question_text: q.question_text || q.statement_line || '',

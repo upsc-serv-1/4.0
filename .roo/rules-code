@@ -1,0 +1,13 @@
+Always ignore these files and directories when working in this workspace:
+- node_modules/
+- admin-panel/node_modules/
+- .expo/
+- .metro-cache/
+- dist/
+- android/
+- ios/
+- *.log
+- .env.local
+- *.tsbuildinfo
+
+Do not read, search, or list files inside node_modules directories.

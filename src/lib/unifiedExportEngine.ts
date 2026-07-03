@@ -100,7 +100,7 @@ export interface ExportOptions {
 }
 
 export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): ExportOptions => ({
-  title: 'Export',
+  title: 'Dr. UPSC PYQ Analysis',
   fontFamily: 'sans',
   fontSize: 6,
   columns: 1,
@@ -121,7 +121,7 @@ export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): Ex
   showTOC: false,
   headerText: 'Dr. UPSC',
   footerText: '',
-  watermark: '',
+  watermark: 'Dr. UPSC',
   moduleName: '',
   includePerformanceMetrics: false,
   hideResponses: false,
@@ -571,7 +571,7 @@ const filterExplanationsByInstitute = (explanations: any[] | undefined, o: Expor
   if (!Array.isArray(explanations)) return [];
   if (!o.instituteFilters || o.instituteFilters.length === 0) return explanations;
   const filterSet = new Set(o.instituteFilters.map((s: string) => s.toLowerCase().trim()));
-  return explanations.filter((e: any) => filterSet.has((e.source || '').toLowerCase().trim()));
+  return explanations.filter((e: any) => filterSet.has((e.source || e.institute || '').toLowerCase().trim()));
 };
 
 // ---------- Filtering & Sorting ----------
@@ -770,13 +770,15 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
         // Render combined explanations from all institutes
         explanation = explList
           .map((expl: any) => {
-            const source = expl.source || 'Unknown Source';
+            const text = expl.text || expl.explanationText || expl.answerText || expl.explanation || '';
+            if (!text) return '';
+            const source = expl.source || expl.institute || 'Unknown Source';
             const year = expl.year ? ` (${expl.year})` : '';
             const ans = expl.answer ? ` • Answer: ${expl.answer.toUpperCase()}` : '';
-            const text = expl.text || expl.explanation || '';
             const header = `<strong>${escapeHtml(source)}${year}${ans}:</strong>`;
-            return text ? `${header}<br/>${renderInline(text)}` : header;
+            return `${header}<br/>${renderInline(text)}`;
           })
+          .filter(Boolean)
           .join('<br/><br/>---<br/><br/>');
       } else {
         // Fall back to single explanation
@@ -938,13 +940,15 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
         if (explList.length > 0) {
           e = explList
             .map((expl: any) => {
-              const source = expl.source || 'Unknown Source';
+              const text = expl.text || expl.explanationText || expl.answerText || expl.explanation || '';
+              if (!text) return '';
+              const source = expl.source || expl.institute || 'Unknown Source';
               const year = expl.year ? ` (${expl.year})` : '';
               const ans = expl.answer ? ` • Answer: ${expl.answer.toUpperCase()}` : '';
-              const text = expl.text || expl.explanation || '';
               const header = `<strong>${escapeHtml(source)}${year}${ans}:</strong>`;
-              return text ? `${header}<br/>${renderInline(text)}` : header;
+              return `${header}<br/>${renderInline(text)}`;
             })
+            .filter(Boolean)
             .join('<br/><br/>---<br/><br/>');
         } else {
           e = q.explanation_markdown || q.explanation || '';
@@ -986,13 +990,15 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
       if (explList.length > 0) {
         e = explList
           .map((expl: any) => {
-            const source = expl.source || 'Unknown Source';
+            const text = expl.text || expl.explanationText || expl.answerText || expl.explanation || '';
+            if (!text) return '';
+            const source = expl.source || expl.institute || 'Unknown Source';
             const year = expl.year ? ` (${expl.year})` : '';
             const ans = expl.answer ? ` • Answer: ${expl.answer.toUpperCase()}` : '';
-            const text = expl.text || expl.explanation || '';
             const header = `<strong>${escapeHtml(source)}${year}${ans}:</strong>`;
-            return text ? `${header}<br/>${renderInline(text)}` : header;
+            return `${header}<br/>${renderInline(text)}`;
           })
+          .filter(Boolean)
           .join('<br/><br/>---<br/><br/>');
       } else {
         e = q.explanation_markdown || q.explanation || '';
@@ -1094,13 +1100,15 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
       if (Array.isArray(q._explanations) && q._explanations.length > 0) {
         explanation = q._explanations
           .map((expl: any) => {
-            const source = expl.source || 'Unknown Source';
+            const text = expl.text || expl.explanationText || expl.answerText || expl.explanation || '';
+            if (!text) return '';
+            const source = expl.source || expl.institute || 'Unknown Source';
             const year = expl.year ? ` (${expl.year})` : '';
             const ans = expl.answer ? ` • Answer: ${expl.answer.toUpperCase()}` : '';
-            const text = expl.text || expl.explanation || '';
             const header = `<strong>${escapeHtml(source)}${year}${ans}:</strong>`;
-            return text ? `${header}<br/>${renderInline(text)}` : header;
+            return `${header}<br/>${renderInline(text)}`;
           })
+          .filter(Boolean)
           .join('<br/><br/>---<br/><br/>');
       } else {
         explanation = q.explanation_markdown || q.explanation || '';
@@ -1161,13 +1169,15 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
       if (Array.isArray(q._explanations) && q._explanations.length > 0) {
         e = q._explanations
           .map((expl: any) => {
-            const source = expl.source || 'Unknown Source';
+            const text = expl.text || expl.explanationText || expl.answerText || expl.explanation || '';
+            if (!text) return '';
+            const source = expl.source || expl.institute || 'Unknown Source';
             const year = expl.year ? ` (${expl.year})` : '';
             const ans = expl.answer ? ` • Answer: ${expl.answer.toUpperCase()}` : '';
-            const text = expl.text || expl.explanation || '';
             const header = `<strong>${escapeHtml(source)}${year}${ans}:</strong>`;
-            return text ? `${header}<br/>${renderInline(text)}` : header;
+            return `${header}<br/>${renderInline(text)}`;
           })
+          .filter(Boolean)
           .join('<br/><br/>---<br/><br/>');
       } else {
         e = q.explanation_markdown || q.explanation || '';
@@ -1392,6 +1402,7 @@ export interface BuildPyqAnalysisSummaryInput {
   focusMicro: string;
   subjectHeatmapRows: PyqHeatmapRow[];
   topicHeatmapRows: PyqHeatmapRow[];
+  subtopicHeatmapRows?: PyqHeatmapRow[];
   heatmapPalette: PyqHeatmapPalette;
   momentumTitle?: string;
   distributionTitle?: string;
@@ -1691,6 +1702,7 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
     focusMicro,
     subjectHeatmapRows,
     topicHeatmapRows,
+    subtopicHeatmapRows,
     heatmapPalette,
     momentumTitle,
     distributionTitle,
@@ -1723,6 +1735,9 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
     }
     if (topicHeatmapRows.length > 0) {
       sections.push(renderPyqHeatmapSvg(secondaryHeatmapTitle || 'Top 20 Topics × Year Heatmap', secondaryHeatmapLabel || 'Topic', topicHeatmapRows, years, heatmapPalette));
+    }
+    if (subtopicHeatmapRows && subtopicHeatmapRows.length > 0 && examStage?.toLowerCase() === 'mains') {
+      sections.push(renderPyqHeatmapSvg('Top 20 Sub Topics × Year Heatmap', 'Sub Topic', subtopicHeatmapRows, years, heatmapPalette));
     }
   }
 

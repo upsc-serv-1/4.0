@@ -178,7 +178,6 @@ const CHOICES = {
 };
 
 const ANALYTICS_REPORT_TOGGLES: Array<{ key: keyof AnalysisReportToggles; label: string }> = [
-  { key: 'full_report', label: 'Full Analytics Report (PDF)' },
   { key: 'trajectory_graph', label: 'Performance Trajectory (Graph)' },
   { key: 'score_history_table', label: 'Score History Table' },
   { key: 'heatmaps', label: 'Mastery Heatmaps (Drill-down)' },
@@ -190,7 +189,6 @@ const ANALYTICS_REPORT_TOGGLES: Array<{ key: keyof AnalysisReportToggles; label:
 ];
 
 const PYQ_REPORT_TOGGLES: Array<{ key: keyof AnalysisReportToggles; label: string }> = [
-  { key: 'full_report', label: 'Full report' },
   { key: 'subject_momentum', label: 'Subject momentum' },
   { key: 'subject_distribution', label: 'Subject distribution' },
   { key: 'heatmaps', label: 'Heatmap' },
@@ -244,7 +242,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
   const [opts, setOpts] = useState<ExportOptions>(() => defaultExportOptions({
     title, moduleName: 'Analysis', headerText: 'Dr. UPSC · Analysis',
     contentScope: 'q_options_expl', answerPlacement: 'inline', sortBy: 'default',
-    fontSize: 10, showTOC: false,
+    fontSize: 10, showTOC: false, watermark: 'Dr. UPSC',
   }));
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -269,7 +267,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
       setOpts(defaultExportOptions({
         title, moduleName: 'Analysis', headerText: 'Dr. UPSC · Analysis',
         contentScope: 'q_options_expl', answerPlacement: 'inline', sortBy: 'default',
-        fontSize: 10, showTOC: false,
+        fontSize: 10, showTOC: false, watermark: 'Dr. UPSC',
       }));
       setIsExporting(false);
       setShowAdvanced(false);
@@ -1235,6 +1233,8 @@ function buildSummaryFromFilteredQuestions(
   const microByYear: Record<string, Record<string, number>> = {};
   const topicTotals: Record<string, number> = {};
   const topicByYear: Record<string, Record<string, number>> = {};
+  const subtopicTotals: Record<string, number> = {};
+  const subtopicByYear: Record<string, Record<string, number>> = {};
   const totalsByYear: Record<string, number> = {};
 
   rows.forEach(q => {
@@ -1245,6 +1245,7 @@ function buildSummaryFromFilteredQuestions(
     const section = q.section_group || 'General';
     const micro = q.micro_topic || 'Other';
     const topic = micro || section;
+    const subtopic = (q as any).sub_topic || (q as any).subtopic || 'Other';
 
     subjectTotals[subject] = (subjectTotals[subject] || 0) + 1;
     if (!subjectByYear[year]) subjectByYear[year] = {};
@@ -1262,6 +1263,10 @@ function buildSummaryFromFilteredQuestions(
     if (!topicByYear[topic]) topicByYear[topic] = {};
     topicByYear[topic][year] = (topicByYear[topic][year] || 0) + 1;
 
+    subtopicTotals[subtopic] = (subtopicTotals[subtopic] || 0) + 1;
+    if (!subtopicByYear[subtopic]) subtopicByYear[subtopic] = {};
+    subtopicByYear[subtopic][year] = (subtopicByYear[subtopic][year] || 0) + 1;
+
     totalsByYear[year] = (totalsByYear[year] || 0) + 1;
   });
 
@@ -1271,6 +1276,7 @@ function buildSummaryFromFilteredQuestions(
   const subjectSorted = Object.entries(subjectTotals).sort((a, b) => b[1] - a[1]);
   const sectionSorted = Object.entries(sectionTotals).sort((a, b) => b[1] - a[1]);
   const microSorted = Object.entries(microTotals).sort((a, b) => b[1] - a[1]);
+  const subtopicSorted = Object.entries(subtopicTotals).sort((a, b) => b[1] - a[1]);
 
   const isSingleSubject = selectedSubjects.length === 1;
   const deepDiveSubject = isSingleSubject ? selectedSubjects[0] : null;
@@ -1291,6 +1297,9 @@ function buildSummaryFromFilteredQuestions(
   }));
   const microHeatmapRows: PyqHeatmapRow[] = microSorted.slice(0, 24).map(([name]) => ({
     key: `micro-${name}`, label: name, byYear: microByYear[name] || {},
+  }));
+  const subtopicHeatmapRows: PyqHeatmapRow[] = subtopicSorted.slice(0, 20).map(([name]) => ({
+    key: `subtopic-${name}`, label: name, byYear: subtopicByYear[name] || {},
   }));
 
   const distributionData = isSingleSubject
@@ -1354,6 +1363,7 @@ function buildSummaryFromFilteredQuestions(
     focusMicro: selectedMicros.length === 1 ? selectedMicros[0] : 'All',
     subjectHeatmapRows: isSingleSubject ? sectionHeatmapRows : subjectHeatmapRows,
     topicHeatmapRows: isSingleSubject ? microHeatmapRows : topicHeatmapRows,
+    subtopicHeatmapRows: subtopicHeatmapRows,
     momentumTitle: isSingleSubject && deepDiveSubject ? `${deepDiveSubject} Momentum` : 'Subject Momentum',
     distributionTitle: isSingleSubject ? `${deepDiveSubject} Section Distribution` : 'Subject Distribution (Donut)',
     focusedTitle: isSingleSubject ? `${deepDiveSubject} Focused Trend` : 'Focused Trend',

@@ -1,0 +1,14 @@
+# Roo Code / Cline workspace rules
+# Ignore node_modules and build artifacts to prevent scanning overload
+
+always_ignore:
+  - node_modules/**
+  - .expo/**
+  - admin-panel/node_modules/**
+  - android/**
+  - ios/**
+  - .git/**
+  - *.lock
+  - package-lock.json
+  - yarn.lock
+

@@ -1,0 +1,10 @@
+# Roo Code workspace rules
+# Ignore large directories to prevent the extension from hanging
+
+always_ignore:
+  - node_modules/**
+  - .expo/**
+  - android/**
+  - ios/**
+  - .git/**
+  - *.lock

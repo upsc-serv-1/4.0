@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import FeatureGate from '../src/components/FeatureGate';
 import {
   View, 
@@ -88,6 +88,117 @@ type Mode = 'prelims' | 'mains' | 'optional';
 type CoverageMode = 'equal' | 'weighted';
 type WeightedYearMode = 'all' | 'single' | 'range';
 
+interface SyllabusNodeProps {
+  name: string;
+  node: any;
+  path: string;
+  level: number;
+  progress: Record<string, SyllabusProgress>;
+  toggleStatus: (path: string, stage: keyof SyllabusProgress) => void;
+  expandedPaths: Record<string, boolean>;
+  togglePathExpanded: (path: string) => void;
+  trackingMethod: 'single' | 'multi';
+  colors: any;
+}
+
+const SyllabusNode: React.FC<SyllabusNodeProps> = ({
+  name,
+  node,
+  path,
+  level,
+  progress,
+  toggleStatus,
+  expandedPaths,
+  togglePathExpanded,
+  trackingMethod,
+  colors
+}) => {
+  const isExpanded = expandedPaths[path];
+
+  if (Array.isArray(node)) {
+    return (
+      <View style={{ marginLeft: level > 0 ? 12 : 0, gap: 10 }}>
+        {node.map((topic, idx) => {
+          const itemPath = `${path}.${topic}`;
+          const itemProgress = progress[itemPath] || { ncert: false, pyqs: false, books: false, test: false, mastered: false };
+          return (
+            <View key={topic} style={[s.topicRow, { borderBottomColor: colors.border, paddingVertical: 10 }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', flex: 1 }}>
+                <TouchableOpacity onPress={() => toggleStatus(itemPath, 'mastered')} style={s.checkBtn}>
+                  {itemProgress.mastered ? (
+                    <CheckCircle2 size={22} color={colors.primary} fill={colors.primary + '20'} />
+                  ) : (
+                    <Circle size={22} color={colors.textTertiary} />
+                  )}
+                </TouchableOpacity>
+                <View style={{ flex: 1, marginLeft: 8 }}>
+                  <Text style={[s.topicText, { color: itemProgress.mastered ? colors.textSecondary : colors.textPrimary, textDecorationLine: itemProgress.mastered ? 'line-through' : 'none' }]}>
+                    {topic}
+                  </Text>
+                </View>
+              </View>
+              {trackingMethod === 'multi' && (
+                <View style={s.statusGrid}>
+                  <StatusBtn active={itemProgress.ncert} onPress={() => toggleStatus(itemPath, 'ncert')} label="NCERT" colors={colors} />
+                  <StatusBtn active={itemProgress.pyqs} onPress={() => toggleStatus(itemPath, 'pyqs')} label="PYQ" colors={colors} />
+                  <StatusBtn active={itemProgress.books} onPress={() => toggleStatus(itemPath, 'books')} label="Book" colors={colors} />
+                </View>
+              )}
+            </View>
+          );
+        })}
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ marginLeft: level > 0 ? 12 : 0, marginBottom: 8 }}>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={() => togglePathExpanded(path)}
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingVertical: 12,
+          paddingHorizontal: 16,
+          backgroundColor: colors.surfaceStrong || colors.surface,
+          borderRadius: 12,
+          borderWidth: 1,
+          borderColor: colors.border,
+          marginBottom: 4
+        }}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 8 }}>
+          <Target color={colors.primary} size={16} />
+          <Text style={{ fontSize: 13, fontWeight: '700', color: colors.textPrimary, flex: 1 }}>{name}</Text>
+        </View>
+        {isExpanded ? <ChevronUp size={16} color={colors.textTertiary} /> : <ChevronDown size={16} color={colors.textTertiary} />}
+      </TouchableOpacity>
+
+      {isExpanded && (
+        <View style={{ marginTop: 6, borderLeftWidth: 1, borderLeftColor: colors.border + '30', paddingLeft: 6 }}>
+          {Object.entries(node).map(([childKey, childNode]) => (
+            <SyllabusNode
+              key={childKey}
+              name={childKey}
+              node={childNode}
+              path={`${path}.${childKey}`}
+              level={level + 1}
+              progress={progress}
+              toggleStatus={toggleStatus}
+              expandedPaths={expandedPaths}
+              togglePathExpanded={togglePathExpanded}
+              trackingMethod={trackingMethod}
+              colors={colors}
+            />
+          ))}
+        </View>
+      )}
+    </View>
+  );
+};
+
 function SyllabusTracker() {
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
@@ -110,6 +221,20 @@ function SyllabusTracker() {
 
   const [progress, setProgress] = useState<Record<string, SyllabusProgress>>({});
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [expandedPaths, setExpandedPaths] = useState<Record<string, boolean>>({});
+
+  const togglePathExpanded = (path: string) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setExpandedPaths(prev => ({
+      ...prev,
+      [path]: !prev[path]
+    }));
+  };
+
+  useEffect(() => {
+    setExpandedPaths({});
+  }, [selectedSubject]);
+
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const [trackingMethod, setTrackingMethod] = useState<'single' | 'multi'>('multi');
   const [optionalChoice, setOptionalChoice] = useState<string>('Anthropology');
@@ -198,7 +323,7 @@ function SyllabusTracker() {
   }, [optionalChoice]);
 
   const activeSyllabus = mode === 'prelims' ? MICRO_SYLLABUS : mode === 'mains' ? MAINS_SYLLABUS : activeOptionalSyllabus;
-  const activeSyllabusMap = activeSyllabus as Record<string, Record<string, string[]>>;
+  const activeSyllabusMap = activeSyllabus as Record<string, any>;
 
   useEffect(() => {
     if (coverageMode !== 'weighted' || mode !== 'prelims') return;
@@ -259,37 +384,75 @@ function SyllabusTracker() {
     return weightedTopicCounts[t] || weightedSectionCounts[g] || weightedSubjectCounts[s] || 0;
   };
 
+  const getLeafNodes = useCallback((node: any, path: string): Array<{ path: string; topic: string }> => {
+    if (Array.isArray(node)) {
+      return node.map(topic => ({
+        path: `${path}.${topic}`,
+        topic
+      }));
+    }
+    const leaves: Array<{ path: string; topic: string }> = [];
+    if (node && typeof node === 'object') {
+      Object.entries(node).forEach(([key, val]) => {
+        leaves.push(...getLeafNodes(val, `${path}.${key}`));
+      });
+    }
+    return leaves;
+  }, []);
+
+  const getSubtreeStats = useCallback((node: any, path: string) => {
+    const leaves = getLeafNodes(node, path);
+    let totalItems = 0;
+    let completedItems = 0;
+    leaves.forEach(leaf => {
+      const item = progress[leaf.path] || {};
+      if (trackingMethod === 'single') {
+        totalItems += 1;
+        if (item.mastered) completedItems += 1;
+      } else {
+        totalItems += 4;
+        if (item.mastered) completedItems += 1;
+        if (item.ncert) completedItems += 1;
+        if (item.pyqs) completedItems += 1;
+        if (item.books) completedItems += 1;
+      }
+    });
+    return { percent: totalItems ? Math.round((completedItems / totalItems) * 100) : 0 };
+  }, [progress, trackingMethod, getLeafNodes]);
+
   const getOverallStats = () => {
     let totalItems = 0;
     let completedItems = 0;
     let weightedTotal = 0;
     let weightedCovered = 0;
 
-    Object.entries(activeSyllabusMap).forEach(([sub, groups]) => {
-      Object.entries(groups).forEach(([group, topics]) => {
-        (topics as string[]).forEach(topic => {
-          const path = `${sub}.${group}.${topic}`;
-          const item = progress[path] || {};
-          
-          if (trackingMethod === 'single') {
-             totalItems += 1;
-             if (item.mastered) completedItems += 1;
-          } else {
-             totalItems += 4; // mastered, ncert, pyqs, books
-             if (item.mastered) completedItems += 1;
-             if (item.ncert) completedItems += 1;
-             if (item.pyqs) completedItems += 1;
-             if (item.books) completedItems += 1;
-          }
+    Object.entries(activeSyllabusMap).forEach(([sub, node]) => {
+      const leaves = getLeafNodes(node, sub);
+      leaves.forEach(leaf => {
+        const item = progress[leaf.path] || {};
+        
+        if (trackingMethod === 'single') {
+           totalItems += 1;
+           if (item.mastered) completedItems += 1;
+        } else {
+           totalItems += 4;
+           if (item.mastered) completedItems += 1;
+           if (item.ncert) completedItems += 1;
+           if (item.pyqs) completedItems += 1;
+           if (item.books) completedItems += 1;
+        }
 
-          if (coverageMode === 'weighted' && mode === 'prelims') {
-            const weight = getTopicWeight(sub, group, topic);
+        if (coverageMode === 'weighted' && mode === 'prelims') {
+          const parts = leaf.path.split('.');
+          if (parts.length >= 3) {
+            const weight = getTopicWeight(parts[0], parts[1], parts[2]);
             weightedTotal += weight;
             weightedCovered += weight * getTopicCompletionScore(item);
           }
-        });
+        }
       });
     });
+
     const weightedPercent = weightedTotal ? Math.round((weightedCovered / weightedTotal) * 100) : 0;
     const linearPercent = totalItems ? Math.round((completedItems / totalItems) * 100) : 0;
     return {
@@ -306,30 +469,31 @@ function SyllabusTracker() {
     let completedItems = 0;
     let weightedTotal = 0;
     let weightedCovered = 0;
-    const groups = activeSyllabusMap[subject];
-    if (groups) {
-      Object.entries(groups).forEach(([group, topics]) => {
-        (topics as string[]).forEach(topic => {
-          const path = `${subject}.${group}.${topic}`;
-          const item = progress[path] || {};
+    const node = activeSyllabusMap[subject];
+    if (node) {
+      const leaves = getLeafNodes(node, subject);
+      leaves.forEach(leaf => {
+        const item = progress[leaf.path] || {};
 
-          if (trackingMethod === 'single') {
-             totalItems += 1;
-             if (item.mastered) completedItems += 1;
-          } else {
-             totalItems += 4;
-             if (item.mastered) completedItems += 1;
-             if (item.ncert) completedItems += 1;
-             if (item.pyqs) completedItems += 1;
-             if (item.books) completedItems += 1;
-          }
+        if (trackingMethod === 'single') {
+           totalItems += 1;
+           if (item.mastered) completedItems += 1;
+        } else {
+           totalItems += 4;
+           if (item.mastered) completedItems += 1;
+           if (item.ncert) completedItems += 1;
+           if (item.pyqs) completedItems += 1;
+           if (item.books) completedItems += 1;
+        }
 
-          if (coverageMode === 'weighted' && mode === 'prelims') {
-            const weight = getTopicWeight(subject, group, topic);
+        if (coverageMode === 'weighted' && mode === 'prelims') {
+          const parts = leaf.path.split('.');
+          if (parts.length >= 3) {
+            const weight = getTopicWeight(parts[0], parts[1], parts[2]);
             weightedTotal += weight;
             weightedCovered += weight * getTopicCompletionScore(item);
           }
-        });
+        }
       });
     }
     const weightedPercent = weightedTotal ? Math.round((weightedCovered / weightedTotal) * 100) : 0;
@@ -345,7 +509,7 @@ function SyllabusTracker() {
 
   const stats = useMemo(
     getOverallStats,
-    [mode, progress, activeSyllabus, trackingMethod, coverageMode, weightedTopicCounts, weightedSectionCounts, weightedSubjectCounts]
+    [mode, progress, activeSyllabus, trackingMethod, coverageMode, weightedTopicCounts, weightedSectionCounts, weightedSubjectCounts, getLeafNodes]
   );
 
   const getGroupStats = (subject: string, group: string, topics: string[]) => {
@@ -371,19 +535,18 @@ function SyllabusTracker() {
   const getSubjectDrilldown = (subject: string) => {
     const groups = activeSyllabusMap[subject] || {};
     const sectionRows = Object.entries(groups)
-      .map(([group, topics]) => ({ name: group, percent: getGroupStats(subject, group, topics as string[]).percent }))
+      .map(([group, val]) => ({ name: group, percent: getSubtreeStats(val, `${subject}.${group}`).percent }))
       .sort((a, b) => b.percent - a.percent);
 
     const microRows: Array<{ name: string; percent: number; group: string }> = [];
-    Object.entries(groups).forEach(([group, topics]) => {
-      (topics as string[]).forEach((topic) => {
-        const path = `${subject}.${group}.${topic}`;
-        const item = progress[path] || {};
-        microRows.push({
-          name: topic,
-          group,
-          percent: Math.round(getTopicCompletionScore(item) * 100),
-        });
+    const leaves = getLeafNodes(groups, subject);
+    leaves.forEach(leaf => {
+      const item = progress[leaf.path] || {};
+      const parts = leaf.path.split('.');
+      microRows.push({
+        name: leaf.topic,
+        group: parts.length > 2 ? parts[parts.length - 2] : '',
+        percent: Math.round(getTopicCompletionScore(item) * 100),
       });
     });
 
@@ -464,7 +627,10 @@ function SyllabusTracker() {
               onPress={() => {
                 LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
                 setSelectedSubject(subject);
-                setExpandedGroup(Object.keys(activeSyllabusMap[subject])[0] || null);
+                const firstGroup = Object.keys(activeSyllabusMap[subject])[0];
+                if (firstGroup) {
+                  setExpandedPaths({ [`${subject}.${firstGroup}`]: true });
+                }
               }}
             >
               <Text style={[s.subjectGridName, { color: colors.textSecondary }]} numberOfLines={1}>{subject}</Text>
@@ -553,12 +719,12 @@ function SyllabusTracker() {
             </View>
 
             <BarChart
-              data={Object.entries(activeSyllabusMap[selectedCompSubject]).map(([group, topics], idx) => {
+              data={Object.entries(activeSyllabusMap[selectedCompSubject]).map(([group, val], idx) => {
                 const groupColors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
                 const groupColor = groupColors[idx % groupColors.length];
                 return {
                   label: group,
-                  value: getGroupStats(selectedCompSubject, group, topics as string[]).percent,
+                  value: getSubtreeStats(val, `${selectedCompSubject}.${group}`).percent,
                   color: groupColor
                 };
               })}
@@ -585,13 +751,13 @@ function SyllabusTracker() {
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 10 }}>
                   {Object.entries(activeSyllabusMap[selectedCompSubject])
                     .filter(([group]) => !heatmapSection || group === heatmapSection)
-                    .flatMap(([group, topics], idx) => {
+                    .flatMap(([group, val], idx) => {
                       const groupColors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
                       const groupColor = groupColors[idx % groupColors.length];
-                      return (topics as string[]).map(topic => ({ group, topic, color: groupColor }));
+                      const leaves = getLeafNodes(val, `${selectedCompSubject}.${group}`);
+                      return leaves.map(leaf => ({ group, topic: leaf.topic, path: leaf.path, color: groupColor }));
                     })
-                    .map(({ group, topic, color }) => {
-                      const path = `${selectedCompSubject}.${group}.${topic}`;
+                    .map(({ group, topic, path, color }) => {
                       const item = progress[path] || {};
                       const isDone = item.mastered;
                       
@@ -645,7 +811,10 @@ function SyllabusTracker() {
                 <TouchableOpacity 
                   onPress={() => {
                     setSelectedSubject(selectedCompSubject);
-                    setExpandedGroup(heatmapSection || Object.keys(activeSyllabusMap[selectedCompSubject])[0]);
+                    const groupToExpand = heatmapSection || Object.keys(activeSyllabusMap[selectedCompSubject])[0];
+                    if (groupToExpand) {
+                      setExpandedPaths({ [`${selectedCompSubject}.${groupToExpand}`]: true });
+                    }
                   }}
                   style={{ 
                     marginTop: 16, 
@@ -734,54 +903,20 @@ function SyllabusTracker() {
         </View>
 
         <View style={s.groupsContainer}>
-          {Object.entries(groups).map(([group, topics]) => (
-            <View key={group} style={[s.groupCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <TouchableOpacity 
-                style={s.groupHeader}
-                onPress={() => {
-                  LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                  setExpandedGroup(expandedGroup === group ? null : group);
-                }}
-              >
-                <Text style={[s.groupName, { color: colors.textPrimary }]}>{group}</Text>
-                {expandedGroup === group ? <ChevronUp size={20} color={colors.textTertiary} /> : <ChevronDown size={20} color={colors.textTertiary} />}
-              </TouchableOpacity>
-
-              {expandedGroup === group && (
-                <View style={s.topicsList}>
-                  {(topics as string[]).map(topic => {
-                    const path = `${selectedSubject}.${group}.${topic}`;
-                    const itemProgress = progress[path] || { ncert: false, pyqs: false, books: false, test: false, mastered: false };
-                    
-                    return (
-                      <View key={topic} style={[s.topicRow, { borderBottomColor: colors.border }]}>
-                        <View style={{ flexDirection: 'row', alignItems: 'flex-start', flex: 1 }}>
-                           <TouchableOpacity onPress={() => toggleStatus(path, 'mastered')} style={s.checkBtn}>
-                              {itemProgress.mastered ? (
-                                <CheckCircle2 size={24} color={colors.primary} fill={colors.primary + '20'} />
-                              ) : (
-                                <Circle size={24} color={colors.textTertiary} />
-                              )}
-                           </TouchableOpacity>
-                           <View style={{ flex: 1 }}>
-                             <Text style={[s.topicText, { color: itemProgress.mastered ? colors.textSecondary : colors.textPrimary, textDecorationLine: itemProgress.mastered ? 'line-through' : 'none' }]}>
-                               {topic}
-                             </Text>
-                           </View>
-                        </View>
-                        
-                        {trackingMethod === 'multi' && (
-                          <View style={s.statusGrid}>
-                            <StatusBtn active={itemProgress.ncert} onPress={() => toggleStatus(path, 'ncert')} label="NCERT" colors={colors} />
-                            <StatusBtn active={itemProgress.pyqs} onPress={() => toggleStatus(path, 'pyqs')} label="PYQ" colors={colors} />
-                            <StatusBtn active={itemProgress.books} onPress={() => toggleStatus(path, 'books')} label="Book" colors={colors} />
-                          </View>
-                        )}
-                      </View>
-                    );
-                  })}
-                </View>
-              )}
+          {Object.entries(groups).map(([group, val]) => (
+            <View key={group} style={[s.groupCard, { backgroundColor: colors.surface, borderColor: colors.border, padding: 8 }]}>
+              <SyllabusNode
+                name={group}
+                node={val}
+                path={`${selectedSubject}.${group}`}
+                level={0}
+                progress={progress}
+                toggleStatus={toggleStatus}
+                expandedPaths={expandedPaths}
+                togglePathExpanded={togglePathExpanded}
+                trackingMethod={trackingMethod}
+                colors={colors}
+              />
             </View>
           ))}
         </View>

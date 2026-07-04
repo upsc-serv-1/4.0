@@ -16,7 +16,8 @@ HEADERS = {
 
 def upload_batch(table_name, rows):
     url = f"{SUPABASE_URL}/rest/v1/{table_name}"
-    batch_size = 50
+    # Use smaller batch size for answers to prevent timeouts (since answer text is massive)
+    batch_size = 20 if table_name == "mains_answers" else 50
     success_count = 0
     
     # Clean frontend-only columns that do not exist in the database table
@@ -25,6 +26,12 @@ def upload_batch(table_name, rows):
         c_row = r.copy()
         c_row.pop("ethicsData", None)
         c_row.pop("ethics_data", None)
+        if table_name == "mains_frameworks":
+            c_row.pop("paper", None)
+            c_row.pop("subject", None)
+            c_row.pop("section_group", None)
+            c_row.pop("microtopic", None)
+            c_row.pop("subtopic", None)
         cleaned_rows.append(c_row)
 
     for i in range(0, len(cleaned_rows), batch_size):
@@ -35,19 +42,22 @@ def upload_batch(table_name, rows):
             all_keys.update(r.keys())
         padded_batch = [{k: r.get(k, None) for k in all_keys} for r in batch]
         
+        success = False
         for attempt in range(5):
             try:
-                resp = requests.post(url, json=padded_batch, headers=HEADERS, timeout=30)
-                if resp.status_code not in [200, 201]:
-                    print(f"  [ERROR] Uploading to {table_name} batch starting at {i}: {resp.status_code} - {resp.text}")
+                resp = requests.post(url, json=padded_batch, headers=HEADERS, timeout=60)
+                if resp.status_code in [200, 201]:
+                    success_count += len(batch)
+                    success = True
                     break
                 else:
-                    success_count += len(batch)
-                    break
+                    print(f"  [WARNING] Uploading to {table_name} batch starting at {i} returned {resp.status_code}: {resp.text}. Retrying in 5 seconds (Attempt {attempt+1}/5)...")
+                    time.sleep(5)
             except Exception as e:
-                print(f"  [RETRY] Attempt {attempt+1}/5 failed with error: {e}. Retrying in 3 seconds...")
-                time.sleep(3)
-        else:
+                print(f"  [RETRY] Attempt {attempt+1}/5 failed with error: {e}. Retrying in 5 seconds...")
+                time.sleep(5)
+                
+        if not success:
             print(f"  [FATAL] Failed to upload batch starting at {i} after 5 attempts.")
             
     print(f"  [SUCCESS] Uploaded {success_count}/{len(rows)} rows to public.{table_name}")
@@ -63,7 +73,23 @@ def upload_mains_questions_answers():
         "mains_gs2_consolidated.json",
         "mains_gs3_consolidated.json",
         "mains_gs4_consolidated.json",
-        "mains_anthro1_consolidated.json"
+        "mains_anthro1_consolidated.json",
+        "mains_anthro2_consolidated.json",
+        "forum mgp 2026/forum-mgp-2026-csm26t01se.json",
+        "forum mgp 2026/forum-mgp-2026-csm26t02se.json",
+        "forum mgp 2026/forum-mgp-2026-csm26t03se.json",
+        "forum mgp 2026/forum-mgp-2026-csm26t04se.json",
+        "forum mgp 2026/forum-mgp-2026-csm26t05se.json",
+        "forum mgp 2026/forum-mgp-2026-csm26t06se.json",
+        "forum mgp 2026/forum-mgp-2026-csm26t07se.json",
+        "forum mgp 2026/forum-mgp-2026-csm26t08se.json",
+        "forum mgp 2026/forum-mgp-2026-csm26t09se.json",
+        "forum mgp 2026/forum-mgp-2026-csm26t10se.json",
+        "forum mgp 2026/forum-mgp-2026-csm26t11se.json",
+        "forum mgp 2026/forum-mgp-2026-csm26t12se.json",
+        "forum mgp 2026/forum-mgp-2026-csm26t13se.json",
+        "forum mgp 2026/forum-mgp-2026-csm26t14se.json",
+        "forum mgp 2026/forum-mgp-2026-csm26t15se.json"
     ]
     
     all_questions = []
@@ -116,20 +142,22 @@ def upload_mains_questions_answers():
                     is_others_val = bool(exam_info_val["is_others"])
                 exam_category_val = exam_info_val.get("exam_category", exam_category_val)
 
+            paper_val = q.get("paper") if q.get("paper") else paper_name
+
             all_questions.append({
                 "id": q_id,
                 "question_number": q.get("questionNumber"),
                 "question_text": q.get("questionText"),
                 "marks": marks_val,
                 "exam_year": q.get("year"),
-                "paper": paper_name,
+                "paper": paper_val,
                 "subject": q.get("subject"),
                 "section_group": q.get("sectionGroup"),
                 "microtopic": q.get("microTopic"),
                 "subtopic": q.get("subTopic"),
+                "nanotopic": q.get("nanoTopic"),
                 "macrotag": q.get("macrotag"),
                 "microtag": q.get("microtag"),
-                "hierarchy_path": q.get("hierarchy_path"),
                 "is_pyq": is_pyq_val,
                 "source_attribution_label": q.get("source_attribution_label"),
                 "exam_info": exam_info_val,

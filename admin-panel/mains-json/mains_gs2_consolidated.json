@@ -25,13 +25,6 @@
       "subTopic": "Amendments",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Features, amendments, significant provisions and basic structure",
-        "Amendments"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q29-civilsdaily",
@@ -77,13 +70,6 @@
       "subTopic": "Amendments",
       "macrotag": "Descriptive, Analytical",
       "microtag": "Explain, Do you think",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Features, amendments, significant provisions and basic structure",
-        "Amendments"
-      ],
       "answers": [
         {
           "id": "",
@@ -134,13 +120,6 @@
       "subTopic": "Case Laws",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Features, amendments, significant provisions and basic structure",
-        "Case Laws"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q4-civilsdaily",
@@ -191,13 +170,6 @@
       "subTopic": "Case Laws",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India, Problem",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Features, amendments, significant provisions and basic structure",
-        "Case Laws"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q3-civilsdaily",
@@ -293,13 +265,6 @@
       "subTopic": "Constitutional Morality",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Features, amendments, significant provisions and basic structure",
-        "Constitutional Morality"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q1-civilsdaily",
@@ -420,13 +385,6 @@
       "subTopic": "Fundamental Rights",
       "macrotag": "Analytical, Applied",
       "microtag": "Comment, India, Indian",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
-        "Fundamental Rights"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q6-civilsdaily",
@@ -482,13 +440,6 @@
       "subTopic": "Fundamental Rights",
       "macrotag": "Analytical",
       "microtag": "Examine",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
-        "Fundamental Rights"
-      ],
       "answers": [
         {
           "id": "",
@@ -539,13 +490,6 @@
       "subTopic": "Fundamental Rights",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India, Indian",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
-        "Fundamental Rights"
-      ],
       "answers": [
         {
           "id": "",
@@ -616,13 +560,6 @@
       "subTopic": "Fundamental Rights",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
-        "Fundamental Rights"
-      ],
       "answers": [
         {
           "id": "",
@@ -698,13 +635,6 @@
       "subTopic": "Constitutional Comparison",
       "macrotag": "Analytical, Applied",
       "microtag": "Critically examine, Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Comparison of the Indian constitutional scheme with that of other countries",
-        "Constitutional Comparison"
-      ],
       "answers": [
         {
           "id": "2025-gs2-q39-civilsdaily",
@@ -755,13 +685,6 @@
       "subTopic": "Constitutional Comparison",
       "macrotag": "Analytical, Comparative, Applied",
       "microtag": "Discuss, Compare, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Comparison of the Indian constitutional scheme with that of other countries",
-        "Constitutional Comparison"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q70-civilsdaily",
@@ -812,13 +735,6 @@
       "subTopic": "Constitutional Comparison",
       "macrotag": "Comparative, Applied",
       "microtag": "Compare, Contrast, India, Indian",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Comparison of the Indian constitutional scheme with that of other countries",
-        "Constitutional Comparison"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q75-civilsdaily",
@@ -874,13 +790,6 @@
       "subTopic": "Constitutional Comparison",
       "macrotag": "Analytical, Applied",
       "microtag": "Critically examine, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Comparison of the Indian constitutional scheme with that of other countries",
-        "Constitutional Comparison"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q73-civilsdaily",
@@ -936,13 +845,6 @@
       "subTopic": "Constitutional Comparison",
       "macrotag": "Analytical, Comparative, Applied",
       "microtag": "Analyze, Distinguish, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Comparison of the Indian constitutional scheme with that of other countries",
-        "Constitutional Comparison"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q130-civilsdaily",
@@ -998,13 +900,6 @@
       "subTopic": "Constitutional Comparison",
       "macrotag": "Descriptive, Applied",
       "microtag": "Highlight, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Comparison of the Indian constitutional scheme with that of other countries",
-        "Constitutional Comparison"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q74-civilsdaily",
@@ -1055,13 +950,6 @@
       "subTopic": "Constitutional Comparison",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India, Indian",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Comparison of the Indian constitutional scheme with that of other countries",
-        "Constitutional Comparison"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q72-civilsdaily",
@@ -1112,13 +1000,6 @@
       "subTopic": "Constitutional Comparison",
       "macrotag": "Analytical, Applied",
       "microtag": "Examine, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Constitutional Framework & Evolution",
-        "Comparison of the Indian constitutional scheme with that of other countries",
-        "Constitutional Comparison"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q129-civilsdaily",
@@ -1164,13 +1045,6 @@
       "subTopic": "Emergency",
       "macrotag": "Descriptive",
       "microtag": "Account for",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Functions and responsibilities of the Union and the States",
-        "Emergency"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q10-civilsdaily",
@@ -1226,13 +1100,6 @@
       "subTopic": "Emergency",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Functions and responsibilities of the Union and the States",
-        "Emergency"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q9-civilsdaily",
@@ -1298,13 +1165,6 @@
       "subTopic": "Special Provisions",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India, Indian",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Functions and responsibilities of the Union and the States",
-        "Special Provisions"
-      ],
       "answers": [
         {
           "id": "",
@@ -1355,13 +1215,6 @@
       "subTopic": "Federalism",
       "macrotag": "Analytical, Applied",
       "microtag": "How far, Examine, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Issues and challenges pertaining to the federal structure",
-        "Federalism"
-      ],
       "answers": [
         {
           "id": "2025-gs2-q19-civilsdaily",
@@ -1412,13 +1265,6 @@
       "subTopic": "Federalism",
       "macrotag": "Descriptive",
       "microtag": "What",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Issues and challenges pertaining to the federal structure",
-        "Federalism"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q20-civilsdaily",
@@ -1469,13 +1315,6 @@
       "subTopic": "Federalism",
       "macrotag": "Descriptive",
       "microtag": "Explain, What",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Issues and challenges pertaining to the federal structure",
-        "Federalism"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q18-civilsdaily",
@@ -1531,13 +1370,6 @@
       "subTopic": "Federalism",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elucidate, India, Indian",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Issues and challenges pertaining to the federal structure",
-        "Federalism"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q13-civilsdaily",
@@ -1588,13 +1420,6 @@
       "subTopic": "Federalism",
       "macrotag": "Analytical, Applied",
       "microtag": "Do you think, How far, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Issues and challenges pertaining to the federal structure",
-        "Federalism"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q12-civilsdaily",
@@ -1645,13 +1470,6 @@
       "subTopic": "Federalism",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Issues and challenges pertaining to the federal structure",
-        "Federalism"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q11-civilsdaily",
@@ -1737,13 +1555,6 @@
       "subTopic": "Federalism",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, Problem",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Issues and challenges pertaining to the federal structure",
-        "Federalism"
-      ],
       "answers": [
         {
           "id": "",
@@ -1814,13 +1625,6 @@
       "subTopic": "Union Territory",
       "macrotag": "Descriptive, Analytical",
       "microtag": "Describe, Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Issues and challenges pertaining to the federal structure",
-        "Union Territory"
-      ],
       "answers": [
         {
           "id": "2025-gs2-q15-civilsdaily",
@@ -1891,13 +1695,6 @@
       "subTopic": "Local Self Government",
       "macrotag": "Descriptive, Analytical",
       "microtag": "Bring out, Analyze",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Devolution of powers and finances up to local levels and challenges therein",
-        "Local Self Government"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q48-civilsdaily",
@@ -1948,13 +1745,6 @@
       "subTopic": "Local Self Government",
       "macrotag": "Analytical, Applied",
       "microtag": "Comment, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Devolution of powers and finances up to local levels and challenges therein",
-        "Local Self Government"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q50-civilsdaily",
@@ -2010,13 +1800,6 @@
       "subTopic": "Local Self Government",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Devolution of powers and finances up to local levels and challenges therein",
-        "Local Self Government"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q47-civilsdaily",
@@ -2072,13 +1855,6 @@
       "subTopic": "Local Self Government",
       "macrotag": "Descriptive, Applied",
       "microtag": "Highlight, Contemporary, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Devolution of powers and finances up to local levels and challenges therein",
-        "Local Self Government"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q51-civilsdaily",
@@ -2129,13 +1905,6 @@
       "subTopic": "Local Self Government",
       "macrotag": "Analytical, Applied",
       "microtag": "Comment, India, Indian",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Devolution of powers and finances up to local levels and challenges therein",
-        "Local Self Government"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q52-civilsdaily",
@@ -2181,13 +1950,6 @@
       "subTopic": "Local Self Government",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Assess, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Devolution of powers and finances up to local levels and challenges therein",
-        "Local Self Government"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q49-civilsdaily",
@@ -2238,13 +2000,6 @@
       "subTopic": "Local Self Government",
       "macrotag": "Analytical, Applied",
       "microtag": "Critically examine, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Devolution of powers and finances up to local levels and challenges therein",
-        "Local Self Government"
-      ],
       "answers": [
         {
           "id": "",
@@ -2295,13 +2050,6 @@
       "subTopic": "Local Self Government",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Federal Structure & Local Governance",
-        "Devolution of powers and finances up to local levels and challenges therein",
-        "Local Self Government"
-      ],
       "answers": [
         {
           "id": "",
@@ -2352,13 +2100,6 @@
       "subTopic": "Executive Vs Judiciary",
       "macrotag": "Analytical, Applied",
       "microtag": "Critically examine, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Separation of powers between different organs",
-        "Executive Vs Judiciary"
-      ],
       "answers": [
         {
           "id": "",
@@ -2409,13 +2150,6 @@
       "subTopic": "Executive Vs Legislature",
       "macrotag": "Descriptive",
       "microtag": "Elucidate",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Separation of powers between different organs",
-        "Executive Vs Legislature"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q22-civilsdaily",
@@ -2466,13 +2200,6 @@
       "subTopic": "Executive Vs Legislature",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Separation of powers between different organs",
-        "Executive Vs Legislature"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q21-civilsdaily",
@@ -2528,13 +2255,6 @@
       "subTopic": "Executive Vs Legislature",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Separation of powers between different organs",
-        "Executive Vs Legislature"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q25-civilsdaily",
@@ -2590,13 +2310,6 @@
       "subTopic": "Executive Vs Legislature",
       "macrotag": "Analytical",
       "microtag": "Examine",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Separation of powers between different organs",
-        "Executive Vs Legislature"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q17-civilsdaily",
@@ -2687,13 +2400,6 @@
       "subTopic": "Judiciary Vs Legislature",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Separation of powers between different organs",
-        "Judiciary Vs Legislature"
-      ],
       "answers": [
         {
           "id": "",
@@ -2744,13 +2450,6 @@
       "subTopic": "Separation of Powers",
       "macrotag": "Analytical",
       "microtag": "Comment",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Separation of powers between different organs",
-        "Separation of Powers"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q37-civilsdaily",
@@ -2806,13 +2505,6 @@
       "subTopic": "Separation of Powers",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Explain, Do you think, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Separation of powers between different organs",
-        "Separation of Powers"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q5-civilsdaily",
@@ -2858,13 +2550,6 @@
       "subTopic": "Bicameralism",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these",
-        "Bicameralism"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q36-civilsdaily",
@@ -2920,13 +2605,6 @@
       "subTopic": "Bicameralism",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these",
-        "Bicameralism"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q36-civilsdaily",
@@ -2982,13 +2660,6 @@
       "subTopic": "Bicameralism",
       "macrotag": "Descriptive",
       "microtag": "Highlight",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these",
-        "Bicameralism"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q35-civilsdaily",
@@ -3039,13 +2710,6 @@
       "subTopic": "Bicameralism",
       "macrotag": "Descriptive, Applied",
       "microtag": "Enumerate, India, Indian",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these",
-        "Bicameralism"
-      ],
       "answers": [
         {
           "id": "",
@@ -3096,13 +2760,6 @@
       "subTopic": "Parliamentary Committees",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Explain, How far, India, Indian",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these",
-        "Parliamentary Committees"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q28-civilsdaily",
@@ -3158,13 +2815,6 @@
       "subTopic": "Parliamentary Committees",
       "macrotag": "Analytical",
       "microtag": "Evaluate",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these",
-        "Parliamentary Committees"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q27-civilsdaily",
@@ -3220,13 +2870,6 @@
       "subTopic": "Parliamentary Committees",
       "macrotag": "Descriptive, Analytical",
       "microtag": "Why, Do you think, Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these",
-        "Parliamentary Committees"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q26-civilsdaily",
@@ -3277,13 +2920,6 @@
       "subTopic": "Parliamentary Committees",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these",
-        "Parliamentary Committees"
-      ],
       "answers": [
         {
           "id": "",
@@ -3379,13 +3015,6 @@
       "subTopic": "Presiding Officers",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these",
-        "Presiding Officers"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q34-civilsdaily",
@@ -3441,13 +3070,6 @@
       "subTopic": "Presiding Officers",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Do you think, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these",
-        "Presiding Officers"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q32-civilsdaily",
@@ -3498,13 +3120,6 @@
       "subTopic": "Role of MPs",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these",
-        "Role of MPs"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q31-civilsdaily",
@@ -3595,13 +3210,6 @@
       "subTopic": "Union Executive",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Structure, organization and functioning of the Executive",
-        "Union Executive"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q23-civilsdaily",
@@ -3692,13 +3300,6 @@
       "subTopic": "Alternate Dispute Resolution",
       "macrotag": "Descriptive, Comparative",
       "microtag": "Explain, Distinguish",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Structure, organization and functioning of the Judiciary (including Tribunals & ADR)",
-        "Alternate Dispute Resolution"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q45-civilsdaily",
@@ -3749,13 +3350,6 @@
       "subTopic": "Alternate Dispute Resolution",
       "macrotag": "Analytical, Applied",
       "microtag": "Assess, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Structure, organization and functioning of the Judiciary (including Tribunals & ADR)",
-        "Alternate Dispute Resolution"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q42-civilsdaily",
@@ -3831,13 +3425,6 @@
       "subTopic": "Judiciary",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, India, Indian",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Structure, organization and functioning of the Judiciary (including Tribunals & ADR)",
-        "Judiciary"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q40-civilsdaily",
@@ -3888,13 +3475,6 @@
       "subTopic": "Judiciary",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Structure, organization and functioning of the Judiciary (including Tribunals & ADR)",
-        "Judiciary"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q38-civilsdaily",
@@ -3970,13 +3550,6 @@
       "subTopic": "Tribunal",
       "macrotag": "Analytical, Comparative",
       "microtag": "Comment, Assess, Compare",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Structure, organization and functioning of the Judiciary (including Tribunals & ADR)",
-        "Tribunal"
-      ],
       "answers": [
         {
           "id": "2025-gs2-q46-civilsdaily",
@@ -4047,13 +3620,6 @@
       "subTopic": "Pressure Groups",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Pressure groups and formal/informal associations and their role in the Polity",
-        "Pressure Groups"
-      ],
       "answers": [
         {
           "id": "2025-gs2-q94-civilsdaily",
@@ -4129,13 +3695,6 @@
       "subTopic": "Pressure Groups",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, How, India, Policy",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Pressure groups and formal/informal associations and their role in the Polity",
-        "Pressure Groups"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q90-civilsdaily",
@@ -4186,13 +3745,6 @@
       "subTopic": "Pressure Groups",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "How, Do you agree, India, Indian",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Pressure groups and formal/informal associations and their role in the Polity",
-        "Pressure Groups"
-      ],
       "answers": [
         {
           "id": "",
@@ -4243,13 +3795,6 @@
       "subTopic": "Pressure Groups",
       "macrotag": "Analytical, Applied",
       "microtag": "Assess, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Organs of Government & Dispute Redressal",
-        "Pressure groups and formal/informal associations and their role in the Polity",
-        "Pressure Groups"
-      ],
       "answers": [
         {
           "id": "",
@@ -4300,13 +3845,6 @@
       "subTopic": "Election Dispute and Disqualification",
       "macrotag": "Analytical",
       "microtag": "Analyze, Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Elections & Political Dynamics",
-        "Salient features of the Representation of People's Act",
-        "Election Dispute and Disqualification"
-      ],
       "answers": [
         {
           "id": "2025-gs2-q55-civilsdaily",
@@ -4382,13 +3920,6 @@
       "subTopic": "Election Dispute and Disqualification",
       "macrotag": "Analytical",
       "microtag": "Comment",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Elections & Political Dynamics",
-        "Salient features of the Representation of People's Act",
-        "Election Dispute and Disqualification"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q54-civilsdaily",
@@ -4439,13 +3970,6 @@
       "subTopic": "Election Dispute and Disqualification",
       "macrotag": "Descriptive",
       "microtag": "What, Mention",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Elections & Political Dynamics",
-        "Salient features of the Representation of People's Act",
-        "Election Dispute and Disqualification"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q53-civilsdaily",
@@ -4496,13 +4020,6 @@
       "subTopic": "Electoral reforms",
       "macrotag": "Analytical",
       "microtag": "Examine",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Elections & Political Dynamics",
-        "Salient features of the Representation of People's Act",
-        "Electoral reforms"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q58-civilsdaily",
@@ -4553,13 +4070,6 @@
       "subTopic": "Electoral reforms",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Elections & Political Dynamics",
-        "Salient features of the Representation of People's Act",
-        "Electoral reforms"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q59-civilsdaily",
@@ -4605,13 +4115,6 @@
       "subTopic": "Electoral reforms",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, How far, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Elections & Political Dynamics",
-        "Salient features of the Representation of People's Act",
-        "Electoral reforms"
-      ],
       "answers": [
         {
           "id": "",
@@ -4662,13 +4165,6 @@
       "subTopic": "Electoral reforms",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Elections & Political Dynamics",
-        "Salient features of the Representation of People's Act",
-        "Electoral reforms"
-      ],
       "answers": [
         {
           "id": "",
@@ -4719,13 +4215,6 @@
       "subTopic": "MCC",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Elections & Political Dynamics",
-        "Salient features of the Representation of People's Act",
-        "MCC"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q57-civilsdaily",
@@ -4781,13 +4270,6 @@
       "subTopic": "Political Parties",
       "macrotag": "Analytical, Applied",
       "microtag": "Comment, India",
-      "hierarchy_path": [
-        "GS2",
-        "POLITY",
-        "Elections & Political Dynamics",
-        "Salient features of the Representation of People's Act",
-        "Political Parties"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q60-civilsdaily",
@@ -4863,13 +4345,6 @@
       "subTopic": "Constitutional Bodies",
       "macrotag": "Analytical",
       "microtag": "Comment",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Appointment to various Constitutional posts; Constitutional Bodies (powers, functions and responsibilities)",
-        "Constitutional Bodies"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q65-civilsdaily",
@@ -4920,13 +4395,6 @@
       "subTopic": "Constitutional Bodies",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Appointment to various Constitutional posts; Constitutional Bodies (powers, functions and responsibilities)",
-        "Constitutional Bodies"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q69-civilsdaily",
@@ -4982,13 +4450,6 @@
       "subTopic": "Constitutional Bodies",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, India",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Appointment to various Constitutional posts; Constitutional Bodies (powers, functions and responsibilities)",
-        "Constitutional Bodies"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q16-civilsdaily",
@@ -5044,13 +4505,6 @@
       "subTopic": "Constitutional Bodies",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, How, Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Appointment to various Constitutional posts; Constitutional Bodies (powers, functions and responsibilities)",
-        "Constitutional Bodies"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q66-civilsdaily",
@@ -5101,13 +4555,6 @@
       "subTopic": "Constitutional Bodies",
       "macrotag": "Descriptive",
       "microtag": "Explain, How",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Appointment to various Constitutional posts; Constitutional Bodies (powers, functions and responsibilities)",
-        "Constitutional Bodies"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q64-civilsdaily",
@@ -5153,13 +4600,6 @@
       "subTopic": "Constitutional Bodies",
       "macrotag": "Analytical",
       "microtag": "Examine",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Appointment to various Constitutional posts; Constitutional Bodies (powers, functions and responsibilities)",
-        "Constitutional Bodies"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q63-civilsdaily",
@@ -5230,13 +4670,6 @@
       "subTopic": "Constitutional Bodies",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Appointment to various Constitutional posts; Constitutional Bodies (powers, functions and responsibilities)",
-        "Constitutional Bodies"
-      ],
       "answers": [
         {
           "id": "",
@@ -5287,13 +4720,6 @@
       "subTopic": "Enforcement Agencies",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, How, India",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Statutory, Regulatory and Quasi-judicial bodies",
-        "Enforcement Agencies"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q14-civilsdaily",
@@ -5349,13 +4775,6 @@
       "subTopic": "Quasi judicial Bodies",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Statutory, Regulatory and Quasi-judicial bodies",
-        "Quasi judicial Bodies"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q44-civilsdaily",
@@ -5401,13 +4820,6 @@
       "subTopic": "Quasi judicial Bodies",
       "macrotag": "Analytical, Applied",
       "microtag": "Do you agree, How far, Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Statutory, Regulatory and Quasi-judicial bodies",
-        "Quasi judicial Bodies"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q43-civilsdaily",
@@ -5518,13 +4930,6 @@
       "subTopic": "Sectoral Regulatory Bodies",
       "macrotag": "Analytical",
       "microtag": "Justify",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Statutory, Regulatory and Quasi-judicial bodies",
-        "Sectoral Regulatory Bodies"
-      ],
       "answers": [
         {
           "id": "",
@@ -5575,13 +4980,6 @@
       "subTopic": "Statutory Bodies",
       "macrotag": "Analytical, Applied",
       "microtag": "Examine, Digital",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Statutory, Regulatory and Quasi-judicial bodies",
-        "Statutory Bodies"
-      ],
       "answers": [
         {
           "id": "2025-gs2-q103-civilsdaily",
@@ -5632,13 +5030,6 @@
       "subTopic": "Statutory Bodies",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Statutory, Regulatory and Quasi-judicial bodies",
-        "Statutory Bodies"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q76-civilsdaily",
@@ -5719,13 +5110,6 @@
       "subTopic": "Statutory Bodies",
       "macrotag": "Analytical, Applied",
       "microtag": "Do you think, India",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Statutory, Regulatory and Quasi-judicial bodies",
-        "Statutory Bodies"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q62-civilsdaily",
@@ -5776,13 +5160,6 @@
       "subTopic": "Statutory Bodies",
       "macrotag": "Analytical, Applied",
       "microtag": "Argue, Problem",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Statutory, Regulatory and Quasi-judicial bodies",
-        "Statutory Bodies"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q61-civilsdaily",
@@ -5828,13 +5205,6 @@
       "subTopic": "Statutory Bodies",
       "macrotag": "Applied",
       "microtag": "Problem",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Statutory, Regulatory and Quasi-judicial bodies",
-        "Statutory Bodies"
-      ],
       "answers": [
         {
           "id": "",
@@ -5905,13 +5275,6 @@
       "subTopic": "Statutory Bodies",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "How, Discuss, Problem",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Constitutional & Regulatory Bodies",
-        "Statutory, Regulatory and Quasi-judicial bodies",
-        "Statutory Bodies"
-      ],
       "answers": [
         {
           "id": "",
@@ -5962,13 +5325,6 @@
       "subTopic": "Government Schemes and Policies",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Development Processes & Policies",
-        "Government Policies & Interventions for development of various sectors (issues in their design, implementation)",
-        "Government Schemes and Policies"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q98-civilsdaily",
@@ -6044,13 +5400,6 @@
       "subTopic": "Government Schemes and Policies",
       "macrotag": "Analytical",
       "microtag": "Comment",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Development Processes & Policies",
-        "Government Policies & Interventions for development of various sectors (issues in their design, implementation)",
-        "Government Schemes and Policies"
-      ],
       "answers": [
         {
           "id": "",
@@ -6101,13 +5450,6 @@
       "subTopic": "Structural reforms and Actions",
       "macrotag": "Analytical, Applied",
       "microtag": "Critically evaluate, Contemporary, Problem",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Development Processes & Policies",
-        "Government Policies & Interventions for development of various sectors (issues in their design, implementation)",
-        "Structural reforms and Actions"
-      ],
       "answers": [
         {
           "id": "2025-gs2-q100-civilsdaily",
@@ -6158,13 +5500,6 @@
       "subTopic": "Structural reforms and Actions",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Development Processes & Policies",
-        "Government Policies & Interventions for development of various sectors (issues in their design, implementation)",
-        "Structural reforms and Actions"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q96-civilsdaily",
@@ -6215,13 +5550,6 @@
       "subTopic": "Structural reforms and Actions",
       "macrotag": "Analytical, Applied",
       "microtag": "Examine, India",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Development Processes & Policies",
-        "Government Policies & Interventions for development of various sectors (issues in their design, implementation)",
-        "Structural reforms and Actions"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q97-civilsdaily",
@@ -6267,13 +5595,6 @@
       "subTopic": "Structural reforms and Actions",
       "macrotag": "Analytical, Applied",
       "microtag": "Comment, Policy",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Development Processes & Policies",
-        "Government Policies & Interventions for development of various sectors (issues in their design, implementation)",
-        "Structural reforms and Actions"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q95-civilsdaily",
@@ -6379,13 +5700,6 @@
       "subTopic": "Civil Society",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Development Processes & Policies",
-        "Development processes and the role of NGOs, Civil Society, and various groups and associations",
-        "Civil Society"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q105-civilsdaily",
@@ -6441,13 +5755,6 @@
       "subTopic": "Civil Society",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Development Processes & Policies",
-        "Development processes and the role of NGOs, Civil Society, and various groups and associations",
-        "Civil Society"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q104-civilsdaily",
@@ -6558,13 +5865,6 @@
       "subTopic": "SHGs",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Development Processes & Policies",
-        "Role of Self Help Groups (SHGs) and microfinancing in development activities",
-        "SHGs"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q111-civilsdaily",
@@ -6615,13 +5915,6 @@
       "subTopic": "SHGs",
       "macrotag": "Analytical, Applied",
       "microtag": "Evaluate, India",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Development Processes & Policies",
-        "Role of Self Help Groups (SHGs) and microfinancing in development activities",
-        "SHGs"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q109-civilsdaily",
@@ -6672,13 +5965,6 @@
       "subTopic": "SHGs",
       "macrotag": "Analytical, Applied",
       "microtag": "Examine, Contemporary, India",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Development Processes & Policies",
-        "Role of Self Help Groups (SHGs) and microfinancing in development activities",
-        "SHGs"
-      ],
       "answers": [
         {
           "id": "",
@@ -6769,13 +6055,6 @@
       "subTopic": "SHGs",
       "macrotag": "Analytical",
       "microtag": "Discuss, Assess",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Development Processes & Policies",
-        "Role of Self Help Groups (SHGs) and microfinancing in development activities",
-        "SHGs"
-      ],
       "answers": [
         {
           "id": "",
@@ -6826,13 +6105,6 @@
       "subTopic": "Donor Agencies",
       "macrotag": "Analytical, Applied",
       "microtag": "Comment, India",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Development Processes & Policies",
-        "Role of donors, charities, institutional and other external stakeholders",
-        "Donor Agencies"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q92-civilsdaily",
@@ -6883,13 +6155,6 @@
       "subTopic": "Donor Agencies",
       "macrotag": "Analytical",
       "microtag": "Do you agree, Justify",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Development Processes & Policies",
-        "Role of donors, charities, institutional and other external stakeholders",
-        "Donor Agencies"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q99-civilsdaily",
@@ -6945,13 +6210,6 @@
       "subTopic": "Citizens Charter",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "Transaparency and accountability (institutional and other measures); Citizens Charter",
-        "Citizens Charter"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q78-civilsdaily",
@@ -7002,13 +6260,6 @@
       "subTopic": "Citizens Charter",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "Transaparency and accountability (institutional and other measures); Citizens Charter",
-        "Citizens Charter"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q77-civilsdaily",
@@ -7054,13 +6305,6 @@
       "subTopic": "Citizens Charter",
       "macrotag": "Analytical",
       "microtag": "Analyze",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "Transaparency and accountability (institutional and other measures); Citizens Charter",
-        "Citizens Charter"
-      ],
       "answers": [
         {
           "id": "",
@@ -7111,13 +6355,6 @@
       "subTopic": "Transparency and Accountability",
       "macrotag": "Descriptive",
       "microtag": "What",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "Transaparency and accountability (institutional and other measures); Citizens Charter",
-        "Transparency and Accountability"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q79-civilsdaily",
@@ -7168,13 +6405,6 @@
       "subTopic": "Transparency and Accountability",
       "macrotag": "Analytical",
       "microtag": "Comment",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "Transaparency and accountability (institutional and other measures); Citizens Charter",
-        "Transparency and Accountability"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q87-civilsdaily",
@@ -7230,13 +6460,6 @@
       "subTopic": "Transparency and Accountability",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "Transaparency and accountability (institutional and other measures); Citizens Charter",
-        "Transparency and Accountability"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q67-civilsdaily",
@@ -7367,13 +6590,6 @@
       "subTopic": "E-governance",
       "macrotag": "Analytical",
       "microtag": "Examine",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "E-Governance (applications, models, successes, limitations, potential)",
-        "E-governance"
-      ],
       "answers": [
         {
           "id": "2025-gs2-q89-civilsdaily",
@@ -7424,13 +6640,6 @@
       "subTopic": "E-governance",
       "macrotag": "Analytical, Applied",
       "microtag": "Evaluate, Digital",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "E-Governance (applications, models, successes, limitations, potential)",
-        "E-governance"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q84-civilsdaily",
@@ -7481,13 +6690,6 @@
       "subTopic": "E-governance",
       "macrotag": "Descriptive",
       "microtag": "What",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "E-Governance (applications, models, successes, limitations, potential)",
-        "E-governance"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q88-civilsdaily",
@@ -7543,13 +6745,6 @@
       "subTopic": "E-governance",
       "macrotag": "Analytical, Applied",
       "microtag": "Examine, Digital",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "E-Governance (applications, models, successes, limitations, potential)",
-        "E-governance"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q86-civilsdaily",
@@ -7605,13 +6800,6 @@
       "subTopic": "E-governance",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, Digital",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "E-Governance (applications, models, successes, limitations, potential)",
-        "E-governance"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q83-civilsdaily",
@@ -7662,13 +6850,6 @@
       "subTopic": "E-governance",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "E-Governance (applications, models, successes, limitations, potential)",
-        "E-governance"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q85-civilsdaily",
@@ -7714,13 +6895,6 @@
       "subTopic": "E-governance",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "E-Governance (applications, models, successes, limitations, potential)",
-        "E-governance"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q82-civilsdaily",
@@ -7771,13 +6945,6 @@
       "subTopic": "E-governance",
       "macrotag": "Analytical",
       "microtag": "Comment",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "E-Governance (applications, models, successes, limitations, potential)",
-        "E-governance"
-      ],
       "answers": [
         {
           "id": "",
@@ -7828,13 +6995,6 @@
       "subTopic": "Civil Services",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "Role of Civil Services in a democracy",
-        "Civil Services"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q81-civilsdaily",
@@ -7885,13 +7045,6 @@
       "subTopic": "Civil Services",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "Role of Civil Services in a democracy",
-        "Civil Services"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q80-civilsdaily",
@@ -7942,13 +7095,6 @@
       "subTopic": "Civil Services",
       "macrotag": "Analytical, Applied",
       "microtag": "Do you agree, Comment, India",
-      "hierarchy_path": [
-        "GS2",
-        "GOVERNANCE",
-        "Accountability & Civil Services",
-        "Role of Civil Services in a democracy",
-        "Civil Services"
-      ],
       "answers": [
         {
           "id": "",
@@ -8059,13 +7205,6 @@
       "subTopic": "Disabled",
       "macrotag": "Analytical",
       "microtag": "Comment",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Vulnerable Sections & Welfare",
-        "Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies",
-        "Disabled"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q101-civilsdaily",
@@ -8121,13 +7260,6 @@
       "subTopic": "Disabled",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Vulnerable Sections & Welfare",
-        "Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies",
-        "Disabled"
-      ],
       "answers": [
         {
           "id": "",
@@ -8178,13 +7310,6 @@
       "subTopic": "Efficacy of Welfare and Development Schemes",
       "macrotag": "Analytical",
       "microtag": "Do you agree",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Vulnerable Sections & Welfare",
-        "Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies",
-        "Efficacy of Welfare and Development Schemes"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q108-civilsdaily",
@@ -8240,13 +7365,6 @@
       "subTopic": "Efficacy of Welfare and Development Schemes",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, Policy",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Vulnerable Sections & Welfare",
-        "Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies",
-        "Efficacy of Welfare and Development Schemes"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q106-civilsdaily",
@@ -8317,13 +7435,6 @@
       "subTopic": "Efficacy of Welfare and Development Schemes",
       "macrotag": "Analytical",
       "microtag": "Critically evaluate",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Vulnerable Sections & Welfare",
-        "Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies",
-        "Efficacy of Welfare and Development Schemes"
-      ],
       "answers": [
         {
           "id": "",
@@ -8374,13 +7485,6 @@
       "subTopic": "Women",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Vulnerable Sections & Welfare",
-        "Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies",
-        "Women"
-      ],
       "answers": [
         {
           "id": "2025-gs2-q112-civilsdaily",
@@ -8431,13 +7535,6 @@
       "subTopic": "Women",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Vulnerable Sections & Welfare",
-        "Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies",
-        "Women"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q110-civilsdaily",
@@ -8488,13 +7585,6 @@
       "subTopic": "Education",
       "macrotag": "Analytical",
       "microtag": "Analyze",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Social Sector & Human Development",
-        "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
-        "Education"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q120-civilsdaily",
@@ -8550,13 +7640,6 @@
       "subTopic": "Education",
       "macrotag": "Analytical",
       "microtag": "Comment",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Social Sector & Human Development",
-        "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
-        "Education"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q119-civilsdaily",
@@ -8607,13 +7690,6 @@
       "subTopic": "Education",
       "macrotag": "Analytical, Applied",
       "microtag": "Examine, India, Policy",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Social Sector & Human Development",
-        "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
-        "Education"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q116-civilsdaily",
@@ -8724,13 +7800,6 @@
       "subTopic": "Health",
       "macrotag": "Analytical",
       "microtag": "Analyze",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Social Sector & Human Development",
-        "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
-        "Health"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q118-civilsdaily",
@@ -8781,13 +7850,6 @@
       "subTopic": "Health",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Social Sector & Human Development",
-        "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
-        "Health"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q115-civilsdaily",
@@ -8838,13 +7900,6 @@
       "subTopic": "Health",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, India",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Social Sector & Human Development",
-        "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
-        "Health"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q113-civilsdaily",
@@ -8895,13 +7950,6 @@
       "subTopic": "Health",
       "macrotag": "Analytical",
       "microtag": "Examine",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Social Sector & Human Development",
-        "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
-        "Health"
-      ],
       "answers": [
         {
           "id": "",
@@ -8972,13 +8020,6 @@
       "subTopic": "Health",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Social Sector & Human Development",
-        "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
-        "Health"
-      ],
       "answers": [
         {
           "id": "",
@@ -9029,13 +8070,6 @@
       "subTopic": "Human Resources",
       "macrotag": "Analytical",
       "microtag": "Analyze",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Social Sector & Human Development",
-        "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
-        "Human Resources"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q121-civilsdaily",
@@ -9091,13 +8125,6 @@
       "subTopic": "Human Resources",
       "macrotag": "Applied",
       "microtag": "India",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Social Sector & Human Development",
-        "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
-        "Human Resources"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q102-civilsdaily",
@@ -9153,13 +8180,6 @@
       "subTopic": "Human Resources",
       "macrotag": "Analytical, Applied",
       "microtag": "Examine, India",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Social Sector & Human Development",
-        "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
-        "Human Resources"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q114-civilsdaily",
@@ -9270,13 +8290,6 @@
       "subTopic": "Hunger",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elucidate, India",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Poverty & Hunger",
-        "Issues and Challenges relating to Poverty & Hunger",
-        "Hunger"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q125-civilsdaily",
@@ -9322,13 +8335,6 @@
       "subTopic": "Hunger",
       "macrotag": "Analytical, Applied",
       "microtag": "Do you agree, How far, India",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Poverty & Hunger",
-        "Issues and Challenges relating to Poverty & Hunger",
-        "Hunger"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q123-civilsdaily",
@@ -9379,13 +8385,6 @@
       "subTopic": "Hunger",
       "macrotag": "Analytical, Applied",
       "microtag": "Critically examine, India",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Poverty & Hunger",
-        "Issues and Challenges relating to Poverty & Hunger",
-        "Hunger"
-      ],
       "answers": [
         {
           "id": "",
@@ -9436,13 +8435,6 @@
       "subTopic": "Miscellaneous (Poverty & Hunger)",
       "macrotag": "Analytical, Applied",
       "microtag": "How far, Evaluate, India, Problem",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Poverty & Hunger",
-        "Issues and Challenges relating to Poverty & Hunger",
-        "Miscellaneous (Poverty & Hunger)"
-      ],
       "answers": [
         {
           "id": "",
@@ -9493,13 +8485,6 @@
       "subTopic": "Poverty",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Poverty & Hunger",
-        "Issues and Challenges relating to Poverty & Hunger",
-        "Poverty"
-      ],
       "answers": [
         {
           "id": "2025-gs2-q128-civilsdaily",
@@ -9550,13 +8535,6 @@
       "subTopic": "Poverty",
       "macrotag": "Descriptive",
       "microtag": "What",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Poverty & Hunger",
-        "Issues and Challenges relating to Poverty & Hunger",
-        "Poverty"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q127-civilsdaily",
@@ -9607,13 +8585,6 @@
       "subTopic": "Poverty",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Poverty & Hunger",
-        "Issues and Challenges relating to Poverty & Hunger",
-        "Poverty"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q107-civilsdaily",
@@ -9669,13 +8640,6 @@
       "subTopic": "Poverty",
       "macrotag": "Analytical",
       "microtag": "Analyze",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Poverty & Hunger",
-        "Issues and Challenges relating to Poverty & Hunger",
-        "Poverty"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q126-civilsdaily",
@@ -9726,13 +8690,6 @@
       "subTopic": "Poverty",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "How, Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "SOCIAL JUSTICE",
-        "Poverty & Hunger",
-        "Issues and Challenges relating to Poverty & Hunger",
-        "Poverty"
-      ],
       "answers": [
         {
           "id": "",
@@ -9803,13 +8760,6 @@
       "subTopic": "Neighbourhood",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Neighborhood & Bilateral Engagements",
-        "Neighborhood Relations: India & its Neighborhood-Relations",
-        "Neighbourhood"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q132-civilsdaily",
@@ -9900,13 +8850,6 @@
       "subTopic": "Neighbourhood",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Neighborhood & Bilateral Engagements",
-        "Neighborhood Relations: India & its Neighborhood-Relations",
-        "Neighbourhood"
-      ],
       "answers": [
         {
           "id": "",
@@ -9957,13 +8900,6 @@
       "subTopic": "Neighbourhood",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "How, Discuss, India, Policy",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Neighborhood & Bilateral Engagements",
-        "Neighborhood Relations: India & its Neighborhood-Relations",
-        "Neighbourhood"
-      ],
       "answers": [
         {
           "id": "",
@@ -10009,13 +8945,6 @@
       "subTopic": "Neighbourhood",
       "macrotag": "Descriptive, Applied",
       "microtag": "What is, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Neighborhood & Bilateral Engagements",
-        "Neighborhood Relations: India & its Neighborhood-Relations",
-        "Neighbourhood"
-      ],
       "answers": [
         {
           "id": "",
@@ -10066,13 +8995,6 @@
       "subTopic": "Neighbourhood",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What is, Discuss, Today, Relevance today",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Neighborhood & Bilateral Engagements",
-        "Neighborhood Relations: India & its Neighborhood-Relations",
-        "Neighbourhood"
-      ],
       "answers": [
         {
           "id": "",
@@ -10123,13 +9045,6 @@
       "subTopic": "Bilateral Relations",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elaborate, Digital, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests",
-        "Bilateral Relations"
-      ],
       "answers": [
         {
           "id": "2025-gs2-q142-civilsdaily",
@@ -10180,13 +9095,6 @@
       "subTopic": "Bilateral Relations",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "How, Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests",
-        "Bilateral Relations"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q133-civilsdaily",
@@ -10237,13 +9145,6 @@
       "subTopic": "Bilateral Relations",
       "macrotag": "Descriptive, Analytical",
       "microtag": "What is, Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests",
-        "Bilateral Relations"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q139-civilsdaily",
@@ -10294,13 +9195,6 @@
       "subTopic": "Bilateral Relations",
       "macrotag": "Analytical, Applied",
       "microtag": "Comment, Contemporary, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests",
-        "Bilateral Relations"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q137-civilsdaily",
@@ -10361,13 +9255,6 @@
       "subTopic": "Bilateral Relations",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests",
-        "Bilateral Relations"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q134-civilsdaily",
@@ -10458,13 +9345,6 @@
       "subTopic": "Bilateral Relations",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elucidate, India, Policy",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests",
-        "Bilateral Relations"
-      ],
       "answers": [
         {
           "id": "",
@@ -10515,13 +9395,6 @@
       "subTopic": "Groupings beyond South Asia",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests",
-        "Groupings beyond South Asia"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q163-civilsdaily",
@@ -10577,13 +9450,6 @@
       "subTopic": "Groupings beyond South Asia",
       "macrotag": "Analytical, Applied",
       "microtag": "Examine, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests",
-        "Groupings beyond South Asia"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q140-civilsdaily",
@@ -10684,13 +9550,6 @@
       "subTopic": "Groupings involving Immediate and Extended neighbours",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Highlight, Analyze, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests",
-        "Groupings involving Immediate and Extended neighbours"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q141-civilsdaily",
@@ -10741,13 +9600,6 @@
       "subTopic": "Groupings involving Immediate and Extended neighbours",
       "macrotag": "Applied",
       "microtag": "India, Problem",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests",
-        "Groupings involving Immediate and Extended neighbours"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q153-civilsdaily",
@@ -10803,13 +9655,6 @@
       "subTopic": "Groupings involving Immediate and Extended neighbours",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, How, Do you think, India, Indian, Policy",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests",
-        "Groupings involving Immediate and Extended neighbours"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q154-civilsdaily",
@@ -10860,13 +9705,6 @@
       "subTopic": "Groupings involving Immediate and Extended neighbours",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Critically examine, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Groupings & Agreements: Bilateral, Regional & Global Groupings & Agreements Involving or Affecting India's Interests",
-        "Groupings involving Immediate and Extended neighbours"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q152-civilsdaily",
@@ -10962,13 +9800,6 @@
       "subTopic": "Energy X Foreign Policy",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, India, Policy",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests",
-        "Energy X Foreign Policy"
-      ],
       "answers": [
         {
           "id": "2025-gs2-q143-civilsdaily",
@@ -11019,13 +9850,6 @@
       "subTopic": "Energy X Foreign Policy",
       "macrotag": "Descriptive, Applied",
       "microtag": "Describe, India, Policy",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests",
-        "Energy X Foreign Policy"
-      ],
       "answers": [
         {
           "id": "2022-gs2-q155-civilsdaily",
@@ -11081,13 +9905,6 @@
       "subTopic": "Energy X Foreign Policy",
       "macrotag": "Analytical, Applied",
       "microtag": "Analyze, India, Policy",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests",
-        "Energy X Foreign Policy"
-      ],
       "answers": [
         {
           "id": "",
@@ -11133,13 +9950,6 @@
       "subTopic": "Geo-politics affecting India's Interest",
       "macrotag": "Descriptive",
       "microtag": "Elucidate",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests",
-        "Geo-politics affecting India's Interest"
-      ],
       "answers": [
         {
           "id": "2025-gs2-q147-civilsdaily",
@@ -11190,13 +10000,6 @@
       "subTopic": "Geo-politics affecting India's Interest",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests",
-        "Geo-politics affecting India's Interest"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q146-civilsdaily",
@@ -11247,13 +10050,6 @@
       "subTopic": "Geo-politics affecting India's Interest",
       "macrotag": "Descriptive, Applied",
       "microtag": "What is, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests",
-        "Geo-politics affecting India's Interest"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q156-civilsdaily",
@@ -11309,13 +10105,6 @@
       "subTopic": "Geo-politics affecting India's Interest",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elaborate, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests",
-        "Geo-politics affecting India's Interest"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q144-civilsdaily",
@@ -11366,13 +10155,6 @@
       "subTopic": "Geo-politics affecting India's Interest",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests",
-        "Geo-politics affecting India's Interest"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q135-civilsdaily",
@@ -11418,13 +10200,6 @@
       "subTopic": "Geo-politics affecting India's Interest",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, How, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests",
-        "Geo-politics affecting India's Interest"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q136-civilsdaily",
@@ -11475,13 +10250,6 @@
       "subTopic": "Geo-politics affecting India's Interest",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests",
-        "Geo-politics affecting India's Interest"
-      ],
       "answers": [
         {
           "id": "",
@@ -11532,13 +10300,6 @@
       "subTopic": "Geo-politics affecting India's Interest",
       "macrotag": "Analytical, Applied",
       "microtag": "Examine, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests",
-        "Geo-politics affecting India's Interest"
-      ],
       "answers": [
         {
           "id": "",
@@ -11589,13 +10350,6 @@
       "subTopic": "Geo-politics affecting India's Interest",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, How, Outline, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests",
-        "Geo-politics affecting India's Interest"
-      ],
       "answers": [
         {
           "id": "",
@@ -11646,13 +10400,6 @@
       "subTopic": "Miscellaneous (Global Geopolitics)",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests",
-        "Miscellaneous (Global Geopolitics)"
-      ],
       "answers": [
         {
           "id": "2021-gs2-q145-civilsdaily",
@@ -11708,13 +10455,6 @@
       "subTopic": "Indian Diaspora",
       "macrotag": "Descriptive, Applied",
       "microtag": "Describe, India, Indian",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Indian Diaspora: Economic, Political & Social Impact of the Indian Diaspora",
-        "Indian Diaspora"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q149-civilsdaily",
@@ -11770,13 +10510,6 @@
       "subTopic": "Indian Diaspora",
       "macrotag": "Analytical, Applied",
       "microtag": "Comment, India, Indian",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Indian Diaspora: Economic, Political & Social Impact of the Indian Diaspora",
-        "Indian Diaspora"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q148-civilsdaily",
@@ -11827,13 +10560,6 @@
       "subTopic": "Indian Diaspora",
       "macrotag": "Applied",
       "microtag": "India, Indian",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "Global Geopolitics & Indian Diaspora",
-        "Indian Diaspora: Economic, Political & Social Impact of the Indian Diaspora",
-        "Indian Diaspora"
-      ],
       "answers": [
         {
           "id": "",
@@ -11964,13 +10690,6 @@
       "subTopic": "United Nations and its Agencies",
       "macrotag": "Analytical, Comparative, Applied",
       "microtag": "Critically evaluate, Examine, Vs, Policy",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "International Organizations",
-        "International Institutions: Structure, Mandate & Functioning of Important Agencies & Fora",
-        "United Nations and its Agencies"
-      ],
       "answers": [
         {
           "id": "2025-gs2-q158-civilsdaily",
@@ -12021,13 +10740,6 @@
       "subTopic": "United Nations and its Agencies",
       "macrotag": "Analytical",
       "microtag": "Evaluate",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "International Organizations",
-        "International Institutions: Structure, Mandate & Functioning of Important Agencies & Fora",
-        "United Nations and its Agencies"
-      ],
       "answers": [
         {
           "id": "2024-gs2-q157-civilsdaily",
@@ -12078,13 +10790,6 @@
       "subTopic": "United Nations and its Agencies",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "International Organizations",
-        "International Institutions: Structure, Mandate & Functioning of Important Agencies & Fora",
-        "United Nations and its Agencies"
-      ],
       "answers": [
         {
           "id": "2023-gs2-q159-civilsdaily",
@@ -12140,13 +10845,6 @@
       "subTopic": "United Nations and its Agencies",
       "macrotag": "Analytical, Applied",
       "microtag": "Critically examine, Covid, Pandemic",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "International Organizations",
-        "International Institutions: Structure, Mandate & Functioning of Important Agencies & Fora",
-        "United Nations and its Agencies"
-      ],
       "answers": [
         {
           "id": "2020-gs2-q161-civilsdaily",
@@ -12197,13 +10895,6 @@
       "subTopic": "United Nations and its Agencies",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "International Organizations",
-        "International Institutions: Structure, Mandate & Functioning of Important Agencies & Fora",
-        "United Nations and its Agencies"
-      ],
       "answers": [
         {
           "id": "2019-gs2-q160-civilsdaily",
@@ -12249,13 +10940,6 @@
       "subTopic": "United Nations and its Agencies",
       "macrotag": "Descriptive, Comparative",
       "microtag": "Explain, What, Different",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "International Organizations",
-        "International Institutions: Structure, Mandate & Functioning of Important Agencies & Fora",
-        "United Nations and its Agencies"
-      ],
       "answers": [
         {
           "id": "",
@@ -12346,13 +11030,6 @@
       "subTopic": "WTO",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS2",
-        "INTERNATIONAL RELATIONS",
-        "International Organizations",
-        "International Institutions: Structure, Mandate & Functioning of Important Agencies & Fora",
-        "WTO"
-      ],
       "answers": [
         {
           "id": "2018-gs2-q150-civilsdaily",

@@ -15,6 +15,7 @@
     {
       "id": "forum-mgp-2026-csm26t09se-q01",
       "questionNumber": 1,
+      "paper": "GS2",
       "subject": "GOVERNANCE",
       "sectionGroup": "Accountability & Civil Services",
       "microTopic": "Role of Civil Services in a democracy",
@@ -46,19 +47,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Governance"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t09se-q02",
       "questionNumber": 2,
+      "paper": "GS2",
       "subject": "GOVERNANCE",
       "sectionGroup": "Accountability & Civil Services",
       "microTopic": "E-Governance (applications, models, successes, limitations, potential)",
@@ -90,19 +87,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Governance"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t09se-q03",
       "questionNumber": 3,
+      "paper": "GS2",
       "subject": "POLITY",
       "sectionGroup": "Organs of Government & Dispute Redressal",
       "microTopic": "Pressure groups and formal/informal associations and their role in the Polity",
@@ -134,19 +127,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t09se-q04",
       "questionNumber": 4,
+      "paper": "GS2",
       "subject": "GOVERNANCE",
       "sectionGroup": "Development Processes & Policies",
       "microTopic": "Role of donors, charities, institutional and other external stakeholders",
@@ -178,19 +167,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Governance"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t09se-q05",
       "questionNumber": 5,
+      "paper": "GS2",
       "subject": "GOVERNANCE",
       "sectionGroup": "Accountability & Civil Services",
       "microTopic": "Transaparency and accountability (institutional and other measures); Citizens Charter",
@@ -222,19 +207,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Governance"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t09se-q06",
       "questionNumber": 6,
+      "paper": "GS2",
       "subject": "GOVERNANCE",
       "sectionGroup": "Accountability & Civil Services",
       "microTopic": "Role of Civil Services in a democracy",
@@ -266,19 +247,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Governance"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t09se-q07",
       "questionNumber": 7,
+      "paper": "GS2",
       "subject": "POLITY",
       "sectionGroup": "Elections & Political Dynamics",
       "microTopic": "Salient features of the Representation of People's Act",
@@ -310,19 +287,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t09se-q08",
       "questionNumber": 8,
+      "paper": "GS2",
       "subject": "GOVERNANCE",
       "sectionGroup": "Development Processes & Policies",
       "microTopic": "Development processes and the role of NGOs, Civil Society, and various groups and associations",
@@ -354,19 +327,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Governance"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t09se-q09",
       "questionNumber": 9,
+      "paper": "GS2",
       "subject": "GOVERNANCE",
       "sectionGroup": "Development Processes & Policies",
       "microTopic": "Role of Self Help Groups (SHGs) and microfinancing in development activities",
@@ -398,19 +367,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Governance"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t09se-q10",
       "questionNumber": 10,
+      "paper": "GS2",
       "subject": "GOVERNANCE",
       "sectionGroup": "Accountability & Civil Services",
       "microTopic": "Transaparency and accountability (institutional and other measures); Citizens Charter",
@@ -442,15 +407,10 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Governance"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     }
   ],
   "paper": "GS2"

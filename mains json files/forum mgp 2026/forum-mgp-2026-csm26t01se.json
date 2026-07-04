@@ -15,6 +15,7 @@
     {
       "id": "forum-mgp-2026-csm26t01se-q01",
       "questionNumber": 1,
+      "paper": "GS2",
       "subject": "POLITY",
       "sectionGroup": "Constitutional Framework & Evolution",
       "microTopic": "Indian Constitution- historical underpinnings and evolution",
@@ -46,19 +47,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q02",
       "questionNumber": 2,
+      "paper": "GS2",
       "subject": "POLITY",
       "sectionGroup": "Federal Structure & Local Governance",
       "microTopic": "Issues and challenges pertaining to the federal structure",
@@ -90,19 +87,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q03",
       "questionNumber": 3,
+      "paper": "GS2",
       "subject": "POLITY",
       "sectionGroup": "Constitutional Framework & Evolution",
       "microTopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
@@ -134,19 +127,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q04",
       "questionNumber": 4,
+      "paper": "GS2",
       "subject": "POLITY",
       "sectionGroup": "Constitutional Framework & Evolution",
       "microTopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
@@ -178,19 +167,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q05",
       "questionNumber": 5,
+      "paper": "GS2",
       "subject": "POLITY",
       "sectionGroup": "Federal Structure & Local Governance",
       "microTopic": "Functions and responsibilities of the Union and the States",
@@ -222,19 +207,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q06",
       "questionNumber": 6,
+      "paper": "GS2",
       "subject": "POLITY",
       "sectionGroup": "Organs of Government & Dispute Redressal",
       "microTopic": "Separation of powers between different organs",
@@ -266,19 +247,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q07",
       "questionNumber": 7,
+      "paper": "GS2",
       "subject": "POLITY",
       "sectionGroup": "Organs of Government & Dispute Redressal",
       "microTopic": "Structure, organization and functioning of the Executive",
@@ -310,19 +287,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q08",
       "questionNumber": 8,
+      "paper": "GS2",
       "subject": "POLITY",
       "sectionGroup": "Constitutional Framework & Evolution",
       "microTopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
@@ -354,19 +327,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q09",
       "questionNumber": 9,
+      "paper": "GS2",
       "subject": "POLITY",
       "sectionGroup": "Federal Structure & Local Governance",
       "microTopic": "Devolution of powers and finances up to local levels and challenges therein",
@@ -398,19 +367,15 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t01se-q10",
       "questionNumber": 10,
+      "paper": "GS2",
       "subject": "POLITY",
       "sectionGroup": "Federal Structure & Local Governance",
       "microTopic": "Issues and challenges pertaining to the federal structure",
@@ -442,15 +407,10 @@
         "stage": "mains",
         "paper": "mains_gs2"
       },
-      "hierarchy_path": [
-        "GS2",
-        "Polity"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     }
   ],
   "paper": "GS2"

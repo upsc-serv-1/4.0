@@ -15,6 +15,7 @@
     {
       "id": "forum-mgp-2026-csm26t10se-q01",
       "questionNumber": 1,
+      "paper": "GS2",
       "subject": "SOCIAL JUSTICE",
       "sectionGroup": "Social Sector & Human Development",
       "microTopic": "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
@@ -46,19 +47,15 @@
         "stage": "mains",
         "paper": "mains_gs1"
       },
-      "hierarchy_path": [
-        "GS1",
-        "Social Justice"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t10se-q02",
       "questionNumber": 2,
+      "paper": "GS2",
       "subject": "SOCIAL JUSTICE",
       "sectionGroup": "Social Sector & Human Development",
       "microTopic": "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
@@ -90,19 +87,15 @@
         "stage": "mains",
         "paper": "mains_gs1"
       },
-      "hierarchy_path": [
-        "GS1",
-        "Social Justice"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t10se-q03",
       "questionNumber": 3,
+      "paper": "GS2",
       "subject": "SOCIAL JUSTICE",
       "sectionGroup": "Poverty & Hunger",
       "microTopic": "Issues and Challenges relating to Poverty & Hunger",
@@ -134,19 +127,15 @@
         "stage": "mains",
         "paper": "mains_gs1"
       },
-      "hierarchy_path": [
-        "GS1",
-        "Social Justice"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t10se-q04",
       "questionNumber": 4,
+      "paper": "GS2",
       "subject": "POLITY",
       "sectionGroup": "Elections & Political Dynamics",
       "microTopic": "Salient features of the Representation of People's Act",
@@ -178,19 +167,15 @@
         "stage": "mains",
         "paper": "mains_gs1"
       },
-      "hierarchy_path": [
-        "GS1",
-        "Polity"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t10se-q05",
       "questionNumber": 5,
+      "paper": "GS2",
       "subject": "SOCIAL JUSTICE",
       "sectionGroup": "Vulnerable Sections & Welfare",
       "microTopic": "Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies",
@@ -222,19 +207,15 @@
         "stage": "mains",
         "paper": "mains_gs1"
       },
-      "hierarchy_path": [
-        "GS1",
-        "Social Justice"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t10se-q06",
       "questionNumber": 6,
+      "paper": "GS2",
       "subject": "SOCIAL JUSTICE",
       "sectionGroup": "Vulnerable Sections & Welfare",
       "microTopic": "Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies",
@@ -266,19 +247,15 @@
         "stage": "mains",
         "paper": "mains_gs1"
       },
-      "hierarchy_path": [
-        "GS1",
-        "Social Justice"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t10se-q07",
       "questionNumber": 7,
+      "paper": "GS2",
       "subject": "SOCIAL JUSTICE",
       "sectionGroup": "Poverty & Hunger",
       "microTopic": "Issues and Challenges relating to Poverty & Hunger",
@@ -310,19 +287,15 @@
         "stage": "mains",
         "paper": "mains_gs1"
       },
-      "hierarchy_path": [
-        "GS1",
-        "Social Justice"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t10se-q08",
       "questionNumber": 8,
+      "paper": "GS2",
       "subject": "SOCIAL JUSTICE",
       "sectionGroup": "Social Sector & Human Development",
       "microTopic": "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
@@ -354,19 +327,15 @@
         "stage": "mains",
         "paper": "mains_gs1"
       },
-      "hierarchy_path": [
-        "GS1",
-        "Social Justice"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t10se-q09",
       "questionNumber": 9,
+      "paper": "GS2",
       "subject": "GOVERNANCE",
       "sectionGroup": "Development Processes & Policies",
       "microTopic": "Government Policies & Interventions for development of various sectors (issues in their design, implementation)",
@@ -398,19 +367,15 @@
         "stage": "mains",
         "paper": "mains_gs1"
       },
-      "hierarchy_path": [
-        "GS1",
-        "Governance"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t10se-q10",
       "questionNumber": 10,
+      "paper": "GS2",
       "subject": "SOCIAL JUSTICE",
       "sectionGroup": "Poverty & Hunger",
       "microTopic": "Issues and Challenges relating to Poverty & Hunger",
@@ -442,15 +407,10 @@
         "stage": "mains",
         "paper": "mains_gs1"
       },
-      "hierarchy_path": [
-        "GS1",
-        "Social Justice"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS2"
+      "program_name": "MGP"
     }
   ],
   "paper": "GS2"

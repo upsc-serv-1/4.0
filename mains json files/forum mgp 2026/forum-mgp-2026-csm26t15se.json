@@ -15,6 +15,7 @@
     {
       "id": "forum-mgp-2026-csm26t15se-q01",
       "questionNumber": 1,
+      "paper": "GS3",
       "subject": "ENVIRONMENT",
       "sectionGroup": "Conservation & Ecosystems",
       "microTopic": "Conservation and environmental impact assessment",
@@ -46,19 +47,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Environment"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q02",
       "questionNumber": 2,
+      "paper": "GS3",
       "subject": "ENVIRONMENT",
       "sectionGroup": "Pollution & Degradation",
       "microTopic": "Environmental pollution and degradation",
@@ -90,19 +87,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Environment"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q03",
       "questionNumber": 3,
+      "paper": "GS3",
       "subject": "ENVIRONMENT",
       "sectionGroup": "Conservation & Ecosystems",
       "microTopic": "Conservation and environmental impact assessment",
@@ -134,19 +127,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Environment"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q04",
       "questionNumber": 4,
+      "paper": "GS3",
       "subject": "ENVIRONMENT",
       "sectionGroup": "Conservation & Ecosystems",
       "microTopic": "Conservation and environmental impact assessment",
@@ -178,19 +167,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Environment"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q05",
       "questionNumber": 5,
+      "paper": "GS3",
       "subject": "ENVIRONMENT",
       "sectionGroup": "Climate Change",
       "microTopic": "Global warming, climate change, and international frameworks",
@@ -222,19 +207,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Environment"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q06",
       "questionNumber": 6,
+      "paper": "GS3",
       "subject": "DISASTER MANAGEMENT",
       "sectionGroup": "Specific Disasters & Hazards",
       "microTopic": "Disasters: Specific natural and man-made hazards",
@@ -266,19 +247,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Disaster Management"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q07",
       "questionNumber": 7,
+      "paper": "GS3",
       "subject": "DISASTER MANAGEMENT",
       "sectionGroup": "Frameworks & Preparedness",
       "microTopic": "Disaster Management: Preparedness, resilience, and vulnerability frameworks",
@@ -310,19 +287,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Disaster Management"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q08",
       "questionNumber": 8,
+      "paper": "GS3",
       "subject": "ENVIRONMENT",
       "sectionGroup": "Conservation & Ecosystems",
       "microTopic": "Conservation and environmental impact assessment",
@@ -354,19 +327,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Environment"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q09",
       "questionNumber": 9,
+      "paper": "GS3",
       "subject": "DISASTER MANAGEMENT",
       "sectionGroup": "Specific Disasters & Hazards",
       "microTopic": "Disasters: Specific natural and man-made hazards",
@@ -398,19 +367,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Disaster Management"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t15se-q10",
       "questionNumber": 10,
+      "paper": "GS3",
       "subject": "DISASTER MANAGEMENT",
       "sectionGroup": "Frameworks & Preparedness",
       "microTopic": "Disaster Management: Preparedness, resilience, and vulnerability frameworks",
@@ -442,15 +407,10 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Disaster Management"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     }
   ],
   "paper": "GS3"

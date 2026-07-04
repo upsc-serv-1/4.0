@@ -15,6 +15,7 @@
     {
       "id": "forum-mgp-2026-csm26t14se-q01",
       "questionNumber": 1,
+      "paper": "GS3",
       "subject": "SCIENCE & TECHNOLOGY",
       "sectionGroup": "Frontier Technologies & IPR",
       "microTopic": "Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights",
@@ -46,19 +47,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Science & Technology"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t14se-q02",
       "questionNumber": 2,
+      "paper": "GS3",
       "subject": "AGRICULTURE",
       "sectionGroup": "Agriculture & Farm Dynamics",
       "microTopic": "Public Distribution System (PDS) management, buffer stock dynamics, food security missions, and economics of animal rearing",
@@ -90,19 +87,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Agriculture"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t14se-q03",
       "questionNumber": 3,
+      "paper": "GS3",
       "subject": "SCIENCE & TECHNOLOGY",
       "sectionGroup": "Frontier Technologies & IPR",
       "microTopic": "Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights",
@@ -134,19 +127,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Science & Technology"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t14se-q04",
       "questionNumber": 4,
+      "paper": "GS3",
       "subject": "SCIENCE & TECHNOLOGY",
       "sectionGroup": "Frontier Technologies & IPR",
       "microTopic": "Awareness in the fields of IT, Computers, and robotics",
@@ -178,19 +167,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Science & Technology"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t14se-q05",
       "questionNumber": 5,
+      "paper": "GS3",
       "subject": "SCIENCE & TECHNOLOGY",
       "sectionGroup": "Frontier Technologies & IPR",
       "microTopic": "Awareness in the fields of Space and Defence technologies",
@@ -222,19 +207,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Science & Technology"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t14se-q06",
       "questionNumber": 6,
+      "paper": "GS3",
       "subject": "SCIENCE & TECHNOLOGY",
       "sectionGroup": "Everyday Science & Innovations",
       "microTopic": "Science and Technology- applications in health, industry, and crisis management",
@@ -266,19 +247,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Science & Technology"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t14se-q07",
       "questionNumber": 7,
+      "paper": "GS3",
       "subject": "SCIENCE & TECHNOLOGY",
       "sectionGroup": "Frontier Technologies & IPR",
       "microTopic": "Awareness in the fields of IT, Computers, and robotics",
@@ -310,19 +287,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Science & Technology"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t14se-q08",
       "questionNumber": 8,
+      "paper": "GS3",
       "subject": "SCIENCE & TECHNOLOGY",
       "sectionGroup": "Frontier Technologies & IPR",
       "microTopic": "Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights",
@@ -354,19 +327,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Science & Technology"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t14se-q09",
       "questionNumber": 9,
+      "paper": "GS3",
       "subject": "SCIENCE & TECHNOLOGY",
       "sectionGroup": "Everyday Science & Innovations",
       "microTopic": "Science and Technology- developments and their effects in everyday life",
@@ -398,19 +367,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Science & Technology"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t14se-q10",
       "questionNumber": 10,
+      "paper": "GS3",
       "subject": "SCIENCE & TECHNOLOGY",
       "sectionGroup": "Frontier Technologies & IPR",
       "microTopic": "Awareness in the fields of IT, Computers, and robotics",
@@ -442,15 +407,10 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Science & Technology"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     }
   ],
   "paper": "GS3"

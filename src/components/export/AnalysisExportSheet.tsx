@@ -251,7 +251,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
   const [opts, setOpts] = useState<ExportOptions>(() => defaultExportOptions({
     title, moduleName: 'Analysis', headerText: 'Dr. UPSC · Analysis',
     contentScope: 'q_options_expl', answerPlacement: 'inline', sortBy: 'default',
-    fontSize: 10, showTOC: false, watermark: 'Dr. UPSC',
+    fontSize: 10, showTOC: true, watermark: 'Dr. UPSC',
   }));
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -288,7 +288,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
       setOpts(defaultExportOptions({
         title, moduleName: 'Analysis', headerText: 'Dr. UPSC · Analysis',
         contentScope: 'q_options_expl', answerPlacement: 'inline', sortBy: 'default',
-        fontSize: 10, showTOC: false, watermark: 'Dr. UPSC',
+        fontSize: 10, showTOC: true, watermark: 'Dr. UPSC',
       }));
       setIsExporting(false);
       setShowAdvanced(false);
@@ -566,7 +566,10 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
         const chunkSize = 200;
         let allAnswers: any[] = [];
         for (let i = 0; i < questionIds.length; i += chunkSize) {
-          const chunkIds = questionIds.slice(i, i + chunkSize).map(id => Number(id));
+          const chunkIds = questionIds.slice(i, i + chunkSize).map(id => {
+            const num = Number(id);
+            return isNaN(num) ? id : num;
+          });
           
           const queryPromise = supabase
             .from('mains_answers')
@@ -1430,7 +1433,11 @@ function buildSummaryFromFilteredQuestions(
     try { forecastRows = buildForecastRows(rows); } catch { forecastRows = undefined; }
   }
 
+  const subjectsInData = Array.from(new Set(rows.map(r => r.subject || 'General').filter(Boolean)));
+
   return buildPyqAnalysisSummaryHtml({
+    filteredQuestionsForSummary: rows,
+    selectedSubjectsList: selectedSubjects.length > 0 ? selectedSubjects : subjectsInData,
     selectedReports: {
       full_report: reports.full_report,
       subject_momentum: reports.subject_momentum,

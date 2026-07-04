@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** Describe the appointment process, duties, and functions of the Attorney General of India. Also, state  the restrictions governing the functioning of the office.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: GOVERNANCE] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Appointment to various Constitutional posts; Constitutional Bodies (powers, functions and responsibilities)] [Sub Topic: Constitutional Bodies] [Macro Tag: Descriptive] [Micro Tag: Describe, State, Attorney General of India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS2] [Subject: GOVERNANCE] [Section Group: Constitutional & Regulatory Bodies] [Micro Topic: Appointment to various Constitutional posts; Constitutional Bodies (powers, functions and responsibilities)] [Sub Topic: Constitutional Bodies] [Macro Tag: Descriptive] [Micro Tag: Describe, State, Attorney General of India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about the post of Attorney General of India. <br>• In the body, describe the appointment process, duties and functions of the Attorney General of India. <br>• Next, state the restricting governing the functioning of the office. <br>• Conclude the answer by impressing on the fact that despite being a part of the Union Executive, the Attorney General is not a government servant. |
@@ -56,7 +56,7 @@ Nevertheless, the framers of the Constitution put **safeguards in place** to pro
 
 ## Q3 [Year: 2026]
 **Question:** “Structural weaknesses and implementation challenges continue to undermine the effectiveness of  the Tenth Schedule of the Constitution”. Comment.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: POLITY] [Section Group: Elections & Political Dynamics] [Micro Topic: Salient features of the Representation of People's Act] [Sub Topic: Election Dispute and Disqualification] [Macro Tag: Analytical] [Micro Tag: Comment, Tenth Schedule, Constitution]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS2] [Subject: POLITY] [Section Group: Elections & Political Dynamics] [Micro Topic: Salient features of the Representation of People's Act] [Sub Topic: Election Dispute and Disqualification] [Macro Tag: Analytical] [Micro Tag: Comment, Tenth Schedule, Constitution]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of the Tenth Schedule of the Constitution. <br>• In the body, first highlight its successes. <br>• Next, point out how structural weaknesses and implementation challenges continue to undermine its effectiveness. <br>• the ways in which it has failed to achieve its objectives. <br>• Conclude with suggestions to reform the law. |
@@ -118,7 +118,7 @@ However, tribunals’ functioning is **beset with multiple challenges:**
 
 ## Q5 [Year: 2026]
 **Question:** Discuss how the Indian Constitution’s approach to secularism differs from that of France. What can  France learn from India?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: POLITY] [Section Group: Constitutional Framework & Evolution] [Micro Topic: Comparison of the Indian constitutional scheme with that of other countries] [Sub Topic: Constitutional Comparison] [Macro Tag: Analytical, Comparative] [Micro Tag: Discuss, Secularism, India, France]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS2] [Subject: POLITY] [Section Group: Constitutional Framework & Evolution] [Micro Topic: Comparison of the Indian constitutional scheme with that of other countries] [Sub Topic: Constitutional Comparison] [Macro Tag: Analytical, Comparative] [Micro Tag: Discuss, Secularism, India, France]*
 #### Answer from ForumIAS
 
 | **Approach:** • Begin by defining secularism and explaining the foundational concepts of secularism in both countries. <br>• In the body, analyze the key differences and their implications, followed by the lessons France could derive from the Indian model. <br>• Conclude by highlighting the growing convergence between the two models. |
@@ -176,7 +176,7 @@ I**ndian secularism,** based on **Sarva Dharm Sambhav,** presents a model for ma
 
 ## Q6 [Year: 2026]
 **Question:** “The growth of the cabinet system has practically resulted in the marginalization of parliamentary  supremacy”. Comment.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: POLITY] [Section Group: Organs of Government & Dispute Redressal] [Micro Topic: Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these] [Sub Topic: Role of MPs] [Macro Tag: Analytical] [Micro Tag: Comment, Cabinet system, Parliamentary supremacy]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS2] [Subject: POLITY] [Section Group: Organs of Government & Dispute Redressal] [Micro Topic: Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these] [Sub Topic: Role of MPs] [Macro Tag: Analytical] [Micro Tag: Comment, Cabinet system, Parliamentary supremacy]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief account of the Cabinet system. <br>• In the body, provide both perspectives on whether the growth of the Cabinet system has practically resulted in the marginalization of parliamentary supremacy. <br>• Conclude by emphasizing that parliamentary supremacy continues to prevail. |
@@ -214,7 +214,7 @@ While the Cabinet system has evolved into a **powerful institution**, the **cons
 
 ## Q7 [Year: 2026]
 **Question:** “The Supreme Court’s recognition of environmental issues within the constitutional framework has  been a landmark transformation in contemporary Indian legal discourse.” Discuss the statement with the  help of relevant case laws.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: POLITY] [Section Group: Organs of Government & Dispute Redressal] [Micro Topic: Structure, organization and functioning of the Judiciary (including Tribunals & ADR)] [Sub Topic: Judiciary] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Supreme Court, Environmental issues, Case laws]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS2] [Subject: POLITY] [Section Group: Organs of Government & Dispute Redressal] [Micro Topic: Structure, organization and functioning of the Judiciary (including Tribunals & ADR)] [Sub Topic: Judiciary] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Supreme Court, Environmental issues, Case laws]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of the recent Supreme Court judgement on adverse effects of climate change. <br>• In the body, discuss the role played by the Indian judiciary in constitutionalization of environmental issues, citing relevant case laws. <br>• Conclude by highlighting the importance of this constitutionalization. |
@@ -263,7 +263,7 @@ This **evolution** of environmental jurisprudence has **operationalized the mand
 
 ## Q8 [Year: 2026]
 **Question:** Discuss the role of the Vice-President as the chairman of the Rajya Sabha. Also describe the  procedure for his/her removal from the office.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: POLITY] [Section Group: Organs of Government & Dispute Redressal] [Micro Topic: Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these] [Sub Topic: Presiding Officers] [Macro Tag: Descriptive, Analytical] [Micro Tag: Discuss, Describe, Vice-President, Rajya Sabha]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS2] [Subject: POLITY] [Section Group: Organs of Government & Dispute Redressal] [Micro Topic: Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these] [Sub Topic: Presiding Officers] [Macro Tag: Descriptive, Analytical] [Micro Tag: Discuss, Describe, Vice-President, Rajya Sabha]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce with the constitutional position of Vice-President as Chairman of Rajya Sabha. <br>• In the body, first explain the functional responsibilities of the Chairman, followed by describing the removal procedure with constitutional provisions. <br>• Conclude with contemporary relevance of these provisions through recent examples. |
@@ -305,7 +305,7 @@ Though the Vice-President **does not have executive powers**, the office remains
 
 ## Q9 [Year: 2026]
 **Question:** Explain the structure of the Parliamentary Committee system. How far have the Departmentally  Related Standing Committees (DRSCs) helped in the institutionalisation of Indian Parliament?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: POLITY] [Section Group: Organs of Government & Dispute Redressal] [Micro Topic: Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these] [Sub Topic: Parliamentary Committees] [Macro Tag: Descriptive, Analytical] [Micro Tag: Explain, Parliamentary Committee system, DRSCs]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS2] [Subject: POLITY] [Section Group: Organs of Government & Dispute Redressal] [Micro Topic: Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these] [Sub Topic: Parliamentary Committees] [Macro Tag: Descriptive, Analytical] [Micro Tag: Explain, Parliamentary Committee system, DRSCs]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a brief background of the Parliamentary Committee system. <br>• In the body, first explain the structure of the same. <br>• Next, highlight the extent to which they have helped in the institutionalization of Indian Parliament. <br>• Conclude by suggesting reforms to improve their functioning. |
@@ -355,7 +355,7 @@ The DRSC System is a path-breaking endeavour of **parliamentary surveillance ove
 
 ## Q10 [Year: 2026]
 **Question:** Critically discuss the need for the codification of parliamentary privileges in the country.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 2] [Subject: POLITY] [Section Group: Organs of Government & Dispute Redressal] [Micro Topic: Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these] [Sub Topic: Parliamentary Privileges] [Macro Tag: Analytical] [Micro Tag: Critically discuss, Codification, Parliamentary privileges, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS2] [Subject: POLITY] [Section Group: Organs of Government & Dispute Redressal] [Micro Topic: Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these] [Sub Topic: Parliamentary Privileges] [Macro Tag: Analytical] [Micro Tag: Critically discuss, Codification, Parliamentary privileges, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by highlighting the different sources of parliamentary privileges and the absence of a definitive Code for the same. <br>• In the body, discuss the need for the codification of parliamentary privileges in the country, highlighting both the positives and negatives of the same. <br>• Conclude by underlining the need to incorporate international best practices in the exercise of privileges. |

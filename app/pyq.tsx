@@ -1725,8 +1725,6 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
     console.log(`[PDFExport] Starting export in mode: ${mode}, subject: ${subjectOverride || 'N/A'}`);
     setExporting(true);
-    // Add a small delay to allow the modal to close completely before heavy processing
-    await new Promise(resolve => setTimeout(resolve, 500));
     try {
       const esc = (value: string | number) =>
       String(value ?? '')
@@ -2118,6 +2116,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       Alert.alert('Export failed', error?.message || 'Unable to export PDF right now.');
     } finally {
       setExporting(false);
+      setExportModalVisible(false);
     }
   };
 
@@ -3000,28 +2999,38 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       </View>
 
       <Modal visible={exportModalVisible} transparent animationType="fade" onRequestClose={() => setExportModalVisible(false)}>
-        <Pressable style={styles.modalOverlay} onPress={() => setExportModalVisible(false)}>
+        <Pressable style={styles.modalOverlay} onPress={() => exporting ? null : setExportModalVisible(false)}>
           <Pressable style={[styles.modalContent, { backgroundColor: colors.surface }]} onPress={(e) => e.stopPropagation()}> 
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Export PYQ PDF</Text>
-              <TouchableOpacity onPress={() => setExportModalVisible(false)}><X size={22} color={colors.textPrimary} /></TouchableOpacity>
+              {!exporting && (
+                <TouchableOpacity onPress={() => setExportModalVisible(false)}><X size={22} color={colors.textPrimary} /></TouchableOpacity>
+              )}
             </View>
 
+            {exporting ? (
+              <View style={{ padding: 40, alignItems: 'center', gap: 16 }}>
+                <ActivityIndicator size="large" color={colors.primary} />
+                <Text style={{ fontSize: 14, fontWeight: '700', color: colors.textSecondary, textAlign: 'center' }}>
+                  Generating PDF...{'\n'}Please wait, this may take a moment.
+                </Text>
+              </View>
+            ) : (
             <ScrollView>
               <Text style={[styles.exportGroupLabel, { color: colors.textTertiary }]}>QUICK EXPORTS</Text>
-              <TouchableOpacity style={[styles.exportActionBtn, { backgroundColor: colors.primary }]} onPress={() => { setExportModalVisible(false); exportPdf('all'); }}>
+              <TouchableOpacity style={[styles.exportActionBtn, { backgroundColor: colors.primary }]} onPress={() => exportPdf('all')}>
                 <Text style={[styles.exportActionText, { color: colors.buttonText }]}>Export Full Report (All Sections)</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.exportActionBtn, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} onPress={() => { setExportModalVisible(false); exportPdf('momentum'); }}>
+              <TouchableOpacity style={[styles.exportActionBtn, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} onPress={() => exportPdf('momentum')}>
                 <Text style={[styles.exportActionText, { color: colors.textPrimary }]}>Export Subject Momentum</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.exportActionBtn, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} onPress={() => { setExportModalVisible(false); exportPdf('distribution'); }}>
+              <TouchableOpacity style={[styles.exportActionBtn, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} onPress={() => exportPdf('distribution')}>
                 <Text style={[styles.exportActionText, { color: colors.textPrimary }]}>Export Subject Distribution</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.exportActionBtn, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} onPress={() => { setExportModalVisible(false); exportPdf('heatmaps'); }}>
+              <TouchableOpacity style={[styles.exportActionBtn, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} onPress={() => exportPdf('heatmaps')}>
                 <Text style={[styles.exportActionText, { color: colors.textPrimary }]}>Export Heatmaps</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.exportActionBtn, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} onPress={() => { setExportModalVisible(false); exportPdf('focused'); }}>
+              <TouchableOpacity style={[styles.exportActionBtn, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} onPress={() => exportPdf('focused')}>
                 <Text style={[styles.exportActionText, { color: colors.textPrimary }]}>Export Focused Trend</Text>
               </TouchableOpacity>
 
@@ -3301,23 +3310,18 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
               </ScrollView>
               <TouchableOpacity
                 style={[styles.exportActionBtn, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}
-                onPress={() => {
-                  setExportModalVisible(false);
-                  if (exportSubject) exportPdf('subject_one', exportSubject);
-                }}
+                onPress={() => { if (exportSubject) exportPdf('subject_one', exportSubject); }}
               >
                 <Text style={[styles.exportActionText, { color: colors.textPrimary }]}>Export Selected Subject Deep Dive</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.exportActionBtn, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }]}
-                onPress={() => {
-                  setExportModalVisible(false);
-                  exportPdf('subject_all');
-                }}
+                onPress={() => { exportPdf('subject_all'); }}
               >
                 <Text style={[styles.exportActionText, { color: colors.textPrimary }]}>Export All Subjects Deep Dive</Text>
               </TouchableOpacity>
             </ScrollView>
+            )}
           </Pressable>
         </Pressable>
       </Modal>
@@ -3336,6 +3340,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           subject: getAnalyticsSubject(q),
           section_group: q.section_group || 'General',
           micro_topic: q.micro_topic || 'Other',
+          sub_topic: q.sub_topic || q.subtopic || q.subTopic || '',
           exam_year: getAnalyticsYear(q) || undefined,
           is_pyq: !!q.is_pyq,
           is_ncert: !!q.is_ncert,

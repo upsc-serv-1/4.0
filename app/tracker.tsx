@@ -52,7 +52,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-import { useFocusEffect, router } from 'expo-router';
+import { useFocusEffect, router, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -93,7 +93,21 @@ function SyllabusTracker() {
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
   const { session } = useAuth();
-  const [mode, setMode] = useState<Mode>('prelims');
+  const params = useLocalSearchParams<{ defaultMode?: Mode }>();
+  const [mode, setMode] = useState<Mode>(
+    params.defaultMode === 'mains' 
+      ? 'mains' 
+      : params.defaultMode === 'optional' 
+        ? 'optional' 
+        : 'prelims'
+  );
+
+  useEffect(() => {
+    if (params.defaultMode) {
+      setMode(params.defaultMode);
+    }
+  }, [params.defaultMode]);
+
   const [progress, setProgress] = useState<Record<string, SyllabusProgress>>({});
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
@@ -784,6 +798,24 @@ function SyllabusTracker() {
         >
           <View style={s.header}>
             <View style={{ flex: 1 }}>
+              <TouchableOpacity
+                onPress={() => router.back()}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 12,
+                  borderWidth: 1,
+                  backgroundColor: colors.surface + '88',
+                  borderColor: colors.border,
+                  alignSelf: 'flex-start',
+                  marginBottom: 12,
+                }}
+              >
+                <ArrowLeft size={16} color={colors.textPrimary} />
+                <Text style={{ fontSize: 12, fontWeight: '700', color: colors.textSecondary, marginLeft: 4 }}>Back</Text>
+              </TouchableOpacity>
               <Text style={[s.h1, { color: colors.textPrimary }]}>Syllabus Progress</Text>
               <Text style={[s.subhead, { color: colors.textSecondary }]}>Track your completion, identify weak areas, and master the UPSC syllabus.</Text>
             </View>

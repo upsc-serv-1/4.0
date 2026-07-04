@@ -132,7 +132,8 @@ function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs,
     tabKey !== 'analyse' &&
     tabKey !== 'pyq' &&
     tabKey !== 'tracker' &&
-    tabKey !== 'ai-search'
+    tabKey !== 'ai-search' &&
+    tabKey !== 'revise'
   );
   const tabletItemWidth = isTablet
     ? Math.max(74, Math.floor((Math.max(width, 768) - 20) / Math.max(1, visibleOrder.length)))

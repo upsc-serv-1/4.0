@@ -25,13 +25,6 @@
       "subTopic": "FDI",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Industrial Dynamics & Reforms",
-        "Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth",
-        "FDI"
-      ],
       "answers": [
         {
           "id": "",
@@ -77,13 +70,6 @@
       "subTopic": "FDI",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Industrial Dynamics & Reforms",
-        "Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth",
-        "FDI"
-      ],
       "answers": [
         {
           "id": "",
@@ -129,13 +115,6 @@
       "subTopic": "LPG Reform and Impact",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, Examine, India, Indian",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Industrial Dynamics & Reforms",
-        "Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth",
-        "LPG Reform and Impact"
-      ],
       "answers": [
         {
           "id": "",
@@ -186,13 +165,6 @@
       "subTopic": "Labour Reform",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Industrial Dynamics & Reforms",
-        "Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth",
-        "Labour Reform"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q23-civilsdaily",
@@ -258,13 +230,6 @@
       "subTopic": "Protectionism and Currency Manipulations",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, How, India, Indian",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Industrial Dynamics & Reforms",
-        "Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth",
-        "Protectionism and Currency Manipulations"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q9-civilsdaily",
@@ -315,13 +280,6 @@
       "subTopic": "Protectionism and Currency Manipulations",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Industrial Dynamics & Reforms",
-        "Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth",
-        "Protectionism and Currency Manipulations"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q6-civilsdaily",
@@ -392,13 +350,6 @@
       "subTopic": "Fiscal Policy",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Explain, What, How, Assess, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Government Budgeting and fiscal management policies",
-        "Fiscal Policy"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q20-civilsdaily",
@@ -449,13 +400,6 @@
       "subTopic": "Fiscal Policy",
       "macrotag": "Descriptive, Comparative",
       "microtag": "Explain, Distinguish",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Government Budgeting and fiscal management policies",
-        "Fiscal Policy"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q19-civilsdaily",
@@ -511,13 +455,6 @@
       "subTopic": "Fiscal Policy",
       "macrotag": "Descriptive, Applied",
       "microtag": "Clarify, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Government Budgeting and fiscal management policies",
-        "Fiscal Policy"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q17-civilsdaily",
@@ -568,13 +505,6 @@
       "subTopic": "Fiscal Policy",
       "macrotag": "Analytical",
       "microtag": "Comment",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Government Budgeting and fiscal management policies",
-        "Fiscal Policy"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q38-drishti_ias",
@@ -620,13 +550,6 @@
       "subTopic": "Fiscal Policy",
       "macrotag": "Analytical, Applied",
       "microtag": "Analyze, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Government Budgeting and fiscal management policies",
-        "Fiscal Policy"
-      ],
       "answers": [
         {
           "id": "",
@@ -692,13 +615,6 @@
       "subTopic": "Fiscal Policy",
       "macrotag": "Descriptive, Analytical",
       "microtag": "What, Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Government Budgeting and fiscal management policies",
-        "Fiscal Policy"
-      ],
       "answers": [
         {
           "id": "",
@@ -749,13 +665,6 @@
       "subTopic": "Fiscal Policy",
       "macrotag": "Descriptive, Analytical",
       "microtag": "What is, How, Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Government Budgeting and fiscal management policies",
-        "Fiscal Policy"
-      ],
       "answers": [
         {
           "id": "",
@@ -806,13 +715,6 @@
       "subTopic": "Corporate Social Responsibility",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Inclusive growth and issues arising from it",
-        "Corporate Social Responsibility"
-      ],
       "answers": [
         {
           "id": "",
@@ -883,13 +785,6 @@
       "subTopic": "Inclusive Growth",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Examine, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Inclusive growth and issues arising from it",
-        "Inclusive Growth"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q14-civilsdaily",
@@ -940,13 +835,6 @@
       "subTopic": "Inclusive Growth",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Inclusive growth and issues arising from it",
-        "Inclusive Growth"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q11-civilsdaily",
@@ -997,13 +885,6 @@
       "subTopic": "Inclusive Growth",
       "macrotag": "Analytical",
       "microtag": "Comment, Argue",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Inclusive growth and issues arising from it",
-        "Inclusive Growth"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q10-civilsdaily",
@@ -1054,13 +935,6 @@
       "subTopic": "Inclusive Growth",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Analyze, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Inclusive growth and issues arising from it",
-        "Inclusive Growth"
-      ],
       "answers": [
         {
           "id": "",
@@ -1151,13 +1025,6 @@
       "subTopic": "Care X Monetized Economy",
       "macrotag": "Descriptive, Comparative",
       "microtag": "How, Distinguish",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "Care X Monetized Economy"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q5-civilsdaily",
@@ -1213,13 +1080,6 @@
       "subTopic": "Digitalization of Economy",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What is, Examine, Digital, India, Indian, Problem",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "Digitalization of Economy"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q22-civilsdaily",
@@ -1275,13 +1135,6 @@
       "subTopic": "Digitalization of Economy",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What is, Examine, Digital, India, Indian, Problem",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "Digitalization of Economy"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q22-civilsdaily",
@@ -1337,13 +1190,6 @@
       "subTopic": "GDP",
       "macrotag": "Descriptive, Comparative, Applied",
       "microtag": "Why, Distinguish, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "GDP"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q15-civilsdaily",
@@ -1394,13 +1240,6 @@
       "subTopic": "GDP",
       "macrotag": "Analytical",
       "microtag": "Comment",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "GDP"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q21-civilsdaily",
@@ -1456,13 +1295,6 @@
       "subTopic": "GDP",
       "macrotag": "Descriptive, Comparative, Applied",
       "microtag": "Explain, Difference, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "GDP"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q3-civilsdaily",
@@ -1518,13 +1350,6 @@
       "subTopic": "GDP",
       "macrotag": "Descriptive, Applied",
       "microtag": "Define, Explain, What, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "GDP"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q2-civilsdaily",
@@ -1575,13 +1400,6 @@
       "subTopic": "GDP",
       "macrotag": "Analytical, Applied",
       "microtag": "How far, Policy",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "GDP"
-      ],
       "answers": [
         {
           "id": "",
@@ -1632,13 +1450,6 @@
       "subTopic": "GST",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, How, Covid",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "GST"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q18-civilsdaily",
@@ -1709,13 +1520,6 @@
       "subTopic": "GST",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Bring out, Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "GST"
-      ],
       "answers": [
         {
           "id": "",
@@ -1766,13 +1570,6 @@
       "subTopic": "Investment",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "Investment"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q27-civilsdaily",
@@ -1828,13 +1625,6 @@
       "subTopic": "Investment",
       "macrotag": "Descriptive, Analytical",
       "microtag": "Explain, Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "Investment"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q26-civilsdaily",
@@ -1885,13 +1675,6 @@
       "subTopic": "Investment",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Do you agree, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "Investment"
-      ],
       "answers": [
         {
           "id": "",
@@ -1962,13 +1745,6 @@
       "subTopic": "Monetary policy",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Comment, India, Policy",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "Monetary policy"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q6-drishti_ias",
@@ -2014,13 +1790,6 @@
       "subTopic": "Monetary policy",
       "macrotag": "Analytical, Applied",
       "microtag": "Do you agree, India, Indian",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "Monetary policy"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q7-civilsdaily",
@@ -2091,13 +1860,6 @@
       "subTopic": "Niti Aayog X Planning Commission",
       "macrotag": "Descriptive, Comparative, Applied",
       "microtag": "How, Different, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
-        "Niti Aayog X Planning Commission"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q1-civilsdaily",
@@ -2148,13 +1910,6 @@
       "subTopic": "Economic Growth",
       "macrotag": "Applied",
       "microtag": "India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Issues relating to overall economic growth, sector manufacturing, and employment generation",
-        "Economic Growth"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q12-civilsdaily",
@@ -2210,13 +1965,6 @@
       "subTopic": "Economic Growth",
       "macrotag": "Analytical, Applied",
       "microtag": "Do you agree, India, Indian",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Issues relating to overall economic growth, sector manufacturing, and employment generation",
-        "Economic Growth"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q25-drishti_ias",
@@ -2327,13 +2075,6 @@
       "subTopic": "Manufacturing Sector",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, Mention, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Issues relating to overall economic growth, sector manufacturing, and employment generation",
-        "Manufacturing Sector"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q25-civilsdaily",
@@ -2384,13 +2125,6 @@
       "subTopic": "Manufacturing Sector",
       "macrotag": "Descriptive",
       "microtag": "Account for",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Issues relating to overall economic growth, sector manufacturing, and employment generation",
-        "Manufacturing Sector"
-      ],
       "answers": [
         {
           "id": "",
@@ -2441,13 +2175,6 @@
       "subTopic": "Unemployment",
       "macrotag": "Analytical, Applied",
       "microtag": "Examine, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Issues relating to overall economic growth, sector manufacturing, and employment generation",
-        "Unemployment"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q4-civilsdaily",
@@ -2503,13 +2230,6 @@
       "subTopic": "Unemployment",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Macroeconomics & Fiscal Policy",
-        "Issues relating to overall economic growth, sector manufacturing, and employment generation",
-        "Unemployment"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q8-civilsdaily",
@@ -2605,13 +2325,6 @@
       "subTopic": "PPP X Infrastructure",
       "macrotag": "Analytical",
       "microtag": "Critically discuss, Pros, Cons",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Physical Infrastructure & Capital",
-        "Capital investment models and public-private frameworks",
-        "PPP X Infrastructure"
-      ],
       "answers": [
         {
           "id": "",
@@ -2662,13 +2375,6 @@
       "subTopic": "Airports X Infrastructure",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Examine, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Physical Infrastructure & Capital",
-        "Infrastructure systems connectivity: energy, ports, roads, airports, and railways",
-        "Airports X Infrastructure"
-      ],
       "answers": [
         {
           "id": "",
@@ -2719,13 +2425,6 @@
       "subTopic": "Renewable Energy",
       "macrotag": "Analytical, Applied",
       "microtag": "Comment, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Physical Infrastructure & Capital",
-        "Infrastructure systems connectivity: energy, ports, roads, airports, and railways",
-        "Renewable Energy"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q31-civilsdaily",
@@ -2826,13 +2525,6 @@
       "subTopic": "Renewable Energy",
       "macrotag": "Descriptive, Applied",
       "microtag": "Write note, India, Problem",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Physical Infrastructure & Capital",
-        "Infrastructure systems connectivity: energy, ports, roads, airports, and railways",
-        "Renewable Energy"
-      ],
       "answers": [
         {
           "id": "",
@@ -2903,13 +2595,6 @@
       "subTopic": "Transport",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What is, Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Physical Infrastructure & Capital",
-        "Infrastructure systems connectivity: energy, ports, roads, airports, and railways",
-        "Transport"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q30-civilsdaily",
@@ -2960,13 +2645,6 @@
       "subTopic": "Transport",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Why, Examine, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Physical Infrastructure & Capital",
-        "Infrastructure systems connectivity: energy, ports, roads, airports, and railways",
-        "Transport"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q28-civilsdaily",
@@ -3022,13 +2700,6 @@
       "subTopic": "Transport",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS3",
-        "INDIAN ECONOMY",
-        "Physical Infrastructure & Capital",
-        "Infrastructure systems connectivity: energy, ports, roads, airports, and railways",
-        "Transport"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q53-civilsdaily",
@@ -3114,13 +2785,6 @@
       "subTopic": "Irrigation system",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India, Indian",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Irrigation design, management, water efficiency, and conservation infrastructure",
-        "Irrigation system"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q56-civilsdaily",
@@ -3171,13 +2835,6 @@
       "subTopic": "Micro-Irrigation",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, How, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Irrigation design, management, water efficiency, and conservation infrastructure",
-        "Micro-Irrigation"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q57-civilsdaily",
@@ -3248,13 +2905,6 @@
       "subTopic": "Water Conservation",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Irrigation design, management, water efficiency, and conservation infrastructure",
-        "Water Conservation"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q58-civilsdaily",
@@ -3300,13 +2950,6 @@
       "subTopic": "Water Conservation",
       "macrotag": "Descriptive",
       "microtag": "Elaborate",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Irrigation design, management, water efficiency, and conservation infrastructure",
-        "Water Conservation"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q59-civilsdaily",
@@ -3357,13 +3000,6 @@
       "subTopic": "Agriculture Subsidy",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Issues related to direct and indirect farm subsidies and minimum support prices (MSP)",
-        "Agriculture Subsidy"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q47-civilsdaily",
@@ -3419,13 +3055,6 @@
       "subTopic": "Agriculture Subsidy",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Issues related to direct and indirect farm subsidies and minimum support prices (MSP)",
-        "Agriculture Subsidy"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q47-civilsdaily",
@@ -3481,13 +3110,6 @@
       "subTopic": "Agriculture Subsidy",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Explain, How, Do you think, Justify, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Issues related to direct and indirect farm subsidies and minimum support prices (MSP)",
-        "Agriculture Subsidy"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q34-civilsdaily",
@@ -3538,13 +3160,6 @@
       "subTopic": "Agriculture Subsidy",
       "macrotag": "Descriptive, Analytical",
       "microtag": "What, How",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Issues related to direct and indirect farm subsidies and minimum support prices (MSP)",
-        "Agriculture Subsidy"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q46-civilsdaily",
@@ -3615,13 +3230,6 @@
       "subTopic": "Agriculture Subsidy",
       "macrotag": "Descriptive, Analytical, Comparative",
       "microtag": "What, Analyze, Different",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Issues related to direct and indirect farm subsidies and minimum support prices (MSP)",
-        "Agriculture Subsidy"
-      ],
       "answers": [
         {
           "id": "",
@@ -3692,13 +3300,6 @@
       "subTopic": "Crop Diversification",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Major Crops, cropping patterns, and regional agriculture production styles",
-        "Crop Diversification"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q37-civilsdaily",
@@ -3749,13 +3350,6 @@
       "subTopic": "Crop Diversification",
       "macrotag": "Descriptive",
       "microtag": "What, How",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Major Crops, cropping patterns, and regional agriculture production styles",
-        "Crop Diversification"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q64-civilsdaily",
@@ -3806,13 +3400,6 @@
       "subTopic": "Crop Diversification",
       "macrotag": "Descriptive",
       "microtag": "What, How",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Major Crops, cropping patterns, and regional agriculture production styles",
-        "Crop Diversification"
-      ],
       "answers": [
         {
           "id": "",
@@ -3863,13 +3450,6 @@
       "subTopic": "Cropping pattern",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Major Crops, cropping patterns, and regional agriculture production styles",
-        "Cropping pattern"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q38-civilsdaily",
@@ -3925,13 +3505,6 @@
       "subTopic": "Cropping pattern",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, How, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Major Crops, cropping patterns, and regional agriculture production styles",
-        "Cropping pattern"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q39-civilsdaily",
@@ -3982,13 +3555,6 @@
       "subTopic": "Cropping pattern",
       "macrotag": "Descriptive",
       "microtag": "What is, How",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Major Crops, cropping patterns, and regional agriculture production styles",
-        "Cropping pattern"
-      ],
       "answers": [
         {
           "id": "",
@@ -4039,13 +3605,6 @@
       "subTopic": "Horticulture",
       "macrotag": "Analytical",
       "microtag": "How far, Assess",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Major Crops, cropping patterns, and regional agriculture production styles",
-        "Horticulture"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q45-civilsdaily",
@@ -4096,13 +3655,6 @@
       "subTopic": "Integrated Farming System",
       "macrotag": "Descriptive, Applied",
       "microtag": "What is, How, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Major Crops, cropping patterns, and regional agriculture production styles",
-        "Integrated Farming System"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q43-civilsdaily",
@@ -4158,13 +3710,6 @@
       "subTopic": "Integrated Farming System",
       "macrotag": "Analytical",
       "microtag": "How far",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Major Crops, cropping patterns, and regional agriculture production styles",
-        "Integrated Farming System"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q42-civilsdaily",
@@ -4215,13 +3760,6 @@
       "subTopic": "Millets",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Major Crops, cropping patterns, and regional agriculture production styles",
-        "Millets"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q41-civilsdaily",
@@ -4272,13 +3810,6 @@
       "subTopic": "Millets",
       "macrotag": "Descriptive",
       "microtag": "Elaborate, How",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Major Crops, cropping patterns, and regional agriculture production styles",
-        "Millets"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q40-civilsdaily",
@@ -4344,13 +3875,6 @@
       "subTopic": "Buffer stock & food security",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Elucidate, What, Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Public Distribution System (PDS) management, buffer stock dynamics, food security missions, and economics of animal rearing",
-        "Buffer stock & food security"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q51-civilsdaily",
@@ -4401,13 +3925,6 @@
       "subTopic": "Buffer stock & food security",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, How, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Public Distribution System (PDS) management, buffer stock dynamics, food security missions, and economics of animal rearing",
-        "Buffer stock & food security"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q50-civilsdaily",
@@ -4463,13 +3980,6 @@
       "subTopic": "Buffer stock & food security",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, How, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Public Distribution System (PDS) management, buffer stock dynamics, food security missions, and economics of animal rearing",
-        "Buffer stock & food security"
-      ],
       "answers": [
         {
           "id": "",
@@ -4520,13 +4030,6 @@
       "subTopic": "Buffer stock & food security",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Public Distribution System (PDS) management, buffer stock dynamics, food security missions, and economics of animal rearing",
-        "Buffer stock & food security"
-      ],
       "answers": [
         {
           "id": "",
@@ -4597,13 +4100,6 @@
       "subTopic": "PDS",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, How, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Public Distribution System (PDS) management, buffer stock dynamics, food security missions, and economics of animal rearing",
-        "PDS"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q48-civilsdaily",
@@ -4659,13 +4155,6 @@
       "subTopic": "PDS",
       "macrotag": "Descriptive",
       "microtag": "What",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Public Distribution System (PDS) management, buffer stock dynamics, food security missions, and economics of animal rearing",
-        "PDS"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q49-civilsdaily",
@@ -4716,13 +4205,6 @@
       "subTopic": "Agri-Marketing",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elaborate, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Storage, transport, and marketing of agricultural produce along with digital e-technology interventions",
-        "Agri-Marketing"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q52-civilsdaily",
@@ -4773,13 +4255,6 @@
       "subTopic": "Agri-Marketing",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Storage, transport, and marketing of agricultural produce along with digital e-technology interventions",
-        "Agri-Marketing"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q55-civilsdaily",
@@ -4835,13 +4310,6 @@
       "subTopic": "Agri-Marketing",
       "macrotag": "Descriptive, Analytical",
       "microtag": "How, Examine",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Storage, transport, and marketing of agricultural produce along with digital e-technology interventions",
-        "Agri-Marketing"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q54-civilsdaily",
@@ -4912,13 +4380,6 @@
       "subTopic": "Tech in Farm Productivity and Income",
       "macrotag": "Descriptive",
       "microtag": "Explain, How",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Agriculture & Farm Dynamics",
-        "Storage, transport, and marketing of agricultural produce along with digital e-technology interventions",
-        "Tech in Farm Productivity and Income"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q65-civilsdaily",
@@ -4994,13 +4455,6 @@
       "subTopic": "Food Processing Sector",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Elaborate, Examine, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Food Processing Industry",
-        "Food processing and related industries (scope, significance, structural locations, and supply chain management)",
-        "Food Processing Sector"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q70-civilsdaily",
@@ -5051,13 +4505,6 @@
       "subTopic": "Food Processing Sector",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elaborate, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Food Processing Industry",
-        "Food processing and related industries (scope, significance, structural locations, and supply chain management)",
-        "Food Processing Sector"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q68-civilsdaily",
@@ -5108,13 +4555,6 @@
       "subTopic": "Food Processing Sector",
       "macrotag": "Descriptive",
       "microtag": "What, How",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Food Processing Industry",
-        "Food processing and related industries (scope, significance, structural locations, and supply chain management)",
-        "Food Processing Sector"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q69-civilsdaily",
@@ -5165,13 +4605,6 @@
       "subTopic": "Food Processing Sector",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elaborate, India, Policy",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Food Processing Industry",
-        "Food processing and related industries (scope, significance, structural locations, and supply chain management)",
-        "Food Processing Sector"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q67-civilsdaily",
@@ -5222,13 +4655,6 @@
       "subTopic": "Food Processing Sector",
       "macrotag": "Descriptive",
       "microtag": "What, How",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Food Processing Industry",
-        "Food processing and related industries (scope, significance, structural locations, and supply chain management)",
-        "Food Processing Sector"
-      ],
       "answers": [
         {
           "id": "",
@@ -5299,13 +4725,6 @@
       "subTopic": "Food Processing Sector",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elucidate, India",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Food Processing Industry",
-        "Food processing and related industries (scope, significance, structural locations, and supply chain management)",
-        "Food Processing Sector"
-      ],
       "answers": [
         {
           "id": "",
@@ -5396,13 +4815,6 @@
       "subTopic": "Land Reforms",
       "macrotag": "Descriptive",
       "microtag": "Elaborate, What",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Land Reforms",
-        "Land Reforms in India and legislative frameworks",
-        "Land Reforms"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q73-civilsdaily",
@@ -5453,13 +4865,6 @@
       "subTopic": "Land Reforms",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "How, Discuss, India, Policy",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Land Reforms",
-        "Land Reforms in India and legislative frameworks",
-        "Land Reforms"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q72-civilsdaily",
@@ -5515,13 +4920,6 @@
       "subTopic": "Land Reforms",
       "macrotag": "Descriptive",
       "microtag": "How",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Land Reforms",
-        "Land Reforms in India and legislative frameworks",
-        "Land Reforms"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q71-civilsdaily",
@@ -5597,13 +4995,6 @@
       "subTopic": "Land Reforms",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India, Indian",
-      "hierarchy_path": [
-        "GS3",
-        "AGRICULTURE",
-        "Land Reforms",
-        "Land Reforms in India and legislative frameworks",
-        "Land Reforms"
-      ],
       "answers": [
         {
           "id": "",
@@ -5654,13 +5045,6 @@
       "subTopic": "Material Science and Industry Applications",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, Mention, India",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- applications in health, industry, and crisis management",
-        "Material Science and Industry Applications"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q25-civilsdaily",
@@ -5711,13 +5095,6 @@
       "subTopic": "Medical and Health Technologies",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, Artificial Intelligence",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- applications in health, industry, and crisis management",
-        "Medical and Health Technologies"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q142-civilsdaily",
@@ -5773,13 +5150,6 @@
       "subTopic": "Medical and Health Technologies",
       "macrotag": "Descriptive, Applied",
       "microtag": "What is, How, Covid, India, Indian",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- applications in health, industry, and crisis management",
-        "Medical and Health Technologies"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q151-civilsdaily",
@@ -5835,13 +5205,6 @@
       "subTopic": "Medical and Health Technologies",
       "macrotag": "Descriptive, Applied",
       "microtag": "What",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- applications in health, industry, and crisis management",
-        "Medical and Health Technologies"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q13-civilsdaily",
@@ -5892,13 +5255,6 @@
       "subTopic": "Medical and Health Technologies",
       "macrotag": "Descriptive",
       "microtag": "What, How",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- applications in health, industry, and crisis management",
-        "Medical and Health Technologies"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q147-civilsdaily",
@@ -5944,13 +5300,6 @@
       "subTopic": "Medical and Health Technologies",
       "macrotag": "Descriptive, Applied",
       "microtag": "Describe, What, India",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- applications in health, industry, and crisis management",
-        "Medical and Health Technologies"
-      ],
       "answers": [
         {
           "id": "",
@@ -6021,13 +5370,6 @@
       "subTopic": "Medical and Health Technologies",
       "macrotag": "Descriptive, Analytical",
       "microtag": "What, Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- applications in health, industry, and crisis management",
-        "Medical and Health Technologies"
-      ],
       "answers": [
         {
           "id": "",
@@ -6078,13 +5420,6 @@
       "subTopic": "Tech in crisis Management",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, Covid, Pandemic",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- applications in health, industry, and crisis management",
-        "Tech in crisis Management"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q148-civilsdaily",
@@ -6135,13 +5470,6 @@
       "subTopic": "General Science",
       "macrotag": "Descriptive",
       "microtag": "What",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- developments and their effects in everyday life",
-        "General Science"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q150-civilsdaily",
@@ -6192,13 +5520,6 @@
       "subTopic": "Innovative Technologies",
       "macrotag": "Descriptive",
       "microtag": "What is",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- developments and their effects in everyday life",
-        "Innovative Technologies"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q96-civilsdaily",
@@ -6249,13 +5570,6 @@
       "subTopic": "Innovative Technologies",
       "macrotag": "Descriptive",
       "microtag": "How",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- developments and their effects in everyday life",
-        "Innovative Technologies"
-      ],
       "answers": [
         {
           "id": "",
@@ -6306,13 +5620,6 @@
       "subTopic": "Innovative Technologies",
       "macrotag": "Descriptive, Analytical",
       "microtag": "What is, How, Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- developments and their effects in everyday life",
-        "Innovative Technologies"
-      ],
       "answers": [
         {
           "id": "",
@@ -6363,13 +5670,6 @@
       "subTopic": "Nobel Prizes",
       "macrotag": "Descriptive",
       "microtag": "How",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- developments and their effects in everyday life",
-        "Nobel Prizes"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q140-civilsdaily",
@@ -6425,13 +5725,6 @@
       "subTopic": "Sports and Technology",
       "macrotag": "Descriptive, Analytical",
       "microtag": "Explain, What, How, Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- developments and their effects in everyday life",
-        "Sports and Technology"
-      ],
       "answers": [
         {
           "id": "",
@@ -6482,13 +5775,6 @@
       "subTopic": "Tech solutions for daily challenges",
       "macrotag": "Descriptive, Analytical",
       "microtag": "What, Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- developments and their effects in everyday life",
-        "Tech solutions for daily challenges"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q80-civilsdaily",
@@ -6559,13 +5845,6 @@
       "subTopic": "Tech solutions for daily challenges",
       "macrotag": "Descriptive, Applied",
       "microtag": "What is, Digital",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Everyday Science & Innovations",
-        "Science and Technology- developments and their effects in everyday life",
-        "Tech solutions for daily challenges"
-      ],
       "answers": [
         {
           "id": "",
@@ -6656,13 +5935,6 @@
       "subTopic": "Defence Technology",
       "macrotag": "Descriptive",
       "microtag": "How",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Frontier Technologies & IPR",
-        "Awareness in the fields of Space and Defence technologies",
-        "Defence Technology"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q139-civilsdaily",
@@ -6718,13 +5990,6 @@
       "subTopic": "Space Technology",
       "macrotag": "Descriptive",
       "microtag": "What, How",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Frontier Technologies & IPR",
-        "Awareness in the fields of Space and Defence technologies",
-        "Space Technology"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q106-civilsdaily",
@@ -6775,13 +6040,6 @@
       "subTopic": "Space Technology",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, What is, India",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Frontier Technologies & IPR",
-        "Awareness in the fields of Space and Defence technologies",
-        "Space Technology"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q143-civilsdaily",
@@ -6837,13 +6095,6 @@
       "subTopic": "Space Technology",
       "macrotag": "Descriptive",
       "microtag": "What",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Frontier Technologies & IPR",
-        "Awareness in the fields of Space and Defence technologies",
-        "Space Technology"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q141-civilsdaily",
@@ -6899,13 +6150,6 @@
       "subTopic": "Space Technology",
       "macrotag": "Descriptive, Applied",
       "microtag": "What is, How, India",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Frontier Technologies & IPR",
-        "Awareness in the fields of Space and Defence technologies",
-        "Space Technology"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q138-civilsdaily",
@@ -6956,13 +6200,6 @@
       "subTopic": "Space Technology",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, India",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Frontier Technologies & IPR",
-        "Awareness in the fields of Space and Defence technologies",
-        "Space Technology"
-      ],
       "answers": [
         {
           "id": "",
@@ -7053,13 +6290,6 @@
       "subTopic": "Bio-Technology##### Subtopic: Bio-Technology",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "How, India",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Frontier Technologies & IPR",
-        "Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights",
-        "Bio-Technology##### Subtopic: Bio-Technology"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q36-civilsdaily",
@@ -7110,13 +6340,6 @@
       "subTopic": "Bio-Technology##### Subtopic: Bio-Technology",
       "macrotag": "Descriptive",
       "microtag": "What, How",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Frontier Technologies & IPR",
-        "Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights",
-        "Bio-Technology##### Subtopic: Bio-Technology"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q149-civilsdaily",
@@ -7172,13 +6395,6 @@
       "subTopic": "Bio-Technology##### Subtopic: Bio-Technology",
       "macrotag": "Descriptive",
       "microtag": "How",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Frontier Technologies & IPR",
-        "Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights",
-        "Bio-Technology##### Subtopic: Bio-Technology"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q62-civilsdaily",
@@ -7229,13 +6445,6 @@
       "subTopic": "Bio-Technology##### Subtopic: Bio-Technology",
       "macrotag": "Descriptive",
       "microtag": "Why, How",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Frontier Technologies & IPR",
-        "Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights",
-        "Bio-Technology##### Subtopic: Bio-Technology"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q145-civilsdaily",
@@ -7286,13 +6495,6 @@
       "subTopic": "Intellectual Property Rights",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, What is, India",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Frontier Technologies & IPR",
-        "Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights",
-        "Intellectual Property Rights"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q153-civilsdaily",
@@ -7343,13 +6545,6 @@
       "subTopic": "Intellectual Property Rights",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, India",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Frontier Technologies & IPR",
-        "Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights",
-        "Intellectual Property Rights"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q146-civilsdaily",
@@ -7440,13 +6635,6 @@
       "subTopic": "Intellectual Property Rights",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "How, Discuss, India, Indian",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Frontier Technologies & IPR",
-        "Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights",
-        "Intellectual Property Rights"
-      ],
       "answers": [
         {
           "id": "",
@@ -7497,13 +6685,6 @@
       "subTopic": "Nano Technology",
       "macrotag": "Descriptive",
       "microtag": "How",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Frontier Technologies & IPR",
-        "Awareness in the fields of nano-technology, bio-technology and issues relating to intellectual property rights",
-        "Nano Technology"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q66-civilsdaily",
@@ -7574,13 +6755,6 @@
       "subTopic": "Achievements of Indians in S&T",
       "macrotag": "Descriptive, Comparative",
       "microtag": "What, How, Compare",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Indigenous Tech & Achievements",
-        "Achievements of Indians in S&T; Indigenisation of technology & developing new technology",
-        "Achievements of Indians in S&T"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q35-civilsdaily",
@@ -7636,13 +6810,6 @@
       "subTopic": "Achievements of Indians in S&T",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Indigenous Tech & Achievements",
-        "Achievements of Indians in S&T; Indigenisation of technology & developing new technology",
-        "Achievements of Indians in S&T"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q152-civilsdaily",
@@ -7698,13 +6865,6 @@
       "subTopic": "Achievements of Indians in S&T",
       "macrotag": "Descriptive, Comparative",
       "microtag": "Describe, What, Contrast",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Indigenous Tech & Achievements",
-        "Achievements of Indians in S&T; Indigenisation of technology & developing new technology",
-        "Achievements of Indians in S&T"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q32-civilsdaily",
@@ -7750,13 +6910,6 @@
       "subTopic": "Achievements of Indians in S&T",
       "macrotag": "Descriptive",
       "microtag": "What, How",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Indigenous Tech & Achievements",
-        "Achievements of Indians in S&T; Indigenisation of technology & developing new technology",
-        "Achievements of Indians in S&T"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q63-civilsdaily",
@@ -7807,13 +6960,6 @@
       "subTopic": "Achievements of Indians in S&T",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, India",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Indigenous Tech & Achievements",
-        "Achievements of Indians in S&T; Indigenisation of technology & developing new technology",
-        "Achievements of Indians in S&T"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q61-civilsdaily",
@@ -7859,13 +7005,6 @@
       "subTopic": "Achievements of Indians in S&T",
       "macrotag": "Descriptive, Analytical",
       "microtag": "How, Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Indigenous Tech & Achievements",
-        "Achievements of Indians in S&T; Indigenisation of technology & developing new technology",
-        "Achievements of Indians in S&T"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q144-civilsdaily",
@@ -7936,13 +7075,6 @@
       "subTopic": "Nuclear Technology",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, Mention, India",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Indigenous Tech & Achievements",
-        "Achievements of Indians in S&T; Indigenisation of technology & developing new technology",
-        "Nuclear Technology"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q155-civilsdaily",
@@ -7993,13 +7125,6 @@
       "subTopic": "Nuclear Technology",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Indigenous Tech & Achievements",
-        "Achievements of Indians in S&T; Indigenisation of technology & developing new technology",
-        "Nuclear Technology"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q154-civilsdaily",
@@ -8050,13 +7175,6 @@
       "subTopic": "Nuclear Technology",
       "macrotag": "Descriptive, Applied",
       "microtag": "What is, India",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Indigenous Tech & Achievements",
-        "Achievements of Indians in S&T; Indigenisation of technology & developing new technology",
-        "Nuclear Technology"
-      ],
       "answers": [
         {
           "id": "",
@@ -8107,13 +7225,6 @@
       "subTopic": "Nuclear Technology",
       "macrotag": "Descriptive, Comparative",
       "microtag": "What, How, Different",
-      "hierarchy_path": [
-        "GS3",
-        "SCIENCE & TECHNOLOGY",
-        "Indigenous Tech & Achievements",
-        "Achievements of Indians in S&T; Indigenisation of technology & developing new technology",
-        "Nuclear Technology"
-      ],
       "answers": [
         {
           "id": "",
@@ -8159,13 +7270,6 @@
       "subTopic": "Climate Change",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, India, Problem",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Climate Change",
-        "Global warming, climate change, and international frameworks",
-        "Climate Change"
-      ],
       "answers": [
         {
           "id": "",
@@ -8216,13 +7320,6 @@
       "subTopic": "IPCC Reports",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India, Indian",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Climate Change",
-        "Global warming, climate change, and international frameworks",
-        "IPCC Reports"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q95-civilsdaily",
@@ -8278,13 +7375,6 @@
       "subTopic": "UNFCCC",
       "macrotag": "Descriptive, Analytical",
       "microtag": "Explain, Mention, Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Climate Change",
-        "Global warming, climate change, and international frameworks",
-        "UNFCCC"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q94-civilsdaily",
@@ -8340,13 +7430,6 @@
       "subTopic": "UNFCCC",
       "macrotag": "Descriptive, Applied",
       "microtag": "Describe, What, India",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Climate Change",
-        "Global warming, climate change, and international frameworks",
-        "UNFCCC"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q92-civilsdaily",
@@ -8402,13 +7485,6 @@
       "subTopic": "UNFCCC",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Climate Change",
-        "Global warming, climate change, and international frameworks",
-        "UNFCCC"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q33-civilsdaily",
@@ -8464,13 +7540,6 @@
       "subTopic": "UNFCCC",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, Mention, India",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Climate Change",
-        "Global warming, climate change, and international frameworks",
-        "UNFCCC"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q93-civilsdaily",
@@ -8541,13 +7610,6 @@
       "subTopic": "Biodiversity",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Conservation & Ecosystems",
-        "Conservation and environmental impact assessment",
-        "Biodiversity"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q44-civilsdaily",
@@ -8598,13 +7660,6 @@
       "subTopic": "Biodiversity",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, India",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Conservation & Ecosystems",
-        "Conservation and environmental impact assessment",
-        "Biodiversity"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q75-civilsdaily",
@@ -8655,13 +7710,6 @@
       "subTopic": "EIA",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Assess, India",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Conservation & Ecosystems",
-        "Conservation and environmental impact assessment",
-        "EIA"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q79-civilsdaily",
@@ -8712,13 +7760,6 @@
       "subTopic": "EIA",
       "macrotag": "Descriptive, Analytical, Comparative",
       "microtag": "How, Assess, Differ",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Conservation & Ecosystems",
-        "Conservation and environmental impact assessment",
-        "EIA"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q77-civilsdaily",
@@ -8789,13 +7830,6 @@
       "subTopic": "Sustainable Development",
       "macrotag": "Descriptive",
       "microtag": "Define, Explain, How",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Conservation & Ecosystems",
-        "Conservation and environmental impact assessment",
-        "Sustainable Development"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q76-civilsdaily",
@@ -8866,13 +7900,6 @@
       "subTopic": "Wetlands",
       "macrotag": "Analytical, Applied",
       "microtag": "Comment, India",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Conservation & Ecosystems",
-        "Conservation and environmental impact assessment",
-        "Wetlands"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q78-civilsdaily",
@@ -8928,13 +7955,6 @@
       "subTopic": "Wetlands",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, What is, India",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Conservation & Ecosystems",
-        "Conservation and environmental impact assessment",
-        "Wetlands"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q74-civilsdaily",
@@ -8980,13 +8000,6 @@
       "subTopic": "Air Pollution and Related Issues",
       "macrotag": "Descriptive, Analytical",
       "microtag": "Explain, Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Pollution & Degradation",
-        "Environmental pollution and degradation",
-        "Air Pollution and Related Issues"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q86-civilsdaily",
@@ -9042,13 +8055,6 @@
       "subTopic": "Air Pollution and Related Issues",
       "macrotag": "Descriptive, Comparative, Applied",
       "microtag": "Describe, What, How, Different, India",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Pollution & Degradation",
-        "Environmental pollution and degradation",
-        "Air Pollution and Related Issues"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q90-civilsdaily",
@@ -9104,13 +8110,6 @@
       "subTopic": "Air Pollution and Related Issues",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Pollution & Degradation",
-        "Environmental pollution and degradation",
-        "Air Pollution and Related Issues"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q91-civilsdaily",
@@ -9161,13 +8160,6 @@
       "subTopic": "Mining and Erosion",
       "macrotag": "Descriptive",
       "microtag": "Explain, Why",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Pollution & Degradation",
-        "Environmental pollution and degradation",
-        "Mining and Erosion"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q85-civilsdaily",
@@ -9238,13 +8230,6 @@
       "subTopic": "Mining and Erosion",
       "macrotag": "Descriptive, Analytical",
       "microtag": "What, Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Pollution & Degradation",
-        "Environmental pollution and degradation",
-        "Mining and Erosion"
-      ],
       "answers": [
         {
           "id": "",
@@ -9295,13 +8280,6 @@
       "subTopic": "River linking and Impact",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Pollution & Degradation",
-        "Environmental pollution and degradation",
-        "River linking and Impact"
-      ],
       "answers": [
         {
           "id": "",
@@ -9352,13 +8330,6 @@
       "subTopic": "Solid wastes",
       "macrotag": "Descriptive",
       "microtag": "What, How",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Pollution & Degradation",
-        "Environmental pollution and degradation",
-        "Solid wastes"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q82-civilsdaily",
@@ -9404,13 +8375,6 @@
       "subTopic": "Solid wastes",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Enumerate, Discuss, India, Policy",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Pollution & Degradation",
-        "Environmental pollution and degradation",
-        "Solid wastes"
-      ],
       "answers": [
         {
           "id": "",
@@ -9461,13 +8425,6 @@
       "subTopic": "Water Pollution and Related Issues",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Pollution & Degradation",
-        "Environmental pollution and degradation",
-        "Water Pollution and Related Issues"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q84-civilsdaily",
@@ -9518,13 +8475,6 @@
       "subTopic": "Water Pollution and Related Issues",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Examine, India",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Pollution & Degradation",
-        "Environmental pollution and degradation",
-        "Water Pollution and Related Issues"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q81-civilsdaily",
@@ -9575,13 +8525,6 @@
       "subTopic": "Water Pollution and Related Issues",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India, Problem",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Pollution & Degradation",
-        "Environmental pollution and degradation",
-        "Water Pollution and Related Issues"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q89-civilsdaily",
@@ -9632,13 +8575,6 @@
       "subTopic": "Water Pollution and Related Issues",
       "macrotag": "Descriptive, Applied",
       "microtag": "What is, India",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Pollution & Degradation",
-        "Environmental pollution and degradation",
-        "Water Pollution and Related Issues"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q88-civilsdaily",
@@ -9694,13 +8630,6 @@
       "subTopic": "Water Pollution and Related Issues",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS3",
-        "ENVIRONMENT",
-        "Pollution & Degradation",
-        "Environmental pollution and degradation",
-        "Water Pollution and Related Issues"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q60-civilsdaily",
@@ -9771,13 +8700,6 @@
       "subTopic": "Disaster Preparedness and Resilience",
       "macrotag": "Descriptive",
       "microtag": "Describe, What is, How, Mention",
-      "hierarchy_path": [
-        "GS3",
-        "DISASTER MANAGEMENT",
-        "Frameworks & Preparedness",
-        "Disaster Management: Preparedness, resilience, and vulnerability frameworks",
-        "Disaster Preparedness and Resilience"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q99-civilsdaily",
@@ -9828,13 +8750,6 @@
       "subTopic": "Disaster Preparedness and Resilience",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "DISASTER MANAGEMENT",
-        "Frameworks & Preparedness",
-        "Disaster Management: Preparedness, resilience, and vulnerability frameworks",
-        "Disaster Preparedness and Resilience"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q98-civilsdaily",
@@ -9885,13 +8800,6 @@
       "subTopic": "Disaster Preparedness and Resilience",
       "macrotag": "Descriptive, Comparative, Applied",
       "microtag": "Describe, How, Different, India",
-      "hierarchy_path": [
-        "GS3",
-        "DISASTER MANAGEMENT",
-        "Frameworks & Preparedness",
-        "Disaster Management: Preparedness, resilience, and vulnerability frameworks",
-        "Disaster Preparedness and Resilience"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q100-civilsdaily",
@@ -9937,13 +8845,6 @@
       "subTopic": "Vulnerability and Risk Assessment",
       "macrotag": "Descriptive, Analytical, Comparative",
       "microtag": "What, How, Discuss, Different",
-      "hierarchy_path": [
-        "GS3",
-        "DISASTER MANAGEMENT",
-        "Frameworks & Preparedness",
-        "Disaster Management: Preparedness, resilience, and vulnerability frameworks",
-        "Vulnerability and Risk Assessment"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q97-civilsdaily",
@@ -9989,13 +8890,6 @@
       "subTopic": "Vulnerability and Risk Assessment",
       "macrotag": "Descriptive, Analytical",
       "microtag": "What, How, Assess",
-      "hierarchy_path": [
-        "GS3",
-        "DISASTER MANAGEMENT",
-        "Frameworks & Preparedness",
-        "Disaster Management: Preparedness, resilience, and vulnerability frameworks",
-        "Vulnerability and Risk Assessment"
-      ],
       "answers": [
         {
           "id": "",
@@ -10046,13 +8940,6 @@
       "subTopic": "Cloudburst",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Explain, Discuss, India, Indian",
-      "hierarchy_path": [
-        "GS3",
-        "DISASTER MANAGEMENT",
-        "Specific Disasters & Hazards",
-        "Disasters: Specific natural and man-made hazards",
-        "Cloudburst"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q104-civilsdaily",
@@ -10128,13 +9015,6 @@
       "subTopic": "Dam failures",
       "macrotag": "Analytical",
       "microtag": "Analyze",
-      "hierarchy_path": [
-        "GS3",
-        "DISASTER MANAGEMENT",
-        "Specific Disasters & Hazards",
-        "Disasters: Specific natural and man-made hazards",
-        "Dam failures"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q105-civilsdaily",
@@ -10250,13 +9130,6 @@
       "subTopic": "Landslide",
       "macrotag": "Descriptive",
       "microtag": "Describe, Mention",
-      "hierarchy_path": [
-        "GS3",
-        "DISASTER MANAGEMENT",
-        "Specific Disasters & Hazards",
-        "Disasters: Specific natural and man-made hazards",
-        "Landslide"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q102-civilsdaily",
@@ -10312,13 +9185,6 @@
       "subTopic": "Landslide",
       "macrotag": "Descriptive",
       "microtag": "Explain, How",
-      "hierarchy_path": [
-        "GS3",
-        "DISASTER MANAGEMENT",
-        "Specific Disasters & Hazards",
-        "Disasters: Specific natural and man-made hazards",
-        "Landslide"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q101-civilsdaily",
@@ -10369,13 +9235,6 @@
       "subTopic": "Tsunami",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, What, India",
-      "hierarchy_path": [
-        "GS3",
-        "DISASTER MANAGEMENT",
-        "Specific Disasters & Hazards",
-        "Disasters: Specific natural and man-made hazards",
-        "Tsunami"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q87-civilsdaily",
@@ -10431,13 +9290,6 @@
       "subTopic": "Tsunami",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Describe, Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "DISASTER MANAGEMENT",
-        "Specific Disasters & Hazards",
-        "Disasters: Specific natural and man-made hazards",
-        "Tsunami"
-      ],
       "answers": [
         {
           "id": "",
@@ -10488,13 +9340,6 @@
       "subTopic": "Urban floods",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Describe, Mention, Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "DISASTER MANAGEMENT",
-        "Specific Disasters & Hazards",
-        "Disasters: Specific natural and man-made hazards",
-        "Urban floods"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q107-civilsdaily",
@@ -10565,13 +9410,6 @@
       "subTopic": "Organized Crime and Terrorism",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Border Management & Organized Crime",
-        "Linkages of organized crime with terrorism.",
-        "Organized Crime and Terrorism"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q117-civilsdaily",
@@ -10627,13 +9465,6 @@
       "subTopic": "Organized Crime and Terrorism",
       "macrotag": "Descriptive, Analytical",
       "microtag": "Describe, Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Border Management & Organized Crime",
-        "Linkages of organized crime with terrorism.",
-        "Organized Crime and Terrorism"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q124-civilsdaily",
@@ -10689,13 +9520,6 @@
       "subTopic": "Organized Crime and Terrorism",
       "macrotag": "Descriptive",
       "microtag": "What",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Border Management & Organized Crime",
-        "Linkages of organized crime with terrorism.",
-        "Organized Crime and Terrorism"
-      ],
       "answers": [
         {
           "id": "",
@@ -10746,13 +9570,6 @@
       "subTopic": "Border Area Management",
       "macrotag": "Analytical, Applied",
       "microtag": "Examine, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Border Management & Organized Crime",
-        "Security challenges and their management in border areas",
-        "Border Area Management"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q134-civilsdaily",
@@ -10803,13 +9620,6 @@
       "subTopic": "Border Area Management",
       "macrotag": "Analytical",
       "microtag": "Comment",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Border Management & Organized Crime",
-        "Security challenges and their management in border areas",
-        "Border Area Management"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q135-civilsdaily",
@@ -10865,13 +9675,6 @@
       "subTopic": "Border Area Management",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Border Management & Organized Crime",
-        "Security challenges and their management in border areas",
-        "Border Area Management"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q132-civilsdaily",
@@ -10922,13 +9725,6 @@
       "subTopic": "Border Area Management",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, Examine, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Border Management & Organized Crime",
-        "Security challenges and their management in border areas",
-        "Border Area Management"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q131-civilsdaily",
@@ -11034,13 +9830,6 @@
       "subTopic": "Border Area Management",
       "macrotag": "Analytical, Applied",
       "microtag": "How far, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Border Management & Organized Crime",
-        "Security challenges and their management in border areas",
-        "Border Area Management"
-      ],
       "answers": [
         {
           "id": "",
@@ -11091,13 +9880,6 @@
       "subTopic": "Maritime Security challenges",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Why, Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Border Management & Organized Crime",
-        "Security challenges and their management in border areas",
-        "Maritime Security challenges"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q137-civilsdaily",
@@ -11148,13 +9930,6 @@
       "subTopic": "Maritime Security challenges",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Discuss, Challenges, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Border Management & Organized Crime",
-        "Security challenges and their management in border areas",
-        "Maritime Security challenges"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q146-civilsdaily",
@@ -11230,13 +10005,6 @@
       "subTopic": "Act based",
       "macrotag": "Descriptive, Applied",
       "microtag": "Describe, Digital",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Cyber, Financial & Media Security",
-        "Challenges to internal security through communication networks, role of media and social networking sites, and basics of cyber security",
-        "Act based"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q128-civilsdaily",
@@ -11302,13 +10070,6 @@
       "subTopic": "Cyber security",
       "macrotag": "Descriptive, Analytical, Comparative, Applied",
       "microtag": "What, Examine, Different, Challenges, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Cyber, Financial & Media Security",
-        "Challenges to internal security through communication networks, role of media and social networking sites, and basics of cyber security",
-        "Cyber security"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q127-civilsdaily",
@@ -11364,13 +10125,6 @@
       "subTopic": "Cyber security",
       "macrotag": "Analytical, Applied",
       "microtag": "Analyze, Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Cyber, Financial & Media Security",
-        "Challenges to internal security through communication networks, role of media and social networking sites, and basics of cyber security",
-        "Cyber security"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q126-civilsdaily",
@@ -11426,13 +10180,6 @@
       "subTopic": "Cyber security",
       "macrotag": "Analytical, Comparative",
       "microtag": "Discuss, Different",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Cyber, Financial & Media Security",
-        "Challenges to internal security through communication networks, role of media and social networking sites, and basics of cyber security",
-        "Cyber security"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q125-civilsdaily",
@@ -11483,13 +10230,6 @@
       "subTopic": "Cyber security",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, What is, How, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Cyber, Financial & Media Security",
-        "Challenges to internal security through communication networks, role of media and social networking sites, and basics of cyber security",
-        "Cyber security"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q174-drishti_ias",
@@ -11535,13 +10275,6 @@
       "subTopic": "Cyber security",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Cyber, Financial & Media Security",
-        "Challenges to internal security through communication networks, role of media and social networking sites, and basics of cyber security",
-        "Cyber security"
-      ],
       "answers": [
         {
           "id": "",
@@ -11592,13 +10325,6 @@
       "subTopic": "Cyber security",
       "macrotag": "Descriptive, Applied",
       "microtag": "Bring out, What, Outline, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Cyber, Financial & Media Security",
-        "Challenges to internal security through communication networks, role of media and social networking sites, and basics of cyber security",
-        "Cyber security"
-      ],
       "answers": [
         {
           "id": "",
@@ -11649,13 +10375,6 @@
       "subTopic": "Digital Media and Security Threats",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, Problem",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Cyber, Financial & Media Security",
-        "Challenges to internal security through communication networks, role of media and social networking sites, and basics of cyber security",
-        "Digital Media and Security Threats"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q130-civilsdaily",
@@ -11746,13 +10465,6 @@
       "subTopic": "Digital Media and Security Threats",
       "macrotag": "Descriptive",
       "microtag": "What",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Cyber, Financial & Media Security",
-        "Challenges to internal security through communication networks, role of media and social networking sites, and basics of cyber security",
-        "Digital Media and Security Threats"
-      ],
       "answers": [
         {
           "id": "",
@@ -11803,13 +10515,6 @@
       "subTopic": "Mob Violence",
       "macrotag": "Analytical, Applied",
       "microtag": "Analyze, India, Problem",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Cyber, Financial & Media Security",
-        "Challenges to internal security through communication networks, role of media and social networking sites, and basics of cyber security",
-        "Mob Violence"
-      ],
       "answers": [
         {
           "id": "",
@@ -11875,13 +10580,6 @@
       "subTopic": "Money-laundering and Prevention",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Elaborate, How, Discuss, Problem",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Cyber, Financial & Media Security",
-        "Money-laundering and its prevention, including illicit trafficking",
-        "Money-laundering and Prevention"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q122-civilsdaily",
@@ -11957,13 +10655,6 @@
       "subTopic": "Left-Wing Extremism",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, How, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Extremism & External Threats",
-        "Linkages between Development & spread of Extremism",
-        "Left-Wing Extremism"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q111-civilsdaily",
@@ -12014,13 +10705,6 @@
       "subTopic": "Left-Wing Extremism",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Extremism & External Threats",
-        "Linkages between Development & spread of Extremism",
-        "Left-Wing Extremism"
-      ],
       "answers": [
         {
           "id": "2022-gs3-q110-civilsdaily",
@@ -12076,13 +10760,6 @@
       "subTopic": "Left-Wing Extremism",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Extremism & External Threats",
-        "Linkages between Development & spread of Extremism",
-        "Left-Wing Extremism"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q108-civilsdaily",
@@ -12153,13 +10830,6 @@
       "subTopic": "Left-Wing Extremism",
       "macrotag": "Analytical, Applied",
       "microtag": "Analyze, India, Indian",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Extremism & External Threats",
-        "Linkages between Development & spread of Extremism",
-        "Left-Wing Extremism"
-      ],
       "answers": [
         {
           "id": "",
@@ -12210,13 +10880,6 @@
       "subTopic": "N-E Insurgency",
       "macrotag": "Descriptive",
       "microtag": "What",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Extremism & External Threats",
-        "Linkages between Development & spread of Extremism",
-        "N-E Insurgency"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q112-civilsdaily",
@@ -12267,13 +10930,6 @@
       "subTopic": "N-E Insurgency",
       "macrotag": "Analytical, Applied",
       "microtag": "Analyze, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Extremism & External Threats",
-        "Linkages between Development & spread of Extremism",
-        "N-E Insurgency"
-      ],
       "answers": [
         {
           "id": "",
@@ -12324,13 +10980,6 @@
       "subTopic": "Threat from External state and Non-state actors",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elaborate, Explain, What, How, Contemporary, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Extremism & External Threats",
-        "Role of external state and non-state actors in creating challenges to internal security.",
-        "Threat from External state and Non-state actors"
-      ],
       "answers": [
         {
           "id": "2025-gs3-q115-civilsdaily",
@@ -12381,13 +11030,6 @@
       "subTopic": "Threat from External state and Non-state actors",
       "macrotag": "Descriptive",
       "microtag": "Explain, How",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Extremism & External Threats",
-        "Role of external state and non-state actors in creating challenges to internal security.",
-        "Threat from External state and Non-state actors"
-      ],
       "answers": [
         {
           "id": "2024-gs3-q118-civilsdaily",
@@ -12438,13 +11080,6 @@
       "subTopic": "Threat from External state and Non-state actors",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Extremism & External Threats",
-        "Role of external state and non-state actors in creating challenges to internal security.",
-        "Threat from External state and Non-state actors"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q114-civilsdaily",
@@ -12500,13 +11135,6 @@
       "subTopic": "Threat from External state and Non-state actors",
       "macrotag": "Analytical, Applied",
       "microtag": "Analyze, Discuss, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Extremism & External Threats",
-        "Role of external state and non-state actors in creating challenges to internal security.",
-        "Threat from External state and Non-state actors"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q123-civilsdaily",
@@ -12562,13 +11190,6 @@
       "subTopic": "Threat from External state and Non-state actors",
       "macrotag": "Analytical",
       "microtag": "Analyze",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Extremism & External Threats",
-        "Role of external state and non-state actors in creating challenges to internal security.",
-        "Threat from External state and Non-state actors"
-      ],
       "answers": [
         {
           "id": "2021-gs3-q119-civilsdaily",
@@ -12624,13 +11245,6 @@
       "subTopic": "Threat from External state and Non-state actors",
       "macrotag": "Analytical",
       "microtag": "Discuss, Examine",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Extremism & External Threats",
-        "Role of external state and non-state actors in creating challenges to internal security.",
-        "Threat from External state and Non-state actors"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q113-civilsdaily",
@@ -12676,13 +11290,6 @@
       "subTopic": "Threat from External state and Non-state actors",
       "macrotag": "Descriptive, Applied",
       "microtag": "Why, Enumerate, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Extremism & External Threats",
-        "Role of external state and non-state actors in creating challenges to internal security.",
-        "Threat from External state and Non-state actors"
-      ],
       "answers": [
         {
           "id": "2018-gs3-q121-civilsdaily",
@@ -12808,13 +11415,6 @@
       "subTopic": "Act based",
       "macrotag": "Analytical, Applied",
       "microtag": "Analyze, Discuss, India, Indian",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Security Forces & Mandates",
-        "Various Security forces and agencies and their mandate.",
-        "Act based"
-      ],
       "answers": [
         {
           "id": "2019-gs3-q116-civilsdaily",
@@ -12880,13 +11480,6 @@
       "subTopic": "Mandates of Security forces",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Security Forces & Mandates",
-        "Various Security forces and agencies and their mandate.",
-        "Mandates of Security forces"
-      ],
       "answers": [
         {
           "id": "2023-gs3-q136-civilsdaily",
@@ -12942,13 +11535,6 @@
       "subTopic": "Mandates of Security forces",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Security Forces & Mandates",
-        "Various Security forces and agencies and their mandate.",
-        "Mandates of Security forces"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q109-civilsdaily",
@@ -12999,13 +11585,6 @@
       "subTopic": "Mandates of Security forces",
       "macrotag": "Analytical",
       "microtag": "Analyze, Discuss",
-      "hierarchy_path": [
-        "GS3",
-        "INTERNAL SECURITY",
-        "Security Forces & Mandates",
-        "Various Security forces and agencies and their mandate.",
-        "Mandates of Security forces"
-      ],
       "answers": [
         {
           "id": "2020-gs3-q133-civilsdaily",

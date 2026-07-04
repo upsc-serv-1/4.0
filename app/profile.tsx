@@ -39,6 +39,7 @@ import {
   WifiOff,
   Brain,
   Users,
+  ShieldCheck,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -78,7 +79,7 @@ export default function Profile() {
   const { colors } = useTheme();
   const { session, signOut } = useAuth();
   const { displayName, avatarId, updateProfile: updateProfileContext } = useProfile();
-  const { hasAccess, featureMap } = useAccessControl();
+  const { featureMap } = useAccessControl();
   const router = useRouter();
   const email = session?.user.email || '';
   const initial = (displayName[0] || 'A').toUpperCase();
@@ -90,7 +91,14 @@ export default function Profile() {
   const [selectedAvatar, setSelectedAvatar] = useState(avatarId);
   const [layoutAdminVisible, setLayoutAdminVisible] = useState(false);
   const [analyticsLayout, setAnalyticsLayout] = useState(DEFAULT_ANALYTICS_LAYOUT);
-  const isAnalyticsAdmin = email.toLowerCase() === 'your@email.com';
+  
+  const ADMIN_EMAILS = [
+    'your@email.com',
+    'aiimsmbbs17@gmail.com',
+    'dn.d.n.g.zm.s.n.f.smb.t@gmail.com',
+    'upsc-serv-1@proton.me'
+  ];
+  const isAnalyticsAdmin = ADMIN_EMAILS.includes(email.toLowerCase());
 
   // ── Subscription Admin State ──────────────────────────────
   const [userSubAdminVisible, setUserSubAdminVisible] = useState(false);
@@ -455,11 +463,11 @@ export default function Profile() {
           {isAnalyticsAdmin ? (
             <>
               <Row 
-                testID="profile-user-subscriptions" 
-                icon={<Users color={colors.primary} size={20} />} 
-                label="Subscription Admin" 
-                sub="Manage user plans & subscriptions in Supabase" 
-                onPress={() => setUserSubAdminVisible(true)} 
+                testID="profile-admin-panel" 
+                icon={<ShieldCheck color="#ef4444" size={20} />} 
+                label="Admin Panel" 
+                sub="Manage users, features, paywalls & configurations" 
+                onPress={() => router.push('/admin')} 
               />
               <Row testID="profile-analytics-layout" icon={<BarChart3 color={colors.primary} size={20} />} label="Analytics Layout Admin" sub="Arrange review and overall cards" onPress={() => setLayoutAdminVisible(true)} />
             </>

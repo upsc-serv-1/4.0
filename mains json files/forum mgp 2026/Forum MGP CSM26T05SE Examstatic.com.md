@@ -4,7 +4,7 @@
 
 ## Q1 [Year: 2026]
 **Question:** What are the key factors contributing to the ‘Missing Middle’ phenomenon in the country's  manufacturing sector?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Manufacturing Sector] [Macro Tag: Descriptive, Analytical] [Micro Tag: What are, Missing Middle, Manufacturing sector, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Manufacturing Sector] [Macro Tag: Descriptive, Analytical] [Micro Tag: What are, Missing Middle, Manufacturing sector, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by explaining the ‘Missing Middle’ problem in Indian manufacturing. <br>• In the body, elaborate on the factors responsible for the same. <br>• Conclude by suggesting corrective measures. |
@@ -38,7 +38,7 @@ Along with the **‘Make in India’** initiative, **India also needs** to nurtu
 
 ## Q2 [Year: 2026]
 **Question:** Discuss the merits and demerits of the four ‘Labour Codes’ in the context of labour market reforms in  India.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Industrial Dynamics & Reforms] [Micro Topic: Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth] [Sub Topic: Labour Reform] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Labour Codes, Labour market reforms, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS1] [Subject: INDIAN ECONOMY] [Section Group: Industrial Dynamics & Reforms] [Micro Topic: Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth] [Sub Topic: Labour Reform] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Labour Codes, Labour market reforms, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a brief background of the four labour codes. <br>• In the body, discuss their merits and demerits in the context of labour market reforms in India. <br>• Conclude by highlighting the need for further deliberations among stakeholders for its smooth implementation. |
@@ -100,7 +100,7 @@ The **progress** regarding the implementation of the codes has been **uneven** s
 
 ## Q3 [Year: 2026]
 **Question:** What are Global Capability Centers (GCCs)? Discuss their significance for the country’s economic  landscape.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Economic Growth] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What are, Discuss, Global Capability Centers, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Economic Growth] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What are, Discuss, Global Capability Centers, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by explaining Global Capability Centers (GCCs). <br>• In the body, discuss their significance for India’s economic landscape, citing relevant data. <br>• Also, mention risks and challenges associated with them. <br>• Conclude with a way forward to strengthen India’s position as the "GCC capital of the world. <br>• ". |
@@ -140,7 +140,7 @@ To address these challenges and cement India’s position as the **“GCC Capita
 
 ## Q4 [Year: 2026]
 **Question:** Amid global economic uncertainties, India’s Balance of Payments (BoP) has shown remarkable  resilience. Elaborate on the factors contributing to this stability.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Industrial Dynamics & Reforms] [Micro Topic: Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth] [Sub Topic: Balance of Payment] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Elaborate, Balance of Payments, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS1] [Subject: INDIAN ECONOMY] [Section Group: Industrial Dynamics & Reforms] [Micro Topic: Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth] [Sub Topic: Balance of Payment] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: Elaborate, Balance of Payments, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of global economic uncertainties and India’s external sector resilience. <br>• In the body, discuss the factors contributing to India’s Balance of Payments (BoP) stability. <br>• Conclude by providing suggestions to maintain this stability. |
@@ -174,7 +174,7 @@ Amid **uncertainties over global trade policies** (e.g., potential tariff wars u
 
 ## Q5 [Year: 2026]
 **Question:** What is the ‘gig economy’? Examine the implications of its rise on the employment scenario in India.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Unemployment] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What is, Examine, Gig economy, Employment, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Issues relating to overall economic growth, sector manufacturing, and employment generation] [Sub Topic: Unemployment] [Macro Tag: Descriptive, Analytical, Applied] [Micro Tag: What is, Examine, Gig economy, Employment, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief description about the Gig economy. <br>• In the body, discuss both positive and negative implications of its rise on the employment scenario in India. <br>• Conclude with suggestions and mention the steps taken in this regard. |
@@ -215,7 +215,7 @@ Policymakers must **balance worker protection with innovation** by developing **
 
 ## Q6 [Year: 2026]
 **Question:** The economic reforms of 1991 significantly reshaped India’s economic landscape. Elaborate on the  need for these reforms and their key objectives.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Industrial Dynamics & Reforms] [Micro Topic: Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth] [Sub Topic: LPG Reform and Impact] [Macro Tag: Descriptive, Analytical] [Micro Tag: Elaborate, Economic reforms 1991, India]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS1] [Subject: INDIAN ECONOMY] [Section Group: Industrial Dynamics & Reforms] [Micro Topic: Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth] [Sub Topic: LPG Reform and Impact] [Macro Tag: Descriptive, Analytical] [Micro Tag: Elaborate, Economic reforms 1991, India]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background about the economic reforms of. <br>• In the body, first elaborate on the need for these reforms, and then discuss their key objectives. Conclude by highlighting the need for Reforms. |
@@ -258,7 +258,7 @@ The economic reforms of 1991 laid the foundation for India's transformation, but
 
 ## Q7 [Year: 2026]
 **Question:** Distinguish between the Consumer Price Index (CPI) and the Wholesale Price Index (WPI). Why is CPI  preferred over WPI as a measure of inflation?
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: Monetary policy] [Macro Tag: Comparative, Analytical] [Micro Tag: Distinguish, Why, CPI, WPI, Inflation]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: Monetary policy] [Macro Tag: Comparative, Analytical] [Micro Tag: Distinguish, Why, CPI, WPI, Inflation]*
 #### Answer from ForumIAS
 
 | **Approach:** • Begin with a brief mention about CPI and WPI. <br>• In the body, first tabulate the differences between the two. <br>• Next, explain why CPI is preferred over WPI as a measure of inflation. <br>• Conclude the answer by highlighting their significance in providing a comprehensive assessment of inflation. |
@@ -301,7 +301,7 @@ Due to their **differing methodologies** and **focus areas**, CPI and WPI may at
 
 ## Q8 [Year: 2026]
 **Question:** Elaborate on the various policy instruments available to the Reserve Bank of India (RBI) for regulating  money supply in the economy. Also, explain why the RBI is known as the ‘lender of last resort’.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: Monetary policy] [Macro Tag: Descriptive, Analytical] [Micro Tag: Elaborate, Explain, RBI, Money supply]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS1] [Subject: INDIAN ECONOMY] [Section Group: Macroeconomics & Fiscal Policy] [Micro Topic: Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework] [Sub Topic: Monetary policy] [Macro Tag: Descriptive, Analytical] [Micro Tag: Elaborate, Explain, RBI, Money supply]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer with a brief background about the RBI. <br>• In the body, elaborate on the various policy instruments available to RBI for regulating money supply in the economy. <br>• Next, explain why it is termed as the ‘lender of last resort’. <br>• Conclude by highlighting the significance of RBI in ensuring financial stability and safeguarding depositors' interests. |
@@ -339,7 +339,7 @@ Thus, the RBI employs a **mix of quantitative and qualitative instruments** to r
 
 ## Q9 [Year: 2026]
 **Question:** Discuss the multi-dimensional implications of the depreciation of the Indian rupee. Also, suggest  policy measures to stabilize the currency.
-*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: Mains - GS 1] [Subject: INDIAN ECONOMY] [Section Group: Industrial Dynamics & Reforms] [Micro Topic: Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth] [Sub Topic: Balance of Payment] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Suggest, Depreciation, Indian rupee]*
+*Metadata: [Year: 2026] [Institute: Forum IAS] [Programme: MGP] [is_pyq: false] [Group: ] [Exam: ] [Stage: Mains] [Paper: GS1] [Subject: INDIAN ECONOMY] [Section Group: Industrial Dynamics & Reforms] [Micro Topic: Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth] [Sub Topic: Balance of Payment] [Macro Tag: Analytical, Applied] [Micro Tag: Discuss, Suggest, Depreciation, Indian rupee]*
 #### Answer from ForumIAS
 
 | **Approach:** • Introduce the answer by giving a brief background of the depreciation of the Indian Rupee. <br>• In the body, discuss its multi-dimensional implications for the economy. <br>• Next, suggest policy measures to stabilize the currency. <br>• Conclude by highlighting how the Indian economy remains on structurally strong foundations despite the depreciation. |

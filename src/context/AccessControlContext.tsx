@@ -35,7 +35,9 @@ export type FeatureKey =
   | 'export_pdf'
   | 'revision'
   | 'tags'
-  | 'pilot_v2';
+  | 'pilot_v2'
+  | 'mains'
+  | 'prelims';
 
 interface AccessControlCtx {
   /** Check if the current user has access to a specific feature */
@@ -67,8 +69,7 @@ const BYPASS_EMAILS = [
   'dn.d.n.g.zm.s.n.f.smb.t@gmail.com',
   'upsc-serv-1@proton.me',
   'your@email.com',
-  // Enter your email address below to grant subscription access:
-  
+  'aiimsmbbs17@gmail.com',
 ];
 
 const Ctx = createContext<AccessControlCtx>({} as AccessControlCtx);
@@ -89,6 +90,7 @@ export function AccessControlProvider({ children }: { children: React.ReactNode 
   const [featureMap, setFeatureMap] = useState<Record<string, boolean>>({});
   const [grantedInstitutes, setGrantedInstitutes] = useState<string[]>([]);
   const [grantedCourses, setGrantedCourses] = useState<string[]>([]);
+  const [globalBypass, setGlobalBypass] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Hydrate from cache on mount
@@ -123,6 +125,25 @@ export function AccessControlProvider({ children }: { children: React.ReactNode 
     }
 
     try {
+      // 0. Check Global config bypass setting
+      let isGlobalBypassActive = false;
+      try {
+        const { data: globalConfig } = await supabase
+          .from('user_settings')
+          .select('permissions')
+          .eq('user_id', '00000000-0000-0000-0000-000000000000')
+          .maybeSingle();
+        if (globalConfig?.permissions) {
+          const conf = globalConfig.permissions as any;
+          if (conf.paywallBypass === true) {
+            isGlobalBypassActive = true;
+          }
+        }
+      } catch (e) {
+        console.error('Error fetching global config bypass:', e);
+      }
+      setGlobalBypass(isGlobalBypassActive);
+
       // 1. Get the user's active subscriptions
       const { data: subs } = await supabase
         .from('user_subscriptions')
@@ -206,26 +227,26 @@ export function AccessControlProvider({ children }: { children: React.ReactNode 
 
   const hasAccess = useCallback(
     (featureKey: string) => {
-      if (isBypassUser) return true;
+      if (isBypassUser || globalBypass) return true;
       return featureMap[featureKey] === true;
     },
-    [featureMap, isBypassUser]
+    [featureMap, isBypassUser, globalBypass]
   );
 
   const hasInstituteAccess = useCallback(
     (institute: string) => {
-      if (isBypassUser) return true;
+      if (isBypassUser || globalBypass) return true;
       return grantedInstitutes.length === 0 || grantedInstitutes.includes(institute);
     },
-    [grantedInstitutes, isBypassUser]
+    [grantedInstitutes, isBypassUser, globalBypass]
   );
 
   const hasCourseAccess = useCallback(
     (course: string) => {
-      if (isBypassUser) return true;
+      if (isBypassUser || globalBypass) return true;
       return grantedCourses.length === 0 || grantedCourses.includes(course);
     },
-    [grantedCourses, isBypassUser]
+    [grantedCourses, isBypassUser, globalBypass]
   );
 
   const value: AccessControlCtx = useMemo(

@@ -15,6 +15,7 @@
     {
       "id": "forum-mgp-2026-csm26t13se-q01",
       "questionNumber": 1,
+      "paper": "GS3",
       "subject": "AGRICULTURE",
       "sectionGroup": "Agriculture & Farm Dynamics",
       "microTopic": "Major Crops, cropping patterns, and regional agriculture production styles",
@@ -46,19 +47,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Agriculture"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t13se-q02",
       "questionNumber": 2,
+      "paper": "GS3",
       "subject": "AGRICULTURE",
       "sectionGroup": "Agriculture & Farm Dynamics",
       "microTopic": "Storage, transport, and marketing of agricultural produce along with digital e-technology interventions",
@@ -90,19 +87,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Agriculture"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t13se-q03",
       "questionNumber": 3,
+      "paper": "GS3",
       "subject": "AGRICULTURE",
       "sectionGroup": "Agriculture & Farm Dynamics",
       "microTopic": "Irrigation design, management, water efficiency, and conservation infrastructure",
@@ -134,19 +127,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Agriculture"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t13se-q04",
       "questionNumber": 4,
+      "paper": "GS3",
       "subject": "AGRICULTURE",
       "sectionGroup": "Agriculture & Farm Dynamics",
       "microTopic": "Storage, transport, and marketing of agricultural produce along with digital e-technology interventions",
@@ -178,19 +167,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Agriculture"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t13se-q05",
       "questionNumber": 5,
+      "paper": "GS3",
       "subject": "SCIENCE & TECHNOLOGY",
       "sectionGroup": "Indigenous Tech & Achievements",
       "microTopic": "Achievements of Indians in S&T; Indigenisation of technology & developing new technology",
@@ -222,19 +207,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Science & Technology"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t13se-q06",
       "questionNumber": 6,
+      "paper": "GS3",
       "subject": "AGRICULTURE",
       "sectionGroup": "Food Processing Industry",
       "microTopic": "Food processing and related industries (scope, significance, structural locations, and supply chain management)",
@@ -266,19 +247,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Agriculture"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t13se-q07",
       "questionNumber": 7,
+      "paper": "GS3",
       "subject": "AGRICULTURE",
       "sectionGroup": "Agriculture & Farm Dynamics",
       "microTopic": "Irrigation design, management, water efficiency, and conservation infrastructure",
@@ -310,19 +287,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Agriculture"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t13se-q08",
       "questionNumber": 8,
+      "paper": "GS3",
       "subject": "AGRICULTURE",
       "sectionGroup": "Agriculture & Farm Dynamics",
       "microTopic": "Issues related to direct and indirect farm subsidies and minimum support prices (MSP)",
@@ -354,19 +327,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Agriculture"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t13se-q09",
       "questionNumber": 9,
+      "paper": "GS3",
       "subject": "AGRICULTURE",
       "sectionGroup": "Land Reforms",
       "microTopic": "Land Reforms in India and legislative frameworks",
@@ -398,19 +367,15 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Agriculture"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     },
     {
       "id": "forum-mgp-2026-csm26t13se-q10",
       "questionNumber": 10,
+      "paper": "GS3",
       "subject": "AGRICULTURE",
       "sectionGroup": "Agriculture & Farm Dynamics",
       "microTopic": "Public Distribution System (PDS) management, buffer stock dynamics, food security missions, and economics of animal rearing",
@@ -442,15 +407,10 @@
         "stage": "mains",
         "paper": "mains_gs3"
       },
-      "hierarchy_path": [
-        "GS3",
-        "Agriculture"
-      ],
       "course": "Civil Services",
       "institute": "Forum IAS",
       "program_id": "mgp",
-      "program_name": "MGP",
-      "paper": "GS3"
+      "program_name": "MGP"
     }
   ],
   "paper": "GS3"

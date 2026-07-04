@@ -25,13 +25,6 @@
       "subTopic": "Energy",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Distribution of key Natural Resources (world, South Asia and Indian subcontinent)",
-        "Energy"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q180-civilsdaily",
@@ -82,13 +75,6 @@
       "subTopic": "Energy",
       "macrotag": "Descriptive, Comparative",
       "microtag": "How, Different",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Distribution of key Natural Resources (world, South Asia and Indian subcontinent)",
-        "Energy"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q183-civilsdaily",
@@ -139,13 +125,6 @@
       "subTopic": "Energy",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Explain, Examine, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Distribution of key Natural Resources (world, South Asia and Indian subcontinent)",
-        "Energy"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q181-civilsdaily",
@@ -201,13 +180,6 @@
       "subTopic": "Energy",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Distribution of key Natural Resources (world, South Asia and Indian subcontinent)",
-        "Energy"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q182-civilsdaily",
@@ -263,13 +235,6 @@
       "subTopic": "Energy",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elaborate, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Distribution of key Natural Resources (world, South Asia and Indian subcontinent)",
-        "Energy"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q179-civilsdaily",
@@ -325,13 +290,6 @@
       "subTopic": "Energy",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "How, Discuss, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Distribution of key Natural Resources (world, South Asia and Indian subcontinent)",
-        "Energy"
-      ],
       "answers": [
         {
           "id": "",
@@ -377,13 +335,6 @@
       "subTopic": "Energy",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Distribution of key Natural Resources (world, South Asia and Indian subcontinent)",
-        "Energy"
-      ],
       "answers": [
         {
           "id": "",
@@ -434,13 +385,6 @@
       "subTopic": "Natural resources Potential",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Distribution of key Natural Resources (world, South Asia and Indian subcontinent)",
-        "Natural resources Potential"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q157-civilsdaily",
@@ -491,13 +435,6 @@
       "subTopic": "Natural resources Potential",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "Highlight, Comment, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Distribution of key Natural Resources (world, South Asia and Indian subcontinent)",
-        "Natural resources Potential"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q154-civilsdaily",
@@ -553,13 +490,6 @@
       "subTopic": "Natural resources Potential",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Distribution of key Natural Resources (world, South Asia and Indian subcontinent)",
-        "Natural resources Potential"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q153-civilsdaily",
@@ -615,13 +545,6 @@
       "subTopic": "Natural resources Potential",
       "macrotag": "Descriptive, Applied",
       "microtag": "Why, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Distribution of key Natural Resources (world, South Asia and Indian subcontinent)",
-        "Natural resources Potential"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q178-civilsdaily",
@@ -687,13 +610,6 @@
       "subTopic": "Land use planning",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, Artificial Intelligence, Drones",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Land use planning"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q137-civilsdaily",
@@ -764,13 +680,6 @@
       "subTopic": "Primary sector",
       "macrotag": "Applied",
       "microtag": "India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Primary sector"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q156-civilsdaily",
@@ -821,13 +730,6 @@
       "subTopic": "Primary sector",
       "macrotag": "Descriptive",
       "microtag": "Describe, Indicate",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Primary sector"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q134-civilsdaily",
@@ -883,13 +785,6 @@
       "subTopic": "Primary sector",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Primary sector"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q133-civilsdaily",
@@ -945,13 +840,6 @@
       "subTopic": "Primary sector",
       "macrotag": "Descriptive, Applied",
       "microtag": "Define, Explain, India, Problem",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Primary sector"
-      ],
       "answers": [],
       "source_attribution_label": "CSE Mains 2018",
       "exam_info": {
@@ -981,13 +869,6 @@
       "subTopic": "Primary sector",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Primary sector"
-      ],
       "answers": [
         {
           "id": "",
@@ -1038,13 +919,6 @@
       "subTopic": "Primary sector",
       "macrotag": "Descriptive",
       "microtag": "Mention",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Primary sector"
-      ],
       "answers": [
         {
           "id": "",
@@ -1095,13 +969,6 @@
       "subTopic": "Primary sector",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Primary sector"
-      ],
       "answers": [
         {
           "id": "",
@@ -1152,13 +1019,6 @@
       "subTopic": "Primary sector",
       "macrotag": "Descriptive, Applied",
       "microtag": "Why, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Primary sector"
-      ],
       "answers": [
         {
           "id": "",
@@ -1209,13 +1069,6 @@
       "subTopic": "Secondary sector",
       "macrotag": "Descriptive",
       "microtag": "Account for",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Secondary sector"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q132-civilsdaily",
@@ -1266,13 +1119,6 @@
       "subTopic": "Secondary sector",
       "macrotag": "Applied",
       "microtag": "India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Secondary sector"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q130-civilsdaily",
@@ -1318,13 +1164,6 @@
       "subTopic": "Secondary sector",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Secondary sector"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q131-civilsdaily",
@@ -1370,13 +1209,6 @@
       "subTopic": "Secondary sector",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, What is, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Secondary sector"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q129-civilsdaily",
@@ -1422,13 +1254,6 @@
       "subTopic": "Secondary sector",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Secondary sector"
-      ],
       "answers": [
         {
           "id": "",
@@ -1479,13 +1304,6 @@
       "subTopic": "Secondary sector",
       "macrotag": "Descriptive",
       "microtag": "Account for",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Secondary sector"
-      ],
       "answers": [
         {
           "id": "",
@@ -1536,13 +1354,6 @@
       "subTopic": "Secondary sector",
       "macrotag": "Analytical, Applied",
       "microtag": "Analyze, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Secondary sector"
-      ],
       "answers": [
         {
           "id": "",
@@ -1593,13 +1404,6 @@
       "subTopic": "Secondary sector",
       "macrotag": "Analytical, Applied",
       "microtag": "Do you agree, Discuss, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Secondary sector"
-      ],
       "answers": [
         {
           "id": "",
@@ -1645,13 +1449,6 @@
       "subTopic": "Tertiary sector",
       "macrotag": "Descriptive",
       "microtag": "Mention",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Tertiary sector"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q135-civilsdaily",
@@ -1707,13 +1504,6 @@
       "subTopic": "Tertiary sector",
       "macrotag": "Descriptive",
       "microtag": "How",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Tertiary sector"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q140-civilsdaily",
@@ -1764,13 +1554,6 @@
       "subTopic": "Tertiary sector",
       "macrotag": "Descriptive, Applied",
       "microtag": "Why, How, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Economic & Resource Geography",
-        "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India).",
-        "Tertiary sector"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q223-civilsdaily",
@@ -1851,13 +1634,6 @@
       "subTopic": "Climate change",
       "macrotag": "Descriptive, Analytical",
       "microtag": "How, Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Climate change"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q144-civilsdaily",
@@ -1908,13 +1684,6 @@
       "subTopic": "Climate change",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Climate change"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q143-civilsdaily",
@@ -1970,13 +1739,6 @@
       "subTopic": "Climate change",
       "macrotag": "Analytical",
       "microtag": "Justify",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Climate change"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q141-civilsdaily",
@@ -2032,13 +1794,6 @@
       "subTopic": "Cryosphere",
       "macrotag": "Descriptive, Comparative",
       "microtag": "Explain, How, Different",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Cryosphere"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q142-civilsdaily",
@@ -2089,13 +1844,6 @@
       "subTopic": "Cryosphere",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Cryosphere"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q148-civilsdaily",
@@ -2151,13 +1899,6 @@
       "subTopic": "Cryosphere",
       "macrotag": "Descriptive",
       "microtag": "How",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Cryosphere"
-      ],
       "answers": [
         {
           "id": "",
@@ -2208,13 +1949,6 @@
       "subTopic": "Cryosphere",
       "macrotag": "Descriptive, Applied",
       "microtag": "Bring out, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Cryosphere"
-      ],
       "answers": [
         {
           "id": "",
@@ -2260,13 +1994,6 @@
       "subTopic": "Flora and Fauna",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, Assess, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Flora and Fauna"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q155-civilsdaily",
@@ -2322,13 +2049,6 @@
       "subTopic": "Flora and Fauna",
       "macrotag": "Analytical, Applied",
       "microtag": "Examine, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Flora and Fauna"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q152-civilsdaily",
@@ -2379,13 +2099,6 @@
       "subTopic": "Flora and Fauna",
       "macrotag": "Analytical",
       "microtag": "Assess",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Flora and Fauna"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q139-civilsdaily",
@@ -2436,13 +2149,6 @@
       "subTopic": "Flora and Fauna",
       "macrotag": "Descriptive, Analytical",
       "microtag": "Explain, Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Flora and Fauna"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q276-civilsdaily",
@@ -2493,13 +2199,6 @@
       "subTopic": "Miscellaneous",
       "macrotag": "Descriptive",
       "microtag": "How",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Miscellaneous"
-      ],
       "answers": [
         {
           "id": "",
@@ -2585,13 +2284,6 @@
       "subTopic": "Water Management",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Water Management"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q151-civilsdaily",
@@ -2642,13 +2334,6 @@
       "subTopic": "Water Management",
       "macrotag": "Descriptive, Applied",
       "microtag": "Why, Today",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Water Management"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q150-civilsdaily",
@@ -2704,13 +2389,6 @@
       "subTopic": "Water Management",
       "macrotag": "Analytical, Applied",
       "microtag": "Critically examine, Problem",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Water Management"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q149-civilsdaily",
@@ -2761,13 +2439,6 @@
       "subTopic": "Water Management",
       "macrotag": "Descriptive, Comparative, Applied",
       "microtag": "What is, Why, How, Differ, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Water Management"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q147-civilsdaily",
@@ -2813,13 +2484,6 @@
       "subTopic": "Water Management",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Water Management"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q145-civilsdaily",
@@ -2870,13 +2534,6 @@
       "subTopic": "Water Management",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Environmental Geography & Climate Dynamics",
-        "Geographical features and their location-changes in critical geographical features (including water-bodies and ice-caps) and in flora and fauna and the effects of such changes.",
-        "Water Management"
-      ],
       "answers": [
         {
           "id": "",
@@ -3002,13 +2659,6 @@
       "subTopic": "Climatology",
       "macrotag": "Descriptive",
       "microtag": "How",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Climatology"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q159-civilsdaily",
@@ -3069,13 +2719,6 @@
       "subTopic": "Climatology",
       "macrotag": "Descriptive, Analytical",
       "microtag": "Explain, Do you agree",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Climatology"
-      ],
       "answers": [
         {
           "id": "",
@@ -3121,13 +2764,6 @@
       "subTopic": "Climatology",
       "macrotag": "Descriptive",
       "microtag": "What, How",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Climatology"
-      ],
       "answers": [
         {
           "id": "",
@@ -3178,13 +2814,6 @@
       "subTopic": "Climatology",
       "macrotag": "Descriptive",
       "microtag": "Why",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Climatology"
-      ],
       "answers": [
         {
           "id": "",
@@ -3235,13 +2864,6 @@
       "subTopic": "Geomorphology",
       "macrotag": "Descriptive, Analytical",
       "microtag": "How, Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Geomorphology"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q171-civilsdaily",
@@ -3292,13 +2914,6 @@
       "subTopic": "Geomorphology",
       "macrotag": "Descriptive",
       "microtag": "Why, How",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Geomorphology"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q177-civilsdaily",
@@ -3354,13 +2969,6 @@
       "subTopic": "Geomorphology",
       "macrotag": "Descriptive",
       "microtag": "Describe",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Geomorphology"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q176-civilsdaily",
@@ -3416,13 +3024,6 @@
       "subTopic": "Geomorphology",
       "macrotag": "Descriptive",
       "microtag": "Explain, Mention",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Geomorphology"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q169-civilsdaily",
@@ -3478,13 +3079,6 @@
       "subTopic": "Geomorphology",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elaborate, Why, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Geomorphology"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q175-civilsdaily",
@@ -3535,13 +3129,6 @@
       "subTopic": "Geomorphology",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Geomorphology"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q172-civilsdaily",
@@ -3592,13 +3179,6 @@
       "subTopic": "Geomorphology",
       "macrotag": "Descriptive",
       "microtag": "Define, Explain",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Geomorphology"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q170-civilsdaily",
@@ -3644,13 +3224,6 @@
       "subTopic": "Geomorphology",
       "macrotag": "Descriptive",
       "microtag": "Bring out, Why",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Geomorphology"
-      ],
       "answers": [
         {
           "id": "",
@@ -3701,13 +3274,6 @@
       "subTopic": "Geomorphology",
       "macrotag": "Descriptive",
       "microtag": "Why",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Geomorphology"
-      ],
       "answers": [
         {
           "id": "",
@@ -3758,13 +3324,6 @@
       "subTopic": "Geomorphology",
       "macrotag": "Descriptive, Analytical",
       "microtag": "What, Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Geomorphology"
-      ],
       "answers": [
         {
           "id": "",
@@ -3815,13 +3374,6 @@
       "subTopic": "Geomorphology",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Geomorphology"
-      ],
       "answers": [
         {
           "id": "",
@@ -3872,13 +3424,6 @@
       "subTopic": "Monsoon",
       "macrotag": "Descriptive",
       "microtag": "Why, How",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Monsoon"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q160-civilsdaily",
@@ -3929,13 +3474,6 @@
       "subTopic": "Monsoon",
       "macrotag": "Descriptive",
       "microtag": "What",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Monsoon"
-      ],
       "answers": [
         {
           "id": "",
@@ -4001,13 +3539,6 @@
       "subTopic": "Oceanography",
       "macrotag": "Descriptive, Comparative",
       "microtag": "How, Differ",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Oceanography"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q163-civilsdaily",
@@ -4073,13 +3604,6 @@
       "subTopic": "Oceanography",
       "macrotag": "Descriptive, Analytical",
       "microtag": "Account for, Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Oceanography"
-      ],
       "answers": [
         {
           "id": "",
@@ -4135,13 +3659,6 @@
       "subTopic": "Oceanography",
       "macrotag": "Analytical",
       "microtag": "Critically evaluate",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Oceanography"
-      ],
       "answers": [
         {
           "id": "",
@@ -4187,13 +3704,6 @@
       "subTopic": "Oceanography",
       "macrotag": "Descriptive",
       "microtag": "Describe, What",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Salient Features of World Physical Geography",
-        "Oceanography"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q162-civilsdaily",
@@ -4249,13 +3759,6 @@
       "subTopic": "Aurora",
       "macrotag": "Descriptive",
       "microtag": "What, How",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,",
-        "Aurora"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q161-civilsdaily",
@@ -4306,13 +3809,6 @@
       "subTopic": "Cloudbursts",
       "macrotag": "Descriptive",
       "microtag": "Explain, What is",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,",
-        "Cloudbursts"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q168-civilsdaily",
@@ -4363,13 +3859,6 @@
       "subTopic": "Cyclone",
       "macrotag": "Descriptive",
       "microtag": "What is, How",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,",
-        "Cyclone"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q164-civilsdaily",
@@ -4420,13 +3909,6 @@
       "subTopic": "Cyclone",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,",
-        "Cyclone"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q167-civilsdaily",
@@ -4482,13 +3964,6 @@
       "subTopic": "Cyclone",
       "macrotag": "Descriptive",
       "microtag": "Why",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,",
-        "Cyclone"
-      ],
       "answers": [
         {
           "id": "",
@@ -4539,13 +4014,6 @@
       "subTopic": "Cyclone",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, India",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,",
-        "Cyclone"
-      ],
       "answers": [
         {
           "id": "",
@@ -4596,13 +4064,6 @@
       "subTopic": "Landslides",
       "macrotag": "Comparative",
       "microtag": "Different",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,",
-        "Landslides"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q173-civilsdaily",
@@ -4673,13 +4134,6 @@
       "subTopic": "Landslides",
       "macrotag": "Descriptive",
       "microtag": "Bring out",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,",
-        "Landslides"
-      ],
       "answers": [
         {
           "id": "",
@@ -4730,13 +4184,6 @@
       "subTopic": "Tsunamis",
       "macrotag": "Descriptive",
       "microtag": "Explain, What, How",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,",
-        "Tsunamis"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q166-civilsdaily",
@@ -4787,13 +4234,6 @@
       "subTopic": "Twisters",
       "macrotag": "Descriptive",
       "microtag": "What is, Why",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,",
-        "Twisters"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q165-civilsdaily",
@@ -4844,13 +4284,6 @@
       "subTopic": "Volcanic activity",
       "macrotag": "Descriptive",
       "microtag": "Mention",
-      "hierarchy_path": [
-        "GS1",
-        "GEOGRAPHY",
-        "Physical Geography & Geophysical Phenomena",
-        "Important Geophysical phenomena such as earthquakes, Tsunami, Volcanic activity, cyclone etc.,",
-        "Volcanic activity"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q174-civilsdaily",
@@ -4906,13 +4339,6 @@
       "subTopic": "Bhakti and Sufi movement",
       "macrotag": "Analytical, Applied",
       "microtag": "Evaluate, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Bhakti and Sufi movement"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q30-civilsdaily",
@@ -4963,13 +4389,6 @@
       "subTopic": "Bhakti and Sufi movement",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Bhakti and Sufi movement"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q29-civilsdaily",
@@ -5020,13 +4439,6 @@
       "subTopic": "Bhakti and Sufi movement",
       "macrotag": "Analytical",
       "microtag": "Comment",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Bhakti and Sufi movement"
-      ],
       "answers": [
         {
           "id": "",
@@ -5077,13 +4489,6 @@
       "subTopic": "Buddhism",
       "macrotag": "Descriptive",
       "microtag": "Highlight",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Buddhism"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q32-civilsdaily",
@@ -5149,13 +4554,6 @@
       "subTopic": "Buddhism",
       "macrotag": "Descriptive",
       "microtag": "Explain",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Buddhism"
-      ],
       "answers": [
         {
           "id": "",
@@ -5201,13 +4599,6 @@
       "subTopic": "Civilizations & Highlights",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Civilizations & Highlights"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q25-civilsdaily",
@@ -5253,13 +4644,6 @@
       "subTopic": "Civilizations & Highlights",
       "macrotag": "Descriptive",
       "microtag": "Underline",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Civilizations & Highlights"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q26-civilsdaily",
@@ -5310,13 +4694,6 @@
       "subTopic": "Civilizations & Highlights",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Do you think, Still prevailing, Prevailing, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Civilizations & Highlights"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q20-civilsdaily",
@@ -5392,13 +4769,6 @@
       "subTopic": "Civilizations & Highlights",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Discuss, Present day",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Civilizations & Highlights"
-      ],
       "answers": [
         {
           "id": "",
@@ -5449,13 +4819,6 @@
       "subTopic": "Conservation of Indian Art & Heritage",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Conservation of Indian Art & Heritage"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q27-civilsdaily",
@@ -5506,13 +4869,6 @@
       "subTopic": "Dance forms",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Dance forms"
-      ],
       "answers": [
         {
           "id": "",
@@ -5563,13 +4919,6 @@
       "subTopic": "Indian Philosophy",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Indian Philosophy"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q34-civilsdaily",
@@ -5620,13 +4969,6 @@
       "subTopic": "Kingdoms & Highlights",
       "macrotag": "Descriptive",
       "microtag": "Elucidate",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Kingdoms & Highlights"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q22-civilsdaily",
@@ -5677,13 +5019,6 @@
       "subTopic": "Kingdoms & Highlights",
       "macrotag": "Applied",
       "microtag": "India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Kingdoms & Highlights"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q23-civilsdaily",
@@ -5734,13 +5069,6 @@
       "subTopic": "Kingdoms & Highlights",
       "macrotag": "Analytical",
       "microtag": "Comment",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Kingdoms & Highlights"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q24-civilsdaily",
@@ -5791,13 +5119,6 @@
       "subTopic": "Kingdoms & Highlights",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, How, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Kingdoms & Highlights"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q21-civilsdaily",
@@ -5853,13 +5174,6 @@
       "subTopic": "Kingdoms & Highlights",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Kingdoms & Highlights"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q19-civilsdaily",
@@ -5910,13 +5224,6 @@
       "subTopic": "Kingdoms & Highlights",
       "macrotag": "Applied",
       "microtag": "India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Kingdoms & Highlights"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q18-civilsdaily",
@@ -5967,13 +5274,6 @@
       "subTopic": "Kingdoms & Highlights",
       "macrotag": "Descriptive, Analytical",
       "microtag": "How, Justify",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Kingdoms & Highlights"
-      ],
       "answers": [
         {
           "id": "",
@@ -6019,13 +5319,6 @@
       "subTopic": "Kingdoms & Highlights",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Kingdoms & Highlights"
-      ],
       "answers": [
         {
           "id": "",
@@ -6076,13 +5369,6 @@
       "subTopic": "Kings & Contributions",
       "macrotag": "Analytical",
       "microtag": "Examine",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Kings & Contributions"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q38-civilsdaily",
@@ -6153,13 +5439,6 @@
       "subTopic": "Literature as Historical Sources",
       "macrotag": "Analytical, Applied",
       "microtag": "Comment, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Literature as Historical Sources"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q31-civilsdaily",
@@ -6210,13 +5489,6 @@
       "subTopic": "Literature as Historical Sources",
       "macrotag": "Analytical, Applied",
       "microtag": "Comment, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Literature as Historical Sources"
-      ],
       "answers": [
         {
           "id": "",
@@ -6267,13 +5539,6 @@
       "subTopic": "Rock-cut Architecture as Historical Sources",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Rock-cut Architecture as Historical Sources"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q33-civilsdaily",
@@ -6339,13 +5604,6 @@
       "subTopic": "Sculptures and Significance",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, How, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Sculptures and Significance"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q35-civilsdaily",
@@ -6396,13 +5654,6 @@
       "subTopic": "Sculptures and Significance",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Sculptures and Significance"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q36-civilsdaily",
@@ -6453,13 +5704,6 @@
       "subTopic": "Travellers",
       "macrotag": "Analytical, Applied",
       "microtag": "Assess, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Art and Culture",
-        "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
-        "Travellers"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q28-civilsdaily",
@@ -6510,13 +5754,6 @@
       "subTopic": "Colonial rule and impact",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, How, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);",
-        "Colonial rule and impact"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q6-civilsdaily",
@@ -6572,13 +5809,6 @@
       "subTopic": "Colonial rule and impact",
       "macrotag": "Descriptive, Applied",
       "microtag": "Why, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);",
-        "Colonial rule and impact"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q158-civilsdaily",
@@ -6634,13 +5864,6 @@
       "subTopic": "Colonial rule and impact",
       "macrotag": "Descriptive, Applied",
       "microtag": "Why, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);",
-        "Colonial rule and impact"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q16-civilsdaily",
@@ -6696,13 +5919,6 @@
       "subTopic": "Colonial rule and impact",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "How, Examine, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);",
-        "Colonial rule and impact"
-      ],
       "answers": [
         {
           "id": "",
@@ -6758,13 +5974,6 @@
       "subTopic": "Colonial rule and impact",
       "macrotag": "Analytical, Applied",
       "microtag": "Examine, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);",
-        "Colonial rule and impact"
-      ],
       "answers": [
         {
           "id": "",
@@ -6820,13 +6029,6 @@
       "subTopic": "Gandhi X Indian Leaders of Freedom Struggle",
       "macrotag": "Descriptive, Comparative",
       "microtag": "What, Difference",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);",
-        "Gandhi X Indian Leaders of Freedom Struggle"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q13-civilsdaily",
@@ -6882,13 +6084,6 @@
       "subTopic": "Gandhi X Indian Leaders of Freedom Struggle",
       "macrotag": "Descriptive",
       "microtag": "Throw light on",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);",
-        "Gandhi X Indian Leaders of Freedom Struggle"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q11-civilsdaily",
@@ -7014,13 +6209,6 @@
       "subTopic": "Revolt and Mutiny",
       "macrotag": "Descriptive",
       "microtag": "Elucidate",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);",
-        "Revolt and Mutiny"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q2-civilsdaily",
@@ -7076,13 +6264,6 @@
       "subTopic": "Revolt and Mutiny",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, Clarify, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);",
-        "Revolt and Mutiny"
-      ],
       "answers": [
         {
           "id": "",
@@ -7158,13 +6339,6 @@
       "subTopic": "Revolt and Mutiny",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);",
-        "Revolt and Mutiny"
-      ],
       "answers": [
         {
           "id": "",
@@ -7220,13 +6394,6 @@
       "subTopic": "Revolt and Mutiny",
       "macrotag": "Descriptive",
       "microtag": "Why",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);",
-        "Revolt and Mutiny"
-      ],
       "answers": [
         {
           "id": "",
@@ -7277,13 +6444,6 @@
       "subTopic": "Socio-religious reform",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);",
-        "Socio-religious reform"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q14-civilsdaily",
@@ -7334,13 +6494,6 @@
       "subTopic": "Socio-religious reform",
       "macrotag": "Descriptive",
       "microtag": "Trace",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);",
-        "Socio-religious reform"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q10-civilsdaily",
@@ -7421,13 +6574,6 @@
       "subTopic": "Viceroy and their Administration",
       "macrotag": "Analytical",
       "microtag": "Evaluate",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);",
-        "Viceroy and their Administration"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q12-civilsdaily",
@@ -7483,13 +6629,6 @@
       "subTopic": "Viceroy and their Administration",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elaborate, Modern India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);",
-        "Viceroy and their Administration"
-      ],
       "answers": [
         {
           "id": "",
@@ -7560,13 +6699,6 @@
       "subTopic": "Important contributors/contribution",
       "macrotag": "Descriptive",
       "microtag": "Why",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Freedom Struggle-various stages, important contributors/contributions from different parts of the country",
-        "Important contributors/contribution"
-      ],
       "answers": [
         {
           "id": "",
@@ -7622,13 +6754,6 @@
       "subTopic": "Important contributors/contribution",
       "macrotag": "Descriptive",
       "microtag": "Highlight",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Freedom Struggle-various stages, important contributors/contributions from different parts of the country",
-        "Important contributors/contribution"
-      ],
       "answers": [
         {
           "id": "",
@@ -7699,13 +6824,6 @@
       "subTopic": "Important contributors/contribution",
       "macrotag": "Analytical, Applied",
       "microtag": "Analyze, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Freedom Struggle-various stages, important contributors/contributions from different parts of the country",
-        "Important contributors/contribution"
-      ],
       "answers": [
         {
           "id": "",
@@ -7761,13 +6879,6 @@
       "subTopic": "Various stages of Freedom struggle",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Freedom Struggle-various stages, important contributors/contributions from different parts of the country",
-        "Various stages of Freedom struggle"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q8-civilsdaily",
@@ -7818,13 +6929,6 @@
       "subTopic": "Various stages of Freedom struggle",
       "macrotag": "Descriptive",
       "microtag": "Bring out",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Freedom Struggle-various stages, important contributors/contributions from different parts of the country",
-        "Various stages of Freedom struggle"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q7-civilsdaily",
@@ -7880,13 +6984,6 @@
       "subTopic": "Various stages of Freedom struggle",
       "macrotag": "Descriptive",
       "microtag": "Elaborate",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Freedom Struggle-various stages, important contributors/contributions from different parts of the country",
-        "Various stages of Freedom struggle"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q3-civilsdaily",
@@ -7942,13 +7039,6 @@
       "subTopic": "Various stages of Freedom struggle",
       "macrotag": "Analytical",
       "microtag": "Assess",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Freedom Struggle-various stages, important contributors/contributions from different parts of the country",
-        "Various stages of Freedom struggle"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q15-civilsdaily",
@@ -8004,13 +7094,6 @@
       "subTopic": "Various stages of Freedom struggle",
       "macrotag": "Analytical, Applied",
       "microtag": "Examine, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Freedom Struggle-various stages, important contributors/contributions from different parts of the country",
-        "Various stages of Freedom struggle"
-      ],
       "answers": [],
       "source_attribution_label": "CSE Mains 2019",
       "exam_info": {
@@ -8040,13 +7123,6 @@
       "subTopic": "Various stages of Freedom struggle",
       "macrotag": "Descriptive, Analytical",
       "microtag": "What, Comment",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Freedom Struggle-various stages, important contributors/contributions from different parts of the country",
-        "Various stages of Freedom struggle"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q5-civilsdaily",
@@ -8102,13 +7178,6 @@
       "subTopic": "Various stages of Freedom struggle",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Freedom Struggle-various stages, important contributors/contributions from different parts of the country",
-        "Various stages of Freedom struggle"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q4-civilsdaily",
@@ -8164,13 +7233,6 @@
       "subTopic": "Various stages of Freedom struggle",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Modern History",
-        "Freedom Struggle-various stages, important contributors/contributions from different parts of the country",
-        "Various stages of Freedom struggle"
-      ],
       "answers": [
         {
           "id": "",
@@ -8226,13 +7288,6 @@
       "subTopic": "Consolidation after Independence",
       "macrotag": "Descriptive, Applied",
       "microtag": "Trace, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Post Independence",
-        "Post-Independence-consolidation and reorganisation within country",
-        "Consolidation after Independence"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q41-civilsdaily",
@@ -8283,13 +7338,6 @@
       "subTopic": "Consolidation after Independence",
       "macrotag": "Analytical, Applied",
       "microtag": "Assess, India, Indian, Problem",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Post Independence",
-        "Post-Independence-consolidation and reorganisation within country",
-        "Consolidation after Independence"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q39-civilsdaily",
@@ -8345,13 +7393,6 @@
       "subTopic": "Foreign influence on Independent India's policies",
       "macrotag": "Analytical, Applied",
       "microtag": "Evaluate, India, Policy",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Post Independence",
-        "Post-Independence-consolidation and reorganisation within country",
-        "Foreign influence on Independent India's policies"
-      ],
       "answers": [
         {
           "id": "",
@@ -8407,13 +7448,6 @@
       "subTopic": "Land reform",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Post Independence",
-        "Post-Independence-consolidation and reorganisation within country",
-        "Land reform"
-      ],
       "answers": [
         {
           "id": "",
@@ -8464,13 +7498,6 @@
       "subTopic": "Personalities Contribution",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Post Independence",
-        "Post-Independence-consolidation and reorganisation within country",
-        "Personalities Contribution"
-      ],
       "answers": [
         {
           "id": "",
@@ -8521,13 +7548,6 @@
       "subTopic": "Slogan based",
       "macrotag": "Analytical",
       "microtag": "Critical note",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Post Independence",
-        "Post-Independence-consolidation and reorganisation within country",
-        "Slogan based"
-      ],
       "answers": [
         {
           "id": "",
@@ -8578,13 +7598,6 @@
       "subTopic": "States Reorganisation",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Post Independence",
-        "Post-Independence-consolidation and reorganisation within country",
-        "States Reorganisation"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q40-civilsdaily",
@@ -8640,13 +7653,6 @@
       "subTopic": "States Reorganisation",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Post Independence",
-        "Post-Independence-consolidation and reorganisation within country",
-        "States Reorganisation"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q219-civilsdaily",
@@ -8712,13 +7718,6 @@
       "subTopic": "Wars after Independence",
       "macrotag": "Descriptive, Analytical",
       "microtag": "Highlight, Analyze, Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Post Independence",
-        "Post-Independence-consolidation and reorganisation within country",
-        "Wars after Independence"
-      ],
       "answers": [
         {
           "id": "",
@@ -8769,13 +7768,6 @@
       "subTopic": "Wars after Independence",
       "macrotag": "Analytical, Applied",
       "microtag": "Critically examine, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "Post Independence",
-        "Post-Independence-consolidation and reorganisation within country",
-        "Wars after Independence"
-      ],
       "answers": [
         {
           "id": "",
@@ -8826,13 +7818,6 @@
       "subTopic": "American and French revolution",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, Contemporary",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "American and French revolution"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q44-civilsdaily",
@@ -8883,13 +7868,6 @@
       "subTopic": "American and French revolution",
       "macrotag": "Descriptive",
       "microtag": "Explain, How",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "American and French revolution"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q43-civilsdaily",
@@ -8945,13 +7923,6 @@
       "subTopic": "American and French revolution",
       "macrotag": "Analytical",
       "microtag": "Substantiate",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "American and French revolution"
-      ],
       "answers": [
         {
           "id": "",
@@ -9007,13 +7978,6 @@
       "subTopic": "Anti-colonial struggles",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, Problem",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "Anti-colonial struggles"
-      ],
       "answers": [
         {
           "id": "",
@@ -9074,13 +8038,6 @@
       "subTopic": "Anti-colonial struggles",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "Anti-colonial struggles"
-      ],
       "answers": [
         {
           "id": "",
@@ -9136,13 +8093,6 @@
       "subTopic": "Anti-colonial struggles",
       "macrotag": "Analytical",
       "microtag": "Analyze",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "Anti-colonial struggles"
-      ],
       "answers": [
         {
           "id": "",
@@ -9198,13 +8148,6 @@
       "subTopic": "Great Economic Depression",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, Policy",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "Great Economic Depression"
-      ],
       "answers": [
         {
           "id": "",
@@ -9255,13 +8198,6 @@
       "subTopic": "Industrial Revolution",
       "macrotag": "Analytical, Applied",
       "microtag": "How far, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "Industrial Revolution"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q17-civilsdaily",
@@ -9337,13 +8273,6 @@
       "subTopic": "Industrial Revolution",
       "macrotag": "Descriptive, Comparative",
       "microtag": "What, Different",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "Industrial Revolution"
-      ],
       "answers": [
         {
           "id": "",
@@ -9399,13 +8328,6 @@
       "subTopic": "Miscellaneous",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "Miscellaneous"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q37-civilsdaily",
@@ -9461,13 +8383,6 @@
       "subTopic": "Miscellaneous",
       "macrotag": "Analytical, Comparative",
       "microtag": "Discuss, Different",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "Miscellaneous"
-      ],
       "answers": [
         {
           "id": "",
@@ -9513,13 +8428,6 @@
       "subTopic": "Miscellaneous",
       "macrotag": "Descriptive, Comparative",
       "microtag": "Bring out, Different",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "Miscellaneous"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q46-civilsdaily",
@@ -9575,13 +8483,6 @@
       "subTopic": "Miscellaneous",
       "macrotag": "Descriptive, Applied",
       "microtag": "Why, India",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "Miscellaneous"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q42-civilsdaily",
@@ -9632,13 +8533,6 @@
       "subTopic": "Miscellaneous",
       "macrotag": "Descriptive",
       "microtag": "What, How",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "Miscellaneous"
-      ],
       "answers": [
         {
           "id": "",
@@ -9694,13 +8588,6 @@
       "subTopic": "World wars",
       "macrotag": "Analytical",
       "microtag": "How far",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "World wars"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q47-civilsdaily",
@@ -9751,13 +8638,6 @@
       "subTopic": "World wars",
       "macrotag": "Analytical",
       "microtag": "Evaluate",
-      "hierarchy_path": [
-        "GS1",
-        "HISTORY",
-        "World History",
-        "History of the world will include events from 18th century such as industrial revolution, world wars, redrawal of national boundaries, colonization, decolonization, political philosophies like communism, capitalism, socialism etc. – their forms and effect on the society.",
-        "World wars"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q45-civilsdaily",
@@ -9838,13 +8718,6 @@
       "subTopic": "Diversity and pluralism",
       "macrotag": "Descriptive, Comparative, Applied",
       "microtag": "What is, How, Differ, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Diversity of India",
-        "Diversity and pluralism"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q221-civilsdaily",
@@ -9895,13 +8768,6 @@
       "subTopic": "Diversity and pluralism",
       "macrotag": "Analytical, Applied",
       "microtag": "Analyze, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Diversity of India",
-        "Diversity and pluralism"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q53-civilsdaily",
@@ -9952,13 +8818,6 @@
       "subTopic": "Diversity and pluralism",
       "macrotag": "Analytical, Applied",
       "microtag": "Analyze, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Diversity of India",
-        "Diversity and pluralism"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q56-civilsdaily",
@@ -10014,13 +8873,6 @@
       "subTopic": "Diversity and pluralism",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elaborate, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Diversity of India",
-        "Diversity and pluralism"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q49-civilsdaily",
@@ -10071,13 +8923,6 @@
       "subTopic": "Diversity and pluralism",
       "macrotag": "Applied",
       "microtag": "India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Diversity of India",
-        "Diversity and pluralism"
-      ],
       "answers": [
         {
           "id": "",
@@ -10148,13 +8993,6 @@
       "subTopic": "Tribes & Related Issues",
       "macrotag": "Applied",
       "microtag": "India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Diversity of India",
-        "Tribes & Related Issues"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q193-civilsdaily",
@@ -10205,13 +9043,6 @@
       "subTopic": "Tribes & Related Issues",
       "macrotag": "Applied",
       "microtag": "India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Diversity of India",
-        "Tribes & Related Issues"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q192-civilsdaily",
@@ -10267,13 +9098,6 @@
       "subTopic": "Tribes & Related Issues",
       "macrotag": "Analytical, Comparative",
       "microtag": "Examine, Compare",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Diversity of India",
-        "Tribes & Related Issues"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q43-rau_ias",
@@ -10324,13 +9148,6 @@
       "subTopic": "Family",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Salient features of Indian Society",
-        "Family"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q57-civilsdaily",
@@ -10381,13 +9198,6 @@
       "subTopic": "Family",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Salient features of Indian Society",
-        "Family"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q207-civilsdaily",
@@ -10443,13 +9253,6 @@
       "subTopic": "Family",
       "macrotag": "Analytical, Applied",
       "microtag": "Do you think, Modern India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Salient features of Indian Society",
-        "Family"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q52-civilsdaily",
@@ -10505,13 +9308,6 @@
       "subTopic": "Family",
       "macrotag": "Analytical",
       "microtag": "Evaluate",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Salient features of Indian Society",
-        "Family"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q202-civilsdaily",
@@ -10567,13 +9363,6 @@
       "subTopic": "Family",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Salient features of Indian Society",
-        "Family"
-      ],
       "answers": [
         {
           "id": "",
@@ -10624,13 +9413,6 @@
       "subTopic": "Uniqueness of Indian society",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, Enumerate, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Salient features of Indian Society",
-        "Uniqueness of Indian society"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q51-civilsdaily",
@@ -10686,13 +9468,6 @@
       "subTopic": "Uniqueness of Indian society",
       "macrotag": "Descriptive, Analytical, Applied",
       "microtag": "What, Discuss, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Salient features of Indian Society",
-        "Uniqueness of Indian society"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q48-civilsdaily",
@@ -10748,13 +9523,6 @@
       "subTopic": "Uniqueness of Indian society",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elaborate, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Foundations & Diversity",
-        "Salient features of Indian Society",
-        "Uniqueness of Indian society"
-      ],
       "answers": [
         {
           "id": "",
@@ -10805,13 +9573,6 @@
       "subTopic": "Population and associated issues",
       "macrotag": "Descriptive",
       "microtag": "Elaborate, What is",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Gender & Demographics",
-        "Population and associated issues",
-        "Population and associated issues"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q62-civilsdaily",
@@ -10862,13 +9623,6 @@
       "subTopic": "Population and associated issues",
       "macrotag": "Descriptive, Applied",
       "microtag": "Why, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Gender & Demographics",
-        "Population and associated issues",
-        "Population and associated issues"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q186-civilsdaily",
@@ -10924,13 +9678,6 @@
       "subTopic": "Population and associated issues",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Gender & Demographics",
-        "Population and associated issues",
-        "Population and associated issues"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q60-civilsdaily",
@@ -11021,13 +9768,6 @@
       "subTopic": "Women and Associated concerns",
       "macrotag": "Descriptive, Comparative",
       "microtag": "Why, Distinguish",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Gender & Demographics",
-        "Role of women and women's organization",
-        "Women and Associated concerns"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q214-civilsdaily",
@@ -11103,13 +9843,6 @@
       "subTopic": "Women and Associated concerns",
       "macrotag": "Analytical, Applied",
       "microtag": "Examine, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Gender & Demographics",
-        "Role of women and women's organization",
-        "Women and Associated concerns"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q212-civilsdaily",
@@ -11165,13 +9898,6 @@
       "subTopic": "Women and Associated concerns",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Gender & Demographics",
-        "Role of women and women's organization",
-        "Women and Associated concerns"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q59-civilsdaily",
@@ -11222,13 +9948,6 @@
       "subTopic": "Women and Associated concerns",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Gender & Demographics",
-        "Role of women and women's organization",
-        "Women and Associated concerns"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q211-civilsdaily",
@@ -11284,13 +10003,6 @@
       "subTopic": "Women and Associated concerns",
       "macrotag": "Analytical, Applied",
       "microtag": "Substantiate, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Gender & Demographics",
-        "Role of women and women's organization",
-        "Women and Associated concerns"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q210-civilsdaily",
@@ -11336,13 +10048,6 @@
       "subTopic": "Women and Associated concerns",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Gender & Demographics",
-        "Role of women and women's organization",
-        "Women and Associated concerns"
-      ],
       "answers": [
         {
           "id": "",
@@ -11393,13 +10098,6 @@
       "subTopic": "Women and Associated concerns",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Gender & Demographics",
-        "Role of women and women's organization",
-        "Women and Associated concerns"
-      ],
       "answers": [
         {
           "id": "",
@@ -11450,13 +10148,6 @@
       "subTopic": "Women and Associated concerns",
       "macrotag": "Descriptive, Applied",
       "microtag": "Why, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Gender & Demographics",
-        "Role of women and women's organization",
-        "Women and Associated concerns"
-      ],
       "answers": [
         {
           "id": "",
@@ -11507,13 +10198,6 @@
       "subTopic": "Women and Associated concerns",
       "macrotag": "Analytical",
       "microtag": "Comment",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Gender & Demographics",
-        "Role of women and women's organization",
-        "Women and Associated concerns"
-      ],
       "answers": [
         {
           "id": "",
@@ -11564,13 +10248,6 @@
       "subTopic": "Development and Related issues",
       "macrotag": "Analytical, Applied",
       "microtag": "Comment, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Poverty, Empowerment & Development",
-        "Social empowerment, poverty and developmental issues",
-        "Development and Related issues"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q189-civilsdaily",
@@ -11621,13 +10298,6 @@
       "subTopic": "Development and Related issues",
       "macrotag": "Descriptive",
       "microtag": "What",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Poverty, Empowerment & Development",
-        "Social empowerment, poverty and developmental issues",
-        "Development and Related issues"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q187-civilsdaily",
@@ -11678,13 +10348,6 @@
       "subTopic": "Development and Related issues",
       "macrotag": "Descriptive, Applied",
       "microtag": "What is, How, Cryptocurrency, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Poverty, Empowerment & Development",
-        "Social empowerment, poverty and developmental issues",
-        "Development and Related issues"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q205-civilsdaily",
@@ -11740,13 +10403,6 @@
       "subTopic": "Development and Related issues",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elaborate, How, Digital, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Poverty, Empowerment & Development",
-        "Social empowerment, poverty and developmental issues",
-        "Development and Related issues"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q185-civilsdaily",
@@ -11802,13 +10458,6 @@
       "subTopic": "Poverty and Related issues",
       "macrotag": "Analytical, Applied",
       "microtag": "Comment, Covid, Pandemic, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Poverty, Empowerment & Development",
-        "Social empowerment, poverty and developmental issues",
-        "Poverty and Related issues"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q190-civilsdaily",
@@ -11864,13 +10513,6 @@
       "subTopic": "Poverty and Related issues",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Poverty, Empowerment & Development",
-        "Social empowerment, poverty and developmental issues",
-        "Poverty and Related issues"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q63-civilsdaily",
@@ -11936,13 +10578,6 @@
       "subTopic": "Social empowerment",
       "macrotag": "Analytical",
       "microtag": "Comment",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Poverty, Empowerment & Development",
-        "Social empowerment, poverty and developmental issues",
-        "Social empowerment"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q188-civilsdaily",
@@ -11993,13 +10628,6 @@
       "subTopic": "Social empowerment",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, Since independence",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Poverty, Empowerment & Development",
-        "Social empowerment, poverty and developmental issues",
-        "Social empowerment"
-      ],
       "answers": [
         {
           "id": "",
@@ -12085,13 +10713,6 @@
       "subTopic": "Globalisation",
       "macrotag": "Analytical",
       "microtag": "Do you think",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "Effects of globalization on Indian society",
-        "Globalisation"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q203-civilsdaily",
@@ -12142,13 +10763,6 @@
       "subTopic": "Globalisation",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, Account for, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "Effects of globalization on Indian society",
-        "Globalisation"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q209-civilsdaily",
@@ -12199,13 +10813,6 @@
       "subTopic": "Globalisation",
       "macrotag": "Descriptive",
       "microtag": "How",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "Effects of globalization on Indian society",
-        "Globalisation"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q208-civilsdaily",
@@ -12256,13 +10863,6 @@
       "subTopic": "Globalisation",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elucidate, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "Effects of globalization on Indian society",
-        "Globalisation"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q206-civilsdaily",
@@ -12318,13 +10918,6 @@
       "subTopic": "Globalisation",
       "macrotag": "Analytical, Applied",
       "microtag": "Justify, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "Effects of globalization on Indian society",
-        "Globalisation"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q201-civilsdaily",
@@ -12380,13 +10973,6 @@
       "subTopic": "Globalisation",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "Effects of globalization on Indian society",
-        "Globalisation"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q200-civilsdaily",
@@ -12437,13 +11023,6 @@
       "subTopic": "Globalisation",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elucidate, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "Effects of globalization on Indian society",
-        "Globalisation"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q199-civilsdaily",
@@ -12529,13 +11108,6 @@
       "subTopic": "Globalisation",
       "macrotag": "Analytical, Applied",
       "microtag": "Critically examine, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "Effects of globalization on Indian society",
-        "Globalisation"
-      ],
       "answers": [
         {
           "id": "",
@@ -12586,13 +11158,6 @@
       "subTopic": "Caste system",
       "macrotag": "Descriptive, Applied",
       "microtag": "Why, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "National Integration, communalism, regionalism & secularism",
-        "Caste system"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q58-civilsdaily",
@@ -12648,13 +11213,6 @@
       "subTopic": "Caste system",
       "macrotag": "Applied",
       "microtag": "India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "National Integration, communalism, regionalism & secularism",
-        "Caste system"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q55-civilsdaily",
@@ -12710,13 +11268,6 @@
       "subTopic": "Caste system",
       "macrotag": "Analytical, Applied",
       "microtag": "Comment, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "National Integration, communalism, regionalism & secularism",
-        "Caste system"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q54-civilsdaily",
@@ -12767,13 +11318,6 @@
       "subTopic": "Communalism",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "National Integration, communalism, regionalism & secularism",
-        "Communalism"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q222-civilsdaily",
@@ -12829,13 +11373,6 @@
       "subTopic": "Communalism",
       "macrotag": "Analytical",
       "microtag": "Argue",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "National Integration, communalism, regionalism & secularism",
-        "Communalism"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q218-civilsdaily",
@@ -12881,13 +11418,6 @@
       "subTopic": "Communalism",
       "macrotag": "Descriptive, Comparative, Applied",
       "microtag": "How, Distinguish, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "National Integration, communalism, regionalism & secularism",
-        "Communalism"
-      ],
       "answers": [
         {
           "id": "",
@@ -12938,13 +11468,6 @@
       "subTopic": "Miscellaneous",
       "macrotag": "Descriptive, Applied",
       "microtag": "Elucidate, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "National Integration, communalism, regionalism & secularism",
-        "Miscellaneous"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q224-civilsdaily",
@@ -12995,13 +11518,6 @@
       "subTopic": "Miscellaneous",
       "macrotag": "Analytical",
       "microtag": "Do you agree",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "National Integration, communalism, regionalism & secularism",
-        "Miscellaneous"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q50-civilsdaily",
@@ -13057,13 +11573,6 @@
       "subTopic": "Regionalism",
       "macrotag": "Analytical, Applied",
       "microtag": "Do you agree, Argue, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "National Integration, communalism, regionalism & secularism",
-        "Regionalism"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q220-civilsdaily",
@@ -13134,13 +11643,6 @@
       "subTopic": "Regionalism",
       "macrotag": "Analytical",
       "microtag": "Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "National Integration, communalism, regionalism & secularism",
-        "Regionalism"
-      ],
       "answers": [
         {
           "id": "",
@@ -13191,13 +11693,6 @@
       "subTopic": "Secularism",
       "macrotag": "Analytical",
       "microtag": "Justify",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "National Integration, communalism, regionalism & secularism",
-        "Secularism"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q217-civilsdaily",
@@ -13253,13 +11748,6 @@
       "subTopic": "Secularism",
       "macrotag": "Descriptive",
       "microtag": "What",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "National Integration, communalism, regionalism & secularism",
-        "Secularism"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q216-civilsdaily",
@@ -13315,13 +11803,6 @@
       "subTopic": "Secularism",
       "macrotag": "Descriptive, Analytical, Comparative, Applied",
       "microtag": "How, Discuss, Different, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "National Integration, communalism, regionalism & secularism",
-        "Secularism"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q100-drishti_ias",
@@ -13357,13 +11838,6 @@
       "subTopic": "Secularism",
       "macrotag": "Descriptive, Comparative, Applied",
       "microtag": "How, Differ, India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Social Dynamics & Ideologies",
-        "National Integration, communalism, regionalism & secularism",
-        "Secularism"
-      ],
       "answers": [
         {
           "id": "",
@@ -13414,13 +11888,6 @@
       "subTopic": "Emerging Urbanisation Trends",
       "macrotag": "Descriptive",
       "microtag": "How",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Urbanisation",
-        "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
-        "Emerging Urbanisation Trends"
-      ],
       "answers": [
         {
           "id": "2022-gs1-q204-civilsdaily",
@@ -13476,13 +11943,6 @@
       "subTopic": "Emerging Urbanisation Trends",
       "macrotag": "Descriptive, Applied",
       "microtag": "What, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Urbanisation",
-        "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
-        "Emerging Urbanisation Trends"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q196-civilsdaily",
@@ -13538,13 +11998,6 @@
       "subTopic": "Emerging Urbanisation Trends",
       "macrotag": "Analytical, Applied",
       "microtag": "Substantiate, Problem",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Urbanisation",
-        "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
-        "Emerging Urbanisation Trends"
-      ],
       "answers": [
         {
           "id": "",
@@ -13590,13 +12043,6 @@
       "subTopic": "Emerging Urbanisation Trends",
       "macrotag": "Analytical, Applied",
       "microtag": "Discuss, India, Problem",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Urbanisation",
-        "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
-        "Emerging Urbanisation Trends"
-      ],
       "answers": [
         {
           "id": "",
@@ -13642,13 +12088,6 @@
       "subTopic": "Environmental Issues",
       "macrotag": "Descriptive",
       "microtag": "Bring out",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Urbanisation",
-        "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
-        "Environmental Issues"
-      ],
       "answers": [
         {
           "id": "",
@@ -13699,13 +12138,6 @@
       "subTopic": "Urban Planning",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Urbanisation",
-        "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
-        "Urban Planning"
-      ],
       "answers": [
         {
           "id": "2019-gs1-q194-civilsdaily",
@@ -13756,13 +12188,6 @@
       "subTopic": "Urban Planning",
       "macrotag": "Descriptive, Applied",
       "microtag": "Explain, Mention, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Urbanisation",
-        "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
-        "Urban Planning"
-      ],
       "answers": [
         {
           "id": "2018-gs1-q184-civilsdaily",
@@ -13843,13 +12268,6 @@
       "subTopic": "Urban Poverty and Migration",
       "macrotag": "Descriptive, Applied",
       "microtag": "How, Smart City, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Urbanisation",
-        "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
-        "Urban Poverty and Migration"
-      ],
       "answers": [
         {
           "id": "2025-gs1-q198-civilsdaily",
@@ -13900,13 +12318,6 @@
       "subTopic": "Urban Poverty and Migration",
       "macrotag": "Descriptive, Analytical",
       "microtag": "Why, Discuss",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Urbanisation",
-        "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
-        "Urban Poverty and Migration"
-      ],
       "answers": [
         {
           "id": "2024-gs1-q61-civilsdaily",
@@ -13957,13 +12368,6 @@
       "subTopic": "Urban Poverty and Migration",
       "macrotag": "Applied",
       "microtag": "India, Indian",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Urbanisation",
-        "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
-        "Urban Poverty and Migration"
-      ],
       "answers": [
         {
           "id": "2023-gs1-q197-civilsdaily",
@@ -14019,13 +12423,6 @@
       "subTopic": "Urban Water Management",
       "macrotag": "Descriptive",
       "microtag": "Explain, What",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Urbanisation",
-        "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
-        "Urban Water Management"
-      ],
       "answers": [
         {
           "id": "2021-gs1-q146-civilsdaily",
@@ -14081,13 +12478,6 @@
       "subTopic": "Urban Water Management",
       "macrotag": "Descriptive, Applied",
       "microtag": "Account for, India",
-      "hierarchy_path": [
-        "GS1",
-        "SOCIETY",
-        "Urbanisation",
-        "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
-        "Urban Water Management"
-      ],
       "answers": [
         {
           "id": "2020-gs1-q195-civilsdaily",

@@ -486,6 +486,9 @@ const baseCss = (o: ExportOptions) => {
     .toc { margin: 0 0 10mm 0; padding: 4mm 6mm; background: rgba(0,0,0,0.03); border-radius: 6px; border: 1px solid var(--rule); }
     .toc-title { font-weight: 900; margin-bottom: 2mm; font-size: ${o.fontSize + 1}pt; color: var(--accent); }
     .toc-item { font-size: ${o.fontSize - 1}pt; padding: 1mm 0; border-bottom: 1px dotted var(--rule); }
+    .toc-item a { color: var(--fg); text-decoration: none; }
+    .toc-item a:hover { color: var(--accent); text-decoration: underline; }
+    .toc-item a:visited { color: var(--fg); }
 
     /* Executive summary prepend support */
     .executive-summary { margin-bottom: 8mm; }
@@ -505,6 +508,63 @@ const baseCss = (o: ExportOptions) => {
 
     /* Perf metrics */
     .metrics { display: inline-block; font-size: ${o.fontSize - 3}pt; margin-left: 6px; padding: 1px 6px; border-radius: 10px; background: rgba(99,102,241,0.12); color: var(--accent); font-weight: 700; }
+
+    /* Mains specific styling */
+    .mains-item {
+      padding: 4mm 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .mains-question-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2mm;
+    }
+    .mains-model-answer {
+      margin-top: 3mm;
+      padding: 3mm 4mm;
+      background: rgba(99, 102, 241, 0.05);
+      border-left: 3px solid var(--accent);
+      border-radius: 4px;
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+    .mains-ma-header {
+      font-size: ${o.fontSize - 3}pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      margin-bottom: 1.5mm;
+    }
+    .mains-ma-content {
+      font-size: ${o.fontSize - 0.5}pt;
+      line-height: 1.6;
+      color: var(--fg);
+    }
+    .mains-content-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 3mm 0;
+      font-size: ${o.fontSize - 1}pt;
+    }
+    .mains-content-table th, .mains-content-table td {
+      border: 1px solid var(--rule);
+      padding: 2mm 3mm;
+      text-align: left;
+    }
+    .mains-content-table th {
+      background: rgba(0, 0, 0, 0.04);
+      font-weight: 700;
+    }
+    .expl ul, .mains-ma-content ul,
+    .expl ol, .mains-ma-content ol {
+      margin: 2mm 0;
+      padding-left: 6mm;
+    }
+    .expl li, .mains-ma-content li {
+      margin-bottom: 1mm;
+      line-height: 1.5;
+    }
   `;
 };
 
@@ -539,17 +599,107 @@ const sanitizeRichHtml = (raw: string = ''): string => {
     });
 };
 
+const parseMarkdownTables = (txt: string): string => {
+  const tableRegex = /((?:^|\n)\|[^\n]*\|(?:\r?\n\|[^\n]*\|)*)/g;
+  return txt.replace(tableRegex, (match) => {
+    const lines = match.trim().split(/\r?\n/).map(l => l.trim());
+    if (lines.length < 2) return match;
+    
+    const isSeparator = /^\|\s*:-*-*:?\s*(?:\|\s*:-*-*:?\s*)*\|$/.test(lines[1]) || /^\|\s*---+\s*\|$/.test(lines[1]);
+    
+    let htmlRows = '';
+    lines.forEach((line, idx) => {
+      if (idx === 1 && isSeparator) return;
+      const cells = line.split('|').map(c => c.trim()).filter((_, i, a) => i > 0 && i < a.length - 1);
+      const isHeader = (idx === 0);
+      const cellTag = isHeader ? 'th' : 'td';
+      
+      const rowContent = cells.map(cell => `<${cellTag}>${cell}</${cellTag}>`).join('');
+      htmlRows += `<tr>${rowContent}</tr>`;
+    });
+    
+    return `\n<table class="mains-content-table">${htmlRows}</table>\n`;
+  });
+};
+
+const parseMarkdownLists = (txt: string): string => {
+  const lines = txt.split('\n');
+  const output: string[] = [];
+  const listStack: Array<{ type: 'ul' | 'ol'; indent: number }> = [];
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      // Keep lists open, just output the empty line (will be cleaned up of br tags later)
+      output.push('');
+      return;
+    }
+
+    const ulMatch = line.match(/^(\s*)(?:[-*+])\s+(.*)$/);
+    const olMatch = line.match(/^(\s*)(?:\d+\.)\s+(.*)$/);
+
+    if (ulMatch || olMatch) {
+      const match = ulMatch || olMatch;
+      const spaces = match![1];
+      const content = match![2];
+      const type = ulMatch ? 'ul' : 'ol';
+      const indent = spaces.length;
+
+      if (listStack.length === 0) {
+        listStack.push({ type, indent });
+        output.push(`<${type}>`);
+      } else {
+        const top = listStack[listStack.length - 1];
+        if (indent > top.indent) {
+          listStack.push({ type, indent });
+          output.push(`<${type}>`);
+        } else {
+          while (listStack.length > 1 && listStack[listStack.length - 1].indent > indent) {
+            output.push(`</${listStack.pop()!.type}>`);
+          }
+          const currentTop = listStack[listStack.length - 1];
+          if (currentTop.type !== type || currentTop.indent !== indent) {
+            output.push(`</${currentTop.type}>`);
+            listStack[listStack.length - 1] = { type, indent };
+            output.push(`<${type}>`);
+          }
+        }
+      }
+      output.push(`<li>${content}</li>`);
+    } else {
+      if (listStack.length > 0) {
+        while (listStack.length > 0) {
+          output.push(`</${listStack.pop()!.type}>`);
+        }
+      }
+      output.push(line);
+    }
+  });
+
+  while (listStack.length > 0) {
+    output.push(`</${listStack.pop()!.type}>`);
+  }
+
+  return output.join('\n');
+};
+
 // Preserve rich HTML; convert markdown for plain text
 const renderInline = (txt: string = ''): string => {
   if (!txt) return '';
-  if (HTML_TAG_REGEX.test(txt)) return sanitizeRichHtml(txt);
-  return escapeHtml(txt)
+  const html = HTML_TAG_REGEX.test(txt) ? sanitizeRichHtml(txt) : escapeHtml(txt);
+  
+  let formatted = parseMarkdownTables(html);
+  formatted = parseMarkdownLists(formatted);
+  
+  return formatted
     .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
     .replace(/__(.*?)__/g, '<u>$1</u>')
     .replace(/==(.*?)==/g, '<mark>$1</mark>')
     .replace(/\*(.*?)\*/g, '<i>$1</i>')
     .replace(/_(.*?)_/g, '<i>$1</i>')
-    .replace(/\n/g, '<br/>');
+    .replace(/\n/g, '<br/>')
+    .replace(/<br\/>\s*(<\/?(ul|ol|li|table|tr|th|td|div|h[1-6]|p)\b[^>]*>)/gi, '$1')
+    .replace(/(<\/?(ul|ol|li|table|tr|th|td|div|h[1-6]|p)\b[^>]*>)\s*<br\/>/gi, '$1');
 };
 
 const wrap = (o: ExportOptions, body: string, extras: string = '') => `<!doctype html>
@@ -731,6 +881,56 @@ const buildQuestionChips = (q: ExportQuestion, o: ExportOptions): string => {
   return `<div class="q-chip-bar">${chips.join('')}</div>`;
 };
 
+const parseIntroductoryBox = (rawText: string | undefined | null) => {
+  if (!rawText) return null;
+  const tableRegex = /^\s*(\|\s*[^\n]*\|\s*(?:\r?\n\s*\|\s*---+\s*\|)?(?:\r?\n\s*\|\s*[^\n]*\|\s*)*)/i;
+  const match = rawText.match(tableRegex);
+  if (!match) return null;
+  
+  const fullTableText = match[1];
+  const lines = fullTableText.split(/\r?\n/);
+  const cellTexts: string[] = [];
+  
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith('|')) return;
+    if (/^\|\s*:-*-*:?\s*(?:\|\s*:-*-*:?\s*)*\|$/.test(trimmed) || /^\|\s*---+\s*\|$/.test(trimmed)) return;
+    const cells = trimmed.split('|')
+      .map(c => c.trim())
+      .filter((c, idx, arr) => idx > 0 && idx < arr.length - 1);
+    if (cells.length > 0) cellTexts.push(cells.join(' '));
+  });
+  
+  if (cellTexts.length === 0) return null;
+  const combinedContent = cellTexts.join('\n');
+  const headerRegex = /^\s*(?:\*\*|__)?\s*([^*:\n]+?)\s*(?:\*\*|__)?\s*:\s*(?:<br\s*\/?>|\n)?\s*([\s\S]*)$/i;
+  let title = 'APPROACH';
+  let body = combinedContent;
+  
+  const headerMatch = combinedContent.match(headerRegex);
+  if (headerMatch) {
+    title = headerMatch[1].trim().toUpperCase();
+    body = headerMatch[2].trim();
+  } else {
+    const boldHeaderRegex = /^\s*(?:\*\*|__)\s*([^\n*]+?)\s*(?:\*\*|__)\s*(?:<br\s*\/?>|\n)\s*([\s\S]*)$/i;
+    const boldMatch = combinedContent.match(boldHeaderRegex);
+    if (boldMatch) {
+      title = boldMatch[1].trim().toUpperCase();
+      body = boldMatch[2].trim();
+    }
+  }
+  return { title, body, fullTableText };
+};
+
+const renderApproachBoxHtml = (title: string, body: string, o: ExportOptions): string => {
+  return `
+    <div class="mains-approach-box" style="margin-top: 3mm; margin-bottom: 3mm; padding: 3mm 4mm; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-left: 4px solid #10b981; border-radius: 6px; break-inside: avoid; page-break-inside: avoid;">
+      <div class="mains-approach-title" style="font-weight: 800; font-size: ${o.fontSize - 2}pt; color: #047857; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.5mm;">💡 ${escapeHtml(title)}</div>
+      <div class="mains-approach-content" style="font-size: ${o.fontSize - 0.5}pt; line-height: 1.5; color: var(--fg);">${renderInline(body)}</div>
+    </div>
+  `;
+};
+
 const renderQaLayoutBlock = (questionHtml: string, answerHtml: string, chipsHtml: string, o: ExportOptions): string => {
   if (o.qaLayoutMode === 'split') {
     const qBox = chipsHtml
@@ -747,6 +947,10 @@ const renderQaLayoutBlock = (questionHtml: string, answerHtml: string, chipsHtml
 export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions): string => {
   const rows = sortQuestions(filterQuestions(rowsRaw, o), o);
 
+  const slugifyHeading = (s: string, prefix: string = '') => {
+    return prefix + String(s).toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  };
+
   const showOpts = o.contentScope !== 'q_only';
   const showExpl = o.contentScope === 'q_options_expl';
   const isFlashStyle = o.visualStyle === 'flashcard';
@@ -755,6 +959,60 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
   // Helper to render a single question item
   const renderQuestionItem = (q: ExportQuestion, i: number) => {
     const stem = q.question_text || q.statement || '';
+    const isQnMains = String(q.stage || '').toLowerCase() === 'mains' || String(q.id || '').startsWith('mains');
+
+    if (isQnMains) {
+      const showMainsExpl = o.contentScope !== 'q_only';
+      let modelAnswerHtml = '';
+      
+      if (showMainsExpl && !o.hideResponses) {
+        const explList = filterExplanationsByInstitute(q._explanations, o);
+        if (Array.isArray(explList) && explList.length > 0) {
+          modelAnswerHtml = explList
+            .map((expl: any) => {
+              const text = expl.text || expl.explanationText || expl.answerText || expl.explanation || '';
+              if (!text) return '';
+              const source = expl.source || expl.institute || 'Unknown Source';
+              const year = expl.year ? ` (${expl.year})` : '';
+              const header = `<div class="mains-ma-header">${escapeHtml(source)}${year} Answer:</div>`;
+              
+              const parsed = parseIntroductoryBox(text);
+              let remainingText = text;
+              let approachHtml = '';
+              if (parsed) {
+                approachHtml = renderApproachBoxHtml(parsed.title, parsed.body, o);
+                remainingText = text.replace(parsed.fullTableText, '').trim();
+              }
+              
+              return `<div class="mains-model-answer">${header}${approachHtml}<div class="mains-ma-content">${renderInline(remainingText)}</div></div>`;
+            })
+            .filter(Boolean)
+            .join('');
+        } else {
+          const singleExpl = q.explanation_markdown || q.explanation || '';
+          if (singleExpl) {
+            const parsed = parseIntroductoryBox(singleExpl);
+            let remainingText = singleExpl;
+            let approachHtml = '';
+            if (parsed) {
+              approachHtml = renderApproachBoxHtml(parsed.title, parsed.body, o);
+              remainingText = singleExpl.replace(parsed.fullTableText, '').trim();
+            }
+            modelAnswerHtml = `<div class="mains-model-answer"><div class="mains-ma-header">Model Answer:</div>${approachHtml}<div class="mains-ma-content">${renderInline(remainingText)}</div></div>`;
+          }
+        }
+      }
+
+      return `
+        <div class="mains-item">
+          <div class="mains-question-block">
+            <div class="qstem"><span class="qnum">${i + 1}.</span>${renderInline(stem)}</div>
+            ${o.showMetaChips ? buildHierarchyBreadcrumb(q) : ''}
+            ${modelAnswerHtml}
+          </div>
+        </div>
+      `;
+    }
     
     // Build chips bar for top-right of QA box (controlled by toggles)
     const chipsHtml = buildQuestionChips(q, o);
@@ -875,10 +1133,31 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
     // TOC with hierarchy
     const tocItems: string[] = [];
     groups.forEach((secMap, sub) => {
-      tocItems.push(`<div class="toc-item" style="font-weight:800">${escapeHtml(sub)}</div>`);
+      const subId = slugifyHeading(sub, 'subject-');
+      tocItems.push(`<div class="toc-item" style="font-weight:800"><a href="#${subId}">${escapeHtml(sub)}</a></div>`);
       if (renderLevel !== 'subject') {
         secMap.forEach((micMap, sec) => {
-          tocItems.push(`<div class="toc-item" style="padding-left:12px">${escapeHtml(sec)}</div>`);
+          const secId = slugifyHeading(sub + '-' + sec, 'section-');
+          tocItems.push(`<div class="toc-item" style="padding-left:12px;font-weight:600"><a href="#${secId}">${escapeHtml(sec)}</a></div>`);
+          
+          if (renderLevel === 'subject_section_microtopic') {
+            micMap.forEach((questions, mic) => {
+              const micId = slugifyHeading(sub + '-' + sec + '-' + mic, 'micro-');
+              tocItems.push(`<div class="toc-item" style="padding-left:24px"><a href="#${micId}">${escapeHtml(mic)}</a></div>`);
+              
+              const subtopics: string[] = [];
+              questions.forEach(q => {
+                const subT = q.sub_topic || q.subtopic || '';
+                const norm = subT && subT !== 'Other' && subT !== 'undefined' && subT !== 'null' ? subT : '';
+                if (norm && !subtopics.includes(norm)) subtopics.push(norm);
+              });
+              
+              subtopics.forEach(subT => {
+                const subTId = slugifyHeading(sub + '-' + sec + '-' + mic + '-' + subT, 'subtopic-');
+                tocItems.push(`<div class="toc-item" style="padding-left:36px;font-style:italic"><a href="#${subTId}">${escapeHtml(subT)}</a></div>`);
+              });
+            });
+          }
         });
       }
     });
@@ -893,7 +1172,8 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
     const sectionsHtml: string[] = [];
 
     groups.forEach((secMap, sub) => {
-      sectionsHtml.push(`<h1 style="color:var(--accent);font-size:${o.fontSize + 6}pt;font-weight:900;margin:8mm 0 4mm 0;border-bottom:2px solid var(--accent);padding-bottom:2mm">${escapeHtml(sub)}</h1>`);
+      const subId = slugifyHeading(sub, 'subject-');
+      sectionsHtml.push(`<h1 id="${subId}" style="color:var(--accent);font-size:${o.fontSize + 6}pt;font-weight:900;margin:8mm 0 4mm 0;border-bottom:2px solid var(--accent);padding-bottom:2mm">${escapeHtml(sub)}</h1>`);
 
       if (renderLevel === 'subject') {
         // Flat list under subject heading
@@ -906,7 +1186,8 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
         });
       } else {
         secMap.forEach((micMap, sec) => {
-          sectionsHtml.push(`<h2 style="color:var(--fg);font-size:${o.fontSize + 3}pt;font-weight:800;margin:6mm 0 3mm 0;opacity:0.85">${escapeHtml(sec)}</h2>`);
+          const secId = slugifyHeading(sub + '-' + sec, 'section-');
+          sectionsHtml.push(`<h2 id="${secId}" style="color:var(--fg);font-size:${o.fontSize + 3}pt;font-weight:800;margin:6mm 0 3mm 0;opacity:0.85">${escapeHtml(sec)}</h2>`);
 
           if (renderLevel === 'subject_section') {
             // Flat list under section heading
@@ -918,9 +1199,25 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
           } else {
             // subject_section_microtopic — full 3-level hierarchy
             micMap.forEach((questions, mic) => {
-              sectionsHtml.push(`<h3 style="color:var(--accent);font-size:${o.fontSize + 1}pt;font-weight:700;margin:4mm 0 2mm 2mm;opacity:0.75">${escapeHtml(mic)}</h3>`);
+              const micId = slugifyHeading(sub + '-' + sec + '-' + mic, 'micro-');
+              sectionsHtml.push(`<h3 id="${micId}" style="color:var(--accent);font-size:${o.fontSize + 1}pt;font-weight:700;margin:4mm 0 2mm 2mm;opacity:0.75">${escapeHtml(mic)}</h3>`);
+              
+              const subtopicMap: Map<string, ExportQuestion[]> = new Map();
               questions.forEach(q => {
-                sectionsHtml.push(renderQuestionItem(q, globalIdx++));
+                const subT = q.sub_topic || q.subtopic || '';
+                const key = subT && subT !== 'Other' && subT !== 'undefined' && subT !== 'null' ? subT : '';
+                if (!subtopicMap.has(key)) subtopicMap.set(key, []);
+                subtopicMap.get(key)!.push(q);
+              });
+
+              subtopicMap.forEach((subtQs, subT) => {
+                if (subT) {
+                  const subTId = slugifyHeading(sub + '-' + sec + '-' + mic + '-' + subT, 'subtopic-');
+                  sectionsHtml.push(`<h4 id="${subTId}" style="color:var(--fg);font-size:${o.fontSize}pt;font-weight:700;margin:3mm 0 2mm 4mm;opacity:0.65">${escapeHtml(subT)}</h4>`);
+                }
+                subtQs.forEach(q => {
+                  sectionsHtml.push(renderQuestionItem(q, globalIdx++));
+                });
               });
             });
           }
@@ -973,10 +1270,23 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
   const tocHtml = o.showTOC && subjectsUsed.length > 0 ? `
     <div class="toc">
       <div class="toc-title">Table of Contents</div>
-      ${subjectsUsed.map(s => `<div class="toc-item">${escapeHtml(s)}</div>`).join('')}
+      ${subjectsUsed.map(s => {
+        const subId = slugifyHeading(s, 'subject-');
+        return `<div class="toc-item"><a href="#${subId}">${escapeHtml(s)}</a></div>`;
+      }).join('')}
     </div>` : '';
 
-  const itemsHtml = rows.map((q, i) => renderQuestionItem(q, i)).join('');
+  const renderedSubjects = new Set<string>();
+  const itemsHtml = rows.map((q, i) => {
+    const s = q.subject || 'General';
+    let anchor = '';
+    if (!renderedSubjects.has(s)) {
+      renderedSubjects.add(s);
+      const subId = slugifyHeading(s, 'subject-');
+      anchor = `<div id="${subId}"></div>`;
+    }
+    return anchor + renderQuestionItem(q, i);
+  }).join('');
 
   // Answer key appendix if not inline
   const answerKey = !isFlashStyle && !inline && !o.hideResponses && (o.contentScope !== 'q_only')
@@ -1615,12 +1925,7 @@ const renderPyqHeatmapSvg = (
       }
     }
 
-    return `<td style="padding: 1px; border: none; width: 44px; height: 32px;">
-                  <svg width="44" height="32" viewBox="0 0 44 32" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="44" height="32" rx="5" fill="${normalizeHex(bg, '#F8FAFC')}" fill-opacity="1" />
-                    <text x="22" y="20.5" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="800" fill="${normalizeHex(tc, '#0F172A')}" fill-opacity="1">${count || ''}</text>
-                  </svg>
-                </td>`;
+    return `<td style="background: ${normalizeHex(bg, '#F8FAFC')}; color: ${normalizeHex(tc, '#0F172A')}; font-weight: 800; text-align: center; vertical-align: middle; font-size: 8.5pt;">${count || ''}</td>`;
   }).join('')}
             </tr>
           `).join('')}
@@ -1828,8 +2133,8 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
       .analysis-summary { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       .analysis-summary h1 { font-size: 21pt; margin: 0 0 3mm; color: #1E40AF; }
       .analysis-summary .muted { color: #475569; font-size: 9pt; margin: 0 0 3mm; }
-      .analysis-summary .analysis-card { margin-bottom: 6mm; padding: 4mm; border: 1px solid #DBEAFE; border-radius: 10px; background: #F8FBFF; break-inside: avoid !important; page-break-inside: avoid !important; }
-      .analysis-summary h3 { font-size: 12pt; margin: 0 0 2mm; color: #334155; }
+      .analysis-summary .analysis-card { margin-bottom: 6mm; padding: 4mm; border: 1px solid #DBEAFE; border-radius: 10px; background: #F8FBFF; }
+      .analysis-summary h3 { font-size: 12pt; margin: 0 0 2mm; color: #334155; break-after: avoid; page-break-after: avoid; }
       .analysis-summary .analysis-chart { border: 1px solid #D1D5DB; border-radius: 12px; padding: 10px; background: #FFFFFF; break-inside: avoid !important; page-break-inside: avoid !important; }
       .analysis-summary .legend-wrap { margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 8px; }
       .analysis-summary .legend-item { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: #334155; }
@@ -1841,9 +2146,10 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
       .analysis-summary .analysis-heatmap-table { width: 100%; border-collapse: collapse; margin-top: 2mm; table-layout: fixed; }
       .analysis-summary .analysis-heatmap-table th,
       .analysis-summary .analysis-heatmap-table td { border: 1px solid #CBD5E1; padding: 3px 5px; font-size: 7.5pt; line-height: 1.2; text-align: left; overflow: hidden; text-overflow: ellipsis; }
-      .analysis-summary .analysis-heatmap-table td:first-child { width: 32%; font-weight: 600; white-space: normal; overflow-wrap: break-word; word-break: break-word; }
+      .analysis-summary .analysis-heatmap-table th:first-child,
+      .analysis-summary .analysis-heatmap-table td:first-child { width: 55%; font-weight: 600; white-space: normal; overflow-wrap: break-word; word-break: break-word; }
       .analysis-summary .analysis-heatmap-table th:not(:first-child),
-      .analysis-summary .analysis-heatmap-table td:not(:first-child) { text-align: center; }
+      .analysis-summary .analysis-heatmap-table td:not(:first-child) { text-align: center; padding: 3px 1px; font-size: 7.5pt; text-overflow: clip; overflow: visible; white-space: nowrap; }
       .analysis-summary .analysis-heatmap-table th { background: #E2E8F0; font-weight: 800; }
       .analysis-summary table,
       .analysis-summary tr,

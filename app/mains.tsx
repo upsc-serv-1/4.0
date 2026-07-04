@@ -191,10 +191,18 @@ import { buildPredictive, probableHotsFor2026 } from '../src/lib/pyqPredictive';
 const getQuestionSection = (q: any): string => q.sectionGroup || q.section_group || q.sectiongroup || '';
 const getQuestionMicro = (q: any): string => q.microTopic || q.microtopic || q.micro_topic || '';
 const getQuestionSub = (q: any): string => q.subTopic || q.subtopic || q.sub_topic || '';
+const getQuestionNano = (q: any): string => q.nanoTopic || q.nanotopic || q.nano_topic || '';
+
+const truncateText = (text: string, maxLen: number = 40): string => {
+  if (!text) return '';
+  if (text.length <= maxLen) return text;
+  return text.substring(0, maxLen).trim() + '...';
+};
 
 const getValueAddSection = (va: any): string => va.sectionGroup || va.section_group || va.sectiongroup || '';
 const getValueAddMicro = (va: any): string => va.microtopic || va.microTopic || va.micro_topic || '';
 const getValueAddSub = (va: any): string => va.subtopic || va.subTopic || va.sub_topic || '';
+const getValueAddNano = (va: any): string => va.nanotopic || va.nanoTopic || va.nano_topic || '';
 
 interface MainsFilters {
   searchAcross: ('Questions' | 'Answers' | 'Value Additions')[];
@@ -207,6 +215,7 @@ interface MainsFilters {
   sections: string;
   microtopics: string;
   subtopics: string;
+  nanotopics: string;
   macrotags: string;
   microtags: string;
   years: string;
@@ -219,11 +228,12 @@ const DEFAULT_MAINS_FILTERS: MainsFilters = {
   institutes: 'All',
   program: 'All',
   // Default to GS papers only — Optional questions should only show when explicitly selected
-  paper: 'GS1|GS2|GS3|GS4',
+  paper: 'All',
   subjects: 'All',
   sections: 'All',
   microtopics: 'All',
   subtopics: 'All',
+  nanotopics: 'All',
   macrotags: 'All',
   microtags: 'All',
   years: 'All',
@@ -2183,14 +2193,15 @@ interface SidebarFilterRowProps {
   showAll?: boolean;
   visible?: boolean;
   itemPrefix?: string;       // e.g. '#' for tags
+  defaultExpanded?: boolean;
 }
 
 function SidebarFilterRow({
   label, items, selected, onSelect, colors,
   delimiter = '|', showSelectAll = false, showAll = true,
-  visible = true, itemPrefix = '',
+  visible = true, itemPrefix = '', defaultExpanded = false,
 }: SidebarFilterRowProps) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
 
   if (!visible || !items || items.length === 0) return null;
 
@@ -2218,12 +2229,12 @@ function SidebarFilterRow({
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 8 }}>
           {/* Label */}
-          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10, marginBottom: 0, letterSpacing: 1 }]}>
+          <Text style={[styles.panelLabel, { color: isAll ? colors.textTertiary : '#7c3aed', fontSize: 10, marginBottom: 0, letterSpacing: 1 }]}>
             {label}
           </Text>
           {/* Badge count */}
-          <View style={{ backgroundColor: isAll ? colors.border + '60' : '#7c3aed20', borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1 }}>
-            <Text style={{ fontSize: 9, fontWeight: '800', color: isAll ? colors.textTertiary : '#7c3aed' }}>
+          <View style={{ backgroundColor: isAll ? colors.border + '60' : '#7c3aed', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 }}>
+            <Text style={{ fontSize: 8, fontWeight: '800', color: isAll ? colors.textTertiary : '#ffffff' }}>
               {isAll ? items.length : `${selectedList.length}/${items.length}`}
             </Text>
           </View>
@@ -2290,7 +2301,7 @@ function SidebarFilterRow({
 
 /** PYQ filter with collapse/expand — separate because it's single-select, not chip-based multi */
 function SidebarPYQFilter({ filters, onUpdateFilters, colors }: { filters: MainsFilters; onUpdateFilters: (f: MainsFilters) => void; colors: any }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const activeLabel = filters.pyqFilter !== 'All' ? filters.pyqFilter : null;
 
   return (
@@ -2505,6 +2516,7 @@ function MainsLeftPanel({
           label="PAPER"
           items={allPapers}
           selected={filters.paper}
+          defaultExpanded={true}
           onSelect={(val) => onUpdateFilters({
             ...filters,
             paper: val,
@@ -2586,25 +2598,6 @@ function MainsLeftPanel({
         <Text style={{ fontSize: 8, fontWeight: '900', color: colors.textTertiary + '80', letterSpacing: 1.5, paddingHorizontal: 4, marginBottom: 2 }}>
           TAGS
         </Text>
-
-        <SidebarFilterRow
-          label="MACRO TAG"
-          items={macrotagOptions}
-          selected={filters.macrotags}
-          onSelect={(val) => onUpdateFilters({ ...filters, macrotags: val, microtags: 'All' })}
-          colors={colors}
-          itemPrefix="#"
-        />
-
-        <SidebarFilterRow
-          label="MICRO TAG"
-          items={microtagOptions}
-          selected={filters.microtags}
-          onSelect={(val) => onUpdateFilters({ ...filters, microtags: val })}
-          colors={colors}
-          itemPrefix="#"
-          visible={filters.macrotags !== 'All'}
-        />
 
         <SidebarFilterRow
           label="REVISION TAGS"
@@ -2713,6 +2706,7 @@ interface HierarchyModalProps {
   isMnemonics?: boolean;
   activeCategoryItems?: any[];
   activeCategory?: string;
+  questions?: ConsolidatedQuestion[];
 }
 
 function HierarchyModal({
@@ -2736,6 +2730,7 @@ function HierarchyModal({
   isMnemonics,
   activeCategoryItems,
   activeCategory,
+  questions,
 }: HierarchyModalProps) {
   const [localFilters, setLocalFilters] = React.useState<MainsFilters>(filters);
 
@@ -2746,119 +2741,255 @@ function HierarchyModal({
   }, [visible, filters]);
 
   const localSubjectOptions = React.useMemo(() => {
-    if (!activeCategoryItems) return [];
+    const items = activeCategoryItems || questions;
+    if (!items) return [];
+
     const paperFilter = localFilters.paper !== 'All' ? localFilters.paper.split('|') : [];
     const subSet = new Set<string>();
-    activeCategoryItems.forEach(item => {
-      getItemPaths(item).forEach(path => {
-        if (paperFilter.length === 0 || paperFilter.includes(path.paper)) {
-          if (path.subject) subSet.add(path.subject);
+
+    if (activeCategoryItems && activeCategoryItems.length > 0) {
+      activeCategoryItems.forEach(item => {
+        getItemPaths(item).forEach(path => {
+          if (paperFilter.length === 0 || paperFilter.includes(path.paper)) {
+            if (path.subject) subSet.add(path.subject);
+          }
+        });
+      });
+    } else {
+      questions?.forEach(q => {
+        if (q && q.paper && (paperFilter.length === 0 || paperFilter.includes(q.paper))) {
+          if (q.subject) subSet.add(q.subject);
         }
       });
-    });
+    }
     return Array.from(subSet).sort();
-  }, [activeCategoryItems, localFilters.paper]);
+  }, [activeCategoryItems, questions, localFilters.paper]);
 
   const localSectionOptions = React.useMemo(() => {
-    if (!activeCategoryItems) return [];
+    const items = activeCategoryItems || questions;
+    if (!items) return [];
+
     const paperFilter = localFilters.paper !== 'All' ? localFilters.paper.split('|') : [];
     const subjectFilter = localFilters.subjects !== 'All' ? localFilters.subjects.split('|') : [];
     const secSet = new Set<string>();
-    activeCategoryItems.forEach(item => {
-      getItemPaths(item).forEach(path => {
-        const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
-        const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
-        if (matchPaper && matchSubject && path.sectionGroup) {
-          secSet.add(path.sectionGroup);
+
+    if (activeCategoryItems && activeCategoryItems.length > 0) {
+      activeCategoryItems.forEach(item => {
+        getItemPaths(item).forEach(path => {
+          const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
+          const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
+          if (matchPaper && matchSubject && path.sectionGroup) {
+            secSet.add(path.sectionGroup);
+          }
+        });
+      });
+    } else {
+      questions?.forEach(q => {
+        if (q) {
+          const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
+          const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
+          if (matchPaper && matchSubject) {
+            const sGroup = getQuestionSection(q);
+            if (sGroup) secSet.add(sGroup);
+          }
         }
       });
-    });
+    }
     return Array.from(secSet).sort(naturalCompare);
-  }, [activeCategoryItems, localFilters.paper, localFilters.subjects]);
+  }, [activeCategoryItems, questions, localFilters.paper, localFilters.subjects]);
 
   const localMicrotopicOptions = React.useMemo(() => {
-    if (!activeCategoryItems) return [];
+    const items = activeCategoryItems || questions;
+    if (!items) return [];
+
     const paperFilter = localFilters.paper !== 'All' ? localFilters.paper.split('|') : [];
     const subjectFilter = localFilters.subjects !== 'All' ? localFilters.subjects.split('|') : [];
     const sectionFilter = localFilters.sections !== 'All' ? localFilters.sections.split('|') : [];
     const mtSet = new Set<string>();
-    activeCategoryItems.forEach(item => {
-      getItemPaths(item).forEach(path => {
-        const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
-        const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
-        const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
-        if (matchPaper && matchSubject && matchSection) {
-          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
-            if (path.microtopic) mtSet.add(path.microtopic);
-          } else {
-            const themeName = item.category === 'data_facts' ? item.metric : item.title;
-            if (themeName) mtSet.add(themeName);
+
+    if (activeCategoryItems && activeCategoryItems.length > 0) {
+      activeCategoryItems.forEach(item => {
+        getItemPaths(item).forEach(path => {
+          const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
+          const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
+          const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
+          if (matchPaper && matchSubject && matchSection) {
+            if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
+              if (path.microtopic) mtSet.add(path.microtopic);
+            } else {
+              const themeName = item.category === 'data_facts' ? item.metric : item.title;
+              if (themeName) mtSet.add(themeName);
+            }
+          }
+        });
+      });
+    } else {
+      questions?.forEach(q => {
+        if (q) {
+          const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
+          const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
+          const matchSection = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
+          if (matchPaper && matchSubject && matchSection) {
+            const micro = getQuestionMicro(q);
+            if (micro) mtSet.add(micro);
           }
         }
       });
-    });
+    }
     return Array.from(mtSet).sort(naturalCompare);
-  }, [activeCategoryItems, localFilters.paper, localFilters.subjects, localFilters.sections, activeCategory]);
+  }, [activeCategoryItems, questions, localFilters.paper, localFilters.subjects, localFilters.sections, activeCategory]);
 
   const localSubtopicOptions = React.useMemo(() => {
-    if (!activeCategoryItems) return [];
+    const items = activeCategoryItems || questions;
+    if (!items) return [];
+
     const selectedMicrotopic = localFilters.microtopics !== 'All' ? localFilters.microtopics : null;
     if (!selectedMicrotopic) return [];
+
     const stSet = new Set<string>();
-    activeCategoryItems.forEach(item => {
-      getItemPaths(item).forEach(path => {
-        if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
-          if (path.microtopic && selectedMicrotopic.split('|').includes(path.microtopic)) {
-            if (path.subtopic) stSet.add(path.subtopic);
+    const paperFilter = localFilters.paper !== 'All' ? localFilters.paper.split('|') : [];
+    const subjectFilter = localFilters.subjects !== 'All' ? localFilters.subjects.split('|') : [];
+    const sectionFilter = localFilters.sections !== 'All' ? localFilters.sections.split('|') : [];
+    const microtopicFilter = selectedMicrotopic.split('|');
+
+    if (activeCategoryItems && activeCategoryItems.length > 0) {
+      activeCategoryItems.forEach(item => {
+        getItemPaths(item).forEach(path => {
+          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
+            if (path.microtopic && microtopicFilter.includes(path.microtopic)) {
+              if (path.subtopic) stSet.add(path.subtopic);
+            }
+          } else {
+            const themeName = item.category === 'data_facts' ? item.metric : item.title;
+            if (themeName === selectedMicrotopic) {
+              const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
+              subThemes.forEach((st: any) => {
+                if (st.title) stSet.add(st.title);
+              });
+            }
           }
-        } else {
-          const themeName = item.category === 'data_facts' ? item.metric : item.title;
-          if (themeName === selectedMicrotopic) {
-            const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
-            subThemes.forEach((st: any) => {
-              if (st.title) stSet.add(st.title);
-            });
+        });
+      });
+    } else {
+      questions?.forEach(q => {
+        if (q) {
+          const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
+          const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
+          const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
+          const matchMicro = microtopicFilter.includes(getQuestionMicro(q));
+          if (matchPaper && matchSubject && matchSec && matchMicro) {
+            const sub = getQuestionSub(q);
+            if (sub) stSet.add(sub);
           }
         }
       });
-    });
+    }
     return Array.from(stSet).sort(naturalCompare);
-  }, [activeCategoryItems, localFilters.microtopics, activeCategory]);
+  }, [activeCategoryItems, questions, localFilters.paper, localFilters.subjects, localFilters.sections, localFilters.microtopics, activeCategory]);
 
-  const localMacrotagOptions = React.useMemo(() => {
-    if (!activeCategoryItems) return [];
+  const localNanotopicOptions = React.useMemo(() => {
+    const items = activeCategoryItems || questions;
+    if (!items) return [];
+
     const selectedSubTheme = localFilters.subtopics !== 'All' ? localFilters.subtopics : null;
     if (!selectedSubTheme) return [];
-    const sstSet = new Set<string>();
-    activeCategoryItems.forEach(item => {
-      getItemPaths(item).forEach(path => {
-        if (activeCategory === 'intro_conclusion') {
-          if (path.subtopic && selectedSubTheme.split('|').includes(path.subtopic)) {
-            if (item.title) sstSet.add(item.title);
+
+    const ntSet = new Set<string>();
+    const paperFilter = localFilters.paper !== 'All' ? localFilters.paper.split('|') : [];
+    const subjectFilter = localFilters.subjects !== 'All' ? localFilters.subjects.split('|') : [];
+    const sectionFilter = localFilters.sections !== 'All' ? localFilters.sections.split('|') : [];
+    const microtopicFilter = localFilters.microtopics !== 'All' ? localFilters.microtopics.split('|') : [];
+    const subtopicFilter = selectedSubTheme.split('|');
+
+    if (activeCategoryItems && activeCategoryItems.length > 0) {
+      activeCategoryItems.forEach(item => {
+        getItemPaths(item).forEach(path => {
+          if (path.subtopic && subtopicFilter.includes(path.subtopic)) {
+            if (path.nanotopic) ntSet.add(path.nanotopic);
           }
-        } else if (activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
-          if (path.subtopic && selectedSubTheme.split('|').includes(path.subtopic)) {
-            if (item.title) sstSet.add(item.title);
+        });
+      });
+    } else {
+      questions?.forEach(q => {
+        if (q) {
+          const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
+          const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
+          const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
+          const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(getQuestionMicro(q));
+          const matchSub = subtopicFilter.includes(getQuestionSub(q));
+          if (matchPaper && matchSubject && matchSec && matchMicro && matchSub) {
+            const nano = getQuestionNano(q);
+            if (nano) ntSet.add(nano);
           }
-        } else {
-          const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
-          subThemes.forEach((st: any) => {
-            if (st.title === selectedSubTheme) {
-              const sstMatches = splitSubSubThemes(st.content);
-              sstMatches.forEach(sst => sstSet.add(sst));
-            }
-          });
         }
       });
-    });
-    return Array.from(sstSet).sort();
-  }, [activeCategoryItems, localFilters.subtopics, activeCategory]);
+    }
+    return Array.from(ntSet).sort(naturalCompare);
+  }, [activeCategoryItems, questions, localFilters.paper, localFilters.subjects, localFilters.sections, localFilters.microtopics, localFilters.subtopics]);
 
-  const subjects = activeCategoryItems ? localSubjectOptions : subjectOptions;
-  const sections = activeCategoryItems ? localSectionOptions : sectionOptions;
-  const microtopics = activeCategoryItems ? localMicrotopicOptions : microtopicOptions;
-  const subtopics = activeCategoryItems ? localSubtopicOptions : subtopicOptions;
-  const macrotags = activeCategoryItems ? localMacrotagOptions : macrotagOptions;
+  const localMacrotagOptions = React.useMemo(() => {
+    const items = activeCategoryItems || questions;
+    if (!items) return [];
+
+    const selectedNano = localFilters.nanotopics !== 'All' ? localFilters.nanotopics : null;
+    if (!selectedNano) return [];
+
+    const sstSet = new Set<string>();
+    const paperFilter = localFilters.paper !== 'All' ? localFilters.paper.split('|') : [];
+    const subjectFilter = localFilters.subjects !== 'All' ? localFilters.subjects.split('|') : [];
+    const sectionFilter = localFilters.sections !== 'All' ? localFilters.sections.split('|') : [];
+    const microtopicFilter = localFilters.microtopics !== 'All' ? localFilters.microtopics.split('|') : [];
+    const subtopicFilter = localFilters.subtopics !== 'All' ? localFilters.subtopics.split('|') : [];
+    const nanotopicFilter = selectedNano.split('|');
+
+    if (activeCategoryItems && activeCategoryItems.length > 0) {
+      activeCategoryItems.forEach(item => {
+        getItemPaths(item).forEach(path => {
+          if (activeCategory === 'intro_conclusion') {
+            if (path.subtopic && selectedNano.split('|').includes(path.subtopic)) {
+              if (item.title) sstSet.add(item.title);
+            }
+          } else if (activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+            if (path.subtopic && selectedNano.split('|').includes(path.subtopic)) {
+              if (item.title) sstSet.add(item.title);
+            }
+          } else {
+            const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
+            subThemes.forEach((st: any) => {
+              if (st.title === selectedNano) {
+                const sstMatches = splitSubSubThemes(st.content);
+                sstMatches.forEach(sst => sstSet.add(sst));
+              }
+            });
+          }
+        });
+      });
+    } else {
+      questions?.forEach(q => {
+        if (q) {
+          const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
+          const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
+          const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
+          const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(getQuestionMicro(q));
+          const matchSub = subtopicFilter.length === 0 || subtopicFilter.includes(getQuestionSub(q));
+          const matchNano = nanotopicFilter.includes(getQuestionNano(q));
+          if (matchPaper && matchSubject && matchSec && matchMicro && matchSub && matchNano) {
+            if (q.macrotag) {
+              q.macrotag.split(',').forEach(t => sstSet.add(t.trim()));
+            }
+          }
+        }
+      });
+    }
+    return Array.from(sstSet).sort();
+  }, [activeCategoryItems, questions, localFilters.paper, localFilters.subjects, localFilters.sections, localFilters.microtopics, localFilters.subtopics, localFilters.nanotopics, activeCategory]);
+
+  const subjects = localSubjectOptions;
+  const sections = localSectionOptions;
+  const microtopics = localMicrotopicOptions;
+  const subtopics = localSubtopicOptions;
+  const nanotopics = localNanotopicOptions;
+  const macrotags = localMacrotagOptions;
 
   const isOptional = localFilters.paper !== 'All' && !localFilters.paper.split('|').some(p => ['GS1', 'GS2', 'GS3', 'GS4', 'Essay'].includes(p));
   const labels = {
@@ -2867,6 +2998,7 @@ function HierarchyModal({
     section: isOptional ? 'Optional Paper' : (columnLabels?.section || 'Section Group'),
     microtopic: isOptional ? 'Unit' : (columnLabels?.microtopic || 'Microtopic'),
     subtopic: isOptional ? 'Microtopic' : (columnLabels?.subtopic || 'Sub-topic'),
+    nanotopic: isOptional ? 'Microtopic' : 'Nanotopic',
   };
 
   const renderColumn = (
@@ -3074,14 +3206,14 @@ function HierarchyModal({
             style={{ flex: 1 }}
           >
             {/* COLUMN 1: Paper (hidden for quotes since all entries are Essay paper) */}
-            {!isQuotes && renderColumn(labels.paper, ['GS1', 'GS2', 'GS3', 'GS4'], localFilters.paper, (p) => {
+            {!isQuotes && renderColumn(labels.paper, ['GS1', 'GS2', 'GS3', 'GS4', 'Essay', 'Optional'], localFilters.paper, (p) => {
               const currentVal = localFilters.paper;
               const nextVal = toggleFilterValue(currentVal, p);
               const isRemoval = nextVal === 'All' || (currentVal !== 'All' && nextVal.split('|').length < currentVal.split('|').length);
               setLocalFilters({
                 ...localFilters,
                 paper: nextVal,
-                ...(isRemoval ? { subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' } : {})
+                ...(isRemoval ? { subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', nanotopics: 'All', macrotags: 'All', microtags: 'All' } : {})
               });
             }, '#3b82f6', isTablet ? 120 : 100)}
 
@@ -3093,7 +3225,7 @@ function HierarchyModal({
               setLocalFilters({
                 ...localFilters,
                 subjects: nextVal,
-                ...(isRemoval ? { sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' } : {})
+                ...(isRemoval ? { sections: 'All', microtopics: 'All', subtopics: 'All', nanotopics: 'All', macrotags: 'All', microtags: 'All' } : {})
               });
             }, '#8b5cf6', isTablet ? 180 : 140)}
 
@@ -3105,7 +3237,7 @@ function HierarchyModal({
               setLocalFilters({
                 ...localFilters,
                 sections: nextVal,
-                ...(isRemoval ? { microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' } : {})
+                ...(isRemoval ? { microtopics: 'All', subtopics: 'All', nanotopics: 'All', macrotags: 'All', microtags: 'All' } : {})
               });
             }, '#f59e0b', isTablet ? 250 : 200)}
 
@@ -3117,7 +3249,7 @@ function HierarchyModal({
               setLocalFilters({
                 ...localFilters,
                 microtopics: nextVal,
-                ...(isRemoval ? { subtopics: 'All', macrotags: 'All', microtags: 'All' } : {})
+                ...(isRemoval ? { subtopics: 'All', nanotopics: 'All', macrotags: 'All', microtags: 'All' } : {})
               });
             }, '#10b981', isTablet ? 320 : 250)}
 
@@ -3129,14 +3261,26 @@ function HierarchyModal({
               setLocalFilters({
                 ...localFilters,
                 subtopics: nextVal,
-                ...(isRemoval ? { macrotags: 'All', microtags: 'All' } : {})
+                ...(isRemoval ? { nanotopics: 'All', macrotags: 'All', microtags: 'All' } : {})
               });
             }, '#f43f5e', isTablet ? 250 : 200)}
 
-            {/* COLUMN 6: Macro tag / Sub-sub-theme */}
+            {/* COLUMN 6: Nanotopic / Sub-microtopic */}
+            {renderColumn(labels.nanotopic, localFilters.subtopics === 'All' ? [] : nanotopics, localFilters.nanotopics, (nt) => {
+              const currentVal = localFilters.nanotopics;
+              const nextVal = toggleFilterValue(currentVal, nt);
+              const isRemoval = nextVal === 'All' || (currentVal !== 'All' && nextVal.split('|').length < currentVal.split('|').length);
+              setLocalFilters({
+                ...localFilters,
+                nanotopics: nextVal,
+                ...(isRemoval ? { macrotags: 'All', microtags: 'All' } : {})
+              });
+            }, '#ec4899', isTablet ? 250 : 200)}
+
+            {/* COLUMN 7: Macro tag / Sub-sub-theme */}
             {(!isMainsValueAdd || macrotags.length > 0) && renderColumn(
               isIntroConclusion ? "Card Title" : (isQuotes ? "Title" : (isMnemonics ? "Mnemonic Title" : (isMainsValueAdd ? "Sub-sub-theme" : "Macro tag"))),
-              localFilters.subtopics === 'All' ? [] : macrotags,
+              localFilters.nanotopics === 'All' ? [] : macrotags,
               localFilters.macrotags,
               (mat) => {
                 const currentVal = localFilters.macrotags;
@@ -3152,7 +3296,7 @@ function HierarchyModal({
               isTablet ? 250 : 200
             )}
 
-            {/* COLUMN 7: Micro tag */}
+            {/* COLUMN 8: Micro tag */}
             {!isMainsValueAdd && renderColumn("Micro tag", localFilters.macrotags === 'All' ? [] : microtagOptions, localFilters.microtags, (mit) => {
               setLocalFilters({
                 ...localFilters,
@@ -3356,12 +3500,34 @@ function QuestionBankView({
     return Array.from(subSet).sort(naturalCompare);
   }, [questions, filters.paper, filters.subjects, filters.sections, filters.microtopics]);
 
+  const nanotopicOptions = useMemo(() => {
+    const paperFilter = filters.paper !== 'All' ? filters.paper.split('|') : [];
+    const subjectFilter = filters.subjects !== 'All' ? filters.subjects.split('|') : [];
+    const sectionFilter = filters.sections !== 'All' ? filters.sections.split('|') : [];
+    const microtopicFilter = filters.microtopics !== 'All' ? filters.microtopics.split('|') : [];
+    const subtopicFilter = filters.subtopics !== 'All' ? filters.subtopics.split('|') : [];
+    const ntSet = new Set<string>();
+    questions.forEach(q => {
+      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
+      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
+      const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
+      const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(getQuestionMicro(q));
+      const matchSub = subtopicFilter.length === 0 || subtopicFilter.includes(getQuestionSub(q));
+      const nano = getQuestionNano(q);
+      if (matchPaper && matchSubject && matchSec && matchMicro && matchSub && nano) {
+        ntSet.add(nano);
+      }
+    });
+    return Array.from(ntSet).sort(naturalCompare);
+  }, [questions, filters.paper, filters.subjects, filters.sections, filters.microtopics, filters.subtopics]);
+
   const macrotagOptions = useMemo(() => {
     const paperFilter = filters.paper !== 'All' ? filters.paper.split('|') : [];
     const subjectFilter = filters.subjects !== 'All' ? filters.subjects.split('|') : [];
     const sectionFilter = filters.sections !== 'All' ? filters.sections.split('|') : [];
     const microtopicFilter = filters.microtopics !== 'All' ? filters.microtopics.split('|') : [];
     const subtopicFilter = filters.subtopics !== 'All' ? filters.subtopics.split('|') : [];
+    const nanotopicFilter = filters.nanotopics !== 'All' ? filters.nanotopics.split('|') : [];
     const tagSet = new Set<string>();
     questions.forEach(q => {
       const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
@@ -3369,12 +3535,13 @@ function QuestionBankView({
       const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
       const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(getQuestionMicro(q));
       const matchSub = subtopicFilter.length === 0 || subtopicFilter.includes(getQuestionSub(q));
-      if (matchPaper && matchSubject && matchSec && matchMicro && matchSub && q.macrotag) {
+      const matchNano = nanotopicFilter.length === 0 || nanotopicFilter.includes(getQuestionNano(q));
+      if (matchPaper && matchSubject && matchSec && matchMicro && matchSub && matchNano && q.macrotag) {
         q.macrotag.split(',').forEach(t => tagSet.add(t.trim()));
       }
     });
     return Array.from(tagSet).sort();
-  }, [questions, filters.paper, filters.subjects, filters.sections, filters.microtopics, filters.subtopics]);
+  }, [questions, filters.paper, filters.subjects, filters.sections, filters.microtopics, filters.subtopics, filters.nanotopics]);
 
   const microtagOptions = useMemo(() => {
     if (filters.macrotags === 'All') return [];
@@ -3383,6 +3550,7 @@ function QuestionBankView({
     const sectionFilter = filters.sections !== 'All' ? filters.sections.split('|') : [];
     const microtopicFilter = filters.microtopics !== 'All' ? filters.microtopics.split('|') : [];
     const subtopicFilter = filters.subtopics !== 'All' ? filters.subtopics.split('|') : [];
+    const nanotopicFilter = filters.nanotopics !== 'All' ? filters.nanotopics.split('|') : [];
     const macrotagFilter = filters.macrotags !== 'All' ? filters.macrotags.split('|') : [];
     const tagSet = new Set<string>();
     questions.forEach(q => {
@@ -3391,13 +3559,14 @@ function QuestionBankView({
       const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
       const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(getQuestionMicro(q));
       const matchSub = subtopicFilter.length === 0 || subtopicFilter.includes(getQuestionSub(q));
+      const matchNano = nanotopicFilter.length === 0 || nanotopicFilter.includes(getQuestionNano(q));
       const matchMacro = macrotagFilter.length === 0 || (q.macrotag || '').split(',').map(t => t.trim()).some(t => macrotagFilter.includes(t));
-      if (matchPaper && matchSubject && matchSec && matchMicro && matchSub && matchMacro && q.microtag) {
+      if (matchPaper && matchSubject && matchSec && matchMicro && matchSub && matchNano && matchMacro && q.microtag) {
         q.microtag.split(',').forEach(t => tagSet.add(t.trim()));
       }
     });
     return Array.from(tagSet).sort();
-  }, [questions, filters.paper, filters.subjects, filters.sections, filters.microtopics, filters.subtopics, filters.macrotags]);
+  }, [questions, filters.paper, filters.subjects, filters.sections, filters.microtopics, filters.subtopics, filters.nanotopics, filters.macrotags]);
 
   const papers = ['All', ...allPapers];
 
@@ -3424,6 +3593,7 @@ function QuestionBankView({
       const sectionFilter = filters.sections !== 'All' ? filters.sections.split('|') : [];
       const microtopicFilter = filters.microtopics !== 'All' ? filters.microtopics.split('|') : [];
       const subtopicFilter = filters.subtopics !== 'All' ? filters.subtopics.split('|') : [];
+      const nanotopicFilter = filters.nanotopics !== 'All' ? filters.nanotopics.split('|') : [];
       const macroFilter = filters.macrotags !== 'All' ? filters.macrotags.split('|') : [];
       const microFilter = filters.microtags !== 'All' ? filters.microtags.split('|') : [];
       const yearFilter = filters.years !== 'All' ? filters.years.split('|') : [];
@@ -3483,6 +3653,9 @@ function QuestionBankView({
 
         const matchSubtopic = subtopicFilter.length === 0 || subtopicFilter.includes(subtopicVal);
         if (!matchSubtopic) return false;
+
+        const matchNanotopic = nanotopicFilter.length === 0 || nanotopicFilter.includes(getQuestionNano(q));
+        if (!matchNanotopic) return false;
 
         const matchMacro = macroFilter.length === 0 || (q.macrotag || '').split(',').map(t => t.trim()).some(t => macroFilter.includes(t));
         if (!matchMacro) return false;
@@ -3579,25 +3752,49 @@ function QuestionBankView({
 
                 {/* Large Input & Filter Scroll */}
                 <View style={styles.filterSection}>
-                  <View style={[styles.largeSearchInput, { backgroundColor: colors.surface + '66', borderColor: 'rgba(255,255,255,0.7)', height: 60, borderRadius: 20 }]}>
-                    <Search size={20} color="#94a3b8" style={{ marginRight: 12 }} />
-                    <TextInput
-                      placeholder="Search questions, topics, themes..."
-                      placeholderTextColor="#94a3b8"
-                      value={search}
-                      onChangeText={setSearch}
-                      style={[styles.largeSearchText, { color: colors.textPrimary, fontSize: 15 }]}
-                    />
-                    {search.length > 0 && (
-                      <TouchableOpacity onPress={() => setSearch('')}>
-                        <X size={20} color={colors.textTertiary} />
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    {!sidebarOpen && (
+                      <TouchableOpacity
+                        onPress={() => setSidebarOpen(true)}
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 14,
+                          backgroundColor: colors.surface,
+                          borderWidth: 1,
+                          borderColor: colors.border,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          shadowColor: colors.primary,
+                          shadowOpacity: 0.1,
+                          shadowRadius: 4,
+                          shadowOffset: { width: 0, height: 2 },
+                          elevation: 3,
+                        }}
+                      >
+                        <ChevronRight size={20} color={colors.primary} />
                       </TouchableOpacity>
                     )}
+                    <View style={[styles.largeSearchInput, { flex: 1, backgroundColor: colors.surface + '66', borderColor: 'rgba(255,255,255,0.7)', height: 60, borderRadius: 20, marginBottom: 0 }]}>
+                      <Search size={20} color="#94a3b8" style={{ marginRight: 12 }} />
+                      <TextInput
+                        placeholder="Search questions, topics, themes..."
+                        placeholderTextColor="#94a3b8"
+                        value={search}
+                        onChangeText={setSearch}
+                        style={[styles.largeSearchText, { color: colors.textPrimary, fontSize: 15 }]}
+                      />
+                      {search.length > 0 && (
+                        <TouchableOpacity onPress={() => setSearch('')}>
+                          <X size={20} color={colors.textTertiary} />
+                        </TouchableOpacity>
+                      )}
+                    </View>
                   </View>
 
                   {(() => {
-                    const hasHierarchyActive = filters.paper !== 'All' || filters.subjects !== 'All' || filters.sections !== 'All' || filters.microtopics !== 'All' || filters.subtopics !== 'All' || filters.macrotags !== 'All' || filters.microtags !== 'All';
-                    const activeHierarchyLabel = filters.subtopics !== 'All' ? filters.subtopics : (filters.microtopics !== 'All' ? filters.microtopics : (filters.sections !== 'All' ? filters.sections : (filters.subjects !== 'All' ? filters.subjects : (filters.paper !== 'All' ? filters.paper : 'Browse Topics'))));
+                    const hasHierarchyActive = filters.paper !== 'All' || filters.subjects !== 'All' || filters.sections !== 'All' || filters.microtopics !== 'All' || filters.subtopics !== 'All' || filters.nanotopics !== 'All' || filters.macrotags !== 'All' || filters.microtags !== 'All';
+                    const activeHierarchyLabel = filters.nanotopics !== 'All' ? filters.nanotopics : (filters.subtopics !== 'All' ? filters.subtopics : (filters.microtopics !== 'All' ? filters.microtopics : (filters.sections !== 'All' ? filters.sections : (filters.subjects !== 'All' ? filters.subjects : (filters.paper !== 'All' ? filters.paper : 'Browse Topics')))));
                     
                     return (
                       <View style={{ gap: 8, paddingHorizontal: 2 }}>
@@ -3618,44 +3815,173 @@ function QuestionBankView({
                           >
                             <BookOpen size={12} color={hasHierarchyActive ? '#fff' : '#3b82f6'} style={{ marginRight: 4 }} />
                             <Text style={[styles.filterPillText, { color: hasHierarchyActive ? '#fff' : colors.textSecondary, fontWeight: '700' }]}>
-                              {hasHierarchyActive ? activeHierarchyLabel : 'Browse Topics'}
+                              {hasHierarchyActive ? truncateText(activeHierarchyLabel, 40) : 'Browse Topics'}
                             </Text>
                             <ChevronDown size={12} color={hasHierarchyActive ? '#fff' : colors.textTertiary} style={{ marginLeft: 4 }} />
                           </TouchableOpacity>
 
                           <View style={{ width: 1, height: 16, backgroundColor: colors.border }} />
 
-                          {/* Paper pills */}
-                          {papers.map(p => {
-                            const isActive = p === 'All' 
-                              ? filters.paper === 'All' 
-                              : filters.paper.split('|').includes(p);
+                          {/* Dynamic Cascading Pills */}
+                          {(() => {
+                            if (filters.paper === 'All') {
+                              // Level 1: Paper Selection
+                              return (
+                                <>
+                                  {papers.map(p => {
+                                    const isActive = p === 'All' ? filters.paper === 'All' : filters.paper.split('|').includes(p);
+                                    return (
+                                      <TouchableOpacity
+                                        key={p}
+                                        onPress={() => {
+                                          if (p === 'All') {
+                                            setFiltersDeferred(prev => ({ ...prev, paper: 'All', subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', nanotopics: 'All', macrotags: 'All', microtags: 'All' }));
+                                          } else {
+                                            setFiltersDeferred(prev => ({ ...prev, paper: p }));
+                                          }
+                                        }}
+                                        style={[
+                                          styles.tabFilterPill,
+                                          isActive
+                                            ? { backgroundColor: '#3b82f6', borderColor: '#3b82f6' }
+                                            : { backgroundColor: colors.surface + 'b3', borderColor: colors.border }
+                                        ]}
+                                      >
+                                        <Text style={[styles.tabFilterPillText, isActive ? { color: '#ffffff' } : { color: colors.textSecondary }]}>
+                                          {p}
+                                        </Text>
+                                      </TouchableOpacity>
+                                    );
+                                  })}
+                                </>
+                              );
+                            }
+
+                            if (filters.subjects === 'All') {
+                              // Level 2: Subject Selection
+                              return (
+                                <>
+                                  <TouchableOpacity
+                                    onPress={() => setFiltersDeferred(prev => ({ ...prev, paper: 'All' }))}
+                                    style={[styles.tabFilterPill, { backgroundColor: '#fee2e2', borderColor: '#fca5a5' }]}
+                                  >
+                                    <Text style={[styles.tabFilterPillText, { color: '#ef4444', fontWeight: '800' }]}>← Back</Text>
+                                  </TouchableOpacity>
+                                  {subjectOptions.map(sub => (
+                                    <TouchableOpacity
+                                      key={sub}
+                                      onPress={() => setFiltersDeferred(prev => ({ ...prev, subjects: sub }))}
+                                      style={[styles.tabFilterPill, { backgroundColor: colors.surface + 'b3', borderColor: '#8b5cf6' }]}
+                                    >
+                                      <Text style={[styles.tabFilterPillText, { color: '#8b5cf6' }]}>{sub}</Text>
+                                    </TouchableOpacity>
+                                  ))}
+                                </>
+                              );
+                            }
+
+                            if (filters.sections === 'All') {
+                              // Level 3: Section Selection
+                              return (
+                                <>
+                                  <TouchableOpacity
+                                    onPress={() => setFiltersDeferred(prev => ({ ...prev, subjects: 'All' }))}
+                                    style={[styles.tabFilterPill, { backgroundColor: '#fee2e2', borderColor: '#fca5a5' }]}
+                                  >
+                                    <Text style={[styles.tabFilterPillText, { color: '#ef4444', fontWeight: '800' }]}>← Back</Text>
+                                  </TouchableOpacity>
+                                  {sectionOptions.map(sec => (
+                                    <TouchableOpacity
+                                      key={sec}
+                                      onPress={() => setFiltersDeferred(prev => ({ ...prev, sections: sec }))}
+                                      style={[styles.tabFilterPill, { backgroundColor: colors.surface + 'b3', borderColor: '#f59e0b' }]}
+                                    >
+                                      <Text style={[styles.tabFilterPillText, { color: '#f59e0b' }]}>{sec}</Text>
+                                    </TouchableOpacity>
+                                  ))}
+                                </>
+                              );
+                            }
+
+                            if (filters.microtopics === 'All') {
+                              // Level 4: Microtopic Selection
+                              return (
+                                <>
+                                  <TouchableOpacity
+                                    onPress={() => setFiltersDeferred(prev => ({ ...prev, sections: 'All' }))}
+                                    style={[styles.tabFilterPill, { backgroundColor: '#fee2e2', borderColor: '#fca5a5' }]}
+                                  >
+                                    <Text style={[styles.tabFilterPillText, { color: '#ef4444', fontWeight: '800' }]}>← Back</Text>
+                                  </TouchableOpacity>
+                                  {microtopicOptions.map(mt => (
+                                    <TouchableOpacity
+                                      key={mt}
+                                      onPress={() => setFiltersDeferred(prev => ({ ...prev, microtopics: mt }))}
+                                      style={[styles.tabFilterPill, { backgroundColor: colors.surface + 'b3', borderColor: '#10b981' }]}
+                                    >
+                                      <Text style={[styles.tabFilterPillText, { color: '#10b981' }]}>{mt}</Text>
+                                    </TouchableOpacity>
+                                  ))}
+                                </>
+                              );
+                            }
+
+                            if (filters.subtopics === 'All') {
+                              // Level 5: Subtopic Selection
+                              return (
+                                <>
+                                  <TouchableOpacity
+                                    onPress={() => setFiltersDeferred(prev => ({ ...prev, microtopics: 'All' }))}
+                                    style={[styles.tabFilterPill, { backgroundColor: '#fee2e2', borderColor: '#fca5a5' }]}
+                                  >
+                                    <Text style={[styles.tabFilterPillText, { color: '#ef4444', fontWeight: '800' }]}>← Back</Text>
+                                  </TouchableOpacity>
+                                  {subtopicOptions.map(st => (
+                                    <TouchableOpacity
+                                      key={st}
+                                      onPress={() => setFiltersDeferred(prev => ({ ...prev, subtopics: st }))}
+                                      style={[styles.tabFilterPill, { backgroundColor: colors.surface + 'b3', borderColor: '#f43f5e' }]}
+                                    >
+                                      <Text style={[styles.tabFilterPillText, { color: '#f43f5e' }]}>{st}</Text>
+                                    </TouchableOpacity>
+                                  ))}
+                                </>
+                              );
+                            }
+
+                            if (filters.nanotopics === 'All') {
+                              // Level 6: Nanotopic Selection
+                              return (
+                                <>
+                                  <TouchableOpacity
+                                    onPress={() => setFiltersDeferred(prev => ({ ...prev, subtopics: 'All' }))}
+                                    style={[styles.tabFilterPill, { backgroundColor: '#fee2e2', borderColor: '#fca5a5' }]}
+                                  >
+                                    <Text style={[styles.tabFilterPillText, { color: '#ef4444', fontWeight: '800' }]}>← Back</Text>
+                                  </TouchableOpacity>
+                                  {nanotopicOptions.map(nt => (
+                                    <TouchableOpacity
+                                      key={nt}
+                                      onPress={() => setFiltersDeferred(prev => ({ ...prev, nanotopics: nt }))}
+                                      style={[styles.tabFilterPill, { backgroundColor: colors.surface + 'b3', borderColor: '#ec4899' }]}
+                                    >
+                                      <Text style={[styles.tabFilterPillText, { color: '#ec4899' }]}>{nt}</Text>
+                                    </TouchableOpacity>
+                                  ))}
+                                </>
+                              );
+                            }
+
+                            // Fully selected up to Level 6
                             return (
                               <TouchableOpacity
-                                key={p}
-                                onPress={() => {
-                                  if (p === 'All') {
-                                    setFiltersDeferred(prev => ({ ...prev, paper: 'All', subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' }));
-                                  } else {
-                                    setFiltersDeferred(prev => ({ 
-                                      ...prev, 
-                                      paper: toggleFilterValue(prev.paper, p)
-                                    }));
-                                  }
-                                }}
-                                style={[
-                                  styles.tabFilterPill,
-                                  isActive
-                                    ? { backgroundColor: '#6366f1', borderColor: '#6366f1' }
-                                    : { backgroundColor: colors.surface + 'b3', borderColor: colors.border },
-                                ]}
+                                onPress={() => setFiltersDeferred(prev => ({ ...prev, nanotopics: 'All' }))}
+                                style={[styles.tabFilterPill, { backgroundColor: '#fee2e2', borderColor: '#fca5a5' }]}
                               >
-                                <Text style={[styles.tabFilterPillText, isActive ? { color: '#ffffff' } : { color: colors.textSecondary }]}>
-                                  {p}
-                                </Text>
+                                <Text style={[styles.tabFilterPillText, { color: '#ef4444', fontWeight: '800' }]}>← Back</Text>
                               </TouchableOpacity>
                             );
-                          })}
+                          })()}
 
                           {/* Dynamic Macro Tags Pills */}
                           {macrotagOptions.length > 0 && (
@@ -3744,7 +4070,7 @@ function QuestionBankView({
                                   setFiltersDeferred(prev => ({ 
                                     ...prev, 
                                     paper: updated, 
-                                    subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                                    subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', nanotopics: 'All', macrotags: 'All', microtags: 'All' 
                                   }));
                                 }}
                                 activeOpacity={0.7}
@@ -3762,7 +4088,7 @@ function QuestionBankView({
                                   setFiltersDeferred(prev => ({ 
                                     ...prev, 
                                     subjects: updated, 
-                                    sections: 'All', microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                                    sections: 'All', microtopics: 'All', subtopics: 'All', nanotopics: 'All', macrotags: 'All', microtags: 'All' 
                                   }));
                                 }}
                                 activeOpacity={0.7}
@@ -3780,7 +4106,7 @@ function QuestionBankView({
                                   setFiltersDeferred(prev => ({ 
                                     ...prev, 
                                     sections: updated, 
-                                    microtopics: 'All', subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                                    microtopics: 'All', subtopics: 'All', nanotopics: 'All', macrotags: 'All', microtags: 'All' 
                                   }));
                                 }}
                                 activeOpacity={0.7}
@@ -3798,7 +4124,7 @@ function QuestionBankView({
                                   setFiltersDeferred(prev => ({ 
                                     ...prev, 
                                     microtopics: updated, 
-                                    subtopics: 'All', macrotags: 'All', microtags: 'All' 
+                                    subtopics: 'All', nanotopics: 'All', macrotags: 'All', microtags: 'All' 
                                   }));
                                 }}
                                 activeOpacity={0.7}
@@ -3816,7 +4142,7 @@ function QuestionBankView({
                                   setFiltersDeferred(prev => ({ 
                                     ...prev, 
                                     subtopics: updated, 
-                                    macrotags: 'All', microtags: 'All' 
+                                    nanotopics: 'All', macrotags: 'All', microtags: 'All' 
                                   }));
                                 }}
                                 activeOpacity={0.7}
@@ -3824,6 +4150,24 @@ function QuestionBankView({
                               >
                                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#be123c' }}>{val}</Text>
                                 <X size={10} color="#be123c" style={{ marginLeft: 4 }} />
+                              </TouchableOpacity>
+                            ))}
+                            {filters.nanotopics !== 'All' && filters.nanotopics.split('|').map(val => (
+                              <TouchableOpacity
+                                key={`crumb-nanotopic-${val}`}
+                                onPress={() => {
+                                  const updated = filters.nanotopics.split('|').filter(x => x !== val).join('|') || 'All';
+                                  setFiltersDeferred(prev => ({ 
+                                    ...prev, 
+                                    nanotopics: updated, 
+                                    macrotags: 'All', microtags: 'All' 
+                                  }));
+                                }}
+                                activeOpacity={0.7}
+                                style={[styles.breadcrumbChip, { backgroundColor: '#fce4ec', borderColor: '#f8bbd0' }]}
+                              >
+                                <Text style={{ fontSize: 10, fontWeight: '700', color: '#880e4f' }}>{val}</Text>
+                                <X size={10} color="#880e4f" style={{ marginLeft: 4 }} />
                               </TouchableOpacity>
                             ))}
                             {filters.macrotags !== 'All' && filters.macrotags.split('|').map(val => (
@@ -4021,31 +4365,7 @@ function QuestionBankView({
         </View>
       </View>
 
-      {/* Floating Toggle Button - ONLY when closed */}
-      {!sidebarOpen && (
-        <TouchableOpacity
-          onPress={() => setSidebarOpen(true)}
-          style={{
-            position: 'absolute',
-            top: insets.top + 70,
-            left: 6,
-            width: 36,
-            height: 36,
-            borderRadius: 18,
-            backgroundColor: '#7c3aed',
-            alignItems: 'center',
-            justifyContent: 'center',
-            shadowColor: '#7c3aed',
-            shadowOpacity: 0.3,
-            shadowRadius: 6,
-            shadowOffset: { width: 0, height: 3 },
-            elevation: 5,
-            zIndex: 9999,
-          }}
-        >
-          <ChevronRight size={18} color="#fff" />
-        </TouchableOpacity>
-      )}
+
 
       <HierarchyModal
         visible={hierarchyModalVisible}
@@ -4061,6 +4381,7 @@ function QuestionBankView({
         macrotagOptions={macrotagOptions}
         microtagOptions={microtagOptions}
         isTablet={isTablet}
+        questions={questions}
       />
     </View>
   );
@@ -6072,8 +6393,9 @@ function MainsAISearchView({
               if (activeFilters.sections !== 'All' && !parsedHiers.some((h: any) => (h.sectionGroup || h.section_group) && activeFilters.sections.split('|').includes(h.sectionGroup || h.section_group))) return;
               if (activeFilters.microtopics !== 'All' && !parsedHiers.some((h: any) => h.microtopic && activeFilters.microtopics.split('|').includes(h.microtopic))) return;
               if (activeFilters.subtopics !== 'All' && !parsedHiers.some((h: any) => h.subtopic && activeFilters.subtopics.split('|').includes(h.subtopic))) return;
+              if (activeFilters.nanotopics !== 'All') return;
             } else {
-              if (activeFilters.paper !== 'All' || activeFilters.subjects !== 'All' || activeFilters.sections !== 'All' || activeFilters.microtopics !== 'All' || activeFilters.subtopics !== 'All') return;
+              if (activeFilters.paper !== 'All' || activeFilters.subjects !== 'All' || activeFilters.sections !== 'All' || activeFilters.microtopics !== 'All' || activeFilters.subtopics !== 'All' || activeFilters.nanotopics !== 'All') return;
             }
           } else {
             if (activeFilters.paper !== 'All' && !activeFilters.paper.split('|').includes(item.paper || '')) return;
@@ -6081,6 +6403,7 @@ function MainsAISearchView({
             if (activeFilters.sections !== 'All' && !activeFilters.sections.split('|').includes(getValueAddSection(item))) return;
             if (activeFilters.microtopics !== 'All' && !activeFilters.microtopics.split('|').includes(getValueAddMicro(item))) return;
             if (activeFilters.subtopics !== 'All' && !activeFilters.subtopics.split('|').includes(getValueAddSub(item))) return;
+            if (activeFilters.nanotopics !== 'All' && !activeFilters.nanotopics.split('|').includes(getValueAddNano(item))) return;
           }
           if (activeFilters.revisionTags !== 'All') return;
           if (activeFilters.macrotags !== 'All') return;
@@ -6807,10 +7130,33 @@ function MainsAISearchView({
 
             {/* AI Search Input Row */}
             <View style={[styles.searchRow, { paddingHorizontal: 10, paddingVertical: 6, gap: 5 }]}>
+              {!sidebarOpen && (
+                <TouchableOpacity
+                  onPress={() => setSidebarOpen(true)}
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 14,
+                    backgroundColor: colors.surface,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    shadowColor: colors.primary,
+                    shadowOpacity: 0.1,
+                    shadowRadius: 4,
+                    shadowOffset: { width: 0, height: 2 },
+                    elevation: 3,
+                  }}
+                >
+                  <ChevronRight size={20} color={colors.primary} />
+                </TouchableOpacity>
+              )}
               <View style={[styles.searchWrap, {
                 flex: 1,
                 backgroundColor: colors.surface,
-                borderColor: searchEngineMode === 'AI' ? '#7c3aed60' : searchEngineMode === 'Matching' ? '#0ea5e940' : '#f59e0b40'
+                borderColor: searchEngineMode === 'AI' ? '#7c3aed60' : searchEngineMode === 'Matching' ? '#0ea5e940' : '#f59e0b40',
+                marginBottom: 0
               }]}>
                 <Search size={18} color="#94a3b8" />
                 <TextInput
@@ -7343,31 +7689,7 @@ function MainsAISearchView({
         </View>
       </View>
 
-      {/* Floating Toggle Button - ONLY when closed */}
-      {!sidebarOpen && (
-        <TouchableOpacity
-          onPress={() => setSidebarOpen(true)}
-          style={{
-            position: 'absolute',
-            top: insets.top + 70,
-            left: 6,
-            width: 36,
-            height: 36,
-            borderRadius: 18,
-            backgroundColor: '#7c3aed',
-            alignItems: 'center',
-            justifyContent: 'center',
-            shadowColor: '#7c3aed',
-            shadowOpacity: 0.3,
-            shadowRadius: 6,
-            shadowOffset: { width: 0, height: 3 },
-            elevation: 5,
-            zIndex: 9999,
-          }}
-        >
-          <ChevronRight size={20} color="#fff" />
-        </TouchableOpacity>
-      )}
+
 
       <AIModelSwitcher visible={showModelSwitcher} onClose={() => setShowModelSwitcher(false)} />
       {FilterPopup}
@@ -7385,6 +7707,7 @@ function MainsAISearchView({
         macrotagOptions={macrotagOptions}
         microtagOptions={microtagOptions}
         isTablet={isTablet}
+        questions={questions}
       />
     </View>
   );
@@ -8287,19 +8610,19 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   sidebarFchip: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.08)',
-    backgroundColor: 'rgba(255,255,255,0.45)',
+    borderColor: 'rgba(0,0,0,0.06)',
+    backgroundColor: 'rgba(255,255,255,0.7)',
     marginBottom: 4,
     marginRight: 4,
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
+    shadowOpacity: 0.02,
+    shadowRadius: 3,
     shadowOffset: { width: 0, height: 1 },
     elevation: 1,
   },
@@ -8307,36 +8630,40 @@ const styles = StyleSheet.create({
     backgroundColor: '#7c3aed',
     borderColor: '#7c3aed',
     shadowColor: '#7c3aed',
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
-    elevation: 3,
+    elevation: 2,
   },
   sidebarFchipText: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
   },
   sidebarSectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 10,
-    paddingHorizontal: 4,
-    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    borderWidth: 0.5,
+    borderColor: 'transparent',
+    marginVertical: 1,
   },
   sidebarSectionHeaderActive: {
-    backgroundColor: 'rgba(124,58,237,0.06)',
+    backgroundColor: 'rgba(124, 58, 237, 0.05)',
+    borderColor: 'rgba(124, 58, 237, 0.12)',
   },
   sidebarBadge: {
-    fontSize: 9,
-    fontWeight: '600',
+    fontSize: 8,
+    fontWeight: '700',
     color: '#7c3aed',
-    backgroundColor: 'rgba(124,58,237,0.1)',
+    backgroundColor: 'rgba(124,58,237,0.08)',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
     overflow: 'hidden',
-    maxWidth: 140,
+    maxWidth: 120,
   },
   phoneKeywordsPanel: {
     paddingHorizontal: 14,

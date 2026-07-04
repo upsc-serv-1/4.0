@@ -14,6 +14,7 @@ export interface ConsolidatedQuestion {
   sectionGroup: string;
   microTopic: string;
   subTopic: string;
+  nanoTopic?: string;
   macrotag: string;
   microtag: string;
   hierarchy_path: string[];
@@ -89,9 +90,19 @@ try {
   console.log('[MainsLoader] Anthro1 consolidated JSON not found or failed to load:', e);
 }
 
+let anthro2Questions: any[] = [];
+try {
+  const anthro2Data = require('../../mains json files/mains_anthro2_consolidated.json');
+  anthro2Questions = anthro2Data.questions || [];
+} catch (e) {
+  console.log('[MainsLoader] Anthro2 consolidated JSON not found or failed to load:', e);
+}
+
 export function resolvePaper(q: any): string {
-  const norm = normalizePaper(q.paper || 'GS1');
-  if (norm === 'Optional') return 'Optional';
+  const norm = normalizePaper(q.paper);
+  if (norm && ['GS1', 'GS2', 'GS3', 'GS4', 'Essay', 'Optional'].includes(norm)) {
+    return norm;
+  }
   if (q.hierarchy_path && q.hierarchy_path.length > 0) {
     const first = q.hierarchy_path[0];
     if (first === 'Anthropology' || first === 'Anthro1' || first.toUpperCase().includes('ANTHRO') || first.toUpperCase().includes('OPTIONAL')) {
@@ -104,7 +115,40 @@ export function resolvePaper(q: any): string {
       return normalizePaper(first);
     }
   }
-  return norm;
+  return norm || 'GS1';
+}
+
+// Load Forum MGP questions
+let forumMGPQuestions: any[] = [];
+const loadMGP = (numStr: string) => {
+  try {
+    switch(numStr) {
+      case '01': return require('../../mains json files/forum mgp 2026/forum-mgp-2026-csm26t01se.json').questions || [];
+      case '02': return require('../../mains json files/forum mgp 2026/forum-mgp-2026-csm26t02se.json').questions || [];
+      case '03': return require('../../mains json files/forum mgp 2026/forum-mgp-2026-csm26t03se.json').questions || [];
+      case '04': return require('../../mains json files/forum mgp 2026/forum-mgp-2026-csm26t04se.json').questions || [];
+      case '05': return require('../../mains json files/forum mgp 2026/forum-mgp-2026-csm26t05se.json').questions || [];
+      case '06': return require('../../mains json files/forum mgp 2026/forum-mgp-2026-csm26t06se.json').questions || [];
+      case '07': return require('../../mains json files/forum mgp 2026/forum-mgp-2026-csm26t07se.json').questions || [];
+      case '08': return require('../../mains json files/forum mgp 2026/forum-mgp-2026-csm26t08se.json').questions || [];
+      case '09': return require('../../mains json files/forum mgp 2026/forum-mgp-2026-csm26t09se.json').questions || [];
+      case '10': return require('../../mains json files/forum mgp 2026/forum-mgp-2026-csm26t10se.json').questions || [];
+      case '11': return require('../../mains json files/forum mgp 2026/forum-mgp-2026-csm26t11se.json').questions || [];
+      case '12': return require('../../mains json files/forum mgp 2026/forum-mgp-2026-csm26t12se.json').questions || [];
+      case '13': return require('../../mains json files/forum mgp 2026/forum-mgp-2026-csm26t13se.json').questions || [];
+      case '14': return require('../../mains json files/forum mgp 2026/forum-mgp-2026-csm26t14se.json').questions || [];
+      case '15': return require('../../mains json files/forum mgp 2026/forum-mgp-2026-csm26t15se.json').questions || [];
+      default: return [];
+    }
+  } catch (e) {
+    console.log(`[MainsLoader] Forum MGP ${numStr} failed to load:`, e);
+    return [];
+  }
+};
+
+for (let i = 1; i <= 15; i++) {
+  const pad = i.toString().padStart(2, '0');
+  forumMGPQuestions = forumMGPQuestions.concat(loadMGP(pad));
 }
 
 // Standardize and export
@@ -114,6 +158,8 @@ export const mainsConsolidatedQuestions: ConsolidatedQuestion[] = [
   ...gs3Questions.map((q: any) => ({ ...q, paper: resolvePaper(q) })),
   ...gs4Questions.map((q: any) => ({ ...q, paper: resolvePaper(q) })),
   ...anthro1Questions.map((q: any) => ({ ...q, paper: resolvePaper(q) })),
+  ...anthro2Questions.map((q: any) => ({ ...q, paper: resolvePaper(q) })),
+  ...forumMGPQuestions.map((q: any) => ({ ...q, paper: resolvePaper(q), is_pyq: q.is_pyq || false })),
 ];
 
 import { supabase } from '../lib/supabase';
@@ -154,6 +200,7 @@ export async function fetchMainsQuestionsFromSupabase(): Promise<ConsolidatedQue
     sectionGroup: q.section_group,
     microTopic: q.microtopic,
     subTopic: q.subtopic,
+    nanoTopic: q.nanotopic,
     macrotag: q.macrotag,
     microtag: q.microtag,
     hierarchy_path: q.hierarchy_path || [],

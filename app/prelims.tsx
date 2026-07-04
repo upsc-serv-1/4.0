@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import FeatureGate from '../src/components/FeatureGate';
 import {
   View,
   Text,
@@ -24,7 +25,7 @@ import {
   Palette,
 } from 'lucide-react-native';
 
-export default function PrelimsScreen() {
+function PrelimsScreen() {
   const { colors, isDark } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -438,3 +439,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
+
+export default function PrelimsScreenWithGate() {
+  return (
+    <FeatureGate feature="prelims" featureLabel="Prelims Hub">
+      <PrelimsScreen />
+    </FeatureGate>
+  );
+}

@@ -306,7 +306,6 @@ const SyllabusNode: React.FC<SyllabusNodeProps> = ({
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 8 }}>
             <BulkCheckbox />
-            <ChevronRight color={ls.iconColor(colors)} size={ls.iconSize} />
             <Text style={{ fontSize: ls.fontSize, fontWeight: ls.fontWeight, color: ls.labelColor(colors), flex: 1, lineHeight: ls.fontSize * 1.4 }} numberOfLines={3}>
               {name}
             </Text>
@@ -383,15 +382,9 @@ const SyllabusNode: React.FC<SyllabusNodeProps> = ({
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 8 }}>
           <BulkCheckbox />
-          {(() => {
-            if (level === 0) {
-              const { Icon, color } = getNodeIcon(name);
-              return <Icon color={color} size={ls.iconSize} />;
-            } else if (level === 1) {
-              return <BookOpen color={ls.iconColor(colors)} size={ls.iconSize} />;
-            } else {
-              return <ChevronRight color={ls.iconColor(colors)} size={ls.iconSize} />;
-            }
+          {level === 0 && (() => {
+            const { Icon, color } = getNodeIcon(name);
+            return <Icon color={color} size={ls.iconSize} />;
           })()}
           <Text style={{ fontSize: ls.fontSize, fontWeight: ls.fontWeight, color: ls.labelColor(colors), flex: 1, lineHeight: ls.fontSize * 1.4 }} numberOfLines={3}>
             {name}

@@ -96,6 +96,7 @@ interface SyllabusNodeProps {
   level: number;
   progress: Record<string, SyllabusProgress>;
   toggleStatus: (path: string, stage: keyof SyllabusProgress) => void;
+  bulkSetMastered: (paths: string[], value: boolean) => void;
   expandedPaths: Record<string, boolean>;
   togglePathExpanded: (path: string) => void;
   trackingMethod: 'single' | 'multi';
@@ -113,6 +114,15 @@ const LEVEL_STYLES = [
   { bgColor: (c: any) => 'transparent', borderColor: (c: any) => c.border + '30', fontSize: 11, fontWeight: '500' as const, iconSize: 12, iconColor: (c: any) => c.textTertiary, indent: 18, labelColor: (c: any) => c.textSecondary },
 ];
 
+// Recursively collect all leaf paths from any depth (pure, no hooks)
+const collectLeaves = (node: any, path: string): string[] => {
+  if (Array.isArray(node)) return node.map((t: string) => `${path}.${t}`);
+  if (node && typeof node === 'object') {
+    return Object.entries(node).flatMap(([k, v]) => collectLeaves(v, `${path}.${k}`));
+  }
+  return [];
+};
+
 const SyllabusNode: React.FC<SyllabusNodeProps> = ({
   name,
   node,
@@ -120,6 +130,7 @@ const SyllabusNode: React.FC<SyllabusNodeProps> = ({
   level,
   progress,
   toggleStatus,
+  bulkSetMastered,
   expandedPaths,
   togglePathExpanded,
   trackingMethod,
@@ -127,6 +138,39 @@ const SyllabusNode: React.FC<SyllabusNodeProps> = ({
 }) => {
   const isExpanded = expandedPaths[path];
   const ls = LEVEL_STYLES[Math.min(level, LEVEL_STYLES.length - 1)];
+
+  // Compute bulk-check state for this branch
+  const leafPaths = collectLeaves(node, path);
+  const masteredCount = leafPaths.filter(p => progress[p]?.mastered).length;
+  const allMastered = leafPaths.length > 0 && masteredCount === leafPaths.length;
+  const someMastered = masteredCount > 0 && !allMastered;
+
+  const handleBulkToggle = () => {
+    bulkSetMastered(leafPaths, !allMastered);
+  };
+
+  // Bulk checkbox UI helper
+  const BulkCheckbox = () => (
+    <TouchableOpacity
+      onPress={(e) => { e.stopPropagation?.(); handleBulkToggle(); }}
+      style={{ padding: 4, marginRight: 4 }}
+      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+    >
+      <View style={{
+        width: 22,
+        height: 22,
+        borderRadius: 6,
+        borderWidth: 2,
+        borderColor: allMastered ? colors.primary : someMastered ? colors.primary : colors.textTertiary,
+        backgroundColor: allMastered ? colors.primary : someMastered ? colors.primary + '30' : 'transparent',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        {allMastered && <Check color="#fff" size={13} strokeWidth={3.5} />}
+        {someMastered && <View style={{ width: 10, height: 2.5, backgroundColor: colors.primary, borderRadius: 2 }} />}
+      </View>
+    </TouchableOpacity>
+  );
 
   // ── Leaf array: render a collapsible header whose children are checkboxes ──
   if (Array.isArray(node)) {
@@ -154,6 +198,7 @@ const SyllabusNode: React.FC<SyllabusNodeProps> = ({
           }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 8 }}>
+            <BulkCheckbox />
             <ChevronRight color={ls.iconColor(colors)} size={ls.iconSize} />
             <Text style={{ fontSize: ls.fontSize, fontWeight: ls.fontWeight, color: ls.labelColor(colors), flex: 1, lineHeight: ls.fontSize * 1.4 }} numberOfLines={3}>
               {name}
@@ -230,6 +275,7 @@ const SyllabusNode: React.FC<SyllabusNodeProps> = ({
         }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 8 }}>
+          <BulkCheckbox />
           {level === 0 ? (
             <Target color={ls.iconColor(colors)} size={ls.iconSize} />
           ) : level === 1 ? (
@@ -260,6 +306,7 @@ const SyllabusNode: React.FC<SyllabusNodeProps> = ({
               level={level + 1}
               progress={progress}
               toggleStatus={toggleStatus}
+              bulkSetMastered={bulkSetMastered}
               expandedPaths={expandedPaths}
               togglePathExpanded={togglePathExpanded}
               trackingMethod={trackingMethod}
@@ -385,6 +432,22 @@ function SyllabusTracker() {
     setProgress(newProgress);
     
     await SyllabusService.updateProgress(session.user.id, path, updated);
+  };
+
+  const bulkSetMastered = async (paths: string[], value: boolean) => {
+    if (!session?.user.id) return;
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    // Build all updates in one go
+    const patch: Record<string, SyllabusProgress> = {};
+    paths.forEach(p => {
+      const current = progress[p] || { ncert: false, pyqs: false, books: false, test: false, mastered: false };
+      patch[p] = { ...current, mastered: value };
+    });
+    setProgress(prev => ({ ...prev, ...patch }));
+    // Persist to Supabase (fire-and-forget for each)
+    paths.forEach(p => {
+      SyllabusService.updateProgress(session!.user.id, p, patch[p]);
+    });
   };
 
   const activeOptionalSyllabus = useMemo(() => {
@@ -985,6 +1048,7 @@ function SyllabusTracker() {
                 level={0}
                 progress={progress}
                 toggleStatus={toggleStatus}
+                bulkSetMastered={bulkSetMastered}
                 expandedPaths={expandedPaths}
                 togglePathExpanded={togglePathExpanded}
                 trackingMethod={trackingMethod}

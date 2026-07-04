@@ -4,7 +4,7 @@ import { router, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import {
   BookOpen, BarChart3, Play, Clock,
-  RotateCcw, Zap, Sliders, FileText, Tag, Award, Brain, Flame, Target, PenTool, Sparkles, Library
+  RotateCcw, Zap, Sliders, FileText, Tag, Award, Brain, Flame, Target, PenTool, Sparkles, Library, Map
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../../src/lib/supabase';
@@ -466,7 +466,7 @@ export default function Home() {
       onPress={() => router.push({ pathname: '/pilot-v2', params: { noteId: item.note_id || item.id } } as any)}
     >
       <LinearGradient 
-        colors={[colors.primary + '1a', 'transparent']} 
+        colors={[colors.primary + '1a', colors.primary + '00']} 
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFillObject}
       />
@@ -565,34 +565,38 @@ export default function Home() {
                 <Zap size={14} color={colors.primary} />
               </View>
 
-              <View style={styles.pulseGrid}>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false} 
+                contentContainerStyle={styles.pulseScroll}
+              >
                 <TouchableOpacity 
-                  style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} 
+                  style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
                   onPress={() => router.push('/flashcards/review')}
                 >
                   <LinearGradient 
-                    colors={['rgba(245, 158, 11, 0.09)', 'transparent']} 
+                    colors={['rgba(245, 158, 11, 0.09)', 'rgba(245, 158, 11, 0)']} 
                     start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                     style={StyleSheet.absoluteFillObject}
                   />
-                  <View style={[styles.resumeIconWrap, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
-                    <RotateCcw size={20} color="#F59E0B" />
+                  <View style={[styles.resumeIconWrap, { backgroundColor: '#F59E0B' }]}>
+                    <RotateCcw size={20} color="#fff" />
                   </View>
                   <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>{stats.dueCards}</Text>
                   <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Due Cards</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity 
-                  style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} 
+                  style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
                   onPress={() => setPyqPickerVisible(true)}
                 >
                   <LinearGradient 
-                    colors={['rgba(99, 102, 241, 0.09)', 'transparent']} 
+                    colors={['rgba(99, 102, 241, 0.09)', 'rgba(99, 102, 241, 0)']} 
                     start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                     style={StyleSheet.absoluteFillObject}
                   />
-                  <View style={[styles.resumeIconWrap, { backgroundColor: 'rgba(99, 102, 241, 0.15)' }]}>
-                    <Play size={20} color="#4F46E5" />
+                  <View style={[styles.resumeIconWrap, { backgroundColor: '#6366F1' }]}>
+                    <Play size={20} color="#fff" />
                   </View>
                   <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>{pyqQuestionCount}</Text>
                   <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Random PYQ</Text>
@@ -601,39 +605,71 @@ export default function Home() {
                 {selectedCourse !== 'Medical Science' && (
                   <>
                     <TouchableOpacity 
-                      style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} 
+                      style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
                       onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'questions' } })}
                     >
                       <LinearGradient 
-                        colors={['rgba(59, 130, 246, 0.09)', 'transparent']} 
+                        colors={['rgba(59, 130, 246, 0.09)', 'rgba(59, 130, 246, 0)']} 
                         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                         style={StyleSheet.absoluteFillObject}
                       />
-                      <View style={[styles.resumeIconWrap, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
-                        <Library size={20} color="#3b82f6" />
+                      <View style={[styles.resumeIconWrap, { backgroundColor: '#3b82f6' }]}>
+                        <Library size={20} color="#fff" />
                       </View>
-                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 16 }]} numberOfLines={1}>Q-Bank</Text>
+                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 20, marginTop: 14 }]} numberOfLines={1}>Q-Bank</Text>
                       <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity 
-                      style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} 
+                      style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
                       onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'value-add' } })}
                     >
                       <LinearGradient 
-                        colors={['rgba(245, 158, 11, 0.09)', 'transparent']} 
+                        colors={['rgba(245, 158, 11, 0.09)', 'rgba(245, 158, 11, 0)']} 
                         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                         style={StyleSheet.absoluteFillObject}
                       />
-                      <View style={[styles.resumeIconWrap, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
-                        <Sparkles size={20} color="#f59e0b" />
+                      <View style={[styles.resumeIconWrap, { backgroundColor: '#f59e0b' }]}>
+                        <Sparkles size={20} color="#fff" />
                       </View>
-                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 16 }]} numberOfLines={1}>Value Add</Text>
+                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 18, marginTop: 16 }]} numberOfLines={1}>Value Add</Text>
+                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                      style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
+                      onPress={() => router.push({ pathname: '/tracker', params: { defaultMode: 'mains' } })}
+                    >
+                      <LinearGradient 
+                        colors={['rgba(16, 185, 129, 0.09)', 'rgba(16, 185, 129, 0)']} 
+                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                        style={StyleSheet.absoluteFillObject}
+                      />
+                      <View style={[styles.resumeIconWrap, { backgroundColor: '#10b981' }]}>
+                        <Map size={20} color="#fff" />
+                      </View>
+                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 18, marginTop: 16 }]} numberOfLines={1}>Syllabus</Text>
+                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                      style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
+                      onPress={() => router.push({ pathname: '/pyq', params: { fromTab: 'mains' } })}
+                    >
+                      <LinearGradient 
+                        colors={['rgba(139, 92, 246, 0.09)', 'rgba(139, 92, 246, 0)']} 
+                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                        style={StyleSheet.absoluteFillObject}
+                      />
+                      <View style={[styles.resumeIconWrap, { backgroundColor: '#8b5cf6' }]}>
+                        <BarChart3 size={20} color="#fff" />
+                      </View>
+                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 16, marginTop: 18 }]} numberOfLines={1}>PYQ Analysis</Text>
                       <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains</Text>
                     </TouchableOpacity>
                   </>
                 )}
-              </View>
+              </ScrollView>
             </View>
 
             {/* 3. Syllabus Tracker Widget */}
@@ -643,7 +679,7 @@ export default function Home() {
               onPress={() => router.push('/tracker')}
             >
               <LinearGradient 
-                colors={[colors.primary + '0b', 'transparent']} 
+                colors={[colors.primary + '0b', colors.primary + '00']} 
                 start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
                 style={StyleSheet.absoluteFillObject}
               />
@@ -1028,12 +1064,13 @@ const styles = StyleSheet.create({
 
   // Pulse Cards
   pulseContainer: { marginBottom: 36 },
-  pulseGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 24, gap: 14 },
+  pulseScroll: { paddingHorizontal: 24, gap: 12 },
   pulseActionCard: { 
+    width: 145,
     minHeight: 124, 
     borderRadius: 28, 
     borderWidth: 1, 
-    padding: 20, 
+    padding: 16, 
     justifyContent: 'flex-start',
     shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 2,
     overflow: 'hidden'
@@ -1041,7 +1078,7 @@ const styles = StyleSheet.create({
   pulseActionTitle: { fontSize: 28, fontWeight: '900', letterSpacing: -1, marginTop: 14 },
   pulseActionSub: { fontSize: 12, fontWeight: '700', marginTop: 4, opacity: 0.7 },
   cardGlow: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
-  resumeIconWrap: { width: 46, height: 46, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  resumeIconWrap: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 
   // Syllabus Tracker Widget
   trackerWidget: { 

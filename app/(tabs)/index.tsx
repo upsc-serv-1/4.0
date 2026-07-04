@@ -471,8 +471,8 @@ export default function Home() {
         style={StyleSheet.absoluteFillObject}
       />
       <View style={styles.glassFill}>
-        <View style={[styles.iconCircle, { backgroundColor: colors.primary + '20', width: 36, height: 36, borderRadius: 18 }]}>
-          <FileText size={16} color={colors.primary} />
+        <View style={[styles.iconCircle, { backgroundColor: 'rgba(59, 130, 246, 0.15)', width: 36, height: 36, borderRadius: 18 }]}>
+          <FileText size={16} color="#3b82f6" />
         </View>
         <Text style={[styles.noteTitle, { color: colors.textPrimary }]} numberOfLines={2}>{item.title}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 'auto' }}>
@@ -684,8 +684,8 @@ export default function Home() {
                 style={StyleSheet.absoluteFillObject}
               />
               <View style={styles.trackerTop}>
-                <View style={[styles.trackerIcon, { backgroundColor: colors.primary + '20' }]}>
-                  <Award size={24} color={colors.primary} />
+                <View style={[styles.trackerIcon, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
+                  <Award size={24} color="#f59e0b" />
                 </View>
                 <View style={{ flex: 1, marginLeft: 16 }}>
                   <Text style={[styles.trackerTitle, { color: colors.textPrimary }]}>Syllabus Mastery</Text>

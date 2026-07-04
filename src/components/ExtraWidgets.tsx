@@ -100,8 +100,8 @@ export function RecentNotesWidget({ data, colors }: { data: WidgetData; colors: 
     <View style={[ws.card, ws.full, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <LinearGradient colors={[colors.primary + '05', 'transparent']} style={ws.cardGlow} />
       <View style={ws.cardHeader}>
-        <View style={[ws.iconCircle, { backgroundColor: colors.primary + '20' }]}>
-          <BookOpen color={colors.primary} size={14} />
+        <View style={[ws.iconCircle, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
+          <BookOpen color="#3b82f6" size={14} />
         </View>
         <Text style={[ws.cardTitle, { color: colors.textPrimary }]}>Recent Notes</Text>
       </View>
@@ -150,8 +150,8 @@ export function QuickPracticeWidget({ colors }: { colors: any }) {
     <View style={[ws.card, ws.full, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <LinearGradient colors={[colors.primary + '08', 'transparent']} style={ws.cardGlow} />
       <View style={ws.cardHeader}>
-        <View style={[ws.iconCircle, { backgroundColor: colors.primary + '20' }]}>
-          <Play color={colors.primary} size={14} fill={colors.primary} />
+        <View style={[ws.iconCircle, { backgroundColor: 'rgba(168, 85, 247, 0.15)' }]}>
+          <Play color="#a855f7" size={14} fill="#a855f7" />
         </View>
         <Text style={[ws.cardTitle, { color: colors.textPrimary }]}>Quick Practice</Text>
       </View>
@@ -218,8 +218,8 @@ export function TestScoresWidget({ data, colors }: { data: WidgetData; colors: a
     <View style={[ws.card, ws.full, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <LinearGradient colors={[colors.primary + '08', 'transparent']} style={ws.cardGlow} />
       <View style={ws.cardHeader}>
-        <View style={[ws.iconCircle, { backgroundColor: colors.primary + '20' }]}>
-          <Layers color={colors.primary} size={14} />
+        <View style={[ws.iconCircle, { backgroundColor: 'rgba(99, 102, 241, 0.15)' }]}>
+          <Layers color="#6366f1" size={14} />
         </View>
         <Text style={[ws.cardTitle, { color: colors.textPrimary }]}>Score Timeline</Text>
       </View>

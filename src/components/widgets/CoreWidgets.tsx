@@ -199,8 +199,8 @@ export function StudyHeatmapWidget({ data, colors }: { data: any; colors: any })
     <TouchableOpacity onPress={() => router.push('/analytics')} style={[ws.card, ws.full, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <LinearGradient colors={[colors.primary + '08', 'transparent']} style={ws.cardGlow} />
       <View style={ws.cardHeader}>
-        <View style={[ws.iconCircle, { backgroundColor: colors.primary + '20' }]}>
-          <TrendingUp color={colors.primary} size={14} />
+        <View style={[ws.iconCircle, { backgroundColor: 'rgba(139, 92, 246, 0.15)' }]}>
+          <TrendingUp color="#8b5cf6" size={14} />
         </View>
         <Text style={[ws.cardTitle, { color: colors.textPrimary }]}>Study Consistency</Text>
         <Text style={[ws.cardValue, { color: colors.textTertiary }]}>12 Weeks</Text>

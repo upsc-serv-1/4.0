@@ -465,14 +465,18 @@ export default function Home() {
       style={[styles.noteCard, { borderColor: colors.border, backgroundColor: colors.surface }]}
       onPress={() => router.push({ pathname: '/pilot-v2', params: { noteId: item.note_id || item.id } } as any)}
     >
-      <LinearGradient colors={[colors.primary + '10', 'transparent']} style={styles.cardGlow} />
+      <LinearGradient 
+        colors={[colors.primary + '1a', 'transparent']} 
+        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+      />
       <View style={styles.glassFill}>
-        <View style={[styles.iconCircle, { backgroundColor: colors.primary + '20', width: 32, height: 32 }]}>
+        <View style={[styles.iconCircle, { backgroundColor: colors.primary + '20', width: 36, height: 36, borderRadius: 18 }]}>
           <FileText size={16} color={colors.primary} />
         </View>
         <Text style={[styles.noteTitle, { color: colors.textPrimary }]} numberOfLines={2}>{item.title}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 'auto' }}>
-          <Clock size={10} color={colors.textTertiary} />
+          <Clock size={11} color={colors.textTertiary} />
           <Text style={[styles.noteDate, { color: colors.textTertiary }]}>{new Date(item.updated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</Text>
         </View>
       </View>
@@ -540,14 +544,15 @@ export default function Home() {
                   testID="home-search-redirect-btn"
                   style={{
                     flexDirection: 'row', alignItems: 'center', gap: 10,
-                    backgroundColor: colors.surface, borderWidth: 1.5, borderColor: colors.border,
-                    borderRadius: 26, paddingHorizontal: 16, paddingVertical: 12,
+                    backgroundColor: colors.surface, borderWidth: 1.5, borderColor: '#7c3aed33',
+                    borderRadius: 26, paddingHorizontal: 18, paddingVertical: 14,
+                    shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 2
                   }}
                 >
-                  <Brain size={16} color="#7c3aed" />
-                  <Text style={{ flex: 1, fontSize: 13, color: colors.textTertiary }}>Search topics, PYQs, notes…</Text>
-                  <View style={{ backgroundColor: '#7c3aed', borderRadius: 12, paddingHorizontal: 8, paddingVertical: 3 }}>
-                    <Text style={{ fontSize: 10, fontWeight: '900', color: '#fff' }}>AI</Text>
+                  <Brain size={18} color="#7c3aed" />
+                  <Text style={{ flex: 1, fontSize: 14, color: colors.textTertiary, fontWeight: '500' }}>Search topics, PYQs, notes…</Text>
+                  <View style={{ backgroundColor: '#7c3aed', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}>
+                    <Text style={{ fontSize: 10, fontWeight: '900', color: '#fff', letterSpacing: 0.5 }}>AI</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -561,17 +566,33 @@ export default function Home() {
               </View>
 
               <View style={styles.pulseGrid}>
-                <TouchableOpacity style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => router.push('/flashcards/review')}>
-                  <View style={[styles.resumeIconWrap, { backgroundColor: '#F59E0B20' }]}>
+                <TouchableOpacity 
+                  style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} 
+                  onPress={() => router.push('/flashcards/review')}
+                >
+                  <LinearGradient 
+                    colors={['rgba(245, 158, 11, 0.09)', 'transparent']} 
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                    style={StyleSheet.absoluteFillObject}
+                  />
+                  <View style={[styles.resumeIconWrap, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
                     <RotateCcw size={20} color="#F59E0B" />
                   </View>
                   <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>{stats.dueCards}</Text>
                   <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Due Cards</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => setPyqPickerVisible(true)}>
-                  <View style={[styles.resumeIconWrap, { backgroundColor: '#6366F120' }]}>
-                    <Play size={20} color="#4F46E5" />
+                <TouchableOpacity 
+                  style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} 
+                  onPress={() => setPyqPickerVisible(true)}
+                >
+                  <LinearGradient 
+                    colors={['rgba(99, 102, 241, 0.09)', 'transparent']} 
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                    style={StyleSheet.absoluteFillObject}
+                  />
+                  <View style={[styles.resumeIconWrap, { backgroundColor: 'rgba(99, 102, 241, 0.15)' }]}>
+                    <Play size={20} color="#6366F1" />
                   </View>
                   <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>{pyqQuestionCount}</Text>
                   <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Random PYQ</Text>
@@ -585,7 +606,11 @@ export default function Home() {
               onLongPress={() => setConfigVisible(true)}
               onPress={() => router.push('/tracker')}
             >
-              <LinearGradient colors={[colors.primary + '05', 'transparent']} style={styles.cardGlow} />
+              <LinearGradient 
+                colors={[colors.primary + '0b', 'transparent']} 
+                start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+                style={StyleSheet.absoluteFillObject}
+              />
               <View style={styles.trackerTop}>
                 <View style={[styles.trackerIcon, { backgroundColor: colors.primary + '20' }]}>
                   <Award size={24} color={colors.primary} />
@@ -616,9 +641,9 @@ export default function Home() {
                         <Text style={[styles.subName, { color: colors.textSecondary }]} numberOfLines={1}>{sp.label}</Text>
                         <Text style={[styles.subPer, { color: colors.textTertiary }]}>{Math.round(sp.progress * 100)}%</Text>
                       </View>
-                      <View style={[styles.barBase, { backgroundColor: colors.border + '50' }]}>
+                      <View style={[styles.barBase, { backgroundColor: colors.border + '30' }]}>
                         <LinearGradient
-                          colors={[sp.color, sp.color + '90']}
+                          colors={[sp.color, sp.color + 'aa']}
                           start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                           style={[styles.barInner, { width: `${Math.max(sp.progress * 100, 5)}%` }]}
                         />
@@ -943,95 +968,129 @@ function WidgetConfigModal({ visible, onClose, onSave, category, setCategory, se
 const styles = StyleSheet.create({
   // Hero & Header
   iconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  heroSection: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 20 },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  greeting: { fontSize: 11, fontWeight: '800', letterSpacing: 1.5 },
-  userName: { fontSize: 32, fontWeight: '900', letterSpacing: -1 },
-  profileBtn: { elevation: 4 },
-  avatarWrap: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
+  heroSection: { paddingHorizontal: 24, paddingTop: 16, paddingBottom: 24 },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
+  greeting: { fontSize: 11, fontWeight: '800', letterSpacing: 2, opacity: 0.6 },
+  userName: { fontSize: 34, fontWeight: '900', letterSpacing: -1.2, marginTop: 4 },
+  profileBtn: { 
+    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 4 
+  },
+  avatarWrap: { width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center' },
   avatarTxt: { color: '#fff', fontSize: 20, fontWeight: '900' },
   searchContainer: { marginTop: 4 },
 
   // Sections
-  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, marginBottom: 14 },
-  sectionHeaderWide: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, marginBottom: 14 },
-  sectionLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 1.2 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 16 },
+  sectionHeaderWide: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 16 },
+  sectionLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 1.5, opacity: 0.6 },
 
   // Pulse Cards
-  pulseContainer: { marginBottom: 32 },
-  pulseGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 20, gap: 12 },
-  pulseActionCard: { minHeight: 118, borderRadius: 24, borderWidth: 1, padding: 16, justifyContent: 'flex-start', elevation: 1 },
-  pulseActionTitle: { fontSize: 16, fontWeight: '900', letterSpacing: -0.3, marginTop: 10 },
-  pulseActionSub: { fontSize: 11, fontWeight: '700', marginTop: 2, opacity: 0.7 },
+  pulseContainer: { marginBottom: 36 },
+  pulseGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 24, gap: 14 },
+  pulseActionCard: { 
+    minHeight: 124, 
+    borderRadius: 28, 
+    borderWidth: 1, 
+    padding: 20, 
+    justifyContent: 'flex-start',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 2,
+    overflow: 'hidden'
+  },
+  pulseActionTitle: { fontSize: 28, fontWeight: '900', letterSpacing: -1, marginTop: 14 },
+  pulseActionSub: { fontSize: 12, fontWeight: '700', marginTop: 4, opacity: 0.7 },
   cardGlow: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
-  resumeIconWrap: { width: 44, height: 44, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.04)', alignItems: 'center', justifyContent: 'center' },
+  resumeIconWrap: { width: 46, height: 46, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
 
   // Syllabus Tracker Widget
-  trackerWidget: { marginHorizontal: 20, borderRadius: 32, borderWidth: 1, padding: 24, marginBottom: 32, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 15 },
-  trackerTop: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
-  trackerIcon: { width: 48, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  trackerTitle: { fontSize: 20, fontWeight: '900', letterSpacing: -0.5 },
-  catBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, alignSelf: 'flex-start', marginTop: 6 },
-  badgeCatText: { fontSize: 9, fontWeight: '900', letterSpacing: 0.5 },
-  masteryText: { fontSize: 28, fontWeight: '900', letterSpacing: -1 },
-  subjectList: { gap: 16 },
-  subjectGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 12 },
-  subItemRow: { gap: 8, width: '48%' },
+  trackerWidget: { 
+    marginHorizontal: 24, 
+    borderRadius: 32, 
+    borderWidth: 1, 
+    padding: 24, 
+    marginBottom: 36, 
+    shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.06, shadowRadius: 20, elevation: 4,
+    overflow: 'hidden'
+  },
+  trackerTop: { flexDirection: 'row', alignItems: 'center', marginBottom: 24 },
+  trackerIcon: { width: 52, height: 52, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  trackerTitle: { fontSize: 22, fontWeight: '900', letterSpacing: -0.7 },
+  catBadge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, alignSelf: 'flex-start', marginTop: 8 },
+  badgeCatText: { fontSize: 9, fontWeight: '900', letterSpacing: 0.8 },
+  masteryText: { fontSize: 32, fontWeight: '900', letterSpacing: -1.2 },
+  subjectList: { gap: 18 },
+  subjectGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 16 },
+  subItemRow: { gap: 10, width: '48%' },
   subTextRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  subName: { fontSize: 16, fontWeight: '800', flex: 1 },
+  subName: { fontSize: 15, fontWeight: '800', flex: 1, letterSpacing: -0.2 },
   subPer: { fontSize: 12, fontWeight: '700', opacity: 0.6 },
-  barBase: { height: 8, borderRadius: 4, overflow: 'hidden' },
-  barInner: { height: '100%', borderRadius: 4 },
+  barBase: { height: 6, borderRadius: 3, overflow: 'hidden' },
+  barInner: { height: '100%', borderRadius: 3 },
 
   // Recent Notes
-  notesSection: { marginBottom: 32 },
-  notesScroll: { paddingHorizontal: 20, gap: 16 },
-  noteCard: { width: 180, height: 130, borderRadius: 24, borderWidth: 1, overflow: 'hidden', elevation: 2 },
+  notesSection: { marginBottom: 36 },
+  notesScroll: { paddingHorizontal: 24, gap: 16 },
+  noteCard: { 
+    width: 190, 
+    height: 140, 
+    borderRadius: 28, 
+    borderWidth: 1, 
+    overflow: 'hidden',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.04, shadowRadius: 12, elevation: 2
+  },
   glassFill: { flex: 1, padding: 20 },
-  noteTitle: { fontSize: 16, fontWeight: '900', marginTop: 12, height: 44, lineHeight: 22 },
-  noteDate: { fontSize: 11, fontWeight: '700', marginTop: 'auto', opacity: 0.5 },
+  noteTitle: { fontSize: 16, fontWeight: '900', marginTop: 12, height: 44, lineHeight: 22, letterSpacing: -0.2 },
+  noteDate: { fontSize: 11, fontWeight: '700', marginTop: 'auto', opacity: 0.6 },
 
   // Tags
-  tagsSection: { marginBottom: 32 },
-  tagCloud: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, paddingHorizontal: 20, marginTop: 16 },
-  tagChip: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 16, borderWidth: 1, elevation: 1 },
-  tagName: { fontSize: 14, fontWeight: '800' },
-  tagCount: { fontSize: 10, fontWeight: '900', opacity: 0.4 },
+  tagsSection: { marginBottom: 36 },
+  tagCloud: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, paddingHorizontal: 24, marginTop: 16 },
+  tagChip: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 8, 
+    paddingHorizontal: 16, 
+    paddingVertical: 10, 
+    borderRadius: 18, 
+    borderWidth: 1, 
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.02, shadowRadius: 4, elevation: 1 
+  },
+  tagName: { fontSize: 14, fontWeight: '800', letterSpacing: -0.1 },
+  tagCount: { fontSize: 10, fontWeight: '900', opacity: 0.6 },
 
   // Footer
   footerBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 20, marginBottom: 40 },
-  customWidgetItem: { marginHorizontal: 20, marginBottom: 12 },
+  customWidgetItem: { marginHorizontal: 24, marginBottom: 12 },
 
   // Modals
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
-  modalContent: { borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, paddingBottom: 40 },
-  modalTitle: { fontSize: 24, fontWeight: '900', marginBottom: 20 },
+  modalContent: { borderTopLeftRadius: 36, borderTopRightRadius: 36, padding: 24, paddingBottom: 40 },
+  modalTitle: { fontSize: 24, fontWeight: '900', marginBottom: 20, letterSpacing: -0.5 },
   pyqForm: { gap: 20 },
   inputGroup: { gap: 10 },
-  inputLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 1 },
+  inputLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 1, opacity: 0.6 },
   yearRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  yearInput: { flex: 1, height: 50, borderRadius: 14, borderWidth: 1, paddingHorizontal: 16, fontSize: 16, fontWeight: '700' },
-  countInput: { height: 50, borderRadius: 14, borderWidth: 1, paddingHorizontal: 16, fontSize: 16, fontWeight: '700' },
-  launchBtn: { height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginTop: 10 },
+  yearInput: { flex: 1, height: 52, borderRadius: 16, borderWidth: 1, paddingHorizontal: 18, fontSize: 16, fontWeight: '700' },
+  countInput: { height: 52, borderRadius: 16, borderWidth: 1, paddingHorizontal: 18, fontSize: 16, fontWeight: '700' },
+  launchBtn: { height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginTop: 10 },
   launchBtnTxt: { color: '#fff', fontSize: 16, fontWeight: '800' },
-  modalLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 1 },
+  modalLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 1, opacity: 0.6 },
 
   catRow: { flexDirection: 'row', gap: 10 },
-  catBtn: { flex: 1, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  catBtn: { flex: 1, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   configCatText: { fontSize: 14, fontWeight: '700' },
   subGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 },
-  subItem: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  subItem: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 14, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
   subText: { fontSize: 13, fontWeight: '600' },
-  applyBtn: { height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  applyBtn: { height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   applyText: { color: '#fff', fontSize: 16, fontWeight: '800' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-  optionRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 12, paddingVertical: 12, borderRadius: 12, borderWidth: 1 },
+  optionRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 14, borderRadius: 14, borderWidth: 1 },
   radioButton: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   radioDot: { width: 8, height: 8, borderRadius: 4 },
   optionText: { fontSize: 14, fontWeight: '600' },

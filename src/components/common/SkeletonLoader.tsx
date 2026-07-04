@@ -282,6 +282,91 @@ export const SkeletonLoader: React.FC<{
   );
 };
 
+// Dashboard Layout Skeleton
+export const SkeletonDashboard: React.FC<{ colors: any }> = ({ colors }) => (
+  <View style={{ flex: 1, backgroundColor: colors.bg, padding: 24, paddingTop: 60 }}>
+    {/* 1. Header Row */}
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+      <View style={{ gap: 8 }}>
+        <SkeletonLine width={100} height={12} borderRadius={6} />
+        <SkeletonLine width={180} height={28} borderRadius={14} />
+      </View>
+      <SkeletonCircle size={50} />
+    </View>
+
+    {/* 2. Search Bar Capsule */}
+    <SkeletonLine width="100%" height={52} borderRadius={26} style={{ marginBottom: 36 }} />
+
+    {/* 3. Productivity Pulse Header */}
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <SkeletonLine width={160} height={12} borderRadius={6} />
+      <SkeletonCircle size={16} />
+    </View>
+
+    {/* 4. Productivity Grid (Two cards side-by-side) */}
+    <View style={{ flexDirection: 'row', gap: 14, marginBottom: 36 }}>
+      <View style={{ flex: 1, height: 124, borderRadius: 28, backgroundColor: colors.surface || '#fff', borderWidth: 1, borderColor: colors.border || '#e5e7eb', padding: 20, gap: 10 }}>
+        <SkeletonCircle size={36} />
+        <SkeletonLine width={50} height={20} borderRadius={10} />
+        <SkeletonLine width={80} height={12} borderRadius={6} />
+      </View>
+      <View style={{ flex: 1, height: 124, borderRadius: 28, backgroundColor: colors.surface || '#fff', borderWidth: 1, borderColor: colors.border || '#e5e7eb', padding: 20, gap: 10 }}>
+        <SkeletonCircle size={36} />
+        <SkeletonLine width={50} height={20} borderRadius={10} />
+        <SkeletonLine width={80} height={12} borderRadius={6} />
+      </View>
+    </View>
+
+    {/* 5. Syllabus Mastery Large Card */}
+    <View style={{ height: 260, borderRadius: 32, backgroundColor: colors.surface || '#fff', borderWidth: 1, borderColor: colors.border || '#e5e7eb', padding: 24, marginBottom: 36 }}>
+      <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center', marginBottom: 24 }}>
+        <SkeletonCircle size={44} />
+        <View style={{ flex: 1, gap: 8 }}>
+          <SkeletonLine width={140} height={16} borderRadius={8} />
+          <SkeletonLine width={80} height={12} borderRadius={6} />
+        </View>
+        <View style={{ alignItems: 'flex-end', gap: 8 }}>
+          <SkeletonLine width={50} height={20} borderRadius={10} />
+          <SkeletonLine width={70} height={10} borderRadius={5} />
+        </View>
+      </View>
+      
+      {/* 2x2 Grid of Progress Bars */}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 16 }}>
+        {[1, 2, 3, 4].map((i) => (
+          <View key={i} style={{ width: '48%', gap: 10 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <SkeletonLine width={60} height={12} borderRadius={6} />
+              <SkeletonLine width={30} height={12} borderRadius={6} />
+            </View>
+            <SkeletonLine width="100%" height={6} borderRadius={3} />
+          </View>
+        ))}
+      </View>
+    </View>
+
+    {/* 6. Recent Notes Header */}
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <SkeletonLine width={180} height={12} borderRadius={6} />
+      <SkeletonLine width={80} height={12} borderRadius={6} />
+    </View>
+    
+    {/* 7. Recent Notes cards (horizontal) */}
+    <View style={{ flexDirection: 'row', gap: 16 }}>
+      <View style={{ width: 190, height: 140, borderRadius: 28, backgroundColor: colors.surface || '#fff', borderWidth: 1, borderColor: colors.border || '#e5e7eb', padding: 20, gap: 12 }}>
+        <SkeletonCircle size={36} />
+        <SkeletonLine width={120} height={14} borderRadius={7} />
+        <SkeletonLine width={80} height={11} borderRadius={5} />
+      </View>
+      <View style={{ flex: 1, height: 140, borderRadius: 28, backgroundColor: colors.surface || '#fff', borderWidth: 1, borderColor: colors.border || '#e5e7eb', padding: 20, gap: 12 }}>
+        <SkeletonCircle size={36} />
+        <SkeletonLine width={120} height={14} borderRadius={7} />
+        <SkeletonLine width={80} height={11} borderRadius={5} />
+      </View>
+    </View>
+  </View>
+);
+
 const styles = StyleSheet.create({
   listItem: {
     flexDirection: 'row',

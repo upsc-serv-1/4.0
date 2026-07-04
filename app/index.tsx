@@ -1,8 +1,7 @@
 import { Redirect } from 'expo-router';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
 import { useTheme } from '../src/context/ThemeContext';
-import { SkeletonLoader } from '../src/components/common/SkeletonLoader';
+import { SkeletonDashboard } from '../src/components/common/SkeletonLoader';
 
 export default function Index() {
   const { session, loading } = useAuth();
@@ -10,15 +9,7 @@ export default function Index() {
 
   console.log("[Route: index] Session:", !!session, "Loading:", loading);
   if (loading) {
-    return (
-      <View testID="splash-loader" style={[styles.center, { backgroundColor: colors.bg }]}>
-        <SkeletonLoader type="list" count={5} colors={colors} />
-      </View>
-    );
+    return <SkeletonDashboard colors={colors} />;
   }
   return session ? <Redirect href="/(tabs)" /> : <Redirect href="/(auth)/login" />;
 }
-
-const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center' }
-});

@@ -774,9 +774,9 @@ export default function Home() {
                           style={StyleSheet.absoluteFillObject}
                         />
                         <View style={[styles.resumeIconWrap, { backgroundColor: s.color }]}>
-                          <IconComp size={20} color="#fff" />
+                          <IconComp size={18} color="#fff" />
                         </View>
-                        <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }, isNumberTitle ? { fontSize: 28, marginTop: 14 } : { fontSize: 16, marginTop: 18 }]} numberOfLines={1}>
+                        <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }, isNumberTitle ? { fontSize: 28, marginTop: 14 } : { fontSize: 16, marginTop: 12 }]} numberOfLines={1}>
                           {titleValue}
                         </Text>
                         <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>{s.sub}</Text>
@@ -1265,14 +1265,14 @@ const styles = StyleSheet.create({
     height: 140, 
     borderRadius: 28, 
     borderWidth: 1, 
-    padding: 20, 
+    padding: 16, 
     shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.04, shadowRadius: 12, elevation: 2,
     overflow: 'hidden'
   },
-  pulseActionTitle: { fontSize: 16, fontWeight: '900', marginTop: 12, height: 44, lineHeight: 22, letterSpacing: -0.2 },
+  pulseActionTitle: { fontSize: 16, fontWeight: '900', marginTop: 10, letterSpacing: -0.2 },
   pulseActionSub: { fontSize: 11, fontWeight: '700', marginTop: 'auto', opacity: 0.6 },
   cardGlow: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
-  resumeIconWrap: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  resumeIconWrap: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
 
   // Syllabus Tracker Widget
   trackerWidget: { 

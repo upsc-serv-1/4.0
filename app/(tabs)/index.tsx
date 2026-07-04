@@ -4,7 +4,7 @@ import { router, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import {
   BookOpen, BarChart3, Play, Clock,
-  RotateCcw, Zap, Sliders, FileText, Tag, Award, Brain
+  RotateCcw, Zap, Sliders, FileText, Tag, Award, Brain, Flame, Target
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../../src/lib/supabase';
@@ -596,6 +596,37 @@ export default function Home() {
                   </View>
                   <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>{pyqQuestionCount}</Text>
                   <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Random PYQ</Text>
+                </TouchableOpacity>
+
+                <View 
+                  style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]}
+                >
+                  <LinearGradient 
+                    colors={['rgba(239, 68, 68, 0.09)', 'transparent']} 
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                    style={StyleSheet.absoluteFillObject}
+                  />
+                  <View style={[styles.resumeIconWrap, { backgroundColor: 'rgba(239, 68, 68, 0.15)' }]}>
+                    <Flame size={20} color="#EF4444" />
+                  </View>
+                  <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>{stats.streak || 5}</Text>
+                  <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Daily Streak</Text>
+                </View>
+
+                <TouchableOpacity 
+                  style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]}
+                  onPress={() => router.push('/analytics' as any)}
+                >
+                  <LinearGradient 
+                    colors={['rgba(16, 185, 129, 0.09)', 'transparent']} 
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                    style={StyleSheet.absoluteFillObject}
+                  />
+                  <View style={[styles.resumeIconWrap, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
+                    <Target size={20} color="#10B981" />
+                  </View>
+                  <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>{stats.accuracy || 0}%</Text>
+                  <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Accuracy Rate</Text>
                 </TouchableOpacity>
               </View>
             </View>

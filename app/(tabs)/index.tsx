@@ -313,43 +313,50 @@ export default function Home() {
         dataPool = MICRO_SYLLABUS;
       }
 
-      Object.entries(dataPool).forEach(([sub, groups]) => {
+      Object.entries(dataPool).forEach(([sub, subNode]) => {
         if (selectedSubjects.length > 0 && !selectedSubjects.includes(sub)) return;
         if (!subjectStats[sub]) {
           subjectStats[sub] = { total: 0, completed: 0, color: COLORS[colorIdx % COLORS.length] };
           colorIdx++;
         }
-        Object.entries(groups as any).forEach(([group, topics]) => {
-          (topics as string[]).forEach(topic => {
-            const path = `${sub}.${group}.${topic}`;
-            const item = progress[path] || {};
-            
-            // 1. Replication of Tracker Logic: Topic Completion Score
-            let compScore = 0;
-            if (pyqReportMode === 'single') {
-              compScore = item.mastered ? 1 : 0;
-            } else {
-              // Checkpoints averaging (matches tracker logic exactly)
-              const done = Number(Boolean(item.mastered)) + Number(Boolean(item.ncert)) + Number(Boolean(item.pyqs)) + Number(Boolean(item.books));
-              compScore = done / 4;
-            }
 
-            // 2. Replication of Tracker Logic: Weight Hierarchy fallback
-            let weight = 1;
-            const isEligibleForWeights = pyqDisplayMode === 'pyq_weighted' && activeCategory.toLowerCase() === 'prelims';
-            if (isEligibleForWeights) {
-              const t = String(topic).trim().toLowerCase();
-              const g = String(group).trim().toLowerCase();
-              const s = String(sub).trim().toLowerCase();
-              weight = topicW[t] || sectionW[g] || subjectW[s] || 0;
-            }
+        const traverse = (node: any, path: string, groupName: string) => {
+          if (Array.isArray(node)) {
+            node.forEach((topic: string) => {
+              const fullPath = `${path}.${topic}`;
+              const item = progress[fullPath] || {};
 
-            totalItems += weight;
-            completedItems += weight * compScore;
-            subjectStats[sub].total += weight;
-            subjectStats[sub].completed += weight * compScore;
-          });
-        });
+              let compScore = 0;
+              if (pyqReportMode === 'single') {
+                compScore = item.mastered ? 1 : 0;
+              } else {
+                const done = Number(Boolean(item.mastered)) + Number(Boolean(item.ncert)) + Number(Boolean(item.pyqs)) + Number(Boolean(item.books));
+                compScore = done / 4;
+              }
+
+              let weight = 1;
+              const isEligibleForWeights = pyqDisplayMode === 'pyq_weighted' && activeCategory.toLowerCase() === 'prelims';
+              if (isEligibleForWeights) {
+                const t = String(topic).trim().toLowerCase();
+                const g = String(groupName).trim().toLowerCase();
+                const s = String(sub).trim().toLowerCase();
+                weight = topicW[t] || sectionW[g] || subjectW[s] || 0;
+              }
+
+              totalItems += weight;
+              completedItems += weight * compScore;
+              subjectStats[sub].total += weight;
+              subjectStats[sub].completed += weight * compScore;
+            });
+          } else if (node && typeof node === 'object') {
+            Object.entries(node).forEach(([key, val]) => {
+              const nextGroup = path === sub ? key : groupName;
+              traverse(val, `${path}.${key}`, nextGroup);
+            });
+          }
+        };
+
+        traverse(subNode, sub, "");
       });
 
       // Final evaluation handling zero-weights fallback matching app/tracker.tsx

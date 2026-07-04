@@ -165,7 +165,12 @@ export default function Home() {
     if (userId) loadWidgets();
   }, [userId]);
 
-
+  useEffect(() => {
+    if (selectedCourse === 'Medical Science') {
+      if (widgetCategory === 'Mains') setWidgetCategory('Prelims');
+      if (pyqExamType === 'mains') setPyqExamType('prelims');
+    }
+  }, [selectedCourse, widgetCategory, pyqExamType]);
 
   const loadWidgets = useCallback(() => {
     if (userId) WidgetService.list(userId).then(setWidgets);
@@ -789,7 +794,14 @@ export default function Home() {
 }
 
 function WidgetConfigModal({ visible, onClose, onSave, category, setCategory, selectedSubjects, setSelectedSubjects, optionalChoice, pyqDisplayMode, setPyqDisplayMode, pyqExamType, setPyqExamType, pyqReportMode, setPyqReportMode, colors }: any) {
-  const categories = ['Prelims', 'Mains', 'Optional'];
+  const { selectedCourse } = useCourse();
+  const categories = useMemo(() => {
+    if (selectedCourse === 'Medical Science') {
+      return ['Prelims', 'Optional'];
+    }
+    return ['Prelims', 'Mains', 'Optional'];
+  }, [selectedCourse]);
+
   const subjects = useMemo(() => {
     if (category === 'Optional') return [`${optionalChoice} Paper 1`, `${optionalChoice} Paper 2`];
     if (category === 'Mains') return Object.keys(require('../../src/data/syllabus').MAINS_SYLLABUS);
@@ -805,6 +817,13 @@ function WidgetConfigModal({ visible, onClose, onSave, category, setCategory, se
     onSave(category, selectedSubjects, pyqDisplayMode, pyqExamType, pyqReportMode);
     onClose();
   };
+
+  const examTypeOptions = useMemo(() => {
+    if (selectedCourse === 'Medical Science') {
+      return ['prelims', 'optional'] as const;
+    }
+    return ['prelims', 'mains', 'optional'] as const;
+  }, [selectedCourse]);
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -864,7 +883,7 @@ function WidgetConfigModal({ visible, onClose, onSave, category, setCategory, se
             {/* Exam Type Section */}
             <Text style={[styles.modalLabel, { color: colors.textSecondary, marginTop: 24 }]}>EXAM TYPE</Text>
             <View style={{ gap: 10 }}>
-              {(['prelims', 'mains', 'optional'] as const).map(examType => (
+              {examTypeOptions.map(examType => (
                 <TouchableOpacity
                   key={examType}
                   activeOpacity={0.7}
@@ -878,6 +897,7 @@ function WidgetConfigModal({ visible, onClose, onSave, category, setCategory, se
                   <Text style={[styles.optionText, { color: colors.textPrimary }]}>
                     {examType.charAt(0).toUpperCase() + examType.slice(1)}
                   </Text>
+
                 </TouchableOpacity>
               ))}
             </View>

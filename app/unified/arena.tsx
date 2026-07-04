@@ -285,6 +285,7 @@ function UnifiedArenaSetup() {
     }
     if (params.pyqFilter) setPyqMaster(params.pyqFilter as string);
     if (params.ncertFilter) setNcertFilter(params.ncertFilter as string);
+    if (params.stage) setSelectedExamStage(params.stage as string);
     if (params.program) {
       const prog = String(params.program);
       if (prog === 'All') setSelectedPrograms([]);
@@ -463,9 +464,16 @@ function UnifiedArenaSetup() {
           query = query.eq('is_pyq', true);
           const cats = sf.pyqCategory || [];
           const fOr = [];
-          if (cats.includes('UPSC') || cats.includes('UPSC CSE')) fOr.push('is_upsc_cse.eq.true');
-          if (cats.includes('Allied')) fOr.push('is_allied.eq.true');
-          if (cats.includes('Others')) fOr.push('is_others.eq.true');
+          if (selectedCourse === 'Medical Science') {
+            if (cats.includes('NEET PG')) fOr.push('is_neetpg.eq.true');
+            if (cats.includes('INI-CET')) fOr.push('is_inicet.eq.true');
+            if (cats.includes('UPSC CMS')) fOr.push('is_upsc_cms.eq.true');
+            if (cats.includes('Others')) fOr.push('is_others.eq.true');
+          } else {
+            if (cats.includes('UPSC') || cats.includes('UPSC CSE')) fOr.push('is_upsc_cse.eq.true');
+            if (cats.includes('Allied') || cats.includes('Allied Exams')) fOr.push('is_allied.eq.true');
+            if (cats.includes('Others')) fOr.push('is_others.eq.true');
+          }
           if (fOr.length > 0) query = query.or(fOr.join(','));
         } else if (sf.pyqFilter === 'Non-PYQ') {
           query = query.eq('is_pyq', false);
@@ -560,10 +568,17 @@ function UnifiedArenaSetup() {
         if (!aExact && bExact) return 1;
         const getRank = (q: any) => {
           const src = (q.source?.group || q.exam_group || q.tests?.series || q.tests?.title || '').toUpperCase();
-          if (q.is_upsc_cse || src.includes('UPSC CSE')) return 3;
-          if (q.is_allied) return 2;
-          if (q.is_pyq) return 1;
-          return 0;
+          if (selectedCourse === 'Medical Science') {
+            if (q.is_neetpg || src.includes('NEET PG')) return 3;
+            if (q.is_inicet || src.includes('INI-CET')) return 2;
+            if (q.is_upsc_cms || src.includes('UPSC CMS')) return 1;
+            return 0;
+          } else {
+            if (q.is_upsc_cse || src.includes('UPSC CSE')) return 3;
+            if (q.is_allied) return 2;
+            if (q.is_pyq) return 1;
+            return 0;
+          }
         };
         const rA = getRank(a), rB = getRank(b);
         if (rA !== rB) return rB - rA;
@@ -825,9 +840,16 @@ function UnifiedArenaSetup() {
           query = query.eq('is_pyq', true);
           if (selectedExamCategory.length > 0) {
             const orFilters = [];
-            if (selectedExamCategory.includes('UPSC CSE')) orFilters.push('is_upsc_cse.eq.true');
-            if (selectedExamCategory.includes('Allied Exams')) orFilters.push('is_allied.eq.true');
-            if (selectedExamCategory.includes('Others')) orFilters.push('is_others.eq.true');
+            if (selectedCourse === 'Medical Science') {
+              if (selectedExamCategory.includes('NEET PG')) orFilters.push('is_neetpg.eq.true');
+              if (selectedExamCategory.includes('INI-CET')) orFilters.push('is_inicet.eq.true');
+              if (selectedExamCategory.includes('UPSC CMS')) orFilters.push('is_upsc_cms.eq.true');
+              if (selectedExamCategory.includes('Others')) orFilters.push('is_others.eq.true');
+            } else {
+              if (selectedExamCategory.includes('UPSC CSE')) orFilters.push('is_upsc_cse.eq.true');
+              if (selectedExamCategory.includes('Allied Exams')) orFilters.push('is_allied.eq.true');
+              if (selectedExamCategory.includes('Others')) orFilters.push('is_others.eq.true');
+            }
             if (orFilters.length > 0) query = query.or(orFilters.join(','));
           }
         } else if (pyqMaster === 'Non-PYQ') {
@@ -897,26 +919,37 @@ function UnifiedArenaSetup() {
   };
 
   const subjects = useMemo(() => {
-    return Array.from(new Set(metadata.map(m => m.subject).filter(Boolean))).sort();
-  }, [metadata]);
+    let base = metadata;
+    if (selectedExamStage !== 'All') {
+      base = base.filter(m => m.series === selectedExamStage);
+    }
+    return Array.from(new Set(base.map(m => m.subject).filter(Boolean))).sort();
+  }, [metadata, selectedExamStage]);
 
   const sections = useMemo(() => {
-    const base = selectedSubjects.length > 0
+    let base = selectedSubjects.length > 0
       ? metadata.filter(m => selectedSubjects.includes(m.subject))
       : metadata;
+    if (selectedExamStage !== 'All') {
+      base = base.filter(m => m.series === selectedExamStage);
+    }
 
     return Array.from(new Set(
       base
         .map(m => m.section_group)
         .filter(Boolean)
     )).sort();
-  }, [metadata, selectedSubjects]);
+  }, [metadata, selectedSubjects, selectedExamStage]);
 
   const microtopics = useMemo(() => {
     if (selectedSection.length === 0) return [];
+    let base = metadata;
+    if (selectedExamStage !== 'All') {
+      base = base.filter(m => m.series === selectedExamStage);
+    }
 
     return Array.from(new Set(
-      metadata
+      base
         .filter(m => {
           const subjectMatch = selectedSubjects.length === 0 || selectedSubjects.includes(m.subject);
           const sectionMatch = selectedSection.includes(m.section_group);
@@ -925,9 +958,14 @@ function UnifiedArenaSetup() {
         .map(m => m.micro_topic)
         .filter(Boolean)
     )).sort();
-  }, [metadata, selectedSubjects, selectedSection]);
+  }, [metadata, selectedSubjects, selectedSection, selectedExamStage]);
 
-  const examCategories = ['UPSC CSE', 'Allied Exams', 'Others'];
+  const examCategories = useMemo(() => {
+    if (selectedCourse === 'Medical Science') {
+      return ['NEET PG', 'INI-CET', 'UPSC CMS', 'Others'];
+    }
+    return ['UPSC CSE', 'Allied Exams', 'Others'];
+  }, [selectedCourse]);
 
   const institutes = useMemo(() => {
     let base = metadata;
@@ -935,8 +973,11 @@ function UnifiedArenaSetup() {
     if (selectedSubjects.length > 0) {
       base = base.filter(m => selectedSubjects.includes(m.subject));
     }
+    if (selectedExamStage !== 'All') {
+      base = base.filter(m => m.series === selectedExamStage);
+    }
     return Array.from(new Set(base.map(m => m.institute).filter(Boolean))).sort();
-  }, [metadata, selectedSubjects]);
+  }, [metadata, selectedSubjects, selectedExamStage]);
 
   const programs = useMemo(() => {
     let base = metadata;

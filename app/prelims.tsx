@@ -191,7 +191,7 @@ function PrelimsScreen() {
                 onPress={() => {
                   switch (card.id) {
                     case 'arena':
-                      router.push('/unified/arena');
+                      router.push({ pathname: '/unified/arena', params: { stage: 'Prelims' } });
                       break;
                     case 'pyq':
                       router.push({ pathname: '/pyq', params: { fromTab: 'prelims' } });
@@ -260,7 +260,7 @@ function PrelimsScreen() {
             {recentTopics.map(topic => (
               <TouchableOpacity
                 key={topic}
-                onPress={() => router.push({ pathname: '/unified/arena', params: { subject: topic } })}
+                onPress={() => router.push({ pathname: '/unified/arena', params: { subject: topic, stage: 'Prelims' } })}
                 style={[
                   styles.topicChip,
                   {

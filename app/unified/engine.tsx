@@ -1783,17 +1783,22 @@ export default function UnifiedQuizEngine() {
           let siblings: any[] = [];
           const groupName = String(target.source?.group || target.exam_group || target.tests?.series || '').toUpperCase();
           const isUpsc = !!target.is_upsc_cse || groupName.includes('UPSC');
+          const isMedical = selectedCourse === 'Medical Science';
           const examYear = String(target.exam_year || '').trim();
-          if (target.is_pyq && isUpsc && examYear) {
-            const { data: sibs } = await supabase
+          if (target.is_pyq && (isUpsc || isMedical) && examYear) {
+            let sibsQuery = supabase
               .from('questions')
               .select(SELECT_COLS)
               .eq('course', selectedCourse)
               .eq('exam_year', examYear)
               .eq('is_pyq', true)
-              .eq('is_upsc_cse', true)
-              .neq('id', target.id)
-              .limit(2000);
+              .neq('id', target.id);
+            
+            if (!isMedical) {
+              sibsQuery = sibsQuery.eq('is_upsc_cse', true);
+            }
+            
+            const { data: sibs } = await sibsQuery.limit(2000);
             siblings = sibs || [];
           }
           allFreshData.push(target, ...siblings);
@@ -1937,9 +1942,16 @@ export default function UnifiedQuizEngine() {
               const cats = typeof pyqCat === 'string' ? pyqCat.split(',').filter(Boolean) : [];
               if (cats.length > 0) {
                 const orFilters = [];
-                if (cats.includes('UPSC CSE') || cats.includes('UPSC')) orFilters.push('is_upsc_cse.eq.true');
-                if (cats.includes('Allied Exams') || cats.includes('Allied')) orFilters.push('is_allied.eq.true');
-                if (cats.includes('Others')) orFilters.push('is_others.eq.true');
+                if (selectedCourse === 'Medical Science') {
+                  if (cats.includes('NEET PG')) orFilters.push('is_neetpg.eq.true');
+                  if (cats.includes('INI-CET')) orFilters.push('is_inicet.eq.true');
+                  if (cats.includes('UPSC CMS')) orFilters.push('is_upsc_cms.eq.true');
+                  if (cats.includes('Others')) orFilters.push('is_others.eq.true');
+                } else {
+                  if (cats.includes('UPSC CSE') || cats.includes('UPSC')) orFilters.push('is_upsc_cse.eq.true');
+                  if (cats.includes('Allied Exams') || cats.includes('Allied')) orFilters.push('is_allied.eq.true');
+                  if (cats.includes('Others')) orFilters.push('is_others.eq.true');
+                }
                 if (orFilters.length > 0) query = query.or(orFilters.join(','));
               }
             }
@@ -2101,9 +2113,16 @@ export default function UnifiedQuizEngine() {
                if (pyqCat && pyqCat !== 'All' && pyqCat !== '' && pyqCat !== '[]') {
                  const cats = typeof pyqCat === 'string' ? pyqCat.split(',').filter(Boolean) : [];
                  const fOr = [];
-                 if (cats.includes('UPSC CSE') || cats.includes('UPSC')) fOr.push('is_upsc_cse.eq.true');
-                 if (cats.includes('Allied Exams') || cats.includes('Allied')) fOr.push('is_allied.eq.true');
-                 if (cats.includes('Others')) fOr.push('is_others.eq.true');
+                 if (selectedCourse === 'Medical Science') {
+                   if (cats.includes('NEET PG')) fOr.push('is_neetpg.eq.true');
+                   if (cats.includes('INI-CET')) fOr.push('is_inicet.eq.true');
+                   if (cats.includes('UPSC CMS')) fOr.push('is_upsc_cms.eq.true');
+                   if (cats.includes('Others')) fOr.push('is_others.eq.true');
+                 } else {
+                   if (cats.includes('UPSC CSE') || cats.includes('UPSC')) fOr.push('is_upsc_cse.eq.true');
+                   if (cats.includes('Allied Exams') || cats.includes('Allied')) fOr.push('is_allied.eq.true');
+                   if (cats.includes('Others')) fOr.push('is_others.eq.true');
+                 }
                  if (fOr.length > 0) fuzzyQ = fuzzyQ.or(fOr.join(','));
                }
              } else if (pyqM === 'Non-PYQ' || pyqM === 'Non PYQ') {

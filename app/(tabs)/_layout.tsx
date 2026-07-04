@@ -1,6 +1,7 @@
 import { Tabs, useSegments, useRouter, Redirect, useFocusEffect } from 'expo-router';
 import { Home, BarChart2, RotateCcw, LayoutList, Tag, Target, FileText, TrendingUp, BarChart3, Layers, Database, PenTool, Sparkles, BookOpen, Compass, Globe, Search } from 'lucide-react-native';
 import { useAuth } from '../../src/context/AuthContext';
+import { useCourse } from '../../src/context/CourseContext';
 import { View, ActivityIndicator, ScrollView, TouchableOpacity, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import { useTheme } from '../../src/context/ThemeContext';
 import { useState, useEffect, useCallback } from 'react';
@@ -121,6 +122,7 @@ function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs,
   const router = useRouter();
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
+  const { selectedCourse } = useCourse();
 
   const visibleOrder = order.filter((tabKey: TabKey) => 
     !!defs[tabKey] && 
@@ -133,7 +135,8 @@ function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs,
     tabKey !== 'pyq' &&
     tabKey !== 'tracker' &&
     tabKey !== 'ai-search' &&
-    tabKey !== 'revise'
+    tabKey !== 'revise' &&
+    !(selectedCourse === 'Medical Science' && (tabKey === 'mains' || tabKey === 'prelims'))
   );
   const tabletItemWidth = isTablet
     ? Math.max(74, Math.floor((Math.max(width, 768) - 20) / Math.max(1, visibleOrder.length)))

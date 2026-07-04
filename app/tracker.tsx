@@ -70,6 +70,7 @@ import { spacing } from '../src/theme';
 import { MICRO_SYLLABUS, MAINS_SYLLABUS, ANTHROPOLOGY_SYLLABUS } from '../src/data/syllabus';
 import { SyllabusService, SyllabusProgress } from '../src/services/SyllabusService';
 import { useAuth } from '../src/context/AuthContext';
+import { useCourse } from '../src/context/CourseContext';
 import { buildWeightedSyllabusData, WeightedYearFilter } from '../src/lib/syllabusWeightedProgress';
 import { AIQuickActionButton } from '../src/components/AIQuickActionButton';
 import { DEFAULT_SYLLABUS_TEMPLATES } from '../src/services/AIPromptManager';
@@ -427,6 +428,7 @@ function SyllabusTracker() {
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
   const { session } = useAuth();
+  const { selectedCourse } = useCourse();
   const params = useLocalSearchParams<{ defaultMode?: Mode }>();
   const [mode, setMode] = useState<Mode>(
     params.defaultMode === 'mains' 
@@ -441,6 +443,12 @@ function SyllabusTracker() {
       setMode(params.defaultMode);
     }
   }, [params.defaultMode]);
+
+  useEffect(() => {
+    if (selectedCourse === 'Medical Science' && mode === 'mains') {
+      setMode('prelims');
+    }
+  }, [selectedCourse, mode]);
 
   const [progress, setProgress] = useState<Record<string, SyllabusProgress>>({});
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -1239,7 +1247,7 @@ function SyllabusTracker() {
             </View>
 
             <View style={[s.topRightPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              {(['prelims', 'mains', 'optional'] as Mode[]).map((m) => (
+              {((selectedCourse === 'Medical Science' ? ['prelims', 'optional'] : ['prelims', 'mains', 'optional']) as Mode[]).map((m) => (
                 <TouchableOpacity key={m} style={[s.modeLineBtn, { borderColor: colors.border }, mode === m && { backgroundColor: colors.primary, borderColor: colors.primary }]} onPress={() => setMode(m)}>
                   <Text style={[s.modeLineText, { color: mode === m ? '#fff' : colors.textSecondary }]}>{m === 'prelims' ? 'Prelims' : m === 'mains' ? 'Mains' : 'Optional'}</Text>
                 </TouchableOpacity>

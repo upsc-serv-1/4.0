@@ -32,6 +32,7 @@ import {
   Download,
   X,
   Check,
+  BookOpen,
 } from 'lucide-react-native';
 
 
@@ -101,6 +102,17 @@ interface SyllabusNodeProps {
   colors: any;
 }
 
+const LEVEL_STYLES = [
+  // level 0 — Section Group: bold, prominent header
+  { bgColor: (c: any) => c.surface, borderColor: (c: any) => c.border, fontSize: 14, fontWeight: '800' as const, iconSize: 18, iconColor: (c: any) => c.primary, indent: 0, labelColor: (c: any) => c.textPrimary },
+  // level 1 — Micro Topic: medium, tinted background
+  { bgColor: (c: any) => c.bg, borderColor: (c: any) => c.border + '80', fontSize: 13, fontWeight: '700' as const, iconSize: 15, iconColor: (c: any) => '#8b5cf6', indent: 8, labelColor: (c: any) => c.textPrimary },
+  // level 2 — Sub-Microtopic: smaller, subtle
+  { bgColor: (c: any) => c.bg + '80', borderColor: (c: any) => c.border + '40', fontSize: 12, fontWeight: '600' as const, iconSize: 13, iconColor: (c: any) => '#06b6d4', indent: 14, labelColor: (c: any) => c.textSecondary },
+  // level 3+ — deep nesting fallback
+  { bgColor: (c: any) => 'transparent', borderColor: (c: any) => c.border + '30', fontSize: 11, fontWeight: '500' as const, iconSize: 12, iconColor: (c: any) => c.textTertiary, indent: 18, labelColor: (c: any) => c.textSecondary },
+];
+
 const SyllabusNode: React.FC<SyllabusNodeProps> = ({
   name,
   node,
@@ -114,11 +126,13 @@ const SyllabusNode: React.FC<SyllabusNodeProps> = ({
   colors
 }) => {
   const isExpanded = expandedPaths[path];
+  const ls = LEVEL_STYLES[Math.min(level, LEVEL_STYLES.length - 1)];
 
+  // Leaf layer — array of subtopic strings
   if (Array.isArray(node)) {
     return (
-      <View style={{ marginLeft: level > 0 ? 12 : 0, gap: 10 }}>
-        {node.map((topic, idx) => {
+      <View style={{ marginLeft: ls.indent, marginTop: 4, gap: 6 }}>
+        {node.map((topic: string) => {
           const itemPath = `${path}.${topic}`;
           const itemProgress = progress[itemPath] || { ncert: false, pyqs: false, books: false, test: false, mastered: false };
           return (
@@ -151,34 +165,53 @@ const SyllabusNode: React.FC<SyllabusNodeProps> = ({
     );
   }
 
+  // Branch layer — object with children
+  const childEntries = Object.entries(node);
+
   return (
-    <View style={{ marginLeft: level > 0 ? 12 : 0, marginBottom: 8 }}>
+    <View style={{ marginLeft: ls.indent, marginBottom: level === 0 ? 12 : 6 }}>
       <TouchableOpacity
         activeOpacity={0.7}
-        onPress={() => togglePathExpanded(path)}
+        onPress={() => {
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+          togglePathExpanded(path);
+        }}
         style={{
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          paddingVertical: 12,
-          paddingHorizontal: 16,
-          backgroundColor: colors.surfaceStrong || colors.surface,
-          borderRadius: 12,
-          borderWidth: 1,
-          borderColor: colors.border,
-          marginBottom: 4
+          paddingVertical: level === 0 ? 14 : 10,
+          paddingHorizontal: 14,
+          backgroundColor: ls.bgColor(colors),
+          borderRadius: level === 0 ? 14 : 10,
+          borderWidth: level === 0 ? 1.5 : 1,
+          borderColor: ls.borderColor(colors),
+          marginBottom: 4,
         }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 8 }}>
-          <Target color={colors.primary} size={16} />
-          <Text style={{ fontSize: 13, fontWeight: '700', color: colors.textPrimary, flex: 1 }}>{name}</Text>
+          {level === 0 ? (
+            <Target color={ls.iconColor(colors)} size={ls.iconSize} />
+          ) : level === 1 ? (
+            <BookOpen color={ls.iconColor(colors)} size={ls.iconSize} />
+          ) : (
+            <ChevronRight color={ls.iconColor(colors)} size={ls.iconSize} />
+          )}
+          <Text style={{ fontSize: ls.fontSize, fontWeight: ls.fontWeight, color: ls.labelColor(colors), flex: 1, lineHeight: ls.fontSize * 1.4 }} numberOfLines={3}>
+            {name}
+          </Text>
         </View>
-        {isExpanded ? <ChevronUp size={16} color={colors.textTertiary} /> : <ChevronDown size={16} color={colors.textTertiary} />}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Text style={{ fontSize: 10, color: colors.textTertiary, fontWeight: '600' }}>
+            {childEntries.length}
+          </Text>
+          {isExpanded ? <ChevronUp size={ls.iconSize} color={colors.textTertiary} /> : <ChevronDown size={ls.iconSize} color={colors.textTertiary} />}
+        </View>
       </TouchableOpacity>
 
       {isExpanded && (
-        <View style={{ marginTop: 6, borderLeftWidth: 1, borderLeftColor: colors.border + '30', paddingLeft: 6 }}>
-          {Object.entries(node).map(([childKey, childNode]) => (
+        <View style={{ marginTop: 4, borderLeftWidth: 2, borderLeftColor: ls.iconColor(colors) + '40', paddingLeft: 8 }}>
+          {childEntries.map(([childKey, childNode]) => (
             <SyllabusNode
               key={childKey}
               name={childKey}

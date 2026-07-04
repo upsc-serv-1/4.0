@@ -49,14 +49,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Contribution of K. S. Singh to Indian Anthropology",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.788
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 4 - Emergence and Growth of Anthropology in India",
+    "subTopic": "4.1 Emergence, growth and development",
+    "nanoTopic": "Contributions of Indian anthropologists to tribal and caste studies",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 4 - Emergence and Growth of Anthropology in India",
+      "4.1 Emergence, growth and development",
+      "Contributions of Indian anthropologists to tribal and caste studies"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, 150 words, India",
+    "matched_similarity": 0.788,
+    "matched_ref_text": "Write a note in 150 words on Contribution of K. S. Singh to Indian Anthropology"
   },
   {
     "key": "2020-P2-Q1d",
@@ -275,14 +283,22 @@
     "questionText": "Discuss the impact of Globalization on Indian villages.",
     "marks": 15,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.792
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 5 - Indian Village and Socio-Cultural Change",
+    "subTopic": "5.1 Indian Village",
+    "nanoTopic": "Impact of globalization on Indian villages",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 5 - Indian Village and Socio-Cultural Change",
+      "5.1 Indian Village",
+      "Impact of globalization on Indian villages"
+    ],
+    "macrotag": "Analytical, Applied",
+    "microtag": "Discuss, India",
+    "matched_similarity": 0.792,
+    "matched_ref_text": "Discuss the impact of globalization on village economy in India"
   },
   {
     "key": "2020-P2-Q4c",
@@ -393,14 +409,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Concept of Ethnicity",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.75
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 7 - Ethnicity, Unrest, and Political Developments",
+    "subTopic": "7.3 Ethnicity, Unrest, and Political Developments",
+    "nanoTopic": "The concept of ethnicity and Ethnic conflicts",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 7 - Ethnicity, Unrest, and Political Developments",
+      "7.3 Ethnicity, Unrest, and Political Developments",
+      "The concept of ethnicity and Ethnic conflicts"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Write a note",
+    "matched_similarity": 0.75,
+    "matched_ref_text": "Write a note on Concept of Ethnicity"
   },
   {
     "key": "2020-P2-Q6a",

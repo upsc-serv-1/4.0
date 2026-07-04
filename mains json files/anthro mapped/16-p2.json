@@ -432,14 +432,22 @@
     "questionText": "Write on the following in about 150 words each: Tribe as a colonial construct",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.782
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 6 - Tribal Situation in India",
+    "subTopic": "6.1 Tribal situation in India",
+    "nanoTopic": "Linguistic and socio-economic characteristics and their distribution",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 6 - Tribal Situation in India",
+      "6.1 Tribal situation in India",
+      "Linguistic and socio-economic characteristics and their distribution"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 0.782,
+    "matched_ref_text": "Write a note in 150 words on Tribe as a colonial construct"
   },
   {
     "key": "2016-P2-Q5e",

@@ -24,14 +24,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Austro-asiatic linguistic groups in India.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.766
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 2 - Demographic Profile of India",
+    "subTopic": "2.1 Demographic profile and population structure",
+    "nanoTopic": "Ethnic and linguistic elements in the Indian population and their distribution",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 2 - Demographic Profile of India",
+      "2.1 Demographic profile and population structure",
+      "Ethnic and linguistic elements in the Indian population and their distribution"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, 150 words, India",
+    "matched_similarity": 0.766,
+    "matched_ref_text": "Write a note in 150 words on Austro-Asiatic linguistic groups in India"
   },
   {
     "key": "2017-P2-Q1c",
@@ -75,14 +83,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Nature-man-spirit complex.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.786
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 5 - Religion",
+    "subTopic": "5.3 Forms and Functionaries",
+    "nanoTopic": "Forms of religion in tribal/peasant societies (animism, animatism, fetishism, naturism, totemism)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 5 - Religion",
+      "5.3 Forms and Functionaries",
+      "Forms of religion in tribal/peasant societies (animism, animatism, fetishism, naturism, totemism)"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Write a note",
+    "matched_similarity": 0.786,
+    "matched_ref_text": "Write a note on Nature-Man-Spirit complex"
   },
   {
     "key": "2017-P2-Q2a",
@@ -317,14 +333,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Indebtedness among tribal communities.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.779
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 6 - Tribal Situation in India",
+    "subTopic": "6.2 Problems of the tribal Communities",
+    "nanoTopic": "Land alienation, poverty, and indebtedness",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 6 - Tribal Situation in India",
+      "6.2 Problems of the tribal Communities",
+      "Land alienation, poverty, and indebtedness"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Write a note",
+    "matched_similarity": 0.779,
+    "matched_ref_text": "Write a note on Indebtedness in Tribal Communities"
   },
   {
     "key": "2017-P2-Q5b",
@@ -393,14 +417,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Impact of Christianity on Indian tribes.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.756
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 5 - Religion",
+    "subTopic": "5.2 Core Concepts of Religion",
+    "nanoTopic": "Monotheism and polytheism",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 5 - Religion",
+      "5.2 Core Concepts of Religion",
+      "Monotheism and polytheism"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, India",
+    "matched_similarity": 0.756,
+    "matched_ref_text": "Write a note in 150 words on Impact of Christianity on Indian tribes"
   },
   {
     "key": "2017-P2-Q6a",

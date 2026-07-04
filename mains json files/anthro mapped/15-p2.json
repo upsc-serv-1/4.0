@@ -66,14 +66,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Panchayati Raj Institutions and Social Change",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.784
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 5 - Indian Village and Socio-Cultural Change",
+    "subTopic": "5.3 Indigenous and exogenous processes of socio-cultural change",
+    "nanoTopic": "Panchayati Raj and social change",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 5 - Indian Village and Socio-Cultural Change",
+      "5.3 Indigenous and exogenous processes of socio-cultural change",
+      "Panchayati Raj and social change"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 0.784,
+    "matched_ref_text": "Write a note in 150 words on Panchayati Raj Institutions and Social Change"
   },
   {
     "key": "2015-P2-Q1e",
@@ -83,14 +91,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Rights over resources and tribal unrest",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.756
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 7 - Ethnicity, Unrest, and Political Developments",
+    "subTopic": "7.3 Ethnicity, Unrest, and Political Developments",
+    "nanoTopic": "Unrest among tribal communities, Regionalism and demand for autonomy",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 7 - Ethnicity, Unrest, and Political Developments",
+      "7.3 Ethnicity, Unrest, and Political Developments",
+      "Unrest among tribal communities, Regionalism and demand for autonomy"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 0.756,
+    "matched_ref_text": "Write a note in 150 words on Rights over resources and tribal unrest"
   },
   {
     "key": "2015-P2-Q2a",

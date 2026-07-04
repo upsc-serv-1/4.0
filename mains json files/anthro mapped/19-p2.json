@@ -399,14 +399,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Anthropological understanding of communalism.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.788
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 9 - Tribal Administration and Applied Anthropology",
+    "subTopic": "9.3 Anthropology and political movements",
+    "nanoTopic": "Contributions to understanding regionalism and communalism",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 9 - Tribal Administration and Applied Anthropology",
+      "9.3 Anthropology and political movements",
+      "Contributions to understanding regionalism and communalism"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 0.788,
+    "matched_ref_text": "Write a note in 150 words on Anthropological understanding of communalism"
   },
   {
     "key": "2019-P2-Q5d",
@@ -433,14 +441,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Distribution of Neolithic sites in India.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.761
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Cultural Evolution: Neolithic and Chalcolithic",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Cultural Evolution: Neolithic and Chalcolithic"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 0.761,
+    "matched_ref_text": "Write a note in 150 words on Distribution of Neolithic sites in India"
   },
   {
     "key": "2019-P2-Q6a",

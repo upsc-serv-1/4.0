@@ -75,14 +75,22 @@
     "questionText": "Write notes on the following in about 150 words each: Ways of Acquiring Mate in Tribal Society",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.756
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 2 - Culture, Society, and Social Institutions",
+    "subTopic": "2.3 Marriage",
+    "nanoTopic": "Marriage regulations (preferential, prescriptive and proscriptive)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 2 - Culture, Society, and Social Institutions",
+      "2.3 Marriage",
+      "Marriage regulations (preferential, prescriptive and proscriptive)"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 0.756,
+    "matched_ref_text": "Write a note in 150 words on Ways of Acquiring Mate in Tribal Society"
   },
   {
     "key": "2018-P1-Q2a",
@@ -317,14 +325,22 @@
     "questionText": "Write notes on the following in about 150 words each: Gordon Childe's Theory of Cultural Evolution",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.776
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 6 - Anthropological Theories",
+    "subTopic": "6(f) Neo-evolutionism",
+    "nanoTopic": "Childe and White",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 6 - Anthropological Theories",
+      "6(f) Neo-evolutionism",
+      "Childe and White"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 0.776,
+    "matched_ref_text": "Write a note in 150 words on Gordon Childe's Theory of Cultural Evolution"
   },
   {
     "key": "2018-P1-Q5b",
@@ -334,14 +350,22 @@
     "questionText": "Write notes on the following in about 150 words each: Advanced Molecular Anthropology Techniques",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.78
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 9 - Human Genetics and Physical Anthropology",
+    "subTopic": "9.1 Human Genetics: Methods and Application",
+    "nanoTopic": "D.N.A. technology and recombinant technologies",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 9 - Human Genetics and Physical Anthropology",
+      "9.1 Human Genetics: Methods and Application",
+      "D.N.A. technology and recombinant technologies"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 0.78,
+    "matched_ref_text": "Write a note in 150 words on Advanced Molecular Anthropology Techniques"
   },
   {
     "key": "2018-P1-Q5c",
@@ -351,14 +375,22 @@
     "questionText": "Write notes on the following in about 150 words each: Categorize Genes that influence Human Survival.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.769
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.7 The biological basis of life",
+    "nanoTopic": "Gene and Mutation",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.7 The biological basis of life",
+      "Gene and Mutation"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 0.769,
+    "matched_ref_text": "Write a note in 150 words on Categorise Genes that influence Human Survival"
   },
   {
     "key": "2018-P1-Q5d",

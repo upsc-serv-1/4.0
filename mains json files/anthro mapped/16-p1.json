@@ -32,14 +32,22 @@
     "questionText": "Write notes on the following in about 150 words each: Cultural Relativism",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.75
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 2 - Culture, Society, and Social Institutions",
+    "subTopic": "2.1 The Nature of Culture",
+    "nanoTopic": "Ethnocentrism vis-a-vis cultural Relativism",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 2 - Culture, Society, and Social Institutions",
+      "2.1 The Nature of Culture",
+      "Ethnocentrism vis-a-vis cultural Relativism"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "",
+    "matched_similarity": 0.75,
+    "matched_ref_text": "Write a note on Cultural relativism"
   },
   {
     "key": "2016-P1-Q1c",
@@ -359,14 +367,22 @@
     "questionText": "Write notes on the following in about 150 words each : Neolithic Cultures of India",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.793
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Cultural Evolution: Neolithic and Chalcolithic",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Cultural Evolution: Neolithic and Chalcolithic"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "",
+    "matched_similarity": 0.793,
+    "matched_ref_text": "Describe the Neolithic culture of India"
   },
   {
     "key": "2016-P1-Q5d",
@@ -393,14 +409,22 @@
     "questionText": "Write notes on the following in about 150 words each : Forensic Anthropology",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.769
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 12 - Applications of Anthropology",
+    "subTopic": "12.2 Forensic and Medical Applications",
+    "nanoTopic": "Forensic Anthropology, personal identification and reconstruction",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 12 - Applications of Anthropology",
+      "12.2 Forensic and Medical Applications",
+      "Forensic Anthropology, personal identification and reconstruction"
+    ],
+    "macrotag": "Descriptive, Applied",
+    "microtag": "Write a note",
+    "matched_similarity": 0.769,
+    "matched_ref_text": "Write a note on Forensic Anthropology"
   },
   {
     "key": "2016-P1-Q6a",

@@ -1,5 +1,35 @@
 [
   {
+    "app_key": "2012-P1-Q1a",
+    "app_text": "Write short notes on the following in about 150 words each: How 'natural selection' acts on variation?",
+    "ref_text": "Write a note in 150 words on How 'natural selection' acts on variation?",
+    "similarity": 0.756,
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 9 - Human Genetics and Physical Anthropology",
+      "9.3 Genetic polymorphism and selection",
+      "Causes and changes which bring down frequency (mutation, isolation, migration, selection, inbreeding and genetic drift)"
+    ],
+    "macrotag": "Descriptive, Short Note"
+  },
+  {
+    "app_key": "2012-P1-Q1b",
+    "app_text": "Write short notes on the following in about 150 words each: Ways of acquiring a spouse in simpler societies",
+    "ref_text": "Write a note in 150 words on Ways of acquiring a spouse in simpler societies",
+    "similarity": 0.784,
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 2 - Culture, Society, and Social Institutions",
+      "2.3 Marriage",
+      "Marriage regulations (preferential, prescriptive and proscriptive)"
+    ],
+    "macrotag": "Descriptive"
+  },
+  {
     "app_key": "2012-P1-Q1c",
     "app_text": "Write short notes on the following in about 150 words each: Post-modernism in Anthropology",
     "ref_text": "Write a note on Post-modernism in Anthropology",
@@ -11,6 +41,21 @@
       "Unit 6 - Anthropological Theories",
       "6(j) Post-modernism in anthropology",
       "Post-modernism in anthropology"
+    ],
+    "macrotag": "Descriptive"
+  },
+  {
+    "app_key": "2012-P1-Q1e",
+    "app_text": "Write short notes on the following in about 150 words each: Adaptive radiation in context of evolution",
+    "ref_text": "Write a note in 150 words on Adaptive tradition in context of evolution",
+    "similarity": 0.75,
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.4 Human Evolution and emergence of Man",
+      "Evolutionary biology terms (parallelism, convergence, adaptive radiation, mosaic evolution)"
     ],
     "macrotag": "Descriptive"
   },
@@ -103,50 +148,5 @@
       "Polygenic inheritance in man"
     ],
     "macrotag": "Descriptive"
-  },
-  {
-    "app_key": "2012-P1-Q4a",
-    "app_text": "Describe the types of kinship groups formed on the basis of different principles.",
-    "ref_text": "Describe the types of kinship groups formed on the basis of different principles",
-    "similarity": 1.0,
-    "hierarchy_path": [
-      "Anthropology",
-      "Anthro - 1",
-      "Paper I",
-      "Unit 2 - Culture, Society, and Social Institutions",
-      "2.5 Kinship",
-      "Forms of descent groups (lineage, clan, phratry, moiety and kindred)"
-    ],
-    "macrotag": "Descriptive"
-  },
-  {
-    "app_key": "2012-P1-Q4b",
-    "app_text": "Give a comparative account of variations in hemoglobin level and respiratory functions among the populations living under different environmental stresses.",
-    "ref_text": "Give a comparative account of variations in hemoglobin level and respiratory functions among the populations living under different environmental stresses",
-    "similarity": 1.0,
-    "hierarchy_path": [
-      "Anthropology",
-      "Anthro - 1",
-      "Paper I",
-      "Unit 9 - Human Genetics and Physical Anthropology",
-      "9.6 Age, sex and population variation as genetic marker",
-      "Physiological characteristics-Hb level, body fat, pulse rate, respiratory functions and sensory perceptions in different cultural and socio-ecomomic groups"
-    ],
-    "macrotag": "Comparative, Analytical"
-  },
-  {
-    "app_key": "2012-P1-Q4c",
-    "app_text": "Comment briefly on the phylogenetic position of Australopithecines.",
-    "ref_text": "Comment briefly on the phylogenetic position of Australopithecines",
-    "similarity": 1.0,
-    "hierarchy_path": [
-      "Anthropology",
-      "Anthro - 1",
-      "Paper I",
-      "Unit 1 - Introduction, Human Evolution, and Prehistory",
-      "1.6 Phylogenetic status, characteristics and geographical distribution",
-      "Plio-pleistocene hominids in South and East Africa (Australopithecines)"
-    ],
-    "macrotag": "Analytical"
   }
 ]

@@ -66,14 +66,22 @@
     "questionText": "Write notes on the following in about 150 words each: Ecological Anthropology",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.786
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 9 - Human Genetics and Physical Anthropology",
+    "subTopic": "9.7 Concepts and methods of Ecological Anthropology",
+    "nanoTopic": "Concepts and methods of Ecological Anthropology",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 9 - Human Genetics and Physical Anthropology",
+      "9.7 Concepts and methods of Ecological Anthropology",
+      "Concepts and methods of Ecological Anthropology"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Write a note",
+    "matched_similarity": 0.786,
+    "matched_ref_text": "Write a note on Ecological Anthropology"
   },
   {
     "key": "2014-P1-Q1e",
@@ -325,14 +333,22 @@
     "questionText": "Write notes on the following in about 150 words each: Cross-sectional methods of studying human growth",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.792
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 10 - Concept of human growth and development",
+    "subTopic": "10.2 Ageing, Senescence, and Somatotypes",
+    "nanoTopic": "Methodologies for growth studies",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 10 - Concept of human growth and development",
+      "10.2 Ageing, Senescence, and Somatotypes",
+      "Methodologies for growth studies"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 0.792,
+    "matched_ref_text": "Write a note in 150 words on Cross-sectional methods of studying human growth"
   },
   {
     "key": "2014-P1-Q5b",
@@ -342,14 +358,22 @@
     "questionText": "Write notes on the following in about 150 words each: Genetic Counselling",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.75
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 9 - Human Genetics and Physical Anthropology",
+    "subTopic": "9.4 Chromosomes and chromosomal aberrations in man, methodology",
+    "nanoTopic": "Genetic imprints in human disease, genetic screening, genetic counseling, human DNA profiling, gene mapping and genome study",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 9 - Human Genetics and Physical Anthropology",
+      "9.4 Chromosomes and chromosomal aberrations in man, methodology",
+      "Genetic imprints in human disease, genetic screening, genetic counseling, human DNA profiling, gene mapping and genome study"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Write a note",
+    "matched_similarity": 0.75,
+    "matched_ref_text": "Write a note on Genetic counselling"
   },
   {
     "key": "2014-P1-Q5c",

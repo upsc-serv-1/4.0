@@ -24,14 +24,22 @@
     "questionText": "Write notes on the following in about 150 words each: Difference between religion and magic",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.75
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 5 - Religion",
+    "subTopic": "5.2 Core Concepts of Religion",
+    "nanoTopic": "Religion, magic and science distinguished",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 5 - Religion",
+      "5.2 Core Concepts of Religion",
+      "Religion, magic and science distinguished"
+    ],
+    "macrotag": "Comparative, Descriptive",
+    "microtag": "Write a note, Difference",
+    "matched_similarity": 0.75,
+    "matched_ref_text": "Write a note in 150 words on Difference between religion and magic"
   },
   {
     "key": "2017-P1-Q1c",
@@ -342,14 +350,22 @@
     "questionText": "Write notes on the following in about 150 words each: Salient features of Mesolithic culture",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.756
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Cultural Evolution: Paleolithic and Mesolithic",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Cultural Evolution: Paleolithic and Mesolithic"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 0.756,
+    "matched_ref_text": "Write a note in 150 words on salient features of Mesolithic culture"
   },
   {
     "key": "2017-P1-Q5c",
@@ -393,14 +409,22 @@
     "questionText": "Write notes on the following in about 150 words each: Anthropology and designing of equipments",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.766
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 12 - Applications of Anthropology",
+    "subTopic": "12.1 Core Applications",
+    "nanoTopic": "Anthropology in designing of defence and other equipments",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 12 - Applications of Anthropology",
+      "12.1 Core Applications",
+      "Anthropology in designing of defence and other equipments"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 0.766,
+    "matched_ref_text": "Write a note in 150 words on Anthropology and designing of equipments"
   },
   {
     "key": "2017-P1-Q6a",

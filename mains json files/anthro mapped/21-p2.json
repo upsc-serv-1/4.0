@@ -83,14 +83,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Factionalism and politics in rural India",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.761
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 3 - Traditional Indian Social System and Caste",
+    "subTopic": "3.2 Caste system in India",
+    "nanoTopic": "Dominant caste and Caste mobility",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 3 - Traditional Indian Social System and Caste",
+      "3.2 Caste system in India",
+      "Dominant caste and Caste mobility"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, 150 words, India",
+    "matched_similarity": 0.761,
+    "matched_ref_text": "Write a note in 150 words on Factionalism and politics in rural India"
   },
   {
     "key": "2021-P2-Q2a",
@@ -325,14 +333,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Urbanization and tribal institutions",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.75
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 6 - Tribal Situation in India",
+    "subTopic": "6.3 Developmental projects and their impact",
+    "nanoTopic": "Impact of urbanisation and industrialisation on tribal populations",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 6 - Tribal Situation in India",
+      "6.3 Developmental projects and their impact",
+      "Impact of urbanisation and industrialisation on tribal populations"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 0.75,
+    "matched_ref_text": "Write a note in 150 words on Urbanization and tribal institutions"
   },
   {
     "key": "2021-P2-Q5b",
@@ -359,14 +375,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Cultural diversity and multiculturalism",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.766
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 5 - Indian Village and Socio-Cultural Change",
+    "subTopic": "5.3 Indigenous and exogenous processes of socio-cultural change",
+    "nanoTopic": "Sanskritization, Westernization, Modernization",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 5 - Indian Village and Socio-Cultural Change",
+      "5.3 Indigenous and exogenous processes of socio-cultural change",
+      "Sanskritization, Westernization, Modernization"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 0.766,
+    "matched_ref_text": "Write a note in 150 words on Cultural diversity and multiculturalism"
   },
   {
     "key": "2021-P2-Q5d",
@@ -393,14 +417,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Politics of recognition and deprivation",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.761
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 9 - Tribal Administration and Applied Anthropology",
+    "subTopic": "9.1 Administration, policies, and PTGs",
+    "nanoTopic": "History of administration of tribal areas and tribal policies",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 9 - Tribal Administration and Applied Anthropology",
+      "9.1 Administration, policies, and PTGs",
+      "History of administration of tribal areas and tribal policies"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, 150 words, India",
+    "matched_similarity": 0.761,
+    "matched_ref_text": "Write a note in 150 words on Politics of recognition and deprivation"
   },
   {
     "key": "2021-P2-Q6a",

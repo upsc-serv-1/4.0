@@ -4,7 +4,7 @@ import { router, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import {
   BookOpen, BarChart3, Play, Clock,
-  RotateCcw, Zap, Sliders, FileText, Tag, Award, Brain, Flame, Target, PenTool, Sparkles
+  RotateCcw, Zap, Sliders, FileText, Tag, Award, Brain, Flame, Target, PenTool, Sparkles, Library
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../../src/lib/supabase';

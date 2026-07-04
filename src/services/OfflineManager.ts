@@ -696,6 +696,8 @@ class OfflineManagerService {
             is_ncert: null,
             test_id: t.id, institute: t.institute, program_name: t.program_name,
             series: t.series, title: t.title,
+            exam_category: t.exam_category || null,
+            level: t.level || null,
           });
         } else {
           for (const q of questions) {
@@ -707,6 +709,8 @@ class OfflineManagerService {
               is_ncert: q.is_ncert ?? null,
               test_id: t.id, institute: t.institute, program_name: t.program_name,
               series: t.series, title: t.title,
+              exam_category: q.exam_category || t.exam_category || null,
+              level: t.level || null,
             });
           }
         }

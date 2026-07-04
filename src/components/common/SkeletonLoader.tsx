@@ -305,7 +305,7 @@ export const SkeletonDashboard: React.FC<{ colors: any }> = ({ colors }) => (
 
     {/* 4. Productivity Grid (Horizontal scroll skeleton) */}
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }} style={{ marginBottom: 36, marginHorizontal: -24 }}>
-      {[1, 2, 3].map((key) => (
+      {[1, 2, 3, 4, 5].map((key) => (
         <View key={key} style={{ width: 145, height: 124, borderRadius: 28, backgroundColor: colors.surface || '#fff', borderWidth: 1, borderColor: colors.border || '#e5e7eb', padding: 16, gap: 10 }}>
           <SkeletonCircle size={36} />
           <SkeletonLine width={50} height={20} borderRadius={10} />

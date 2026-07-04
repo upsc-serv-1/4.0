@@ -7,14 +7,22 @@
     "questionText": "Write notes on the following in about 150 words each: The Relevance of Anthropology",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.703
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.1 Meaning, scope and development of Anthropology",
+    "nanoTopic": "Scope of Anthropology",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.1 Meaning, scope and development of Anthropology",
+      "Scope of Anthropology"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on the Relevance of Anthropology"
   },
   {
     "key": "2018-P1-Q1b",
@@ -24,14 +32,22 @@
     "questionText": "Write notes on the following in about 150 words each: Difference between Science and Magic",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.744
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 5 - Religion",
+    "subTopic": "5.2 Core Concepts of Religion",
+    "nanoTopic": "Religion, magic and science distinguished",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 5 - Religion",
+      "5.2 Core Concepts of Religion",
+      "Religion, magic and science distinguished"
+    ],
+    "macrotag": "Comparative, Descriptive",
+    "microtag": "Write a note, Difference",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Difference between Science and Magic"
   },
   {
     "key": "2018-P1-Q1c",
@@ -41,14 +57,22 @@
     "questionText": "Write notes on the following in about 150 words each: Town Planning of Harappan Culture",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.725
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Cultural Evolution: Copper-Bronze Age and Iron Age",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Cultural Evolution: Copper-Bronze Age and Iron Age"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Town Planning of Harappan Culture"
   },
   {
     "key": "2018-P1-Q1d",
@@ -58,14 +82,22 @@
     "questionText": "Write notes on the following in about 150 words each: Kinship Terminology",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.621
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 2 - Culture, Society, and Social Institutions",
+    "subTopic": "2.5 Kinship",
+    "nanoTopic": "Kinship terminology (descriptive and classificatory)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 2 - Culture, Society, and Social Institutions",
+      "2.5 Kinship",
+      "Kinship terminology (descriptive and classificatory)"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Kinship Terminology"
   },
   {
     "key": "2018-P1-Q1e",
@@ -89,7 +121,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.756,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Ways of Acquiring Mate in Tribal Society"
   },
   {
@@ -339,7 +371,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.776,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Gordon Childe's Theory of Cultural Evolution"
   },
   {
@@ -364,7 +396,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.78,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Advanced Molecular Anthropology Techniques"
   },
   {
@@ -389,7 +421,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.769,
+    "matched_similarity": 0.976,
     "matched_ref_text": "Write a note in 150 words on Categorise Genes that influence Human Survival"
   },
   {
@@ -414,7 +446,7 @@
     ],
     "macrotag": "Descriptive, Analytical, Applied",
     "microtag": "Write a note, Justify",
-    "matched_similarity": 0.87,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note on Race is a Myth. Justify its Present Day Relevance"
   },
   {
@@ -439,7 +471,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.847,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Issues of Elderly and Senescence in Developing and Developed Countries"
   },
   {

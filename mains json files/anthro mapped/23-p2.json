@@ -21,7 +21,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Short Note",
-    "matched_similarity": 0.935,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Material culture and archaeology. UPSC"
   },
   {
@@ -39,7 +39,7 @@
     "hierarchy_path": [],
     "macrotag": null,
     "microtag": null,
-    "matched_similarity": 0.482
+    "matched_similarity": 0.522
   },
   {
     "key": "2023-P2-Q1c",
@@ -49,22 +49,14 @@
     "questionText": "Write short notes on the following in about 150 words each: Jajmani system: continuity and change",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": "Paper II",
-    "microTopic": "Unit 3 - Traditional Indian Social System and Caste",
-    "subTopic": "3.2 Caste system in India",
-    "nanoTopic": "Future of caste system and Jajmani system",
-    "hierarchy_path": [
-      "Anthropology",
-      "Anthro - 2",
-      "Paper II",
-      "Unit 3 - Traditional Indian Social System and Caste",
-      "3.2 Caste system in India",
-      "Future of caste system and Jajmani system"
-    ],
-    "macrotag": "Descriptive, Short Note",
-    "microtag": "Short Note",
-    "matched_similarity": 0.941,
-    "matched_ref_text": "Jajmani system: continuity and change. UPSC"
+    "sectionGroup": null,
+    "microTopic": null,
+    "subTopic": null,
+    "nanoTopic": null,
+    "hierarchy_path": [],
+    "macrotag": null,
+    "microtag": null,
+    "matched_similarity": 0.745
   },
   {
     "key": "2023-P2-Q1d",
@@ -113,7 +105,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Short Note",
-    "matched_similarity": 0.813,
+    "matched_similarity": 0.881,
     "matched_ref_text": "Religious pluralism and social solidarity  2023, Paper 2, 10 Marks"
   },
   {
@@ -138,7 +130,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Critically comment, India",
-    "matched_similarity": 0.976,
+    "matched_similarity": 1.0,
     "matched_ref_text": "\"Tribes are backward Hindus.\" Critically comment with reference to the contributions of G. S. Ghurye. UPSC"
   },
   {
@@ -213,7 +205,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Critically comment, India",
-    "matched_similarity": 0.987,
+    "matched_similarity": 1.0,
     "matched_ref_text": "\"Sanskritization is a culture-bound concept.\" Critically comment to assess the strength and limitation of this concept in developing a theoretical framework to study social change. UPSC"
   },
   {
@@ -263,7 +255,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Critically examine, Illustrate, India",
-    "matched_similarity": 0.984,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Critically examine the impact of modern democratic institutions on contemporary tribal societies. Illustrate with suitable ethnographic examples. UPSC"
   },
   {
@@ -288,7 +280,7 @@
     ],
     "macrotag": "Descriptive, Analytical, Applied",
     "microtag": "Elucidate, India",
-    "matched_similarity": 0.986,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Elucidate the problems faced by Particularly Vulnerable Tribal Groups and the major challenges in the formulation of special programmes for their development. UPSC"
   },
   {
@@ -313,7 +305,7 @@
     ],
     "macrotag": "Comparative, Analytical, Applied",
     "microtag": "Critically compare, India",
-    "matched_similarity": 0.975,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Critically compare Risley's and Sarkar's approaches to the classification of peoples of India. UPSC"
   },
   {
@@ -338,7 +330,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Discuss, India",
-    "matched_similarity": 0.976,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Is caste mobility a recent phenomenon? Discuss in the light of Indological and Empirical context. UPSC"
   },
   {
@@ -363,7 +355,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Short Note, India",
-    "matched_similarity": 0.875,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Scheduled areas. UPSC"
   },
   {
@@ -413,7 +405,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Short Note",
-    "matched_similarity": 0.92,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Village as little republic. UPSC"
   },
   {
@@ -438,7 +430,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Short Note",
-    "matched_similarity": 0.946,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Dravidian languages and their subgroups. UPSC"
   },
   {
@@ -463,7 +455,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Short Note",
-    "matched_similarity": 0.882,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Karma and Rebirth UPSC"
   },
   {
@@ -488,7 +480,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Discuss, India",
-    "matched_similarity": 0.983,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Is annihilation of caste possible? Discuss the future of caste system in the light of various proactive measures taken by the Indian State. UPSC"
   },
   {
@@ -513,7 +505,7 @@
     ],
     "macrotag": "Comparative, Analytical, Applied",
     "microtag": "Distinguishing, Discuss, India",
-    "matched_similarity": 0.981,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Distinguishing between ethnic identity and ethnicity, discuss the factors responsible for ethnic conflict in tribal areas. UPSC"
   },
   {
@@ -563,7 +555,7 @@
     ],
     "macrotag": "Descriptive, Applied",
     "microtag": "Elucidate, India",
-    "matched_similarity": 0.976,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Elucidate the shifting terrains of India's tribal policies in colonial and post-colonial periods. UPSC"
   },
   {
@@ -588,7 +580,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Critically examine, Illustrate",
-    "matched_similarity": 0.988,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Critically examine how the displacement of tribal communities due to hydroelectric river dam projects has affected the women in local context. Illustrate with suitable ethnographic examples. UPSC"
   },
   {
@@ -613,7 +605,7 @@
     ],
     "macrotag": "Descriptive, Analytical, Applied",
     "microtag": "Elucidate, Illustrate, India",
-    "matched_similarity": 0.974,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Elucidate the role of anthropology in nation building. Illustrate with suitable examples. UPSC"
   },
   {
@@ -638,7 +630,7 @@
     ],
     "macrotag": "Analytical, Descriptive, Applied",
     "microtag": "Discuss, Identify, India",
-    "matched_similarity": 0.986,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Discuss the distribution of tribes in different geographical regions of India. Identify the distinct institutional features of tribal societies of these regions. UPSC"
   },
   {
@@ -663,7 +655,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Critically evaluate, India",
-    "matched_similarity": 0.968,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Critically evaluate the contributions of S. C. Roy to Indian anthropology. UPSC"
   },
   {
@@ -688,7 +680,7 @@
     ],
     "macrotag": "Descriptive, Analytical, Applied",
     "microtag": "How are, Elucidate",
-    "matched_similarity": 0.984,
+    "matched_similarity": 1.0,
     "matched_ref_text": "How are Other Backward Classes identified? Enumerating the important features, elucidate the recent changes in their social and economic life. UPSC"
   }
 ]

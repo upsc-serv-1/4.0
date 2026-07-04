@@ -7,14 +7,22 @@
     "questionText": "Write notes on the following in about 150 words each: Animism and Deep Ecology",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.656
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 5 - Religion",
+    "subTopic": "5.3 Forms and Functionaries",
+    "nanoTopic": "Forms of religion in tribal/peasant societies (animism, animatism, fetishism, naturism, totemism)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 5 - Religion",
+      "5.3 Forms and Functionaries",
+      "Forms of religion in tribal/peasant societies (animism, animatism, fetishism, naturism, totemism)"
+    ],
+    "macrotag": "Descriptive, Applied",
+    "microtag": "Write a Note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a Note in 150 words on Animism and Deep Ecology"
   },
   {
     "key": "2021-P1-Q1b",
@@ -38,7 +46,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.766,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Marriage Regulations and Alliance Theory"
   },
   {
@@ -63,7 +71,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a Note",
-    "matched_similarity": 0.761,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a Note in 150 words on Historical Particularism and Franz Boas"
   },
   {
@@ -99,14 +107,22 @@
     "questionText": "Write notes on the following in about 150 words each: Thermoluminescence (TL) dating",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.703
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Chronology: Absolute Dating methods",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Chronology: Absolute Dating methods"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 0.963,
+    "matched_ref_text": "Write a Note on Thermoluminescence (TL) dating in 150 words"
   },
   {
     "key": "2021-P1-Q2a",
@@ -341,14 +357,22 @@
     "questionText": "Write notes on the following in about 150 words each: Human adolescent growth spurt",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.703
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 10 - Concept of human growth and development",
+    "subTopic": "10.1 Stages of growth and factors",
+    "nanoTopic": "Stages of growth (pre-natal, natal, infant, childhood, adolescence, maturity, senescence)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 10 - Concept of human growth and development",
+      "10.1 Stages of growth and factors",
+      "Stages of growth (pre-natal, natal, infant, childhood, adolescence, maturity, senescence)"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a Note, 150 words",
+    "matched_similarity": 0.963,
+    "matched_ref_text": "Write a Note on Human adolescent growth spurt in 150 words"
   },
   {
     "key": "2021-P1-Q5b",
@@ -358,14 +382,22 @@
     "questionText": "Write notes on the following in about 150 words each: The losses and gains of erect posture",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.738
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.5 Primatology",
+    "nanoTopic": "Skeletal changes due to erect posture and its implications",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.5 Primatology",
+      "Skeletal changes due to erect posture and its implications"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 0.969,
+    "matched_ref_text": "Write a note on the losses and gains of erect posture in 150 words"
   },
   {
     "key": "2021-P1-Q5c",
@@ -400,14 +432,22 @@
     "questionText": "Write notes on the following in about 150 words each: Descent Groups",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.578
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 2 - Culture, Society, and Social Institutions",
+    "subTopic": "2.5 Kinship",
+    "nanoTopic": "Forms of descent groups (lineage, clan, phratry, moiety and kindred)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 2 - Culture, Society, and Social Institutions",
+      "2.5 Kinship",
+      "Forms of descent groups (lineage, clan, phratry, moiety and kindred)"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Descent Groups"
   },
   {
     "key": "2021-P1-Q5e",
@@ -431,7 +471,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "",
-    "matched_similarity": 0.75,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a Note on Modes of Subsistence"
   },
   {
@@ -549,7 +589,7 @@
     "hierarchy_path": [],
     "macrotag": null,
     "microtag": null,
-    "matched_similarity": 0.595
+    "matched_similarity": 0.646
   },
   {
     "key": "2021-P1-Q7c",
@@ -648,7 +688,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Explain",
-    "matched_similarity": 0.992,
+    "matched_similarity": 0.99,
     "matched_ref_text": "Explain the structural analysis of kinship as proposed by Levi-Strauss"
   }
 ]

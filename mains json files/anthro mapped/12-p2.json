@@ -7,14 +7,22 @@
     "questionText": "Write short notes (in about 150 words each) on the following: Sacred Geography",
     "marks": 12,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.577
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 5 - Religion",
+    "subTopic": "5.2 Core Concepts of Religion",
+    "nanoTopic": "Sacred and profane",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 5 - Religion",
+      "5.2 Core Concepts of Religion",
+      "Sacred and profane"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Write a note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Sacred Geography"
   },
   {
     "key": "2012-P2-Q1b",
@@ -24,14 +32,22 @@
     "questionText": "Write short notes (in about 150 words each) on the following: Youth Dormitory",
     "marks": 12,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.56
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 6 - Tribal Situation in India",
+    "subTopic": "6.1 Tribal situation in India",
+    "nanoTopic": "Linguistic and socio-economic characteristics and their distribution",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 6 - Tribal Situation in India",
+      "6.1 Tribal situation in India",
+      "Linguistic and socio-economic characteristics and their distribution"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Youth Dormitory"
   },
   {
     "key": "2012-P2-Q1c",
@@ -41,14 +57,22 @@
     "questionText": "Write short notes (in about 150 words each) on the following: Narmada Man",
     "marks": 12,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.476
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.6 Phylogenetic status, characteristics and geographical distribution",
+    "nanoTopic": "Homo erectus: Asia (Homo erectus javanicus, Homo erectus pekinensis)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.6 Phylogenetic status, characteristics and geographical distribution",
+      "Homo erectus: Asia (Homo erectus javanicus, Homo erectus pekinensis)"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Narmada Man"
   },
   {
     "key": "2012-P2-Q1d",
@@ -58,14 +82,22 @@
     "questionText": "Write short notes (in about 150 words each) on the following: Participatory Rural Appraisal",
     "marks": 12,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.711
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 9 - Tribal Administration and Applied Anthropology",
+    "subTopic": "9.1 Administration, policies, and PTGs",
+    "nanoTopic": "Plans, programmes of tribal development and their implementation",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 9 - Tribal Administration and Applied Anthropology",
+      "9.1 Administration, policies, and PTGs",
+      "Plans, programmes of tribal development and their implementation"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, 150 words, India",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Participatory Rural Appraisal"
   },
   {
     "key": "2012-P2-Q1e",
@@ -75,14 +107,22 @@
     "questionText": "Write short notes (in about 150 words each) on the following: Palaeolithic Art",
     "marks": 12,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.577
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Cultural Evolution: Paleolithic and Mesolithic",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Cultural Evolution: Paleolithic and Mesolithic"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Palaeolithic Art"
   },
   {
     "key": "2012-P2-Q2a",
@@ -131,7 +171,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Discuss, Are tribals, Comment, India",
-    "matched_similarity": 0.949,
+    "matched_similarity": 0.943,
     "matched_ref_text": "Discuss the concept of 'indigenous people' as per the convention. Are tribals of India indigenous people? Comment"
   },
   {
@@ -181,7 +221,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Examine, India",
-    "matched_similarity": 0.973,
+    "matched_similarity": 0.97,
     "matched_ref_text": "Examine the relevance of Tribal Panchsheel by Jawaharlal Nehru in the light of emerging developing practices"
   },
   {
@@ -317,14 +357,22 @@
     "questionText": "Write short notes (in about 150 words each) on the following: Colonial Ethnography",
     "marks": 12,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.667
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 8 - Research Methods in Anthropology",
+    "subTopic": "8(a) Fieldwork Tradition",
+    "nanoTopic": "Fieldwork tradition in anthropology",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 8 - Research Methods in Anthropology",
+      "8(a) Fieldwork Tradition",
+      "Fieldwork tradition in anthropology"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Colonial Ethnography"
   },
   {
     "key": "2012-P2-Q5b",
@@ -334,14 +382,22 @@
     "questionText": "Write short notes (in about 150 words each) on the following: Commodification of Tribal Art",
     "marks": 12,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.703
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 2 - Culture, Society, and Social Institutions",
+    "subTopic": "2.1 The Nature of Culture",
+    "nanoTopic": "The concept and characteristics of civilization",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 2 - Culture, Society, and Social Institutions",
+      "2.1 The Nature of Culture",
+      "The concept and characteristics of civilization"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Commodification of Tribal Art"
   },
   {
     "key": "2012-P2-Q5c",
@@ -351,14 +407,22 @@
     "questionText": "Write short notes (in about 150 words each) on the following: Soan culture",
     "marks": 12,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.6
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Cultural Evolution: Paleolithic and Mesolithic",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Cultural Evolution: Paleolithic and Mesolithic"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Soan culture"
   },
   {
     "key": "2012-P2-Q5d",
@@ -375,7 +439,7 @@
     "hierarchy_path": [],
     "macrotag": null,
     "microtag": null,
-    "matched_similarity": 0.0
+    "matched_similarity": 0.462
   },
   {
     "key": "2012-P2-Q5e",
@@ -392,7 +456,7 @@
     "hierarchy_path": [],
     "macrotag": null,
     "microtag": null,
-    "matched_similarity": 0.0
+    "matched_similarity": 0.533
   },
   {
     "key": "2012-P2-Q6a",

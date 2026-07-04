@@ -21,7 +21,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words, India",
-    "matched_similarity": 0.823,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Distinctive cultural features of tribes of Andaman Islands"
   },
   {
@@ -39,7 +39,7 @@
     "hierarchy_path": [],
     "macrotag": null,
     "microtag": null,
-    "matched_similarity": 0.0
+    "matched_similarity": 0.4
   },
   {
     "key": "2018-P2-Q1c",
@@ -49,14 +49,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Endangered Languages",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.633
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 2 - Demographic Profile of India",
+    "subTopic": "2.1 Demographic profile and population structure",
+    "nanoTopic": "Ethnic and linguistic elements in the Indian population and their distribution",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 2 - Demographic Profile of India",
+      "2.1 Demographic profile and population structure",
+      "Ethnic and linguistic elements in the Indian population and their distribution"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Endangered languages"
   },
   {
     "key": "2018-P2-Q1d",
@@ -66,14 +74,22 @@
     "questionText": "Write short notes on the following in about 150 words each: OBCs among non-Hindu communities",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.718
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 5 - Indian Village and Socio-Cultural Change",
+    "subTopic": "5.2 Linguistic and religious minorities",
+    "nanoTopic": "Social, political and economic status of linguistic and religious minorities",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 5 - Indian Village and Socio-Cultural Change",
+      "5.2 Linguistic and religious minorities",
+      "Social, political and economic status of linguistic and religious minorities"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, 150 words, India",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on OBCs among non-Hindu communities"
   },
   {
     "key": "2018-P2-Q1e",
@@ -97,7 +113,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.761,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Ethnoarchaeology as a research strategy"
   },
   {
@@ -333,14 +349,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Youth dormitory as an institution",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.725
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 6 - Tribal Situation in India",
+    "subTopic": "6.1 Tribal situation in India",
+    "nanoTopic": "Linguistic and socio-economic characteristics and their distribution",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 6 - Tribal Situation in India",
+      "6.1 Tribal situation in India",
+      "Linguistic and socio-economic characteristics and their distribution"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Youth dormitory as an institution"
   },
   {
     "key": "2018-P2-Q5b",
@@ -350,14 +374,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Tribe and scheduled tribe",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.646
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 6 - Tribal Situation in India",
+    "subTopic": "6.1 Tribal situation in India",
+    "nanoTopic": "Linguistic and socio-economic characteristics and their distribution",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 6 - Tribal Situation in India",
+      "6.1 Tribal situation in India",
+      "Linguistic and socio-economic characteristics and their distribution"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 0.977,
+    "matched_ref_text": "Write a note in 150 words on Tribe and schedule tribe"
   },
   {
     "key": "2018-P2-Q5c",
@@ -367,22 +399,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Agrarian social structure",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": "Paper I",
-    "microTopic": "Unit 2 - Culture, Society, and Social Institutions",
-    "subTopic": "2.2 The Nature of Society",
-    "nanoTopic": "Concept of Society and Society and Culture",
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 5 - Indian Village and Socio-Cultural Change",
+    "subTopic": "5.1 Indian Village",
+    "nanoTopic": "Agrarian relations in Indian villages",
     "hierarchy_path": [
       "Anthropology",
-      "Anthro - 1",
-      "Paper I",
-      "Unit 2 - Culture, Society, and Social Institutions",
-      "2.2 The Nature of Society",
-      "Concept of Society and Society and Culture"
+      "Anthro - 2",
+      "Paper II",
+      "Unit 5 - Indian Village and Socio-Cultural Change",
+      "5.1 Indian Village",
+      "Agrarian relations in Indian villages"
     ],
-    "macrotag": "Descriptive",
-    "microtag": "",
-    "matched_similarity": 0.76,
-    "matched_ref_text": "Write a note on Social structure"
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Agrarian social structure"
   },
   {
     "key": "2018-P2-Q5d",
@@ -406,7 +438,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.814,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on the impact of Panchayati Raj Institutions in rural areas"
   },
   {
@@ -417,14 +449,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Modernization",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.0
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 5 - Indian Village and Socio-Cultural Change",
+    "subTopic": "5.3 Indigenous and exogenous processes of socio-cultural change",
+    "nanoTopic": "Sanskritization, Westernization, Modernization",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 5 - Indian Village and Socio-Cultural Change",
+      "5.3 Indigenous and exogenous processes of socio-cultural change",
+      "Sanskritization, Westernization, Modernization"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Modernization"
   },
   {
     "key": "2018-P2-Q6a",
@@ -598,7 +638,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Examine, India",
-    "matched_similarity": 0.984,
+    "matched_similarity": 0.982,
     "matched_ref_text": "Examine the strengths and weaknesses of anthropology in the context of in role in tribal and rural development"
   },
   {

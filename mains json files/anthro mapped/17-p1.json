@@ -7,14 +7,22 @@
     "questionText": "Write notes on the following in about 150 words each: Bilineal and bilateral descents",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.701
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 2 - Culture, Society, and Social Institutions",
+    "subTopic": "2.5 Kinship",
+    "nanoTopic": "Principles and types of descent (Unilineal, Double, Bilateral, Ambilineal)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 2 - Culture, Society, and Social Institutions",
+      "2.5 Kinship",
+      "Principles and types of descent (Unilineal, Double, Bilateral, Ambilineal)"
+    ],
+    "macrotag": "Descriptive, Comparative",
+    "microtag": "Short Note",
+    "matched_similarity": 0.982,
+    "matched_ref_text": "Write a note in 150 words on Bilineal and Bilateral descent"
   },
   {
     "key": "2017-P1-Q1b",
@@ -38,7 +46,7 @@
     ],
     "macrotag": "Comparative, Descriptive",
     "microtag": "Write a note, Difference",
-    "matched_similarity": 0.75,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Difference between religion and magic"
   },
   {
@@ -61,10 +69,10 @@
       "6(c) Functionalism and Structural-functionalism",
       "Radcliffe-Brown (Structural-functionalism)"
     ],
-    "macrotag": "Descriptive",
-    "microtag": "Write a note",
-    "matched_similarity": 0.817,
-    "matched_ref_text": "Write a note on Structural-functionalism"
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Basic tenets of structural-functionalism"
   },
   {
     "key": "2017-P1-Q1d",
@@ -74,14 +82,22 @@
     "questionText": "Write notes on the following in about 150 words each: Non-verbal communication",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.667
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 7 - Culture, Language and Communication",
+    "subTopic": "7.1 Culture, language and communication",
+    "nanoTopic": "Verbal and non-verbal communication",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 7 - Culture, Language and Communication",
+      "7.1 Culture, language and communication",
+      "Verbal and non-verbal communication"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Non-verbal communication"
   },
   {
     "key": "2017-P1-Q1e",
@@ -91,14 +107,22 @@
     "questionText": "Write notes on the following in about 150 words each: Questionnaire",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.0
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 8 - Research Methods in Anthropology",
+    "subTopic": "8(c) Tools of data collection",
+    "nanoTopic": "Observation, interview, schedules, questionnaire",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 8 - Research Methods in Anthropology",
+      "8(c) Tools of data collection",
+      "Observation, interview, schedules, questionnaire"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Questionnaire"
   },
   {
     "key": "2017-P1-Q2a",
@@ -333,14 +357,22 @@
     "questionText": "Write notes on the following in about 150 words each: Hardy-Weinberg law",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.593
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 9 - Human Genetics and Physical Anthropology",
+    "subTopic": "9.3 Genetic polymorphism and selection",
+    "nanoTopic": "Mendelian population, Hardy-Weinberg law",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 9 - Human Genetics and Physical Anthropology",
+      "9.3 Genetic polymorphism and selection",
+      "Mendelian population, Hardy-Weinberg law"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Hardy-Weinberg Law"
   },
   {
     "key": "2017-P1-Q5b",
@@ -364,7 +396,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.756,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on salient features of Mesolithic culture"
   },
   {
@@ -375,14 +407,22 @@
     "questionText": "Write notes on the following in about 150 words each: Concept of race",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.684
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 9 - Human Genetics and Physical Anthropology",
+    "subTopic": "9.5 Race and racism",
+    "nanoTopic": "Race and racism",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 9 - Human Genetics and Physical Anthropology",
+      "9.5 Race and racism",
+      "Race and racism"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Write a note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note on Concept of race"
   },
   {
     "key": "2017-P1-Q5d",
@@ -392,14 +432,22 @@
     "questionText": "Write notes on the following in about 150 words each: Age at menarche",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.542
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 11 - Demography and Fertility",
+    "subTopic": "11.1 Fertility Events",
+    "nanoTopic": "Relevance of menarche, menopause and other bioevents to fertility",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 11 - Demography and Fertility",
+      "11.1 Fertility Events",
+      "Relevance of menarche, menopause and other bioevents to fertility"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Age at menarche"
   },
   {
     "key": "2017-P1-Q5e",
@@ -423,7 +471,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.766,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Anthropology and designing of equipments"
   },
   {
@@ -573,7 +621,7 @@
     ],
     "macrotag": "Descriptive, Analytical",
     "microtag": "Describe",
-    "matched_similarity": 0.987,
+    "matched_similarity": 0.985,
     "matched_ref_text": "Describe the biological and socio-ecological factors affecting fertility an and mortality"
   },
   {

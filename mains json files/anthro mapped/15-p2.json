@@ -7,14 +7,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Relevance of tribal Panchsheel today",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.744
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 7 - Exploitation, Unrest, and Marginalized Communities",
+    "subTopic": "7.2 Social change and contemporary tribal societies",
+    "nanoTopic": "Impact of development programmes and welfare measures on tribals and weaker sections",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 7 - Exploitation, Unrest, and Marginalized Communities",
+      "7.2 Social change and contemporary tribal societies",
+      "Impact of development programmes and welfare measures on tribals and weaker sections"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, 150 words, India",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Relevance of tribal Panchsheel today"
   },
   {
     "key": "2015-P2-Q1b",
@@ -38,7 +46,7 @@
     ],
     "macrotag": "Descriptive, Applied",
     "microtag": "Write a note, India",
-    "matched_similarity": 0.804,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Sacred complex as a dimension of Indian civilization"
   },
   {
@@ -49,14 +57,22 @@
     "questionText": "Write short notes on the following in about 150 words each: South Indian Paleoliths",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.656
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Cultural Evolution: Paleolithic and Mesolithic",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Cultural Evolution: Paleolithic and Mesolithic"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on South Indian Paleoliths"
   },
   {
     "key": "2015-P2-Q1d",
@@ -80,7 +96,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.784,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Panchayati Raj Institutions and Social Change"
   },
   {
@@ -105,7 +121,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.756,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Rights over resources and tribal unrest"
   },
   {
@@ -255,7 +271,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "",
-    "matched_similarity": 0.861,
+    "matched_similarity": 0.846,
     "matched_ref_text": "Describe the paleo anthropological fossil finds from Siwalik hillsfossils to paleoanthropological knowledge"
   },
   {
@@ -341,14 +357,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Prehistoric Rock Art of Central India",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.744
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Cultural Evolution: Paleolithic and Mesolithic",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Cultural Evolution: Paleolithic and Mesolithic"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Prehistoric Rock Art of Central India"
   },
   {
     "key": "2015-P2-Q5b",
@@ -358,14 +382,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Islam and Matriliny",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.607
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 5 - Religion",
+    "subTopic": "5.2 Core Concepts of Religion",
+    "nanoTopic": "Monotheism and polytheism",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 5 - Religion",
+      "5.2 Core Concepts of Religion",
+      "Monotheism and polytheism"
+    ],
+    "macrotag": "Descriptive, Applied",
+    "microtag": "Write a note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Islam and Matriliny"
   },
   {
     "key": "2015-P2-Q5c",
@@ -389,7 +421,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.817,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Socio-economic characteristics of shifting cultivators"
   },
   {
@@ -400,14 +432,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Elwin-Ghurye Debate on Tribes",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.694
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 4 - Emergence and Growth of Anthropology in India",
+    "subTopic": "4.1 Emergence, growth and development",
+    "nanoTopic": "Contributions of Indian anthropologists to tribal and caste studies",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 4 - Emergence and Growth of Anthropology in India",
+      "4.1 Emergence, growth and development",
+      "Contributions of Indian anthropologists to tribal and caste studies"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Elwin-Ghurye Debate on Tribes"
   },
   {
     "key": "2015-P2-Q5e",
@@ -430,9 +470,9 @@
       "Constitutional safeguards for Scheduled Tribes and Scheduled Castes"
     ],
     "macrotag": "Descriptive, Applied, Short Note",
-    "microtag": "Short Note, India",
-    "matched_similarity": 0.919,
-    "matched_ref_text": "Role of the Governor in the Fifth Schedule areas"
+    "microtag": "Write a note, 150 words, India",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Role of Governor in Fifth Schedule Areas"
   },
   {
     "key": "2015-P2-Q6a",

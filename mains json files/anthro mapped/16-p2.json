@@ -21,7 +21,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.844,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Significance of Mesolithic findings from Belan Valley"
   },
   {
@@ -44,10 +44,10 @@
       "2.1 Demographic profile and population structure",
       "Ethnic and linguistic elements in the Indian population and their distribution"
     ],
-    "macrotag": "Descriptive, Applied, Short Note",
-    "microtag": "Write a note, 150 words, India",
-    "matched_similarity": 0.818,
-    "matched_ref_text": "Write a note in 150 words on Linguistic elements in Indian population"
+    "macrotag": "Descriptive, Applied",
+    "microtag": "Describe, India",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Describe the linguistic elements in Indian population"
   },
   {
     "key": "2016-P2-Q1c",
@@ -71,7 +71,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words, India",
-    "matched_similarity": 0.838,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Relevance of caste in contemporary Indian politics"
   },
   {
@@ -96,7 +96,7 @@
     ],
     "macrotag": "Descriptive, Applied",
     "microtag": "Write a note, India",
-    "matched_similarity": 0.8,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Impact of Jainism on Indian society"
   },
   {
@@ -121,7 +121,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words, India",
-    "matched_similarity": 0.883,
+    "matched_similarity": 0.993,
     "matched_ref_text": "Write a note in 150 words on Ethno-archaeological evidence for the survival of hunting-gathering traditions in India"
   },
   {
@@ -371,7 +371,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words, India",
-    "matched_similarity": 0.88,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words: The role that regionalism plays in demand for autonomy among Indian tribes"
   },
   {
@@ -396,7 +396,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words, India",
-    "matched_similarity": 0.815,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Bio-genetic variability of Indian tribes"
   },
   {
@@ -421,7 +421,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words, India",
-    "matched_similarity": 0.87,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Impact of industrialization on scheduled tribe population of Jharkhand"
   },
   {
@@ -446,7 +446,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.782,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Tribe as a colonial construct"
   },
   {
@@ -471,7 +471,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.864,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Anthropological interpretation of ethnic and political movements"
   },
   {
@@ -546,7 +546,7 @@
     ],
     "macrotag": "Descriptive, Analytical, Applied",
     "microtag": "Explain",
-    "matched_similarity": 0.978,
+    "matched_similarity": 0.976,
     "matched_ref_text": "Explain the difficulties experienced by scheduled tribes with regard to implementation of 'the Reorganisation of Forest Rights Act, 2006"
   },
   {

@@ -7,14 +7,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Sufi tradition of Islam.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.645
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 5 - Religion",
+    "subTopic": "5.2 Core Concepts of Religion",
+    "nanoTopic": "Monotheism and polytheism",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 5 - Religion",
+      "5.2 Core Concepts of Religion",
+      "Monotheism and polytheism"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Write a note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Sufi tradition of Islam"
   },
   {
     "key": "2013-P2-Q1b",
@@ -24,14 +32,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Threat to tribal languages in India.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.732
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 6 - Tribal Situation in India",
+    "subTopic": "6.1 Tribal situation in India",
+    "nanoTopic": "Linguistic and socio-economic characteristics and their distribution",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 6 - Tribal Situation in India",
+      "6.1 Tribal situation in India",
+      "Linguistic and socio-economic characteristics and their distribution"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, 150 words, India",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Threat to tribal languages in India"
   },
   {
     "key": "2013-P2-Q1c",
@@ -55,7 +71,7 @@
     ],
     "macrotag": "Analytical, Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.792,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words: Examine the debates related to Ramapithecus"
   },
   {
@@ -80,7 +96,7 @@
     ],
     "macrotag": "Descriptive, Analytical, Short Note",
     "microtag": "Write a note, 150 words, Discuss",
-    "matched_similarity": 0.788,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on: Discuss how Louis Dumont explained caste system"
   },
   {
@@ -105,7 +121,7 @@
     ],
     "macrotag": "Analytical, Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.891,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words: Discuss salient features of Mesolithic culture in India with special reference to western India"
   },
   {
@@ -116,14 +132,22 @@
     "questionText": "Answer the following in about 250 words each: Examine Nature-man-spirit complex as an ecological concept.",
     "marks": 15,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.73
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 5 - Religion",
+    "subTopic": "5.3 Forms and Functionaries",
+    "nanoTopic": "Forms of religion in tribal/peasant societies (animism, animatism, fetishism, naturism, totemism)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 5 - Religion",
+      "5.3 Forms and Functionaries",
+      "Forms of religion in tribal/peasant societies (animism, animatism, fetishism, naturism, totemism)"
+    ],
+    "macrotag": "Analytical",
+    "microtag": "Examine",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Examine Nature - man spirit complex as an ecological concept"
   },
   {
     "key": "2013-P2-Q2b",
@@ -147,7 +171,7 @@
     ],
     "macrotag": "Analytical",
     "microtag": "",
-    "matched_similarity": 0.848,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Indian Paleolithic culture can neither be conceived chronologically homogenous nor as a uniform cultural phase. Discuss"
   },
   {
@@ -172,7 +196,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Discuss, India",
-    "matched_similarity": 0.821,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Discuss the significance of study of religious centres to the understanding of Indian civilization"
   },
   {
@@ -197,7 +221,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Examine, India",
-    "matched_similarity": 0.772,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Examine the anthropological contributions dealing with tribes and Indian civilization. (375 words)"
   },
   {
@@ -222,7 +246,7 @@
     ],
     "macrotag": "Descriptive, Analytical",
     "microtag": "What is, Examine, Give reasons",
-    "matched_similarity": 0.86,
+    "matched_similarity": 1.0,
     "matched_ref_text": "What is Jajmani system? Examine the views on Jajmani system as an egalitarian as well as exploitative system. Give reasons for its decline"
   },
   {
@@ -247,7 +271,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Discuss, India",
-    "matched_similarity": 0.764,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Indian farmers are not slow to react to economic opportunities. Discuss this statement. (250 words)"
   },
   {
@@ -258,14 +282,22 @@
     "questionText": "Answer the following in about 250 words each: Examine the criticisms on the concept of dominant caste.",
     "marks": 15,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.718
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 3 - Traditional Indian Social System and Caste",
+    "subTopic": "3.2 Caste system in India",
+    "nanoTopic": "Dominant caste and Caste mobility",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 3 - Traditional Indian Social System and Caste",
+      "3.2 Caste system in India",
+      "Dominant caste and Caste mobility"
+    ],
+    "macrotag": "Analytical",
+    "microtag": "Examine criticisms",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Examine the criticisms on the concept of dominant caste"
   },
   {
     "key": "2013-P2-Q4c",
@@ -275,14 +307,22 @@
     "questionText": "Answer the following in about 250 words each: Discuss the contributions of H. D. Sankalia to prehistoric anthropology in India.",
     "marks": 20,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.749
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Principles of Prehistoric Archaeology",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Principles of Prehistoric Archaeology"
+    ],
+    "macrotag": "Analytical",
+    "microtag": "",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Discuss the contributions of H.D. Sankalia to prehistoric anthropology in India. (250 words"
   },
   {
     "key": "2013-P2-Q5a",
@@ -306,7 +346,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words, India",
-    "matched_similarity": 0.784,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Government Action towards Left Wing Extremism"
   },
   {
@@ -317,14 +357,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Role of Gramasabha under PESA.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.676
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 5 - Indian Village and Socio-Cultural Change",
+    "subTopic": "5.3 Indigenous and exogenous processes of socio-cultural change",
+    "nanoTopic": "Panchayati Raj and social change",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 5 - Indian Village and Socio-Cultural Change",
+      "5.3 Indigenous and exogenous processes of socio-cultural change",
+      "Panchayati Raj and social change"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 0.98,
+    "matched_ref_text": "Write a note in 150 words on Role of Gramsabha under PESA"
   },
   {
     "key": "2013-P2-Q5c",
@@ -348,7 +396,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.824,
+    "matched_similarity": 0.991,
     "matched_ref_text": "Write a note in 150 words on Impacts of sanctuaries and national park on tribal populations"
   },
   {
@@ -360,21 +408,21 @@
     "marks": 10,
     "subject": "Anthropology",
     "sectionGroup": "Paper II",
-    "microTopic": "Unit 2 - Demographic Profile of India",
-    "subTopic": "2.1 Demographic profile and population structure",
-    "nanoTopic": "Ethnic and linguistic elements in the Indian population and their distribution",
+    "microTopic": "Unit 6 - Tribal Situation in India",
+    "subTopic": "6.1 Tribal situation in India",
+    "nanoTopic": "Linguistic and socio-economic characteristics and their distribution",
     "hierarchy_path": [
       "Anthropology",
       "Anthro - 2",
       "Paper II",
-      "Unit 2 - Demographic Profile of India",
-      "2.1 Demographic profile and population structure",
-      "Ethnic and linguistic elements in the Indian population and their distribution"
+      "Unit 6 - Tribal Situation in India",
+      "6.1 Tribal situation in India",
+      "Linguistic and socio-economic characteristics and their distribution"
     ],
-    "macrotag": "Descriptive, Applied",
-    "microtag": "Elucidate, India",
-    "matched_similarity": 0.864,
-    "matched_ref_text": "Elucidate the linguistic classification of Indian tribes"
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, 150 words, India",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Linguistic classification of Indian tribes"
   },
   {
     "key": "2013-P2-Q5e",
@@ -384,14 +432,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Ethnic movements in India.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.667
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 7 - Ethnicity, Unrest, and Political Developments",
+    "subTopic": "7.3 Ethnicity, Unrest, and Political Developments",
+    "nanoTopic": "The concept of ethnicity and Ethnic conflicts",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 7 - Ethnicity, Unrest, and Political Developments",
+      "7.3 Ethnicity, Unrest, and Political Developments",
+      "The concept of ethnicity and Ethnic conflicts"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, 150 words, India",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Ethnic movements in India"
   },
   {
     "key": "2013-P2-Q6a",
@@ -415,7 +471,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Discuss, India",
-    "matched_similarity": 0.822,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Fifth Schedule and Sixth Schedule of the Constitution are built on the foundations laid by the colonial Government. Discuss. (250 words)"
   },
   {
@@ -440,7 +496,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Discuss, India",
-    "matched_similarity": 0.802,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Discuss the significance of cultural and administrative factors in tribal development"
   },
   {
@@ -451,14 +507,22 @@
     "questionText": "Answer the following in about 250 words each: Examine the impacts of green revolution on rural poor.",
     "marks": 15,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.709
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 5 - Indian Village and Socio-Cultural Change",
+    "subTopic": "5.1 Indian Village",
+    "nanoTopic": "Agrarian relations in Indian villages",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 5 - Indian Village and Socio-Cultural Change",
+      "5.1 Indian Village",
+      "Agrarian relations in Indian villages"
+    ],
+    "macrotag": "Analytical, Applied",
+    "microtag": "Examine, India",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Examine the impacts of green revolution on rural poor"
   },
   {
     "key": "2013-P2-Q7a",
@@ -482,7 +546,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Discuss, India",
-    "matched_similarity": 0.852,
+    "matched_similarity": 0.995,
     "matched_ref_text": "Discuss the criticism levelled against anthropology in the context of Isolation, and assimilations debate on tribal populations"
   },
   {
@@ -507,7 +571,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Assess, India",
-    "matched_similarity": 0.814,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Assess the contributions of early 20th century ethnographic tradition to Indian anthropology"
   },
   {
@@ -532,7 +596,7 @@
     ],
     "macrotag": "Analytical",
     "microtag": "Discuss how",
-    "matched_similarity": 0.828,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Discuss how British policies dispossessed tribals of their communal properties and agricultural lands"
   },
   {
@@ -557,7 +621,7 @@
     ],
     "macrotag": "Analytical",
     "microtag": "Discuss",
-    "matched_similarity": 0.831,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Discuss alternatives for shifting cultivators in the context of ecological costs and humanistic concerns"
   },
   {
@@ -582,7 +646,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Examine, Examples, India",
-    "matched_similarity": 0.833,
+    "matched_similarity": 0.994,
     "matched_ref_text": "Examine the impact of non-tribal contract on socio-cultural institutions of tribal people with suitable examples"
   },
   {
@@ -593,13 +657,21 @@
     "questionText": "Answer the following in about 250 words each: Discuss the Social disabilities suffered by scheduled castes.",
     "marks": 15,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.741
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 7 - Exploitation, Unrest, and Marginalized Communities",
+    "subTopic": "7.1 Exploitation and constitutional safeguards",
+    "nanoTopic": "Problems of exploitation and deprivation of SCs, STs and OBCs",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 7 - Exploitation, Unrest, and Marginalized Communities",
+      "7.1 Exploitation and constitutional safeguards",
+      "Problems of exploitation and deprivation of SCs, STs and OBCs"
+    ],
+    "macrotag": "Analytical",
+    "microtag": "Discuss",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Discuss the Social disabilities suffered by scheduled castes"
   }
 ]

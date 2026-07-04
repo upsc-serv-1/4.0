@@ -171,7 +171,7 @@
     ],
     "macrotag": "Analytical",
     "microtag": "",
-    "matched_similarity": 0.994,
+    "matched_similarity": 0.993,
     "matched_ref_text": "Discuss the Paleolithic environment in light of available evidence with special reference to India"
   },
   {
@@ -296,7 +296,7 @@
     ],
     "macrotag": "Analytical",
     "microtag": "",
-    "matched_similarity": 0.965,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Discuss the role of marriage regulations in traditional societies in India for strengthening social solidarity.  , 20 Marks"
   },
   {
@@ -471,7 +471,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.885,
+    "matched_similarity": 1.0,
     "matched_ref_text": "William Ogburn and Cultural lag.  , 10 Marks"
   },
   {
@@ -546,7 +546,7 @@
     ],
     "macrotag": "Descriptive, Applied",
     "microtag": "Describe",
-    "matched_similarity": 0.955,
+    "matched_similarity": 0.946,
     "matched_ref_text": "Describe the practical applications of DNA technology in the present scenario"
   },
   {
@@ -696,7 +696,7 @@
     ],
     "macrotag": "Analytical",
     "microtag": "",
-    "matched_similarity": 0.94,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Critically discuss A.L. Kroeber's contribution to kinship studies.  , 15 Marks"
   }
 ]

@@ -7,14 +7,22 @@
     "questionText": "Write notes on the following in about 150 words each: Double Descent",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.542
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 2 - Culture, Society, and Social Institutions",
+    "subTopic": "2.5 Kinship",
+    "nanoTopic": "Principles and types of descent (Unilineal, Double, Bilateral, Ambilineal)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 2 - Culture, Society, and Social Institutions",
+      "2.5 Kinship",
+      "Principles and types of descent (Unilineal, Double, Bilateral, Ambilineal)"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Double Descent"
   },
   {
     "key": "2014-P1-Q1b",
@@ -24,14 +32,22 @@
     "questionText": "Write notes on the following in about 150 words each: Genealogical Method",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.621
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 8 - Research Methods in Anthropology",
+    "subTopic": "8(c) Tools of data collection",
+    "nanoTopic": "Case study, genealogy, life-history, oral history",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 8 - Research Methods in Anthropology",
+      "8(c) Tools of data collection",
+      "Case study, genealogy, life-history, oral history"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Genealogical Method"
   },
   {
     "key": "2014-P1-Q1c",
@@ -55,7 +71,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "",
-    "matched_similarity": 0.838,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note on Major sub-divisions of Anthropology"
   },
   {
@@ -80,7 +96,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Write a note",
-    "matched_similarity": 0.786,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note on Ecological Anthropology"
   },
   {
@@ -91,14 +107,22 @@
     "questionText": "Write notes on the following in about 150 words each: Field work tradition in Anthropology",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.744
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 8 - Research Methods in Anthropology",
+    "subTopic": "8(a) Fieldwork Tradition",
+    "nanoTopic": "Fieldwork tradition in anthropology",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 8 - Research Methods in Anthropology",
+      "8(a) Fieldwork Tradition",
+      "Fieldwork tradition in anthropology"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Field work tradition in Anthropology"
   },
   {
     "key": "2014-P1-Q2a",
@@ -347,7 +371,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.792,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Cross-sectional methods of studying human growth"
   },
   {
@@ -372,7 +396,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Write a note",
-    "matched_similarity": 0.75,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note on Genetic counselling"
   },
   {
@@ -383,14 +407,22 @@
     "questionText": "Write notes on the following in about 150 words each: Epidemiological Anthropology",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.711
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 9 - Human Genetics and Physical Anthropology",
+    "subTopic": "9.8 Epidemiological Anthropology: Health and disease",
+    "nanoTopic": "Epidemiological Anthropology",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 9 - Human Genetics and Physical Anthropology",
+      "9.8 Epidemiological Anthropology: Health and disease",
+      "Epidemiological Anthropology"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Epidemiological anthropology"
   },
   {
     "key": "2014-P1-Q5d",
@@ -400,14 +432,22 @@
     "questionText": "Write notes on the following in about 150 words each: Asian Homo erectus",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.667
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.6 Phylogenetic status, characteristics and geographical distribution",
+    "nanoTopic": "Homo erectus: Asia (Homo erectus javanicus, Homo erectus pekinensis)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.6 Phylogenetic status, characteristics and geographical distribution",
+      "Homo erectus: Asia (Homo erectus javanicus, Homo erectus pekinensis)"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Asian Homo erectus"
   },
   {
     "key": "2014-P1-Q5e",
@@ -417,14 +457,22 @@
     "questionText": "Write notes on the following in about 150 words each: Fertility and Fecundity",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.656
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 11 - Demography and Fertility",
+    "subTopic": "11.3 Biological and socio-ecological factors",
+    "nanoTopic": "Factors influencing fecundity, fertility, natality and mortality",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 11 - Demography and Fertility",
+      "11.3 Biological and socio-ecological factors",
+      "Factors influencing fecundity, fertility, natality and mortality"
+    ],
+    "macrotag": "Descriptive, Comparative, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Fertility and Fecundity"
   },
   {
     "key": "2014-P1-Q6a",

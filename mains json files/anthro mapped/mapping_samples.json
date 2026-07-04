@@ -3,7 +3,7 @@
     "app_key": "2012-P1-Q1a",
     "app_text": "Write short notes on the following in about 150 words each: How 'natural selection' acts on variation?",
     "ref_text": "Write a note in 150 words on How 'natural selection' acts on variation?",
-    "similarity": 0.756,
+    "similarity": 1.0,
     "hierarchy_path": [
       "Anthropology",
       "Anthro - 1",
@@ -18,7 +18,7 @@
     "app_key": "2012-P1-Q1b",
     "app_text": "Write short notes on the following in about 150 words each: Ways of acquiring a spouse in simpler societies",
     "ref_text": "Write a note in 150 words on Ways of acquiring a spouse in simpler societies",
-    "similarity": 0.784,
+    "similarity": 1.0,
     "hierarchy_path": [
       "Anthropology",
       "Anthro - 1",
@@ -33,7 +33,7 @@
     "app_key": "2012-P1-Q1c",
     "app_text": "Write short notes on the following in about 150 words each: Post-modernism in Anthropology",
     "ref_text": "Write a note on Post-modernism in Anthropology",
-    "similarity": 0.818,
+    "similarity": 1.0,
     "hierarchy_path": [
       "Anthropology",
       "Anthro - 1",
@@ -45,10 +45,25 @@
     "macrotag": "Descriptive"
   },
   {
+    "app_key": "2012-P1-Q1d",
+    "app_text": "Write short notes on the following in about 150 words each: Relative dating methods",
+    "ref_text": "Write a note in 150 words on Relative dating methods",
+    "similarity": 1.0,
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Chronology: Relative Dating methods"
+    ],
+    "macrotag": "Descriptive"
+  },
+  {
     "app_key": "2012-P1-Q1e",
     "app_text": "Write short notes on the following in about 150 words each: Adaptive radiation in context of evolution",
     "ref_text": "Write a note in 150 words on Adaptive tradition in context of evolution",
-    "similarity": 0.75,
+    "similarity": 0.973,
     "hierarchy_path": [
       "Anthropology",
       "Anthro - 1",
@@ -93,7 +108,7 @@
     "app_key": "2012-P1-Q2c",
     "app_text": "Discuss the role of ABO blood group system in resolving cases of disputed paternity.",
     "ref_text": "Discuss the role of ADO blood group system in resolving cases of disputed paternity",
-    "similarity": 0.986,
+    "similarity": 0.983,
     "hierarchy_path": [
       "Anthropology",
       "Anthro - 1",
@@ -123,7 +138,7 @@
     "app_key": "2012-P1-Q3b",
     "app_text": "Discuss the typology and distribution of Upper Palaeolithic cultures in India.",
     "ref_text": "Discuss the typology and distribution of Upper Paleolithic cultures in India",
-    "similarity": 0.992,
+    "similarity": 0.991,
     "hierarchy_path": [
       "Anthropology",
       "Anthro - 1",
@@ -133,20 +148,5 @@
       "Cultural Evolution: Paleolithic and Mesolithic"
     ],
     "macrotag": "Analytical"
-  },
-  {
-    "app_key": "2012-P1-Q3c",
-    "app_text": "What are lethal and sub-lethal genes ? Explain.",
-    "ref_text": "What are lethal and sub-lethal genes? Explain",
-    "similarity": 1.0,
-    "hierarchy_path": [
-      "Anthropology",
-      "Anthro - 1",
-      "Paper I",
-      "Unit 9 - Human Genetics and Physical Anthropology",
-      "9.2 Mendelian genetics in man-family study",
-      "Polygenic inheritance in man"
-    ],
-    "macrotag": "Descriptive"
   }
 ]

@@ -21,7 +21,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "",
-    "matched_similarity": 0.812,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note on Archaeological Anthropology"
   },
   {
@@ -32,14 +32,22 @@
     "questionText": "Write notes on the following in about 150 words each : Society and Culture.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.607
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 2 - Culture, Society, and Social Institutions",
+    "subTopic": "2.2 The Nature of Society",
+    "nanoTopic": "Concept of Society and Society and Culture",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 2 - Culture, Society, and Social Institutions",
+      "2.2 The Nature of Society",
+      "Concept of Society and Society and Culture"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Society and Culture"
   },
   {
     "key": "2015-P1-Q1c",
@@ -49,14 +57,22 @@
     "questionText": "Write notes on the following in about 150 words each : Incest Taboos.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.667
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 2 - Culture, Society, and Social Institutions",
+    "subTopic": "2.3 Marriage",
+    "nanoTopic": "Laws of marriage (endogamy, exogamy, hypergamy, hypogamy, incest taboo)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 2 - Culture, Society, and Social Institutions",
+      "2.3 Marriage",
+      "Laws of marriage (endogamy, exogamy, hypergamy, hypogamy, incest taboo)"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note on Incest Taboos"
   },
   {
     "key": "2015-P1-Q1d",
@@ -66,14 +82,22 @@
     "questionText": "Write notes on the following in about 150 words each : Horticulture.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.0
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 3 - Economic Organization",
+    "subTopic": "3.1 Economic Organization",
+    "nanoTopic": "Communities subsisting on swiddening, pastoralism, horticulture, and agriculture",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 3 - Economic Organization",
+      "3.1 Economic Organization",
+      "Communities subsisting on swiddening, pastoralism, horticulture, and agriculture"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Horticulture"
   },
   {
     "key": "2015-P1-Q1e",
@@ -83,14 +107,22 @@
     "questionText": "Write notes on the following in about 150 words each : Historical Particularism.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.676
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 6 - Anthropological Theories",
+    "subTopic": "6(b) Historical particularism and Diffusionism",
+    "nanoTopic": "Boas (Historical particularism)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 6 - Anthropological Theories",
+      "6(b) Historical particularism and Diffusionism",
+      "Boas (Historical particularism)"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Historical Particularism"
   },
   {
     "key": "2015-P1-Q2a",
@@ -325,14 +357,22 @@
     "questionText": "Write notes on the following in about 150 words each : Palaeolithic culture.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.633
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Cultural Evolution: Paleolithic and Mesolithic",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Cultural Evolution: Paleolithic and Mesolithic"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Palaeolithic culture"
   },
   {
     "key": "2015-P1-Q5b",
@@ -342,14 +382,22 @@
     "questionText": "Write notes on the following in about 150 words each : Down's Syndrome.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.542
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 9 - Human Genetics and Physical Anthropology",
+    "subTopic": "9.4 Chromosomes and chromosomal aberrations in man, methodology",
+    "nanoTopic": "Autosomal aberrations (Down syndrome, Patau, Edward and Cri-du-chat syndromes)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 9 - Human Genetics and Physical Anthropology",
+      "9.4 Chromosomes and chromosomal aberrations in man, methodology",
+      "Autosomal aberrations (Down syndrome, Patau, Edward and Cri-du-chat syndromes)"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Down's Syndrome"
   },
   {
     "key": "2015-P1-Q5c",
@@ -373,7 +421,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.756,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Longitudinal method of studying growth"
   },
   {
@@ -384,14 +432,22 @@
     "questionText": "Write notes on the following in about 150 words each : Menopause and its impact.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.656
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 11 - Demography and Fertility",
+    "subTopic": "11.1 Fertility Events",
+    "nanoTopic": "Relevance of menarche, menopause and other bioevents to fertility",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 11 - Demography and Fertility",
+      "11.1 Fertility Events",
+      "Relevance of menarche, menopause and other bioevents to fertility"
+    ],
+    "macrotag": "Descriptive, Analytical, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Menopause and its impact"
   },
   {
     "key": "2015-P1-Q5e",
@@ -401,14 +457,22 @@
     "questionText": "Write notes on the following in about 150 words each : DNA technology in Medicine.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.676
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 12 - Applications of Anthropology",
+    "subTopic": "12.2 Forensic and Medical Applications",
+    "nanoTopic": "DNA technology in diseases and medicine",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 12 - Applications of Anthropology",
+      "12.2 Forensic and Medical Applications",
+      "DNA technology in diseases and medicine"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on DNA technology in Medicine"
   },
   {
     "key": "2015-P1-Q6a",

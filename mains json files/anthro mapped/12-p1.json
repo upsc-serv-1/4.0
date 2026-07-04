@@ -21,7 +21,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.756,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on How 'natural selection' acts on variation?"
   },
   {
@@ -46,7 +46,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.784,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Ways of acquiring a spouse in simpler societies"
   },
   {
@@ -71,7 +71,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Write a note",
-    "matched_similarity": 0.818,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note on Post-modernism in Anthropology"
   },
   {
@@ -82,14 +82,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Relative dating methods",
     "marks": 12,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.656
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Chronology: Relative Dating methods",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Chronology: Relative Dating methods"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Relative dating methods"
   },
   {
     "key": "2012-P1-Q1e",
@@ -113,7 +121,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.75,
+    "matched_similarity": 0.973,
     "matched_ref_text": "Write a note in 150 words on Adaptive tradition in context of evolution"
   },
   {
@@ -188,7 +196,7 @@
     ],
     "macrotag": "Analytical, Applied",
     "microtag": "Discuss role",
-    "matched_similarity": 0.986,
+    "matched_similarity": 0.983,
     "matched_ref_text": "Discuss the role of ADO blood group system in resolving cases of disputed paternity"
   },
   {
@@ -238,7 +246,7 @@
     ],
     "macrotag": "Analytical",
     "microtag": "",
-    "matched_similarity": 0.992,
+    "matched_similarity": 0.991,
     "matched_ref_text": "Discuss the typology and distribution of Upper Paleolithic cultures in India"
   },
   {
@@ -349,14 +357,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Is family a social institution?",
     "marks": 12,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.703
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 2 - Culture, Society, and Social Institutions",
+    "subTopic": "2.4 Family",
+    "nanoTopic": "Definition and universality",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 2 - Culture, Society, and Social Institutions",
+      "2.4 Family",
+      "Definition and universality"
+    ],
+    "macrotag": "Descriptive, Analytical",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on: Is family a social institution?"
   },
   {
     "key": "2012-P1-Q5b",
@@ -380,7 +396,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.776,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Applications of Anthropometry in designing"
   },
   {
@@ -405,7 +421,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "",
-    "matched_similarity": 0.786,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note on Band and Tribal societies"
   },
   {
@@ -430,7 +446,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Write a note",
-    "matched_similarity": 0.75,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note on Genetic counselling"
   },
   {
@@ -441,14 +457,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Epidemiological anthropology",
     "marks": 12,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.711
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 9 - Human Genetics and Physical Anthropology",
+    "subTopic": "9.8 Epidemiological Anthropology: Health and disease",
+    "nanoTopic": "Epidemiological Anthropology",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 9 - Human Genetics and Physical Anthropology",
+      "9.8 Epidemiological Anthropology: Health and disease",
+      "Epidemiological Anthropology"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Epidemiological anthropology"
   },
   {
     "key": "2012-P1-Q6a",

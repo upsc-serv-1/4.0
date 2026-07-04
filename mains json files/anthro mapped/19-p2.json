@@ -21,7 +21,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.841,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Phylogenetic position and morphological features of Ramapithecus"
   },
   {
@@ -46,7 +46,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.875,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Ethno-archaeological analysis of hunting activities of contemporary tribal communities"
   },
   {
@@ -71,7 +71,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words, India",
-    "matched_similarity": 0.817,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Distribution of Tibeto-Burman group of languages in India"
   },
   {
@@ -96,7 +96,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.836,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Use of doctrine of Karma and rebirth in justifying the Varna system"
   },
   {
@@ -121,7 +121,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.8,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on The Jajmani system and contemporary market economy"
   },
   {
@@ -146,7 +146,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "",
-    "matched_similarity": 0.996,
+    "matched_similarity": 0.995,
     "matched_ref_text": "Describe the Palaeolithic culture with special reference to Soanian tradition. Indicate the problems of describing the Indian Paleolithic"
   },
   {
@@ -196,7 +196,7 @@
     ],
     "macrotag": "Descriptive, Applied",
     "microtag": "Describe, India",
-    "matched_similarity": 0.991,
+    "matched_similarity": 0.989,
     "matched_ref_text": "Describe the impact of Buddhism on the tribal population of India"
   },
   {
@@ -357,14 +357,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Ethnicity and regionalism.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.676
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 7 - Ethnicity, Unrest, and Political Developments",
+    "subTopic": "7.3 Ethnicity, Unrest, and Political Developments",
+    "nanoTopic": "Unrest among tribal communities, Regionalism and demand for autonomy",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 7 - Ethnicity, Unrest, and Political Developments",
+      "7.3 Ethnicity, Unrest, and Political Developments",
+      "Unrest among tribal communities, Regionalism and demand for autonomy"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Ethnicity and regionalism"
   },
   {
     "key": "2019-P2-Q5b",
@@ -388,7 +396,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.841,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Panchayati Raj as a facilitator of social inclusion in rural society"
   },
   {
@@ -413,7 +421,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.788,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Anthropological understanding of communalism"
   },
   {
@@ -424,14 +432,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Issues relating to tribal education.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.738
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 6 - Tribal Situation in India",
+    "subTopic": "6.2 Problems of the tribal Communities",
+    "nanoTopic": "Low literacy, poor educational facilities, unemployment, and under-employment",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 6 - Tribal Situation in India",
+      "6.2 Problems of the tribal Communities",
+      "Low literacy, poor educational facilities, unemployment, and under-employment"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Issues relating to tribal education"
   },
   {
     "key": "2019-P2-Q5e",
@@ -455,7 +471,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.761,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Distribution of Neolithic sites in India"
   },
   {

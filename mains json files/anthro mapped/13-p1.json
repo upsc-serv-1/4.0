@@ -21,7 +21,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.796,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on How do you situate Anthropology in Social Sciences?"
   },
   {
@@ -32,14 +32,22 @@
     "questionText": "Write notes on the following in about 150 words each: Various types of descent",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.656
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 2 - Culture, Society, and Social Institutions",
+    "subTopic": "2.5 Kinship",
+    "nanoTopic": "Principles and types of descent (Unilineal, Double, Bilateral, Ambilineal)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 2 - Culture, Society, and Social Institutions",
+      "2.5 Kinship",
+      "Principles and types of descent (Unilineal, Double, Bilateral, Ambilineal)"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Various types of descent"
   },
   {
     "key": "2013-P1-Q1c",
@@ -49,14 +57,22 @@
     "questionText": "Write notes on the following in about 150 words each: Totemism",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.0
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 5 - Religion",
+    "subTopic": "5.3 Forms and Functionaries",
+    "nanoTopic": "Forms of religion in tribal/peasant societies (animism, animatism, fetishism, naturism, totemism)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 5 - Religion",
+      "5.3 Forms and Functionaries",
+      "Forms of religion in tribal/peasant societies (animism, animatism, fetishism, naturism, totemism)"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Totemism"
   },
   {
     "key": "2013-P1-Q1d",
@@ -80,7 +96,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "",
-    "matched_similarity": 0.786,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note on Linguistic anthropology"
   },
   {
@@ -91,14 +107,22 @@
     "questionText": "Write notes on the following in about 150 words each: Carbon-14 method of dating",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.667
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Chronology: Absolute Dating methods",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Chronology: Absolute Dating methods"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Carbon -14 method of dating"
   },
   {
     "key": "2013-P1-Q2a",
@@ -222,7 +246,7 @@
     ],
     "macrotag": "Comparative",
     "microtag": "In what ways",
-    "matched_similarity": 0.938,
+    "matched_similarity": 1.0,
     "matched_ref_text": "In what ways is Functionalism different from Structural Functionalism? (350 words"
   },
   {
@@ -247,7 +271,7 @@
     ],
     "macrotag": "Comparative, Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.929,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Differentiate between Economics and Economic Anthropology. (150 words"
   },
   {
@@ -272,7 +296,7 @@
     ],
     "macrotag": "Analytical",
     "microtag": "",
-    "matched_similarity": 0.934,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Discuss the impact of urbanization and feminist movement on family. (250 words"
   },
   {
@@ -347,7 +371,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.788,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Role of primatology in Anthropological studies"
   },
   {
@@ -358,14 +382,22 @@
     "questionText": "Write notes on the following in about 150 words each: Differentiation between Child Growth and Development",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.739
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 10 - Concept of human growth and development",
+    "subTopic": "10.1 Stages of growth and factors",
+    "nanoTopic": "Stages of growth (pre-natal, natal, infant, childhood, adolescence, maturity, senescence)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 10 - Concept of human growth and development",
+      "10.1 Stages of growth and factors",
+      "Stages of growth (pre-natal, natal, infant, childhood, adolescence, maturity, senescence)"
+    ],
+    "macrotag": "Comparative, Descriptive, Short Note",
+    "microtag": "Write a note, Differentiate",
+    "matched_similarity": 0.921,
+    "matched_ref_text": "Write a note in 150 words on Differentiate between Child Growth & Development"
   },
   {
     "key": "2013-P1-Q5c",
@@ -375,14 +407,22 @@
     "questionText": "Write notes on the following in about 150 words each: Ageing and Senescence",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.633
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 10 - Concept of human growth and development",
+    "subTopic": "10.2 Ageing, Senescence, and Somatotypes",
+    "nanoTopic": "Ageing and senescence",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 10 - Concept of human growth and development",
+      "10.2 Ageing, Senescence, and Somatotypes",
+      "Ageing and senescence"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Ageing and Senescence"
   },
   {
     "key": "2013-P1-Q5d",
@@ -392,14 +432,22 @@
     "questionText": "Write notes on the following in about 150 words each: Twin method in human genetics",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.694
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 9 - Human Genetics and Physical Anthropology",
+    "subTopic": "9.1 Human Genetics: Methods and Application",
+    "nanoTopic": "Family study (pedigree analysis, twin study, foster child, co-twin method)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 9 - Human Genetics and Physical Anthropology",
+      "9.1 Human Genetics: Methods and Application",
+      "Family study (pedigree analysis, twin study, foster child, co-twin method)"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Twin method in human genetics"
   },
   {
     "key": "2013-P1-Q5e",
@@ -423,7 +471,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Write a note",
-    "matched_similarity": 0.778,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note on Demographic Transition"
   },
   {
@@ -473,7 +521,7 @@
     ],
     "macrotag": "Descriptive, Analytical",
     "microtag": "What do you understand, How is it measured",
-    "matched_similarity": 0.964,
+    "matched_similarity": 1.0,
     "matched_ref_text": "What do you understand by 'Genetic Load' in a population? How is it measured and what are the important factors that can influence it? (250 words"
   },
   {
@@ -498,7 +546,7 @@
     ],
     "macrotag": "Analytical",
     "microtag": "Justify",
-    "matched_similarity": 0.96,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Justify \"Though human growth is under tight genetic control but it is influenced by various environmental factors.\" (250 words"
   },
   {
@@ -523,7 +571,7 @@
     ],
     "macrotag": "Analytical",
     "microtag": "Discuss",
-    "matched_similarity": 0.929,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Discuss the relevance of Case Study method of data collection. (250 words"
   },
   {
@@ -548,7 +596,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Elaborate",
-    "matched_similarity": 0.922,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Elaborate upon major human adaptations to heat and cold. (250 words"
   },
   {
@@ -573,7 +621,7 @@
     ],
     "macrotag": "Descriptive, Analytical",
     "microtag": "What are, Why, Illustrate",
-    "matched_similarity": 0.966,
+    "matched_similarity": 1.0,
     "matched_ref_text": "What are genetic markers and what is their usefulness? Why are blood groups considered as good genetic markers? Illustrate with examples. (250 words"
   },
   {
@@ -598,7 +646,7 @@
     ],
     "macrotag": "Analytical",
     "microtag": "",
-    "matched_similarity": 0.94,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Discuss how Neo-Darwinism integrated the fields of Genetics and Evolution. (250 words"
   },
   {
@@ -648,7 +696,7 @@
     ],
     "macrotag": "Comparative, Descriptive",
     "microtag": "Differentiate, Give criteria",
-    "matched_similarity": 0.951,
+    "matched_similarity": 0.981,
     "matched_ref_text": "Differentiate between Race and Racism. What are three races of the world? Give important biological criteria used frequently for such a classification. (250 words"
   }
 ]

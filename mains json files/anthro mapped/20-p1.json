@@ -7,14 +7,22 @@
     "questionText": "Write notes on the following in about 150 words each: Natufian culture",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.714
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Cultural Evolution: Paleolithic and Mesolithic",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Cultural Evolution: Paleolithic and Mesolithic"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note on Natufian culture"
   },
   {
     "key": "2020-P1-Q1b",
@@ -24,14 +32,22 @@
     "questionText": "Write notes on the following in about 150 words each: Sapir-Whorf hypothesis",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.645
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 7 - Culture, Language and Communication",
+    "subTopic": "7.1 Culture, language and communication",
+    "nanoTopic": "Nature, origin and characteristics of language",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 7 - Culture, Language and Communication",
+      "7.1 Culture, language and communication",
+      "Nature, origin and characteristics of language"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note",
+    "matched_similarity": 0.952,
+    "matched_ref_text": "Write a note on Sapir-Whorf hypothesis in 150 words"
   },
   {
     "key": "2020-P1-Q1c",
@@ -41,14 +57,22 @@
     "questionText": "Write notes on the following in about 150 words each: Human rights and Cultural relativism",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.71
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 2 - Culture, Society, and Social Institutions",
+    "subTopic": "2.1 The Nature of Culture",
+    "nanoTopic": "Ethnocentrism vis-a-vis cultural Relativism",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 2 - Culture, Society, and Social Institutions",
+      "2.1 The Nature of Culture",
+      "Ethnocentrism vis-a-vis cultural Relativism"
+    ],
+    "macrotag": "Descriptive, Applied",
+    "microtag": "",
+    "matched_similarity": 0.78,
+    "matched_ref_text": "Write a note on (Cultural relativism) Human rights and Cultural relativism"
   },
   {
     "key": "2020-P1-Q1d",
@@ -58,14 +82,22 @@
     "questionText": "Write notes on the following in about 150 words each: Victor Turner and Liminality",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.61
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 2 - Culture, Society, and Social Institutions",
+    "subTopic": "2.1 The Nature of Culture",
+    "nanoTopic": "The concept and characteristics of culture",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 2 - Culture, Society, and Social Institutions",
+      "2.1 The Nature of Culture",
+      "The concept and characteristics of culture"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 0.833,
+    "matched_ref_text": "Write a note in 150 words on (Liminality) Victor Turner and Liminality"
   },
   {
     "key": "2020-P1-Q1e",
@@ -89,7 +121,7 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Short Note",
-    "matched_similarity": 0.823,
+    "matched_similarity": 0.981,
     "matched_ref_text": "Write a note on Jane Goodall's contributions in studying primate behaviour in 150 words"
   },
   {
@@ -325,14 +357,22 @@
     "questionText": "Write notes on the following in about 150 words each: Racism and Eugenics",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.531
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 12 - Applications of Anthropology",
+    "subTopic": "12.2 Forensic and Medical Applications",
+    "nanoTopic": "Applied human genetics (Paternity diagnosis, genetic counseling and eugenics)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 12 - Applications of Anthropology",
+      "12.2 Forensic and Medical Applications",
+      "Applied human genetics (Paternity diagnosis, genetic counseling and eugenics)"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 0.773,
+    "matched_ref_text": "Write a note on (Eugenics) Racism and Eugenics in 150 words"
   },
   {
     "key": "2020-P1-Q5b",
@@ -342,14 +382,22 @@
     "questionText": "Write notes on the following in about 150 words each: Genetic drift",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.522
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 9 - Human Genetics and Physical Anthropology",
+    "subTopic": "9.3 Genetic polymorphism and selection",
+    "nanoTopic": "Causes and changes which bring down frequency (mutation, isolation, migration, selection, inbreeding and genetic drift)",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 9 - Human Genetics and Physical Anthropology",
+      "9.3 Genetic polymorphism and selection",
+      "Causes and changes which bring down frequency (mutation, isolation, migration, selection, inbreeding and genetic drift)"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 0.923,
+    "matched_ref_text": "Write a note on Genetic drift in 150 words"
   },
   {
     "key": "2020-P1-Q5c",
@@ -359,14 +407,22 @@
     "questionText": "Write notes on the following in about 150 words each: Experiential Ethnography",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.696
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 8 - Research Methods in Anthropology",
+    "subTopic": "8(a) Fieldwork Tradition",
+    "nanoTopic": "Fieldwork tradition in anthropology",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 8 - Research Methods in Anthropology",
+      "8(a) Fieldwork Tradition",
+      "Fieldwork tradition in anthropology"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "write a Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "write a Note in 150 words on Experiential Ethnography"
   },
   {
     "key": "2020-P1-Q5d",
@@ -376,14 +432,22 @@
     "questionText": "Write notes on the following in about 150 words each: Ethics and Genetic engineering",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.711
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 9 - Human Genetics and Physical Anthropology",
+    "subTopic": "9.1 Human Genetics: Methods and Application",
+    "nanoTopic": "D.N.A. technology and recombinant technologies",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 9 - Human Genetics and Physical Anthropology",
+      "9.1 Human Genetics: Methods and Application",
+      "D.N.A. technology and recombinant technologies"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "write a Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "write a Note in 150 words on Ethics and Genetic engineering"
   },
   {
     "key": "2020-P1-Q5e",
@@ -393,14 +457,22 @@
     "questionText": "Write notes on the following in about 150 words each: Senescence",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.625
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 10 - Concept of human growth and development",
+    "subTopic": "10.2 Ageing, Senescence, and Somatotypes",
+    "nanoTopic": "Ageing and senescence",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 10 - Concept of human growth and development",
+      "10.2 Ageing, Senescence, and Somatotypes",
+      "Ageing and senescence"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Write a note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note on Senescence"
   },
   {
     "key": "2020-P1-Q6a",

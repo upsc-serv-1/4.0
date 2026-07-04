@@ -7,14 +7,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Neolithic cultures of South India.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.73
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Cultural Evolution: Neolithic and Chalcolithic",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Cultural Evolution: Neolithic and Chalcolithic"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Neolithic cultures of South India"
   },
   {
     "key": "2017-P2-Q1b",
@@ -38,7 +46,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words, India",
-    "matched_similarity": 0.766,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Austro-Asiatic linguistic groups in India"
   },
   {
@@ -49,14 +57,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Varnashram and the concept of Rina.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.725
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 3 - Traditional Indian Social System and Caste",
+    "subTopic": "3.1 The structure and nature of traditional Indian social system",
+    "nanoTopic": "Varnashram",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 3 - Traditional Indian Social System and Caste",
+      "3.1 The structure and nature of traditional Indian social system",
+      "Varnashram"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Varnashram and the concept of Rina"
   },
   {
     "key": "2017-P2-Q1d",
@@ -66,14 +82,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Ethno-archaeology.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.593
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 1 - Evolution of Indian Culture and Palaeo-Anthropology",
+    "subTopic": "1.3 Ethno-archaeology in India",
+    "nanoTopic": "The concept of ethno-archaeology",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 1 - Evolution of Indian Culture and Palaeo-Anthropology",
+      "1.3 Ethno-archaeology in India",
+      "The concept of ethno-archaeology"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Ethno-archaeology"
   },
   {
     "key": "2017-P2-Q1e",
@@ -97,8 +121,8 @@
     ],
     "macrotag": "Descriptive",
     "microtag": "Write a note",
-    "matched_similarity": 0.786,
-    "matched_ref_text": "Write a note on Nature-Man-Spirit complex"
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 200 words: Nature-man-spirit complex"
   },
   {
     "key": "2017-P2-Q2a",
@@ -170,10 +194,10 @@
       "7.1 Exploitation and constitutional safeguards",
       "Constitutional safeguards for Scheduled Tribes and Scheduled Castes"
     ],
-    "macrotag": "Analytical, Applied",
-    "microtag": "Critically discuss, India",
+    "macrotag": "Descriptive",
+    "microtag": "Write a note",
     "matched_similarity": 1.0,
-    "matched_ref_text": "Critically discuss the constitutional safeguards for the Scheduled Castes"
+    "matched_ref_text": "Write a note on Constitutional safeguards for the Scheduled Castes"
   },
   {
     "key": "2017-P2-Q3a",
@@ -345,10 +369,10 @@
       "6.2 Problems of the tribal Communities",
       "Land alienation, poverty, and indebtedness"
     ],
-    "macrotag": "Descriptive",
-    "microtag": "Write a note",
-    "matched_similarity": 0.779,
-    "matched_ref_text": "Write a note on Indebtedness in Tribal Communities"
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Indebtedness among tribal communities"
   },
   {
     "key": "2017-P2-Q5b",
@@ -358,14 +382,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Ethnicity and regionalism.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.676
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 7 - Ethnicity, Unrest, and Political Developments",
+    "subTopic": "7.3 Ethnicity, Unrest, and Political Developments",
+    "nanoTopic": "Unrest among tribal communities, Regionalism and demand for autonomy",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 7 - Ethnicity, Unrest, and Political Developments",
+      "7.3 Ethnicity, Unrest, and Political Developments",
+      "Unrest among tribal communities, Regionalism and demand for autonomy"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Ethnicity and regionalism"
   },
   {
     "key": "2017-P2-Q5c",
@@ -375,14 +407,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Other Backward Class.",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.621
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 7 - Exploitation, Unrest, and Marginalized Communities",
+    "subTopic": "7.1 Exploitation and constitutional safeguards",
+    "nanoTopic": "Problems of exploitation and deprivation of SCs, STs and OBCs",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 7 - Exploitation, Unrest, and Marginalized Communities",
+      "7.1 Exploitation and constitutional safeguards",
+      "Problems of exploitation and deprivation of SCs, STs and OBCs"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Other Backward Class"
   },
   {
     "key": "2017-P2-Q5d",
@@ -406,7 +446,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words, India",
-    "matched_similarity": 0.823,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Particularly Vulnerable Tribal Groups (earlier known as PTG)"
   },
   {
@@ -431,7 +471,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, India",
-    "matched_similarity": 0.756,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Impact of Christianity on Indian tribes"
   },
   {

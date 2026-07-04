@@ -14,7 +14,7 @@
     "hierarchy_path": [],
     "macrotag": null,
     "microtag": null,
-    "matched_similarity": 0.0
+    "matched_similarity": 0.321
   },
   {
     "key": "2021-P2-Q1b",
@@ -36,10 +36,10 @@
       "3.2 Caste system in India",
       "Tribe-caste continuum"
     ],
-    "macrotag": "Descriptive",
-    "microtag": "Write a note",
-    "matched_similarity": 0.82,
-    "matched_ref_text": "Write a note on Tribe-caste continuum"
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Relevance of tribe-caste continuum"
   },
   {
     "key": "2021-P2-Q1c",
@@ -49,14 +49,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Harappan seals",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.588
+    "sectionGroup": "Paper I",
+    "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+    "subTopic": "1.8 Prehistoric Archaeology",
+    "nanoTopic": "Cultural Evolution: Copper-Bronze Age and Iron Age",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 1",
+      "Paper I",
+      "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "1.8 Prehistoric Archaeology",
+      "Cultural Evolution: Copper-Bronze Age and Iron Age"
+    ],
+    "macrotag": "Descriptive",
+    "microtag": "Short Note",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Harappan seals"
   },
   {
     "key": "2021-P2-Q1d",
@@ -66,14 +74,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Caste and social capital",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.656
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 3 - Traditional Indian Social System and Caste",
+    "subTopic": "3.2 Caste system in India",
+    "nanoTopic": "Future of caste system and Jajmani system",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 3 - Traditional Indian Social System and Caste",
+      "3.2 Caste system in India",
+      "Future of caste system and Jajmani system"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Caste and social capital"
   },
   {
     "key": "2021-P2-Q1e",
@@ -97,7 +113,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words, India",
-    "matched_similarity": 0.761,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Factionalism and politics in rural India"
   },
   {
@@ -347,7 +363,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.75,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Urbanization and tribal institutions"
   },
   {
@@ -358,14 +374,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Ethnic media and social awareness",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.725
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 7 - Ethnicity, Unrest, and Political Developments",
+    "subTopic": "7.3 Ethnicity, Unrest, and Political Developments",
+    "nanoTopic": "The concept of ethnicity and Ethnic conflicts",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 7 - Ethnicity, Unrest, and Political Developments",
+      "7.3 Ethnicity, Unrest, and Political Developments",
+      "The concept of ethnicity and Ethnic conflicts"
+    ],
+    "macrotag": "Descriptive, Short Note",
+    "microtag": "Write a note, 150 words",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Ethnic media and social awareness"
   },
   {
     "key": "2021-P2-Q5c",
@@ -389,7 +413,7 @@
     ],
     "macrotag": "Descriptive, Short Note",
     "microtag": "Write a note, 150 words",
-    "matched_similarity": 0.766,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Cultural diversity and multiculturalism"
   },
   {
@@ -400,14 +424,22 @@
     "questionText": "Write short notes on the following in about 150 words each: Concept of tribe and Indian census",
     "marks": 10,
     "subject": "Anthropology",
-    "sectionGroup": null,
-    "microTopic": null,
-    "subTopic": null,
-    "nanoTopic": null,
-    "hierarchy_path": [],
-    "macrotag": null,
-    "microtag": null,
-    "matched_similarity": 0.725
+    "sectionGroup": "Paper II",
+    "microTopic": "Unit 6 - Tribal Situation in India",
+    "subTopic": "6.1 Tribal situation in India",
+    "nanoTopic": "Linguistic and socio-economic characteristics and their distribution",
+    "hierarchy_path": [
+      "Anthropology",
+      "Anthro - 2",
+      "Paper II",
+      "Unit 6 - Tribal Situation in India",
+      "6.1 Tribal situation in India",
+      "Linguistic and socio-economic characteristics and their distribution"
+    ],
+    "macrotag": "Descriptive, Applied, Short Note",
+    "microtag": "Write a note, 150 words, India",
+    "matched_similarity": 1.0,
+    "matched_ref_text": "Write a note in 150 words on Concept of tribe and Indian census"
   },
   {
     "key": "2021-P2-Q5e",
@@ -431,7 +463,7 @@
     ],
     "macrotag": "Descriptive, Applied, Short Note",
     "microtag": "Write a note, 150 words, India",
-    "matched_similarity": 0.761,
+    "matched_similarity": 1.0,
     "matched_ref_text": "Write a note in 150 words on Politics of recognition and deprivation"
   },
   {

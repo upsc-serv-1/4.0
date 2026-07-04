@@ -128,44 +128,84 @@ const SyllabusNode: React.FC<SyllabusNodeProps> = ({
   const isExpanded = expandedPaths[path];
   const ls = LEVEL_STYLES[Math.min(level, LEVEL_STYLES.length - 1)];
 
-  // Leaf layer — array of subtopic strings
+  // ── Leaf array: render a collapsible header whose children are checkboxes ──
   if (Array.isArray(node)) {
+    const subtopics: string[] = node;
     return (
-      <View style={{ marginLeft: ls.indent, marginTop: 4, gap: 6 }}>
-        {node.map((topic: string) => {
-          const itemPath = `${path}.${topic}`;
-          const itemProgress = progress[itemPath] || { ncert: false, pyqs: false, books: false, test: false, mastered: false };
-          return (
-            <View key={topic} style={[s.topicRow, { borderBottomColor: colors.border, paddingVertical: 10 }]}>
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start', flex: 1 }}>
-                <TouchableOpacity onPress={() => toggleStatus(itemPath, 'mastered')} style={s.checkBtn}>
-                  {itemProgress.mastered ? (
-                    <CheckCircle2 size={22} color={colors.primary} fill={colors.primary + '20'} />
-                  ) : (
-                    <Circle size={22} color={colors.textTertiary} />
+      <View style={{ marginLeft: ls.indent, marginBottom: 6 }}>
+        {/* Header row — same collapsible style as object branches */}
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => {
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+            togglePathExpanded(path);
+          }}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingVertical: 10,
+            paddingHorizontal: 14,
+            backgroundColor: ls.bgColor(colors),
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: ls.borderColor(colors),
+            marginBottom: 4,
+          }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 8 }}>
+            <ChevronRight color={ls.iconColor(colors)} size={ls.iconSize} />
+            <Text style={{ fontSize: ls.fontSize, fontWeight: ls.fontWeight, color: ls.labelColor(colors), flex: 1, lineHeight: ls.fontSize * 1.4 }} numberOfLines={3}>
+              {name}
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Text style={{ fontSize: 10, color: colors.textTertiary, fontWeight: '600' }}>
+              {subtopics.length}
+            </Text>
+            {isExpanded ? <ChevronUp size={ls.iconSize} color={colors.textTertiary} /> : <ChevronDown size={ls.iconSize} color={colors.textTertiary} />}
+          </View>
+        </TouchableOpacity>
+
+        {/* Subtopic checkboxes — only shown when expanded */}
+        {isExpanded && (
+          <View style={{ marginTop: 4, borderLeftWidth: 2, borderLeftColor: ls.iconColor(colors) + '40', paddingLeft: 8 }}>
+            {subtopics.map((topic: string) => {
+              const itemPath = `${path}.${topic}`;
+              const itemProgress = progress[itemPath] || { ncert: false, pyqs: false, books: false, test: false, mastered: false };
+              return (
+                <View key={topic} style={[s.topicRow, { borderBottomColor: colors.border, paddingVertical: 10 }]}>
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', flex: 1 }}>
+                    <TouchableOpacity onPress={() => toggleStatus(itemPath, 'mastered')} style={s.checkBtn}>
+                      {itemProgress.mastered ? (
+                        <CheckCircle2 size={22} color={colors.primary} fill={colors.primary + '20'} />
+                      ) : (
+                        <Circle size={22} color={colors.textTertiary} />
+                      )}
+                    </TouchableOpacity>
+                    <View style={{ flex: 1, marginLeft: 8 }}>
+                      <Text style={[s.topicText, { color: itemProgress.mastered ? colors.textSecondary : colors.textPrimary, textDecorationLine: itemProgress.mastered ? 'line-through' : 'none' }]}>
+                        {topic}
+                      </Text>
+                    </View>
+                  </View>
+                  {trackingMethod === 'multi' && (
+                    <View style={s.statusGrid}>
+                      <StatusBtn active={itemProgress.ncert} onPress={() => toggleStatus(itemPath, 'ncert')} label="NCERT" colors={colors} />
+                      <StatusBtn active={itemProgress.pyqs} onPress={() => toggleStatus(itemPath, 'pyqs')} label="PYQ" colors={colors} />
+                      <StatusBtn active={itemProgress.books} onPress={() => toggleStatus(itemPath, 'books')} label="Book" colors={colors} />
+                    </View>
                   )}
-                </TouchableOpacity>
-                <View style={{ flex: 1, marginLeft: 8 }}>
-                  <Text style={[s.topicText, { color: itemProgress.mastered ? colors.textSecondary : colors.textPrimary, textDecorationLine: itemProgress.mastered ? 'line-through' : 'none' }]}>
-                    {topic}
-                  </Text>
                 </View>
-              </View>
-              {trackingMethod === 'multi' && (
-                <View style={s.statusGrid}>
-                  <StatusBtn active={itemProgress.ncert} onPress={() => toggleStatus(itemPath, 'ncert')} label="NCERT" colors={colors} />
-                  <StatusBtn active={itemProgress.pyqs} onPress={() => toggleStatus(itemPath, 'pyqs')} label="PYQ" colors={colors} />
-                  <StatusBtn active={itemProgress.books} onPress={() => toggleStatus(itemPath, 'books')} label="Book" colors={colors} />
-                </View>
-              )}
-            </View>
-          );
-        })}
+              );
+            })}
+          </View>
+        )}
       </View>
     );
   }
 
-  // Branch layer — object with children
+  // ── Branch: object with children — recurse ──
   const childEntries = Object.entries(node);
 
   return (

@@ -29,6 +29,21 @@ export const SyllabusExportSheet = ({ visible, onClose, progress, syllabus, titl
     if (visible) setLoading(false);
   }, [visible]);
 
+  // Recursively collect all leaf { path, topic } from any depth
+  const getLeafNodes = (node: any, path: string): Array<{ path: string; topic: string }> => {
+    if (Array.isArray(node)) {
+      return node.map((topic: string) => ({ path: `${path}.${topic}`, topic }));
+    }
+    if (node && typeof node === 'object') {
+      const leaves: Array<{ path: string; topic: string }> = [];
+      Object.entries(node).forEach(([key, val]) => {
+        leaves.push(...getLeafNodes(val, `${path}.${key}`));
+      });
+      return leaves;
+    }
+    return [];
+  };
+
   const generatePdf = async () => {
     try {
       setLoading(true);
@@ -61,17 +76,15 @@ export const SyllabusExportSheet = ({ visible, onClose, progress, syllabus, titl
           </div>
       `;
 
-      // Aggregate overall stats
+      // Aggregate overall stats using recursive leaf collection
       let total = 0;
       let completed = 0;
 
-      Object.entries(syllabus).forEach(([sub, groups]) => {
-        Object.entries(groups).forEach(([group, topics]) => {
-          topics.forEach(topic => {
-            const path = `${sub}.${group}.${topic}`;
-            total++;
-            if (progress[path]?.mastered) completed++;
-          });
+      Object.entries(syllabus).forEach(([sub, subNode]) => {
+        const leaves = getLeafNodes(subNode, sub);
+        leaves.forEach(leaf => {
+          total++;
+          if (progress[leaf.path]?.mastered) completed++;
         });
       });
 
@@ -86,7 +99,7 @@ export const SyllabusExportSheet = ({ visible, onClose, progress, syllabus, titl
             <span class="stat-label">Mastered</span>
           </div>
           <div class="stat-item">
-            <span class="stat-val">${Math.round((completed/total)*100)}%</span>
+            <span class="stat-val">${total > 0 ? Math.round((completed/total)*100) : 0}%</span>
             <span class="stat-label">Total Progress</span>
           </div>
         </div>
@@ -102,17 +115,11 @@ export const SyllabusExportSheet = ({ visible, onClose, progress, syllabus, titl
               </tr>
             </thead>
             <tbody>
-              ${Object.entries(syllabus).map(([sub, groups]) => {
-                let sTotal = 0;
-                let sCompleted = 0;
-                Object.values(groups).forEach(topics => {
-                  topics.forEach(topic => {
-                    sTotal++;
-                    const path = `${sub}.${Object.keys(groups).find(k => groups[k] === topics)}.${topic}`;
-                    if (progress[path]?.mastered) sCompleted++;
-                  });
-                });
-                const percent = Math.round((sCompleted/sTotal)*100);
+              ${Object.entries(syllabus).map(([sub, subNode]) => {
+                const leaves = getLeafNodes(subNode, sub);
+                const sTotal = leaves.length;
+                const sCompleted = leaves.filter(l => progress[l.path]?.mastered).length;
+                const percent = sTotal > 0 ? Math.round((sCompleted/sTotal)*100) : 0;
                 return `
                   <tr>
                     <td style="font-weight: bold;">${sub}</td>
@@ -132,25 +139,18 @@ export const SyllabusExportSheet = ({ visible, onClose, progress, syllabus, titl
       `;
 
       // Subject-wise details
-      Object.entries(syllabus).forEach(([sub, groups]) => {
-        let subTotal = 0;
-        let subCompleted = 0;
-        
-        Object.entries(groups).forEach(([_, topics]) => {
-          topics.forEach(topic => {
-            subTotal++;
-            const path = `${sub}.${_}.${topic}`;
-            if (progress[path]?.mastered) subCompleted++;
-          });
-        });
+      Object.entries(syllabus).forEach(([sub, subNode]) => {
+        const leaves = getLeafNodes(subNode, sub);
+        const subTotal = leaves.length;
+        const subCompleted = leaves.filter(l => progress[l.path]?.mastered).length;
 
         html += `
           <div class="subject-block">
-            <div class="subject-title">${sub} (${Math.round((subCompleted/subTotal)*100)}%)</div>
+            <div class="subject-title">${sub} (${subTotal > 0 ? Math.round((subCompleted/subTotal)*100) : 0}%)</div>
             <table>
               <thead>
                 <tr>
-                  <th style="width: 25%;">Section</th>
+                  <th style="width: 30%;">Path</th>
                   <th>Topic</th>
                   ${exportMode === 'multi' ? `
                     <th style="width: 12%;">NCERT</th>
@@ -162,25 +162,26 @@ export const SyllabusExportSheet = ({ visible, onClose, progress, syllabus, titl
               <tbody>
         `;
 
-        Object.entries(groups).forEach(([group, topics]) => {
-          topics.forEach((topic, idx) => {
-            const path = `${sub}.${group}.${topic}`;
-            const p = progress[path] || {};
-            
-            if (!includeUnattempted && !p.mastered && !p.ncert && !p.pyqs) return;
+        leaves.forEach(leaf => {
+          const p = progress[leaf.path] || {};
 
-            html += `
-              <tr>
-                <td>${idx === 0 ? group : ''}</td>
-                <td>${topic}</td>
-                ${exportMode === 'multi' ? `
-                  <td><span class="status-badge ${p.ncert ? 'completed' : 'pending'}">${p.ncert ? 'DONE' : 'PENDING'}</span></td>
-                  <td><span class="status-badge ${p.pyqs ? 'completed' : 'pending'}">${p.pyqs ? 'DONE' : 'PENDING'}</span></td>
-                ` : ''}
-                <td><span class="status-badge ${p.mastered ? 'completed' : 'pending'}">${p.mastered ? 'MASTERED' : 'IN PROGRESS'}</span></td>
-              </tr>
-            `;
-          });
+          if (!includeUnattempted && !p.mastered && !p.ncert && !p.pyqs) return;
+
+          // Build a readable breadcrumb path by removing subject prefix and last topic
+          const parts = leaf.path.split('.').slice(1, -1);
+          const breadcrumb = parts.join(' › ') || sub;
+
+          html += `
+            <tr>
+              <td style="font-size: 9px; color: #6b7280;">${breadcrumb}</td>
+              <td>${leaf.topic}</td>
+              ${exportMode === 'multi' ? `
+                <td><span class="status-badge ${p.ncert ? 'completed' : 'pending'}">${p.ncert ? 'DONE' : 'PENDING'}</span></td>
+                <td><span class="status-badge ${p.pyqs ? 'completed' : 'pending'}">${p.pyqs ? 'DONE' : 'PENDING'}</span></td>
+              ` : ''}
+              <td><span class="status-badge ${p.mastered ? 'completed' : 'pending'}">${p.mastered ? 'MASTERED' : 'IN PROGRESS'}</span></td>
+            </tr>
+          `;
         });
 
         html += `
@@ -193,12 +194,11 @@ export const SyllabusExportSheet = ({ visible, onClose, progress, syllabus, titl
       html += `</body></html>`;
 
       const { uri } = await Print.printToFileAsync({ html });
-      setLoading(false); // Reset button as soon as PDF is ready
+      setLoading(false);
       try {
-        // Share with generous timeout for large PDFs
         await Promise.race([
           Sharing.shareAsync(uri),
-          new Promise<void>((resolve) => setTimeout(resolve, 20000)), // 20 second timeout
+          new Promise<void>((resolve) => setTimeout(resolve, 20000)),
         ]).catch(() => {
           console.warn('[SyllabusExport] Share operation timed out or was dismissed (non-fatal)');
         });

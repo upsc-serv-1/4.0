@@ -803,7 +803,7 @@ function UnifiedArenaSetup() {
         } else {
           if (deferredSelectedInstitutes.length > 0) rows = rows.filter((m: any) => deferredSelectedInstitutes.includes(m.institute));
           if (selectedPrograms.length > 0) rows = rows.filter((m: any) => selectedPrograms.includes(m.program_name));
-          if (selectedExamStage !== 'All') rows = rows.filter((m: any) => m.series === selectedExamStage);
+          if (selectedExamStage !== 'All') rows = rows.filter((m: any) => String(m.series || '').toLowerCase().includes(selectedExamStage.toLowerCase()));
         }
 
         if (ncertFilter === 'NCERT Only') {
@@ -921,7 +921,7 @@ function UnifiedArenaSetup() {
   const subjects = useMemo(() => {
     let base = metadata;
     if (selectedExamStage !== 'All') {
-      base = base.filter(m => m.series === selectedExamStage);
+      base = base.filter(m => String(m.series || '').toLowerCase().includes(selectedExamStage.toLowerCase()));
     }
     return Array.from(new Set(base.map(m => m.subject).filter(Boolean))).sort();
   }, [metadata, selectedExamStage]);
@@ -931,7 +931,7 @@ function UnifiedArenaSetup() {
       ? metadata.filter(m => selectedSubjects.includes(m.subject))
       : metadata;
     if (selectedExamStage !== 'All') {
-      base = base.filter(m => m.series === selectedExamStage);
+      base = base.filter(m => String(m.series || '').toLowerCase().includes(selectedExamStage.toLowerCase()));
     }
 
     return Array.from(new Set(
@@ -945,7 +945,7 @@ function UnifiedArenaSetup() {
     if (selectedSection.length === 0) return [];
     let base = metadata;
     if (selectedExamStage !== 'All') {
-      base = base.filter(m => m.series === selectedExamStage);
+      base = base.filter(m => String(m.series || '').toLowerCase().includes(selectedExamStage.toLowerCase()));
     }
 
     return Array.from(new Set(
@@ -974,7 +974,7 @@ function UnifiedArenaSetup() {
       base = base.filter(m => selectedSubjects.includes(m.subject));
     }
     if (selectedExamStage !== 'All') {
-      base = base.filter(m => m.series === selectedExamStage);
+      base = base.filter(m => String(m.series || '').toLowerCase().includes(selectedExamStage.toLowerCase()));
     }
     return Array.from(new Set(base.map(m => m.institute).filter(Boolean))).sort();
   }, [metadata, selectedSubjects, selectedExamStage]);
@@ -982,7 +982,9 @@ function UnifiedArenaSetup() {
   const programs = useMemo(() => {
     let base = metadata;
     if (deferredSelectedInstitutes.length > 0) base = base.filter(m => deferredSelectedInstitutes.includes(m.institute));
-    if (selectedExamStage !== 'All') base = base.filter(m => m.series === selectedExamStage);
+    if (selectedExamStage !== 'All') {
+      base = base.filter(m => String(m.series || '').toLowerCase().includes(selectedExamStage.toLowerCase()));
+    }
     return Array.from(new Set(base.map(m => m.program_name).filter(Boolean))).sort();
   }, [metadata, deferredSelectedInstitutes, selectedExamStage]);
 
@@ -996,7 +998,7 @@ function UnifiedArenaSetup() {
       if (!m.test_id) return;
       if (deferredSelectedInstitutes.length > 0 && !deferredSelectedInstitutes.includes(m.institute)) return;
       if (selectedPrograms.length > 0 && !selectedPrograms.includes(m.program_name)) return;
-      if (selectedExamStage !== 'All' && m.series !== selectedExamStage) return;
+      if (selectedExamStage !== 'All' && !String(m.series || '').toLowerCase().includes(selectedExamStage.toLowerCase())) return;
 
       if (!tests.has(m.test_id)) {
         tests.set(m.test_id, {

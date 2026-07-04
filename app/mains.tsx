@@ -239,73 +239,6 @@ const DEFAULT_MAINS_FILTERS: MainsFilters = {
   years: 'All',
 };
 
-// ─── SYLLABUS DATA ───
-const SYLLABUS_DATA = [
-  {
-    id: 'gs1',
-    title: 'General Studies I',
-    topics: [
-      {
-        id: 'gs1-1',
-        title: 'Indian Heritage and Culture',
-        subtopics: ['Art Forms', 'Literature', 'Architecture from ancient to modern times']
-      },
-      {
-        id: 'gs1-2',
-        title: 'Modern Indian History',
-        subtopics: ['Significant events', 'Personalities', 'Issues', 'The Freedom Struggle']
-      },
-      {
-        id: 'gs1-3',
-        title: 'World History',
-        subtopics: ['18th Century events', 'Industrial Revolution', 'World Wars', 'Redrawn boundaries']
-      }
-    ]
-  },
-  {
-    id: 'gs2',
-    title: 'General Studies II',
-    topics: [
-      {
-        id: 'gs2-1',
-        title: 'Indian Constitution',
-        subtopics: ['Historical underpinnings', 'Evolution', 'Features', 'Amendments', 'Basic Structure']
-      },
-      {
-        id: 'gs2-2',
-        title: 'Governance & Polity',
-        subtopics: ['Executive and Judiciary', 'Constitutional Bodies', 'Model Code of Conduct']
-      }
-    ]
-  },
-  {
-    id: 'gs3',
-    title: 'General Studies III',
-    topics: [
-      {
-        id: 'gs3-1',
-        title: 'Indian Economy',
-        subtopics: ['Planning', 'Mobilization of resources', 'Growth', 'Development and employment']
-      },
-      {
-        id: 'gs3-2',
-        title: 'Disaster Management',
-        subtopics: ['Frameworks & Preparedness', 'Drought & Land vulnerability']
-      }
-    ]
-  },
-  {
-    id: 'gs4',
-    title: 'General Studies IV',
-    topics: [
-      {
-        id: 'gs4-1',
-        title: 'Foundations of Ethics',
-        subtopics: ['Ethical Theories', 'Ethics in Public Life', 'Moral Compass', 'Ethical Dissonance']
-      }
-    ]
-  }
-];
 
 export default function MainsScreen() {
   const { colors, isDark } = useTheme();
@@ -325,8 +258,7 @@ export default function MainsScreen() {
     from?: string;
   }>();
 
-  // Navigation State
-  const [currentScreen, setCurrentScreen] = useState<'hub' | 'questions' | 'value-add' | 'syllabus' | 'search' | 'detailed-question'>('hub');
+  const [currentScreen, setCurrentScreen] = useState<'hub' | 'questions' | 'value-add' | 'search' | 'detailed-question'>('hub');
   const [sessionFilters, setSessionFilters] = useState<MainsFilters | null>(null);
 
   useEffect(() => {
@@ -732,7 +664,6 @@ export default function MainsScreen() {
   
   // Saved questions / syllabus progress
   const [savedQuestionIds, setSavedQuestionIds] = useState<string[]>([]);
-  const [completedSubtopics, setCompletedSubtopics] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Theme state: 'gradient' or 'white'
@@ -748,9 +679,6 @@ export default function MainsScreen() {
       try {
         const savedQ = await AsyncStorage.getItem('mains_saved_questions');
         if (savedQ) setSavedQuestionIds(JSON.parse(savedQ));
-
-        const savedS = await AsyncStorage.getItem('mains_completed_syllabus');
-        if (savedS) setCompletedSubtopics(JSON.parse(savedS));
 
         const savedTheme = await AsyncStorage.getItem('mains_theme');
         if (savedTheme === 'white') setMainsTheme('white');
@@ -820,17 +748,6 @@ export default function MainsScreen() {
     }
   };
 
-  const toggleSyllabusSubtopic = async (sub: string) => {
-    try {
-      const next = completedSubtopics.includes(sub)
-        ? completedSubtopics.filter(s => s !== sub)
-        : [...completedSubtopics, sub];
-      setCompletedSubtopics(next);
-      await AsyncStorage.setItem('mains_completed_syllabus', JSON.stringify(next));
-    } catch (err) {
-      console.error('Failed to save syllabus check:', err);
-    }
-  };
 
   const toggleMainsTheme = async () => {
     try {
@@ -954,15 +871,7 @@ export default function MainsScreen() {
               onAddFlashcardClick={handleValueAddFlashcard}
             />
           )}
-          {currentScreen === 'syllabus' && (
-            <SyllabusView
-              colors={colors}
-              completed={completedSubtopics}
-              onToggle={toggleSyllabusSubtopic}
-              isTablet={isTablet}
-              insets={insets}
-            />
-          )}
+
           {currentScreen === 'search' && (
             <MainsAISearchView
               colors={colors}
@@ -1210,8 +1119,13 @@ function HubView({
                     pathname: '/pyq',
                     params: { fromTab: 'mains' }
                   });
+                } else if (card.id === 'syllabus') {
+                  router.push({
+                    pathname: '/tracker',
+                    params: { defaultMode: 'mains' }
+                  });
                 } else {
-                  onSelect(card.id);
+                  onSelect(card.id as any);
                 }
               }}
               style={[
@@ -5716,152 +5630,6 @@ function ValueAdditionView({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 4. SYLLABUS EXPLORER VIEW
-// ─────────────────────────────────────────────────────────────────────────────
-function SyllabusView({
-  colors,
-  completed,
-  onToggle,
-  isTablet,
-  insets,
-}: {
-  colors: any;
-  completed: string[];
-  onToggle: (s: string) => void;
-  isTablet: boolean;
-  insets: any;
-}) {
-  const [expandedPaperId, setExpandedPaperId] = useState<string | null>('gs1');
-
-  // Calculate stats
-  const totalSubtopicsCount = SYLLABUS_DATA.reduce(
-    (acc, paper) => acc + paper.topics.reduce((tAcc, topic) => tAcc + topic.subtopics.length, 0),
-    0
-  );
-  const completedCount = SYLLABUS_DATA.reduce(
-    (acc, paper) =>
-      acc +
-      paper.topics.reduce(
-        (tAcc, topic) => tAcc + topic.subtopics.filter(sub => completed.includes(sub)).length,
-        0
-      ),
-    0
-  );
-  const overallPercentage = totalSubtopicsCount > 0 ? Math.round((completedCount / totalSubtopicsCount) * 100) : 0;
-
-  return (
-    <ScrollView contentContainerStyle={styles.hubScroll} showsVerticalScrollIndicator={false}>
-      {/* Spacer for floating back button */}
-      <View style={{ height: insets.top + 48 }} />
-
-      {/* Progress Header */}
-      <View style={[styles.figmaProgressCard, { backgroundColor: 'rgba(255, 255, 255, 0.45)', borderColor: 'rgba(255, 255, 255, 0.65)' }]}>
-        <View style={styles.progressRow}>
-          <Text style={[styles.progressTitle, { color: colors.textPrimary }]}>Preparation Progress</Text>
-          <Text style={[styles.progressPercentage, { color: '#10b981' }]}>{overallPercentage}%</Text>
-        </View>
-        <View style={styles.figmaProgressBarBg}>
-          <LinearGradient
-            colors={['#10b981', '#059669']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={[styles.figmaProgressBarFilled, { width: `${overallPercentage}%` }]}
-          />
-        </View>
-        <Text style={[styles.progressStats, { color: colors.textTertiary }]}>
-          {completedCount} of {totalSubtopicsCount} subtopics checked off
-        </Text>
-      </View>
-
-      {/* Accordions */}
-      <View style={{ gap: 16 }}>
-        {SYLLABUS_DATA.map(paper => {
-          const isExpanded = expandedPaperId === paper.id;
-          const totalSubs = paper.topics.reduce((acc, t) => acc + t.subtopics.length, 0);
-          const compSubs = paper.topics.reduce((acc, t) => acc + t.subtopics.filter(sub => completed.includes(sub)).length, 0);
-          const percent = totalSubs > 0 ? Math.round((compSubs / totalSubs) * 100) : 0;
-
-          return (
-            <View
-              key={paper.id}
-              style={[
-                styles.figmaPaperCollapsible,
-                { backgroundColor: 'rgba(255, 255, 255, 0.45)', borderColor: 'rgba(255, 255, 255, 0.65)' },
-              ]}
-            >
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => setExpandedPaperId(isExpanded ? null : paper.id)}
-                style={styles.paperCollapsibleHeaderSpacious}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.paperTitleText, { color: colors.textPrimary }]}>{paper.title}</Text>
-                  <Text style={styles.paperStatsText}>
-                    {percent}% Completed • {compSubs}/{totalSubs} topics
-                  </Text>
-                </View>
-                <ChevronDown
-                  size={22}
-                  color={colors.textTertiary}
-                  style={{ transform: [{ rotate: isExpanded ? '180deg' : '0deg' }] as any }}
-                />
-              </TouchableOpacity>
-
-              {isExpanded && (
-                <View style={[styles.paperCollapsibleBody, { borderTopColor: 'rgba(255,255,255,0.5)' }]}>
-                  {paper.topics.map(topic => (
-                    <View key={topic.id} style={styles.topicSectionSpacious}>
-                      <Text style={[styles.topicTitleHeader, { color: colors.textSecondary }]}>
-                        {topic.title}
-                      </Text>
-                      <View style={{ gap: 10, marginTop: 8 }}>
-                        {topic.subtopics.map((sub, idx) => {
-                          const isCheck = completed.includes(sub);
-                          return (
-                            <TouchableOpacity
-                              key={idx}
-                              activeOpacity={0.7}
-                              onPress={() => onToggle(sub)}
-                              style={[
-                                styles.subtopicCheckboxRowSpacious,
-                                { backgroundColor: 'rgba(255, 255, 255, 0.3)', borderColor: 'rgba(255,255,255,0.4)' },
-                              ]}
-                            >
-                              <View
-                                style={[
-                                  styles.checkboxCircle,
-                                  isCheck
-                                    ? { backgroundColor: '#10b981', borderColor: '#10b981' }
-                                    : { borderColor: colors.textTertiary },
-                                ]}
-                              >
-                                {isCheck && <Check size={10} color="#ffffff" />}
-                              </View>
-                              <Text
-                                style={[
-                                  styles.subtopicCheckLabelText,
-                                  { color: isCheck ? colors.textTertiary : colors.textPrimary },
-                                  isCheck && { textDecorationLine: 'line-through' },
-                                ]}
-                              >
-                                {sub}
-                              </Text>
-                            </TouchableOpacity>
-                          );
-                        })}
-                      </View>
-                    </View>
-                  ))}
-                </View>
-              )}
-            </View>
-          );
-        })}
-      </View>
-    </ScrollView>
-  );
-}
 
 function countActiveMainsFilters(f: MainsFilters): number {
   let count = 0;

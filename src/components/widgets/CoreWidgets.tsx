@@ -236,7 +236,7 @@ export function SpeedMeterWidget({ data, colors }: { data: WidgetData; colors: a
 
 // ─── Styles ──────────────────────────────────────────────────
 export const ws = StyleSheet.create({
-  card: { borderRadius: 24, borderWidth: 1, padding: 20, alignItems: 'center', justifyContent: 'center', height: '100%', overflow: 'hidden', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 10 },
+  card: { borderRadius: 24, borderWidth: 1, padding: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'stretch', minHeight: 120, overflow: 'hidden', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 10 },
   cardGlow: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
   half: { flex: 1 },
   full: { width: '100%', alignItems: 'stretch' },

@@ -21,6 +21,7 @@ import {
   Modal,
   Pressable,
   FlatList,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -256,6 +257,7 @@ export default function MainsScreen() {
     year?: string;
     initialScreen?: string;
     from?: string;
+    category?: string;
   }>();
 
   const [currentScreen, setCurrentScreen] = useState<'hub' | 'questions' | 'value-add' | 'search' | 'detailed-question'>('hub');
@@ -266,8 +268,13 @@ export default function MainsScreen() {
       setCurrentScreen('questions');
     } else if (params.initialScreen === 'value-add' || params.initialScreen === 'value-addition') {
       setCurrentScreen('value-add');
+      if (params.category) {
+        setValueAddCategory(params.category);
+      } else {
+        setValueAddCategory(null);
+      }
     }
-  }, [params.initialScreen]);
+  }, [params.initialScreen, params.category]);
 
   const initialFiltersFromParams = useMemo(() => {
     if (!params.initialScreen) return null;
@@ -331,8 +338,8 @@ export default function MainsScreen() {
     const fetchAllStates = async () => {
       try {
         const { data } = await supabase
-          .from('question_states')
-          .select('question_id, review_tags, confidence, difficulty_level, review_difficulty')
+          .from('mains_question_states')
+          .select('question_id, review_tags, confidence, difficulty_level')
           .eq('user_id', session.user.id);
         if (data) {
           const stateMap: Record<string, any> = {};
@@ -377,8 +384,8 @@ export default function MainsScreen() {
       const loadStates = async () => {
         try {
           const { data } = await supabase
-            .from('question_states')
-            .select('review_tags, confidence, difficulty_level, review_difficulty')
+            .from('mains_question_states')
+            .select('review_tags, confidence, difficulty_level')
             .eq('user_id', session.user.id)
             .eq('question_id', detailedQuestion.id)
             .maybeSingle();
@@ -428,7 +435,7 @@ export default function MainsScreen() {
     }));
 
     try {
-      await StudentSync.enqueue('question_state', {
+      await StudentSync.enqueue('mains_question_state', {
         userId: session.user.id,
         questionId: detailedQuestion.id,
         testId: 'manual',
@@ -455,7 +462,7 @@ export default function MainsScreen() {
     }));
 
     try {
-      await StudentSync.enqueue('question_state', {
+      await StudentSync.enqueue('mains_question_state', {
         userId: session.user.id,
         questionId: detailedQuestion.id,
         testId: 'manual',
@@ -486,7 +493,7 @@ export default function MainsScreen() {
     }));
 
     try {
-      await StudentSync.enqueue('question_state', {
+      await StudentSync.enqueue('mains_question_state', {
         userId: session.user.id,
         questionId: detailedQuestion.id,
         testId: 'manual',
@@ -645,7 +652,7 @@ export default function MainsScreen() {
       } catch {}
       try {
         const { data } = await supabase
-          .from('question_states')
+          .from('mains_question_states')
           .select('review_tags')
           .eq('user_id', userId)
           .not('review_tags', 'is', null);
@@ -8938,7 +8945,11 @@ function DetailedQuestionView({
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bg }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={{ flex: 1, backgroundColor: colors.bg }}
+    >
+      <View style={{ flex: 1 }}>
       {/* Floating Back Button */}
       <TouchableOpacity
         onPress={onBack}
@@ -8985,6 +8996,7 @@ function DetailedQuestionView({
           style={{ flex: 1 }}
           contentContainerStyle={{ padding: 16, paddingTop: insets.top + 64, paddingBottom: 60 }}
           scrollEventThrottle={16}
+          keyboardShouldPersistTaps="handled"
         >
           {/* Question Text */}
           <View style={{
@@ -9409,7 +9421,8 @@ function DetailedQuestionView({
           </View>
         </ScrollView>
       </PinchGestureHandler>
-    </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 

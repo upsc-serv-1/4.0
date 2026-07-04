@@ -706,18 +706,66 @@ export default function Home() {
 
                     <TouchableOpacity 
                       style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
-                      onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'value-add' } })}
+                      onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'value-add', category: 'data_facts' } })}
                     >
                       <LinearGradient 
-                        colors={['rgba(245, 158, 11, 0.09)', 'rgba(245, 158, 11, 0)']} 
+                        colors={['rgba(59, 130, 246, 0.09)', 'rgba(59, 130, 246, 0)']} 
                         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                         style={StyleSheet.absoluteFillObject}
                       />
-                      <View style={[styles.resumeIconWrap, { backgroundColor: '#f59e0b' }]}>
+                      <View style={[styles.resumeIconWrap, { backgroundColor: '#3b82f6' }]}>
+                        <BarChart3 size={20} color="#fff" />
+                      </View>
+                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 16, marginTop: 18 }]} numberOfLines={1}>Data & Facts</Text>
+                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains Value Add</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                      style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
+                      onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'value-add', category: 'intro_conclusion' } })}
+                    >
+                      <LinearGradient 
+                        colors={['rgba(16, 185, 129, 0.09)', 'rgba(16, 185, 129, 0)']} 
+                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                        style={StyleSheet.absoluteFillObject}
+                      />
+                      <View style={[styles.resumeIconWrap, { backgroundColor: '#10b981' }]}>
+                        <PenTool size={20} color="#fff" />
+                      </View>
+                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 16, marginTop: 18 }]} numberOfLines={1}>Intro/Concl.</Text>
+                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains Value Add</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                      style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
+                      onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'value-add', category: 'ethics' } })}
+                    >
+                      <LinearGradient 
+                        colors={['rgba(6, 182, 212, 0.09)', 'rgba(6, 182, 212, 0)']} 
+                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                        style={StyleSheet.absoluteFillObject}
+                      />
+                      <View style={[styles.resumeIconWrap, { backgroundColor: '#06b6d4' }]}>
+                        <Scale size={20} color="#fff" />
+                      </View>
+                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 16, marginTop: 18 }]} numberOfLines={1}>Ethics Hub</Text>
+                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains Value Add</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                      style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
+                      onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'value-add', category: 'quotes' } })}
+                    >
+                      <LinearGradient 
+                        colors={['rgba(139, 92, 246, 0.09)', 'rgba(139, 92, 246, 0)']} 
+                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                        style={StyleSheet.absoluteFillObject}
+                      />
+                      <View style={[styles.resumeIconWrap, { backgroundColor: '#8b5cf6' }]}>
                         <Sparkles size={20} color="#fff" />
                       </View>
-                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 18, marginTop: 16 }]} numberOfLines={1}>Value Add</Text>
-                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains</Text>
+                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 16, marginTop: 18 }]} numberOfLines={1}>Quotes/Hooks</Text>
+                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains Value Add</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity 

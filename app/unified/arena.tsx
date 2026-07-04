@@ -649,20 +649,29 @@ function UnifiedArenaSetup() {
           // Fetch metadata directly from Supabase — don't wait for sync
           const { data: supabaseQuestions, error } = await supabase
             .from('questions')
-            .select('course, subject, section_group, micro_topic, sub_topic, test_id, id')
+            .select('course, subject, section_group, micro_topic, sub_topic, test_id, id, exam_category, tests(level, series, institute, program_name, title)')
             .eq('course', selectedCourse)
             .not('subject', 'is', null)
             .limit(5000);
 
           if (!error && supabaseQuestions?.length) {
-            dataToShow = supabaseQuestions.map((q: any) => ({
-              course: q.course || selectedCourse,
-              subject: q.subject || null,
-              section_group: q.section_group || null,
-              micro_topic: q.micro_topic || null,
-              test_id: q.test_id || null,
-              id: q.id,
-            }));
+            dataToShow = supabaseQuestions.map((q: any) => {
+              const testObj = Array.isArray(q.tests) ? q.tests[0] : q.tests;
+              return {
+                course: q.course || selectedCourse,
+                subject: q.subject || null,
+                section_group: q.section_group || null,
+                micro_topic: q.micro_topic || null,
+                test_id: q.test_id || null,
+                id: q.id,
+                exam_category: q.exam_category || testObj?.exam_category || null,
+                level: testObj?.level || null,
+                series: testObj?.series || null,
+                institute: testObj?.institute || null,
+                program_name: testObj?.program_name || null,
+                title: testObj?.title || null,
+              };
+            });
             console.log('[ARENA-LOAD] ✅ Metadata from Supabase:', { items: supabaseQuestions.length, course: selectedCourse });
           } else {
             console.log('[ARENA-LOAD] No data from Supabase for:', selectedCourse, error || '');
@@ -703,38 +712,39 @@ function UnifiedArenaSetup() {
             console.log('[ARENA-SYNC] Starting background sync for course:', selectedCourse);
             const { data: supabaseQuestions, error } = await supabase
               .from('questions')
-              .select('course, subject, section_group, micro_topic, sub_topic, id')
+              .select('course, subject, section_group, micro_topic, sub_topic, test_id, id, exam_category, tests(level, series, institute, program_name, title)')
               .eq('course', selectedCourse)
               .not('subject', 'is', null)
               .limit(5000);
 
             if (error) throw error;
             if (supabaseQuestions?.length) {
-              const grouped: any = {};
-              supabaseQuestions.forEach((q: any) => {
-                const subj = q.subject;
-                const sg = q.section_group || 'General';
-                const mt = q.micro_topic || 'Other';
-                const st = q.sub_topic || 'Other';
-                
-                if (!grouped[subj]) grouped[subj] = { course: selectedCourse, subject: subj };
-                if (!grouped[subj][sg]) grouped[subj][sg] = {};
-                if (!grouped[subj][sg][mt]) grouped[subj][sg][mt] = {};
-                
-                const key = `${mt}|${st}`;
-                if (!grouped[subj][sg][mt][key]) grouped[subj][sg][mt][key] = [];
-                grouped[subj][sg][mt][key].push(q);
+              const flatSynced = supabaseQuestions.map((q: any) => {
+                const testObj = Array.isArray(q.tests) ? q.tests[0] : q.tests;
+                return {
+                  course: q.course || selectedCourse,
+                  subject: q.subject || null,
+                  section_group: q.section_group || null,
+                  micro_topic: q.micro_topic || null,
+                  test_id: q.test_id || null,
+                  id: q.id,
+                  exam_category: q.exam_category || testObj?.exam_category || null,
+                  level: testObj?.level || null,
+                  series: testObj?.series || null,
+                  institute: testObj?.institute || null,
+                  program_name: testObj?.program_name || null,
+                  title: testObj?.title || null,
+                };
               });
 
-              const syncedData = Object.values(grouped);
-              console.log('[ARENA-SYNC] ✅ Synced from Supabase:', { items: supabaseQuestions.length, grouped: syncedData.length, course: selectedCourse });
+              console.log('[ARENA-SYNC] ✅ Synced from Supabase:', { items: flatSynced.length, course: selectedCourse });
               
               // Only update UI if we have more data than what was offline
-              if (syncedData.length > courseFiltered.length) {
-                arenaMetadataCache = syncedData;
+              if (flatSynced.length > courseFiltered.length) {
+                arenaMetadataCache = flatSynced;
                 arenaMetadataCachedAt = Date.now();
-                setMetadata(syncedData);
-                console.log('[ARENA-SYNC] Updated UI with synced data');
+                setMetadata(flatSynced);
+                console.log('[ARENA-SYNC] Updated UI with synced flat data');
               }
             }
           } catch (syncErr) {

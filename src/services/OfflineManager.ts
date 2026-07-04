@@ -723,12 +723,17 @@ class OfflineManagerService {
     };
 
     if (cached && Array.isArray(cached) && cached.length > 0) {
-      // Return cached immediately, refresh in background
-      buildMetadata().catch(console.error);
-      return cached;
+      const firstItem = cached[0];
+      // If the first item has the 'level' property, the cache is up-to-date.
+      if (firstItem && 'level' in firstItem) {
+        // Return cached immediately, refresh in background
+        buildMetadata().catch(console.error);
+        return cached;
+      }
+      console.log('[OfflineManager] Old cached metadata schema detected. Rebuilding consolidated metadata synchronously...');
     }
 
-    // No cache or empty cache, build synchronously
+    // No cache, empty cache, or old schema: build synchronously
     return buildMetadata();
   }
 

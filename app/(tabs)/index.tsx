@@ -592,92 +592,49 @@ export default function Home() {
                     style={StyleSheet.absoluteFillObject}
                   />
                   <View style={[styles.resumeIconWrap, { backgroundColor: 'rgba(99, 102, 241, 0.15)' }]}>
-                    <Play size={20} color="#6366F1" />
+                    <Play size={20} color="#4F46E5" />
                   </View>
                   <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>{pyqQuestionCount}</Text>
                   <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Random PYQ</Text>
                 </TouchableOpacity>
 
-                <View 
-                  style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]}
-                >
-                  <LinearGradient 
-                    colors={['rgba(239, 68, 68, 0.09)', 'transparent']} 
-                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                    style={StyleSheet.absoluteFillObject}
-                  />
-                  <View style={[styles.resumeIconWrap, { backgroundColor: 'rgba(239, 68, 68, 0.15)' }]}>
-                    <Flame size={20} color="#EF4444" />
-                  </View>
-                  <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>{stats.streak || 5}</Text>
-                  <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Daily Streak</Text>
-                </View>
+                {selectedCourse !== 'Medical Science' && (
+                  <>
+                    <TouchableOpacity 
+                      style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} 
+                      onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'questions' } })}
+                    >
+                      <LinearGradient 
+                        colors={['rgba(59, 130, 246, 0.09)', 'transparent']} 
+                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                        style={StyleSheet.absoluteFillObject}
+                      />
+                      <View style={[styles.resumeIconWrap, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
+                        <Library size={20} color="#3b82f6" />
+                      </View>
+                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 16 }]} numberOfLines={1}>Q-Bank</Text>
+                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains</Text>
+                    </TouchableOpacity>
 
-                <TouchableOpacity 
-                  style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]}
-                  onPress={() => router.push('/analytics' as any)}
-                >
-                  <LinearGradient 
-                    colors={['rgba(16, 185, 129, 0.09)', 'transparent']} 
-                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                    style={StyleSheet.absoluteFillObject}
-                  />
-                  <View style={[styles.resumeIconWrap, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
-                    <Target size={20} color="#10B981" />
-                  </View>
-                  <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>{stats.accuracy || 0}%</Text>
-                  <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Accuracy Rate</Text>
-                </TouchableOpacity>
+                    <TouchableOpacity 
+                      style={[styles.pulseActionCard, { width: pulseTileWidth, borderColor: colors.border, backgroundColor: colors.surface }]} 
+                      onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'value-add' } })}
+                    >
+                      <LinearGradient 
+                        colors={['rgba(245, 158, 11, 0.09)', 'transparent']} 
+                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                        style={StyleSheet.absoluteFillObject}
+                      />
+                      <View style={[styles.resumeIconWrap, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
+                        <Sparkles size={20} color="#f59e0b" />
+                      </View>
+                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 16 }]} numberOfLines={1}>Value Add</Text>
+                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
               </View>
             </View>
-
-            {/* Mains Study Hub Shortcuts (Only for non-Medical Science courses) */}
-            {selectedCourse !== 'Medical Science' && (
-              <View style={styles.mainsHubSection}>
-                <View style={styles.sectionHeader}>
-                  <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>MAINS STUDY HUB</Text>
-                  <PenTool size={14} color="#f43f5e" />
-                </View>
-                
-                <View style={styles.mainsHubGrid}>
-                  <TouchableOpacity 
-                    style={[styles.mainsHubCard, { borderColor: colors.border, backgroundColor: colors.surface }]}
-                    onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'questions' } })}
-                  >
-                    <LinearGradient 
-                      colors={['rgba(244, 63, 94, 0.08)', 'transparent']} 
-                      start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                      style={StyleSheet.absoluteFillObject}
-                    />
-                    <View style={[styles.hubIconWrap, { backgroundColor: 'rgba(244, 63, 94, 0.15)' }]}>
-                      <PenTool size={20} color="#f43f5e" />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={[styles.hubCardTitle, { color: colors.textPrimary }]}>Mains Q-Bank</Text>
-                      <Text style={[styles.hubCardSub, { color: colors.textTertiary }]} numberOfLines={1}>UPSC Mains official PYQs & model answers</Text>
-                    </View>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity 
-                    style={[styles.mainsHubCard, { borderColor: colors.border, backgroundColor: colors.surface }]}
-                    onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'value-add' } })}
-                  >
-                    <LinearGradient 
-                      colors={['rgba(245, 158, 11, 0.08)', 'transparent']} 
-                      start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                      style={StyleSheet.absoluteFillObject}
-                    />
-                    <View style={[styles.hubIconWrap, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
-                      <Sparkles size={20} color="#f59e0b" />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={[styles.hubCardTitle, { color: colors.textPrimary }]}>Value Additions</Text>
-                      <Text style={[styles.hubCardSub, { color: colors.textTertiary }]} numberOfLines={1}>Ready-made answer enhancement tools</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
 
             {/* 3. Syllabus Tracker Widget */}
             <TouchableOpacity
@@ -1173,21 +1130,4 @@ const styles = StyleSheet.create({
   radioButton: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   radioDot: { width: 8, height: 8, borderRadius: 4 },
   optionText: { fontSize: 14, fontWeight: '600' },
-
-  // Mains Study Hub
-  mainsHubSection: { marginBottom: 36 },
-  mainsHubGrid: { paddingHorizontal: 24, gap: 12 },
-  mainsHubCard: { 
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    borderRadius: 28, 
-    borderWidth: 1, 
-    padding: 16, 
-    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.02, shadowRadius: 8, elevation: 1,
-    overflow: 'hidden'
-  },
-  hubIconWrap: { width: 46, height: 46, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  hubCardTitle: { fontSize: 16, fontWeight: '900', letterSpacing: -0.2 },
-  hubCardSub: { fontSize: 12, fontWeight: '600', marginTop: 2, opacity: 0.7 },
 });

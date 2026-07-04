@@ -33,6 +33,32 @@ import {
   X,
   Check,
   BookOpen,
+  Globe,
+  Landmark,
+  Users,
+  Scale,
+  Shield,
+  Leaf,
+  TrendingUp,
+  Factory,
+  Building2,
+  Zap,
+  TreePine,
+  AlertTriangle,
+  Vote,
+  Heart,
+  Microscope,
+  Flame,
+  Waves,
+  Map,
+  Clock,
+  Scroll,
+  FlaskConical,
+  Cpu,
+  BrainCircuit,
+  Gavel,
+  Handshake,
+  ShieldAlert,
 } from 'lucide-react-native';
 
 
@@ -102,6 +128,87 @@ interface SyllabusNodeProps {
   trackingMethod: 'single' | 'multi';
   colors: any;
 }
+
+// ── Icon lookup for Section Groups & Subjects ────────────────────────────────
+// Returns { Icon, color } based on keywords in the node name
+const getNodeIcon = (name: string): { Icon: any; color: string } => {
+  const n = name.toLowerCase();
+  // GS1 Subjects
+  if (n.includes('geography'))                     return { Icon: Globe,         color: '#06b6d4' };
+  if (n.includes('history'))                       return { Icon: Landmark,      color: '#f59e0b' };
+  if (n.includes('society'))                       return { Icon: Users,         color: '#8b5cf6' };
+  // GS1 Section Groups
+  if (n.includes('art') && n.includes('culture'))  return { Icon: Scroll,        color: '#f97316' };
+  if (n.includes('modern history') || n.includes('freedom') || n.includes('post independence')) return { Icon: Clock, color: '#f59e0b' };
+  if (n.includes('world history'))                 return { Icon: Map,           color: '#ef4444' };
+  if (n.includes('physical geography') || n.includes('geophysical')) return { Icon: Waves, color: '#06b6d4' };
+  if (n.includes('environmental geography') || n.includes('climate dynamics')) return { Icon: TreePine, color: '#22c55e' };
+  if (n.includes('economic') && n.includes('resource')) return { Icon: TrendingUp, color: '#3b82f6' };
+  if (n.includes('gender') || n.includes('demograph')) return { Icon: Heart,      color: '#ec4899' };
+  if (n.includes('poverty') || n.includes('hunger') || n.includes('empowerment')) return { Icon: Heart, color: '#f97316' };
+  if (n.includes('urbanis'))                       return { Icon: Building2,    color: '#64748b' };
+  if (n.includes('social dynamics') || n.includes('ideolog')) return { Icon: Users, color: '#8b5cf6' };
+  if (n.includes('foundations') || n.includes('diversity')) return { Icon: Users, color: '#a78bfa' };
+  // GS2 Subjects
+  if (n.includes('polity'))                        return { Icon: Gavel,         color: '#3b82f6' };
+  if (n.includes('governance'))                    return { Icon: Building2,     color: '#6366f1' };
+  if (n.includes('social justice'))                return { Icon: Scale,         color: '#22c55e' };
+  if (n.includes('international relations'))       return { Icon: Handshake,     color: '#f59e0b' };
+  // GS2 Section Groups
+  if (n.includes('constitutional') && n.includes('framework')) return { Icon: Scroll, color: '#3b82f6' };
+  if (n.includes('federal') || n.includes('local governance')) return { Icon: Building2, color: '#6366f1' };
+  if (n.includes('organs') || n.includes('dispute'))  return { Icon: Gavel,     color: '#8b5cf6' };
+  if (n.includes('elections') || n.includes('political dynamic')) return { Icon: Vote, color: '#ef4444' };
+  if (n.includes('constitutional') && n.includes('regulatory')) return { Icon: Scroll, color: '#6366f1' };
+  if (n.includes('development processes') || n.includes('policies')) return { Icon: Target, color: '#22c55e' };
+  if (n.includes('accountability') || n.includes('civil services')) return { Icon: Shield, color: '#3b82f6' };
+  if (n.includes('vulnerable') || n.includes('welfare'))  return { Icon: Heart,  color: '#ec4899' };
+  if (n.includes('social sector') || n.includes('human development')) return { Icon: Users, color: '#22c55e' };
+  if (n.includes('neighborhood') || n.includes('bilateral')) return { Icon: Handshake, color: '#f59e0b' };
+  if (n.includes('geopolit') || n.includes('diaspora')) return { Icon: Globe,    color: '#3b82f6' };
+  if (n.includes('international organ'))           return { Icon: Globe,         color: '#06b6d4' };
+  // GS3 Subjects
+  if (n.includes('indian economy') || n.includes('economy')) return { Icon: TrendingUp, color: '#22c55e' };
+  if (n.includes('agriculture'))                   return { Icon: Leaf,          color: '#16a34a' };
+  if (n.includes('science') && n.includes('technology')) return { Icon: FlaskConical, color: '#a78bfa' };
+  if (n.includes('environment'))                   return { Icon: TreePine,      color: '#22c55e' };
+  if (n.includes('disaster'))                      return { Icon: AlertTriangle, color: '#ef4444' };
+  if (n.includes('internal security') || n.includes('security')) return { Icon: ShieldAlert, color: '#dc2626' };
+  // GS3 Section Groups
+  if (n.includes('macroeconom') || n.includes('fiscal')) return { Icon: TrendingUp, color: '#22c55e' };
+  if (n.includes('industrial') || n.includes('reforms')) return { Icon: Factory,  color: '#64748b' };
+  if (n.includes('physical infrastructure') || n.includes('capital')) return { Icon: Building2, color: '#3b82f6' };
+  if (n.includes('farm') || n.includes('agriculture')) return { Icon: Leaf,      color: '#16a34a' };
+  if (n.includes('food processing'))               return { Icon: Flame,         color: '#f97316' };
+  if (n.includes('land reform'))                   return { Icon: Map,           color: '#f59e0b' };
+  if (n.includes('everyday science') || n.includes('innovation')) return { Icon: Zap, color: '#f59e0b' };
+  if (n.includes('indigenous') || n.includes('achievement')) return { Icon: Microscope, color: '#8b5cf6' };
+  if (n.includes('frontier') || n.includes('ipr') || n.includes('cyber')) return { Icon: Cpu, color: '#06b6d4' };
+  if (n.includes('conservation') || n.includes('ecosystem')) return { Icon: TreePine, color: '#22c55e' };
+  if (n.includes('pollution') || n.includes('degradation')) return { Icon: Waves, color: '#64748b' };
+  if (n.includes('climate change'))                return { Icon: AlertTriangle, color: '#f97316' };
+  if (n.includes('frameworks') || n.includes('preparedness')) return { Icon: Shield, color: '#ef4444' };
+  if (n.includes('specific disaster') || n.includes('hazard')) return { Icon: Flame, color: '#dc2626' };
+  if (n.includes('extremism') || n.includes('external threat')) return { Icon: ShieldAlert, color: '#dc2626' };
+  if (n.includes('border') || n.includes('organised crime')) return { Icon: Shield, color: '#ef4444' };
+  if (n.includes('security forces') || n.includes('mandate')) return { Icon: Shield, color: '#3b82f6' };
+  // GS4 Subjects & Groups
+  if (n.includes('ethics') || n.includes('integrity') || n.includes('aptitude')) return { Icon: Scale, color: '#a78bfa' };
+  if (n.includes('human values'))                  return { Icon: Heart,         color: '#ec4899' };
+  if (n.includes('psychology') || n.includes('foundational values')) return { Icon: BrainCircuit, color: '#8b5cf6' };
+  if (n.includes('moral thinkers') || n.includes('leaders'))  return { Icon: Landmark, color: '#f59e0b' };
+  if (n.includes('public admin') || n.includes('civil admin')) return { Icon: Building2, color: '#6366f1' };
+  // Prelims subjects fallback by common keywords
+  if (n.includes('polity') || n.includes('constitution')) return { Icon: Gavel,  color: '#3b82f6' };
+  if (n.includes('science'))                       return { Icon: FlaskConical,  color: '#a78bfa' };
+  if (n.includes('econom'))                        return { Icon: TrendingUp,    color: '#22c55e' };
+  if (n.includes('environ'))                       return { Icon: TreePine,      color: '#22c55e' };
+  if (n.includes('geograph') || n.includes('map')) return { Icon: Globe,         color: '#06b6d4' };
+  if (n.includes('histor'))                        return { Icon: Landmark,      color: '#f59e0b' };
+  // Default
+  return { Icon: Target, color: '#8b5cf6' };
+};
+
 
 const LEVEL_STYLES = [
   // level 0 — Section Group: bold, prominent header
@@ -276,13 +383,16 @@ const SyllabusNode: React.FC<SyllabusNodeProps> = ({
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 8 }}>
           <BulkCheckbox />
-          {level === 0 ? (
-            <Target color={ls.iconColor(colors)} size={ls.iconSize} />
-          ) : level === 1 ? (
-            <BookOpen color={ls.iconColor(colors)} size={ls.iconSize} />
-          ) : (
-            <ChevronRight color={ls.iconColor(colors)} size={ls.iconSize} />
-          )}
+          {(() => {
+            if (level === 0) {
+              const { Icon, color } = getNodeIcon(name);
+              return <Icon color={color} size={ls.iconSize} />;
+            } else if (level === 1) {
+              return <BookOpen color={ls.iconColor(colors)} size={ls.iconSize} />;
+            } else {
+              return <ChevronRight color={ls.iconColor(colors)} size={ls.iconSize} />;
+            }
+          })()}
           <Text style={{ fontSize: ls.fontSize, fontWeight: ls.fontWeight, color: ls.labelColor(colors), flex: 1, lineHeight: ls.fontSize * 1.4 }} numberOfLines={3}>
             {name}
           </Text>
@@ -296,7 +406,7 @@ const SyllabusNode: React.FC<SyllabusNodeProps> = ({
       </TouchableOpacity>
 
       {isExpanded && (
-        <View style={{ marginTop: 4, borderLeftWidth: 2, borderLeftColor: ls.iconColor(colors) + '40', paddingLeft: 8 }}>
+        <View style={{ marginTop: 4, borderLeftWidth: 2, borderLeftColor: (level === 0 ? getNodeIcon(name).color : ls.iconColor(colors)) + '50', paddingLeft: 8 }}>
           {childEntries.map(([childKey, childNode]) => (
             <SyllabusNode
               key={childKey}

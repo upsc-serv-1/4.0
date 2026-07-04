@@ -327,6 +327,7 @@ export default function MainsScreen() {
 
   // Navigation State
   const [currentScreen, setCurrentScreen] = useState<'hub' | 'questions' | 'value-add' | 'syllabus' | 'search' | 'detailed-question'>('hub');
+  const [sessionFilters, setSessionFilters] = useState<MainsFilters | null>(null);
 
   useEffect(() => {
     if (params.initialScreen === 'questions') {
@@ -936,7 +937,8 @@ export default function MainsScreen() {
                 setCurrentScreen('detailed-question');
               }}
               onActiveQuestionChange={handleActiveQuestionChange}
-              initialFilters={initialFiltersFromParams}
+              initialFilters={sessionFilters || initialFiltersFromParams}
+              onFilterChange={setSessionFilters}
             />
           )}
           {currentScreen === 'value-add' && (
@@ -2203,6 +2205,12 @@ function SidebarFilterRow({
 }: SidebarFilterRowProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
 
+  React.useEffect(() => {
+    if (defaultExpanded) {
+      setExpanded(true);
+    }
+  }, [defaultExpanded]);
+
   if (!visible || !items || items.length === 0) return null;
 
   const selectedList = selected === 'All' ? [] : selected.split(delimiter).filter(Boolean);
@@ -2229,11 +2237,11 @@ function SidebarFilterRow({
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 8 }}>
           {/* Label */}
-          <Text style={[styles.panelLabel, { color: isAll ? colors.textTertiary : '#7c3aed', fontSize: 10, marginBottom: 0, letterSpacing: 1 }]}>
+          <Text style={[styles.panelLabel, { color: isAll ? colors.textTertiary : colors.primary, fontSize: 10, marginBottom: 0, letterSpacing: 1 }]}>
             {label}
           </Text>
           {/* Badge count */}
-          <View style={{ backgroundColor: isAll ? colors.border + '60' : '#7c3aed', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 }}>
+          <View style={{ backgroundColor: isAll ? colors.border + '60' : colors.primary, borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 }}>
             <Text style={{ fontSize: 8, fontWeight: '800', color: isAll ? colors.textTertiary : '#ffffff' }}>
               {isAll ? items.length : `${selectedList.length}/${items.length}`}
             </Text>
@@ -2242,12 +2250,7 @@ function SidebarFilterRow({
 
         {/* Active label + chevron */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 0, marginLeft: 8 }}>
-          {activeLabel && (
-            <Text style={styles.sidebarBadge} numberOfLines={1}>
-              {activeLabel}
-            </Text>
-          )}
-          <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: expanded ? '#7c3aed15' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: expanded ? colors.primary + '15' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
             {expanded
               ? <ChevronUp size={13} color={colors.textSecondary} />
               : <ChevronDown size={13} color={colors.textTertiary} />
@@ -2263,7 +2266,7 @@ function SidebarFilterRow({
             <TouchableOpacity
               onPress={() => onSelect('All')}
               activeOpacity={0.8}
-              style={[styles.sidebarFchip, isAll && styles.sidebarFchipSel]}
+              style={[styles.sidebarFchip, isAll && [styles.sidebarFchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
             >
               <Text style={[styles.sidebarFchipText, { color: isAll ? '#fff' : colors.textSecondary }]}>All</Text>
             </TouchableOpacity>
@@ -2272,7 +2275,7 @@ function SidebarFilterRow({
             <TouchableOpacity
               onPress={() => onSelect(allSelected ? 'All' : items.join(delimiter))}
               activeOpacity={0.8}
-              style={[styles.sidebarFchip, allSelected && styles.sidebarFchipSel]}
+              style={[styles.sidebarFchip, allSelected && [styles.sidebarFchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
             >
               <Text style={[styles.sidebarFchipText, { color: allSelected ? '#fff' : colors.textSecondary }]}>Select All</Text>
             </TouchableOpacity>
@@ -2284,7 +2287,7 @@ function SidebarFilterRow({
                 key={item}
                 onPress={() => onSelect(toggleFilterValue(selected, item, delimiter))}
                 activeOpacity={0.8}
-                style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
+                style={[styles.sidebarFchip, isSelected && [styles.sidebarFchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
               >
                 <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]} numberOfLines={1}>
                   {itemPrefix}{item}
@@ -2318,19 +2321,14 @@ function SidebarPYQFilter({ filters, onUpdateFilters, colors }: { filters: Mains
           <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10, marginBottom: 0, letterSpacing: 1 }]}>
             PYQ FILTER
           </Text>
-          <View style={{ backgroundColor: activeLabel ? '#7c3aed20' : colors.border + '60', borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1 }}>
-            <Text style={{ fontSize: 9, fontWeight: '800', color: activeLabel ? '#7c3aed' : colors.textTertiary }}>
+          <View style={{ backgroundColor: activeLabel ? colors.primary : colors.border + '60', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 }}>
+            <Text style={{ fontSize: 8, fontWeight: '800', color: activeLabel ? '#ffffff' : colors.textTertiary }}>
               {activeLabel ? '1/3' : '3'}
             </Text>
           </View>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          {activeLabel && (
-            <Text style={styles.sidebarBadge} numberOfLines={1}>
-              {activeLabel}
-            </Text>
-          )}
-          <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: expanded ? '#7c3aed15' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: expanded ? colors.primary + '15' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
             {expanded
               ? <ChevronUp size={13} color={colors.textSecondary} />
               : <ChevronDown size={13} color={colors.textTertiary} />
@@ -2347,7 +2345,7 @@ function SidebarPYQFilter({ filters, onUpdateFilters, colors }: { filters: Mains
                 key={opt}
                 onPress={() => onUpdateFilters({ ...filters, pyqFilter: opt })}
                 activeOpacity={0.8}
-                style={[styles.sidebarFchip, isSelected && styles.sidebarFchipSel]}
+                style={[styles.sidebarFchip, isSelected && [styles.sidebarFchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
               >
                 <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
               </TouchableOpacity>
@@ -2370,6 +2368,7 @@ interface MainsLeftPanelProps {
   sectionOptions: string[];
   microtopicOptions: string[];
   subtopicOptions: string[];
+  nanotopicOptions: string[];
   macrotagOptions: string[];
   microtagOptions: string[];
   isSearchView?: boolean;
@@ -2402,6 +2401,7 @@ function MainsLeftPanel({
   sectionOptions,
   microtopicOptions,
   subtopicOptions,
+  nanotopicOptions,
   macrotagOptions,
   microtagOptions,
   isSearchView = false,
@@ -2483,7 +2483,7 @@ function MainsLeftPanel({
       {/* ── HEADER ── */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 14, marginBottom: 6, paddingHorizontal: 4 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <View style={{ width: 3, height: 16, borderRadius: 2, backgroundColor: '#7c3aed' }} />
+          <View style={{ width: 3, height: 16, borderRadius: 2, backgroundColor: colors.primary }} />
           <Text style={[styles.panelLabel, { color: colors.textPrimary, marginBottom: 0, fontSize: 11 }]}>
             FILTERS
           </Text>
@@ -2534,6 +2534,7 @@ function MainsLeftPanel({
           label="SUBJECT"
           items={subjectOptions}
           selected={filters.subjects}
+          defaultExpanded={filters.paper !== 'All'}
           onSelect={(val) => onUpdateFilters({
             ...filters,
             subjects: val,
@@ -2548,9 +2549,10 @@ function MainsLeftPanel({
         />
 
         <SidebarFilterRow
-          label={isOptional ? 'OPTIONAL PAPER' : 'SECTION / CHAPTER'}
+          label={isOptional ? 'OPTIONAL PAPER' : 'SECTION GROUP'}
           items={sectionOptions}
           selected={filters.sections}
+          defaultExpanded={filters.subjects !== 'All'}
           onSelect={(val) => onUpdateFilters({
             ...filters,
             sections: val,
@@ -2567,6 +2569,7 @@ function MainsLeftPanel({
           label={isOptional ? 'UNIT' : 'MICROTOPIC'}
           items={microtopicOptions}
           selected={filters.microtopics}
+          defaultExpanded={filters.sections !== 'All'}
           onSelect={(val) => onUpdateFilters({
             ...filters,
             microtopics: val,
@@ -2579,17 +2582,34 @@ function MainsLeftPanel({
         />
 
         <SidebarFilterRow
-          label={isOptional ? 'MICROTOPIC' : 'SUB-TOPIC'}
+          label={isOptional ? 'SUB-UNIT' : 'SUB-TOPIC'}
           items={subtopicOptions}
           selected={filters.subtopics}
+          defaultExpanded={filters.microtopics !== 'All'}
           onSelect={(val) => onUpdateFilters({
             ...filters,
             subtopics: val,
+            nanotopics: 'All',
             macrotags: 'All',
             microtags: 'All',
           })}
           colors={colors}
           visible={filters.subjects !== 'All' && filters.sections !== 'All' && filters.microtopics !== 'All'}
+        />
+
+        <SidebarFilterRow
+          label={isOptional ? 'TOPIC' : 'NANOTOPIC'}
+          items={nanotopicOptions}
+          selected={filters.nanotopics}
+          defaultExpanded={filters.subtopics !== 'All'}
+          onSelect={(val) => onUpdateFilters({
+            ...filters,
+            nanotopics: val,
+            macrotags: 'All',
+            microtags: 'All',
+          })}
+          colors={colors}
+          visible={filters.subjects !== 'All' && filters.sections !== 'All' && filters.microtopics !== 'All' && filters.subtopics !== 'All'}
         />
       </View>
 
@@ -2598,6 +2618,25 @@ function MainsLeftPanel({
         <Text style={{ fontSize: 8, fontWeight: '900', color: colors.textTertiary + '80', letterSpacing: 1.5, paddingHorizontal: 4, marginBottom: 2 }}>
           TAGS
         </Text>
+
+        <SidebarFilterRow
+          label="MACRO TAG"
+          items={macrotagOptions}
+          selected={filters.macrotags}
+          onSelect={(val) => onUpdateFilters({ ...filters, macrotags: val, microtags: 'All' })}
+          colors={colors}
+          itemPrefix="#"
+        />
+
+        <SidebarFilterRow
+          label="MICRO TAG"
+          items={microtagOptions}
+          selected={filters.microtags}
+          onSelect={(val) => onUpdateFilters({ ...filters, microtags: val })}
+          colors={colors}
+          itemPrefix="#"
+          visible={filters.macrotags !== 'All'}
+        />
 
         <SidebarFilterRow
           label="REVISION TAGS"
@@ -2931,32 +2970,30 @@ function HierarchyModal({
     const items = activeCategoryItems || questions;
     if (!items) return [];
 
-    const selectedNano = localFilters.nanotopics !== 'All' ? localFilters.nanotopics : null;
-    if (!selectedNano) return [];
-
-    const sstSet = new Set<string>();
     const paperFilter = localFilters.paper !== 'All' ? localFilters.paper.split('|') : [];
     const subjectFilter = localFilters.subjects !== 'All' ? localFilters.subjects.split('|') : [];
     const sectionFilter = localFilters.sections !== 'All' ? localFilters.sections.split('|') : [];
     const microtopicFilter = localFilters.microtopics !== 'All' ? localFilters.microtopics.split('|') : [];
     const subtopicFilter = localFilters.subtopics !== 'All' ? localFilters.subtopics.split('|') : [];
-    const nanotopicFilter = selectedNano.split('|');
+    const nanotopicFilter = localFilters.nanotopics !== 'All' ? localFilters.nanotopics.split('|') : [];
+
+    const sstSet = new Set<string>();
 
     if (activeCategoryItems && activeCategoryItems.length > 0) {
       activeCategoryItems.forEach(item => {
         getItemPaths(item).forEach(path => {
           if (activeCategory === 'intro_conclusion') {
-            if (path.subtopic && selectedNano.split('|').includes(path.subtopic)) {
+            if (path.subtopic && (subtopicFilter.length === 0 || subtopicFilter.includes(path.subtopic))) {
               if (item.title) sstSet.add(item.title);
             }
           } else if (activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
-            if (path.subtopic && selectedNano.split('|').includes(path.subtopic)) {
+            if (path.subtopic && (subtopicFilter.length === 0 || subtopicFilter.includes(path.subtopic))) {
               if (item.title) sstSet.add(item.title);
             }
           } else {
             const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
             subThemes.forEach((st: any) => {
-              if (st.title === selectedNano) {
+              if (nanotopicFilter.length === 0 || nanotopicFilter.includes(st.title)) {
                 const sstMatches = splitSubSubThemes(st.content);
                 sstMatches.forEach(sst => sstSet.add(sst));
               }
@@ -2972,7 +3009,7 @@ function HierarchyModal({
           const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
           const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(getQuestionMicro(q));
           const matchSub = subtopicFilter.length === 0 || subtopicFilter.includes(getQuestionSub(q));
-          const matchNano = nanotopicFilter.includes(getQuestionNano(q));
+          const matchNano = nanotopicFilter.length === 0 || nanotopicFilter.includes(getQuestionNano(q));
           if (matchPaper && matchSubject && matchSec && matchMicro && matchSub && matchNano) {
             if (q.macrotag) {
               q.macrotag.split(',').forEach(t => sstSet.add(t.trim()));
@@ -2984,12 +3021,43 @@ function HierarchyModal({
     return Array.from(sstSet).sort();
   }, [activeCategoryItems, questions, localFilters.paper, localFilters.subjects, localFilters.sections, localFilters.microtopics, localFilters.subtopics, localFilters.nanotopics, activeCategory]);
 
+  const localMicrotagOptions = React.useMemo(() => {
+    if (localFilters.macrotags === 'All') return [];
+    const paperFilter = localFilters.paper !== 'All' ? localFilters.paper.split('|') : [];
+    const subjectFilter = localFilters.subjects !== 'All' ? localFilters.subjects.split('|') : [];
+    const sectionFilter = localFilters.sections !== 'All' ? localFilters.sections.split('|') : [];
+    const microtopicFilter = localFilters.microtopics !== 'All' ? localFilters.microtopics.split('|') : [];
+    const subtopicFilter = localFilters.subtopics !== 'All' ? localFilters.subtopics.split('|') : [];
+    const nanotopicFilter = localFilters.nanotopics !== 'All' ? localFilters.nanotopics.split('|') : [];
+    const macrotagFilter = localFilters.macrotags.split('|');
+
+    const tagSet = new Set<string>();
+    questions?.forEach(q => {
+      if (q) {
+        const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
+        const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
+        const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
+        const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(getQuestionMicro(q));
+        const matchSub = subtopicFilter.length === 0 || subtopicFilter.includes(getQuestionSub(q));
+        const matchNano = nanotopicFilter.length === 0 || nanotopicFilter.includes(getQuestionNano(q));
+        const qMacros = (q.macrotag || '').split(',').map(t => t.trim());
+        const hasMacroMatch = qMacros.some(m => macrotagFilter.includes(m));
+
+        if (matchPaper && matchSubject && matchSec && matchMicro && matchSub && matchNano && hasMacroMatch && q.microtag) {
+          q.microtag.split(',').forEach(t => tagSet.add(t.trim()));
+        }
+      }
+    });
+    return Array.from(tagSet).sort();
+  }, [questions, localFilters.paper, localFilters.subjects, localFilters.sections, localFilters.microtopics, localFilters.subtopics, localFilters.nanotopics, localFilters.macrotags]);
+
   const subjects = localSubjectOptions;
   const sections = localSectionOptions;
   const microtopics = localMicrotopicOptions;
   const subtopics = localSubtopicOptions;
   const nanotopics = localNanotopicOptions;
   const macrotags = localMacrotagOptions;
+  const microtags = localMicrotagOptions;
 
   const isOptional = localFilters.paper !== 'All' && !localFilters.paper.split('|').some(p => ['GS1', 'GS2', 'GS3', 'GS4', 'Essay'].includes(p));
   const labels = {
@@ -2997,8 +3065,8 @@ function HierarchyModal({
     subject: columnLabels?.subject || 'Subject',
     section: isOptional ? 'Optional Paper' : (columnLabels?.section || 'Section Group'),
     microtopic: isOptional ? 'Unit' : (columnLabels?.microtopic || 'Microtopic'),
-    subtopic: isOptional ? 'Microtopic' : (columnLabels?.subtopic || 'Sub-topic'),
-    nanotopic: isOptional ? 'Microtopic' : 'Nanotopic',
+    subtopic: isOptional ? 'Sub-unit' : (columnLabels?.subtopic || 'Sub-topic'),
+    nanotopic: isOptional ? 'Topic' : 'Nanotopic',
   };
 
   const renderColumn = (
@@ -3215,7 +3283,7 @@ function HierarchyModal({
                 paper: nextVal,
                 ...(isRemoval ? { subjects: 'All', sections: 'All', microtopics: 'All', subtopics: 'All', nanotopics: 'All', macrotags: 'All', microtags: 'All' } : {})
               });
-            }, '#3b82f6', isTablet ? 120 : 100)}
+            }, '#3b82f6', isTablet ? 150 : 130)}
 
             {/* COLUMN 2: Subject — for quotes shows all subjects; for others requires paper selection */}
             {renderColumn(labels.subject, isQuotes ? subjects : (localFilters.paper === 'All' ? [] : subjects), localFilters.subjects, (sub) => {
@@ -3280,7 +3348,7 @@ function HierarchyModal({
             {/* COLUMN 7: Macro tag / Sub-sub-theme */}
             {(!isMainsValueAdd || macrotags.length > 0) && renderColumn(
               isIntroConclusion ? "Card Title" : (isQuotes ? "Title" : (isMnemonics ? "Mnemonic Title" : (isMainsValueAdd ? "Sub-sub-theme" : "Macro tag"))),
-              localFilters.nanotopics === 'All' ? [] : macrotags,
+              macrotags,
               localFilters.macrotags,
               (mat) => {
                 const currentVal = localFilters.macrotags;
@@ -3297,7 +3365,7 @@ function HierarchyModal({
             )}
 
             {/* COLUMN 8: Micro tag */}
-            {!isMainsValueAdd && renderColumn("Micro tag", localFilters.macrotags === 'All' ? [] : microtagOptions, localFilters.microtags, (mit) => {
+            {!isMainsValueAdd && renderColumn("Micro tag", microtags, localFilters.microtags, (mit) => {
               setLocalFilters({
                 ...localFilters,
                 microtags: toggleFilterValue(localFilters.microtags, mit)
@@ -3338,6 +3406,7 @@ function QuestionBankView({
   userQuestionStates,
   onActiveQuestionChange,
   initialFilters,
+  onFilterChange,
 }: {
   colors: any;
   savedIds: string[];
@@ -3350,6 +3419,7 @@ function QuestionBankView({
   userQuestionStates: Record<string, { reviewTags: string[], confidence: string | null, difficulty: string | null }>;
   onActiveQuestionChange?: (q: ConsolidatedQuestion | null, activeInst?: string) => void;
   initialFilters?: MainsFilters | null;
+  onFilterChange?: (filters: MainsFilters) => void;
 }) {
   const { isDark } = useTheme();
   const [search, setSearch] = useState('');
@@ -3375,6 +3445,10 @@ function QuestionBankView({
   const [filters, setFilters] = useState<MainsFilters>(() => {
     return initialFilters || DEFAULT_MAINS_FILTERS;
   });
+
+  useEffect(() => {
+    onFilterChange?.(filters);
+  }, [filters, onFilterChange]);
 
   const setFiltersDeferred = useCallback((updater: MainsFilters | ((prev: MainsFilters) => MainsFilters)) => {
     setTimeout(() => {
@@ -3723,6 +3797,7 @@ function QuestionBankView({
               sectionOptions={sectionOptions}
               microtopicOptions={microtopicOptions}
               subtopicOptions={subtopicOptions}
+              nanotopicOptions={nanotopicOptions}
               macrotagOptions={macrotagOptions}
               microtagOptions={microtagOptions}
               isSearchView={false}
@@ -3982,68 +4057,6 @@ function QuestionBankView({
                               </TouchableOpacity>
                             );
                           })()}
-
-                          {/* Dynamic Macro Tags Pills */}
-                          {macrotagOptions.length > 0 && (
-                            <>
-                              <View style={{ width: 1, height: 16, backgroundColor: colors.border }} />
-                              {macrotagOptions.map(tag => {
-                                const isActive = filters.macrotags.split('|').includes(tag);
-                                return (
-                                  <TouchableOpacity
-                                    key={`macro-${tag}`}
-                                    onPress={() => {
-                                      setFiltersDeferred(prev => ({
-                                        ...prev,
-                                        macrotags: toggleFilterValue(prev.macrotags, tag)
-                                      }));
-                                    }}
-                                    style={[
-                                      styles.tabFilterPill,
-                                      isActive
-                                        ? { backgroundColor: '#06b6d4', borderColor: '#06b6d4' }
-                                        : { backgroundColor: colors.surface + 'b3', borderColor: '#06b6d4' },
-                                    ]}
-                                  >
-                                    <Text style={[styles.tabFilterPillText, isActive ? { color: '#ffffff' } : { color: '#06b6d4' }]}>
-                                      #{tag}
-                                    </Text>
-                                  </TouchableOpacity>
-                                );
-                              })}
-                            </>
-                          )}
-
-                          {/* Dynamic Micro Tags Pills */}
-                          {filters.macrotags !== 'All' && microtagOptions.length > 0 && (
-                            <>
-                              <View style={{ width: 1, height: 16, backgroundColor: colors.border }} />
-                              {microtagOptions.map(tag => {
-                                const isActive = filters.microtags.split('|').includes(tag);
-                                return (
-                                  <TouchableOpacity
-                                    key={`micro-${tag}`}
-                                    onPress={() => {
-                                      setFiltersDeferred(prev => ({
-                                        ...prev,
-                                        microtags: toggleFilterValue(prev.microtags, tag)
-                                      }));
-                                    }}
-                                    style={[
-                                      styles.tabFilterPill,
-                                      isActive
-                                        ? { backgroundColor: '#ec4899', borderColor: '#ec4899' }
-                                        : { backgroundColor: colors.surface + 'b3', borderColor: '#ec4899' },
-                                    ]}
-                                  >
-                                    <Text style={[styles.tabFilterPillText, isActive ? { color: '#ffffff' } : { color: '#ec4899' }]}>
-                                      #{tag}
-                                    </Text>
-                                  </TouchableOpacity>
-                                );
-                              })}
-                            </>
-                          )}
 
                           {hasHierarchyActive && (
                             <>
@@ -6077,6 +6090,27 @@ function MainsAISearchView({
     return Array.from(subSet).sort(naturalCompare);
   }, [questions, valueAddItems, pendingFilters.paper, pendingFilters.subjects, pendingFilters.sections, pendingFilters.microtopics]);
 
+  const nanotopicOptions = useMemo(() => {
+    const paperFilter = pendingFilters.paper !== 'All' ? pendingFilters.paper.split('|') : [];
+    const subjectFilter = pendingFilters.subjects !== 'All' ? pendingFilters.subjects.split('|') : [];
+    const sectionFilter = pendingFilters.sections !== 'All' ? pendingFilters.sections.split('|') : [];
+    const microtopicFilter = pendingFilters.microtopics !== 'All' ? pendingFilters.microtopics.split('|') : [];
+    const subtopicFilter = pendingFilters.subtopics !== 'All' ? pendingFilters.subtopics.split('|') : [];
+    const ntSet = new Set<string>();
+    questions.forEach(q => {
+      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
+      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
+      const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
+      const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(getQuestionMicro(q));
+      const matchSub = subtopicFilter.length === 0 || subtopicFilter.includes(getQuestionSub(q));
+      const nano = getQuestionNano(q);
+      if (matchPaper && matchSubject && matchSec && matchMicro && matchSub && nano) {
+        ntSet.add(nano);
+      }
+    });
+    return Array.from(ntSet).sort(naturalCompare);
+  }, [questions, pendingFilters.paper, pendingFilters.subjects, pendingFilters.sections, pendingFilters.microtopics, pendingFilters.subtopics]);
+
   const macrotagOptions = useMemo(() => {
     const paperFilter = pendingFilters.paper !== 'All' ? pendingFilters.paper.split('|') : [];
     const subjectFilter = pendingFilters.subjects !== 'All' ? pendingFilters.subjects.split('|') : [];
@@ -7063,6 +7097,7 @@ function MainsAISearchView({
               sectionOptions={sectionOptions}
               microtopicOptions={microtopicOptions}
               subtopicOptions={subtopicOptions}
+              nanotopicOptions={nanotopicOptions}
               macrotagOptions={macrotagOptions}
               microtagOptions={microtagOptions}
               isSearchView={true}

@@ -137,6 +137,20 @@ export default function AdminScreen() {
   const [planCourses, setPlanCourses] = useState<string[]>([]);
   const [newInstName, setNewInstName] = useState('');
   const [newCourseName, setNewCourseName] = useState('');
+
+  // Course access lists (populated from DB)
+  const [availableCourses, setAvailableCourses] = useState<string[]>(['UPSC CSE', 'Medical Science']);
+  const [availableInstitutes, setAvailableInstitutes] = useState<string[]>(['VisionIAS', 'Vajiram & Ravi', 'ForumIAS', 'InsightIAS', 'IASbaba']);
+  
+  // Pickers Visibility
+  const [instPickerVisible, setInstPickerVisible] = useState(false);
+  const [planCoursePickerVisible, setPlanCoursePickerVisible] = useState(false);
+  const [coursePickerVisible, setCoursePickerVisible] = useState(false);
+
+  // User-specific course access states
+  const [subCourseName, setSubCourseName] = useState<string>('UPSC CSE');
+  const [userAllowedCourses, setUserAllowedCourses] = useState<string[]>([]);
+
   // --- Global Config State ---
   const [paywallBypassActive, setPaywallBypassActive] = useState(false);
   const [announcementBannerText, setAnnouncementBannerText] = useState('Welcome to Dr. UPSC! Pro Plans are now live.');
@@ -180,6 +194,7 @@ export default function AdminScreen() {
 
       if (verified) {
         fetchStats();
+        fetchAvailableCoursesAndInstitutes();
         loadTabContent(activeTab);
       }
     }
@@ -216,8 +231,8 @@ export default function AdminScreen() {
   // --- Fetch Summary Stats ---
   const fetchStats = async () => {
     try {
-      // Run quick count aggregates (approximate counts using limit select)
-      const { count: usersCount } = await supabase.from('users').select('*', { count: 'estimated', head: true });
+      // Run quick count aggregates (using exact count since estimated can fail under RLS)
+      const { count: usersCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
       const { count: plansCount } = await supabase.from('access_plans').select('*', { count: 'exact', head: true });
       const { count: featuresCount } = await supabase.from('access_features').select('*', { count: 'exact', head: true });
       const { count: subsCount } = await supabase.from('user_subscriptions').select('*', { count: 'exact', head: true });
@@ -233,19 +248,102 @@ export default function AdminScreen() {
     }
   };
 
+  const fetchAvailableCoursesAndInstitutes = async () => {
+    try {
+      const { data: coursesData } = await supabase
+        .from('courses')
+        .select('name');
+      const coursesList = (coursesData || []).map((c: any) => c.name);
+      const uniqueCourses = Array.from(new Set(['UPSC CSE', 'Medical Science', ...coursesList])).filter(Boolean);
+      setAvailableCourses(uniqueCourses);
+
+      const { data: testsData } = await supabase
+        .from('tests')
+        .select('institute')
+        .not('institute', 'is', null);
+      const testsInsts = (testsData || []).map((t: any) => t.institute);
+      const defaultInsts = ['VisionIAS', 'Vajiram & Ravi', 'ForumIAS', 'InsightIAS', 'IASbaba', 'NextIAS', 'Sleepy Classes', 'OnlyIAS'];
+      const uniqueInsts = Array.from(new Set([...defaultInsts, ...testsInsts])).filter(Boolean) as string[];
+      setAvailableInstitutes(uniqueInsts);
+    } catch (e) {
+      console.error('Error fetching courses/institutes:', e);
+    }
+  };
+
   // --- TAB 1: USERS FUNCTIONS ---
   const fetchUsers = async (search = userSearch) => {
     setUsersLoading(true);
     try {
-      let query = supabase.from('users').select('id, email, created_at');
-      
+      // 1. Fetch from public.users table
+      let usersQuery = supabase.from('users').select('id, email, created_at');
       if (search.trim()) {
-        query = query.ilike('email', `%${search.trim()}%`);
+        usersQuery = usersQuery.ilike('email', `%${search.trim()}%`);
       }
+      const { data: usersData } = await usersQuery.order('email').limit(50);
+
+      // 2. Fetch from user_settings table to merge display names and capture settings-only users
+      const { data: settingsData } = await supabase
+        .from('user_settings')
+        .select('user_id, display_name, full_name');
       
-      const { data, error } = await query.order('email').limit(30);
-      if (error) throw error;
-      setUsersList(data || []);
+      const settingsMap = new Map<string, any>();
+      (settingsData || []).forEach(s => {
+        settingsMap.set(s.user_id, s);
+      });
+
+      // 3. Fetch user IDs from user_subscriptions to ensure all subscribers are represented
+      const { data: subsData } = await supabase.from('user_subscriptions').select('user_id');
+      const subUserIds = new Set<string>((subsData || []).map(s => s.user_id));
+
+      const mergedUsersMap = new Map<string, any>();
+
+      // Add users from users table
+      (usersData || []).forEach(u => {
+        const s = settingsMap.get(u.id);
+        mergedUsersMap.set(u.id, {
+          id: u.id,
+          email: u.email || `ID: ${u.id.slice(0, 8)}... (No Email)`,
+          created_at: u.created_at,
+          display_name: s?.display_name || s?.full_name || '',
+        });
+      });
+
+      // Add any additional users found in settings that match search filter
+      settingsMap.forEach((s, userId) => {
+        if (!mergedUsersMap.has(userId)) {
+          const matchSearch = !search.trim() || 
+            userId.toLowerCase().includes(search.toLowerCase()) ||
+            (s.display_name && s.display_name.toLowerCase().includes(search.toLowerCase())) ||
+            (s.full_name && s.full_name.toLowerCase().includes(search.toLowerCase()));
+
+          if (matchSearch) {
+            mergedUsersMap.set(userId, {
+              id: userId,
+              email: `ID: ${userId.slice(0, 8)}...`,
+              created_at: null,
+              display_name: s.display_name || s.full_name || '',
+            });
+          }
+        }
+      });
+
+      // Add any additional users found in subscriptions that match search filter
+      subUserIds.forEach(userId => {
+        if (!mergedUsersMap.has(userId)) {
+          const matchSearch = !search.trim() || userId.toLowerCase().includes(search.toLowerCase());
+          if (matchSearch) {
+            const s = settingsMap.get(userId);
+            mergedUsersMap.set(userId, {
+              id: userId,
+              email: `ID: ${userId.slice(0, 8)}...`,
+              created_at: null,
+              display_name: s?.display_name || s?.full_name || '',
+            });
+          }
+        }
+      });
+
+      setUsersList(Array.from(mergedUsersMap.values()));
     } catch (e: any) {
       Alert.alert('Error', 'Failed to load users: ' + e.message);
     } finally {
@@ -257,10 +355,10 @@ export default function AdminScreen() {
     setSelectedUser(user);
     setLoadingUserDetails(true);
     try {
-      // 1. Fetch Subscriptions
+      // 1. Fetch Subscriptions (including course_name)
       const { data: subData } = await supabase
         .from('user_subscriptions')
-        .select('id, plan_id, is_active, expires_at, created_at, notes')
+        .select('id, plan_id, is_active, expires_at, created_at, notes, course_name')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -270,11 +368,13 @@ export default function AdminScreen() {
         setSubExpiresAt(subData.expires_at ? new Date(subData.expires_at).toISOString().split('T')[0] : '');
         setSubIsActive(subData.is_active);
         setSubNotes(subData.notes || '');
+        setSubCourseName(subData.course_name || 'UPSC CSE');
       } else {
         setSelectedPlanIdForUser('free');
         setSubExpiresAt('');
         setSubIsActive(true);
         setSubNotes('');
+        setSubCourseName('UPSC CSE');
       }
 
       // 2. Fetch Overrides
@@ -292,6 +392,12 @@ export default function AdminScreen() {
         .maybeSingle();
 
       setUserPermissionsJson(settingsData?.permissions ? JSON.stringify(settingsData.permissions, null, 2) : '{}');
+      if (settingsData?.permissions && typeof settingsData.permissions === 'object') {
+        const perms = settingsData.permissions as any;
+        setUserAllowedCourses(Array.isArray(perms.allowedCourses) ? perms.allowedCourses : []);
+      } else {
+        setUserAllowedCourses([]);
+      }
 
       // 4. Fetch User Stats (Parallel)
       const [reviewsRes, attemptsRes, notesRes, sessionsRes] = await Promise.all([
@@ -336,6 +442,7 @@ export default function AdminScreen() {
           plan_id: selectedPlanIdForUser,
           is_active: subIsActive,
           notes: subNotes,
+          course_name: subCourseName, // Store selected course!
           updated_at: new Date().toISOString(),
         };
 
@@ -422,13 +529,24 @@ export default function AdminScreen() {
       // Validate JSON
       const parsedJson = JSON.parse(userPermissionsJson);
       
+      // Merge allowedCourses
+      const updatedPermissions = {
+        ...parsedJson,
+        allowedCourses: userAllowedCourses,
+      };
+
       const { error } = await supabase
         .from('user_settings')
-        .update({ permissions: parsedJson })
-        .eq('user_id', selectedUser.id);
+        .upsert({
+          user_id: selectedUser.id,
+          permissions: updatedPermissions,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' });
 
       if (error) throw error;
-      Alert.alert('Success', 'User permissions JSON updated successfully');
+      setUserPermissionsJson(JSON.stringify(updatedPermissions, null, 2));
+      Alert.alert('Success', 'User permissions and course access updated successfully');
+      refreshPermissions();
     } catch (e: any) {
       Alert.alert('JSON Error', 'Invalid JSON syntax or DB update failed: ' + e.message);
     } finally {
@@ -765,9 +883,9 @@ export default function AdminScreen() {
   };
 
   // Plan-Institute tag add/remove
-  const handleAddInstitute = async () => {
-    if (!selectedPlan || !newInstName.trim()) return;
-    const cleanName = newInstName.trim();
+  const handleAddInstituteDirectly = async (instName: string) => {
+    if (!selectedPlan || !instName) return;
+    const cleanName = instName.trim();
     if (planInstitutes.includes(cleanName)) {
       Alert.alert('Info', 'Institute already mapped.');
       return;
@@ -783,7 +901,6 @@ export default function AdminScreen() {
 
       if (error) throw error;
       setPlanInstitutes(prev => [...prev, cleanName]);
-      setNewInstName('');
     } catch (e: any) {
       Alert.alert('Error', 'Failed to add institute: ' + e.message);
     }
@@ -806,9 +923,9 @@ export default function AdminScreen() {
   };
 
   // Plan-Course tag add/remove
-  const handleAddCourse = async () => {
-    if (!selectedPlan || !newCourseName.trim()) return;
-    const cleanName = newCourseName.trim();
+  const handleAddCourseDirectly = async (courseName: string) => {
+    if (!selectedPlan || !courseName) return;
+    const cleanName = courseName.trim();
     if (planCourses.includes(cleanName)) {
       Alert.alert('Info', 'Course already mapped.');
       return;
@@ -824,7 +941,6 @@ export default function AdminScreen() {
 
       if (error) throw error;
       setPlanCourses(prev => [...prev, cleanName]);
-      setNewCourseName('');
     } catch (e: any) {
       Alert.alert('Error', 'Failed to add course: ' + e.message);
     }
@@ -1113,7 +1229,7 @@ export default function AdminScreen() {
                       <View style={[styles.detailBlock, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                         <Text style={[styles.sectionSub, { color: colors.textTertiary, marginBottom: 12 }]}>SUBSCRIPTION CONTROL</Text>
                         
-                        <Text style={styles.formLabel}>Active Tier</Text>
+                        <Text style={styles.formLabel}>Active Plan</Text>
                         <View style={styles.planPickers}>
                           <TouchableOpacity
                             onPress={() => setSelectedPlanIdForUser('free')}
@@ -1142,6 +1258,16 @@ export default function AdminScreen() {
 
                         {selectedPlanIdForUser !== 'free' && (
                           <View style={{ marginTop: 16 }}>
+                            {/* Course selection for subscription (Issue 6) */}
+                            <Text style={styles.formLabel}>Purchase Course Mappings</Text>
+                            <TouchableOpacity
+                              onPress={() => setCoursePickerVisible(true)}
+                              style={[styles.input, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderColor: colors.border, paddingVertical: 12, paddingHorizontal: 12, marginBottom: 12 }]}
+                            >
+                              <Text style={{ color: colors.textPrimary, fontSize: 13 }}>{subCourseName || 'UPSC CSE'}</Text>
+                              <ChevronRight size={16} color={colors.textTertiary} />
+                            </TouchableOpacity>
+
                             <View style={styles.switchRow}>
                               <Text style={styles.formLabel}>Subscription Status</Text>
                               <Switch
@@ -1186,6 +1312,56 @@ export default function AdminScreen() {
                         >
                           {savingSub ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.saveBtnText}>Save Subscription</Text>}
                         </TouchableOpacity>
+                      </View>
+
+                      {/* Course overrides (Issue 5) */}
+                      <View style={[styles.detailBlock, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                        <Text style={[styles.sectionSub, { color: colors.textTertiary, marginBottom: 12 }]}>USER-SPECIFIC COURSE ACCESS</Text>
+                        <Text style={{ fontSize: 11, color: colors.textTertiary, marginBottom: 12 }}>
+                          Choose exactly which courses this user is allowed to access. Unchecking all defaults to plan mappings.
+                        </Text>
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                          {availableCourses.map(course => {
+                            const hasAccess = userAllowedCourses.includes(course);
+                            return (
+                              <TouchableOpacity
+                                key={course}
+                                onPress={() => {
+                                  if (hasAccess) {
+                                    setUserAllowedCourses(prev => prev.filter(c => c !== course));
+                                  } else {
+                                    setUserAllowedCourses(prev => [...prev, course]);
+                                  }
+                                }}
+                                style={{
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  gap: 8,
+                                  paddingVertical: 8,
+                                  paddingHorizontal: 12,
+                                  borderRadius: 10,
+                                  borderWidth: 1.5,
+                                  borderColor: hasAccess ? colors.primary : colors.border,
+                                  backgroundColor: hasAccess ? colors.primary + '12' : colors.surfaceStrong,
+                                }}
+                              >
+                                <View style={{
+                                  width: 14,
+                                  height: 14,
+                                  borderRadius: 3,
+                                  borderWidth: 1,
+                                  borderColor: hasAccess ? colors.primary : colors.textTertiary,
+                                  backgroundColor: hasAccess ? colors.primary : 'transparent',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}>
+                                  {hasAccess && <Check size={10} color="#fff" />}
+                                </View>
+                                <Text style={{ fontSize: 12, fontWeight: '700', color: colors.textPrimary }}>{course}</Text>
+                              </TouchableOpacity>
+                            );
+                          })}
+                        </View>
                       </View>
 
                       {/* Feature overrides */}
@@ -1408,18 +1584,13 @@ export default function AdminScreen() {
 
                   {/* Institute Access */}
                   <Text style={styles.formLabel}>Coaching Institute Access</Text>
-                  <View style={styles.tagInputRow}>
-                    <TextInput
-                      placeholder="e.g. VisionIAS"
-                      placeholderTextColor={colors.textTertiary}
-                      value={newInstName}
-                      onChangeText={setNewInstName}
-                      style={[styles.input, { flex: 1, color: colors.textPrimary, borderColor: colors.border, marginBottom: 0 }]}
-                    />
-                    <TouchableOpacity onPress={handleAddInstitute} style={[styles.addTagBtn, { backgroundColor: colors.primary }]}>
-                      <Plus size={16} color="#fff" />
-                    </TouchableOpacity>
-                  </View>
+                  <TouchableOpacity
+                    onPress={() => setInstPickerVisible(true)}
+                    style={[styles.input, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderColor: colors.border, paddingVertical: 12, paddingHorizontal: 12 }]}
+                  >
+                    <Text style={{ color: colors.textSecondary, fontSize: 13 }}>Select Institute...</Text>
+                    <Plus size={16} color={colors.primary} />
+                  </TouchableOpacity>
                   <View style={styles.tagsContainer}>
                     {planInstitutes.length === 0 && <Text style={{ fontStyle: 'italic', color: colors.textTertiary, fontSize: 11 }}>All institutes granted (unrestricted)</Text>}
                     {planInstitutes.map(inst => (
@@ -1436,18 +1607,13 @@ export default function AdminScreen() {
 
                   {/* Course Access */}
                   <Text style={styles.formLabel}>Course Access</Text>
-                  <View style={styles.tagInputRow}>
-                    <TextInput
-                      placeholder="e.g. Prelims 2025"
-                      placeholderTextColor={colors.textTertiary}
-                      value={newCourseName}
-                      onChangeText={setNewCourseName}
-                      style={[styles.input, { flex: 1, color: colors.textPrimary, borderColor: colors.border, marginBottom: 0 }]}
-                    />
-                    <TouchableOpacity onPress={handleAddCourse} style={[styles.addTagBtn, { backgroundColor: colors.primary }]}>
-                      <Plus size={16} color="#fff" />
-                    </TouchableOpacity>
-                  </View>
+                  <TouchableOpacity
+                    onPress={() => setPlanCoursePickerVisible(true)}
+                    style={[styles.input, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderColor: colors.border, paddingVertical: 12, paddingHorizontal: 12 }]}
+                  >
+                    <Text style={{ color: colors.textSecondary, fontSize: 13 }}>Select Course...</Text>
+                    <Plus size={16} color={colors.primary} />
+                  </TouchableOpacity>
                   <View style={styles.tagsContainer}>
                     {planCourses.length === 0 && <Text style={{ fontStyle: 'italic', color: colors.textTertiary, fontSize: 11 }}>All courses granted (unrestricted)</Text>}
                     {planCourses.map(course => (
@@ -1753,6 +1919,157 @@ export default function AdminScreen() {
           </View>
         </Modal>
 
+        {/* 1. Coaching Institute Picker Modal (Issue 3) */}
+        <Modal
+          visible={instPickerVisible}
+          animationType="fade"
+          transparent={true}
+          onRequestClose={() => setInstPickerVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={[styles.modalBox, { backgroundColor: colors.bg, borderColor: colors.border, borderWidth: 1 }]}>
+              <View style={styles.modalHeader}>
+                <Text style={{ fontSize: 16, fontWeight: '900', color: colors.textPrimary }}>Select Coaching Institute</Text>
+                <TouchableOpacity onPress={() => setInstPickerVisible(false)}>
+                  <X size={20} color={colors.textPrimary} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Custom Input inside Picker */}
+              <View style={{ flexDirection: 'row', gap: 8, paddingVertical: 8, borderBottomWidth: 0.5, borderBottomColor: colors.border, marginBottom: 10 }}>
+                <TextInput
+                  placeholder="Or type custom institute..."
+                  placeholderTextColor={colors.textTertiary}
+                  value={newInstName}
+                  onChangeText={setNewInstName}
+                  style={[styles.input, { flex: 1, color: colors.textPrimary, borderColor: colors.border, marginBottom: 0, paddingVertical: 6 }]}
+                />
+                <TouchableOpacity 
+                  onPress={() => {
+                    if (newInstName.trim()) {
+                      handleAddInstituteDirectly(newInstName.trim());
+                      setNewInstName('');
+                      setInstPickerVisible(false);
+                    }
+                  }}
+                  style={{ backgroundColor: colors.primary, borderRadius: 10, paddingHorizontal: 16, justifyContent: 'center' }}
+                >
+                  <Text style={{ color: '#fff', fontWeight: '800', fontSize: 12 }}>Add</Text>
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView style={{ maxHeight: 250 }}>
+                {availableInstitutes
+                  .filter(inst => !planInstitutes.includes(inst))
+                  .map(inst => (
+                    <TouchableOpacity
+                      key={inst}
+                      onPress={() => {
+                        handleAddInstituteDirectly(inst);
+                        setInstPickerVisible(false);
+                      }}
+                      style={[styles.pickerItem, { borderBottomColor: colors.border }]}
+                    >
+                      <Text style={{ color: colors.textPrimary, fontSize: 13 }}>{inst}</Text>
+                    </TouchableOpacity>
+                  ))}
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+
+        {/* 2. Plan Course Picker Modal (Issue 3) */}
+        <Modal
+          visible={planCoursePickerVisible}
+          animationType="fade"
+          transparent={true}
+          onRequestClose={() => setPlanCoursePickerVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={[styles.modalBox, { backgroundColor: colors.bg, borderColor: colors.border, borderWidth: 1 }]}>
+              <View style={styles.modalHeader}>
+                <Text style={{ fontSize: 16, fontWeight: '900', color: colors.textPrimary }}>Select Course Access</Text>
+                <TouchableOpacity onPress={() => setPlanCoursePickerVisible(false)}>
+                  <X size={20} color={colors.textPrimary} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Custom Input inside Picker */}
+              <View style={{ flexDirection: 'row', gap: 8, paddingVertical: 8, borderBottomWidth: 0.5, borderBottomColor: colors.border, marginBottom: 10 }}>
+                <TextInput
+                  placeholder="Or type custom course..."
+                  placeholderTextColor={colors.textTertiary}
+                  value={newCourseName}
+                  onChangeText={setNewCourseName}
+                  style={[styles.input, { flex: 1, color: colors.textPrimary, borderColor: colors.border, marginBottom: 0, paddingVertical: 6 }]}
+                />
+                <TouchableOpacity 
+                  onPress={() => {
+                    if (newCourseName.trim()) {
+                      handleAddCourseDirectly(newCourseName.trim());
+                      setNewCourseName('');
+                      setPlanCoursePickerVisible(false);
+                    }
+                  }}
+                  style={{ backgroundColor: colors.primary, borderRadius: 10, paddingHorizontal: 16, justifyContent: 'center' }}
+                >
+                  <Text style={{ color: '#fff', fontWeight: '800', fontSize: 12 }}>Add</Text>
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView style={{ maxHeight: 250 }}>
+                {availableCourses
+                  .filter(c => !planCourses.includes(c))
+                  .map(c => (
+                    <TouchableOpacity
+                      key={c}
+                      onPress={() => {
+                        handleAddCourseDirectly(c);
+                        setPlanCoursePickerVisible(false);
+                      }}
+                      style={[styles.pickerItem, { borderBottomColor: colors.border }]}
+                    >
+                      <Text style={{ color: colors.textPrimary, fontSize: 13 }}>{c}</Text>
+                    </TouchableOpacity>
+                  ))}
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+
+        {/* 3. Subscription Course Picker Modal (Issue 6) */}
+        <Modal
+          visible={coursePickerVisible}
+          animationType="fade"
+          transparent={true}
+          onRequestClose={() => setCoursePickerVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={[styles.modalBox, { backgroundColor: colors.bg, borderColor: colors.border, borderWidth: 1 }]}>
+              <View style={styles.modalHeader}>
+                <Text style={{ fontSize: 16, fontWeight: '900', color: colors.textPrimary }}>Select Subscription Course</Text>
+                <TouchableOpacity onPress={() => setCoursePickerVisible(false)}>
+                  <X size={20} color={colors.textPrimary} />
+                </TouchableOpacity>
+              </View>
+              <ScrollView style={{ maxHeight: 300 }}>
+                {availableCourses.map(c => (
+                  <TouchableOpacity
+                    key={c}
+                    onPress={() => {
+                      setSubCourseName(c);
+                      setCoursePickerVisible(false);
+                    }}
+                    style={[styles.pickerItem, { borderBottomColor: colors.border }]}
+                  >
+                    <Text style={{ color: colors.textPrimary, fontSize: 13 }}>{c}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+
       </KeyboardAvoidingView>
     </PageWrapper>
   );
@@ -1832,4 +2149,5 @@ const styles = StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 20 },
   modalBox: { borderRadius: 18, padding: 16 },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  pickerItem: { paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: '#e5e7eb' },
 });

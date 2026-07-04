@@ -147,7 +147,7 @@ export function AccessControlProvider({ children }: { children: React.ReactNode 
       // 1. Get the user's active subscriptions
       const { data: subs } = await supabase
         .from('user_subscriptions')
-        .select('plan_id, is_active, expires_at')
+        .select('plan_id, is_active, expires_at, course_name')
         .eq('user_id', userId)
         .eq('is_active', true)
         .maybeSingle();
@@ -182,6 +182,11 @@ export function AccessControlProvider({ children }: { children: React.ReactNode 
           .select('course_name')
           .eq('plan_id', subs.plan_id);
         courses = (planCrs || []).map((pc: any) => pc.course_name);
+
+        // Add subscription-level course access (Issue 6)
+        if (subs.course_name) {
+          courses.push(subs.course_name);
+        }
       }
 
       // 5. Apply overrides (overrides always win)
@@ -193,6 +198,24 @@ export function AccessControlProvider({ children }: { children: React.ReactNode 
       (overrides || []).forEach((ov: any) => {
         effectiveFeatures[ov.feature_key] = ov.is_granted;
       });
+
+      // 6. User-specific course access overrides from user_settings permissions (Issue 5)
+      try {
+        const { data: settingsData } = await supabase
+          .from('user_settings')
+          .select('permissions')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (settingsData?.permissions && typeof settingsData.permissions === 'object') {
+          const perms = settingsData.permissions as any;
+          if (Array.isArray(perms.allowedCourses)) {
+            courses = Array.from(new Set([...courses, ...perms.allowedCourses]));
+          }
+        }
+      } catch (err) {
+        console.error('[AccessControl] Failed to load course overrides:', err);
+      }
 
       setFeatureMap(effectiveFeatures);
       setGrantedInstitutes(institutes);

@@ -4,7 +4,8 @@ import { router, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import {
   BookOpen, BarChart3, Play, Clock,
-  RotateCcw, Zap, Sliders, FileText, Tag, Award, Brain, Flame, Target, PenTool, Sparkles, Library, Map
+  RotateCcw, Zap, Sliders, FileText, Tag, Award, Brain, Flame, Target, PenTool, Sparkles, Library, Map,
+  ScrollText, Landmark, Globe2, Leaf, TrendingUp, FlaskConical, Scale, Book
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../../src/lib/supabase';
@@ -42,7 +43,7 @@ type Stats = {
 };
 
 type NoteNode = {
-  id: string; title: string; type: 'note' | 'folder'; updated_at: string; note_id: string | null;
+  id: string; title: string; type: 'note' | 'folder'; updated_at: string; note_id: string | null; subject?: string | null;
 };
 
 const normalizeText = (value: string) =>
@@ -259,6 +260,7 @@ export default function Home() {
           type: 'note',
           updated_at: n.updated_at,
           note_id: n.id,
+          subject: n.subject || null,
         }));
         setRecentNotes(mapped);
       } catch (e) {
@@ -270,6 +272,7 @@ export default function Home() {
           type: 'note',
           updated_at: n.updated_at,
           note_id: n.id,
+          subject: n.subject || null,
         }));
         setRecentNotes(mapped);
       }
@@ -460,28 +463,109 @@ export default function Home() {
   const handleLongPressIn = () => { longPressTimer.current = setTimeout(() => { Vibration.vibrate(50); setIsEditMode(true); }, 3000); };
   const handleLongPressOut = () => { if (longPressTimer.current) clearTimeout(longPressTimer.current); };
 
-  const renderNoteCard = ({ item }: { item: NoteNode }) => (
-    <TouchableOpacity
-      style={[styles.noteCard, { borderColor: colors.border, backgroundColor: colors.surface }]}
-      onPress={() => router.push({ pathname: '/pilot-v2', params: { noteId: item.note_id || item.id } } as any)}
-    >
-      <LinearGradient 
-        colors={[colors.primary + '1a', colors.primary + '00']} 
-        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFillObject}
-      />
-      <View style={styles.glassFill}>
-        <View style={[styles.iconCircle, { backgroundColor: 'rgba(59, 130, 246, 0.15)', width: 36, height: 36, borderRadius: 18 }]}>
-          <FileText size={16} color="#3b82f6" />
+  const getSubjectIconAndColor = (subjectName: string | null | undefined) => {
+    if (!subjectName) {
+      return {
+        IconComponent: FileText,
+        color: '#3b82f6',
+        bgColor: 'rgba(59, 130, 246, 0.15)',
+        cardGradient: ['rgba(59, 130, 246, 0.09)', 'rgba(59, 130, 246, 0)']
+      };
+    }
+
+    const lc = subjectName.toLowerCase().replace(/[^a-z0-9&]/g, '');
+
+    if (lc.includes('polit') || lc.includes('law') || lc.includes('constitut') || lc.includes('govern')) {
+      return {
+        IconComponent: Landmark,
+        color: '#3B82F6',
+        bgColor: 'rgba(59, 130, 246, 0.15)',
+        cardGradient: ['rgba(59, 130, 246, 0.09)', 'rgba(59, 130, 246, 0)']
+      };
+    }
+    if (lc.includes('econom') || lc.includes('finance') || lc.includes('budget') || lc.includes('market') || lc.includes('csat')) {
+      return {
+        IconComponent: TrendingUp,
+        color: '#F59E0B',
+        bgColor: 'rgba(245, 158, 11, 0.15)',
+        cardGradient: ['rgba(245, 158, 11, 0.09)', 'rgba(245, 158, 11, 0)']
+      };
+    }
+    if (lc.includes('history') || lc.includes('ancient') || lc.includes('medieval') || lc.includes('modern')) {
+      return {
+        IconComponent: ScrollText,
+        color: '#EF4444',
+        bgColor: 'rgba(239, 68, 68, 0.15)',
+        cardGradient: ['rgba(239, 68, 68, 0.09)', 'rgba(239, 68, 68, 0)']
+      };
+    }
+    if (lc.includes('geograph') || lc.includes('map') || lc.includes('intern') || lc.includes('relation')) {
+      return {
+        IconComponent: Globe2,
+        color: '#0EA5E9',
+        bgColor: 'rgba(14, 165, 233, 0.15)',
+        cardGradient: ['rgba(14, 165, 233, 0.09)', 'rgba(14, 165, 233, 0)']
+      };
+    }
+    if (lc.includes('science') || lc.includes('tech') || lc.includes('space') || lc.includes('biotech')) {
+      return {
+        IconComponent: FlaskConical,
+        color: '#8B5CF6',
+        bgColor: 'rgba(139, 92, 246, 0.15)',
+        cardGradient: ['rgba(139, 92, 246, 0.09)', 'rgba(139, 92, 246, 0)']
+      };
+    }
+    if (lc.includes('ethic') || lc.includes('philosoph') || lc.includes('moral') || lc.includes('integrity')) {
+      return {
+        IconComponent: Scale,
+        color: '#8B5CF6',
+        bgColor: 'rgba(139, 92, 246, 0.15)',
+        cardGradient: ['rgba(139, 92, 246, 0.09)', 'rgba(139, 92, 246, 0)']
+      };
+    }
+    if (lc.includes('environ') || lc.includes('ecology') || lc.includes('agri') || lc.includes('farm') || lc.includes('cultur') || lc.includes('art')) {
+      return {
+        IconComponent: Leaf,
+        color: '#10B981',
+        bgColor: 'rgba(16, 185, 129, 0.15)',
+        cardGradient: ['rgba(16, 185, 129, 0.09)', 'rgba(16, 185, 129, 0)']
+      };
+    }
+
+    return {
+      IconComponent: Book,
+      color: '#3b82f6',
+      bgColor: 'rgba(59, 130, 246, 0.15)',
+      cardGradient: ['rgba(59, 130, 246, 0.09)', 'rgba(59, 130, 246, 0)']
+    };
+  };
+
+  const renderNoteCard = ({ item }: { item: NoteNode }) => {
+    const themeStyle = getSubjectIconAndColor(item.subject);
+    const IconComponent = themeStyle.IconComponent;
+    return (
+      <TouchableOpacity
+        style={[styles.noteCard, { borderColor: colors.border, backgroundColor: colors.surface }]}
+        onPress={() => router.push({ pathname: '/pilot-v2', params: { noteId: item.note_id || item.id } } as any)}
+      >
+        <LinearGradient 
+          colors={themeStyle.cardGradient as [string, string]} 
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFillObject}
+        />
+        <View style={styles.glassFill}>
+          <View style={[styles.iconCircle, { backgroundColor: themeStyle.bgColor, width: 36, height: 36, borderRadius: 18 }]}>
+            <IconComponent size={16} color={themeStyle.color} />
+          </View>
+          <Text style={[styles.noteTitle, { color: colors.textPrimary }]} numberOfLines={2}>{item.title}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 'auto' }}>
+            <Clock size={11} color={colors.textTertiary} />
+            <Text style={[styles.noteDate, { color: colors.textTertiary }]}>{new Date(item.updated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</Text>
+          </View>
         </View>
-        <Text style={[styles.noteTitle, { color: colors.textPrimary }]} numberOfLines={2}>{item.title}</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 'auto' }}>
-          <Clock size={11} color={colors.textTertiary} />
-          <Text style={[styles.noteDate, { color: colors.textTertiary }]}>{new Date(item.updated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   const saveConfig = async (category: any, subjects: string[], pyqMode?: 'normal' | 'pyq_weighted', examType?: 'prelims' | 'mains' | 'optional', reportMode?: 'single' | 'multi') => {
     const newConfig = { category, subjects };

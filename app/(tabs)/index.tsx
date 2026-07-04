@@ -5,7 +5,8 @@ import * as Haptics from 'expo-haptics';
 import {
   BookOpen, BarChart3, Play, Clock,
   RotateCcw, Zap, Sliders, FileText, Tag, Award, Brain, Flame, Target, PenTool, Sparkles, Library, Map,
-  ScrollText, Landmark, Globe2, Leaf, TrendingUp, FlaskConical, Scale, Book
+  ScrollText, Landmark, Globe2, Leaf, TrendingUp, FlaskConical, Scale, Book,
+  ChevronUp, ChevronDown
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../../src/lib/supabase';
@@ -45,6 +46,27 @@ type Stats = {
 type NoteNode = {
   id: string; title: string; type: 'note' | 'folder'; updated_at: string; note_id: string | null; subject?: string | null;
 };
+
+interface PulseShortcut {
+  id: string;
+  label: string;
+  sub: string;
+  icon: string;
+  color: string;
+  visible: boolean;
+}
+
+const DEFAULT_SHORTCUTS: PulseShortcut[] = [
+  { id: 'due_cards', label: 'Due Cards', sub: 'Flashcards', icon: 'RotateCcw', color: '#F59E0B', visible: true },
+  { id: 'random_pyq', label: 'Random PYQ', sub: 'Prelims Test', icon: 'Play', color: '#6366F1', visible: true },
+  { id: 'q_bank', label: 'Q-Bank', sub: 'Mains', icon: 'Library', color: '#3b82f6', visible: true },
+  { id: 'data_facts', label: 'Data & Facts', sub: 'Mains Value Add', icon: 'BarChart3', color: '#3b82f6', visible: true },
+  { id: 'intro_conclusion', label: 'Intro/Concl.', sub: 'Mains Value Add', icon: 'PenTool', color: '#10b981', visible: true },
+  { id: 'ethics', label: 'Ethics Hub', sub: 'Mains Value Add', icon: 'Scale', color: '#06b6d4', visible: true },
+  { id: 'quotes', label: 'Quotes/Hooks', sub: 'Mains Value Add', icon: 'Sparkles', color: '#8b5cf6', visible: true },
+  { id: 'syllabus', label: 'Syllabus', sub: 'Mains', icon: 'Map', color: '#10b981', visible: true },
+  { id: 'pyq_analysis', label: 'PYQ Analysis', sub: 'Mains', icon: 'BarChart3', color: '#8b5cf6', visible: true },
+];
 
 const normalizeText = (value: string) =>
   String(value || '')
@@ -138,6 +160,31 @@ export default function Home() {
   const longPressTimer = useRef<any>(null);
   const { data: widgetData, refresh: refreshWidgets } = useWidgetData(userId);
 
+  const [shortcuts, setShortcuts] = useState<PulseShortcut[]>(DEFAULT_SHORTCUTS);
+  const [manageTab, setManageTab] = useState<'widgets' | 'pulse'>('widgets');
+
+  const handleToggleShortcut = useCallback((id: string) => {
+    setShortcuts(prev => {
+      const next = prev.map(s => s.id === id ? { ...s, visible: !s.visible } : s);
+      AsyncStorage.setItem('productivity_pulse_shortcuts', JSON.stringify(next)).catch(() => {});
+      return next;
+    });
+  }, []);
+
+  const handleMoveShortcut = useCallback((index: number, direction: 'up' | 'down') => {
+    setShortcuts(prev => {
+      const next = [...prev];
+      const targetIndex = direction === 'up' ? index - 1 : index + 1;
+      if (targetIndex >= 0 && targetIndex < next.length) {
+        const temp = next[index];
+        next[index] = next[targetIndex];
+        next[targetIndex] = temp;
+        AsyncStorage.setItem('productivity_pulse_shortcuts', JSON.stringify(next)).catch(() => {});
+      }
+      return next;
+    });
+  }, []);
+
   const activeWidgets = useMemo(() => widgets.filter(w => !w.is_archived), [widgets]);
   const archivedWidgets = useMemo(() => widgets.filter(w => w.is_archived), [widgets]);
 
@@ -162,6 +209,25 @@ export default function Home() {
       setPyqDisplayMode('normal');
       setPyqExamType('prelims');
       setPyqReportMode('single');
+    });
+    AsyncStorage.getItem('productivity_pulse_shortcuts').then(savedPulse => {
+      if (savedPulse) {
+        try {
+          const parsed = JSON.parse(savedPulse) as PulseShortcut[];
+          const merged = DEFAULT_SHORTCUTS.map(def => {
+            const match = parsed.find(p => p.id === def.id);
+            return match ? { ...def, visible: match.visible } : def;
+          });
+          merged.sort((a, b) => {
+            const idxA = parsed.findIndex(p => p.id === a.id);
+            const idxB = parsed.findIndex(p => p.id === b.id);
+            if (idxA === -1) return 1;
+            if (idxB === -1) return -1;
+            return idxA - idxB;
+          });
+          setShortcuts(merged);
+        } catch (e) {}
+      }
     });
     if (userId) loadWidgets();
   }, [userId]);
@@ -654,153 +720,69 @@ export default function Home() {
                 showsHorizontalScrollIndicator={false} 
                 contentContainerStyle={styles.pulseScroll}
               >
-                <TouchableOpacity 
-                  style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
-                  onPress={() => router.push('/flashcards/review')}
-                >
-                  <LinearGradient 
-                    colors={['rgba(245, 158, 11, 0.09)', 'rgba(245, 158, 11, 0)']} 
-                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                    style={StyleSheet.absoluteFillObject}
-                  />
-                  <View style={[styles.resumeIconWrap, { backgroundColor: '#F59E0B' }]}>
-                    <RotateCcw size={20} color="#fff" />
-                  </View>
-                  <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>{stats.dueCards}</Text>
-                  <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Due Cards</Text>
-                </TouchableOpacity>
+                {shortcuts
+                  .filter(s => s.visible && (!['q_bank', 'data_facts', 'intro_conclusion', 'ethics', 'quotes', 'syllabus', 'pyq_analysis'].includes(s.id) || selectedCourse !== 'Medical Science'))
+                  .map(s => {
+                    const gradientColors = s.id === 'due_cards' 
+                      ? ['rgba(245, 158, 11, 0.09)', 'rgba(245, 158, 11, 0)']
+                      : s.id === 'random_pyq'
+                      ? ['rgba(99, 102, 241, 0.09)', 'rgba(99, 102, 241, 0)']
+                      : s.id === 'data_facts' || s.id === 'q_bank'
+                      ? ['rgba(59, 130, 246, 0.09)', 'rgba(59, 130, 246, 0)']
+                      : s.id === 'intro_conclusion' || s.id === 'syllabus'
+                      ? ['rgba(16, 185, 129, 0.09)', 'rgba(16, 185, 129, 0)']
+                      : s.id === 'ethics'
+                      ? ['rgba(6, 182, 212, 0.09)', 'rgba(6, 182, 212, 0)']
+                      : ['rgba(139, 92, 246, 0.09)', 'rgba(139, 92, 246, 0)'];
 
-                <TouchableOpacity 
-                  style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
-                  onPress={() => setPyqPickerVisible(true)}
-                >
-                  <LinearGradient 
-                    colors={['rgba(99, 102, 241, 0.09)', 'rgba(99, 102, 241, 0)']} 
-                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                    style={StyleSheet.absoluteFillObject}
-                  />
-                  <View style={[styles.resumeIconWrap, { backgroundColor: '#6366F1' }]}>
-                    <Play size={20} color="#fff" />
-                  </View>
-                  <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }]}>{pyqQuestionCount}</Text>
-                  <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Random PYQ</Text>
-                </TouchableOpacity>
+                    const onPress = () => {
+                      if (s.id === 'due_cards') router.push('/flashcards/review');
+                      else if (s.id === 'random_pyq') setPyqPickerVisible(true);
+                      else if (s.id === 'q_bank') router.push({ pathname: '/mains', params: { initialScreen: 'questions' } });
+                      else if (s.id === 'data_facts') router.push({ pathname: '/mains', params: { initialScreen: 'value-add', category: 'data_facts' } });
+                      else if (s.id === 'intro_conclusion') router.push({ pathname: '/mains', params: { initialScreen: 'value-add', category: 'intro_conclusion' } });
+                      else if (s.id === 'ethics') router.push({ pathname: '/mains', params: { initialScreen: 'value-add', category: 'ethics' } });
+                      else if (s.id === 'quotes') router.push({ pathname: '/mains', params: { initialScreen: 'value-add', category: 'quotes' } });
+                      else if (s.id === 'syllabus') router.push({ pathname: '/tracker', params: { defaultMode: 'mains' } });
+                      else if (s.id === 'pyq_analysis') router.push({ pathname: '/pyq', params: { fromTab: 'mains' } });
+                    };
 
-                {selectedCourse !== 'Medical Science' && (
-                  <>
-                    <TouchableOpacity 
-                      style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
-                      onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'questions' } })}
-                    >
-                      <LinearGradient 
-                        colors={['rgba(59, 130, 246, 0.09)', 'rgba(59, 130, 246, 0)']} 
-                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                        style={StyleSheet.absoluteFillObject}
-                      />
-                      <View style={[styles.resumeIconWrap, { backgroundColor: '#3b82f6' }]}>
-                        <Library size={20} color="#fff" />
-                      </View>
-                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 20, marginTop: 14 }]} numberOfLines={1}>Q-Bank</Text>
-                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains</Text>
-                    </TouchableOpacity>
+                    let IconComp = RotateCcw;
+                    if (s.icon === 'Play') IconComp = Play;
+                    else if (s.icon === 'Library') IconComp = Library;
+                    else if (s.icon === 'BarChart3') IconComp = BarChart3;
+                    else if (s.icon === 'PenTool') IconComp = PenTool;
+                    else if (s.icon === 'Scale') IconComp = Scale;
+                    else if (s.icon === 'Sparkles') IconComp = Sparkles;
+                    else if (s.icon === 'Map') IconComp = Map;
 
-                    <TouchableOpacity 
-                      style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
-                      onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'value-add', category: 'data_facts' } })}
-                    >
-                      <LinearGradient 
-                        colors={['rgba(59, 130, 246, 0.09)', 'rgba(59, 130, 246, 0)']} 
-                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                        style={StyleSheet.absoluteFillObject}
-                      />
-                      <View style={[styles.resumeIconWrap, { backgroundColor: '#3b82f6' }]}>
-                        <BarChart3 size={20} color="#fff" />
-                      </View>
-                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 16, marginTop: 18 }]} numberOfLines={1}>Data & Facts</Text>
-                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains Value Add</Text>
-                    </TouchableOpacity>
+                    let titleValue: string | number = s.label;
+                    if (s.id === 'due_cards') titleValue = stats.dueCards;
+                    else if (s.id === 'random_pyq') titleValue = pyqQuestionCount;
 
-                    <TouchableOpacity 
-                      style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
-                      onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'value-add', category: 'intro_conclusion' } })}
-                    >
-                      <LinearGradient 
-                        colors={['rgba(16, 185, 129, 0.09)', 'rgba(16, 185, 129, 0)']} 
-                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                        style={StyleSheet.absoluteFillObject}
-                      />
-                      <View style={[styles.resumeIconWrap, { backgroundColor: '#10b981' }]}>
-                        <PenTool size={20} color="#fff" />
-                      </View>
-                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 16, marginTop: 18 }]} numberOfLines={1}>Intro/Concl.</Text>
-                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains Value Add</Text>
-                    </TouchableOpacity>
+                    const isNumberTitle = typeof titleValue === 'number' || s.id === 'due_cards' || s.id === 'random_pyq';
 
-                    <TouchableOpacity 
-                      style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
-                      onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'value-add', category: 'ethics' } })}
-                    >
-                      <LinearGradient 
-                        colors={['rgba(6, 182, 212, 0.09)', 'rgba(6, 182, 212, 0)']} 
-                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                        style={StyleSheet.absoluteFillObject}
-                      />
-                      <View style={[styles.resumeIconWrap, { backgroundColor: '#06b6d4' }]}>
-                        <Scale size={20} color="#fff" />
-                      </View>
-                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 16, marginTop: 18 }]} numberOfLines={1}>Ethics Hub</Text>
-                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains Value Add</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity 
-                      style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
-                      onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'value-add', category: 'quotes' } })}
-                    >
-                      <LinearGradient 
-                        colors={['rgba(139, 92, 246, 0.09)', 'rgba(139, 92, 246, 0)']} 
-                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                        style={StyleSheet.absoluteFillObject}
-                      />
-                      <View style={[styles.resumeIconWrap, { backgroundColor: '#8b5cf6' }]}>
-                        <Sparkles size={20} color="#fff" />
-                      </View>
-                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 16, marginTop: 18 }]} numberOfLines={1}>Quotes/Hooks</Text>
-                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains Value Add</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity 
-                      style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
-                      onPress={() => router.push({ pathname: '/tracker', params: { defaultMode: 'mains' } })}
-                    >
-                      <LinearGradient 
-                        colors={['rgba(16, 185, 129, 0.09)', 'rgba(16, 185, 129, 0)']} 
-                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                        style={StyleSheet.absoluteFillObject}
-                      />
-                      <View style={[styles.resumeIconWrap, { backgroundColor: '#10b981' }]}>
-                        <Map size={20} color="#fff" />
-                      </View>
-                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 18, marginTop: 16 }]} numberOfLines={1}>Syllabus</Text>
-                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity 
-                      style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
-                      onPress={() => router.push({ pathname: '/pyq', params: { fromTab: 'mains' } })}
-                    >
-                      <LinearGradient 
-                        colors={['rgba(139, 92, 246, 0.09)', 'rgba(139, 92, 246, 0)']} 
-                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                        style={StyleSheet.absoluteFillObject}
-                      />
-                      <View style={[styles.resumeIconWrap, { backgroundColor: '#8b5cf6' }]}>
-                        <BarChart3 size={20} color="#fff" />
-                      </View>
-                      <Text style={[styles.pulseActionTitle, { color: colors.textPrimary, fontSize: 16, marginTop: 18 }]} numberOfLines={1}>PYQ Analysis</Text>
-                      <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>Mains</Text>
-                    </TouchableOpacity>
-                  </>
-                )}
+                    return (
+                      <TouchableOpacity 
+                        key={s.id}
+                        style={[styles.pulseActionCard, { borderColor: colors.border, backgroundColor: colors.surface }]} 
+                        onPress={onPress}
+                      >
+                        <LinearGradient 
+                          colors={gradientColors as [string, string]} 
+                          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                          style={StyleSheet.absoluteFillObject}
+                        />
+                        <View style={[styles.resumeIconWrap, { backgroundColor: s.color }]}>
+                          <IconComp size={20} color="#fff" />
+                        </View>
+                        <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }, isNumberTitle ? { fontSize: 28, marginTop: 14 } : { fontSize: 16, marginTop: 18 }]} numberOfLines={1}>
+                          {titleValue}
+                        </Text>
+                        <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>{s.sub}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
               </ScrollView>
             </View>
 
@@ -966,47 +948,128 @@ export default function Home() {
               </TouchableOpacity>
             </View>
             
-            <ScrollView nestedScrollEnabled contentContainerStyle={{ paddingBottom: 20 }}>
-              {widgets.map(w => {
-                const isActive = !w.is_archived;
-                const label = WIDGET_LABELS[w.widget_key] || w.widget_key.replace(/_/g, ' ').toUpperCase();
-                return (
-                  <TouchableOpacity
-                    key={w.id}
-                    style={{ 
-                      flexDirection: 'row', 
-                      justifyContent: 'space-between', 
-                      alignItems: 'center',
-                      paddingVertical: 14, 
-                      paddingHorizontal: 16,
-                      borderBottomWidth: 1, 
-                      borderBottomColor: colors.border,
-                      backgroundColor: isActive ? 'transparent' : colors.surfaceStrong + '50',
-                      borderRadius: 8,
-                      marginBottom: 4
-                    }}
-                    onPress={() => handleToggleArchive(w)}
-                  >
-                    <View style={{ flex: 1, paddingRight: 12 }}>
-                      <Text style={{ color: isActive ? colors.textPrimary : colors.textTertiary, fontSize: 15, fontWeight: '700' }}>
-                        {label}
-                      </Text>
-                    </View>
-                    <View style={{ 
-                      width: 44, height: 24, borderRadius: 12, 
-                      backgroundColor: isActive ? colors.primary : colors.border,
-                      justifyContent: 'center',
-                      paddingHorizontal: 2
-                    }}>
+            {/* Tab Selector */}
+            <View style={{ flexDirection: 'row', backgroundColor: colors.border + '30', borderRadius: 12, padding: 4, marginBottom: 16 }}>
+              <TouchableOpacity 
+                style={{ flex: 1, paddingVertical: 8, alignItems: 'center', backgroundColor: manageTab === 'widgets' ? colors.surface : 'transparent', borderRadius: 8 }}
+                onPress={() => setManageTab('widgets')}
+              >
+                <Text style={{ fontWeight: '700', fontSize: 13, color: manageTab === 'widgets' ? colors.textPrimary : colors.textTertiary }}>Dashboard Widgets</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={{ flex: 1, paddingVertical: 8, alignItems: 'center', backgroundColor: manageTab === 'pulse' ? colors.surface : 'transparent', borderRadius: 8 }}
+                onPress={() => setManageTab('pulse')}
+              >
+                <Text style={{ fontWeight: '700', fontSize: 13, color: manageTab === 'pulse' ? colors.textPrimary : colors.textTertiary }}>Productivity Pulse</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView nestedScrollEnabled contentContainerStyle={{ paddingBottom: 20 }} style={{ minHeight: 300 }}>
+              {manageTab === 'widgets' ? (
+                widgets.map(w => {
+                  const isActive = !w.is_archived;
+                  const label = WIDGET_LABELS[w.widget_key] || w.widget_key.replace(/_/g, ' ').toUpperCase();
+                  return (
+                    <TouchableOpacity
+                      key={w.id}
+                      style={{ 
+                        flexDirection: 'row', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        paddingVertical: 14, 
+                        paddingHorizontal: 16,
+                        borderBottomWidth: 1, 
+                        borderBottomColor: colors.border,
+                        backgroundColor: isActive ? 'transparent' : colors.surfaceStrong + '50',
+                        borderRadius: 8,
+                        marginBottom: 4
+                      }}
+                      onPress={() => handleToggleArchive(w)}
+                    >
+                      <View style={{ flex: 1, paddingRight: 12 }}>
+                        <Text style={{ color: isActive ? colors.textPrimary : colors.textTertiary, fontSize: 15, fontWeight: '700' }}>
+                          {label}
+                        </Text>
+                      </View>
                       <View style={{ 
-                        width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff',
-                        alignSelf: isActive ? 'flex-end' : 'flex-start',
-                        elevation: 2
-                      }} />
+                        width: 44, height: 24, borderRadius: 12, 
+                        backgroundColor: isActive ? colors.primary : colors.border,
+                        justifyContent: 'center',
+                        paddingHorizontal: 2
+                      }}>
+                        <View style={{ 
+                          width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff',
+                          alignSelf: isActive ? 'flex-end' : 'flex-start',
+                          elevation: 2
+                        }} />
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })
+              ) : (
+                shortcuts.map((s, idx) => {
+                  return (
+                    <View
+                      key={s.id}
+                      style={{ 
+                        flexDirection: 'row', 
+                        alignItems: 'center',
+                        paddingVertical: 12, 
+                        paddingHorizontal: 16,
+                        borderBottomWidth: 1, 
+                        borderBottomColor: colors.border,
+                        backgroundColor: s.visible ? 'transparent' : colors.surfaceStrong + '50',
+                        borderRadius: 8,
+                        marginBottom: 4
+                      }}
+                    >
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ color: s.visible ? colors.textPrimary : colors.textTertiary, fontSize: 15, fontWeight: '700' }}>
+                          {s.label}
+                        </Text>
+                        <Text style={{ color: colors.textTertiary, fontSize: 11, marginTop: 1 }}>
+                          {s.sub}
+                        </Text>
+                      </View>
+                      
+                      {/* Rearrange Arrows */}
+                      <View style={{ flexDirection: 'row', gap: 4, marginRight: 16 }}>
+                        <TouchableOpacity 
+                          disabled={idx === 0}
+                          onPress={() => handleMoveShortcut(idx, 'up')}
+                          style={{ padding: 6, opacity: idx === 0 ? 0.2 : 0.8 }}
+                        >
+                          <ChevronUp size={18} color={idx === 0 ? colors.textTertiary : colors.textPrimary} />
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                          disabled={idx === shortcuts.length - 1}
+                          onPress={() => handleMoveShortcut(idx, 'down')}
+                          style={{ padding: 6, opacity: idx === shortcuts.length - 1 ? 0.2 : 0.8 }}
+                        >
+                          <ChevronDown size={18} color={idx === shortcuts.length - 1 ? colors.textTertiary : colors.textPrimary} />
+                        </TouchableOpacity>
+                      </View>
+
+                      {/* Toggle Switch */}
+                      <TouchableOpacity
+                        onPress={() => handleToggleShortcut(s.id)}
+                        style={{ 
+                          width: 44, height: 24, borderRadius: 12, 
+                          backgroundColor: s.visible ? colors.primary : colors.border,
+                          justifyContent: 'center',
+                          paddingHorizontal: 2
+                        }}
+                      >
+                        <View style={{ 
+                          width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff',
+                          alignSelf: s.visible ? 'flex-end' : 'flex-start',
+                          elevation: 2
+                        }} />
+                      </TouchableOpacity>
                     </View>
-                  </TouchableOpacity>
-                );
-              })}
+                  );
+                })
+              )}
             </ScrollView>
             <TouchableOpacity 
               style={[styles.applyBtn, { backgroundColor: colors.primary, marginTop: 16 }]} 
@@ -1198,17 +1261,16 @@ const styles = StyleSheet.create({
   pulseContainer: { marginBottom: 36 },
   pulseScroll: { paddingHorizontal: 24, gap: 12 },
   pulseActionCard: { 
-    width: 145,
-    minHeight: 124, 
+    width: 190,
+    height: 140, 
     borderRadius: 28, 
     borderWidth: 1, 
-    padding: 16, 
-    justifyContent: 'flex-start',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 2,
+    padding: 20, 
+    shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.04, shadowRadius: 12, elevation: 2,
     overflow: 'hidden'
   },
-  pulseActionTitle: { fontSize: 28, fontWeight: '900', letterSpacing: -1, marginTop: 14 },
-  pulseActionSub: { fontSize: 12, fontWeight: '700', marginTop: 4, opacity: 0.7 },
+  pulseActionTitle: { fontSize: 16, fontWeight: '900', marginTop: 12, height: 44, lineHeight: 22, letterSpacing: -0.2 },
+  pulseActionSub: { fontSize: 11, fontWeight: '700', marginTop: 'auto', opacity: 0.6 },
   cardGlow: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
   resumeIconWrap: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 

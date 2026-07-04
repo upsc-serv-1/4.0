@@ -649,7 +649,7 @@ function UnifiedArenaSetup() {
           // Fetch metadata directly from Supabase — don't wait for sync
           const { data: supabaseQuestions, error } = await supabase
             .from('questions')
-            .select('course, subject, section_group, micro_topic, sub_topic, test_id, id, exam_category, tests(level, series, institute, program_name, title)')
+            .select('course, subject, section_group, micro_topic, sub_topic, test_id, id, exam_category, exam_stage, tests(series, institute, program_name, title)')
             .eq('course', selectedCourse)
             .not('subject', 'is', null)
             .limit(5000);
@@ -664,8 +664,8 @@ function UnifiedArenaSetup() {
                 micro_topic: q.micro_topic || null,
                 test_id: q.test_id || null,
                 id: q.id,
-                exam_category: q.exam_category || testObj?.exam_category || null,
-                level: testObj?.level || null,
+                exam_category: q.exam_category || null,
+                exam_stage: q.exam_stage || null,
                 series: testObj?.series || null,
                 institute: testObj?.institute || null,
                 program_name: testObj?.program_name || null,
@@ -712,7 +712,7 @@ function UnifiedArenaSetup() {
             console.log('[ARENA-SYNC] Starting background sync for course:', selectedCourse);
             const { data: supabaseQuestions, error } = await supabase
               .from('questions')
-              .select('course, subject, section_group, micro_topic, sub_topic, test_id, id, exam_category, tests(level, series, institute, program_name, title)')
+              .select('course, subject, section_group, micro_topic, sub_topic, test_id, id, exam_category, exam_stage, tests(series, institute, program_name, title)')
               .eq('course', selectedCourse)
               .not('subject', 'is', null)
               .limit(5000);
@@ -728,8 +728,8 @@ function UnifiedArenaSetup() {
                   micro_topic: q.micro_topic || null,
                   test_id: q.test_id || null,
                   id: q.id,
-                  exam_category: q.exam_category || testObj?.exam_category || null,
-                  level: testObj?.level || null,
+                  exam_category: q.exam_category || null,
+                  exam_stage: q.exam_stage || null,
                   series: testObj?.series || null,
                   institute: testObj?.institute || null,
                   program_name: testObj?.program_name || null,
@@ -816,7 +816,7 @@ function UnifiedArenaSetup() {
         } else {
           if (deferredSelectedInstitutes.length > 0) rows = rows.filter((m: any) => deferredSelectedInstitutes.includes(m.institute));
           if (selectedPrograms.length > 0) rows = rows.filter((m: any) => selectedPrograms.includes(m.program_name));
-          if (selectedExamStage !== 'All') rows = rows.filter((m: any) => String(m.level || '').toLowerCase() === selectedExamStage.toLowerCase());
+          if (selectedExamStage !== 'All') rows = rows.filter((m: any) => String(m.exam_stage || '').toLowerCase() === selectedExamStage.toLowerCase());
         }
 
         if (ncertFilter === 'NCERT Only') {
@@ -934,7 +934,7 @@ function UnifiedArenaSetup() {
   const subjects = useMemo(() => {
     let base = metadata;
     if (selectedExamStage !== 'All') {
-      base = base.filter(m => String(m.level || '').toLowerCase() === selectedExamStage.toLowerCase());
+      base = base.filter(m => String(m.exam_stage || '').toLowerCase() === selectedExamStage.toLowerCase());
     }
     return Array.from(new Set(base.map(m => m.subject).filter(Boolean))).sort();
   }, [metadata, selectedExamStage]);
@@ -944,7 +944,7 @@ function UnifiedArenaSetup() {
       ? metadata.filter(m => selectedSubjects.includes(m.subject))
       : metadata;
     if (selectedExamStage !== 'All') {
-      base = base.filter(m => String(m.level || '').toLowerCase() === selectedExamStage.toLowerCase());
+      base = base.filter(m => String(m.exam_stage || '').toLowerCase() === selectedExamStage.toLowerCase());
     }
 
     return Array.from(new Set(
@@ -958,7 +958,7 @@ function UnifiedArenaSetup() {
     if (selectedSection.length === 0) return [];
     let base = metadata;
     if (selectedExamStage !== 'All') {
-      base = base.filter(m => String(m.level || '').toLowerCase() === selectedExamStage.toLowerCase());
+      base = base.filter(m => String(m.exam_stage || '').toLowerCase() === selectedExamStage.toLowerCase());
     }
 
     return Array.from(new Set(
@@ -987,7 +987,7 @@ function UnifiedArenaSetup() {
       base = base.filter(m => selectedSubjects.includes(m.subject));
     }
     if (selectedExamStage !== 'All') {
-      base = base.filter(m => String(m.level || '').toLowerCase() === selectedExamStage.toLowerCase());
+      base = base.filter(m => String(m.exam_stage || '').toLowerCase() === selectedExamStage.toLowerCase());
     }
     return Array.from(new Set(base.map(m => m.institute).filter(Boolean))).sort();
   }, [metadata, selectedSubjects, selectedExamStage]);
@@ -996,7 +996,7 @@ function UnifiedArenaSetup() {
     let base = metadata;
     if (deferredSelectedInstitutes.length > 0) base = base.filter(m => deferredSelectedInstitutes.includes(m.institute));
     if (selectedExamStage !== 'All') {
-      base = base.filter(m => String(m.level || '').toLowerCase() === selectedExamStage.toLowerCase());
+      base = base.filter(m => String(m.exam_stage || '').toLowerCase() === selectedExamStage.toLowerCase());
     }
     return Array.from(new Set(base.map(m => m.program_name).filter(Boolean))).sort();
   }, [metadata, deferredSelectedInstitutes, selectedExamStage]);
@@ -1011,7 +1011,7 @@ function UnifiedArenaSetup() {
       if (!m.test_id) return;
       if (deferredSelectedInstitutes.length > 0 && !deferredSelectedInstitutes.includes(m.institute)) return;
       if (selectedPrograms.length > 0 && !selectedPrograms.includes(m.program_name)) return;
-      if (selectedExamStage !== 'All' && String(m.level || '').toLowerCase() !== selectedExamStage.toLowerCase()) return;
+      if (selectedExamStage !== 'All' && String(m.exam_stage || '').toLowerCase() !== selectedExamStage.toLowerCase()) return;
 
       if (!tests.has(m.test_id)) {
         tests.set(m.test_id, {

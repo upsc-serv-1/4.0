@@ -696,8 +696,8 @@ class OfflineManagerService {
             is_ncert: null,
             test_id: t.id, institute: t.institute, program_name: t.program_name,
             series: t.series, title: t.title,
-            exam_category: t.exam_category || null,
-            level: t.level || null,
+            exam_category: null,
+            exam_stage: null,
           });
         } else {
           for (const q of questions) {
@@ -709,8 +709,8 @@ class OfflineManagerService {
               is_ncert: q.is_ncert ?? null,
               test_id: t.id, institute: t.institute, program_name: t.program_name,
               series: t.series, title: t.title,
-              exam_category: q.exam_category || t.exam_category || null,
-              level: t.level || null,
+              exam_category: q.exam_category || null,
+              exam_stage: q.exam_stage || null,
             });
           }
         }
@@ -724,8 +724,8 @@ class OfflineManagerService {
 
     if (cached && Array.isArray(cached) && cached.length > 0) {
       const firstItem = cached[0];
-      // If the first item has the 'level' property, the cache is up-to-date.
-      if (firstItem && 'level' in firstItem) {
+      // If the first item has the 'exam_stage' property, the cache is up-to-date.
+      if (firstItem && 'exam_stage' in firstItem) {
         // Return cached immediately, refresh in background
         buildMetadata().catch(console.error);
         return cached;

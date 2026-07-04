@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Animated, StyleSheet } from 'react-native';
+import { View, Animated, StyleSheet, ScrollView } from 'react-native';
 
 interface SkeletonLoaderProps {
   width?: number | string;
@@ -303,19 +303,16 @@ export const SkeletonDashboard: React.FC<{ colors: any }> = ({ colors }) => (
       <SkeletonCircle size={16} />
     </View>
 
-    {/* 4. Productivity Grid (Two cards side-by-side) */}
-    <View style={{ flexDirection: 'row', gap: 14, marginBottom: 36 }}>
-      <View style={{ flex: 1, height: 124, borderRadius: 28, backgroundColor: colors.surface || '#fff', borderWidth: 1, borderColor: colors.border || '#e5e7eb', padding: 20, gap: 10 }}>
-        <SkeletonCircle size={36} />
-        <SkeletonLine width={50} height={20} borderRadius={10} />
-        <SkeletonLine width={80} height={12} borderRadius={6} />
-      </View>
-      <View style={{ flex: 1, height: 124, borderRadius: 28, backgroundColor: colors.surface || '#fff', borderWidth: 1, borderColor: colors.border || '#e5e7eb', padding: 20, gap: 10 }}>
-        <SkeletonCircle size={36} />
-        <SkeletonLine width={50} height={20} borderRadius={10} />
-        <SkeletonLine width={80} height={12} borderRadius={6} />
-      </View>
-    </View>
+    {/* 4. Productivity Grid (Horizontal scroll skeleton) */}
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }} style={{ marginBottom: 36, marginHorizontal: -24 }}>
+      {[1, 2, 3].map((key) => (
+        <View key={key} style={{ width: 145, height: 124, borderRadius: 28, backgroundColor: colors.surface || '#fff', borderWidth: 1, borderColor: colors.border || '#e5e7eb', padding: 16, gap: 10 }}>
+          <SkeletonCircle size={36} />
+          <SkeletonLine width={50} height={20} borderRadius={10} />
+          <SkeletonLine width={80} height={12} borderRadius={6} />
+        </View>
+      ))}
+    </ScrollView>
 
     {/* 5. Syllabus Mastery Large Card */}
     <View style={{ height: 260, borderRadius: 32, backgroundColor: colors.surface || '#fff', borderWidth: 1, borderColor: colors.border || '#e5e7eb', padding: 24, marginBottom: 36 }}>

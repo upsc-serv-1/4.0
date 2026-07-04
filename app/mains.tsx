@@ -264,6 +264,8 @@ export default function MainsScreen() {
   useEffect(() => {
     if (params.initialScreen === 'questions') {
       setCurrentScreen('questions');
+    } else if (params.initialScreen === 'value-add' || params.initialScreen === 'value-addition') {
+      setCurrentScreen('value-add');
     }
   }, [params.initialScreen]);
 

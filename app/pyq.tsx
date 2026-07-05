@@ -667,17 +667,24 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           
           console.log(`[MainsFetch] Querying mains_questions for paper: ${mappedPaper}, stage: ${examStage}`);
           
-          // Query Supabase mains_questions with paper filter and is_pyq=true at DB level
-          const { data, error: mainsErr } = await supabase
-            .from('mains_questions')
-            .select('id, question_number, question_text, marks, exam_year, subject, section_group, microtopic, subtopic, macrotag, microtag, hierarchy_path, paper, is_pyq, source_attribution_label, exam_info, stage, exam, exam_group, is_upsc_cse, is_allied, is_others, exam_category, answers:mains_answers(id, institute)')
-            .eq('paper', mappedPaper)
-            .eq('is_pyq', true);
-          
-          if (mainsErr) throw mainsErr;
-          
-          const mainsQs: any[] = data || [];
-          console.log('[MainsFetch] Fetched from Supabase:', mainsQs.length, 'questions for paper:', mappedPaper);
+          // Query Supabase mains_questions with paper filter and is_pyq=true at DB level (paginated)
+          const mainsQs: any[] = [];
+          let from = 0;
+          while (true) {
+            const { data, error: mainsErr } = await supabase
+              .from('mains_questions')
+              .select('id, question_number, question_text, marks, exam_year, subject, section_group, microtopic, subtopic, macrotag, microtag, hierarchy_path, paper, is_pyq, source_attribution_label, exam_info, stage, exam, exam_group, is_upsc_cse, is_allied, is_others, exam_category, answers:mains_answers(id, institute)')
+              .eq('paper', mappedPaper)
+              .eq('is_pyq', true)
+              .range(from, from + PYQ_PAGE_SIZE - 1);
+            
+            if (mainsErr) throw mainsErr;
+            if (!data || data.length === 0) break;
+            mainsQs.push(...data);
+            if (data.length < PYQ_PAGE_SIZE) break;
+            from += PYQ_PAGE_SIZE;
+          }
+          console.log('[MainsFetch] Fetched from Supabase (paginated):', mainsQs.length, 'questions for paper:', mappedPaper);
           
           if (mainsQs.length === 0) {
             console.warn(`[MainsFetch] No questions found for paper=${mappedPaper} in mains_questions table`);

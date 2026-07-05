@@ -92,7 +92,7 @@ const TREND_PALETTE = [
 ];
 const PYQ_PAGE_SIZE = 1000;
 
-type HubKey = 'overview' | 'focused' | 'pilot' | 'forecast' | 'compare';
+type HubKey = 'overview' | 'lapsed' | 'pilot' | 'forecast' | 'compare';
 type ExportMode = 'all' | 'momentum' | 'distribution' | 'heatmaps' | 'focused' | 'subject_one' | 'subject_all';
 type AnalysisReportKey = 'full_report' | 'subject_momentum' | 'subject_distribution' | 'heatmaps' | 'focused_trend' | 'forecast';
 
@@ -445,6 +445,13 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
   const [heatmapPalette, setHeatmapPalette] = useState<'spectral' | 'ocean'>('spectral');
   const [heatmapMetric, setHeatmapMetric] = useState<'count' | 'marks'>('count');
+
+  // Lapsed / Neglected Trends Analysis tab states
+  const [lapsedSubject, setLapsedSubject] = useState<string>('All');
+  const [lapsedLevel, setLapsedLevel] = useState<'section' | 'micro' | 'subtopic'>('micro');
+  const [lapsedYears, setLapsedYears] = useState<number>(2);
+  const [lapsedMinAsks, setLapsedMinAsks] = useState<number>(3);
+  const [lapsedPriorityOnly, setLapsedPriorityOnly] = useState<boolean>(false);
 
   // Auto-scroll refs/coords for PYQ analysis heatmap (Issue #20)
   const mainScrollRef = useRef<ScrollView | null>(null);
@@ -1192,6 +1199,79 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       byYear: item.byYear,
     }));
   }, [heatmapSubtopics]);
+
+  const lapsedTopics = useMemo(() => {
+    let qSource = rawQuestions;
+    if (lapsedSubject && lapsedSubject !== 'All') {
+      qSource = rawQuestions.filter(q => getAnalyticsSubject(q) === lapsedSubject);
+    }
+
+    const groupMap: Record<string, {
+      name: string;
+      totalAsks: number;
+      lastAskedYear: number | null;
+      parentInfo: string;
+    }> = {};
+
+    qSource.forEach(q => {
+      let keyName = '';
+      let parentPath = '';
+      if (lapsedLevel === 'section') {
+        keyName = q.section_group || 'General';
+        parentPath = getAnalyticsSubject(q);
+      } else if (lapsedLevel === 'micro') {
+        keyName = q.micro_topic || 'Other';
+        parentPath = `${getAnalyticsSubject(q)} · ${q.section_group || 'General'}`;
+      } else {
+        keyName = q.subTopic || q.sub_topic || 'Other';
+        parentPath = `${getAnalyticsSubject(q)} · ${q.section_group || 'General'} · ${q.micro_topic || 'Other'}`;
+      }
+
+      if (!keyName) return;
+
+      const year = getAnalyticsYear(q);
+      const val = heatmapMetric === 'marks' ? (Number(q.marks) || 0) : 1;
+
+      if (!groupMap[keyName]) {
+        groupMap[keyName] = {
+          name: keyName,
+          totalAsks: 0,
+          lastAskedYear: null,
+          parentInfo: parentPath
+        };
+      }
+
+      groupMap[keyName].totalAsks += val;
+      if (year) {
+        if (groupMap[keyName].lastAskedYear === null || year > groupMap[keyName].lastAskedYear) {
+          groupMap[keyName].lastAskedYear = year;
+        }
+      }
+    });
+
+    const currentYear = 2026;
+    const thresholdYear = currentYear - lapsedYears;
+
+    return Object.values(groupMap)
+      .map(item => {
+        const lastYear = item.lastAskedYear;
+        const yearsLapsed = lastYear ? (currentYear - lastYear) : 99;
+        return {
+          ...item,
+          yearsLapsed
+        };
+      })
+      .filter(item => {
+        if (item.lastAskedYear && item.lastAskedYear >= thresholdYear) {
+          return false;
+        }
+        if (lapsedPriorityOnly && item.totalAsks < lapsedMinAsks) {
+          return false;
+        }
+        return true;
+      })
+      .sort((a, b) => b.totalAsks - a.totalAsks);
+  }, [rawQuestions, lapsedSubject, lapsedLevel, lapsedYears, lapsedMinAsks, lapsedPriorityOnly, heatmapMetric]);
 
   const trendColorMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -2777,87 +2857,206 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     );
   };
 
-  const renderFocusedTrend = () => (
-    <View style={styles.blockGap}>
-      <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <Text style={[styles.panelTitle, { color: colors.textPrimary }]}>Focused Trend</Text>
-        <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-          Subject only, then deeper into section group and micro topic when you need it.
-        </Text>
+  const renderLapsedTrends = () => {
+    const subjects = ['All', ...focusSubjects.filter(s => s !== 'All')];
+    
+    return (
+      <View style={styles.blockGap}>
+        <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={[styles.panelTitle, { color: colors.textPrimary }]}>Lapsed & Neglected Topics Analysis</Text>
+          <Text style={[styles.helperText, { color: colors.textSecondary, marginBottom: 12 }]}>
+            Identify syllabus areas that have not been asked recently, with options to sort by high-frequency recurrence.
+          </Text>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-          {focusSubjects.map(item => (
-            <TouchableOpacity
-              key={`subject-${item}`}
-              activeOpacity={0.7}
-              style={[styles.filterChip, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }, focusSubject === item && { backgroundColor: colors.primary, borderColor: colors.primaryDark }]}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setFocusSubject(item);
-                setFocusSection('All');
-                setFocusMicro('All');
-              }}
-            >
-              <Text style={[styles.filterChipText, { color: focusSubject === item ? colors.buttonText : colors.textSecondary }]}>{item}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        {focusSubject !== 'All' ? (
+          {/* Subject Filter */}
+          <Text style={[styles.exportGroupLabel, { color: colors.textTertiary, marginLeft: 4, marginBottom: 6 }]}>SUBJECT</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-            {focusSections.map(item => (
+            {subjects.map(item => (
               <TouchableOpacity
-                key={`section-${item}`}
-                style={[styles.filterChip, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }, focusSection === item && { backgroundColor: colors.primary, borderColor: colors.primaryDark }]}
+                key={`lapsed-subject-${item}`}
+                activeOpacity={0.7}
+                style={[
+                  styles.filterChip,
+                  { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                  lapsedSubject === item && { backgroundColor: colors.primary, borderColor: colors.primary }
+                ]}
                 onPress={() => {
-                  setFocusSection(item);
-                  setFocusMicro('All');
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setLapsedSubject(item);
                 }}
               >
-                <Text style={[styles.filterChipText, { color: focusSection === item ? colors.buttonText : colors.textSecondary }]}>{item}</Text>
+                <Text style={[styles.filterChipText, { color: lapsedSubject === item ? '#fff' : colors.textSecondary }]}>
+                  {item}
+                </Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
-        ) : null}
 
-        {focusSection !== 'All' ? (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-            {focusMicros.map(item => (
+          {/* Taxonomy Level Selector */}
+          <Text style={[styles.exportGroupLabel, { color: colors.textTertiary, marginLeft: 4, marginTop: 12, marginBottom: 6 }]}>TAXONOMY LEVEL</Text>
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+            {(['section', 'micro', 'subtopic'] as const).map(level => {
+              const label = level === 'section' ? 'Section Group' : level === 'micro' ? 'Micro-Topic' : 'Sub-Topic';
+              return (
+                <TouchableOpacity
+                  key={`lapsed-level-${level}`}
+                  activeOpacity={0.7}
+                  style={[
+                    styles.filterChip,
+                    { borderColor: colors.border, backgroundColor: colors.surfaceStrong, flex: 1, alignItems: 'center' },
+                    lapsedLevel === level && { backgroundColor: colors.primary, borderColor: colors.primary }
+                  ]}
+                  onPress={() => setLapsedLevel(level)}
+                >
+                  <Text style={[styles.filterChipText, { color: lapsedLevel === level ? '#fff' : colors.textSecondary }]}>
+                    {label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          {/* Lapse Duration & Priority Settings */}
+          <View style={{ flexDirection: 'row', gap: 12, marginTop: 4, alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.exportGroupLabel, { color: colors.textTertiary, marginLeft: 4, marginBottom: 6 }]}>NOT ASKED IN LAST</Text>
+              <View style={{ flexDirection: 'row', gap: 6 }}>
+                {[1, 2, 3, 4, 5].map(n => (
+                  <TouchableOpacity
+                    key={`lapsed-yr-${n}`}
+                    style={[
+                      { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceStrong },
+                      lapsedYears === n && { backgroundColor: colors.primary, borderColor: colors.primary }
+                    ]}
+                    onPress={() => setLapsedYears(n)}
+                  >
+                    <Text style={{ fontSize: 12, fontWeight: '700', color: lapsedYears === n ? '#fff' : colors.textSecondary }}>
+                      {n} yr{n > 1 ? 's' : ''}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
+              <Text style={[styles.exportGroupLabel, { color: colors.textTertiary, marginRight: 4, marginBottom: 6 }]}>PRIORITY FILTER</Text>
               <TouchableOpacity
-                key={`micro-${item}`}
-                style={[styles.filterChip, { borderColor: colors.border, backgroundColor: colors.surfaceStrong }, focusMicro === item && { backgroundColor: colors.primary, borderColor: colors.primaryDark }]}
-                onPress={() => setFocusMicro(item)}
+                style={[
+                  { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceStrong, flexDirection: 'row', alignItems: 'center', gap: 4 },
+                  lapsedPriorityOnly && { backgroundColor: '#b91c1c', borderColor: '#b91c1c' }
+                ]}
+                onPress={() => setLapsedPriorityOnly(!lapsedPriorityOnly)}
               >
-                <Text style={[styles.filterChipText, { color: focusMicro === item ? colors.buttonText : colors.textSecondary }]}>{item}</Text>
+                <Text style={{ fontSize: 12, fontWeight: '700', color: lapsedPriorityOnly ? '#fff' : colors.textSecondary }}>
+                  {lapsedPriorityOnly ? '🔥 High Probability Only' : 'Show All Lapsed'}
+                </Text>
               </TouchableOpacity>
-            ))}
-          </ScrollView>
-        ) : null}
+            </View>
+          </View>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <LineChart
-            labels={years}
-            data={focusTrendSeries}
-            colors={[colors.primary]}
-            height={320}
-            width={Math.max(width * 1.65, years.length * 108, 460)}
-            topInset={34}
-          />
-        </ScrollView>
+          {/* Min Asks for High Probability Settings */}
+          {lapsedPriorityOnly && (
+            <View style={{ marginTop: 12, padding: 10, borderRadius: 8, backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border }}>
+              <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary, marginBottom: 6 }}>
+                MINIMUM HISTORICAL {heatmapMetric.toUpperCase()}: {lapsedMinAsks}
+              </Text>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                {[2, 3, 5, 8, 10].map(m => (
+                  <TouchableOpacity
+                    key={`min-asks-${m}`}
+                    style={[
+                      { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
+                      lapsedMinAsks === m && { backgroundColor: colors.primary, borderColor: colors.primary }
+                    ]}
+                    onPress={() => setLapsedMinAsks(m)}
+                  >
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: lapsedMinAsks === m ? '#fff' : colors.textSecondary }}>
+                      {m}+ {heatmapMetric === 'marks' ? 'marks' : 'asks'}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          )}
+        </View>
 
-        <TouchableOpacity
-          style={[styles.openBtn, { backgroundColor: colors.primary }]}
-          onPress={() => navigateToLearning({
-            subject: focusSubject === 'All' ? undefined : focusSubject,
-            section: focusSection === 'All' ? undefined : focusSection,
-            micro: focusMicro === 'All' ? undefined : focusMicro,
-          })}
-        >
-          <Text style={[styles.openBtnText, { color: colors.buttonText }]}>Open This In Learn Mode</Text>
-        </TouchableOpacity>
+        {/* Results List */}
+        <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={[styles.panelTitle, { color: colors.textPrimary, marginBottom: 4 }]}>
+            Neglected Areas ({lapsedTopics.length})
+          </Text>
+          <Text style={[styles.helperText, { color: colors.textSecondary, marginBottom: 12 }]}>
+            Sorted by total historical weight. Click on a topic to open matching questions.
+          </Text>
+
+          {lapsedTopics.length === 0 ? (
+            <Text style={{ color: colors.textTertiary, fontSize: 14, textAlign: 'center', paddingVertical: 24 }}>
+              No neglected topics found matching the criteria. Try lowering the threshold or asks minimum.
+            </Text>
+          ) : (
+            <View style={{ gap: 8 }}>
+              {lapsedTopics.map((topic, index) => {
+                const isHighProb = topic.totalAsks >= lapsedMinAsks;
+                return (
+                  <TouchableOpacity
+                    key={`lapsed-item-${index}`}
+                    activeOpacity={0.7}
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      const opts: any = {
+                        subject: lapsedSubject === 'All' ? undefined : lapsedSubject,
+                      };
+                      if (lapsedLevel === 'section') opts.section = topic.name;
+                      else if (lapsedLevel === 'micro') opts.micro = topic.name;
+                      else opts.subtopic = topic.name;
+
+                      // Filter years before threshold
+                      const targetYears = years.filter(y => Number(y) < (2026 - lapsedYears)).join(',');
+                      navigateToLearning({ ...opts, year: targetYears });
+                    }}
+                    style={{
+                      padding: 12,
+                      borderRadius: 12,
+                      backgroundColor: colors.surfaceStrong,
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}
+                  >
+                    <View style={{ flex: 1, marginRight: 12 }}>
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: colors.textPrimary, marginBottom: 2 }}>
+                        {topic.name}
+                      </Text>
+                      <Text style={{ fontSize: 11, color: colors.textTertiary }} numberOfLines={1}>
+                        {topic.parentInfo}
+                      </Text>
+                    </View>
+                    <View style={{ alignItems: 'flex-end', gap: 4 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textSecondary }}>
+                          {topic.totalAsks} {heatmapMetric === 'marks' ? 'marks' : 'asks'}
+                        </Text>
+                        <Text style={{ fontSize: 11, color: colors.textTertiary }}>
+                          • {topic.yearsLapsed === 99 ? 'Never' : `${topic.yearsLapsed} yrs lapsed`}
+                        </Text>
+                      </View>
+                      {isHighProb && (
+                        <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, backgroundColor: '#fee2e2', borderWidth: 0.5, borderColor: '#fecaca' }}>
+                          <Text style={{ fontSize: 8, fontWeight: '900', color: '#dc2626' }}>🔥 HIGH PRIORITY</Text>
+                        </View>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: isEmbedded ? 'transparent' : colors.bg }]}>
@@ -2964,7 +3163,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
               <>
                 {activeHub === 'overview' && renderOverview()}
 
-                {activeHub === 'focused' && renderFocusedTrend()}
+                {activeHub === 'lapsed' && renderLapsedTrends()}
                 {activeHub === 'pilot' && renderPilot()}
                 {activeHub === 'forecast' && (
                   <PredictiveInsightsPanel
@@ -3016,9 +3215,9 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
       <View style={[styles.tabBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         {[
-          { key: 'pilot', label: 'Deep Dive', icon: Target },
+          {key: 'pilot', label: 'Deep Dive', icon: Target },
           { key: 'overview', label: 'Overview', icon: TrendingUp },
-          { key: 'focused', label: 'Focused', icon: LineIcon },
+          { key: 'lapsed', label: 'Not Asked', icon: HelpCircle },
           { key: 'forecast', label: 'Forecast', icon: TrendingUp },
           { key: 'compare', label: 'Compare', icon: Grid },
         ].map(item => {

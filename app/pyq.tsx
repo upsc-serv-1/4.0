@@ -644,7 +644,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const fetchPyqData = async (bypassCache = false) => {
     const stageNorm = examStage.toLowerCase();
     const targetPaperGroup = normalizePyqPaperGroup(selectedPaper, examStage);
-    const cacheKey = `pyq_cache_${stageNorm}_${targetPaperGroup.replace(/\s+/g, '_')}_${selectedRange.replace(/\s+/g, '_')}`;
+    const cacheKey = `pyq_cache_v3_${stageNorm}_${targetPaperGroup.replace(/\s+/g, '_')}_${selectedRange.replace(/\s+/g, '_')}`;
 
     if (!bypassCache) {
       try {

@@ -1858,6 +1858,7 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
   onAddFlashcardClick,
   templateFilter,
   zoomScale,
+  activeCategory,
 }: {
   item: any;
   colors: any;
@@ -1870,6 +1871,7 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
   onAddFlashcardClick?: (item: any, front: string, back: string) => void;
   templateFilter?: string;
   zoomScale?: number;
+  activeCategory?: string | null;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const isCopied = copiedId === item.id;
@@ -1883,12 +1885,13 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
   }, [forceExpandCollapse]);
 
   const submodules = [
-    { id: 'data_facts', title: 'Data & Facts' },
-    { id: 'intro_conclusion', title: 'Intro & Conclusion' },
-    { id: 'quotes', title: 'Quotes & Anecdotes' },
-    { id: 'mnemonics', title: 'Mnemonics' },
-    { id: 'frameworks', title: 'Frameworks' },
-    { id: 'ethics', title: 'Ethics Specific Hub' },
+    { id: 'data_facts', title: 'Data & Facts', color: '#3b82f6' },
+    { id: 'intro_conclusion', title: 'Intro & Conclusion', color: '#10b981' },
+    { id: 'quotes', title: 'Quotes & Anecdotes', color: '#8b5cf6' },
+    { id: 'mnemonics', title: 'Mnemonics', color: '#f59e0b' },
+    { id: 'frameworks', title: 'Frameworks', color: '#f43f5e' },
+    { id: 'ethics', title: 'Ethics Specific Hub', color: '#06b6d4' },
+    { id: 'va_hub', title: 'VA Hub', color: '#7c3aed' },
   ];
   const categoryTitle = submodules.find(s => s.id === item.category)?.title || item.category;
 
@@ -1910,6 +1913,22 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
           onPress={() => setCollapsed(!collapsed)}
           style={{ flex: 1, marginRight: 8 }}
         >
+          {activeCategory === 'va_hub' && (
+            <View style={{
+              alignSelf: 'flex-start',
+              backgroundColor: (submodules.find(s => s.id === item.category)?.color || colors.primary) + '22',
+              borderColor: (submodules.find(s => s.id === item.category)?.color || colors.primary) + '55',
+              borderWidth: 0.5,
+              paddingHorizontal: 6,
+              paddingVertical: 2,
+              borderRadius: 4,
+              marginBottom: 6
+            }}>
+              <Text style={{ fontSize: 9, fontWeight: '800', color: submodules.find(s => s.id === item.category)?.color || colors.primary }}>
+                {(submodules.find(s => s.id === item.category)?.title || item.category).toUpperCase()}
+              </Text>
+            </View>
+          )}
           <Text
             style={[
               styles.vCardFigmaTitle,
@@ -4349,8 +4368,22 @@ function ValueAdditionView({
 }) {
   const { isDark } = useTheme();
   const [search, setSearch] = useState('');
-  const [ethicsTab, setEthicsTab] = useState<'diagrams' | 'dimensions' | 'comparisons' | 'innovations' | 'pyq_quotes' | 'keywords' | 'khemka_toolkit'>('diagrams');
+  const [ethicsTab, setEthicsTab] = useState<'diagrams' | 'dimensions' | 'comparisons' | 'innovations' | 'pyq_quotes' | 'keywords' | 'khemka_toolkit' | 'all_formats'>('diagrams');
   const [khemkaSubTab, setKhemkaSubTab] = useState<'skeleton' | 'rules' | 'toolkit' | 'cases'>('cases');
+  const [vaHubCategory, setVaHubCategory] = useState<string | null>(null);
+  const [chipVaHubCategory, setChipVaHubCategory] = useState<string | null>(null);
+  const [chipEthicsTab, setChipEthicsTab] = useState<any>('diagrams');
+  const [chipKhemkaSubTab, setChipKhemkaSubTab] = useState<any>('cases');
+
+  // Sync deferred chip states when actual state changes to avoid lag
+  useEffect(() => {
+    setChipEthicsTab(ethicsTab);
+  }, [ethicsTab]);
+
+  useEffect(() => {
+    setChipKhemkaSubTab(khemkaSubTab);
+  }, [khemkaSubTab]);
+
   // Actual filter states — used in filteredItems useMemo (may trigger heavy recompute)
   const [templateFilter, setTemplateFilter] = useState<'All' | 'Templates' | 'IntroConclusionOnly'>('All');
   const [quotesEntryTypeTab, setQuotesEntryTypeTab] = useState<'All' | 'quote' | 'anecdote'>('All');
@@ -4389,11 +4422,13 @@ function ValueAdditionView({
   const _catKey: string = activeCategory ?? 'root';
   const filters: MainsFilters = categoryFilters[_catKey] || DEFAULT_MAINS_FILTERS;
   const setFilters = (updater: MainsFilters | ((prev: MainsFilters) => MainsFilters)) => {
-    setCategoryFilters(prev => {
-      const current = prev[_catKey] || DEFAULT_MAINS_FILTERS;
-      const next = typeof updater === 'function' ? (updater as (p: MainsFilters) => MainsFilters)(current) : updater;
-      return { ...prev, [_catKey]: next };
-    });
+    setTimeout(() => {
+      setCategoryFilters(prev => {
+        const current = prev[_catKey] || DEFAULT_MAINS_FILTERS;
+        const next = typeof updater === 'function' ? (updater as (p: MainsFilters) => MainsFilters)(current) : updater;
+        return { ...prev, [_catKey]: next };
+      });
+    }, 0);
   };
 
   const [hierarchyModalVisible, setHierarchyModalVisible] = useState(false);
@@ -4419,6 +4454,7 @@ function ValueAdditionView({
     { id: 'mnemonics', title: 'Mnemonics', subtitle: 'Memory Hooks', icon: Brain, color: '#f59e0b', desc: 'Abbreviations and memory structures for quick syllabus topic recovery.' },
     { id: 'frameworks', title: 'Frameworks', subtitle: 'Argument Structures', icon: Layers, color: '#f43f5e', desc: 'Socio-political and administrative boxes (PESTLE, SWOT) to structure arguments.' },
     { id: 'ethics', title: 'Ethics Specific Hub', subtitle: 'GS4 X-Factor Value Add', icon: ShieldCheck, color: '#06b6d4', desc: 'Ethics diagrams, comparisons, innovations, and keyword toolkits.' },
+    { id: 'va_hub', title: 'VA Hub', subtitle: 'Consolidated Value Additions', icon: Zap, color: '#7c3aed', desc: 'A unified view of data facts, templates, quotes, frameworks, ethics, and mnemonics.' }
   ];
 
   const uniqueValueAddItems = useMemo(() => {
@@ -4456,7 +4492,7 @@ function ValueAdditionView({
   // Dynamic Options extraction for HierarchyModal based on value addition items
   const activeCategoryItems = useMemo(() => {
     return uniqueValueAddItems.filter(item => {
-      if (item.category !== activeCategory) return false;
+      if (activeCategory !== 'va_hub' && item.category !== activeCategory) return false;
 
       // If we are in Ethics, filter by the active sub-tab (or Khemka sub-tab) to only show relevant hierarchy options
       if (activeCategory === 'ethics') {
@@ -4551,7 +4587,8 @@ function ValueAdditionView({
         const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
         const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
         if (matchPaper && matchSubject && matchSection) {
-          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
+          const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
+          if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics') {
             if (path.microtopic) mtSet.add(path.microtopic);
           } else {
             const themeName = item.category === 'data_facts' ? item.metric : item.title;
@@ -4569,7 +4606,8 @@ function ValueAdditionView({
     const stSet = new Set<string>();
     activeCategoryItems.forEach(item => {
       getItemPaths(item).forEach(path => {
-        if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
+        const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
+        if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics') {
           if (path.microtopic && selectedMicrotopic.split('|').includes(path.microtopic)) {
             if (path.subtopic) stSet.add(path.subtopic);
           }
@@ -4593,11 +4631,12 @@ function ValueAdditionView({
     const sstSet = new Set<string>();
     activeCategoryItems.forEach(item => {
       getItemPaths(item).forEach(path => {
-        if (activeCategory === 'intro_conclusion') {
+        const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
+        if (currentCat === 'intro_conclusion') {
           if (path.subtopic && selectedSubTheme.split('|').includes(path.subtopic)) {
             if (item.title) sstSet.add(item.title);
           }
-        } else if (activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+        } else if (currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks') {
           if (path.subtopic && selectedSubTheme.split('|').includes(path.subtopic)) {
             if (item.title) sstSet.add(item.title);
           }
@@ -4627,8 +4666,13 @@ function ValueAdditionView({
     const subSubThemeFilter = filters.macrotags !== 'All' ? filters.macrotags.split('|') : [];
 
     return uniqueValueAddItems.filter(item => {
-      const matchCat = !activeCategory || item.category === activeCategory;
+      const matchCat = !activeCategory || activeCategory === 'va_hub' || item.category === activeCategory;
       const matchSearch = !search || item.searchableText.includes(search.toLowerCase());
+
+      let matchHubCat = true;
+      if (activeCategory === 'va_hub' && vaHubCategory) {
+        matchHubCat = item.category === vaHubCategory;
+      }
 
       const paths = getItemPaths(item);
       const matchesAnyPath = paths.some(path => {
@@ -4638,7 +4682,8 @@ function ValueAdditionView({
         
         let matchTheme = true;
         if (themeFilter.length > 0) {
-          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
+          const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
+          if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics') {
             matchTheme = !!path.microtopic && themeFilter.includes(path.microtopic);
           } else {
             const themeName = item.category === 'data_facts' ? item.metric : item.title;
@@ -4648,7 +4693,8 @@ function ValueAdditionView({
 
         let matchSubTheme = true;
         if (subThemeFilter.length > 0) {
-          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
+          const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
+          if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics') {
             matchSubTheme = !!path.subtopic && subThemeFilter.includes(path.subtopic);
           } else {
             matchSubTheme = !!item.parsedSubThemes && item.parsedSubThemes.some((st: any) => 
@@ -4659,7 +4705,8 @@ function ValueAdditionView({
 
         let matchSubSubTheme = true;
         if (subSubThemeFilter.length > 0) {
-          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
+          const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
+          if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics') {
             matchSubSubTheme = !!item.title && subSubThemeFilter.includes(item.title);
           } else {
             matchSubSubTheme = !!item.parsedSubSubThemes && item.parsedSubSubThemes.some((sst: any) => 
@@ -4681,14 +4728,19 @@ function ValueAdditionView({
         }
       }
 
-      return matchCat && matchSearch && matchesAnyPath && matchTemplate;
+      return matchCat && matchHubCat && matchSearch && matchesAnyPath && matchTemplate;
     });
-  }, [activeCategory, search, uniqueValueAddItems, filters, templateFilter]);
+  }, [activeCategory, search, uniqueValueAddItems, filters, templateFilter, vaHubCategory]);
 
 
   const ethicsMappedItems = useMemo(() => {
     const list = filteredItems.filter(item => {
-      if (activeCategory === 'ethics') {
+      const isEthicsTabActive = activeCategory === 'ethics' || (activeCategory === 'va_hub' && (filters.paper === 'GS-4' || vaHubCategory === 'ethics'));
+      if (isEthicsTabActive) {
+        if (ethicsTab === 'all_formats') return true;
+        if (item.category !== 'ethics') {
+          return false;
+        }
         if (ethicsTab === 'khemka_toolkit') {
           if (khemkaSubTab === 'skeleton') {
             return item.title === "Khemka Sir's 5 Step Answer Skeleton (GS-4)";
@@ -4722,7 +4774,7 @@ function ValueAdditionView({
     });
 
     return list;
-  }, [filteredItems, activeCategory, ethicsTab, quotesEntryTypeTab, khemkaSubTab]);
+  }, [filteredItems, activeCategory, ethicsTab, quotesEntryTypeTab, khemkaSubTab, vaHubCategory, filters.paper]);
 
   // Calculate counts for Khemka sub-tabs dynamically based on current hierarchy/search filters
   const khemkaTabCounts = useMemo(() => {
@@ -4934,7 +4986,45 @@ function ValueAdditionView({
                 </TouchableOpacity>
               </View>
 
-              {/* Borrowed Browse by Topic filter pill and breadcrumbs */}
+              {/* Category Filter Chips for VA Hub */}
+              {activeCategory === 'va_hub' && (
+                <View style={{ marginBottom: 12, paddingHorizontal: 2 }}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingVertical: 4 }}>
+                    {[
+                      { id: null, label: 'All', color: '#6366f1' },
+                      { id: 'data_facts', label: 'Data & Facts', color: '#3b82f6' },
+                      { id: 'intro_conclusion', label: 'Intro & Conclusion', color: '#10b981' },
+                      { id: 'quotes', label: 'Quotes & Anecdotes', color: '#8b5cf6' },
+                      { id: 'mnemonics', label: 'Mnemonics', color: '#f59e0b' },
+                      { id: 'frameworks', label: 'Frameworks', color: '#f43f5e' },
+                      { id: 'ethics', label: 'Ethics Specific', color: '#06b6d4' },
+                    ].map(cat => {
+                      const isActive = chipVaHubCategory === cat.id;
+                      return (
+                        <TouchableOpacity
+                          key={String(cat.id)}
+                          onPress={() => {
+                            setChipVaHubCategory(cat.id);
+                            setTimeout(() => setVaHubCategory(cat.id), 0);
+                            Haptics.selectionAsync().catch(() => {});
+                          }}
+                          activeOpacity={0.75}
+                          style={[
+                            styles.tabFilterPill,
+                            isActive
+                              ? { backgroundColor: cat.color, borderColor: cat.color }
+                              : { backgroundColor: colors.surface + 'b3', borderColor: colors.border },
+                          ]}
+                        >
+                          <Text style={[styles.tabFilterPillText, isActive ? { color: '#ffffff', fontWeight: '700' } : { color: colors.textSecondary }]}>
+                            {cat.label}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              )}
               {activeCategoryItems.length > 0 && (() => {
                 const hasHierarchyActive = filters.paper !== 'All' || filters.subjects !== 'All' || filters.sections !== 'All' || filters.microtopics !== 'All' || filters.subtopics !== 'All';
                 const activeHierarchyLabel = filters.subtopics !== 'All' ? filters.subtopics : (filters.microtopics !== 'All' ? filters.microtopics : (filters.sections !== 'All' ? filters.sections : (filters.subjects !== 'All' ? filters.subjects : (filters.paper !== 'All' ? filters.paper : 'Browse Topics'))));
@@ -5304,10 +5394,11 @@ function ValueAdditionView({
               )}
 
               {/* Special sub-navigation for Ethics */}
-              {activeCategory === 'ethics' && (
+              {(activeCategory === 'ethics' || (activeCategory === 'va_hub' && (filters.paper === 'GS-4' || chipVaHubCategory === 'ethics'))) && (
                 <View style={{ gap: 4 }}>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.ethicsTabsScroll} contentContainerStyle={{ paddingBottom: 8 }}>
                     {[
+                      ...(activeCategory === 'va_hub' ? [{ id: 'all_formats', label: 'All Formats' }] : []),
                       { id: 'diagrams', label: 'Diagrams' },
                       { id: 'dimensions', label: 'Dimensions' },
                       { id: 'comparisons', label: 'Comparisons' },
@@ -5315,32 +5406,41 @@ function ValueAdditionView({
                       { id: 'pyq_quotes', label: 'PYQ Quotes' },
                       { id: 'keywords', label: 'Keywords' },
                       { id: 'khemka_toolkit', label: "Khemka Sir's Hub" }
-                    ].map(tab => (
-                      <TouchableOpacity
-                        key={tab.id}
-                        onPress={() => setEthicsTab(tab.id as any)}
-                        activeOpacity={1}
-                        style={[
-                          styles.tabFilterPill,
-                          ethicsTab === tab.id
-                            ? { backgroundColor: '#06b6d4', borderColor: '#06b6d4' }
-                            : { backgroundColor: 'rgba(255,255,255,0.5)', borderColor: 'rgba(255,255,255,0.6)' },
-                        ]}
-                      >
-                        <Text
+                    ].map(tab => {
+                      const isActive = chipEthicsTab === tab.id;
+                      const countText = tab.id === 'all_formats' 
+                        ? '' 
+                        : ` (${ethicsTabCounts[tab.id as keyof typeof ethicsTabCounts] || 0})`;
+                      return (
+                        <TouchableOpacity
+                          key={tab.id}
+                          onPress={() => {
+                            setChipEthicsTab(tab.id as any);
+                            setTimeout(() => setEthicsTab(tab.id as any), 0);
+                          }}
+                          activeOpacity={1}
                           style={[
-                            styles.tabFilterPillText,
-                            ethicsTab === tab.id ? { color: '#ffffff' } : { color: colors.textSecondary },
+                            styles.tabFilterPill,
+                            isActive
+                              ? { backgroundColor: '#06b6d4', borderColor: '#06b6d4' }
+                              : { backgroundColor: 'rgba(255,255,255,0.5)', borderColor: 'rgba(255,255,255,0.6)' },
                           ]}
                         >
-                          {`${tab.label} (${ethicsTabCounts[tab.id as keyof typeof ethicsTabCounts] || 0})`}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
+                          <Text
+                            style={[
+                              styles.tabFilterPillText,
+                              isActive ? { color: '#ffffff' } : { color: colors.textSecondary },
+                            ]}
+                          >
+                            {`${tab.label}${countText}`}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
                   </ScrollView>
 
                   {/* Option 6: Secondary sub-tabs bar when Khemka Sir's Hub is active */}
-                  {ethicsTab === 'khemka_toolkit' && (
+                  {chipEthicsTab === 'khemka_toolkit' && (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }} contentContainerStyle={{ gap: 6, paddingVertical: 4 }}>
                       {[
                         { id: 'skeleton', label: 'Answer Skeleton' },
@@ -5350,11 +5450,14 @@ function ValueAdditionView({
                       ].map(tab => (
                         <TouchableOpacity
                           key={tab.id}
-                          onPress={() => setKhemkaSubTab(tab.id as any)}
+                          onPress={() => {
+                            setChipKhemkaSubTab(tab.id as any);
+                            setTimeout(() => setKhemkaSubTab(tab.id as any), 0);
+                          }}
                           activeOpacity={1}
                           style={[
                             styles.tabFilterPill,
-                            khemkaSubTab === tab.id
+                            chipKhemkaSubTab === tab.id
                               ? { backgroundColor: '#8b5cf6', borderColor: '#8b5cf6' }
                               : { backgroundColor: colors.surface + 'b3', borderColor: colors.border },
                           ]}
@@ -5362,7 +5465,7 @@ function ValueAdditionView({
                           <Text
                             style={[
                               styles.tabFilterPillText,
-                              khemkaSubTab === tab.id ? { color: '#ffffff' } : { color: colors.textSecondary },
+                              chipKhemkaSubTab === tab.id ? { color: '#ffffff' } : { color: colors.textSecondary },
                             ]}
                           >
                             {`${tab.label} (${khemkaTabCounts[tab.id as keyof typeof khemkaTabCounts] || 0})`}
@@ -5495,6 +5598,7 @@ function ValueAdditionView({
                         onAddFlashcardClick={onAddFlashcardClick}
                         templateFilter={templateFilter}
                         zoomScale={zoomScale}
+                        activeCategory={activeCategory}
                       />
                     ))}
                   </View>
@@ -5513,6 +5617,7 @@ function ValueAdditionView({
                         onAddFlashcardClick={onAddFlashcardClick}
                         templateFilter={templateFilter}
                         zoomScale={zoomScale}
+                        activeCategory={activeCategory}
                       />
                     ))}
                   </View>
@@ -5533,6 +5638,7 @@ function ValueAdditionView({
                 onAddFlashcardClick={onAddFlashcardClick}
                 templateFilter={templateFilter}
                 zoomScale={zoomScale}
+                activeCategory={activeCategory}
               />
             );
           }}
@@ -5552,7 +5658,16 @@ function ValueAdditionView({
                 <TouchableOpacity
                   key={sub.id}
                   activeOpacity={0.8}
-                  onPress={() => setActiveCategory(sub.id)}
+                  onPress={() => {
+                    setActiveCategory(sub.id);
+                    if (sub.id === 'va_hub') {
+                      setEthicsTab('all_formats');
+                      setVaHubCategory(null);
+                      setChipVaHubCategory(null);
+                    } else if (sub.id === 'ethics') {
+                      setEthicsTab('diagrams');
+                    }
+                  }}
                   style={[
                     styles.submoduleItemCard,
                     { 

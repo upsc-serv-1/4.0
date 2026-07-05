@@ -67,6 +67,9 @@ export default function MainsFrameworksCard({
 
   const rawContent = item.frameworkGuide || item.rawContent || '';
   const { diagramContent, breakdownContent } = parseFrameworkMarkdown(rawContent);
+  const cleanDiagram = item.diagramImagePath
+    ? diagramContent.replace(/!\[.*?\]\(.*?\)/g, '').trim()
+    : diagramContent;
 
   return (
     <View style={{ gap: 10 }}>
@@ -81,10 +84,10 @@ export default function MainsFrameworksCard({
         </View>
       ) : null}
 
-      {/* Render diagram content preamble (e.g. "Diagram: SHIELD Framework" + image inside markdown) */}
-      {diagramContent ? (
+      {/* Render diagram content preamble */}
+      {cleanDiagram ? (
         <Markdown style={markdownStyles} rules={markdownRules}>
-          {cleanMarkdownContent(diagramContent)}
+          {cleanMarkdownContent(cleanDiagram)}
         </Markdown>
       ) : null}
 

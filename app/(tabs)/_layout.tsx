@@ -1,5 +1,5 @@
 import { Tabs, useSegments, useRouter, Redirect, useFocusEffect } from 'expo-router';
-import { Home, BarChart2, RotateCcw, LayoutList, Tag, Target, FileText, TrendingUp, BarChart3, Layers, Database, PenTool, Sparkles, BookOpen, Compass, Globe, Search } from 'lucide-react-native';
+import { Home, BarChart2, RotateCcw, LayoutList, Tag, Target, FileText, TrendingUp, BarChart3, Layers, Database, PenTool, Sparkles, BookOpen, Compass, Globe, Search, Zap } from 'lucide-react-native';
 import { useAuth } from '../../src/context/AuthContext';
 import { useCourse } from '../../src/context/CourseContext';
 import { View, ActivityIndicator, ScrollView, TouchableOpacity, Text, StyleSheet, useWindowDimensions } from 'react-native';
@@ -95,6 +95,7 @@ export default function TabsLayout() {
     revise: { title: 'Repo', icon: RotateCcw },
     tracker: { title: 'Syllabus', icon: LayoutList },
     'ai-search': { title: 'Search', icon: Search },
+    drupsc_hub: { title: 'DR UPSC', icon: TrendingUp },
   };
 
   return (

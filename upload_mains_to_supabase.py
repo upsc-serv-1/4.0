@@ -144,9 +144,12 @@ def upload_mains_questions_answers():
 
             paper_val = q.get("paper") if q.get("paper") else paper_name
 
+            q_num = q.get("questionNumber")
+            if q_num is not None:
+                q_num = str(q_num)
             all_questions.append({
                 "id": q_id,
-                "question_number": q.get("questionNumber"),
+                "question_number": q_num,
                 "question_text": q.get("questionText"),
                 "marks": marks_val,
                 "exam_year": q.get("year"),

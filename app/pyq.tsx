@@ -2642,12 +2642,12 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       ? filteredForSubtopic.filter(q => q.subTopic === pilotSubtopic || q.sub_topic === pilotSubtopic)
       : filteredForSubtopic;
 
-    const pilotNanotopicRows = Array.from(new Set(filteredForNanotopic.map(q => q.nanoTopic || q.nanotopic || 'General')))
+    const pilotNanotopicRows = Array.from(new Set(filteredForNanotopic.map(q => q.nano_topic || q.nanoTopic || q.nanotopic || 'General')))
       .map(nano => ({
         key: `pilot-nanotopic-${nano}`,
         label: nano,
         byYear: years.reduce((acc, y) => {
-          const matchingQs = filteredForNanotopic.filter(q => getAnalyticsYear(q) === parseInt(y, 10) && (q.nanoTopic === nano || q.nanotopic === nano));
+          const matchingQs = filteredForNanotopic.filter(q => getAnalyticsYear(q) === parseInt(y, 10) && (q.nano_topic === nano || q.nanoTopic === nano || q.nanotopic === nano));
           const value = heatmapMetric === 'marks'
             ? matchingQs.reduce((sum, q) => sum + (Number(q.marks) || 0), 0)
             : matchingQs.length;

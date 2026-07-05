@@ -727,14 +727,22 @@ function UnifiedArenaSetup() {
         setTimeout(async () => {
           try {
             console.log('[ARENA-SYNC] Starting background sync for course:', selectedCourse);
-            const { data: supabaseQuestions, error } = await supabase
-              .from('questions')
-              .select('course, subject, section_group, micro_topic, sub_topic, test_id, id, exam_category, exam_stage, tests(series, institute, program_name, title)')
-              .eq('course', selectedCourse)
-              .not('subject', 'is', null)
-              .limit(5000);
+            const supabaseQuestions: any[] = [];
+            let from = 0;
+            while (true) {
+              const { data, error } = await supabase
+                .from('questions')
+                .select('course, subject, section_group, micro_topic, sub_topic, test_id, id, exam_category, exam_stage, tests(series, institute, program_name, title)')
+                .eq('course', selectedCourse)
+                .not('subject', 'is', null)
+                .range(from, from + 4999);
 
-            if (error) throw error;
+              if (error) throw error;
+              if (!data || data.length === 0) break;
+              supabaseQuestions.push(...data);
+              if (data.length < 5000) break;
+              from += 5000;
+            }
             if (supabaseQuestions?.length) {
               const flatSynced = supabaseQuestions.map((q: any) => {
                 const testObj = Array.isArray(q.tests) ? q.tests[0] : q.tests;

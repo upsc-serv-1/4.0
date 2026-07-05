@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import FeatureGate from '../src/components/FeatureGate';
 import MainsDataFactsCard from '../src/components/mains/MainsDataFactsCard';
 import MainsIntroConclusionCard from '../src/components/mains/MainsIntroConclusionCard';
 import MainsQuotesCard from '../src/components/mains/MainsQuotesCard';
 import MainsMnemonicsCard from '../src/components/mains/MainsMnemonicsCard';
 import MainsFrameworksCard from '../src/components/mains/MainsFrameworksCard';
 import MainsEthicsCard from '../src/components/mains/MainsEthicsCard';
+import MainsTagsView from '../src/components/mains/MainsTagsView';
 import {
   View,
   Text,
@@ -93,7 +95,7 @@ const naturalCompare = (() => {
  * Returns markdown-display rules with theme-aware table / image renderers.
  * Call once per component with the current colors + isDark values.
  */
-export const getMarkdownRules = (colors: any, isDark: boolean) => ({
+export const getMarkdownRules = (colors: any, isDark: boolean, onImagePress?: (uri: string) => void) => ({
   table: (node: any, children: any) => (
     <View
       key={node.key}
@@ -162,13 +164,18 @@ export const getMarkdownRules = (colors: any, isDark: boolean) => ({
     const src = node.attributes?.src || '';
     if (!src) return null;
     return (
-      <View key={node.key} style={{ width: '100%', alignItems: 'center', marginVertical: 12 }}>
+      <TouchableOpacity
+        key={node.key}
+        activeOpacity={0.9}
+        onPress={() => onImagePress?.(src)}
+        style={{ width: '100%', alignItems: 'center', marginVertical: 12 }}
+      >
         <Image
           source={{ uri: src }}
           style={{ width: '100%', height: Dimensions.get('window').width >= 768 ? 320 : 220 }}
           resizeMode="contain"
         />
-      </View>
+      </TouchableOpacity>
     );
   },
 });
@@ -241,7 +248,7 @@ const DEFAULT_MAINS_FILTERS: MainsFilters = {
 };
 
 
-export default function MainsScreen() {
+export function MainsScreenInner() {
   const { colors, isDark } = useTheme();
   const router = useRouter();
   const { session } = useAuth();
@@ -260,7 +267,7 @@ export default function MainsScreen() {
     category?: string;
   }>();
 
-  const [currentScreen, setCurrentScreen] = useState<'hub' | 'questions' | 'value-add' | 'search' | 'detailed-question'>('hub');
+  const [currentScreen, setCurrentScreen] = useState<'hub' | 'questions' | 'value-add' | 'search' | 'detailed-question' | 'revision-tags'>('hub');
   const [sessionFilters, setSessionFilters] = useState<MainsFilters | null>(null);
 
   useEffect(() => {
@@ -880,7 +887,16 @@ export default function MainsScreen() {
               onAddFlashcardClick={handleValueAddFlashcard}
             />
           )}
-
+          {currentScreen === 'revision-tags' && (
+            <MainsTagsView
+              colors={colors}
+              isTablet={isTablet}
+              insets={insets}
+              onBack={() => setCurrentScreen('hub')}
+              onOpenDetailed={() => {}}
+              onOpenQuestionBank={() => {}}
+            />
+          )}
           {currentScreen === 'search' && (
             <MainsAISearchView
               colors={colors}
@@ -1067,6 +1083,13 @@ function HubView({
       description: 'Trend analysis of previous year questions',
       color: '#8b5cf6',
       icon: BarChart3,
+    },
+    {
+      id: 'revision-tags',
+      title: 'Revision Tags',
+      description: 'Tag & track questions for revision',
+      color: '#ec4899',
+      icon: Tag,
     },
   ];
 
@@ -1776,7 +1799,8 @@ function ValueAddCardBody({
   ethicsTab,
   templateFilter,
   onAddFlashcardClick,
-  zoomScale
+  zoomScale,
+  onImagePress
 }: {
   item: any;
   colors: any;
@@ -1784,6 +1808,7 @@ function ValueAddCardBody({
   templateFilter?: string;
   onAddFlashcardClick?: (front: string, back: string) => void;
   zoomScale?: number;
+  onImagePress?: (uri: string) => void;
 }) {
   const scale = zoomScale || 1.0;
 
@@ -1805,6 +1830,7 @@ function ValueAddCardBody({
           colors={colors}
           templateFilter={templateFilter || 'All'}
           zoomScale={scale}
+          onImagePress={onImagePress}
         />
       )}
 
@@ -1829,6 +1855,7 @@ function ValueAddCardBody({
           item={item}
           colors={colors}
           zoomScale={scale}
+          onImagePress={onImagePress}
         />
       )}
 
@@ -1838,6 +1865,7 @@ function ValueAddCardBody({
           colors={colors}
           ethicsTab={ethicsTab || ''}
           zoomScale={scale}
+          onImagePress={onImagePress}
         />
       )}
     </View>
@@ -1859,6 +1887,7 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
   templateFilter,
   zoomScale,
   activeCategory,
+  onImagePress,
 }: {
   item: any;
   colors: any;
@@ -1872,6 +1901,7 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
   templateFilter?: string;
   zoomScale?: number;
   activeCategory?: string | null;
+  onImagePress?: (uri: string) => void;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const isCopied = copiedId === item.id;
@@ -1975,6 +2005,7 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
             templateFilter={templateFilter}
             onAddFlashcardClick={(front, back) => onAddFlashcardClick?.(item, front, back)}
             zoomScale={zoomScale}
+            onImagePress={onImagePress}
           />
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10, paddingRight: 4, gap: 8 }}>
             <TouchableOpacity
@@ -4374,6 +4405,41 @@ function ValueAdditionView({
   const [chipVaHubCategories, setChipVaHubCategories] = useState<string[]>([]);
   const [chipEthicsTab, setChipEthicsTab] = useState<any>('diagrams');
   const [chipKhemkaSubTab, setChipKhemkaSubTab] = useState<any>('cases');
+  const [zoomImageUri, setZoomImageUri] = useState<string | null>(null);
+  const [imageCopying, setImageCopying] = useState(false);
+
+  const handleCopyImage = async (uri: string) => {
+    setImageCopying(true);
+    try {
+      if (uri.startsWith('http')) {
+        const response = await fetch(uri);
+        const blob = await response.blob();
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          try {
+            const base64data = reader.result as string;
+            const base64 = base64data.split(',')[1];
+            await Clipboard.setImageAsync(base64);
+            Alert.alert('Success', 'Image copied to clipboard!');
+          } catch (err) {
+            await Clipboard.setStringAsync(uri);
+            Alert.alert('Copied', 'Image URL copied to clipboard!');
+          } finally {
+            setImageCopying(false);
+          }
+        };
+        reader.readAsDataURL(blob);
+      } else {
+        await Clipboard.setStringAsync(uri);
+        Alert.alert('Copied', 'Image path copied to clipboard!');
+        setImageCopying(false);
+      }
+    } catch (e) {
+      await Clipboard.setStringAsync(uri);
+      Alert.alert('Copied', 'Image link copied to clipboard!');
+      setImageCopying(false);
+    }
+  };
 
   // Sync deferred chip states when actual state changes to avoid lag
   useEffect(() => {
@@ -5690,6 +5756,7 @@ function ValueAdditionView({
                         templateFilter={templateFilter}
                         zoomScale={zoomScale}
                         activeCategory={activeCategory}
+                        onImagePress={setZoomImageUri}
                       />
                     ))}
                   </View>
@@ -5709,6 +5776,7 @@ function ValueAdditionView({
                         templateFilter={templateFilter}
                         zoomScale={zoomScale}
                         activeCategory={activeCategory}
+                        onImagePress={setZoomImageUri}
                       />
                     ))}
                   </View>
@@ -5730,6 +5798,7 @@ function ValueAdditionView({
                 templateFilter={templateFilter}
                 zoomScale={zoomScale}
                 activeCategory={activeCategory}
+                onImagePress={setZoomImageUri}
               />
             );
           }}
@@ -5840,6 +5909,114 @@ function ValueAdditionView({
         activeCategory={activeCategory || undefined}
         activeCategoryItems={activeCategoryItems || []}
       />
+
+      {/* Image Zoom Modal */}
+      <Modal
+        visible={!!zoomImageUri}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setZoomImageUri(null)}
+      >
+        <Pressable 
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20
+          }}
+          onPress={() => setZoomImageUri(null)}
+        >
+          {zoomImageUri && (
+            <Pressable 
+              style={{
+                width: '92%',
+                height: '78%',
+                backgroundColor: '#ffffff',
+                borderRadius: 24,
+                padding: 20,
+                alignItems: 'center',
+                justifyContent: 'center',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.3,
+                shadowRadius: 20,
+                elevation: 10,
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.1)'
+              }}
+              onPress={() => {} /* Capture touch to prevent modal close */}
+            >
+              <Image
+                source={{ uri: zoomImageUri }}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                }}
+                resizeMode="contain"
+              />
+            </Pressable>
+          )}
+
+          {/* Floating Action Buttons */}
+          <View 
+            style={{
+              position: 'absolute',
+              top: insets.top + 20,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 16,
+              zIndex: 100
+            }}
+          >
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={async () => {
+                if (zoomImageUri) {
+                  await handleCopyImage(zoomImageUri);
+                }
+              }}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                paddingVertical: 10,
+                paddingHorizontal: 20,
+                borderRadius: 30,
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.2)',
+                gap: 8
+              }}
+            >
+              {imageCopying ? (
+                <Text style={{ color: '#ffffff', fontWeight: '600', fontSize: 13 }}>Copying...</Text>
+              ) : (
+                <>
+                  <Copy size={16} color="#ffffff" />
+                  <Text style={{ color: '#ffffff', fontWeight: '600', fontSize: 13 }}>Copy Image</Text>
+                </>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => setZoomImageUri(null)}
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.2)',
+              }}
+            >
+              <X size={20} color="#ffffff" />
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
 
     </View>
   );
@@ -9629,6 +9806,14 @@ function DetailedQuestionView({
       </PinchGestureHandler>
       </View>
     </KeyboardAvoidingView>
+  );
+}
+
+export default function MainsScreen() {
+  return (
+    <FeatureGate feature="mains" featureLabel="Mains Hub">
+      <MainsScreenInner />
+    </FeatureGate>
   );
 }
 

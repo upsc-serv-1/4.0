@@ -95,7 +95,6 @@ export default function TabsLayout() {
     revise: { title: 'Repo', icon: RotateCcw },
     tracker: { title: 'Syllabus', icon: LayoutList },
     'ai-search': { title: 'Search', icon: Search },
-    drupsc_hub: { title: 'DR UPSC', icon: TrendingUp },
   };
 
   return (
@@ -137,6 +136,8 @@ function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs,
     tabKey !== 'tracker' &&
     tabKey !== 'ai-search' &&
     tabKey !== 'revise' &&
+    tabKey !== 'tags' &&
+    tabKey !== 'drupsc_hub' &&
     !(selectedCourse === 'Medical Science' && (tabKey === 'mains' || tabKey === 'prelims'))
   );
   const tabletItemWidth = isTablet

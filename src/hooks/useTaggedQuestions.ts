@@ -145,10 +145,21 @@ export function useTaggedVault(userId: string | undefined) {
       return;
     }
 
-    // ISSUE FIX #8: Always fetch from server first to avoid showing stale data
-    // after external database changes (e.g., manual row deletions).
-    // We'll only fall back to cache if the network request fails.
-    setLoading(true);
+    // FAST PATH: Load from cache first so UI appears immediately
+    let hasCacheData = false;
+    try {
+      const cached = await AsyncStorage.getItem(cacheKey);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setRawQuestions(parsed);
+          hasCacheData = true;
+        }
+      }
+    } catch { /* ignore cache read errors */ }
+
+    // Only show loading spinner if we have nothing to display
+    if (!hasCacheData) setLoading(true);
 
     try {
       // Force fresh fetch from Supabase to ensure Tags tab stays in sync
@@ -169,8 +180,6 @@ export function useTaggedVault(userId: string | undefined) {
       }
 
       // Fetch only the tagged questions that belong to the current course.
-      // This course filter prevents "Unassigned" subjects from tagged UPSC questions when
-      // the user switches to another course (e.g., Medical Science).
       const { data: questions, error: questionsError } = await supabase
         .from('questions')
         .select('id, test_id, subject, section_group, micro_topic, question_text, explanation_markdown, correct_answer, options, is_pyq, is_upsc_cse, exam_year, exam_group, tests(institute,program_name,series)')
@@ -196,9 +205,6 @@ export function useTaggedVault(userId: string | undefined) {
       }
 
       // Issue 52: Fetch sibling UPSC PYQ questions for full multi-institute coverage.
-      // The merger needs ALL institute variants of the same question to aggregate
-      // explanations — but we only fetched the specific questions the user tagged.
-      // Find UPSC PYQs among tagged questions and fetch their siblings.
       const rawQuestions = questions || [];
       const upscPyqYears = new Set<string>();
       for (const q of rawQuestions) {
@@ -276,14 +282,10 @@ export function useTaggedVault(userId: string | undefined) {
 
       setRawQuestions(transformed);
 
-      // Save to cache. Use safeSetItem so an Android SQLITE_FULL doesn't
-      // crash the Vault. Cap the cached payload at ~3 MB worth of JSON so
-      // a single very large session can't push the AsyncStorage backing
-      // database past its on-device ceiling.
+      // Save to cache.
       const cachePayload = JSON.stringify(transformed);
       const MAX_CACHE_BYTES = 3 * 1024 * 1024;
       if (cachePayload.length > MAX_CACHE_BYTES) {
-        // Cache only the most recent slice to stay under the ceiling.
         const truncated = transformed.slice(0, Math.max(50, Math.floor(transformed.length / 2)));
         await safeSetItem(cacheKey, JSON.stringify(truncated));
       } else {
@@ -292,20 +294,21 @@ export function useTaggedVault(userId: string | undefined) {
     } catch (err) {
       console.error('Vault Engine Error:', err);
 
-      // Network failed -> fall back to cache if present.
-      try {
-        const cached = await AsyncStorage.getItem(cacheKey);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed)) {
-            setRawQuestions(parsed);
-            setError(null);
-            return;
+      // Network failed — we already restored cache above, so only update error state
+      if (!hasCacheData) {
+        try {
+          const cached = await AsyncStorage.getItem(cacheKey);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed)) {
+              setRawQuestions(parsed);
+              setError(null);
+              return;
+            }
           }
-        }
-      } catch {}
-
-      setError(err);
+        } catch {}
+        setError(err);
+      }
     } finally {
       setLoading(false);
     }

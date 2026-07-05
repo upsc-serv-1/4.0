@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { cleanMarkdownContent, getMarkdownStyles } from '../../../app/mains';
 
@@ -198,12 +198,14 @@ export default function MainsIntroConclusionCard({
   item,
   colors,
   templateFilter,
-  zoomScale
+  zoomScale,
+  onImagePress
 }: {
   item: any;
   colors: any;
   templateFilter: string;
   zoomScale: number;
+  onImagePress?: (uri: string) => void;
 }) {
   const quoteTextMarkdownStyle = {
     ...getMarkdownStyles(colors),
@@ -233,6 +235,36 @@ export default function MainsIntroConclusionCard({
     }
   };
 
+  const markdownRules = useMemo(() => ({
+    ...introConclusionMarkdownRules,
+    image: (node: any) => {
+      const src = node.attributes?.src || '';
+      if (!src) return null;
+      return (
+        <Pressable
+          key={node.key}
+          onPress={() => onImagePress?.(src)}
+          style={{ 
+            width: '100%', 
+            alignItems: 'center', 
+            marginVertical: 12,
+            backgroundColor: '#ffffff',
+            borderRadius: 12,
+            padding: 8,
+            borderWidth: 1,
+            borderColor: colors.border
+          }}
+        >
+          <Image
+            source={{ uri: src }}
+            style={{ width: '100%', height: 220 }}
+            resizeMode="contain"
+          />
+        </Pressable>
+      );
+    }
+  }), [onImagePress, colors.border]);
+
   let sections = parseMarkdownToSections(item.introduction || '');
 
   return (
@@ -245,11 +277,11 @@ export default function MainsIntroConclusionCard({
           <View key={`sec-${sIdx}`} style={[localStyles.templateBox, { backgroundColor: theme.bgColor, borderColor: theme.borderColor }]}>
             <Text style={[localStyles.subPartHeader, { color: theme.textColor, fontSize: 11 * zoomScale }]}>{theme.label}</Text>
             {isQuote ? (
-              <Markdown style={quoteTextMarkdownStyle} rules={introConclusionMarkdownRules}>
+              <Markdown style={quoteTextMarkdownStyle} rules={markdownRules}>
                 {cleanMarkdownContent(sec.content)}
               </Markdown>
             ) : (
-              <Markdown style={subPartBodyMarkdownStyle} rules={introConclusionMarkdownRules}>
+              <Markdown style={subPartBodyMarkdownStyle} rules={markdownRules}>
                 {cleanMarkdownContent(sec.content)}
               </Markdown>
             )}

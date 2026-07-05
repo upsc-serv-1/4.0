@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { cleanMarkdownContent, getMarkdownStyles, getDiagramUri, markdownRules } from '../../../app/mains';
 
@@ -13,12 +13,14 @@ export default function MainsEthicsCard({
   item,
   colors,
   ethicsTab,
-  zoomScale
+  zoomScale,
+  onImagePress
 }: {
   item: any;
   colors: any;
   ethicsTab: string;
   zoomScale: number;
+  onImagePress?: (uri: string) => void;
 }) {
   const isDark = colors.isDark;
 
@@ -121,25 +123,29 @@ export default function MainsEthicsCard({
                       {d.title}
                     </Text>
                   ) : null}
-                  <View style={{
-                    borderRadius: 12,
-                    overflow: 'hidden',
-                    backgroundColor: '#ffffff',
-                    padding: 8,
-                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)',
-                    borderWidth: 1,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.05,
-                    shadowRadius: 4,
-                    elevation: 2
-                  }}>
+                  <TouchableOpacity 
+                    activeOpacity={0.9}
+                    onPress={() => onImagePress?.(getDiagramUri(d.imagePath))}
+                    style={{
+                      borderRadius: 12,
+                      overflow: 'hidden',
+                      backgroundColor: '#ffffff',
+                      padding: 8,
+                      borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)',
+                      borderWidth: 1,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.05,
+                      shadowRadius: 4,
+                      elevation: 2
+                    }}
+                  >
                     <Image
                       source={{ uri: getDiagramUri(d.imagePath) }}
                       style={{ width: '100%', height: 240 }}
                       resizeMode="contain"
                     />
-                  </View>
+                  </TouchableOpacity>
                 </View>
               ))}
             </View>
@@ -148,25 +154,29 @@ export default function MainsEthicsCard({
             return (
               <View style={{ gap: 12 }}>
                 {paths.map((path: string, pIdx: number) => (
-                  <View key={pIdx} style={{
-                    borderRadius: 12,
-                    overflow: 'hidden',
-                    backgroundColor: '#ffffff',
-                    padding: 8,
-                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)',
-                    borderWidth: 1,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.05,
-                    shadowRadius: 4,
-                    elevation: 2
-                  }}>
+                  <TouchableOpacity 
+                    activeOpacity={0.9}
+                    onPress={() => onImagePress?.(getDiagramUri(path))}
+                    style={{
+                      borderRadius: 12,
+                      overflow: 'hidden',
+                      backgroundColor: '#ffffff',
+                      padding: 8,
+                      borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)',
+                      borderWidth: 1,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.05,
+                      shadowRadius: 4,
+                      elevation: 2
+                    }}
+                  >
                     <Image
                       source={{ uri: getDiagramUri(path) }}
                       style={{ width: '100%', height: 240 }}
                       resizeMode="contain"
                     />
-                  </View>
+                  </TouchableOpacity>
                 ))}
               </View>
             );

@@ -139,7 +139,7 @@ export default function AdminScreen() {
   const [newCourseName, setNewCourseName] = useState('');
 
   // Course access lists (populated from DB)
-  const [availableCourses, setAvailableCourses] = useState<string[]>(['UPSC CSE', 'Medical Science']);
+  const [availableCourses, setAvailableCourses] = useState<string[]>(['Civil Services', 'Medical Science']);
   const [availableInstitutes, setAvailableInstitutes] = useState<string[]>(['VisionIAS', 'Vajiram & Ravi', 'ForumIAS', 'InsightIAS', 'IASbaba']);
   
   // Pickers Visibility
@@ -148,7 +148,7 @@ export default function AdminScreen() {
   const [coursePickerVisible, setCoursePickerVisible] = useState(false);
 
   // User-specific course access states
-  const [subCourseName, setSubCourseName] = useState<string>('UPSC CSE');
+  const [subCourseName, setSubCourseName] = useState<string>('Civil Services');
   const [userAllowedCourses, setUserAllowedCourses] = useState<string[]>([]);
 
   // --- Global Config State ---
@@ -215,6 +215,8 @@ export default function AdminScreen() {
     switch (tab) {
       case 'users':
         fetchUsers();
+        fetchPlans();
+        fetchFeatures();
         break;
       case 'features':
         fetchFeatures();
@@ -254,7 +256,7 @@ export default function AdminScreen() {
         .from('courses')
         .select('name');
       const coursesList = (coursesData || []).map((c: any) => c.name);
-      const uniqueCourses = Array.from(new Set(['UPSC CSE', 'Medical Science', ...coursesList])).filter(Boolean);
+      const uniqueCourses = Array.from(new Set(['Civil Services', 'Medical Science', ...coursesList])).filter(Boolean);
       setAvailableCourses(uniqueCourses);
 
       const { data: testsData } = await supabase
@@ -368,13 +370,13 @@ export default function AdminScreen() {
         setSubExpiresAt(subData.expires_at ? new Date(subData.expires_at).toISOString().split('T')[0] : '');
         setSubIsActive(subData.is_active);
         setSubNotes(subData.notes || '');
-        setSubCourseName(subData.course_name || 'UPSC CSE');
+        setSubCourseName(subData.course_name || 'Civil Services');
       } else {
         setSelectedPlanIdForUser('free');
         setSubExpiresAt('');
         setSubIsActive(true);
         setSubNotes('');
-        setSubCourseName('UPSC CSE');
+        setSubCourseName('Civil Services');
       }
 
       // 2. Fetch Overrides
@@ -522,6 +524,26 @@ export default function AdminScreen() {
     }
   };
 
+  const toggleCourseAccess = (course: string) => {
+    let updatedAllowed: string[];
+    if (userAllowedCourses.includes(course)) {
+      updatedAllowed = userAllowedCourses.filter(c => c !== course);
+    } else {
+      updatedAllowed = [...userAllowedCourses, course];
+    }
+    setUserAllowedCourses(updatedAllowed);
+    
+    // Sync directly into the displayed JSON string in real-time!
+    try {
+      const parsed = JSON.parse(userPermissionsJson);
+      parsed.allowedCourses = updatedAllowed;
+      setUserPermissionsJson(JSON.stringify(parsed, null, 2));
+    } catch (e) {
+      // If the JSON is currently being edited and is invalid, just create a new one
+      setUserPermissionsJson(JSON.stringify({ allowedCourses: updatedAllowed }, null, 2));
+    }
+  };
+
   const handleSavePermissions = async () => {
     if (!selectedUser) return;
     setSavingPermissions(true);
@@ -535,13 +557,33 @@ export default function AdminScreen() {
         allowedCourses: userAllowedCourses,
       };
 
-      const { error } = await supabase
+      // Check if user settings record already exists
+      const { data: existingSettings } = await supabase
         .from('user_settings')
-        .upsert({
-          user_id: selectedUser.id,
-          permissions: updatedPermissions,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' });
+        .select('user_id')
+        .eq('user_id', selectedUser.id)
+        .maybeSingle();
+
+      let error;
+      if (existingSettings) {
+        const res = await supabase
+          .from('user_settings')
+          .update({
+            permissions: updatedPermissions,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('user_id', selectedUser.id);
+        error = res.error;
+      } else {
+        const res = await supabase
+          .from('user_settings')
+          .insert({
+            user_id: selectedUser.id,
+            permissions: updatedPermissions,
+            updated_at: new Date().toISOString(),
+          });
+        error = res.error;
+      }
 
       if (error) throw error;
       setUserPermissionsJson(JSON.stringify(updatedPermissions, null, 2));
@@ -1264,7 +1306,7 @@ export default function AdminScreen() {
                               onPress={() => setCoursePickerVisible(true)}
                               style={[styles.input, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderColor: colors.border, paddingVertical: 12, paddingHorizontal: 12, marginBottom: 12 }]}
                             >
-                              <Text style={{ color: colors.textPrimary, fontSize: 13 }}>{subCourseName || 'UPSC CSE'}</Text>
+                              <Text style={{ color: colors.textPrimary, fontSize: 13 }}>{subCourseName || 'Civil Services'}</Text>
                               <ChevronRight size={16} color={colors.textTertiary} />
                             </TouchableOpacity>
 
@@ -1326,13 +1368,7 @@ export default function AdminScreen() {
                             return (
                               <TouchableOpacity
                                 key={course}
-                                onPress={() => {
-                                  if (hasAccess) {
-                                    setUserAllowedCourses(prev => prev.filter(c => c !== course));
-                                  } else {
-                                    setUserAllowedCourses(prev => [...prev, course]);
-                                  }
-                                }}
+                                onPress={() => toggleCourseAccess(course)}
                                 style={{
                                   flexDirection: 'row',
                                   alignItems: 'center',

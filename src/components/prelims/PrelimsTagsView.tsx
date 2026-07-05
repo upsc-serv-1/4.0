@@ -23,7 +23,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useTaggedVault } from '../../hooks/useTaggedQuestions';
 import { RepoQuestionCard } from '../../components/RepoQuestionCard';
 import { PageWrapper } from '../../components/PageWrapper';
-import { useFocusEffect, router } from 'expo-router';
 import {
   Search,
   Filter,
@@ -193,11 +192,12 @@ export default function PrelimsTagsView({
   const zenBg = isZenMode ? '#F4ECD8' : colors.bg;
   const zenTextColor = isZenMode ? '#433422' : colors.textPrimary;
 
-  useFocusEffect(
-    React.useCallback(() => {
-      refresh();
-    }, [refresh])
-  );
+  // Refresh data when this view mounts (replaces useFocusEffect since
+  // PrelimsTagsView is now embedded inline in prelims.tsx, not a route screen)
+  useEffect(() => {
+    refresh();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!exportConfig.singleTag && uniqueTags.length > 0) {
@@ -1295,11 +1295,3 @@ const styles = StyleSheet.create({
   exportFooter: { marginTop: 8, borderTopWidth: 1, paddingTop: 14, paddingBottom: 26, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   exportBtn: { paddingHorizontal: 14, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 });
-
-export default function TagsScreen() {
-  return (
-    <FeatureGate feature="tags" featureLabel="Tags">
-      <TaggedRepoScreen />
-    </FeatureGate>
-  );
-}

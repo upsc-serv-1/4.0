@@ -89,9 +89,7 @@
       "Inclusive growth and issues arising from it",
       "Inclusive Growth"
     ],
-    "hierarchy_5_path": null,
-    "paper": "GS1",
-    "subject": "SOCIETY"
+    "hierarchy_5_path": null
   },
   {
     "framework_name": "Bilateral Relations / International Organisations Framework",
@@ -183,9 +181,7 @@
       "International Institutions: Structure, Mandate & Functioning of Important Agencies & Fora",
       "United Nations and its Agencies"
     ],
-    "hierarchy_5_path": null,
-    "paper": "GS2",
-    "subject": "INTERNATIONAL RELATIONS"
+    "hierarchy_5_path": null
   },
   {
     "framework_name": "SHIELD Framework: Way Forward for Disaster Management",
@@ -257,9 +253,7 @@
       "Miscellaneous"
     ],
     "hierarchy_4_path": null,
-    "hierarchy_5_path": null,
-    "paper": "GS3",
-    "subject": "DISASTER MANAGEMENT"
+    "hierarchy_5_path": null
   },
   {
     "framework_name": "WATER Framework: Theme - Irrigation",
@@ -351,9 +345,7 @@
       "Conservation and environmental impact assessment",
       "Sustainable Development"
     ],
-    "hierarchy_5_path": null,
-    "paper": "GS3",
-    "subject": "AGRICULTURE"
+    "hierarchy_5_path": null
   },
   {
     "framework_name": "INTERNATIONAL RELATIONS - KEY DIMENSIONS",
@@ -465,9 +457,7 @@
       "Global Geopolitics & Indian Diaspora",
       "Global Policies & Politics: Effect of Policies & Politics of Developed & Developing Countries on India's Interests",
       "Geo-politics affecting India's Interest"
-    ],
-    "paper": "GS2",
-    "subject": "INTERNATIONAL RELATIONS"
+    ]
   },
   {
     "framework_name": "IR Diagrams: Africa-India Relations",
@@ -539,9 +529,7 @@
       "Indian Diaspora"
     ],
     "hierarchy_4_path": null,
-    "hierarchy_5_path": null,
-    "paper": "GS2",
-    "subject": "INTERNATIONAL RELATIONS"
+    "hierarchy_5_path": null
   },
   {
     "framework_name": "IR Answer Writing Framework",
@@ -593,9 +581,7 @@
     ],
     "hierarchy_3_path": null,
     "hierarchy_4_path": null,
-    "hierarchy_5_path": null,
-    "paper": "GS2",
-    "subject": "INTERNATIONAL RELATIONS"
+    "hierarchy_5_path": null
   },
   {
     "framework_name": "IR Key Words",
@@ -667,8 +653,6 @@
       "Ethical Issues in International Relations and Funding"
     ],
     "hierarchy_4_path": null,
-    "hierarchy_5_path": null,
-    "paper": "GS2",
-    "subject": "INTERNATIONAL RELATIONS"
+    "hierarchy_5_path": null
   }
 ]

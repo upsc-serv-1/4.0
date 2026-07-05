@@ -2,9 +2,9 @@ import { ValueAdditionItem } from './mainsMockData';
 import { normalizePaper } from './mainsConsolidatedLoader';
 export { ValueAdditionItem };
 
-const normalizeSubject = (subj: any, defaultSubj: string = ''): string => {
-  if (!subj) return defaultSubj;
-  return String(subj).replace(/\*\*/g, '').trim();
+const cleanHierarchyString = (str: any, defaultVal: string = ''): string => {
+  if (!str) return defaultVal;
+  return String(str).replace(/\*/g, '').trim();
 };
 
 
@@ -209,8 +209,8 @@ const mappedDataFacts: ValueAdditionItem[] = dataFacts.map((item, idx) => ({
   id: `va-df-${idx}`,
   category: 'data_facts',
   paper: normalizePaper(item.paper),
-  subject: normalizeSubject(item.subject),
-  sectionGroup: item.section_group,
+  subject: cleanHierarchyString(item.subject),
+  sectionGroup: cleanHierarchyString(item.section_group),
   title: `${item.parameter} - ${item.card_title}`,
   metric: item.card_title,
   context: item.content_markdown,
@@ -222,10 +222,10 @@ const mappedIntroConclusions: ValueAdditionItem[] = introConclusions.map((item, 
   id: `va-ic-${idx}`,
   category: 'intro_conclusion',
   paper: normalizePaper(item.paper),
-  subject: normalizeSubject(item.subject),
-  sectionGroup: item.section_group,
-  microtopic: item.microtopic,
-  subtopic: item.subtopic,
+  subject: cleanHierarchyString(item.subject),
+  sectionGroup: cleanHierarchyString(item.section_group),
+  microtopic: cleanHierarchyString(item.microtopic),
+  subtopic: cleanHierarchyString(item.subtopic),
   title: item.card_title,
   introduction: item.body || undefined,
   conclusion: undefined,
@@ -241,9 +241,9 @@ const mappedEssayValueAdd: ValueAdditionItem[] = essayValueAdd.map((item, idx) =
   id: `va-es-${idx}`,
   category: 'quotes',
   paper: normalizePaper(item.paper),
-  subject: normalizeSubject(item.subject),
-  sectionGroup: item.section_group,
-  microtopic: item.microtopic,
+  subject: cleanHierarchyString(item.subject),
+  sectionGroup: cleanHierarchyString(item.section_group),
+  microtopic: cleanHierarchyString(item.microtopic),
   title: item.title,
   quoteText: item.content,
   author: item.author || undefined,
@@ -257,10 +257,10 @@ const mappedMnemonics: ValueAdditionItem[] = mnemonics.map((item, idx) => ({
   id: `va-mn-${idx}`,
   category: 'mnemonics',
   paper: normalizePaper(item.paper),
-  subject: normalizeSubject(item.subject),
-  sectionGroup: item.section_group,
-  microtopic: item.microtopic,
-  subtopic: item.subtopic,
+  subject: cleanHierarchyString(item.subject),
+  sectionGroup: cleanHierarchyString(item.section_group),
+  microtopic: cleanHierarchyString(item.microtopic),
+  subtopic: cleanHierarchyString(item.subtopic),
   title: item.mnemonic_number_title,
   mnemonicKeyword: item.mnemonic_keyword,
   mnemonicExpansion: item.formula_expansion,
@@ -269,26 +269,35 @@ const mappedMnemonics: ValueAdditionItem[] = mnemonics.map((item, idx) => ({
   rawContent: item.explanation_examples
 }));
 
-const mappedFrameworks: ValueAdditionItem[] = frameworks.map((item, idx) => ({
-  id: `va-fw-${idx}`,
-  category: 'frameworks',
-  title: item.framework_name,
-  frameworkBoxes: parseFrameworkBoxes(item.breakdown_markdown),
-  frameworkGuide: item.breakdown_markdown,
-  source: 'Writing Frameworks',
-  rawContent: item.breakdown_markdown,
-  diagramImagePath: item.diagram_image_path,
-  hierarchies: item.hierarchies || [],
-  hierarchy_1_path: item.hierarchy_1_path || null,
-  hierarchy_2_path: item.hierarchy_2_path || null,
-  hierarchy_3_path: item.hierarchy_3_path || null,
-  hierarchy_4_path: item.hierarchy_4_path || null,
-  hierarchy_5_path: item.hierarchy_5_path || null
-}));
+const mappedFrameworks: ValueAdditionItem[] = frameworks.map((item, idx) => {
+  const cleanPath = (p: any) => Array.isArray(p) ? p.map(val => cleanHierarchyString(val)) : null;
+  return {
+    id: `va-fw-${idx}`,
+    category: 'frameworks',
+    title: item.framework_name,
+    frameworkBoxes: parseFrameworkBoxes(item.breakdown_markdown),
+    frameworkGuide: item.breakdown_markdown,
+    source: 'Writing Frameworks',
+    rawContent: item.breakdown_markdown,
+    diagramImagePath: item.diagram_image_path,
+    hierarchies: Array.isArray(item.hierarchies) ? item.hierarchies.map((h: any) => h ? {
+      paper: cleanHierarchyString(h.paper),
+      subject: cleanHierarchyString(h.subject),
+      sectionGroup: cleanHierarchyString(h.sectionGroup || h.section_group),
+      microtopic: cleanHierarchyString(h.microtopic),
+      subtopic: cleanHierarchyString(h.subtopic),
+    } : h) : [],
+    hierarchy_1_path: cleanPath(item.hierarchy_1_path),
+    hierarchy_2_path: cleanPath(item.hierarchy_2_path),
+    hierarchy_3_path: cleanPath(item.hierarchy_3_path),
+    hierarchy_4_path: cleanPath(item.hierarchy_4_path),
+    hierarchy_5_path: cleanPath(item.hierarchy_5_path)
+  };
+});
 
 const mappedEthics: ValueAdditionItem[] = ethicsValueAdd.flatMap((item, idx) => {
   let ethicsType: any = 'keyword';
-  let subject = normalizeSubject(item.subject, 'ETHICS, INTEGRITY & APTITUDE');
+  let subject = cleanHierarchyString(item.subject, 'ETHICS, INTEGRITY & APTITUDE');
   let title = item.title;
   let author = item.author || undefined;
 
@@ -365,10 +374,10 @@ const mappedEthics: ValueAdditionItem[] = ethicsValueAdd.flatMap((item, idx) => 
         id: `va-et-${idx}-rule-${ruleIdx}`,
         category: 'ethics',
         paper: normalizePaper(item.paper),
-        subject: normalizeSubject(item.subject, 'ETHICS, INTEGRITY & APTITUDE'),
-        sectionGroup: item.section_group,
-        microtopic: item.microtopic,
-        subtopic: item.subtopic,
+        subject: cleanHierarchyString(item.subject, 'ETHICS, INTEGRITY & APTITUDE'),
+        sectionGroup: cleanHierarchyString(item.section_group),
+        microtopic: cleanHierarchyString(item.microtopic),
+        subtopic: cleanHierarchyString(item.subtopic),
         title: ruleTitle,
         ethicsType: 'keyword',
         ethicsData: {
@@ -395,9 +404,9 @@ const mappedEthics: ValueAdditionItem[] = ethicsValueAdd.flatMap((item, idx) => 
     category: 'ethics',
     paper: normalizePaper(item.paper),
     subject: subject,
-    sectionGroup: item.section_group,
-    microtopic: item.microtopic,
-    subtopic: item.subtopic,
+    sectionGroup: cleanHierarchyString(item.section_group),
+    microtopic: cleanHierarchyString(item.microtopic),
+    subtopic: cleanHierarchyString(item.subtopic),
     title: title,
     author: author,
     ethicsType,
@@ -487,8 +496,8 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     id: item.id || `va-df-${idx}`,
     category: 'data_facts',
     paper: normalizePaper(item.paper),
-    subject: normalizeSubject(item.subject),
-    sectionGroup: item.section_group,
+    subject: cleanHierarchyString(item.subject),
+    sectionGroup: cleanHierarchyString(item.section_group),
     title: `${item.parameter} - ${item.card_title}`,
     metric: item.card_title,
     context: item.content_markdown,
@@ -500,10 +509,10 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     id: item.id || `va-ic-${idx}`,
     category: 'intro_conclusion',
     paper: normalizePaper(item.paper),
-    subject: normalizeSubject(item.subject),
-    sectionGroup: item.section_group,
-    microtopic: item.microtopic,
-    subtopic: item.subtopic,
+    subject: cleanHierarchyString(item.subject),
+    sectionGroup: cleanHierarchyString(item.section_group),
+    microtopic: cleanHierarchyString(item.microtopic),
+    subtopic: cleanHierarchyString(item.subtopic),
     title: item.card_title,
     introduction: item.body || undefined,
     conclusion: undefined,
@@ -519,9 +528,9 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     id: item.id || `va-es-${idx}`,
     category: 'quotes',
     paper: normalizePaper(item.paper),
-    subject: normalizeSubject(item.subject),
-    sectionGroup: item.section_group,
-    microtopic: item.microtopic,
+    subject: cleanHierarchyString(item.subject),
+    sectionGroup: cleanHierarchyString(item.section_group),
+    microtopic: cleanHierarchyString(item.microtopic),
     title: item.title,
     quoteText: item.content,
     author: item.author || undefined,
@@ -535,10 +544,10 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     id: item.id || `va-mn-${idx}`,
     category: 'mnemonics',
     paper: normalizePaper(item.paper),
-    subject: normalizeSubject(item.subject),
-    sectionGroup: item.section_group,
-    microtopic: item.microtopic,
-    subtopic: item.subtopic,
+    subject: cleanHierarchyString(item.subject),
+    sectionGroup: cleanHierarchyString(item.section_group),
+    microtopic: cleanHierarchyString(item.microtopic),
+    subtopic: cleanHierarchyString(item.subtopic),
     title: item.mnemonic_number_title,
     mnemonicKeyword: item.mnemonic_keyword,
     mnemonicExpansion: item.formula_expansion,
@@ -547,26 +556,35 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     rawContent: item.explanation_examples
   }));
 
-  const mappedFrameworks: ValueAdditionItem[] = (fwRes.data || []).map((item, idx) => ({
-    id: item.id || `va-fw-${idx}`,
-    category: 'frameworks',
-    title: item.framework_name,
-    frameworkBoxes: parseFrameworkBoxes(item.breakdown_markdown),
-    frameworkGuide: item.breakdown_markdown,
-    source: 'Writing Frameworks',
-    rawContent: item.breakdown_markdown,
-    diagramImagePath: item.diagram_image_path,
-    hierarchies: item.hierarchies || [],
-    hierarchy_1_path: item.hierarchy_1_path || null,
-    hierarchy_2_path: item.hierarchy_2_path || null,
-    hierarchy_3_path: item.hierarchy_3_path || null,
-    hierarchy_4_path: item.hierarchy_4_path || null,
-    hierarchy_5_path: item.hierarchy_5_path || null
-  }));
+  const mappedFrameworks: ValueAdditionItem[] = (fwRes.data || []).map((item, idx) => {
+    const cleanPath = (p: any) => Array.isArray(p) ? p.map(val => cleanHierarchyString(val)) : null;
+    return {
+      id: item.id || `va-fw-${idx}`,
+      category: 'frameworks',
+      title: item.framework_name,
+      frameworkBoxes: parseFrameworkBoxes(item.breakdown_markdown),
+      frameworkGuide: item.breakdown_markdown,
+      source: 'Writing Frameworks',
+      rawContent: item.breakdown_markdown,
+      diagramImagePath: item.diagram_image_path,
+      hierarchies: Array.isArray(item.hierarchies) ? item.hierarchies.map((h: any) => h ? {
+        paper: cleanHierarchyString(h.paper),
+        subject: cleanHierarchyString(h.subject),
+        sectionGroup: cleanHierarchyString(h.sectionGroup || h.section_group),
+        microtopic: cleanHierarchyString(h.microtopic),
+        subtopic: cleanHierarchyString(h.subtopic),
+      } : h) : [],
+      hierarchy_1_path: cleanPath(item.hierarchy_1_path),
+      hierarchy_2_path: cleanPath(item.hierarchy_2_path),
+      hierarchy_3_path: cleanPath(item.hierarchy_3_path),
+      hierarchy_4_path: cleanPath(item.hierarchy_4_path),
+      hierarchy_5_path: cleanPath(item.hierarchy_5_path)
+    };
+  });
 
   const mappedEthics: ValueAdditionItem[] = (etRes.data || []).flatMap((item, idx) => {
     let ethicsType: any = 'keyword';
-    let subject = normalizeSubject(item.subject, 'ETHICS, INTEGRITY & APTITUDE');
+    let subject = cleanHierarchyString(item.subject, 'ETHICS, INTEGRITY & APTITUDE');
     let title = item.title;
     let author = item.author || undefined;
 
@@ -643,10 +661,10 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
           id: `${item.id || `va-et-${idx}`}-rule-${ruleIdx}`,
           category: 'ethics',
           paper: normalizePaper(item.paper),
-          subject: normalizeSubject(item.subject, 'ETHICS, INTEGRITY & APTITUDE'),
-          sectionGroup: item.section_group,
-          microtopic: item.microtopic,
-          subtopic: item.subtopic,
+          subject: cleanHierarchyString(item.subject, 'ETHICS, INTEGRITY & APTITUDE'),
+          sectionGroup: cleanHierarchyString(item.section_group),
+          microtopic: cleanHierarchyString(item.microtopic),
+          subtopic: cleanHierarchyString(item.subtopic),
           title: ruleTitle,
           ethicsType: 'keyword',
           ethicsData: {
@@ -673,9 +691,9 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
       category: 'ethics',
       paper: normalizePaper(item.paper),
       subject: subject,
-      sectionGroup: item.section_group,
-      microtopic: item.microtopic,
-      subtopic: item.subtopic,
+      sectionGroup: cleanHierarchyString(item.section_group),
+      microtopic: cleanHierarchyString(item.microtopic),
+      subtopic: cleanHierarchyString(item.subtopic),
       title: title,
       author: author,
       ethicsType,

@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, StyleSheet, Image } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Markdown from 'react-native-markdown-display';
-import { cleanMarkdownContent, getMarkdownStyles, getDiagramUri, markdownRules } from '../../../app/mains';
+import { cleanMarkdownContent, getMarkdownStyles, getDiagramUri, getMarkdownRules } from '../../../app/mains';
 
 /**
  * Splits framework markdown into:
@@ -38,10 +38,12 @@ export default function MainsFrameworksCard({
   item,
   colors,
   zoomScale,
+  onImagePress
 }: {
   item: any;
   colors: any;
   zoomScale: number;
+  onImagePress?: (uri: string) => void;
 }) {
   const markdownStyles = getMarkdownStyles(colors);
 
@@ -71,22 +73,30 @@ export default function MainsFrameworksCard({
     ? diagramContent.replace(/!\[.*?\]\(.*?\)/g, '').trim()
     : diagramContent;
 
+  const dynamicRules = useMemo(() => {
+    return getMarkdownRules(colors, colors.isDark || false, onImagePress);
+  }, [colors, onImagePress]);
+
   return (
     <View style={{ gap: 10 }}>
       {/* If the DB has a diagramImagePath, show it at the top */}
       {item.diagramImagePath ? (
-        <View style={[localStyles.imageContainer, { borderColor: colors.border }]}>
+        <TouchableOpacity 
+          activeOpacity={0.9}
+          onPress={() => onImagePress?.(getDiagramUri(item.diagramImagePath))}
+          style={[localStyles.imageContainer, { borderColor: colors.border }]}
+        >
           <Image
             source={{ uri: getDiagramUri(item.diagramImagePath) }}
             style={{ width: '100%', height: 220 }}
             resizeMode="contain"
           />
-        </View>
+        </TouchableOpacity>
       ) : null}
 
       {/* Render diagram content preamble */}
       {cleanDiagram ? (
-        <Markdown style={markdownStyles} rules={markdownRules}>
+        <Markdown style={markdownStyles} rules={dynamicRules}>
           {cleanMarkdownContent(cleanDiagram)}
         </Markdown>
       ) : null}
@@ -102,7 +112,7 @@ export default function MainsFrameworksCard({
             },
           ]}
         >
-          <Markdown style={subPartBodyMarkdownStyle} rules={markdownRules}>
+          <Markdown style={subPartBodyMarkdownStyle} rules={dynamicRules}>
             {cleanMarkdownContent(breakdownContent)}
           </Markdown>
         </View>

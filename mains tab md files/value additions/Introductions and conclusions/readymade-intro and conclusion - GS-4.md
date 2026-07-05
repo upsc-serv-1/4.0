@@ -223,11 +223,11 @@ w
 
 ---
 
-##### Subtopic: Normative **Ethics** (Deontology vs Teleology)
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: **Ethics** & Human **Values**]
-[Microtopic: **Ethics** and Human Interface: Essence, Determinants, Consequences, and Dimensions of **Ethics**]
-[Subtopic: Normative **Ethics** (Deontology vs Teleology)]
+##### Subtopic: Normative Ethics (Deontology vs Teleology)
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Ethics & Human Values]
+[Microtopic: Ethics and Human Interface: Essence, Determinants, Consequences, and Dimensions of Ethics]
+[Subtopic: Normative Ethics (Deontology vs Teleology)]
 
 ###### Card 1: Dimensions of Ethics
 *   **Quote:**
@@ -393,9 +393,9 @@ w
 ---
 
 ##### Subtopic: Value Based Questions
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: **Ethics** & Human **Values**]
-[Microtopic: Human **Values**: Role of family society and educational institutions in inculcating **values**]
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Ethics & Human Values]
+[Microtopic: Human Values: Role of family society and educational institutions in inculcating values]
 [Subtopic: Value Based Questions]
 
 ###### Card 1: Meaning and Scope of Human Values
@@ -459,15 +459,15 @@ w
 
 ---
 
-### Section Group: Psychology & Foundational **Values**
+### Section Group: Psychology & Foundational Values
 
-#### Microtopic: Aptitude and Foundational **Values** for Civil Service
+#### Microtopic: Aptitude and Foundational Values for Civil Service
 
-##### Subtopic: **Empathy** and **Compassion**
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: Psychology & Foundational **Values**]
-[Microtopic: Aptitude and Foundational **Values** for Civil Service]
-[Subtopic: **Empathy** and **Compassion**]
+##### Subtopic: Empathy and Compassion
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Psychology & Foundational Values]
+[Microtopic: Aptitude and Foundational Values for Civil Service]
+[Subtopic: Empathy and Compassion]
 
 ###### Card 1: Empathy
 *   **Quote:**
@@ -676,11 +676,11 @@ w
 
 ---
 
-##### Subtopic: **Integrity**
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: Psychology & Foundational **Values**]
-[Microtopic: Aptitude and Foundational **Values** for Civil Service]
-[Subtopic: **Integrity**]
+##### Subtopic: Integrity
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Psychology & Foundational Values]
+[Microtopic: Aptitude and Foundational Values for Civil Service]
+[Subtopic: Integrity]
 
 ###### Card 1: Integrity
 *   **Quote:**
@@ -720,11 +720,11 @@ w
 
 ---
 
-##### Subtopic: **Integrity** X Intelligence X Energy
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: Psychology & Foundational **Values**]
-[Microtopic: Aptitude and Foundational **Values** for Civil Service]
-[Subtopic: **Integrity** X Intelligence X Energy]
+##### Subtopic: Integrity X Intelligence X Energy
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Psychology & Foundational Values]
+[Microtopic: Aptitude and Foundational Values for Civil Service]
+[Subtopic: Integrity X Intelligence X Energy]
 
 ###### Card 1: COMPETENCE WITHOUT ETHICS (JOSEF MENGELE)
 *   **Examples:**
@@ -751,11 +751,11 @@ w
 
 ---
 
-##### Subtopic: Trustworthiness and **Fortitude**
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: Psychology & Foundational **Values**]
-[Microtopic: Aptitude and Foundational **Values** for Civil Service]
-[Subtopic: Trustworthiness and **Fortitude**]
+##### Subtopic: Trustworthiness and Fortitude
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Psychology & Foundational Values]
+[Microtopic: Aptitude and Foundational Values for Civil Service]
+[Subtopic: Trustworthiness and Fortitude]
 
 ###### Card 1: OVERCOMING EXTREME STRESS AND ADVERSITY
 *   **Examples:**
@@ -821,9 +821,9 @@ w
 ---
 
 ##### Subtopic: Attitude for Individuals
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: Psychology & Foundational **Values**]
-[Microtopic: Attitude: Content, Structure, Function, **Moral** and Political Attitudes, Social **Influence**]
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Psychology & Foundational Values]
+[Microtopic: Attitude: Content, Structure, Function, Moral and Political Attitudes, Social Influence]
 [Subtopic: Attitude for Individuals]
 
 ###### Card 1: Content of Attitude
@@ -1048,9 +1048,9 @@ w
 ---
 
 ##### Subtopic: EI in Administration
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: Psychology & Foundational **Values**]
-[Microtopic: **Emotional intelligence**: Concepts, utilities and application in administration]
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Psychology & Foundational Values]
+[Microtopic: Emotional intelligence: Concepts, utilities and application in administration]
 [Subtopic: EI in Administration]
 
 ###### Card 1: Application of EI in Administration
@@ -1292,9 +1292,9 @@ w
 ---
 
 ##### Subtopic: EQ vs IQ
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: Psychology & Foundational **Values**]
-[Microtopic: **Emotional intelligence**: Concepts, utilities and application in administration]
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Psychology & Foundational Values]
+[Microtopic: Emotional intelligence: Concepts, utilities and application in administration]
 [Subtopic: EQ vs IQ]
 
 ###### Card 1: WARREN BUFFET ON RATIONAL BEHAVIOUR
@@ -1305,15 +1305,15 @@ w
 
 ---
 
-### Section Group: **Moral** Thinkers & Leaders
+### Section Group: Moral Thinkers & Leaders
 
-#### Microtopic: Contributions of **Moral** Thinkers and Philosophers from India and World
+#### Microtopic: Contributions of Moral Thinkers and Philosophers from India and World
 
-##### Subtopic: A.P.J. Abdul **Kalam**
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: **Moral** Thinkers & Leaders]
-[Microtopic: Contributions of **Moral** Thinkers and Philosophers from India and World]
-[Subtopic: A.P.J. Abdul **Kalam**]
+##### Subtopic: A.P.J. Abdul Kalam
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Moral Thinkers & Leaders]
+[Microtopic: Contributions of Moral Thinkers and Philosophers from India and World]
+[Subtopic: A.P.J. Abdul Kalam]
 
 ###### Card 1: MARTIN LUTHER KING JR. & A.P.J. ABDUL KALAM
 *   **Quotes:**
@@ -1336,11 +1336,11 @@ w
 
 ---
 
-##### Subtopic: **Aristotle**
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: **Moral** Thinkers & Leaders]
-[Microtopic: Contributions of **Moral** Thinkers and Philosophers from India and World]
-[Subtopic: **Aristotle**]
+##### Subtopic: Aristotle
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Moral Thinkers & Leaders]
+[Microtopic: Contributions of Moral Thinkers and Philosophers from India and World]
+[Subtopic: Aristotle]
 
 ###### Card 1: Contributions of Aristotle
 *   **Quote:**
@@ -1371,11 +1371,11 @@ w
 
 ---
 
-##### Subtopic: Immanuel **Kant**
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: **Moral** Thinkers & Leaders]
-[Microtopic: Contributions of **Moral** Thinkers and Philosophers from India and World]
-[Subtopic: Immanuel **Kant**]
+##### Subtopic: Immanuel Kant
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Moral Thinkers & Leaders]
+[Microtopic: Contributions of Moral Thinkers and Philosophers from India and World]
+[Subtopic: Immanuel Kant]
 
 ###### Card 1: Contributions of Immanuel Kant
 *   **Quote:**
@@ -1415,9 +1415,9 @@ w
 ---
 
 ##### Subtopic: John Rawls's concept of social Justice
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: **Moral** Thinkers & Leaders]
-[Microtopic: Contributions of **Moral** Thinkers and Philosophers from India and World]
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Moral Thinkers & Leaders]
+[Microtopic: Contributions of Moral Thinkers and Philosophers from India and World]
 [Subtopic: John Rawls's concept of social Justice]
 
 ###### Card 1: RAWLS ON NATURAL JUSTICE
@@ -1502,11 +1502,11 @@ w
 
 ---
 
-##### Subtopic: **Plato**
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: **Moral** Thinkers & Leaders]
-[Microtopic: Contributions of **Moral** Thinkers and Philosophers from India and World]
-[Subtopic: **Plato**]
+##### Subtopic: Plato
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Moral Thinkers & Leaders]
+[Microtopic: Contributions of Moral Thinkers and Philosophers from India and World]
+[Subtopic: Plato]
 
 ###### Card 1: PLATO ON RATIONALITY
 *   **Concept:**
@@ -1532,11 +1532,11 @@ w
 
 ---
 
-##### Subtopic: **Socrates**
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: **Moral** Thinkers & Leaders]
-[Microtopic: Contributions of **Moral** Thinkers and Philosophers from India and World]
-[Subtopic: **Socrates**]
+##### Subtopic: Socrates
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Moral Thinkers & Leaders]
+[Microtopic: Contributions of Moral Thinkers and Philosophers from India and World]
+[Subtopic: Socrates]
 
 ###### Card 1: SOCRATES ON WISDOM
 *   **Quote:**
@@ -1546,11 +1546,11 @@ w
 
 ---
 
-##### Subtopic: Swami **Vivekananda**
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: **Moral** Thinkers & Leaders]
-[Microtopic: Contributions of **Moral** Thinkers and Philosophers from India and World]
-[Subtopic: Swami **Vivekananda**]
+##### Subtopic: Swami Vivekananda
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Moral Thinkers & Leaders]
+[Microtopic: Contributions of Moral Thinkers and Philosophers from India and World]
+[Subtopic: Swami Vivekananda]
 
 ###### Card 1: Contributions of Swami Vivekananda
 *   **Quote:**
@@ -1979,11 +1979,11 @@ w
 
 ---
 
-##### Subtopic: **Probity** in Governance
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: Governance & **Probity**]
-[Microtopic: **Probity** in Governance: Concept of **Public Service**; Philosophical Basis of Governance and **Probity**; Information Sharing and **Transparency** in Government, **Right to information**; Codes of **Ethics**, Codes of Conduct, Citizen’s Charters, Work Culture, Quality of Service Delivery, utilization of **Public Funds**, Challenges of **Corruption**.]
-[Subtopic: **Probity** in Governance]
+##### Subtopic: Probity in Governance
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Governance & Probity]
+[Microtopic: Probity in Governance: Concept of Public Service; Philosophical Basis of Governance and Probity; Information Sharing and Transparency in Government, Right to information; Codes of Ethics, Codes of Conduct, Citizen’s Charters, Work Culture, Quality of Service Delivery, utilization of Public Funds, Challenges of Corruption.]
+[Subtopic: Probity in Governance]
 
 ###### Card 1: Concept of Public Service
 *   **Quote:**
@@ -2026,9 +2026,9 @@ w
 ---
 
 ##### Subtopic: Quality of Service Delivery
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: Governance & **Probity**]
-[Microtopic: **Probity** in Governance: Concept of **Public Service**; Philosophical Basis of Governance and **Probity**; Information Sharing and **Transparency** in Government, **Right to information**; Codes of **Ethics**, Codes of Conduct, Citizen’s Charters, Work Culture, Quality of Service Delivery, utilization of **Public Funds**, Challenges of **Corruption**.]
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Governance & Probity]
+[Microtopic: Probity in Governance: Concept of Public Service; Philosophical Basis of Governance and Probity; Information Sharing and Transparency in Government, Right to information; Codes of Ethics, Codes of Conduct, Citizen’s Charters, Work Culture, Quality of Service Delivery, utilization of Public Funds, Challenges of Corruption.]
 [Subtopic: Quality of Service Delivery]
 
 ###### Card 1: Quality of Service Delivery
@@ -2058,11 +2058,11 @@ w
 
 ---
 
-##### Subtopic: **Transparency** X **RTI**
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: Governance & **Probity**]
-[Microtopic: **Probity** in Governance: Concept of **Public Service**; Philosophical Basis of Governance and **Probity**; Information Sharing and **Transparency** in Government, **Right to information**; Codes of **Ethics**, Codes of Conduct, Citizen’s Charters, Work Culture, Quality of Service Delivery, utilization of **Public Funds**, Challenges of **Corruption**.]
-[Subtopic: **Transparency** X **RTI**]
+##### Subtopic: Transparency X RTI
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Governance & Probity]
+[Microtopic: Probity in Governance: Concept of Public Service; Philosophical Basis of Governance and Probity; Information Sharing and Transparency in Government, Right to information; Codes of Ethics, Codes of Conduct, Citizen’s Charters, Work Culture, Quality of Service Delivery, utilization of Public Funds, Challenges of Corruption.]
+[Subtopic: Transparency X RTI]
 
 ###### Card 1: Information Sharing and Transparency in Government
 *   **Quote:**
@@ -2128,11 +2128,11 @@ w
 
 ---
 
-##### Subtopic: Utilization of **Public Funds**
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: Governance & **Probity**]
-[Microtopic: **Probity** in Governance: Concept of **Public Service**; Philosophical Basis of Governance and **Probity**; Information Sharing and **Transparency** in Government, **Right to information**; Codes of **Ethics**, Codes of Conduct, Citizen’s Charters, Work Culture, Quality of Service Delivery, utilization of **Public Funds**, Challenges of **Corruption**.]
-[Subtopic: Utilization of **Public Funds**]
+##### Subtopic: Utilization of Public Funds
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Governance & Probity]
+[Microtopic: Probity in Governance: Concept of Public Service; Philosophical Basis of Governance and Probity; Information Sharing and Transparency in Government, Right to information; Codes of Ethics, Codes of Conduct, Citizen’s Charters, Work Culture, Quality of Service Delivery, utilization of Public Funds, Challenges of Corruption.]
+[Subtopic: Utilization of Public Funds]
 
 ###### Card 1: Utilization of Public Funds
 *   **Quote:**
@@ -2286,9 +2286,9 @@ w
 ---
 
 ##### Subtopic: Conflict of Interest
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: Governance & **Probity**]
-[Microtopic: Public/Civil Service **Values** and **Ethics** in Public Administration: Status and Problems; **Ethical** Concerns and Dilemmas in Government and Private Institutions; Laws, Rules, Regulations and **Conscience** as Sources of **Ethical** Guidance; **Accountability** and **Ethical** Governance; Strengthening of **Ethical** and **Moral** **Values** in Governance; **ethical** Issues in International Relations and Funding; **Corporate Governance**]
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Governance & Probity]
+[Microtopic: Public/Civil Service Values and Ethics in Public Administration: Status and Problems; Ethical Concerns and Dilemmas in Government and Private Institutions; Laws, Rules, Regulations and Conscience as Sources of Ethical Guidance; Accountability and Ethical Governance; Strengthening of Ethical and Moral Values in Governance; ethical Issues in International Relations and Funding; Corporate Governance]
 [Subtopic: Conflict of Interest]
 
 ###### Card 1: DEFINITION OF CONFLICT OF INTEREST
@@ -2363,11 +2363,11 @@ w
 
 ---
 
-##### Subtopic: **Ethical** Issues in International Relations and Funding
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: Governance & **Probity**]
-[Microtopic: Public/Civil Service **Values** and **Ethics** in Public Administration: Status and Problems; **Ethical** Concerns and Dilemmas in Government and Private Institutions; Laws, Rules, Regulations and **Conscience** as Sources of **Ethical** Guidance; **Accountability** and **Ethical** Governance; Strengthening of **Ethical** and **Moral** **Values** in Governance; **ethical** Issues in International Relations and Funding; **Corporate Governance**]
-[Subtopic: **Ethical** Issues in International Relations and Funding]
+##### Subtopic: Ethical Issues in International Relations and Funding
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Governance & Probity]
+[Microtopic: Public/Civil Service Values and Ethics in Public Administration: Status and Problems; Ethical Concerns and Dilemmas in Government and Private Institutions; Laws, Rules, Regulations and Conscience as Sources of Ethical Guidance; Accountability and Ethical Governance; Strengthening of Ethical and Moral Values in Governance; ethical Issues in International Relations and Funding; Corporate Governance]
+[Subtopic: Ethical Issues in International Relations and Funding]
 
 ###### Card 1: Ethical Issues in International Relations and Funding
 *   **Quote:**
@@ -2497,11 +2497,11 @@ w
 
 ---
 
-##### Subtopic: Public/Civil Service **Values**
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: Governance & **Probity**]
-[Microtopic: Public/Civil Service **Values** and **Ethics** in Public Administration: Status and Problems; **Ethical** Concerns and Dilemmas in Government and Private Institutions; Laws, Rules, Regulations and **Conscience** as Sources of **Ethical** Guidance; **Accountability** and **Ethical** Governance; Strengthening of **Ethical** and **Moral** **Values** in Governance; **ethical** Issues in International Relations and Funding; **Corporate Governance**]
-[Subtopic: Public/Civil Service **Values**]
+##### Subtopic: Public/Civil Service Values
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Governance & Probity]
+[Microtopic: Public/Civil Service Values and Ethics in Public Administration: Status and Problems; Ethical Concerns and Dilemmas in Government and Private Institutions; Laws, Rules, Regulations and Conscience as Sources of Ethical Guidance; Accountability and Ethical Governance; Strengthening of Ethical and Moral Values in Governance; ethical Issues in International Relations and Funding; Corporate Governance]
+[Subtopic: Public/Civil Service Values]
 
 ###### Card 1: Values in Public Administration
 *   **Quote:**
@@ -2557,8 +2557,8 @@ w
 ---
 
 ##### Subtopic: International Relations & National Security
-[Subject: **ETHICS**, **INTEGRITY** & APTITUDE]
-[Section Group: Applied **Ethics**]
+[Subject: ETHICS, INTEGRITY & APTITUDE]
+[Section Group: Applied Ethics]
 [Microtopic: Case Studies on above issues]
 [Subtopic: International Relations & National Security]
 

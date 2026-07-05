@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import FeatureGate from '../src/components/FeatureGate';
+import PrelimsTagsView from '../src/components/prelims/PrelimsTagsView';
+import MainsTagsView from '../src/components/mains/MainsTagsView';
 import {
   View,
   Text,
@@ -13,8 +15,9 @@ import {
   Pressable,
   Alert,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { useTheme } from '../src/context/ThemeContext';
@@ -1292,10 +1295,78 @@ const styles = StyleSheet.create({
   exportBtn: { paddingHorizontal: 14, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 });
 
+function TagsSwitcher() {
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
+  const [activeTab, setActiveTab] = React.useState<'prelims' | 'mains'>('prelims');
+
+  const tabs: { id: 'prelims' | 'mains'; label: string }[] = [
+    { id: 'prelims', label: 'Prelims Tags' },
+    { id: 'mains', label: 'Mains Tags' },
+  ];
+
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      {/* Tab switcher header */}
+      <View style={{
+        flexDirection: 'row',
+        paddingHorizontal: 16,
+        paddingTop: insets.top + 8,
+        paddingBottom: 4,
+        gap: 8,
+        backgroundColor: colors.bg,
+      }}>
+        {tabs.map(tab => {
+          const isActive = activeTab === tab.id;
+          return (
+            <TouchableOpacity
+              key={tab.id}
+              onPress={() => setActiveTab(tab.id)}
+              style={{
+                flex: 1,
+                paddingVertical: 10,
+                borderRadius: 14,
+                alignItems: 'center',
+                backgroundColor: isActive ? colors.primary : colors.surface,
+                borderWidth: 1,
+                borderColor: isActive ? colors.primary : colors.border,
+              }}
+            >
+              <Text style={{
+                fontSize: 13,
+                fontWeight: '800',
+                color: isActive ? '#fff' : colors.textSecondary,
+              }}>
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+      {/* Content */}
+      {activeTab === 'prelims' ? (
+        <PrelimsTagsView onBack={() => router.back()} />
+      ) : (
+        <MainsTagsView
+          colors={colors}
+          isTablet={isTablet}
+          insets={insets}
+          onBack={() => router.back()}
+          onOpenDetailed={() => {}}
+          onOpenQuestionBank={() => {}}
+        />
+      )}
+    </View>
+  );
+}
+
 export default function TagsScreen() {
   return (
     <FeatureGate feature="tags" featureLabel="Tags">
-      <TaggedRepoScreen />
+      <TagsSwitcher />
     </FeatureGate>
   );
 }

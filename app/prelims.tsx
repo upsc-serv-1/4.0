@@ -23,7 +23,9 @@ import {
   BarChart2,
   Sparkles,
   Palette,
+  Bookmark,
 } from 'lucide-react-native';
+import PrelimsTagsView from '../src/components/prelims/PrelimsTagsView';
 
 function PrelimsScreen() {
   const { colors, isDark } = useTheme();
@@ -31,6 +33,7 @@ function PrelimsScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
+  const [currentScreen, setCurrentScreen] = useState<'hub' | 'revision-tags'>('hub');
 
   // Theme state: 'gradient' or 'white' (default is 'white' for prelims)
   const [prelimsTheme, setPrelimsTheme] = useState<'gradient' | 'white'>('white');
@@ -90,6 +93,13 @@ function PrelimsScreen() {
       color: '#14b8a6',
       icon: BarChart2,
     },
+    {
+      id: 'revision-tags',
+      title: 'Revision Tags',
+      description: 'Tag & track questions for revision',
+      color: '#ec4899',
+      icon: Bookmark,
+    },
   ];
 
   const recentTopics = [
@@ -111,6 +121,12 @@ function PrelimsScreen() {
           style={StyleSheet.absoluteFillObject}
         />
       )}
+
+      {/* Screen: Revision Tags */}
+      {currentScreen === 'revision-tags' ? (
+        <PrelimsTagsView onBack={() => setCurrentScreen('hub')} />
+      ) : (
+        <>
       {/* Back Button Header */}
       <View style={[styles.header, { backgroundColor: 'transparent', paddingTop: insets.top, height: 64 + insets.top }]}>
         <TouchableOpacity
@@ -202,6 +218,9 @@ function PrelimsScreen() {
                     case 'analyse':
                       router.push('/analyse');
                       break;
+                    case 'revision-tags':
+                      setCurrentScreen('revision-tags');
+                      break;
                   }
                 }}
                 style={[
@@ -275,6 +294,8 @@ function PrelimsScreen() {
           </View>
         </View>
       </ScrollView>
+        </>
+      )}
     </View>
   );
 }

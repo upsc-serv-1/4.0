@@ -1849,7 +1849,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         mode: (opts.mode && opts.mode !== 'choice') ? opts.mode : 'learning',
         view: 'list',
         pyqFilter: 'PYQ Only',
-        examCategory: isUpscCseCourse ? 'UPSC CSE' : 'CMS',
+        examCategory: isUpscCseCourse ? 'UPSC CSE' : 'All',
         subject: s,
         year_start: yearStart,
         year_end: yearEnd,

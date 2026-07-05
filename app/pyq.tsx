@@ -1844,11 +1844,12 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       // - stage: examStage so tests are filtered by series (prelims/mains)
       // - year_start/year_end: year range for exact match
       // - subject/section/microtopic: filters from heatmap cell click
+      const isUpscCseCourse = selectedCourse === 'UPSC CSE' || selectedCourse === 'Civil Services';
       const engineParams: Record<string, string> = {
         mode: (opts.mode && opts.mode !== 'choice') ? opts.mode : 'learning',
         view: 'list',
         pyqFilter: 'PYQ Only',
-        examCategory: 'UPSC CSE',
+        examCategory: isUpscCseCourse ? 'UPSC CSE' : 'CMS',
         subject: s,
         year_start: yearStart,
         year_end: yearEnd,

@@ -177,6 +177,7 @@ export interface ExportQuestion {
   exam_group?: string;
   source?: Record<string, any>;
   exam_info?: Record<string, any>;
+  [key: string]: any;
 }
 
 export interface ExportFlashcard {

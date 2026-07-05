@@ -1,0 +1,32 @@
+# Dependency directories
+node_modules/
+
+# Cache directories
+.expo/
+.metro-cache/
+.gradle/
+.idea/
+
+# Large data and admin folders (not needed for EAS mobile build)
+admin-panel/
+data/
+lscs-thesis-app/
+mains json files/
+mains tab md files/
+unmapped_anthropology_questions.txt
+forum_mgp_2026_questions_to_tag.txt
+Theme 1 gemini i style.tsx
+mains.tsx.backup
+*.pdf
+*.zip
+*.tar.gz
+*.json
+!app.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!eas.json
+
+# Virtual environments
+.venv/
+__pycache__/

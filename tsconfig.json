@@ -8,6 +8,11 @@
   },
   "exclude": [
     "node_modules",
+    "android",
+    "ios",
+    ".expo",
+    "dist",
+    ".metro-cache",
     "scratch",
     "scratch.txt",
     "scratch2.txt",

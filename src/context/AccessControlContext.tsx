@@ -253,7 +253,7 @@ export function AccessControlProvider({ children }: { children: React.ReactNode 
   useEffect(() => {
     if (!userId) return;
     
-    const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (nextAppState === 'active') {
         resolvePermissions();
       }

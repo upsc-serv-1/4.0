@@ -883,7 +883,14 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           const targetSeries = stageNorm === 'prelims' ? 'prelims (official)' : 'mains (official)';
           if (series !== targetSeries) return false;
         } else {
-          if (stageNorm && !series.includes(stageNorm)) return false;
+          if (stageNorm) {
+            const matchesStage =
+              programId.includes(stageNorm) ||
+              programName.toLowerCase().includes(stageNorm) ||
+              series.includes(stageNorm) ||
+              (stageNorm === 'upsc cms' && (programId === 'cms' || programName.toLowerCase() === 'cms'));
+            if (!matchesStage) return false;
+          }
         }
 
         if (paperType && !['test-paper', 'question bank'].includes(paperType)) return false;

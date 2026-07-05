@@ -1054,6 +1054,7 @@ function HubView({
 }) {
   const router = useRouter();
   const { isDark } = useTheme();
+  const { width } = useWindowDimensions();
 
   const primaryCards = [
     {
@@ -1165,7 +1166,7 @@ function HubView({
                 { 
                   backgroundColor: !isDark ? 'rgba(255, 255, 255, 0.55)' : 'rgba(30, 41, 59, 0.55)', 
                   borderColor: !isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.15)',
-                  width: isTablet ? '48%' : '48.3%',
+                  width: Platform.OS === 'android' ? (width - 52) / 2 : (isTablet ? '48%' : '48.3%'),
                   padding: isTablet ? 24 : 14,
                 }
               ]}
@@ -8123,7 +8124,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 10,
-    elevation: 2,
+    elevation: Platform.OS === 'ios' ? 2 : 0,
     marginBottom: 8,
   },
   largeSearchText: {
@@ -8145,7 +8146,7 @@ const styles = StyleSheet.create({
   figmaCard: {
     borderRadius: 24,
     borderWidth: 1.2,
-    elevation: 3,
+    elevation: Platform.OS === 'ios' ? 3 : 0,
     shadowColor: '#64748b',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.05,
@@ -8173,7 +8174,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
-    elevation: 2,
+    elevation: Platform.OS === 'ios' ? 2 : 0,
     marginBottom: 2,
   },
   cardTextContainer: {

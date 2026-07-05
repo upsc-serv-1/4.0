@@ -444,6 +444,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const [exportSubject, setExportSubject] = useState('');
 
   const [heatmapPalette, setHeatmapPalette] = useState<'spectral' | 'ocean'>('spectral');
+  const [heatmapMetric, setHeatmapMetric] = useState<'count' | 'marks'>('count');
 
   // Auto-scroll refs/coords for PYQ analysis heatmap (Issue #20)
   const mainScrollRef = useRef<ScrollView | null>(null);
@@ -920,14 +921,16 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       if (!year) return;
       const yearKey = String(year);
 
-      subjectMap[subject] = (subjectMap[subject] || 0) + 1;
+      const val = heatmapMetric === 'marks' ? (Number(q.marks) || 0) : 1;
+
+      subjectMap[subject] = (subjectMap[subject] || 0) + val;
       if (!yearSubjectMap[yearKey]) yearSubjectMap[yearKey] = {};
-      yearSubjectMap[yearKey][subject] = (yearSubjectMap[yearKey][subject] || 0) + 1;
+      yearSubjectMap[yearKey][subject] = (yearSubjectMap[yearKey][subject] || 0) + val;
 
       const topic = q.micro_topic || q.section_group || 'Other';
-      topicMap[topic] = (topicMap[topic] || 0) + 1;
+      topicMap[topic] = (topicMap[topic] || 0) + val;
       if (!topicYearMap[topic]) topicYearMap[topic] = {};
-      topicYearMap[topic][yearKey] = (topicYearMap[topic][yearKey] || 0) + 1;
+      topicYearMap[topic][yearKey] = (topicYearMap[topic][yearKey] || 0) + val;
       if (!topicToSubject[topic]) topicToSubject[topic] = subject;
     });
 
@@ -949,6 +952,12 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     });
     setTopicYearHeatmap(filteredTopicHeatmap);
   };
+
+  useEffect(() => {
+    if (rawQuestions.length > 0) {
+      processAnalytics(rawQuestions);
+    }
+  }, [heatmapMetric]);
 
   // Single subject selection for the Distribution Donut (reusing existing logic for now)
   const [oneSub, setOneSub] = useState<string | null>(null);
@@ -1034,13 +1043,14 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         const year = String(getAnalyticsYear(q) || '');
         if (!year) return;
         if (!map[section]) map[section] = {};
-        map[section][year] = (map[section][year] || 0) + 1;
+        const value = heatmapMetric === 'marks' ? (Number(q.marks) || 0) : 1;
+        map[section][year] = (map[section][year] || 0) + value;
       });
     return Object.entries(map)
       .map(([name, byYear]) => ({ name, byYear, total: Object.values(byYear).reduce((sum, val) => sum + val, 0) }))
       .sort((a, b) => b.total - a.total)
       .slice(0, 16);
-  }, [rawQuestions, selSubjects, years]);
+  }, [rawQuestions, selSubjects, years, heatmapMetric]);
 
   const heatmapMicros = useMemo(() => {
     if (selSubjects.length === 0) return [];
@@ -1057,13 +1067,14 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         const year = String(getAnalyticsYear(q) || '');
         if (!year) return;
         if (!map[micro]) map[micro] = {};
-        map[micro][year] = (map[micro][year] || 0) + 1;
+        const value = heatmapMetric === 'marks' ? (Number(q.marks) || 0) : 1;
+        map[micro][year] = (map[micro][year] || 0) + value;
       });
     return Object.entries(map)
       .map(([name, byYear]) => ({ name, byYear, total: Object.values(byYear).reduce((sum, val) => sum + val, 0) }))
       .sort((a, b) => b.total - a.total)
       .slice(0, 24);
-  }, [rawQuestions, selSubjects, selSections, years]);
+  }, [rawQuestions, selSubjects, selSections, years, heatmapMetric]);
 
   const subjectHeatmapRows = useMemo<HeatmapRow[]>(() => {
     return distributionData.slice(0, 16).map(item => ({
@@ -1165,13 +1176,14 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         const year = String(getAnalyticsYear(q) || '');
         if (!year) return;
         if (!map[subtopic]) map[subtopic] = {};
-        map[subtopic][year] = (map[subtopic][year] || 0) + 1;
+        const value = heatmapMetric === 'marks' ? (Number(q.marks) || 0) : 1;
+        map[subtopic][year] = (map[subtopic][year] || 0) + value;
       });
     return Object.entries(map)
       .map(([name, byYear]) => ({ name, byYear, total: Object.values(byYear).reduce((sum, val) => sum + val, 0) }))
       .sort((a, b) => b.total - a.total)
       .slice(0, 24);
-  }, [rawQuestions, selSubjects, selSections, selMicros, years]);
+  }, [rawQuestions, selSubjects, selSections, selMicros, years, heatmapMetric]);
 
   const subtopicHeatmapRows = useMemo<HeatmapRow[]>(() => {
     return heatmapSubtopics.map(item => ({
@@ -2301,8 +2313,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       colors={colors}
       heatmapPalette={heatmapPalette}
       preferredCellWidth={72}
-      onCellPress={(topic, year) => handleHeatmapPress(topic, { micro: topic }, year)}
-      onRowPress={(topic) => handleHeatmapPress(topic, { micro: topic })}
+      onCellPress={(topic, year) => handleHeatmapPress(topic, { subject: topicSubjectMap[topic], micro: topic }, year)}
+      onRowPress={(topic) => handleHeatmapPress(topic, { subject: topicSubjectMap[topic], micro: topic })}
     />
   );
 
@@ -2568,6 +2580,22 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
             onPress={() => setHeatmapPalette('forest')}
           >
             <Text style={[styles.paletteChipText, { color: heatmapPalette === 'forest' ? '#fff' : colors.textSecondary }]}>Forest</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={[styles.paletteRow, { marginTop: 8 }]}>
+          <Text style={[styles.paletteLabel, { color: colors.textTertiary }]}>METRIC:</Text>
+          <TouchableOpacity 
+            style={[styles.paletteChip, heatmapMetric === 'count' && { backgroundColor: colors.primary, borderColor: colors.primary }]} 
+            onPress={() => setHeatmapMetric('count')}
+          >
+            <Text style={[styles.paletteChipText, { color: heatmapMetric === 'count' ? '#fff' : colors.textSecondary }]}>Questions Count</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.paletteChip, heatmapMetric === 'marks' && { backgroundColor: colors.primary, borderColor: colors.primary }]} 
+            onPress={() => setHeatmapMetric('marks')}
+          >
+            <Text style={[styles.paletteChipText, { color: heatmapMetric === 'marks' ? '#fff' : colors.textSecondary }]}>Total Marks</Text>
           </TouchableOpacity>
         </View>
 

@@ -173,6 +173,7 @@ export interface ExportQuestion {
   is_inicet?: boolean;
   is_allied?: boolean;
   is_others?: boolean;
+  marks?: number;
   exam_group?: string;
   source?: Record<string, any>;
   exam_info?: Record<string, any>;
@@ -406,6 +407,8 @@ const baseCss = (o: ExportOptions) => {
     .q-breadcrumb { font-size: ${o.fontSize - 3}pt; color: var(--fg); opacity: 0.7; margin-bottom: 1mm; }
     .q-breadcrumb-arrow { margin: 0 2px; opacity: 0.5; }
     .q-breadcrumb-chip { display: inline-block; padding: 0 6px; border-radius: 6px; background: #e0f2fe; color: #0369a1; font-weight: 700; font-size: ${o.fontSize - 4}pt; margin-left: 4px; }
+    .q-marks { display: inline-block; padding: 0 5px; border-radius: 4px; background: #fef3c7; color: #92400e; font-weight: 800; font-size: ${o.fontSize - 3}pt; margin-right: 4px; }
+    .q-year { display: inline-block; padding: 0 5px; border-radius: 4px; background: #e0e7ff; color: #4338ca; font-weight: 800; font-size: ${o.fontSize - 3}pt; margin-right: 4px; }
     .opts { margin: 2mm 0 0 4mm; padding: 0; list-style: none; }
     .opts li { margin: 1mm 0; padding: 1mm 2mm; border-radius: 4px; }
     .opts li.correct { background: rgba(34,197,94,0.12); border-left: 3px solid #22c55e; }
@@ -1006,7 +1009,7 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
       return `
         <div class="mains-item">
           <div class="mains-question-block">
-            <div class="qstem"><span class="qnum">${i + 1}.</span>${renderInline(stem)}</div>
+            <div class="qstem"><span class="qnum">${i + 1}.</span>${q.marks ? `<span class="q-marks">[${q.marks} marks]</span>` : ''}${q.exam_year ? `<span class="q-year">${q.exam_year}</span>` : ''}${renderInline(stem)}</div>
             ${o.showMetaChips ? buildHierarchyBreadcrumb(q) : ''}
             ${modelAnswerHtml}
           </div>
@@ -1076,7 +1079,7 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
       : '';
 
     const questionBlock = `
-      <div class="qstem"><span class="qnum">${i + 1}.</span>${renderInline(stem)}${metricsBlock}</div>
+      <div class="qstem"><span class="qnum">${i + 1}.</span>${q.marks ? `<span class="q-marks">[${q.marks} marks]</span>` : ''}${q.exam_year ? `<span class="q-year">${q.exam_year}</span>` : ''}${renderInline(stem)}${metricsBlock}</div>
       ${o.showMetaChips ? buildHierarchyBreadcrumb(q) : ''}
       ${optsBlock}
     `;
@@ -2200,22 +2203,18 @@ const injectExecutiveSummary = (html: string, prependHtml?: string): string => {
 
 const sharePdfWithTimeout = async (uri: string, dialogTitle: string): Promise<void> => {
   // On iPad/iOS, the share sheet can take time to render and animate, especially
-  // with large PDFs. We don't want to block the UI, so we start the share operation
-  // and resolve immediately, letting it happen in the background.
+  // with large PDFs. We don't want to block the UI.
   try {
-    // Share with generous timeout for large PDFs
-    await Promise.race([
-      Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle }),
-      new Promise<void>((resolve) => setTimeout(resolve, 25000)), // 25 second timeout for large PDFs
-    ]).catch((e) => {
-      console.warn('[Export] Share operation failed (non-fatal):', e?.message || e);
-    });
+    // Share without timeout — let the system share sheet complete naturally.
+    // The user will dismiss it when done. If they switch to Telegram and upload
+    // takes long, that's fine — the temp file stays until they finish.
+    await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle })
+      .catch((e) => {
+        console.warn('[Export] Share operation failed (non-fatal):', e?.message || e);
+      });
   } catch (e) {
     console.warn('[Export] Share error (non-fatal):', e);
   }
-  
-  // Wait a bit to let the system share sheet start appearing
-  await new Promise<void>((resolve) => setTimeout(resolve, 500));
 };
 
 export async function exportToPdf(payload: ExportPayload, options: ExportOptions, extras: ExportRenderExtras = {}): Promise<string> {
@@ -2257,12 +2256,8 @@ export async function exportToPdf(payload: ExportPayload, options: ExportOptions
     console.error('[exportToPdf] Fatal error:', err);
     throw err;
   } finally {
-    // Cleanup: schedule deletion of temp files to avoid memory bloat
-    if (tempUri) {
-      setTimeout(() => {
-        FileSystem.deleteAsync(tempUri!, { idempotent: true })
-          .catch(e => console.warn('[exportToPdf] Cleanup failed:', e));
-      }, 3000); // Wait 3 seconds before cleanup
-    }
+    // Cleanup is intentionally skipped — the temp file must remain available
+    // for the share target (Telegram, print, etc.) until the user finishes.
+    // The OS will clean up temp files automatically.
   }
 }

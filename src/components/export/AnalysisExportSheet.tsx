@@ -505,6 +505,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
       micro_topic: q.micro_topic || 'Other',
       sub_topic: q.sub_topic || q.subtopic || (q as any).subTopic || '',
       exam_year: q.exam_year,
+      marks: q.marks,
       is_pyq: !!q.is_pyq,
       is_upsc_cse: !!(q as any).is_upsc_cse,
       is_upsc_cms: !!(q as any).is_upsc_cms,
@@ -1257,17 +1258,14 @@ async function printStandaloneReport(fragmentHtml: string, o: ExportOptions): Pr
     
     if (await Sharing.isAvailableAsync()) {
       try {
-        // Use timeout to prevent indefinite hangs on print preview
-        const sharePromise = Sharing.shareAsync(finalUri, { 
+        // Share without timeout — let the system share sheet complete naturally.
+        // The user will dismiss it when done. No timeout so Telegram uploads
+        // can finish without the file being deleted underneath.
+        await Sharing.shareAsync(finalUri, { 
           mimeType: 'application/pdf', 
           dialogTitle: o.title || 'Analysis Report' 
-        });
-        
-        await Promise.race([
-          sharePromise,
-          new Promise<void>((resolve) => setTimeout(resolve, 25000)), // 25 second timeout
-        ]).catch(() => {
-          console.warn('[AnalysisExport] Share operation completed/timed out');
+        }).catch(() => {
+          console.warn('[AnalysisExport] Share operation completed/cancelled');
         });
       } catch (e) {
         console.warn('[AnalysisExport] Share error (non-fatal):', e);
@@ -1280,13 +1278,8 @@ async function printStandaloneReport(fragmentHtml: string, o: ExportOptions): Pr
     console.error('[AnalysisExport] Print operation failed:', e);
     throw e;
   } finally {
-    // Cleanup: delete temporary files after a short delay to allow sharing to complete
-    setTimeout(() => {
-      if (tempUri) {
-        FileSystem.deleteAsync(tempUri, { idempotent: true })
-          .catch(err => console.warn('[AnalysisExport] Cleanup failed:', err));
-      }
-    }, 2000);
+    // Cleanup intentionally skipped — temp file must stay until share target finishes.
+    // OS will clean up temp files automatically.
   }
 }
 

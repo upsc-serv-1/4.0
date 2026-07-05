@@ -10197,9 +10197,9 @@
       "paper": "Optional",
       "subject": "Anthropology",
       "sectionGroup": "Paper I",
-      "microTopic": null,
-      "subTopic": null,
-      "nanoTopic": null,
+      "microTopic": "Unit 11 - Demography and Fertility",
+      "subTopic": "11.3 Biological and socio-ecological factors",
+      "nanoTopic": "Factors influencing fecundity, fertility, natality and mortality",
       "macrotag": null,
       "microtag": null,
       "answers": [],
@@ -10223,7 +10223,15 @@
       "institute": "UPSC",
       "is_pyq": true,
       "program_id": "cse",
-      "program_name": "CSE"
+      "program_name": "CSE",
+      "hierarchy_path": [
+        "Anthropology",
+        "Anthro - 1",
+        "Paper I",
+        "Unit 11 - Demography and Fertility",
+        "11.3 Biological and socio-ecological factors",
+        "Factors influencing fecundity, fertility, natality and mortality"
+      ]
     },
     {
       "id": "mains-anthro1-q945",
@@ -10530,9 +10538,9 @@
       "paper": "Optional",
       "subject": "Anthropology",
       "sectionGroup": "Paper I",
-      "microTopic": null,
-      "subTopic": null,
-      "nanoTopic": null,
+      "microTopic": "Unit 8 - Research Methods in Anthropology",
+      "subTopic": "8(c) Tools of data collection",
+      "nanoTopic": "Secondary sources of information and participatory methods",
       "macrotag": null,
       "microtag": null,
       "answers": [],
@@ -10556,7 +10564,15 @@
       "institute": "UPSC",
       "is_pyq": true,
       "program_id": "cse",
-      "program_name": "CSE"
+      "program_name": "CSE",
+      "hierarchy_path": [
+        "Anthropology",
+        "Anthro - 1",
+        "Paper I",
+        "Unit 8 - Research Methods in Anthropology",
+        "8(c) Tools of data collection",
+        "Secondary sources of information and participatory methods"
+      ]
     },
     {
       "id": "mains-anthro1-q954",
@@ -10863,9 +10879,9 @@
       "paper": "Optional",
       "subject": "Anthropology",
       "sectionGroup": "Paper I",
-      "microTopic": null,
-      "subTopic": null,
-      "nanoTopic": null,
+      "microTopic": "Unit 3 - Economic Organization",
+      "subTopic": "3.1 Economic Organization",
+      "nanoTopic": "Principles governing production, distribution and exchange (reciprocity, redistribution, market)",
       "macrotag": null,
       "microtag": null,
       "answers": [],
@@ -10889,7 +10905,15 @@
       "institute": "UPSC",
       "is_pyq": true,
       "program_id": "cse",
-      "program_name": "CSE"
+      "program_name": "CSE",
+      "hierarchy_path": [
+        "Anthropology",
+        "Anthro - 1",
+        "Paper I",
+        "Unit 3 - Economic Organization",
+        "3.1 Economic Organization",
+        "Principles governing production, distribution and exchange (reciprocity, redistribution, market)"
+      ]
     },
     {
       "id": "mains-anthro1-q963",
@@ -14193,9 +14217,9 @@
       "paper": "Optional",
       "subject": "Anthropology",
       "sectionGroup": "Paper I",
-      "microTopic": null,
-      "subTopic": null,
-      "nanoTopic": null,
+      "microTopic": "Unit 9 - Human Genetics and Physical Anthropology",
+      "subTopic": "9.6 Age, sex and population variation as genetic marker",
+      "nanoTopic": "ABO, Rh blood groups, HLA, Hp, transferrin, Gm, blood enzymes",
       "macrotag": null,
       "microtag": null,
       "answers": [],
@@ -14219,7 +14243,15 @@
       "institute": "UPSC",
       "is_pyq": true,
       "program_id": "cse",
-      "program_name": "CSE"
+      "program_name": "CSE",
+      "hierarchy_path": [
+        "Anthropology",
+        "Anthro - 1",
+        "Paper I",
+        "Unit 9 - Human Genetics and Physical Anthropology",
+        "9.6 Age, sex and population variation as genetic marker",
+        "ABO, Rh blood groups, HLA, Hp, transferrin, Gm, blood enzymes"
+      ]
     },
     {
       "id": "mains-anthro1-q1053",
@@ -14230,9 +14262,9 @@
       "paper": "Optional",
       "subject": "Anthropology",
       "sectionGroup": "Paper I",
-      "microTopic": null,
-      "subTopic": null,
-      "nanoTopic": null,
+      "microTopic": "Unit 1 - Introduction, Human Evolution, and Prehistory",
+      "subTopic": "1.3 Main branches of Anthropology, their scope and relevance",
+      "nanoTopic": "Biological Anthropology",
       "macrotag": null,
       "microtag": null,
       "answers": [],
@@ -14256,7 +14288,15 @@
       "institute": "UPSC",
       "is_pyq": true,
       "program_id": "cse",
-      "program_name": "CSE"
+      "program_name": "CSE",
+      "hierarchy_path": [
+        "Anthropology",
+        "Anthro - 1",
+        "Paper I",
+        "Unit 1 - Introduction, Human Evolution, and Prehistory",
+        "1.3 Main branches of Anthropology, their scope and relevance",
+        "Biological Anthropology"
+      ]
     },
     {
       "id": "mains-anthro1-q1054",
@@ -14267,9 +14307,9 @@
       "paper": "Optional",
       "subject": "Anthropology",
       "sectionGroup": "Paper I",
-      "microTopic": null,
-      "subTopic": null,
-      "nanoTopic": null,
+      "microTopic": "Unit 7 - Culture, Language and Communication",
+      "subTopic": "7.1 Culture, language and communication",
+      "nanoTopic": "Social context of language use",
       "macrotag": null,
       "microtag": null,
       "answers": [],
@@ -14293,7 +14333,15 @@
       "institute": "UPSC",
       "is_pyq": true,
       "program_id": "cse",
-      "program_name": "CSE"
+      "program_name": "CSE",
+      "hierarchy_path": [
+        "Anthropology",
+        "Anthro - 1",
+        "Paper I",
+        "Unit 7 - Culture, Language and Communication",
+        "7.1 Culture, language and communication",
+        "Social context of language use"
+      ]
     },
     {
       "id": "mains-anthro1-q1055",

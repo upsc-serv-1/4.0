@@ -2,7 +2,7 @@ name: Build iOS IPA (Unsigned)
 
 on:
   push:
-    branches: [ main, '2.*' ]
+    branches: [ main, '2.*', '10.2', '10.*' ]
   workflow_dispatch:
 
 jobs:

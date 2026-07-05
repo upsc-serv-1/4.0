@@ -14,6 +14,7 @@
  */
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { KVStore } from '../lib/kvStore';
 import { useAuth } from './AuthContext';
@@ -246,6 +247,34 @@ export function AccessControlProvider({ children }: { children: React.ReactNode 
       setGrantedCourses([]);
       setLoading(false);
     }
+  }, [userId, resolvePermissions]);
+
+  // Resolve when app state transitions back to active (foreground)
+  useEffect(() => {
+    if (!userId) return;
+    
+    const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'active') {
+        resolvePermissions();
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [userId, resolvePermissions]);
+
+  // Periodically refresh permissions in the background every 5 minutes to catch subscription changes
+  useEffect(() => {
+    if (!userId) return;
+    
+    const interval = setInterval(() => {
+      resolvePermissions();
+    }, 5 * 60_000); // 5 minutes
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [userId, resolvePermissions]);
 
   const hasAccess = useCallback(

@@ -10,3 +10,7 @@ ios/
 .gradle/
 .idea/
 *.tsbuildinfo
+
+# Thesis App and Data (ignored)
+lscs-thesis-app/
+data/

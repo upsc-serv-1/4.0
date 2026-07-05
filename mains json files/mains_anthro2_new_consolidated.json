@@ -651,9 +651,9 @@
       "paper": "Optional",
       "subject": "Anthropology",
       "sectionGroup": "Paper II",
-      "microTopic": null,
-      "subTopic": null,
-      "nanoTopic": null,
+      "microTopic": "Unit 6 - Tribal Situation in India",
+      "subTopic": "6.1 Tribal situation in India",
+      "nanoTopic": "Bio-genetic variability",
       "macrotag": null,
       "microtag": null,
       "answers": [],
@@ -677,7 +677,15 @@
       "institute": "UPSC",
       "is_pyq": true,
       "program_id": "cse",
-      "program_name": "CSE"
+      "program_name": "CSE",
+      "hierarchy_path": [
+        "Anthropology",
+        "Anthro - 2",
+        "Paper II",
+        "Unit 6 - Tribal Situation in India",
+        "6.1 Tribal situation in India",
+        "Bio-genetic variability"
+      ]
     },
     {
       "id": "mains-anthro2-q397",
@@ -688,9 +696,9 @@
       "paper": "Optional",
       "subject": "Anthropology",
       "sectionGroup": "Paper II",
-      "microTopic": null,
-      "subTopic": null,
-      "nanoTopic": null,
+      "microTopic": "Unit 9 - Tribal Administration and Applied Anthropology",
+      "subTopic": "9.2 Role of anthropology in tribal and rural development",
+      "nanoTopic": "Role of anthropology in tribal and rural development",
       "macrotag": null,
       "microtag": null,
       "answers": [],
@@ -714,7 +722,15 @@
       "institute": "UPSC",
       "is_pyq": true,
       "program_id": "cse",
-      "program_name": "CSE"
+      "program_name": "CSE",
+      "hierarchy_path": [
+        "Anthropology",
+        "Anthro - 2",
+        "Paper II",
+        "Unit 9 - Tribal Administration and Applied Anthropology",
+        "9.2 Role of anthropology in tribal and rural development",
+        "Role of anthropology in tribal and rural development"
+      ]
     },
     {
       "id": "mains-anthro2-q398",
@@ -6164,9 +6180,9 @@
       "paper": "Optional",
       "subject": "Anthropology",
       "sectionGroup": "Paper II",
-      "microTopic": null,
-      "subTopic": null,
-      "nanoTopic": null,
+      "microTopic": "Unit 3 - Traditional Indian Social System and Caste",
+      "subTopic": "3.1 The structure and nature of traditional Indian social system",
+      "nanoTopic": "Purushartha",
       "macrotag": null,
       "microtag": null,
       "answers": [],
@@ -6190,7 +6206,15 @@
       "institute": "UPSC",
       "is_pyq": true,
       "program_id": "cse",
-      "program_name": "CSE"
+      "program_name": "CSE",
+      "hierarchy_path": [
+        "Anthropology",
+        "Anthro - 2",
+        "Paper II",
+        "Unit 3 - Traditional Indian Social System and Caste",
+        "3.1 The structure and nature of traditional Indian social system",
+        "Purushartha"
+      ]
     },
     {
       "id": "mains-anthro2-q546",
@@ -8347,9 +8371,9 @@
       "paper": "Optional",
       "subject": "Anthropology",
       "sectionGroup": "Paper II",
-      "microTopic": null,
-      "subTopic": null,
-      "nanoTopic": null,
+      "microTopic": "Unit 5 - Indian Village and Socio-Cultural Change",
+      "subTopic": "5.3 Indigenous and exogenous processes of socio-cultural change",
+      "nanoTopic": "Panchayati Raj and social change",
       "macrotag": null,
       "microtag": null,
       "answers": [],
@@ -8373,7 +8397,15 @@
       "institute": "UPSC",
       "is_pyq": true,
       "program_id": "cse",
-      "program_name": "CSE"
+      "program_name": "CSE",
+      "hierarchy_path": [
+        "Anthropology",
+        "Anthro - 2",
+        "Paper II",
+        "Unit 5 - Indian Village and Socio-Cultural Change",
+        "5.3 Indigenous and exogenous processes of socio-cultural change",
+        "Panchayati Raj and social change"
+      ]
     },
     {
       "id": "mains-anthro2-q605",
@@ -8643,9 +8675,9 @@
       "paper": "Optional",
       "subject": "Anthropology",
       "sectionGroup": "Paper II",
-      "microTopic": null,
-      "subTopic": null,
-      "nanoTopic": null,
+      "microTopic": "Unit 5 - Indian Village and Socio-Cultural Change",
+      "subTopic": "5.1 Indian Village",
+      "nanoTopic": "Impact of globalization on Indian villages",
       "macrotag": null,
       "microtag": null,
       "answers": [],
@@ -8669,7 +8701,15 @@
       "institute": "UPSC",
       "is_pyq": true,
       "program_id": "cse",
-      "program_name": "CSE"
+      "program_name": "CSE",
+      "hierarchy_path": [
+        "Anthropology",
+        "Anthro - 2",
+        "Paper II",
+        "Unit 5 - Indian Village and Socio-Cultural Change",
+        "5.1 Indian Village",
+        "Impact of globalization on Indian villages"
+      ]
     },
     {
       "id": "mains-anthro2-q613",
@@ -9235,9 +9275,9 @@
       "paper": "Optional",
       "subject": "Anthropology",
       "sectionGroup": "Paper II",
-      "microTopic": null,
-      "subTopic": null,
-      "nanoTopic": null,
+      "microTopic": "Unit 3 - Traditional Indian Social System and Caste",
+      "subTopic": "3.1 The structure and nature of traditional Indian social system",
+      "nanoTopic": "Purushartha",
       "macrotag": null,
       "microtag": null,
       "answers": [],
@@ -9261,7 +9301,15 @@
       "institute": "UPSC",
       "is_pyq": true,
       "program_id": "cse",
-      "program_name": "CSE"
+      "program_name": "CSE",
+      "hierarchy_path": [
+        "Anthropology",
+        "Anthro - 2",
+        "Paper II",
+        "Unit 3 - Traditional Indian Social System and Caste",
+        "3.1 The structure and nature of traditional Indian social system",
+        "Purushartha"
+      ]
     },
     {
       "id": "mains-anthro2-q629",
@@ -11344,9 +11392,9 @@
       "paper": "Optional",
       "subject": "Anthropology",
       "sectionGroup": "Paper II",
-      "microTopic": null,
-      "subTopic": null,
-      "nanoTopic": null,
+      "microTopic": "Unit 3 - Traditional Indian Social System and Caste",
+      "subTopic": "3.1 The structure and nature of traditional Indian social system",
+      "nanoTopic": "Varnashram",
       "macrotag": null,
       "microtag": null,
       "answers": [],
@@ -11370,7 +11418,15 @@
       "institute": "UPSC",
       "is_pyq": true,
       "program_id": "cse",
-      "program_name": "CSE"
+      "program_name": "CSE",
+      "hierarchy_path": [
+        "Anthropology",
+        "Anthro - 2",
+        "Paper II",
+        "Unit 3 - Traditional Indian Social System and Caste",
+        "3.1 The structure and nature of traditional Indian social system",
+        "Varnashram"
+      ]
     },
     {
       "id": "mains-anthro2-q686",
@@ -11381,9 +11437,9 @@
       "paper": "Optional",
       "subject": "Anthropology",
       "sectionGroup": "Paper II",
-      "microTopic": null,
-      "subTopic": null,
-      "nanoTopic": null,
+      "microTopic": "Unit 3 - Traditional Indian Social System and Caste",
+      "subTopic": "3.2 Caste system in India",
+      "nanoTopic": "Future of caste system and Jajmani system",
       "macrotag": null,
       "microtag": null,
       "answers": [],
@@ -11407,7 +11463,15 @@
       "institute": "UPSC",
       "is_pyq": true,
       "program_id": "cse",
-      "program_name": "CSE"
+      "program_name": "CSE",
+      "hierarchy_path": [
+        "Anthropology",
+        "Anthro - 2",
+        "Paper II",
+        "Unit 3 - Traditional Indian Social System and Caste",
+        "3.2 Caste system in India",
+        "Future of caste system and Jajmani system"
+      ]
     },
     {
       "id": "mains-anthro2-q687",

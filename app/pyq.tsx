@@ -682,7 +682,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           while (true) {
             const { data, error: mainsErr } = await supabase
               .from('mains_questions')
-              .select('id, question_number, question_text, marks, exam_year, subject, section_group, microtopic, subtopic, macrotag, microtag, hierarchy_path, paper, is_pyq, source_attribution_label, exam_info, stage, exam, exam_group, is_upsc_cse, is_allied, is_others, exam_category, answers:mains_answers(id, institute)')
+              .select('id, question_number, question_text, marks, exam_year, subject, section_group, microtopic, subtopic, nanotopic, macrotag, microtag, hierarchy_path, paper, is_pyq, source_attribution_label, exam_info, stage, exam, exam_group, is_upsc_cse, is_allied, is_others, exam_category, answers:mains_answers(id, institute)')
               .eq('paper', mappedPaper)
               .eq('is_pyq', true)
               .range(from, from + PYQ_PAGE_SIZE - 1);
@@ -715,6 +715,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
             sectionGroup: q.section_group,
             microTopic: q.microtopic,
             subTopic: q.subtopic,
+            nanoTopic: q.nanotopic,
             macrotag: q.macrotag,
             microtag: q.microtag,
             hierarchy_path: q.hierarchy_path || [],
@@ -773,6 +774,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
               section_group: q.sectionGroup,
               micro_topic: q.microTopic,
               sub_topic: q.subTopic,
+              nano_topic: q.nanoTopic,
               macrotag: q.macrotag,
               microtag: q.microtag,
               hierarchy_path: q.hierarchy_path || [],

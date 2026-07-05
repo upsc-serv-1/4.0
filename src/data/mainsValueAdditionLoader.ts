@@ -2,6 +2,11 @@ import { ValueAdditionItem } from './mainsMockData';
 import { normalizePaper } from './mainsConsolidatedLoader';
 export { ValueAdditionItem };
 
+const normalizeSubject = (subj: any, defaultSubj: string = ''): string => {
+  if (!subj) return defaultSubj;
+  return String(subj).replace(/\*\*/g, '').trim();
+};
+
 
 
 // Helper to parse framework lines like "- **Political**: ..." into frameworkBoxes structure
@@ -204,7 +209,7 @@ const mappedDataFacts: ValueAdditionItem[] = dataFacts.map((item, idx) => ({
   id: `va-df-${idx}`,
   category: 'data_facts',
   paper: normalizePaper(item.paper),
-  subject: item.subject,
+  subject: normalizeSubject(item.subject),
   sectionGroup: item.section_group,
   title: `${item.parameter} - ${item.card_title}`,
   metric: item.card_title,
@@ -217,7 +222,7 @@ const mappedIntroConclusions: ValueAdditionItem[] = introConclusions.map((item, 
   id: `va-ic-${idx}`,
   category: 'intro_conclusion',
   paper: normalizePaper(item.paper),
-  subject: item.subject,
+  subject: normalizeSubject(item.subject),
   sectionGroup: item.section_group,
   microtopic: item.microtopic,
   subtopic: item.subtopic,
@@ -236,7 +241,7 @@ const mappedEssayValueAdd: ValueAdditionItem[] = essayValueAdd.map((item, idx) =
   id: `va-es-${idx}`,
   category: 'quotes',
   paper: normalizePaper(item.paper),
-  subject: item.subject,
+  subject: normalizeSubject(item.subject),
   sectionGroup: item.section_group,
   microtopic: item.microtopic,
   title: item.title,
@@ -252,7 +257,7 @@ const mappedMnemonics: ValueAdditionItem[] = mnemonics.map((item, idx) => ({
   id: `va-mn-${idx}`,
   category: 'mnemonics',
   paper: normalizePaper(item.paper),
-  subject: item.subject,
+  subject: normalizeSubject(item.subject),
   sectionGroup: item.section_group,
   microtopic: item.microtopic,
   subtopic: item.subtopic,
@@ -283,7 +288,7 @@ const mappedFrameworks: ValueAdditionItem[] = frameworks.map((item, idx) => ({
 
 const mappedEthics: ValueAdditionItem[] = ethicsValueAdd.flatMap((item, idx) => {
   let ethicsType: any = 'keyword';
-  let subject = item.subject;
+  let subject = normalizeSubject(item.subject, 'ETHICS, INTEGRITY & APTITUDE');
   let title = item.title;
   let author = item.author || undefined;
 
@@ -294,7 +299,6 @@ const mappedEthics: ValueAdditionItem[] = ethicsValueAdd.flatMap((item, idx) => 
   else if (item.ethics_type === 'pyq_quote') ethicsType = 'pyq_quote';
   else if (item.ethics_type === 'situation') {
     ethicsType = 'situation';
-    subject = "Khemka Sir's Case Studies";
   }
 
   if (item.ethics_type === 'situation' && item.content_markdown) {
@@ -361,7 +365,7 @@ const mappedEthics: ValueAdditionItem[] = ethicsValueAdd.flatMap((item, idx) => 
         id: `va-et-${idx}-rule-${ruleIdx}`,
         category: 'ethics',
         paper: normalizePaper(item.paper),
-        subject: item.subject,
+        subject: normalizeSubject(item.subject, 'ETHICS, INTEGRITY & APTITUDE'),
         sectionGroup: item.section_group,
         microtopic: item.microtopic,
         subtopic: item.subtopic,
@@ -483,7 +487,7 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     id: item.id || `va-df-${idx}`,
     category: 'data_facts',
     paper: normalizePaper(item.paper),
-    subject: item.subject,
+    subject: normalizeSubject(item.subject),
     sectionGroup: item.section_group,
     title: `${item.parameter} - ${item.card_title}`,
     metric: item.card_title,
@@ -496,7 +500,7 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     id: item.id || `va-ic-${idx}`,
     category: 'intro_conclusion',
     paper: normalizePaper(item.paper),
-    subject: item.subject,
+    subject: normalizeSubject(item.subject),
     sectionGroup: item.section_group,
     microtopic: item.microtopic,
     subtopic: item.subtopic,
@@ -515,7 +519,7 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     id: item.id || `va-es-${idx}`,
     category: 'quotes',
     paper: normalizePaper(item.paper),
-    subject: item.subject,
+    subject: normalizeSubject(item.subject),
     sectionGroup: item.section_group,
     microtopic: item.microtopic,
     title: item.title,
@@ -531,7 +535,7 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     id: item.id || `va-mn-${idx}`,
     category: 'mnemonics',
     paper: normalizePaper(item.paper),
-    subject: item.subject,
+    subject: normalizeSubject(item.subject),
     sectionGroup: item.section_group,
     microtopic: item.microtopic,
     subtopic: item.subtopic,
@@ -562,7 +566,7 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
 
   const mappedEthics: ValueAdditionItem[] = (etRes.data || []).flatMap((item, idx) => {
     let ethicsType: any = 'keyword';
-    let subject = item.subject;
+    let subject = normalizeSubject(item.subject, 'ETHICS, INTEGRITY & APTITUDE');
     let title = item.title;
     let author = item.author || undefined;
 
@@ -573,7 +577,6 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     else if (item.ethics_type === 'pyq_quote') ethicsType = 'pyq_quote';
     else if (item.ethics_type === 'situation') {
       ethicsType = 'situation';
-      subject = "Khemka Sir's Case Studies";
     }
 
     if (item.ethics_type === 'situation' && item.content_markdown) {
@@ -640,7 +643,7 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
           id: `${item.id || `va-et-${idx}`}-rule-${ruleIdx}`,
           category: 'ethics',
           paper: normalizePaper(item.paper),
-          subject: item.subject,
+          subject: normalizeSubject(item.subject, 'ETHICS, INTEGRITY & APTITUDE'),
           sectionGroup: item.section_group,
           microtopic: item.microtopic,
           subtopic: item.subtopic,

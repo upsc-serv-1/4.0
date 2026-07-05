@@ -151,20 +151,6 @@ export function useTaggedVault(userId: string | undefined) {
     setLoading(true);
 
     try {
-      // COURSE-AWARE FIX: First fetch question IDs for the selected course,
-      // then filter question_states to only those belonging to the current course.
-      // This prevents "Unassigned" subjects from tagged UPSC questions when
-      // the user switches to Medical Science.
-      const { data: courseQuestions, error: courseQError } = await supabase
-        .from('questions')
-        .select('id')
-        .eq('course', selectedCourse)
-        .limit(50000);
-
-      if (courseQError) throw courseQError;
-
-      const courseQuestionIds = new Set((courseQuestions || []).map(q => q.id));
-
       // Force fresh fetch from Supabase to ensure Tags tab stays in sync
       const { data: states, error: fetchError } = await supabase
         .from('question_states')
@@ -173,6 +159,27 @@ export function useTaggedVault(userId: string | undefined) {
         .not('review_tags', 'is', null);
 
       if (fetchError) throw fetchError;
+
+      const questionIds = Array.from(new Set((states || []).map(row => row.question_id).filter(Boolean)));
+      if (questionIds.length === 0) {
+        setRawQuestions([]);
+        await safeSetItem(cacheKey, JSON.stringify([]));
+        setLoading(false);
+        return;
+      }
+
+      // Fetch only the tagged questions that belong to the current course.
+      // This course filter prevents "Unassigned" subjects from tagged UPSC questions when
+      // the user switches to another course (e.g., Medical Science).
+      const { data: questions, error: questionsError } = await supabase
+        .from('questions')
+        .select('id, test_id, subject, section_group, micro_topic, question_text, explanation_markdown, correct_answer, options, is_pyq, is_upsc_cse, exam_year, exam_group, tests(institute,program_name,series)')
+        .eq('course', selectedCourse)
+        .in('id', questionIds as string[]);
+
+      if (questionsError) throw questionsError;
+
+      const courseQuestionIds = new Set((questions || []).map(q => q.id));
 
       // Filter states to only those belonging to the selected course
       const filteredStates = (states || [])
@@ -187,15 +194,6 @@ export function useTaggedVault(userId: string | undefined) {
         setLoading(false);
         return;
       }
-
-      const questionIds = Array.from(new Set(filteredStates.map(row => row.question_id).filter(Boolean)));
-      const { data: questions, error: questionsError } = await supabase
-        .from('questions')
-        .select('id, test_id, subject, section_group, micro_topic, question_text, explanation_markdown, correct_answer, options, is_pyq, is_upsc_cse, exam_year, exam_group, tests(institute,program_name,series)')
-        .eq('course', selectedCourse)
-        .in('id', questionIds as string[]);
-
-      if (questionsError) throw questionsError;
 
       // Issue 52: Fetch sibling UPSC PYQ questions for full multi-institute coverage.
       // The merger needs ALL institute variants of the same question to aggregate

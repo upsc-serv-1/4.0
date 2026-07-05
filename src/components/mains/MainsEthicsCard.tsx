@@ -72,7 +72,7 @@ export default function MainsEthicsCard({
   };
 
   // If inside the Khemka Sir Hub tab, render cards based on their individual database types
-  const type = (ethicsTab && ethicsTab !== 'khemka_toolkit')
+  const type = (ethicsTab && ethicsTab !== 'khemka_toolkit' && ethicsTab !== 'all_formats')
     ? (ethicsTab === 'diagrams' ? 'diagram' :
        ethicsTab === 'dimensions' ? 'dimension' :
        ethicsTab === 'comparisons' ? 'comparison' :

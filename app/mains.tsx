@@ -825,7 +825,7 @@ export default function MainsScreen() {
             <TouchableOpacity
               onPress={() => {
                 if (currentScreen === 'value-add' && valueAddCategory !== null) {
-                  setValueAddCategory(null);
+                  setTimeout(() => setValueAddCategory(null), 0);
                 } else if (currentScreen === 'questions' && params.from === 'pyq') {
                   router.back();
                 } else {
@@ -4370,8 +4370,8 @@ function ValueAdditionView({
   const [search, setSearch] = useState('');
   const [ethicsTab, setEthicsTab] = useState<'diagrams' | 'dimensions' | 'comparisons' | 'innovations' | 'pyq_quotes' | 'keywords' | 'khemka_toolkit' | 'all_formats'>('diagrams');
   const [khemkaSubTab, setKhemkaSubTab] = useState<'skeleton' | 'rules' | 'toolkit' | 'cases'>('cases');
-  const [vaHubCategory, setVaHubCategory] = useState<string | null>(null);
-  const [chipVaHubCategory, setChipVaHubCategory] = useState<string | null>(null);
+  const [vaHubCategories, setVaHubCategories] = useState<string[]>([]);
+  const [chipVaHubCategories, setChipVaHubCategories] = useState<string[]>([]);
   const [chipEthicsTab, setChipEthicsTab] = useState<any>('diagrams');
   const [chipKhemkaSubTab, setChipKhemkaSubTab] = useState<any>('cases');
 
@@ -4445,7 +4445,7 @@ function ValueAdditionView({
       setVisibleLimit(15);
     }, 50);
     return () => clearTimeout(timer);
-  }, [activeCategory, ethicsTab, search]);
+  }, [activeCategory, ethicsTab, search, filters]);
 
   const submodules = [
     { id: 'data_facts', title: 'Data & Facts', subtitle: 'Sunya IAS & Metrics', icon: BarChart3, color: '#3b82f6', desc: 'Muted stats, percentages, and indicators sorted for instant citation.' },
@@ -4534,9 +4534,14 @@ function ValueAdditionView({
   const allPapers = useMemo(() => {
     const paperSet = new Set<string>();
     activeCategoryItems.forEach(item => {
-      getItemPaths(item).forEach(path => {
-        if (path.paper) paperSet.add(path.paper);
-      });
+      if (item.category === 'frameworks') {
+        getFrameworkPaths(item).forEach(path => {
+          if (path.paper) paperSet.add(path.paper);
+        });
+      } else {
+        const p = item.paper;
+        if (p) paperSet.add(p);
+      }
     });
     return Array.from(paperSet).sort();
   }, [activeCategoryItems]);
@@ -4551,11 +4556,19 @@ function ValueAdditionView({
     const paperFilter = filters.paper !== 'All' ? filters.paper.split('|') : [];
     const subSet = new Set<string>();
     activeCategoryItems.forEach(item => {
-      getItemPaths(item).forEach(path => {
-        if (paperFilter.length === 0 || paperFilter.includes(path.paper)) {
-          if (path.subject) subSet.add(path.subject);
+      if (item.category === 'frameworks') {
+        getFrameworkPaths(item).forEach(path => {
+          if (paperFilter.length === 0 || paperFilter.includes(path.paper)) {
+            if (path.subject) subSet.add(path.subject);
+          }
+        });
+      } else {
+        const p = item.paper || '';
+        if (paperFilter.length === 0 || paperFilter.includes(p)) {
+          const s = item.subject || '';
+          if (s) subSet.add(s);
         }
-      });
+      }
     });
     return Array.from(subSet).sort();
   }, [activeCategoryItems, filters.paper]);
@@ -4565,13 +4578,26 @@ function ValueAdditionView({
     const subjectFilter = filters.subjects !== 'All' ? filters.subjects.split('|') : [];
     const secSet = new Set<string>();
     activeCategoryItems.forEach(item => {
-      getItemPaths(item).forEach(path => {
-        const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
-        const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
-        if (matchPaper && matchSubject && path.sectionGroup) {
-          secSet.add(path.sectionGroup);
+      if (item.category === 'frameworks') {
+        getFrameworkPaths(item).forEach(path => {
+          const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
+          const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
+          if (matchPaper && matchSubject && path.sectionGroup) {
+            secSet.add(path.sectionGroup);
+          }
+        });
+      } else {
+        const p = item.paper || '';
+        const matchPaper = paperFilter.length === 0 || paperFilter.includes(p);
+        if (matchPaper) {
+          const s = item.subject || '';
+          const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(s);
+          if (matchSubject) {
+            const sg = item.sectionGroup || '';
+            if (sg) secSet.add(sg);
+          }
         }
-      });
+      }
     });
     return Array.from(secSet).sort(naturalCompare);
   }, [activeCategoryItems, filters.paper, filters.subjects]);
@@ -4582,20 +4608,37 @@ function ValueAdditionView({
     const sectionFilter = filters.sections !== 'All' ? filters.sections.split('|') : [];
     const mtSet = new Set<string>();
     activeCategoryItems.forEach(item => {
-      getItemPaths(item).forEach(path => {
-        const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
-        const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
-        const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
-        if (matchPaper && matchSubject && matchSection) {
-          const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
-          if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics') {
+      if (item.category === 'frameworks') {
+        getFrameworkPaths(item).forEach(path => {
+          const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
+          const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
+          const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
+          if (matchPaper && matchSubject && matchSection) {
             if (path.microtopic) mtSet.add(path.microtopic);
-          } else {
-            const themeName = item.category === 'data_facts' ? item.metric : item.title;
-            if (themeName) mtSet.add(themeName);
+          }
+        });
+      } else {
+        const p = item.paper || '';
+        const matchPaper = paperFilter.length === 0 || paperFilter.includes(p);
+        if (matchPaper) {
+          const s = item.subject || '';
+          const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(s);
+          if (matchSubject) {
+            const sg = item.sectionGroup || '';
+            const matchSection = sectionFilter.length === 0 || sectionFilter.includes(sg);
+            if (matchSection) {
+              const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
+              if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics') {
+                const mt = item.microtopic || '';
+                if (mt) mtSet.add(mt);
+              } else {
+                const themeName = item.category === 'data_facts' ? item.metric : item.title;
+                if (themeName) mtSet.add(themeName);
+              }
+            }
           }
         }
-      });
+      }
     });
     return Array.from(mtSet).sort(naturalCompare);
   }, [activeCategoryItems, filters.paper, filters.subjects, filters.sections, activeCategory]);
@@ -4604,23 +4647,32 @@ function ValueAdditionView({
     const selectedMicrotopic = filters.microtopics !== 'All' ? filters.microtopics : null;
     if (!selectedMicrotopic) return [];
     const stSet = new Set<string>();
+    const microFilter = selectedMicrotopic.split('|');
     activeCategoryItems.forEach(item => {
-      getItemPaths(item).forEach(path => {
+      if (item.category === 'frameworks') {
+        getFrameworkPaths(item).forEach(path => {
+          if (path.microtopic && microFilter.includes(path.microtopic)) {
+            if (path.subtopic) stSet.add(path.subtopic);
+          }
+        });
+      } else {
         const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
         if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics') {
-          if (path.microtopic && selectedMicrotopic.split('|').includes(path.microtopic)) {
-            if (path.subtopic) stSet.add(path.subtopic);
+          const mt = item.microtopic || '';
+          if (mt && microFilter.includes(mt)) {
+            const st = item.subtopic || '';
+            if (st) stSet.add(st);
           }
         } else {
           const themeName = item.category === 'data_facts' ? item.metric : item.title;
-          if (themeName === selectedMicrotopic) {
+          if (themeName && microFilter.includes(themeName)) {
             const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
             subThemes.forEach((st: any) => {
               if (st.title) stSet.add(st.title);
             });
           }
         }
-      });
+      }
     });
     return Array.from(stSet).sort(naturalCompare);
   }, [activeCategoryItems, filters.microtopics, activeCategory]);
@@ -4629,27 +4681,31 @@ function ValueAdditionView({
     const selectedSubTheme = filters.subtopics !== 'All' ? filters.subtopics : null;
     if (!selectedSubTheme) return [];
     const sstSet = new Set<string>();
+    const subThemeFilter = selectedSubTheme.split('|');
     activeCategoryItems.forEach(item => {
-      getItemPaths(item).forEach(path => {
-        const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
-        if (currentCat === 'intro_conclusion') {
-          if (path.subtopic && selectedSubTheme.split('|').includes(path.subtopic)) {
+      if (item.category === 'frameworks') {
+        getFrameworkPaths(item).forEach(path => {
+          if (path.subtopic && subThemeFilter.includes(path.subtopic)) {
             if (item.title) sstSet.add(item.title);
           }
-        } else if (currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks') {
-          if (path.subtopic && selectedSubTheme.split('|').includes(path.subtopic)) {
+        });
+      } else {
+        const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
+        if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics') {
+          const st = item.subtopic || '';
+          if (st && subThemeFilter.includes(st)) {
             if (item.title) sstSet.add(item.title);
           }
         } else {
           const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
           subThemes.forEach((st: any) => {
-            if (st.title === selectedSubTheme) {
+            if (st.title && subThemeFilter.includes(st.title)) {
               const sstMatches = splitSubSubThemes(st.content);
               sstMatches.forEach(sst => sstSet.add(sst));
             }
           });
         }
-      });
+      }
     });
     return Array.from(sstSet).sort();
   }, [activeCategoryItems, filters.subtopics, activeCategory]);
@@ -4670,21 +4726,44 @@ function ValueAdditionView({
       const matchSearch = !search || item.searchableText.includes(search.toLowerCase());
 
       let matchHubCat = true;
-      if (activeCategory === 'va_hub' && vaHubCategory) {
-        matchHubCat = item.category === vaHubCategory;
+      if (activeCategory === 'va_hub' && vaHubCategories.length > 0) {
+        matchHubCat = vaHubCategories.includes(item.category);
       }
 
-      const paths = getItemPaths(item);
-      const matchesAnyPath = paths.some(path => {
-        const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
-        const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
-        const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
+      let matchesAnyPath = false;
+      if (item.category === 'frameworks') {
+        matchesAnyPath = getFrameworkPaths(item).some(path => {
+          const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
+          const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
+          const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
+          
+          let matchTheme = true;
+          if (themeFilter.length > 0) {
+            matchTheme = !!path.microtopic && themeFilter.includes(path.microtopic);
+          }
+
+          let matchSubTheme = true;
+          if (subThemeFilter.length > 0) {
+            matchSubTheme = !!path.subtopic && subThemeFilter.includes(path.subtopic);
+          }
+
+          let matchSubSubTheme = true;
+          if (subSubThemeFilter.length > 0) {
+            matchSubSubTheme = !!item.title && subSubThemeFilter.includes(item.title);
+          }
+
+          return matchPaper && matchSubject && matchSection && matchTheme && matchSubTheme && matchSubSubTheme;
+        });
+      } else {
+        const matchPaper = paperFilter.length === 0 || paperFilter.includes(item.paper || '');
+        const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(item.subject || '');
+        const matchSection = sectionFilter.length === 0 || sectionFilter.includes(item.sectionGroup || '');
         
         let matchTheme = true;
         if (themeFilter.length > 0) {
           const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
           if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics') {
-            matchTheme = !!path.microtopic && themeFilter.includes(path.microtopic);
+            matchTheme = !!item.microtopic && themeFilter.includes(item.microtopic);
           } else {
             const themeName = item.category === 'data_facts' ? item.metric : item.title;
             matchTheme = !!themeName && themeFilter.includes(themeName);
@@ -4695,7 +4774,7 @@ function ValueAdditionView({
         if (subThemeFilter.length > 0) {
           const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
           if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics') {
-            matchSubTheme = !!path.subtopic && subThemeFilter.includes(path.subtopic);
+            matchSubTheme = !!item.subtopic && subThemeFilter.includes(item.subtopic);
           } else {
             matchSubTheme = !!item.parsedSubThemes && item.parsedSubThemes.some((st: any) => 
               subThemeFilter.includes(st.title)
@@ -4715,8 +4794,8 @@ function ValueAdditionView({
           }
         }
 
-        return matchPaper && matchSubject && matchSection && matchTheme && matchSubTheme && matchSubSubTheme;
-      });
+        matchesAnyPath = matchPaper && matchSubject && matchSection && matchTheme && matchSubTheme && matchSubSubTheme;
+      }
 
       let matchTemplate = true;
       if (activeCategory === 'intro_conclusion') {
@@ -4730,12 +4809,12 @@ function ValueAdditionView({
 
       return matchCat && matchHubCat && matchSearch && matchesAnyPath && matchTemplate;
     });
-  }, [activeCategory, search, uniqueValueAddItems, filters, templateFilter, vaHubCategory]);
+  }, [activeCategory, search, uniqueValueAddItems, filters, templateFilter, vaHubCategories]);
 
 
   const ethicsMappedItems = useMemo(() => {
     const list = filteredItems.filter(item => {
-      const isEthicsTabActive = activeCategory === 'ethics' || (activeCategory === 'va_hub' && (filters.paper === 'GS-4' || vaHubCategory === 'ethics'));
+      const isEthicsTabActive = activeCategory === 'ethics' || (activeCategory === 'va_hub' && (filters.paper === 'GS-4' || vaHubCategories.includes('ethics')));
       if (isEthicsTabActive) {
         if (ethicsTab === 'all_formats') return true;
         if (item.category !== 'ethics') {
@@ -4774,7 +4853,7 @@ function ValueAdditionView({
     });
 
     return list;
-  }, [filteredItems, activeCategory, ethicsTab, quotesEntryTypeTab, khemkaSubTab, vaHubCategory, filters.paper]);
+  }, [filteredItems, activeCategory, ethicsTab, quotesEntryTypeTab, khemkaSubTab, vaHubCategories, filters.paper]);
 
   // Calculate counts for Khemka sub-tabs dynamically based on current hierarchy/search filters
   const khemkaTabCounts = useMemo(() => {
@@ -4999,13 +5078,25 @@ function ValueAdditionView({
                       { id: 'frameworks', label: 'Frameworks', color: '#f43f5e' },
                       { id: 'ethics', label: 'Ethics Specific', color: '#06b6d4' },
                     ].map(cat => {
-                      const isActive = chipVaHubCategory === cat.id;
+                      const isActive = cat.id === null 
+                        ? chipVaHubCategories.length === 0 
+                        : chipVaHubCategories.includes(cat.id);
                       return (
                         <TouchableOpacity
                           key={String(cat.id)}
                           onPress={() => {
-                            setChipVaHubCategory(cat.id);
-                            setTimeout(() => setVaHubCategory(cat.id), 0);
+                            let nextCats: string[];
+                            if (cat.id === null) {
+                              nextCats = [];
+                            } else {
+                              if (chipVaHubCategories.includes(cat.id)) {
+                                nextCats = chipVaHubCategories.filter(id => id !== cat.id);
+                              } else {
+                                nextCats = [...chipVaHubCategories, cat.id];
+                              }
+                            }
+                            setChipVaHubCategories(nextCats);
+                            setTimeout(() => setVaHubCategories(nextCats), 0);
                             Haptics.selectionAsync().catch(() => {});
                           }}
                           activeOpacity={0.75}
@@ -5394,7 +5485,7 @@ function ValueAdditionView({
               )}
 
               {/* Special sub-navigation for Ethics */}
-              {(activeCategory === 'ethics' || (activeCategory === 'va_hub' && (filters.paper === 'GS-4' || chipVaHubCategory === 'ethics'))) && (
+              {(activeCategory === 'ethics' || (activeCategory === 'va_hub' && (filters.paper === 'GS-4' || chipVaHubCategories.includes('ethics')))) && (
                 <View style={{ gap: 4 }}>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.ethicsTabsScroll} contentContainerStyle={{ paddingBottom: 8 }}>
                     {[
@@ -5662,8 +5753,8 @@ function ValueAdditionView({
                     setActiveCategory(sub.id);
                     if (sub.id === 'va_hub') {
                       setEthicsTab('all_formats');
-                      setVaHubCategory(null);
-                      setChipVaHubCategory(null);
+                      setVaHubCategories([]);
+                      setChipVaHubCategories([]);
                     } else if (sub.id === 'ethics') {
                       setEthicsTab('diagrams');
                     }

@@ -1616,6 +1616,12 @@ export default function UnifiedQuizEngine() {
                 filtered = filtered.filter((q: any) => q.is_allied);
               } else if (cats.includes('Others')) {
                 filtered = filtered.filter((q: any) => q.is_others);
+              } else if (cats.includes('NEET PG')) {
+                filtered = filtered.filter((q: any) => q.is_neetpg === true);
+              } else if (cats.includes('INI-CET')) {
+                filtered = filtered.filter((q: any) => q.is_inicet === true);
+              } else if (cats.includes('UPSC CMS') || cats.includes('CMS')) {
+                filtered = filtered.filter((q: any) => q.is_upsc_cms === true);
               }
             }
           } else if (pyqM === 'Non-PYQ' || pyqM === 'Non PYQ') {

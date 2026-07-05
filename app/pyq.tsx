@@ -1845,11 +1845,22 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       // - year_start/year_end: year range for exact match
       // - subject/section/microtopic: filters from heatmap cell click
       const isUpscCseCourse = selectedCourse === 'UPSC CSE' || selectedCourse === 'Civil Services';
+      let targetCat = 'All';
+      if (isUpscCseCourse) {
+        targetCat = 'UPSC CSE';
+      } else if (examStage === 'NEET PG') {
+        targetCat = 'NEET PG';
+      } else if (examStage === 'INICET') {
+        targetCat = 'INI-CET';
+      } else if (examStage === 'UPSC CMS') {
+        targetCat = 'UPSC CMS';
+      }
+
       const engineParams: Record<string, string> = {
         mode: (opts.mode && opts.mode !== 'choice') ? opts.mode : 'learning',
         view: 'list',
         pyqFilter: 'PYQ Only',
-        examCategory: isUpscCseCourse ? 'UPSC CSE' : 'All',
+        examCategory: targetCat,
         subject: s,
         year_start: yearStart,
         year_end: yearEnd,

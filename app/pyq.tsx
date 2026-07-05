@@ -13,11 +13,13 @@ import {
   TouchableOpacity,
   View,
   Animated,
+  RefreshControl,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { KVStore } from '../src/lib/kvStore';
 import { OfflineManager } from '../src/services/OfflineManager';
+import { QuestionCache } from '../src/services/QuestionCache';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import * as Print from 'expo-print';
@@ -425,6 +427,18 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const [pilotSection, setPilotSection] = useState<string | null>(null);
   const [pilotMicro, setPilotMicro] = useState<string | null>(null);
   const [pilotSubtopic, setPilotSubtopic] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchPyqData(true);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setRefreshing(false);
+    }
+  };
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'stage' | 'paper' | 'range' | null>(null);
   const [exportModalVisible, setExportModalVisible] = useState(false);
@@ -623,13 +637,15 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     return true;
   };
 
-  const fetchQuestionsForTests = async (testIds: string[]) => {
-    // OFFLINE-FIRST: use cached questions when available.
-    const cachedQuestions = OfflineManager.getOfflineQuestionsAllSync() || [];
-    if (cachedQuestions.length > 0) {
-      const cachedRows = cachedQuestions.filter((q: any) => testIds.includes(q.test_id));
-      if (cachedRows.length > 0) {
-        return cachedRows;
+  const fetchQuestionsForTests = async (testIds: string[], bypassCache = false) => {
+    // OFFLINE-FIRST: use cached questions when available unless bypassing cache.
+    if (!bypassCache) {
+      const cachedQuestions = OfflineManager.getOfflineQuestionsAllSync() || [];
+      if (cachedQuestions.length > 0) {
+        const cachedRows = cachedQuestions.filter((q: any) => testIds.includes(q.test_id));
+        if (cachedRows.length > 0) {
+          return cachedRows;
+        }
       }
     }
 
@@ -650,6 +666,20 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       if (data.length < PYQ_PAGE_SIZE) break;
       from += PYQ_PAGE_SIZE;
     }
+
+    if (bypassCache && rows.length > 0) {
+      const grouped: Record<string, any[]> = {};
+      rows.forEach(q => {
+        if (q.test_id) {
+          if (!grouped[q.test_id]) grouped[q.test_id] = [];
+          grouped[q.test_id].push(q);
+        }
+      });
+      for (const tId of Object.keys(grouped)) {
+        await QuestionCache.cacheQuestions(tId, grouped[tId]);
+      }
+    }
+
     return rows;
   };
 
@@ -825,8 +855,11 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         }
       }
 
-      // OFFLINE-FIRST: use cached tests metadata first.
-      let tests: any[] = (OfflineManager as any).getOfflineTestsSync?.() || [];
+      // OFFLINE-FIRST: use cached tests metadata first unless bypassing cache.
+      let tests: any[] = [];
+      if (!bypassCache) {
+        tests = (OfflineManager as any).getOfflineTestsSync?.() || [];
+      }
 
       if (!tests || tests.length === 0) {
         const { data: networkTests, error: testError } = await supabase
@@ -867,7 +900,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
       const testIds = visibleTests.map((test: any) => test.id);
       const testsMetaMap = Object.fromEntries(visibleTests.map((test: any) => [String(test.id), test]));
-      const questions = await fetchQuestionsForTests(testIds);
+      const questions = await fetchQuestionsForTests(testIds, bypassCache);
       
       // Run dedup merge so each question carries _explanations and _institutes
       const { mergedQs } = mergeQuestions(questions);
@@ -2209,16 +2242,14 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         await new Promise(resolve => setTimeout(resolve, 300));
 
         try {
-          // Fire-and-forget share with generous timeout for large PDFs
-          await Promise.race([
-            Sharing.shareAsync(uri, { 
-              mimeType: 'application/pdf', 
-              dialogTitle: 'PYQ Analysis Report',
-              UTI: 'com.adobe.pdf' 
-            }),
-            new Promise<void>((resolve) => setTimeout(resolve, 20000)), // 20 second timeout
-          ]).catch(() => {
-            console.warn('[PDFExport] Share operation timed out or was dismissed (non-fatal)');
+          // Share without timeout — let the system share sheet complete naturally.
+          // No timeout so Telegram uploads can finish without the file being deleted.
+          await Sharing.shareAsync(uri, { 
+            mimeType: 'application/pdf', 
+            dialogTitle: 'PYQ Analysis Report',
+            UTI: 'com.adobe.pdf' 
+          }).catch(() => {
+            console.warn('[PDFExport] Share operation completed/cancelled');
           });
         } catch (shareErr) {
           console.error('[PDFExport] Sharing failed, falling back to Print dialog', shareErr);
@@ -3149,7 +3180,19 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
       {renderHeader()}
 
-      <ScrollView ref={mainScrollRef} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        ref={mainScrollRef} 
+        contentContainerStyle={styles.content} 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={handleRefresh} 
+            colors={[colors.primary]} 
+            tintColor={colors.primary} 
+          />
+        }
+      >
         {/* Filter chips scroll away with content */}
         <View style={[
           styles.filterWrap, 

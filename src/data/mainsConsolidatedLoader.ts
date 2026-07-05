@@ -84,18 +84,20 @@ try {
 
 let anthro1Questions: any[] = [];
 try {
-  const anthro1Data = require('../../mains json files/mains_anthro1_consolidated.json');
-  anthro1Questions = anthro1Data.questions || [];
+  const anthro1Pre = require('../../mains json files/mains_anthro1_pre2012.json');
+  const anthro1New = require('../../mains json files/mains_anthro1_new_consolidated.json');
+  anthro1Questions = [...(anthro1Pre.questions || []), ...(anthro1New.questions || [])];
 } catch (e) {
-  console.log('[MainsLoader] Anthro1 consolidated JSON not found or failed to load:', e);
+  console.log('[MainsLoader] Anthro1 JSON files failed to load:', e);
 }
 
 let anthro2Questions: any[] = [];
 try {
-  const anthro2Data = require('../../mains json files/mains_anthro2_consolidated.json');
-  anthro2Questions = anthro2Data.questions || [];
+  const anthro2Pre = require('../../mains json files/mains_anthro2_pre2012.json');
+  const anthro2New = require('../../mains json files/mains_anthro2_new_consolidated.json');
+  anthro2Questions = [...(anthro2Pre.questions || []), ...(anthro2New.questions || [])];
 } catch (e) {
-  console.log('[MainsLoader] Anthro2 consolidated JSON not found or failed to load:', e);
+  console.log('[MainsLoader] Anthro2 JSON files failed to load:', e);
 }
 
 export function resolvePaper(q: any): string {

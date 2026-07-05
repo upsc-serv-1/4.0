@@ -200,6 +200,19 @@ function StickyHeatmapTable({
   const finalRowHeight = dims.rowHeight;
   const headerRef = useRef<ScrollView | null>(null);
 
+  const computedMaxVal = useMemo(() => {
+    let max = 1;
+    rows.forEach(row => {
+      years.forEach(year => {
+        const val = row.byYear[year] || 0;
+        if (val > max) max = val;
+      });
+    });
+    return max;
+  }, [rows, years]);
+
+  const finalMaxVal = computedMaxVal;
+
   const handleBodyHorizontalScroll = (x: number) => {
     headerRef.current?.scrollTo({ x, animated: false });
   };
@@ -280,9 +293,8 @@ function StickyHeatmapTable({
                         let opacity = 1;
 
                         if (count > 0) {
-                          // Scale ratio based on maxValue (defaults to 22 for global, set to 6 for deep-dives)
-                          const denom = Math.max(1, (maxValue || 22) - 1);
-                          const ratio = Math.min(1, (count - 1) / denom);
+                          const denom = Math.max(1, finalMaxVal);
+                          const ratio = finalMaxVal <= 1 ? 1.0 : (0.15 + (Math.min(1, count / denom) * 0.85));
                           
                           if (heatmapPalette === 'spectral') {
                             // Spectral: Yellow-Green to Deep Blue

@@ -12,7 +12,9 @@ import {
   Platform,
   Modal,
   TextInput,
+  RefreshControl,
 } from 'react-native';
+import { KVStore } from '../../src/lib/kvStore';
 import * as Haptics from 'expo-haptics';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import {
@@ -229,7 +231,22 @@ function UnifiedArenaSetup() {
   const [metadata, setMetadata] = useState<any[]>(() => arenaMetadataCache || []);
   const [loading, setLoading] = useState(!arenaMetadataCache);
   const [refreshingMetadata, setRefreshingMetadata] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [syncProgress, setSyncProgress] = useState<{ phase: string; current: number; total: number; detail: string } | null>(null);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      KVStore.removeItem('@offline_metadata_consolidated');
+      arenaMetadataCache = [];
+      arenaMetadataCachedAt = 0;
+      await fetchMetadata();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setRefreshing(false);
+    }
+  };
   const [userTags, setUserTags] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState<number | null>(null);
   const [calculatingCount, setCalculatingCount] = useState(false);
@@ -1287,7 +1304,18 @@ function UnifiedArenaSetup() {
           </View>
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent} 
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl 
+              refreshing={refreshing} 
+              onRefresh={handleRefresh} 
+              colors={[colors.primary]} 
+              tintColor={colors.primary} 
+            />
+          }
+        >
 
           {(loading || refreshingMetadata || syncProgress) && (
             <View style={[styles.metadataRefreshBanner, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}>

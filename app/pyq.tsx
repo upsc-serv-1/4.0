@@ -412,6 +412,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const [pilotSubject, setPilotSubject] = useState<string | null>(null);
   const [pilotSection, setPilotSection] = useState<string | null>(null);
   const [pilotMicro, setPilotMicro] = useState<string | null>(null);
+  const [pilotSubtopic, setPilotSubtopic] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'stage' | 'paper' | 'range' | null>(null);
   const [exportModalVisible, setExportModalVisible] = useState(false);
@@ -1740,7 +1741,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     setModalVisible(false);
   };
 
-  const navigateToLearning = (opts: { subject?: string; subjects?: string[]; section?: string; sections?: string[]; micro?: string; micros?: string[]; subtopic?: string; year?: string; mode?: 'learning' | 'exam' | 'choice' }) => {
+  const navigateToLearning = (opts: { subject?: string; subjects?: string[]; section?: string; sections?: string[]; micro?: string; micros?: string[]; subtopic?: string; nanotopic?: string; year?: string; mode?: 'learning' | 'exam' | 'choice' }) => {
     const s = opts.subjects?.join(',') || opts.subject || 'All';
     const sec = opts.sections?.join('|') || opts.section || '';
     const m = opts.micros?.join('|') || opts.micro || '';
@@ -1776,6 +1777,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           section: sec,
           microtopic: m,
           subtopic: opts.subtopic || '',
+          nanotopic: opts.nanotopic || '',
           year: yearParam,
           initialScreen: 'questions',
           from: 'pyq',
@@ -1803,6 +1805,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       // Only add section/microtopic if they have actual values (not 'All')
       if (sec && sec !== 'All') engineParams.section = sec;
       if (m && m !== 'All') engineParams.microtopic = m;
+      if (opts.subtopic) engineParams.subtopic = opts.subtopic;
+      if (opts.nanotopic) engineParams.nanotopic = opts.nanotopic;
 
       router.push({
         pathname: '/unified/engine',
@@ -2581,8 +2585,11 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         key: `pilot-sec-${sec}`,
         label: sec,
         byYear: years.reduce((acc, y) => {
-          const count = pilotQuestions.filter(q => getAnalyticsYear(q) === parseInt(y, 10) && (q.section_group === sec || q.sectionGroup === sec)).length;
-          if (count) acc[y] = count;
+          const matchingQs = pilotQuestions.filter(q => getAnalyticsYear(q) === parseInt(y, 10) && (q.section_group === sec || q.sectionGroup === sec));
+          const value = heatmapMetric === 'marks'
+            ? matchingQs.reduce((sum, q) => sum + (Number(q.marks) || 0), 0)
+            : matchingQs.length;
+          if (value > 0) acc[y] = value;
           return acc;
         }, {} as Record<string, number>)
       }))
@@ -2598,8 +2605,11 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         key: `pilot-micro-${m}`,
         label: m,
         byYear: years.reduce((acc, y) => {
-          const count = filteredForMicro.filter(q => getAnalyticsYear(q) === parseInt(y, 10) && (q.micro_topic === m || q.microTopic === m || q.microtopic === m)).length;
-          if (count) acc[y] = count;
+          const matchingQs = filteredForMicro.filter(q => getAnalyticsYear(q) === parseInt(y, 10) && (q.micro_topic === m || q.microTopic === m || q.microtopic === m));
+          const value = heatmapMetric === 'marks'
+            ? matchingQs.reduce((sum, q) => sum + (Number(q.marks) || 0), 0)
+            : matchingQs.length;
+          if (value > 0) acc[y] = value;
           return acc;
         }, {} as Record<string, number>)
       }))
@@ -2615,8 +2625,31 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         key: `pilot-subtopic-${sub}`,
         label: sub,
         byYear: years.reduce((acc, y) => {
-          const count = filteredForSubtopic.filter(q => getAnalyticsYear(q) === parseInt(y, 10) && (q.subTopic === sub || q.sub_topic === sub)).length;
-          if (count) acc[y] = count;
+          const matchingQs = filteredForSubtopic.filter(q => getAnalyticsYear(q) === parseInt(y, 10) && (q.subTopic === sub || q.sub_topic === sub));
+          const value = heatmapMetric === 'marks'
+            ? matchingQs.reduce((sum, q) => sum + (Number(q.marks) || 0), 0)
+            : matchingQs.length;
+          if (value > 0) acc[y] = value;
+          return acc;
+        }, {} as Record<string, number>)
+      }))
+      .sort((a, b) => Object.values(b.byYear).reduce((sum, v) => sum + v, 0) - Object.values(a.byYear).reduce((sum, v) => sum + v, 0));
+
+    // Calculate Nanotopic Rows for Pilot (Filtered by Subject AND Section AND Micro topic AND Subtopic if selected)
+    const filteredForNanotopic = pilotSubtopic
+      ? filteredForSubtopic.filter(q => q.subTopic === pilotSubtopic || q.sub_topic === pilotSubtopic)
+      : filteredForSubtopic;
+
+    const pilotNanotopicRows = Array.from(new Set(filteredForNanotopic.map(q => q.nanoTopic || q.nanotopic || 'General')))
+      .map(nano => ({
+        key: `pilot-nanotopic-${nano}`,
+        label: nano,
+        byYear: years.reduce((acc, y) => {
+          const matchingQs = filteredForNanotopic.filter(q => getAnalyticsYear(q) === parseInt(y, 10) && (q.nanoTopic === nano || q.nanotopic === nano));
+          const value = heatmapMetric === 'marks'
+            ? matchingQs.reduce((sum, q) => sum + (Number(q.marks) || 0), 0)
+            : matchingQs.length;
+          if (value > 0) acc[y] = value;
           return acc;
         }, {} as Record<string, number>)
       }))
@@ -2701,6 +2734,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
               setPilotSubject(subj);
               setPilotSection(null); // Reset section when subject changes
               setPilotMicro(null); // Reset microtopic
+              setPilotSubtopic(null); // Reset subtopic
             }}
             onLabelActionPress={(subj) => {
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -2752,6 +2786,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   setPilotSection(sec);
                   setPilotMicro(null); // Reset microtopic
+                  setPilotSubtopic(null); // Reset subtopic
                 }}
                 onLabelActionPress={(sec) => {
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -2784,6 +2819,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   if (examStage?.toLowerCase() === 'mains') {
                     setPilotMicro(m);
+                    setPilotSubtopic(null); // Reset subtopic
                   } else {
                     navigateToLearning({ subject: pilotSubject, section: pilotSection || undefined, micro: m, mode: 'choice' });
                   }
@@ -2792,31 +2828,24 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   if (examStage?.toLowerCase() === 'mains') {
                     setPilotMicro(m);
+                    setPilotSubtopic(null);
                   } else {
                     handleHeatmapPress(m, { subject: pilotSubject, section: pilotSection || undefined, micro: m });
                   }
                 }}
                 onYearPress={(year) => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  if (examStage?.toLowerCase() === 'mains') {
-                    // Do not navigate immediately for Mains
-                  } else {
-                    handleHeatmapPress('', { subject: pilotSubject, section: pilotSection || undefined, year }, year);
-                  }
+                  handleHeatmapPress('', { subject: pilotSubject, section: pilotSection || undefined, micro: m, year }, year);
                 }}
                 onCellPress={(m, year) => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  if (examStage?.toLowerCase() === 'mains') {
-                    setPilotMicro(m);
-                  } else {
-                    handleHeatmapPress(m, { subject: pilotSubject, section: pilotSection || undefined, micro: m }, year);
-                  }
+                  handleHeatmapPress(m, { subject: pilotSubject, section: pilotSection || undefined, micro: m }, year);
                 }}
               />
               </View>
 
               {examStage?.toLowerCase() === 'mains' && pilotMicro && (
-                <View>
+                <View style={{ gap: 24 }}>
                   <StickyHeatmapTable
                     title={`4. ${pilotMicro} Sub-Topics`}
                     labelHeader="Sub-Topic"
@@ -2829,11 +2858,19 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                     labelWidth={microWidth}
                     onRowPress={(sub) => {
                       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                      navigateToLearning({ subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro, subtopic: sub, mode: 'choice' });
+                      if (examStage?.toLowerCase() === 'mains') {
+                        setPilotSubtopic(sub);
+                      } else {
+                        navigateToLearning({ subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro, subtopic: sub, mode: 'choice' });
+                      }
                     }}
                     onLabelActionPress={(sub) => {
                       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                      handleHeatmapPress(sub, { subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro, subtopic: sub });
+                      if (examStage?.toLowerCase() === 'mains') {
+                        setPilotSubtopic(sub);
+                      } else {
+                        handleHeatmapPress(sub, { subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro, subtopic: sub });
+                      }
                     }}
                     onYearPress={(year) => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -2841,6 +2878,33 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                     }}
                     onCellPress={(sub, year) => handleHeatmapPress(sub, { subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro, subtopic: sub }, year)}
                   />
+
+                  {pilotSubtopic && (
+                    <StickyHeatmapTable
+                      title={`5. ${pilotSubtopic} Nano-Topics`}
+                      labelHeader="Nano-Topic"
+                      years={years}
+                      rows={pilotNanotopicRows}
+                      baseColor={colors.primary}
+                      maxValue={6}
+                      colors={colors}
+                      heatmapPalette={heatmapPalette}
+                      labelWidth={microWidth}
+                      onRowPress={(nano) => {
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                        navigateToLearning({ subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro || undefined, subtopic: pilotSubtopic, nanotopic: nano, mode: 'choice' });
+                      }}
+                      onLabelActionPress={(nano) => {
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                        handleHeatmapPress(nano, { subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro || undefined, subtopic: pilotSubtopic, nanotopic: nano });
+                      }}
+                      onYearPress={(year) => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        handleHeatmapPress('', { subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro || undefined, subtopic: pilotSubtopic, year }, year);
+                      }}
+                      onCellPress={(nano, year) => handleHeatmapPress(nano, { subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro || undefined, subtopic: pilotSubtopic, nanotopic: nano }, year)}
+                    />
+                  )}
                 </View>
               )}
             </View>

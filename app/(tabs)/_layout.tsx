@@ -137,8 +137,7 @@ function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs,
     tabKey !== 'ai-search' &&
     tabKey !== 'revise' &&
     tabKey !== 'tags' &&
-    tabKey !== 'drupsc_hub' &&
-    !(selectedCourse === 'Medical Science' && (tabKey === 'mains' || tabKey === 'prelims'))
+    tabKey !== 'drupsc_hub'
   );
   const tabletItemWidth = isTablet
     ? Math.max(74, Math.floor((Math.max(width, 768) - 20) / Math.max(1, visibleOrder.length)))

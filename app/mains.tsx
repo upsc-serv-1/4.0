@@ -1881,7 +1881,7 @@ export function ValueAddCardBody({
         <MainsEthicsCard
           item={item}
           colors={colors}
-          ethicsTab={ethicsTab || ''}
+          ethicsTab={ethicsTab || item.ethicsType || 'diagrams'}
           zoomScale={scale}
           onImagePress={onImagePress}
         />
@@ -1906,6 +1906,7 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
   zoomScale,
   activeCategory,
   onImagePress,
+  initialCollapsed = true,
 }: {
   item: any;
   colors: any;
@@ -1920,8 +1921,9 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
   zoomScale?: number;
   activeCategory?: string | null;
   onImagePress?: (uri: string) => void;
+  initialCollapsed?: boolean;
 }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(initialCollapsed ?? true);
   const isCopied = copiedId === item.id;
 
   useEffect(() => {
@@ -6016,6 +6018,7 @@ function ValueAdditionView({
                         zoomScale={zoomScale}
                         activeCategory={activeCategory}
                         onImagePress={setZoomImageUri}
+                        initialCollapsed={false}
                       />
                     ))}
                   </View>
@@ -6036,6 +6039,7 @@ function ValueAdditionView({
                         zoomScale={zoomScale}
                         activeCategory={activeCategory}
                         onImagePress={setZoomImageUri}
+                        initialCollapsed={false}
                       />
                     ))}
                   </View>
@@ -6058,6 +6062,7 @@ function ValueAdditionView({
                 zoomScale={zoomScale}
                 activeCategory={activeCategory}
                 onImagePress={setZoomImageUri}
+                initialCollapsed={false}
               />
             );
           }}

@@ -1211,19 +1211,19 @@ export default function IntegratedSearchScreen() {
                 </View>
               )}
 
-              {prelimsInst ? (
+              {prelimsInst && prelimsInst.toUpperCase() !== 'UPSC' && prelimsInst.toUpperCase() !== 'CSE' ? (
                 <View style={[styles.chip, { backgroundColor: '#dbeafe' }]}>
                   <Text style={[styles.chipText, { color: '#1d4ed8' }]}>{prelimsInst}</Text>
                 </View>
               ) : (
-                !(item.rawItem.is_pyq || item.rawItem.isPyq) && (
+                !(item.rawItem.is_pyq || item.rawItem.isPyq) && !prelimsInst && (
                   <View style={[styles.chip, { backgroundColor: colors.surfaceStrong }]}>
                     <Text style={[styles.chipText, { color: colors.textTertiary }]}>Practice</Text>
                   </View>
                 )
               )}
 
-              {prelimsProg ? (
+              {prelimsProg && prelimsProg.toUpperCase() !== 'UPSC' && prelimsProg.toUpperCase() !== 'CSE' ? (
                 <View style={[styles.chip, { backgroundColor: '#f3e8ff' }]}>
                   <Text style={[styles.chipText, { color: '#6b21a8' }]}>{prelimsProg}</Text>
                 </View>

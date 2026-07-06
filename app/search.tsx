@@ -372,6 +372,8 @@ const MainsResultAnswerPanel = ({
   mdStyles,
   mdRules,
   router,
+  activeTab,
+  onActiveTabChange,
 }: {
   rawItem: any;
   colors: any;
@@ -379,9 +381,10 @@ const MainsResultAnswerPanel = ({
   mdStyles: any;
   mdRules: any;
   router: any;
+  activeTab: string;
+  onActiveTabChange: (tab: string) => void;
 }) => {
   const cleanAnswers = getCleanAvailableAnswers(rawItem.answers || []);
-  const [activeTab, setActiveTab] = React.useState(cleanAnswers[0]?.institute || '');
 
   if (cleanAnswers.length === 0) return null;
 
@@ -408,17 +411,21 @@ const MainsResultAnswerPanel = ({
                 return (
                   <TouchableOpacity
                     key={ans.institute}
-                    onPress={() => setActiveTab(ans.institute)}
+                    onPress={() => onActiveTabChange(ans.institute)}
                     style={{
-                      paddingHorizontal: 8,
-                      paddingVertical: 4,
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
                       borderRadius: 6,
-                      backgroundColor: isTabActive ? colors.primary + '15' : 'transparent',
-                      borderWidth: 1,
-                      borderColor: isTabActive ? colors.primary + '30' : 'transparent',
+                      borderWidth: 0.5,
+                      borderColor: isTabActive ? '#3b82f6' : colors.border,
+                      backgroundColor: isTabActive ? '#3b82f6' : colors.surfaceStrong,
                     }}
                   >
-                    <Text style={{ fontSize: 11, fontWeight: isTabActive ? '700' : '500', color: isTabActive ? colors.primary : colors.textTertiary }}>
+                    <Text style={{ 
+                      fontSize: 11, 
+                      fontWeight: '700', 
+                      color: isTabActive ? '#ffffff' : colors.textTertiary 
+                    }}>
                       {ans.institute}
                     </Text>
                   </TouchableOpacity>
@@ -1285,6 +1292,10 @@ export default function IntegratedSearchScreen() {
                 mdStyles={mdStyles}
                 mdRules={mdRules}
                 router={router}
+                activeTab={activeMainsTabs[item.id] || getCleanAvailableAnswers(item.rawItem.answers || [])[0]?.institute || ''}
+                onActiveTabChange={(tab) => {
+                  setActiveMainsTabs(prev => ({ ...prev, [item.id]: tab }));
+                }}
               />
             )}
           </View>

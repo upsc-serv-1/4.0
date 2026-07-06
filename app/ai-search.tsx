@@ -350,6 +350,8 @@ export default function AISearchTab() {
 
   // Fix #2 — sidebar subject filter (separate from filters.subjects)
   const [sidebarSubjectFilter, setSidebarSubjectFilter] = useState<string | null>(null);
+  // Sidebar institute filter — local state for instant chip color, synced to filters.institutes
+  const [sidebarInstituteFilter, setSidebarInstituteFilter] = useState<string>('All');
 
   // Sidebar collapse state for iPad/tablet view
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -824,6 +826,11 @@ export default function AISearchTab() {
       setMicrotopicOptions(mts);
     });
   }, [pendingFilters.subjects, pendingFilters.sections, selectedCourse]);
+
+  // Sync sidebar institute filter when filters.institutes changes from popup
+  useEffect(() => {
+    setSidebarInstituteFilter(filters.institutes);
+  }, [filters.institutes]);
 
   // ── Offline-first: search ALL 20k locally-downloaded questions ──────────────
   // Synchronous, instant, no limit. Then Supabase supplements new questions.
@@ -1769,7 +1776,7 @@ export default function AISearchTab() {
                     key={sub}
                     style={[styles.subjectChip, {
                       borderColor: isSelected ? '#7c3aed' : colors.border,
-                      backgroundColor: isSelected ? '#ede9fe' : colors.surface,
+                      backgroundColor: isSelected ? '#7c3aed' : colors.surface,
                     }]}
                     onPress={() => {
                       // Issue #11: Client-side filtering — no re-query needed
@@ -1785,7 +1792,7 @@ export default function AISearchTab() {
                     }}
                   >
                     <View style={[styles.subjectDot, { backgroundColor: color }]} />
-                    <Text style={[styles.subjectChipText, { color: isSelected ? '#7c3aed' : colors.textSecondary }]}>{sub}</Text>
+                    <Text style={[styles.subjectChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
                     <Text style={[styles.subjectCount, { color: colors.textTertiary }]}>{count}</Text>
                   </TouchableOpacity>
                 );
@@ -1801,8 +1808,8 @@ export default function AISearchTab() {
               style={[
                 styles.subjectChip,
                 {
-                  borderColor: filters.pyqFilter === opt ? '#c4b5fd' : colors.border,
-                  backgroundColor: filters.pyqFilter === opt ? '#ede9fe' : colors.surface,
+                  borderColor: filters.pyqFilter === opt ? '#7c3aed' : colors.border,
+                  backgroundColor: filters.pyqFilter === opt ? '#7c3aed' : colors.surface,
                 },
               ]}
               onPress={() => {
@@ -1825,7 +1832,7 @@ export default function AISearchTab() {
               }}
             >
               <Text style={[styles.subjectChipText, {
-                color: filters.pyqFilter === opt ? '#7c3aed' : colors.textSecondary,
+                color: filters.pyqFilter === opt ? '#fff' : colors.textSecondary,
                 fontWeight: filters.pyqFilter === opt ? '800' : '600',
               }]}>{opt}</Text>
             </TouchableOpacity>
@@ -1848,20 +1855,22 @@ export default function AISearchTab() {
               <>
                 <Text style={[styles.panelLabel, { color: colors.textTertiary, marginTop: 14 }]}>BY INSTITUTE</Text>
                 {instEntries.slice(0, 6).map(([inst, count]) => {
-                  const isSelected = filters.institutes.split(',').includes(inst);
+                  const isSelected = sidebarInstituteFilter !== 'All' && sidebarInstituteFilter.split(',').includes(inst);
                   return (
                     <TouchableOpacity
                       key={inst}
                       style={[styles.subjectChip, {
                         borderColor: isSelected ? '#7c3aed' : colors.border,
-                        backgroundColor: isSelected ? '#ede9fe' : colors.surface,
+                        backgroundColor: isSelected ? '#7c3aed' : colors.surface,
                       }]}
                       onPress={() => {
-                        const list = filters.institutes === 'All' ? [] : filters.institutes.split(',').filter(Boolean);
+                        const list = sidebarInstituteFilter === 'All' ? [] : sidebarInstituteFilter.split(',').filter(Boolean);
                         const next = isSelected ? list.filter(i => i !== inst) : [...list, inst];
-                        const newFilters = { ...filters, institutes: next.length ? next.join(',') : 'All' };
+                        const nextVal = next.length ? next.join(',') : 'All';
+                        setSidebarInstituteFilter(nextVal);
+                        // Sync to filters and results
+                        const newFilters = { ...filters, institutes: nextVal };
                         setFilters(newFilters);
-                        // Issue #11: Client-side institute filtering
                         let filtered = sidebarSubjectFilter
                           ? masterResults.filter(r => r.subject === sidebarSubjectFilter)
                           : [...masterResults];
@@ -1872,8 +1881,8 @@ export default function AISearchTab() {
                         setResults(filtered);
                       }}
                     >
-                      <View style={[styles.subjectDot, { backgroundColor: '#7c3aed' }]} />
-                      <Text style={[styles.subjectChipText, { color: isSelected ? '#7c3aed' : colors.textSecondary }]}>{inst}</Text>
+                      <View style={[styles.subjectDot, { backgroundColor: isSelected ? '#fff' : '#7c3aed' }]} />
+                      <Text style={[styles.subjectChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{inst}</Text>
                       <Text style={[styles.subjectCount, { color: colors.textTertiary }]}>{count}</Text>
                     </TouchableOpacity>
                   );
@@ -2052,7 +2061,7 @@ export default function AISearchTab() {
                 <View style={styles.chipsWrap}>
                   <TouchableOpacity
                     onPress={() => setPendingFilters(p => ({ ...p, revisionTags: 'All' }))}
-                    style={[styles.fchip, pendingFilters.revisionTags === 'All' && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
+                    style={[styles.fchip, pendingFilters.revisionTags === 'All' && styles.fchipSel]}
                   >
                     <Text style={[styles.fchipText, { color: pendingFilters.revisionTags === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
                     {pendingFilters.revisionTags === 'All' && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
@@ -2086,7 +2095,7 @@ export default function AISearchTab() {
                           const next = isSelected ? list.filter(t => t !== tag) : [...list, tag];
                           setPendingFilters(p => ({ ...p, revisionTags: next.length ? next.join(',') : 'All' }));
                         }}
-                        style={[styles.fchip, isSelected && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
+                        style={[styles.fchip, isSelected && styles.fchipSel]}
                       >
                         <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{tag}</Text>
                         {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
@@ -2103,7 +2112,7 @@ export default function AISearchTab() {
                 <View style={styles.chipsWrap}>
                   <TouchableOpacity
                     onPress={() => setPendingFilters(p => ({ ...p, institutes: 'All' }))}
-                    style={[styles.fchip, pendingFilters.institutes === 'All' && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
+                    style={[styles.fchip, pendingFilters.institutes === 'All' && styles.fchipSel]}
                   >
                     <Text style={[styles.fchipText, { color: pendingFilters.institutes === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
                     {pendingFilters.institutes === 'All' && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
@@ -2118,7 +2127,7 @@ export default function AISearchTab() {
                           const next = isSelected ? list.filter(i => i !== inst) : [...list, inst];
                           setPendingFilters(p => ({ ...p, institutes: next.length ? next.join(',') : 'All' }));
                         }}
-                        style={[styles.fchip, isSelected && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
+                        style={[styles.fchip, isSelected && styles.fchipSel]}
                       >
                         <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{inst}</Text>
                         {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
@@ -2135,7 +2144,7 @@ export default function AISearchTab() {
               <View style={styles.chipsWrap}>
                 <TouchableOpacity
                   onPress={() => setPendingFilters(p => ({ ...p, stage: 'All' }))}
-                  style={[styles.fchip, pendingFilters.stage === 'All' && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
+                  style={[styles.fchip, pendingFilters.stage === 'All' && styles.fchipSel]}
                 >
                   <Text style={[styles.fchipText, { color: pendingFilters.stage === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
                   {pendingFilters.stage === 'All' && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
@@ -2150,7 +2159,7 @@ export default function AISearchTab() {
                         const next = isSelected ? list.filter(x => x !== s) : [...list, s];
                         setPendingFilters(p => ({ ...p, stage: next.length ? next.join(',') : 'All' }));
                       }}
-                      style={[styles.fchip, isSelected && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
+                      style={[styles.fchip, isSelected && styles.fchipSel]}
                     >
                       <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{s}</Text>
                       {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
@@ -2167,7 +2176,7 @@ export default function AISearchTab() {
                 <View style={styles.chipsWrap}>
                   <TouchableOpacity
                     onPress={() => setPendingFilters(p => ({ ...p, programs: 'All' }))}
-                    style={[styles.fchip, pendingFilters.programs === 'All' && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
+                    style={[styles.fchip, pendingFilters.programs === 'All' && styles.fchipSel]}
                   >
                     <Text style={[styles.fchipText, { color: pendingFilters.programs === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
                     {pendingFilters.programs === 'All' && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
@@ -2182,7 +2191,7 @@ export default function AISearchTab() {
                           const next = isSelected ? list.filter(p => p !== prog) : [...list, prog];
                           setPendingFilters(p => ({ ...p, programs: next.length ? next.join(',') : 'All' }));
                         }}
-                        style={[styles.fchip, isSelected && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
+                        style={[styles.fchip, isSelected && styles.fchipSel]}
                       >
                         <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{prog}</Text>
                         {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
@@ -2199,7 +2208,7 @@ export default function AISearchTab() {
               <View style={styles.chipsWrap}>
                 <TouchableOpacity
                   onPress={() => setPendingFilters(p => ({ ...p, subjects: 'All', sections: 'All', microtopics: 'All' }))}
-                  style={[styles.fchip, pendingFilters.subjects === 'All' && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
+                  style={[styles.fchip, pendingFilters.subjects === 'All' && styles.fchipSel]}
                 >
                   <Text style={[styles.fchipText, { color: pendingFilters.subjects === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
                   {pendingFilters.subjects === 'All' && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
@@ -2215,7 +2224,7 @@ export default function AISearchTab() {
                           const next = isSelected ? list.filter(s => s !== sub) : [...list, sub];
                           setPendingFilters(p => ({ ...p, subjects: next.length ? next.join(',') : 'All', sections: 'All', microtopics: 'All' }));
                         }}
-                        style={[styles.fchip, isSelected && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
+                        style={[styles.fchip, isSelected && styles.fchipSel]}
                       >
                         <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
                         {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
@@ -2237,7 +2246,7 @@ export default function AISearchTab() {
                 <View style={styles.chipsWrap}>
                   <TouchableOpacity
                     onPress={() => setPendingFilters(p => ({ ...p, sections: 'All', microtopics: 'All' }))}
-                    style={[styles.fchip, pendingFilters.sections === 'All' && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
+                    style={[styles.fchip, pendingFilters.sections === 'All' && styles.fchipSel]}
                   >
                     <Text style={[styles.fchipText, { color: pendingFilters.sections === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
                     {pendingFilters.sections === 'All' && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
@@ -2253,7 +2262,7 @@ export default function AISearchTab() {
                             const next = isSelected ? list.filter(s => s !== sec) : [...list, sec];
                             setPendingFilters(p => ({ ...p, sections: next.length ? next.join(',') : 'All', microtopics: 'All' }));
                           }}
-                          style={[styles.fchip, isSelected && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
+                          style={[styles.fchip, isSelected && styles.fchipSel]}
                         >
                           <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sec}</Text>
                           {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
@@ -2276,7 +2285,7 @@ export default function AISearchTab() {
                 <View style={styles.chipsWrap}>
                   <TouchableOpacity
                     onPress={() => setPendingFilters(p => ({ ...p, microtopics: 'All' }))}
-                    style={[styles.fchip, pendingFilters.microtopics === 'All' && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
+                    style={[styles.fchip, pendingFilters.microtopics === 'All' && styles.fchipSel]}
                   >
                     <Text style={[styles.fchipText, { color: pendingFilters.microtopics === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
                     {pendingFilters.microtopics === 'All' && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
@@ -2292,7 +2301,7 @@ export default function AISearchTab() {
                             const next = isSelected ? list.filter(s => s !== mt) : [...list, mt];
                             setPendingFilters(p => ({ ...p, microtopics: next.length ? next.join(',') : 'All' }));
                           }}
-                          style={[styles.fchip, isSelected && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
+                          style={[styles.fchip, isSelected && styles.fchipSel]}
                         >
                           <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{mt}</Text>
                           {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
@@ -2376,7 +2385,7 @@ export default function AISearchTab() {
   );
 
   const SearchBar = (
-    <View>
+    <View style={{ position: 'relative', zIndex: 100 }}>
       {/* ── 3-Mode Engine Toggle ──────────────────────────────────────────── */}
       <View style={{ flexDirection: 'row', gap: 4, paddingHorizontal: 12, paddingTop: 6, paddingBottom: 4 }}>
         {([
@@ -2481,6 +2490,44 @@ export default function AISearchTab() {
           )}
         </TouchableOpacity>
       </View>
+      {showHistory && (searchHistory.length > 0 || instituteOptions.length > 0) && (
+        <View style={[styles.historyDropdown, {
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+        }]}>
+          {searchHistory.length > 0 && (
+            <>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 6, paddingBottom: 4 }}>
+                <Text style={[styles.panelLabel, { color: colors.textTertiary, marginBottom: 0 }]}>RECENT SEARCHES</Text>
+                <TouchableOpacity onPress={() => {
+                  setSearchHistory([]);
+                  AsyncStorage.removeItem('ai_search_history');
+                  setShowHistory(false);
+                }}>
+                  <Text style={{ fontSize: 10, fontWeight: '700', color: colors.textTertiary }}>Clear</Text>
+                </TouchableOpacity>
+              </View>
+              {searchHistory.map((h, i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={[styles.historyItem, { borderBottomColor: colors.border }]}
+                  onPress={() => { setQuery(h); setShowHistory(false); runSearch(h, filters); }}
+                >
+                  <Clock size={12} color={colors.textTertiary} />
+                  <Text style={[styles.historyText, { color: colors.textSecondary }]} numberOfLines={1}>{h}</Text>
+                  <TouchableOpacity onPress={() => {
+                    const next = searchHistory.filter((_, j) => j !== i);
+                    setSearchHistory(next);
+                    AsyncStorage.setItem('ai_search_history', JSON.stringify(next));
+                  }}>
+                    <X size={11} color={colors.textTertiary} />
+                  </TouchableOpacity>
+                </TouchableOpacity>
+              ))}
+            </>
+          )}
+        </View>
+      )}
     </View>
   );
 
@@ -2510,52 +2557,9 @@ export default function AISearchTab() {
           </View>
         </View>
 
-        <View style={{ position: 'relative' }}>
+        <View style={{ position: 'relative', zIndex: 10 }}>
           {QuickFilterBar}
           {SearchBar}
-
-          {/* Fix #4 — Search History Dropdown: renders inline below search bar,
-              no absolute positioning so it never covers the search input */}
-          {showHistory && (searchHistory.length > 0 || instituteOptions.length > 0) && (
-            <View style={[styles.historyDropdown, {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-            }]}>
-              {/* Quick institute filter chips */}
-              {/* Recent searches */}
-              {searchHistory.length > 0 && (
-                <>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 6, paddingBottom: 4 }}>
-                    <Text style={[styles.panelLabel, { color: colors.textTertiary, marginBottom: 0 }]}>RECENT SEARCHES</Text>
-                    <TouchableOpacity onPress={() => {
-                      setSearchHistory([]);
-                      AsyncStorage.removeItem('ai_search_history');
-                      setShowHistory(false);
-                    }}>
-                      <Text style={{ fontSize: 10, fontWeight: '700', color: colors.textTertiary }}>Clear</Text>
-                    </TouchableOpacity>
-                  </View>
-                  {searchHistory.map((h, i) => (
-                    <TouchableOpacity
-                      key={i}
-                      style={[styles.historyItem, { borderBottomColor: colors.border }]}
-                      onPress={() => { setQuery(h); setShowHistory(false); runSearch(h, filters); }}
-                    >
-                      <Clock size={12} color={colors.textTertiary} />
-                      <Text style={[styles.historyText, { color: colors.textSecondary }]} numberOfLines={1}>{h}</Text>
-                      <TouchableOpacity onPress={() => {
-                        const next = searchHistory.filter((_, j) => j !== i);
-                        setSearchHistory(next);
-                        AsyncStorage.setItem('ai_search_history', JSON.stringify(next));
-                      }}>
-                        <X size={11} color={colors.textTertiary} />
-                      </TouchableOpacity>
-                    </TouchableOpacity>
-                  ))}
-                </>
-              )}
-            </View>
-          )}
         </View>
 
         {IS_IPAD ? (
@@ -3056,7 +3060,7 @@ const styles = StyleSheet.create({
   fchipSel:       { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
   fchipText:      { fontSize: 11, fontWeight: '700' },
   // Fix #4 styles — dropdown sits below the search row (toggle row ~33px + search row ~68px = ~101px)
-  historyDropdown:{ borderRadius: 14, borderWidth: 1, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5, marginHorizontal: 14, marginTop: 4 },
+  historyDropdown:{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 9999, borderRadius: 14, borderWidth: 1, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5, marginHorizontal: 14, marginTop: 4 },
   historyItem:    { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: 0.5 },
   historyText:    { flex: 1, fontSize: 13, fontWeight: '500' },
   // Fix #5 styles

@@ -64,7 +64,8 @@ import {
   PenTool,
   Flag,
   Clock,
-  Palette
+  Palette,
+  FileDown,
 } from 'lucide-react-native';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
@@ -194,6 +195,7 @@ import {
   fetchValueAdditionFromSupabase
 } from '../src/data/mainsValueAdditionLoader';
 import { buildPredictive, probableHotsFor2026 } from '../src/lib/pyqPredictive';
+import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet';
 
 
 const getQuestionSection = (q: any): string => q.sectionGroup || q.section_group || q.sectiongroup || '';
@@ -265,6 +267,8 @@ export function MainsScreenInner() {
     initialScreen?: string;
     from?: string;
     category?: string;
+    questionId?: string;
+    vaId?: string;
   }>();
 
   const [currentScreen, setCurrentScreen] = useState<'hub' | 'questions' | 'value-add' | 'search' | 'detailed-question' | 'revision-tags'>('hub');
@@ -272,6 +276,15 @@ export function MainsScreenInner() {
 
   useEffect(() => {
     if (params.initialScreen === 'questions') {
+      if (params.questionId) {
+        const q = mainsConsolidatedQuestions.find(item => String(item.id) === String(params.questionId));
+        if (q) {
+          setDetailedQuestion(q);
+          setCurrentScreen('detailed-question');
+          setPreviousScreen('questions');
+          return;
+        }
+      }
       setCurrentScreen('questions');
     } else if (params.initialScreen === 'value-add' || params.initialScreen === 'value-addition') {
       setCurrentScreen('value-add');
@@ -281,7 +294,7 @@ export function MainsScreenInner() {
         setValueAddCategory(null);
       }
     }
-  }, [params.initialScreen, params.category]);
+  }, [params.initialScreen, params.category, params.questionId]);
 
   const initialFiltersFromParams = useMemo(() => {
     if (!params.initialScreen) return null;
@@ -1574,7 +1587,7 @@ const getUniqueValueAddItems = (items: any[]): any[] => {
   });
 };
 
-const parseIntroductoryBox = (rawText: string | undefined | null) => {
+export const parseIntroductoryBox = (rawText: string | undefined | null) => {
   if (!rawText) return null;
   const tableRegex = /^\s*(\|\s*[^\n]*\|\s*(?:\r?\n\s*\|\s*---+\s*\|)?(?:\r?\n\s*\|\s*[^\n]*\|\s*)*)/i;
   const match = rawText.match(tableRegex);
@@ -1794,7 +1807,7 @@ const getThemeForHeading = (heading: string, colors: any) => {
   };
 };
 
-function ValueAddCardBody({
+export function ValueAddCardBody({
   item,
   colors,
   ethicsTab,
@@ -3401,6 +3414,8 @@ function QuestionBankView({
   const [selectedInstitutes, setSelectedInstitutes] = useState<Record<string, string>>({});
   const flatListRef = useRef<FlatList>(null);
   const cardYOffsets = useRef<Record<string, number>>({});
+  const [exportSheetVisible, setExportSheetVisible] = useState(false);
+  const [exportPayload, setExportPayload] = useState<any>(null);
 
   useEffect(() => {
     if (expandedId) {
@@ -3802,6 +3817,47 @@ function QuestionBankView({
                 {/* Large Input & Filter Scroll */}
                 <View style={styles.filterSection}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (!filteredQuestions || filteredQuestions.length === 0) {
+                          Alert.alert('No Questions', 'There are no questions to export.');
+                          return;
+                        }
+                        const rows = filteredQuestions.map((q: ConsolidatedQuestion) => ({
+                          id: q.id,
+                          question_text: q.questionText,
+                          statement: q.questionText,
+                          subject: q.subject,
+                          section_group: q.sectionGroup,
+                          micro_topic: q.microTopic,
+                          sub_topic: q.subTopic,
+                          exam_year: q.year,
+                          is_pyq: q.is_pyq,
+                          marks: q.marks,
+                          paper: q.paper,
+                          macrotag: q.macrotag,
+                          microtag: q.microtag,
+                          _explanations: (q.answers || []).map((a: ConsolidatedAnswer) => ({
+                            source: a.institute,
+                            text: a.answerText,
+                          })),
+                        }));
+                        setExportPayload({ kind: 'questions', rows });
+                        setExportSheetVisible(true);
+                      }}
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: 14,
+                        backgroundColor: colors.surface,
+                        borderWidth: 1,
+                        borderColor: colors.border,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <FileDown size={20} color={colors.primary} />
+                    </TouchableOpacity>
                     {!sidebarOpen && (
                       <TouchableOpacity
                         onPress={() => setSidebarOpen(true)}
@@ -4369,6 +4425,19 @@ function QuestionBankView({
         microtagOptions={microtagOptions}
         isTablet={isTablet}
         questions={questions}
+      />
+
+      <UnifiedExportSheet
+        visible={exportSheetVisible}
+        onClose={() => setExportSheetVisible(false)}
+        payload={exportPayload}
+        title="Mains Question Bank"
+        initialOptions={{
+          title: 'Mains Question Bank Export',
+          moduleName: 'Mains PYQ',
+          headerText: 'Dr. UPSC · Mains PYQ',
+          footerText: 'Generated by Dr. UPSC',
+        }}
       />
     </View>
   );
@@ -6451,17 +6520,20 @@ function MainsAISearchView({
 
     try {
       let keywordsList: string[] = [currentQuery.toLowerCase()];
+      let displayKeywords: string[] = [];
       if (engineMode === 'AI' || engineMode === 'AI+Fuzzy') {
         try {
           const res = await aiExpandSearchQuery(currentQuery);
           if (res && res.keywords && res.keywords.length > 0) {
-            keywordsList = [...keywordsList, ...res.keywords.map(k => k.toLowerCase())];
+            displayKeywords = res.keywords.map(k => k.toLowerCase());
+            const userWords = currentQuery.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2);
+            keywordsList = [...new Set([currentQuery.toLowerCase(), ...userWords, ...displayKeywords])];
           }
         } catch (err) {
           console.warn('Gemini query expansion failed, falling back to exact:', err);
         }
       }
-      setKeywords(keywordsList);
+      setKeywords(displayKeywords.length > 0 ? displayKeywords : [currentQuery.toLowerCase()]);
 
       // ── LOCAL FILTERING & SCORING ──
       const matchedResults: any[] = [];
@@ -9150,7 +9222,7 @@ function ApproachBox({ content, title = 'APPROACH', colors, zoomFontSize, isDark
   );
 }
 
-interface DetailedQuestionViewProps {
+export interface DetailedQuestionViewProps {
   question: ConsolidatedQuestion;
   onBack: () => void;
   colors: any;
@@ -9178,7 +9250,7 @@ interface DetailedQuestionViewProps {
   onActiveAnswerChange?: (activeText: string, activeInst: string, allAnswers: any[]) => void;
 }
 
-function DetailedQuestionView({
+export function DetailedQuestionView({
   question,
   onBack,
   colors,
@@ -9211,6 +9283,7 @@ function DetailedQuestionView({
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [newTagText, setNewTagText] = useState('');
   const [note, setNote] = useState('');
+  const [showCopyModal, setShowCopyModal] = useState(false);
 
   useEffect(() => {
     if (answers.length > 0) {
@@ -9322,10 +9395,34 @@ function DetailedQuestionView({
     setIsAddingTag(false);
   };
 
-  const handleCopyQuestion = async () => {
-    const textToCopy = `Question:\n${question.questionText}\n\nModel Answer (${(activeAnswer as any).institute || 'Vision IAS'}):\n${activeAnswer.answerText}`;
+  const handleCopyQuestion = () => {
+    setShowCopyModal(true);
+  };
+
+  const handleCopyOnlyQuestion = async () => {
+    await Clipboard.setStringAsync(question.questionText);
+    setShowCopyModal(false);
+    Alert.alert('Copied', 'Question copied to clipboard.');
+  };
+
+  const handleCopyQuestionAndCurrentAnswer = async () => {
+    const textToCopy = `Question:\n${question.questionText}\n\nModel Answer (${activeInst}):\n${activeAnswer.answerText}`;
     await Clipboard.setStringAsync(textToCopy);
-    Alert.alert('Copied', 'Question and answer copied to clipboard.');
+    setShowCopyModal(false);
+    Alert.alert('Copied', 'Question and selected answer copied.');
+  };
+
+  const handleCopyQuestionAndAllAnswers = async () => {
+    let textToCopy = `Question:\n${question.questionText}\n\n`;
+    answers.forEach((ans, i) => {
+      textToCopy += `--- Model Answer ${i+1} (${ans.institute || 'Vision IAS'}) ---\n${ans.answerText}\n\n`;
+    });
+    if (detailedBestAnswer) {
+      textToCopy += `--- My Vitamin Answer ---\n${detailedBestAnswer.answer_text}\n\n`;
+    }
+    await Clipboard.setStringAsync(textToCopy.trim());
+    setShowCopyModal(false);
+    Alert.alert('Copied', 'Question and all model answers copied.');
   };
 
   return (
@@ -9334,6 +9431,51 @@ function DetailedQuestionView({
       style={{ flex: 1, backgroundColor: colors.bg }}
     >
       <View style={{ flex: 1 }}>
+      {/* Copy Options Modal */}
+      <Modal
+        visible={showCopyModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowCopyModal(false)}
+      >
+        <Pressable 
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 }}
+          onPress={() => setShowCopyModal(false)}
+        >
+          <View style={{ backgroundColor: colors.surface, borderRadius: 16, width: '100%', maxWidth: 340, padding: 20, borderWidth: 1, borderColor: colors.border }}>
+            <Text style={{ fontSize: 16, fontWeight: '800', color: colors.textPrimary, marginBottom: 16, textAlign: 'center' }}>Copy Options</Text>
+            
+            <TouchableOpacity 
+              onPress={handleCopyOnlyQuestion}
+              style={{ paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: colors.border, alignItems: 'center' }}
+            >
+              <Text style={{ fontSize: 14, fontWeight: '600', color: colors.primary }}>Copy Question Only</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              onPress={handleCopyQuestionAndCurrentAnswer}
+              style={{ paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: colors.border, alignItems: 'center' }}
+            >
+              <Text style={{ fontSize: 14, fontWeight: '600', color: colors.primary }}>Copy Question & Current Answer</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              onPress={handleCopyQuestionAndAllAnswers}
+              style={{ paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: colors.border, alignItems: 'center' }}
+            >
+              <Text style={{ fontSize: 14, fontWeight: '600', color: colors.primary }}>Copy Question & All Answers</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              onPress={() => setShowCopyModal(false)}
+              style={{ marginTop: 12, paddingVertical: 8, alignItems: 'center' }}
+            >
+              <Text style={{ fontSize: 14, fontWeight: '700', color: colors.textSecondary }}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
+
       {/* Floating Back Button */}
       <TouchableOpacity
         onPress={onBack}

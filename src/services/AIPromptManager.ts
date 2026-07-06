@@ -11,7 +11,7 @@ import { supabase } from '../lib/supabase';
 import { NetworkStatus } from '../lib/networkStatus';
 import { OfflineManager } from './OfflineManager';
 
-export type PromptCategory = 'quiz' | 'notes' | 'tags' | 'analysis' | 'syllabus' | 'flashcard' | 'save_sheet';
+export type PromptCategory = 'quiz' | 'mains' | 'notes' | 'tags' | 'analysis' | 'syllabus' | 'flashcard' | 'save_sheet';
 
 export type PromptTemplate = {
   id?: string;
@@ -452,8 +452,117 @@ EXPLANATION: {{explanation}}`,
   },
 ];
 
+export const DEFAULT_MAINS_TEMPLATES: PromptTemplate[] = [
+  {
+    template_name: 'Concept Explanation',
+    template_key: 'concept_explain',
+    button_label: 'Explain',
+    button_emoji: '📚',
+    prompt_text: `Explain the core concept behind this UPSC Mains question completely.
+
+QUESTION:
+{{question}}
+
+MODEL ANSWERS CONTEXT:
+{{correct_answer}}
+
+Provide:
+1. Clear explanation of the core concept.
+2. Key background info and theoretical underpinnings.
+3. Why this matters for the UPSC Mains exam.`,
+    category: 'mains',
+    is_active: true,
+    display_order: 0,
+  },
+  {
+    template_name: 'Critique & Arguments',
+    template_key: 'critique_args',
+    button_label: 'Critique',
+    button_emoji: '⚖️',
+    prompt_text: `Provide a critical analysis and arguments for and against the core issue raised in this question.
+
+QUESTION:
+{{question}}
+
+MODEL ANSWERS CONTEXT:
+{{correct_answer}}
+
+Focus on:
+1. Arguments in favor (Pros / Strengths)
+2. Arguments against (Cons / Challenges)
+3. Forward-looking way forward (Balanced conclusion)`,
+    category: 'mains',
+    is_active: true,
+    display_order: 1,
+  },
+  {
+    template_name: 'Mains Answer Structure',
+    template_key: 'mains_structure',
+    button_label: 'Structure',
+    button_emoji: '🏗️',
+    prompt_text: `Suggest a premium answer writing structure/skeleton for this UPSC Mains question.
+
+QUESTION:
+{{question}}
+
+MODEL ANSWERS CONTEXT:
+{{correct_answer}}
+
+Provide a detailed skeleton:
+1. Introduction: Hook, definition, or key context (ideal word count: 20-30 words).
+2. Body paragraphs: Heading suggestions, bullet-point outlines, and what flow charts/diagrams to draw.
+3. Conclusion: Optimistic way forward, constitutional references, or committee recommendations.`,
+    category: 'mains',
+    is_active: true,
+    display_order: 2,
+  },
+  {
+    template_name: 'Current Context & Links',
+    template_key: 'current_links',
+    button_label: 'Current Link',
+    button_emoji: '🌍',
+    prompt_text: `Link this UPSC Mains topic to recent current affairs, news events (2024-2026), reports, committees, or case studies.
+
+QUESTION:
+{{question}}
+
+MODEL ANSWERS CONTEXT:
+{{correct_answer}}
+
+Provide:
+1. Key recent news linkages or developments.
+2. Relevant committee recommendations, indexes, or stats to cite.
+3. Real-world case studies or success stories in India.`,
+    category: 'mains',
+    is_active: true,
+    display_order: 3,
+  },
+  {
+    template_name: 'Key Points Summary',
+    template_key: 'points_summary',
+    button_label: 'Summary',
+    button_emoji: '🔑',
+    prompt_text: `Summarize the key arguments, facts, and takeaways from the compiled model answers for fast revision.
+
+QUESTION:
+{{question}}
+
+MODEL ANSWERS CONTEXT:
+{{correct_answer}}
+
+Summarize into:
+1. 5 key factual pointers to memorize.
+2. Essential keywords and terms to write.
+3. Simple diagrammatic description (if applicable).`,
+    category: 'mains',
+    is_active: true,
+    display_order: 4,
+  },
+];
+
 const ALL_DEFAULTS: Record<string, PromptTemplate[]> = {
   quiz: DEFAULT_QUIZ_TEMPLATES,
+  mains: DEFAULT_MAINS_TEMPLATES,
   notes: DEFAULT_NOTES_TEMPLATES,
   tags: DEFAULT_TAGS_TEMPLATES,
   analysis: DEFAULT_ANALYSIS_TEMPLATES,
@@ -558,9 +667,10 @@ export class AIPromptManager {
     template: PromptTemplate
   ): Promise<PromptTemplate | null> {
     try {
+      // Use upsert to handle cases where a template key already exists for the user
       const { data, error } = await supabase
         .from('prompt_templates')
-        .insert({ user_id: userId, ...template })
+        .upsert({ user_id: userId, ...template }, { onConflict: 'user_id,template_key' })
         .select()
         .single();
 

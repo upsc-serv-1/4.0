@@ -7,7 +7,7 @@ import { useTheme } from '../../src/context/ThemeContext';
 import { useState, useEffect, useCallback } from 'react';
 import { TabConfigService, TabKey } from '../../src/services/TabConfigService';
 
-const DEFAULT_TAB_ORDER: TabKey[] = ['index', 'arena', 'prelims', 'analyse', 'mains', 'pyq', 'flashcards', 'tags', 'pilot-v2', 'browser', 'revise', 'tracker'];
+const DEFAULT_TAB_ORDER: TabKey[] = ['index', 'search', 'arena', 'prelims', 'analyse', 'mains', 'pyq', 'flashcards', 'tags', 'pilot-v2', 'browser', 'revise', 'tracker'];
 
 export default function TabsLayout() {
   const { colors } = useTheme();
@@ -59,6 +59,7 @@ export default function TabsLayout() {
   // Distinct accent colors for each tab icon (vibrant, not just gray)
   const TAB_COLORS: Record<string, string> = {
     index: '#6366f1',       // Indigo
+    search: '#6366f1',      // Indigo
     arena: '#ef4444',       // Red
     prelims: '#7c3aed',     // Purple
     analyse: '#14b8a6',     // Teal
@@ -79,6 +80,7 @@ export default function TabsLayout() {
 
   const TAB_DEFINITIONS: Record<TabKey, { title: string; icon: any }> = {
     index: { title: 'Home', icon: Home },
+    search: { title: 'Search', icon: Search },
     arena: { title: 'Arena', icon: Target },
     prelims: { title: 'Prelims', icon: Target },
     analyse: { title: 'Analyse', icon: BarChart2 },
@@ -89,7 +91,7 @@ export default function TabsLayout() {
     notes: { title: 'Notes', icon: FileText },
     hardnotes: { title: 'Hardnotes', icon: PenTool },
     capsule: { title: 'Capsule', icon: Sparkles },
-    'pilot-v2': { title: 'Pilot V2', icon: Compass },
+    'pilot-v2': { title: 'Notes', icon: Compass },
     browser: { title: 'Ghost', icon: Globe },
     softnotes: { title: 'Softnotes', icon: BookOpen },
     revise: { title: 'Repo', icon: RotateCcw },

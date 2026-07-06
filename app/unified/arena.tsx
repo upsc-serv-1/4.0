@@ -237,7 +237,7 @@ function UnifiedArenaSetup() {
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
-      KVStore.removeItem('@offline_metadata_consolidated');
+      KVStore.delete('@offline_metadata_consolidated_v1');
       arenaMetadataCache = [];
       arenaMetadataCachedAt = 0;
       await fetchMetadata();

@@ -17,7 +17,7 @@ const ALL_TABS: { key: TabKey; title: string; icon: any }[] = [
   { key: 'notes', title: 'Notes', icon: FileText },
   { key: 'hardnotes', title: 'Hardnotes', icon: PenTool },
   { key: 'softnotes', title: 'Softnotes', icon: BookOpen },
-  { key: 'pilot-v2', title: 'Pilot V2', icon: Compass },
+  { key: 'pilot-v2', title: 'Notes', icon: Compass },
   { key: 'revise', title: 'Revise', icon: RotateCcw },
   { key: 'tracker', title: 'Tracker', icon: LayoutList },
 ];

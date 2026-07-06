@@ -112,6 +112,7 @@ function AISettings() {
 
   const TEMPLATE_CATEGORIES: { key: PromptCategory; label: string; emoji: string }[] = [
     { key: 'quiz', label: 'Quiz', emoji: '📝' },
+    { key: 'mains', label: 'Mains Chat', emoji: '✍️' },
     { key: 'notes', label: 'Notes', emoji: '📔' },
     { key: 'tags', label: 'Tags', emoji: '🏷️' },
     { key: 'analysis', label: 'Analysis', emoji: '📊' },

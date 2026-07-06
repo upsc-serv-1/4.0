@@ -4,9 +4,9 @@
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type TabKey = 'index' | 'arena' | 'prelims' | 'analyse' | 'mains' | 'pyq' | 'flashcards' | 'tags' | 'notes' | 'hardnotes' | 'capsule' | 'softnotes' | 'revise' | 'tracker' | 'ai-search' | 'pilot-v2' | 'browser';
+export type TabKey = 'index' | 'search' | 'arena' | 'prelims' | 'analyse' | 'mains' | 'pyq' | 'flashcards' | 'tags' | 'notes' | 'hardnotes' | 'capsule' | 'softnotes' | 'revise' | 'tracker' | 'ai-search' | 'pilot-v2' | 'browser';
 
-const DEFAULT_TAB_ORDER: TabKey[] = ['index', 'arena', 'prelims', 'analyse', 'mains', 'pyq', 'flashcards', 'ai-search', 'tags', 'pilot-v2', 'hardnotes', 'softnotes', 'notes', 'capsule', 'revise', 'tracker', 'browser'];
+const DEFAULT_TAB_ORDER: TabKey[] = ['index', 'search', 'arena', 'prelims', 'analyse', 'mains', 'pyq', 'flashcards', 'ai-search', 'tags', 'pilot-v2', 'hardnotes', 'softnotes', 'notes', 'capsule', 'revise', 'tracker', 'browser'];
 
 const normalizeOrder = (order: TabKey[]): TabKey[] => {
   const cleaned = order.filter((key, index) => order.indexOf(key) === index);

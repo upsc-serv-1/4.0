@@ -3716,6 +3716,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           micro_topic: q.micro_topic || 'Other',
           sub_topic: q.sub_topic || q.subtopic || q.subTopic || '',
           exam_year: getAnalyticsYear(q) || undefined,
+          marks: q.marks,
           is_pyq: !!q.is_pyq,
           is_ncert: !!q.is_ncert,
           difficulty: q.difficulty || q.difficulty_level,

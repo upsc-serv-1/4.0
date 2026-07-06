@@ -3431,6 +3431,49 @@ function QuestionBankView({
   const [exportSheetVisible, setExportSheetVisible] = useState(false);
   const [exportPayload, setExportPayload] = useState<any>(null);
 
+  // Pinch-to-zoom state for QuestionBankView
+  const [zoomFontSize, setZoomFontSize] = useState<number>(16);
+  const baseFontSizeRef = React.useRef<number>(16);
+  const [showZoomIndicator, setShowZoomIndicator] = useState(false);
+  const zoomTimerRef = React.useRef<any>(null);
+
+  const onPinchGestureEvent = (event: any) => {
+    const scale = event.nativeEvent.scale;
+    let next = baseFontSizeRef.current * scale;
+    next = Math.max(12, Math.min(32, next));
+    setZoomFontSize(Math.round(next));
+    setShowZoomIndicator(true);
+    if (zoomTimerRef.current) clearTimeout(zoomTimerRef.current);
+    zoomTimerRef.current = setTimeout(() => setShowZoomIndicator(false), 1200);
+  };
+
+  const onPinchHandlerStateChange = (event: any) => {
+    if (event.nativeEvent.state === GHState.END || event.nativeEvent.state === GHState.CANCELLED) {
+      baseFontSizeRef.current = zoomFontSize;
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    }
+  };
+
+  const zoomScale = zoomFontSize / 16;
+
+  // Dynamically scaled markdown styles for expanded model answers
+  const dynamicMarkdownStyles = React.useMemo(() => {
+    const base = getMarkdownStyles(colors);
+    const ratio = zoomFontSize / 16;
+    return {
+      ...base,
+      body: {
+        ...base.body,
+        fontSize: Math.round(14 * ratio),
+        lineHeight: Math.round(14 * ratio * 1.5),
+      },
+      heading1: { ...base.heading1, fontSize: Math.round(18 * ratio) },
+      heading2: { ...base.heading2, fontSize: Math.round(16 * ratio) },
+      heading3: { ...base.heading3, fontSize: Math.round(15 * ratio) },
+      heading4: { ...base.heading4, fontSize: Math.round(14 * ratio) },
+    };
+  }, [colors, zoomFontSize]);
+
   // View mode selector state: 'all' | 'questions' | 'valueAdd'
   const [viewMode, setViewMode] = useState<'all' | 'questions' | 'valueAdd'>('all');
 
@@ -3930,8 +3973,25 @@ function QuestionBankView({
           </View>
         )}
         <View style={{ flex: 1 }}>
-        <FlatList
-          ref={flatListRef}
+          {showZoomIndicator && (
+            <View style={{
+              position: 'absolute',
+              top: insets.top + 60,
+              alignSelf: 'center',
+              backgroundColor: 'rgba(0, 0, 0, 0.75)',
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              borderRadius: 20,
+              zIndex: 9999,
+            }}>
+              <Text style={{ color: '#fff', fontSize: 11, fontWeight: '800' }}>ZOOM: {Math.round(zoomScale * 100)}%</Text>
+            </View>
+          )}
+
+          <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
+            <View style={{ flex: 1 }}>
+              <FlatList
+                ref={flatListRef}
           data={activeContent}
             keyExtractor={item => item.id}
             contentContainerStyle={styles.listScroll}
@@ -4441,6 +4501,7 @@ function QuestionBankView({
                       onCopy={onCopy}
                       width="100%"
                       onAddFlashcardClick={onAddFlashcardClick}
+                      zoomScale={zoomScale}
                     />
                   </View>
                 );
@@ -4481,13 +4542,13 @@ function QuestionBankView({
                   >
                     <View style={{ flex: 1 }}>
                       <View style={styles.badgeRow}>
-                        <Text style={[styles.paperBadgeText, { color: '#3b82f6' }]}>{q.paper}</Text>
-                        <Text style={[styles.metaTextDot, { color: colors.textTertiary }]}>•</Text>
-                        <Text style={[styles.metaText, { color: colors.textTertiary }]}>{q.year}</Text>
-                        <Text style={[styles.metaTextDot, { color: colors.textTertiary }]}>•</Text>
-                        <Text style={[styles.metaText, { color: colors.textTertiary }]}>{q.marks} Marks</Text>
+                        <Text style={[styles.paperBadgeText, { color: '#3b82f6', fontSize: Math.round(zoomFontSize * 0.65) }]}>{q.paper}</Text>
+                        <Text style={[styles.metaTextDot, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>•</Text>
+                        <Text style={[styles.metaText, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>{q.year}</Text>
+                        <Text style={[styles.metaTextDot, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>•</Text>
+                        <Text style={[styles.metaText, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>{q.marks} Marks</Text>
                       </View>
-                      <Text style={[styles.questionTitleText, { color: colors.textPrimary }]}>
+                      <Text style={[styles.questionTitleText, { color: colors.textPrimary, fontSize: zoomFontSize, lineHeight: Math.round(zoomFontSize * 1.35) }]}>
                         {q.questionText}
                       </Text>
                     </View>
@@ -4567,10 +4628,11 @@ function QuestionBankView({
                             {(() => {
                               const parsed = parseIntroductoryBox(activeAnswer.answerText);
                               if (parsed) {
+                                const approachZoom = Math.round(14 * zoomScale);
                                 return (
                                   <View style={{ marginTop: 8 }}>
-                                    <ApproachBox content={parsed.body} title={parsed.title} colors={colors} zoomFontSize={14} isDark={isDark} />
-                                    <Markdown style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
+                                    <ApproachBox content={parsed.body} title={parsed.title} colors={colors} zoomFontSize={approachZoom} isDark={isDark} />
+                                    <Markdown style={dynamicMarkdownStyles} rules={getMarkdownRules(colors, isDark)}>
                                       {cleanMarkdown(activeAnswer.answerText.replace(parsed.rawMatch, '').trim())}
                                     </Markdown>
                                   </View>
@@ -4578,7 +4640,7 @@ function QuestionBankView({
                               }
                               return (
                                 <View style={{ marginTop: 8 }}>
-                                  <Markdown style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
+                                  <Markdown style={dynamicMarkdownStyles} rules={getMarkdownRules(colors, isDark)}>
                                     {cleanMarkdown(activeAnswer.answerText)}
                                   </Markdown>
                                 </View>
@@ -4593,6 +4655,8 @@ function QuestionBankView({
               );
             }}
           />
+            </View>
+          </PinchGestureHandler>
         </View>
       </View>
 

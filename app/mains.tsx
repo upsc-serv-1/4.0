@@ -4495,9 +4495,6 @@ function QuestionBankView({
                       <TouchableOpacity onPress={() => onOpenDetailed(q)} style={styles.actionIconButton}>
                         <ExternalLink size={20} color={colors.textTertiary} />
                       </TouchableOpacity>
-                      <TouchableOpacity onPress={() => onToggleSaved(q.id)} style={styles.actionIconButton}>
-                        <Bookmark size={22} color={isBookmarked ? '#f59e0b' : colors.textTertiary} fill={isBookmarked ? '#f59e0b' : 'transparent'} />
-                      </TouchableOpacity>
                       <ChevronDown
                         size={22}
                         color={colors.textTertiary}
@@ -8035,9 +8032,6 @@ function MainsAISearchView({
                           <TouchableOpacity onPress={() => onOpenDetailed(item)} style={styles.actionIconButton}>
                             <ExternalLink size={20} color={colors.textTertiary} />
                           </TouchableOpacity>
-                          <TouchableOpacity onPress={() => onToggleBookmark(item.id)} style={styles.actionIconButton}>
-                            <Bookmark size={22} color={isBookmarked ? '#f59e0b' : colors.textTertiary} fill={isBookmarked ? '#f59e0b' : 'transparent'} />
-                          </TouchableOpacity>
                           {isExpanded ? (
                             <ChevronUp size={22} color={colors.textTertiary} />
                           ) : (
@@ -9738,13 +9732,6 @@ export function DetailedQuestionView({
                 <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1 }}>QUESTION</Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <TouchableOpacity onPress={() => onToggleTag('Must Revise')} style={{ padding: 4 }}>
-                  <Flag
-                    size={14}
-                    color={studyTags.includes('Must Revise') ? '#eab308' : colors.textSecondary}
-                    fill={studyTags.includes('Must Revise') ? '#eab308' : 'transparent'}
-                  />
-                </TouchableOpacity>
                 <TouchableOpacity onPress={handleCopyQuestion} style={{ padding: 4 }}>
                   <Copy size={14} color={colors.textSecondary} />
                 </TouchableOpacity>

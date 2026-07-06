@@ -65,9 +65,6 @@ export const upsertFlashcard = (input: Partial<Flashcard> & { user_id: string })
   const offlineMerged = [...offlineCards.filter(c => c.id !== id), next];
   KVStore.setJson('@cards_all', offlineMerged);
 
-  // Enqueue for remote sync — strip _dirty before sending
-  const { _dirty, ...payload } = next;
-  SyncQueue.enqueue('card_review', payload);
   return next;
 };
 

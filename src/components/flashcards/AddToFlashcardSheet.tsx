@@ -101,7 +101,7 @@ export function AddToFlashcardSheet(props: AddToFlashcardSheetProps) {
     const subject = (hint.subject || 'General').trim();
     const section = (hint.section_group || 'General').trim();
     const micro = (hint.microtopic || 'General').trim();
-    const prefix = hint.isMains ? 'mains \u2192 ' : '';
+    const prefix = hint.isMains ? 'Mains → ' : '';
     return `${prefix}${subject} \u2192 ${section} \u2192 ${micro}`;
   }, [hint]);
 
@@ -309,7 +309,7 @@ export function AddToFlashcardSheet(props: AddToFlashcardSheetProps) {
                   >
                     <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                       <View style={[s.homeIcon, { backgroundColor: colors.primary + '20' }]}>
-                        <Layers size={20} color={colors.primary} />
+                        <Zap size={20} color={colors.primary} />
                       </View>
                       <Text style={[s.moveRowText, { color: colors.textPrimary, marginLeft: 12 }]}>Home</Text>
                     </View>

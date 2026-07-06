@@ -640,27 +640,29 @@ export default function IntegratedSearchScreen() {
     });
   };
 
+  // Cache course-specific prelims questions to avoid calling the slow getOfflineQuestionsEnrichedSync() repeatedly
+  const coursePrelims = useMemo(() => {
+    const allPre = OfflineManager.getOfflineQuestionsEnrichedSync() || [];
+    return allPre.filter((q: any) => q.course === selectedCourse);
+  }, [selectedCourse]);
+
   // Aggregate subjects dynamically - ONLY for the selected course!
   const subjectOptions = useMemo(() => {
     const subjects = new Set<string>();
     // Prelims source
-    const allPre = OfflineManager.getOfflineQuestionsEnrichedSync() || [];
-    const coursePre = allPre.filter((q: any) => q.course === selectedCourse);
-    coursePre.forEach((q: any) => { if (q.subject) subjects.add(q.subject); });
+    coursePrelims.forEach((q: any) => { if (q.subject) subjects.add(q.subject); });
 
     // Mains source
     mainsQuestions.forEach(q => { if (q.subject) subjects.add(q.subject); });
     mainsValueAdd.forEach(va => { if (va.subject) subjects.add(va.subject); });
 
     return ['All', ...Array.from(subjects).sort()];
-  }, [mainsQuestions, mainsValueAdd, selectedCourse]);
+  }, [mainsQuestions, mainsValueAdd, coursePrelims]);
 
   // Aggregate unique institutes dynamically
   const instituteOptions = useMemo(() => {
     const insts = new Set<string>();
-    const allPre = OfflineManager.getOfflineQuestionsEnrichedSync() || [];
-    const coursePre = allPre.filter((q: any) => q.course === selectedCourse);
-    coursePre.forEach((q: any) => {
+    coursePrelims.forEach((q: any) => {
       const tests = Array.isArray(q.tests) ? q.tests[0] : q.tests;
       const inst = tests?.institute || q.provider || q.source?.institute || '';
       if (inst) insts.add(inst);
@@ -669,15 +671,13 @@ export default function IntegratedSearchScreen() {
     mainsQuestions.forEach(q => { if (q.institute) insts.add(q.institute); });
 
     return ['All', ...Array.from(insts).sort()];
-  }, [mainsQuestions, selectedCourse]);
+  }, [mainsQuestions, coursePrelims]);
 
   const programmeOptions = useMemo(() => {
     const progs = new Set<string>();
     
     // 1. Prelims questions
-    const allPre = OfflineManager.getOfflineQuestionsEnrichedSync() || [];
-    const coursePre = allPre.filter((q: any) => q.course === selectedCourse);
-    coursePre.forEach((q: any) => {
+    coursePrelims.forEach((q: any) => {
       const tests = Array.isArray(q.tests) ? q.tests[0] : q.tests;
       const inst = tests?.institute || q.provider || q.source?.institute || '';
       
@@ -700,7 +700,7 @@ export default function IntegratedSearchScreen() {
     });
 
     return ['All', ...Array.from(progs).sort()];
-  }, [selectedCourse, filters.institutes, mainsQuestions]);
+  }, [coursePrelims, filters.institutes, mainsQuestions]);
 
   // Execute integrated search
   const runIntegratedSearch = async (
@@ -1409,6 +1409,7 @@ export default function IntegratedSearchScreen() {
               style={[styles.fchip, filters.subjects.length === 0 && { backgroundColor: colors.primary, borderColor: colors.primary }]}
             >
               <Text style={[styles.fchipText, { color: filters.subjects.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+              {filters.subjects.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
             </TouchableOpacity>
             {subjectOptions.filter(x => x !== 'All').map(sub => {
               const isSelected = filters.subjects.includes(sub);
@@ -1419,6 +1420,7 @@ export default function IntegratedSearchScreen() {
                   style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                 >
                   <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
+                  {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                 </TouchableOpacity>
               );
             })}
@@ -1437,6 +1439,7 @@ export default function IntegratedSearchScreen() {
                 style={[styles.fchip, filters.mainsPapers.length === 0 && { backgroundColor: colors.primary, borderColor: colors.primary }]}
               >
                 <Text style={[styles.fchipText, { color: filters.mainsPapers.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                {filters.mainsPapers.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
               </TouchableOpacity>
               {(['GS1', 'GS2', 'GS3', 'GS4', 'Essay'] as const).map(opt => {
                 const isSelected = filters.mainsPapers.includes(opt);
@@ -1447,6 +1450,7 @@ export default function IntegratedSearchScreen() {
                     style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                   >
                     <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
+                    {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                   </TouchableOpacity>
                 );
               })}
@@ -1465,6 +1469,7 @@ export default function IntegratedSearchScreen() {
               style={[styles.fchip, filters.institutes.length === 0 && { backgroundColor: colors.primary, borderColor: colors.primary }]}
             >
               <Text style={[styles.fchipText, { color: filters.institutes.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+              {filters.institutes.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
             </TouchableOpacity>
             {instituteOptions.filter(x => x !== 'All').map(inst => {
               const isSelected = filters.institutes.includes(inst);
@@ -1475,6 +1480,7 @@ export default function IntegratedSearchScreen() {
                   style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                 >
                   <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{inst}</Text>
+                  {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                 </TouchableOpacity>
               );
             })}
@@ -1492,6 +1498,7 @@ export default function IntegratedSearchScreen() {
               style={[styles.fchip, filters.programmes.length === 0 && { backgroundColor: colors.primary, borderColor: colors.primary }]}
             >
               <Text style={[styles.fchipText, { color: filters.programmes.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+              {filters.programmes.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
             </TouchableOpacity>
             {programmeOptions.filter(x => x !== 'All').map(prog => {
               const isSelected = filters.programmes.includes(prog);
@@ -1502,6 +1509,7 @@ export default function IntegratedSearchScreen() {
                   style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                 >
                   <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{prog}</Text>
+                  {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                 </TouchableOpacity>
               );
             })}
@@ -1556,6 +1564,7 @@ export default function IntegratedSearchScreen() {
                     style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                   >
                     <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
+                    {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                   </TouchableOpacity>
                 );
               })}
@@ -2593,6 +2602,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#cbd5e1',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   fchipText: {
     fontSize: 11,

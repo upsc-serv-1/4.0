@@ -15,7 +15,7 @@ import { useRouter } from 'expo-router';
 import {
   Brain, Search, SlidersHorizontal, X, ChevronRight, ChevronLeft,
   Sparkles, Filter, Clock, ChevronUp, ChevronDown, BookOpen, Target, Zap,
-  TrendingUp, BarChart2, Flame, Bold, Italic, Underline, Highlighter,
+  TrendingUp, BarChart2, Flame, Bold, Italic, Underline, Highlighter, Check,
 } from 'lucide-react-native';
 import { PinchGestureHandler, State as GHState } from 'react-native-gesture-handler';
 import * as Haptics from 'expo-haptics';
@@ -2052,9 +2052,10 @@ export default function AISearchTab() {
                 <View style={styles.chipsWrap}>
                   <TouchableOpacity
                     onPress={() => setPendingFilters(p => ({ ...p, revisionTags: 'All' }))}
-                    style={[styles.fchip, pendingFilters.revisionTags === 'All' && styles.fchipSel]}
+                    style={[styles.fchip, pendingFilters.revisionTags === 'All' && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                   >
                     <Text style={[styles.fchipText, { color: pendingFilters.revisionTags === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
+                    {pendingFilters.revisionTags === 'All' && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                   </TouchableOpacity>
                   {/* Select All — selects every tag so results are filtered to tagged questions only */}
                   {userTags.length > 1 && (
@@ -2064,14 +2065,15 @@ export default function AISearchTab() {
                         revisionTags: userTags.join(','),
                       }))}
                       style={[styles.fchip, {
-                        borderColor: '#7c3aed',
-                        backgroundColor: pendingFilters.revisionTags === userTags.join(',') ? '#7c3aed' : '#ede9fe',
+                        borderColor: colors.primary,
+                        backgroundColor: pendingFilters.revisionTags === userTags.join(',') ? colors.primary : colors.surfaceStrong,
                       }]}
                     >
                       <Text style={[styles.fchipText, {
-                        color: pendingFilters.revisionTags === userTags.join(',') ? '#fff' : '#7c3aed',
+                        color: pendingFilters.revisionTags === userTags.join(',') ? '#fff' : colors.primary,
                         fontWeight: '800',
                       }]}>Select All</Text>
+                      {pendingFilters.revisionTags === userTags.join(',') && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                     </TouchableOpacity>
                   )}
                   {userTags.map(tag => {
@@ -2084,9 +2086,10 @@ export default function AISearchTab() {
                           const next = isSelected ? list.filter(t => t !== tag) : [...list, tag];
                           setPendingFilters(p => ({ ...p, revisionTags: next.length ? next.join(',') : 'All' }));
                         }}
-                        style={[styles.fchip, isSelected && styles.fchipSel]}
+                        style={[styles.fchip, isSelected && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                       >
                         <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{tag}</Text>
+                        {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                       </TouchableOpacity>
                     );
                   })}
@@ -2100,9 +2103,10 @@ export default function AISearchTab() {
                 <View style={styles.chipsWrap}>
                   <TouchableOpacity
                     onPress={() => setPendingFilters(p => ({ ...p, institutes: 'All' }))}
-                    style={[styles.fchip, pendingFilters.institutes === 'All' && styles.fchipSel]}
+                    style={[styles.fchip, pendingFilters.institutes === 'All' && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                   >
                     <Text style={[styles.fchipText, { color: pendingFilters.institutes === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
+                    {pendingFilters.institutes === 'All' && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                   </TouchableOpacity>
                   {instituteOptions.map(inst => {
                     const isSelected = pendingFilters.institutes.split(',').includes(inst);
@@ -2114,9 +2118,10 @@ export default function AISearchTab() {
                           const next = isSelected ? list.filter(i => i !== inst) : [...list, inst];
                           setPendingFilters(p => ({ ...p, institutes: next.length ? next.join(',') : 'All' }));
                         }}
-                        style={[styles.fchip, isSelected && styles.fchipSel]}
+                        style={[styles.fchip, isSelected && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                       >
                         <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{inst}</Text>
+                        {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                       </TouchableOpacity>
                     );
                   })}
@@ -2130,9 +2135,10 @@ export default function AISearchTab() {
               <View style={styles.chipsWrap}>
                 <TouchableOpacity
                   onPress={() => setPendingFilters(p => ({ ...p, stage: 'All' }))}
-                  style={[styles.fchip, pendingFilters.stage === 'All' && styles.fchipSel]}
+                  style={[styles.fchip, pendingFilters.stage === 'All' && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                 >
                   <Text style={[styles.fchipText, { color: pendingFilters.stage === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
+                  {pendingFilters.stage === 'All' && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                 </TouchableOpacity>
                 {['Prelims', 'Mains', 'Optional'].map(s => {
                   const isSelected = pendingFilters.stage.split(',').includes(s);
@@ -2144,9 +2150,10 @@ export default function AISearchTab() {
                         const next = isSelected ? list.filter(x => x !== s) : [...list, s];
                         setPendingFilters(p => ({ ...p, stage: next.length ? next.join(',') : 'All' }));
                       }}
-                      style={[styles.fchip, isSelected && styles.fchipSel]}
+                      style={[styles.fchip, isSelected && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                     >
                       <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{s}</Text>
+                      {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                     </TouchableOpacity>
                   );
                 })}
@@ -2160,9 +2167,10 @@ export default function AISearchTab() {
                 <View style={styles.chipsWrap}>
                   <TouchableOpacity
                     onPress={() => setPendingFilters(p => ({ ...p, programs: 'All' }))}
-                    style={[styles.fchip, pendingFilters.programs === 'All' && styles.fchipSel]}
+                    style={[styles.fchip, pendingFilters.programs === 'All' && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                   >
                     <Text style={[styles.fchipText, { color: pendingFilters.programs === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
+                    {pendingFilters.programs === 'All' && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                   </TouchableOpacity>
                   {programOptions.map(prog => {
                     const isSelected = pendingFilters.programs.split(',').includes(prog);
@@ -2174,9 +2182,10 @@ export default function AISearchTab() {
                           const next = isSelected ? list.filter(p => p !== prog) : [...list, prog];
                           setPendingFilters(p => ({ ...p, programs: next.length ? next.join(',') : 'All' }));
                         }}
-                        style={[styles.fchip, isSelected && styles.fchipSel]}
+                        style={[styles.fchip, isSelected && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                       >
                         <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{prog}</Text>
+                        {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                       </TouchableOpacity>
                     );
                   })}
@@ -2190,9 +2199,10 @@ export default function AISearchTab() {
               <View style={styles.chipsWrap}>
                 <TouchableOpacity
                   onPress={() => setPendingFilters(p => ({ ...p, subjects: 'All', sections: 'All', microtopics: 'All' }))}
-                  style={[styles.fchip, pendingFilters.subjects === 'All' && styles.fchipSel]}
+                  style={[styles.fchip, pendingFilters.subjects === 'All' && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                 >
                   <Text style={[styles.fchipText, { color: pendingFilters.subjects === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
+                  {pendingFilters.subjects === 'All' && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                 </TouchableOpacity>
                 {subjectOptions.length > 0 ? (
                   subjectOptions.map(sub => {
@@ -2205,9 +2215,10 @@ export default function AISearchTab() {
                           const next = isSelected ? list.filter(s => s !== sub) : [...list, sub];
                           setPendingFilters(p => ({ ...p, subjects: next.length ? next.join(',') : 'All', sections: 'All', microtopics: 'All' }));
                         }}
-                        style={[styles.fchip, isSelected && styles.fchipSel]}
+                        style={[styles.fchip, isSelected && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                       >
                         <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
+                        {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                       </TouchableOpacity>
                     );
                   })
@@ -2226,9 +2237,10 @@ export default function AISearchTab() {
                 <View style={styles.chipsWrap}>
                   <TouchableOpacity
                     onPress={() => setPendingFilters(p => ({ ...p, sections: 'All', microtopics: 'All' }))}
-                    style={[styles.fchip, pendingFilters.sections === 'All' && styles.fchipSel]}
+                    style={[styles.fchip, pendingFilters.sections === 'All' && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                   >
                     <Text style={[styles.fchipText, { color: pendingFilters.sections === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
+                    {pendingFilters.sections === 'All' && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                   </TouchableOpacity>
                   {sectionOptions.length > 0 ? (
                     sectionOptions.map(sec => {
@@ -2241,9 +2253,10 @@ export default function AISearchTab() {
                             const next = isSelected ? list.filter(s => s !== sec) : [...list, sec];
                             setPendingFilters(p => ({ ...p, sections: next.length ? next.join(',') : 'All', microtopics: 'All' }));
                           }}
-                          style={[styles.fchip, isSelected && styles.fchipSel]}
+                          style={[styles.fchip, isSelected && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                         >
                           <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sec}</Text>
+                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                         </TouchableOpacity>
                       );
                     })
@@ -2263,9 +2276,10 @@ export default function AISearchTab() {
                 <View style={styles.chipsWrap}>
                   <TouchableOpacity
                     onPress={() => setPendingFilters(p => ({ ...p, microtopics: 'All' }))}
-                    style={[styles.fchip, pendingFilters.microtopics === 'All' && styles.fchipSel]}
+                    style={[styles.fchip, pendingFilters.microtopics === 'All' && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                   >
                     <Text style={[styles.fchipText, { color: pendingFilters.microtopics === 'All' ? '#fff' : colors.textSecondary }]}>All</Text>
+                    {pendingFilters.microtopics === 'All' && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                   </TouchableOpacity>
                   {microtopicOptions.length > 0 ? (
                     microtopicOptions.map(mt => {
@@ -2278,9 +2292,10 @@ export default function AISearchTab() {
                             const next = isSelected ? list.filter(s => s !== mt) : [...list, mt];
                             setPendingFilters(p => ({ ...p, microtopics: next.length ? next.join(',') : 'All' }));
                           }}
-                          style={[styles.fchip, isSelected && styles.fchipSel]}
+                          style={[styles.fchip, isSelected && [styles.fchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                         >
                           <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{mt}</Text>
+                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                         </TouchableOpacity>
                       );
                     })
@@ -3037,7 +3052,7 @@ const styles = StyleSheet.create({
   filterGroup:    { gap: 6 },
   filterGroupTitle:{ fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   chipsWrap:      { flexDirection: 'row', flexWrap: 'wrap', gap: 5 },
-  fchip:          { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, borderWidth: 1, borderColor: '#e2e8f0', backgroundColor: '#f8fafc' },
+  fchip:          { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, borderWidth: 1, borderColor: '#e2e8f0', backgroundColor: '#f8fafc', flexDirection: 'row', alignItems: 'center' },
   fchipSel:       { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
   fchipText:      { fontSize: 11, fontWeight: '700' },
   // Fix #4 styles — dropdown sits below the search row (toggle row ~33px + search row ~68px = ~101px)

@@ -868,13 +868,17 @@ export function MainsScreenInner() {
             <HubView onSelect={setCurrentScreen} colors={colors} isTablet={isTablet} />
           )}
           {currentScreen === 'questions' && (
-            <QuestionBankView
+          <QuestionBankView
               colors={colors}
               savedIds={savedQuestionIds}
               onToggleSaved={toggleBookmark}
               isTablet={isTablet}
               insets={insets}
               questions={questions}
+              valueAddItems={valueAddItems}
+              copiedId={copiedId}
+              onCopy={handleCopy}
+              onAddFlashcardClick={handleValueAddFlashcard}
               userTags={userTags}
               userQuestionStates={userQuestionStates}
               onOpenDetailed={(q) => {
@@ -3388,6 +3392,10 @@ function QuestionBankView({
   isTablet,
   insets,
   questions,
+  valueAddItems = [],
+  copiedId = null,
+  onCopy = () => {},
+  onAddFlashcardClick,
   onOpenDetailed,
   userTags,
   userQuestionStates,
@@ -3401,6 +3409,10 @@ function QuestionBankView({
   isTablet: boolean;
   insets: any;
   questions: ConsolidatedQuestion[];
+  valueAddItems?: ValueAdditionItem[];
+  copiedId?: string | null;
+  onCopy?: (id: string, text: string) => void;
+  onAddFlashcardClick?: (item: any, front: string, back: string) => void;
   onOpenDetailed: (q: ConsolidatedQuestion) => void;
   userTags: string[];
   userQuestionStates: Record<string, { reviewTags: string[], confidence: string | null, difficulty: string | null }>;
@@ -3416,6 +3428,9 @@ function QuestionBankView({
   const cardYOffsets = useRef<Record<string, number>>({});
   const [exportSheetVisible, setExportSheetVisible] = useState(false);
   const [exportPayload, setExportPayload] = useState<any>(null);
+
+  // View mode selector state: 'all' | 'questions' | 'valueAdd'
+  const [viewMode, setViewMode] = useState<'all' | 'questions' | 'valueAdd'>('all');
 
   useEffect(() => {
     if (expandedId) {
@@ -3498,8 +3513,9 @@ function QuestionBankView({
   const allPapers = useMemo(() => {
     const paperSet = new Set<string>();
     questions.forEach(q => { if (q.paper) paperSet.add(q.paper); });
+    valueAddItems.forEach(va => { if (va.paper) paperSet.add(va.paper); });
     return Array.from(paperSet).sort();
-  }, [questions]);
+  }, [questions, valueAddItems]);
 
   const subjectOptions = useMemo(() => {
     const paperFilter = filters.paper !== 'All' ? filters.paper.split('|') : [];
@@ -3509,8 +3525,13 @@ function QuestionBankView({
         if (q.subject) subSet.add(q.subject);
       }
     });
+    valueAddItems.forEach(va => {
+      if (paperFilter.length === 0 || paperFilter.includes(va.paper || '')) {
+        if (va.subject) subSet.add(va.subject);
+      }
+    });
     return Array.from(subSet).sort();
-  }, [questions, filters.paper]);
+  }, [questions, valueAddItems, filters.paper]);
 
   const sectionOptions = useMemo(() => {
     const paperFilter = filters.paper !== 'All' ? filters.paper.split('|') : [];
@@ -3524,8 +3545,16 @@ function QuestionBankView({
         secSet.add(sGroup);
       }
     });
+    valueAddItems.forEach(va => {
+      const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
+      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(va.subject || '');
+      const sGroup = getValueAddSection(va);
+      if (matchPaper && matchSubject && sGroup) {
+        secSet.add(sGroup);
+      }
+    });
     return Array.from(secSet).sort(naturalCompare);
-  }, [questions, filters.paper, filters.subjects]);
+  }, [questions, valueAddItems, filters.paper, filters.subjects]);
 
   const microtopicOptions = useMemo(() => {
     const paperFilter = filters.paper !== 'All' ? filters.paper.split('|') : [];
@@ -3541,8 +3570,17 @@ function QuestionBankView({
         mtSet.add(micro);
       }
     });
+    valueAddItems.forEach(va => {
+      const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
+      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(va.subject || '');
+      const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getValueAddSection(va));
+      const micro = getValueAddMicro(va);
+      if (matchPaper && matchSubject && matchSec && micro) {
+        mtSet.add(micro);
+      }
+    });
     return Array.from(mtSet).sort(naturalCompare);
-  }, [questions, filters.paper, filters.subjects, filters.sections]);
+  }, [questions, valueAddItems, filters.paper, filters.subjects, filters.sections]);
 
   const subtopicOptions = useMemo(() => {
     const paperFilter = filters.paper !== 'All' ? filters.paper.split('|') : [];
@@ -3560,8 +3598,18 @@ function QuestionBankView({
         subSet.add(sub);
       }
     });
+    valueAddItems.forEach(va => {
+      const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
+      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(va.subject || '');
+      const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getValueAddSection(va));
+      const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(getValueAddMicro(va));
+      const sub = getValueAddSub(va);
+      if (matchPaper && matchSubject && matchSec && matchMicro && sub) {
+        subSet.add(sub);
+      }
+    });
     return Array.from(subSet).sort(naturalCompare);
-  }, [questions, filters.paper, filters.subjects, filters.sections, filters.microtopics]);
+  }, [questions, valueAddItems, filters.paper, filters.subjects, filters.sections, filters.microtopics]);
 
   const nanotopicOptions = useMemo(() => {
     const paperFilter = filters.paper !== 'All' ? filters.paper.split('|') : [];
@@ -3581,8 +3629,19 @@ function QuestionBankView({
         ntSet.add(nano);
       }
     });
+    valueAddItems.forEach(va => {
+      const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
+      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(va.subject || '');
+      const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getValueAddSection(va));
+      const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(getValueAddMicro(va));
+      const matchSub = subtopicFilter.length === 0 || subtopicFilter.includes(getValueAddSub(va));
+      const nano = getValueAddNano(va);
+      if (matchPaper && matchSubject && matchSec && matchMicro && matchSub && nano) {
+        ntSet.add(nano);
+      }
+    });
     return Array.from(ntSet).sort(naturalCompare);
-  }, [questions, filters.paper, filters.subjects, filters.sections, filters.microtopics, filters.subtopics]);
+  }, [questions, valueAddItems, filters.paper, filters.subjects, filters.sections, filters.microtopics, filters.subtopics]);
 
   const macrotagOptions = useMemo(() => {
     const paperFilter = filters.paper !== 'All' ? filters.paper.split('|') : [];
@@ -3637,6 +3696,7 @@ function QuestionBankView({
   // The naive useMemo blocks React rendering for 40+ seconds on large question sets.
   // Instead we run filtering asynchronously and show chip visual feedback instantly.
   const [filteredQuestions, setFilteredQuestions] = useState<ConsolidatedQuestion[]>([]);
+  const [filteredValueAdds, setFilteredValueAdds] = useState<ValueAdditionItem[]>([]);
   const filterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const filterVersionRef = useRef(0);
 
@@ -3666,6 +3726,7 @@ function QuestionBankView({
       const selectedTags = filters.revisionTags !== 'All' ? filters.revisionTags.split(',') : null;
       const searchLower = search.trim().toLowerCase();
 
+      // Filter Questions
       const result = questions.filter(q => {
         if (version !== filterVersionRef.current) return false; // stale, abort early
 
@@ -3732,6 +3793,62 @@ function QuestionBankView({
         return true;
       });
 
+      // Filter Value Additions
+      const valAddResult = valueAddItems.filter(va => {
+        if (version !== filterVersionRef.current) return false; // stale, abort early
+
+        // PYQ Filter: Value additions are not PYQs, so if pyqFilter is 'PYQ Only', we hide them
+        if (filters.pyqFilter === 'PYQ Only') return false;
+
+        // Paper filter
+        if (paperFilter.length > 0) {
+          const matchPaper = paperFilter.includes(va.paper || '');
+          if (!matchPaper) return false;
+        } else {
+          if (va.paper === 'Optional') return false;
+        }
+
+        // Subject filter
+        if (subjectFilter.length > 0) {
+          const matchSubject = subjectFilter.includes(va.subject || '');
+          if (!matchSubject) return false;
+        }
+
+        // Section group filter
+        if (sectionFilter.length > 0) {
+          const matchSection = sectionFilter.includes(getValueAddSection(va));
+          if (!matchSection) return false;
+        }
+
+        // Microtopic filter
+        if (microtopicFilter.length > 0) {
+          const matchMicro = microtopicFilter.includes(getValueAddMicro(va));
+          if (!matchMicro) return false;
+        }
+
+        // Subtopic filter
+        if (subtopicFilter.length > 0) {
+          const matchSub = subtopicFilter.includes(getValueAddSub(va));
+          if (!matchSub) return false;
+        }
+
+        // Nanotopic filter
+        if (nanotopicFilter.length > 0) {
+          const matchNano = nanotopicFilter.includes(getValueAddNano(va));
+          if (!matchNano) return false;
+        }
+
+        // Search text matching
+        if (searchLower) {
+          const matchSearch = (va.title?.toLowerCase() || '').includes(searchLower) ||
+            (va.subject?.toLowerCase() || '').includes(searchLower) ||
+            (getValueAddSub(va).toLowerCase() || '').includes(searchLower);
+          if (!matchSearch) return false;
+        }
+
+        return true;
+      });
+
       if (version === filterVersionRef.current) {
         const elapsed = Date.now() - startTs;
         if (elapsed > 100) {
@@ -3762,13 +3879,24 @@ function QuestionBankView({
           return 0;
         });
         setFilteredQuestions(result);
+        setFilteredValueAdds(valAddResult);
       }
     }, 0); // defer to next frame
 
     return () => {
       if (filterTimerRef.current) clearTimeout(filterTimerRef.current);
     };
-  }, [search, filters, questions, userQuestionStates]);
+  }, [search, filters, questions, valueAddItems, userQuestionStates]);
+
+  const activeContent = useMemo(() => {
+    if (viewMode === 'questions') {
+      return filteredQuestions;
+    } else if (viewMode === 'valueAdd') {
+      return filteredValueAdds;
+    } else {
+      return [...filteredQuestions, ...filteredValueAdds];
+    }
+  }, [viewMode, filteredQuestions, filteredValueAdds]);
 
   return (
     <View style={styles.subContainer}>
@@ -3790,7 +3918,7 @@ function QuestionBankView({
               macrotagOptions={macrotagOptions}
               microtagOptions={microtagOptions}
               isSearchView={false}
-              totalCount={filteredQuestions.length}
+              totalCount={filteredQuestions.length + filteredValueAdds.length}
               allInstitutes={allInstitutes}
               allPrograms={allPrograms}
               userTags={userTags}
@@ -3802,7 +3930,7 @@ function QuestionBankView({
         <View style={{ flex: 1 }}>
         <FlatList
           ref={flatListRef}
-          data={filteredQuestions}
+          data={activeContent}
             keyExtractor={item => item.id}
             contentContainerStyle={styles.listScroll}
             showsVerticalScrollIndicator={false}
@@ -3837,7 +3965,7 @@ function QuestionBankView({
                           paper: q.paper,
                           macrotag: q.macrotag,
                           microtag: q.microtag,
-                          _explanations: (q.answers || []).map((a: ConsolidatedAnswer) => ({
+                          _explanations: (q.answers || []).map((a: any) => ({
                             source: a.institute,
                             text: a.answerText,
                           })),
@@ -3895,6 +4023,38 @@ function QuestionBankView({
                         </TouchableOpacity>
                       )}
                     </View>
+                  </View>
+
+                  {/* ─── VIEW MODE SWITCHER ─── */}
+                  <View style={{ flexDirection: 'row', gap: 6, marginTop: 6, marginBottom: 2 }}>
+                    {(['all', 'questions', 'valueAdd'] as const).map(mode => {
+                      const labels: Record<string, string> = { all: 'All', questions: 'Questions Only', valueAdd: 'Value Additions Only' };
+                      const counts: Record<string, number> = { all: filteredQuestions.length + filteredValueAdds.length, questions: filteredQuestions.length, valueAdd: filteredValueAdds.length };
+                      const colors_map: Record<string, string> = { all: '#7c3aed', questions: '#3b82f6', valueAdd: '#10b981' };
+                      const isActive = viewMode === mode;
+                      return (
+                        <TouchableOpacity
+                          key={mode}
+                          onPress={() => setViewMode(mode)}
+                          style={[
+                            styles.filterPill,
+                            {
+                              backgroundColor: isActive ? colors_map[mode] : (colors.surface + 'b3'),
+                              borderColor: isActive ? colors_map[mode] : colors.border,
+                              paddingVertical: 5,
+                              paddingHorizontal: 10,
+                            }
+                          ]}
+                        >
+                          <Text style={[styles.filterPillText, { color: isActive ? '#fff' : colors.textSecondary, fontWeight: '700', fontSize: 11 }]}>
+                            {labels[mode]}
+                          </Text>
+                          <View style={{ backgroundColor: isActive ? 'rgba(255,255,255,0.25)' : colors.border, borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1, marginLeft: 5 }}>
+                            <Text style={{ fontSize: 9, fontWeight: '900', color: isActive ? '#fff' : colors.textTertiary }}>{counts[mode]}</Text>
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    })}
                   </View>
 
                   {(() => {
@@ -4256,7 +4416,36 @@ function QuestionBankView({
                 </View>
               </View>
             }
-            renderItem={({ item: q }) => {
+            renderItem={({ item }) => {
+              // ── VALUE ADDITION CARD ──
+              if ((item as any).category !== undefined && !(item as any).questionText) {
+                const va = item as ValueAdditionItem;
+                return (
+                  <View key={va.id} style={[styles.figmaQuestionCard, { backgroundColor: 'rgba(236,253,245,0.7)', borderColor: 'rgba(16,185,129,0.3)', marginBottom: 12, borderWidth: 1.5 }]}>
+                    {/* VA Header badge */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4 }}>
+                      <View style={{ backgroundColor: '#d1fae5', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 }}>
+                        <Text style={{ fontSize: 9, fontWeight: '900', color: '#059669', letterSpacing: 0.5 }}>VALUE ADDITION</Text>
+                      </View>
+                      <View style={{ backgroundColor: '#f0fdf4', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, borderWidth: 1, borderColor: '#bbf7d0' }}>
+                        <Text style={{ fontSize: 9, fontWeight: '800', color: '#047857' }}>{va.paper || ''}{va.paper && va.subject ? ' · ' : ''}{va.subject || ''}</Text>
+                      </View>
+                    </View>
+                    <ValueAdditionCard
+                      item={va}
+                      colors={colors}
+                      isDark={isDark}
+                      copiedId={copiedId}
+                      onCopy={onCopy}
+                      width="100%"
+                      onAddFlashcardClick={onAddFlashcardClick}
+                    />
+                  </View>
+                );
+              }
+
+              // ── QUESTION CARD ──
+              const q = item as ConsolidatedQuestion;
               const isExpanded = expandedId === q.id;
               const isBookmarked = savedIds.includes(q.id);
 
@@ -9889,7 +10078,7 @@ export function DetailedQuestionView({
                     <ActivityIndicator size="small" color="#8b5cf6" />
                   ) : (
                     <>
-                      <Layers size={14} color={isFlashcarded ? '#8b5cf6' : colors.textSecondary} />
+                      <Zap size={14} color={isFlashcarded ? '#8b5cf6' : colors.textSecondary} />
                       <Text style={{ fontSize: 12, fontWeight: '600', color: isFlashcarded ? '#7c3aed' : colors.textSecondary }}>
                         {isFlashcarded ? 'In Flashcards' : 'Add Flashcard'}
                       </Text>

@@ -2258,11 +2258,19 @@ export const ValueAdditionCard = React.memo(function ValueAdditionCard({
           />
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10, paddingRight: 4, gap: 8 }}>
             <TouchableOpacity
-              onPress={() => onAddFlashcardClick?.(
-                item,
-                `Theme: ${item.category === 'data_facts' ? (item.metric || '') : (item.title || '')}`,
-                item.rawContent || item.context || item.quoteText || ''
-              )}
+              onPress={() => {
+                const cardTitle = item.category === 'data_facts' ? (item.metric || '') : (item.title || '');
+                // Build back content: for ethics dimensions use the dimensions list text; otherwise use rawContent
+                let backContent = item.rawContent || item.context || item.quoteText || '';
+                if (item.category === 'ethics' && item.ethicsType === 'dimension' && item.ethicsData?.dimensionsList?.length > 0) {
+                  const dimLines = (item.ethicsData.dimensionsList as string[]).map((d: string) => `- ${d}`).join('\n');
+                  backContent = `**Dimensions of ${cardTitle}:**\n${dimLines}\n\n${item.ethicsData.diagramDescription || ''}`.trim();
+                } else if (item.category === 'data_facts') {
+                  // Strip HTML comments (<!-- ... -->) from data_facts content
+                  backContent = (item.rawContent || item.context || '').replace(/<!--[\s\S]*?-->/g, '').trim();
+                }
+                onAddFlashcardClick?.(item, cardTitle, backContent);
+              }}
               style={[styles.copyButton, { borderColor: '#8b5cf6', backgroundColor: '#8b5cf612' }]}
             >
               <Zap size={12} color="#8b5cf6" />

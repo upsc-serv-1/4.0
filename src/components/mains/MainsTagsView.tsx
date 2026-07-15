@@ -484,9 +484,10 @@ export default function MainsTagsView({
     return (
       <View style={{ flex: 1, backgroundColor: colors.bg }}>
         {/* Header */}
-        <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: (insets?.top || 0) + 10 }]}>
           <TouchableOpacity onPress={() => setActiveSubject(null)} style={styles.backBtn}>
-            <ChevronLeft size={24} color={colors.textPrimary} />
+            <ChevronLeft size={22} color={colors.primary} />
+            <Text style={{ fontSize: 11, color: colors.primary, fontWeight: '700', marginTop: 1 }}>Back</Text>
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
             <Text style={[styles.headerTitle, { color: colors.textPrimary }]} numberOfLines={1}>
@@ -592,16 +593,20 @@ export default function MainsTagsView({
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      {/* Top Bar Controls */}
-      <View style={[styles.commandBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+      {/* Top Bar Controls — uses insets for safe area */}
+      <View style={[
+        styles.commandBar,
+        { backgroundColor: colors.surface, borderBottomColor: colors.border, paddingTop: insets?.top || 0 }
+      ]}>
         <TouchableOpacity 
           onPress={onBack} 
-          style={{ padding: 8, marginLeft: -8, marginRight: 4 }}
+          style={{ padding: 8, marginLeft: -4, marginRight: 4 }}
         >
-          <ChevronLeft size={28} color={colors.primary} />
+          <ChevronLeft size={22} color={colors.primary} />
+          <Text style={{ fontSize: 11, color: colors.primary, fontWeight: '700', marginTop: 1 }}>Hub</Text>
         </TouchableOpacity>
         <View style={styles.searchContainer}>
-          <Search size={18} color={colors.textTertiary} />
+          <Search size={16} color={colors.textTertiary} />
           <TextInput
             style={[styles.searchInput, { color: colors.textPrimary }]}
             placeholder="Search mains tags..."
@@ -614,11 +619,11 @@ export default function MainsTagsView({
           onPress={() => setShowFilters(!showFilters)}
           style={[styles.filterButton, { backgroundColor: showFilters ? colors.primary : colors.surfaceStrong + '20' }]}
         >
-          <Filter size={18} color={showFilters ? '#fff' : colors.textSecondary} />
+          <Filter size={16} color={showFilters ? '#fff' : colors.textSecondary} />
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => setMenuVisible(true)} style={[styles.iconBtn, { borderColor: colors.border }]}>
-          <MoreVertical size={17} color={colors.textPrimary} />
+          <MoreVertical size={16} color={colors.textPrimary} />
         </TouchableOpacity>
       </View>
 
@@ -657,14 +662,12 @@ export default function MainsTagsView({
         </View>
       ) : (
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.mainScroll}>
-          <View style={styles.statsRow}>
+        <View style={styles.statsRow}>
             {stats.map((stat, idx) => (
               <View key={idx} style={[styles.statCard, { backgroundColor: colors.surface }]}>
-                <stat.icon size={20} color={colors.primary} />
-                <View>
-                  <Text style={[styles.statValue, { color: colors.textPrimary }]}>{stat.value}</Text>
-                  <Text style={[styles.statLabel, { color: colors.textTertiary }]}>{stat.label}</Text>
-                </View>
+                <stat.icon size={18} color={colors.primary} />
+                <Text style={[styles.statValue, { color: colors.textPrimary }]}>{stat.value}</Text>
+                <Text style={[styles.statLabel, { color: colors.textTertiary }]} numberOfLines={2}>{stat.label}</Text>
               </View>
             ))}
           </View>
@@ -814,12 +817,14 @@ export default function MainsTagsView({
 
 const styles = StyleSheet.create({
   commandBar: {
-    height: 60,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
+    paddingBottom: 10,
+    paddingTop: 12,
     borderBottomWidth: 1,
     gap: 8,
+    minHeight: 60,
   },
   searchContainer: {
     flex: 1,
@@ -881,25 +886,32 @@ const styles = StyleSheet.create({
   },
   statsRow: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
     marginBottom: 20,
   },
   statCard: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
-    gap: 12,
-    padding: 14,
+    justifyContent: 'center',
+    gap: 4,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
     borderRadius: 16,
+    minWidth: 0,
   },
   statValue: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '800',
+    textAlign: 'center',
   },
   statLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    marginTop: 2,
+    fontSize: 9,
+    fontWeight: '700',
+    marginTop: 1,
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
   },
   gridHeader: {
     flexDirection: 'row',
@@ -962,10 +974,11 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   header: {
-    height: 60,
+    minHeight: 60,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
+    paddingBottom: 12,
     borderBottomWidth: 1,
     gap: 12,
   },

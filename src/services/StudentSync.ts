@@ -367,12 +367,40 @@ class StudentSyncService {
       updateData.difficulty_level = patch.review_difficulty;
     }
 
-    const { error } = await supabase
+    // SELECT + UPDATE/INSERT pattern (100% robust, matches saveQuestionState)
+    const { data: existingRows, error: selectError } = await supabase
       .from('mains_question_states')
-      .upsert(updateData, { onConflict: 'user_id,question_id' });
+      .select('id')
+      .eq('user_id', userId)
+      .eq('question_id', questionId);
 
-    if (error) {
-      throw error;
+    if (selectError) {
+      throw selectError;
+    }
+
+    const existing = existingRows && existingRows.length > 0 ? existingRows[0] : null;
+
+    if (existing?.id) {
+      const { error } = await supabase
+        .from('mains_question_states')
+        .update(updateData)
+        .eq('id', existing.id);
+
+      if (error) {
+        throw error;
+      }
+    } else {
+      const { error } = await supabase
+        .from('mains_question_states')
+        .insert(updateData);
+
+      // Handle race condition
+      if (error && error.code === '23505') {
+        return this.saveMainsQuestionState(payload); // Retry
+      }
+      if (error) {
+        throw error;
+      }
     }
   }
 

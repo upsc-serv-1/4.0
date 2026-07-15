@@ -2995,7 +2995,7 @@ function HierarchyModal({
             if (path.subtopic && (subtopicFilter.length === 0 || subtopicFilter.includes(path.subtopic))) {
               if (item.title) sstSet.add(item.title);
             }
-          } else if (activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks') {
+          } else if (activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'keywords_hub' || activeCategory === 'case_studies_hub' || activeCategory === 'sc_judgments_hub') {
             if (path.subtopic && (subtopicFilter.length === 0 || subtopicFilter.includes(path.subtopic))) {
               if (item.title) sstSet.add(item.title);
             }
@@ -3356,7 +3356,13 @@ function HierarchyModal({
 
             {/* COLUMN 7: Macro tag / Sub-sub-theme */}
             {(!isMainsValueAdd || macrotags.length > 0) && renderColumn(
-              isIntroConclusion ? "Card Title" : (isQuotes ? "Title" : (isMnemonics ? "Mnemonic Title" : (isMainsValueAdd ? "Sub-sub-theme" : "Macro tag"))),
+              isIntroConclusion ? "Card Title" : 
+              isQuotes ? "Title" : 
+              isMnemonics ? "Mnemonic Title" : 
+              activeCategory === 'sc_judgments_hub' ? "Judgment Title" : 
+              activeCategory === 'keywords_hub' ? "Keyword" : 
+              activeCategory === 'case_studies_hub' ? "Case Study Title" : 
+              isMainsValueAdd ? "Sub-sub-theme" : "Macro tag",
               macrotags,
               localFilters.macrotags,
               (mat) => {
@@ -4737,7 +4743,7 @@ function ValueAdditionView({
 }) {
   const { isDark } = useTheme();
   const [search, setSearch] = useState('');
-  const [ethicsTab, setEthicsTab] = useState<'diagrams' | 'dimensions' | 'comparisons' | 'innovations' | 'pyq_quotes' | 'keywords' | 'khemka_toolkit' | 'all_formats'>('diagrams');
+  const [ethicsTab, setEthicsTab] = useState<'diagrams' | 'dimensions' | 'comparisons' | 'innovations' | 'pyq_quotes' | 'keywords' | 'philosophies' | 'dilemmas' | 'phrases' | 'khemka_toolkit' | 'all_formats'>('diagrams');
   const [khemkaSubTab, setKhemkaSubTab] = useState<'skeleton' | 'rules' | 'toolkit' | 'cases'>('cases');
   const [vaHubCategories, setVaHubCategories] = useState<string[]>([]);
   const [chipVaHubCategories, setChipVaHubCategories] = useState<string[]>([]);
@@ -4790,11 +4796,11 @@ function ValueAdditionView({
 
   // Actual filter states — used in filteredItems useMemo (may trigger heavy recompute)
   const [templateFilter, setTemplateFilter] = useState<'All' | 'Templates' | 'IntroConclusionOnly'>('All');
-  const [quotesEntryTypeTab, setQuotesEntryTypeTab] = useState<'All' | 'quote' | 'anecdote'>('All');
+  const [quotesEntryTypeTab, setQuotesEntryTypeTab] = useState<'All' | 'quote' | 'anecdote' | 'connecting_words'>('All');
 
   // Immediate chip UI states — update instantly on press so chip appears selected without waiting for filteredItems recompute
   const [chipTemplateFilter, setChipTemplateFilter] = useState<'All' | 'Templates' | 'IntroConclusionOnly'>('All');
-  const [chipQuotesEntryTypeTab, setChipQuotesEntryTypeTab] = useState<'All' | 'quote' | 'anecdote'>('All');
+  const [chipQuotesEntryTypeTab, setChipQuotesEntryTypeTab] = useState<'All' | 'quote' | 'anecdote' | 'connecting_words'>('All');
 
   // Pinch-to-zoom state for Value Additions (ranges from 12 to 32, default 16, representing font size base)
   const [zoomFontSize, setZoomFontSize] = useState<number>(16);
@@ -4918,13 +4924,24 @@ function ValueAdditionView({
           }
           return false;
         }
+        if (ethicsTab === 'philosophies') {
+          return item.ethicsType === 'keyword' && item.core_values === 'philosophy';
+        }
+        if (ethicsTab === 'dilemmas') {
+          return item.ethicsType === 'keyword' && item.core_values === 'dilemma';
+        }
+        if (ethicsTab === 'phrases') {
+          return item.ethicsType === 'keyword' && item.core_values === 'phrase';
+        }
+        if (ethicsTab === 'keywords') {
+          return item.ethicsType === 'keyword' && !['philosophy', 'dilemma', 'phrase'].includes(item.core_values);
+        }
         const mappedTab = 
           ethicsTab === 'diagrams' ? 'diagram' :
           ethicsTab === 'dimensions' ? 'dimension' :
           ethicsTab === 'comparisons' ? 'comparison' :
           ethicsTab === 'innovations' ? 'innovation' :
-          ethicsTab === 'pyq_quotes' ? 'pyq_quote' :
-          ethicsTab === 'keywords' ? 'keyword' : ethicsTab;
+          ethicsTab === 'pyq_quotes' ? 'pyq_quote' : ethicsTab;
         return item.ethicsType === mappedTab;
       }
 
@@ -5035,7 +5052,7 @@ function ValueAdditionView({
             const matchSection = sectionFilter.length === 0 || sectionFilter.includes(sg);
             if (matchSection) {
               const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
-              if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics') {
+              if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics' || currentCat === 'keywords_hub' || currentCat === 'case_studies_hub' || currentCat === 'sc_judgments_hub') {
                 const mt = item.microtopic || '';
                 if (mt) mtSet.add(mt);
               } else {
@@ -5064,7 +5081,7 @@ function ValueAdditionView({
         });
       } else {
         const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
-        if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics') {
+        if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics' || currentCat === 'keywords_hub' || currentCat === 'case_studies_hub' || currentCat === 'sc_judgments_hub') {
           const mt = item.microtopic || '';
           if (mt && microFilter.includes(mt)) {
             const st = item.subtopic || '';
@@ -5098,7 +5115,7 @@ function ValueAdditionView({
         });
       } else {
         const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
-        if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics') {
+        if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'keywords_hub' || currentCat === 'case_studies_hub' || currentCat === 'sc_judgments_hub') {
           const st = item.subtopic || '';
           if (st && subThemeFilter.includes(st)) {
             if (item.title) sstSet.add(item.title);
@@ -5242,13 +5259,24 @@ function ValueAdditionView({
           }
           return false;
         }
+        if (ethicsTab === 'philosophies') {
+          return item.ethicsType === 'keyword' && item.core_values === 'philosophy';
+        }
+        if (ethicsTab === 'dilemmas') {
+          return item.ethicsType === 'keyword' && item.core_values === 'dilemma';
+        }
+        if (ethicsTab === 'phrases') {
+          return item.ethicsType === 'keyword' && item.core_values === 'phrase';
+        }
+        if (ethicsTab === 'keywords') {
+          return item.ethicsType === 'keyword' && !['philosophy', 'dilemma', 'phrase'].includes(item.core_values);
+        }
         const mappedTab = 
           ethicsTab === 'diagrams' ? 'diagram' :
           ethicsTab === 'dimensions' ? 'dimension' :
           ethicsTab === 'comparisons' ? 'comparison' :
           ethicsTab === 'innovations' ? 'innovation' :
-          ethicsTab === 'pyq_quotes' ? 'pyq_quote' :
-          ethicsTab === 'keywords' ? 'keyword' : ethicsTab;
+          ethicsTab === 'pyq_quotes' ? 'pyq_quote' : ethicsTab;
         return item.ethicsType === mappedTab;
       }
       if (activeCategory === 'quotes') {
@@ -5292,6 +5320,9 @@ function ValueAdditionView({
       innovations: 0,
       pyq_quotes: 0,
       keywords: 0,
+      philosophies: 0,
+      dilemmas: 0,
+      phrases: 0,
       khemka_toolkit: 0,
     };
     
@@ -5303,7 +5334,12 @@ function ValueAdditionView({
         if (item.ethicsType === 'comparison') counts.comparisons++;
         if (item.ethicsType === 'innovation') counts.innovations++;
         if (item.ethicsType === 'pyq_quote') counts.pyq_quotes++;
-        if (item.ethicsType === 'keyword') counts.keywords++;
+        if (item.ethicsType === 'keyword') {
+          if (item.core_values === 'philosophy') counts.philosophies++;
+          else if (item.core_values === 'dilemma') counts.dilemmas++;
+          else if (item.core_values === 'phrase') counts.phrases++;
+          else counts.keywords++;
+        }
       }
     });
 
@@ -5870,6 +5906,7 @@ function ValueAdditionView({
                     { id: 'All', label: 'All Entries' },
                     { id: 'quote', label: 'Quotes Only' },
                     { id: 'anecdote', label: 'Anecdotes Only' },
+                    { id: 'connecting_words', label: 'Connecting Words / Statements' },
                   ].map(tab => (
                     <TouchableOpacity
                       key={tab.id}
@@ -5906,6 +5943,9 @@ function ValueAdditionView({
                       { id: 'innovations', label: 'Innovations' },
                       { id: 'pyq_quotes', label: 'PYQ Quotes' },
                       { id: 'keywords', label: 'Keywords' },
+                      { id: 'philosophies', label: 'Religious Philosophy' },
+                      { id: 'dilemmas', label: 'Ethical Dilemmas' },
+                      { id: 'phrases', label: 'Ethics Phrases' },
                       { id: 'khemka_toolkit', label: "Khemka Sir's Hub" }
                     ].map(tab => {
                       const isActive = chipEthicsTab === tab.id;

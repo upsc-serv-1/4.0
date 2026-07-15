@@ -1,10 +1,41 @@
 import { ValueAdditionItem } from './mainsMockData';
-import { normalizePaper } from './mainsConsolidatedLoader';
+import { normalizePaper, normalizeSubject } from './mainsConsolidatedLoader';
 export { ValueAdditionItem };
 
 const cleanHierarchyString = (str: any, defaultVal: string = ''): string => {
   if (!str) return defaultVal;
   return String(str).replace(/\*/g, '').trim();
+};
+
+const getNanotopic = (item: any): string => {
+  if (!item) return '';
+  if (item.nanotopic) return cleanHierarchyString(item.nanotopic);
+  if (item.nanoTopic) return cleanHierarchyString(item.nanoTopic);
+  if (item.nano_topic) return cleanHierarchyString(item.nano_topic);
+  if (Array.isArray(item.hierarchy_path) && item.hierarchy_path.length >= 6) {
+    return cleanHierarchyString(item.hierarchy_path[5]);
+  }
+  return '';
+};
+
+const getMicrotopic = (item: any): string => {
+  if (!item) return '';
+  const mt = cleanHierarchyString(item.microtopic);
+  if (mt) return mt;
+  if (Array.isArray(item.hierarchy_path) && item.hierarchy_path.length >= 4) {
+    return cleanHierarchyString(item.hierarchy_path[3]);
+  }
+  return '';
+};
+
+const getSubtopic = (item: any): string => {
+  if (!item) return '';
+  const st = cleanHierarchyString(item.subtopic);
+  if (st) return st;
+  if (Array.isArray(item.hierarchy_path) && item.hierarchy_path.length >= 5) {
+    return cleanHierarchyString(item.hierarchy_path[4]);
+  }
+  return '';
 };
 
 
@@ -167,6 +198,9 @@ let essayValueAdd: any[] = [];
 let mnemonics: any[] = [];
 let frameworks: any[] = [];
 let ethicsValueAdd: any[] = [];
+let localKeywords: any[] = [];
+let localCaseStudies: any[] = [];
+let localJudgments: any[] = [];
 
 try {
   dataFacts = require('../../mains json files/mains_data_facts.json') || [];
@@ -204,13 +238,35 @@ try {
   console.log('[VALoader] ethics value add json failed to load:', e);
 }
 
+try {
+  localKeywords = require('../../mains json files/mains_keywords.json') || [];
+} catch (e) {
+  console.log('[VALoader] keywords json failed to load:', e);
+}
+
+try {
+  localCaseStudies = require('../../mains json files/mains_case_studies.json') || [];
+} catch (e) {
+  console.log('[VALoader] case studies json failed to load:', e);
+}
+
+try {
+  localJudgments = require('../../mains json files/mains_sc_judgments.json') || [];
+} catch (e) {
+  console.log('[VALoader] sc judgments json failed to load:', e);
+}
+
+
 // Map real items to ValueAdditionItem interface
 const mappedDataFacts: ValueAdditionItem[] = dataFacts.map((item, idx) => ({
   id: `va-df-${idx}`,
   category: 'data_facts',
   paper: normalizePaper(item.paper),
-  subject: cleanHierarchyString(item.subject),
+  subject: normalizeSubject(cleanHierarchyString(item.subject)),
   sectionGroup: cleanHierarchyString(item.section_group),
+  microtopic: getMicrotopic(item),
+  subtopic: getSubtopic(item),
+  nanotopic: getNanotopic(item),
   title: `${item.parameter} - ${item.card_title}`,
   metric: item.card_title,
   context: item.content_markdown,
@@ -222,10 +278,11 @@ const mappedIntroConclusions: ValueAdditionItem[] = introConclusions.map((item, 
   id: `va-ic-${idx}`,
   category: 'intro_conclusion',
   paper: normalizePaper(item.paper),
-  subject: cleanHierarchyString(item.subject),
+  subject: normalizeSubject(cleanHierarchyString(item.subject)),
   sectionGroup: cleanHierarchyString(item.section_group),
-  microtopic: cleanHierarchyString(item.microtopic),
-  subtopic: cleanHierarchyString(item.subtopic),
+  microtopic: getMicrotopic(item),
+  subtopic: getSubtopic(item),
+  nanotopic: getNanotopic(item),
   title: item.card_title,
   introduction: item.body || undefined,
   conclusion: undefined,
@@ -241,26 +298,29 @@ const mappedEssayValueAdd: ValueAdditionItem[] = essayValueAdd.map((item, idx) =
   id: `va-es-${idx}`,
   category: 'quotes',
   paper: normalizePaper(item.paper),
-  subject: cleanHierarchyString(item.subject),
+  subject: normalizeSubject(cleanHierarchyString(item.subject)),
   sectionGroup: cleanHierarchyString(item.section_group),
-  microtopic: cleanHierarchyString(item.microtopic),
+  microtopic: getMicrotopic(item),
+  subtopic: getSubtopic(item),
+  nanotopic: getNanotopic(item),
   title: item.title,
   quoteText: item.content,
   author: item.author || undefined,
   usageGuide: item.usage_guide || undefined,
   source: 'Essay Value Add',
   rawContent: item.content,
-  entry_type: item.entry_type || 'quote',
+  entry_type: item.category === 'Connecting Words' ? 'connecting_words' : (item.entry_type || 'quote'),
 }));
 
 const mappedMnemonics: ValueAdditionItem[] = mnemonics.map((item, idx) => ({
   id: `va-mn-${idx}`,
   category: 'mnemonics',
   paper: normalizePaper(item.paper),
-  subject: cleanHierarchyString(item.subject),
+  subject: normalizeSubject(cleanHierarchyString(item.subject)),
   sectionGroup: cleanHierarchyString(item.section_group),
-  microtopic: cleanHierarchyString(item.microtopic),
-  subtopic: cleanHierarchyString(item.subtopic),
+  microtopic: getMicrotopic(item),
+  subtopic: getSubtopic(item),
+  nanotopic: getNanotopic(item),
   title: item.mnemonic_number_title,
   mnemonicKeyword: item.mnemonic_keyword,
   mnemonicExpansion: item.formula_expansion,
@@ -282,7 +342,7 @@ const mappedFrameworks: ValueAdditionItem[] = frameworks.map((item, idx) => {
     diagramImagePath: item.diagram_image_path,
     hierarchies: Array.isArray(item.hierarchies) ? item.hierarchies.map((h: any) => h ? {
       paper: cleanHierarchyString(h.paper),
-      subject: cleanHierarchyString(h.subject),
+      subject: normalizeSubject(cleanHierarchyString(h.subject)),
       sectionGroup: cleanHierarchyString(h.sectionGroup || h.section_group),
       microtopic: cleanHierarchyString(h.microtopic),
       subtopic: cleanHierarchyString(h.subtopic),
@@ -297,7 +357,7 @@ const mappedFrameworks: ValueAdditionItem[] = frameworks.map((item, idx) => {
 
 const mappedEthics: ValueAdditionItem[] = ethicsValueAdd.flatMap((item, idx) => {
   let ethicsType: any = 'keyword';
-  let subject = cleanHierarchyString(item.subject, 'ETHICS, INTEGRITY & APTITUDE');
+  let subject = normalizeSubject(cleanHierarchyString(item.subject, 'ETHICS, INTEGRITY & APTITUDE'));
   let title = item.title;
   let author = item.author || undefined;
 
@@ -374,10 +434,10 @@ const mappedEthics: ValueAdditionItem[] = ethicsValueAdd.flatMap((item, idx) => 
         id: `va-et-${idx}-rule-${ruleIdx}`,
         category: 'ethics',
         paper: normalizePaper(item.paper),
-        subject: cleanHierarchyString(item.subject, 'ETHICS, INTEGRITY & APTITUDE'),
+        subject: normalizeSubject(cleanHierarchyString(item.subject, 'ETHICS, INTEGRITY & APTITUDE')),
         sectionGroup: cleanHierarchyString(item.section_group),
-        microtopic: cleanHierarchyString(item.microtopic),
-        subtopic: cleanHierarchyString(item.subtopic),
+        microtopic: getMicrotopic(item),
+        subtopic: getSubtopic(item),
         title: ruleTitle,
         ethicsType: 'keyword',
         ethicsData: {
@@ -401,15 +461,16 @@ const mappedEthics: ValueAdditionItem[] = ethicsValueAdd.flatMap((item, idx) => 
 
   return [{
     id: `va-et-${idx}`,
-    category: 'ethics',
+    category: item.core_values === 'general_keyword' ? 'keywords_hub' : item.core_values === 'case_study' ? 'case_studies_hub' : item.core_values === 'judgment' ? 'sc_judgments_hub' : 'ethics',
     paper: normalizePaper(item.paper),
     subject: subject,
     sectionGroup: cleanHierarchyString(item.section_group),
-    microtopic: cleanHierarchyString(item.microtopic),
-    subtopic: cleanHierarchyString(item.subtopic),
+    microtopic: getMicrotopic(item),
+    subtopic: getSubtopic(item),
     title: title,
     author: author,
     ethicsType,
+    core_values: item.core_values || undefined,
     ethicsData: {
       diagramType: item.title,
       diagramDescription: item.content_markdown,
@@ -431,13 +492,94 @@ const mappedEthics: ValueAdditionItem[] = ethicsValueAdd.flatMap((item, idx) => 
   }];
 });
 
+const offlineMappedKeywords: ValueAdditionItem[] = localKeywords.map((item, idx) => ({
+  id: item.id || `va-kw-${idx}`,
+  category: 'keywords_hub',
+  paper: normalizePaper(item.paper),
+  subject: normalizeSubject(cleanHierarchyString(item.subject)),
+  sectionGroup: cleanHierarchyString(item.section_group),
+  microtopic: getMicrotopic(item),
+  subtopic: getSubtopic(item),
+  title: item.title,
+  ethicsType: 'keyword' as any,
+  core_values: 'general_keyword',
+  ethicsData: {
+    keywordDefinition: item.content_markdown,
+    keywordExample: item.content_markdown,
+    diagramType: item.title,
+    diagramDescription: item.content_markdown,
+    dimensionsList: [],
+    comparisonPoints: [],
+    columnHeaders: { col1: 'Aspect', col2: 'Term A', col3: 'Term B' },
+    comparisonNonTableContent: '',
+    diagramsList: []
+  },
+  source: 'Keywords Hub',
+  rawContent: item.content_markdown
+}));
+
+const offlineMappedCaseStudies: ValueAdditionItem[] = localCaseStudies.map((item, idx) => ({
+  id: item.id || `va-cs-${idx}`,
+  category: 'case_studies_hub',
+  paper: normalizePaper(item.paper),
+  subject: normalizeSubject(cleanHierarchyString(item.subject)),
+  sectionGroup: cleanHierarchyString(item.section_group),
+  microtopic: getMicrotopic(item),
+  subtopic: getSubtopic(item),
+  title: item.title,
+  ethicsType: 'keyword' as any,
+  core_values: 'case_study',
+  ethicsData: {
+    keywordDefinition: item.content_markdown,
+    keywordExample: item.content_markdown,
+    diagramType: item.title,
+    diagramDescription: item.content_markdown,
+    dimensionsList: [],
+    comparisonPoints: [],
+    columnHeaders: { col1: 'Aspect', col2: 'Term A', col3: 'Term B' },
+    comparisonNonTableContent: '',
+    diagramsList: []
+  },
+  source: 'Case Studies Hub',
+  rawContent: item.content_markdown
+}));
+
+const offlineMappedJudgments: ValueAdditionItem[] = localJudgments.map((item, idx) => ({
+  id: item.id || `va-jd-${idx}`,
+  category: 'sc_judgments_hub',
+  paper: normalizePaper(item.paper),
+  subject: normalizeSubject(cleanHierarchyString(item.subject)),
+  sectionGroup: cleanHierarchyString(item.section_group),
+  microtopic: getMicrotopic(item),
+  subtopic: getSubtopic(item),
+  title: item.title,
+  ethicsType: 'keyword' as any,
+  core_values: 'judgment',
+  ethicsData: {
+    keywordDefinition: item.content_markdown,
+    keywordExample: item.content_markdown,
+    diagramType: item.title,
+    diagramDescription: item.content_markdown,
+    dimensionsList: [],
+    comparisonPoints: [],
+    columnHeaders: { col1: 'Aspect', col2: 'Term A', col3: 'Term B' },
+    comparisonNonTableContent: '',
+    diagramsList: []
+  },
+  source: 'SC Judgments Hub',
+  rawContent: item.content_markdown
+}));
+
 export const mainsConsolidatedValueAdd: ValueAdditionItem[] = [
   ...mappedDataFacts,
   ...mappedIntroConclusions,
   ...mappedEssayValueAdd,
   ...mappedMnemonics,
   ...mappedFrameworks,
-  ...mappedEthics
+  ...mappedEthics,
+  ...offlineMappedKeywords,
+  ...offlineMappedCaseStudies,
+  ...offlineMappedJudgments
 ];
 
 import { supabase } from '../lib/supabase';
@@ -459,7 +601,8 @@ async function fetchAllRows(tableName: string): Promise<{ data: any[]; error: an
     if (!data || data.length === 0) {
       break;
     }
-    allData = [...allData, ...data];
+    const publishedData = data.filter((row: any) => row.status === undefined || row.status === 'published');
+    allData = [...allData, ...publishedData];
     if (data.length < step) {
       break;
     }
@@ -475,14 +618,20 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     esRes,
     etRes,
     mnRes,
-    fwRes
+    fwRes,
+    kwRes,
+    csRes,
+    jdRes
   ] = await Promise.all([
     fetchAllRows('mains_data_facts'),
     fetchAllRows('mains_intro_conclusions'),
     fetchAllRows('mains_essay_value_add'),
     fetchAllRows('mains_ethics_value_add'),
     fetchAllRows('mains_mnemonics'),
-    fetchAllRows('mains_frameworks')
+    fetchAllRows('mains_frameworks'),
+    fetchAllRows('mains_keywords'),
+    fetchAllRows('mains_case_studies'),
+    fetchAllRows('mains_sc_judgments')
   ]);
 
   if (dfRes.error) throw dfRes.error;
@@ -491,13 +640,19 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
   if (etRes.error) throw etRes.error;
   if (mnRes.error) throw mnRes.error;
   if (fwRes.error) throw fwRes.error;
+  if (kwRes.error) console.warn('mains_keywords fetch error:', kwRes.error);
+  if (csRes.error) console.warn('mains_case_studies fetch error:', csRes.error);
+  if (jdRes.error) console.warn('mains_sc_judgments fetch error:', jdRes.error);
 
   const mappedDataFacts: ValueAdditionItem[] = (dfRes.data || []).map((item, idx) => ({
     id: item.id || `va-df-${idx}`,
     category: 'data_facts',
     paper: normalizePaper(item.paper),
-    subject: cleanHierarchyString(item.subject),
+    subject: normalizeSubject(cleanHierarchyString(item.subject)),
     sectionGroup: cleanHierarchyString(item.section_group),
+    microtopic: getMicrotopic(item),
+    subtopic: getSubtopic(item),
+    nanotopic: getNanotopic(item),
     title: `${item.parameter} - ${item.card_title}`,
     metric: item.card_title,
     context: item.content_markdown,
@@ -509,10 +664,11 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     id: item.id || `va-ic-${idx}`,
     category: 'intro_conclusion',
     paper: normalizePaper(item.paper),
-    subject: cleanHierarchyString(item.subject),
+    subject: normalizeSubject(cleanHierarchyString(item.subject)),
     sectionGroup: cleanHierarchyString(item.section_group),
-    microtopic: cleanHierarchyString(item.microtopic),
-    subtopic: cleanHierarchyString(item.subtopic),
+    microtopic: getMicrotopic(item),
+    subtopic: getSubtopic(item),
+    nanotopic: getNanotopic(item),
     title: item.card_title,
     introduction: item.body || undefined,
     conclusion: undefined,
@@ -528,16 +684,18 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     id: item.id || `va-es-${idx}`,
     category: 'quotes',
     paper: normalizePaper(item.paper),
-    subject: cleanHierarchyString(item.subject),
+    subject: normalizeSubject(cleanHierarchyString(item.subject)),
     sectionGroup: cleanHierarchyString(item.section_group),
-    microtopic: cleanHierarchyString(item.microtopic),
+    microtopic: getMicrotopic(item),
+    subtopic: getSubtopic(item),
+    nanotopic: getNanotopic(item),
     title: item.title,
     quoteText: item.content,
     author: item.author || undefined,
     usageGuide: item.usage_guide || undefined,
     source: 'Essay Value Add',
     rawContent: item.content,
-    entry_type: item.entry_type || 'quote',
+    entry_type: item.category === 'Connecting Words' ? 'connecting_words' : (item.entry_type || 'quote'),
   }));
 
   const mappedMnemonics: ValueAdditionItem[] = (mnRes.data || []).map((item, idx) => ({
@@ -546,8 +704,9 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     paper: normalizePaper(item.paper),
     subject: cleanHierarchyString(item.subject),
     sectionGroup: cleanHierarchyString(item.section_group),
-    microtopic: cleanHierarchyString(item.microtopic),
-    subtopic: cleanHierarchyString(item.subtopic),
+    microtopic: getMicrotopic(item),
+    subtopic: getSubtopic(item),
+    nanotopic: getNanotopic(item),
     title: item.mnemonic_number_title,
     mnemonicKeyword: item.mnemonic_keyword,
     mnemonicExpansion: item.formula_expansion,
@@ -573,6 +732,7 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
         sectionGroup: cleanHierarchyString(h.sectionGroup || h.section_group),
         microtopic: cleanHierarchyString(h.microtopic),
         subtopic: cleanHierarchyString(h.subtopic),
+        nanotopic: cleanHierarchyString(h.nanotopic || h.nanoTopic || h.nano_topic)
       } : h) : [],
       hierarchy_1_path: cleanPath(item.hierarchy_1_path),
       hierarchy_2_path: cleanPath(item.hierarchy_2_path),
@@ -584,7 +744,7 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
 
   const mappedEthics: ValueAdditionItem[] = (etRes.data || []).flatMap((item, idx) => {
     let ethicsType: any = 'keyword';
-    let subject = cleanHierarchyString(item.subject, 'ETHICS, INTEGRITY & APTITUDE');
+    let subject = normalizeSubject(cleanHierarchyString(item.subject, 'ETHICS, INTEGRITY & APTITUDE'));
     let title = item.title;
     let author = item.author || undefined;
 
@@ -661,10 +821,11 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
           id: `${item.id || `va-et-${idx}`}-rule-${ruleIdx}`,
           category: 'ethics',
           paper: normalizePaper(item.paper),
-          subject: cleanHierarchyString(item.subject, 'ETHICS, INTEGRITY & APTITUDE'),
+          subject: normalizeSubject(cleanHierarchyString(item.subject, 'ETHICS, INTEGRITY & APTITUDE')),
           sectionGroup: cleanHierarchyString(item.section_group),
-          microtopic: cleanHierarchyString(item.microtopic),
-          subtopic: cleanHierarchyString(item.subtopic),
+          microtopic: getMicrotopic(item),
+          subtopic: getSubtopic(item),
+          nanotopic: getNanotopic(item),
           title: ruleTitle,
           ethicsType: 'keyword',
           ethicsData: {
@@ -688,15 +849,17 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
 
     return [{
       id: item.id || `va-et-${idx}`,
-      category: 'ethics',
+      category: item.core_values === 'general_keyword' ? 'keywords_hub' : item.core_values === 'case_study' ? 'case_studies_hub' : item.core_values === 'judgment' ? 'sc_judgments_hub' : 'ethics',
       paper: normalizePaper(item.paper),
       subject: subject,
       sectionGroup: cleanHierarchyString(item.section_group),
-      microtopic: cleanHierarchyString(item.microtopic),
-      subtopic: cleanHierarchyString(item.subtopic),
+      microtopic: getMicrotopic(item),
+      subtopic: getSubtopic(item),
+      nanotopic: getNanotopic(item),
       title: title,
       author: author,
       ethicsType,
+      core_values: item.core_values || undefined,
       ethicsData: {
         diagramType: item.title,
         diagramDescription: item.content_markdown,
@@ -718,13 +881,97 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     }];
   });
 
+  // Map Keywords from dedicated table
+  const mappedKeywords: ValueAdditionItem[] = (kwRes.data || []).map((item, idx) => ({
+    id: item.id || `va-kw-${idx}`,
+    category: 'keywords_hub',
+    paper: normalizePaper(item.paper),
+    subject: normalizeSubject(cleanHierarchyString(item.subject)),
+    sectionGroup: cleanHierarchyString(item.section_group),
+    microtopic: getMicrotopic(item),
+    subtopic: getSubtopic(item),
+    title: item.title,
+    ethicsType: 'keyword' as any,
+    core_values: 'general_keyword',
+    ethicsData: {
+      keywordDefinition: item.content_markdown,
+      keywordExample: item.content_markdown,
+      diagramType: item.title,
+      diagramDescription: item.content_markdown,
+      dimensionsList: [],
+      comparisonPoints: [],
+      columnHeaders: { col1: 'Aspect', col2: 'Term A', col3: 'Term B' },
+      comparisonNonTableContent: '',
+      diagramsList: []
+    },
+    source: 'Keywords Hub',
+    rawContent: item.content_markdown
+  }));
+
+  // Map Case Studies from dedicated table
+  const mappedCaseStudies: ValueAdditionItem[] = (csRes.data || []).map((item, idx) => ({
+    id: item.id || `va-cs-${idx}`,
+    category: 'case_studies_hub',
+    paper: normalizePaper(item.paper),
+    subject: normalizeSubject(cleanHierarchyString(item.subject)),
+    sectionGroup: cleanHierarchyString(item.section_group),
+    microtopic: getMicrotopic(item),
+    subtopic: getSubtopic(item),
+    title: item.title,
+    ethicsType: 'keyword' as any,
+    core_values: 'case_study',
+    ethicsData: {
+      keywordDefinition: item.content_markdown,
+      keywordExample: item.content_markdown,
+      diagramType: item.title,
+      diagramDescription: item.content_markdown,
+      dimensionsList: [],
+      comparisonPoints: [],
+      columnHeaders: { col1: 'Aspect', col2: 'Term A', col3: 'Term B' },
+      comparisonNonTableContent: '',
+      diagramsList: []
+    },
+    source: 'Case Studies Hub',
+    rawContent: item.content_markdown
+  }));
+
+  // Map SC Judgments from dedicated table
+  const mappedJudgments: ValueAdditionItem[] = (jdRes.data || []).map((item, idx) => ({
+    id: item.id || `va-jd-${idx}`,
+    category: 'sc_judgments_hub',
+    paper: normalizePaper(item.paper),
+    subject: normalizeSubject(cleanHierarchyString(item.subject)),
+    sectionGroup: cleanHierarchyString(item.section_group),
+    microtopic: getMicrotopic(item),
+    subtopic: getSubtopic(item),
+    title: item.title,
+    ethicsType: 'keyword' as any,
+    core_values: 'judgment',
+    ethicsData: {
+      keywordDefinition: item.content_markdown,
+      keywordExample: item.content_markdown,
+      diagramType: item.title,
+      diagramDescription: item.content_markdown,
+      dimensionsList: [],
+      comparisonPoints: [],
+      columnHeaders: { col1: 'Aspect', col2: 'Term A', col3: 'Term B' },
+      comparisonNonTableContent: '',
+      diagramsList: []
+    },
+    source: 'SC Judgments Hub',
+    rawContent: item.content_markdown
+  }));
+
   return [
     ...mappedDataFacts,
     ...mappedIntroConclusions,
     ...mappedEssayValueAdd,
     ...mappedMnemonics,
     ...mappedFrameworks,
-    ...mappedEthics
+    ...mappedEthics,
+    ...mappedKeywords,
+    ...mappedCaseStudies,
+    ...mappedJudgments
   ];
 }
 

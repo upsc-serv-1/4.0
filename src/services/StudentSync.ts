@@ -10,6 +10,7 @@ const USER_ATTEMPTS_PREFIX = '@user_attempts_';
 export type WriteKind = 
   | 'attempt_draft' 
   | 'question_state' 
+  | 'mains_question_state' 
   | 'attempt_submit' 
   | 'user_note' 
   | 'note_content' 
@@ -201,6 +202,8 @@ class StudentSyncService {
     switch (kind) {
       case 'question_state':
         return this.saveQuestionState(payload);
+      case 'mains_question_state':
+        return this.saveMainsQuestionState(payload);
       case 'user_note':
         return this.saveUserNote(payload);
       case 'tag_update':
@@ -336,6 +339,40 @@ class StudentSyncService {
         return this.saveQuestionState(payload); // Retry
       }
       if (error) throw error;
+    }
+  }
+
+  private async saveMainsQuestionState(payload: any): Promise<void> {
+    const { userId, questionId, patch } = payload;
+    if (!questionId || !userId) {
+      console.warn('[Sync] Skipping mains_question_state because questionId/userId is missing');
+      return;
+    }
+
+    console.log(`[Sync] Saving mains state for Q:${questionId} User:${userId}`, patch);
+
+    const updateData: any = {
+      user_id: userId,
+      question_id: questionId,
+      updated_at: new Date().toISOString()
+    };
+
+    if (patch.hasOwnProperty('review_tags')) {
+      updateData.review_tags = patch.review_tags;
+    }
+    if (patch.hasOwnProperty('confidence')) {
+      updateData.confidence = patch.confidence;
+    }
+    if (patch.hasOwnProperty('review_difficulty')) {
+      updateData.difficulty_level = patch.review_difficulty;
+    }
+
+    const { error } = await supabase
+      .from('mains_question_states')
+      .upsert(updateData, { onConflict: 'user_id,question_id' });
+
+    if (error) {
+      throw error;
     }
   }
 

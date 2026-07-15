@@ -49,7 +49,8 @@ import {
 } from 'lucide-react-native';
 import { normalizeTag, formatTagLabel } from '../../utils/tagUtils';
 import Markdown from 'react-native-markdown-display';
-import { getMarkdownStyles, getMarkdownRules, cleanMarkdownContent } from '../../../app/mains';
+import { getMarkdownStyles, getMarkdownRules, cleanMarkdownContent, ValueAdditionCard } from '../../../app/mains';
+import { ValueAdditionItem } from '../../data/mainsValueAdditionLoader';
 import { supabase } from '../../lib/supabase';
 
 // Card for rendering subjective questions in the tags view
@@ -236,6 +237,11 @@ export default function MainsTagsView({
   onBack,
   onOpenDetailed,
   onOpenQuestionBank,
+  valueAddItems = [],
+  valueAddTags = {},
+  onToggleValueAddTag,
+  onCreateTag,
+  userTags = [],
 }: {
   colors: any;
   isTablet: boolean;
@@ -243,19 +249,36 @@ export default function MainsTagsView({
   onBack: () => void;
   onOpenDetailed: (q: MainsTaggedQuestion) => void;
   onOpenQuestionBank: (q: MainsTaggedQuestion) => void;
+  valueAddItems?: ValueAdditionItem[];
+  valueAddTags?: Record<string, string[]>;
+  onToggleValueAddTag?: (cardId: string, tag: string) => void;
+  onCreateTag?: (tag: string) => void;
+  userTags?: string[];
 }) {
+  const { isDark } = useTheme();
   const { session } = useAuth();
   const {
     loading,
     vaultData,
     allQuestions,
-    uniqueTags,
+    uniqueTags: questionTags,
     filters,
     refresh,
     addTagToReview,
     renameTagGlobally,
     removeTagFromReview,
   } = useMainsTaggedVault(session?.user?.id);
+
+  const [copiedId, setCopiedId] = React.useState<string | null>(null);
+  const handleCopy = (id: string, text: string) => {
+    // use React Native clipboard
+    try {
+      const { Clipboard } = require('react-native');
+      Clipboard.setString(text);
+    } catch {}
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   // Local UI State
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -330,13 +353,110 @@ export default function MainsTagsView({
     );
   };
 
+  // Extended unique tags: combine question tags + value addition tags
+  const uniqueTags = useMemo(() => {
+    const tags = new Set<string>();
+    questionTags.forEach(t => tags.add(t));
+    valueAddItems.forEach(item => {
+      (valueAddTags[item.id] || []).forEach(t => tags.add(formatTagLabel(t)));
+    });
+    return Array.from(tags).sort((a, b) => a.localeCompare(b));
+  }, [questionTags, valueAddItems, valueAddTags]);
+
+  // Count of tagged value additions
+  const totalTaggedVAs = useMemo(() => {
+    return valueAddItems.filter(item => (valueAddTags[item.id] || []).length > 0).length;
+  }, [valueAddItems, valueAddTags]);
+
+  // Combined vault data: merge questions + tagged value additions into Subject > Section > MicroTopic hierarchy
+  const combinedVaultData = useMemo(() => {
+    const normalizedSelectedTag = normalizeTag(filters.selectedTag);
+    const normalizedSelectedSubject = (filters.selectedSubject || 'All');
+    const searchQueryClean = (filters.searchQuery || '').trim().toLowerCase();
+
+    // Filter questions (same logic as the hook, but we re-filter allQuestions here)
+    const filteredQuestions = allQuestions.filter(q => {
+      if (normalizedSelectedTag !== 'all') {
+        const hasTag = (q.normalizedReviewTags || []).includes(normalizedSelectedTag);
+        if (!hasTag) return false;
+      }
+      if (normalizedSelectedSubject !== 'All') {
+        if (q.subject.toLowerCase() !== normalizedSelectedSubject.toLowerCase()) return false;
+      }
+      if (searchQueryClean) {
+        const inText = q.questionText.toLowerCase().includes(searchQueryClean);
+        const inSubject = q.subject.toLowerCase().includes(searchQueryClean);
+        const inSec = q.sectionGroup.toLowerCase().includes(searchQueryClean);
+        const inMicro = q.microTopic.toLowerCase().includes(searchQueryClean);
+        if (!inText && !inSubject && !inSec && !inMicro) return false;
+      }
+      return true;
+    });
+
+    // Filter tagged value additions
+    const filteredVAs = valueAddItems.filter(item => {
+      const activeTags = valueAddTags[item.id] || [];
+      if (activeTags.length === 0) return false;
+      if (normalizedSelectedTag !== 'all') {
+        const hasTag = activeTags.map(normalizeTag).includes(normalizedSelectedTag);
+        if (!hasTag) return false;
+      }
+      if (normalizedSelectedSubject !== 'All') {
+        if ((item.subject || '').toLowerCase() !== normalizedSelectedSubject.toLowerCase()) return false;
+      }
+      if (searchQueryClean) {
+        const inTitle = (item.title || item.metric || '').toLowerCase().includes(searchQueryClean);
+        const inSubject = (item.subject || '').toLowerCase().includes(searchQueryClean);
+        const inSec = (item.sectionGroup || '').toLowerCase().includes(searchQueryClean);
+        const inMicro = (item.microtopic || '').toLowerCase().includes(searchQueryClean);
+        const inContent = (item.rawContent || '').toLowerCase().includes(searchQueryClean);
+        if (!inTitle && !inSubject && !inSec && !inMicro && !inContent) return false;
+      }
+      return true;
+    });
+
+    // Build nested Subject > SectionGroup > MicroTopic hierarchy
+    const subjectsMap: Record<string, any> = {};
+
+    filteredQuestions.forEach(q => {
+      const subName = q.subject || 'General';
+      const secName = q.sectionGroup || 'General';
+      const microName = q.microTopic || 'General';
+      if (!subjectsMap[subName]) subjectsMap[subName] = { name: subName, totalCount: 0, sectionGroups: {} };
+      subjectsMap[subName].totalCount++;
+      if (!subjectsMap[subName].sectionGroups[secName]) subjectsMap[subName].sectionGroups[secName] = { name: secName, totalCount: 0, microTopics: {} };
+      subjectsMap[subName].sectionGroups[secName].totalCount++;
+      if (!subjectsMap[subName].sectionGroups[secName].microTopics[microName]) {
+        subjectsMap[subName].sectionGroups[secName].microTopics[microName] = { name: microName, questions: [], valueAdditions: [] };
+      }
+      subjectsMap[subName].sectionGroups[secName].microTopics[microName].questions.push(q);
+    });
+
+    filteredVAs.forEach(item => {
+      const subName = item.subject || 'General';
+      const secName = item.sectionGroup || 'General';
+      const microName = item.microtopic || 'General';
+      if (!subjectsMap[subName]) subjectsMap[subName] = { name: subName, totalCount: 0, sectionGroups: {} };
+      subjectsMap[subName].totalCount++;
+      if (!subjectsMap[subName].sectionGroups[secName]) subjectsMap[subName].sectionGroups[secName] = { name: secName, totalCount: 0, microTopics: {} };
+      subjectsMap[subName].sectionGroups[secName].totalCount++;
+      if (!subjectsMap[subName].sectionGroups[secName].microTopics[microName]) {
+        subjectsMap[subName].sectionGroups[secName].microTopics[microName] = { name: microName, questions: [], valueAdditions: [] };
+      }
+      subjectsMap[subName].sectionGroups[secName].microTopics[microName].valueAdditions.push(item);
+    });
+
+    return subjectsMap;
+  }, [allQuestions, valueAddItems, valueAddTags, filters.selectedTag, filters.selectedSubject, filters.searchQuery]);
+
   // Stats calculation
   const stats = useMemo(() => {
     return [
       { label: 'Tagged Questions', value: allQuestions.length, icon: PenTool },
+      { label: 'Tagged Value Adds', value: totalTaggedVAs, icon: Database },
       { label: 'Active Tags', value: uniqueTags.length, icon: Tag },
     ];
-  }, [allQuestions, uniqueTags]);
+  }, [allQuestions, totalTaggedVAs, uniqueTags]);
 
   const getSubjectIcon = (sub: string) => {
     const n = sub.toLowerCase();
@@ -358,7 +478,7 @@ export default function MainsTagsView({
 
   // Subject folders drill-down
   if (activeSubject) {
-    const subjectData = vaultData[activeSubject];
+    const subjectData = combinedVaultData[activeSubject];
     const sections = subjectData ? Object.values(subjectData.sectionGroups) : [];
 
     return (
@@ -373,7 +493,7 @@ export default function MainsTagsView({
               {activeSubject}
             </Text>
             <Text style={{ fontSize: 12, color: colors.textTertiary }}>
-              {subjectData?.totalCount || 0} tagged questions
+              {subjectData?.totalCount || 0} tagged items
             </Text>
           </View>
         </View>
@@ -385,7 +505,7 @@ export default function MainsTagsView({
               No questions inside subject.
             </Text>
           ) : (
-            sections.map((section) => (
+            (sections as any[]).map((section: any) => (
               <View key={section.name} style={styles.sectionContainer}>
                 <TouchableOpacity
                   onPress={() => toggleSection(section.name)}
@@ -409,10 +529,10 @@ export default function MainsTagsView({
                     <ChevronRight size={18} color={colors.textTertiary} />
                   )}
                 </TouchableOpacity>
-
+ 
                 {expandedSections[section.name] && (
                   <View style={styles.microTopicContainer}>
-                    {Object.values(section.microTopics).map((topic) => (
+                    {Object.values(section.microTopics).map((topic: any) => (
                       <View key={topic.name} style={styles.topicBlock}>
                         <TouchableOpacity
                           onPress={() => toggleMicroTopic(`${section.name}-${topic.name}`)}
@@ -421,13 +541,13 @@ export default function MainsTagsView({
                           <FolderOpen size={14} color={colors.textSecondary} />
                           <Text style={[styles.topicName, { color: colors.textSecondary }]}>{topic.name}</Text>
                           <View style={[styles.countBadge, { backgroundColor: colors.surfaceStrong + '20' }]}>
-                            <Text style={[styles.countText, { color: colors.textSecondary }]}>{topic.questions.length}</Text>
+                            <Text style={[styles.countText, { color: colors.textSecondary }]}>{topic.questions.length + (topic.valueAdditions || []).length}</Text>
                           </View>
                         </TouchableOpacity>
                         
                         {expandedMicroTopics[`${section.name}-${topic.name}`] && (
                           <View style={styles.questionsList}>
-                            {topic.questions.map((q) => (
+                            {topic.questions.map((q: any) => (
                               <MainsRepoQuestionCard
                                 key={q.id}
                                 question={q}
@@ -436,6 +556,27 @@ export default function MainsTagsView({
                                 colors={colors}
                               />
                             ))}
+                            {(topic.valueAdditions || []).length > 0 && (
+                              <View style={{ marginTop: topic.questions.length > 0 ? 8 : 0 }}>
+                                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary, marginBottom: 6, marginLeft: 4, letterSpacing: 0.5 }}>VALUE ADDITIONS</Text>
+                                {(topic.valueAdditions || []).map((item: ValueAdditionItem) => (
+                                  <ValueAdditionCard
+                                    key={item.id}
+                                    item={item}
+                                    colors={colors}
+                                    isDark={isDark}
+                                    copiedId={copiedId}
+                                    onCopy={handleCopy}
+                                    width="100%"
+                                    initialCollapsed={false}
+                                    userTags={userTags}
+                                    valueAddTags={valueAddTags}
+                                    onToggleValueAddTag={onToggleValueAddTag}
+                                    onCreateTag={onCreateTag}
+                                  />
+                                ))}
+                              </View>
+                            )}
                           </View>
                         )}
                       </View>
@@ -510,7 +651,7 @@ export default function MainsTagsView({
       )}
 
       {/* Folders & Cards Grid */}
-      {loading && Object.keys(vaultData).length === 0 ? (
+      {loading && Object.keys(combinedVaultData).length === 0 ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
@@ -541,13 +682,13 @@ export default function MainsTagsView({
           </View>
 
           <View style={viewMode === 'grid' ? styles.grid : styles.list}>
-            {Object.keys(vaultData).length === 0 ? (
+            {Object.keys(combinedVaultData).length === 0 ? (
               <View style={styles.emptyState}>
                 <Database size={48} color={colors.textTertiary} opacity={0.3} />
-                <Text style={{ color: colors.textSecondary, marginTop: 12 }}>No tagged questions found.</Text>
+                <Text style={{ color: colors.textSecondary, marginTop: 12 }}>No tagged items found.</Text>
               </View>
             ) : (
-              Object.values(vaultData)
+              Object.values(combinedVaultData)
                 .filter((x) => x.totalCount > 0)
                 .map((subject) => (
                   <TouchableOpacity

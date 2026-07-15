@@ -69,6 +69,7 @@ import {
   Hash,
   Briefcase,
   Scale,
+  Star,
 } from 'lucide-react-native';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
@@ -383,9 +384,11 @@ export function MainsScreenInner() {
   }, [session?.user?.id]);
 
 
-
   // User Revision Tags (Landed at top level to be shared)
   const [userTags, setUserTags] = useState<string[]>([]);
+  const [valueAddTags, setValueAddTags] = useState<Record<string, string[]>>({});
+  // VA Favorites (saved to Supabase)
+  const [vaFavorites, setVaFavorites] = useState<Set<string>>(new Set());
 
   // Flashcards Integration hook
   const {
@@ -691,8 +694,84 @@ export function MainsScreenInner() {
       const list = Array.from(allTags).sort();
       setUserTags(list.length > 0 ? list : DEFAULT_TAGS);
     };
+    const loadValueAddTags = async () => {
+      try {
+        const raw = await AsyncStorage.getItem('mains_value_add_tags');
+        if (raw) {
+          setValueAddTags(JSON.parse(raw));
+        }
+      } catch (err) {
+        console.error('Failed to load mains_value_add_tags:', err);
+      }
+    };
+    const loadVaFavorites = async () => {
+      if (!session?.user?.id) return;
+      try {
+        const { data, error } = await supabase
+          .from('user_va_favorites')
+          .select('card_id')
+          .eq('user_id', session.user.id);
+        if (!error && data) {
+          setVaFavorites(new Set(data.map((r: any) => r.card_id)));
+        }
+      } catch (err) {
+        console.error('[VA Favorites] Failed to load from Supabase:', err);
+      }
+    };
     loadTags();
+    loadValueAddTags();
+    loadVaFavorites();
   }, [session?.user?.id]);
+
+  const handleToggleVaFavorite = async (cardId: string) => {
+    if (!session?.user?.id) return;
+    const isFav = vaFavorites.has(cardId);
+    // Optimistic update
+    setVaFavorites(prev => {
+      const next = new Set(prev);
+      if (isFav) next.delete(cardId); else next.add(cardId);
+      return next;
+    });
+    try {
+      if (isFav) {
+        await supabase
+          .from('user_va_favorites')
+          .delete()
+          .eq('user_id', session.user.id)
+          .eq('card_id', cardId);
+      } else {
+        await supabase
+          .from('user_va_favorites')
+          .upsert({ user_id: session.user.id, card_id: cardId }, { onConflict: 'user_id,card_id' });
+      }
+    } catch (err) {
+      console.error('[VA Favorites] Failed to sync Supabase:', err);
+      // Revert on error
+      setVaFavorites(prev => {
+        const next = new Set(prev);
+        if (isFav) next.add(cardId); else next.delete(cardId);
+        return next;
+      });
+    }
+  };
+
+  const handleToggleValueAddTag = async (cardId: string, tag: string) => {
+    const currentTags = valueAddTags[cardId] || [];
+    const nextTags = currentTags.includes(tag)
+      ? currentTags.filter(t => t !== tag)
+      : [...currentTags, tag];
+
+    const nextValueAddTags = {
+      ...valueAddTags,
+      [cardId]: nextTags,
+    };
+    setValueAddTags(nextValueAddTags);
+    try {
+      await AsyncStorage.setItem('mains_value_add_tags', JSON.stringify(nextValueAddTags));
+    } catch (err) {
+      console.error('Failed to save mains_value_add_tags:', err);
+    }
+  };
   
   // Saved questions / syllabus progress
   const [savedQuestionIds, setSavedQuestionIds] = useState<string[]>([]);
@@ -892,6 +971,11 @@ export function MainsScreenInner() {
               onActiveQuestionChange={handleActiveQuestionChange}
               initialFilters={sessionFilters || initialFiltersFromParams}
               onFilterChange={setSessionFilters}
+              valueAddTags={valueAddTags}
+              onToggleValueAddTag={handleToggleValueAddTag}
+              onCreateTag={handleCreateDetailedTag}
+              vaFavorites={vaFavorites}
+              onToggleVaFavorite={handleToggleVaFavorite}
             />
           )}
           {currentScreen === 'value-add' && (
@@ -905,6 +989,12 @@ export function MainsScreenInner() {
               activeCategory={valueAddCategory}
               setActiveCategory={setValueAddCategory}
               onAddFlashcardClick={handleValueAddFlashcard}
+              valueAddTags={valueAddTags}
+              userTags={userTags}
+              onToggleValueAddTag={handleToggleValueAddTag}
+              onCreateTag={handleCreateDetailedTag}
+              vaFavorites={vaFavorites}
+              onToggleVaFavorite={handleToggleVaFavorite}
             />
           )}
           {currentScreen === 'revision-tags' && (
@@ -913,8 +1003,16 @@ export function MainsScreenInner() {
               isTablet={isTablet}
               insets={insets}
               onBack={() => setCurrentScreen('hub')}
-              onOpenDetailed={() => {}}
+              onOpenDetailed={(q) => {
+                setPreviousScreen('questions');
+                setDetailedQuestion(q as any);
+              }}
               onOpenQuestionBank={() => {}}
+              valueAddItems={valueAddItems}
+              valueAddTags={valueAddTags}
+              onToggleValueAddTag={handleToggleValueAddTag}
+              onCreateTag={handleCreateDetailedTag}
+              userTags={userTags}
             />
           )}
           {currentScreen === 'search' && (
@@ -938,6 +1036,11 @@ export function MainsScreenInner() {
               }}
               onActiveQuestionChange={handleActiveQuestionChange}
               onAddFlashcardClick={handleValueAddFlashcard}
+              valueAddTags={valueAddTags}
+              onToggleValueAddTag={handleToggleValueAddTag}
+              onCreateTag={handleCreateDetailedTag}
+              vaFavorites={vaFavorites}
+              onToggleVaFavorite={handleToggleVaFavorite}
             />
           )}
           {currentScreen === 'detailed-question' && detailedQuestion && (
@@ -1186,7 +1289,7 @@ function HubView({
                 { 
                   backgroundColor: !isDark ? 'rgba(255, 255, 255, 0.55)' : 'rgba(30, 41, 59, 0.55)', 
                   borderColor: !isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.15)',
-                  width: Platform.OS === 'android' ? (width - 52) / 2 : (isTablet ? '48%' : '48.3%'),
+                  width: isTablet ? '48%' : (width - 52) / 2,
                   padding: isTablet ? 24 : 14,
                 }
               ]}
@@ -1342,6 +1445,78 @@ const preProcessMarkdownTables = (text: string): string => {
     result.push(line);
   }
   return result.join('\n');
+};
+
+const getQuestionTaxonomy = (q: any): string[] => {
+  if (Array.isArray(q.hierarchy_path) && q.hierarchy_path.length > 0) {
+    return q.hierarchy_path.filter((p: any) => p && p !== 'Unknown' && p !== 'undefined' && p !== 'null');
+  }
+  const path: string[] = [];
+  if (q.paper) path.push(q.paper);
+  if (q.subject) path.push(q.subject);
+  if (q.sectionGroup) path.push(q.sectionGroup);
+  if (q.microTopic) path.push(q.microTopic);
+  if (q.subTopic) path.push(q.subTopic);
+  if (q.nanoTopic) path.push(q.nanoTopic);
+  return path.filter((p: any) => p && p !== 'Unknown' && p !== 'undefined' && p !== 'null');
+};
+
+const renderTaxonomyStrip = (q: any, colors: any, isDark: boolean) => {
+  const levels = getQuestionTaxonomy(q);
+  if (levels.length === 0) return null;
+
+  return (
+    <View style={{
+      marginTop: 14,
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        <Layers size={13} color={colors.textSecondary} />
+        <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textSecondary, letterSpacing: 0.5 }}>
+          TAXONOMY HIERARCHY
+        </Text>
+      </View>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 }}>
+        {levels.map((lvl, index) => {
+          const colorsList = [
+            { bg: '#eff6ff', border: '#bfdbfe', text: '#1e40af' }, // Paper (blue)
+            { bg: '#f5f3ff', border: '#ddd6fe', text: '#5b21b6' }, // Subject (purple)
+            { bg: '#fffbeb', border: '#fde68a', text: '#92400e' }, // Section Group (amber)
+            { bg: '#f0fdf4', border: '#bbf7d0', text: '#166534' }, // Micro Topic (green)
+            { bg: '#ecfeff', border: '#a5f3fc', text: '#075985' }, // Sub Topic (cyan)
+            { bg: '#fff5f5', border: '#fed7d7', text: '#9b1c1c' }, // Nano Topic (red)
+          ];
+          const style = colorsList[Math.min(index, colorsList.length - 1)];
+          
+          return (
+            <React.Fragment key={lvl}>
+              {index > 0 && (
+                <Text style={{ fontSize: 11, color: colors.textTertiary, marginHorizontal: 2 }}>&gt;</Text>
+              )}
+              <View style={{
+                backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : style.bg,
+                borderColor: isDark ? 'rgba(255,255,255,0.15)' : style.border,
+                borderWidth: 1,
+                borderRadius: 6,
+                paddingHorizontal: 8,
+                paddingVertical: 3,
+              }}>
+                <Text style={{
+                  fontSize: 11,
+                  fontWeight: '700',
+                  color: isDark ? colors.textPrimary : style.text,
+                }}>
+                  {lvl}
+                </Text>
+              </View>
+            </React.Fragment>
+          );
+        })}
+      </View>
+    </View>
+  );
 };
 
 export const cleanMarkdownContent = (text: string | undefined | null): string => {
@@ -1518,8 +1693,9 @@ const getItemPaths = (item: any): any[] => {
     paper: item.paper || '',
     subject: item.subject || '',
     sectionGroup: item.sectionGroup || '',
-    microtopic: item.microtopic || '',
-    subtopic: item.subtopic || ''
+    microtopic: item.microtopic || (Array.isArray(item.hierarchy_path) && item.hierarchy_path.length >= 4 ? item.hierarchy_path[3] : ''),
+    subtopic: item.subtopic || (Array.isArray(item.hierarchy_path) && item.hierarchy_path.length >= 5 ? item.hierarchy_path[4] : ''),
+    nanotopic: item.nanotopic || item.nanoTopic || item.nano_topic || (Array.isArray(item.hierarchy_path) && item.hierarchy_path.length >= 6 ? item.hierarchy_path[5] : '')
   }];
 };
 
@@ -1905,7 +2081,7 @@ export function ValueAddCardBody({
 
 
 
-const ValueAdditionCard = React.memo(function ValueAdditionCard({
+export const ValueAdditionCard = React.memo(function ValueAdditionCard({
   item,
   colors,
   isDark,
@@ -1920,6 +2096,12 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
   activeCategory,
   onImagePress,
   initialCollapsed = true,
+  userTags,
+  valueAddTags,
+  onToggleValueAddTag,
+  onCreateTag,
+  vaFavorites,
+  onToggleVaFavorite,
 }: {
   item: any;
   colors: any;
@@ -1935,8 +2117,15 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
   activeCategory?: string | null;
   onImagePress?: (uri: string) => void;
   initialCollapsed?: boolean;
+  userTags?: string[];
+  valueAddTags?: Record<string, string[]>;
+  onToggleValueAddTag?: (cardId: string, tag: string) => void;
+  onCreateTag?: (tag: string) => void;
+  vaFavorites?: Set<string>;
+  onToggleVaFavorite?: (cardId: string) => void;
 }) {
   const [collapsed, setCollapsed] = useState(initialCollapsed ?? true);
+  const [showTagsSelector, setShowTagsSelector] = useState(false);
   const isCopied = copiedId === item.id;
 
   useEffect(() => {
@@ -2008,6 +2197,30 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
           {item.source && item.category !== 'data_facts' && item.category !== 'intro_conclusion' && item.category !== 'quotes' && item.category !== 'mnemonics' && item.category !== 'frameworks' && item.category !== 'ethics' && <Text style={styles.vCardSource}>{item.source}</Text>}
         </TouchableOpacity>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          {/* Star / Favorite button — always visible */}
+          {onToggleVaFavorite && (
+            <TouchableOpacity
+              onPress={() => onToggleVaFavorite(item.id)}
+              style={[
+                styles.copyButton,
+                {
+                  borderColor: vaFavorites?.has(item.id) ? '#f59e0b' : (isDark ? 'rgba(255,255,255,0.15)' : '#e2e8f0'),
+                  backgroundColor: vaFavorites?.has(item.id) ? '#f59e0b18' : 'transparent',
+                  paddingHorizontal: 8,
+                  paddingVertical: 6,
+                  minHeight: 28,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }
+              ]}
+            >
+              <Star
+                size={14}
+                color={vaFavorites?.has(item.id) ? '#f59e0b' : colors.textSecondary}
+                fill={vaFavorites?.has(item.id) ? '#f59e0b' : 'none'}
+              />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             onPress={() => setCollapsed(!collapsed)}
             style={[
@@ -2055,6 +2268,21 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
               <Zap size={12} color="#8b5cf6" />
             </TouchableOpacity>
 
+            {userTags && onToggleValueAddTag && (
+              <TouchableOpacity
+                onPress={() => setShowTagsSelector(!showTagsSelector)}
+                style={[
+                  styles.copyButton,
+                  {
+                    borderColor: (valueAddTags?.[item.id] || []).length > 0 ? colors.primary : colors.border,
+                    backgroundColor: (valueAddTags?.[item.id] || []).length > 0 ? colors.primary + '12' : 'transparent',
+                  }
+                ]}
+              >
+                <Tag size={12} color={(valueAddTags?.[item.id] || []).length > 0 ? colors.primary : colors.textSecondary} />
+              </TouchableOpacity>
+            )}
+
             <TouchableOpacity
               onPress={() => onCopy(item.id, item.rawContent || item.context || item.quoteText || '')}
               style={[styles.copyButton, isCopied && { backgroundColor: '#10b981', borderColor: '#10b981' }]}
@@ -2072,6 +2300,42 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
               )}
             </TouchableOpacity>
           </View>
+
+          {showTagsSelector && userTags && onToggleValueAddTag && (
+            <View style={{ marginTop: 10, borderTopWidth: 0.5, borderTopColor: colors.border, paddingTop: 10, paddingHorizontal: 4 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textSecondary }}>SELECT REVISION TAGS</Text>
+                <TouchableOpacity onPress={() => setShowTagsSelector(false)}>
+                  <Text style={{ fontSize: 10, color: colors.primary, fontWeight: '700' }}>Close</Text>
+                </TouchableOpacity>
+              </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexDirection: 'row', gap: 6 }}>
+                {userTags.map(tag => {
+                  const activeTags = valueAddTags?.[item.id] || [];
+                  const isSelected = activeTags.includes(tag);
+                  return (
+                    <TouchableOpacity
+                      key={tag}
+                      onPress={() => onToggleValueAddTag(item.id, tag)}
+                      style={{
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        borderRadius: 6,
+                        borderWidth: 1,
+                        borderColor: isSelected ? colors.primary : colors.border,
+                        backgroundColor: isSelected ? colors.primary + '12' : colors.surface,
+                        marginRight: 6,
+                      }}
+                    >
+                      <Text style={{ fontSize: 10, color: isSelected ? colors.primary : colors.textSecondary, fontWeight: isSelected ? '700' : '400' }}>
+                        {tag}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
         </View>
       )}
     </View>
@@ -2862,7 +3126,9 @@ function HierarchyModal({
           const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
           const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
           if (matchPaper && matchSubject && matchSection) {
-            if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics' || activeCategory === 'keywords_hub' || activeCategory === 'case_studies_hub' || activeCategory === 'sc_judgments_hub') {
+            const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
+            const isStandardHierarchyCat = ['intro_conclusion', 'quotes', 'mnemonics', 'frameworks', 'ethics', 'keywords_hub', 'case_studies_hub', 'sc_judgments_hub', 'data_facts'].includes(currentCat || '');
+            if (isStandardHierarchyCat) {
               if (path.microtopic) mtSet.add(path.microtopic);
             } else {
               const themeName = item.category === 'data_facts' ? item.metric : item.title;
@@ -2907,7 +3173,9 @@ function HierarchyModal({
           const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
           const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
           if (matchPaper && matchSubject && matchSection) {
-            if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics' || activeCategory === 'keywords_hub' || activeCategory === 'case_studies_hub' || activeCategory === 'sc_judgments_hub') {
+            const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
+            const isStandardHierarchyCat = ['intro_conclusion', 'quotes', 'mnemonics', 'frameworks', 'ethics', 'keywords_hub', 'case_studies_hub', 'sc_judgments_hub', 'data_facts'].includes(currentCat || '');
+            if (isStandardHierarchyCat) {
               if (path.microtopic && microtopicFilter.includes(path.microtopic)) {
                 if (path.subtopic) stSet.add(path.subtopic);
               }
@@ -2957,8 +3225,14 @@ function HierarchyModal({
     if (activeCategoryItems && activeCategoryItems.length > 0) {
       activeCategoryItems.forEach(item => {
         getItemPaths(item).forEach(path => {
-          if (path.subtopic && subtopicFilter.includes(path.subtopic)) {
-            if (path.nanotopic) ntSet.add(path.nanotopic);
+          const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
+          const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
+          const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
+          const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(path.microtopic);
+          if (matchPaper && matchSubject && matchSection && matchMicro) {
+            if (path.subtopic && subtopicFilter.includes(path.subtopic)) {
+              if (path.nanotopic) ntSet.add(path.nanotopic);
+            }
           }
         });
       });
@@ -3003,8 +3277,16 @@ function HierarchyModal({
           const matchSub = subtopicFilter.length === 0 || subtopicFilter.includes(path.subtopic);
 
           if (matchPaper && matchSubject && matchSec && matchMicro && matchSub) {
-            if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'keywords_hub' || activeCategory === 'case_studies_hub' || activeCategory === 'sc_judgments_hub') {
-              if (item.title) sstSet.add(item.title);
+            const itemCat = activeCategory === 'va_hub' ? item.category : activeCategory;
+            if (itemCat === 'intro_conclusion') {
+              if (path.subtopic && (subtopicFilter.length === 0 || subtopicFilter.includes(path.subtopic))) {
+                if (item.title) sstSet.add(item.title);
+              }
+            } else if (['quotes', 'mnemonics', 'frameworks', 'ethics', 'keywords_hub', 'case_studies_hub', 'sc_judgments_hub', 'data_facts'].includes(itemCat || '')) {
+              if (path.subtopic && (subtopicFilter.length === 0 || subtopicFilter.includes(path.subtopic))) {
+                const cardTitleName = itemCat === 'data_facts' ? item.metric : item.title;
+                if (cardTitleName) sstSet.add(cardTitleName);
+              }
             } else {
               const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
               subThemes.forEach((st: any) => {
@@ -3363,6 +3645,7 @@ function HierarchyModal({
 
             {/* COLUMN 7: Macro tag / Sub-sub-theme */}
             {(!isMainsValueAdd || macrotags.length > 0) && renderColumn(
+              activeCategory === 'data_facts' ? "Theme" :
               isIntroConclusion ? "Card Title" : 
               isQuotes ? "Title" : 
               isMnemonics ? "Mnemonic Title" : 
@@ -3433,6 +3716,11 @@ function QuestionBankView({
   onActiveQuestionChange,
   initialFilters,
   onFilterChange,
+  valueAddTags = {},
+  onToggleValueAddTag,
+  onCreateTag,
+  vaFavorites = new Set<string>(),
+  onToggleVaFavorite,
 }: {
   colors: any;
   savedIds: string[];
@@ -3450,6 +3738,11 @@ function QuestionBankView({
   onActiveQuestionChange?: (q: ConsolidatedQuestion | null, activeInst?: string) => void;
   initialFilters?: MainsFilters | null;
   onFilterChange?: (filters: MainsFilters) => void;
+  valueAddTags?: Record<string, string[]>;
+  onToggleValueAddTag?: (cardId: string, tag: string) => void;
+  onCreateTag?: (tag: string) => void;
+  vaFavorites?: Set<string>;
+  onToggleVaFavorite?: (cardId: string) => void;
 }) {
   const { isDark } = useTheme();
   const [search, setSearch] = useState('');
@@ -4531,6 +4824,12 @@ function QuestionBankView({
                       width="100%"
                       onAddFlashcardClick={onAddFlashcardClick}
                       zoomScale={zoomScale}
+                      userTags={userTags}
+                      valueAddTags={valueAddTags}
+                      onToggleValueAddTag={onToggleValueAddTag}
+                      onCreateTag={onCreateTag}
+                      vaFavorites={vaFavorites}
+                      onToggleVaFavorite={onToggleVaFavorite}
                     />
                   </View>
                 );
@@ -4593,7 +4892,7 @@ function QuestionBankView({
                     </View>
                   </TouchableOpacity>
 
-                  {isExpanded && q.answers && q.answers.length > 0 && (
+                  {isExpanded && (
                     <View style={[
                       styles.answerContainerSpacious,
                       {
@@ -4602,7 +4901,7 @@ function QuestionBankView({
                         borderTopWidth: 1,
                       }
                     ]}>
-                      {(() => {
+                      {q.answers && q.answers.length > 0 ? (() => {
                         const cleanAnsList = getCleanAvailableAnswers(q.answers);
                         if (cleanAnsList.length === 0) {
                           return (
@@ -4677,7 +4976,14 @@ function QuestionBankView({
                             })()}
                           </View>
                         );
-                      })()}
+                      })() : (
+                        <View style={{ padding: 12 }}>
+                          <Text style={{ fontSize: 13, color: colors.textTertiary, fontStyle: 'italic' }}>
+                            No solved answers available for this question.
+                          </Text>
+                        </View>
+                      )}
+                      {renderTaxonomyStrip(q, colors, isDark)}
                     </View>
                   )}
                 </View>
@@ -4737,6 +5043,12 @@ function ValueAdditionView({
   activeCategory,
   setActiveCategory,
   onAddFlashcardClick,
+  valueAddTags = {},
+  onToggleValueAddTag,
+  onCreateTag,
+  userTags = [],
+  vaFavorites = new Set<string>(),
+  onToggleVaFavorite,
 }: {
   colors: any;
   copiedId: string | null;
@@ -4747,8 +5059,15 @@ function ValueAdditionView({
   activeCategory: string | null;
   setActiveCategory: (cat: string | null) => void;
   onAddFlashcardClick?: (item: any, front: string, back: string) => void;
+  valueAddTags?: Record<string, string[]>;
+  onToggleValueAddTag?: (cardId: string, tag: string) => void;
+  onCreateTag?: (tag: string) => void;
+  userTags?: string[];
+  vaFavorites?: Set<string>;
+  onToggleVaFavorite?: (cardId: string) => void;
 }) {
   const { isDark } = useTheme();
+  const { width } = useWindowDimensions();
   const [search, setSearch] = useState('');
   const [ethicsTab, setEthicsTab] = useState<'diagrams' | 'dimensions' | 'comparisons' | 'innovations' | 'pyq_quotes' | 'keywords' | 'philosophies' | 'dilemmas' | 'phrases' | 'khemka_toolkit' | 'all_formats'>('diagrams');
   const [khemkaSubTab, setKhemkaSubTab] = useState<'skeleton' | 'rules' | 'toolkit' | 'cases'>('cases');
@@ -5059,7 +5378,8 @@ function ValueAdditionView({
             const matchSection = sectionFilter.length === 0 || sectionFilter.includes(sg);
             if (matchSection) {
               const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
-              if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics' || currentCat === 'keywords_hub' || currentCat === 'case_studies_hub' || currentCat === 'sc_judgments_hub') {
+              const isStandardHierarchyCat = ['intro_conclusion', 'quotes', 'mnemonics', 'frameworks', 'ethics', 'keywords_hub', 'case_studies_hub', 'sc_judgments_hub', 'data_facts'].includes(currentCat);
+              if (isStandardHierarchyCat) {
                 const mt = item.microtopic || '';
                 if (mt) mtSet.add(mt);
               } else {
@@ -5088,7 +5408,8 @@ function ValueAdditionView({
         });
       } else {
         const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
-        if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics' || currentCat === 'keywords_hub' || currentCat === 'case_studies_hub' || currentCat === 'sc_judgments_hub') {
+        const isStandardHierarchyCat = ['intro_conclusion', 'quotes', 'mnemonics', 'frameworks', 'ethics', 'keywords_hub', 'case_studies_hub', 'sc_judgments_hub', 'data_facts'].includes(currentCat);
+        if (isStandardHierarchyCat) {
           const mt = item.microtopic || '';
           if (mt && microFilter.includes(mt)) {
             const st = item.subtopic || '';
@@ -5122,10 +5443,12 @@ function ValueAdditionView({
         });
       } else {
         const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
-        if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'keywords_hub' || currentCat === 'case_studies_hub' || currentCat === 'sc_judgments_hub') {
+        const isStandardHierarchyCat = ['intro_conclusion', 'quotes', 'mnemonics', 'frameworks', 'ethics', 'keywords_hub', 'case_studies_hub', 'sc_judgments_hub', 'data_facts'].includes(currentCat);
+        if (isStandardHierarchyCat) {
           const st = item.subtopic || '';
           if (st && subThemeFilter.includes(st)) {
-            if (item.title) sstSet.add(item.title);
+            const cardTitleName = currentCat === 'data_facts' ? item.metric : item.title;
+            if (cardTitleName) sstSet.add(cardTitleName);
           }
         } else {
           const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
@@ -5193,7 +5516,8 @@ function ValueAdditionView({
         let matchTheme = true;
         if (themeFilter.length > 0) {
           const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
-          if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics' || currentCat === 'keywords_hub' || currentCat === 'case_studies_hub' || currentCat === 'sc_judgments_hub') {
+          const isStandardHierarchyCatTheme = ['intro_conclusion', 'quotes', 'mnemonics', 'frameworks', 'ethics', 'keywords_hub', 'case_studies_hub', 'sc_judgments_hub', 'data_facts'].includes(currentCat);
+          if (isStandardHierarchyCatTheme) {
             matchTheme = !!item.microtopic && themeFilter.includes(item.microtopic);
           } else {
             const themeName = item.category === 'data_facts' ? item.metric : item.title;
@@ -5203,8 +5527,9 @@ function ValueAdditionView({
 
         let matchSubTheme = true;
         if (subThemeFilter.length > 0) {
-          const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
-          if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics' || currentCat === 'keywords_hub' || currentCat === 'case_studies_hub' || currentCat === 'sc_judgments_hub') {
+          const currentCat2 = activeCategory === 'va_hub' ? item.category : activeCategory;
+          const isStandardHierarchyCatSubTheme = ['intro_conclusion', 'quotes', 'mnemonics', 'frameworks', 'ethics', 'keywords_hub', 'case_studies_hub', 'sc_judgments_hub', 'data_facts'].includes(currentCat2);
+          if (isStandardHierarchyCatSubTheme) {
             matchSubTheme = !!item.subtopic && subThemeFilter.includes(item.subtopic);
           } else {
             matchSubTheme = !!item.parsedSubThemes && item.parsedSubThemes.some((st: any) => 
@@ -5215,9 +5540,11 @@ function ValueAdditionView({
 
         let matchSubSubTheme = true;
         if (subSubThemeFilter.length > 0) {
-          const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
-          if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics' || currentCat === 'keywords_hub' || currentCat === 'case_studies_hub' || currentCat === 'sc_judgments_hub') {
-            matchSubSubTheme = !!item.title && subSubThemeFilter.includes(item.title);
+          const currentCat3 = activeCategory === 'va_hub' ? item.category : activeCategory;
+          const isStandardHierarchyCatSubSubTheme = ['intro_conclusion', 'quotes', 'mnemonics', 'frameworks', 'ethics', 'keywords_hub', 'case_studies_hub', 'sc_judgments_hub', 'data_facts'].includes(currentCat3);
+          if (isStandardHierarchyCatSubSubTheme) {
+            const cardTitleName = currentCat3 === 'data_facts' ? item.metric : item.title;
+            matchSubSubTheme = !!cardTitleName && subSubThemeFilter.includes(cardTitleName);
           } else {
             matchSubSubTheme = !!item.parsedSubSubThemes && item.parsedSubSubThemes.some((sst: any) => 
               subSubThemeFilter.includes(sst)
@@ -5294,8 +5621,20 @@ function ValueAdditionView({
       return true;
     });
 
-    return list;
-  }, [filteredItems, activeCategory, ethicsTab, quotesEntryTypeTab, khemkaSubTab, vaHubCategories, filters.paper]);
+    // Sort: favorites first, then tagged, then rest — all filter-aware
+    const sorted = [...list].sort((a, b) => {
+      const aFav = vaFavorites.has(a.id) ? 2 : 0;
+      const bFav = vaFavorites.has(b.id) ? 2 : 0;
+      const aTags = (valueAddTags[a.id] || []).length > 0 ? 1 : 0;
+      const bTags = (valueAddTags[b.id] || []).length > 0 ? 1 : 0;
+      const aScore = aFav + aTags;
+      const bScore = bFav + bTags;
+      if (aScore > bScore) return -1;
+      if (aScore < bScore) return 1;
+      return 0; // maintain relative order
+    });
+    return sorted;
+  }, [filteredItems, activeCategory, ethicsTab, quotesEntryTypeTab, khemkaSubTab, vaHubCategories, filters.paper, valueAddTags, vaFavorites]);
 
   // Calculate counts for Khemka sub-tabs dynamically based on current hierarchy/search filters
   const khemkaTabCounts = useMemo(() => {
@@ -6153,6 +6492,10 @@ function ValueAdditionView({
                         activeCategory={activeCategory}
                         onImagePress={setZoomImageUri}
                         initialCollapsed={false}
+                        userTags={userTags}
+                        valueAddTags={valueAddTags}
+                        onToggleValueAddTag={onToggleValueAddTag}
+                        onCreateTag={onCreateTag}
                       />
                     ))}
                   </View>
@@ -6174,6 +6517,12 @@ function ValueAdditionView({
                         activeCategory={activeCategory}
                         onImagePress={setZoomImageUri}
                         initialCollapsed={false}
+                        userTags={userTags}
+                        valueAddTags={valueAddTags}
+                        onToggleValueAddTag={onToggleValueAddTag}
+                        onCreateTag={onCreateTag}
+                        vaFavorites={vaFavorites}
+                        onToggleVaFavorite={onToggleVaFavorite}
                       />
                     ))}
                   </View>
@@ -6197,6 +6546,12 @@ function ValueAdditionView({
                 activeCategory={activeCategory}
                 onImagePress={setZoomImageUri}
                 initialCollapsed={false}
+                userTags={userTags}
+                valueAddTags={valueAddTags}
+                onToggleValueAddTag={onToggleValueAddTag}
+                onCreateTag={onCreateTag}
+                vaFavorites={vaFavorites}
+                onToggleVaFavorite={onToggleVaFavorite}
               />
             );
           }}
@@ -6231,7 +6586,7 @@ function ValueAdditionView({
                     { 
                       backgroundColor: !isDark ? 'rgba(255, 255, 255, 0.55)' : 'rgba(30, 41, 59, 0.55)', 
                       borderColor: !isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.15)',
-                      width: isTablet ? '48%' : '48.3%',
+                      width: isTablet ? '48%' : (width - 44) / 2,
                       padding: isTablet ? 24 : 14,
                     }
                   ]}
@@ -6453,6 +6808,11 @@ function MainsAISearchView({
   userQuestionStates,
   onActiveQuestionChange,
   onAddFlashcardClick,
+  valueAddTags = {},
+  onToggleValueAddTag,
+  onCreateTag,
+  vaFavorites = new Set<string>(),
+  onToggleVaFavorite,
 }: {
   colors: any;
   isTablet: boolean;
@@ -6469,6 +6829,11 @@ function MainsAISearchView({
   userQuestionStates: Record<string, { reviewTags: string[], confidence: string | null, difficulty: string | null }>;
   onActiveQuestionChange?: (q: ConsolidatedQuestion | null, activeInst?: string) => void;
   onAddFlashcardClick?: (item: any, front: string, back: string) => void;
+  valueAddTags?: Record<string, string[]>;
+  onToggleValueAddTag?: (cardId: string, tag: string) => void;
+  onCreateTag?: (tag: string) => void;
+  vaFavorites?: Set<string>;
+  onToggleVaFavorite?: (cardId: string) => void;
 }) {
   const { isDark } = useTheme();
   const { session } = useAuth();
@@ -8175,7 +8540,7 @@ function MainsAISearchView({
                         </View>
                       </TouchableOpacity>
 
-                      {isExpanded && item.answers && item.answers.length > 0 && (
+                      {isExpanded && (
                         <View style={[
                           styles.answerContainerSpacious,
                           {
@@ -8184,7 +8549,7 @@ function MainsAISearchView({
                             borderTopWidth: 1,
                           }
                         ]}>
-                          {(() => {
+                          {item.answers && item.answers.length > 0 ? (() => {
                             const cleanAnsList = getCleanAvailableAnswers(item.answers);
                             if (cleanAnsList.length === 0) {
                               return (
@@ -8255,7 +8620,14 @@ function MainsAISearchView({
                                 })()}
                               </View>
                             );
-                          })()}
+                          })() : (
+                            <View style={{ padding: 12 }}>
+                              <Text style={{ fontSize: 13, color: colors.textTertiary, fontStyle: 'italic' }}>
+                                No solved answers available for this question.
+                              </Text>
+                            </View>
+                          )}
+                          {renderTaxonomyStrip(item, colors, isDark)}
                         </View>
                       )}
                     </View>
@@ -8271,6 +8643,12 @@ function MainsAISearchView({
                       onCopy={onCopy}
                       width="100%"
                       onAddFlashcardClick={onAddFlashcardClick}
+                      userTags={userTags}
+                      valueAddTags={valueAddTags}
+                      onToggleValueAddTag={onToggleValueAddTag}
+                      onCreateTag={onCreateTag}
+                      vaFavorites={vaFavorites}
+                      onToggleVaFavorite={onToggleVaFavorite}
                     />
                   );
                 }

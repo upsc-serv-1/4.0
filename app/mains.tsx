@@ -2862,7 +2862,7 @@ function HierarchyModal({
           const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
           const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
           if (matchPaper && matchSubject && matchSection) {
-            if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
+            if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics' || activeCategory === 'keywords_hub' || activeCategory === 'case_studies_hub' || activeCategory === 'sc_judgments_hub') {
               if (path.microtopic) mtSet.add(path.microtopic);
             } else {
               const themeName = item.category === 'data_facts' ? item.metric : item.title;
@@ -2903,17 +2903,22 @@ function HierarchyModal({
     if (activeCategoryItems && activeCategoryItems.length > 0) {
       activeCategoryItems.forEach(item => {
         getItemPaths(item).forEach(path => {
-          if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics') {
-            if (path.microtopic && microtopicFilter.includes(path.microtopic)) {
-              if (path.subtopic) stSet.add(path.subtopic);
-            }
-          } else {
-            const themeName = item.category === 'data_facts' ? item.metric : item.title;
-            if (themeName === selectedMicrotopic) {
-              const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
-              subThemes.forEach((st: any) => {
-                if (st.title) stSet.add(st.title);
-              });
+          const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
+          const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
+          const matchSection = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
+          if (matchPaper && matchSubject && matchSection) {
+            if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'ethics' || activeCategory === 'keywords_hub' || activeCategory === 'case_studies_hub' || activeCategory === 'sc_judgments_hub') {
+              if (path.microtopic && microtopicFilter.includes(path.microtopic)) {
+                if (path.subtopic) stSet.add(path.subtopic);
+              }
+            } else {
+              const themeName = item.category === 'data_facts' ? item.metric : item.title;
+              if (themeName === selectedMicrotopic) {
+                const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
+                subThemes.forEach((st: any) => {
+                  if (st.title) stSet.add(st.title);
+                });
+              }
             }
           }
         });
@@ -2991,22 +2996,24 @@ function HierarchyModal({
     if (activeCategoryItems && activeCategoryItems.length > 0) {
       activeCategoryItems.forEach(item => {
         getItemPaths(item).forEach(path => {
-          if (activeCategory === 'intro_conclusion') {
-            if (path.subtopic && (subtopicFilter.length === 0 || subtopicFilter.includes(path.subtopic))) {
+          const matchPaper = paperFilter.length === 0 || paperFilter.includes(path.paper);
+          const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(path.subject);
+          const matchSec = sectionFilter.length === 0 || sectionFilter.includes(path.sectionGroup);
+          const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(path.microtopic);
+          const matchSub = subtopicFilter.length === 0 || subtopicFilter.includes(path.subtopic);
+
+          if (matchPaper && matchSubject && matchSec && matchMicro && matchSub) {
+            if (activeCategory === 'intro_conclusion' || activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'keywords_hub' || activeCategory === 'case_studies_hub' || activeCategory === 'sc_judgments_hub') {
               if (item.title) sstSet.add(item.title);
+            } else {
+              const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
+              subThemes.forEach((st: any) => {
+                if (nanotopicFilter.length === 0 || nanotopicFilter.includes(st.title)) {
+                  const sstMatches = splitSubSubThemes(st.content);
+                  sstMatches.forEach(sst => sstSet.add(sst));
+                }
+              });
             }
-          } else if (activeCategory === 'quotes' || activeCategory === 'mnemonics' || activeCategory === 'frameworks' || activeCategory === 'keywords_hub' || activeCategory === 'case_studies_hub' || activeCategory === 'sc_judgments_hub') {
-            if (path.subtopic && (subtopicFilter.length === 0 || subtopicFilter.includes(path.subtopic))) {
-              if (item.title) sstSet.add(item.title);
-            }
-          } else {
-            const subThemes = item.parsedSubThemes || splitSubThemes(item.context);
-            subThemes.forEach((st: any) => {
-              if (nanotopicFilter.length === 0 || nanotopicFilter.includes(st.title)) {
-                const sstMatches = splitSubSubThemes(st.content);
-                sstMatches.forEach(sst => sstSet.add(sst));
-              }
-            });
           }
         });
       });
@@ -5349,17 +5356,16 @@ function ValueAdditionView({
     return counts;
   }, [filteredItems, khemkaTabCounts]);
 
-  // Automatically switch to the first main tab that has >0 matching items if the current tab is empty
   useEffect(() => {
     if (activeCategory === 'ethics') {
-      const currentCount = ethicsTabCounts[ethicsTab] || 0;
+      const currentCount = ethicsTab === 'all_formats' ? 0 : ((ethicsTabCounts as any)[ethicsTab] || 0);
       if (currentCount === 0) {
-        const tabsOrder: (keyof typeof ethicsTabCounts)[] = [
+        const tabsOrder: string[] = [
           'diagrams', 'dimensions', 'comparisons', 'innovations', 'pyq_quotes', 'keywords', 'khemka_toolkit'
         ];
-        const firstActiveTab = tabsOrder.find(t => ethicsTabCounts[t] > 0);
+        const firstActiveTab = tabsOrder.find(t => (ethicsTabCounts as any)[t] > 0);
         if (firstActiveTab) {
-          setEthicsTab(firstActiveTab);
+          setEthicsTab(firstActiveTab as any);
         }
       }
     }
@@ -5442,6 +5448,11 @@ function ValueAdditionView({
                     onChangeText={setSearch}
                     style={[styles.largeSearchText, { color: colors.textPrimary, fontSize: 14 }]}
                   />
+                  {search.length > 0 && (
+                    <TouchableOpacity onPress={() => setSearch('')} style={{ marginRight: 6 }}>
+                      <X size={18} color={colors.textTertiary} />
+                    </TouchableOpacity>
+                  )}
                 </View>
 
                 {isTablet && (

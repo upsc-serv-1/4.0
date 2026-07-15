@@ -172,15 +172,16 @@ class StudentSyncService {
           queue = queue.filter(i => i.id !== item.id);
           await AsyncStorage.setItem(PENDING_WRITES_KEY, JSON.stringify(queue));
         } catch (err: any) {
-          console.error(`[Sync] Failed to apply write ${item.id}`, err);
-          
-          // If it's an RLS error or schema error, remove it so it doesn't block the queue
-          if (err.code === '42501' || err.code === 'PGRST204') {
-            console.warn(`[Sync] Removing permanently failing item: ${err.message}`);
+          // If it's an RLS error, foreign key failure, or schema error, remove it silently (or with a warning) so it doesn't block the queue
+          if (err.code === '42501' || err.code === '23503' || err.code === '42703' || err.code === 'PGRST204') {
+            console.warn(`[Sync] Discarding permanently failing write ${item.id} (${err.code}): ${err.message}`);
             queue = queue.filter(i => i.id !== item.id);
             await AsyncStorage.setItem(PENDING_WRITES_KEY, JSON.stringify(queue));
             continue;
           }
+
+          // Otherwise, it is a transient error (e.g. network offline), log error and retry later
+          console.error(`[Sync] Failed to apply write ${item.id} (will retry):`, err);
 
           item.failedAttempts++;
           item.lastError = err.message;
@@ -245,6 +246,9 @@ class StudentSyncService {
       sanitizedPatch.difficulty_level = sanitizedPatch.review_difficulty;
       delete sanitizedPatch.review_difficulty;
     }
+    if (sanitizedPatch.hasOwnProperty('review_tags')) {
+      sanitizedPatch.marked_must_revise = Array.isArray(sanitizedPatch.review_tags) && sanitizedPatch.review_tags.includes('Must Revise');
+    }
 
     if (sanitizedPatch.hasOwnProperty('status')) {
       const isCorrect = sanitizedPatch.status === 'Correct';
@@ -264,12 +268,17 @@ class StudentSyncService {
     
     // WORKAROUND for missing unique constraint (42P10):
     // 1. Try to find existing record
-    const { data: existing } = await supabase
+    const { data: existingRows, error: selectError } = await supabase
       .from('question_states')
       .select('*')
       .eq('user_id', userId)
-      .eq('question_id', questionId)
-      .maybeSingle();
+      .eq('question_id', questionId);
+
+    if (selectError) {
+      throw new Error(`Select failed: ${selectError.message}`);
+    }
+
+    const existing = existingRows && existingRows.length > 0 ? existingRows[0] : null;
 
     const updateData: any = this.withoutUndefined({
       user_id: userId,
@@ -286,8 +295,12 @@ class StudentSyncService {
       note: sanitizedPatch.note,
       is_incorrect_last_attempt: sanitizedPatch.is_incorrect_last_attempt,
       marked_must_revise: sanitizedPatch.marked_must_revise,
-      attempt_hour: sanitizedPatch.attempt_hour || new Date().getHours(),
-      time_spent_seconds: sanitizedPatch.time_spent_seconds || 0,
+      attempt_hour: sanitizedPatch.hasOwnProperty('attempt_hour') 
+        ? sanitizedPatch.attempt_hour 
+        : (existing?.id ? undefined : new Date().getHours()),
+      time_spent_seconds: sanitizedPatch.hasOwnProperty('time_spent_seconds')
+        ? sanitizedPatch.time_spent_seconds
+        : (existing?.id ? undefined : 0),
       difficulty_level: sanitizedPatch.difficulty_level,
       error_category: sanitizedPatch.error_category,
       updated_at: new Date().toISOString()
@@ -335,12 +348,17 @@ class StudentSyncService {
 
     
     // WORKAROUND for missing unique constraint
-    const { data: existing } = await supabase
+    const { data: existingRows, error: selectError } = await supabase
       .from('user_notes')
       .select('id')
       .eq('user_id', userId)
-      .eq('question_id', questionId)
-      .maybeSingle();
+      .eq('question_id', questionId);
+
+    if (selectError) {
+      throw new Error(`Select failed: ${selectError.message}`);
+    }
+
+    const existing = existingRows && existingRows.length > 0 ? existingRows[0] : null;
 
     const updateData = {
       user_id: userId,
@@ -376,12 +394,17 @@ class StudentSyncService {
 
     
     // WORKAROUND for missing unique constraint
-    const { data: existing } = await supabase
+    const { data: existingRows, error: selectError } = await supabase
       .from('question_states')
       .select('*')
       .eq('user_id', userId)
-      .eq('question_id', questionId)
-      .maybeSingle();
+      .eq('question_id', questionId);
+
+    if (selectError) {
+      throw new Error(`Select failed: ${selectError.message}`);
+    }
+
+    const existing = existingRows && existingRows.length > 0 ? existingRows[0] : null;
 
     const updateData = {
       user_id: userId,

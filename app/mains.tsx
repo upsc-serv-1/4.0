@@ -66,6 +66,9 @@ import {
   Clock,
   Palette,
   FileDown,
+  Hash,
+  Briefcase,
+  Scale,
 } from 'lucide-react-native';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
@@ -1349,11 +1352,11 @@ export const cleanMarkdownContent = (text: string | undefined | null): string =>
   cleaned = cleaned.replace(/<img([\s\S]*?)src=["']([^"']+)["']([\s\S]*?)\/?>/gi, (match, before, src, after) => {
     const altMatch = /alt=["']([^"']+)["']/i.exec(before) || /alt=["']([^"']+)["']/i.exec(after);
     const alt = altMatch ? altMatch[1] : 'Diagram';
-    return `![${alt}](${src})`;
+    return `\n\n![${alt}](${src})\n\n`;
   });
 
   // Strip align wrappers around standard markdown/converted markdown images
-  cleaned = cleaned.replace(/<p\s+align=["']center["']>\s*(!\[[^\]]*\]\([^)]+\))\s*<\/p>/gi, '$1');
+  cleaned = cleaned.replace(/<p\s+align=["']center["']>\s*(!\[[^\]]*\]\([^)]+\))\s*<\/p>/gi, '\n\n$1\n\n');
   cleaned = cleaned.replace(/<p[^>]*>/gi, '');
   cleaned = cleaned.replace(/<\/p>/gi, '\n');
 
@@ -1886,6 +1889,16 @@ export function ValueAddCardBody({
           onImagePress={onImagePress}
         />
       )}
+
+      {(item.category === 'keywords_hub' || item.category === 'case_studies_hub' || item.category === 'sc_judgments_hub') && (
+        <MainsEthicsCard
+          item={item}
+          colors={colors}
+          ethicsTab="keywords"
+          zoomScale={scale}
+          onImagePress={onImagePress}
+        />
+      )}
     </View>
   );
 }
@@ -1941,6 +1954,9 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
     { id: 'mnemonics', title: 'Mnemonics', color: '#f59e0b' },
     { id: 'frameworks', title: 'Frameworks', color: '#f43f5e' },
     { id: 'ethics', title: 'Ethics Specific Hub', color: '#06b6d4' },
+    { id: 'keywords_hub', title: 'Keywords', color: '#ec4899' },
+    { id: 'case_studies_hub', title: 'Case Studies', color: '#f97316' },
+    { id: 'sc_judgments_hub', title: 'SC Judgments', color: '#ef4444' },
     { id: 'va_hub', title: 'VA Hub', color: '#7c3aed' },
   ];
   const categoryTitle = submodules.find(s => s.id === item.category)?.title || item.category;
@@ -2036,7 +2052,7 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
               )}
               style={[styles.copyButton, { borderColor: '#8b5cf6', backgroundColor: '#8b5cf612' }]}
             >
-              <Layers size={12} color="#8b5cf6" />
+              <Zap size={12} color="#8b5cf6" />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -4842,7 +4858,10 @@ function ValueAdditionView({
     { id: 'mnemonics', title: 'Mnemonics', subtitle: 'Memory Hooks', icon: Brain, color: '#f59e0b', desc: 'Abbreviations and memory structures for quick syllabus topic recovery.' },
     { id: 'frameworks', title: 'Frameworks', subtitle: 'Argument Structures', icon: Layers, color: '#f43f5e', desc: 'Socio-political and administrative boxes (PESTLE, SWOT) to structure arguments.' },
     { id: 'ethics', title: 'Ethics Specific Hub', subtitle: 'GS4 X-Factor Value Add', icon: ShieldCheck, color: '#06b6d4', desc: 'Ethics diagrams, comparisons, innovations, and keyword toolkits.' },
-    { id: 'va_hub', title: 'VA Hub', subtitle: 'Consolidated Value Additions', icon: Zap, color: '#7c3aed', desc: 'A unified view of data facts, templates, quotes, frameworks, ethics, and mnemonics.' }
+    { id: 'keywords_hub', title: 'Keywords', subtitle: 'Mains Keywords Hub', icon: Hash, color: '#ec4899', desc: 'Core vocabulary and definition keys to elevate your writing.' },
+    { id: 'case_studies_hub', title: 'Case Studies', subtitle: 'Landmark Examples', icon: Briefcase, color: '#f97316', desc: 'Real-world case studies and examples to validate arguments.' },
+    { id: 'sc_judgments_hub', title: 'SC Judgments', subtitle: 'Supreme Court Rulings', icon: Scale, color: '#ef4444', desc: 'Landmark court judgments and articles for legal arguments.' },
+    { id: 'va_hub', title: 'VA Hub', subtitle: 'Consolidated Value Additions', icon: Zap, color: '#7c3aed', desc: 'A unified view of data facts, templates, quotes, frameworks, ethics, mnemonics, keywords, case studies, and SC judgments.' }
   ];
 
   const uniqueValueAddItems = useMemo(() => {
@@ -5150,7 +5169,7 @@ function ValueAdditionView({
         let matchTheme = true;
         if (themeFilter.length > 0) {
           const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
-          if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics') {
+          if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics' || currentCat === 'keywords_hub' || currentCat === 'case_studies_hub' || currentCat === 'sc_judgments_hub') {
             matchTheme = !!item.microtopic && themeFilter.includes(item.microtopic);
           } else {
             const themeName = item.category === 'data_facts' ? item.metric : item.title;
@@ -5161,7 +5180,7 @@ function ValueAdditionView({
         let matchSubTheme = true;
         if (subThemeFilter.length > 0) {
           const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
-          if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics') {
+          if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics' || currentCat === 'keywords_hub' || currentCat === 'case_studies_hub' || currentCat === 'sc_judgments_hub') {
             matchSubTheme = !!item.subtopic && subThemeFilter.includes(item.subtopic);
           } else {
             matchSubTheme = !!item.parsedSubThemes && item.parsedSubThemes.some((st: any) => 
@@ -5173,7 +5192,7 @@ function ValueAdditionView({
         let matchSubSubTheme = true;
         if (subSubThemeFilter.length > 0) {
           const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
-          if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics') {
+          if (currentCat === 'intro_conclusion' || currentCat === 'quotes' || currentCat === 'mnemonics' || currentCat === 'frameworks' || currentCat === 'ethics' || currentCat === 'keywords_hub' || currentCat === 'case_studies_hub' || currentCat === 'sc_judgments_hub') {
             matchSubSubTheme = !!item.title && subSubThemeFilter.includes(item.title);
           } else {
             matchSubSubTheme = !!item.parsedSubSubThemes && item.parsedSubSubThemes.some((sst: any) => 
@@ -5465,6 +5484,9 @@ function ValueAdditionView({
                       { id: 'mnemonics', label: 'Mnemonics', color: '#f59e0b' },
                       { id: 'frameworks', label: 'Frameworks', color: '#f43f5e' },
                       { id: 'ethics', label: 'Ethics Specific', color: '#06b6d4' },
+                      { id: 'keywords_hub', label: 'Keywords', color: '#ec4899' },
+                      { id: 'case_studies_hub', label: 'Case Studies', color: '#f97316' },
+                      { id: 'sc_judgments_hub', label: 'SC Judgments', color: '#ef4444' },
                     ].map(cat => {
                       const isActive = cat.id === null 
                         ? chipVaHubCategories.length === 0 
@@ -6221,9 +6243,7 @@ function ValueAdditionView({
         columnLabels={
           activeCategory === 'quotes'
             ? { paper: 'Paper', subject: 'Subject', section: 'Section Group', microtopic: 'Microtopic', subtopic: 'Category' }
-            : activeCategory === 'mnemonics'
-            ? { paper: 'Paper', subject: 'Subject', section: 'Section Group', microtopic: 'Microtopic', subtopic: 'Subtopic' }
-            : activeCategory === 'intro_conclusion'
+            : (activeCategory === 'mnemonics' || activeCategory === 'intro_conclusion' || activeCategory === 'keywords_hub' || activeCategory === 'case_studies_hub' || activeCategory === 'sc_judgments_hub')
             ? { paper: 'Paper', subject: 'Subject', section: 'Section Group', microtopic: 'Microtopic', subtopic: 'Subtopic' }
             : { microtopic: 'Theme', subtopic: 'Sub-theme' }
         }

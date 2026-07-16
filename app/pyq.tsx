@@ -2739,9 +2739,24 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     };
   };
 
+  // Caches taxonomy mapping, subject name, and year for every question to avoid heavy redundant computations in loops
+  const taxonomyMappedQuestions = useMemo(() => {
+    return rawQuestions.map(q => {
+      const tax = getTaxonomyLevels(q, examStage);
+      const yr = getAnalyticsYear(q);
+      const subj = getAnalyticsSubject(q);
+      return {
+        ...q,
+        _taxonomy: tax,
+        _year: yr,
+        _subject: subj
+      };
+    });
+  }, [rawQuestions, examStage]);
+
   const renderPilot = () => {
     // Filter questions for the selected subject in Pilot mode
-    const pilotQuestions = rawQuestions.filter(q => getAnalyticsSubject(q) === pilotSubject);
+    const pilotQuestions = taxonomyMappedQuestions.filter(q => q._subject === pilotSubject);
     
     // Determine exam type depth
     const stageLower = examStage?.toLowerCase() || '';
@@ -2751,7 +2766,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
     // Helper to build heatmap rows generically
     const buildHeatmapRows = (qs: any[], levelKey: keyof ReturnType<typeof getTaxonomyLevels>, prefix: string) => {
-      const uniqueLabels = Array.from(new Set(qs.map(q => getTaxonomyLevels(q, examStage)[levelKey] || 'General')))
+      const uniqueLabels = Array.from(new Set(qs.map(q => q._taxonomy[levelKey] || 'General')))
         .filter(label => label && label !== 'General' && label !== 'Other' && label !== 'undefined' && label !== 'null');
       
       const finalLabels = uniqueLabels.length > 0 ? uniqueLabels : ['General'];
@@ -2760,10 +2775,9 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         key: `${prefix}-${label}`,
         label,
         byYear: years.reduce((acc, y) => {
+          const yearInt = parseInt(y, 10);
           const matchingQs = qs.filter(q => {
-            const yr = getAnalyticsYear(q);
-            const lvl = getTaxonomyLevels(q, examStage);
-            return yr === parseInt(y, 10) && lvl[levelKey] === label;
+            return q._year === yearInt && q._taxonomy[levelKey] === label;
           });
           const value = heatmapMetric === 'marks'
             ? matchingQs.reduce((sum, q) => sum + (Number(q.marks) || 0), 0)
@@ -2781,22 +2795,20 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
     // 2. Micro Topic Rows: filtered by Subject and Section Group (if selected)
     const qsForMicroTopic = pilotSectionGroup
-      ? pilotQuestions.filter(q => getTaxonomyLevels(q, examStage).sectionGroup === pilotSectionGroup)
+      ? pilotQuestions.filter(q => q._taxonomy.sectionGroup === pilotSectionGroup)
       : pilotQuestions;
     const microTopicRows = buildHeatmapRows(qsForMicroTopic, 'microTopic', 'pilot-micro');
 
     // 3. Sub Topic Rows: filtered by Subject, Section Group (if selected), and Micro Topic (if selected)
     const qsForSubtopic = qsForMicroTopic.filter(q => {
-      const lvl = getTaxonomyLevels(q, examStage);
-      if (pilotMicro && lvl.microTopic !== pilotMicro) return false;
+      if (pilotMicro && q._taxonomy.microTopic !== pilotMicro) return false;
       return true;
     });
     const subtopicRows = buildHeatmapRows(qsForSubtopic, 'subTopic', 'pilot-sub');
 
     // 4. Nano Topic Rows: filtered by Subject, Section Group (if selected), Micro Topic (if selected), and Sub Topic (if selected)
     const qsForNanotopic = qsForSubtopic.filter(q => {
-      const lvl = getTaxonomyLevels(q, examStage);
-      if (pilotSubtopic && lvl.subTopic !== pilotSubtopic) return false;
+      if (pilotSubtopic && q._taxonomy.subTopic !== pilotSubtopic) return false;
       return true;
     });
     const nanotopicRows = buildHeatmapRows(qsForNanotopic, 'nanoTopic', 'pilot-nano');

@@ -477,6 +477,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
         selectedSections,
         selectedMicros,
         pyqMeta,
+        heatmapMetric,
       );
       if (summary) pieces.push(summary);
     }
@@ -1344,6 +1345,7 @@ function buildSummaryFromFilteredQuestions(
   selectedSections: string[],
   selectedMicros: string[],
   pyqMeta?: AnalysisExportSheetProps['pyqMeta'],
+  heatmapMetric?: 'count' | 'marks',
 ): string {
   if (!rows.length) return '';
 

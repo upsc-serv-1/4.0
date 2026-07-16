@@ -714,14 +714,32 @@ export function MainsScreenInner() {
             .eq('user_id', session.user.id);
           
           if (!error && data) {
-            const vaTagsMap: Record<string, string[]> = { ...localTags };
+            const vaTagsMap: Record<string, string[]> = {};
             data.forEach(row => {
               if (row.review_tags && row.review_tags.length > 0) {
                 vaTagsMap[row.card_id] = row.review_tags;
-              } else {
-                delete vaTagsMap[row.card_id];
               }
             });
+
+            // Overlay pending local offline writes for mains_value_add_state
+            try {
+              const queue = await StudentSync.getQueue();
+              queue.forEach(item => {
+                if (item.kind === 'mains_value_add_state') {
+                  const { cardId, patch } = item.payload;
+                  if (patch && patch.hasOwnProperty('review_tags')) {
+                    if (patch.review_tags && patch.review_tags.length > 0) {
+                      vaTagsMap[cardId] = patch.review_tags;
+                    } else {
+                      delete vaTagsMap[cardId];
+                    }
+                  }
+                }
+              });
+            } catch (queueErr) {
+              console.warn('[loadValueAddTags] Failed to read sync queue:', queueErr);
+            }
+
             setValueAddTags(vaTagsMap);
             await AsyncStorage.setItem('mains_value_add_tags', JSON.stringify(vaTagsMap));
             console.log('[MainsScreen] Synced value add tags from Supabase:', data.length);
@@ -782,6 +800,76 @@ export function MainsScreenInner() {
     }
   };
 
+  const getMainsCardContentString = (item: ValueAdditionItem): string => {
+    if (!item) return '';
+    const { category } = item;
+    if (category === 'data_facts') {
+      return [
+        item.metric ? `Metric: ${item.metric}` : '',
+        item.context ? `Context: ${item.context}` : '',
+        item.source ? `Source: ${item.source}` : ''
+      ].filter(Boolean).join('\n');
+    }
+    if (category === 'intro_conclusion') {
+      return [
+        item.introduction ? `Introduction: ${item.introduction}` : '',
+        item.conclusion ? `Conclusion: ${item.conclusion}` : ''
+      ].filter(Boolean).join('\n');
+    }
+    if (category === 'quotes') {
+      return [
+        item.quoteText ? `Quote: "${item.quoteText}"` : '',
+        item.author ? `- ${item.author}` : '',
+        item.usageGuide ? `Usage Guide: ${item.usageGuide}` : ''
+      ].filter(Boolean).join('\n');
+    }
+    if (category === 'mnemonics') {
+      const expansionStr = Array.isArray(item.mnemonicExpansion)
+        ? item.mnemonicExpansion.map(e => `${e.letter}: ${e.meaning}${e.detail ? ` (${e.detail})` : ''}`).join(', ')
+        : '';
+      return [
+        item.mnemonicKeyword ? `Mnemonic Keyword: ${item.mnemonicKeyword}` : '',
+        expansionStr ? `Expansion: ${expansionStr}` : ''
+      ].filter(Boolean).join('\n');
+    }
+    if (category === 'frameworks') {
+      const boxesStr = Array.isArray(item.frameworkBoxes)
+        ? item.frameworkBoxes.map(b => `${b.label}: ${b.description}`).join('\n')
+        : '';
+      return [
+        item.frameworkGuide ? `Guide: ${item.frameworkGuide}` : '',
+        boxesStr ? `Boxes:\n${boxesStr}` : ''
+      ].filter(Boolean).join('\n');
+    }
+    if (category === 'ethics') {
+      const ethicsDetails: string[] = [];
+      if (item.ethicsType) {
+        ethicsDetails.push(`Ethics Type: ${item.ethicsType}`);
+      }
+      const data = item.ethicsData;
+      if (data) {
+        if (data.diagramType) ethicsDetails.push(`Diagram Type: ${data.diagramType}`);
+        if (data.diagramDescription) ethicsDetails.push(`Diagram Description: ${data.diagramDescription}`);
+        if (Array.isArray(data.dimensionsList)) ethicsDetails.push(`Dimensions: ${data.dimensionsList.join(', ')}`);
+        if (Array.isArray(data.comparisonPoints)) {
+          const points = data.comparisonPoints.map(p => `${p.criteria}: ${p.termA} vs ${p.termB}`).join('\n');
+          ethicsDetails.push(`Comparison:\n${points}`);
+        }
+        if (data.officerName) ethicsDetails.push(`Officer: ${data.officerName}`);
+        if (data.initiative) ethicsDetails.push(`Initiative: ${data.initiative}`);
+        if (data.impact) ethicsDetails.push(`Impact: ${data.impact}`);
+        if (data.values) ethicsDetails.push(`Values: ${data.values}`);
+        if (data.keywordDefinition) ethicsDetails.push(`Definition: ${data.keywordDefinition}`);
+        if (data.keywordExample) ethicsDetails.push(`Example: ${data.keywordExample}`);
+      }
+      if (item.rawContent) {
+        ethicsDetails.push(`Raw Content: ${item.rawContent}`);
+      }
+      return ethicsDetails.filter(Boolean).join('\n');
+    }
+    return item.rawContent || '';
+  };
+
   const handleToggleValueAddTag = async (cardId: string, tag: string) => {
     const currentTags = valueAddTags[cardId] || [];
     const nextTags = currentTags.includes(tag)
@@ -800,11 +888,21 @@ export function MainsScreenInner() {
     }
 
     if (session?.user?.id) {
+      const cardItem = valueAddItems.find(item => item.id === cardId);
+      const cardContent = cardItem ? {
+        category: cardItem.category,
+        title: cardItem.title,
+        paper: cardItem.paper || null,
+        subject: cardItem.subject || null,
+        details: getMainsCardContentString(cardItem)
+      } : null;
+
       StudentSync.enqueue('mains_value_add_state', {
         userId: session.user.id,
         cardId,
         patch: {
-          review_tags: nextTags
+          review_tags: nextTags,
+          content: cardContent
         }
       });
     }
@@ -1056,6 +1154,7 @@ export function MainsScreenInner() {
               onToggleValueAddTag={handleToggleValueAddTag}
               onCreateTag={handleCreateDetailedTag}
               userTags={userTags}
+              questions={questions}
             />
           )}
           {currentScreen === 'search' && (
@@ -5219,6 +5318,7 @@ function ValueAdditionView({
   };
 
   const [hierarchyModalVisible, setHierarchyModalVisible] = useState(false);
+  const [showVaTagsDropdown, setShowVaTagsDropdown] = useState(false);
   
   // Layout columns state (1 or 2 columns on Tablet)
   const [layoutColumns, setLayoutColumns] = useState<number>(isTablet ? 2 : 1);
@@ -5246,6 +5346,17 @@ function ValueAdditionView({
     { id: 'sc_judgments_hub', title: 'SC Judgments', subtitle: 'Supreme Court Rulings', icon: Scale, color: '#ef4444', desc: 'Landmark court judgments and articles for legal arguments.' },
     { id: 'va_hub', title: 'VA Hub', subtitle: 'Consolidated Value Additions', icon: Zap, color: '#7c3aed', desc: 'A unified view of data facts, templates, quotes, frameworks, ethics, mnemonics, keywords, case studies, and SC judgments.' }
   ];
+
+  const activeVaTags = useMemo(() => {
+    const tags = new Set<string>();
+    const DEFAULT_TAGS = ['Imp. Fact', 'Imp. Concept', 'Trap Question', 'Must Revise', 'Memorize'];
+    DEFAULT_TAGS.forEach(t => tags.add(t));
+    (userTags || []).forEach(t => tags.add(t));
+    Object.values(valueAddTags || {}).forEach((list: string[]) => {
+      (list || []).forEach(t => tags.add(t));
+    });
+    return Array.from(tags).sort((a, b) => a.localeCompare(b));
+  }, [userTags, valueAddTags]);
 
   const uniqueValueAddItems = useMemo(() => {
     const uniques = getUniqueValueAddItems(valueAddItems);
@@ -5616,9 +5727,15 @@ function ValueAdditionView({
         }
       }
 
-      return matchCat && matchHubCat && matchSearch && matchesAnyPath && matchTemplate;
+      let matchRevisionTag = true;
+      if (filters.revisionTags !== 'All') {
+        const itemTags = valueAddTags[item.id] || [];
+        matchRevisionTag = itemTags.includes(filters.revisionTags);
+      }
+
+      return matchCat && matchHubCat && matchSearch && matchesAnyPath && matchTemplate && matchRevisionTag;
     });
-  }, [activeCategory, search, uniqueValueAddItems, filters, templateFilter, vaHubCategories]);
+  }, [activeCategory, search, uniqueValueAddItems, filters, templateFilter, vaHubCategories, valueAddTags]);
 
 
   const ethicsMappedItems = useMemo(() => {
@@ -5989,6 +6106,24 @@ function ValueAdditionView({
                           {hasHierarchyActive ? activeHierarchyLabel : 'Browse Topics'}
                         </Text>
                         <ChevronDown size={12} color={hasHierarchyActive ? '#fff' : colors.textTertiary} style={{ marginLeft: 4 }} />
+                      </Pressable>
+
+                      {/* Revision Tags Pill */}
+                      <Pressable
+                        onPress={() => setShowVaTagsDropdown(true)}
+                        style={({ pressed }) => [
+                          styles.filterPill,
+                          filters.revisionTags !== 'All'
+                            ? { backgroundColor: '#8b5cf6', borderColor: '#8b5cf6' }
+                            : { backgroundColor: colors.surface + 'b3', borderColor: colors.border },
+                          { opacity: pressed ? 0.6 : 1 }
+                        ]}
+                      >
+                        <Tag size={12} color={filters.revisionTags !== 'All' ? '#fff' : '#8b5cf6'} style={{ marginRight: 4 }} />
+                        <Text style={[styles.filterPillText, { color: filters.revisionTags !== 'All' ? '#fff' : colors.textSecondary, fontWeight: '700' }]}>
+                          {filters.revisionTags !== 'All' ? filters.revisionTags : 'Revision Tags'}
+                        </Text>
+                        <ChevronDown size={12} color={filters.revisionTags !== 'All' ? '#fff' : colors.textTertiary} style={{ marginLeft: 4 }} />
                       </Pressable>
 
                       <View style={{ width: 1, height: 16, backgroundColor: colors.border }} />
@@ -6711,6 +6846,91 @@ function ValueAdditionView({
         activeCategory={activeCategory || undefined}
         activeCategoryItems={activeCategoryItems || []}
       />
+
+      {/* Revision Tags Selection Modal */}
+      <Modal
+        transparent
+        visible={showVaTagsDropdown}
+        animationType="fade"
+        onRequestClose={() => setShowVaTagsDropdown(false)}
+      >
+        <Pressable 
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(15, 23, 42, 0.4)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }} 
+          onPress={() => setShowVaTagsDropdown(false)}
+        >
+          <View style={{
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+            borderWidth: 1,
+            borderRadius: 16,
+            width: 250,
+            maxHeight: 350,
+            padding: 8,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.15,
+            shadowRadius: 12,
+            elevation: 8,
+          }}>
+            <Text style={{ fontSize: 13, fontWeight: '800', color: colors.textSecondary, paddingHorizontal: 12, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+              Filter by Revision Tag
+            </Text>
+            <ScrollView showsVerticalScrollIndicator={false} style={{ marginTop: 4 }}>
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingVertical: 10,
+                  paddingHorizontal: 12,
+                  borderRadius: 8,
+                  gap: 8,
+                  backgroundColor: filters.revisionTags === 'All' ? colors.primary + '15' : 'transparent'
+                }}
+                onPress={() => {
+                  setFilters(prev => ({ ...prev, revisionTags: 'All' }));
+                  setShowVaTagsDropdown(false);
+                }}
+              >
+                <Tag size={14} color={filters.revisionTags === 'All' ? colors.primary : colors.textSecondary} />
+                <Text style={{ fontSize: 13, fontWeight: '600', color: filters.revisionTags === 'All' ? colors.primary : colors.textPrimary }}>All Tags</Text>
+              </TouchableOpacity>
+              
+              {activeVaTags.map(tag => {
+                const isSelected = filters.revisionTags === tag;
+                return (
+                  <TouchableOpacity
+                    key={tag}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      paddingVertical: 10,
+                      paddingHorizontal: 12,
+                      borderRadius: 8,
+                      gap: 8,
+                      backgroundColor: isSelected ? colors.primary + '15' : 'transparent',
+                      marginTop: 2
+                    }}
+                    onPress={() => {
+                      setFilters(prev => ({ ...prev, revisionTags: tag }));
+                      setShowVaTagsDropdown(false);
+                    }}
+                  >
+                    <Tag size={14} color={isSelected ? colors.primary : colors.textSecondary} />
+                    <Text style={{ fontSize: 13, fontWeight: '600', color: isSelected ? colors.primary : colors.textPrimary }} numberOfLines={1}>
+                      {tag}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+        </Pressable>
+      </Modal>
 
       {/* Image Zoom Modal */}
       <Modal

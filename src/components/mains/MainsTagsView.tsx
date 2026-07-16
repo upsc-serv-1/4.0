@@ -46,11 +46,14 @@ import {
   Heart,
   Users,
   Settings,
+  ChevronsDown,
+  ChevronsUp,
 } from 'lucide-react-native';
 import { normalizeTag, formatTagLabel } from '../../utils/tagUtils';
 import Markdown from 'react-native-markdown-display';
 import { getMarkdownStyles, getMarkdownRules, cleanMarkdownContent, ValueAdditionCard } from '../../../app/mains';
 import { ValueAdditionItem } from '../../data/mainsValueAdditionLoader';
+import { ConsolidatedQuestion } from '../../data/mainsConsolidatedLoader';
 import { supabase } from '../../lib/supabase';
 
 // Card for rendering subjective questions in the tags view
@@ -242,6 +245,7 @@ export default function MainsTagsView({
   onToggleValueAddTag,
   onCreateTag,
   userTags = [],
+  questions = [],
 }: {
   colors: any;
   isTablet: boolean;
@@ -254,6 +258,7 @@ export default function MainsTagsView({
   onToggleValueAddTag?: (cardId: string, tag: string) => void;
   onCreateTag?: (tag: string) => void;
   userTags?: string[];
+  questions?: ConsolidatedQuestion[];
 }) {
   const { isDark } = useTheme();
   const { session } = useAuth();
@@ -267,7 +272,7 @@ export default function MainsTagsView({
     addTagToReview,
     renameTagGlobally,
     removeTagFromReview,
-  } = useMainsTaggedVault(session?.user?.id);
+  } = useMainsTaggedVault(session?.user?.id, questions);
 
   const [copiedId, setCopiedId] = React.useState<string | null>(null);
   const handleCopy = (id: string, text: string) => {
@@ -285,6 +290,8 @@ export default function MainsTagsView({
   const [activeSubject, setActiveSubject] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [expandedMicroTopics, setExpandedMicroTopics] = useState<Record<string, boolean>>({});
+  const [expandedSubTopics, setExpandedSubTopics] = useState<Record<string, boolean>>({});
+  const [expandedNanoTopics, setExpandedNanoTopics] = useState<Record<string, boolean>>({});
   const [showFilters, setShowFilters] = useState(false);
 
   // Tag management state
@@ -301,6 +308,46 @@ export default function MainsTagsView({
 
   const toggleMicroTopic = (topicKey: string) => {
     setExpandedMicroTopics((prev) => ({ ...prev, [topicKey]: !prev[topicKey] }));
+  };
+
+  const toggleExpandAll = (subjectData: any) => {
+    const sections = subjectData ? Object.values(subjectData.sectionGroups) : [];
+    const hasAnyExpanded = Object.values(expandedSections).some(v => v) || Object.values(expandedMicroTopics).some(v => v);
+    
+    if (hasAnyExpanded) {
+      setExpandedSections({});
+      setExpandedMicroTopics({});
+      setExpandedSubTopics({});
+      setExpandedNanoTopics({});
+    } else {
+      const nextSec: Record<string, boolean> = {};
+      const nextMicro: Record<string, boolean> = {};
+      const nextSub: Record<string, boolean> = {};
+      const nextNano: Record<string, boolean> = {};
+      
+      sections.forEach((sec: any) => {
+        nextSec[sec.name] = true;
+        Object.values(sec.microTopics).forEach((topic: any) => {
+          const microKey = `${sec.name}-${topic.name}`;
+          nextMicro[microKey] = true;
+          
+          Object.values(topic.subTopics || {}).forEach((sub: any) => {
+            const subKey = `${microKey}-${sub.name}`;
+            nextSub[subKey] = true;
+            
+            Object.values(sub.nanoTopics || {}).forEach((nano: any) => {
+              const nanoKey = `${subKey}-${nano.name}`;
+              nextNano[nanoKey] = true;
+            });
+          });
+        });
+      });
+      
+      setExpandedSections(nextSec);
+      setExpandedMicroTopics(nextMicro);
+      setExpandedSubTopics(nextSub);
+      setExpandedNanoTopics(nextNano);
+    }
   };
 
   const addTag = async () => {
@@ -415,35 +462,80 @@ export default function MainsTagsView({
       return true;
     });
 
-    // Build nested Subject > SectionGroup > MicroTopic hierarchy
+    // Build nested Subject > SectionGroup > MicroTopic > SubTopic > NanoTopic hierarchy
     const subjectsMap: Record<string, any> = {};
+
+    const getOrCreateMicro = (subName: string, secName: string, microName: string) => {
+      if (!subjectsMap[subName]) subjectsMap[subName] = { name: subName, totalCount: 0, sectionGroups: {} };
+      if (!subjectsMap[subName].sectionGroups[secName]) subjectsMap[subName].sectionGroups[secName] = { name: secName, totalCount: 0, microTopics: {} };
+      if (!subjectsMap[subName].sectionGroups[secName].microTopics[microName]) {
+        subjectsMap[subName].sectionGroups[secName].microTopics[microName] = {
+          name: microName,
+          questions: [],
+          valueAdditions: [],
+          subTopics: {}
+        };
+      }
+      return subjectsMap[subName].sectionGroups[secName].microTopics[microName];
+    };
+
+    const getOrCreateSub = (microNode: any, subTopicName: string) => {
+      if (!subTopicName) return microNode;
+      if (!microNode.subTopics[subTopicName]) {
+        microNode.subTopics[subTopicName] = {
+          name: subTopicName,
+          questions: [],
+          valueAdditions: [],
+          nanoTopics: {}
+        };
+      }
+      return microNode.subTopics[subTopicName];
+    };
+
+    const getOrCreateNano = (subNode: any, nanoTopicName: string) => {
+      if (!nanoTopicName) return subNode;
+      if (!subNode.nanoTopics[nanoTopicName]) {
+        subNode.nanoTopics[nanoTopicName] = {
+          name: nanoTopicName,
+          questions: [],
+          valueAdditions: []
+        };
+      }
+      return subNode.nanoTopics[nanoTopicName];
+    };
 
     filteredQuestions.forEach(q => {
       const subName = q.subject || 'General';
       const secName = q.sectionGroup || 'General';
       const microName = q.microTopic || 'General';
-      if (!subjectsMap[subName]) subjectsMap[subName] = { name: subName, totalCount: 0, sectionGroups: {} };
+      const subTopicName = q.subTopic || q.subtopic || '';
+      const nanoTopicName = q.nanoTopic || q.nanotopic || '';
+
+      const microNode = getOrCreateMicro(subName, secName, microName);
+      const subNode = getOrCreateSub(microNode, subTopicName);
+      const targetNode = getOrCreateNano(subNode, nanoTopicName);
+      
+      targetNode.questions.push(q);
+      
       subjectsMap[subName].totalCount++;
-      if (!subjectsMap[subName].sectionGroups[secName]) subjectsMap[subName].sectionGroups[secName] = { name: secName, totalCount: 0, microTopics: {} };
       subjectsMap[subName].sectionGroups[secName].totalCount++;
-      if (!subjectsMap[subName].sectionGroups[secName].microTopics[microName]) {
-        subjectsMap[subName].sectionGroups[secName].microTopics[microName] = { name: microName, questions: [], valueAdditions: [] };
-      }
-      subjectsMap[subName].sectionGroups[secName].microTopics[microName].questions.push(q);
     });
 
     filteredVAs.forEach(item => {
       const subName = item.subject || 'General';
       const secName = item.sectionGroup || 'General';
       const microName = item.microtopic || 'General';
-      if (!subjectsMap[subName]) subjectsMap[subName] = { name: subName, totalCount: 0, sectionGroups: {} };
+      const subTopicName = item.subtopic || '';
+      const nanoTopicName = item.nanotopic || '';
+
+      const microNode = getOrCreateMicro(subName, secName, microName);
+      const subNode = getOrCreateSub(microNode, subTopicName);
+      const targetNode = getOrCreateNano(subNode, nanoTopicName);
+      
+      targetNode.valueAdditions.push(item);
+      
       subjectsMap[subName].totalCount++;
-      if (!subjectsMap[subName].sectionGroups[secName]) subjectsMap[subName].sectionGroups[secName] = { name: secName, totalCount: 0, microTopics: {} };
       subjectsMap[subName].sectionGroups[secName].totalCount++;
-      if (!subjectsMap[subName].sectionGroups[secName].microTopics[microName]) {
-        subjectsMap[subName].sectionGroups[secName].microTopics[microName] = { name: microName, questions: [], valueAdditions: [] };
-      }
-      subjectsMap[subName].sectionGroups[secName].microTopics[microName].valueAdditions.push(item);
     });
 
     return subjectsMap;
@@ -507,6 +599,31 @@ export default function MainsTagsView({
               {subjectData?.totalCount || 0} tagged items
             </Text>
           </View>
+          {/* Expand/Collapse All Button */}
+          {subjectData && (
+            <TouchableOpacity
+              onPress={() => toggleExpandAll(subjectData)}
+              style={[
+                styles.iconBtn,
+                {
+                  borderColor: colors.border,
+                  backgroundColor: colors.surface + 'b3',
+                  marginRight: 8,
+                  width: 36,
+                  height: 36,
+                  borderRadius: 12,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }
+              ]}
+            >
+              {hasAnyExpanded ? (
+                <ChevronsUp size={16} color={colors.textPrimary} />
+              ) : (
+                <ChevronsDown size={16} color={colors.textPrimary} />
+              )}
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Drill-down accordion list */}
@@ -543,55 +660,99 @@ export default function MainsTagsView({
  
                 {expandedSections[section.name] && (
                   <View style={styles.microTopicContainer}>
-                    {Object.values(section.microTopics).map((topic: any) => (
-                      <View key={topic.name} style={styles.topicBlock}>
-                        <TouchableOpacity
-                          onPress={() => toggleMicroTopic(`${section.name}-${topic.name}`)}
-                          style={[styles.topicAccordion, { borderBottomColor: colors.border }]}
-                        >
-                          <FolderOpen size={14} color={colors.textSecondary} />
-                          <Text style={[styles.topicName, { color: colors.textSecondary }]}>{topic.name}</Text>
-                          <View style={[styles.countBadge, { backgroundColor: colors.surfaceStrong + '20' }]}>
-                            <Text style={[styles.countText, { color: colors.textSecondary }]}>{topic.questions.length + (topic.valueAdditions || []).length}</Text>
-                          </View>
-                        </TouchableOpacity>
-                        
-                        {expandedMicroTopics[`${section.name}-${topic.name}`] && (
-                          <View style={styles.questionsList}>
-                            {topic.questions.map((q: any) => (
-                              <MainsRepoQuestionCard
-                                key={q.id}
-                                question={q}
-                                onUpdate={refresh}
-                                onOpenQuestionBank={onOpenQuestionBank}
-                                colors={colors}
-                              />
-                            ))}
-                            {(topic.valueAdditions || []).length > 0 && (
-                              <View style={{ marginTop: topic.questions.length > 0 ? 8 : 0 }}>
-                                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary, marginBottom: 6, marginLeft: 4, letterSpacing: 0.5 }}>VALUE ADDITIONS</Text>
-                                {(topic.valueAdditions || []).map((item: ValueAdditionItem) => (
-                                  <ValueAdditionCard
-                                    key={item.id}
-                                    item={item}
-                                    colors={colors}
-                                    isDark={isDark}
-                                    copiedId={copiedId}
-                                    onCopy={handleCopy}
-                                    width="100%"
-                                    initialCollapsed={false}
-                                    userTags={userTags}
-                                    valueAddTags={valueAddTags}
-                                    onToggleValueAddTag={onToggleValueAddTag}
-                                    onCreateTag={onCreateTag}
-                                  />
-                                ))}
-                              </View>
-                            )}
-                          </View>
-                        )}
-                      </View>
-                    ))}
+                    {Object.values(section.microTopics).map((topic: any) => {
+                      const microKey = `${section.name}-${topic.name}`;
+                      const hasSubtopics = Object.keys(topic.subTopics || {}).length > 0;
+                      
+                      return (
+                        <View key={topic.name} style={styles.topicBlock}>
+                          <TouchableOpacity
+                            onPress={() => toggleMicroTopic(microKey)}
+                            style={[styles.topicAccordion, { borderBottomColor: colors.border }]}
+                          >
+                            <FolderOpen size={14} color={colors.textSecondary} />
+                            <Text style={[styles.topicName, { color: colors.textSecondary }]}>{topic.name}</Text>
+                            <View style={[styles.countBadge, { backgroundColor: colors.surfaceStrong + '20' }]}>
+                              <Text style={[styles.countText, { color: colors.textSecondary }]}>
+                                {topic.questions.length + (topic.valueAdditions || []).length + 
+                                 Object.values(topic.subTopics || {}).reduce((acc: number, sub: any) => {
+                                   return acc + sub.questions.length + sub.valueAdditions.length + 
+                                          Object.values(sub.nanoTopics || {}).reduce((acc2: number, nano: any) => {
+                                            return acc2 + nano.questions.length + nano.valueAdditions.length;
+                                          }, 0);
+                                 }, 0)}
+                              </Text>
+                            </View>
+                          </TouchableOpacity>
+                          
+                          {expandedMicroTopics[microKey] && (
+                            <View style={{ paddingLeft: 8, paddingVertical: 4 }}>
+                              {/* Direct MicroTopic Items */}
+                              {(topic.questions.length > 0 || (topic.valueAdditions || []).length > 0) && (
+                                renderItemsList(topic.questions, topic.valueAdditions)
+                              )}
+                              
+                              {/* Nested Subtopics */}
+                              {hasSubtopics && (
+                                <View style={{ marginTop: 4, gap: 8 }}>
+                                  {Object.values(topic.subTopics).map((sub: any) => {
+                                    const subKey = `${microKey}-${sub.name}`;
+                                    const hasNanotopics = Object.keys(sub.nanoTopics || {}).length > 0;
+                                    
+                                    return (
+                                      <View key={sub.name} style={{ borderRadius: 8, borderLeftWidth: 2, borderLeftColor: colors.border + '50', paddingLeft: 6 }}>
+                                        <TouchableOpacity
+                                          onPress={() => setExpandedSubTopics(prev => ({ ...prev, [subKey]: !prev[subKey] }))}
+                                          style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 6, gap: 6 }}
+                                        >
+                                          <ChevronRight size={12} color={colors.textTertiary} style={{ transform: [{ rotate: expandedSubTopics[subKey] ? '90deg' : '0deg' }] }} />
+                                          <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textSecondary, flex: 1 }}>{sub.name}</Text>
+                                        </TouchableOpacity>
+                                        
+                                        {expandedSubTopics[subKey] && (
+                                          <View style={{ paddingLeft: 6 }}>
+                                            {/* Direct SubTopic Items */}
+                                            {(sub.questions.length > 0 || (sub.valueAdditions || []).length > 0) && (
+                                              renderItemsList(sub.questions, sub.valueAdditions)
+                                            )}
+                                            
+                                            {/* Nested Nanotopics */}
+                                            {hasNanotopics && (
+                                              <View style={{ marginTop: 4, gap: 6 }}>
+                                                {Object.values(sub.nanoTopics).map((nano: any) => {
+                                                  const nanoKey = `${subKey}-${nano.name}`;
+                                                  return (
+                                                    <View key={nano.name} style={{ borderRadius: 6, borderLeftWidth: 1.5, borderLeftColor: colors.border + '40', paddingLeft: 6 }}>
+                                                      <TouchableOpacity
+                                                        onPress={() => setExpandedNanoTopics(prev => ({ ...prev, [nanoKey]: !prev[nanoKey] }))}
+                                                        style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 4, gap: 6 }}
+                                                      >
+                                                        <ChevronRight size={10} color={colors.textTertiary} style={{ transform: [{ rotate: expandedNanoTopics[nanoKey] ? '90deg' : '0deg' }] }} />
+                                                        <Text style={{ fontSize: 10.5, fontWeight: '600', color: colors.textTertiary, flex: 1 }}>{nano.name}</Text>
+                                                      </TouchableOpacity>
+                                                      
+                                                      {expandedNanoTopics[nanoKey] && (
+                                                        <View style={{ paddingLeft: 4 }}>
+                                                          {renderItemsList(nano.questions, nano.valueAdditions)}
+                                                        </View>
+                                                      )}
+                                                    </View>
+                                                  );
+                                                })}
+                                              </View>
+                                            )}
+                                          </View>
+                                        )}
+                                      </View>
+                                    );
+                                  })}
+                                </View>
+                              )}
+                            </View>
+                          )}
+                        </View>
+                      );
+                    })}
                   </View>
                 )}
               </View>

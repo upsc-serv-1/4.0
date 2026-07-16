@@ -5,6 +5,8 @@ import { supabase } from '../lib/supabase';
 import { formatTagLabel, normalizeTag } from '../utils/tagUtils';
 import { useTagStore } from '../store/tagStore';
 import { useCourse } from '../context/CourseContext';
+import { mainsConsolidatedQuestions } from '../data/mainsConsolidatedLoader';
+import { StudentSync } from '../services/StudentSync';
 
 export interface MainsTaggedQuestion {
   id: string;
@@ -81,7 +83,7 @@ const replaceTagInList = (tags: string[], oldTag: string, newTag: string) => {
   return dedupeTags(next);
 };
 
-export function useMainsTaggedVault(userId: string | undefined) {
+export function useMainsTaggedVault(userId: string | undefined, localQuestionsList?: any[]) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<any>(null);
   const [rawQuestions, setRawQuestions] = useState<MainsTaggedQuestion[]>([]);
@@ -147,65 +149,89 @@ export function useMainsTaggedVault(userId: string | undefined) {
         return;
       }
 
-      // Fetch only the tagged mains questions that belong to the current course.
-      const { data: questions, error: questionsError } = await supabase
-        .from('mains_questions')
-        .select('id, question_number, question_text, marks, exam_year, paper, subject, section_group, microtopic, subtopic, nanotopic, macrotag, microtag, answers:mains_answers(id, institute, answer_text)')
-        .eq('course', selectedCourse)
-        .in('id', questionIds as string[]);
+      // Map from local questions list instead of querying Supabase
+      const questionsList = localQuestionsList && localQuestionsList.length > 0 
+        ? localQuestionsList 
+        : mainsConsolidatedQuestions;
 
-      if (questionsError) throw questionsError;
-
-      const courseQuestionIds = new Set((questions || []).map(q => q.id));
-
-      // Filter states to only those belonging to the selected course
-      const filteredStates = (states || [])
-        .filter(row => {
-          const tags = parseReviewTags(row.review_tags);
-          return tags.length > 0 && courseQuestionIds.has(row.question_id);
-        });
-
-      if (filteredStates.length === 0) {
-        setRawQuestions([]);
-        await safeSetItem(cacheKey, JSON.stringify([]));
-        setLoading(false);
-        return;
-      }
-
-      // Build mapping
       const qMap = new Map<string, any>();
-      (questions || []).forEach(q => {
-        qMap.set(q.id, q);
+      questionsList.forEach(q => {
+        qMap.set(String(q.id), q);
       });
 
-      const nextQuestions: MainsTaggedQuestion[] = filteredStates.map(row => {
-        const q = qMap.get(row.question_id);
-        const tags = parseReviewTags(row.review_tags);
-        return {
-          id: q.id,
-          questionNumber: q.question_number,
-          questionText: q.question_text,
-          marks: q.marks,
-          year: q.exam_year,
-          paper: q.paper,
-          subject: q.subject || 'General',
-          sectionGroup: q.section_group || 'General',
-          microTopic: q.microtopic || 'General',
-          subTopic: q.subtopic,
-          nanoTopic: q.nanotopic,
-          macrotag: q.macrotag,
-          microtag: q.microtag,
-          reviewTags: tags,
-          normalizedReviewTags: tags.map(normalizeTag),
-          confidence: row.confidence || undefined,
-          difficultyLevel: row.difficulty_level || undefined,
-          createdAt: row.updated_at || new Date().toISOString(),
-          answers: (q.answers || []).map((ans: any) => ({
-            id: ans.id,
-            institute: ans.institute,
-            answerText: ans.answer_text,
-          }))
-        };
+      // Keep track of the active review_tags per questionId
+      const activeTagsMap = new Map<string, { tags: string[], row: any }>();
+      (states || []).forEach(row => {
+        // Filter by selectedCourse if course info is present
+        const q = qMap.get(String(row.question_id));
+        if (q && q.course === selectedCourse) {
+          const tags = parseReviewTags(row.review_tags);
+          if (tags.length > 0) {
+            activeTagsMap.set(String(row.question_id), { tags, row });
+          }
+        }
+      });
+
+      // Overlay pending local offline writes for mains_question_state
+      try {
+        const queue = await StudentSync.getQueue();
+        queue.forEach(item => {
+          if (item.kind === 'mains_question_state') {
+            const { questionId, patch } = item.payload;
+            if (patch && patch.hasOwnProperty('review_tags')) {
+              const tags = parseReviewTags(patch.review_tags);
+              if (tags.length > 0) {
+                // Get existing row values if any
+                const existing = activeTagsMap.get(String(questionId));
+                activeTagsMap.set(String(questionId), {
+                  tags,
+                  row: {
+                    ...(existing?.row || {}),
+                    confidence: patch.confidence !== undefined ? patch.confidence : (existing?.row?.confidence),
+                    difficulty_level: patch.difficultyLevel !== undefined ? patch.difficultyLevel : (existing?.row?.difficulty_level),
+                    updated_at: new Date().toISOString()
+                  }
+                });
+              } else {
+                activeTagsMap.delete(String(questionId));
+              }
+            }
+          }
+        });
+      } catch (queueErr) {
+        console.warn('[useMainsTaggedVault] Failed to read sync queue:', queueErr);
+      }
+
+      const nextQuestions: MainsTaggedQuestion[] = [];
+      activeTagsMap.forEach((val, qId) => {
+        const q = qMap.get(qId);
+        if (q) {
+          nextQuestions.push({
+            id: q.id,
+            questionNumber: q.questionNumber || q.question_number,
+            questionText: q.questionText || q.question_text,
+            marks: q.marks,
+            year: q.year || q.exam_year,
+            paper: q.paper,
+            subject: q.subject || 'General',
+            sectionGroup: q.sectionGroup || q.section_group || 'General',
+            microTopic: q.microTopic || q.microtopic || 'General',
+            subTopic: q.subTopic || q.subtopic,
+            nanoTopic: q.nanoTopic || q.nanotopic,
+            macrotag: q.macrotag,
+            microtag: q.microtag,
+            reviewTags: val.tags,
+            normalizedReviewTags: val.tags.map(normalizeTag),
+            confidence: val.row.confidence || undefined,
+            difficultyLevel: val.row.difficulty_level || undefined,
+            createdAt: val.row.updated_at || new Date().toISOString(),
+            answers: (q.answers || []).map((ans: any) => ({
+              id: ans.id,
+              institute: ans.institute,
+              answerText: ans.answerText || ans.answer_text,
+            }))
+          });
+        }
       });
 
       setRawQuestions(nextQuestions);
@@ -225,7 +251,7 @@ export function useMainsTaggedVault(userId: string | undefined) {
     } finally {
       setLoading(false);
     }
-  }, [cacheKey, userId, selectedCourse]);
+  }, [cacheKey, userId, selectedCourse, localQuestionsList]);
 
   // Load cache on mount & focus
   useEffect(() => {

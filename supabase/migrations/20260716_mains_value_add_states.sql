@@ -7,9 +7,14 @@ CREATE TABLE IF NOT EXISTS public.mains_value_add_states (
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   card_id TEXT NOT NULL,
   review_tags JSONB DEFAULT '[]'::jsonb,
+  content JSONB DEFAULT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   CONSTRAINT unique_user_mains_value_add UNIQUE (user_id, card_id)
 );
+
+-- If the table already exists from a previous step, run this SQL statement to add the column:
+-- ALTER TABLE public.mains_value_add_states ADD COLUMN IF NOT EXISTS content JSONB DEFAULT NULL;
+
 
 COMMENT ON TABLE public.mains_value_add_states IS 'Stores user-specific revision tags for Value Addition cards.';
 

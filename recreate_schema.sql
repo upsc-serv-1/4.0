@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS mains_intro_conclusions ( id uuid NOT NULL DEFAULT ge
 CREATE TABLE IF NOT EXISTS mains_keywords ( id uuid NOT NULL DEFAULT gen_random_uuid(), paper text, subject text, section_group text, microtopic text, subtopic text, title text, content_markdown text, core_values text[], hierarchy_path text[], status text DEFAULT 'published'::text, created_at timestamp with time zone DEFAULT now(), updated_at timestamp with time zone DEFAULT now() );
 CREATE TABLE IF NOT EXISTS mains_mnemonics ( id uuid NOT NULL DEFAULT gen_random_uuid(), paper text, subject text, section_group text, microtopic text, subtopic text, mnemonic_number_title text NOT NULL, mnemonic_keyword text NOT NULL, formula_expansion jsonb NOT NULL DEFAULT '[]'::jsonb, explanation_examples text NOT NULL, hierarchy_path text[], created_at timestamp with time zone DEFAULT now(), updated_at timestamp with time zone DEFAULT now(), status text NOT NULL DEFAULT 'draft'::text );
 CREATE TABLE IF NOT EXISTS mains_question_states ( id uuid NOT NULL DEFAULT gen_random_uuid(), user_id uuid NOT NULL, question_id text NOT NULL, confidence text, difficulty_level text, review_tags jsonb DEFAULT '[]'::jsonb, note text, updated_at timestamp with time zone DEFAULT now() );
-CREATE TABLE IF NOT EXISTS mains_questions ( id text NOT NULL, question_number integer, question_text text NOT NULL, marks integer, exam_year integer, paper text, subject text, section_group text, microtopic text, subtopic text, nanotopic text, hierarchy_path text[], macrotag text, microtag text, is_pyq boolean DEFAULT false, source_attribution_label text, exam_info jsonb, stage text, exam text, exam_group text, is_upsc_cse boolean DEFAULT false, is_allied boolean DEFAULT false, is_others boolean DEFAULT false, exam_category text, course text, institute text, program_id text, program_name text, created_at timestamp with time zone DEFAULT now(), updated_at timestamp with time zone DEFAULT now(), status text NOT NULL DEFAULT 'draft'::text );
+CREATE TABLE IF NOT EXISTS mains_questions ( id text NOT NULL, question_number text, question_text text NOT NULL, marks integer, exam_year integer, paper text, subject text, section_group text, microtopic text, subtopic text, nanotopic text, hierarchy_path text[], macrotag text, microtag text, is_pyq boolean DEFAULT false, source_attribution_label text, exam_info jsonb, stage text, exam text, exam_group text, is_upsc_cse boolean DEFAULT false, is_allied boolean DEFAULT false, is_others boolean DEFAULT false, exam_category text, course text, institute text, program_id text, program_name text, created_at timestamp with time zone DEFAULT now(), updated_at timestamp with time zone DEFAULT now(), status text NOT NULL DEFAULT 'draft'::text );
 CREATE TABLE IF NOT EXISTS mains_sc_judgments ( id uuid NOT NULL DEFAULT gen_random_uuid(), paper text, subject text, section_group text, microtopic text, subtopic text, title text, content_markdown text, core_values text[], hierarchy_path text[], status text DEFAULT 'published'::text, created_at timestamp with time zone DEFAULT now(), updated_at timestamp with time zone DEFAULT now() );
 CREATE TABLE IF NOT EXISTS mains_user_revision ( id uuid NOT NULL DEFAULT gen_random_uuid(), user_id uuid NOT NULL, question_id text NOT NULL, institute text, revised_at timestamp with time zone DEFAULT now(), confidence text DEFAULT 'medium'::text );
 CREATE TABLE IF NOT EXISTS pilot_v2_ai_history ( id uuid NOT NULL DEFAULT uuid_generate_v4(), user_id uuid, question_id text NOT NULL, messages jsonb NOT NULL DEFAULT '[]'::jsonb, metadata jsonb DEFAULT '{}'::jsonb, created_at timestamp with time zone DEFAULT now(), updated_at timestamp with time zone DEFAULT now() );
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS plan_institutes ( id uuid NOT NULL DEFAULT gen_random
 CREATE TABLE IF NOT EXISTS posts ( id uuid, user_id uuid, content text );
 CREATE TABLE IF NOT EXISTS prompt_templates ( id uuid NOT NULL DEFAULT gen_random_uuid(), user_id uuid NOT NULL, template_name character varying(100) NOT NULL, template_key character varying(100) NOT NULL, button_label character varying(50) NOT NULL, button_emoji character varying(10), prompt_text text NOT NULL, category character varying(50) NOT NULL, is_active boolean DEFAULT true, display_order integer DEFAULT 0, created_at timestamp without time zone DEFAULT now(), updated_at timestamp without time zone DEFAULT now() );
 CREATE TABLE IF NOT EXISTS question_states ( id uuid NOT NULL DEFAULT gen_random_uuid(), user_id uuid NOT NULL, question_id text NOT NULL, test_id text, selected_answer text, confidence text, note text, highlight_text text, saved_folders jsonb DEFAULT '[]'::jsonb, review_tags jsonb DEFAULT '[]'::jsonb, question_type_tags jsonb DEFAULT '[]'::jsonb, review_difficulty text, is_incorrect_last_attempt boolean DEFAULT false, marked_tough boolean DEFAULT false, marked_must_revise boolean DEFAULT false, attempts_history jsonb DEFAULT '[]'::jsonb, spaced_revision jsonb DEFAULT '{}'::jsonb, updated_at timestamp with time zone DEFAULT now(), attempt_hour integer, difficulty_level text, error_category text, user_tags text[], time_spent_seconds integer DEFAULT 0, attempt_id text, deleted boolean DEFAULT false );
-CREATE TABLE IF NOT EXISTS questions ( id text NOT NULL, test_id text NOT NULL, question_number integer, question_text text NOT NULL DEFAULT ''::text, statement_lines jsonb DEFAULT '[]'::jsonb, question_blocks jsonb DEFAULT '[]'::jsonb, options jsonb DEFAULT '{}'::jsonb, correct_answer text, explanation_markdown text DEFAULT ''::text, source_attribution_label text, source jsonb DEFAULT '{}'::jsonb, subject text, section_group text, micro_topic text, is_pyq boolean DEFAULT false, is_ncert boolean DEFAULT false, is_upsc_cse boolean DEFAULT false, is_allied boolean DEFAULT false, is_others boolean DEFAULT false, is_cancelled boolean DEFAULT false, exam text, exam_group text, exam_year integer, exam_category text, specific_exam text, exam_stage text, exam_paper text, updated_at timestamp with time zone DEFAULT now(), course text DEFAULT 'Civil Services'::text, sub_topic text, is_upsc_cms boolean DEFAULT false, is_neetpg boolean DEFAULT false, is_inicet boolean DEFAULT false );
+CREATE TABLE IF NOT EXISTS questions ( id text NOT NULL, test_id text NOT NULL, question_number text, question_text text NOT NULL DEFAULT ''::text, statement_lines jsonb DEFAULT '[]'::jsonb, question_blocks jsonb DEFAULT '[]'::jsonb, options jsonb DEFAULT '{}'::jsonb, correct_answer text, explanation_markdown text DEFAULT ''::text, source_attribution_label text, source jsonb DEFAULT '{}'::jsonb, subject text, section_group text, micro_topic text, is_pyq boolean DEFAULT false, is_ncert boolean DEFAULT false, is_upsc_cse boolean DEFAULT false, is_allied boolean DEFAULT false, is_others boolean DEFAULT false, is_cancelled boolean DEFAULT false, exam text, exam_group text, exam_year integer, exam_category text, specific_exam text, exam_stage text, exam_paper text, updated_at timestamp with time zone DEFAULT now(), course text DEFAULT 'Civil Services'::text, sub_topic text, is_upsc_cms boolean DEFAULT false, is_neetpg boolean DEFAULT false, is_inicet boolean DEFAULT false );
 CREATE TABLE IF NOT EXISTS soft_notebooks ( id uuid NOT NULL DEFAULT gen_random_uuid(), user_id uuid NOT NULL, name text NOT NULL, cover_color text NOT NULL DEFAULT '#fde68a'::text, paper_style text NOT NULL DEFAULT 'plain'::text, archived boolean NOT NULL DEFAULT false, pinned boolean NOT NULL DEFAULT false, created_at timestamp with time zone NOT NULL DEFAULT now(), updated_at timestamp with time zone NOT NULL DEFAULT now() );
 CREATE TABLE IF NOT EXISTS soft_pages ( id uuid NOT NULL DEFAULT gen_random_uuid(), notebook_id uuid NOT NULL, order_index integer NOT NULL, width integer NOT NULL DEFAULT 800, height integer NOT NULL DEFAULT 1131, paper_style text NOT NULL DEFAULT 'plain'::text, created_at timestamp with time zone NOT NULL DEFAULT now(), updated_at timestamp with time zone NOT NULL DEFAULT now() );
 CREATE TABLE IF NOT EXISTS soft_strokes ( id uuid NOT NULL DEFAULT gen_random_uuid(), page_id uuid NOT NULL, tool text NOT NULL, color text NOT NULL, width numeric NOT NULL, opacity numeric NOT NULL, raw_points jsonb NOT NULL, bezier_points jsonb, bounding_box jsonb, z_index integer NOT NULL DEFAULT 0, created_at timestamp with time zone NOT NULL DEFAULT now() );
@@ -607,22 +607,6 @@ CREATE TRIGGER trg_user_subscriptions_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION set_updated_at();
 
--- Trigger function to automatically copy new auth.users records to public.users profiles
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS trigger AS $$
-BEGIN
-  INSERT INTO public.users (id, email, created_at)
-  VALUES (new.id, new.email, new.created_at)
-  ON CONFLICT (id) DO NOTHING;
-  RETURN new;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-
 -- ==========================================================================
 -- HELPER FUNCTION: Get effective permissions for a user
 -- ==========================================================================
@@ -831,35 +815,12 @@ COMMENT ON TABLE public.mains_question_states IS 'Stores user-specific states (r
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE public.mains_question_states ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.question_states ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.user_notes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.test_attempts ENABLE ROW LEVEL SECURITY;
 
 -- Policies for RLS
 DROP POLICY IF EXISTS "Users can manage their own mains question states" ON public.mains_question_states;
+
 CREATE POLICY "Users can manage their own mains question states"
   ON public.mains_question_states
-  FOR ALL
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-DROP POLICY IF EXISTS "Users can manage their own question states" ON public.question_states;
-CREATE POLICY "Users can manage their own question states"
-  ON public.question_states
-  FOR ALL
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-DROP POLICY IF EXISTS "Users can manage their own notes" ON public.user_notes;
-CREATE POLICY "Users can manage their own notes"
-  ON public.user_notes
-  FOR ALL
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-DROP POLICY IF EXISTS "Users can manage their own test attempts" ON public.test_attempts;
-CREATE POLICY "Users can manage their own test attempts"
-  ON public.test_attempts
   FOR ALL
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
@@ -909,6 +870,34 @@ BEGIN
     RAISE NOTICE 'Mapped prelims and mains to plan: %', plan_rec.name;
   END LOOP;
 END $$;
+
+-- ========================================================================
+-- 20260716_mains_value_add_states.sql — User value addition states for Mains Tab
+-- ========================================================================
+
+CREATE TABLE IF NOT EXISTS public.mains_value_add_states (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  card_id TEXT NOT NULL,
+  review_tags JSONB DEFAULT '[]'::jsonb,
+  content JSONB DEFAULT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT unique_user_mains_value_add UNIQUE (user_id, card_id)
+);
+
+COMMENT ON TABLE public.mains_value_add_states IS 'Stores user-specific revision tags for Value Addition cards.';
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE public.mains_value_add_states ENABLE ROW LEVEL SECURITY;
+
+-- Policies for RLS
+DROP POLICY IF EXISTS "Users can manage their own mains value add states" ON public.mains_value_add_states;
+
+CREATE POLICY "Users can manage their own mains value add states"
+  ON public.mains_value_add_states
+  FOR ALL
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
 
 -- ══════════════════════════════════════════════════════════════════════════════
 -- MIGRATION: create_user_ai_prompts

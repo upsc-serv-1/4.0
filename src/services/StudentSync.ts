@@ -436,6 +436,10 @@ class StudentSyncService {
       updateData.review_tags = patch.review_tags;
     }
 
+    if (patch.hasOwnProperty('content')) {
+      updateData.content = patch.content;
+    }
+
     // SELECT + UPDATE/INSERT pattern (100% robust)
     const { data: existingRows, error: selectError } = await supabase
       .from('mains_value_add_states')

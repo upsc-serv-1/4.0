@@ -113,6 +113,7 @@ export interface AnalysisExportSheetProps {
     selectedPaper?: string;
     selectedRange?: string;
     heatmapPalette?: 'spectral' | 'ocean';
+    heatmapMetric?: 'count' | 'marks';
   };
   /** Global revision tags (if provided, replaces derived tags) */
   allRevisionTags?: string[];
@@ -256,6 +257,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isDetailedReport, setIsDetailedReport] = useState(true);
+  const [heatmapMetric, setHeatmapMetric] = useState<'count' | 'marks'>(pyqMeta?.heatmapMetric || 'count');
 
   // Re-seed on open
   useEffect(() => {
@@ -285,6 +287,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
       setYearStartIn('');
       setYearEndIn('');
       setReports(defaultReports);
+      setHeatmapMetric(pyqMeta?.heatmapMetric || 'count');
       setOpts(defaultExportOptions({
         title, moduleName: 'Analysis', headerText: 'Dr. UPSC · Analysis',
         contentScope: 'q_options_expl', answerPlacement: 'inline', sortBy: 'default',
@@ -293,7 +296,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
       setIsExporting(false);
       setShowAdvanced(false);
     }
-  }, [visible, title, questions]);
+  }, [visible, title, questions, pyqMeta]);
 
   const includeReport = scope === 'report_only' || scope === 'report_with_pyqs';
   const includePyqs = scope === 'report_with_pyqs' || scope === 'pyqs_only';
@@ -983,7 +986,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
               </Section>
             )}
 
-            {includeReport && (
+             {includeReport && (
               <Section title="Report Options" colors={colors}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                    <Text style={{ color: colors.textPrimary, fontSize: 13, fontWeight: '700' }}>Subject-wise Detailed Pages</Text>
@@ -993,6 +996,25 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
                      trackColor={{ true: colors.primary, false: colors.border }}
                    />
                 </View>
+                {reportVariant === 'pyq' && (
+                  <View style={{ marginBottom: 16 }}>
+                    <Label colors={colors}>HEATMAP METRIC</Label>
+                    <Row style={{ marginTop: 4 }}>
+                      <Chip
+                        active={heatmapMetric === 'count'}
+                        onPress={() => setHeatmapMetric('count')}
+                      >
+                        Question Count
+                      </Chip>
+                      <Chip
+                        active={heatmapMetric === 'marks'}
+                        onPress={() => setHeatmapMetric('marks')}
+                      >
+                        Total Marks
+                      </Chip>
+                    </Row>
+                  </View>
+                )}
                 <Row>
                   {reportToggleChoices.map(t => (
                     <CheckRow
@@ -1347,27 +1369,29 @@ function buildSummaryFromFilteredQuestions(
     const topic = micro || section;
     const subtopic = (q as any).sub_topic || (q as any).subtopic || 'Other';
 
-    subjectTotals[subject] = (subjectTotals[subject] || 0) + 1;
+    const val = heatmapMetric === 'marks' ? (Number(q.marks) || 0) : 1;
+
+    subjectTotals[subject] = (subjectTotals[subject] || 0) + val;
     if (!subjectByYear[year]) subjectByYear[year] = {};
-    subjectByYear[year][subject] = (subjectByYear[year][subject] || 0) + 1;
+    subjectByYear[year][subject] = (subjectByYear[year][subject] || 0) + val;
 
-    sectionTotals[section] = (sectionTotals[section] || 0) + 1;
+    sectionTotals[section] = (sectionTotals[section] || 0) + val;
     if (!sectionByYear[section]) sectionByYear[section] = {};
-    sectionByYear[section][year] = (sectionByYear[section][year] || 0) + 1;
+    sectionByYear[section][year] = (sectionByYear[section][year] || 0) + val;
 
-    microTotals[micro] = (microTotals[micro] || 0) + 1;
+    microTotals[micro] = (microTotals[micro] || 0) + val;
     if (!microByYear[micro]) microByYear[micro] = {};
-    microByYear[micro][year] = (microByYear[micro][year] || 0) + 1;
+    microByYear[micro][year] = (microByYear[micro][year] || 0) + val;
 
-    topicTotals[topic] = (topicTotals[topic] || 0) + 1;
+    topicTotals[topic] = (topicTotals[topic] || 0) + val;
     if (!topicByYear[topic]) topicByYear[topic] = {};
-    topicByYear[topic][year] = (topicByYear[topic][year] || 0) + 1;
+    topicByYear[topic][year] = (topicByYear[topic][year] || 0) + val;
 
-    subtopicTotals[subtopic] = (subtopicTotals[subtopic] || 0) + 1;
+    subtopicTotals[subtopic] = (subtopicTotals[subtopic] || 0) + val;
     if (!subtopicByYear[subtopic]) subtopicByYear[subtopic] = {};
-    subtopicByYear[subtopic][year] = (subtopicByYear[subtopic][year] || 0) + 1;
+    subtopicByYear[subtopic][year] = (subtopicByYear[subtopic][year] || 0) + val;
 
-    totalsByYear[year] = (totalsByYear[year] || 0) + 1;
+    totalsByYear[year] = (totalsByYear[year] || 0) + val;
   });
 
   const summaryYears = Object.keys(totalsByYear).sort((a, b) => Number(b) - Number(a));
@@ -1456,6 +1480,7 @@ function buildSummaryFromFilteredQuestions(
     selectedPaper: pyqMeta?.selectedPaper || (selectedSubjects.length ? selectedSubjects.join(', ') : 'All Subjects'),
     selectedRange: pyqMeta?.selectedRange || yearLabel,
     heatmapPalette: pyqMeta?.heatmapPalette || 'spectral',
+    heatmapMetric,
     questionCount: rows.length,
     years: summaryYears,
     distributionData,

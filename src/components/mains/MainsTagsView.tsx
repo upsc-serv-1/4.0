@@ -294,6 +294,8 @@ export default function MainsTagsView({
   const [expandedNanoTopics, setExpandedNanoTopics] = useState<Record<string, boolean>>({});
   const [showFilters, setShowFilters] = useState(false);
 
+  const hasAnyExpanded = Object.values(expandedSections).some(v => v) || Object.values(expandedMicroTopics).some(v => v);
+
   // Tag management state
   const [menuVisible, setMenuVisible] = useState(false);
   const [manageVisible, setManageVisible] = useState(false);
@@ -312,7 +314,6 @@ export default function MainsTagsView({
 
   const toggleExpandAll = (subjectData: any) => {
     const sections = subjectData ? Object.values(subjectData.sectionGroups) : [];
-    const hasAnyExpanded = Object.values(expandedSections).some(v => v) || Object.values(expandedMicroTopics).some(v => v);
     
     if (hasAnyExpanded) {
       setExpandedSections({});
@@ -589,6 +590,43 @@ export default function MainsTagsView({
   if (activeSubject) {
     const subjectData = combinedVaultData[activeSubject];
     const sections = subjectData ? Object.values(subjectData.sectionGroups) : [];
+
+    const renderItemsList = (questionsList: any[], vaList: any[]) => {
+      return (
+        <View style={styles.questionsList}>
+          {questionsList.map((q: any) => (
+            <MainsRepoQuestionCard
+              key={q.id}
+              question={q}
+              onUpdate={refresh}
+              onOpenQuestionBank={onOpenQuestionBank}
+              colors={colors}
+            />
+          ))}
+          {(vaList || []).length > 0 && (
+            <View style={{ marginTop: questionsList.length > 0 ? 8 : 0 }}>
+              <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary, marginBottom: 6, marginLeft: 4, letterSpacing: 0.5 }}>VALUE ADDITIONS</Text>
+              {(vaList || []).map((item: ValueAdditionItem) => (
+                <ValueAdditionCard
+                  key={item.id}
+                  item={item}
+                  colors={colors}
+                  isDark={isDark}
+                  copiedId={copiedId}
+                  onCopy={handleCopy}
+                  width="100%"
+                  initialCollapsed={false}
+                  userTags={userTags}
+                  valueAddTags={valueAddTags}
+                  onToggleValueAddTag={onToggleValueAddTag}
+                  onCreateTag={onCreateTag}
+                />
+              ))}
+            </View>
+          )}
+        </View>
+      );
+    };
 
     return (
       <View style={{ flex: 1, backgroundColor: colors.bg }}>

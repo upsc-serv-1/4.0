@@ -3871,6 +3871,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           customYearStart,
           customYearEnd,
           heatmapPalette,
+          heatmapMetric,
         }}
       />
 

@@ -1772,6 +1772,7 @@ export interface BuildPyqAnalysisSummaryInput {
   customYearEnd?: string;
   questionCount: number;
   years: string[];
+  heatmapMetric?: 'count' | 'marks';
   distributionData: Array<{ name: string; value: number }>;
   overviewSeries: Array<{ label: string; values: number[]; color?: string }>;
   focusSubject: string;
@@ -1971,6 +1972,14 @@ const renderPyqHeatmapSvg = (
 ) => {
   if (!rows.length) return '';
   const headingId = slugifyId(title);
+  
+  const maxVal = rows.reduce((max, row) => {
+    const vals = Object.keys(row.byYear)
+      .filter(y => years.includes(y))
+      .map(y => row.byYear[y] || 0);
+    return Math.max(max, ...vals);
+  }, 1);
+
   return `
     <section class="analysis-card">
       <h3 id="${headingId}">${escHtml(title)}</h3>
@@ -1985,8 +1994,7 @@ const renderPyqHeatmapSvg = (
     let bg = '#F8FAFC';
     let tc = '#94A3B8';
     if (count > 0) {
-      const capped = Math.min(count, 22);
-      const ratio = (capped - 1) / 21;
+      const ratio = maxVal <= 1 ? 1.0 : (0.15 + (Math.min(1, count / maxVal) * 0.85));
       if (palette === 'spectral') {
         const h = 70 + (ratio * 155);
         const s = 65 + (ratio * 20);
@@ -2103,6 +2111,7 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
     filteredQuestionsForSummary,
     selectedSubjectsList,
     showTOC,
+    heatmapMetric = 'count',
   } = input;
 
   const includeMomentum = !!selectedReports.subject_momentum;
@@ -2163,17 +2172,19 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
           const micro = q.micro_topic || q.microtopic || 'Other';
           const subtopic = q.sub_topic || q.subtopic || 'Other';
           
-          secTotals[section] = (secTotals[section] || 0) + 1;
+          const val = heatmapMetric === 'marks' ? (Number(q.marks) || 0) : 1;
+
+          secTotals[section] = (secTotals[section] || 0) + val;
           if (!secByYear[section]) secByYear[section] = {};
-          secByYear[section][year] = (secByYear[section][year] || 0) + 1;
+          secByYear[section][year] = (secByYear[section][year] || 0) + val;
           
-          micTotals[micro] = (micTotals[micro] || 0) + 1;
+          micTotals[micro] = (micTotals[micro] || 0) + val;
           if (!micByYear[micro]) micByYear[micro] = {};
-          micByYear[micro][year] = (micByYear[micro][year] || 0) + 1;
+          micByYear[micro][year] = (micByYear[micro][year] || 0) + val;
           
-          subTotals[subtopic] = (subTotals[subtopic] || 0) + 1;
+          subTotals[subtopic] = (subTotals[subtopic] || 0) + val;
           if (!subByYear[subtopic]) subByYear[subtopic] = {};
-          subByYear[subtopic][year] = (subByYear[subtopic][year] || 0) + 1;
+          subByYear[subtopic][year] = (subByYear[subtopic][year] || 0) + val;
         });
         
         const secRows = Object.entries(secTotals)

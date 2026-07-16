@@ -772,7 +772,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
               .eq('is_pyq', true);
 
             if (mappedPaper === 'Optional') {
-              query = query.not.in('paper', ['GS1', 'GS2', 'GS3', 'GS4', 'Essay']);
+              query = query.not('paper', 'in', '("GS1","GS2","GS3","GS4","Essay")');
             } else {
               query = query.eq('paper', mappedPaper);
             }

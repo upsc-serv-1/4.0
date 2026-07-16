@@ -762,15 +762,22 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           
           console.log(`[MainsFetch] Querying mains_questions for paper: ${mappedPaper}, stage: ${examStage}`);
           
-          // Query Supabase mains_questions with paper filter and is_pyq=true at DB level (paginated)
+           // Query Supabase mains_questions with paper filter and is_pyq=true at DB level (paginated)
           const mainsQs: any[] = [];
           let from = 0;
           while (true) {
-            const { data, error: mainsErr } = await supabase
+            let query = supabase
               .from('mains_questions')
               .select('id, question_number, question_text, marks, exam_year, subject, section_group, microtopic, subtopic, nanotopic, macrotag, microtag, hierarchy_path, paper, is_pyq, source_attribution_label, exam_info, stage, exam, exam_group, is_upsc_cse, is_allied, is_others, exam_category, answers:mains_answers(id, institute)')
-              .eq('paper', mappedPaper)
-              .eq('is_pyq', true)
+              .eq('is_pyq', true);
+
+            if (mappedPaper === 'Optional') {
+              query = query.not.in('paper', ['GS1', 'GS2', 'GS3', 'GS4', 'Essay']);
+            } else {
+              query = query.eq('paper', mappedPaper);
+            }
+
+            const { data, error: mainsErr } = await query
               .range(from, from + PYQ_PAGE_SIZE - 1);
             
             if (mainsErr) throw mainsErr;
@@ -2706,7 +2713,15 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     if (Array.isArray(hp) && hp.length > 0) {
       // If hp[0] is the subject, shift mapping by 1
       const startsWithSubject = String(hp[0]).toLowerCase() === String(subject).toLowerCase();
-      const offset = startsWithSubject ? 1 : 0;
+      let offset = startsWithSubject ? 1 : 0;
+
+      // For optional subjects, there is an extra Anthro-1/Anthro-2 level in hierarchy
+      const secondLevel = hp[1] ? String(hp[1]).toLowerCase() : '';
+      const thirdLevel = hp[2] ? String(hp[2]).toLowerCase() : '';
+      const isOptionalHierarchy = secondLevel.includes('anthro') || thirdLevel.includes('paper');
+      if (isOptionalHierarchy && startsWithSubject) {
+        offset = 2;
+      }
 
       // Map according to depths
       if (hp[0 + offset]) sectionGroup = hp[0 + offset];

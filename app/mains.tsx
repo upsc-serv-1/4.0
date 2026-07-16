@@ -24,6 +24,8 @@ import {
   Pressable,
   FlatList,
   KeyboardAvoidingView,
+  AppState,
+  AppStateStatus,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -766,7 +768,20 @@ export function MainsScreenInner() {
     loadTags();
     loadValueAddTags();
     loadVaFavorites();
-  }, [session?.user?.id]);
+
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'active') {
+        console.log('[MainsScreen] App foregrounded, reloading sync state...');
+        loadTags();
+        loadValueAddTags();
+        loadVaFavorites();
+      }
+    };
+    const appStateSub = AppState.addEventListener('change', handleAppStateChange);
+    return () => {
+      appStateSub.remove();
+    };
+  }, [session?.user?.id, currentScreen]);
 
   const handleToggleVaFavorite = async (cardId: string) => {
     if (!session?.user?.id) return;

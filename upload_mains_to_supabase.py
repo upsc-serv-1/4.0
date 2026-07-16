@@ -257,45 +257,45 @@ def upload_value_additions():
             rows = json.load(f)
         upload_batch("mains_data_facts", rows)
         
-    # B. Introductions & Conclusions
-    ic_path = os.path.join(JSON_DIR, "mains_intro_conclusions.json")
-    if os.path.exists(ic_path):
-        print("\n--- Processing Introductions and Conclusions ---")
-        with open(ic_path, "r", encoding="utf-8") as f:
-            rows = json.load(f)
-        upload_batch("mains_intro_conclusions", rows)
+    # B. Introductions & Conclusions (already uploaded, commented out to save egress)
+    # ic_path = os.path.join(JSON_DIR, "mains_intro_conclusions.json")
+    # if os.path.exists(ic_path):
+    #     print("\n--- Processing Introductions and Conclusions ---")
+    #     with open(ic_path, "r", encoding="utf-8") as f:
+    #         rows = json.load(f)
+    #     upload_batch("mains_intro_conclusions", rows)
         
-    # C. Essay Value Add
-    essay_path = os.path.join(JSON_DIR, "mains_essay_value_add.json")
-    if os.path.exists(essay_path):
-        print("\n--- Processing Essay Value Add (Anecdotes & Quotes) ---")
-        with open(essay_path, "r", encoding="utf-8") as f:
-            rows = json.load(f)
-        upload_batch("mains_essay_value_add", rows)
+    # C. Essay Value Add (already uploaded, commented out to save egress)
+    # essay_path = os.path.join(JSON_DIR, "mains_essay_value_add.json")
+    # if os.path.exists(essay_path):
+    #     print("\n--- Processing Essay Value Add (Anecdotes & Quotes) ---")
+    #     with open(essay_path, "r", encoding="utf-8") as f:
+    #         rows = json.load(f)
+    #     upload_batch("mains_essay_value_add", rows)
         
-    # D. Ethics Value Add
-    ethics_path = os.path.join(JSON_DIR, "mains_ethics_value_add.json")
-    if os.path.exists(ethics_path):
-        print("\n--- Processing Ethics Hub Value Add ---")
-        with open(ethics_path, "r", encoding="utf-8") as f:
-            rows = json.load(f)
-        upload_batch("mains_ethics_value_add", rows)
+    # D. Ethics Value Add (already uploaded, commented out to save egress)
+    # ethics_path = os.path.join(JSON_DIR, "mains_ethics_value_add.json")
+    # if os.path.exists(ethics_path):
+    #     print("\n--- Processing Ethics Hub Value Add ---")
+    #     with open(ethics_path, "r", encoding="utf-8") as f:
+    #         rows = json.load(f)
+    #     upload_batch("mains_ethics_value_add", rows)
         
-    # E. Mnemonics
-    mn_path = os.path.join(JSON_DIR, "mains_mnemonics.json")
-    if os.path.exists(mn_path):
-        print("\n--- Processing Mnemonics ---")
-        with open(mn_path, "r", encoding="utf-8") as f:
-            rows = json.load(f)
-        upload_batch("mains_mnemonics", rows)
+    # E. Mnemonics (already uploaded, commented out to save egress)
+    # mn_path = os.path.join(JSON_DIR, "mains_mnemonics.json")
+    # if os.path.exists(mn_path):
+    #     print("\n--- Processing Mnemonics ---")
+    #     with open(mn_path, "r", encoding="utf-8") as f:
+    #         rows = json.load(f)
+    #     upload_batch("mains_mnemonics", rows)
         
-    # F. Frameworks
-    fw_path = os.path.join(JSON_DIR, "mains_frameworks.json")
-    if os.path.exists(fw_path):
-        print("\n--- Processing Answer Writing Frameworks ---")
-        with open(fw_path, "r", encoding="utf-8") as f:
-            rows = json.load(f)
-        upload_batch("mains_frameworks", rows)
+    # F. Frameworks (already uploaded, commented out to save egress)
+    # fw_path = os.path.join(JSON_DIR, "mains_frameworks.json")
+    # if os.path.exists(fw_path):
+    #     print("\n--- Processing Answer Writing Frameworks ---")
+    #     with open(fw_path, "r", encoding="utf-8") as f:
+    #         rows = json.load(f)
+    #     upload_batch("mains_frameworks", rows)
 
     # G. Keywords (dedicated table)
     kw_path = os.path.join(JSON_DIR, "mains_keywords.json")
@@ -333,7 +333,7 @@ def main():
         print(f"Error: Directory '{JSON_DIR}' not found.")
         return
         
-    upload_mains_questions_answers()
+    # upload_mains_questions_answers()  # Commented out to save egress
     upload_value_additions()
     
     print("\nSupabase upload process completed successfully.")

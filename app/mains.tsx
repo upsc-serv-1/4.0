@@ -194,7 +194,8 @@ export const markdownRules = getMarkdownRules({ border: '#d1d5db' }, false);
 import {
   mainsConsolidatedQuestions,
   ConsolidatedQuestion,
-  fetchMainsQuestionsFromSupabase
+  fetchMainsQuestionsFromSupabase,
+  normalizeSubject
 } from '../src/data/mainsConsolidatedLoader';
 import {
   mainsConsolidatedValueAdd,
@@ -271,6 +272,8 @@ export function MainsScreenInner() {
     subject?: string;
     section?: string;
     microtopic?: string;
+    subtopic?: string;
+    nanotopic?: string;
     year?: string;
     initialScreen?: string;
     from?: string;
@@ -281,8 +284,19 @@ export function MainsScreenInner() {
 
   const [currentScreen, setCurrentScreen] = useState<'hub' | 'questions' | 'value-add' | 'search' | 'detailed-question' | 'revision-tags'>('hub');
   const [sessionFilters, setSessionFilters] = useState<MainsFilters | null>(null);
+  // Guard so params-based navigation only fires once on initial mount.
+  // Without this, navigating back from a heatmap-opened question keeps
+  // re-setting currentScreen to 'detailed-question' (infinite loop).
+  const hasHandledInitialParams = React.useRef(false);
+  // Set to true when the user entered this screen directly to a sub-view via URL params
+  // (e.g., tapping a heatmap cell that opens a specific question). In this case,
+  // pressing Back should return to the calling screen (PYQ Analysis), not go to hub.
+  const cameFromExternalRoute = React.useRef(false);
 
   useEffect(() => {
+    if (hasHandledInitialParams.current) return;
+    hasHandledInitialParams.current = true;
+
     if (params.initialScreen === 'questions') {
       if (params.questionId) {
         const q = mainsConsolidatedQuestions.find(item => String(item.id) === String(params.questionId));
@@ -290,8 +304,14 @@ export function MainsScreenInner() {
           setDetailedQuestion(q);
           setCurrentScreen('detailed-question');
           setPreviousScreen('questions');
+          // Mark that we jumped directly here — back should exit to calling screen
+          cameFromExternalRoute.current = true;
           return;
         }
+      }
+      // Opened question list directly (e.g. from heatmap without a specific questionId)
+      if (params.from === 'pyq') {
+        cameFromExternalRoute.current = true;
       }
       setCurrentScreen('questions');
     } else if (params.initialScreen === 'value-add' || params.initialScreen === 'value-addition') {
@@ -302,7 +322,8 @@ export function MainsScreenInner() {
         setValueAddCategory(null);
       }
     }
-  }, [params.initialScreen, params.category, params.questionId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run only once on mount — params are stable URL values
 
   const initialFiltersFromParams = useMemo(() => {
     if (!params.initialScreen) return null;
@@ -328,16 +349,22 @@ export function MainsScreenInner() {
       else mappedPaper = cleanParam(p);
     }
 
+    const cleanSubjectParam = (val: string | undefined | null) => {
+      if (!val || val === 'All') return 'All';
+      return normalizeSubject(val);
+    };
+
     return {
       ...DEFAULT_MAINS_FILTERS,
       paper: mappedPaper,
-      subjects: cleanParam(params.subject),
+      subjects: cleanSubjectParam(params.subject),
       sections: cleanParam(params.section),
       microtopics: cleanParam(params.microtopic),
       subtopics: cleanParam(params.subtopic),
+      nanotopics: cleanParam(params.nanotopic),
       years: cleanYearsParam(params.year),
     };
-  }, [params.initialScreen, params.paper, params.subject, params.section, params.microtopic, params.subtopic, params.year]);
+  }, [params.initialScreen, params.paper, params.subject, params.section, params.microtopic, params.subtopic, params.nanotopic, params.year]);
 
   const [previousScreen, setPreviousScreen] = useState<'questions' | 'search'>('questions');
   const [detailedQuestion, setDetailedQuestion] = useState<ConsolidatedQuestion | null>(null);
@@ -346,24 +373,44 @@ export function MainsScreenInner() {
   const [detailedConfidence, setDetailedConfidence] = useState<string | null>(null);
   const [detailedDifficulty, setDetailedDifficulty] = useState<string | null>(null);
 
-  const isNotAtRoot = currentScreen !== 'hub' || (currentScreen === 'value-add' && valueAddCategory !== null);
+  // isNotAtRoot: true when we are inside a sub-screen, false when at the Mains hub root.
+  // The second condition in the original OR was always false (value-add AND not hub is already
+  // covered by the first clause), simplified here for clarity.
+  const isNotAtRoot = currentScreen !== 'hub';
 
   usePreventRemove(
     isNotAtRoot,
-    () => {
+    ({ data }) => {
       if (currentScreen === 'value-add' && valueAddCategory !== null) {
         setValueAddCategory(null);
-      } else if (currentScreen === 'questions' && params.from === 'pyq') {
-        router.back();
       } else if (currentScreen === 'detailed-question') {
-        setCurrentScreen(previousScreen);
-        setDetailedQuestion(null);
+        if (cameFromExternalRoute.current) {
+          // User jumped straight to a detailed question from an external screen
+          // (e.g. PYQ heatmap). Back should exit the whole Mains screen and return
+          // to that calling screen. We reset local state so the screen is clean if
+          // the user navigates back here later, then allow the native back action.
+          cameFromExternalRoute.current = false;
+          setCurrentScreen('hub');
+          setDetailedQuestion(null);
+          navigation.dispatch(data.action); // allow the native pop — goes back to PYQ
+        } else {
+          setCurrentScreen(previousScreen);
+          setDetailedQuestion(null);
+        }
       } else if (currentScreen === 'revision-tags') {
         setCurrentScreen('hub');
       } else if (currentScreen === 'search') {
         setCurrentScreen('hub');
       } else if (currentScreen === 'questions') {
-        setCurrentScreen('hub');
+        if (cameFromExternalRoute.current) {
+          // Questions list was opened directly from PYQ heatmap.
+          // Back should return to PYQ Analysis, not to the Mains hub.
+          cameFromExternalRoute.current = false;
+          setCurrentScreen('hub');
+          navigation.dispatch(data.action); // allow native pop — goes back to PYQ
+        } else {
+          setCurrentScreen('hub');
+        }
       } else if (currentScreen === 'value-add') {
         setCurrentScreen('hub');
       } else {
@@ -385,17 +432,30 @@ export function MainsScreenInner() {
       if (startX < 50 && translationX > 80 && velocityX > 100) {
         if (currentScreen === 'value-add' && valueAddCategory !== null) {
           setValueAddCategory(null);
-        } else if (currentScreen === 'questions' && params.from === 'pyq') {
-          router.back();
         } else if (currentScreen === 'detailed-question') {
-          setCurrentScreen(previousScreen);
-          setDetailedQuestion(null);
+          if (cameFromExternalRoute.current) {
+            // Came from PYQ heatmap directly — swipe back should exit to PYQ Analysis
+            cameFromExternalRoute.current = false;
+            setCurrentScreen('hub');
+            setDetailedQuestion(null);
+            router.back();
+          } else {
+            setCurrentScreen(previousScreen);
+            setDetailedQuestion(null);
+          }
         } else if (currentScreen === 'revision-tags') {
           setCurrentScreen('hub');
         } else if (currentScreen === 'search') {
           setCurrentScreen('hub');
         } else if (currentScreen === 'questions') {
-          setCurrentScreen('hub');
+          if (cameFromExternalRoute.current) {
+            // Questions list opened from PYQ heatmap — swipe back exits to PYQ Analysis
+            cameFromExternalRoute.current = false;
+            setCurrentScreen('hub');
+            router.back();
+          } else {
+            setCurrentScreen('hub');
+          }
         } else if (currentScreen === 'value-add') {
           setCurrentScreen('hub');
         }
@@ -432,7 +492,7 @@ export function MainsScreenInner() {
             stateMap[row.question_id] = {
               reviewTags: row.review_tags || [],
               confidence: row.confidence || null,
-              difficulty: row.difficulty_level || row.review_difficulty || null,
+              difficulty: row.difficulty_level || null,
             };
           });
           setUserQuestionStates(stateMap);
@@ -480,7 +540,7 @@ export function MainsScreenInner() {
           if (data) {
             setDetailedStudyTags(data.review_tags || []);
             setDetailedConfidence(data.confidence || null);
-            setDetailedDifficulty(data.difficulty_level || data.review_difficulty || null);
+            setDetailedDifficulty(data.difficulty_level || null);
           } else {
             setDetailedStudyTags([]);
             setDetailedConfidence(null);
@@ -1158,7 +1218,10 @@ export function MainsScreenInner() {
               onPress={() => {
                 if (currentScreen === 'value-add' && valueAddCategory !== null) {
                   setTimeout(() => setValueAddCategory(null), 0);
-                } else if (currentScreen === 'questions' && params.from === 'pyq') {
+                } else if (currentScreen === 'questions' && cameFromExternalRoute.current) {
+                  // Questions list opened from PYQ heatmap — go back to PYQ Analysis
+                  cameFromExternalRoute.current = false;
+                  setCurrentScreen('hub');
                   router.back();
                 } else {
                   setCurrentScreen('hub');
@@ -1170,7 +1233,7 @@ export function MainsScreenInner() {
               <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>
                 {currentScreen === 'value-add' && valueAddCategory !== null 
                   ? 'Back' 
-                  : (currentScreen === 'questions' && params.from === 'pyq') ? 'Back' : 'Hub'}
+                  : cameFromExternalRoute.current ? 'Back' : 'Hub'}
               </Text>
             </TouchableOpacity>
           ) : null}
@@ -6724,7 +6787,7 @@ function ValueAdditionView({
                       shadowOffset: { width: 0, height: 2 },
                       shadowOpacity: colors.isDark ? 0.25 : 0.04,
                       shadowRadius: 8,
-                      elevation: 3
+                      elevation: Platform.OS === 'ios' ? 3 : 0
                     }}>
                       {/* Table Header */}
                       <View style={{ flexDirection: 'row', backgroundColor: colors.isDark ? '#1e293b' : '#f8fafc', borderBottomColor: colors.border, borderBottomWidth: 1.5 }}>
@@ -9454,7 +9517,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.04,
     shadowRadius: 10,
-    elevation: 1,
+    elevation: Platform.OS === 'ios' ? 1 : 0,
   },
   qCardHeaderSpacious: {
     padding: 20,
@@ -9759,7 +9822,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     padding: 32,
     marginBottom: 16,
-    elevation: 2,
+    elevation: Platform.OS === 'ios' ? 2 : 0,
     shadowColor: '#64748b',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.05,
@@ -9933,7 +9996,7 @@ const styles = StyleSheet.create({
     shadowColor: '#7c3aed',
     shadowOpacity: 0.07,
     shadowRadius: 12,
-    elevation: 3,
+    elevation: Platform.OS === 'ios' ? 3 : 0,
   },
   searchInput: {
     flex: 1,
@@ -10002,7 +10065,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.02,
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 1 },
-    elevation: 1,
+    elevation: Platform.OS === 'ios' ? 1 : 0,
   },
   sidebarFchipSel: {
     backgroundColor: '#7c3aed',
@@ -10011,7 +10074,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    elevation: Platform.OS === 'ios' ? 2 : 0,
   },
   sidebarFchipText: {
     fontSize: 10,

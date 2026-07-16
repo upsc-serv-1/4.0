@@ -735,17 +735,20 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     if (!bypassCache) {
       try {
         const cached = KVStore.getJson(cacheKey);
-        if (cached) {
-          setRawQuestions(cached.questions || []);
+        if (cached && Array.isArray(cached.questions) && cached.questions.length > 0) {
+          setRawQuestions(cached.questions);
           setTestsMetaById(cached.testsMeta || {});
-          processAnalytics(cached.questions || []);
-        } else {
-          setLoading(true);
+          processAnalytics(cached.questions);
+          setLoading(false);
+          console.log(`[PyqCache] Loaded ${cached.questions.length} items from cache key: ${cacheKey}, skipping Supabase query.`);
+          return;
         }
       } catch (e) {
-        setLoading(true);
+        console.warn('[PyqCache] Error reading from cache:', e);
       }
     }
+
+    setLoading(true);
 
     try {
       // CourseContext uses 'Civil Services' but legacy code also uses 'UPSC CSE'

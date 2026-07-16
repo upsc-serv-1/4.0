@@ -42,8 +42,8 @@ interface PilotV2AIChatProps {
   isOtherPopupOpen?: boolean;
   activeQuestion?: any;
   onSaveResponse?: (res: string) => void;
-  externalOpenTrigger?: boolean;
-  onOpenVitaminEditor?: () => void;
+  externalOpenTrigger?: number | boolean;
+  onOpenVitaminEditor?: (text: string) => void;
   isMains?: boolean;
 }
 

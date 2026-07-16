@@ -20,7 +20,7 @@ const getNanotopic = (item: any): string => {
 
 const getMicrotopic = (item: any): string => {
   if (!item) return '';
-  const mt = cleanHierarchyString(item.microtopic);
+  const mt = cleanHierarchyString(item.microtopic || item.micro_topic || item.microTopic);
   if (mt) return mt;
   if (Array.isArray(item.hierarchy_path) && item.hierarchy_path.length >= 4) {
     return cleanHierarchyString(item.hierarchy_path[3]);
@@ -30,7 +30,7 @@ const getMicrotopic = (item: any): string => {
 
 const getSubtopic = (item: any): string => {
   if (!item) return '';
-  const st = cleanHierarchyString(item.subtopic);
+  const st = cleanHierarchyString(item.subtopic || item.sub_topic || item.subTopic);
   if (st) return st;
   if (Array.isArray(item.hierarchy_path) && item.hierarchy_path.length >= 5) {
     return cleanHierarchyString(item.hierarchy_path[4]);

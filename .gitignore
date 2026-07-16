@@ -14,3 +14,14 @@ ios/
 # Thesis App and Data (ignored)
 lscs-thesis-app/
 data/
+
+# Python caches
+__pycache__/
+*.pyc
+
+# Local environment secrets
+.env
+
+# Backups
+*.backup
+*.bak

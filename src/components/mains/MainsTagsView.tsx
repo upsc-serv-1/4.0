@@ -480,7 +480,6 @@ export default function MainsTagsView({
     };
 
     const getOrCreateSub = (microNode: any, subTopicName: string) => {
-      if (!subTopicName) return microNode;
       if (!microNode.subTopics[subTopicName]) {
         microNode.subTopics[subTopicName] = {
           name: subTopicName,
@@ -493,7 +492,9 @@ export default function MainsTagsView({
     };
 
     const getOrCreateNano = (subNode: any, nanoTopicName: string) => {
-      if (!nanoTopicName) return subNode;
+      if (!subNode.nanoTopics) {
+        subNode.nanoTopics = {};
+      }
       if (!subNode.nanoTopics[nanoTopicName]) {
         subNode.nanoTopics[nanoTopicName] = {
           name: nanoTopicName,
@@ -512,10 +513,18 @@ export default function MainsTagsView({
       const nanoTopicName = q.nanoTopic || q.nanotopic || '';
 
       const microNode = getOrCreateMicro(subName, secName, microName);
-      const subNode = getOrCreateSub(microNode, subTopicName);
-      const targetNode = getOrCreateNano(subNode, nanoTopicName);
       
-      targetNode.questions.push(q);
+      if (subTopicName) {
+        const subNode = getOrCreateSub(microNode, subTopicName);
+        if (nanoTopicName) {
+          const nanoNode = getOrCreateNano(subNode, nanoTopicName);
+          nanoNode.questions.push(q);
+        } else {
+          subNode.questions.push(q);
+        }
+      } else {
+        microNode.questions.push(q);
+      }
       
       subjectsMap[subName].totalCount++;
       subjectsMap[subName].sectionGroups[secName].totalCount++;
@@ -529,10 +538,18 @@ export default function MainsTagsView({
       const nanoTopicName = item.nanotopic || '';
 
       const microNode = getOrCreateMicro(subName, secName, microName);
-      const subNode = getOrCreateSub(microNode, subTopicName);
-      const targetNode = getOrCreateNano(subNode, nanoTopicName);
       
-      targetNode.valueAdditions.push(item);
+      if (subTopicName) {
+        const subNode = getOrCreateSub(microNode, subTopicName);
+        if (nanoTopicName) {
+          const nanoNode = getOrCreateNano(subNode, nanoTopicName);
+          nanoNode.valueAdditions.push(item);
+        } else {
+          subNode.valueAdditions.push(item);
+        }
+      } else {
+        microNode.valueAdditions.push(item);
+      }
       
       subjectsMap[subName].totalCount++;
       subjectsMap[subName].sectionGroups[secName].totalCount++;
@@ -719,7 +736,7 @@ export default function MainsTagsView({
                                             {/* Nested Nanotopics */}
                                             {hasNanotopics && (
                                               <View style={{ marginTop: 4, gap: 6 }}>
-                                                {Object.values(sub.nanoTopics).map((nano: any) => {
+                                                {Object.values(sub.nanoTopics || {}).map((nano: any) => {
                                                   const nanoKey = `${subKey}-${nano.name}`;
                                                   return (
                                                     <View key={nano.name} style={{ borderRadius: 6, borderLeftWidth: 1.5, borderLeftColor: colors.border + '40', paddingLeft: 6 }}>

@@ -2803,9 +2803,14 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
     // Calculate label widths dynamically
     const getLabelWidth = (rows: any[]) => {
-      if (!rows || !rows.length) return 180;
+      const screenW = Dimensions.get('window').width;
+      const isTablet = screenW >= 768;
+      const maxAllowed = isTablet ? 360 : Math.floor(screenW * 0.42); // Cap at 42% of screen width on mobile
+      const minAllowed = isTablet ? 180 : Math.floor(screenW * 0.35); // Min 35% of screen width on mobile
+      
+      if (!rows || !rows.length) return minAllowed;
       const maxLen = Math.max(...rows.map(r => String(r.label || '').length));
-      return Math.min(360, Math.max(180, maxLen * 9.0)); 
+      return Math.min(maxAllowed, Math.max(minAllowed, maxLen * (isTablet ? 9.0 : 7.0))); 
     };
 
     const subjectWidth = 200;

@@ -36,19 +36,19 @@ export function blocksToPlainText(blocks: PilotV2Block[]): string {
     .map(block => {
       switch (block.type) {
         case 'heading':
-          return `# ${block.title || block.content}`;
-        case 'text':
-          return block.content || '';
+          return `# ${block.text || ''}`;
+        case 'paragraph':
+          return block.text || '';
         case 'bullet':
-          return `• ${block.content || ''}`;
-        case 'list':
-          return `${block.metadata?.order || '1'}. ${block.content || ''}`;
+          return `• ${block.text || ''}`;
+        case 'numbered':
+          return `${block.meta?.order || '1'}. ${block.text || ''}`;
         case 'quote':
-          return `"${block.content || ''}"`;
+          return `"${block.text || ''}"`;
         case 'code':
-          return `\`\`\`\n${block.content || ''}\n\`\`\``;
+          return `\`\`\`\n${block.text || ''}\n\`\`\``;
         default:
-          return block.content || '';
+          return block.text || '';
       }
     })
     .filter(line => line.trim())
@@ -64,7 +64,7 @@ function generateContextSummary(
   noteTitle: string
 ): string {
   const blockCount = blocks.length;
-  const wordCount = blocks.reduce((sum, b) => sum + (b.content?.split(/\s+/).length || 0), 0);
+  const wordCount = blocks.reduce((sum, b) => sum + (b.text?.split(/\s+/).length || 0), 0);
   const typeBreakdown = blocks.reduce(
     (acc, b) => {
       acc[b.type] = (acc[b.type] || 0) + 1;

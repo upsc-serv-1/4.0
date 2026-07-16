@@ -76,6 +76,7 @@ import {
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { usePreventRemove, useNavigation } from '@react-navigation/native';
 import Markdown from 'react-native-markdown-display';
 import { aiExpandSearchQuery } from '../src/services/GeminiService';
 import { AIModelSwitcher } from '../src/components/ai/AIModelSwitcher';
@@ -85,7 +86,7 @@ import { AddToFlashcardSheet } from '../src/components/flashcards/AddToFlashcard
 import { StudentSync } from '../src/services/StudentSync';
 import { useTagStore } from '../src/store/tagStore';
 import * as Haptics from 'expo-haptics';
-import { PinchGestureHandler, State as GHState } from 'react-native-gesture-handler';
+import { PinchGestureHandler, PanGestureHandler, State as GHState } from 'react-native-gesture-handler';
 import { PilotV2Provider } from '../src/context/PilotV2Context';
 import { PilotV2AIChat } from '../src/components/pilot-v2/PilotV2AIChat';
 import { PilotV2SaveSheet } from '../src/components/pilot-v2/PilotV2SaveSheet';
@@ -259,6 +260,7 @@ const DEFAULT_MAINS_FILTERS: MainsFilters = {
 export function MainsScreenInner() {
   const { colors, isDark } = useTheme();
   const router = useRouter();
+  const navigation = useNavigation();
   const { session } = useAuth();
   const { width, height } = useWindowDimensions();
   const isTablet = width >= 768;
@@ -343,6 +345,63 @@ export function MainsScreenInner() {
   const [detailedStudyTags, setDetailedStudyTags] = useState<string[]>([]);
   const [detailedConfidence, setDetailedConfidence] = useState<string | null>(null);
   const [detailedDifficulty, setDetailedDifficulty] = useState<string | null>(null);
+
+  const isNotAtRoot = currentScreen !== 'hub' || (currentScreen === 'value-add' && valueAddCategory !== null);
+
+  usePreventRemove(
+    isNotAtRoot,
+    () => {
+      if (currentScreen === 'value-add' && valueAddCategory !== null) {
+        setValueAddCategory(null);
+      } else if (currentScreen === 'questions' && params.from === 'pyq') {
+        router.back();
+      } else if (currentScreen === 'detailed-question') {
+        setCurrentScreen(previousScreen);
+        setDetailedQuestion(null);
+      } else if (currentScreen === 'revision-tags') {
+        setCurrentScreen('hub');
+      } else if (currentScreen === 'search') {
+        setCurrentScreen('hub');
+      } else if (currentScreen === 'questions') {
+        setCurrentScreen('hub');
+      } else if (currentScreen === 'value-add') {
+        setCurrentScreen('hub');
+      } else {
+        setCurrentScreen('hub');
+      }
+    }
+  );
+
+  useEffect(() => {
+    navigation.setOptions({
+      gestureEnabled: !isNotAtRoot,
+    });
+  }, [isNotAtRoot, navigation]);
+
+  const onGestureStateChange = (event: any) => {
+    if (event.nativeEvent.state === GHState.END) {
+      const { translationX, x, velocityX } = event.nativeEvent;
+      const startX = x - translationX;
+      if (startX < 50 && translationX > 80 && velocityX > 100) {
+        if (currentScreen === 'value-add' && valueAddCategory !== null) {
+          setValueAddCategory(null);
+        } else if (currentScreen === 'questions' && params.from === 'pyq') {
+          router.back();
+        } else if (currentScreen === 'detailed-question') {
+          setCurrentScreen(previousScreen);
+          setDetailedQuestion(null);
+        } else if (currentScreen === 'revision-tags') {
+          setCurrentScreen('hub');
+        } else if (currentScreen === 'search') {
+          setCurrentScreen('hub');
+        } else if (currentScreen === 'questions') {
+          setCurrentScreen('hub');
+        } else if (currentScreen === 'value-add') {
+          setCurrentScreen('hub');
+        }
+      }
+    }
+  };
 
   // Pilot V2 & Vitamin & AI Chat states
   const [pilotV2SaveOpen, setPilotV2SaveOpen] = useState(false);
@@ -754,12 +813,22 @@ export function MainsScreenInner() {
     const loadVaFavorites = async () => {
       if (!session?.user?.id) return;
       try {
+        const cached = await AsyncStorage.getItem('user_va_favorites');
+        if (cached) {
+          setVaFavorites(new Set(JSON.parse(cached)));
+        }
+      } catch (err) {
+        console.warn('Failed to load user_va_favorites from AsyncStorage:', err);
+      }
+      try {
         const { data, error } = await supabase
           .from('user_va_favorites')
           .select('card_id')
           .eq('user_id', session.user.id);
         if (!error && data) {
-          setVaFavorites(new Set(data.map((r: any) => r.card_id)));
+          const cardIds = data.map((r: any) => r.card_id);
+          setVaFavorites(new Set(cardIds));
+          await AsyncStorage.setItem('user_va_favorites', JSON.stringify(cardIds));
         }
       } catch (err) {
         console.error('[VA Favorites] Failed to load from Supabase:', err);
@@ -786,12 +855,13 @@ export function MainsScreenInner() {
   const handleToggleVaFavorite = async (cardId: string) => {
     if (!session?.user?.id) return;
     const isFav = vaFavorites.has(cardId);
+    
     // Optimistic update
-    setVaFavorites(prev => {
-      const next = new Set(prev);
-      if (isFav) next.delete(cardId); else next.add(cardId);
-      return next;
-    });
+    const nextSet = new Set(vaFavorites);
+    if (isFav) nextSet.delete(cardId); else nextSet.add(cardId);
+    setVaFavorites(nextSet);
+    await AsyncStorage.setItem('user_va_favorites', JSON.stringify(Array.from(nextSet))).catch(() => {});
+
     try {
       if (isFav) {
         await supabase
@@ -807,11 +877,10 @@ export function MainsScreenInner() {
     } catch (err) {
       console.error('[VA Favorites] Failed to sync Supabase:', err);
       // Revert on error
-      setVaFavorites(prev => {
-        const next = new Set(prev);
-        if (isFav) next.add(cardId); else next.delete(cardId);
-        return next;
-      });
+      const revertSet = new Set(vaFavorites);
+      if (isFav) revertSet.add(cardId); else revertSet.delete(cardId);
+      setVaFavorites(revertSet);
+      await AsyncStorage.setItem('user_va_favorites', JSON.stringify(Array.from(revertSet))).catch(() => {});
     }
   };
 
@@ -1039,7 +1108,12 @@ export function MainsScreenInner() {
           />
         )}
 
-        <View style={styles.safeArea}>
+        <PanGestureHandler
+          onHandlerStateChange={onGestureStateChange}
+          activeOffsetX={[-20, 20]}
+          failOffsetY={[-20, 20]}
+        >
+          <View style={styles.safeArea}>
           {currentScreen === 'hub' ? (
             <View style={[styles.header, { borderBottomWidth: 0, backgroundColor: 'transparent', paddingTop: insets.top, height: 64 + insets.top }]}>
               <TouchableOpacity
@@ -1103,7 +1177,15 @@ export function MainsScreenInner() {
 
           {/* Screen Switching */}
           {currentScreen === 'hub' && (
-            <HubView onSelect={setCurrentScreen} colors={colors} isTablet={isTablet} />
+            <HubView
+              onSelect={setCurrentScreen}
+              onSelectVaHub={() => {
+                setValueAddCategory('va_hub');
+                setCurrentScreen('value-add');
+              }}
+              colors={colors}
+              isTablet={isTablet}
+            />
           )}
           {currentScreen === 'questions' && (
           <QuestionBankView
@@ -1170,6 +1252,8 @@ export function MainsScreenInner() {
               onCreateTag={handleCreateDetailedTag}
               userTags={userTags}
               questions={questions}
+              vaFavorites={vaFavorites}
+              onToggleVaFavorite={handleToggleVaFavorite}
             />
           )}
           {currentScreen === 'search' && (
@@ -1236,6 +1320,7 @@ export function MainsScreenInner() {
             />
           )}
         </View>
+      </PanGestureHandler>
 
         <AddToFlashcardSheet
           visible={aff.visible}
@@ -1325,10 +1410,12 @@ export function MainsScreenInner() {
 // ─────────────────────────────────────────────────────────────────────────────
 function HubView({
   onSelect,
+  onSelectVaHub,
   colors,
   isTablet,
 }: {
   onSelect: (s: any) => void;
+  onSelectVaHub?: () => void;
   colors: any;
   isTablet: boolean;
 }) {
@@ -1343,6 +1430,13 @@ function HubView({
       description: 'Official PYQs & model answers',
       color: '#3b82f6',
       icon: Library,
+    },
+    {
+      id: 'va-hub',
+      title: 'VA Hub',
+      description: 'Consolidated value additions hub',
+      color: '#7c3aed',
+      icon: Zap,
     },
     {
       id: 'value-add',
@@ -1437,6 +1531,8 @@ function HubView({
                     pathname: '/tracker',
                     params: { defaultMode: 'mains' }
                   });
+                } else if (card.id === 'va-hub') {
+                  onSelectVaHub?.();
                 } else {
                   onSelect(card.id as any);
                 }
@@ -4421,14 +4517,31 @@ function QuestionBankView({
   }, [search, filters, questions, valueAddItems, userQuestionStates]);
 
   const activeContent = useMemo(() => {
+    let list: any[] = [];
     if (viewMode === 'questions') {
-      return filteredQuestions;
+      list = filteredQuestions;
     } else if (viewMode === 'valueAdd') {
-      return filteredValueAdds;
+      list = filteredValueAdds;
     } else {
-      return [...filteredQuestions, ...filteredValueAdds];
+      list = [...filteredQuestions, ...filteredValueAdds];
     }
-  }, [viewMode, filteredQuestions, filteredValueAdds]);
+
+    // Sort: favorites first for value addition cards
+    const sorted = [...list].sort((a, b) => {
+      const isAValAdd = !a.hasOwnProperty('questionText');
+      const isBValAdd = !b.hasOwnProperty('questionText');
+      
+      const aFav = (isAValAdd && vaFavorites.has(a.id)) ? 1 : 0;
+      const bFav = (isBValAdd && vaFavorites.has(b.id)) ? 1 : 0;
+      
+      if (aFav !== bFav) {
+        return bFav - aFav;
+      }
+      return 0;
+    });
+
+    return sorted;
+  }, [viewMode, filteredQuestions, filteredValueAdds, vaFavorites]);
 
   return (
     <View style={styles.subContainer}>
@@ -6697,6 +6810,8 @@ function ValueAdditionView({
                         valueAddTags={valueAddTags}
                         onToggleValueAddTag={onToggleValueAddTag}
                         onCreateTag={onCreateTag}
+                        vaFavorites={vaFavorites}
+                        onToggleVaFavorite={onToggleVaFavorite}
                       />
                     ))}
                   </View>
@@ -7147,6 +7262,14 @@ function MainsAISearchView({
 
   // Sidebar specific subject filter (client-side)
   const [sidebarSubjectFilter, setSidebarSubjectFilter] = useState<string | null>(null);
+
+  const sortedResults = useMemo(() => {
+    return [...results].sort((a, b) => {
+      const aFav = (a.type === 'value_add' && vaFavorites?.has(a.id)) ? 1 : 0;
+      const bFav = (b.type === 'value_add' && vaFavorites?.has(b.id)) ? 1 : 0;
+      return bFav - aFav;
+    });
+  }, [results, vaFavorites]);
 
   const allYears = useMemo(() => {
     const yearSet = new Set<string>();
@@ -8760,13 +8883,13 @@ function MainsAISearchView({
               </View>
             ) : !hasSearched ? (
               renderEmptyState()
-            ) : results.length === 0 ? (
+            ) : sortedResults.length === 0 ? (
               <View style={{ paddingVertical: 40, alignItems: 'center' }}>
                 <Text style={{ color: colors.textSecondary, fontSize: 15, fontWeight: '600' }}>No matches found</Text>
                 <Text style={{ color: colors.textTertiary, fontSize: 13, marginTop: 4 }}>Try using different keywords or clearing filters.</Text>
               </View>
             ) : (
-              results.map((item, idx) => {
+              sortedResults.map((item, idx) => {
                 if (item.type === 'question') {
                   const isExpanded = expandedId === item.id;
                   const isBookmarked = savedQuestionIds.includes(item.id);

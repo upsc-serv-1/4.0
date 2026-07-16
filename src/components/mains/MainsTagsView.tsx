@@ -246,6 +246,8 @@ export default function MainsTagsView({
   onCreateTag,
   userTags = [],
   questions = [],
+  vaFavorites = new Set<string>(),
+  onToggleVaFavorite,
 }: {
   colors: any;
   isTablet: boolean;
@@ -259,6 +261,8 @@ export default function MainsTagsView({
   onCreateTag?: (tag: string) => void;
   userTags?: string[];
   questions?: ConsolidatedQuestion[];
+  vaFavorites?: Set<string>;
+  onToggleVaFavorite?: (cardId: string) => void;
 }) {
   const { isDark } = useTheme();
   const { session } = useAuth();
@@ -592,6 +596,12 @@ export default function MainsTagsView({
     const sections = subjectData ? Object.values(subjectData.sectionGroups) : [];
 
     const renderItemsList = (questionsList: any[], vaList: any[]) => {
+      const sortedVaList = [...(vaList || [])].sort((a, b) => {
+        const aFav = vaFavorites?.has(a.id) ? 1 : 0;
+        const bFav = vaFavorites?.has(b.id) ? 1 : 0;
+        return bFav - aFav;
+      });
+
       return (
         <View style={styles.questionsList}>
           {questionsList.map((q: any) => (
@@ -603,10 +613,10 @@ export default function MainsTagsView({
               colors={colors}
             />
           ))}
-          {(vaList || []).length > 0 && (
+          {sortedVaList.length > 0 && (
             <View style={{ marginTop: questionsList.length > 0 ? 8 : 0 }}>
               <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary, marginBottom: 6, marginLeft: 4, letterSpacing: 0.5 }}>VALUE ADDITIONS</Text>
-              {(vaList || []).map((item: ValueAdditionItem) => (
+              {sortedVaList.map((item: ValueAdditionItem) => (
                 <ValueAdditionCard
                   key={item.id}
                   item={item}
@@ -620,6 +630,8 @@ export default function MainsTagsView({
                   valueAddTags={valueAddTags}
                   onToggleValueAddTag={onToggleValueAddTag}
                   onCreateTag={onCreateTag}
+                  vaFavorites={vaFavorites}
+                  onToggleVaFavorite={onToggleVaFavorite}
                 />
               ))}
             </View>

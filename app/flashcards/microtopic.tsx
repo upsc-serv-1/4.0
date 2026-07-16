@@ -14,6 +14,7 @@ import { NetworkStatus } from '../../src/lib/networkStatus';
 import { useAuth } from '../../src/context/AuthContext';
 import { useTheme } from '../../src/context/ThemeContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
+import { SkeletonCard } from '../../src/components/common/SkeletonLoader';
 import { FlashcardSvc } from '../../src/services/FlashcardService';
 import { logDiagEvent } from '../../src/../app/offline-diag';
 import { CardOverflowMenu, CardMenuAction } from '../../src/components/flashcards/CardOverflowMenu';
@@ -376,7 +377,7 @@ export default function MicrotopicScreen() {
 
   return (
     <PageWrapper>
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
+      <View style={[styles.container, { backgroundColor: colors.bg }]}>
         {/* Header */}
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
           <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn} testID="btn-back"><ArrowLeft size={24} color={colors.textPrimary} /></TouchableOpacity>
@@ -474,7 +475,11 @@ export default function MicrotopicScreen() {
           }
           ListEmptyComponent={
             loading ? (
-              <View style={{ alignItems: 'center', marginTop: 40 }}><ActivityIndicator color={colors.primary} /></View>
+              <View style={{ gap: 10 }}>
+                {[1, 2, 3].map((key) => (
+                  <SkeletonCard key={key} style={{ backgroundColor: colors.surface, borderColor: colors.border, padding: 14, borderRadius: 16, borderWidth: 1, marginBottom: 10 }} />
+                ))}
+              </View>
             ) : (
               <View style={{ alignItems: 'center', marginTop: 60 }}>
                 <BookOpen size={48} color={colors.border} />
@@ -593,7 +598,7 @@ export default function MicrotopicScreen() {
           }}
           title="Select location"
         />
-      </SafeAreaView>
+      </View>
     </PageWrapper>
   );
 }

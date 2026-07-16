@@ -1034,248 +1034,405 @@ export const OPTIONAL_SUBJECTS = ['Sociology', 'PSIR', 'Geography', 'Public Admi
 
 export const ANTHROPOLOGY_SYLLABUS: any = {
   "Paper 1": {
-    "Unit 1 - Introduction, Human Evolution, and Prehistory": [
-      "Meaning, scope and development of Anthropology",
-      "Relationships with other disciplines: Social Sciences",
-      "Relationships with other disciplines: Behavioural Sciences",
-      "Relationships with other disciplines: Life Sciences",
-      "Relationships with other disciplines: Medical Sciences",
-      "Relationships with other disciplines: Earth Sciences",
-      "Relationships with other disciplines: Humanities",
-      "(a) Social-cultural Anthropology, their scope and relevance",
-      "(b) Biological Anthropology, their scope and relevance",
-      "(c) Archaeological Anthropology, their scope and relevance",
-      "(d) Linguistic Anthropology, their scope and relevance",
-      "(a) Biological and Cultural factors in human evolution",
-      "(b) Theories of Organic Evolution (Pre-Darwinian, Darwinian and Post-Darwinian)",
-      "(c) Synthetic theory of evolution",
-      "(c) Brief outline of terms and concepts of evolutionary biology (Doll’s rule, Cope’s rule, Gause’s rule, parallelism, convergence, adaptive radiation, and mosaic evolution)",
-      "Characteristics of Primates",
-      "Evolutionary Trend and Primate Taxonomy",
-      "Primate Adaptations",
-      "(Arboreal and Terrestrial) Primate Taxonomy",
-      "Primate Behaviour",
-      "Tertiary and Quaternary fossil primates",
-      "Living Major Primates",
-      "Comparative Anatomy of Man and Apes",
-      "Skeletal changes due to erect posture and its implications",
-      "(a) Plio-pleistocene hominids in South and East Africa - Australopithecines",
-      "(b) Homo erectus: Africa (Paranthropus)",
-      "(b) Homo erectus: Europe (Homo erectus heidelbergensis)",
-      "(b) Homo erectus: Asia (Homo erectus javanicus, Homo erectus pekinensis)",
-      "(c) Neanderthal Man- La-Chapelle-aux-saints (Classical type)",
-      "(c) Neanderthal Man- Mt. Carmel (Progressive type)",
-      "(d) Rhodesian man",
-      "(e) Homo sapiens — Cromagnon, Grimaldi and Chancelade",
-      "The Cell",
-      "DNA structure and replication",
-      "Protein Synthesis",
-      "Gene",
-      "Mutation",
-      "Chromosomes",
-      "Cell Division",
-      "(a) Principles of Prehistoric Archaeology",
-      "(a) Chronology: Relative and Absolute Dating methods",
-      "(b) Cultural Evolution- Broad Outlines of Prehistoric cultures: (i) Paleolithic",
-      "(b) Cultural Evolution- Broad Outlines of Prehistoric cultures: (ii) Mesolithic",
-      "(b) Cultural Evolution- Broad Outlines of Prehistoric cultures: (iii) Neolithic",
-      "(b) Cultural Evolution- Broad Outlines of Prehistoric cultures: (iv) Chalcolithic",
-      "(b) Cultural Evolution- Broad Outlines of Prehistoric cultures: (v) Copper-Bronze Age",
-      "(b) Cultural Evolution- Broad Outlines of Prehistoric cultures: (vi) Iron Age"
-    ],
-    "Unit 2 - Culture, Society, and Social Institutions": [
-      "The concept and characteristics of culture and civilization",
-      "Ethnocentrism vis-a-vis cultural Relativism",
-      "Concept of Society",
-      "Society and Culture",
-      "Social Institutions",
-      "Social groups",
-      "Social stratification",
-      "Definition and universality",
-      "Laws of marriage (endogamy, exogamy, hypergamy, hypogamy, incest taboo)",
-      "Types of marriage (monogamy, polygamy, polyandry, group marriage)",
-      "Functions of marriage",
-      "Marriage regulations (preferential, prescriptive and proscriptive)",
-      "Marriage payments (bride wealth and dowry)",
-      "Family, household and domestic groups",
-      "Functions of family",
-      "Types of family (from the perspectives of structure, blood relation, marriage, residence and succession)",
-      "Impact of urbanization, industrialization and feminist movements on family",
-      "Consanguinity and Affinity",
-      "Principles and types of descent (Unilineal, Double, Bilateral, Ambilineal)",
-      "Forms of descent groups (lineage, clan, phratry, moiety and kindred)",
-      "Kinship terminology (descriptive and classificatory)",
-      "Descent, Filiation and Complimentary Filiation",
-      "Descent and Alliance"
-    ],
-    "Unit 3 - Economic Organization": [
-      "Meaning, scope and relevance of economic anthropology",
-      "Formalist and Substantivist debate",
-      "Principles governing production, distribution and exchange (reciprocity, redistribution and market)",
-      "In communities, subsisting on hunting and gathering, fishing",
-      "In communities, subsisting on swiddening, pastoralism, horticulture, and agriculture",
-      "Globalization and indigenous economic systems"
-    ],
-    "Unit 4 - Political Organization and Social Control": [
-      "Band, tribe, chiefdom, kingdom and state",
-      "Concepts of power, authority and legitimacy",
-      "Social control, law and justice in simple societies"
-    ],
-    "Unit 5 - Religion": [
-      "Anthropological approaches to the study of religion (evolutionary, psychological and functional)",
-      "Monotheism and polytheism",
-      "Sacred and profane",
-      "Myths and rituals",
-      "Forms of religion in tribal and peasant societies (animism, animatism, fetishism, naturism and totemism)",
-      "Religion, magic and science distinguished",
-      "Magico-religious functionaries (priest, shaman, medicine man, sorcerer and witch)"
-    ],
-    "Unit 6 - Anthropological Theories": [
-      "Classical evolutionism (Tylor, Morgan and Frazer)",
-      "Historical particularism (Boas)",
-      "Diffusionism (British, German and American)",
-      "Functionalism (Malinowski)",
-      "Structural-functionalism (Radcliffe-Brown)",
-      "Structuralism (L’evi - Strauss and E. Leach)",
-      "Culture and personality (Benedict, Mead, Linton, Kardiner and Cora-du Bois)",
-      "Neo-evolutionism (Childe, White, Steward, Sahlins and Service)",
-      "Cultural materialism (Harris)",
-      "Symbolic and interpretive theories (Turner, Schneider and Geertz)",
-      "Cognitive theories (Tyler, Conklin)",
-      "Post-modernism in anthropology"
-    ],
-    "Unit 7 - Culture, Language and Communication": [
-      "Nature, origin and characteristics of language",
-      "Verbal and non-verbal communication",
-      "Social context of language use"
-    ],
-    "Unit 8 - Research Methods in Anthropology": [
-      "Fieldwork tradition in anthropology",
-      "Distinction between technique, method and methodology",
-      "Observation, interview, schedules, questionnaire",
-      "Case study, genealogy, life-history, oral history",
-      "Secondary sources of information, participatory methods",
-      "Analysis, interpretation and presentation of data"
-    ],
-    "Unit 9 - Human Genetics and Physical Anthropology": [
-      "Methods for study of genetic principles in man-family study",
-      "Biochemical methods",
-      "Immunological methods",
-      "D.N.A. technology and recombinant technologies",
-      "Single factor, multifactor",
-      "Lethal, sub-lethal and polygenic inheritance in man",
-      "Mendelian population, Hardy-Weinberg law",
-      "Causes and changes which bring down frequency",
-      "Consanguineous and non-consanguineous mating",
-      "Genetic load, genetic effect of consanguineous and cousin marriages",
-      "(a) Numerical and structural aberrations (disorders)",
-      "(b) Sex chromosomal aberrations",
-      "(c) Autosomal aberrations",
-      "(d) Genetic imprints in human disease",
-      "Biological basis of morphological variation of non-metric and metric characters",
-      "Racial criteria, racial traits in relation to heredity and environment",
-      "Biological basis of racial classification, racial differentiation and race crossing in man",
-      "ABO, Rh blood groups, HLA Hp, transferring, Gm, blood enzymes",
-      "Physiological characteristics-Hb level, body fat, pulse rate",
-      "Bio-cultural Adaptations - Genetic and Non-genetic factors",
-      "Man’s physiological responses to environmental stresses: hot desert",
-      "Man’s physiological responses to environmental stresses: cold",
-      "Man’s physiological responses to environmental stresses: high altitude climate",
-      "Health and disease",
-      "Infectious and non-infectious diseases",
-      "Nutritional deficiency related diseases"
-    ],
-    "Unit 10 - Concept of human growth and development": [
-      "Pre-natal, natal, infant, childhood, adolescence, maturity, senescence",
-      "Genetic, environmental, biochemical, nutritional, cultural and socio-economic",
-      "Theories and observations - biological and chronological longevity",
-      "Human physique and somatotypes",
-      "Methodologies for growth studies"
-    ],
-    "Unit 11 - Demography and Fertility": [
-      "Fertility patterns and differentials",
-      "Biological, social and cultural",
-      "Influencing fecundity, fertility, natality and mortality"
-    ],
-    "Unit 12 - Applications of Anthropology": [
-      "Anthropology of sports",
-      "Nutritional anthropology",
-      "Anthropology in designing of defence and other equipments",
-      "Forensic Anthropology",
-      "Methods and principles of personal identification and reconstruction",
-      "Applied human genetics – Paternity diagnosis, genetic counseling and eugenics",
-      "DNA technology in diseases and medicine",
-      "Serogenetics and cytogenetics in reproductive biology"
-    ]
+    "Unit 1 - Introduction, Human Evolution, and Prehistory": {
+      "1.1 Meaning, scope and development of Anthropology": [
+        "Meaning and development of Anthropology",
+        "Scope of Anthropology"
+      ],
+      "1.2 Relationships with other disciplines": [
+        "Relation with Social Sciences and Behavioural Sciences",
+        "Relation with Life Sciences and Medical Sciences",
+        "Relation with Earth Sciences and Humanities"
+      ],
+      "1.3 Main branches of Anthropology, their scope and relevance": [
+        "Social-cultural Anthropology",
+        "Biological Anthropology",
+        "Archaeological Anthropology",
+        "Linguistic Anthropology"
+      ],
+      "1.4 Human Evolution and emergence of Man": [
+        "Biological and Cultural factors in human evolution",
+        "Theories of Organic Evolution (Pre-Darwinian, Darwinian, Post-Darwinian)",
+        "Synthetic theory of evolution",
+        "Evolutionary biology concepts (Doll’s rule, Cope’s rule, Gause’s rule)",
+        "Evolutionary biology terms (parallelism, convergence, adaptive radiation, mosaic evolution)"
+      ],
+      "1.5 Primatology": [
+        "Characteristics of Primates and Evolutionary Trend",
+        "Primate Taxonomy and Primate Behaviour",
+        "Primate Adaptations (Arboreal and Terrestrial)",
+        "Tertiary and Quaternary fossil primates",
+        "Living Major Primates",
+        "Comparative Anatomy of Man and Apes",
+        "Skeletal changes due to erect posture and its implications"
+      ],
+      "1.6 Phylogenetic status, characteristics and geographical distribution": [
+        "Plio-pleistocene hominids in South and East Africa (Australopithecines)",
+        "Homo erectus: Africa (Paranthropus)",
+        "Homo erectus: Europe (Homo erectus heidelbergensis)",
+        "Homo erectus: Asia (Homo erectus javanicus, Homo erectus pekinensis)",
+        "Neanderthal Man: La-Chapelle-aux-saints (Classical type)",
+        "Neanderthal Man: Mt. Carmel (Progressive type)",
+        "Rhodesian man",
+        "Homo sapiens (Cromagnon, Grimaldi and Chancelade)"
+      ],
+      "1.7 The biological basis of life": [
+        "The Cell and Cell Division",
+        "DNA structure and replication",
+        "Protein Synthesis",
+        "Gene and Mutation",
+        "Chromosomes"
+      ],
+      "1.8 Prehistoric Archaeology": [
+        "Principles of Prehistoric Archaeology",
+        "Chronology: Relative Dating methods",
+        "Chronology: Absolute Dating methods",
+        "Cultural Evolution: Paleolithic and Mesolithic",
+        "Cultural Evolution: Neolithic and Chalcolithic",
+        "Cultural Evolution: Copper-Bronze Age and Iron Age"
+      ]
+    },
+    "Unit 2 - Culture, Society, and Social Institutions": {
+      "2.1 The Nature of Culture": [
+        "The concept and characteristics of culture",
+        "The concept and characteristics of civilization",
+        "Ethnocentrism vis-a-vis cultural Relativism"
+      ],
+      "2.2 The Nature of Society": [
+        "Concept of Society and Society and Culture",
+        "Social Institutions and Social groups",
+        "Social stratification"
+      ],
+      "2.3 Marriage": [
+        "Definition and universality",
+        "Laws of marriage (endogamy, exogamy, hypergamy, hypogamy, incest taboo)",
+        "Types of marriage (monogamy, polygamy, polyandry, group marriage)",
+        "Functions of marriage",
+        "Marriage regulations (preferential, prescriptive and proscriptive)",
+        "Marriage payments (bride wealth and dowry)"
+      ],
+      "2.4 Family": [
+        "Definition and universality",
+        "Family, household and domestic groups",
+        "Functions of family",
+        "Types of family (structure, blood relation, marriage, residence, succession)",
+        "Impact of urbanization and industrialization on family",
+        "Impact of feminist movements on family"
+      ],
+      "2.5 Kinship": [
+        "Consanguinity and Affinity",
+        "Principles and types of descent (Unilineal, Double, Bilateral, Ambilineal)",
+        "Forms of descent groups (lineage, clan, phratry, moiety and kindred)",
+        "Kinship terminology (descriptive and classificatory)",
+        "Descent, Filiation, Complimentary Filiation, and Alliance"
+      ]
+    },
+    "Unit 3 - Economic Organization": {
+      "3.1 Economic Organization": [
+        "Meaning, scope and relevance of economic anthropology",
+        "Formalist and Substantivist debate",
+        "Principles governing production, distribution and exchange (reciprocity, redistribution, market)",
+        "Communities subsisting on hunting and gathering, fishing",
+        "Communities subsisting on swiddening, pastoralism, horticulture, and agriculture",
+        "Globalization and indigenous economic systems"
+      ]
+    },
+    "Unit 4 - Political Organization and Social Control": {
+      "4.1 Political organization and Social Control": [
+        "Band, tribe, chiefdom, kingdom and state",
+        "Concepts of power, authority and legitimacy",
+        "Social control, law and justice in simple societies"
+      ]
+    },
+    "Unit 5 - Religion": {
+      "5.1 Anthropological approaches to the study of religion": [
+        "Evolutionary approach",
+        "Psychological approach",
+        "Functional approach"
+      ],
+      "5.2 Core Concepts of Religion": [
+        "Monotheism and polytheism",
+        "Sacred and profane",
+        "Myths and rituals",
+        "Religion, magic and science distinguished"
+      ],
+      "5.3 Forms and Functionaries": [
+        "Forms of religion in tribal/peasant societies (animism, animatism, fetishism, naturism, totemism)",
+        "Magico-religious functionaries (priest, shaman, medicine man, sorcerer, witch)"
+      ]
+    },
+    "Unit 6 - Anthropological Theories": {
+      "6(a) Classical evolutionism": [
+        "Tylor",
+        "Morgan",
+        "Frazer"
+      ],
+      "6(b) Historical particularism and Diffusionism": [
+        "Boas (Historical particularism)",
+        "British Diffusionism",
+        "German and American Diffusionism"
+      ],
+      "6(c) Functionalism and Structural-functionalism": [
+        "Malinowski (Functionalism)",
+        "Radcliffe-Brown (Structural-functionalism)"
+      ],
+      "6(d) Structuralism": [
+        "L’evi - Strauss",
+        "E. Leach"
+      ],
+      "6(e) Culture and personality": [
+        "Benedict and Mead",
+        "Linton and Kardiner",
+        "Cora-du Bois"
+      ],
+      "6(f) Neo-evolutionism": [
+        "Childe and White",
+        "Steward",
+        "Sahlins and Service"
+      ],
+      "6(g) Cultural materialism": [
+        "Harris"
+      ],
+      "6(h) Symbolic and interpretive theories": [
+        "Turner",
+        "Schneider",
+        "Geertz"
+      ],
+      "6(i) Cognitive theories": [
+        "Tyler",
+        "Conklin"
+      ],
+      "6(j) Post-modernism in anthropology": [
+        "Post-modernism in anthropology"
+      ]
+    },
+    "Unit 7 - Culture, Language and Communication": {
+      "7.1 Culture, language and communication": [
+        "Nature, origin and characteristics of language",
+        "Verbal and non-verbal communication",
+        "Social context of language use"
+      ]
+    },
+    "Unit 8 - Research Methods in Anthropology": {
+      "8(a) Fieldwork Tradition": [
+        "Fieldwork tradition in anthropology"
+      ],
+      "8(b) Distinction between technique, method and methodology": [
+        "Distinction between technique, method and methodology"
+      ],
+      "8(c) Tools of data collection": [
+        "Observation, interview, schedules, questionnaire",
+        "Case study, genealogy, life-history, oral history",
+        "Secondary sources of information and participatory methods"
+      ],
+      "8(d) Analysis, interpretation and presentation of data": [
+        "Analysis, interpretation and presentation of data"
+      ]
+    },
+    "Unit 9 - Human Genetics and Physical Anthropology": {
+      "9.1 Human Genetics: Methods and Application": [
+        "Family study (pedigree analysis, twin study, foster child, co-twin method)",
+        "Cytogenetic method, chromosomal and karyo-type analysis",
+        "Biochemical methods and immunological methods",
+        "D.N.A. technology and recombinant technologies"
+      ],
+      "9.2 Mendelian genetics in man-family study": [
+        "Single factor and multifactor inheritance",
+        "Lethal and sub-lethal inheritance",
+        "Polygenic inheritance in man"
+      ],
+      "9.3 Concept of genetic polymorphism and selection": [
+        "Mendelian population and Hardy-Weinberg law",
+        "Causes/changes in frequency (mutation, isolation, migration, selection, inbreeding, genetic drift)",
+        "Consanguineous and non-consanguineous mating",
+        "Genetic load and genetic effect of consanguineous and cousin marriages"
+      ],
+      "9.4 Chromosomes and chromosomal aberrations in man, methodology": [
+        "Numerical and structural aberrations (disorders)",
+        "Sex chromosomal aberrations (Klinefelter XXY, Turner XO, Super female XXX, intersex, syndromic)",
+        "Autosomal aberrations (Down syndrome, Patau, Edward and Cri-du-chat syndromes)",
+        "Genetic imprints in human disease, genetic screening, genetic counseling, human DNA profiling, gene mapping, genome study"
+      ],
+      "9.5 Race and racism": [
+        "Biological basis of morphological variation of non-metric and metric characters",
+        "Racial criteria and racial traits in relation to heredity and environment",
+        "Biological basis of racial classification, racial differentiation and race crossing in man"
+      ],
+      "9.6 Age, sex and population variation as genetic marker": [
+        "ABO, Rh blood groups, HLA, Hp, transferrin, Gm, blood enzymes",
+        "Physiological characteristics (Hb level, body fat, pulse rate, respiratory functions, sensory perceptions) in different groups"
+      ],
+      "9.7 Concepts and methods of Ecological Anthropology": [
+        "Bio-cultural Adaptations (Genetic and Non-genetic factors)",
+        "Man’s physiological responses to environmental stresses: hot desert",
+        "Man’s physiological responses to environmental stresses: cold",
+        "Man’s physiological responses to environmental stresses: high altitude climate"
+      ],
+      "9.8 Epidemiological Anthropology: Health and disease": [
+        "Infectious and non-infectious diseases",
+        "Nutritional deficiency related diseases"
+      ]
+    },
+    "Unit 10 - Concept of human growth and development": {
+      "10.1 Stages of growth and factors": [
+        "Stages of growth (pre-natal, natal, infant, childhood, adolescence, maturity, senescence)",
+        "Factors affecting growth and development (genetic, environmental, biochemical, nutritional, cultural, socio-economic)"
+      ],
+      "10.2 Ageing, Senescence, and Somatotypes": [
+        "Ageing and senescence",
+        "Theories and observations (biological and chronological longevity)",
+        "Human physique and somatotypes",
+        "Methodologies for growth studies"
+      ]
+    },
+    "Unit 11 - Demography and Fertility": {
+      "11.1 Fertility Events": [
+        "Relevance of menarche, menopause and other bioevents to fertility",
+        "Fertility patterns and differentials"
+      ],
+      "11.2 Demographic theories": [
+        "Biological, social and cultural demographic theories"
+      ],
+      "11.3 Biological and socio-ecological factors": [
+        "Factors influencing fecundity, fertility, natality and mortality"
+      ]
+    },
+    "Unit 12 - Applications of Anthropology": {
+      "12.1 Core Applications": [
+        "Anthropology of sports",
+        "Nutritional anthropology",
+        "Anthropology in designing of defence and other equipments"
+      ],
+      "12.2 Forensic and Medical Applications": [
+        "Forensic Anthropology, personal identification and reconstruction",
+        "Applied human genetics (Paternity diagnosis, genetic counseling and eugenics)",
+        "DNA technology in diseases and medicine",
+        "Serogenetics and cytogenetics in reproductive biology"
+      ]
+    }
   },
   "Paper 2": {
-    "Unit 1 - Evolution of the Indian Culture and Civilization": [
-      "Prehistoric (Palaeolithic, Mesolithic, Neolithic and Neolithic-Chalcolithic)",
-      "Protohistoric (Indus Civilization): Pre- Harappan, Harappan and post-Harappan cultures",
-      "Contributions of tribal cultures to Indian civilization",
-      "Palaeo-anthropological evidences from India",
-      "The concept of ethno-archaeology",
-      "Survivals and Parallels among the hunting, foraging, fishing, pastoral and peasant communities"
-    ],
-    "Unit 2 - Demographic profile of India": [
-      "Ethnic and linguistic elements in the Indian population and their distribution",
-      "Indian population - factors influencing its structure and growth"
-    ],
-    "Unit 3 - Traditional Indian social system and Caste": [
-      "Varnashram, Purushartha, Karma, Rina and Rebirth",
-      "Structure and characteristics, Varna and caste",
-      "Theories of origin of caste system",
-      "Dominant caste, Caste mobility, Future of caste system",
-      "Jajmani system, Tribe-caste continuum",
-      "Sacred Complex",
-      "Nature-Man-Spirit Complex",
-      "Impact of Buddhism, Jainism, Islam and Christianity on Indian society"
-    ],
-    "Unit 4 - Emergence and growth of anthropology in India": [
-      "Contributions of the 18th, 19th and early 20th Century scholar-administrators",
-      "Contributions of Indian anthropologists to tribal and caste studies"
-    ],
-    "Unit 5 - Indian Village and socio-cultural change": [
-      "Significance of village study in India",
-      "Indian village as a social system",
-      "Traditional and changing patterns of settlement and inter-caste relations",
-      "Agrarian relations in Indian villages",
-      "Impact of globalization on Indian villages",
-      "Linguistic and religious minorities and their social, political and economic status",
-      "Sanskritization, Westernization, Modernization",
-      "Inter-play of little and great traditions",
-      "Panchayati raj and social change",
-      "Media and social change"
-    ],
-    "Unit 6 - Tribal situation in India": [
-      "Bio-genetic variability, linguistic and socio-economic characteristics of tribal populations",
-      "Land alienation, poverty, indebtedness",
-      "Low literacy, poor educational facilities",
-      "Unemployment, underemployment, health and nutrition",
-      "Developmental projects and their impact on tribal displacement",
-      "Development of forest policy and tribals",
-      "Impact of urbanization and industrialization on tribal populations"
-    ],
-    "Unit 7 - Exploitation, social change and ethnicity": [
-      "Problems of exploitation and deprivation of Scheduled Castes, Scheduled Tribes and Other Backward Classes",
-      "Constitutional safeguards for Scheduled Tribes and Scheduled Castes",
-      "Impact of modern democratic institutions, development programmes and welfare measures",
-      "Ethnic conflicts and political developments",
-      "Unrest among tribal communities",
-      "Regionalism and demand for autonomy",
-      "Pseudo-tribalism",
-      "Social change among the tribes during colonial and post-Independent India"
-    ],
-    "Unit 8 - Impact of religions and Tribe and nation state": [
-      "Impact of Hinduism, Buddhism, Christianity, Islam and other religions on tribal societies",
-      "A comparative study of tribal communities in India and other countries"
-    ],
-    "Unit 9 - Tribal administration and Role of anthropology": [
-      "Tribal policies, plans, programmes of tribal development and their implementation",
-      "The concept of PTGs (Primitive Tribal Groups)",
-      "Role of N.G.O.s in tribal development",
-      "Role of anthropology in tribal and rural development",
-      "Contributions of anthropology to the understanding of regionalism, communalism, and ethnic and political movements"
-    ]
+    "Unit 1 - Evolution of Indian Culture and Palaeo-Anthropology": {
+      "1.1 Evolution of the Indian Culture and Civilization": [
+        "Prehistoric (Palaeolithic, Mesolithic, Neolithic and Neolithic-Chalcolithic)",
+        "Protohistoric (Indus Civilization)",
+        "Pre-Harappan, Harappan and post-Harappan cultures",
+        "Contributions of the tribal cultures to Indian civilization"
+      ],
+      "1.2 Palaeo-Anthropological evidences from India": [
+        "Evidences with special reference to Siwaliks and Narmada basin",
+        "Ramapithecus, Sivapithecus and Narmada Man"
+      ],
+      "1.3 Ethno-archaeology in India": [
+        "The concept of ethno-archaeology",
+        "Survivals and Parallels among communities (hunting, pastoral, peasant, arts and crafts)"
+      ]
+    },
+    "Unit 2 - Demographic Profile of India": {
+      "2.1 Demographic profile and population structure": [
+        "Ethnic and linguistic elements in the Indian population and their distribution",
+        "Indian population factors influencing structure and growth"
+      ]
+    },
+    "Unit 3 - Traditional Indian Social System and Caste": {
+      "3.1 The structure and nature of traditional Indian social system": [
+        "Varnashram",
+        "Purushartha",
+        "Karma, Rina and Rebirth"
+      ],
+      "3.2 Caste system in India": [
+        "Structure and characteristics of Varna and caste",
+        "Theories of origin of caste system",
+        "Dominant caste and Caste mobility",
+        "Future of caste system and Jajmani system",
+        "Tribe-caste continuum"
+      ],
+      "3.3 Sacred Complex and Nature-Man-Spirit Complex": [
+        "Sacred Complex",
+        "Nature-Man-Spirit Complex"
+      ],
+      "3.4 Impact of Religions on Indian society": [
+        "Impact of Buddhism and Jainism",
+        "Impact of Islam and Christianity"
+      ]
+    },
+    "Unit 4 - Emergence and Growth of Anthropology in India": {
+      "4.1 Emergence, growth and development": [
+        "Contributions of the 18th, 19th and early 20th Century scholar-administrators",
+        "Contributions of Indian anthropologists to tribal and caste studies"
+      ]
+    },
+    "Unit 5 - Indian Village and Socio-Cultural Change": {
+      "5.1 Indian Village": [
+        "Significance of village study in India and Indian village as a social system",
+        "Traditional and changing patterns of settlement and inter-caste relations",
+        "Agrarian relations in Indian villages",
+        "Impact of globalization on Indian villages"
+      ],
+      "5.2 Linguistic and religious minorities": [
+        "Social, political and economic status of linguistic and religious minorities"
+      ],
+      "5.3 Indigenous and exogenous processes of socio-cultural change": [
+        "Sanskritization, Westernization, Modernization",
+        "Inter-play of little and great traditions",
+        "Panchayati Raj and social change",
+        "Media and Social change"
+      ]
+    },
+    "Unit 6 - Tribal Situation in India": {
+      "6.1 Tribal situation in India": [
+        "Bio-genetic variability",
+        "Linguistic and socio-economic characteristics and their distribution"
+      ],
+      "6.2 Problems of the tribal Communities": [
+        "Land alienation, poverty, and indebtedness",
+        "Low literacy, poor educational facilities, unemployment, and under-employment",
+        "Health and nutrition"
+      ],
+      "6.3 Developmental projects and their impact": [
+        "Tribal displacement and problems of rehabilitation",
+        "Development of forest policy and tribals",
+        "Impact of urbanisation and industrialisation on tribal populations"
+      ]
+    },
+    "Unit 7 - Exploitation, Unrest, and Marginalized Communities": {
+      "7.1 Exploitation and constitutional safeguards": [
+        "Problems of exploitation and deprivation of SCs, STs and OBCs",
+        "Constitutional safeguards for Scheduled Tribes and Scheduled Castes"
+      ],
+      "7.2 Social change and contemporary tribal societies": [
+        "Impact of modern democratic institutions",
+        "Impact of development programmes and welfare measures on tribals and weaker sections"
+      ],
+      "7.3 Ethnicity, Unrest, and Political Developments": [
+        "The concept of ethnicity and Ethnic conflicts",
+        "Unrest among tribal communities, Regionalism and demand for autonomy",
+        "Pseudo-tribalism",
+        "Social change among the tribes during colonial and post-Independent India"
+      ]
+    },
+    "Unit 8 - Religion, Tribes, and the Nation State": {
+      "8.1 Impact of religions on tribal societies": [
+        "Impact of Hinduism, Buddhism, Christianity, Islam and other religions"
+      ],
+      "8.2 Tribe and nation state": [
+        "Comparative study of tribal communities in India and other countries"
+      ]
+    },
+    "Unit 9 - Tribal Administration and Applied Anthropology": {
+      "9.1 Administration, policies, and PTGs": [
+        "History of administration of tribal areas and tribal policies",
+        "Plans, programmes of tribal development and their implementation",
+        "The concept of PTGs (Primitive Tribal Groups), their distribution, and special programmes",
+        "Role of N.G.O.s in tribal development"
+      ],
+      "9.2 Role of anthropology in tribal and rural development": [
+        "Role of anthropology in tribal and rural development"
+      ],
+      "9.3 Anthropology and political movements": [
+        "Contributions to understanding regionalism and communalism",
+        "Contributions to understanding ethnic and political movements"
+      ]
+    }
   }
 };

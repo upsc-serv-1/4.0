@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { ChevronRight, Minus, Plus, Layers } from 'lucide-react-native';
+import { ChevronRight, Minus, Plus, Zap } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { BranchNode } from '../../services/BranchService';
 import { Settings as SettingsIcon, Edit2, FolderPlus, Trash2, FolderInput, Folder, FileDown } from 'lucide-react-native';
@@ -130,7 +130,7 @@ export function DeckRow({ node, expanded, onToggle, onOpen, onAction, color }: P
             ) : (
               color && !node.is_folder ? (
                 <View style={[styles.circleIcon, { backgroundColor: color, borderColor: darken(color, 0.2) }]}>
-                  <Layers size={12} color={darken(color)} />
+                  <Zap size={12} color={darken(color)} />
                 </View>
               ) : (
                 <View style={styles.circlePlaceholder} />

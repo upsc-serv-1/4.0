@@ -1,0 +1,2680 @@
+================================================================================
+GEMINI PROMPT INSTRUCTIONS FOR ANTHROPOLOGY OPTIONAL MODEL ANSWERS
+================================================================================
+Act as an expert Anthropology professor and UPSC civil services exam mentor.
+You are required to write high-scoring model answers for the following UPSC Anthropology Optional questions.
+
+Please strictly follow these formatting guidelines:
+1. The output must be written in high-quality Markdown, using standard markdown elements:
+   - Headings (###) and subheadings (####) for clean structure.
+   - Bullet points (-) and numbered lists (1.) for clarity.
+   - Tables (| Column 1 | Column 2 |) where comparison is needed.
+2. Highlight and BOLD key terms, important scholars, anthropological theories, case studies, tribal examples, and key data points.
+   - For example: **M.N. Srinivas**, **L.H. Morgan**, **Functionalism**, **Gond tribe**, **Sanskritization**, etc.
+3. Every answer must follow a standard high-scoring mains structure:
+   - Introduction: Define the core anthropological concept or term and give context.
+   - Body: Elaborate points, include scholars, case studies, and diagrams/flowcharts description where applicable.
+   - Conclusion: Summarize the anthropological significance or contemporary relevance.
+4. Surround each answer with the custom delimiters <<<START_ANSWER id="[QUESTION_ID]">>> and <<<END_ANSWER>>> exactly as shown below:
+
+<<<START_ANSWER id="[QUESTION_ID]">>>
+### Introduction
+[Intro text here...]
+
+### Body
+[Body text here...]
+
+### Conclusion
+[Conclusion text here...]
+<<<END_ANSWER>>>
+
+Do NOT include any extra conversational text or preambles outside these delimiters.
+================================================================================
+QUESTIONS LIST:
+================================================================================
+Question #1
+ID: mains-anthro2-q1
+Marks: Not specified
+Word Limit: Not specified
+Question: Give in detail the ethnographic profits of either a matrilineal or a polyandrous tribe of India
+--------------------------------------------------------------------------------
+
+Question #2
+ID: mains-anthro2-q2
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Ethnographic profile of a polyandrous tribe
+--------------------------------------------------------------------------------
+
+Question #3
+ID: mains-anthro2-q3
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Ethnographic profile of a matrilineal tribe in India
+--------------------------------------------------------------------------------
+
+Question #4
+ID: mains-anthro2-q4
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Concept of Ethnoarchaeology
+--------------------------------------------------------------------------------
+
+Question #5
+ID: mains-anthro2-q5
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on New Archaeology
+--------------------------------------------------------------------------------
+
+Question #6
+ID: mains-anthro2-q6
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note on Food gatherers among Indian tribe. (200 words)
+--------------------------------------------------------------------------------
+
+Question #7
+ID: mains-anthro2-q7
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Hunting and food-gathering tribes of India
+--------------------------------------------------------------------------------
+
+Question #8
+ID: mains-anthro2-q8
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the special problems of shifting cultivators or of hunting food gathering tribes
+--------------------------------------------------------------------------------
+
+Question #9
+ID: mains-anthro2-q9
+Marks: Not specified
+Word Limit: Not specified
+Question: Delineate the major social and cultural characteristics of Indian tribes at the hunting and food gathering stage. How is their ecological adaptation reflected in the worldview?
+--------------------------------------------------------------------------------
+
+Question #10
+ID: mains-anthro2-q10
+Marks: Not specified
+Word Limit: 150 words
+Question: Write a note in 150 words on Future of Hunting and Gathering Tribes
+--------------------------------------------------------------------------------
+
+Question #11
+ID: mains-anthro2-q11
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Pastoralism
+--------------------------------------------------------------------------------
+
+Question #12
+ID: mains-anthro2-q12
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Peasant society
+--------------------------------------------------------------------------------
+
+Question #13
+ID: mains-anthro2-q13
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on: Shifting cultivation of different geophysical
+--------------------------------------------------------------------------------
+
+Question #14
+ID: mains-anthro2-q14
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the special problems of shifting cultivators or of hunting food gathering tribes
+--------------------------------------------------------------------------------
+
+Question #15
+ID: mains-anthro2-q15
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Problem of shifting cultivation in Indian tribes
+--------------------------------------------------------------------------------
+
+Question #16
+ID: mains-anthro2-q16
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Shifting cultivation in the context of land use pattern
+--------------------------------------------------------------------------------
+
+Question #17
+ID: mains-anthro2-q17
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Shifting cultivation, its merits and demerits
+--------------------------------------------------------------------------------
+
+Question #18
+ID: mains-anthro2-q18
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Controversy over the existence of Negrito racial strain in Indian population
+--------------------------------------------------------------------------------
+
+Question #19
+ID: mains-anthro2-q19
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss some of the important attempts to classify the racial elements in Indian population
+--------------------------------------------------------------------------------
+
+Question #20
+ID: mains-anthro2-q20
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Monogoloid racial element in Indian population
+--------------------------------------------------------------------------------
+
+Question #21
+ID: mains-anthro2-q21
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on "Tribe" and "Caste" as closed ethnic groups
+--------------------------------------------------------------------------------
+
+Question #22
+ID: mains-anthro2-q22
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on racial elements among the Scheduled Tribes of India
+--------------------------------------------------------------------------------
+
+Question #23
+ID: mains-anthro2-q23
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on: Guha's classification on the ethnic composition of the people of India is not adequate. Comment
+--------------------------------------------------------------------------------
+
+Question #24
+ID: mains-anthro2-q24
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Critical approach of Guha's classification of ethnic elements in Indian population
+--------------------------------------------------------------------------------
+
+Question #25
+ID: mains-anthro2-q25
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Controversy over the existence on Negrito racial strain in Indian population
+--------------------------------------------------------------------------------
+
+Question #26
+ID: mains-anthro2-q26
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Negrito elements in India
+--------------------------------------------------------------------------------
+
+Question #27
+ID: mains-anthro2-q27
+Marks: Not specified
+Word Limit: Not specified
+Question: Describe ethnic elements in the Indian population focusing either on Risley's or Guha's classification
+--------------------------------------------------------------------------------
+
+Question #28
+ID: mains-anthro2-q28
+Marks: Not specified
+Word Limit: Not specified
+Question: Is Risley's Racial Classification of Indian Population valid?
+--------------------------------------------------------------------------------
+
+Question #29
+ID: mains-anthro2-q29
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Mediterranean Element in Indian Population
+--------------------------------------------------------------------------------
+
+Question #30
+ID: mains-anthro2-q30
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the relevance of Guha's racial classification in the context of India's ethnic groups
+--------------------------------------------------------------------------------
+
+Question #31
+ID: mains-anthro2-q31
+Marks: Not specified
+Word Limit: Not specified
+Question: Describe the linguistic elements in Indian population
+--------------------------------------------------------------------------------
+
+Question #32
+ID: mains-anthro2-q32
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note in 200 words: Linguistic diversity in India
+--------------------------------------------------------------------------------
+
+Question #33
+ID: mains-anthro2-q33
+Marks: Not specified
+Word Limit: Not specified
+Question: What are the major linguistic families in India? Identify such families, showing the geographical distribution and the population groups under different families
+--------------------------------------------------------------------------------
+
+Question #34
+ID: mains-anthro2-q34
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the major linguistic divisions in the Indian population. Also point out the role of language in ethno-political movements
+--------------------------------------------------------------------------------
+
+Question #35
+ID: mains-anthro2-q35
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Linguistic distribution of Indian Population
+--------------------------------------------------------------------------------
+
+Question #36
+ID: mains-anthro2-q36
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Distribution of Dravidian linguistic elements among Indian people
+--------------------------------------------------------------------------------
+
+Question #37
+ID: mains-anthro2-q37
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Distribution of Dravidian family of languages in India
+--------------------------------------------------------------------------------
+
+Question #38
+ID: mains-anthro2-q38
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Distribution of Austric family of languages in India
+--------------------------------------------------------------------------------
+
+Question #39
+ID: mains-anthro2-q39
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on the distribution of Indo-Aryan Languages
+--------------------------------------------------------------------------------
+
+Question #40
+ID: mains-anthro2-q40
+Marks: Not specified
+Word Limit: Not specified
+Question: Give an account of the distribution of blood group among Indian population. Is there a correlation between the distribution of blood groups and physical types?
+--------------------------------------------------------------------------------
+
+Question #41
+ID: mains-anthro2-q41
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Nayar Tharavad and universality of the family
+--------------------------------------------------------------------------------
+
+Question #42
+ID: mains-anthro2-q42
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Social elements in Indian population
+--------------------------------------------------------------------------------
+
+Question #43
+ID: mains-anthro2-q43
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Caste bound occupations vis-a-vis urban populations
+--------------------------------------------------------------------------------
+
+Question #44
+ID: mains-anthro2-q44
+Marks: Not specified
+Word Limit: Not specified
+Question: Critically evaluate the Indian Population Policies. Suggest appropriate measures for its improvement
+--------------------------------------------------------------------------------
+
+Question #45
+ID: mains-anthro2-q45
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Social implication of sex-ratio in Indian population
+--------------------------------------------------------------------------------
+
+Question #46
+ID: mains-anthro2-q46
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Demographic transition in India
+--------------------------------------------------------------------------------
+
+Question #47
+ID: mains-anthro2-q47
+Marks: Not specified
+Word Limit: Not specified
+Question: Bring out the interrelationship between population growth and development in the Indian context
+--------------------------------------------------------------------------------
+
+Question #48
+ID: mains-anthro2-q48
+Marks: Not specified
+Word Limit: Not specified
+Question: Write in brief 'Population Growth in India indicating causes and measures of its control'
+--------------------------------------------------------------------------------
+
+Question #49
+ID: mains-anthro2-q49
+Marks: Not specified
+Word Limit: Not specified
+Question: Critically examine the factors responsible for the high population growth in India and suggest suitable measures for population control
+--------------------------------------------------------------------------------
+
+Question #50
+ID: mains-anthro2-q50
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note in 200 words: Economic aspects of joint family
+--------------------------------------------------------------------------------
+
+Question #51
+ID: mains-anthro2-q51
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Joint family in modern India
+--------------------------------------------------------------------------------
+
+Question #52
+ID: mains-anthro2-q52
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Structure and function of Joint family
+--------------------------------------------------------------------------------
+
+Question #53
+ID: mains-anthro2-q53
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Joint family system in India
+--------------------------------------------------------------------------------
+
+Question #54
+ID: mains-anthro2-q54
+Marks: Not specified
+Word Limit: Not specified
+Question: Point out the salient features of traditional joint family system in India. Trace causes for its disintegration in recent decades
+--------------------------------------------------------------------------------
+
+Question #55
+ID: mains-anthro2-q55
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the basic of Indian Social System. Do you find any change today?
+--------------------------------------------------------------------------------
+
+Question #56
+ID: mains-anthro2-q56
+Marks: Not specified
+Word Limit: Not specified
+Question: Trace the broad unifying features of the traditional Hindu society in the anthropological perspective
+--------------------------------------------------------------------------------
+
+Question #57
+ID: mains-anthro2-q57
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note on (200 words): Varnashram dharma
+--------------------------------------------------------------------------------
+
+Question #58
+ID: mains-anthro2-q58
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note in 200 words: Significance of Varna and Ashram as regulators of social life
+--------------------------------------------------------------------------------
+
+Question #59
+ID: mains-anthro2-q59
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Social Significance of Grihastha-ashram
+--------------------------------------------------------------------------------
+
+Question #60
+ID: mains-anthro2-q60
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Significance of Varna and Caste
+--------------------------------------------------------------------------------
+
+Question #61
+ID: mains-anthro2-q61
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Varnashram
+--------------------------------------------------------------------------------
+
+Question #62
+ID: mains-anthro2-q62
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Importance of Karma in Hindu social system
+--------------------------------------------------------------------------------
+
+Question #63
+ID: mains-anthro2-q63
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Concept of Karma in relation to caste
+--------------------------------------------------------------------------------
+
+Question #64
+ID: mains-anthro2-q64
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Karma
+--------------------------------------------------------------------------------
+
+Question #65
+ID: mains-anthro2-q65
+Marks: Not specified
+Word Limit: Not specified
+Question: Explain the concept of "Rina" according to the Hindu Scriptures. What were the mechanisms suggested by the scholars to reply the "Rivas"?
+--------------------------------------------------------------------------------
+
+Question #66
+ID: mains-anthro2-q66
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Concept of rebirth in Hindu Social System
+--------------------------------------------------------------------------------
+
+Question #67
+ID: mains-anthro2-q67
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Concept of Rina Rebirth
+--------------------------------------------------------------------------------
+
+Question #68
+ID: mains-anthro2-q68
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note in 200 words: Inter-caste hierarchy in any region of India
+--------------------------------------------------------------------------------
+
+Question #69
+ID: mains-anthro2-q69
+Marks: Not specified
+Word Limit: Not specified
+Question: Define untouchability and point out whether the problems of its removal should be treated as a matter of social reform rather than as part of administrative and legal measures
+--------------------------------------------------------------------------------
+
+Question #70
+ID: mains-anthro2-q70
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the essential features of the caste system in India. Critically examine its role in the changing social context in contemporary times
+--------------------------------------------------------------------------------
+
+Question #71
+ID: mains-anthro2-q71
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on: Distinguish between varna and caste
+--------------------------------------------------------------------------------
+
+Question #72
+ID: mains-anthro2-q72
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Varna model of caste
+--------------------------------------------------------------------------------
+
+Question #73
+ID: mains-anthro2-q73
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the inter-related concepts of Varna and Jati Caste. Do you agree with the view that in the context of existing realities in village India, it is the Caste that is important and not the Varna?
+--------------------------------------------------------------------------------
+
+Question #74
+ID: mains-anthro2-q74
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Concept of purity and the caste system
+--------------------------------------------------------------------------------
+
+Question #75
+ID: mains-anthro2-q75
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Concept of caste as a hierarchical system based on the opposition between 'pure' and 'impure'
+--------------------------------------------------------------------------------
+
+Question #76
+ID: mains-anthro2-q76
+Marks: Not specified
+Word Limit: Not specified
+Question: Critically examine the theories of Origin of Castes
+--------------------------------------------------------------------------------
+
+Question #77
+ID: mains-anthro2-q77
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note on (200 words): Concept of dominant caste and its relevance in the study of political processes
+--------------------------------------------------------------------------------
+
+Question #78
+ID: mains-anthro2-q78
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss relationship between "dominant caste" and economic development in rural India
+--------------------------------------------------------------------------------
+
+Question #79
+ID: mains-anthro2-q79
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Role of Dominant caste in the political institutions of a peasant village
+--------------------------------------------------------------------------------
+
+Question #80
+ID: mains-anthro2-q80
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Dominant Caste
+--------------------------------------------------------------------------------
+
+Question #81
+ID: mains-anthro2-q81
+Marks: Not specified
+Word Limit: Not specified
+Question: Explain criteria for dominant caste. How far is this concept still crucial to our understanding of India's villages after implementation of reservations in democratic institutions? Discuss
+--------------------------------------------------------------------------------
+
+Question #82
+ID: mains-anthro2-q82
+Marks: Not specified
+Word Limit: Not specified
+Question: Bring out the various features and the importance of the 'dominant caste' concept
+--------------------------------------------------------------------------------
+
+Question #83
+ID: mains-anthro2-q83
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the relevance of the concept Dominant Caste in the context of Contemporary Indian Society
+--------------------------------------------------------------------------------
+
+Question #84
+ID: mains-anthro2-q84
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the concept of social signification and comment on caste as a stratified system of interaction
+--------------------------------------------------------------------------------
+
+Question #85
+ID: mains-anthro2-q85
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Caste as a pattern of social stratification
+--------------------------------------------------------------------------------
+
+Question #86
+ID: mains-anthro2-q86
+Marks: Not specified
+Word Limit: Not specified
+Question: Examine the changes that have come about in caste system and joint family in modern India
+--------------------------------------------------------------------------------
+
+Question #87
+ID: mains-anthro2-q87
+Marks: Not specified
+Word Limit: Not specified
+Question: Examine the role of joint family in Hindu social system and its impacts on caste system
+--------------------------------------------------------------------------------
+
+Question #88
+ID: mains-anthro2-q88
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the salient features of the prevalent hypotheses on the future of the caste system in India
+--------------------------------------------------------------------------------
+
+Question #89
+ID: mains-anthro2-q89
+Marks: Not specified
+Word Limit: Not specified
+Question: Examine the role of the caste system in the present political context
+--------------------------------------------------------------------------------
+
+Question #90
+ID: mains-anthro2-q90
+Marks: Not specified
+Word Limit: Not specified
+Question: Is the present political system strengthening the caste system? Discuss
+--------------------------------------------------------------------------------
+
+Question #91
+ID: mains-anthro2-q91
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Jajmani System
+--------------------------------------------------------------------------------
+
+Question #92
+ID: mains-anthro2-q92
+Marks: Not specified
+Word Limit: Not specified
+Question: Define the Jajmani system. Analyse the changes in the relationship between caste and occupation in contemporary rural society
+--------------------------------------------------------------------------------
+
+Question #93
+ID: mains-anthro2-q93
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Jajmani System
+--------------------------------------------------------------------------------
+
+Question #94
+ID: mains-anthro2-q94
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note in 200 words: Distinction between tribe and caste
+--------------------------------------------------------------------------------
+
+Question #95
+ID: mains-anthro2-q95
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Tribe-caste continuum
+--------------------------------------------------------------------------------
+
+Question #96
+ID: mains-anthro2-q96
+Marks: Not specified
+Word Limit: Not specified
+Question: What is the notion of 'folk-urban continuum' in the study of peasant society? Is it applicable to Indian conditions?
+--------------------------------------------------------------------------------
+
+Question #97
+ID: mains-anthro2-q97
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Tribe caste continuum
+--------------------------------------------------------------------------------
+
+Question #98
+ID: mains-anthro2-q98
+Marks: Not specified
+Word Limit: Not specified
+Question: Describe the tribe-caste continuum in India. Is this continuum relevant in the modern Indian society?
+--------------------------------------------------------------------------------
+
+Question #99
+ID: mains-anthro2-q99
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Folk-Urban Continuum
+--------------------------------------------------------------------------------
+
+Question #100
+ID: mains-anthro2-q100
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Tribe-caste continuum
+--------------------------------------------------------------------------------
+
+Question #101
+ID: mains-anthro2-q101
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Tribe-Caste Continuum
+--------------------------------------------------------------------------------
+
+Question #102
+ID: mains-anthro2-q102
+Marks: Not specified
+Word Limit: Not specified
+Question: Is Tribe-Caste Continuum a reality or myth? Discuss
+--------------------------------------------------------------------------------
+
+Question #103
+ID: mains-anthro2-q103
+Marks: Not specified
+Word Limit: Not specified
+Question: Write an essay on the growth of Anthropology in India
+--------------------------------------------------------------------------------
+
+Question #104
+ID: mains-anthro2-q104
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the major concept and approaches employed by the Anthropologists in the study of peasant society in India
+--------------------------------------------------------------------------------
+
+Question #105
+ID: mains-anthro2-q105
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Distinctive features in the growth of Indian Anthropology
+--------------------------------------------------------------------------------
+
+Question #106
+ID: mains-anthro2-q106
+Marks: Not specified
+Word Limit: Not specified
+Question: Critically discuss the major anthropological contributions in the study of Indian tribal population
+--------------------------------------------------------------------------------
+
+Question #107
+ID: mains-anthro2-q107
+Marks: Not specified
+Word Limit: Not specified
+Question: Give a brief summary on the growth of Indian Anthropology indicating the factors responsible and the results achieved
+--------------------------------------------------------------------------------
+
+Question #108
+ID: mains-anthro2-q108
+Marks: Not specified
+Word Limit: Not specified
+Question: Assess the growth and development of Anthropology in India. Illustrate the contributions of early twentieth century Anthropologists in Tribal and Caste studies
+--------------------------------------------------------------------------------
+
+Question #109
+ID: mains-anthro2-q109
+Marks: Not specified
+Word Limit: Not specified
+Question: Critically examine the contributions of some of the British scholar administrators to Indian anthropology
+--------------------------------------------------------------------------------
+
+Question #110
+ID: mains-anthro2-q110
+Marks: Not specified
+Word Limit: Not specified
+Question: Give an account of the contributions of Indian scholars in the growth and development of Anthropology in India in early 20th century
+--------------------------------------------------------------------------------
+
+Question #111
+ID: mains-anthro2-q111
+Marks: Not specified
+Word Limit: Not specified
+Question: Briefly discuss the contribution of Indian anthropologists during 20th century
+--------------------------------------------------------------------------------
+
+Question #112
+ID: mains-anthro2-q112
+Marks: Not specified
+Word Limit: Not specified
+Question: Highlight the contributions of Indian anthropologists in the understanding of tribal life
+--------------------------------------------------------------------------------
+
+Question #113
+ID: mains-anthro2-q113
+Marks: Not specified
+Word Limit: Not specified
+Question: Evaluate the contribution of American anthropologists to Indian anthropology
+--------------------------------------------------------------------------------
+
+Question #114
+ID: mains-anthro2-q114
+Marks: Not specified
+Word Limit: Not specified
+Question: Briefly describe the highpoints in the growth of Indian anthropology and evaluate the contributions made either by D.N. Majumdar or Verrier Elwin
+--------------------------------------------------------------------------------
+
+Question #115
+ID: mains-anthro2-q115
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on V. Elwin and his contributions
+--------------------------------------------------------------------------------
+
+Question #116
+ID: mains-anthro2-q116
+Marks: Not specified
+Word Limit: Not specified
+Question: Assess the contribution of Verrier Elwin to Indian anthropology
+--------------------------------------------------------------------------------
+
+Question #117
+ID: mains-anthro2-q117
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the major contributions of von Purer Haimendorf to Indian Anthropology
+--------------------------------------------------------------------------------
+
+Question #118
+ID: mains-anthro2-q118
+Marks: Not specified
+Word Limit: Not specified
+Question: Estimate the contributions of S.C. Roy in the field of ethnography and his influence on the growth of Anthropology in India
+--------------------------------------------------------------------------------
+
+Question #119
+ID: mains-anthro2-q119
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on S.C. Roy's contributions to anthropology
+--------------------------------------------------------------------------------
+
+Question #120
+ID: mains-anthro2-q120
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on K.S. Singh's project on the People of India
+--------------------------------------------------------------------------------
+
+Question #121
+ID: mains-anthro2-q121
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on N.K. Bose's contribution to Indian Anthropology
+--------------------------------------------------------------------------------
+
+Question #122
+ID: mains-anthro2-q122
+Marks: Not specified
+Word Limit: Not specified
+Question: Assess the contributions of M.N. Srinivas towards Indian Anthropology in general. Add a note on his understanding in the context of studying social mobility in India
+--------------------------------------------------------------------------------
+
+Question #123
+ID: mains-anthro2-q123
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a brief note on the contributions of Prof. L. P. Vidyarthi in the field of anthropology
+--------------------------------------------------------------------------------
+
+Question #124
+ID: mains-anthro2-q124
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Maler's perception of the habitat
+--------------------------------------------------------------------------------
+
+Question #125
+ID: mains-anthro2-q125
+Marks: Not specified
+Word Limit: Not specified
+Question: Village studies are crucial in the understanding of Indian life and culture. Who were the pioneer anthropologists undertake such studies? Give a comprehensive picture of any one of them
+--------------------------------------------------------------------------------
+
+Question #126
+ID: mains-anthro2-q126
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on village studies in India
+--------------------------------------------------------------------------------
+
+Question #127
+ID: mains-anthro2-q127
+Marks: Not specified
+Word Limit: Not specified
+Question: Analyse how the village studies contributed in understanding the Indian Social System
+--------------------------------------------------------------------------------
+
+Question #128
+ID: mains-anthro2-q128
+Marks: Not specified
+Word Limit: Not specified
+Question: Describe the significant contributions of village studies in Indian in the understanding of social transformations
+--------------------------------------------------------------------------------
+
+Question #129
+ID: mains-anthro2-q129
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the contributions of S.C. Dube towards the understanding of the Indian village
+--------------------------------------------------------------------------------
+
+Question #130
+ID: mains-anthro2-q130
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note on (200 words): Cultural parochialization in village India
+--------------------------------------------------------------------------------
+
+Question #131
+ID: mains-anthro2-q131
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note on (200 words): Distinctive features of peasant society
+--------------------------------------------------------------------------------
+
+Question #132
+ID: mains-anthro2-q132
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Form of labour bondage in Indian agriculture
+--------------------------------------------------------------------------------
+
+Question #133
+ID: mains-anthro2-q133
+Marks: Not specified
+Word Limit: Not specified
+Question: What do you understand by Green Revolution? What are its economic and ecological dimensions?
+--------------------------------------------------------------------------------
+
+Question #134
+ID: mains-anthro2-q134
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note on (200 words): Impact of industrialization on simple societies
+--------------------------------------------------------------------------------
+
+Question #135
+ID: mains-anthro2-q135
+Marks: Not specified
+Word Limit: Not specified
+Question: Evaluate various changes in social organization of India's villages due to impinging pressures of the market economy on them
+--------------------------------------------------------------------------------
+
+Question #136
+ID: mains-anthro2-q136
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Globalisation and Indian peasantry
+--------------------------------------------------------------------------------
+
+Question #137
+ID: mains-anthro2-q137
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on: The state should protect the personal laws of religious minorities. Discuss with reference to the problems of national integration
+--------------------------------------------------------------------------------
+
+Question #138
+ID: mains-anthro2-q138
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Special provisions for minorities
+--------------------------------------------------------------------------------
+
+Question #139
+ID: mains-anthro2-q139
+Marks: Not specified
+Word Limit: Not specified
+Question: Distinguish between the characteristics and problems of linguistic and religious minorities in India. Give examples of conflicts generated by such considerations and steps to resolve them
+--------------------------------------------------------------------------------
+
+Question #140
+ID: mains-anthro2-q140
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the socio-economic status of religious minorities in India. Identify their role in politics
+--------------------------------------------------------------------------------
+
+Question #141
+ID: mains-anthro2-q141
+Marks: Not specified
+Word Limit: Not specified
+Question: Linguistic and religious minorities are particularly vulnerable to political manipulations. Comment
+--------------------------------------------------------------------------------
+
+Question #142
+ID: mains-anthro2-q142
+Marks: Not specified
+Word Limit: Not specified
+Question: What are the issues and socio-economic problems arising out of being a religious minority? Discuss
+--------------------------------------------------------------------------------
+
+Question #143
+ID: mains-anthro2-q143
+Marks: Not specified
+Word Limit: Not specified
+Question: Assess the nature of social change in India since Independence, specially pertaining to the main institutions of the society
+--------------------------------------------------------------------------------
+
+Question #144
+ID: mains-anthro2-q144
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on: Are the socio-cultural factors which justify calling an area underdeveloped? Elaborate
+--------------------------------------------------------------------------------
+
+Question #145
+ID: mains-anthro2-q145
+Marks: Not specified
+Word Limit: Not specified
+Question: Make a distinction between socio-cultural change and technological change. Indicate how technological development bring about changes in other aspects of culture
+--------------------------------------------------------------------------------
+
+Question #146
+ID: mains-anthro2-q146
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Cultural change-enforced and induced
+--------------------------------------------------------------------------------
+
+Question #147
+ID: mains-anthro2-q147
+Marks: Not specified
+Word Limit: Not specified
+Question: What are the various exogenous processes of socio-cultural changes in Indian Society?
+--------------------------------------------------------------------------------
+
+Question #148
+ID: mains-anthro2-q148
+Marks: Not specified
+Word Limit: 150 words
+Question: Write a note in 150 words on Universalization and Parochialization
+--------------------------------------------------------------------------------
+
+Question #149
+ID: mains-anthro2-q149
+Marks: Not specified
+Word Limit: Not specified
+Question: Describe the different forms and process of sanskritization and assess the overall impact of this phenomenon on caste structure in India
+--------------------------------------------------------------------------------
+
+Question #150
+ID: mains-anthro2-q150
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note in 200 words: Sanskritization as a mode of social change
+--------------------------------------------------------------------------------
+
+Question #151
+ID: mains-anthro2-q151
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the concepts of Sanskritization and Westernization. Explain the processes of change in Indian society and culture
+--------------------------------------------------------------------------------
+
+Question #152
+ID: mains-anthro2-q152
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Sanskritization as a factor of social change among the scheduled castes in India
+--------------------------------------------------------------------------------
+
+Question #153
+ID: mains-anthro2-q153
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Relationship between Sanskritization and Westernization as processes of sociocultural change
+--------------------------------------------------------------------------------
+
+Question #154
+ID: mains-anthro2-q154
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Sanskritization as a mode of social change
+--------------------------------------------------------------------------------
+
+Question #155
+ID: mains-anthro2-q155
+Marks: Not specified
+Word Limit: Not specified
+Question: Do you think that the process of Sanskritization leads to any structural changes in the society? Discuss with reference to the modern Indian society
+--------------------------------------------------------------------------------
+
+Question #156
+ID: mains-anthro2-q156
+Marks: Not specified
+Word Limit: Not specified
+Question: Distinguish between sanskritization and desanskritization. Critically examine impact of sanskritization on social mobility in India
+--------------------------------------------------------------------------------
+
+Question #157
+ID: mains-anthro2-q157
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Sanskritization
+--------------------------------------------------------------------------------
+
+Question #158
+ID: mains-anthro2-q158
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Sanskritisation and Westernisation
+--------------------------------------------------------------------------------
+
+Question #159
+ID: mains-anthro2-q159
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the concepts of Sanskritization and Westernization, Explain the processes of change in Indian society and culture
+--------------------------------------------------------------------------------
+
+Question #160
+ID: mains-anthro2-q160
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Relationship between Sanskritization and Westernization as processes of sociocultural change
+--------------------------------------------------------------------------------
+
+Question #161
+ID: mains-anthro2-q161
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Sanskritisation and Westernisation
+--------------------------------------------------------------------------------
+
+Question #162
+ID: mains-anthro2-q162
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the impact of modernization of the tribal and rural people in India
+--------------------------------------------------------------------------------
+
+Question #163
+ID: mains-anthro2-q163
+Marks: Not specified
+Word Limit: Not specified
+Question: "Modernity has entered Indian character and society, but it has done so through assimilation not replacement." Discuss
+--------------------------------------------------------------------------------
+
+Question #164
+ID: mains-anthro2-q164
+Marks: Not specified
+Word Limit: Not specified
+Question: Explain with the help of suitable examples how great and little traditions interact with each other in Indian society
+--------------------------------------------------------------------------------
+
+Question #165
+ID: mains-anthro2-q165
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note in 200 words: Little traditions and their significance
+--------------------------------------------------------------------------------
+
+Question #166
+ID: mains-anthro2-q166
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss in what way the study of Great tradition and Little tradition is essential for understanding the cultural processes of Indian civilization
+--------------------------------------------------------------------------------
+
+Question #167
+ID: mains-anthro2-q167
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Little tradition
+--------------------------------------------------------------------------------
+
+Question #168
+ID: mains-anthro2-q168
+Marks: Not specified
+Word Limit: Not specified
+Question: "Tradition is a single unbroken chain." Discuss this statement throwing light on the relevance of the use of the term Great Tradition and Little Tradition in India in the fields of (a) religion, (b) kinship and (c) agriculture
+--------------------------------------------------------------------------------
+
+Question #169
+ID: mains-anthro2-q169
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on: The study of Great tradition and Little tradition is essential for understanding Indian Civilization. Discuss
+--------------------------------------------------------------------------------
+
+Question #170
+ID: mains-anthro2-q170
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss in what way the study of Great tradition and Little tradition is essential for understanding the cultural processes of Indian civilization
+--------------------------------------------------------------------------------
+
+Question #171
+ID: mains-anthro2-q171
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Little and Great traditions
+--------------------------------------------------------------------------------
+
+Question #172
+ID: mains-anthro2-q172
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Great Traditions
+--------------------------------------------------------------------------------
+
+Question #173
+ID: mains-anthro2-q173
+Marks: Not specified
+Word Limit: Not specified
+Question: Critically examine the concepts of Little and Great Traditions for understanding the Indian Villages
+--------------------------------------------------------------------------------
+
+Question #174
+ID: mains-anthro2-q174
+Marks: Not specified
+Word Limit: 150 words
+Question: Write a note in 150 words on Critique of the concept of Great and Little Tradition
+--------------------------------------------------------------------------------
+
+Question #175
+ID: mains-anthro2-q175
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Panchayati Raj
+--------------------------------------------------------------------------------
+
+Question #176
+ID: mains-anthro2-q176
+Marks: Not specified
+Word Limit: 150 words
+Question: Write a note in 150 words on Panchayati Raj and the tribes
+--------------------------------------------------------------------------------
+
+Question #177
+ID: mains-anthro2-q177
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Tribes in transition
+--------------------------------------------------------------------------------
+
+Question #178
+ID: mains-anthro2-q178
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Direction of tribal change
+--------------------------------------------------------------------------------
+
+Question #179
+ID: mains-anthro2-q179
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Detribalization
+--------------------------------------------------------------------------------
+
+Question #180
+ID: mains-anthro2-q180
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Detribalization
+--------------------------------------------------------------------------------
+
+Question #181
+ID: mains-anthro2-q181
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Tribe and peasant: similarities and differences
+--------------------------------------------------------------------------------
+
+Question #182
+ID: mains-anthro2-q182
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Tribes as Indigenous Cultures
+--------------------------------------------------------------------------------
+
+Question #183
+ID: mains-anthro2-q183
+Marks: Not specified
+Word Limit: Not specified
+Question: "Tribes in India are not homogeneous group." Discuss
+--------------------------------------------------------------------------------
+
+Question #184
+ID: mains-anthro2-q184
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Biogenetic variability in tribal population
+--------------------------------------------------------------------------------
+
+Question #185
+ID: mains-anthro2-q185
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Genetic diversity among Indian tribes
+--------------------------------------------------------------------------------
+
+Question #186
+ID: mains-anthro2-q186
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss bio-morphological variation among the tribals of Northeastern India
+--------------------------------------------------------------------------------
+
+Question #187
+ID: mains-anthro2-q187
+Marks: Not specified
+Word Limit: Not specified
+Question: Do you think that Indian tribes have rich biogenetic variability? Discuss
+--------------------------------------------------------------------------------
+
+Question #188
+ID: mains-anthro2-q188
+Marks: Not specified
+Word Limit: Not specified
+Question: Describe the racial, linguistic and socio-economic characteristics of a tribe either of Central India or of South India
+--------------------------------------------------------------------------------
+
+Question #189
+ID: mains-anthro2-q189
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Languages spoken by the scheduled tribes
+--------------------------------------------------------------------------------
+
+Question #190
+ID: mains-anthro2-q190
+Marks: Not specified
+Word Limit: Not specified
+Question: Briefly describe the linguistic and socio-economic characteristics of the tribal peoples either (a) of Central India, including the Chota Nagpur plateau or (b) of North East India
+--------------------------------------------------------------------------------
+
+Question #191
+ID: mains-anthro2-q191
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Linguistic diversity among the tribes of Chhota Nagpur
+--------------------------------------------------------------------------------
+
+Question #192
+ID: mains-anthro2-q192
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a brief note on the linguistic diversity among Indian tribes
+--------------------------------------------------------------------------------
+
+Question #193
+ID: mains-anthro2-q193
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note in 200 words: Racial affinity of Indian tribes
+--------------------------------------------------------------------------------
+
+Question #194
+ID: mains-anthro2-q194
+Marks: Not specified
+Word Limit: Not specified
+Question: Write an ethnographic profile in detail about any one Indian tribe you are aware of
+--------------------------------------------------------------------------------
+
+Question #195
+ID: mains-anthro2-q195
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Migration as a means of socio-economic mobility in tribal society
+--------------------------------------------------------------------------------
+
+Question #196
+ID: mains-anthro2-q196
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Key characteristics of the Scheduled Tribes in India
+--------------------------------------------------------------------------------
+
+Question #197
+ID: mains-anthro2-q197
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the distinctive features of tribal in North-east India
+--------------------------------------------------------------------------------
+
+Question #198
+ID: mains-anthro2-q198
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note on Youth dormitory in a Central Indian tribe. (200 words)
+--------------------------------------------------------------------------------
+
+Question #199
+ID: mains-anthro2-q199
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Role of dormitory in tribal life
+--------------------------------------------------------------------------------
+
+Question #200
+ID: mains-anthro2-q200
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Tribal Youth Dormitories
+--------------------------------------------------------------------------------
+
+Question #201
+ID: mains-anthro2-q201
+Marks: Not specified
+Word Limit: Not specified
+Question: Identify the main type of problems that arise out of contacts between tribal people and more advanced sections of Indian population. What measures do you suggest to mitigate the same?
+--------------------------------------------------------------------------------
+
+Question #202
+ID: mains-anthro2-q202
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss major problems of the tribes of India. Make a critical evaluation of the measures adopted by the Central and State Govt. in India to solve these problems and account for their limited success
+--------------------------------------------------------------------------------
+
+Question #203
+ID: mains-anthro2-q203
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the anthropological approach to the understanding of the tribal ethos and comment on the major socio economic problems of Indian tribes
+--------------------------------------------------------------------------------
+
+Question #204
+ID: mains-anthro2-q204
+Marks: Not specified
+Word Limit: Not specified
+Question: What are the major problems of the tribes in India? Evaluate the measures adopted by the Central and State Governments in India to solve these problems
+--------------------------------------------------------------------------------
+
+Question #205
+ID: mains-anthro2-q205
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on The problems of denotified groups
+--------------------------------------------------------------------------------
+
+Question #206
+ID: mains-anthro2-q206
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note in 200 words: Indebtedness and land alienation among Indian tribes
+--------------------------------------------------------------------------------
+
+Question #207
+ID: mains-anthro2-q207
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Indebtedness and land alienation among Indian tribes
+--------------------------------------------------------------------------------
+
+Question #208
+ID: mains-anthro2-q208
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Common Property Resources in tribal villages
+--------------------------------------------------------------------------------
+
+Question #209
+ID: mains-anthro2-q209
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Elites and alienation in tribal society
+--------------------------------------------------------------------------------
+
+Question #210
+ID: mains-anthro2-q210
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Transfer and alienation of tribal land
+--------------------------------------------------------------------------------
+
+Question #211
+ID: mains-anthro2-q211
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Indebtedness and land alienation among Indian tribes
+--------------------------------------------------------------------------------
+
+Question #212
+ID: mains-anthro2-q212
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Land Alienation in tribal India
+--------------------------------------------------------------------------------
+
+Question #213
+ID: mains-anthro2-q213
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Land alienation among the tribals
+--------------------------------------------------------------------------------
+
+Question #214
+ID: mains-anthro2-q214
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Land Alienation
+--------------------------------------------------------------------------------
+
+Question #215
+ID: mains-anthro2-q215
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Indebtedness in Tribal Communities
+--------------------------------------------------------------------------------
+
+Question #216
+ID: mains-anthro2-q216
+Marks: Not specified
+Word Limit: Not specified
+Question: "Land and forest are the twin problems of the tribes." Explain
+--------------------------------------------------------------------------------
+
+Question #217
+ID: mains-anthro2-q217
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Tribal education
+--------------------------------------------------------------------------------
+
+Question #218
+ID: mains-anthro2-q218
+Marks: Not specified
+Word Limit: Not specified
+Question: Bring out, with suitable examples, the constraints of educational development of tribal communities in India. Suggest remedial measures in this context
+--------------------------------------------------------------------------------
+
+Question #219
+ID: mains-anthro2-q219
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Constraints of educational development among the tribals
+--------------------------------------------------------------------------------
+
+Question #220
+ID: mains-anthro2-q220
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the factors related to low literacy rate among the tribals of India. Write in brief the measures taken by the government in different five-year plans to eradicate it
+--------------------------------------------------------------------------------
+
+Question #221
+ID: mains-anthro2-q221
+Marks: Not specified
+Word Limit: 150 words
+Question: Write a note in 150 words on Education and health among tribal women
+--------------------------------------------------------------------------------
+
+Question #222
+ID: mains-anthro2-q222
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the relevance of traditional wisdom and knowledge of the tribes with reference to health in the present day context
+--------------------------------------------------------------------------------
+
+Question #223
+ID: mains-anthro2-q223
+Marks: Not specified
+Word Limit: Not specified
+Question: Critically examine the various structural constraints in the educational development of Scheduled Tribes
+--------------------------------------------------------------------------------
+
+Question #224
+ID: mains-anthro2-q224
+Marks: Not specified
+Word Limit: Not specified
+Question: Describe the socio-cultural factors related to the poor health conditions of the Indian tribal population. Suggest measures for improving these conditions
+--------------------------------------------------------------------------------
+
+Question #225
+ID: mains-anthro2-q225
+Marks: Not specified
+Word Limit: Not specified
+Question: Distinguish among nutrition, food and diet. Comment on the nutritional status of the tribes with subsistence economy in the form of hunting-gathering, shifting cultivation and settled agriculture in India
+--------------------------------------------------------------------------------
+
+Question #226
+ID: mains-anthro2-q226
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the health and nutritional status of tribal and rural children in India. How far has the government policy been effective?
+--------------------------------------------------------------------------------
+
+Question #227
+ID: mains-anthro2-q227
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the health problems faced by tribal populations in India. Suggest some corrective measures
+--------------------------------------------------------------------------------
+
+Question #228
+ID: mains-anthro2-q228
+Marks: Not specified
+Word Limit: 150 words
+Question: Write a note in 150 words on Education and health among tribal women
+--------------------------------------------------------------------------------
+
+Question #229
+ID: mains-anthro2-q229
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the people's response and participation in development programmes in tribal areas
+--------------------------------------------------------------------------------
+
+Question #230
+ID: mains-anthro2-q230
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on People's participation in tribal development
+--------------------------------------------------------------------------------
+
+Question #231
+ID: mains-anthro2-q231
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Displacement and Rehabilitation
+--------------------------------------------------------------------------------
+
+Question #232
+ID: mains-anthro2-q232
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the concept of people's participation in planned development
+--------------------------------------------------------------------------------
+
+Question #233
+ID: mains-anthro2-q233
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Large scale development and distress in tribal regions
+--------------------------------------------------------------------------------
+
+Question #234
+ID: mains-anthro2-q234
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on 'Push' and 'Pull' factors in rural-urban migration
+--------------------------------------------------------------------------------
+
+Question #235
+ID: mains-anthro2-q235
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Factors responsible for tribal migration and its consequences
+--------------------------------------------------------------------------------
+
+Question #236
+ID: mains-anthro2-q236
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the problem of tribal displacement in India. To what extent, are development policies responsible for such displacement? Also explain the role of NGOs in providing the remedial measures to the affected people
+--------------------------------------------------------------------------------
+
+Question #237
+ID: mains-anthro2-q237
+Marks: Not specified
+Word Limit: Not specified
+Question: Indicate the main thrust of anthropological studies on development induced displacement and rehabilitation. Suggest a worthwhile rehabilitation package for displaced tribals to retain their sense of community-belonging
+--------------------------------------------------------------------------------
+
+Question #238
+ID: mains-anthro2-q238
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the context, process and consequences of involuntary displacement among tribal communities in India and analyze the problems of rehabilitation
+--------------------------------------------------------------------------------
+
+Question #239
+ID: mains-anthro2-q239
+Marks: Not specified
+Word Limit: Not specified
+Question: Illustrate, with suitable examples, the impact of development programmes on tribal and weaker sections
+--------------------------------------------------------------------------------
+
+Question #240
+ID: mains-anthro2-q240
+Marks: Not specified
+Word Limit: 150 words
+Question: Write a note in 150 words on Tribal displacement
+--------------------------------------------------------------------------------
+
+Question #241
+ID: mains-anthro2-q241
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the problem of displaced tribal communities with the help of recent examples
+--------------------------------------------------------------------------------
+
+Question #242
+ID: mains-anthro2-q242
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note on (200 words): Forest policy and tribal interests
+--------------------------------------------------------------------------------
+
+Question #243
+ID: mains-anthro2-q243
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Forests and the tribal peoples
+--------------------------------------------------------------------------------
+
+Question #244
+ID: mains-anthro2-q244
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the world view of tribal people in forest regions of India
+--------------------------------------------------------------------------------
+
+Question #245
+ID: mains-anthro2-q245
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Effects of governmental policy regarding forests on Indian tribes
+--------------------------------------------------------------------------------
+
+Question #246
+ID: mains-anthro2-q246
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on 'Land and forest' are basic needs of tribals
+--------------------------------------------------------------------------------
+
+Question #247
+ID: mains-anthro2-q247
+Marks: Not specified
+Word Limit: Not specified
+Question: How are the tribes in India dependent on forest? Make a comparative evaluation on malevolent and benevolent actions of the tribes on forest
+--------------------------------------------------------------------------------
+
+Question #248
+ID: mains-anthro2-q248
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Involvement of local communities in forest management
+--------------------------------------------------------------------------------
+
+Question #249
+ID: mains-anthro2-q249
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Social Forestry
+--------------------------------------------------------------------------------
+
+Question #250
+ID: mains-anthro2-q250
+Marks: Not specified
+Word Limit: Not specified
+Question: Critically examine the forest policy in India right since the British period. Discuss its impact on tribal people
+--------------------------------------------------------------------------------
+
+Question #251
+ID: mains-anthro2-q251
+Marks: Not specified
+Word Limit: Not specified
+Question: Give an account of Joint Forest Management programmes. What is the role of NGOs in such programmes?
+--------------------------------------------------------------------------------
+
+Question #252
+ID: mains-anthro2-q252
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss how forest is related to the tribal life. Critically examine how a change in forest policy and forest degradation have affected tribal economy
+--------------------------------------------------------------------------------
+
+Question #253
+ID: mains-anthro2-q253
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Joint Forest Management
+--------------------------------------------------------------------------------
+
+Question #254
+ID: mains-anthro2-q254
+Marks: Not specified
+Word Limit: Not specified
+Question: Critically examine the evolution of Forest policy in India since the British period. Discuss its impact on tribals of India
+--------------------------------------------------------------------------------
+
+Question #255
+ID: mains-anthro2-q255
+Marks: Not specified
+Word Limit: 150 words
+Question: Write a note in 150 words on Forest Rights Act, 2006
+--------------------------------------------------------------------------------
+
+Question #256
+ID: mains-anthro2-q256
+Marks: Not specified
+Word Limit: Not specified
+Question: The impact of Industrialization of the tribes of India created for them many problems. Discuss with suitable examples
+--------------------------------------------------------------------------------
+
+Question #257
+ID: mains-anthro2-q257
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on 'Rapid industrialisation may lead to psychological frustrations.' Discuss
+--------------------------------------------------------------------------------
+
+Question #258
+ID: mains-anthro2-q258
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Impact of urbanization on the tribal societies
+--------------------------------------------------------------------------------
+
+Question #259
+ID: mains-anthro2-q259
+Marks: Not specified
+Word Limit: Not specified
+Question: Describe the traditional economy of the Indian tribal communities and show how changes have come in it due to impact of Industrialization
+--------------------------------------------------------------------------------
+
+Question #260
+ID: mains-anthro2-q260
+Marks: Not specified
+Word Limit: Not specified
+Question: Point out the favourable and detrimental impacts of industrialization on rural population living in the vicinity areas. What are your proposals for achieving a balance without harmful effects?
+--------------------------------------------------------------------------------
+
+Question #261
+ID: mains-anthro2-q261
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Genesis of urbanization in India
+--------------------------------------------------------------------------------
+
+Question #262
+ID: mains-anthro2-q262
+Marks: Not specified
+Word Limit: Not specified
+Question: Bring out the impact of industrialization on rural population in India. Illustrate your answer with suitable examples. Suggest appropriate measures for the solution of the problems encountered with
+--------------------------------------------------------------------------------
+
+Question #263
+ID: mains-anthro2-q263
+Marks: Not specified
+Word Limit: Not specified
+Question: Examine the impact of urbanisation and industrialisation on tribal economy in India
+--------------------------------------------------------------------------------
+
+Question #264
+ID: mains-anthro2-q264
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on impact of Industrialization on Tribals
+--------------------------------------------------------------------------------
+
+Question #265
+ID: mains-anthro2-q265
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the impact of Urbanization and Industrialization on tribal women
+--------------------------------------------------------------------------------
+
+Question #266
+ID: mains-anthro2-q266
+Marks: Not specified
+Word Limit: Not specified
+Question: What is sustainable development? How does anthropology help attain sustainable development in the tribal communities in India?
+--------------------------------------------------------------------------------
+
+Question #267
+ID: mains-anthro2-q267
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Sustainable Development
+--------------------------------------------------------------------------------
+
+Question #268
+ID: mains-anthro2-q268
+Marks: Not specified
+Word Limit: Not specified
+Question: What is planning from below? Critically assess the role of anthropology towards implementing sustainable development
+--------------------------------------------------------------------------------
+
+Question #269
+ID: mains-anthro2-q269
+Marks: Not specified
+Word Limit: Not specified
+Question: Explain the concept of sustainable development with reference to development and rehabilitation
+--------------------------------------------------------------------------------
+
+Question #270
+ID: mains-anthro2-q270
+Marks: Not specified
+Word Limit: Not specified
+Question: Identify the main problems of the scheduled castes and discuss the measures adopted to solve them
+--------------------------------------------------------------------------------
+
+Question #271
+ID: mains-anthro2-q271
+Marks: Not specified
+Word Limit: Not specified
+Question: Write an essay on the social disabilities experienced by the scheduled castes and discuss the important efforts made to alleviate the same
+--------------------------------------------------------------------------------
+
+Question #272
+ID: mains-anthro2-q272
+Marks: Not specified
+Word Limit: Not specified
+Question: What are the major socio-economic problems faced by the Scheduled castes? Point out the criteria for diagnosis and suggest the remedial measures
+--------------------------------------------------------------------------------
+
+Question #273
+ID: mains-anthro2-q273
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on: Distinguish between exploitation and deprivation of Scheduled Castes
+--------------------------------------------------------------------------------
+
+Question #274
+ID: mains-anthro2-q274
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note in 200 words: Types of subsistence economy of Indian tribes
+--------------------------------------------------------------------------------
+
+Question #275
+ID: mains-anthro2-q275
+Marks: Not specified
+Word Limit: Not specified
+Question: Do you think that exploitation emanates from clash of self interest between groups? Discuss in the context of tribals and non-tribals
+--------------------------------------------------------------------------------
+
+Question #276
+ID: mains-anthro2-q276
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on the problem of bonded labour among Indian tribes
+--------------------------------------------------------------------------------
+
+Question #277
+ID: mains-anthro2-q277
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss some of the important provisions in our constitution which are meant to protect the interest of scheduled castes and scheduled tribes. What is the impact of these provisions have so far had on the weaker sections?
+--------------------------------------------------------------------------------
+
+Question #278
+ID: mains-anthro2-q278
+Marks: Not specified
+Word Limit: Not specified
+Question: Analyse the programmes for tribal welfare undertaken by the Governments in terms of relevant constitutional and statutory provisions
+--------------------------------------------------------------------------------
+
+Question #279
+ID: mains-anthro2-q279
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Constitutional safeguards for scheduled tribes
+--------------------------------------------------------------------------------
+
+Question #280
+ID: mains-anthro2-q280
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the provisions and significance of the protective discrimination policy towards scheduled caste. Assess its impact on their social mobility
+--------------------------------------------------------------------------------
+
+Question #281
+ID: mains-anthro2-q281
+Marks: Not specified
+Word Limit: Not specified
+Question: Evaluate the extent to which existing reservations for scheduled castes and scheduled tribes have led to social mobility among them. What suggestions would you make for implementing to policy of adding an economic in extending reservation to the so-called 'forward' castes?
+--------------------------------------------------------------------------------
+
+Question #282
+ID: mains-anthro2-q282
+Marks: Not specified
+Word Limit: Not specified
+Question: Describe the efficacy of the legislative measures adopted by the Government to tackle the socio-economic problems of the scheduled castes. What other measure would you suggest to tackle these problems?
+--------------------------------------------------------------------------------
+
+Question #283
+ID: mains-anthro2-q283
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Constitutional safeguards for the scheduled tribes
+--------------------------------------------------------------------------------
+
+Question #284
+ID: mains-anthro2-q284
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Constitutional safeguards for the Scheduled Castes
+--------------------------------------------------------------------------------
+
+Question #285
+ID: mains-anthro2-q285
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Scheduled Area
+--------------------------------------------------------------------------------
+
+Question #286
+ID: mains-anthro2-q286
+Marks: Not specified
+Word Limit: Not specified
+Question: Critically examine the merits and demerits of reservation policy for the Scheduled tribes, Scheduled castes and other Backward classes
+--------------------------------------------------------------------------------
+
+Question #287
+ID: mains-anthro2-q287
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on National Commission for SCs and STs
+--------------------------------------------------------------------------------
+
+Question #288
+ID: mains-anthro2-q288
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Constitutional Safeguards for Scheduled Castes
+--------------------------------------------------------------------------------
+
+Question #289
+ID: mains-anthro2-q289
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Fifth Schedule of the Constitution
+--------------------------------------------------------------------------------
+
+Question #290
+ID: mains-anthro2-q290
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Advantages of Ashram school in tribal areas
+--------------------------------------------------------------------------------
+
+Question #291
+ID: mains-anthro2-q291
+Marks: Not specified
+Word Limit: Not specified
+Question: Estimate the role of democratic institutions/organisation for the development of weaker sections and the welfare measures adopted by them
+--------------------------------------------------------------------------------
+
+Question #292
+ID: mains-anthro2-q292
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on ITDA
+--------------------------------------------------------------------------------
+
+Question #293
+ID: mains-anthro2-q293
+Marks: Not specified
+Word Limit: Not specified
+Question: Critically review the processes of social changes the contemporary Indian society is undergoing
+--------------------------------------------------------------------------------
+
+Question #294
+ID: mains-anthro2-q294
+Marks: Not specified
+Word Limit: Not specified
+Question: How have modern democratic institutions influenced the Indian tribal societies? Assess
+--------------------------------------------------------------------------------
+
+Question #295
+ID: mains-anthro2-q295
+Marks: Not specified
+Word Limit: Not specified
+Question: Make an evaluation of welfare measures adopted by the government for the betterment of scheduled tribes in India
+--------------------------------------------------------------------------------
+
+Question #296
+ID: mains-anthro2-q296
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the methods concerning the welfare and development of scheduled tribes
+--------------------------------------------------------------------------------
+
+Question #297
+ID: mains-anthro2-q297
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Programmes for Tribal Development'
+--------------------------------------------------------------------------------
+
+Question #298
+ID: mains-anthro2-q298
+Marks: Not specified
+Word Limit: 150 words
+Question: Write a note in 150 words on Tribal Panchsheel
+--------------------------------------------------------------------------------
+
+Question #299
+ID: mains-anthro2-q299
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the role of education as an instrument of socio-economic change among the weaker sections of India
+--------------------------------------------------------------------------------
+
+Question #300
+ID: mains-anthro2-q300
+Marks: Not specified
+Word Limit: Not specified
+Question: What are the distinct segments in the backward population of India? What special approaches do you recommend to suit the development of different segments?
+--------------------------------------------------------------------------------
+
+Question #301
+ID: mains-anthro2-q301
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the methods concerning the welfare and development of scheduled castes
+--------------------------------------------------------------------------------
+
+Question #302
+ID: mains-anthro2-q302
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on MADA, LAMPS, TRIFED
+--------------------------------------------------------------------------------
+
+Question #303
+ID: mains-anthro2-q303
+Marks: Not specified
+Word Limit: Not specified
+Question: Mention various developmental programmes implemented for the socio-economic well-being of Scheduled Castes. Do these programmes fulfil their aspiration? Discuss
+--------------------------------------------------------------------------------
+
+Question #304
+ID: mains-anthro2-q304
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Ethnicity
+--------------------------------------------------------------------------------
+
+Question #305
+ID: mains-anthro2-q305
+Marks: Not specified
+Word Limit: Not specified
+Question: Explain Fredrik Barth's concept of ethnic boundaries. Explain its distinction from cultural content
+--------------------------------------------------------------------------------
+
+Question #306
+ID: mains-anthro2-q306
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the anthropological understanding of rising ethnicity among Indian tribes in the context of nation-building
+--------------------------------------------------------------------------------
+
+Question #307
+ID: mains-anthro2-q307
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Concept of Ethnicity
+--------------------------------------------------------------------------------
+
+Question #308
+ID: mains-anthro2-q308
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the role of sociopolitical movements in the emergence of tribal identity in the Indian context
+--------------------------------------------------------------------------------
+
+Question #309
+ID: mains-anthro2-q309
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the socio-economic and political characteristics of revitalization movements in tribal India. How are they affected by culture-contact with outsiders?
+--------------------------------------------------------------------------------
+
+Question #310
+ID: mains-anthro2-q310
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Tribal movement - pros and cons
+--------------------------------------------------------------------------------
+
+Question #311
+ID: mains-anthro2-q311
+Marks: Not specified
+Word Limit: Not specified
+Question: To what extent, ethnicity is responsible for the tribal movements in India? Elaborate with suitable examples
+--------------------------------------------------------------------------------
+
+Question #312
+ID: mains-anthro2-q312
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Jharkhand Movement
+--------------------------------------------------------------------------------
+
+Question #313
+ID: mains-anthro2-q313
+Marks: Not specified
+Word Limit: Not specified
+Question: Assess the political and economic role of tribal and rural movements in the creation of the new states of Uttaranchal, Jharkhand and Chhattisgarh
+--------------------------------------------------------------------------------
+
+Question #314
+ID: mains-anthro2-q314
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Birsa Movement
+--------------------------------------------------------------------------------
+
+Question #315
+ID: mains-anthro2-q315
+Marks: Not specified
+Word Limit: Not specified
+Question: What is ethnicity? Does ethnicity add to conflicts and tensions in the society? Illustrate
+--------------------------------------------------------------------------------
+
+Question #316
+ID: mains-anthro2-q316
+Marks: Not specified
+Word Limit: Not specified
+Question: Identify the causes and consequences of major tribal movements in India
+--------------------------------------------------------------------------------
+
+Question #317
+ID: mains-anthro2-q317
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Ethnic Conflict
+--------------------------------------------------------------------------------
+
+Question #318
+ID: mains-anthro2-q318
+Marks: Not specified
+Word Limit: Not specified
+Question: Classify the tribal movements in contemporary India in a regional perspective and analyse the contributive factors
+--------------------------------------------------------------------------------
+
+Question #319
+ID: mains-anthro2-q319
+Marks: Not specified
+Word Limit: Not specified
+Question: Critically review Tana Bhagat Movement-its causes and effects
+--------------------------------------------------------------------------------
+
+Question #320
+ID: mains-anthro2-q320
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Revivalistic Movements
+--------------------------------------------------------------------------------
+
+Question #321
+ID: mains-anthro2-q321
+Marks: Not specified
+Word Limit: Not specified
+Question: Define the concept of 'ethnic identity'. Discuss how it is emerging in the context of tribal unrest in some regions of country
+--------------------------------------------------------------------------------
+
+Question #322
+ID: mains-anthro2-q322
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Positive and negative response of the tribals to Governmental measures
+--------------------------------------------------------------------------------
+
+Question #323
+ID: mains-anthro2-q323
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Tribal unrest in Central India
+--------------------------------------------------------------------------------
+
+Question #324
+ID: mains-anthro2-q324
+Marks: Not specified
+Word Limit: 150 words
+Question: Write a note in 150 words on Left-wing extremism and tribals in India
+--------------------------------------------------------------------------------
+
+Question #325
+ID: mains-anthro2-q325
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the divisive factors which disrupt national integration in India. Suggest solutions to counteract the divisive forces
+--------------------------------------------------------------------------------
+
+Question #326
+ID: mains-anthro2-q326
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Role of ethnic groups in national integration
+--------------------------------------------------------------------------------
+
+Question #327
+ID: mains-anthro2-q327
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Issues relating to national integration
+--------------------------------------------------------------------------------
+
+Question #328
+ID: mains-anthro2-q328
+Marks: Not specified
+Word Limit: Not specified
+Question: Examine the advantages and disadvantages of linguistic States in India in the context of national integration
+--------------------------------------------------------------------------------
+
+Question #329
+ID: mains-anthro2-q329
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Regional Disparity and National Integration
+--------------------------------------------------------------------------------
+
+Question #330
+ID: mains-anthro2-q330
+Marks: Not specified
+Word Limit: Not specified
+Question: Assertion of ethnic identity and ethnic solidarity has been a pervasive process in India after Independence. Analyse this in relation to constitutional safeguards and emerging national integration
+--------------------------------------------------------------------------------
+
+Question #331
+ID: mains-anthro2-q331
+Marks: Not specified
+Word Limit: Not specified
+Question: What are the major issues of National Integration in India? Discuss how it has been eroded in the recent years. What remedial measures would you suggest for National Integration?
+--------------------------------------------------------------------------------
+
+Question #332
+ID: mains-anthro2-q332
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Cultural pluralism and national integration
+--------------------------------------------------------------------------------
+
+Question #333
+ID: mains-anthro2-q333
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the divisive factors which disrupt national integration in India. What would you suggest to counteract the divisive forces?
+--------------------------------------------------------------------------------
+
+Question #334
+ID: mains-anthro2-q334
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Identify the factors responsible for regionalism in contemporary India
+--------------------------------------------------------------------------------
+
+Question #335
+ID: mains-anthro2-q335
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the significance of the regionalism and communalism in Indian context and its role in ethno-political movements in the present political system
+--------------------------------------------------------------------------------
+
+Question #336
+ID: mains-anthro2-q336
+Marks: Not specified
+Word Limit: Not specified
+Question: What is regionalism? Evaluate how regionalism has stimulated political movements in India
+--------------------------------------------------------------------------------
+
+Question #337
+ID: mains-anthro2-q337
+Marks: Not specified
+Word Limit: Not specified
+Question: Analyse the factors influencing tribal regionalism, citing Indian examples
+--------------------------------------------------------------------------------
+
+Question #338
+ID: mains-anthro2-q338
+Marks: Not specified
+Word Limit: Not specified
+Question: Taking the example of any region, describe the radical changes that are taking place in tribal societies and assess their future outcome
+--------------------------------------------------------------------------------
+
+Question #339
+ID: mains-anthro2-q339
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Nation building processes in new states
+--------------------------------------------------------------------------------
+
+Question #340
+ID: mains-anthro2-q340
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Nation State
+--------------------------------------------------------------------------------
+
+Question #341
+ID: mains-anthro2-q341
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the relationship of ethnicity and nation-state
+--------------------------------------------------------------------------------
+
+Question #342
+ID: mains-anthro2-q342
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the factors affecting ethnic boundaries giving suitable examples
+--------------------------------------------------------------------------------
+
+Question #343
+ID: mains-anthro2-q343
+Marks: Not specified
+Word Limit: Not specified
+Question: What do you know by tribe and nation? How do states carved for tribals in India differ from tribal-nation-states in Africa? Discuss
+--------------------------------------------------------------------------------
+
+Question #344
+ID: mains-anthro2-q344
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note in 200 words: History of tribal administration in India
+--------------------------------------------------------------------------------
+
+Question #345
+ID: mains-anthro2-q345
+Marks: Not specified
+Word Limit: Not specified
+Question: Outline the historical background of tribal administration during the colonial period. Evaluate post-Independence administrative policies with special reference to states under either the Fifth Schedule or Sixth Schedule of the Constitution of India
+--------------------------------------------------------------------------------
+
+Question #346
+ID: mains-anthro2-q346
+Marks: Not specified
+Word Limit: Not specified
+Question: Elucidate the nature of changes in administration of tribal areas from colonial period to Post-Independence era in India
+--------------------------------------------------------------------------------
+
+Question #347
+ID: mains-anthro2-q347
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the isolationist and assimilationist approaches to the tribal problems, showing their respective merits and demerits
+--------------------------------------------------------------------------------
+
+Question #348
+ID: mains-anthro2-q348
+Marks: Not specified
+Word Limit: Not specified
+Question: Critically evaluate various approaches to set the tribals within the mainstream of Indian civilization. In your opinion which approach is relevant in the modern context?
+--------------------------------------------------------------------------------
+
+Question #349
+ID: mains-anthro2-q349
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss and compare the approaches towards the tribes during colonial and post independent India. Do you find any significant change in the approaches? Assess
+--------------------------------------------------------------------------------
+
+Question #350
+ID: mains-anthro2-q350
+Marks: Not specified
+Word Limit: Not specified
+Question: Compare the approach adopted towards tribal communities during Colonial and post independence periods
+--------------------------------------------------------------------------------
+
+Question #351
+ID: mains-anthro2-q351
+Marks: Not specified
+Word Limit: Not specified
+Question: How are cultural factors important in planning and executing development programmes among simple communities?
+--------------------------------------------------------------------------------
+
+Question #352
+ID: mains-anthro2-q352
+Marks: Not specified
+Word Limit: Not specified
+Question: What are the various policies that have been suggested for bringing the tribals into the mainstream of national life? In the interest of the tribals, which of these policies do you consider suitable?
+--------------------------------------------------------------------------------
+
+Question #353
+ID: mains-anthro2-q353
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Plans and Programmes of Tribal development
+--------------------------------------------------------------------------------
+
+Question #354
+ID: mains-anthro2-q354
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Tribal Sub-Plan
+--------------------------------------------------------------------------------
+
+Question #355
+ID: mains-anthro2-q355
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Tribal education in the context of development
+--------------------------------------------------------------------------------
+
+Question #356
+ID: mains-anthro2-q356
+Marks: Not specified
+Word Limit: Not specified
+Question: What do you understand by the integrated tribal and rural development programmes? How would you evaluate the success or failure of these programmes?
+--------------------------------------------------------------------------------
+
+Question #357
+ID: mains-anthro2-q357
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Implications of recent Presidential orders relating to Scheduled Tribes and Scheduled Castes
+--------------------------------------------------------------------------------
+
+Question #358
+ID: mains-anthro2-q358
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Sustainable Development of Tribes
+--------------------------------------------------------------------------------
+
+Question #359
+ID: mains-anthro2-q359
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Tribal sub-plan
+--------------------------------------------------------------------------------
+
+Question #360
+ID: mains-anthro2-q360
+Marks: Not specified
+Word Limit: Not specified
+Question: What are the special problems of the Primitive Tribal Groups (PTGs)? How far have the developmental programmes of the Government been able to address these?
+--------------------------------------------------------------------------------
+
+Question #361
+ID: mains-anthro2-q361
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Role of NGOs in literacy programme
+--------------------------------------------------------------------------------
+
+Question #362
+ID: mains-anthro2-q362
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on the role of N.G.O.s for tribal development
+--------------------------------------------------------------------------------
+
+Question #363
+ID: mains-anthro2-q363
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Role of NGO's in Development
+--------------------------------------------------------------------------------
+
+Question #364
+ID: mains-anthro2-q364
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on NGOs and tribal development
+--------------------------------------------------------------------------------
+
+Question #365
+ID: mains-anthro2-q365
+Marks: Not specified
+Word Limit: Not specified
+Question: How does applied anthropology help to solve some of the different problems confronting Administrators in tribal areas?
+--------------------------------------------------------------------------------
+
+Question #366
+ID: mains-anthro2-q366
+Marks: Not specified
+Word Limit: 200 words
+Question: Write a note in 200 words: Role of anthropology in tribal development
+--------------------------------------------------------------------------------
+
+Question #367
+ID: mains-anthro2-q367
+Marks: Not specified
+Word Limit: Not specified
+Question: Discuss the role of Anthropology to planning and executing developmental programmes among the tribal communities
+--------------------------------------------------------------------------------
+
+Question #368
+ID: mains-anthro2-q368
+Marks: Not specified
+Word Limit: Not specified
+Question: What suggestions would you like to make as an anthropologist for bringing the tribal peoples in the national mainstream without obliterating their separate identity
+--------------------------------------------------------------------------------
+
+Question #369
+ID: mains-anthro2-q369
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Anthropological approach to tribal development
+--------------------------------------------------------------------------------
+
+Question #370
+ID: mains-anthro2-q370
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Role of anthropology in tribal development
+--------------------------------------------------------------------------------
+
+Question #371
+ID: mains-anthro2-q371
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Role of Anthropology in tribal development
+--------------------------------------------------------------------------------
+
+Question #372
+ID: mains-anthro2-q372
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Role of Anthropologists as an Administrator
+--------------------------------------------------------------------------------
+
+Question #373
+ID: mains-anthro2-q373
+Marks: Not specified
+Word Limit: Not specified
+Question: Anthropologists are better equipped to play an effective role in rural and tribal development. Discuss
+--------------------------------------------------------------------------------
+
+Question #374
+ID: mains-anthro2-q374
+Marks: Not specified
+Word Limit: Not specified
+Question: Describe the role of anthropologists in Tribal Development
+--------------------------------------------------------------------------------
+
+Question #375
+ID: mains-anthro2-q375
+Marks: Not specified
+Word Limit: Not specified
+Question: Write a note on Role of anthropologists in rural development
+--------------------------------------------------------------------------------
+
+Question #376
+ID: mains-anthro2-q376
+Marks: Not specified
+Word Limit: Not specified
+Question: Why are gender studies gaining importance these days? Assess the contribution of anthropology to gender studies
+--------------------------------------------------------------------------------
+
+Question #377
+ID: mains-anthro2-q377
+Marks: Not specified
+Word Limit: 150 words
+Question: Write a note in 150 words on Factors contributing to communalism
+--------------------------------------------------------------------------------
+
+Question #378
+ID: mains-anthro2-q378
+Marks: Not specified
+Word Limit: Not specified
+Question: In what ways has anthropology contributed to the understanding of ethnic & political movements in India?
+--------------------------------------------------------------------------------
+

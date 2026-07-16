@@ -1,0 +1,820 @@
+=== HIERARCHY RANDOM ALIGNMENT CHECKS (100 ITEMS) ===
+
+Total cards pool: 2585
+Randomly selected check size: 100
+
+============================================================
+
+Check #1:
+  Type: Keyword
+  Title/Name: Virtual Exhibitions
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Art and Culture
+  Assigned Microtopic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.
+----------------------------------------
+Check #2:
+  Type: SC Judgment
+  Title/Name: S.R. Bommai v. Union of India
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Federal Structure & Local Governance
+  Assigned Microtopic: Functions and responsibilities of the Union and the States
+----------------------------------------
+Check #3:
+  Type: Keyword
+  Title/Name: Unequal Development
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Poverty, Empowerment & Development
+  Assigned Microtopic: Social empowerment, poverty and developmental issues
+----------------------------------------
+Check #4:
+  Type: Keyword
+  Title/Name: Empowerment Ecosystem
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Poverty, Empowerment & Development
+  Assigned Microtopic: Social empowerment, poverty and developmental issues
+----------------------------------------
+Check #5:
+  Type: Keyword
+  Title/Name: Political Quota
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Gender & Demographics
+  Assigned Microtopic: Role of women and women's organization
+----------------------------------------
+Check #6:
+  Type: Keyword
+  Title/Name: Cartographic Assertion
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Modern History
+  Assigned Microtopic: Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);
+----------------------------------------
+Check #7:
+  Type: Keyword
+  Title/Name: Skyline Integration
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Art and Culture
+  Assigned Microtopic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.
+----------------------------------------
+Check #8:
+  Type: Keyword
+  Title/Name: Legislative Competence
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: General Science
+----------------------------------------
+Check #9:
+  Type: Keyword
+  Title/Name: Myth Recasting
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Art and Culture
+  Assigned Microtopic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.
+----------------------------------------
+Check #10:
+  Type: Keyword
+  Title/Name: Advanced Robotics for Elderly Care
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: Science and Technology- developments and their effects in everyday life
+----------------------------------------
+Check #11:
+  Type: Keyword
+  Title/Name: Bureaucratic Entrenchment
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Organs of Government & Dispute Redressal
+  Assigned Microtopic: Structure, organization and functioning of the Judiciary (including Tribunals & ADR)
+----------------------------------------
+Check #12:
+  Type: SC Judgment
+  Title/Name: Subrata Roy Sahara Contempt Case
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Organs of Government & Dispute Redressal
+  Assigned Microtopic: Structure, organization and functioning of the Judiciary (including Tribunals & ADR)
+----------------------------------------
+Check #13:
+  Type: SC Judgment
+  Title/Name: Pritam Lal v. High Court of Madhya Pradesh (1992)
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Organs of Government & Dispute Redressal
+  Assigned Microtopic: Structure, organization and functioning of the Judiciary (including Tribunals & ADR)
+----------------------------------------
+Check #14:
+  Type: Keyword
+  Title/Name: Postal Agitation
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Art and Culture
+  Assigned Microtopic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.
+----------------------------------------
+Check #15:
+  Type: Keyword
+  Title/Name: Intersectional Mobilization
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Gender & Demographics
+  Assigned Microtopic: Role of women and women's organization
+----------------------------------------
+Check #16:
+  Type: Keyword
+  Title/Name: Affirmative Action
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Poverty, Empowerment & Development
+  Assigned Microtopic: Social empowerment, poverty and developmental issues
+----------------------------------------
+Check #17:
+  Type: Keyword
+  Title/Name: Electoral Commission Independence
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: General Science
+----------------------------------------
+Check #18:
+  Type: Keyword
+  Title/Name: Green Chemistry Innovations
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: Science and Technology- developments and their effects in everyday life
+----------------------------------------
+Check #19:
+  Type: SC Judgment
+  Title/Name: Kerala Government v. Governor of Kerala
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Federal Structure & Local Governance
+  Assigned Microtopic: Issues and challenges pertaining to the federal structure
+----------------------------------------
+Check #20:
+  Type: Keyword
+  Title/Name: Political Federal Synergy
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: General Science
+----------------------------------------
+Check #21:
+  Type: Keyword
+  Title/Name: Population Aging Syndrome
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Gender & Demographics
+  Assigned Microtopic: Population and associated issues
+----------------------------------------
+Check #22:
+  Type: Keyword
+  Title/Name: Legislative Autonomy
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: General Science
+----------------------------------------
+Check #23:
+  Type: Keyword
+  Title/Name: Quorum Requirement
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Organs of Government & Dispute Redressal
+  Assigned Microtopic: Parliament and State Legislatures - structure, functioning, conduct of business, powers & privileges and issues arising out of these
+----------------------------------------
+Check #24:
+  Type: Keyword
+  Title/Name: Matriarchal Societies
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Gender & Demographics
+  Assigned Microtopic: Role of women and women's organization
+----------------------------------------
+Check #25:
+  Type: Keyword
+  Title/Name: Vertical Farming Innovations
+  Assigned Paper: GS-III
+  Assigned Subject: AGRICULTURE
+  Assigned Section Group: Agriculture & Farm Dynamics
+  Assigned Microtopic: Major Crops, cropping patterns, and regional agriculture production styles
+----------------------------------------
+Check #26:
+  Type: Keyword
+  Title/Name: Weapon Smuggling
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: General Science
+----------------------------------------
+Check #27:
+  Type: Keyword
+  Title/Name: Cultural Assimilation
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Social Dynamics & Ideologies
+  Assigned Microtopic: Effects of globalization on Indian society
+----------------------------------------
+Check #28:
+  Type: Case Study
+  Title/Name: Indian Foreign Policy: Issues and Challenges
+  Case Study Name: 
+  Assigned Paper: GS-II
+  Assigned Subject: INTERNATIONAL RELATIONS
+  Assigned Section Group: Global Geopolitics & Indian Diaspora
+  Assigned Microtopic: Energy X Foreign Policy
+----------------------------------------
+Check #29:
+  Type: Keyword
+  Title/Name: Pillars of Nationalism: Describing the foundational principles and leaders of India's
+nationalist movement.
+https://t.me/X_IAS
+o
+Example: "The Indian National Congress and its leaders were pillars of
+nationalism, advocating for self
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Modern History
+  Assigned Microtopic: Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);
+----------------------------------------
+Check #30:
+  Type: Keyword
+  Title/Name: Bureaucratic Resistance
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Organs of Government & Dispute Redressal
+  Assigned Microtopic: Structure, organization and functioning of the Judiciary (including Tribunals & ADR)
+----------------------------------------
+Check #31:
+  Type: Keyword
+  Title/Name: Constitutional Bodies
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Constitutional Framework & Evolution
+  Assigned Microtopic: Features, amendments, significant provisions and basic structure
+----------------------------------------
+Check #32:
+  Type: Keyword
+  Title/Name: Cultural Appreciation
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Social Dynamics & Ideologies
+  Assigned Microtopic: Effects of globalization on Indian society
+----------------------------------------
+Check #33:
+  Type: Keyword
+  Title/Name: Luminaries of Enlightenment
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Modern History
+  Assigned Microtopic: Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);
+----------------------------------------
+Check #34:
+  Type: Keyword
+  Title/Name: Gender Mainstreaming
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Gender & Demographics
+  Assigned Microtopic: Role of women and women's organization
+----------------------------------------
+Check #35:
+  Type: Keyword
+  Title/Name: Appointment Quota
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Constitutional Framework & Evolution
+  Assigned Microtopic: Features, amendments, significant provisions and basic structure
+----------------------------------------
+Check #36:
+  Type: Keyword
+  Title/Name: Short story mastery
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Art and Culture
+  Assigned Microtopic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.
+----------------------------------------
+Check #37:
+  Type: Keyword
+  Title/Name: Pictorial devotion
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Art and Culture
+  Assigned Microtopic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.
+----------------------------------------
+Check #38:
+  Type: Keyword
+  Title/Name: Constitutional Integrity
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Constitutional Framework & Evolution
+  Assigned Microtopic: Indian Constitution- historical underpinnings and evolution
+----------------------------------------
+Check #39:
+  Type: Keyword
+  Title/Name: Regional vernacular
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Art and Culture
+  Assigned Microtopic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.
+----------------------------------------
+Check #40:
+  Type: Keyword
+  Title/Name: Governance Models
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Constitutional Framework & Evolution
+  Assigned Microtopic: Features, amendments, significant provisions and basic structure
+----------------------------------------
+Check #41:
+  Type: Keyword
+  Title/Name: Constitutional Frameworks
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Constitutional Framework & Evolution
+  Assigned Microtopic: Features, amendments, significant provisions and basic structure
+----------------------------------------
+Check #42:
+  Type: Keyword
+  Title/Name: Internet of Things (IoT) Innovations
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: Science and Technology- developments and their effects in everyday life
+----------------------------------------
+Check #43:
+  Type: Keyword
+  Title/Name: Resource Redistribution
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Poverty, Empowerment & Development
+  Assigned Microtopic: Social empowerment, poverty and developmental issues
+----------------------------------------
+Check #44:
+  Type: SC Judgment
+  Title/Name: National Campaign Committee v. Union of India
+  Assigned Paper: GS-II
+  Assigned Subject: SOCIAL JUSTICE
+  Assigned Section Group: Vulnerable Sections & Welfare
+  Assigned Microtopic: Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies
+----------------------------------------
+Check #45:
+  Type: Keyword
+  Title/Name: Consumer Protection
+  Assigned Paper: GS-II
+  Assigned Subject: GOVERNANCE
+  Assigned Section Group: Constitutional & Regulatory Bodies
+  Assigned Microtopic: Statutory, Regulatory and Quasi-judicial bodies
+----------------------------------------
+Check #46:
+  Type: Keyword
+  Title/Name: Interbranch Coordination
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: General Science
+----------------------------------------
+Check #47:
+  Type: Keyword
+  Title/Name: Guardians of the Constitution
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Modern History
+  Assigned Microtopic: Freedom Struggle-various stages, important contributors/contributions from different parts of the country
+----------------------------------------
+Check #48:
+  Type: Keyword
+  Title/Name: Constitutional Ethos
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Constitutional Framework & Evolution
+  Assigned Microtopic: Indian Constitution- historical underpinnings and evolution
+----------------------------------------
+Check #49:
+  Type: Keyword
+  Title/Name: Khilafat Solidarity
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Art and Culture
+  Assigned Microtopic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.
+----------------------------------------
+Check #50:
+  Type: Keyword
+  Title/Name: Malware Implants
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: General Science
+----------------------------------------
+Check #51:
+  Type: Keyword
+  Title/Name: Cultural Diversity Preservation
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Social Dynamics & Ideologies
+  Assigned Microtopic: National Integration, communalism, regionalism & secularism
+----------------------------------------
+Check #52:
+  Type: Keyword
+  Title/Name: Narcotics Intelligence Cells
+  Assigned Paper: GS-III
+  Assigned Subject: INTERNAL SECURITY
+  Assigned Section Group: Security Forces & Mandates
+  Assigned Microtopic: Various Security forces and agencies and their mandate.
+----------------------------------------
+Check #53:
+  Type: Keyword
+  Title/Name: Political Manipulation
+  Assigned Paper: GS-III
+  Assigned Subject: INTERNAL SECURITY
+  Assigned Section Group: Extremism & External Threats
+  Assigned Microtopic: Linkages between Development & spread of Extremism
+----------------------------------------
+Check #54:
+  Type: Keyword
+  Title/Name: Judicial Principles
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Constitutional Framework & Evolution
+  Assigned Microtopic: Features, amendments, significant provisions and basic structure
+----------------------------------------
+Check #55:
+  Type: Keyword
+  Title/Name: Strategic Subversion
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: General Science
+----------------------------------------
+Check #56:
+  Type: Keyword
+  Title/Name: Census
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Gender & Demographics
+  Assigned Microtopic: Population and associated issues
+----------------------------------------
+Check #57:
+  Type: Keyword
+  Title/Name: Feminist Awakening
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Art and Culture
+  Assigned Microtopic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.
+----------------------------------------
+Check #58:
+  Type: SC Judgment
+  Title/Name: Reservation for Transgender Persons Case
+  Assigned Paper: GS-II
+  Assigned Subject: SOCIAL JUSTICE
+  Assigned Section Group: Vulnerable Sections & Welfare
+  Assigned Microtopic: Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies
+----------------------------------------
+Check #59:
+  Type: Keyword
+  Title/Name: Women's Collective Action
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Gender & Demographics
+  Assigned Microtopic: Role of women and women's organization
+----------------------------------------
+Check #60:
+  Type: Keyword
+  Title/Name: Civic Secularism
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Social Dynamics & Ideologies
+  Assigned Microtopic: National Integration, communalism, regionalism & secularism
+----------------------------------------
+Check #61:
+  Type: Keyword
+  Title/Name: Literary criticism
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Art and Culture
+  Assigned Microtopic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.
+----------------------------------------
+Check #62:
+  Type: Keyword
+  Title/Name: Agency Amplification
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Poverty, Empowerment & Development
+  Assigned Microtopic: Social empowerment, poverty and developmental issues
+----------------------------------------
+Check #63:
+  Type: Keyword
+  Title/Name: Satirical wit
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Art and Culture
+  Assigned Microtopic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.
+----------------------------------------
+Check #64:
+  Type: Keyword
+  Title/Name: Gold
+  Assigned Paper: GS-III
+  Assigned Subject: INTERNAL SECURITY
+  Assigned Section Group: Border Management & Organized Crime
+  Assigned Microtopic: Security challenges and their management in border areas
+----------------------------------------
+Check #65:
+  Type: Keyword
+  Title/Name: Legal Frameworks
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Constitutional Framework & Evolution
+  Assigned Microtopic: Features, amendments, significant provisions and basic structure
+----------------------------------------
+Check #66:
+  Type: Keyword
+  Title/Name: Sentinels of Sovereignty: Protectors of India's independent status and internal
+stability.
+o
+Example: "The Indian armed forces acted as sentinels of sovereignty,
+defending the nation during conflicts such as the Indo
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Modern History
+  Assigned Microtopic: Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);
+----------------------------------------
+Check #67:
+  Type: Keyword
+  Title/Name: Amendatory Dynamics
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Constitutional Framework & Evolution
+  Assigned Microtopic: Indian Constitution- historical underpinnings and evolution
+----------------------------------------
+Check #68:
+  Type: Keyword
+  Title/Name: Federal
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Constitutional Framework & Evolution
+  Assigned Microtopic: Features, amendments, significant provisions and basic structure
+----------------------------------------
+Check #69:
+  Type: Keyword
+  Title/Name: Digital Mobilization
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Gender & Demographics
+  Assigned Microtopic: Role of women and women's organization
+----------------------------------------
+Check #70:
+  Type: Keyword
+  Title/Name: Skill Development
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Poverty, Empowerment & Development
+  Assigned Microtopic: Social empowerment, poverty and developmental issues
+----------------------------------------
+Check #71:
+  Type: Keyword
+  Title/Name: Fortified Urbanism
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Art and Culture
+  Assigned Microtopic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.
+----------------------------------------
+Check #72:
+  Type: Keyword
+  Title/Name: Smart Agriculture Technologies
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: Science and Technology- developments and their effects in everyday life
+----------------------------------------
+Check #73:
+  Type: Keyword
+  Title/Name: Cultural Heritage
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Foundations & Diversity
+  Assigned Microtopic: Diversity of India
+----------------------------------------
+Check #74:
+  Type: Keyword
+  Title/Name: Institutional Autonomy
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: General Science
+----------------------------------------
+Check #75:
+  Type: Keyword
+  Title/Name: Empowerment Dividend
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Poverty, Empowerment & Development
+  Assigned Microtopic: Social empowerment, poverty and developmental issues
+----------------------------------------
+Check #76:
+  Type: Keyword
+  Title/Name: Spectrum of Development
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Modern History
+  Assigned Microtopic: Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);
+----------------------------------------
+Check #77:
+  Type: Keyword
+  Title/Name: Insurance Regulatory Authority
+  Assigned Paper: GS-II
+  Assigned Subject: GOVERNANCE
+  Assigned Section Group: Constitutional & Regulatory Bodies
+  Assigned Microtopic: Statutory, Regulatory and Quasi-judicial bodies
+----------------------------------------
+Check #78:
+  Type: Keyword
+  Title/Name: Constitutional Genesis
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Constitutional Framework & Evolution
+  Assigned Microtopic: Indian Constitution- historical underpinnings and evolution
+----------------------------------------
+Check #79:
+  Type: Keyword
+  Title/Name: Social Inequality
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Poverty, Empowerment & Development
+  Assigned Microtopic: Social empowerment, poverty and developmental issues
+----------------------------------------
+Check #80:
+  Type: Keyword
+  Title/Name: Ombudsman Mechanism
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: General Science
+----------------------------------------
+Check #81:
+  Type: Keyword
+  Title/Name: Legal Pluralism
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Gender & Demographics
+  Assigned Microtopic: Role of women and women's organization
+----------------------------------------
+Check #82:
+  Type: Keyword
+  Title/Name: Urban Agriculture
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Urbanisation
+  Assigned Microtopic: Urbanisation: problems and remedies (Added to house the PDF microthemes)
+----------------------------------------
+Check #83:
+  Type: Keyword
+  Title/Name: Clay Revivalism
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Art and Culture
+  Assigned Microtopic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.
+----------------------------------------
+Check #84:
+  Type: Keyword
+  Title/Name: Women’s Health
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Gender & Demographics
+  Assigned Microtopic: Role of women and women's organization
+----------------------------------------
+Check #85:
+  Type: SC Judgment
+  Title/Name: Charles Sobhraj v. Superintendent, Tihar Jail (1978)
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Organs of Government & Dispute Redressal
+  Assigned Microtopic: Structure, organization and functioning of the Judiciary (including Tribunals & ADR)
+----------------------------------------
+Check #86:
+  Type: Keyword
+  Title/Name: Green Space Depletion
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Urbanisation
+  Assigned Microtopic: Urbanisation: problems and remedies (Added to house the PDF microthemes)
+----------------------------------------
+Check #87:
+  Type: Keyword
+  Title/Name: Libertarian Codex
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Constitutional Framework & Evolution
+  Assigned Microtopic: Indian Constitution- historical underpinnings and evolution
+----------------------------------------
+Check #88:
+  Type: Keyword
+  Title/Name: Social Capital Deficit
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Poverty, Empowerment & Development
+  Assigned Microtopic: Social empowerment, poverty and developmental issues
+----------------------------------------
+Check #89:
+  Type: Keyword
+  Title/Name: Environmental aesthetics: Artistic expressions that advocate for environmental awareness and
+conservation.
+o
+Example: Eco
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Art and Culture
+  Assigned Microtopic: Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.
+----------------------------------------
+Check #90:
+  Type: Keyword
+  Title/Name: Economic Resilience
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Gender & Demographics
+  Assigned Microtopic: Role of women and women's organization
+----------------------------------------
+Check #91:
+  Type: Keyword
+  Title/Name: Regulatory Compliance
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: General Science
+----------------------------------------
+Check #92:
+  Type: Keyword
+  Title/Name: Energy Inequality
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Urbanisation
+  Assigned Microtopic: Urbanisation: problems and remedies (Added to house the PDF microthemes)
+----------------------------------------
+Check #93:
+  Type: Keyword
+  Title/Name: Feminist Networks
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Gender & Demographics
+  Assigned Microtopic: Role of women and women's organization
+----------------------------------------
+Check #94:
+  Type: Keyword
+  Title/Name: Dispute Resolution
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: General Science
+----------------------------------------
+Check #95:
+  Type: Keyword
+  Title/Name: Judicial Keystone
+  Assigned Paper: GS-II
+  Assigned Subject: POLITY
+  Assigned Section Group: Constitutional Framework & Evolution
+  Assigned Microtopic: Indian Constitution- historical underpinnings and evolution
+----------------------------------------
+Check #96:
+  Type: Keyword
+  Title/Name: Undercover Narcos
+  Assigned Paper: GS-III
+  Assigned Subject: INTERNAL SECURITY
+  Assigned Section Group: Border Management & Organized Crime
+  Assigned Microtopic: Security challenges and their management in border areas
+----------------------------------------
+Check #97:
+  Type: Keyword
+  Title/Name: Crusaders for Progress
+  Assigned Paper: GS-I
+  Assigned Subject: HISTORY
+  Assigned Section Group: Modern History
+  Assigned Microtopic: Modern Indian History-Mid-18th century - Present (significant events, personalities, issues);
+----------------------------------------
+Check #98:
+  Type: Keyword
+  Title/Name: Rights Realization
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Poverty, Empowerment & Development
+  Assigned Microtopic: Social empowerment, poverty and developmental issues
+----------------------------------------
+Check #99:
+  Type: Keyword
+  Title/Name: Empowerment Resilience
+  Assigned Paper: GS-I
+  Assigned Subject: SOCIETY
+  Assigned Section Group: Poverty, Empowerment & Development
+  Assigned Microtopic: Social empowerment, poverty and developmental issues
+----------------------------------------
+Check #100:
+  Type: Keyword
+  Title/Name: Political Parties
+  Assigned Paper: GS-III
+  Assigned Subject: SCIENCE & TECHNOLOGY
+  Assigned Section Group: Everyday Science & Innovations
+  Assigned Microtopic: General Science
+----------------------------------------

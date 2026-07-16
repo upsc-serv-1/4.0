@@ -695,13 +695,40 @@ export function MainsScreenInner() {
       setUserTags(list.length > 0 ? list : DEFAULT_TAGS);
     };
     const loadValueAddTags = async () => {
+      let localTags: Record<string, string[]> = {};
       try {
         const raw = await AsyncStorage.getItem('mains_value_add_tags');
         if (raw) {
-          setValueAddTags(JSON.parse(raw));
+          localTags = JSON.parse(raw);
+          setValueAddTags(localTags);
         }
       } catch (err) {
         console.error('Failed to load mains_value_add_tags:', err);
+      }
+
+      if (session?.user?.id) {
+        try {
+          const { data, error } = await supabase
+            .from('mains_value_add_states')
+            .select('card_id, review_tags')
+            .eq('user_id', session.user.id);
+          
+          if (!error && data) {
+            const vaTagsMap: Record<string, string[]> = { ...localTags };
+            data.forEach(row => {
+              if (row.review_tags && row.review_tags.length > 0) {
+                vaTagsMap[row.card_id] = row.review_tags;
+              } else {
+                delete vaTagsMap[row.card_id];
+              }
+            });
+            setValueAddTags(vaTagsMap);
+            await AsyncStorage.setItem('mains_value_add_tags', JSON.stringify(vaTagsMap));
+            console.log('[MainsScreen] Synced value add tags from Supabase:', data.length);
+          }
+        } catch (err) {
+          console.warn('Failed to sync mains_value_add_states from Supabase:', err);
+        }
       }
     };
     const loadVaFavorites = async () => {
@@ -770,6 +797,16 @@ export function MainsScreenInner() {
       await AsyncStorage.setItem('mains_value_add_tags', JSON.stringify(nextValueAddTags));
     } catch (err) {
       console.error('Failed to save mains_value_add_tags:', err);
+    }
+
+    if (session?.user?.id) {
+      StudentSync.enqueue('mains_value_add_state', {
+        userId: session.user.id,
+        cardId,
+        patch: {
+          review_tags: nextTags
+        }
+      });
     }
   };
   
@@ -913,17 +950,23 @@ export function MainsScreenInner() {
                   {
                     backgroundColor: colors.surface + '88',
                     borderColor: colors.border,
-                    paddingHorizontal: 10,
+                    paddingHorizontal: isTablet ? 10 : 12,
+                    minWidth: isTablet ? undefined : 40,
+                    height: 34,
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }
                 ]}
               >
                 <Palette size={16} color={mainsTheme === 'gradient' ? colors.primary : colors.textSecondary} />
-                <Text style={[styles.backButtonText, { color: mainsTheme === 'gradient' ? colors.primary : colors.textSecondary, marginLeft: 4 }]}>
-                  {mainsTheme === 'gradient' ? 'Theme 1' : 'Theme 2'}
-                </Text>
+                {isTablet && (
+                  <Text style={[styles.backButtonText, { color: mainsTheme === 'gradient' ? colors.primary : colors.textSecondary, marginLeft: 4 }]}>
+                    {mainsTheme === 'gradient' ? 'Theme 1' : 'Theme 2'}
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
-          ) : currentScreen !== 'detailed-question' ? (
+          ) : (currentScreen !== 'detailed-question' && currentScreen !== 'revision-tags') ? (
             <TouchableOpacity
               onPress={() => {
                 if (currentScreen === 'value-add' && valueAddCategory !== null) {

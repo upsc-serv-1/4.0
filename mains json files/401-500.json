@@ -1,0 +1,902 @@
+[
+{
+"id": "401",
+"paper": "GS-I",
+"subject": "HISTORY",
+"section_group": "Post Independence",
+"microtopic": "Post-Independence-consolidation and reorganisation within country",
+"subtopic": "States Reorganisation",
+"title": "Navigators of Federalism"
+},
+{
+"id": "402",
+"paper": "GS-III",
+"subject": "AGRICULTURE",
+"section_group": "Agriculture & Farm Dynamics",
+"microtopic": "Public Distribution System (PDS) management, buffer stock dynamics, food security missions, and economics of animal rearing",
+"subtopic": "PDS",
+"title": "Champions of Public Welfare"
+},
+{
+"id": "403",
+"paper": "GS-III",
+"subject": "SCIENCE & TECHNOLOGY",
+"section_group": "Indigenous Tech & Achievements",
+"microtopic": "Achievements of Indians in S&T; Indigenisation of technology & developing new technology",
+"subtopic": "Nuclear Technology",
+"title": "Pioneers of Technological Advancement"
+},
+{
+"id": "404",
+"paper": "GS-I",
+"subject": "HISTORY",
+"section_group": "Post Independence",
+"microtopic": "Post-Independence-consolidation and reorganisation within country",
+"subtopic": "Foreign influence on Independent India's policies",
+"title": "Guardians of Sovereignty"
+},
+{
+"id": "405",
+"paper": "GS-I",
+"subject": "HISTORY",
+"section_group": "Art and Culture",
+"microtopic": "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
+"subtopic": "Conservation of Indian Art & Heritage",
+"title": "Custodians of Heritage"
+},
+{
+"id": "406",
+"paper": "GS-II",
+"subject": "GOVERNANCE",
+"section_group": "Accountability & Civil Services",
+"microtopic": "Transaparency and accountability (institutional and other measures); Citizens Charter",
+"subtopic": "Transparency and Accountability",
+"title": "Champions of Civil Rights"
+},
+{
+"id": "407",
+"paper": "GS-II",
+"subject": "SOCIAL JUSTICE",
+"section_group": "Vulnerable Sections & Welfare",
+"microtopic": "Welfare Schemes (Vulnerable Sections): Performance, Mechanisms, Laws, Institutions & Bodies",
+"subtopic": "Efficacy of Welfare and Development Schemes",
+"title": "Sentinels of Progress"
+},
+{
+"id": "408",
+"paper": "GS-II",
+"subject": "SOCIAL JUSTICE",
+"section_group": "Social Sector & Human Development",
+"microtopic": "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
+"subtopic": "Education",
+"title": "Harbingers of Technological Progress"
+},
+{
+"id": "409",
+"paper": "GS-I",
+"subject": "HISTORY",
+"section_group": "Post Independence",
+"microtopic": "Post-Independence-consolidation and reorganisation within country",
+"subtopic": "Consolidation after Independence",
+"title": "Pillars of National Integrity"
+},
+{
+"id": "410",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Acculturation"
+},
+{
+"id": "411",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Caste system",
+"title": "Caste Dynamics"
+},
+{
+"id": "412",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Caste system",
+"title": "Caste Fluidity"
+},
+{
+"id": "413",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Civic Nationalism"
+},
+{
+"id": "414",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Communal Harmony"
+},
+{
+"id": "415",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Communalization of Politics"
+},
+{
+"id": "416",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Composite Culture"
+},
+{
+"id": "417",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Appropriation"
+},
+{
+"id": "418",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Assimilation"
+},
+{
+"id": "419",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Salient features of Indian Society",
+"subtopic": "Uniqueness of Indian society",
+"title": "Cultural Capital"
+},
+{
+"id": "420",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Coexistence"
+},
+{
+"id": "421",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Commodification"
+},
+{
+"id": "422",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Salient features of Indian Society",
+"subtopic": "Uniqueness of Indian society",
+"title": "Cultural Continuity"
+},
+{
+"id": "423",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Democratization"
+},
+{
+"id": "424",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Heritage"
+},
+{
+"id": "425",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "Effects of globalization on Indian society",
+"subtopic": "Globalisation",
+"title": "Cultural Homogenization"
+},
+{
+"id": "426",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Identity"
+},
+{
+"id": "427",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Integration"
+},
+{
+"id": "428",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Intermediation"
+},
+{
+"id": "429",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Mosaic"
+},
+{
+"id": "430",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Pluralism"
+},
+{
+"id": "431",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Relativism"
+},
+{
+"id": "432",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Resilience"
+},
+{
+"id": "433",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Salient features of Indian Society",
+"subtopic": "Uniqueness of Indian society",
+"title": "Cultural Revivalism"
+},
+{
+"id": "434",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Synapse"
+},
+{
+"id": "435",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Syncretism"
+},
+{
+"id": "436",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Vitality"
+},
+{
+"id": "437",
+"paper": "GS-II",
+"subject": "INTERNATIONAL RELATIONS",
+"section_group": "Global Geopolitics & Indian Diaspora",
+"microtopic": "Indian Diaspora: Economic, Political & Social Impact of the Indian Diaspora",
+"subtopic": "Indian Diaspora",
+"title": "Diaspora"
+},
+{
+"id": "438",
+"paper": "GS-II",
+"subject": "INTERNATIONAL RELATIONS",
+"section_group": "Global Geopolitics & Indian Diaspora",
+"microtopic": "Indian Diaspora: Economic, Political & Social Impact of the Indian Diaspora",
+"subtopic": "Indian Diaspora",
+"title": "Diaspora Influence"
+},
+{
+"id": "439",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Development and Related issues",
+"title": "Digital Divide"
+},
+{
+"id": "440",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Ethnic Boundary Maintenance"
+},
+{
+"id": "441",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Ethnic Enclaves"
+},
+{
+"id": "442",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Ethnic Heritage"
+},
+{
+"id": "443",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Ethnic Identity"
+},
+{
+"id": "444",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Ethnic Minorities"
+},
+{
+"id": "445",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Ethnic Mobilization"
+},
+{
+"id": "446",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Ethnic Pluralism"
+},
+{
+"id": "447",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Ethnic Solidarity"
+},
+{
+"id": "448",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Ethno-linguistic Groups"
+},
+{
+"id": "449",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Ethno-religious Groups"
+},
+{
+"id": "450",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Ethnocentrism"
+},
+{
+"id": "451",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Salient features of Indian Society",
+"subtopic": "Uniqueness of Indian society",
+"title": "Folk Traditions"
+},
+{
+"id": "452",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Gender & Demographics",
+"microtopic": "Role of women and women's organization",
+"subtopic": "Women and Associated concerns",
+"title": "Gendered Social Roles"
+},
+{
+"id": "453",
+"paper": "GS-I",
+"subject": "HISTORY",
+"section_group": "Art and Culture",
+"microtopic": "Indian Culture-Salient aspects of Art Forms, Literature and Architecture from ancient to modern times.",
+"subtopic": "Conservation of Indian Art & Heritage",
+"title": "Heritage Conservation"
+},
+{
+"id": "454",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Tribes & Related Issues",
+"title": "Identity Assertion"
+},
+{
+"id": "455",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Miscellaneous",
+"title": "Inclusive Nationalism"
+},
+{
+"id": "456",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Social empowerment",
+"title": "Inclusive Society"
+},
+{
+"id": "457",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Tribes & Related Issues",
+"title": "Indigenous Knowledge"
+},
+{
+"id": "458",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Caste system",
+"title": "Inter-Caste Alliances"
+},
+{
+"id": "459",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Inter-community Dialogue"
+},
+{
+"id": "460",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Salient features of Indian Society",
+"subtopic": "Uniqueness of Indian society",
+"title": "Inter-Generational Transition"
+},
+{
+"id": "461",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Intercultural Dialogue"
+},
+{
+"id": "462",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Intercultural Hybridization"
+},
+{
+"id": "463",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Interfaith Dialogue"
+},
+{
+"id": "464",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Linguistic Diversity"
+},
+{
+"id": "465",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Linguistic Nationalism"
+},
+{
+"id": "466",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Linguistic Plurality"
+},
+{
+"id": "467",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Caste system",
+"title": "Marginalized Narratives"
+},
+{
+"id": "468",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
+"subtopic": "Fundamental Rights",
+"title": "Minority Rights Assertion"
+},
+{
+"id": "469",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Gender & Demographics",
+"microtopic": "Role of women and women's organization",
+"subtopic": "Women and Associated concerns",
+"title": "Patriarchal Norms"
+},
+{
+"id": "470",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Plural Society"
+},
+{
+"id": "471",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Pluralistic Ethos"
+},
+{
+"id": "472",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Caste system",
+"title": "Political Patronage"
+},
+{
+"id": "473",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Religious Pluralism"
+},
+{
+"id": "474",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Religious Syncretism"
+},
+{
+"id": "475",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Development and Related issues",
+"title": "Rural Marginalization"
+},
+{
+"id": "476",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Urbanisation",
+"microtopic": "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
+"subtopic": "Urban Poverty and Migration",
+"title": "Rural-Urban Continuum"
+},
+{
+"id": "477",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Caste system",
+"title": "Sanskritization"
+},
+{
+"id": "478",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Secular Fabric"
+},
+{
+"id": "479",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Social empowerment",
+"title": "Social Capital"
+},
+{
+"id": "480",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Urbanisation",
+"microtopic": "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
+"subtopic": "Urban Poverty and Migration",
+"title": "Social Capital Deficit"
+},
+{
+"id": "481",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Salient features of Indian Society",
+"subtopic": "Uniqueness of Indian society",
+"title": "Social Cohesion"
+},
+{
+"id": "482",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Social empowerment",
+"title": "Social Empowerment"
+},
+{
+"id": "483",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Caste system",
+"title": "Social Exclusion"
+},
+{
+"id": "484",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Social Fabric"
+},
+{
+"id": "485",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Miscellaneous",
+"title": "Social Fragmentation"
+},
+{
+"id": "486",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Miscellaneous",
+"title": "Social Harmony"
+},
+{
+"id": "487",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Social empowerment",
+"title": "Social Integration"
+},
+{
+"id": "488",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Social empowerment",
+"title": "Social Mobility"
+},
+{
+"id": "489",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Caste system",
+"title": "Social Reform Movements"
+},
+{
+"id": "490",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Social empowerment",
+"title": "Social Solidarity"
+},
+{
+"id": "491",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Caste system",
+"title": "Social Stratification"
+},
+{
+"id": "492",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Social Tapestry"
+},
+{
+"id": "493",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Salient features of Indian Society",
+"subtopic": "Uniqueness of Indian society",
+"title": "Societal Norms"
+},
+{
+"id": "494",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Socio-cultural Diversity"
+},
+{
+"id": "495",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Urbanisation",
+"microtopic": "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
+"subtopic": "Urban Planning",
+"title": "Spatial Segregation"
+},
+{
+"id": "496",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Social empowerment",
+"title": "Subaltern Groups"
+},
+{
+"id": "497",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Syncretic Traditions"
+},
+{
+"id": "498",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Syncretism"
+},
+{
+"id": "499",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Tribes & Related Issues",
+"title": "Traditional Ecological Knowledge"
+},
+{
+"id": "500",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Salient features of Indian Society",
+"subtopic": "Uniqueness of Indian society",
+"title": "Traditional Societies"
+}
+]

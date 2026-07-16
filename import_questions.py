@@ -4,8 +4,19 @@ import os
 import time
 
 # Configuration
-SUPABASE_URL = "https://ngwsuqzkndlxfoantnlf.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nd3N1cXprbmRseGZvYW50bmxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMjA0NjAsImV4cCI6MjA5Mjc5NjQ2MH0.u9-dnMmLXr_5fF243uzx6WyE_vR6dzERDuyFuF-HeZk"
+def load_env():
+    env_vars = {}
+    if os.path.exists(".env"):
+        with open(".env", "r", encoding="utf-8") as f:
+            for line in f:
+                if "=" in line and not line.strip().startswith("#"):
+                    k, v = line.strip().split("=", 1)
+                    env_vars[k.strip()] = v.strip().strip('"').strip("'")
+    return env_vars
+
+env = load_env()
+SUPABASE_URL = env.get("EXPO_PUBLIC_SUPABASE_URL") or "https://ngwsuqzkndlxfoantnlf.supabase.co"
+SUPABASE_KEY = env.get("EXPO_PUBLIC_SUPABASE_ANON_KEY") or "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nd3N1cXprbmRseGZvYW50bmxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMjA0NjAsImV4cCI6MjA5Mjc5NjQ2MH0.u9-dnMmLXr_5fF243uzx6WyE_vR6dzERDuyFuF-HeZk"
 JSON_DIR = "json files"
 
 def import_all():

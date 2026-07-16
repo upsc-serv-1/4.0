@@ -55,7 +55,7 @@
 
 ###### Mnemonic 1: Reasons for the growth of democracy in England
 
-- **Mnemonic Keyword:** `Mnemonics – “DEMOCRATIC ENGLAND`
+- **Mnemonic Keyword:** `Mnemonics – DEMOCRATIC ENGLAND`
 - **Formula / Expansion:**
   - **D:** Development of Political Institutions
   - **E:** Expansion of the Franchise
@@ -358,7 +358,7 @@
 
 ###### Mnemonic 31: Impact of NAM around the world
 
-- **Mnemonic Keyword:** `Mnemonics – “NAM'S GLOBAL IMPACT`
+- **Mnemonic Keyword:** `Mnemonics – NAM'S GLOBAL IMPACT`
 - **Formula / Expansion:**
   - **N:** Non-Alignment Strategy
   - **A:** Advocacy for Peace
@@ -428,7 +428,7 @@
 
 ###### Mnemonic 32: Reasons for the Suez Canal crisis
 
-- **Mnemonic Keyword:** `Mnemonics – “SUEZ CRISIS”`
+- **Mnemonic Keyword:** `Mnemonics – SUEZ CRISIS`
 - **Formula / Expansion:**
   - **S:** Strategic Importance
   - **U:** Unequal Distribution of Control
@@ -474,7 +474,7 @@
 
 ###### Mnemonic 33: Causes of Cuban missile Crisis
 
-- **Mnemonic Keyword:** `Mnemonics – “MISSILE CRISIS`
+- **Mnemonic Keyword:** `Mnemonics – MISSILE CRISIS`
 - **Formula / Expansion:**
   - **M:** Missile Deployment in Europe
   - **I:** Ideological Conflict
@@ -532,7 +532,7 @@
 
 ###### Mnemonic 34: Effect of Cuban missile crisis
 
-- **Mnemonic Keyword:** `Mnemonics – “CUBAN IMPACT”`
+- **Mnemonic Keyword:** `Mnemonics – CUBAN IMPACT`
 - **Formula / Expansion:**
   - **C:** Communication Improvement
   - **U:** Understanding Deterrence
@@ -582,7 +582,7 @@
 
 ###### Mnemonic 39: Why Indentured labour taken from India to abroad?
 
-- **Mnemonic Keyword:** `Mnemonics – “LABOR ROUTES”`
+- **Mnemonic Keyword:** `Mnemonics – LABOR ROUTES`
 - **Formula / Expansion:**
   - **L:** Labor Shortages in Colonies
   - **A:** Agrarian Distress in India
@@ -632,7 +632,7 @@
 
 ###### Mnemonic 41: Key aspects of APARTHEID
 
-- **Mnemonic Keyword:** `APARTHEID”`
+- **Mnemonic Keyword:** `APARTHEID`
 - **Formula / Expansion:**
   - **A:** Apartheid Laws
   - **P:** Pass Laws (Restricted movement of non-whites)
@@ -719,7 +719,7 @@
 
 ###### Mnemonic 50: Reasons for the rise of Communism around the world in 19 th and 20 th century
 
-- **Mnemonic Keyword:** `Mnemonics – “COMMUNISM”`
+- **Mnemonic Keyword:** `Mnemonics – COMMUNISM`
 - **Formula / Expansion:**
   - **C:** Class Struggle
   - **O:** Oppressive Regimes
@@ -761,7 +761,7 @@
 
 ###### Mnemonic 51: Impact for the rise of communism around the world in the 19 th and 20 th century
 
-- **Mnemonic Keyword:** `“EQUALITY`
+- **Mnemonic Keyword:** `EQUALITY`
 - **Formula / Expansion:**
   - **E:** Economic Redistribution
   - **Q:** Quashing of Private Ownership
@@ -799,7 +799,7 @@
 
 ###### Mnemonic 53: Key impacts of redrawl of national boundaries around the world in the 20 th century
 
-- **Mnemonic Keyword:** `Mnemonics – “DIVISION`
+- **Mnemonic Keyword:** `Mnemonics – DIVISION`
 - **Formula / Expansion:**
   - **D:** Displacement of populations
   - **I:** Independence movements
@@ -1178,7 +1178,7 @@
 
 ###### Mnemonic 11: Impact of French Revolution
 
-- **Mnemonic Keyword:** `LIBERATE”`
+- **Mnemonic Keyword:** `LIBERATE`
 - **Formula / Expansion:**
   - L** – Liberty **I** – Inequality **B** – Bourgeoisie **E** – Enlightenment **R** – Republicanism **A** – Aristocracy **T** – Terror
   - **E:** Equality
@@ -1246,7 +1246,7 @@
 
 ###### Mnemonic 15: Impact of Russian Revolution
 
-- **Mnemonic Keyword:** `RUSSIAN FLAG”`
+- **Mnemonic Keyword:** `RUSSIAN FLAG`
 - **Formula / Expansion:**
   - **R:** Redistribution of Land
   - **U:** Union of Soviet Socialist Republics (USSR Formation)
@@ -1288,32 +1288,24 @@
     - • **Explanation**: The Great Terror was a period of intense political repression and persecution under Stalin's rule.
     - • **Example**: **Purge of the Red Army**: During the Great Purge, Stalin targeted the Red Army leadership, resulting in the execution and imprisonment of a significant portion of the officer corps, weakening the military and instilling fear throughout the armed forces.
 
-###### Mnemonic 16: Reasons behind the Chinese Revolution
+###### Mnemonic 16: Reasons behind the Chinese Revolution (NOTE: The Chinese revolution has several distinct phases: the late Qing period (to 1911), the early republic (1911-16), the Warlord Era (1916-27), the Nationalist period or 'Nanjing Decade' (1927-37), the war with Japan (1937-45) and the Chinese Civil War (1945-49).)
 
-- **Mnemonic Keyword:** `CHINESE REVOLT” C – Corruption`
+- **Mnemonic Keyword:** `CHINESE REVOLT`
 - **Formula / Expansion:**
   - ❖
-- **Explanation & Examples:**
-  - ❖ **C – Corruption**
-    - • **Explanation**: Widespread corruption within the Nationalist government eroded its credibility and effectiveness, contributing to public disillusionment.
-
-###### Mnemonic : NOTE: The Chinese revolution has several distinct phases: the late Qing period (to 1911), the early republic (1911-16), the Warlord Era (1916-27), the Nationalist period or 'Nanjing Decade' (1927-37), the war with Japan (1937-45) and the Chinese Civil War (1945-49).
-
-- **Mnemonic Keyword:** ``
-- **Formula / Expansion:**
   - **H:** Harsh Rule **I –** Inequality **N –** Nationalism
   - **E:** Economic Hardship
   - **S:** Social Unrest
-  - **E:** Exploitation by Foreign Powers
   - **R:** Revolutionary Ideology
-  - **E:** Economic Exploitation
   - **V:** Victory of the CCP
   - **O:** Opposition to the KMT
   - **L:** Land Reform
   - **T:** The Fall of the Qing Dynasty
   - ❖ ❖ ❖ ❖ ❖ ❖ ❖ ❖ ❖ ❖ ❖ ❖
 - **Explanation & Examples:**
-    - • **Example**: **KMT Corruption Scandals**: The Kuomintang (KMT) government, led by Chiang Kai-shek, was plagued by corruption and nepotism, including the mismanagement of resources and funds, which undermined its legitimacy and effectiveness in addressing national issues.
+  - ❖ **C – Corruption**
+    - • **Explanation**: Widespread corruption within the Nationalist government eroded its credibility and effectiveness, contributing to public disillusionment.
+  - ❖ - • **Example**: **KMT Corruption Scandals**: The Kuomintang (KMT) government, led by Chiang Kai-shek, was plagued by corruption and nepotism, including the mismanagement of resources and funds, which undermined its legitimacy and effectiveness in addressing national issues.
   - ❖ **H - Harsh Rule**
     - • **Explanation**: The authoritarian and repressive nature of the Nationalist government created widespread dissatisfaction and opposition.
     - • **Example**: **Suppression of Opposition**: Chiang Kai-shek's government used force to suppress political dissent and opposition, including the violent repression of labour strikes and student protests, which contributed to the revolutionary climate.
@@ -1398,7 +1390,7 @@
 
 ###### Mnemonic 35: Conditions that helped the growth of Imperialism
 
-- **Mnemonic Keyword:** `Mnemonics – “EMPIRE GROWS`
+- **Mnemonic Keyword:** `Mnemonics – EMPIRE GROWS`
 - **Formula / Expansion:**
   - **E:** Economic Motives
   - **M:** Military Superiority
@@ -1448,7 +1440,7 @@
 
 ###### Mnemonic 36: Effect of Imperialism around the world
 
-- **Mnemonic Keyword:** `Mnemonics – “IMPERIAL POWERS`
+- **Mnemonic Keyword:** `Mnemonics – IMPERIAL POWERS`
 - **Formula / Expansion:**
   - **I:** Industrialization and Infrastructure
   - **M:** Missionary Activities and Cultural Changes
@@ -1650,7 +1642,7 @@
 
 ###### Mnemonic 54: Key impact of decolonization around the world
 
-- **Mnemonic Keyword:** `Mnemonics – “DECOLONIZATION`
+- **Mnemonic Keyword:** `Mnemonics – DECOLONIZATION`
 - **Formula / Expansion:**
   - **D:** Decline of colonial empires
   - **E:** Emergence of new nations
@@ -1992,7 +1984,7 @@
 
 ###### Mnemonic 6: How the Japanese Industrial revolution was different from the west?
 
-- **Mnemonic Keyword:** `Mnemonics – “JAPAN'S EDGE”`
+- **Mnemonic Keyword:** `Mnemonics – JAPAN'S EDGE`
 - **Formula / Expansion:**
   - **J:** Juxtaposition of Tradition and Modernity
   - **A:** Adaptation over Innovation
@@ -2037,7 +2029,7 @@
 
 ###### Mnemonic 46: Reasons for the rise of capitalism around the world in 19 th and 20 th century
 
-- **Mnemonic Keyword:** `Mnemonics – “CAPITALISM RISES”`
+- **Mnemonic Keyword:** `Mnemonics – CAPITALISM RISES`
 - **Formula / Expansion:**
   - **C:** Colonial Expansion
   - **A:** Agricultural Advancements
@@ -2172,7 +2164,7 @@
 
 ###### Mnemonic 48: Reasons for the rise of socialism around the world in the 19 th and 20 th century
 
-- **Mnemonic Keyword:** `Mnemonics – “SOCIALISM”`
+- **Mnemonic Keyword:** `Mnemonics – SOCIALISM`
 - **Formula / Expansion:**
   - **S:** Social Inequality
   - **O:** Oppression of Workers
@@ -2214,7 +2206,7 @@
 
 ###### Mnemonic 49: Impact of the rise of socialism around the world in the 19 th and 20 th century
 
-- **Mnemonic Keyword:** `Mnemonics – “PROLETARIAT”`
+- **Mnemonic Keyword:** `Mnemonics – PROLETARIAT`
 - **Formula / Expansion:**
   - **P:** Public Ownership of Resources
   - **R:** Rise of Worker’s Rights Movements
@@ -2228,7 +2220,7 @@
   - **A:** Abolition of Class Hierarchies
   - **T:** Trade Unionism Flourished
 - **Explanation & Examples:**
-      Here are detailed explanations for each part of the **“PROLETARIAT”** mnemonic regarding the **impact of the rise of socialism around the world in the 19th and 20th centuries**:
+  - ❖ Here are detailed explanations for each part of the **“PROLETARIAT”** mnemonic regarding the **impact of the rise of socialism around the world in the 19th and 20th centuries**:
   - ❖ **P - Public Ownership of Resources**
     - • **Explanation:** Socialism called for the nationalization of key industries, land, and resources, taking control away from private ownership and placing it in the hands of the state or public.
     - • **Example**: In the Soviet Union, after the 1917 Bolshevik Revolution, industries like steel, coal, and railroads were nationalized, becoming state property under central planning.
@@ -2265,7 +2257,7 @@
 
 ###### Mnemonic 52: Difference between Communism and Socialism
 
-- **Mnemonic Keyword:** `Mnemonics – “SOCIETY CONTROL” (Note – for socialism, remember`
+- **Mnemonic Keyword:** `Mnemonics – SOCIETY CONTROL (Note – for socialism, remember`
 - **Formula / Expansion:**
   - SOCIETY and for Communism, remember CONTROL) **SOCIALISM (SOCIETY):**
   - **S:** State ownership (partial)
@@ -2282,7 +2274,7 @@
   - **O:** One-party rule
   - **L:** Labor directed by the state
 - **Explanation & Examples:**
-      **Socialism (SOCIETY):**
+  - ❖ **Socialism (SOCIETY):**
   - ❖ **S - State ownership (partial)**
     - • **Explanation:** In socialism, the government controls key industries (like healthcare or transportation), but there is still private ownership in non-essential sectors.
     - • **Example:** In Sweden, healthcare and education are publicly funded, but businesses operate in other sectors.
@@ -2328,7 +2320,7 @@
 
 ###### Mnemonic 55: Effect of capitalism on Society in general
 
-- **Mnemonic Keyword:** `Mnemonics – “PRIVATE OWNERSHIP”`
+- **Mnemonic Keyword:** `Mnemonics – PRIVATE OWNERSHIP`
 - **Formula / Expansion:**
   - **P:** Profit-driven economy
   - **R:** Resource exploitation
@@ -2398,7 +2390,7 @@
 
 ###### Mnemonic 56: Effect of socialism on Society in general
 
-- **Mnemonic Keyword:** `Mnemonics – “SOCIETY CARE”`
+- **Mnemonic Keyword:** `Mnemonics – SOCIETY CARE`
 - **Formula / Expansion:**
   - **S:** Social welfare programs
   - **O:** Ownership by the public
@@ -2412,7 +2404,7 @@
   - **R:** Redistribution of wealth
   - **E:** Emphasis on social justice
 - **Explanation & Examples:**
-    - • **S - Social welfare programs**
+  - ❖ - • **S - Social welfare programs**
     - • **Explanation:** Socialism emphasizes extensive social welfare programs to support citizens' well-being, including healthcare, education, housing, and unemployment benefits.
     - • **Example:** In Sweden, the government provides comprehensive social welfare programs, including universal healthcare, free education, and generous parental leave, ensuring a high standard of living for all citizens.
     - • **O - Ownership by the public**
@@ -2451,7 +2443,7 @@
 
 ###### Mnemonic 1: Reasons for the growth of democracy in England
 
-- **Mnemonic Keyword:** `Mnemonics – “DEMOCRATIC ENGLAND`
+- **Mnemonic Keyword:** `Mnemonics – DEMOCRATIC ENGLAND`
 - **Formula / Expansion:**
   - **D:** Development of Political Institutions
   - **E:** Expansion of the Franchise
@@ -2754,7 +2746,7 @@
 
 ###### Mnemonic 31: Impact of NAM around the world
 
-- **Mnemonic Keyword:** `Mnemonics – “NAM'S GLOBAL IMPACT`
+- **Mnemonic Keyword:** `Mnemonics – NAM'S GLOBAL IMPACT`
 - **Formula / Expansion:**
   - **N:** Non-Alignment Strategy
   - **A:** Advocacy for Peace
@@ -2824,7 +2816,7 @@
 
 ###### Mnemonic 32: Reasons for the Suez Canal crisis
 
-- **Mnemonic Keyword:** `Mnemonics – “SUEZ CRISIS”`
+- **Mnemonic Keyword:** `Mnemonics – SUEZ CRISIS`
 - **Formula / Expansion:**
   - **S:** Strategic Importance
   - **U:** Unequal Distribution of Control
@@ -2870,7 +2862,7 @@
 
 ###### Mnemonic 33: Causes of Cuban missile Crisis
 
-- **Mnemonic Keyword:** `Mnemonics – “MISSILE CRISIS`
+- **Mnemonic Keyword:** `Mnemonics – MISSILE CRISIS`
 - **Formula / Expansion:**
   - **M:** Missile Deployment in Europe
   - **I:** Ideological Conflict
@@ -2928,7 +2920,7 @@
 
 ###### Mnemonic 34: Effect of Cuban missile crisis
 
-- **Mnemonic Keyword:** `Mnemonics – “CUBAN IMPACT”`
+- **Mnemonic Keyword:** `Mnemonics – CUBAN IMPACT`
 - **Formula / Expansion:**
   - **C:** Communication Improvement
   - **U:** Understanding Deterrence
@@ -2978,7 +2970,7 @@
 
 ###### Mnemonic 39: Why Indentured labour taken from India to abroad?
 
-- **Mnemonic Keyword:** `Mnemonics – “LABOR ROUTES”`
+- **Mnemonic Keyword:** `Mnemonics – LABOR ROUTES`
 - **Formula / Expansion:**
   - **L:** Labor Shortages in Colonies
   - **A:** Agrarian Distress in India
@@ -3028,7 +3020,7 @@
 
 ###### Mnemonic 41: Key aspects of APARTHEID
 
-- **Mnemonic Keyword:** `APARTHEID”`
+- **Mnemonic Keyword:** `APARTHEID`
 - **Formula / Expansion:**
   - **A:** Apartheid Laws
   - **P:** Pass Laws (Restricted movement of non-whites)
@@ -3115,7 +3107,7 @@
 
 ###### Mnemonic 50: Reasons for the rise of Communism around the world in 19 th and 20 th century
 
-- **Mnemonic Keyword:** `Mnemonics – “COMMUNISM”`
+- **Mnemonic Keyword:** `Mnemonics – COMMUNISM`
 - **Formula / Expansion:**
   - **C:** Class Struggle
   - **O:** Oppressive Regimes
@@ -3157,7 +3149,7 @@
 
 ###### Mnemonic 51: Impact for the rise of communism around the world in the 19 th and 20 th century
 
-- **Mnemonic Keyword:** `“EQUALITY`
+- **Mnemonic Keyword:** `EQUALITY`
 - **Formula / Expansion:**
   - **E:** Economic Redistribution
   - **Q:** Quashing of Private Ownership
@@ -3195,7 +3187,7 @@
 
 ###### Mnemonic 53: Key impacts of redrawl of national boundaries around the world in the 20 th century
 
-- **Mnemonic Keyword:** `Mnemonics – “DIVISION`
+- **Mnemonic Keyword:** `Mnemonics – DIVISION`
 - **Formula / Expansion:**
   - **D:** Displacement of populations
   - **I:** Independence movements
@@ -3395,7 +3387,7 @@
 
 ###### Mnemonic 20: Key aspects of the Treaty of Versailles
 
-- **Mnemonic Keyword:** `VERSAILLES”`
+- **Mnemonic Keyword:** `VERSAILLES`
 - **Formula / Expansion:**
   - V** – Victors **E** – Economic Reparations **R** – Rhineland **S** – Saar Basin **A** – Alsace-Lorraine **I** – Independence **L** – League of Nations **L** – Loss of Territory **E** – Emperor **S** – Self-determination
   - ❖ ❖ ❖ ❖ ❖ ❖ ❖ ❖
@@ -3433,7 +3425,7 @@
 
 ###### Mnemonic 21: Key aspects of fascism M
 
-- **Mnemonic Keyword:** `FASCISM ASPECT”`
+- **Mnemonic Keyword:** `FASCISM ASPECT`
 - **Formula / Expansion:**
   - F** – Führer Principle (Leadership Principle)
   - **A:** Anti-democratic
@@ -3486,7 +3478,7 @@
 
 ###### Mnemonic 22: Reasons for the rise of fascism in Italy
 
-- **Mnemonic Keyword:** `Mnemonics – “ITALY FASCISM`
+- **Mnemonic Keyword:** `Mnemonics – ITALY FASCISM`
 - **Formula / Expansion:**
   - **I:** Instability and Political Chaos
   - **T:** Treaty of Versailles Discontent
@@ -3539,7 +3531,7 @@
 
 ###### Mnemonic 23: Impact of the rise of Fascism in Italy and World
 
-- **Mnemonic Keyword:** `Mnemonics – “MUSSOLINI`
+- **Mnemonic Keyword:** `Mnemonics – MUSSOLINI`
 - **Formula / Expansion:**
   - **M:** Military Aggression
   - **U:** Unification under Authoritarian Rule
@@ -3581,7 +3573,7 @@
 
 ###### Mnemonic 24: Reasons for the rise of Nazism in Germany
 
-- **Mnemonic Keyword:** `Mnemonics – “GERMAN POWER`
+- **Mnemonic Keyword:** `Mnemonics – GERMAN POWER`
 - **Formula / Expansion:**
   - **G:** Great Depression
   - **E:** Economic Instability
@@ -3630,7 +3622,7 @@
 
 ###### Mnemonic 25: Impact of the rise of Nazism in Germany and World
 
-- **Mnemonic Keyword:** `Mnemonics – “NAZISM IMPACT”`
+- **Mnemonic Keyword:** `Mnemonics – NAZISM IMPACT`
 - **Formula / Expansion:**
   - **N:** Nationalism
   - **A:** Anti-Semitism
@@ -3682,7 +3674,7 @@
 
 ###### Mnemonic 28: Reasons behind World War II
 
-- **Mnemonic Keyword:** `ADOLF HITLER”`
+- **Mnemonic Keyword:** `ADOLF HITLER`
 - **Formula / Expansion:**
   - **A:** Appeasement Policy of Western Powers
   - ❖ **D** - Discontent from Treaty of Versailles
@@ -3812,7 +3804,7 @@
 
 ###### Mnemonic 30: Reasons for the emergence of USA as the strongest power during 2 nd world war
 
-- **Mnemonic Keyword:** `Mnemonics – “POWER LEADER`
+- **Mnemonic Keyword:** `Mnemonics – POWER LEADER`
 - **Formula / Expansion:**
   - **P:** Productive Industrial Capacity
   - **O:** Organizational Efficiency
@@ -3904,7 +3896,7 @@
 
 ###### Mnemonic 43: Impact of Cold war around the world
 
-- **Mnemonic Keyword:** `Mnemonics – “COLD WAR LEGACIES`
+- **Mnemonic Keyword:** `Mnemonics – COLD WAR LEGACIES`
 - **Formula / Expansion:**
   - **C:** Conflict and Proxy Wars
   - **O:** Arms Race and Militarization
@@ -3970,7 +3962,7 @@
 
 ###### Mnemonic 45: Post Cold War challenges around the world
 
-- **Mnemonic Keyword:** `Mnemonic – “POST CHALLENGES`
+- **Mnemonic Keyword:** `Mnemonic – POST CHALLENGES`
 - **Formula / Expansion:**
   - **P:** Proliferation of Weapons
   - **O:** Organized Crime
@@ -4027,3 +4019,4 @@
   - ❖ **S - Social Fragmentation**
     - • **Explanation:** Societies faced increasing fragmentation due to cultural, ethnic, and ideological divides.
     - • **Example:** Communal tensions in India, such as those between Hindu and Muslim communities, underscored the challenges of maintaining social cohesion in diverse societies.
+

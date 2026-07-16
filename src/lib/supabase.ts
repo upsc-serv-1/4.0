@@ -4,8 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 import { Platform } from 'react-native';
 import { NetworkStatus } from './networkStatus';
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://ngwsuqzkndlxfoantnlf.supabase.co';
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_jvMJygEAm0GdUAiz4RvlYQ_DCTOBApa';
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://rnelxupyiejsqekmcrcz.supabase.co';
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_37cNF9ZUNgPYmLnxn_ivSQ_rx5CooPd';
 
 // AsyncStorage accesses window on web — safe-guard during SSR/static render.
 const isBrowserOrNative = Platform.OS !== 'web' || typeof window !== 'undefined';

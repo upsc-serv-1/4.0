@@ -1,0 +1,63 @@
+Line 1: (466, 54) Ethical | (511, 54) Dilemmas | (575, 54) Comparison
+Line 2: (391, 103) Dilemma | (633, 103) Description
+Line 3: (642, 145) Conflicting
+Line 4: (419, 156) Duty | (451, 156) vs | (468, 156) Conscience | (626, 158) obligations, | (681, 158) moral
+Line 5: (627, 170) compass | (672, 170) needed
+Line 6: (419, 213) Public | (461, 213) vs | (479, 213) Personal | (623, 211) Serving | (659, 211) community
+Line 7: (628, 223) versus | (661, 223) individual
+Line 8: (419, 230) Interest | (657, 235) gain
+Line 9: (634, 274) Justice | (670, 274) versus
+Line 10: (419, 283) Rule | (450, 283) of | (466, 283) Law | (494, 283) vs | (634, 286) understanding
+Line 11: (419, 299) Compassion | (645, 299) individual
+Line 12: (633, 311) circumstances
+Line 13: (419, 352) Legally | (467, 352) vs | (484, 352) Ethically | (539, 352) Right | (620, 348) Lawful | (653, 348) action | (684, 348) versus
+Line 14: (638, 360) moral | (667, 360) action
+Line 15: (419, 401) Majority | (473, 401) vs | (491, 401) Minority | (627, 399) Serving | (663, 399) the | (680, 399) many
+Line 16: (627, 411) versus | (660, 411) protecting
+Line 17: (419, 418) Interest | (658, 424) few
+Line 18: (419, 467) Professional | (500, 467) vs | (518, 467) Personal | (623, 465) Workplace | (673, 465) conduct
+Line 19: (628, 477) versus | (661, 477) individual
+Line 20: (419, 483) Ethics | (652, 489) values
+Line 21: (633, 530) Clash | (661, 530) between
+Line 22: (419, 541) Conflict | (471, 541) of | (487, 541) Interest | (622, 542) duties | (652, 542) and | (672, 542) personal
+Line 23: (657, 555) gain
+Line 24: (634, 595) Understanding
+Line 25: (419, 606) Empathy | (476, 606) vs | (494, 606) Objectivity | (633, 608) feelings | (672, 608) versus
+Line 26: (624, 620) unbiased | (668, 620) judgment
+Line 27: (627, 661) Openness | (675, 661) versus
+Line 28: (419, 672) Transparency | (507, 672) vs | (524, 672) Secrecy | (628, 673) confidentiality | (695, 673) of
+Line 29: (640, 685) information
+Line 30: (629, 726) Following | (675, 726) orders
+Line 31: (419, 737) Obedience | (488, 737) vs | (505, 737) Autonomy | (622, 739) versus | (654, 739) independent
+Line 32: (652, 751) action
+Line 33: (419, 790) Private | (466, 790) vs | (484, 790) Organisational | (621, 794) Individual, | (669, 794) company,
+Line 34: (419, 807) vs | (437, 807) Employee | (500, 807) Interest | (628, 806) or | (640, 806) worker | (674, 806) benefit
+Line 35: (619, 849) Personal | (662, 849) data | (685, 849) versus
+Line 36: (419, 860) Privacy | (468, 860) vs | (486, 860) Public | (527, 860) Interest | (630, 861) community | (683, 861) well-
+Line 37: (654, 874) being
+Line 38: (419, 917) Self-Sufficiency | (521, 917) vs | (634, 915) Independence
+Line 39: (629, 927) versus | (662, 927) company
+Line 40: (419, 933) Organisational | (512, 933) Goals | (643, 939) objectives
+Line 41: (419, 983) Shareholder | (497, 983) vs | (635, 980) Investor | (674, 980) profit
+Line 42: (633, 992) versus | (665, 992) broader
+Line 43: (419, 999) Stakeholder | (651, 1005) impact
+Line 44: (419, 1044) Resource | (481, 1044) Management | (565, 1044) vs | (622, 1048) Efficient | (662, 1048) use | (681, 1048) versus
+Line 45: (419, 1060) State’s | (465, 1060) Welfare | (633, 1060) citizen | (665, 1060) support
+Line 46: (419, 1105) Health | (463, 1105) vs | (480, 1105) Economy | (627, 1101) Well-being | (676, 1101) versus
+Line 47: (630, 1113) financial | (671, 1113) growth
+Line 48: (419, 1154) Equality | (472, 1154) vs | (489, 1154) Caste | (528, 1154) Divide | (631, 1150) Fairness | (672, 1150) versus
+Line 49: (631, 1162) social | (660, 1162) hierarchy
+Line 50: (419, 1199) Human | (467, 1199) as | (485, 1199) Means | (529, 1199) vs | (621, 1203) Using | (649, 1203) people | (682, 1203) versus
+Line 51: (419, 1216) Human | (467, 1216) as | (485, 1216) Ends | (637, 1215) valuing | (672, 1215) them
+Line 52: (419, 1257) Inclusiveness | (507, 1257) vs | (524, 1257) Rule | (555, 1257) of | (623, 1260) Acceptance | (680, 1260) versus
+Line 53: (419, 1273) Law | (632, 1273) legal | (656, 1273) principles
+Line 54: (419, 1318) Quality | (466, 1318) vs | (483, 1318) Quantity | (538, 1318) of | (554, 1318) Life | (628, 1314) Well-being | (678, 1314) versus
+Line 55: (625, 1326) length | (655, 1326) of | (667, 1326) existence
+Line 56: (642, 1365) Conflicting
+Line 57: (419, 1375) Duty | (451, 1375) Dilemma | (622, 1377) obligations, | (677, 1377) difficult
+Line 58: (651, 1389) choice
+Line 59: (419, 1433) Nature | (464, 1433) vs | (482, 1433) Human | (622, 1428) Environment | (681, 1428) versus
+Line 60: (636, 1441) human | (670, 1441) needs
+Line 61: (630, 1479) Progress | (673, 1479) versus
+Line 62: (419, 1490) Development | (504, 1490) vs | (521, 1490) Ecology | (634, 1492) environmental
+Line 63: (643, 1504) protection

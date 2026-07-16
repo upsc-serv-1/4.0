@@ -1479,7 +1479,8 @@ const getFrameworkPaths = (item: any): any[] => {
           subject: h.subject || '',
           sectionGroup: h.sectionGroup || h.section_group || '',
           microtopic: h.microtopic || '',
-          subtopic: h.subtopic || ''
+          subtopic: h.subtopic || '',
+          nanotopic: h.nanotopic || h.nanoTopic || h.nano_topic || ''
         });
       }
     });
@@ -1492,7 +1493,8 @@ const getFrameworkPaths = (item: any): any[] => {
         subject: path[1] || '',
         sectionGroup: path[2] || '',
         microtopic: path[3] || '',
-        subtopic: path[4] || ''
+        subtopic: path[4] || '',
+        nanotopic: path[5] || ''
       });
     }
   }
@@ -1508,7 +1510,8 @@ const getItemPaths = (item: any): any[] => {
     subject: item.subject || '',
     sectionGroup: item.sectionGroup || '',
     microtopic: item.microtopic || '',
-    subtopic: item.subtopic || ''
+    subtopic: item.subtopic || '',
+    nanotopic: item.nanotopic || item.nanoTopic || item.nano_topic || (Array.isArray(item.hierarchy_path) && item.hierarchy_path.length >= 6 ? item.hierarchy_path[5] : '')
   }];
 };
 
@@ -2892,7 +2895,7 @@ function HierarchyModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <Pressable 
+      <View 
         style={[
           styles.overlay, 
           { 
@@ -2902,10 +2905,10 @@ function HierarchyModal({
             paddingLeft: isTablet ? 24 : 10,
             paddingRight: isTablet ? 24 : 10,
           }
-        ]} 
-        onPress={onClose}
+        ]}
       >
-        <Pressable
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+        <View
           style={[
             styles.hierarchyPopup,
             {
@@ -2916,7 +2919,6 @@ function HierarchyModal({
               maxWidth: 1600,
             }
           ]}
-          onPress={e => e.stopPropagation()}
         >
           {/* Header */}
           <View style={[styles.popupHeader, { borderBottomColor: colors.border }]}>
@@ -3001,6 +3003,17 @@ function HierarchyModal({
                     {localFilters.subtopics.split('|').map(val => (
                       <View key={`modal-crumb-sub-${val}`} style={[styles.crumbBadge, { backgroundColor: '#ffe4e6' }]}>
                         <Text style={[styles.crumbText, { color: '#be123c' }]}>{val}</Text>
+                      </View>
+                    ))}
+                  </>
+                )}
+
+                {localFilters.nanotopics !== 'All' && (
+                  <>
+                    <ChevronRight size={12} color="#94a3b8" />
+                    {localFilters.nanotopics.split('|').map(val => (
+                      <View key={`modal-crumb-nano-${val}`} style={[styles.crumbBadge, { backgroundColor: '#fdf2f8' }]}>
+                        <Text style={[styles.crumbText, { color: '#db2777' }]}>{val}</Text>
                       </View>
                     ))}
                   </>
@@ -3143,8 +3156,8 @@ function HierarchyModal({
             </TouchableOpacity>
 
           </View>
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 }

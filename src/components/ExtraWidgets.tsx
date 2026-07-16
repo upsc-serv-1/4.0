@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Layers, Tag, BookOpen, Play, ChevronRight, CheckCircle, Trophy, Sparkles, Clock } from 'lucide-react-native';
+import { Zap, Tag, BookOpen, Play, ChevronRight, CheckCircle, Trophy, Sparkles, Clock } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { WidgetData } from '../hooks/useWidgetData';
@@ -17,7 +17,7 @@ export function DueCardsWidget({ data, colors }: { data: WidgetData; colors: any
     >
       <LinearGradient colors={[hasDue ? '#fbbf2415' : 'transparent', 'transparent']} style={ws.cardGlow} />
       <View style={[ws.iconCircle, { backgroundColor: hasDue ? '#fbbf2420' : colors.border + '30' }]}>
-        <Layers color={hasDue ? '#f59e0b' : colors.textTertiary} size={16} />
+        <Zap color={hasDue ? '#f59e0b' : colors.textTertiary} size={16} />
       </View>
       <Text style={[ws.bigNum, { color: hasDue ? '#f59e0b' : colors.textPrimary, marginTop: 8 }]}>{data.dueCards}</Text>
       <Text style={[ws.widgetLabel, { color: colors.textSecondary }]}>cards due</Text>
@@ -219,7 +219,7 @@ export function TestScoresWidget({ data, colors }: { data: WidgetData; colors: a
       <LinearGradient colors={[colors.primary + '08', 'transparent']} style={ws.cardGlow} />
       <View style={ws.cardHeader}>
         <View style={[ws.iconCircle, { backgroundColor: 'rgba(99, 102, 241, 0.15)' }]}>
-          <Layers color="#6366f1" size={14} />
+          <Zap color="#6366f1" size={14} />
         </View>
         <Text style={[ws.cardTitle, { color: colors.textPrimary }]}>Score Timeline</Text>
       </View>

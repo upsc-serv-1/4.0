@@ -1,0 +1,1352 @@
+[
+  {
+    "id": "651",
+    "title": "Population Health",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "652",
+    "title": "Population Imbalance",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "653",
+    "title": "Population Inclusion",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "654",
+    "title": "Population Literacy",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "655",
+    "title": "Population Migration",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Urbanisation",
+    "microtopic": "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
+    "subtopic": "Urban Poverty and Migration"
+  },
+  {
+    "id": "656",
+    "title": "Population Momentum",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "657",
+    "title": "Population Policy",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "658",
+    "title": "Population Pressure",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "659",
+    "title": "Population Projection",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "660",
+    "title": "Population Pyramid",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "661",
+    "title": "Population Stabilization",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "662",
+    "title": "Population Sustainability",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "663",
+    "title": "Population Transition",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "664",
+    "title": "Replacement Level Fertility",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "665",
+    "title": "Rural Exodus",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Urbanisation",
+    "microtopic": "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
+    "subtopic": "Urban Poverty and Migration"
+  },
+  {
+    "id": "666",
+    "title": "Rural-Urban Migration",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Urbanisation",
+    "microtopic": "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
+    "subtopic": "Urban Poverty and Migration"
+  },
+  {
+    "id": "667",
+    "title": "Sex Ratio",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "668",
+    "title": "Sex-Selective Practices",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "669",
+    "title": "Urban Sprawl",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Urbanisation",
+    "microtopic": "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
+    "subtopic": "Emerging Urbanisation Trends"
+  },
+  {
+    "id": "670",
+    "title": "Urbanization",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Urbanisation",
+    "microtopic": "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
+    "subtopic": "Emerging Urbanisation Trends"
+  },
+  {
+    "id": "671",
+    "title": "Urbanization Rate",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Urbanisation",
+    "microtopic": "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
+    "subtopic": "Emerging Urbanisation Trends"
+  },
+  {
+    "id": "672",
+    "title": "Youth Bulge",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Gender & Demographics",
+    "microtopic": "Population and associated issues",
+    "subtopic": "Population and associated issues"
+  },
+  {
+    "id": "673",
+    "title": "Absolute Poverty",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "674",
+    "title": "Access to Clean Water",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "675",
+    "title": "Access to Credit",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "676",
+    "title": "Asset Poverty",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "677",
+    "title": "Basic Needs Approach",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "678",
+    "title": "Basic Services Gap",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "679",
+    "title": "Capability Deprivation",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "680",
+    "title": "Chronic Poverty",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "681",
+    "title": "Climate Vulnerability",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "682",
+    "title": "Community Development",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "683",
+    "title": "Corruption in Welfare",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "684",
+    "title": "Developmental Displacement",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "685",
+    "title": "Developmental Imbalance",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "686",
+    "title": "Digital Poverty",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "687",
+    "title": "Economic Disparities",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "688",
+    "title": "Economic Diversification",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Economic Growth"
+  },
+  {
+    "id": "689",
+    "title": "Economic Empowerment",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "690",
+    "title": "Economic Growth",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "691",
+    "title": "Economic Inclusion",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "692",
+    "title": "Economic Inequality",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "693",
+    "title": "Economic Security",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "694",
+    "title": "Education Divide",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "695",
+    "title": "Education for All",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "696",
+    "title": "Employment Generation",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "697",
+    "title": "Empowerment",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "698",
+    "title": "Environmental Poverty",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "699",
+    "title": "Financial Inclusion",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Inclusive growth and issues arising from it",
+    "subtopic": "Financial Inclusion"
+  },
+  {
+    "id": "700",
+    "title": "Food Insecurity",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "701",
+    "title": "Food Security",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "702",
+    "title": "Gendered Poverty",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "703",
+    "title": "Health Inequality",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "704",
+    "title": "Housing for All",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "705",
+    "title": "Human Capital Deficit",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "706",
+    "title": "Human Capital Development",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Economic Growth"
+  },
+  {
+    "id": "707",
+    "title": "Human Development",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "708",
+    "title": "Human Development Index (HDI)",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "709",
+    "title": "Human Rights",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "710",
+    "title": "Human Security",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "711",
+    "title": "Inclusive Growth",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Inclusive growth and issues arising from it",
+    "subtopic": "Inclusive Growth"
+  },
+  {
+    "id": "712",
+    "title": "Inclusive Planning",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "713",
+    "title": "Income Inequality",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "714",
+    "title": "Income Redistribution",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "715",
+    "title": "Inequality Index",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "716",
+    "title": "Inequitable Land Ownership",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "717",
+    "title": "Informal Economy",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "718",
+    "title": "Infrastructure Deficit",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "719",
+    "title": "Livelihood Security",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "720",
+    "title": "Malnutrition",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "721",
+    "title": "Microfinance",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "722",
+    "title": "Multidimensional Poverty",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "723",
+    "title": "Nutritional Security",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "724",
+    "title": "Poverty Alleviation",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "725",
+    "title": "Poverty Cycle",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "726",
+    "title": "Poverty Gap",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "727",
+    "title": "Poverty Line",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "728",
+    "title": "Poverty Reduction Strategy",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "729",
+    "title": "Poverty Trap",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "730",
+    "title": "Poverty-Induced Migration",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Urbanisation",
+    "microtopic": "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
+    "subtopic": "Urban Poverty and Migration"
+  },
+  {
+    "id": "731",
+    "title": "Relative Poverty",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "732",
+    "title": "Resource Inequality",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "733",
+    "title": "Rural Development",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "734",
+    "title": "Rural Infrastructure",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "735",
+    "title": "Rural Poverty",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "736",
+    "title": "Rural-Urban Divide",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "737",
+    "title": "Sanitation",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "738",
+    "title": "Seasonal Poverty",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "739",
+    "title": "Skill Deficit",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "740",
+    "title": "Skill Development",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "741",
+    "title": "Slum Development",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Urbanisation",
+    "microtopic": "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
+    "subtopic": "Urban Poverty and Migration"
+  },
+  {
+    "id": "742",
+    "title": "Social Capital",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "743",
+    "title": "Social Exclusion",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "744",
+    "title": "Social Inequality",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "745",
+    "title": "Social Justice",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "746",
+    "title": "Social Mobility",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "747",
+    "title": "Social Protection",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "748",
+    "title": "Social Safety Nets",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "749",
+    "title": "Social Welfare Programs",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "750",
+    "title": "Subsidy Leakages",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "751",
+    "title": "Sustainable Development",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Inclusive growth and issues arising from it",
+    "subtopic": "Inclusive Growth X Sustainable Development"
+  },
+  {
+    "id": "752",
+    "title": "Sustainable Livelihoods",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "753",
+    "title": "Underemployment",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "754",
+    "title": "Unemployment",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "755",
+    "title": "Unequal Development",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "756",
+    "title": "Urban Informal Settlements",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Urbanisation",
+    "microtopic": "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
+    "subtopic": "Urban Poverty and Migration"
+  },
+  {
+    "id": "757",
+    "title": "Urban Poverty",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Urbanisation",
+    "microtopic": "Urbanisation: problems and remedies (Added to house the PDF microthemes)",
+    "subtopic": "Urban Poverty and Migration"
+  },
+  {
+    "id": "758",
+    "title": "Vulnerability",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Poverty and Related issues"
+  },
+  {
+    "id": "759",
+    "title": "Welfare Schemes",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "760",
+    "title": "Welfare State",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "761",
+    "title": "Affirmative Action",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "762",
+    "title": "Agency Amplification",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "763",
+    "title": "Artistic Expression Platforms",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Foundations & Diversity",
+    "microtopic": "Diversity of India",
+    "subtopic": "Diversity and pluralism"
+  },
+  {
+    "id": "764",
+    "title": "Capacity Building",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "765",
+    "title": "Capacity Expansion",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "766",
+    "title": "Civic Engagement Campaigns",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "767",
+    "title": "Civic Literacy",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "768",
+    "title": "Collective Agency",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "769",
+    "title": "Community Development",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Development and Related issues"
+  },
+  {
+    "id": "770",
+    "title": "Community Empowerment Strategies",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "771",
+    "title": "Community Outreach Programs",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "772",
+    "title": "Community Resilience Initiatives",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "773",
+    "title": "Cultural Assertion",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Foundations & Diversity",
+    "microtopic": "Diversity of India",
+    "subtopic": "Diversity and pluralism"
+  },
+  {
+    "id": "774",
+    "title": "Cultural Diversity Policies",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Foundations & Diversity",
+    "microtopic": "Diversity of India",
+    "subtopic": "Diversity and pluralism"
+  },
+  {
+    "id": "775",
+    "title": "Cultural Heritage Conservation",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Foundations & Diversity",
+    "microtopic": "Diversity of India",
+    "subtopic": "Diversity and pluralism"
+  },
+  {
+    "id": "776",
+    "title": "Decentralized Empowerment",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "777",
+    "title": "Digital Democratization",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "778",
+    "title": "Digital Inclusion Strategies",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "779",
+    "title": "Digital Literacy Campaigns",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "780",
+    "title": "Digital Literacy Gap",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "781",
+    "title": "Disability Rights Advocacy",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "782",
+    "title": "Diversity Policies",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Foundations & Diversity",
+    "microtopic": "Diversity of India",
+    "subtopic": "Diversity and pluralism"
+  },
+  {
+    "id": "783",
+    "title": "Economic Empowerment Programs",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "784",
+    "title": "Economic Inclusion",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "785",
+    "title": "Economic Inclusion Initiatives",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "786",
+    "title": "Empowerment",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "787",
+    "title": "Empowerment Catalysts",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "788",
+    "title": "Empowerment Disparities",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "789",
+    "title": "Empowerment Dividend",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "790",
+    "title": "Empowerment Ecosystem",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "791",
+    "title": "Empowerment Feedback",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "792",
+    "title": "Empowerment Feedback Loop",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "793",
+    "title": "Empowerment Metrics",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "794",
+    "title": "Empowerment Narratives",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "795",
+    "title": "Empowerment Paradox",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "796",
+    "title": "Empowerment Programs",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "797",
+    "title": "Empowerment Resilience",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "798",
+    "title": "Empowerment Synergy",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "799",
+    "title": "Empowerment Trajectories",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  },
+  {
+    "id": "800",
+    "title": "Environmental Justice Initiatives",
+    "paper": "GS-I",
+    "subject": "SOCIETY",
+    "section_group": "Poverty, Empowerment & Development",
+    "microtopic": "Social empowerment, poverty and developmental issues",
+    "subtopic": "Social empowerment"
+  }
+]

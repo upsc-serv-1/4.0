@@ -151,14 +151,20 @@ function PrelimsScreen() {
             {
               backgroundColor: colors.surface + '88',
               borderColor: colors.border,
-              paddingHorizontal: 10,
+              paddingHorizontal: isTablet ? 10 : 12,
+              minWidth: isTablet ? undefined : 40,
+              height: 34,
+              justifyContent: 'center',
+              alignItems: 'center',
             }
           ]}
         >
           <Palette size={16} color={prelimsTheme === 'gradient' ? colors.primary : colors.textSecondary} />
-          <Text style={[styles.backButtonText, { color: prelimsTheme === 'gradient' ? colors.primary : colors.textSecondary, marginLeft: 4 }]}>
-            {prelimsTheme === 'gradient' ? 'Theme 1' : 'Theme 2'}
-          </Text>
+          {isTablet && (
+            <Text style={[styles.backButtonText, { color: prelimsTheme === 'gradient' ? colors.primary : colors.textSecondary, marginLeft: 4 }]}>
+              {prelimsTheme === 'gradient' ? 'Theme 1' : 'Theme 2'}
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -229,7 +235,7 @@ function PrelimsScreen() {
                   {
                     backgroundColor: !isDark ? 'rgba(255, 255, 255, 0.55)' : 'rgba(30, 41, 59, 0.55)',
                     borderColor: !isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.15)',
-                    width: Platform.OS === 'android' ? (width - 52) / 2 : (isTablet ? '48%' : '48.3%'),
+                    width: isTablet ? '48%' : (width - 44) / 2,
                     padding: isTablet ? 24 : 14,
                   }
                 ]}

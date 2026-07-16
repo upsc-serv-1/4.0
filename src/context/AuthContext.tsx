@@ -8,6 +8,7 @@ import { SyncQueue, stopSyncQueueWorker, startSyncQueueWorker } from '../service
 type AuthCtx = {
   session: Session | null;
   loading: boolean;
+  isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signUp: (email: string, password: string, displayName: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
@@ -18,14 +19,45 @@ const Ctx = createContext<AuthCtx>({} as AuthCtx);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const checkAdminStatus = async (userId: string, email: string) => {
+    const hardcodedAdmins = ['dryogeshkumar@gmail.com', 'admin@sunyaias.com', 'yogesh@sunyaias.com'];
+    if (hardcodedAdmins.includes(email || '')) {
+      setIsAdmin(true);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('admin_users')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin');
+      
+      if (data && data.length > 0) {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    } catch (err) {
+      console.error("Error checking admin status:", err);
+      setIsAdmin(false);
+    }
+  };
 
   useEffect(() => {
     const initAuth = async () => {
       try {
         const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Auth Timeout')), 5000));
         const { data } = await Promise.race([supabase.auth.getSession(), timeout]) as any;
-        setSession(data?.session || null);
-
+        const s = data?.session || null;
+        setSession(s);
+        if (s?.user?.id) {
+          checkAdminStatus(s.user.id, s.user.email || '');
+        } else {
+          setIsAdmin(false);
+        }
       } catch (err) {
         console.error("Auth init error:", err);
       } finally {
@@ -40,6 +72,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Start SyncQueue worker when user logs in
       if (s?.user?.id) {
         startSyncQueueWorker();
+        checkAdminStatus(s.user.id, s.user.email || '');
+      } else {
+        setIsAdmin(false);
       }
     });
     return () => sub.subscription.unsubscribe();
@@ -73,7 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <Ctx.Provider value={{ session, loading, signIn, signUp, signOut }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ session, loading, isAdmin, signIn, signUp, signOut }}>{children}</Ctx.Provider>
   );
 }
 

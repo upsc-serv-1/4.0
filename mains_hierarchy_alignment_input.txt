@@ -1,0 +1,1569 @@
+ID: 577ac3b5-fd6c-5ddc-957d-f929fded96c2
+Type: Case Study
+Name: The Right to Information Act (RTI)
+Context: Governance and Accountability
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 0d3c79a0-8f6c-5e07-af6a-188123bf835b
+Type: Case Study
+Name: Hiware Bazar Model
+Context: Agriculture
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 1480c112-24d6-5ec6-ad6b-d335d18a474f
+Type: Case Study
+Name: PRADAN’s ‘Jal Jivan’ Project
+Context: Agriculture
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: f8ea7e4c-3a94-5627-a3b4-18e4edaa3a2e
+Type: Case Study
+Name: Pune’s Waste Management Model
+Context: Urbanization
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: d4659da8-926d-5db2-910f-2072bcc702cd
+Type: Case Study
+Name: Ujjwala Yojana
+Context: Climate Change
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: ca126199-dc7b-53b6-a508-3f092eca7c56
+Type: Case Study
+Name: Alaknanda River Rejuvenation Project
+Context: Environmental Protection
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 7f178778-d715-5877-8359-2efd9bbc123d
+Type: Case Study
+Name: Sundarbans Mangrove Conservation
+Context: Environment and Ecology
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 5a43feb7-a666-5626-8fca-d4dd42c2368c
+Type: Case Study
+Name: BHEL’s Power Plant Projects
+Context: Industrial Development
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 0d4c7bd2-c953-5b21-88d1-23a355a0ad84
+Type: Case Study
+Name: Barefoot College
+Context: Rural Development
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 6bcbf0a8-fd55-56a0-b294-75390719f59e
+Type: Case Study
+Name: Kachchh’s Salt Farming Sustainability
+Context: Sustainable Development
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 0b0168cb-07bd-5730-bcc4-d45f7be6142a
+Type: Case Study
+Name: Rurban Mission
+Context: Rural Development
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: a0ec22c4-9cca-541d-b14a-fc95dafee543
+Type: Case Study
+Name: The Appointment of CAG (Comptroller and Auditor General)
+Context: Appointment to Various Constitutional Posts
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: c1454642-4590-520d-9ba3-4d2b210271ab
+Type: Case Study
+Name: The Role of SEBI in the Sahara Case
+Context: Statutory, Regulatory, and Quasi-Judicial Bodies
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 69804f85-6074-5c64-8835-8bd87ba39b9b
+Type: Case Study
+Name: Federal Structure Comparison: India vs. USA
+Context: Comparison of the Indian Constitutional Scheme with Other Countries
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: b4559b2e-66d0-53f1-9ea5-b2bc0b849349
+Type: Case Study
+Name: The Demonetization Initiative (2016)
+Context: Indian Economy: Issues and Challenges
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 3270ef68-a130-5cb4-9a67-8d2714a860ea
+Type: Case Study
+Name: The Preamble’s Role in Judicial Interpretation
+Context: Indian Constitution: Historical Underpinnings, Evolution, Features
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 0f209480-79d0-5436-ac2a-83d87f8ff25d
+Type: Case Study
+Name: Maharashtra-Karnataka Border Dispute
+Context: Federal Structure: Issues and Challenges
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 5d660bef-06b1-535c-a63f-5e7189ba6fe7
+Type: Case Study
+Name: Goods and Services Tax (GST) Implementation
+Context: Economic Policies and Reforms
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: be5c78ab-a136-5560-81be-c66a2e14213e
+Type: Case Study
+Name: The Supreme Court's Judgment on Electoral Bonds
+Context: Salient Features of the Representation of People’s Act
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 89609cb6-c26d-5ee4-a1c4-8ccfa1b5db3b
+Type: Case Study
+Name: Indian Institute of Technology (IIT) Bombay’s Innovation Center
+Context: Innovation and Technology
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 5cda2c29-8c01-5b5e-b32a-5ef22310a483
+Type: Case Study
+Name: Biocon's Affordable Insulin
+Context: Science and Technology
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: bd5146d0-54cc-5953-bdeb-d296245d8920
+Type: Case Study
+Name: Mumbai Police’s Counter-Terrorism Unit
+Context: Internal Security
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 8630f153-429e-526a-baf2-187bfa2c0241
+Type: Case Study
+Name: Kerala’s Decentralized Planning
+Context: Devolution of Powers and Finances: Local Levels
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: e946c930-f188-58b5-88c8-5dca949411af
+Type: Case Study
+Name: The Beti Bachao Beti Padhao Scheme
+Context: Social Justice and Empowerment
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 95345b6b-4e55-5e59-a415-77de26731f02
+Type: Case Study
+Name: Gujarat Earthquake Recovery (2001)
+Context: Disaster Management
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: bf0b09d3-ac61-58fd-8a5c-1ec6a035a126
+Type: Case Study
+Name: Bhopal Smart City Initiative
+Context: Infrastructure and Connectivity
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: ebdca1c5-336c-5af2-92c6-e616da01a204
+Type: Case Study
+Name: India’s Stand on the Paris Agreement
+Context: Indian Foreign Policy: Issues and Challenges
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 711fdfaf-fb1f-5dc5-875a-7f80c3cd9606
+Type: Case Study
+Name: Rainwater Harvesting in Chennai
+Context: Water Resources
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 83aec697-d8c8-55be-b673-17661a9a2781
+Type: Case Study
+Name: India’s Membership in the United Nations Security Council (UNSC)
+Context: International Organizations and Institutions
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 268c20ba-7add-5203-9454-fad5e7f05098
+Type: Case Study
+Name: Amul Dairy Cooperative
+Context: Economic Development
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: da267f62-c9d7-5b16-8a74-750ea1da1925
+Type: Case Study
+Name: The NITI Aayog’s Role in Policy Formulation
+Context: Functioning of the Executive and Judiciary
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 566466a3-1170-55a8-98dd-a80fed394622
+Type: Case Study
+Name: The Lok Sabha’s Role in the GST Bill
+Context: Parliament and State Legislatures: Structure, Functioning, Conduct of Business
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 69ef2a7e-18bb-5947-8094-677f5377c56c
+Type: Case Study
+Name: The Role of Farmers' Unions in the Farm Bills Protest
+Context: Pressure Groups and Formal/Informal Associations
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: bac0e0b2-f99d-5b70-ae9a-77668e90cdd6
+Type: Case Study
+Name: The Ayodhya Land Dispute Case
+Context: Separation of Powers: Dispute Redressal Mechanisms
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: c158ad87-0442-5b02-a5c8-f7c6a58df1bb
+Type: Case Study
+Name: Delhi Metro Project
+Context: Infrastructure
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: b5c8bd82-81ba-59bf-9041-4239767c8e50
+Type: Case Study
+Name: NTPC’s Renewable Energy Initiatives
+Context: Energy
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: a9bba651-2877-58bc-b9f9-a805276fbb74
+Type: Case Study
+Name: Aarogya Setu App
+Context: Health and Education
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 830b3249-a5c7-53f7-9dc0-12b4d7d92a26
+Type: Case Study
+Name: The Nanhi Kali Project
+Context: Social Justice
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 94e84084-3134-500d-93a9-036c6e046a90
+Type: Case Study
+Name: The Clean India Mission (Swachh Bharat Abhiyan)
+Context: Public Administration
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 44a10abf-ad6e-5ce3-871f-ee467f9a8c1d
+Type: Case Study
+Name: The Right to Education Act (RTE)
+Context: Education Reforms
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: aaee25fd-0536-55d5-8fd7-d1629cb1228a
+Type: Case Study
+Name: The National Health Insurance Scheme (Ayushman Bharat)
+Context: Health Sector Reforms
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 1e196986-5005-5294-9362-8337e66337ab
+Type: SC Judgment
+Name: Union of India v. Association for Democratic Reforms
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 5cef00bf-92b4-5fb5-9cb6-57c54750bd4b
+Type: SC Judgment
+Name: Central Public Information Officer v. Subhash Chandra Agarwal (2019)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 0ed3f46b-7c7e-51d7-b8e1-b56f441225ed
+Type: SC Judgment
+Name: Dakshin Haryana Bijli Vitran Nigam Ltd. v. Ajay Kumar
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 1f414f97-dd03-52e4-9e59-ae0ad5637ce0
+Type: SC Judgment
+Name: Reserve Bank of India v. Jayantilal N. Mistry (2021)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 277d949a-f252-50a7-82eb-6af5f29e6e3d
+Type: SC Judgment
+Name: Prajwala v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: c9f2f035-a0ae-5993-885d-b306a9713092
+Type: SC Judgment
+Name: Navtej Singh Johar v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 6c28bb39-af01-5ca9-9520-5631b9d4c887
+Type: SC Judgment
+Name: Indian Young Lawyers Association v. State of Kerala (Sabarimala Case)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 59b53062-1b8f-566c-98a4-bc094f1f2418
+Type: SC Judgment
+Name: Shayara Bano v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 79a18de1-ccca-591b-9064-50c87c71ba70
+Type: SC Judgment
+Name: NALSA v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 343a1f4b-6dc0-504f-a073-726826e82a9f
+Type: SC Judgment
+Name: Justice K.S. Puttaswamy v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: ded3ac32-eb35-5d12-a8b0-6c83de80e1e3
+Type: SC Judgment
+Name: Maneka Gandhi v. Union of India (1978)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 7b5cb70e-b607-5d17-9e04-03966757928a
+Type: SC Judgment
+Name: A.K. Roy v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: b86be1be-7917-58fc-9c90-d23117f70705
+Type: SC Judgment
+Name: Rekha v. State of Tamil Nadu (2011)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: d795f0ee-9483-5308-8626-04d2209b833b
+Type: SC Judgment
+Name: Justice Lokur Bench (UAPA Bail Guidelines)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: e051f4c3-307d-553a-ae15-86e26f1f67c8
+Type: SC Judgment
+Name: Ahmed Ali v. State of Assam (2024)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: abebaadd-0209-506c-885d-51dc3ece3bc3
+Type: SC Judgment
+Name: Puttaswamy v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: d0b61a19-0fa2-5efc-8713-6d30d19de1ec
+Type: SC Judgment
+Name: Faheema Shirin v. State of Kerala
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 8e8e11b8-3a0a-518e-8c39-ada7ade3dd48
+Type: SC Judgment
+Name: Aadhaar Constitutionality Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 71b33e1f-5e43-5796-a37c-50d7ba063578
+Type: SC Judgment
+Name: Right to Be Forgotten Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 0dfe2c68-ff8e-50e2-abac-74bbfd1785d7
+Type: SC Judgment
+Name: Digital Surveillance PIL
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 73588084-0d61-591c-80a6-8c22137da48e
+Type: SC Judgment
+Name: Rev. Stainislaus v. State of Madhya Pradesh (1977)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: d486037d-e600-566c-a923-bbf67bc8dd66
+Type: SC Judgment
+Name: Shafin Jahan v. Asokan K.M. (2018)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: cf63eb71-f23f-5c4a-9526-281d78185d04
+Type: SC Judgment
+Name: Fr. Stan Swamy PIL (2020–2021)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 434d7efe-836e-51a8-a5b1-73e0492f92e5
+Type: SC Judgment
+Name: State of Gujarat v. Salimbhai Abdulgaffur (2023)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 6dc576f9-79b3-5d32-8ef5-694995600971
+Type: SC Judgment
+Name: In Re: Hadiya Marriage Case (2017–18)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: b189b3cb-969d-5ffe-9795-32fb5bef1d39
+Type: SC Judgment
+Name: Shreya Singhal v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 92bf7912-5b65-53dc-89bb-f89213948658
+Type: SC Judgment
+Name: Anuradha Bhasin v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 066e5170-056f-54d1-8a8f-8f464fb65d80
+Type: SC Judgment
+Name: Indian Express Newspapers v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 4bf54e6d-2505-534c-aa17-3370d541816f
+Type: SC Judgment
+Name: S. Rangarajan v. P. Jagjivan Ram
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 54ca57ef-b630-5748-91cf-522feb6e2a53
+Type: SC Judgment
+Name: Kaushal Kishore v. State of Uttar Pradesh
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 23930f7a-f5a8-5060-94b3-2f3c7b13dc1a
+Type: SC Judgment
+Name: S.R. Bommai v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: b3277ca7-113f-5001-9259-a8d68c29658c
+Type: SC Judgment
+Name: St. Stephen’s College v. University of Delhi
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 59b53062-1b8f-566c-98a4-bc094f1f2418
+Type: SC Judgment
+Name: Shayara Bano v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 8367f90b-84bd-5d2a-aa24-7df700f8b1c7
+Type: SC Judgment
+Name: Ahmedabad St. Xavier’s College v. State of Gujarat
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: d576073b-a8ff-5c7d-b726-cc3fc6471cc7
+Type: SC Judgment
+Name: T.M.A. Pai Foundation v. State of Karnataka
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 9ddd0142-3ebf-58d8-b77a-ff99495cb5f5
+Type: SC Judgment
+Name: 2G Spectrum Case (2012)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: a6ce714f-a6d9-5954-9762-0805e3218076
+Type: SC Judgment
+Name: Coal Block Allocation Case (2014)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 7b89d78d-116b-5361-b71c-6d4d695bd871
+Type: SC Judgment
+Name: Sahara India Real Estate Corp. v. SEBI
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 200e9fef-f707-5844-8697-95deec303513
+Type: SC Judgment
+Name: Swiss Ribbons v. Union of India (2019)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 55b14a8f-7f30-561a-9fd6-35ea0f13b075
+Type: SC Judgment
+Name: National Herald Case (2023)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 2474b4a7-e868-5b0d-8276-39b26f168ee6
+Type: SC Judgment
+Name: M.C. Mehta v. Union of India (Ganga Tanneries Case, 1988)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 32178e3c-4a75-5931-bc54-db0325d215ed
+Type: SC Judgment
+Name: Indian Council for Enviro-Legal Action v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 0dd71ba5-b2ad-5c28-ad99-4d38bed8ffed
+Type: SC Judgment
+Name: Subhash Kumar v. State of Bihar
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: d4885217-22c2-523f-89ac-8b084b4c3b40
+Type: SC Judgment
+Name: M.K. Ranjitsinh v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: c24f1d56-ee35-55f2-90da-8f15c19f9f64
+Type: SC Judgment
+Name: Samit Mehta v. Union of India (Delhi Clean Air Case)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 582396bf-ab64-5849-aabc-187cc6a44bf1
+Type: SC Judgment
+Name: ADR v. Union of India (Electoral Bonds)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 1785dc85-6d6e-5322-8001-d80e82563b9d
+Type: SC Judgment
+Name: In Re: Appointment of Election Commissioners
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 5eaea7b1-cdef-5a56-afe9-5fad969f745e
+Type: SC Judgment
+Name: Undertrial Voting Rights PIL
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 801fe856-7c6d-5d42-ace4-67ec152d169d
+Type: SC Judgment
+Name: EVM-VVPAT Cross- verification Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 2967a810-253b-5db2-9fbf-db5d2de20d7c
+Type: SC Judgment
+Name: One Nation One Election Feasibility Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 6c9f1426-04be-5b07-bd4d-4f0efaeeacde
+Type: SC Judgment
+Name: ADR v. Union of India (2002)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: f35d97e7-f912-5dcf-b270-74d4db88e3d5
+Type: SC Judgment
+Name: Lily Thomas v. Union of India (2013)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 4dee4162-dc7a-5a38-9093-e56abb5b8845
+Type: SC Judgment
+Name: Public Interest Foundation v. Union of India (2014)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 598b3bc3-0fc1-5a24-9fbd-5a07ec5aaffb
+Type: SC Judgment
+Name: PUCL v. Union of India (2013)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 38f66e65-2965-5483-95fa-09e6fc86bcb5
+Type: SC Judgment
+Name: Common Cause v. Union of India (2014)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 17b09591-3f42-5062-ba37-8754b2805299
+Type: SC Judgment
+Name: Olga Tellis v. Bombay Municipal Corporation
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: adaf6682-35a5-55e5-a8a9-2a37300cb65c
+Type: SC Judgment
+Name: Delhi Slum Rehabilitation Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 2d5b75c6-6763-5871-b615-ffdf2f27d138
+Type: SC Judgment
+Name: Shaheen Bagh Protest Judgment
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: c3428f5d-88af-5507-87ca-f81798ba85ab
+Type: SC Judgment
+Name: Chameli Singh v. State of U.P.
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 698a205d-c00c-578d-9f80-34842664f433
+Type: SC Judgment
+Name: Shelter Homes PIL
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 08f5c228-7efb-5a3f-929c-d711d56a91dc
+Type: SC Judgment
+Name: NCT of Delhi v. Union of India (2023)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 23930f7a-f5a8-5060-94b3-2f3c7b13dc1a
+Type: SC Judgment
+Name: S.R. Bommai v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: aed07348-fa4d-57d5-8608-b9031c184812
+Type: SC Judgment
+Name: State of West Bengal v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 29e1483f-08f2-51d5-bd5a-1e53c587fafb
+Type: SC Judgment
+Name: Justice Lokur PIL on Inter-State River Disputes
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 5595849b-ae13-50ef-a68c-5d87aa6fd3fa
+Type: SC Judgment
+Name: GST Council Ruling
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 19b5b57f-35bd-5064-aeeb-f20437083a5f
+Type: SC Judgment
+Name: State of Tamil Nadu v. Governor of Tamil Nadu
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 79ed25b4-f489-5801-8241-9dfb5dd537fb
+Type: SC Judgment
+Name: Punjab Assembly v. Governor of Punjab
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 9960eb04-702e-58c5-a9c0-c2f444769d19
+Type: SC Judgment
+Name: Kerala Government v. Governor of Kerala
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: f162724d-500e-5b70-b853-d626ba576aa5
+Type: SC Judgment
+Name: Telangana v. Governor (Administrative Deadlock Case)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 6c873d13-961d-5fa3-a9c9-f46a9f0e6b52
+Type: SC Judgment
+Name: West Bengal Education Bill Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 512bbc94-ffa8-565d-aabe-7921841e6468
+Type: SC Judgment
+Name: Kihoto Hollohan v. Zachilhu (1992)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: c06ee867-192b-5d01-a711-0589deda09d1
+Type: SC Judgment
+Name: Ravi S. Naik v. Union of India (1994)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: b2962263-6a4f-5c88-9286-6406ceb393fe
+Type: SC Judgment
+Name: Rajendra Singh Rana v. Swami Prasad Maurya (2007)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 8cae8523-fe4a-590c-a0ba-3d1d07421177
+Type: SC Judgment
+Name: Shrimanth Balasaheb Patil v. Speaker (2019)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: c244a8f3-49e8-5d8d-ac87-1015e37cd7e8
+Type: SC Judgment
+Name: Karnataka MLAs Case (2019)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: fc4a89c2-4680-5b5f-b873-aebb683226fe
+Type: SC Judgment
+Name: Prakash Singh v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 541c9afb-56eb-5a56-b14b-700e4dc141ad
+Type: SC Judgment
+Name: Hussainara Khatoon v. State of Bihar
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 7415d0bf-fb69-53fa-97d7-058117806501
+Type: SC Judgment
+Name: Devangana Kalita v. State
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: b63ae39b-3e7d-51d8-b33a-2fefe3b65f59
+Type: SC Judgment
+Name: Mazdoor Kisan Shakti Sangathan v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 9a61eda5-b2fb-5c29-b729-734a7b8e04c3
+Type: SC Judgment
+Name: Padmanabhaiah Committee Follow- up Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: c7039086-3a60-52f6-8aaa-1ef18c6bcb1d
+Type: SC Judgment
+Name: PN Dua v. Shiv Shankar (1988)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: a1a56085-2155-5563-85cc-ab1663193066
+Type: SC Judgment
+Name: Pritam Lal v. High Court of Madhya Pradesh (1992)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 766ffc33-4346-539f-8517-5a2754235021
+Type: SC Judgment
+Name: Arundhati Roy Contempt Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: ea4cd72a-5a96-57f4-897f-73c7d10e6bff
+Type: SC Judgment
+Name: Prashant Bhushan Contempt Case 2020
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 536381e5-fa4b-59bb-8358-48b68d42d413
+Type: SC Judgment
+Name: Mulgaonkar Guidelines (1978)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 588b30c8-8add-5e58-8609-c853d3f1a82e
+Type: SC Judgment
+Name: All India Judges’ Association v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: d56e323b-060c-5ee8-9a54-b78f8dfb2ef3
+Type: SC Judgment
+Name: Krishna Rao Committee PIL (2021)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: b7204370-f81e-5951-8eb1-955cabd16e67
+Type: SC Judgment
+Name: Malik Mazhar Sultan v. U.P. Public Service Commission
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: ba7b7081-13b3-5145-9d4b-a2f59ecc46b5
+Type: SC Judgment
+Name: Hussain v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: d1f14e55-a7e1-5f08-925a-9f3a80f1c588
+Type: SC Judgment
+Name: Subrata Roy Sahara Contempt Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 3f15443d-572d-5f57-a958-74807e71595f
+Type: SC Judgment
+Name: Charles Sobhraj v. Superintendent, Tihar Jail (1978)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: a0f87996-2acd-52d0-8d47-a1aff62218b3
+Type: SC Judgment
+Name: In Re: Custodial Deaths PIL (2021)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 34646aa8-c3fe-58eb-b82b-76e854e43abd
+Type: SC Judgment
+Name: Re-Inhuman Conditions in 1382 Prisons (2017)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 1f0dea07-01b1-5c7d-bf17-46021a57ca62
+Type: SC Judgment
+Name: D.K. Basu v. State of West Bengal (1997)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 72cb3045-ee86-5159-b7d4-954d28687749
+Type: SC Judgment
+Name: Mental Health Care PIL (2022)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 95895a7b-e914-5f96-8504-6af71a589e5a
+Type: SC Judgment
+Name: S.P. Gupta v. Union of India (1981)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: b5ada148-b782-5718-954e-f159f4d3649c
+Type: SC Judgment
+Name: Bandhua Mukti Morcha v. Union of India (1984)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 30bec0d5-c7df-5e1e-a5fc-98b6a90602f7
+Type: SC Judgment
+Name: Hussainara Khatoon v. State of Bihar (1979)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 55cab10e-5881-5600-90ab-38aeb62f0323
+Type: SC Judgment
+Name: Citizens for Democracy v. State of Assam
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: b6150c62-6966-5757-ad86-78e5335eb2d1
+Type: SC Judgment
+Name: Mumbai Kamgar Sabha v. Abdulbhai Faizullabhai (1976)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 407dbbd9-3c03-5edb-aa1b-feb0bb40ebda
+Type: SC Judgment
+Name: Mohini Jain v. State of Karnataka (1992)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 31d2cd0c-abac-546c-8315-16fd3d536c3a
+Type: SC Judgment
+Name: Unni Krishnan v. State of Andhra Pradesh (1993)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 201b35c3-4e04-525a-8265-a488fb01e1de
+Type: SC Judgment
+Name: T.M.A. Pai Foundation v. State of Karnataka (2002)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 43d86f23-3d87-5d21-ab4e-cd1e5fad863f
+Type: SC Judgment
+Name: Modern Dental College v. State of Madhya Pradesh (2016)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 61641958-1c9e-5fed-b844-540d90ba22e0
+Type: SC Judgment
+Name: P.A. Inamdar v. State of Maharashtra (2005)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 86dcbb5f-195d-53f9-9c13-4820be62af50
+Type: SC Judgment
+Name: Mohini Jain v. State of Karnataka
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: f65a92d5-cd53-5316-bb1f-3fbdb8cf373b
+Type: SC Judgment
+Name: Unni Krishnan v. State of Andhra Pradesh
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: c3428f5d-88af-5507-87ca-f81798ba85ab
+Type: SC Judgment
+Name: Chameli Singh v. State of U.P.
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 819bf289-4c10-5769-b23f-3a446aa539d3
+Type: SC Judgment
+Name: Right to Health PIL (Covid-era Cases)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: a5d11a98-b362-5ddf-a045-fdc8ce8d6335
+Type: SC Judgment
+Name: Common Cause v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 52bc2b42-6f46-5686-b5d5-7d67e52a6743
+Type: SC Judgment
+Name: Sheela Barse v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: f091535c-3edc-52a7-a6f2-166a165b7db2
+Type: SC Judgment
+Name: Sampurna Behura v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 0d2887ae-7fbc-561e-a06c-f4076eb4bb53
+Type: SC Judgment
+Name: M.C. Mehta v. State of Tamil Nadu (1996)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: d4caaa45-1f60-5658-a0a8-e22ec83e35b5
+Type: SC Judgment
+Name: Re: Alarming Rise in Child Rape Cases (2019)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: e906dd7e-8bf5-579e-a3f7-ec04da06cbe6
+Type: SC Judgment
+Name: Ashok v. State of Rajasthan (2023)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 685a9485-a90b-5668-8b12-f5a64422470c
+Type: SC Judgment
+Name: National Federation of the Blind v. Union of India (2013)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: f11a7e86-c633-5417-93ee-671d2c27720c
+Type: SC Judgment
+Name: Vikas Kumar v. UPSC (2021)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 7421e5b9-ae3e-5325-aeff-87f0f42c5e9d
+Type: SC Judgment
+Name: Rajive Raturi v. Union of India (2018)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: fd33bb72-26fe-5ebf-8fb9-34981502926a
+Type: SC Judgment
+Name: Shikhar Sharma v. National Law University (2022)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 7c30839f-95d9-5bbf-8915-3b8ffa524119
+Type: SC Judgment
+Name: Deaf Rights PIL (ongoing)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: b63ae39b-3e7d-51d8-b33a-2fefe3b65f59
+Type: SC Judgment
+Name: Mazdoor Kisan Shakti Sangathan v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: c5ebaba3-1964-58e2-8393-ce12bad17518
+Type: SC Judgment
+Name: Right to Food Campaign Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 1381f97d-7668-5e70-8f3a-c2b9afd99ea1
+Type: SC Judgment
+Name: PUCL v. Union of India (Midday Meal Scheme)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 28165489-92d0-5214-abde-44d679abbf9d
+Type: SC Judgment
+Name: Municipal Workers’ Union v. State
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: edba45f9-4924-5d58-b518-9e6c4735792a
+Type: SC Judgment
+Name: Healthcare Infrastructure PIL
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: c0668f78-a6c6-5d50-8a44-67169679f717
+Type: SC Judgment
+Name: Forest Land Recovery PIL
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: ef9c951f-19e8-5fdb-a075-ec35e48db5ea
+Type: SC Judgment
+Name: Great Nicobar Development Project Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: f6188bb0-08bf-5bfb-a58b-b7a1be3611ab
+Type: SC Judgment
+Name: Eco-Sensitive Zone Expansion Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 72cfa4a6-8de5-5c8e-8f54-3129102e5de2
+Type: SC Judgment
+Name: Coastal Regulation Zone PIL
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: e62ba908-1be2-508d-840e-aaf50fca22c1
+Type: SC Judgment
+Name: Mining Rehabilitation Compliance Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 63c909ee-15a3-526d-9b99-28e18cedb6a3
+Type: SC Judgment
+Name: Alimony for Divorced Muslim Women Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 9a498148-6199-5222-a835-e9abc33e76a4
+Type: SC Judgment
+Name: Transgender Prison Rights PIL
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 2c8c8293-3888-5e9f-ac61-3b09790c3d36
+Type: SC Judgment
+Name: Marital Rape Exception Challenge
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 1af94c92-9931-544e-ac54-f8ee21a946ed
+Type: SC Judgment
+Name: LGBTQIA+ Adoption Rights PIL
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 91f63b3f-a726-5699-a405-b0c819c25e85
+Type: SC Judgment
+Name: Sexual Orientation Discrimination Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 417b623c-c71b-5481-91c1-fcfac8f7afa5
+Type: SC Judgment
+Name: Gig Workers Union v. State
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 53f43e46-f5af-532c-acae-517cfaf0fb4e
+Type: SC Judgment
+Name: National Campaign Committee v. Union of India
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 831dfea4-6dcd-5b3b-a391-b77d0b40b713
+Type: SC Judgment
+Name: Platform Worker Safety PIL
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 8f59169a-12fb-581a-811e-b824cd407ada
+Type: SC Judgment
+Name: Dignity of Work Case (Manual Scavenging)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 4153dd0b-c175-5f5d-8f1d-b074258ca4d6
+Type: SC Judgment
+Name: Contract Labour Rights Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 614fb74a-63e9-58ce-bcfb-ec8941c3a1ff
+Type: SC Judgment
+Name: Indra Sawhney v. Union of India (1992)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: d3e89288-67aa-5733-861c-592c99e8e053
+Type: SC Judgment
+Name: M. Nagaraj v. Union of India (2006)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 6326ce89-2bfc-577f-a0be-95108d910b55
+Type: SC Judgment
+Name: Jarnail Singh v. Lachhmi Narain Gupta (2018)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: b576c324-91c0-52d0-95c4-34a3a5185e6f
+Type: SC Judgment
+Name: Ashok Kumar Thakur v. Union of India (2008)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: d3b9161c-f71b-5a96-8f1d-2d330bf995b4
+Type: SC Judgment
+Name: State of Punjab v. Davinder Singh (2020)
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 1dce0779-214c-5588-b21b-1798b214dfcb
+Type: SC Judgment
+Name: Sub-Categorisation of SCs and STs Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: e4bb9034-ffe6-542f-ab42-b3992ff5868e
+Type: SC Judgment
+Name: Reservation for Transgender Persons Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: 94553588-ea88-57ff-87b3-d93af6549685
+Type: SC Judgment
+Name: Women Quota in Panchayats Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: b6d9a817-b93a-516f-90fa-ddf72c94ac5b
+Type: SC Judgment
+Name: EWS Verification PIL
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------
+ID: fdfdbd0f-f5f6-5838-ba00-bd39554f0430
+Type: SC Judgment
+Name: PwD Quota Enforcement Case
+Paper: 
+Subject: 
+Section Group: 
+Microtopic: 
+--------------------------------------------------

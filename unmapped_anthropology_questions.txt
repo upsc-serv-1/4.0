@@ -1,0 +1,143 @@
+UPSC Mains Anthropology Questions with Missing Hierarchy Mappings:
+================================================================================
+
+Question #1
+ID: mains-anthro1-q944
+Year: 2021
+Paper: Paper I (mains_questions.paper: Optional)
+Text: Discuss the bio-social determinants of fertility and fecundity.
+Current Microtopic: None
+Current Subtopic: None
+Current Nanotopic: None
+--------------------------------------------------------------------------------
+
+Question #2
+ID: mains-anthro1-q953
+Year: 2022
+Paper: Paper I (mains_questions.paper: Optional)
+Text: Write notes on the following in about 150 words each: Participatory Rural Appraisal (PRA) and Participatory Learning and Action (PLA)
+Current Microtopic: None
+Current Subtopic: None
+Current Nanotopic: None
+--------------------------------------------------------------------------------
+
+Question #3
+ID: mains-anthro1-q962
+Year: 2022
+Paper: Paper I (mains_questions.paper: Optional)
+Text: Critically examine various anthropological interpretations about the Kula Ring.
+Current Microtopic: None
+Current Subtopic: None
+Current Nanotopic: None
+--------------------------------------------------------------------------------
+
+Question #4
+ID: mains-anthro1-q1052
+Year: 2025
+Paper: Paper I (mains_questions.paper: Optional)
+Text: What are genetic markers ? Discuss their applications in understanding population variation, disease association and forensics.
+Current Microtopic: None
+Current Subtopic: None
+Current Nanotopic: None
+--------------------------------------------------------------------------------
+
+Question #5
+ID: mains-anthro1-q1053
+Year: 2025
+Paper: Paper I (mains_questions.paper: Optional)
+Text: The agenda of biological anthropology became more scientific from the middle of the twentieth century." Justify.
+Current Microtopic: None
+Current Subtopic: None
+Current Nanotopic: None
+--------------------------------------------------------------------------------
+
+Question #6
+ID: mains-anthro1-q1054
+Year: 2025
+Paper: Paper I (mains_questions.paper: Optional)
+Text: Describe briefly the theoretical perspectives in linguistic anthropology to explain the relationship of culture, language and thought.
+Current Microtopic: None
+Current Subtopic: None
+Current Nanotopic: None
+--------------------------------------------------------------------------------
+
+Question #7
+ID: mains-anthro2-q396
+Year: 2012
+Paper: Paper II (mains_questions.paper: Optional)
+Text: Write short notes (in about 150 words each) on the following: Ethical issues in Genetic Research
+Current Microtopic: None
+Current Subtopic: None
+Current Nanotopic: None
+--------------------------------------------------------------------------------
+
+Question #8
+ID: mains-anthro2-q397
+Year: 2012
+Paper: Paper II (mains_questions.paper: Optional)
+Text: Write short notes (in about 150 words each) on the following: Indigenous knowledge
+Current Microtopic: None
+Current Subtopic: None
+Current Nanotopic: None
+--------------------------------------------------------------------------------
+
+Question #9
+ID: mains-anthro2-q545
+Year: 2018
+Paper: Paper II (mains_questions.paper: Optional)
+Text: Write short notes on the following in about 150 words each: Philosophy behind Purusharthas
+Current Microtopic: None
+Current Subtopic: None
+Current Nanotopic: None
+--------------------------------------------------------------------------------
+
+Question #10
+ID: mains-anthro2-q604
+Year: 2020
+Paper: Paper II (mains_questions.paper: Optional)
+Text: Write short notes on the following in about 150 words each: 'Khap' Panchayat
+Current Microtopic: None
+Current Subtopic: None
+Current Nanotopic: None
+--------------------------------------------------------------------------------
+
+Question #11
+ID: mains-anthro2-q612
+Year: 2020
+Paper: Paper II (mains_questions.paper: Optional)
+Text: Discuss the impact of Globalization on Indian villages.
+Current Microtopic: None
+Current Subtopic: None
+Current Nanotopic: None
+--------------------------------------------------------------------------------
+
+Question #12
+ID: mains-anthro2-q628
+Year: 2021
+Paper: Paper II (mains_questions.paper: Optional)
+Text: Write short notes on the following in about 150 words each: Purushartha and righteous living today
+Current Microtopic: None
+Current Subtopic: None
+Current Nanotopic: None
+--------------------------------------------------------------------------------
+
+Question #13
+ID: mains-anthro2-q685
+Year: 2023
+Paper: Paper II (mains_questions.paper: Optional)
+Text: Write short notes on the following in about 150 words each: Interface between Purushartha and Ashrama
+Current Microtopic: None
+Current Subtopic: None
+Current Nanotopic: None
+--------------------------------------------------------------------------------
+
+Question #14
+ID: mains-anthro2-q686
+Year: 2023
+Paper: Paper II (mains_questions.paper: Optional)
+Text: Write short notes on the following in about 150 words each: Jajmani system: continuity and change
+Current Microtopic: None
+Current Subtopic: None
+Current Nanotopic: None
+--------------------------------------------------------------------------------
+

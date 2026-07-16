@@ -484,10 +484,20 @@ export default function MainsTagsView({
     return (
       <View style={{ flex: 1, backgroundColor: colors.bg }}>
         {/* Header */}
-        <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: (insets?.top || 0) + 10 }]}>
-          <TouchableOpacity onPress={() => setActiveSubject(null)} style={styles.backBtn}>
-            <ChevronLeft size={22} color={colors.primary} />
-            <Text style={{ fontSize: 11, color: colors.primary, fontWeight: '700', marginTop: 1 }}>Back</Text>
+        <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: (insets?.top || 0) + 12 }]}>
+          <TouchableOpacity
+            onPress={() => setActiveSubject(null)}
+            style={[
+              styles.inlineBackButton,
+              {
+                backgroundColor: colors.surface + 'b3',
+                borderColor: colors.border,
+                marginRight: 10,
+              }
+            ]}
+          >
+            <ChevronLeft size={20} color={colors.textPrimary} />
+            <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>Back</Text>
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
             <Text style={[styles.headerTitle, { color: colors.textPrimary }]} numberOfLines={1}>
@@ -596,14 +606,20 @@ export default function MainsTagsView({
       {/* Top Bar Controls — uses insets for safe area */}
       <View style={[
         styles.commandBar,
-        { backgroundColor: colors.surface, borderBottomColor: colors.border, paddingTop: insets?.top || 0 }
+        { backgroundColor: colors.surface, borderBottomColor: colors.border, paddingTop: (insets?.top || 0) + 12 }
       ]}>
-        <TouchableOpacity 
-          onPress={onBack} 
-          style={{ padding: 8, marginLeft: -4, marginRight: 4 }}
+        <TouchableOpacity
+          onPress={onBack}
+          style={[
+            styles.inlineBackButton,
+            {
+              backgroundColor: colors.surface + 'b3',
+              borderColor: colors.border,
+            }
+          ]}
         >
-          <ChevronLeft size={22} color={colors.primary} />
-          <Text style={{ fontSize: 11, color: colors.primary, fontWeight: '700', marginTop: 1 }}>Hub</Text>
+          <ChevronLeft size={20} color={colors.textPrimary} />
+          <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>Hub</Text>
         </TouchableOpacity>
         <View style={styles.searchContainer}>
           <Search size={16} color={colors.textTertiary} />
@@ -1257,5 +1273,23 @@ const styles = StyleSheet.create({
   smallTopBtnText: {
     fontSize: 10,
     fontWeight: '800',
+  },
+  inlineBackButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  backButtonText: {
+    fontSize: 13,
+    fontWeight: '700',
+    marginLeft: 6,
   },
 });

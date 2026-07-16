@@ -50,7 +50,7 @@ ALTER TABLE public.user_settings
 ADD COLUMN IF NOT EXISTS selected_course TEXT DEFAULT 'UPSC CSE';
 
 COMMENT ON COLUMN public.user_settings.selected_course IS 
-'User's currently selected course. Stored in app context as well.';
+'User''s currently selected course. Stored in app context as well.';
 
 -- ========================================================================
 -- IMPORTANT: After running this migration:

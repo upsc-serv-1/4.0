@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { View, TouchableOpacity, Animated, StyleSheet, Modal, Pressable, Text, Keyboard, Platform } from 'react-native';
-import { Plus, Layers, FileText, Zap, X } from 'lucide-react-native';
+import { Plus, Zap, FileText, X } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { useTheme } from '../context/ThemeContext';
 
@@ -22,7 +22,7 @@ export function GlobalCreateFAB() {
   }, []);
 
   const actions = [
-    { key: 'card', label: 'Flashcard', icon: Layers, onPress: () => router.push('/flashcards/new') },
+    { key: 'card', label: 'Flashcard', icon: Zap, onPress: () => router.push('/flashcards/new') },
     { key: 'deck', label: 'Deck', icon: Zap, onPress: () => router.push('/flashcards') },
     { key: 'note', label: 'Note', icon: FileText, onPress: () => router.push('/notes') },
   ];

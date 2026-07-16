@@ -1,0 +1,902 @@
+[
+  {
+    "id": "cc986b86-9525-5f57-9b64-c6bcf80a11a1",
+    "paper": "GS-III",
+    "subject": "AGRICULTURE",
+    "section_group": "Agriculture & Farm Dynamics",
+    "microtopic": "Major Crops, cropping patterns, and regional agriculture production styles",
+    "subtopic": "Crop Diversification",
+    "title": "Hiware Bazar Model",
+    "content_markdown": "- **Details**: In Maharashtra, Hiware Bazar transformed its agricultural practices through water conservation and soil management, leading to a 300% increase in income and 50% increase in crop yield.\n- **Impact**: Enhanced agricultural productivity and rural livelihoods through sustainable practices.\n- **Paper**: GS-III\n- **Subject**: AGRICULTURE",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "AGRICULTURE",
+      "Agriculture & Farm Dynamics",
+      "Major Crops, cropping patterns, and regional agriculture production styles",
+      "Crop Diversification"
+    ]
+  },
+  {
+    "id": "cc986b86-9525-5f57-9b64-c6bcf80a11a1",
+    "paper": "GS-III",
+    "subject": "AGRICULTURE",
+    "section_group": "Agriculture & Farm Dynamics",
+    "microtopic": "Major Crops, cropping patterns, and regional agriculture production styles",
+    "subtopic": "Crop Diversification",
+    "title": "PRADAN’s ‘Jal Jivan’ Project",
+    "content_markdown": "- **Details**: Implemented in Madhya Pradesh, focusing on rainwater harvesting and watershed management. Over 4000 water harvesting structures built as of 2022.\n- **Impact**: Increased water availability by 30%, improving agricultural productivity and rural livelihoods.  Page 2\n- **Paper**: GS-III\n- **Subject**: AGRICULTURE",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "AGRICULTURE",
+      "Agriculture & Farm Dynamics",
+      "Major Crops, cropping patterns, and regional agriculture production styles",
+      "Crop Diversification"
+    ]
+  },
+  {
+    "id": "ff8a659e-9560-5121-a7bb-e0912f445396",
+    "paper": "GS-III",
+    "subject": "ENVIRONMENT",
+    "section_group": "Conservation & Ecosystems",
+    "microtopic": "Conservation and environmental impact assessment",
+    "subtopic": "Biodiversity",
+    "title": "Sundarbans Mangrove Conservation",
+    "content_markdown": "- **Details**: In West Bengal, conservation efforts for the Sundarbans mangroves have been critical in protecting biodiversity and mitigating climate change. The area is a UNESCO World Heritage site and crucial for tiger habitat.\n- **Impact**: Protected mangrove ecosystems, supported local livelihoods, and preserved endangered species.\n- **Paper**: GS-III\n- **Subject**: ENVIRONMENT",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "ENVIRONMENT",
+      "Conservation & Ecosystems",
+      "Conservation and environmental impact assessment",
+      "Biodiversity"
+    ]
+  },
+  {
+    "id": "93d974ec-2227-5ae1-b9c0-a9b7da494fb0",
+    "paper": "GS-III",
+    "subject": "ENVIRONMENT",
+    "section_group": "Conservation & Ecosystems",
+    "microtopic": "Conservation and environmental impact assessment",
+    "subtopic": "Environment",
+    "title": "Alaknanda River Rejuvenation Project",
+    "content_markdown": "- **Details**: This project focuses on cleaning and restoring the Alaknanda River in Uttarakhand through waste management and riverbank development.\n- **Impact**: Improved water quality, supported local ecosystems, and enhanced community health.\n- **Paper**: GS-III\n- **Subject**: ENVIRONMENT",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "ENVIRONMENT",
+      "Conservation & Ecosystems",
+      "Conservation and environmental impact assessment",
+      "Environment"
+    ]
+  },
+  {
+    "id": "e15c0d2e-ea83-5b42-94aa-76f675ff7d0e",
+    "paper": "GS-III",
+    "subject": "DISASTER MANAGEMENT",
+    "section_group": "Specific Disasters & Hazards",
+    "microtopic": "Disasters: Specific natural and man-made hazards",
+    "subtopic": "Earthquake",
+    "title": "Gujarat Earthquake Recovery (2001)",
+    "content_markdown": "- **Details**: After the 2001 earthquake, Gujarat implemented a comprehensive recovery plan focusing on infrastructure, housing, and disaster preparedness. The state rebuilt over 400,000 houses and established disaster management protocols.\n- **Impact**: Improved infrastructure, increased resilience to future disasters, and enhanced recovery mechanisms.\n- **Paper**: GS-III\n- **Subject**: DISASTER MANAGEMENT",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "DISASTER MANAGEMENT",
+      "Specific Disasters & Hazards",
+      "Disasters: Specific natural and man-made hazards",
+      "Earthquake"
+    ]
+  },
+  {
+    "id": "b37bc1f1-01e9-5041-b0eb-ac065574d61c",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Physical Infrastructure & Capital",
+    "microtopic": "Infrastructure systems connectivity: energy, ports, roads, airports, and railways",
+    "subtopic": "Transport",
+    "title": "Delhi Metro Project",
+    "content_markdown": "- **Details**: Launched in 2002, the Delhi Metro has expanded to cover over 300 km with multiple lines. It has become a model for urban transport in India.\n- **Impact**: Reduced traffic congestion, improved urban mobility, and set a benchmark for public transport systems.\n- **Paper**: GS-III\n- **Subject**: INDIAN ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Physical Infrastructure & Capital",
+      "Infrastructure systems connectivity: energy, ports, roads, airports, and railways",
+      "Transport"
+    ]
+  },
+  {
+    "id": "8ee33c98-5001-5b49-8f32-6d8769a04135",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Physical Infrastructure & Capital",
+    "microtopic": "Infrastructure systems connectivity: energy, ports, roads, airports, and railways",
+    "subtopic": "Airports X Infrastructure",
+    "title": "Bhopal Smart City Initiative",
+    "content_markdown": "- **Details**: Focuses on enhancing urban infrastructure through smart technology, including intelligent traffic management and e-governance systems.\n- **Impact**: Improved urban management, increased efficiency in city services, and enhanced quality of life for residents.\n- **Paper**: GS-III\n- **Subject**: INDIAN ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Physical Infrastructure & Capital",
+      "Infrastructure systems connectivity: energy, ports, roads, airports, and railways",
+      "Airports X Infrastructure"
+    ]
+  },
+  {
+    "id": "693b3b23-b62b-55b3-b143-499ca120a953",
+    "paper": "GS-III",
+    "subject": "SCIENCE & TECHNOLOGY",
+    "section_group": "Everyday Science & Innovations",
+    "microtopic": "Science and Technology- developments and their effects in everyday life",
+    "subtopic": "General Science",
+    "title": "Biocon's Affordable Insulin",
+    "content_markdown": "- **Details**: Biocon, an Indian biopharmaceutical company, developed affordable insulin products for diabetes management. Their biosimilar insulin is priced significantly lower than international counterparts.\n- **Impact**: Increased access to affordable diabetes treatment, improving health outcomes for many patients.\n- **Paper**: GS-III\n- **Subject**: SCIENCE & TECHNOLOGY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "SCIENCE & TECHNOLOGY",
+      "Everyday Science & Innovations",
+      "Science and Technology- developments and their effects in everyday life",
+      "General Science"
+    ]
+  },
+  {
+    "id": "3549f114-19d7-5561-950c-f31e557f7df3",
+    "paper": "GS-III",
+    "subject": "SCIENCE & TECHNOLOGY",
+    "section_group": "Everyday Science & Innovations",
+    "microtopic": "Science and Technology- developments and their effects in everyday life",
+    "subtopic": "Sports and Technology",
+    "title": "Indian Institute of Technology (IIT) Bombay’s Innovation Center",
+    "content_markdown": "- **Details**: IIT Bombay’s Innovation Center supports startups and fosters research in technology and innovation, contributing to various technological advancements.\n- **Impact**: Promoted technological entrepreneurship, supported innovation, and facilitated research collaborations.\n- **Paper**: GS-III\n- **Subject**: SCIENCE & TECHNOLOGY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "SCIENCE & TECHNOLOGY",
+      "Everyday Science & Innovations",
+      "Science and Technology- developments and their effects in everyday life",
+      "Sports and Technology"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "Amul Dairy Cooperative",
+    "content_markdown": "- **Details**: Started in 1946, Amul has grown into a major dairy cooperative in India. It transformed the dairy industry through a cooperative model and modern dairy farming practices.\n- **Impact**: Provided a reliable income source for farmers, ensured high-quality dairy products, and fostered rural development.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "Barefoot College",
+    "content_markdown": "- **Details**: An NGO based in Rajasthan, Barefoot College trains rural women as solar engineers. The initiative has empowered women and provided solar electricity to numerous villages.\n- **Impact**: Promoted renewable energy, empowered women, and improved rural energy access.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "Pune’s Waste Management Model",
+    "content_markdown": "- **Details**: Pune has implemented a successful waste segregation and composting model that includes citizen participation and efficient waste processing.\n- **Impact**: Reduced landfill waste, improved waste management practices, and promoted environmental sustainability.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "The Nanhi Kali Project",
+    "content_markdown": "- **Details**: This initiative provides educational support to underprivileged girls in India, including school supplies, uniforms, and mentoring.\n- **Impact**: Increased school enrollment and retention rates among girls, and improved educational outcomes.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "Ujjwala Yojana",
+    "content_markdown": "- **Details**: Launched in 2016 to provide free LPG connections to poor households, improving air quality and reducing health risks from traditional cooking fuels.\n- **Impact**: Enhanced household health, reduced indoor air pollution, and contributed to environmental sustainability.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "Rainwater Harvesting in Chennai",
+    "content_markdown": "- **Details**: Chennai has implemented extensive rainwater harvesting systems in urban and rural areas to address water scarcity.\n- **Impact**: Improved groundwater levels, ensured sustainable water supply, and reduced dependence on external sources.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "NTPC’s Renewable Energy Initiatives",
+    "content_markdown": "- **Details**: National Thermal Power Corporation (NTPC) has expanded its focus to include significant investments in solar and wind energy projects.\n- **Impact**: Increased renewable energy capacity, reduced carbon emissions, and supported India’s transition to cleaner energy sources.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "Kachchh’s Salt Farming Sustainability",
+    "content_markdown": "- **Details**: Salt farmers in Kachchh, Gujarat, adopted sustainable practices to manage salinity and environmental impact, improving productivity and ecological balance.\n- **Impact**: Enhanced sustainable agricultural practices, improved farmer livelihoods, and preserved local ecosystems. For GS2 1. Indian Constitution: Historical Underpinnings, Evolution, Features\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "The Preamble’s Role in Judicial Interpretation",
+    "content_markdown": "- **Details**: The Indian Supreme Court has used the Preamble as a guiding principle in various landmark judgments, such as the Kesavananda Bharati case (1973), to interpret fundamental rights and the basic structure doctrine.\n- **Impact**: Reinforced the importance of the Preamble in interpreting constitutional provisions and safeguarding fundamental rights. 2. Parliament and State Legislatures: Structure, Functioning, Conduct of Business\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "The NITI Aayog’s Role in Policy Formulation",
+    "content_markdown": "- **Details**: Established in 2015 to replace the Planning Commission, NITI Aayog has been instrumental in shaping policies like the National Health Policy 2017.\n- **Impact**: Enhanced policy formulation with a focus on cooperative federalism and development goals. 4. Federal Structure: Issues and Challenges\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "Maharashtra-Karnataka Border Dispute",
+    "content_markdown": "- **Details**: The ongoing dispute over the border between Maharashtra and Karnataka involves claims over linguistic regions and has been addressed by the Supreme Court and various commissions.\n- **Impact**: Highlighted the complexities of federal boundaries and the need for legal and administrative solutions to inter-state disputes. 5. Devolution of Powers and Finances: Local Levels\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "Kerala’s Decentralized Planning",
+    "content_markdown": "- **Details**: Kerala’s model of decentralized planning through local self-governments has led to successful implementation of various community-driven projects.\n- **Impact**: Improved local governance, increased community participation, and better delivery of public services. 6. Separation of Powers: Dispute Redressal Mechanisms\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "The Ayodhya Land Dispute Case",
+    "content_markdown": "- **Details**: The Supreme Court’s judgment in 2019 resolved the longstanding dispute over the Ram Janmabhoomi-Babri Masjid site, allocating land for a Ram temple and providing land for a mosque.\n- **Impact**: Provided a legal resolution to a high-profile dispute, showcasing the judiciary’s role in maintaining rule of law and secularism.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "Federal Structure Comparison: India vs. USA",
+    "content_markdown": "- **Details**: India’s federal system is more centralized compared to the USA’s federalism, as seen in the division of powers between the central and state governments.\n- **Impact**: Provides insights into the strengths and weaknesses of different federal systems and their impact on governance. 8. Pressure Groups and Formal/Informal Associations\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "The Role of Farmers' Unions in the Farm Bills Protest",
+    "content_markdown": "- **Details**: Farmers’ unions played a significant role in organizing protests against the Farm Bills 2020, leading to their eventual repeal in 2021.\n- **Impact**: Demonstrated the influence of organized pressure groups in shaping policy and governance. 9. Salient Features of the Representation of People’s Act\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "The Supreme Court's Judgment on Electoral Bonds",
+    "content_markdown": "- **Details**: The Supreme Court’s 2018 judgment on electoral bonds addressed transparency issues in political funding and upheld the legality of the scheme.\n- **Impact**: Highlighted issues of electoral transparency and the need for reforms in political funding.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "The Role of SEBI in the Sahara Case",
+    "content_markdown": "- **Details**: The Securities and Exchange Board of India (SEBI) played a key role in investigating the Sahara Group’s financial practices and protecting investors.\n- **Impact**: Enhanced regulatory oversight and investor protection in the financial markets. 12. Indian Foreign Policy: Issues and Challenges  Page 6\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "India’s Stand on the Paris Agreement",
+    "content_markdown": "- **Details**: India’s commitment to the Paris Agreement on climate change, including its Nationally Determined Contributions (NDCs), reflects its approach to global climate policy.\n- **Impact**: Demonstrated India’s role in global environmental governance and its commitment to sustainable development.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "India’s Membership in the United Nations Security Council (UNSC)",
+    "content_markdown": "- **Details**: India’s non-permanent membership on the UNSC from 2011-2012 and its bid for permanent membership reflects its growing influence in global diplomacy.\n- **Impact**: Enhanced India’s role in international peace and security discussions and showcased its global diplomatic engagement. 14. Indian Economy: Issues and Challenges\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "The Demonetization Initiative (2016)",
+    "content_markdown": "- **Details**: The Indian government’s decision to demonetize ₹500 and ₹1,000 notes aimed at curbing black money and corruption. The move led to significant short- term disruptions.\n- **Impact**: Triggered debates on the effectiveness of such measures and their impact on the economy and informal sector.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "The Clean India Mission (Swachh Bharat Abhiyan)",
+    "content_markdown": "- **Details**: Launched in 2014 to improve sanitation and cleanliness, with a focus on eliminating open defecation. Significant progress has been made with the construction of over 10 crore toilets.\n- **Impact**: Improved sanitation standards, public health, and urban cleanliness.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "824e99bb-d5a8-50ae-95f8-c271b55b4845",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Miscellaneous",
+    "title": "The Beti Bachao Beti Padhao Scheme",
+    "content_markdown": "- **Details**: Launched in 2015 to improve child sex ratio and promote female education. The scheme has led to increased awareness and initiatives for girl child education.\n- **Impact**: Addressed gender imbalances and promoted education for girls, improving social equity.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Miscellaneous"
+    ]
+  },
+  {
+    "id": "0af0e69f-5b5a-502e-9b4c-625b35112481",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Economic Growth",
+    "title": "BHEL’s Power Plant Projects",
+    "content_markdown": "- **Details**: Bharat Heavy Electricals Limited (BHEL) has been instrumental in setting up power plants across India, contributing significantly to the country's energy infrastructure.\n- **Impact**: Expanded power generation capacity, supported industrial growth, and contributed to energy security.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Economic Growth"
+    ]
+  },
+  {
+    "id": "0af0e69f-5b5a-502e-9b4c-625b35112481",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Economic Growth",
+    "title": "Rurban Mission",
+    "content_markdown": "- **Details**: Aimed at developing rural areas into economically viable and sustainable urban centers through infrastructure development and skill enhancement.\n- **Impact**: Boosted rural economic development, improved infrastructure, and enhanced quality of life.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Economic Growth"
+    ]
+  },
+  {
+    "id": "0af0e69f-5b5a-502e-9b4c-625b35112481",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Economic Growth",
+    "title": "The Lok Sabha’s Role in the GST Bill",
+    "content_markdown": "- **Details**: The Goods and Services Tax (GST) Bill was passed in the Lok Sabha in 2016 after extensive debates and modifications. The Bill was crucial for economic reform in India.\n- **Impact**: Streamlined indirect tax structure, improved tax compliance, and promoted economic growth.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Economic Growth"
+    ]
+  },
+  {
+    "id": "0af0e69f-5b5a-502e-9b4c-625b35112481",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Economic Growth",
+    "title": "The Appointment of CAG (Comptroller and Auditor General)",
+    "content_markdown": "- **Details**: The appointment of Rajiv Mehrishi as the CAG in 2017 was notable for his prior experience as Secretary of Economic Affairs and Home Affairs.\n- **Impact**: Demonstrated the importance of experience and neutrality in the appointment of key constitutional positions. 11. Statutory, Regulatory, and Quasi-Judicial Bodies\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Economic Growth"
+    ]
+  },
+  {
+    "id": "0af0e69f-5b5a-502e-9b4c-625b35112481",
+    "paper": "GS-III",
+    "subject": "INDIAN ECONOMY",
+    "section_group": "Macroeconomics & Fiscal Policy",
+    "microtopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+    "subtopic": "Economic Growth",
+    "title": "Goods and Services Tax (GST) Implementation",
+    "content_markdown": "- **Details**: Implemented in 2017 to unify India’s indirect tax structure. The GST has streamlined tax administration and reduced the multiplicity of taxes.\n- **Impact**: Simplified tax compliance, improved revenue collection, and fostered economic integration.\n- **Paper**: GS-III\n- **Subject**: ECONOMY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INDIAN ECONOMY",
+      "Macroeconomics & Fiscal Policy",
+      "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "Economic Growth"
+    ]
+  },
+  {
+    "id": "4d5ad431-a8af-58ee-9dea-4f4ecdc4add4",
+    "paper": "GS-II",
+    "subject": "SOCIAL JUSTICE",
+    "section_group": "Social Sector & Human Development",
+    "microtopic": "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
+    "subtopic": "Health",
+    "title": "Aarogya Setu App",
+    "content_markdown": "- **Details**: Launched during the COVID-19 pandemic, this app helped in tracking infections, providing health information, and facilitating contact tracing.\n- **Impact**: Enhanced public health response, increased awareness, and supported containment efforts during the pandemic.\n- **Paper**: GS-II\n- **Subject**: SOCIAL JUSTICE",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-II",
+      "SOCIAL JUSTICE",
+      "Social Sector & Human Development",
+      "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
+      "Health"
+    ]
+  },
+  {
+    "id": "4d5ad431-a8af-58ee-9dea-4f4ecdc4add4",
+    "paper": "GS-II",
+    "subject": "SOCIAL JUSTICE",
+    "section_group": "Social Sector & Human Development",
+    "microtopic": "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
+    "subtopic": "Health",
+    "title": "The National Health Insurance Scheme (Ayushman Bharat)",
+    "content_markdown": "- **Details**: Launched in 2018 to provide health insurance coverage to low-income families, aiming for 50 crore beneficiaries.\n- **Impact**: Expanded access to healthcare services, reduced out-of-pocket expenses, and improved health coverage.\n- **Paper**: GS-II\n- **Subject**: SOCIAL JUSTICE",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-II",
+      "SOCIAL JUSTICE",
+      "Social Sector & Human Development",
+      "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
+      "Health"
+    ]
+  },
+  {
+    "id": "58598c11-41b9-5bbe-b52c-ed28ebe1b7ba",
+    "paper": "GS-II",
+    "subject": "SOCIAL JUSTICE",
+    "section_group": "Social Sector & Human Development",
+    "microtopic": "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
+    "subtopic": "Education",
+    "title": "The Right to Education Act (RTE)",
+    "content_markdown": "- **Details**: Enacted in 2009 to provide free and compulsory education to children aged 6-14. Significant progress has been made in increasing school enrollment rates.\n- **Impact**: Increased educational access, improved literacy rates, and addressed disparities in education.\n- **Paper**: GS-II\n- **Subject**: SOCIAL JUSTICE",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-II",
+      "SOCIAL JUSTICE",
+      "Social Sector & Human Development",
+      "Social Sector & Services: Issues relating to Development & Management of Health, Education & Human Resources",
+      "Education"
+    ]
+  },
+  {
+    "id": "9e6b1878-531f-510e-bb0b-22fad6698b2e",
+    "paper": "GS-III",
+    "subject": "INTERNAL SECURITY",
+    "section_group": "Cyber, Financial & Media Security",
+    "microtopic": "Challenges to internal security through communication networks, role of media and social networking sites, and basics of cyber security",
+    "subtopic": "Cyber security",
+    "title": "Mumbai Police’s Counter-Terrorism Unit",
+    "content_markdown": "- **Details**: After the 2008 Mumbai attacks, the Mumbai Police established a dedicated counter-terrorism unit with advanced training and resources.\n- **Impact**: Strengthened counter-terrorism capabilities, improved security measures, and increased vigilance against potential threats.\n- **Paper**: GS-III\n- **Subject**: INTERNAL SECURITY",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-III",
+      "INTERNAL SECURITY",
+      "Cyber, Financial & Media Security",
+      "Challenges to internal security through communication networks, role of media and social networking sites, and basics of cyber security",
+      "Cyber security"
+    ]
+  },
+  {
+    "id": "9143d80a-ce3c-5873-bc65-575517fbb2f0",
+    "paper": "GS-II",
+    "subject": "GOVERNANCE",
+    "section_group": "Accountability & Civil Services",
+    "microtopic": "Transaparency and accountability (institutional and other measures); Citizens Charter",
+    "subtopic": "Transparency and Accountability",
+    "title": "The Right to Information Act (RTI)",
+    "content_markdown": "",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-II",
+      "GOVERNANCE",
+      "Accountability & Civil Services",
+      "Transaparency and accountability (institutional and other measures); Citizens Charter",
+      "Transparency and Accountability"
+    ]
+  },
+  {
+    "id": "9143d80a-ce3c-5873-bc65-575517fbb2f0",
+    "paper": "GS-II",
+    "subject": "GOVERNANCE",
+    "section_group": "Accountability & Civil Services",
+    "microtopic": "Transaparency and accountability (institutional and other measures); Citizens Charter",
+    "subtopic": "Transparency and Accountability",
+    "title": "Details",
+    "content_markdown": "Enacted in 2005 to promote transparency and accountability in government operations. The RTI Act has empowered citizens to seek information from public authorities.",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-II",
+      "GOVERNANCE",
+      "Accountability & Civil Services",
+      "Transaparency and accountability (institutional and other measures); Citizens Charter",
+      "Transparency and Accountability"
+    ]
+  },
+  {
+    "id": "9143d80a-ce3c-5873-bc65-575517fbb2f0",
+    "paper": "GS-II",
+    "subject": "GOVERNANCE",
+    "section_group": "Accountability & Civil Services",
+    "microtopic": "Transaparency and accountability (institutional and other measures); Citizens Charter",
+    "subtopic": "Transparency and Accountability",
+    "title": "Impact",
+    "content_markdown": "Enhanced transparency, reduced corruption, and improved public administration.  Page 7",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-II",
+      "GOVERNANCE",
+      "Accountability & Civil Services",
+      "Transaparency and accountability (institutional and other measures); Citizens Charter",
+      "Transparency and Accountability"
+    ]
+  },
+  {
+    "id": "9143d80a-ce3c-5873-bc65-575517fbb2f0",
+    "paper": "GS-II",
+    "subject": "GOVERNANCE",
+    "section_group": "Accountability & Civil Services",
+    "microtopic": "Transaparency and accountability (institutional and other measures); Citizens Charter",
+    "subtopic": "Transparency and Accountability",
+    "title": "Paper",
+    "content_markdown": "GS-II",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-II",
+      "GOVERNANCE",
+      "Accountability & Civil Services",
+      "Transaparency and accountability (institutional and other measures); Citizens Charter",
+      "Transparency and Accountability"
+    ]
+  },
+  {
+    "id": "9143d80a-ce3c-5873-bc65-575517fbb2f0",
+    "paper": "GS-II",
+    "subject": "GOVERNANCE",
+    "section_group": "Accountability & Civil Services",
+    "microtopic": "Transaparency and accountability (institutional and other measures); Citizens Charter",
+    "subtopic": "Transparency and Accountability",
+    "title": "Subject",
+    "content_markdown": "GOVERNANCE",
+    "core_values": [
+      "case_study"
+    ],
+    "hierarchy_path": [
+      "GS-II",
+      "GOVERNANCE",
+      "Accountability & Civil Services",
+      "Transaparency and accountability (institutional and other measures); Citizens Charter",
+      "Transparency and Accountability"
+    ]
+  }
+]

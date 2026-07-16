@@ -123,7 +123,7 @@ type HeatmapRow = {
 // these on larger screens (iPads/tablets) so the grid uses available width.
 const HEATMAP_LABEL_WIDTH = 170;
 const HEATMAP_CELL_WIDTH = 54;
-const HEATMAP_ROW_HEIGHT = 58;
+const HEATMAP_ROW_HEIGHT = 68;
 const HEATMAP_MAX_BODY_HEIGHT = 520;
 
 // Responsive helper: expands cell width / label width based on screen width.
@@ -141,15 +141,15 @@ const getResponsiveHeatmapDims = (screenWidth: number, yearsCount: number, isCom
   let rowHeight: number;
 
   if (isLargeTablet) {
-    labelWidth = isCompact ? 220 : 260;
-    rowHeight = 60;
+    labelWidth = isCompact ? 300 : 420;
+    rowHeight = 74;
     // Target fit: divide remaining space across years but clamp to 64-120
     const remaining = available - labelWidth;
     const ideal = Math.floor(remaining / Math.max(1, yearsCount));
     cellWidth = Math.max(68, Math.min(120, ideal));
   } else if (isTablet) {
-    labelWidth = isCompact ? 200 : 230;
-    rowHeight = 58;
+    labelWidth = isCompact ? 270 : 380;
+    rowHeight = 70;
     const remaining = available - labelWidth;
     const ideal = Math.floor(remaining / Math.max(1, yearsCount));
     cellWidth = Math.max(62, Math.min(96, ideal));
@@ -188,7 +188,7 @@ function StickyHeatmapTable({
   onRowPress?: (rowLabel: string) => void;
   onLabelActionPress?: (rowLabel: string) => void;
   onYearPress?: (year: string) => void;
-  heatmapPalette: 'spectral' | 'ocean';
+  heatmapPalette: 'spectral' | 'ocean' | 'sunset' | 'forest';
   maxValue?: number;
   labelWidth?: number;
   compactLabel?: boolean;
@@ -251,8 +251,7 @@ function StickyHeatmapTable({
             </ScrollView>
           </View>
 
-          <ScrollView style={styles.heatmapBodyScroll} nestedScrollEnabled>
-            <View style={styles.heatmapBodyLayout}>
+          <View style={styles.heatmapBodyLayout}>
               <View style={[styles.heatmapStickyLabelColumn, { borderRightColor: colors.border, width: finalLabelWidth }]}> 
                 {rows.map((row) => (
                   <TouchableOpacity 
@@ -262,7 +261,12 @@ function StickyHeatmapTable({
                     activeOpacity={0.7}
                   > 
                     <View style={styles.heatmapLabelRow}>
-                      <Text style={[styles.heatmapStickyLabelText, { color: colors.textSecondary, flex: 1, fontSize: 11, lineHeight: 15 }]} numberOfLines={2}>
+                      <Text 
+                        style={[styles.heatmapStickyLabelText, { color: colors.textSecondary, flex: 1, fontSize: 10.5, lineHeight: 13.5 }]} 
+                        numberOfLines={4}
+                        adjustsFontSizeToFit
+                        minimumFontScale={0.8}
+                      >
                         {row.displayLabel || row.label}
                       </Text>
                       {onLabelActionPress && (
@@ -356,8 +360,7 @@ function StickyHeatmapTable({
                 </View>
               </ScrollView>
             </View>
-          </ScrollView>
-        </View>
+          </View>
       )}
     </View>
   );
@@ -425,6 +428,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const [activeHub, setActiveHub] = useState<HubKey>('pilot');
   const [pilotSubject, setPilotSubject] = useState<string | null>(null);
   const [pilotSection, setPilotSection] = useState<string | null>(null);
+  const [pilotSectionGroup, setPilotSectionGroup] = useState<string | null>(null);
+  const [pilotMacroTopic, setPilotMacroTopic] = useState<string | null>(null);
   const [pilotMicro, setPilotMicro] = useState<string | null>(null);
   const [pilotSubtopic, setPilotSubtopic] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -438,6 +443,45 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     } finally {
       setRefreshing(false);
     }
+  };
+
+  const selectSubject = (subj: string | null) => {
+    setPilotSubject(subj);
+    setPilotSection(null);
+    setPilotSectionGroup(null);
+    setPilotMacroTopic(null);
+    setPilotMicro(null);
+    setPilotSubtopic(null);
+  };
+
+  const selectSection = (sec: string | null) => {
+    setPilotSection(sec);
+    setPilotSectionGroup(null);
+    setPilotMacroTopic(null);
+    setPilotMicro(null);
+    setPilotSubtopic(null);
+  };
+
+  const selectSectionGroup = (sg: string | null) => {
+    setPilotSectionGroup(sg);
+    setPilotMacroTopic(null);
+    setPilotMicro(null);
+    setPilotSubtopic(null);
+  };
+
+  const selectMacroTopic = (mt: string | null) => {
+    setPilotMacroTopic(mt);
+    setPilotMicro(null);
+    setPilotSubtopic(null);
+  };
+
+  const selectMicroTopic = (mic: string | null) => {
+    setPilotMicro(mic);
+    setPilotSubtopic(null);
+  };
+
+  const selectSubtopic = (sub: string | null) => {
+    setPilotSubtopic(sub);
   };
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'stage' | 'paper' | 'range' | null>(null);
@@ -470,7 +514,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const [focusMicro, setFocusMicro] = useState('All');
   const [exportSubject, setExportSubject] = useState('');
 
-  const [heatmapPalette, setHeatmapPalette] = useState<'spectral' | 'ocean'>('spectral');
+  const [heatmapPalette, setHeatmapPalette] = useState<'spectral' | 'ocean' | 'sunset' | 'forest'>('spectral');
   const [heatmapMetric, setHeatmapMetric] = useState<'count' | 'marks'>('count');
 
   // Lapsed / Neglected Trends Analysis tab states
@@ -953,6 +997,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     // Clear selection states
     setPilotSubject(null);
     setPilotSection(null);
+    setPilotSectionGroup(null);
+    setPilotMacroTopic(null);
+    setPilotMicro(null);
+    setPilotSubtopic(null);
     setOneSub(null);
     setOneSec(null);
     setSelSubjects([]);
@@ -1619,7 +1667,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       focusMicro: questionExportSummary.focusMicro,
       subjectHeatmapRows: questionExportSummary.primaryHeatmapRows,
       topicHeatmapRows: questionExportSummary.secondaryHeatmapRows,
-      heatmapPalette,
+      heatmapPalette: (heatmapPalette === 'sunset' || heatmapPalette === 'forest') ? 'spectral' : heatmapPalette,
       momentumTitle: questionExportSummary.momentumTitle,
       distributionTitle: questionExportSummary.distributionTitle,
       focusedTitle: questionExportSummary.focusedTitle,
@@ -2639,17 +2687,69 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     );
   };
 
+  const getTaxonomyLevels = (q: any, stage: string | null) => {
+    const hp = q.hierarchy_path || [];
+    const subject = getAnalyticsSubject(q);
+
+    // Get database column values
+    const dbSectionGroup = q.sectionGroup || q.section_group;
+    const dbMicroTopic = q.microTopic || q.micro_topic || q.microtopic;
+    const dbSubTopic = q.subTopic || q.sub_topic || q.subtopic;
+    const dbNanoTopic = q.nanoTopic || q.nano_topic || q.nanotopic;
+
+    let sectionGroup = dbSectionGroup || 'General';
+    let microTopic = dbMicroTopic || 'General';
+    let subTopic = dbSubTopic || 'General';
+    let nanoTopic = dbNanoTopic || 'General';
+
+    // Check if hierarchy_path has valid data
+    if (Array.isArray(hp) && hp.length > 0) {
+      // If hp[0] is the subject, shift mapping by 1
+      const startsWithSubject = String(hp[0]).toLowerCase() === String(subject).toLowerCase();
+      const offset = startsWithSubject ? 1 : 0;
+
+      // Map according to depths
+      if (hp[0 + offset]) sectionGroup = hp[0 + offset];
+      if (hp[1 + offset]) microTopic = hp[1 + offset];
+      if (hp[2 + offset]) subTopic = hp[2 + offset];
+      if (hp[3 + offset]) nanoTopic = hp[3 + offset];
+    }
+
+    return {
+      subject,
+      sectionGroup,
+      microTopic,
+      subTopic,
+      nanoTopic
+    };
+  };
+
   const renderPilot = () => {
     // Filter questions for the selected subject in Pilot mode
     const pilotQuestions = rawQuestions.filter(q => getAnalyticsSubject(q) === pilotSubject);
     
-    // Calculate Section Rows for Pilot
-    const pilotSectionRows = Array.from(new Set(pilotQuestions.map(q => q.section_group || q.sectionGroup || 'General')))
-      .map(sec => ({
-        key: `pilot-sec-${sec}`,
-        label: sec,
+    // Determine exam type depth
+    const stageLower = examStage?.toLowerCase() || '';
+    const isPrelims = stageLower === 'prelims';
+    const isOptional = selectedPaper === 'Optional';
+    const isMains = !isPrelims && !isOptional;
+
+    // Helper to build heatmap rows generically
+    const buildHeatmapRows = (qs: any[], levelKey: keyof ReturnType<typeof getTaxonomyLevels>, prefix: string) => {
+      const uniqueLabels = Array.from(new Set(qs.map(q => getTaxonomyLevels(q, examStage)[levelKey] || 'General')))
+        .filter(label => label && label !== 'General' && label !== 'Other' && label !== 'undefined' && label !== 'null');
+      
+      const finalLabels = uniqueLabels.length > 0 ? uniqueLabels : ['General'];
+
+      return finalLabels.map(label => ({
+        key: `${prefix}-${label}`,
+        label,
         byYear: years.reduce((acc, y) => {
-          const matchingQs = pilotQuestions.filter(q => getAnalyticsYear(q) === parseInt(y, 10) && (q.section_group === sec || q.sectionGroup === sec));
+          const matchingQs = qs.filter(q => {
+            const yr = getAnalyticsYear(q);
+            const lvl = getTaxonomyLevels(q, examStage);
+            return yr === parseInt(y, 10) && lvl[levelKey] === label;
+          });
           const value = heatmapMetric === 'marks'
             ? matchingQs.reduce((sum, q) => sum + (Number(q.marks) || 0), 0)
             : matchingQs.length;
@@ -2658,77 +2758,46 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         }, {} as Record<string, number>)
       }))
       .sort((a, b) => Object.values(b.byYear).reduce((sum, v) => sum + v, 0) - Object.values(a.byYear).reduce((sum, v) => sum + v, 0));
-
-    // Calculate Micro Rows for Pilot (Filtered by Subject AND Section if selected)
-    const filteredForMicro = pilotSection 
-      ? pilotQuestions.filter(q => q.section_group === pilotSection || q.sectionGroup === pilotSection)
-      : pilotQuestions;
-
-    const pilotMicroRows = Array.from(new Set(filteredForMicro.map(q => q.micro_topic || q.microTopic || q.microtopic || 'General')))
-      .map(m => ({
-        key: `pilot-micro-${m}`,
-        label: m,
-        byYear: years.reduce((acc, y) => {
-          const matchingQs = filteredForMicro.filter(q => getAnalyticsYear(q) === parseInt(y, 10) && (q.micro_topic === m || q.microTopic === m || q.microtopic === m));
-          const value = heatmapMetric === 'marks'
-            ? matchingQs.reduce((sum, q) => sum + (Number(q.marks) || 0), 0)
-            : matchingQs.length;
-          if (value > 0) acc[y] = value;
-          return acc;
-        }, {} as Record<string, number>)
-      }))
-      .sort((a, b) => Object.values(b.byYear).reduce((sum, v) => sum + v, 0) - Object.values(a.byYear).reduce((sum, v) => sum + v, 0));
-    
-    // Calculate Subtopic Rows for Pilot (Filtered by Subject AND Section AND Micro topic if selected)
-    const filteredForSubtopic = pilotMicro
-      ? filteredForMicro.filter(q => q.micro_topic === pilotMicro || q.microTopic === pilotMicro || q.microtopic === pilotMicro)
-      : filteredForMicro;
-
-    const pilotSubtopicRows = Array.from(new Set(filteredForSubtopic.map(q => q.subTopic || q.sub_topic || 'General')))
-      .map(sub => ({
-        key: `pilot-subtopic-${sub}`,
-        label: sub,
-        byYear: years.reduce((acc, y) => {
-          const matchingQs = filteredForSubtopic.filter(q => getAnalyticsYear(q) === parseInt(y, 10) && (q.subTopic === sub || q.sub_topic === sub));
-          const value = heatmapMetric === 'marks'
-            ? matchingQs.reduce((sum, q) => sum + (Number(q.marks) || 0), 0)
-            : matchingQs.length;
-          if (value > 0) acc[y] = value;
-          return acc;
-        }, {} as Record<string, number>)
-      }))
-      .sort((a, b) => Object.values(b.byYear).reduce((sum, v) => sum + v, 0) - Object.values(a.byYear).reduce((sum, v) => sum + v, 0));
-
-    // Calculate Nanotopic Rows for Pilot (Filtered by Subject AND Section AND Micro topic AND Subtopic if selected)
-    const filteredForNanotopic = pilotSubtopic
-      ? filteredForSubtopic.filter(q => q.subTopic === pilotSubtopic || q.sub_topic === pilotSubtopic)
-      : filteredForSubtopic;
-
-    const pilotNanotopicRows = Array.from(new Set(filteredForNanotopic.map(q => q.nano_topic || q.nanoTopic || q.nanotopic || 'General')))
-      .map(nano => ({
-        key: `pilot-nanotopic-${nano}`,
-        label: nano,
-        byYear: years.reduce((acc, y) => {
-          const matchingQs = filteredForNanotopic.filter(q => getAnalyticsYear(q) === parseInt(y, 10) && (q.nano_topic === nano || q.nanoTopic === nano || q.nanotopic === nano));
-          const value = heatmapMetric === 'marks'
-            ? matchingQs.reduce((sum, q) => sum + (Number(q.marks) || 0), 0)
-            : matchingQs.length;
-          if (value > 0) acc[y] = value;
-          return acc;
-        }, {} as Record<string, number>)
-      }))
-      .sort((a, b) => Object.values(b.byYear).reduce((sum, v) => sum + v, 0) - Object.values(a.byYear).reduce((sum, v) => sum + v, 0));
-    
-    // Dynamic width calculator
-    const getLabelWidth = (rows: any[]) => {
-      if (!rows || !rows.length) return 120;
-      const maxLen = Math.max(...rows.map(r => String(r.label || '').length));
-      return Math.min(180, Math.max(100, maxLen * 7.5)); 
     };
 
-    const subjectWidth = 140;
-    const sectionWidth = 150;
-    const microWidth = 160;
+    // Progressively filter datasets and build rows
+    // 1. Section Group Rows: filtered only by Subject
+    const sectionGroupRows = buildHeatmapRows(pilotQuestions, 'sectionGroup', 'pilot-sg');
+
+    // 2. Micro Topic Rows: filtered by Subject and Section Group (if selected)
+    const qsForMicroTopic = pilotSectionGroup
+      ? pilotQuestions.filter(q => getTaxonomyLevels(q, examStage).sectionGroup === pilotSectionGroup)
+      : pilotQuestions;
+    const microTopicRows = buildHeatmapRows(qsForMicroTopic, 'microTopic', 'pilot-micro');
+
+    // 3. Sub Topic Rows: filtered by Subject, Section Group (if selected), and Micro Topic (if selected)
+    const qsForSubtopic = qsForMicroTopic.filter(q => {
+      const lvl = getTaxonomyLevels(q, examStage);
+      if (pilotMicro && lvl.microTopic !== pilotMicro) return false;
+      return true;
+    });
+    const subtopicRows = buildHeatmapRows(qsForSubtopic, 'subTopic', 'pilot-sub');
+
+    // 4. Nano Topic Rows: filtered by Subject, Section Group (if selected), Micro Topic (if selected), and Sub Topic (if selected)
+    const qsForNanotopic = qsForSubtopic.filter(q => {
+      const lvl = getTaxonomyLevels(q, examStage);
+      if (pilotSubtopic && lvl.subTopic !== pilotSubtopic) return false;
+      return true;
+    });
+    const nanotopicRows = buildHeatmapRows(qsForNanotopic, 'nanoTopic', 'pilot-nano');
+
+    // Calculate label widths dynamically
+    const getLabelWidth = (rows: any[]) => {
+      if (!rows || !rows.length) return 180;
+      const maxLen = Math.max(...rows.map(r => String(r.label || '').length));
+      return Math.min(360, Math.max(180, maxLen * 9.0)); 
+    };
+
+    const subjectWidth = 200;
+    const sgWidth = getLabelWidth(sectionGroupRows);
+    const microWidth = getLabelWidth(microTopicRows);
+    const subWidth = getLabelWidth(subtopicRows);
+    const nanoWidth = getLabelWidth(nanotopicRows);
 
     return (
       <View style={styles.blockGap}>
@@ -2776,8 +2845,6 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           </TouchableOpacity>
         </View>
 
-
-
         {/* TOP HALF: Global Subject Heatmap */}
         <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border, paddingBottom: 20 }]}>
           <Text style={[styles.panelTitle, { color: colors.textPrimary }]}>1. Choose a Subject</Text>
@@ -2795,10 +2862,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
             labelWidth={subjectWidth}
             onRowPress={(subj) => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              setPilotSubject(subj);
-              setPilotSection(null); // Reset section when subject changes
-              setPilotMicro(null); // Reset microtopic
-              setPilotSubtopic(null); // Reset subtopic
+              selectSubject(subj);
             }}
             onLabelActionPress={(subj) => {
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -2824,152 +2888,182 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                 <Text style={[styles.helperText, { color: colors.textSecondary }]}>Sections and Topics for {pilotSubject}</Text>
               </View>
               <TouchableOpacity 
-                onPress={() => {
-                  setPilotSubject(null);
-                  setPilotSection(null);
-                  setPilotMicro(null);
-                }}
+                onPress={() => selectSubject(null)}
                 style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border }}
               >
-                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary }}>CLEAR</Text>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary }}>CLEAR ALL</Text>
               </TouchableOpacity>
             </View>
 
+            {/* Breadcrumbs for Active Selections */}
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
+              {pilotSubject && (
+                <TouchableOpacity 
+                  style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.primary + '15', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 16, borderWidth: 1, borderColor: colors.primary }}
+                  onPress={() => selectSubject(null)}
+                >
+                  <Text style={{ fontSize: 11, fontWeight: 'bold', color: colors.primary }}>Subject: {pilotSubject}</Text>
+                  <Text style={{ fontSize: 11, color: colors.primary, marginLeft: 4 }}>×</Text>
+                </TouchableOpacity>
+              )}
+              {pilotSectionGroup && (
+                <TouchableOpacity 
+                  style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.primary + '15', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 16, borderWidth: 1, borderColor: colors.primary }}
+                  onPress={() => selectSectionGroup(null)}
+                >
+                  <Text style={{ fontSize: 11, fontWeight: 'bold', color: colors.primary }}>Section: {pilotSectionGroup}</Text>
+                  <Text style={{ fontSize: 11, color: colors.primary, marginLeft: 4 }}>×</Text>
+                </TouchableOpacity>
+              )}
+              {pilotMicro && (
+                <TouchableOpacity 
+                  style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.primary + '15', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 16, borderWidth: 1, borderColor: colors.primary }}
+                  onPress={() => selectMicroTopic(null)}
+                >
+                  <Text style={{ fontSize: 11, fontWeight: 'bold', color: colors.primary }}>Topic: {pilotMicro}</Text>
+                  <Text style={{ fontSize: 11, color: colors.primary, marginLeft: 4 }}>×</Text>
+                </TouchableOpacity>
+              )}
+              {pilotSubtopic && (
+                <TouchableOpacity 
+                  style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.primary + '15', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 16, borderWidth: 1, borderColor: colors.primary }}
+                  onPress={() => selectSubtopic(null)}
+                >
+                  <Text style={{ fontSize: 11, fontWeight: 'bold', color: colors.primary }}>Sub-Topic: {pilotSubtopic}</Text>
+                  <Text style={{ fontSize: 11, color: colors.primary, marginLeft: 4 }}>×</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
             <View style={{ gap: 24 }}>
+              {/* 1. Section Group Breakdown Heatmap */}
               <StickyHeatmapTable
-                title="2. Section Breakdown"
+                title="1. Section Breakdown"
                 labelHeader="Section"
                 years={years}
-                rows={pilotSectionRows}
+                rows={sectionGroupRows}
                 baseColor={colors.primary}
                 maxValue={6}
                 colors={colors}
                 heatmapPalette={heatmapPalette}
-                labelWidth={sectionWidth}
-                onRowPress={(sec) => {
+                labelWidth={sgWidth}
+                onRowPress={(sg) => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setPilotSection(sec);
-                  setPilotMicro(null); // Reset microtopic
-                  setPilotSubtopic(null); // Reset subtopic
+                  selectSectionGroup(sg === pilotSectionGroup ? null : sg);
                 }}
-                onLabelActionPress={(sec) => {
+                onLabelActionPress={(sg) => {
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                  handleHeatmapPress(sec, { subject: pilotSubject, section: sec });
+                  handleHeatmapPress(sg, { subject: pilotSubject, section: sg });
                 }}
                 onYearPress={(year) => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   handleHeatmapPress('', { subject: pilotSubject, year }, year);
                 }}
-                onCellPress={(sec, year) => handleHeatmapPress(sec, { subject: pilotSubject, section: sec }, year)}
+                onCellPress={(sg, year) => handleHeatmapPress(sg, { subject: pilotSubject, section: sg }, year)}
               />
 
+              {/* 2. Micro Topic Breakdown Heatmap */}
               <View
                 onLayout={(e) => {
-                  // y is relative to the inner gap:24 View; add panel y to compute absolute scroll target
                   microTopicsYRef.current = deepDivePanelYRef.current + e.nativeEvent.layout.y + 60;
                 }}
               >
-              <StickyHeatmapTable
-                title={`3. ${pilotSection || 'All'} Micro-Topics`}
-                labelHeader="Topic"
-                years={years}
-                rows={pilotMicroRows}
-                baseColor={colors.primary}
-                maxValue={6}
-                colors={colors}
-                heatmapPalette={heatmapPalette}
-                labelWidth={microWidth}
-                onRowPress={(m) => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  if (examStage?.toLowerCase() === 'mains') {
-                    setPilotMicro(m);
-                    setPilotSubtopic(null); // Reset subtopic
-                  } else {
-                    navigateToLearning({ subject: pilotSubject, section: pilotSection || undefined, micro: m, mode: 'choice' });
-                  }
-                }}
-                onLabelActionPress={(m) => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  if (examStage?.toLowerCase() === 'mains') {
-                    setPilotMicro(m);
-                    setPilotSubtopic(null);
-                  } else {
-                    handleHeatmapPress(m, { subject: pilotSubject, section: pilotSection || undefined, micro: m });
-                  }
-                }}
-                onYearPress={(year) => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  handleHeatmapPress('', { subject: pilotSubject, section: pilotSection || undefined, micro: m, year }, year);
-                }}
-                onCellPress={(m, year) => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  handleHeatmapPress(m, { subject: pilotSubject, section: pilotSection || undefined, micro: m }, year);
-                }}
-              />
+                <StickyHeatmapTable
+                  title={`2. ${pilotSectionGroup || 'All'} Micro-Topics`}
+                  labelHeader="Micro-Topic"
+                  years={years}
+                  rows={microTopicRows}
+                  baseColor={colors.primary}
+                  maxValue={6}
+                  colors={colors}
+                  heatmapPalette={heatmapPalette}
+                  labelWidth={microWidth}
+                  onRowPress={(mic) => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    if (isPrelims) {
+                      navigateToLearning({ subject: pilotSubject, section: pilotSectionGroup || undefined, micro: mic, mode: 'choice' });
+                    } else {
+                      selectMicroTopic(mic === pilotMicro ? null : mic);
+                    }
+                  }}
+                  onLabelActionPress={(mic) => {
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    if (isPrelims) {
+                      handleHeatmapPress(mic, { subject: pilotSubject, section: pilotSectionGroup || undefined, micro: mic });
+                    } else {
+                      selectMicroTopic(mic === pilotMicro ? null : mic);
+                    }
+                  }}
+                  onYearPress={(year) => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    handleHeatmapPress('', { subject: pilotSubject, section: pilotSectionGroup || undefined, year }, year);
+                  }}
+                  onCellPress={(mic, year) => handleHeatmapPress(mic, { subject: pilotSubject, section: pilotSectionGroup || undefined, micro: mic }, year)}
+                />
               </View>
 
-              {examStage?.toLowerCase() === 'mains' && pilotMicro && (
-                <View style={{ gap: 24 }}>
-                  <StickyHeatmapTable
-                    title={`4. ${pilotMicro} Sub-Topics`}
-                    labelHeader="Sub-Topic"
-                    years={years}
-                    rows={pilotSubtopicRows}
-                    baseColor={colors.primary}
-                    maxValue={6}
-                    colors={colors}
-                    heatmapPalette={heatmapPalette}
-                    labelWidth={microWidth}
-                    onRowPress={(sub) => {
-                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                      if (examStage?.toLowerCase() === 'mains') {
-                        setPilotSubtopic(sub);
-                      } else {
-                        navigateToLearning({ subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro, subtopic: sub, mode: 'choice' });
-                      }
-                    }}
-                    onLabelActionPress={(sub) => {
-                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                      if (examStage?.toLowerCase() === 'mains') {
-                        setPilotSubtopic(sub);
-                      } else {
-                        handleHeatmapPress(sub, { subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro, subtopic: sub });
-                      }
-                    }}
-                    onYearPress={(year) => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      handleHeatmapPress('', { subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro, year }, year);
-                    }}
-                    onCellPress={(sub, year) => handleHeatmapPress(sub, { subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro, subtopic: sub }, year)}
-                  />
+              {/* 3. Sub Topic Breakdown Heatmap (Mains and Optional only) */}
+              {!isPrelims && (
+                <StickyHeatmapTable
+                  title={`3. ${pilotMicro || 'All'} Sub-Topics`}
+                  labelHeader="Sub-Topic"
+                  years={years}
+                  rows={subtopicRows}
+                  baseColor={colors.primary}
+                  maxValue={6}
+                  colors={colors}
+                  heatmapPalette={heatmapPalette}
+                  labelWidth={subWidth}
+                  onRowPress={(sub) => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    if (isMains) {
+                      navigateToLearning({ subject: pilotSubject, section: pilotSectionGroup || undefined, micro: pilotMicro || undefined, subtopic: sub, mode: 'choice' });
+                    } else {
+                      selectSubtopic(sub === pilotSubtopic ? null : sub);
+                    }
+                  }}
+                  onLabelActionPress={(sub) => {
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    if (isMains) {
+                      handleHeatmapPress(sub, { subject: pilotSubject, section: pilotSectionGroup || undefined, micro: pilotMicro || undefined, subtopic: sub });
+                    } else {
+                      selectSubtopic(sub === pilotSubtopic ? null : sub);
+                    }
+                  }}
+                  onYearPress={(year) => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    handleHeatmapPress('', { subject: pilotSubject, section: pilotSectionGroup || undefined, micro: pilotMicro || undefined, year }, year);
+                  }}
+                  onCellPress={(sub, year) => handleHeatmapPress(sub, { subject: pilotSubject, section: pilotSectionGroup || undefined, micro: pilotMicro || undefined, subtopic: sub }, year)}
+                />
+              )}
 
-                  {pilotSubtopic && (
-                    <StickyHeatmapTable
-                      title={`5. ${pilotSubtopic} Nano-Topics`}
-                      labelHeader="Nano-Topic"
-                      years={years}
-                      rows={pilotNanotopicRows}
-                      baseColor={colors.primary}
-                      maxValue={6}
-                      colors={colors}
-                      heatmapPalette={heatmapPalette}
-                      labelWidth={microWidth}
-                      onRowPress={(nano) => {
-                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                        navigateToLearning({ subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro || undefined, subtopic: pilotSubtopic, nanotopic: nano, mode: 'choice' });
-                      }}
-                      onLabelActionPress={(nano) => {
-                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                        handleHeatmapPress(nano, { subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro || undefined, subtopic: pilotSubtopic, nanotopic: nano });
-                      }}
-                      onYearPress={(year) => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        handleHeatmapPress('', { subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro || undefined, subtopic: pilotSubtopic, year }, year);
-                      }}
-                      onCellPress={(nano, year) => handleHeatmapPress(nano, { subject: pilotSubject, section: pilotSection || undefined, micro: pilotMicro || undefined, subtopic: pilotSubtopic, nanotopic: nano }, year)}
-                    />
-                  )}
-                </View>
+              {/* 4. Nano Topic Breakdown Heatmap (Optional only) */}
+              {isOptional && (
+                <StickyHeatmapTable
+                  title={`4. ${pilotSubtopic || 'All'} Nano-Topics`}
+                  labelHeader="Nano-Topic"
+                  years={years}
+                  rows={nanotopicRows}
+                  baseColor={colors.primary}
+                  maxValue={6}
+                  colors={colors}
+                  heatmapPalette={heatmapPalette}
+                  labelWidth={nanoWidth}
+                  onRowPress={(nano) => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    navigateToLearning({ subject: pilotSubject, section: pilotSectionGroup || undefined, micro: pilotMicro || undefined, subtopic: pilotSubtopic || undefined, nanotopic: nano, mode: 'choice' });
+                  }}
+                  onLabelActionPress={(nano) => {
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    handleHeatmapPress(nano, { subject: pilotSubject, section: pilotSectionGroup || undefined, micro: pilotMicro || undefined, subtopic: pilotSubtopic || undefined, nanotopic: nano });
+                  }}
+                  onYearPress={(year) => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    handleHeatmapPress('', { subject: pilotSubject, section: pilotSectionGroup || undefined, micro: pilotMicro || undefined, subtopic: pilotSubtopic || undefined, year }, year);
+                  }}
+                  onCellPress={(nano, year) => handleHeatmapPress(nano, { subject: pilotSubject, section: pilotSectionGroup || undefined, micro: pilotMicro || undefined, subtopic: pilotSubtopic || undefined, nanotopic: nano }, year)}
+                />
               )}
             </View>
           </View>
@@ -2987,7 +3081,6 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
   const renderLapsedTrends = () => {
     const subjects = ['All', ...focusSubjects.filter(s => s !== 'All')];
-    
     return (
       <View style={styles.blockGap}>
         <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border }]}>

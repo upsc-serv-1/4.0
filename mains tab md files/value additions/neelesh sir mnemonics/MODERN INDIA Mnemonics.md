@@ -133,9 +133,9 @@
     - • **Explanation:** Overall, British economic policies in India were marked by systematic exploitation of resources, labour, and markets to benefit British colonial interests.
     - • **Example:** The drain of wealth through heavy taxation, export of capital, and unequal trade practices significantly impoverished India while enriching Britain.
 
-###### Mnemonic 48: Role of vernacular press to strengthen and weaken Indian freedom struggle (Note – if in question they ask – how strengthen or weaken – just keep in mind the expansion and do the appropriate division while writing points for strengthening and weakening. Write both the points separately while keeping in mind the division
+###### Mnemonic 48: Role of vernacular press to strengthen and weaken Indian freedom struggle (Note – if in question they ask – how strengthen or weaken – just keep in mind the expansion and do the appropriate division while keeping in mind the division – SO, DIVIDE AND RULE OVER THE EXAMINER MIND.)
 
-- **Mnemonic Keyword:** `Mnemonics – “VERNACULAR PRESS”`
+- **Mnemonic Keyword:** `VERNACULAR PRESS`
 - **Formula / Expansion:**
   - **V:** Voice of the Masses
   - **E:** Empowerment of Regional Leaders
@@ -144,6 +144,9 @@
   - **A:** Awareness and Education
   - **C:** Cultural Revival
   - **U:** Uncovering Colonial Injustices
+  - **L:** Linguistic Diversity
+  - **P:** Polarization within Indian Society
+  - **S:** Suppression of Radical Views
 - **Explanation & Examples:**
   - ❖ **V - Voice of the Masses**
     - • **Strengthen:** The vernacular press served as a voice for the Indian masses, expressing their grievances and aspirations.
@@ -151,6 +154,45 @@
   - ❖ **E - Empowerment of Regional Leaders**
     - • **Strengthen:** It empowered regional leaders to mobilize public opinion and foster regional nationalism.
     - • **Example:** Bal Gangadhar Tilak used his newspaper **Kesari** (Marathi) to inspire Maharashtrians to join the freedom struggle, emphasizing regional pride alongside the national movement.
+  - ❖ **R - Resistance against Colonial Policies**
+    - • **Strengthen:** The vernacular press was instrumental in opposing oppressive colonial policies and laws.
+    - • **Example:** The Hindu Patriot was critical in mobilizing support against the Indigo Rebellion (1859-1860), exposing the exploitation of indigo planters by the British. The press helped unite various sections of society against such economic injustices.
+  - ❖ **N - National Unity**
+    - • **Strengthen:** It promoted national unity by highlighting shared struggles across different regions.
+    - • **Example:** Vernacular publications like Gyan Prakash and Sudharak highlighted events and issues from various parts of India, fostering a sense of unity among readers who shared similar struggles against colonial rule.
+  - ❖ **A - Awareness and Education**
+    - • **Strengthen:** The press educated the public about their rights and the importance of self- rule.
+    - • **Example:** Newspapers like **Bangavasi** and **Sanjibani** focused on educating the masses about their political rights and duties, encouraging participation in the freedom struggle.
+  - ❖ **C - Cultural Revival**
+    - • **Strengthen:** The vernacular press played a significant role in the cultural revival, promoting Indian languages, literature, and traditions.
+    - • **Example:** Anandamath**,** serialized in the magazine Bangadarshan by Bankim Chandra Chatterjee, inspired cultural nationalism by depicting the struggle against British rule and reviving pride in Indian heritage.
+  - ❖ **U - Uncovering Colonial Injustices**
+    - • **Strengthen:** It exposed colonial injustices and atrocities, fueling anger and resistance.
+    - • **Example:** The Hind Swaraj by Mahatma Gandhi, although written in Gujarati, critiqued Western civilization and British rule, encouraging readers to understand the deeper motives of colonial exploitation.
+  - ❖ **L - Linguistic Diversity**
+    - • **Strengthen:** By publishing in multiple languages, the vernacular press reached diverse linguistic communities.
+    - • **Example:** Papers like Swadeshmitran (Tamil) and Sandhya (Bengali) catered to specific linguistic groups, ensuring that the freedom struggle's message reached every corner of India, irrespective of language barriers.
+    - • **A - Assertive Political Activism**
+    - • **Strengthen:** The press was assertive in political activism, encouraging direct action against colonial rule.
+    - • **Example:** The editorials in Maharatta called for active participation in protests and boycotts, urging readers to take tangible actions against British policies.
+  - ❖ **R - Resistance through Censorship Challenges**
+    - • **Weaken:** The colonial government often censored or banned vernacular publications, limiting their reach and impact.
+    - • **Example:** The Vernacular Press Act of 1878 was specifically designed to curb the power of the Indian press, leading to closures and self-censorship. This law, enacted by Lord Lytton, was used to silence dissent and prevent the spread of nationalist sentiments.
+  - ❖ **P - Polarization within Indian Society**
+    - • **Weaken:** Sometimes, the press exacerbated divisions within Indian society by emphasizing communal or regional differences.
+    - • **Example:** Certain publications focused on religious or ethnic identities, potentially heightening tensions between communities and diverting attention from the common national goal. Papers like Urdu-e-Mualla were accused of fostering Muslim separatism by focusing on Muslim grievances under colonial rule.
+  - ❖ **R - Regional Focus Limitation**
+    - • **Weaken:** A strong regional focus occasionally limited the broader national perspective.
+    - • **Example:** Some vernacular publications primarily addressed local issues, which could detract from the national movement by fragmenting attention. Sandes**h** in Bengal focused extensively on local issues, which, while important, sometimes detracted from the broader nationalist narrative.
+  - ❖ **E - Economic Vulnerability**
+    - • **Weaken:** Many vernacular newspapers struggled financially, making them susceptible to shutdowns or influence.
+    - • **Example:** British authorities often used financial pressure to weaken critical publications, offering incentives to pro-government editors or simply forcing closures through economic means.
+  - ❖ **S - Suppression of Radical Views**
+    - • **Weaken:** Radicals within the freedom struggle sometimes felt that the vernacular press was too moderate.
+    - • **Example:** Revolutionaries like Bhagat Singh criticized some sections of the vernacular press for not fully endorsing armed struggle, believing it hindered the movement's progress. The conservative nature of some vernacular papers often led to self-censorship, diluting the impact of more aggressive nationalistic messages.
+  - ❖ **S - Sensationalism and Misinformation**
+    - • **Weaken:** Occasionally, the press engaged in sensationalism or misinformation, affecting credibility.
+    - • **Example:** Sensational reporting without verification could lead to misunderstandings or misdirection within the movement. Unverified reports of British troop movements or plans were published by papers like **Kesari**, which sometimes led to unnecessary panic or misdirected efforts.
 
 ###### Mnemonic 49: British Education Policies in India
 
@@ -216,7 +258,7 @@
 
 ###### Mnemonic 50: Role of education to strengthen and weaken the freedom struggle (Note – if in question they ask – how strengthen or weaken – just keep in mind the expansion and do the appropriate division while writing points for strengthening and weakening. Write both the points separately while keeping in mind the division – SO, DIVIDE AND RULE OVER THE EXAMINER MIND.)
 
-- **Mnemonic Keyword:** `Mnemonics – “EDUCATION IMPACT”`
+- **Mnemonic Keyword:** `Mnemonics – EDUCATION IMPACT`
 - **Formula / Expansion:**
   - **E:** Enlightenment and Awareness
   - **D:** Development of Nationalist Leaders
@@ -332,7 +374,7 @@
 
 ###### Mnemonic 9: Rebellions before 1857
 
-- **Mnemonic Keyword:** `Mnemonics – “BRAVE FIGHTS`
+- **Mnemonic Keyword:** `Mnemonics – BRAVE FIGHTS`
 - **Formula / Expansion:**
   - (**Note – har alphabet ke according unhone revolt nahi kiya. To thoda E and I ke liye adjust kiya hai. Ap bhi adjust kariye isi ke sath) B -** Bhil Revolt (1818-1831)
   - **R:** Rangpur Dhing (1783)
@@ -420,7 +462,7 @@
 
 ###### Mnemonic 12: Why 1857 a watershed moment in British Raj
 
-- **Mnemonic Keyword:** `Mnemonics – “WATERSHED”`
+- **Mnemonic Keyword:** `Mnemonics – WATERSHED`
 - **Formula / Expansion:**
   - **W:** Widespread Rebellion
   - **A:** Administrative Changes
@@ -691,7 +733,7 @@
 
 ###### Mnemonic 88: Role of Peasant in the Indian freedom struggle
 
-- **Mnemonic Keyword:** `Mnemonics – “PEASANT REVOLT”`
+- **Mnemonic Keyword:** `Mnemonics – PEASANT REVOLT`
 - **Formula / Expansion:**
   - **P:** Participation in Movements
   - **E:** Economic Protests
@@ -944,7 +986,7 @@
 
 ###### Mnemonic 20: Contribution of Dayanand Saraswati in the socio religious movement
 
-- **Mnemonic Keyword:** `Mnemonics – “DAYANAND SARASWATI`
+- **Mnemonic Keyword:** `Mnemonics – DAYANAND SARASWATI`
 - **Formula / Expansion:**
   - **D:** Dharma Revival
   - **A:** Abolition of Caste Discrimination
@@ -1069,12 +1111,6 @@
 #### Microtopic: Freedom Struggle-various stages, important contributors/contributions from different parts of the country
 
 ##### Subtopic: Acts and their Features
-
-###### Mnemonic S. No.: Theme (I HAVE BROADLY FOLLOWED THE SEQUENCE FACTS / THEMES / ARRANGEMENT AS PER THE TIMELINE / NEED OF THEME) Note: Where-ever I have written Features / characteristic, you can see them as themes / components / aspects etc. too. They will give you a brief idea of the same.
-
-- **Mnemonic Keyword:** `Related Mnemonics to remember it (we have kept the keywords)`
-- **Explanation & Examples:**
-      **Explanation of Mnemonics with Example (in case you need it for value addition)**
 
 ###### Mnemonic 11: Impact of the Revolt of 1857
 
@@ -1202,7 +1238,7 @@
 - **Formula / Expansion:**
   - S** – Suppress Discontent **A** – All India Congress **F** – Foster Loyalty **E** – Encourage Dialogue **T** – Temper Agitation **Y** – Yield Political Space **V** – Vent Grievances **A** – Avoid Revolt **L** – Legitimate Forum **V** – Voice Concerns **E** – Engage Elites
 - **Explanation & Examples:**
-      **Hume formed the Congress with the idea that it would prove to be a 'safety valve' for releasing the growing discontent of the Indians**
+  - ❖ **Hume formed the Congress with the idea that it would prove to be a 'safety valve' for releasing the growing discontent of the Indians**
   - ❖ **S – Suppress Discontent**
     - • **Explanation:** The colonial authorities aimed to suppress potential discontent and unrest by providing an outlet for political expression within the framework they controlled. The INC, initially seen as a moderate and loyalist organization, was allowed to function to channel grievances peacefully.
   - ❖ **A – All India Congress**
@@ -1228,7 +1264,7 @@
 
 ###### Mnemonic 24: Role/Features/Characteristi cs of Swadeshi Movement in British India
 
-- **Mnemonic Keyword:** `Mnemonics – “SWADESHI”`
+- **Mnemonic Keyword:** `Mnemonics – SWADESHI`
 - **Formula / Expansion:**
   - **S:** Self-reliance
   - **W:** Wealth empowerment
@@ -1266,7 +1302,7 @@
 
 ###### Mnemonic 26: Role/Feature/Characteristic s of the Moderates in the freedom movement
 
-- **Mnemonic Keyword:** `MODERATES”`
+- **Mnemonic Keyword:** `MODERATES`
 - **Formula / Expansion:**
   - **M:** Mainstream Leaders
   - **O:** Organizational Strength
@@ -1308,7 +1344,7 @@
 
 ###### Mnemonic 28: Role/ Features / Characteristic of extremists in the freedom movement
 
-- **Mnemonic Keyword:** `“EXTREMISTS`
+- **Mnemonic Keyword:** `EXTREMISTS`
 - **Formula / Expansion:**
   - **E:** Energized Leadership
   - **X:** Xenophobic Opposition
@@ -1483,7 +1519,7 @@
 
 ###### Mnemonic 40: Impact of Royal Indian Navy (R.I.N) mutiny on British Rule in India
 
-- **Mnemonic Keyword:** `Mnemonics – “RIN MUTINY IMPACT”`
+- **Mnemonic Keyword:** `Mnemonics – RIN MUTINY IMPACT`
 - **Formula / Expansion:**
   - **R:** Revolutionary Spirit
   - **I:** Immediate Spread of Unrest
@@ -1549,7 +1585,7 @@
 
 ###### Mnemonic 41: Impact of Cabinet Mission on Indian Independence
 
-- **Mnemonic Keyword:** `Mnemonics – “CABINET MISSION”`
+- **Mnemonic Keyword:** `Mnemonics – CABINET MISSION`
 - **Formula / Expansion:**
   - **C:** Constituent Assembly Formation
   - **A:** Avoidance of Partition
@@ -1735,7 +1771,7 @@
 
 ###### Mnemonic 45: Impact of Government of India Act 1935 on Indian constitution
 
-- **Mnemonic Keyword:** `GOVERNANCE ACT”`
+- **Mnemonic Keyword:** `GOVERNANCE ACT`
 - **Formula / Expansion:**
   - **G:** Greater Provincial Autonomy
   - **O:** Office of the Governor- General
@@ -1835,7 +1871,7 @@
 
 ###### Mnemonic 51: Railway acted as catalyst of complete colonization in India
 
-- **Mnemonic Keyword:** `“RAILWAYS COLONY”`
+- **Mnemonic Keyword:** `RAILWAYS COLONY`
 - **Formula / Expansion:**
   - **R:** Resource Extraction
   - **A:** Administrative Control
@@ -1897,7 +1933,7 @@
 
 ###### Mnemonic 52: Railway acted as catalyst of industrial revolution in Europe
 
-- **Mnemonic Keyword:** `“RAIL ROAD SYSTEM”`
+- **Mnemonic Keyword:** `RAIL ROAD SYSTEM`
 - **Formula / Expansion:**
   - **R:** Rapid Industrial Growth
   - **A:** Accessibility of Markets
@@ -1959,7 +1995,7 @@
 
 ###### Mnemonic 58: Role of Warren hasting and his impact on India
 
-- **Mnemonic Keyword:** `Mnemonics – “HASTINGS REVAMP”`
+- **Mnemonic Keyword:** `Mnemonics – HASTINGS REVAMP`
 - **Formula / Expansion:**
   - **H:** Hastening Centralization
   - **A:** Administrative Reforms
@@ -2224,7 +2260,7 @@
 
 ###### Mnemonic 63: Role of Lord Canning and his impact on India
 
-- **Mnemonic Keyword:** `“CANNING RESTRUCTURE”`
+- **Mnemonic Keyword:** `CANNING RESTRUCTURE`
 - **Formula / Expansion:**
   - **C:** Consolidation of Power
   - **A:** Abolition of East India Company Rule
@@ -2564,7 +2600,7 @@
 
 ###### Mnemonic 69: Character of Gandhi’s Nationalism
 
-- **Mnemonic Keyword:** `Mnemonics – “NATIONALISM”`
+- **Mnemonic Keyword:** `Mnemonics – NATIONALISM`
 - **Formula / Expansion:**
   - **N:** Non-Violence (Ahimsa**) A -** All-Inclusive Approach
   - **T:** Truth (Satya)
@@ -2616,7 +2652,7 @@
 
 ###### Mnemonic 70: Role of Mahatma Gandhi in the Indian Independence movement
 
-- **Mnemonic Keyword:** `Mnemonics – “GANDHIAN IDEALS`
+- **Mnemonic Keyword:** `Mnemonics – GANDHIAN IDEALS`
 - **Formula / Expansion:**
   - **G:** Grassroots Mobilization
   - **A:** Advocacy of Non- Violence (Ahimsa)
@@ -2678,7 +2714,7 @@
 
 ###### Mnemonic 71: Role of Satyagraha of Gandhi
 
-- **Mnemonic Keyword:** `Mnemonics – “SATYAGRAHA”`
+- **Mnemonic Keyword:** `Mnemonics – SATYAGRAHA`
 - **Formula / Expansion:**
   - **S:** Salt March
   - **A:** Ahimsa
@@ -2720,7 +2756,7 @@
 
 ###### Mnemonic 72: Relevance of Gandhi’s thought in today’s world
 
-- **Mnemonic Keyword:** `Mnemonics – “GANDHI'S THOUGHT”`
+- **Mnemonic Keyword:** `Mnemonics – GANDHI'S THOUGHT`
 - **Formula / Expansion:**
   - **G:** Global Peace
   - **A:** Anti-Corruption
@@ -2781,7 +2817,7 @@
 
 ###### Mnemonic 73: Relevance of Nehru’s thought in today’s worlds
 
-- **Mnemonic Keyword:** `Mnemonics – “NEHRU'S VISION`
+- **Mnemonic Keyword:** `Mnemonics – NEHRU'S VISION`
 - **Formula / Expansion:**
   - **N:** Non-Alignment Policy
   - **E:** Emphasis on Secularism
@@ -2889,7 +2925,7 @@
 
 ###### Mnemonic 75: Contribution of Sardar Patel for India
 
-- **Mnemonic Keyword:** `“PATEL'S VISION`
+- **Mnemonic Keyword:** `PATEL'S VISION`
 - **Formula / Expansion:**
   - **P:** Political Integration
   - **A:** Agricultural Reforms
@@ -2903,7 +2939,7 @@
   - **O:** Organization of the State
   - **N:** Nation Building
 - **Explanation & Examples:**
-    - • **P - Political Integration**: Played a crucial role in integrating over 500 princely states into the Indian Union, ensuring the political unity of the country.
+  - ❖ - • **P - Political Integration**: Played a crucial role in integrating over 500 princely states into the Indian Union, ensuring the political unity of the country.
     - • **A - Agricultural Reforms**: Advocated for and implemented reforms to improve agricultural practices and enhance farmers' welfare.
     - • **T - The Iron Man of India**: Earned the nickname for his strong leadership and unwavering determination in unifying India.
     - • **E - Economic Development**: Promoted economic policies and infrastructure development to foster growth and modernization in post-independence India.
@@ -2918,7 +2954,7 @@
 
 ###### Mnemonic 76: Contribution of S.C. BOSE in the Indian freedom struggle
 
-- **Mnemonic Keyword:** `Mnemonics – “SCBOSE FREEDOM”`
+- **Mnemonic Keyword:** `Mnemonics – SCBOSE FREEDOM`
 - **Formula / Expansion:**
   - **S:** Strategic Alliances
   - **C:** Creation of Azad Hind Government
@@ -2976,7 +3012,7 @@
 
 ###### Mnemonic 77: Ambedkar’s contribution towards downtrodden sections of the society
 
-- **Mnemonic Keyword:** `“DALIT SOCIAL CHANGES”`
+- **Mnemonic Keyword:** `DALIT SOCIAL CHANGES`
 - **Formula / Expansion:**
   - **D:** Drafting the Constitution
   - **A:** Abolition of Untouchability
@@ -3054,7 +3090,7 @@
 
 ###### Mnemonic 78: Ambedkar’s contribution towards Indian constitution
 
-- **Mnemonic Keyword:** `CONSTITUTIONAL”`
+- **Mnemonic Keyword:** `CONSTITUTIONAL`
 - **Formula / Expansion:**
   - **C:** Champion of Social Justice
   - **O:** Opposition to Untouchability
@@ -3115,7 +3151,7 @@
 
 ###### Mnemonic 79: Differences of thought between. GANDHI and AMBEDKAR
 
-- **Mnemonic Keyword:** `GANDHI AMBEDKAR”`
+- **Mnemonic Keyword:** `GANDHI AMBEDKAR`
 - **Formula / Expansion:**
   - **G:** Gandhian Spirituality vs. Rationalist Approach
   - **A:** Ahimsa vs. Assertive Action
@@ -3218,7 +3254,7 @@
 
 ###### Mnemonic 81: Difference of thought between Gandhi and Tagore
 
-- **Mnemonic Keyword:** `Mnemonics – “GANDHI TAGORE”`
+- **Mnemonic Keyword:** `Mnemonics – GANDHI TAGORE`
 - **Formula / Expansion:**
   - **G:** Grassroots Development vs. Global Humanism
   - **A:** Ahimsa (Non-violence) vs. Artistic Expression
@@ -3410,7 +3446,7 @@
 
 ###### Mnemonic 3: Role of EIC in establishing an empire in India
 
-- **Mnemonic Keyword:** `EAST INDIA”`
+- **Mnemonic Keyword:** `EAST INDIA`
 - **Formula / Expansion:**
   - **E:** Economic Exploitation
   - **A:** Administrative Control
@@ -3466,7 +3502,7 @@
   - **R:** Rich Resources: Economic benefits from control.
   - **S:** Strategic Military Location: Base for further campaigns.
 - **Explanation & Examples:**
-      **To remember the reasons why there were so many battles at Panipat, you can use the mnemonic "P.A.N.I.P.A.T. W.A.R.S." Here’s how each letter corresponds to a reason:**
+  - ❖ **To remember the reasons why there were so many battles at Panipat, you can use the mnemonic "P.A.N.I.P.A.T. W.A.R.S." Here’s how each letter corresponds to a reason:**
   - ❖ **P - Proximity to Delhi**
     - • **Explanation:** Panipat's location is just 90 kilometers north of Delhi, making it a strategic gateway to the capital. Control over Panipat often meant easier access to Delhi, which was a major political and economic center.
     - • **Example:** The First Battle of Panipat (1526) was fought between Babur and Ibrahim Lodi, where Babur’s victory paved the way for the establishment of the Mughal Empire in India by capturing Delhi.
@@ -3503,7 +3539,7 @@
 
 ###### Mnemonic 5: Why battle of Panipat is important
 
-- **Mnemonic Keyword:** `“GREAT MARATHA”`
+- **Mnemonic Keyword:** `GREAT MARATHA`
 - **Formula / Expansion:**
   - **G:** Great Powers Involved
   - **R:** Reshaped Political Boundaries
@@ -3555,7 +3591,7 @@
 
 ###### Mnemonic 6: Significance of Battle of Plassey
 
-- **Mnemonic Keyword:** `Mnemonics – “TURNING POINT BATTLE`
+- **Mnemonic Keyword:** `Mnemonics – TURNING POINT BATTLE`
 - **Formula / Expansion:**
   - **T:** Trade Dominance Established
   - **U:** Undermining Local Powers
@@ -3632,7 +3668,7 @@
 
 ###### Mnemonic 7: After battle of Plassey, how did India transit from medieval to Modern age
 
-- **Mnemonic Keyword:** `Mnemonics – “PLASSEY CHANGE”`
+- **Mnemonic Keyword:** `Mnemonics – PLASSEY CHANGE`
 - **Formula / Expansion:**
   - **P:** Political Domination
   - **L:** Legal Reforms
@@ -3690,7 +3726,7 @@
 
 ###### Mnemonic 8: Significance of battle of Buxar
 
-- **Mnemonic Keyword:** `Mnemonics – “BUXAR VICTORY “`
+- **Mnemonic Keyword:** `Mnemonics – BUXAR VICTORY`
 - **Formula / Expansion:**
   - **B:** British Supremacy Established
   - **U:** Unification of British Power
@@ -3844,7 +3880,7 @@
 
 ###### Mnemonic 21: Contribution of Indian renaissance to the Modern India
 
-- **Mnemonic Keyword:** `Mnemonics – “RENAISSANCE”`
+- **Mnemonic Keyword:** `Mnemonics – RENAISSANCE`
 - **Formula / Expansion:**
   - **R:** Reform in Social Practices
   - **E:** Educational Advancements
@@ -3943,7 +3979,7 @@
 
 ###### Mnemonic 25: Significance of Swadeshi movement to Indian freedom struggle.
 
-- **Mnemonic Keyword:** `Mnemonics – “SELF RELIANT`
+- **Mnemonic Keyword:** `Mnemonics – SELF RELIANT`
 - **Formula / Expansion:**
   - **S:** Strengthened National Identity
   - **E:** Economic Independence
@@ -3993,7 +4029,7 @@
 
 ###### Mnemonic 27: Limitations of the Moderates in the freedom movement
 
-- **Mnemonic Keyword:** `LIMITATION”`
+- **Mnemonic Keyword:** `LIMITATION`
 - **Formula / Expansion:**
   - **L:** Lack of Radicalism
   - **I:** Ineffectiveness of Petitions
@@ -4039,7 +4075,7 @@
 
 ###### Mnemonic 29: Limitation of Extremists in the freedom struggle of Indian Independence
 
-- **Mnemonic Keyword:** `Mnemonics – “BAL TILAK`
+- **Mnemonic Keyword:** `Mnemonics – BAL TILAK`
 - **Formula / Expansion:**
   - **B:** Boycott Limitations
   - **A:** Alienation of Moderates
@@ -4077,7 +4113,7 @@
 
 ###### Mnemonic 30: Reasons behind the growth of the revolutionary movement in India
 
-- **Mnemonic Keyword:** `Mnemonics – “BHAGAT SINGH`
+- **Mnemonic Keyword:** `Mnemonics – BHAGAT SINGH`
 - **Formula / Expansion:**
   - **B:** British Oppression
   - **H:** Hunger for Immediate Change
@@ -4197,7 +4233,7 @@
 
 ###### Mnemonic 32: New Voices in Indian freedom struggle during 20 th century
 
-- **Mnemonic Keyword:** `Mnemonics – “NEW VOICES”`
+- **Mnemonic Keyword:** `Mnemonics – NEW VOICES`
 - **Formula / Expansion:**
   - **N:** Nationalist Leaders
   - **E:** Emerging Political Parties
@@ -4239,7 +4275,7 @@
 
 ###### Mnemonic 33: New Ideologies in Indian freedom struggle during 20 th century
 
-- **Mnemonic Keyword:** `Mnemonics – “IDEAS FOR INDIA”`
+- **Mnemonic Keyword:** `Mnemonics – IDEAS FOR INDIA`
 - **Formula / Expansion:**
   - **I:** Ideologies of Radical Nationalism
   - **D:** Democratic Socialism
@@ -4295,7 +4331,7 @@
 
 ###### Mnemonic 34: Role of socialist Ideas in the Indian freedom struggle
 
-- **Mnemonic Keyword:** `Mnemonics – “SOCIALISM”`
+- **Mnemonic Keyword:** `Mnemonics – SOCIALISM`
 - **Formula / Expansion:**
   - **S:** Socioeconomic Equality
   - **O:** Organized Labour Movements
@@ -4337,7 +4373,7 @@
 
 ###### Mnemonic 37: Why salt was chosen for Civil Disobedience movement
 
-- **Mnemonic Keyword:** `Mnemonics – “CHALLENGE TAX”`
+- **Mnemonic Keyword:** `Mnemonics – CHALLENGE TAX`
 - **Formula / Expansion:**
   - **C:** Common Necessity
   - **H:** Heavy Taxation
@@ -4391,7 +4427,7 @@
 
 ###### Mnemonic 38: Why Cripps mission was a post-dated cheque
 
-- **Mnemonic Keyword:** `MNEMONICS – “CRIPPS MISSION”`
+- **Mnemonic Keyword:** `MNEMONICS – CRIPPS MISSION`
 - **Formula / Expansion:**
   - **C:** Conditional Promises
   - **R:** Retention of British Control
@@ -4489,62 +4525,9 @@
     - • **Explanation:** Nationalist aspirations among both Hindus and Muslims were sometimes at odds, leading to conflicting visions for the future of India.
     - • **Example:** The Indian National Congress aimed for a united and secular India, while the Muslim League sought an independent state where Muslims could exercise sovereignty.
 
-###### Mnemonic : – SO, DIVIDE AND RULE OVER THE EXAMINER MIND.)
-
-- **Mnemonic Keyword:** ``
-- **Formula / Expansion:**
-  - **L:** Linguistic Diversity
-  - **A:** Assertive Political Activism
-  - **R:** Resistance through Censorship Challenges
-  - **P:** Polarization within Indian Society
-  - **R:** Regional Focus Limitation
-  - **E:** Economic Vulnerability
-  - **S:** Suppression of Radical Views
-  - **S:** Sensationalism and Misinformation
-- **Explanation & Examples:**
-  - ❖ **R - Resistance against Colonial Policies**
-    - • **Strengthen:** The vernacular press was instrumental in opposing oppressive colonial policies and laws.
-    - • **Example:** The Hindu Patriot was critical in mobilizing support against the Indigo Rebellion (1859-1860), exposing the exploitation of indigo planters by the British. The press helped unite various sections of society against such economic injustices.
-  - ❖ **N - National Unity**
-    - • **Strengthen:** It promoted national unity by highlighting shared struggles across different regions.
-    - • **Example:** Vernacular publications like Gyan Prakash and Sudharak highlighted events and issues from various parts of India, fostering a sense of unity among readers who shared similar struggles against colonial rule.
-  - ❖ **A - Awareness and Education**
-    - • **Strengthen:** The press educated the public about their rights and the importance of self- rule.
-    - • **Example:** Newspapers like **Bangavasi** and **Sanjibani** focused on educating the masses about their political rights and duties, encouraging participation in the freedom struggle.
-  - ❖ **C - Cultural Revival**
-    - • **Strengthen:** The vernacular press played a significant role in the cultural revival, promoting Indian languages, literature, and traditions.
-    - • **Example:** Anandamath**,** serialized in the magazine Bangadarshan by Bankim Chandra Chatterjee, inspired cultural nationalism by depicting the struggle against British rule and reviving pride in Indian heritage.
-  - ❖ **U - Uncovering Colonial Injustices**
-    - • **Strengthen:** It exposed colonial injustices and atrocities, fueling anger and resistance.
-    - • **Example:** The Hind Swaraj by Mahatma Gandhi, although written in Gujarati, critiqued Western civilization and British rule, encouraging readers to understand the deeper motives of colonial exploitation.
-  - ❖ **L - Linguistic Diversity**
-    - • **Strengthen:** By publishing in multiple languages, the vernacular press reached diverse linguistic communities.
-    - • **Example:** Papers like Swadeshmitran (Tamil) and Sandhya (Bengali) catered to specific linguistic groups, ensuring that the freedom struggle's message reached every corner of India, irrespective of language barriers.
-    - • **A - Assertive Political Activism**
-    - • **Strengthen:** The press was assertive in political activism, encouraging direct action against colonial rule.
-    - • **Example:** The editorials in Maharatta called for active participation in protests and boycotts, urging readers to take tangible actions against British policies.
-  - ❖ **R - Resistance through Censorship Challenges**
-    - • **Weaken:** The colonial government often censored or banned vernacular publications, limiting their reach and impact.
-    - • **Example:** The Vernacular Press Act of 1878 was specifically designed to curb the power of the Indian press, leading to closures and self-censorship. This law, enacted by Lord Lytton, was used to silence dissent and prevent the spread of nationalist sentiments.
-  - ❖ **P - Polarization within Indian Society**
-    - • **Weaken:** Sometimes, the press exacerbated divisions within Indian society by emphasizing communal or regional differences.
-    - • **Example:** Certain publications focused on religious or ethnic identities, potentially heightening tensions between communities and diverting attention from the common national goal. Papers like Urdu-e-Mualla were accused of fostering Muslim separatism by focusing on Muslim grievances under colonial rule.
-  - ❖ **R - Regional Focus Limitation**
-    - • **Weaken:** A strong regional focus occasionally limited the broader national perspective.
-    - • **Example:** Some vernacular publications primarily addressed local issues, which could detract from the national movement by fragmenting attention. Sandes**h** in Bengal focused extensively on local issues, which, while important, sometimes detracted from the broader nationalist narrative.
-  - ❖ **E - Economic Vulnerability**
-    - • **Weaken:** Many vernacular newspapers struggled financially, making them susceptible to shutdowns or influence.
-    - • **Example:** British authorities often used financial pressure to weaken critical publications, offering incentives to pro-government editors or simply forcing closures through economic means.
-  - ❖ **S - Suppression of Radical Views**
-    - • **Weaken:** Radicals within the freedom struggle sometimes felt that the vernacular press was too moderate.
-    - • **Example:** Revolutionaries like Bhagat Singh criticized some sections of the vernacular press for not fully endorsing armed struggle, believing it hindered the movement's progress. The conservative nature of some vernacular papers often led to self-censorship, diluting the impact of more aggressive nationalistic messages.
-  - ❖ **S - Sensationalism and Misinformation**
-    - • **Weaken:** Occasionally, the press engaged in sensationalism or misinformation, affecting credibility.
-    - • **Example:** Sensational reporting without verification could lead to misunderstandings or misdirection within the movement. Unverified reports of British troop movements or plans were published by papers like **Kesari**, which sometimes led to unnecessary panic or misdirected efforts.
-
 ###### Mnemonic 54: Pattern of commercialization of agriculture in 19 th century
 
-- **Mnemonic Keyword:** `Mnemonics – “COMMERCIAL AGRICULTURE”`
+- **Mnemonic Keyword:** `Mnemonics – COMMERCIAL AGRICULTURE`
 - **Formula / Expansion:**
   - **C:** Cash Crops Dominance
   - **O:** Overseas Markets
@@ -4688,7 +4671,7 @@
 
 ###### Mnemonic 82: Role of women in the freedom struggle
 
-- **Mnemonic Keyword:** `Mnemonics – “FREEDOMS”`
+- **Mnemonic Keyword:** `Mnemonics – FREEDOMS`
 - **Formula / Expansion:**
   - **F:** Fearless leaders. **R** – Resistance
   - **E:** Educational pioneers.
@@ -4778,7 +4761,7 @@
 
 ###### Mnemonic 85: Role of students in the Indian freedom struggle
 
-- **Mnemonic Keyword:** `Mnemonics – “STUDENTS RISE”`
+- **Mnemonic Keyword:** `Mnemonics – STUDENTS RISE`
 - **Formula / Expansion:**
   - **S:** Satyagraha Participation
   - **T:** Transformative Leadership
@@ -4832,7 +4815,7 @@
 
 ###### Mnemonic 86: Role of youth in the Indian freedom struggle
 
-- **Mnemonic Keyword:** `Mnemonics – “YOUTH FOR FREEDOM”`
+- **Mnemonic Keyword:** `Mnemonics – YOUTH FOR FREEDOM`
 - **Formula / Expansion:**
   - **Y:** Youth Leadership
   - **O:** Organized Protests
@@ -4898,7 +4881,7 @@
 
 ###### Mnemonic 87: Role of Muslims in the Indian freedom struggle
 
-- **Mnemonic Keyword:** `Mnemonics – “MUSLIMS FOR FREEDOM”`
+- **Mnemonic Keyword:** `Mnemonics – MUSLIMS FOR FREEDOM`
 - **Formula / Expansion:**
   - **M:** Muslim League's Role
   - **U:** Uprising Against British Rule
@@ -4972,7 +4955,7 @@
 
 ###### Mnemonic 89: Role of Middle class in the Indian freedom struggle
 
-- **Mnemonic Keyword:** `Mnemonics – “MIDDLE CLASS RISE”`
+- **Mnemonic Keyword:** `Mnemonics – MIDDLE CLASS RISE`
 - **Formula / Expansion:**
   - **M:** Mass Mobilization
   - **I:** Intellectual Leadership
@@ -5038,7 +5021,7 @@
 
 ###### Mnemonic 90: Role of business class in the Indian freedom struggle
 
-- **Mnemonic Keyword:** `“BUSINESS CLASS”`
+- **Mnemonic Keyword:** `BUSINESS CLASS`
 - **Formula / Expansion:**
   - **B:** Backing Political Movements
   - **U:** Use of Indigenous Products
@@ -5096,7 +5079,7 @@
 
 ###### Mnemonic 91: Role of princely states in Indian freedom struggle
 
-- **Mnemonic Keyword:** `Mnemonics – “PRINCELY STATES”`
+- **Mnemonic Keyword:** `Mnemonics – PRINCELY STATES`
 - **Formula / Expansion:**
   - **P:** Political Manoeuvring
   - **R:** Resistance and Rebellion
@@ -5158,7 +5141,7 @@
 
 ###### Mnemonic 92: Contribution of foreigners to Indian freedom struggle (Note – from examples, you can have enough number of foreigner names in case they ask. But use it cautiously as at some places I have shown how Indians were supported in the foreign land for the cause of Indian Freedom Struggle.)
 
-- **Mnemonic Keyword:** `Mnemonics – “FOREIGN HEROES”`
+- **Mnemonic Keyword:** `Mnemonics – FOREIGN HEROES`
 - **Formula / Expansion:**
   - **F:** Freedom Fighters
   - **O:** Overseas Support
@@ -5303,3 +5286,4 @@
 ##### Subtopic: World wars
 
 *No mnemonics currently listed under this subtopic.*
+

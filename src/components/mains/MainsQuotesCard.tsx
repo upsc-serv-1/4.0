@@ -38,6 +38,34 @@ export default function MainsQuotesCard({
     }
   };
 
+  const isConnectingWords = item.subtopic === 'Essay Connectors' || item.category === 'Connecting Words';
+
+  const connectingWordsMarkdownStyle = {
+    ...getMarkdownStyles(colors),
+    body: {
+      color: colors.textPrimary,
+      fontSize: 14.5 * zoomScale,
+      lineHeight: 22 * zoomScale,
+      fontWeight: '500' as const,
+      fontStyle: 'normal' as const,
+      textAlign: 'left' as const,
+    },
+    paragraph: {
+      marginVertical: 4,
+      textAlign: 'left' as const,
+    },
+    bullet_list: {
+      marginVertical: 4,
+    },
+    list_item: {
+      marginVertical: 4,
+    },
+    strong: {
+      fontWeight: '800' as const,
+      color: colors.textPrimary,
+    }
+  };
+
   const isQuote = item.entry_type === 'quote' || !item.entry_type;
   const isAnecdote = item.entry_type === 'anecdote';
 
@@ -108,11 +136,14 @@ export default function MainsQuotesCard({
           localStyles.quoteWrapper, 
           { 
             backgroundColor: colors.isDark ? 'rgba(217,119,6,0.04)' : 'rgba(217,119,6,0.03)',
-            borderColor: colors.isDark ? 'rgba(217,119,6,0.2)' : 'rgba(217,119,6,0.12)'
+            borderColor: colors.isDark ? 'rgba(217,119,6,0.2)' : 'rgba(217,119,6,0.12)',
+            alignItems: isConnectingWords ? 'stretch' : 'center',
           }
         ]}>
-          <Text style={[localStyles.quoteMark, { color: colors.isDark ? 'rgba(245,158,11,0.15)' : 'rgba(180,83,9,0.1)' }]}>“</Text>
-          <Markdown style={quoteTextMarkdownStyle}>
+          {!isConnectingWords && (
+            <Text style={[localStyles.quoteMark, { color: colors.isDark ? 'rgba(245,158,11,0.15)' : 'rgba(180,83,9,0.1)' }]}>“</Text>
+          )}
+          <Markdown style={isConnectingWords ? connectingWordsMarkdownStyle : quoteTextMarkdownStyle}>
             {cleanMarkdownContent(displayQuoteText)}
           </Markdown>
           

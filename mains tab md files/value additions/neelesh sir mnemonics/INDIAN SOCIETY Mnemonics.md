@@ -10,7 +10,7 @@
 
 ###### Mnemonic 3: Which features of Vedic Society and Religion continue to thrive even today
 
-- **Mnemonic Keyword:** `“VEDIC ROOTS”`
+- **Mnemonic Keyword:** `VEDIC ROOTS`
 - **Formula / Expansion:**
   - **V:** Veneration of Nature
   - **E:** Emphasis on Knowledge and Learning
@@ -56,7 +56,7 @@
 
 ###### Mnemonic 4: Various forms of Diversity in India
 
-- **Mnemonic Keyword:** `Mnemonics – “DIVERSE INDIA”`
+- **Mnemonic Keyword:** `Mnemonics – DIVERSE INDIA`
 - **Formula / Expansion:**
   - **D:** Diverse Religions
   - **I:** Indigenous Tribes
@@ -110,7 +110,7 @@
 
 ###### Mnemonic 5: How unity is maintained despite diversity in India
 
-- **Mnemonic Keyword:** `Mnemonics – “NATIONAL IDENTITY”`
+- **Mnemonic Keyword:** `Mnemonics – NATIONAL IDENTITY`
 - **Formula / Expansion:**
   - **N:** National Symbols and Institutions
   - **A:** Adherence to Constitutional Values
@@ -180,7 +180,7 @@
 
 ###### Mnemonic 7: Factors threatening India’s diversity
 
-- **Mnemonic Keyword:** `Mnemonics – “DISRUPTIVE”`
+- **Mnemonic Keyword:** `Mnemonics – DISRUPTIVE`
 - **Formula / Expansion:**
   - **D:** Discrimination
   - **I:** Intolerance
@@ -226,7 +226,7 @@
 
 ###### Mnemonic 8: How to address the threats to diversity in India / How to promote Unity in India
 
-- **Mnemonic Keyword:** `Mnemonics – “TEACH TOLERANCE”`
+- **Mnemonic Keyword:** `Mnemonics – TEACH TOLERANCE`
 - **Formula / Expansion:**
   - **T:** Tolerance
   - **E:** Education
@@ -288,7 +288,7 @@
 
 ###### Mnemonic 43: Positive Impact of Globalization on Cultural Diversity in India
 
-- **Mnemonic Keyword:** `Mnemonics – “CIVILISATION GAIN”`
+- **Mnemonic Keyword:** `Mnemonics – CIVILISATION GAIN`
 - **Formula / Expansion:**
   - **C:** Cultural Exchange
   - **I:** International Recognition
@@ -356,72 +356,9 @@
     - • **Explanation**: Globalization creates networking opportunities for Indian cultural professionals and organizations.
     - • **Example**: **Indian filmmakers** and **artists** network with international peers at global festivals and conferences.
 
-###### Mnemonic : on Cultural Diversity in India
-
-- **Mnemonic Keyword:** ``
-- **Formula / Expansion:**
-  - **N:** Neglect of Indigenous Practices
-  - **D:** Dilution of Traditional Knowledge
-  - **E:** Erosion of Local Languages
-  - **R:** Rise in Cultural Commodification
-  - **V:** Vanishing Local Festivals
-  - **A:** Assimilation of Local Customs
-  - **L:** Loss of Unique Cultural Identity
-  - **U:** Undermining of Local Arts
-  - **E:** Erosion of Local Traditions
-  - **L:** Loss of Unique Cultural Identity
-  - **O:** Overemphasis on Global Culture
-  - **C:** Commercialization of Heritage
-  - **A:** Anonymity of Local Artisans
-  - **L:** Lesser Importance Given to Traditional Skills
-- **Explanation & Examples:**
-    - • **Example**: **International fast-food chains** like **KFC and Pizza Hut** becoming more common, leading to the decline in popularity of traditional street food.
-  - ❖ **N – Neglect of Indigenous Practices**
-    - • **Explanation**: Indigenous customs and practices may be neglected or overshadowed by global trends.
-    - • **Example**: **Local festivals** such as **Chhau dance** in Jharkhand might receive less attention compared to global entertainment options.
-  - ❖ **D – Dilution of Traditional Knowledge**
-    - • **Explanation**: Traditional knowledge and practices can become diluted as global culture permeates.
-    - • **Example**: **Traditional medicinal practices** like **Ayurveda** may lose prominence as Western medicine becomes more dominant.
-  - ❖ **E – Erosion of Local Languages**
-    - • **Explanation**: The dominance of global languages like English can lead to the erosion of regional languages.
-    - • **Example**: **Local languages** such as **Kannada** and **Telugu** might be less used in education and media compared to English.
-  - ❖ **R – Rise in Cultural Commodification**
-    - • **Explanation**: Cultural practices may be commercialized, losing their original significance.
-    - • **Example**: **Handicrafts** like **Madhubani paintings** may be mass-produced for commercial purposes, diminishing their traditional value.
-  - ❖ **V – Vanishing Local Festivals**
-    - • **Explanation**: Some local festivals may become less celebrated as global events gain popularity.
-    - • **Example**: **Regional festivals** like **Baisakhi** might see reduced observance in favor of globally recognized holidays.
-  - ❖ **A – Assimilation of Local Customs**
-    - • **Explanation**: Local customs may be assimilated into broader global practices, leading to a loss of distinctiveness.
-    - • **Example**: **Traditional wedding ceremonies** may incorporate Western elements, overshadowing indigenous rituals.
-  - ❖ **L – Loss of Unique Cultural Identity**
-    - • **Explanation**: The unique cultural identity of regions may be compromised as global culture prevails.
-    - • **Example**: **Traditional attire** like **Saris** and **Sherwanis** may be less worn in favor of Western clothing styles.
-  - ❖ **U – Undermining of Local Arts**
-    - • **Explanation**: Local arts and performances may struggle to compete with global entertainment options.
-    - • **Example**: **Traditional dance forms** like **Kathakali** may receive less attention compared to global entertainment.
-  - ❖ **E – Erosion of Local Traditions**
-    - • **Explanation:** Globalization can lead to the weakening or disappearance of traditional customs and practices as global influences overshadow them.
-    - • **Example:** Traditional arts like Puppetry in Rajasthan may diminish as global entertainment forms, such as video games, gain popularity among younger generations.
-  - ❖ **L – Loss of Unique Cultural Identity**
-    - • Explanation: The unique aspects of local cultures can be lost as global culture becomes more dominant and assimilates diverse traditions.
-    - • Example: Regional festivals like Pongal in Tamil Nadu might lose their unique identity as Western holidays gain more popularity and commercial emphasis.
-  - ❖ **O – Overemphasis on Global Culture**
-    - • Explanation: There is an overemphasis on global culture which can diminish the importance of local traditions and customs.
-    - • Example: Western clothing and fast food are becoming more common in place of traditional attire like Saris and local foods like Dosa.
-  - ❖ **C – Commercialization of Heritage**
-    - • **Explanation**: Heritage and cultural practices might be commercialized, losing their authentic essence.
-    - • **Example**: **Local cultural heritage sites** being marketed primarily for tourism rather than preserving their traditional significance.
-  - ❖ **A – Anonymity of Local Artisans**
-    - • **Explanation**: Local artisans and their crafts may become anonymous as global brands dominate the market.
-    - • **Example**: **Local craftspersons** producing **traditional pottery** might be overshadowed by large- scale, global pottery manufacturers.
-  - ❖ **L – Lesser Importance Given to Traditional Skills**
-    - • **Explanation**: Traditional skills and crafts may be undervalued compared to modern skills.
-    - • **Example**: **Traditional weaving techniques** might be less emphasized in Favor of modern, industrial methods.
-
 ###### Mnemonic 69: Features of Indian Tribes
 
-- **Mnemonic Keyword:** `Mnemonics – “TRIBES”`
+- **Mnemonic Keyword:** `Mnemonics – TRIBES`
 - **Formula / Expansion:**
   - **T:** Traditional Practices
   - **R:** Rural Lifestyle
@@ -451,7 +388,7 @@
 
 ###### Mnemonic 70: Features of Indian Tribes which differentiate them from Mainstream society in India
 
-- **Mnemonic Keyword:** `Mnemonics – “DISTINCT”`
+- **Mnemonic Keyword:** `Mnemonics – DISTINCT`
 - **Formula / Expansion:**
   - **D:** Distinct Languages
   - **I:** Indigenous Beliefs
@@ -489,7 +426,7 @@
 
 ###### Mnemonic 71: Challenges faced by Tribal Groups
 
-- **Mnemonic Keyword:** `Mnemonics – “DISPLACEMENT”`
+- **Mnemonic Keyword:** `Mnemonics – DISPLACEMENT`
 - **Formula / Expansion:**
   - **D:** Disruption of Traditional Lifestyles
   - **I:** Inadequate Healthcare
@@ -542,7 +479,7 @@
 
 ###### Mnemonic 72: Solution to the problems of Indian Tribes
 
-- **Mnemonic Keyword:** `Mnemonics – “INCLUSIVITY”`
+- **Mnemonic Keyword:** `Mnemonics – INCLUSIVITY`
 - **Formula / Expansion:**
   - **I:** Improved Access to Education
   - **N:** Nurturing Cultural Preservation
@@ -592,7 +529,7 @@
 
 ###### Mnemonic 73: Uniqueness of tribal knowledge
 
-- **Mnemonic Keyword:** `Mnemonics – “NATURAL WAY”`
+- **Mnemonic Keyword:** `Mnemonics – NATURAL WAY`
 - **Formula / Expansion:**
   - **N:** Nature-Based Wisdom
   - **A:** Adaptation to Environment
@@ -652,15 +589,9 @@
 
 ##### Subtopic: Uniqueness of Indian society
 
-###### Mnemonic S. No: Theme
-
-- **Mnemonic Keyword:** `Mnemonic`
-- **Explanation & Examples:**
-      **Explanation**
-
 ###### Mnemonic 1: SALIENT FEATURES OF INDIAN SOCIETY
 
-- **Mnemonic Keyword:** `Mnemonics – “UNITY IN DIVERSITY”`
+- **Mnemonic Keyword:** `Mnemonics – UNITY IN DIVERSITY`
 - **Formula / Expansion:**
   - **U:** Unique Cultural Heritage
   - **N:** Numerous Languages
@@ -730,7 +661,7 @@
 
 ###### Mnemonic 2: What makes India society Unique in sustaining its culture
 
-- **Mnemonic Keyword:** `Mnemonics – “CULTURE”`
+- **Mnemonic Keyword:** `Mnemonics – CULTURE`
 - **Formula / Expansion:**
   - **C:** Continuity of Traditions
   - **U:** Unity in Diversity
@@ -764,7 +695,7 @@
 
 ###### Mnemonic 6: Factors threatening India’s unity
 
-- **Mnemonic Keyword:** `Mnemonics – “DIVISIVE POLITICS”`
+- **Mnemonic Keyword:** `Mnemonics – DIVISIVE POLITICS`
 - **Formula / Expansion:**
   - **D:** Divisive Social Movements
   - **I:** Identity Politics
@@ -834,7 +765,7 @@
 
 ###### Mnemonic 18: Significance of census data
 
-- **Mnemonic Keyword:** `Mnemonics – “CENSUS FACTS”`
+- **Mnemonic Keyword:** `Mnemonics – CENSUS FACTS`
 - **Formula / Expansion:**
   - **C:** Comprehensive Demographic Data
   - **E:** Economic Planning
@@ -884,7 +815,7 @@
 
 ###### Mnemonic 31: Green Revolution and its social consequences
 
-- **Mnemonic Keyword:** `Mnemonics – “GREEN IMPACT”`
+- **Mnemonic Keyword:** `Mnemonics – GREEN IMPACT`
 - **Formula / Expansion:**
   - **G:** Growing Income Disparities
   - **R:** Rural-Urban Migration
@@ -934,7 +865,7 @@
 
 ###### Mnemonic 32: Transformation in Rural Society after Independence
 
-- **Mnemonic Keyword:** `Mnemonics – “LAND REFORMS”`
+- **Mnemonic Keyword:** `Mnemonics – LAND REFORMS`
 - **Formula / Expansion:**
   - **L:** Land Reforms
   - **A:** Agricultural Modernization
@@ -984,7 +915,7 @@
 
 ###### Mnemonic 55: Positive Impact of globalisation on Indian Family
 
-- **Mnemonic Keyword:** `Mnemonics – “MODERN HEALTH”`
+- **Mnemonic Keyword:** `Mnemonics – MODERN HEALTH`
 - **Formula / Expansion:**
   - **M:** Modern Employment Opportunities
   - **O:** Outreach to Global Education
@@ -1038,7 +969,7 @@
 
 ###### Mnemonic 56: Negative Impact of Globalisation on Indian Family
 
-- **Mnemonic Keyword:** `Mnemonics – “FRAGMENTATION”`
+- **Mnemonic Keyword:** `Mnemonics – FRAGMENTATION`
 - **Formula / Expansion:**
   - **F:** Family Disintegration
   - **R:** Rise in Stress
@@ -1096,7 +1027,7 @@
 
 ###### Mnemonic 58: Impact of Work from Home on Indian Family
 
-- **Mnemonic Keyword:** `Mnemonics – “WORK LIFE BALANCE”`
+- **Mnemonic Keyword:** `Mnemonics – WORK LIFE BALANCE`
 - **Formula / Expansion:**
   - **W:** Work Flexibility
   - **O:** Overlapping Responsibilities
@@ -1162,7 +1093,7 @@
 
 ###### Mnemonic 86: Issues faced by migrants
 
-- **Mnemonic Keyword:** `Mnemonics – “MIGRANT HARDSHIP”`
+- **Mnemonic Keyword:** `Mnemonics – MIGRANT HARDSHIP`
 - **Formula / Expansion:**
   - **M:** Marginalization in Society
   - **I:** Informal Employment and Exploitation
@@ -1226,48 +1157,9 @@
     - • **Explanation:** Migrants, especially in informal work, have little legal recourse when facing issues like wage theft, exploitation, or eviction.
     - • **Example:** Many migrant laborers are not protected by labor laws and face legal challenges when trying to claim unpaid wages or challenge wrongful dismissal.
 
-###### Mnemonic : outside the country
-
-- **Mnemonic Keyword:** ``
-- **Formula / Expansion:**
-  - **I:** Information Technology Professionals
-  - **N:** Nursing and Medical Professionals
-  - **D:** Development of Skills Abroad
-  - **R:** Research and Innovation
-  - **A:** Attractive Living Standards
-  - **I:** Industrial Demand
-  - **N:** Non-Resident Indians (NRIs) and Diaspora Influence
-- **Explanation & Examples:**
-    - • **Explanation:** Indian migrants abroad send remittances back to their families in India, contributing significantly to the Indian economy.
-    - • **Example:** Migrant workers in the Middle East send remittances to their families in states like Kerala and Punjab, supporting local economies.
-  - ❖ **A – Advanced Education**
-    - • **Explanation:** Indian students migrate to developed countries to pursue higher education in fields like engineering, medicine, and management, contributing to a significant outflow of skilled talent.
-    - • **Example:** A large number of Indian students pursue education in universities in the USA, Canada, the UK, and Australia, especially for postgraduate degrees.
-  - ❖ **I – Information Technology Professionals**
-    - • **Explanation:** A significant trend in Indian migration involves IT professionals moving to countries like the USA, Canada, and Europe, seeking better job opportunities and career growth.
-    - • **Example:** Indian software engineers often move to the USA, particularly Silicon Valley, through the H-1B visa program, driving tech innovation globally.
-  - ❖ **N – Nursing and Medical Professionals**
-    - • **Explanation:** Indian healthcare professionals, especially doctors and nurses, migrate to countries with a higher demand for medical workers, better salaries, and advanced healthcare systems.
-    - • **Example:** Many Indian nurses move to the UK and Gulf countries, filling gaps in healthcare systems and seeking better living conditions.
-  - ❖ **D – Development of Skills Abroad**
-    - • **Explanation:** Indian professionals migrate to develop their skills and gain global experience, which might not be available in India due to resource constraints or limited opportunities.
-    - • **Example:** Engineers and scientists from India migrating to European countries to work in high- tech industries and research institutions.
-  - ❖ **R – Research and Innovation**
-    - • **Explanation:** Indian scholars and scientists often migrate to countries with advanced research facilities and funding opportunities, contributing to the global knowledge economy.
-    - • **Example:** Indian researchers relocating to the USA or Germany to engage in cutting-edge scientific research in fields like AI, biotechnology, and space exploration.
-  - ❖ **A – Attractive Living Standards**
-    - • **Explanation:** Higher living standards, better healthcare, education, and a secure lifestyle in countries like Canada, Australia, and the USA attract Indian migrants.
-    - • **Example:** Skilled professionals, particularly from the middle class, are moving to Canada under its skilled migration programs for better living conditions.
-  - ❖ **I – Industrial Demand**
-    - • **Explanation:** Industrialized countries with aging populations often invite skilled Indian labor to fill workforce gaps in sectors like construction, IT, and healthcare.
-    - • **Example:** Germany's need for skilled IT professionals has led to an influx of Indian tech workers through its Blue Card program.
-  - ❖ **N – Non-Resident Indians (NRIs) and Diaspora Influence**
-    - • **Explanation:** The Indian diaspora plays a key role in influencing migration trends by creating supportive networks for new migrants and maintaining economic and cultural ties with India.
-    - • **Example:** The large Indian-American community, particularly in the IT and healthcare sectors, facilitates further migration through family reunification and professional networks.
-
 ###### Mnemonic 89: Reasons behind growing suicide rates in India
 
-- **Mnemonic Keyword:** `Mnemonics – “DARK SHADOWS”`
+- **Mnemonic Keyword:** `Mnemonics – DARK SHADOWS`
 - **Formula / Expansion:**
   - **D:** Depression and Mental Health Issues
   - **A:** Addiction and Substance Abuse
@@ -1317,7 +1209,7 @@
 
 ###### Mnemonic 90: Reasons why marriage might be seen as losing its sacramental value
 
-- **Mnemonic Keyword:** `Mnemonics – “WEAKENED”`
+- **Mnemonic Keyword:** `Mnemonics – WEAKENED`
 - **Formula / Expansion:**
   - **W:** Widespread Divorce Rates
   - **E:** Evolving Social Norms
@@ -1355,7 +1247,7 @@
 
 ###### Mnemonic 93: Challenges to same- sex marriages in India
 
-- **Mnemonic Keyword:** `“SOCIETAL BLOCKS”`
+- **Mnemonic Keyword:** `SOCIETAL BLOCKS`
 - **Formula / Expansion:**
   - **S:** Social Stigma
   - **O:** Opposition from Traditional Norms
@@ -1417,7 +1309,7 @@
 
 ###### Mnemonic 94: Relevance of Uniform Civil Code in India
 
-- **Mnemonic Keyword:** `“UNIFORM CODE”`
+- **Mnemonic Keyword:** `UNIFORM CODE`
 - **Formula / Expansion:**
   - **U:** Unity in Law
   - **N:** National Integration
@@ -1467,7 +1359,7 @@
 
 ###### Mnemonic 95: Argument against the implementation of Uniform Code in India
 
-- **Mnemonic Keyword:** `“NO CONSENSUS”`
+- **Mnemonic Keyword:** `NO CONSENSUS`
 - **Formula / Expansion:**
   - **N:** Nationalism Concerns
   - **O:** Opposition from Religious Groups
@@ -1526,7 +1418,7 @@
 
 ###### Mnemonic 15: Reasons behind the growing population in India
 
-- **Mnemonic Keyword:** `Mnemonics – “GROWTH FACTOR”`
+- **Mnemonic Keyword:** `Mnemonics – GROWTH FACTOR`
 - **Formula / Expansion:**
   - **G:** General High Birth Rate
   - **R:** Reduced Mortality Rate
@@ -1580,7 +1472,7 @@
 
 ###### Mnemonic 16: Negative Impact of Population growth in INDIA
 
-- **Mnemonic Keyword:** `Mnemonics – “RAPID PRESSURE”`
+- **Mnemonic Keyword:** `Mnemonics – RAPID PRESSURE`
 - **Formula / Expansion:**
   - **R:** Resource Depletion
   - **A:** Air Pollution
@@ -1638,7 +1530,7 @@
 
 ###### Mnemonic 17: Population control measures that need to be taken to control population in India
 
-- **Mnemonic Keyword:** `Mnemonics – “FAMILY PLANS”`
+- **Mnemonic Keyword:** `Mnemonics – FAMILY PLANS`
 - **Formula / Expansion:**
   - **F:** Family Planning Programs
   - **A:** Awareness Campaigns
@@ -1688,7 +1580,7 @@
 
 ###### Mnemonic 21: Relation of poverty and population
 
-- **Mnemonic Keyword:** `Mnemonics – “POPULATION LAG”`
+- **Mnemonic Keyword:** `Mnemonics – POPULATION LAG`
 - **Formula / Expansion:**
   - **P:** Pressure on Resources
   - **O:** Overcrowded Living Conditions
@@ -1746,7 +1638,7 @@
 
 ###### Mnemonic 22: Population Growth is a real problem
 
-- **Mnemonic Keyword:** `Mnemonics – “PROBLEM AREAS”`
+- **Mnemonic Keyword:** `Mnemonics – PROBLEM AREAS`
 - **Formula / Expansion:**
   - **P:** Pressure on Resources
   - **R:** Rising Unemployment
@@ -1800,7 +1692,7 @@
 
 ###### Mnemonic 23: Population Growth is not a real problem in India (Significance of population growth)
 
-- **Mnemonic Keyword:** `Mnemonics – “PROGRESSIVE”`
+- **Mnemonic Keyword:** `Mnemonics – PROGRESSIVE`
 - **Formula / Expansion:**
   - **P:** Population Dividen**d R :** Renewed Innovation
   - **O:** Opportunities for Markets
@@ -1849,7 +1741,7 @@
 
 ###### Mnemonic 48: Positive Impact of globalisation on Ageing Population (Senior Citizens)
 
-- **Mnemonic Keyword:** `Mnemonics – “SENIOR CARE”`
+- **Mnemonic Keyword:** `Mnemonics – SENIOR CARE`
 - **Formula / Expansion:**
   - **S:** Social Connectivity
   - **E:** Economic Opportunities
@@ -1895,7 +1787,7 @@
 
 ###### Mnemonic 49: Negative Impact of globalisation on Ageing Population (Senior Citizens)
 
-- **Mnemonic Keyword:** `Mnemonics – “ISOLATION”`
+- **Mnemonic Keyword:** `Mnemonics – ISOLATION`
 - **Formula / Expansion:**
   - **I:** Increased Loneliness
   - **S:** Social Displacement
@@ -1937,7 +1829,7 @@
 
 ###### Mnemonic 50: Issues faced by the ageing population in general (senior citizens)
 
-- **Mnemonic Keyword:** `Mnemonics – “LONELINESS”`
+- **Mnemonic Keyword:** `Mnemonics – LONELINESS`
 - **Formula / Expansion:**
   - **L:** Lack of Social Support
   - **O:** Outdated Skillsets for Employment
@@ -1983,7 +1875,7 @@
 
 ###### Mnemonic 87: Trends of Migration in India
 
-- **Mnemonic Keyword:** `Mnemonics – “SHIFTING TIDES”`
+- **Mnemonic Keyword:** `Mnemonics – SHIFTING TIDES`
 - **Formula / Expansion:**
   - **S:** Seasonal Migration
   - **H:** High Urbanization Rate
@@ -2039,13 +1931,16 @@
     - • **Explanation:** Migration is driven by stark socioeconomic disparities between regions, with people from underdeveloped or economically weaker states migrating to developed regions for better opportunities.
     - • **Example:** People from impoverished states like Bihar, Jharkhand, and Chhattisgarh often migrate to more prosperous states like Maharashtra and Gujarat for better wages and living conditions.
 
-###### Mnemonic 88: Trend of migration outside India / Why Indians are migrating
+###### Mnemonic 88: Trend of migration outside India / Why Indians are migrating outside the country
 
-- **Mnemonic Keyword:** `Mnemonics – “BRAIN DRAIN”`
+- **Mnemonic Keyword:** `BRAIN DRAIN`
 - **Formula / Expansion:**
   - **B:** Business Opportunities
   - **R:** Remittances and Economic Support
   - **A:** Advanced Education
+  - **I:** Information Technology Professionals
+  - **N:** Nursing and Medical Professionals
+  - **D:** Development of Skills Abroad
 - **Explanation & Examples:**
   - ❖ **B – Business Opportunities**
     - • **Explanation:** Many Indian entrepreneurs and business professionals migrate to countries with better infrastructure and market potential for startups and business ventures.
@@ -2057,10 +1952,36 @@
 #### Microtopic: Role of women and women's organization
 
 ##### Subtopic: Women and Associated concerns
+  - ❖ - • **Explanation:** Indian migrants abroad send remittances back to their families in India, contributing significantly to the Indian economy.
+    - • **Example:** Migrant workers in the Middle East send remittances to their families in states like Kerala and Punjab, supporting local economies.
+  - ❖ **A – Advanced Education**
+    - • **Explanation:** Indian students migrate to developed countries to pursue higher education in fields like engineering, medicine, and management, contributing to a significant outflow of skilled talent.
+    - • **Example:** A large number of Indian students pursue education in universities in the USA, Canada, the UK, and Australia, especially for postgraduate degrees.
+  - ❖ **I – Information Technology Professionals**
+    - • **Explanation:** A significant trend in Indian migration involves IT professionals moving to countries like the USA, Canada, and Europe, seeking better job opportunities and career growth.
+    - • **Example:** Indian software engineers often move to the USA, particularly Silicon Valley, through the H-1B visa program, driving tech innovation globally.
+  - ❖ **N – Nursing and Medical Professionals**
+    - • **Explanation:** Indian healthcare professionals, especially doctors and nurses, migrate to countries with a higher demand for medical workers, better salaries, and advanced healthcare systems.
+    - • **Example:** Many Indian nurses move to the UK and Gulf countries, filling gaps in healthcare systems and seeking better living conditions.
+  - ❖ **D – Development of Skills Abroad**
+    - • **Explanation:** Indian professionals migrate to develop their skills and gain global experience, which might not be available in India due to resource constraints or limited opportunities.
+    - • **Example:** Engineers and scientists from India migrating to European countries to work in high- tech industries and research institutions.
+  - ❖ **R – Research and Innovation**
+    - • **Explanation:** Indian scholars and scientists often migrate to countries with advanced research facilities and funding opportunities, contributing to the global knowledge economy.
+    - • **Example:** Indian researchers relocating to the USA or Germany to engage in cutting-edge scientific research in fields like AI, biotechnology, and space exploration.
+  - ❖ **A – Attractive Living Standards**
+    - • **Explanation:** Higher living standards, better healthcare, education, and a secure lifestyle in countries like Canada, Australia, and the USA attract Indian migrants.
+    - • **Example:** Skilled professionals, particularly from the middle class, are moving to Canada under its skilled migration programs for better living conditions.
+  - ❖ **I – Industrial Demand**
+    - • **Explanation:** Industrialized countries with aging populations often invite skilled Indian labor to fill workforce gaps in sectors like construction, IT, and healthcare.
+    - • **Example:** Germany's need for skilled IT professionals has led to an influx of Indian tech workers through its Blue Card program.
+  - ❖ **N – Non-Resident Indians (NRIs) and Diaspora Influence**
+    - • **Explanation:** The Indian diaspora plays a key role in influencing migration trends by creating supportive networks for new migrants and maintaining economic and cultural ties with India.
+    - • **Example:** The large Indian-American community, particularly in the IT and healthcare sectors, facilitates further migration through family reunification and professional networks.
 
 ###### Mnemonic 9: Continued challenges for women in India
 
-- **Mnemonic Keyword:** `Mnemonics – “CHALLENGES”`
+- **Mnemonic Keyword:** `Mnemonics – CHALLENGES`
 - **Formula / Expansion:**
   - **C:** Cultural Norms
   - **H:** Health Issues
@@ -2106,7 +2027,7 @@
 
 ###### Mnemonic 10: Role of women in Modern India: A multidimensional perspective
 
-- **Mnemonic Keyword:** `Mnemonics – “WOMEN LEAD”`
+- **Mnemonic Keyword:** `Mnemonics – WOMEN LEAD`
 - **Formula / Expansion:**
   - **W:** Workforce Participation
   - **O:** Overcoming Stereotypes
@@ -2148,7 +2069,7 @@
 
 ###### Mnemonic 11: Role of Women organisations in Modern India
 
-- **Mnemonic Keyword:** `Mnemonics – “EMPOWER HER”`
+- **Mnemonic Keyword:** `Mnemonics – EMPOWER HER`
 - **Formula / Expansion:**
   - **E:** Empowerment through Advocacy
   - **M:** Mentorship and Leadership Training
@@ -2194,7 +2115,7 @@
 
 ###### Mnemonic 12: Various issues related to women’s education
 
-- **Mnemonic Keyword:** `Mnemonics – “LEARNING GAP”`
+- **Mnemonic Keyword:** `Mnemonics – LEARNING GAP`
 - **Formula / Expansion:**
   - **L:** Lack of Infrastructure
   - **E:** Economic Barriers
@@ -2244,7 +2165,7 @@
 
 ###### Mnemonic 13: Reasons behind the adverse sex ratio for women in India
 
-- **Mnemonic Keyword:** `Mnemonics – “GENDER BIAS”`
+- **Mnemonic Keyword:** `Mnemonics – GENDER BIAS`
 - **Formula / Expansion:**
   - **G:** Gender Preference and Son Preference
   - **E:** Economic Factors
@@ -2290,7 +2211,7 @@
 
 ###### Mnemonic 14: Steps taken in India to promote gender equality
 
-- **Mnemonic Keyword:** `Mnemonics – “EDUCATE THEM”`
+- **Mnemonic Keyword:** `Mnemonics – EDUCATE THEM`
 - **Formula / Expansion:**
   - **E:** Education Initiatives
   - **D:** Development Programs
@@ -2340,7 +2261,7 @@
 
 ###### Mnemonic 46: Positive Impact of globalisation on Indian women
 
-- **Mnemonic Keyword:** `Mnemonics – “FEMALE RISE”`
+- **Mnemonic Keyword:** `Mnemonics – FEMALE RISE`
 - **Formula / Expansion:**
   - **F:** Financial Independence
   - **E:** Educational Opportunities Expanded
@@ -2386,7 +2307,7 @@
 
 ###### Mnemonic 47: Negative Impact of globalisation on Indian women
 
-- **Mnemonic Keyword:** `Mnemonics – “LOST SPEACE”`
+- **Mnemonic Keyword:** `Mnemonics – LOST SPEACE`
 - **Formula / Expansion:**
   - **L:** Labor Exploitation
   - **O:** Objectification through Media
@@ -2428,7 +2349,7 @@
 
 ###### Mnemonic 91: Challenges faced by transgender in India
 
-- **Mnemonic Keyword:** `Mnemonics – “DISCRIMINATION”`
+- **Mnemonic Keyword:** `Mnemonics – DISCRIMINATION`
 - **Formula / Expansion:**
   - **D:** Discrimination in Employment
   - **I:** Inadequate Healthcare Access
@@ -2490,7 +2411,7 @@
 
 ###### Mnemonic 92: Solutions to the problems faced by the transgender in India
 
-- **Mnemonic Keyword:** `Mnemonics – “SUPPORTIVE CIRCLES”`
+- **Mnemonic Keyword:** `Mnemonics – SUPPORTIVE CIRCLES`
 - **Formula / Expansion:**
   - **S:** Social Acceptance
   - **U:** Universal Healthcare
@@ -2573,7 +2494,7 @@
 
 ###### Mnemonic 25: Why the human development felt to keep pace with economic development in India
 
-- **Mnemonic Keyword:** `Mnemonics – “WEAK SOCIAL SAFETY”`
+- **Mnemonic Keyword:** `Mnemonics – WEAK SOCIAL SAFETY`
 - **Formula / Expansion:**
   - **W:** Widening Inequality
   - **E:** Employment Informality
@@ -2644,7 +2565,7 @@
 
 ###### Mnemonic 24: Poverty reasons/Causes of Poverty in India
 
-- **Mnemonic Keyword:** `Mnemonics – “IMPOVERISHED”`
+- **Mnemonic Keyword:** `Mnemonics – IMPOVERISHED`
 - **Formula / Expansion:**
   - **I:** Inequality in Income Distribution
   - **M:** Malnutrition and Health Issues
@@ -2698,7 +2619,7 @@
 
 ###### Mnemonic 26: Negative Consequences of Poverty
 
-- **Mnemonic Keyword:** `Mnemonics – “POVERTY TRAP”`
+- **Mnemonic Keyword:** `Mnemonics – POVERTY TRAP`
 - **Formula / Expansion:**
   - **P:** Poor Health Outcomes
   - **O:** Overpopulation in Slums
@@ -2747,7 +2668,7 @@
 
 ###### Mnemonic 27: Impact of COVID 19 on poverty
 
-- **Mnemonic Keyword:** `Mnemonics – “COVID CRISIS”`
+- **Mnemonic Keyword:** `Mnemonics – COVID CRISIS`
 - **Formula / Expansion:**
   - **C:** Collapse of Livelihoods
   - **O:** Overburdened Healthcare System
@@ -2797,7 +2718,7 @@
 
 ###### Mnemonic 28: Poverty Solutions / Measures to alleviate poverty
 
-- **Mnemonic Keyword:** `Mnemonics – “RAISE BHARAT”`
+- **Mnemonic Keyword:** `Mnemonics – RAISE BHARAT`
 - **Formula / Expansion:**
   - **R:** Rural Development Programs
   - **A:** Affordable Housing
@@ -2847,7 +2768,7 @@
 
 ###### Mnemonic 29: Social dimensions of poverty in India
 
-- **Mnemonic Keyword:** `Mnemonics – “OUTDATED SOCIAL NORM”`
+- **Mnemonic Keyword:** `Mnemonics – OUTDATED SOCIAL NORM`
 - **Formula / Expansion:**
   - **O:** Oppression of Women
   - **U:** Unequal Land Distribution
@@ -2925,7 +2846,7 @@
 
 ###### Mnemonic 30: Regional dimensions of poverty in India
 
-- **Mnemonic Keyword:** `Mnemonics – “REGION POOR”`
+- **Mnemonic Keyword:** `Mnemonics – REGION POOR`
 - **Formula / Expansion:**
   - **R:** Rural Underdevelopment
   - **E:** Economic Disparities
@@ -2970,7 +2891,7 @@
 
 ###### Mnemonic 57: Globalisation has exacerbated inequality in India
 
-- **Mnemonic Keyword:** `Mnemonics – “ECONOMIC DISPARITY”`
+- **Mnemonic Keyword:** `Mnemonics – ECONOMIC DISPARITY`
 - **Formula / Expansion:**
   - **E:** Employment Inequality
   - **C:** Class Divide
@@ -3047,7 +2968,7 @@
 
 ###### Mnemonic 53: Positive Impact of globalisation on disabled in India
 
-- **Mnemonic Keyword:** `Mnemonics – “ENABLES”`
+- **Mnemonic Keyword:** `Mnemonics – ENABLES`
 - **Formula / Expansion:**
   - **E:** Enhanced Accessibility
   - **N:** New Employment Opportunities
@@ -3081,7 +3002,7 @@
 
 ###### Mnemonic 54: Negative Impact of globalisation on disabled in India
 
-- **Mnemonic Keyword:** `Mnemonics – “EXCLUDED”`
+- **Mnemonic Keyword:** `Mnemonics – EXCLUDED`
 - **Formula / Expansion:**
   - **E:** Employment Challenges
   - **X:** Xenophobia and Social Stigma
@@ -3128,7 +3049,7 @@
 
 ###### Mnemonic 39: Factors leading to Globalisation
 
-- **Mnemonic Keyword:** `Mnemonics – “GLOBAL CONNECT”`
+- **Mnemonic Keyword:** `Mnemonics – GLOBAL CONNECT`
 - **Formula / Expansion:**
   - **G:** Growth of Multinational Corporations (MNCs)
   - **L:** Liberalization of Trade
@@ -3186,7 +3107,7 @@
 
 ###### Mnemonic 40: How has technology contributed to Globalisation
 
-- **Mnemonic Keyword:** `Mnemonics – “TECH JOINT”`
+- **Mnemonic Keyword:** `Mnemonics – TECH JOINT`
 - **Formula / Expansion:**
   - **T:** Telecommunications Expansion
   - **E:** E-commerce Growth
@@ -3228,7 +3149,7 @@
 
 ###### Mnemonic 41: Positive Impact of Globalization on Indian society
 
-- **Mnemonic Keyword:** `Mnemonics – “WEALTH CREATION”`
+- **Mnemonic Keyword:** `Mnemonics – WEALTH CREATION`
 - **Formula / Expansion:**
   - **W:** Wider Social Networks
   - **E:** Enhanced Cultural Awareness
@@ -3290,7 +3211,7 @@
 
 ###### Mnemonic 42: Negative Impact of Globalization on Indian Society
 
-- **Mnemonic Keyword:** `Mnemonics – “LOSS OF TRADITION”`
+- **Mnemonic Keyword:** `Mnemonics – LOSS OF TRADITION`
 - **Formula / Expansion:**
   - **L:** Local Culture Erosion
   - **O:** Overemphasis on Western Values
@@ -3354,18 +3275,67 @@
     - • **Explanation**: Local traditions and customs may be neglected or undervalued as global practices gain prominence.
     - • **Example**: **Traditional festivals** and **rituals** may be overshadowed by global celebrations like **New Year's Eve** and **Christmas**, reducing their cultural significance.
 
-###### Mnemonic 44: Negative Impact of Globalization
+###### Mnemonic 44: Negative Impact of Globalization on Cultural Diversity in India
 
-- **Mnemonic Keyword:** `Mnemonics – “UNDERVALUE LOCAL”`
+- **Mnemonic Keyword:** `UNDERVALUE LOCAL`
 - **Formula / Expansion:**
   - **U:** Uniformity of Culture
+  - **N:** Neglect of Indigenous Practices
+  - **D:** Dilution of Traditional Knowledge
+  - **E:** Erosion of Local Languages
+  - **R:** Rise in Cultural Commodification
+  - **V:** Vanishing Local Festivals
+  - **A:** Assimilation of Local Customs
+  - **L:** Loss of Unique Cultural Identity
+  - **O:** Overemphasis on Global Culture
+  - **C:** Commercialization of Heritage
 - **Explanation & Examples:**
   - ❖ **U – Uniformity of Culture**
     - • **Explanation**: Globalization can lead to the homogenization of cultural practices, overshadowing local traditions.
+  - ❖ - • **Example**: **International fast-food chains** like **KFC and Pizza Hut** becoming more common, leading to the decline in popularity of traditional street food.
+  - ❖ **N – Neglect of Indigenous Practices**
+    - • **Explanation**: Indigenous customs and practices may be neglected or overshadowed by global trends.
+    - • **Example**: **Local festivals** such as **Chhau dance** in Jharkhand might receive less attention compared to global entertainment options.
+  - ❖ **D – Dilution of Traditional Knowledge**
+    - • **Explanation**: Traditional knowledge and practices can become diluted as global culture permeates.
+    - • **Example**: **Traditional medicinal practices** like **Ayurveda** may lose prominence as Western medicine becomes more dominant.
+  - ❖ **E – Erosion of Local Languages**
+    - • **Explanation**: The dominance of global languages like English can lead to the erosion of regional languages.
+    - • **Example**: **Local languages** such as **Kannada** and **Telugu** might be less used in education and media compared to English.
+  - ❖ **R – Rise in Cultural Commodification**
+    - • **Explanation**: Cultural practices may be commercialized, losing their original significance.
+    - • **Example**: **Handicrafts** like **Madhubani paintings** may be mass-produced for commercial purposes, diminishing their traditional value.
+  - ❖ **V – Vanishing Local Festivals**
+    - • **Explanation**: Some local festivals may become less celebrated as global events gain popularity.
+    - • **Example**: **Regional festivals** like **Baisakhi** might see reduced observance in favor of globally recognized holidays.
+  - ❖ **A – Assimilation of Local Customs**
+    - • **Explanation**: Local customs may be assimilated into broader global practices, leading to a loss of distinctiveness.
+    - • **Example**: **Traditional wedding ceremonies** may incorporate Western elements, overshadowing indigenous rituals.
+  - ❖ **L – Loss of Unique Cultural Identity**
+    - • **Explanation**: The unique cultural identity of regions may be compromised as global culture prevails.
+    - • **Example**: **Traditional attire** like **Saris** and **Sherwanis** may be less worn in favor of Western clothing styles.
+  - ❖ **U – Undermining of Local Arts**
+    - • **Explanation**: Local arts and performances may struggle to compete with global entertainment options.
+    - • **Example**: **Traditional dance forms** like **Kathakali** may receive less attention compared to global entertainment.
+  - ❖ **E – Erosion of Local Traditions**
+    - • **Explanation:** Globalization can lead to the weakening or disappearance of traditional customs and practices as global influences overshadow them.
+    - • **Example:** Traditional arts like Puppetry in Rajasthan may diminish as global entertainment forms, such as video games, gain popularity among younger generations.
+  - ❖ **O – Overemphasis on Global Culture**
+    - • Explanation: There is an overemphasis on global culture which can diminish the importance of local traditions and customs.
+    - • Example: Western clothing and fast food are becoming more common in place of traditional attire like Saris and local foods like Dosa.
+  - ❖ **C – Commercialization of Heritage**
+    - • **Explanation**: Heritage and cultural practices might be commercialized, losing their authentic essence.
+    - • **Example**: **Local cultural heritage sites** being marketed primarily for tourism rather than preserving their traditional significance.
+  - ❖ **A – Anonymity of Local Artisans**
+    - • **Explanation**: Local artisans and their crafts may become anonymous as global brands dominate the market.
+    - • **Example**: **Local craftspersons** producing **traditional pottery** might be overshadowed by large- scale, global pottery manufacturers.
+  - ❖ **L – Lesser Importance Given to Traditional Skills**
+    - • **Explanation**: Traditional skills and crafts may be undervalued compared to modern skills.
+    - • **Example**: **Traditional weaving techniques** might be less emphasized in Favor of modern, industrial methods.
 
 ###### Mnemonic 45: The economic Implications of Globalisation
 
-- **Mnemonic Keyword:** `Mnemonics – “OPEN MARKET”`
+- **Mnemonic Keyword:** `Mnemonics – OPEN MARKET`
 - **Formula / Expansion:**
   - **O:** Occupational Shift
   - **P:** Poverty Alleviation (Uneven)
@@ -3411,7 +3381,7 @@
 
 ###### Mnemonic 51: Positive Impact of globalisation on Children in India
 
-- **Mnemonic Keyword:** `Mnemonics – “CHILDRENS”`
+- **Mnemonic Keyword:** `Mnemonics – CHILDRENS`
 - **Formula / Expansion:**
   - **C:** Cultural Exposure
   - **H:** Higher Educational Opportunities
@@ -3453,7 +3423,7 @@
 
 ###### Mnemonic 52: NEGATIVE Impact of globalisation on children in India
 
-- **Mnemonic Keyword:** `Mnemonics – “SPOILED BOY”`
+- **Mnemonic Keyword:** `Mnemonics – SPOILED BOY`
 - **Formula / Expansion:**
   - **S:** Social Disintegration
   - **P:** Pressure to Conform
@@ -3505,7 +3475,7 @@
 
 ###### Mnemonic 19: Positives of Caste Census in India
 
-- **Mnemonic Keyword:** `Mnemonics – “CASTE EQUALITY”`
+- **Mnemonic Keyword:** `Mnemonics – CASTE EQUALITY`
 - **Formula / Expansion:**
   - **C:** Correct Representation
   - **A:** Addressing Inequality
@@ -3563,7 +3533,7 @@
 
 ###### Mnemonic 20: Negatives of conducting a Caste Census in India
 
-- **Mnemonic Keyword:** `Mnemonics – “JATI BARRIERS”`
+- **Mnemonic Keyword:** `Mnemonics – JATI BARRIERS`
 - **Formula / Expansion:**
   - **J:** Judicial Overload
   - **A:** Affirmation of Caste Identities
@@ -3617,7 +3587,7 @@
 
 ###### Mnemonic 59: Features of Caste System in India
 
-- **Mnemonic Keyword:** `Mnemonics – “GRADING SYSTEM”`
+- **Mnemonic Keyword:** `Mnemonics – GRADING SYSTEM`
 - **Formula / Expansion:**
   - **G:** Group-Based Social Stratification
   - **R:** Ritual Purity and Pollution
@@ -3675,7 +3645,7 @@
 
 ###### Mnemonic 60: Function of Caste System in India
 
-- **Mnemonic Keyword:** `Mnemonics – “OCCUPATION ROLES”`
+- **Mnemonic Keyword:** `Mnemonics – OCCUPATION ROLES`
 - **Formula / Expansion:**
   - **O:** Occupational Division of Labor
   - **C:** Community Identity Formation
@@ -3741,7 +3711,7 @@
 
 ###### Mnemonic 61: Positive Role / Function of caste in Indian Society
 
-- **Mnemonic Keyword:** `Mnemonics – “BONDING”`
+- **Mnemonic Keyword:** `Mnemonics – BONDING`
 - **Formula / Expansion:**
   - **B:** Belongingness
   - **O:** Occupational Stability
@@ -3775,7 +3745,7 @@
 
 ###### Mnemonic 62: Negative Role / Function of caste in Indian Society
 
-- **Mnemonic Keyword:** `Mnemonics – “DIVIDE”`
+- **Mnemonic Keyword:** `Mnemonics – DIVIDE`
 - **Formula / Expansion:**
   - **D:** Discrimination
   - **I:** Inequality
@@ -3805,7 +3775,7 @@
 
 ###### Mnemonic 63: Caste is fluid (Caste is changing)
 
-- **Mnemonic Keyword:** `Mnemonics – “CHANGE”`
+- **Mnemonic Keyword:** `Mnemonics – CHANGE`
 - **Formula / Expansion:**
   - **C:** Class Mobility
   - **H:** Historical Shifts
@@ -3835,7 +3805,7 @@
 
 ###### Mnemonic 64: Caste is static
 
-- **Mnemonic Keyword:** `Mnemonics – “STATIC JOB”`
+- **Mnemonic Keyword:** `Mnemonics – STATIC JOB`
 - **Formula / Expansion:**
   - **S:** Social Hierarchies
   - **T:** Traditional Roles
@@ -3877,7 +3847,7 @@
 
 ###### Mnemonic 65: Factor contributing to weakening of the caste system in India
 
-- **Mnemonic Keyword:** `Mnemonics – “MODERNISATION”`
+- **Mnemonic Keyword:** `Mnemonics – MODERNISATION`
 - **Formula / Expansion:**
   - **M:** Migration and Urbanization
   - **O:** Occupational Mobility
@@ -3934,7 +3904,7 @@
 
 ###### Mnemonic 66: Factor Contributing to Strengthening of the caste system in India
 
-- **Mnemonic Keyword:** `Mnemonics – “SCRIPTURAL BACKING”`
+- **Mnemonic Keyword:** `Mnemonics – SCRIPTURAL BACKING`
 - **Formula / Expansion:**
   - **S:** Social Segregation in Rural Areas
   - **C:** Caste-Based Political Identity
@@ -4008,7 +3978,7 @@
 
 ###### Mnemonic 67: Role of Caste in Indian Politics
 
-- **Mnemonic Keyword:** `Mnemonics – “ELECTORAL SUCCESS”`
+- **Mnemonic Keyword:** `Mnemonics – ELECTORAL SUCCESS`
 - **Formula / Expansion:**
   - **E:** Electoral Strategy Based on Caste
   - **L:** Leveraging Caste-Based Reservations
@@ -4078,7 +4048,7 @@
 
 ###### Mnemonic 68: Is caste losing its relevance
 
-- **Mnemonic Keyword:** `Mnemonics – “IRRELEVANT”`
+- **Mnemonic Keyword:** `Mnemonics – IRRELEVANT`
 - **Formula / Expansion:**
   - **I:** Increased Social Mobility
   - **R:** Rising Educational Access
@@ -4127,7 +4097,7 @@
 
 ###### Mnemonic 74: Reasons behind communalism
 
-- **Mnemonic Keyword:** `Mnemonics – “COMMUNALISM”`
+- **Mnemonic Keyword:** `Mnemonics – COMMUNALISM`
 - **Formula / Expansion:**
   - **C:** Colonial Legacy
   - **O:** Outdated Social Structures
@@ -4177,7 +4147,7 @@
 
 ###### Mnemonic 75: Consequences of Communalism on Indian Society
 
-- **Mnemonic Keyword:** `Mnemonics – “CONSEQUENCES”`
+- **Mnemonic Keyword:** `Mnemonics – CONSEQUENCES`
 - **Formula / Expansion:**
   - **C:** Community Disintegration
   - **O:** Outbreak of Violence
@@ -4231,7 +4201,7 @@
 
 ###### Mnemonic 76: Steps required to address the issues created by communalism in India
 
-- **Mnemonic Keyword:** `Mnemonics – “COMMUNITY”`
+- **Mnemonic Keyword:** `Mnemonics – COMMUNITY`
 - **Formula / Expansion:**
   - **C:** Community Dialogues
   - **O:** Outreach Programs
@@ -4273,7 +4243,7 @@
 
 ###### Mnemonic 77: Reasons behind regionalism in India/Factors leading to growth of communalism in India
 
-- **Mnemonic Keyword:** `Mnemonics – “REGIONS”`
+- **Mnemonic Keyword:** `Mnemonics – REGIONS`
 - **Formula / Expansion:**
   - **R:** Resource Distribution
   - **E:** Ethnic Identity
@@ -4307,7 +4277,7 @@
 
 ###### Mnemonic 82: Features of Indian Secularism
 
-- **Mnemonic Keyword:** `Mnemonics – “PLURAL PEACE”`
+- **Mnemonic Keyword:** `Mnemonics – PLURAL PEACE`
 - **Formula / Expansion:**
   - **P:** Positive Secularism
   - **L:** Legal Pluralism
@@ -4357,7 +4327,7 @@
 
 ###### Mnemonic 83: How the Indian concept of secularism is different from the western model of secularism?
 
-- **Mnemonic Keyword:** `Mnemonics – “PRINCIPLED (Distance)”`
+- **Mnemonic Keyword:** `Mnemonics – PRINCIPLED (Distance)`
 - **Formula / Expansion:**
   - **P:** Positive State Intervention vs. Neutrality
   - **R:** Religious Reforms vs. Religious Autonomy
@@ -4413,7 +4383,7 @@
 
 ###### Mnemonic 84: Challenges to Indian Secularism
 
-- **Mnemonic Keyword:** `Mnemonics – “SECULAR RISK”`
+- **Mnemonic Keyword:** `Mnemonics – SECULAR RISK`
 - **Formula / Expansion:**
   - **S:** Saffronization of Politics
   - **E:** Erosion of Minority Rights
@@ -4463,7 +4433,7 @@
 
 ###### Mnemonic 85: How to strengthen India’s Secularism
 
-- **Mnemonic Keyword:** `Mnemonics – “RESPECT RELIGION”`
+- **Mnemonic Keyword:** `Mnemonics – RESPECT RELIGION`
 - **Formula / Expansion:**
   - **R:** Reinforce Constitutional Safeguards
   - **E:** Education for Religious Harmony
@@ -4535,7 +4505,7 @@
 
 ###### Mnemonic 78: Positive Impact of Regionalism in India
 
-- **Mnemonic Keyword:** `Mnemonics – “PRESERVE”`
+- **Mnemonic Keyword:** `Mnemonics – PRESERVE`
 - **Formula / Expansion:**
   - **P:** Promotion of Local Culture and Languages
   - **R:** Representation in Political Space
@@ -4573,7 +4543,7 @@
 
 ###### Mnemonic 79: Negative Impacts of Regionalism in India
 
-- **Mnemonic Keyword:** `Mnemonics – “CONFLICT”`
+- **Mnemonic Keyword:** `Mnemonics – CONFLICT`
 - **Formula / Expansion:**
   - **C:** Cultural Fragmentation
   - **O:** Obstruction to National Unity
@@ -4611,7 +4581,7 @@
 
 ###### Mnemonic 80: Measures to address Regionalism in India
 
-- **Mnemonic Keyword:** `“Mnemonics – INTEGRATE”`
+- **Mnemonic Keyword:** `Mnemonics – INTEGRATE`
 - **Formula / Expansion:**
   - **I:** Inclusive Economic Development
   - **N:** National Identity Promotion
@@ -4653,7 +4623,7 @@
 
 ###### Mnemonic 81: How regionalism affect Indian Polity/Politics
 
-- **Mnemonic Keyword:** `Mnemonics – “VOCAL POLITICS”`
+- **Mnemonic Keyword:** `Mnemonics – VOCAL POLITICS`
 - **Formula / Expansion:**
   - **V:** Vocalization of Regional Issues
   - **O:** Opposition to Centralization
@@ -4735,7 +4705,7 @@
 
 ###### Mnemonic 33: How does urbanisation varies amongst states in India
 
-- **Mnemonic Keyword:** `Mnemonics – “URBAN VARY”`
+- **Mnemonic Keyword:** `Mnemonics – URBAN VARY`
 - **Formula / Expansion:**
   - **U:** Urban Infrastructure Development
   - **R:** Rural to Urban Migration
@@ -4786,7 +4756,7 @@
 
 ###### Mnemonic 34: Factors leading to Urbanisation in India
 
-- **Mnemonic Keyword:** `Mnemonics – “CITY SPREAD”`
+- **Mnemonic Keyword:** `Mnemonics – CITY SPREAD`
 - **Formula / Expansion:**
   - **C:** Commercial Growth
   - **I:** Industrialization
@@ -4832,7 +4802,7 @@
 
 ###### Mnemonic 35: Issues/Problems of Urbanization in India
 
-- **Mnemonic Keyword:** `Mnemonics – “RESOURCE ISSUE”`
+- **Mnemonic Keyword:** `Mnemonics – RESOURCE ISSUE`
 - **Formula / Expansion:**
   - **R:** Resource Depletion
   - **E:** Environmental Pollution
@@ -4890,7 +4860,7 @@
 
 ###### Mnemonic 36: Social Problems due to Urbanisation
 
-- **Mnemonic Keyword:** `Mnemonics – “SCARCE VALUES”`
+- **Mnemonic Keyword:** `Mnemonics – SCARCE VALUES`
 - **Formula / Expansion:**
   - **S:** Social Inequality
   - **C:** Crime Increase
@@ -4944,7 +4914,7 @@
 
 ###### Mnemonic 37: Economic Problems due to Urbanisation
 
-- **Mnemonic Keyword:** `Mnemonics – “COSTLY LABOUR”`
+- **Mnemonic Keyword:** `Mnemonics – COSTLY LABOUR`
 - **Formula / Expansion:**
   - **C:** Cost of Living Increases
   - **O:** Overburdened Public Services
@@ -4996,33 +4966,23 @@
     - • **Explanation**: Increased urban activities and vehicular traffic lead to higher pollution levels, affecting public health and quality of life.
     - • **Example**: **Delhi** faces severe air pollution problems, with smog and poor air quality impacting residents' health.
 
-###### Mnemonic 38: Solutions to Urbanisation issues/steps to address
+###### Mnemonic 38: Solutions to Urbanisation issues/steps to address challenges of urbanisation
 
-- **Mnemonic Keyword:** `Mnemonics – “REACTIVE STEPS”`
+- **Mnemonic Keyword:** `ACTIVE STEPS`
 - **Formula / Expansion:**
   - **R:** Revise Urban Planning
   - **E:** Expand Public Transportation
-- **Explanation & Examples:**
-  - ❖ **R – Revise Urban Planning**
-    - • **Explanation**: Update urban planning policies to accommodate growing populations and ensure sustainable development.
-
-###### Mnemonic : challenges of urbanisation
-
-- **Mnemonic Keyword:** ``
-- **Formula / Expansion:**
   - **A:** Affordable Housing Initiatives
   - **C:** Create Green Spaces
   - **T:** Technological Solutions
   - **I:** Invest in Infrastructure
   - **V:** Vocational Training Programs
-  - **E:** Encourage Sustainable Practices
   - **S:** Strengthen Local Governance
-  - **T:** Tackle Informal Settlements
-  - **E:** Encourage Public Participation
   - **P:** Promote Economic Diversification
-  - **S:** Support Regional Development
 - **Explanation & Examples:**
-    - • **Example**: **Singapore** has successfully implemented comprehensive urban planning strategies to manage its population density and infrastructure needs.
+  - ❖ **R – Revise Urban Planning**
+    - • **Explanation**: Update urban planning policies to accommodate growing populations and ensure sustainable development.
+  - ❖ - • **Example**: **Singapore** has successfully implemented comprehensive urban planning strategies to manage its population density and infrastructure needs.
   - ❖ **E – Expand Public Transportation**
     - • **Explanation**: Improve and expand public transportation networks to reduce traffic congestion and pollution.
     - • **Example**: **Delhi** is working on expanding its metro system to enhance connectivity and reduce traffic issues.
@@ -5069,3 +5029,4 @@
 ##### Subtopic: Urban Water Management
 
 *No mnemonics currently listed under this subtopic.*
+

@@ -2,7 +2,7 @@ import React from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Dimensions,
 } from 'react-native';
-import { X, BookOpen, Target, BarChart2, BarChart3, Layers, Tag, FileText, PenTool, Sparkles, Compass, Globe, RotateCcw, LayoutList, Search, Brain, Zap, Star, ChevronRight } from 'lucide-react-native';
+import { X, BookOpen, Target, BarChart2, BarChart3, Tag, FileText, PenTool, Sparkles, Compass, Globe, RotateCcw, LayoutList, Search, Brain, Zap, Star, ChevronRight } from 'lucide-react-native';
 import { useTheme } from '../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
@@ -44,7 +44,7 @@ const FEATURES: FeatureSection[] = [
     ],
   },
   {
-    icon: Layers,
+    icon: Zap,
     color: '#8b5cf6',
     title: 'Flashcards',
     tagline: 'Smart Spaced Repetition for Revision',

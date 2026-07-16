@@ -1,11 +1,230 @@
 import os
 import json
 import re
+import uuid
 
 VA_DIR = r"c:\Users\Dr. Yogesh\Videos\APP FOLDER - V1 - Copy\app\frontend-noji-2.6.2\3\pilot pro 10.2\mains tab md files\value additions"
 OUT_DIR = r"c:\Users\Dr. Yogesh\Videos\APP FOLDER - V1 - Copy\app\frontend-noji-2.6.2\3\pilot pro 10.2\mains json files"
 
 os.makedirs(OUT_DIR, exist_ok=True)
+
+# ==============================================================================
+# SYLLABUS TAXONOMY MATCHER (for aligning Keywords, Case Studies, and SC Judgments)
+# ==============================================================================
+HIERARCHY_PATH = r"C:\Users\Dr. Yogesh\Desktop\mains\neet and upsc cms\upsc\solved paper\merged\GS_Syllabus_Hierarchy_Merged.md"
+truth_tree = {}
+valid_nodes = []
+
+if os.path.exists(HIERARCHY_PATH):
+    import difflib
+    try:
+        with open(HIERARCHY_PATH, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+        current_paper = ""
+        current_subject = ""
+        current_sec_grp = ""
+        current_microtopic = ""
+        for line in lines:
+            line_strip = line.strip()
+            if not line_strip: continue
+            if line_strip.startswith("# GS-"):
+                current_paper = line_strip.replace("# ", "").strip()
+            elif line_strip.startswith("## SUBJECT:"):
+                current_subject = line_strip.replace("## SUBJECT:", "").strip().upper()
+                if current_subject not in truth_tree:
+                    truth_tree[current_subject] = {}
+            elif line_strip.startswith("### Section Group:"):
+                current_sec_grp = line_strip.replace("### Section Group:", "").strip()
+                if current_subject and current_sec_grp not in truth_tree[current_subject]:
+                    truth_tree[current_subject][current_sec_grp] = {}
+            elif line_strip.startswith("- ") or line_strip.startswith("* "):
+                text = re.sub(r'^[-*]\s+', '', line_strip).strip()
+                indent = len(line) - len(line.lstrip())
+                if indent == 0:
+                    current_microtopic = text
+                    if current_subject and current_sec_grp:
+                        if current_microtopic not in truth_tree[current_subject][current_sec_grp]:
+                            truth_tree[current_subject][current_sec_grp][current_microtopic] = set()
+                        valid_nodes.append({
+                            'paper': current_paper,
+                            'subject': current_subject,
+                            'section_group': current_sec_grp,
+                            'microtopic': current_microtopic,
+                            'subtopic': ''
+                        })
+                elif indent == 2:
+                    current_subtopic = text
+                    if current_subject and current_sec_grp and current_microtopic:
+                        truth_tree[current_subject][current_sec_grp][current_microtopic].add(current_subtopic)
+                        valid_nodes.append({
+                            'paper': current_paper,
+                            'subject': current_subject,
+                            'section_group': current_sec_grp,
+                            'microtopic': current_microtopic,
+                            'subtopic': current_subtopic
+                        })
+    except Exception as e:
+        print(f"Error parsing hierarchy: {e}")
+
+def clean_for_match(text):
+    if not text: return ""
+    text = text.lower().strip()
+    text = text.replace('’', "'").replace('`', "'").replace('–', '-').replace('—', '-')
+    text = text.replace('and', '&').replace('isation', 'ization').replace('ise', 'ize')
+    text = re.sub(r'[^a-z0-9\s]', '', text)
+    return re.sub(r'\s+', ' ', text).strip()
+
+cleaned_micro_map = {}
+for n in valid_nodes:
+    if n['subtopic'] == '':
+        cleaned_micro_map[clean_for_match(n['microtopic'])] = n
+
+subject_alias = {
+    "AGRICULTURE & FARM DYNAMICS": "AGRICULTURE",
+    "CONSERVATION & ECOSYSTEMS": "ENVIRONMENT",
+    "EVERYDAY SCIENCE & INNOVATIONS": "SCIENCE & TECHNOLOGY",
+    "INDIGENOUS TECH & ACHIEVEMENTS": "SCIENCE & TECHNOLOGY",
+    "FRONTIER TECHNOLOGIES & IPR": "SCIENCE & TECHNOLOGY",
+    "PHYSICAL INFRASTRUCTURE & CAPITAL": "INDIAN ECONOMY",
+    "MACROECONOMICS & FISCAL POLICY": "INDIAN ECONOMY",
+    "POLLUTION & DEGRADATION": "ENVIRONMENT",
+    "CLIMATE CHANGE": "ENVIRONMENT",
+    "FRAMEWORKS & PREPAREDNESS": "DISASTER MANAGEMENT",
+    "SPECIFIC DISASTERS & HAZARDS": "DISASTER MANAGEMENT",
+    "EXTREMISM & EXTERNAL THREATS": "INTERNAL SECURITY",
+    "BORDER MANAGEMENT & ORGANIZED CRIME": "INTERNAL SECURITY",
+    "CYBER, FINANCIAL & MEDIA SECURITY": "INTERNAL SECURITY",
+    "SECURITY FORCES & MANDATES": "INTERNAL SECURITY",
+    "ETHICS": "ETHICS, INTEGRITY & APTITUDE",
+    "GOVERNANCE & PROBITY": "ETHICS, INTEGRITY & APTITUDE",
+    "PSYCHOLOGY & FOUNDATIONAL VALUES": "ETHICS, INTEGRITY & APTITUDE",
+    "MORAL THINKERS & LEADERS": "ETHICS, INTEGRITY & APTITUDE",
+    "APPLIED ETHICS": "ETHICS, INTEGRITY & APTITUDE",
+    "SOCIAL JUSTICE AND EMPOWERMENT": "SOCIAL JUSTICE",
+    "HEALTH SECTOR REFORMS": "SOCIAL JUSTICE",
+    "EDUCATION REFORMS": "SOCIAL JUSTICE",
+    "GOVERNANCE AND ACCOUNTABILITY": "GOVERNANCE",
+    "ECONOMIC POLICIES AND REFORMS": "INDIAN ECONOMY",
+    "ELECTIONS & POLITICAL DYNAMICS": "POLITY",
+    "ACCOUNTABILITY & CIVIL SERVICES": "GOVERNANCE",
+    "SOCIAL SECTOR & HUMAN DEVELOPMENT": "SOCIAL JUSTICE",
+    "ECONOMY": "INDIAN ECONOMY"
+}
+
+def find_smart_match(paper, subject, sec_grp, micro, old_subtopic=""):
+    if not valid_nodes: return None
+    import difflib
+    subj_upper = subject.upper().strip()
+    subj_resolved = subject_alias.get(subj_upper, subj_upper)
+    sec_grp_clean = clean_for_match(sec_grp)
+    micro_clean = clean_for_match(micro)
+    old_sub_clean = clean_for_match(old_subtopic)
+    
+    subject_nodes = [n for n in valid_nodes if n['subject'] == subj_resolved]
+    
+    # 0. Check if the microtopic is general/miscellaneous
+    if micro_clean in ('general', 'miscellaneous', 'other', 'unknown', ''):
+        for n in subject_nodes:
+            if clean_for_match(n['section_group']) == sec_grp_clean and n['subtopic'] == '':
+                return n
+        for n in subject_nodes:
+            if clean_for_match(n['section_group']) == sec_grp_clean:
+                return n
+    
+    for n in subject_nodes:
+        if n['subtopic'] and clean_for_match(n['subtopic']) == micro_clean:
+            return n
+            
+    if old_sub_clean:
+        for n in subject_nodes:
+            if n['subtopic'] and clean_for_match(n['subtopic']) == old_sub_clean:
+                return n
+
+    exact_micro_node = None
+    for n in subject_nodes:
+        if clean_for_match(n['section_group']) == sec_grp_clean:
+            if clean_for_match(n['microtopic']) == micro_clean:
+                if old_sub_clean and clean_for_match(n['subtopic']) == old_sub_clean:
+                    return n
+                if n['subtopic'] == '':
+                    exact_micro_node = n
+                    
+    if exact_micro_node:
+        if old_sub_clean:
+            for n in subject_nodes:
+                if clean_for_match(n['section_group']) == sec_grp_clean:
+                    if clean_for_match(n['microtopic']) == micro_clean:
+                        n_sub_clean = clean_for_match(n['subtopic'])
+                        if n_sub_clean and (n_sub_clean in old_sub_clean or old_sub_clean in n_sub_clean):
+                            return n
+        return exact_micro_node
+
+    for n in subject_nodes:
+        if clean_for_match(n['microtopic']) == micro_clean:
+            if old_sub_clean and clean_for_match(n['subtopic']) == old_sub_clean:
+                return n
+            if n['subtopic'] == '':
+                exact_micro_node = n
+                
+    if exact_micro_node:
+        if old_sub_clean:
+            for n in subject_nodes:
+                if clean_for_match(n['microtopic']) == micro_clean:
+                    n_sub_clean = clean_for_match(n['subtopic'])
+                    if n_sub_clean and (n_sub_clean in old_sub_clean or old_sub_clean in n_sub_clean):
+                        return n
+        return exact_micro_node
+
+    if micro_clean in cleaned_micro_map:
+        base_node = cleaned_micro_map[micro_clean]
+        if old_sub_clean:
+            for n in valid_nodes:
+                if clean_for_match(n['microtopic']) == micro_clean:
+                    n_sub_clean = clean_for_match(n['subtopic'])
+                    if n_sub_clean and (n_sub_clean in old_sub_clean or old_sub_clean in n_sub_clean):
+                        return n
+        return base_node
+
+    best_node = None
+    best_score = 0.0
+    for n in subject_nodes:
+        if n['subtopic'] == '':
+            score = difflib.SequenceMatcher(None, micro_clean, clean_for_match(n['microtopic'])).ratio()
+            if micro_clean in clean_for_match(n['microtopic']) or clean_for_match(n['microtopic']) in micro_clean:
+                score += 0.3
+            if score > best_score and score >= 0.7:
+                best_score = score
+                best_node = n
+                
+    if best_node:
+        if old_sub_clean:
+            for n in subject_nodes:
+                if clean_for_match(n['microtopic']) == clean_for_match(best_node['microtopic']):
+                    n_sub_clean = clean_for_match(n['subtopic'])
+                    if n_sub_clean and (n_sub_clean in old_sub_clean or old_sub_clean in n_sub_clean):
+                        return n
+        return best_node
+
+    for n in valid_nodes:
+        if n['subtopic'] == '':
+            score = difflib.SequenceMatcher(None, micro_clean, clean_for_match(n['microtopic'])).ratio()
+            if micro_clean in clean_for_match(n['microtopic']) or clean_for_match(n['microtopic']) in micro_clean:
+                score += 0.3
+            if score > best_score and score >= 0.75:
+                best_score = score
+                best_node = n
+                
+    if best_node:
+        if old_sub_clean:
+            for n in valid_nodes:
+                if clean_for_match(n['microtopic']) == clean_for_match(best_node['microtopic']):
+                    n_sub_clean = clean_for_match(n['subtopic'])
+                    if n_sub_clean and (n_sub_clean in old_sub_clean or old_sub_clean in n_sub_clean):
+                        return n
+        return best_node
+        
+    return None
+
 
 def strip_clean(text):
     return text.strip() if text else ""
@@ -161,7 +380,7 @@ def parse_intro_conclusions():
             content = f.read()
             
         # Split by H5 subtopics
-        subtopics = re.split(r'\n#####\s+Subtopic:\s*', content)
+        subtopics = re.split(r'\n#####\s+Subtopic:[ \t]*', content)
         
         for subtopic_block in subtopics[1:]:
             lines = subtopic_block.split('\n')
@@ -294,10 +513,38 @@ def parse_essay_value_add():
                     
                 results.append(row)
             
+    # Parse Essay Connectors / Transition Words
+    connecting_path = os.path.join(VA_DIR, "essay", "Connecting_Words.md")
+    if os.path.exists(connecting_path):
+        with open(connecting_path, 'r', encoding='utf-8') as f:
+            essay_conn_content = f.read()
+            
+        def build_conn_card(sec_grp, m_topic, s_topic, card_title, card_body):
+            return {
+                "paper": "Essay",
+                "subject": "Essay",
+                "section_group": sec_grp,
+                "microtopic": m_topic,
+                "subtopic": s_topic,
+                "title": card_title,
+                "category": "Connecting Words",
+                "entry_type": "quote",
+                "content": card_body,
+                "hierarchy_path": build_hierarchy_path("Essay", "Essay", sec_grp, m_topic, s_topic)
+            }
+            
+        conn_results = _parse_hierarchy_md(essay_conn_content, build_conn_card)
+        results.extend(conn_results)
+
     out_path = os.path.join(OUT_DIR, "mains_essay_value_add.json")
     with open(out_path, 'w', encoding='utf-8') as out_f:
         json.dump(results, out_f, indent=2, ensure_ascii=False)
-    print(f"Parsed {len(results)} Essay Anecdotes to {out_path}")
+        
+    out_path_admin = r"c:\Users\Dr. Yogesh\Videos\APP FOLDER - V1 - Copy\app\frontend-noji-2.6.2\3\pilot pro 10.2\admin-panel\mains-json\mains_essay_value_add.json"
+    with open(out_path_admin, 'w', encoding='utf-8') as out_f:
+        json.dump(results, out_f, indent=2, ensure_ascii=False)
+        
+    print(f"Parsed {len(results)} Essay Anecdotes and Connectors to {out_path} and {out_path_admin}")
 
 # ==============================================================================
 # 4. PARSE MNEMONICS
@@ -329,7 +576,7 @@ def parse_mnemonics():
         default_subject = strip_clean(h2_match.group(1)) if h2_match else "GEOGRAPHY"
         
         # Split by Subtopic H5
-        subtopics = re.split(r'\n#####\s+Subtopic:\s*', content)
+        subtopics = re.split(r'\n#####\s+Subtopic:[ \t]*', content)
         
         for subtopic_block in subtopics[1:]:
             lines = subtopic_block.split('\n')
@@ -497,7 +744,7 @@ def parse_ethics_value_add():
         with open(innovations_file, 'r', encoding='utf-8') as f:
             content = f.read()
             
-        subtopics = re.split(r'\n#####\s+Subtopic:\s*', content)
+        subtopics = re.split(r'\n#####\s+Subtopic:[ \t]*', content)
         for st_block in subtopics[1:]:
             lines = st_block.split('\n')
             subtopic_name = strip_clean(lines[0])
@@ -1004,10 +1251,578 @@ def parse_ethics_value_add():
                 "hierarchy_path": hierarchy_path
             })
             
+    # File 9: GS4- Indian Philosophies and Religious Ethics.md
+    philosophies_file = os.path.join(folder, "GS4- Indian Philosophies and Religious Ethics.md")
+    if os.path.exists(philosophies_file):
+        with open(philosophies_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+        cards = re.split(r'\n##\s+\d+\.\s*', content)
+        for card_block in cards[1:]:
+            lines = card_block.split('\n')
+            title = strip_clean(lines[0])
+            
+            block_content = "\n".join(lines[1:])
+            tags = extract_bracket_tags(block_content)
+            
+            subject = tags.get('subject', 'ETHICS, INTEGRITY & APTITUDE')
+            section_group = tags.get('section_group', 'Moral Thinkers & Leaders')
+            microtopic = tags.get('microtopic', 'Contributions of Moral Thinkers and Philosophers from India and World')
+            subtopic = tags.get('subtopic', None)
+            
+            hierarchy_path = build_hierarchy_path("GS-IV", subject, section_group, microtopic, subtopic)
+            cleaned_text = re.sub(r'\[(Subject|Section Group|Microtopic|Subtopic|Category):\s*[^\]]+\]\n*', '', block_content)
+            
+            results.append({
+                "ethics_type": "keyword",
+                "paper": "GS-IV",
+                "subject": subject,
+                "section_group": section_group,
+                "microtopic": microtopic,
+                "subtopic": subtopic,
+                "title": title,
+                "content_markdown": strip_clean(cleaned_text),
+                "diagram_image_path": None,
+                "officer_name": None,
+                "initiative": None,
+                "impact": None,
+                "core_values": "philosophy",
+                "pyqs": [],
+                "hierarchy_path": hierarchy_path
+            })
+
+    # File 10: Final Ethics Phrases Updated.md
+    phrases_file = os.path.join(folder, "Final Ethics Phrases Updated.md")
+    if os.path.exists(phrases_file):
+        with open(phrases_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+        cards = re.split(r'\n##\s+\d+\.\s*', content)
+        for card_block in cards[1:]:
+            lines = card_block.split('\n')
+            title = strip_clean(lines[0])
+            
+            block_content = "\n".join(lines[1:])
+            tags = extract_bracket_tags(block_content)
+            
+            subject = tags.get('subject', 'ETHICS, INTEGRITY & APTITUDE')
+            section_group = tags.get('section_group', 'Governance & Probity')
+            microtopic = tags.get('microtopic', None)
+            subtopic = tags.get('subtopic', None)
+            
+            hierarchy_path = build_hierarchy_path("GS-IV", subject, section_group, microtopic, subtopic)
+            cleaned_text = re.sub(r'\[(Subject|Section Group|Microtopic|Subtopic|Category):\s*[^\]]+\]\n*', '', block_content)
+            
+            results.append({
+                "ethics_type": "keyword",
+                "paper": "GS-IV",
+                "subject": subject,
+                "section_group": section_group,
+                "microtopic": microtopic,
+                "subtopic": subtopic,
+                "title": title,
+                "content_markdown": strip_clean(cleaned_text),
+                "diagram_image_path": None,
+                "officer_name": None,
+                "initiative": None,
+                "impact": None,
+                "core_values": "phrase",
+                "pyqs": [],
+                "hierarchy_path": hierarchy_path
+            })
+
+    # File 11: ETHICAL DILEMMAS.md
+    dilemmas_file = os.path.join(folder, "ETHICAL DILEMMAS.md")
+    if os.path.exists(dilemmas_file):
+        with open(dilemmas_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+        cards = re.split(r'\n##\s+\d+\.\s*', content)
+        for card_block in cards[1:]:
+            lines = card_block.split('\n')
+            title = strip_clean(lines[0])
+            
+            block_content = "\n".join(lines[1:])
+            tags = extract_bracket_tags(block_content)
+            
+            subject = tags.get('subject', 'ETHICS, INTEGRITY & APTITUDE')
+            section_group = tags.get('section_group', 'Applied Ethics')
+            microtopic = tags.get('microtopic', 'Case Studies on above issues')
+            subtopic = tags.get('subtopic', None)
+            
+            hierarchy_path = build_hierarchy_path("GS-IV", subject, section_group, microtopic, subtopic)
+            cleaned_text = re.sub(r'\[(Subject|Section Group|Microtopic|Subtopic|Category):\s*[^\]]+\]\n*', '', block_content)
+            
+            results.append({
+                "ethics_type": "keyword",
+                "paper": "GS-IV",
+                "subject": subject,
+                "section_group": section_group,
+                "microtopic": microtopic,
+                "subtopic": subtopic,
+                "title": title,
+                "content_markdown": strip_clean(cleaned_text),
+                "diagram_image_path": None,
+                "officer_name": None,
+                "initiative": None,
+                "impact": None,
+                "core_values": "dilemma",
+                "pyqs": [],
+                "hierarchy_path": hierarchy_path
+            })
+            
+    # Parse Phase 2 General Keywords, Case Studies, and SC Judgments
+    def split_into_cards(sub_content):
+        """Handle both --- separator and numbered/bullet list formats."""
+        # Try --- separator first
+        if '\n---' in sub_content:
+            parts = sub_content.split('\n---')
+            if len(parts) > 1:
+                return parts
+        # Try numbered list: lines like "1. **keyword**" or "1. keyword"
+        numbered = re.split(r'\n(?=\d+\.\s)', sub_content)
+        if len(numbered) > 1:
+            return numbered
+        # Try bullet list: lines like "- **keyword**" or "• **keyword**"
+        bulleted = re.split(r'\n(?=[-•]\s+\*\*)', sub_content)
+        if len(bulleted) > 1:
+            return bulleted
+        return [sub_content]
+
+    def extract_title_and_body(card):
+        """Extract clean keyword title and body. Handles both:
+        1. **Keyword** - definition (correct format)
+        2. **Keyword refers to definition** (entire phrase bolded - PDF artifact)
+        3. 1. **Keyword** - definition (numbered list)
+        """
+        card = card.strip()
+        # Remove leading number or bullet
+        card = re.sub(r'^\d+\.\s+', '', card)
+        card = re.sub(r'^[-•]\s+', '', card)
+
+        title_match = re.search(r'\*\*(.+?)\*\*', card, re.DOTALL)
+        if not title_match:
+            return None, None
+
+        raw_title = title_match.group(1).strip()
+        raw_title = re.sub(r'^[-•\*\d\.]\s*', '', raw_title).strip()
+
+        # If the bolded text is actually the whole "Keyword definition Example" phrase,
+        # split at the first verb/separator to isolate just the keyword name
+        DEFN_SEPARATORS = [
+            r'\s+refers to\s+', r'\s+is the\s+', r'\s+are the\s+',
+            r'\s+means\s+', r'\s+denotes\s+', r'\s+involves\s+',
+            r'\s+describes\s+', r'\s+is a\s+', r'\s+is an\s+',
+            r'\s+are a\s+', r'\s+signifies\s+', r'\s+represents\s+',
+            r'\s+indicates\s+', r'\s+refers\b', r'\s+is\s+(?:the|a|an)\s+',
+            r'\s+are\s+(?:jali|simple|symbolic|carved|sacred|overhanging|complementary|functional|intricate|flexible)',
+            r'\s+uses\s+', r'\s+features\s+', r'\s+integrates\s+',
+            r'\s+allows\s+', r'\s+promotes\s+', r'\s+emphasizes\s+',
+            r'\s+ensures\s+', r'\s+combines\s+', r'\s+blends\s+',
+        ]
+        prepend_body = ''
+        for sep_pat in DEFN_SEPARATORS:
+            m = re.search(sep_pat, raw_title, re.IGNORECASE)
+            if m and m.start() > 2:  # keyword must be at least 3 chars
+                prepend_body = raw_title[m.start():].strip()
+                raw_title = raw_title[:m.start()].strip()
+                break
+
+        # Get rest of card after the bold match
+        parts = card.split(title_match.group(0), 1)
+        body_rest = parts[1].strip() if len(parts) > 1 else ''
+        # Remove leading colon, dash, hyphen
+        body_rest = re.sub(r'^[:\-–]\s*', '', body_rest).strip()
+
+        # Combine
+        if prepend_body and body_rest:
+            card_body = prepend_body.rstrip(' ') + ' ' + body_rest
+        elif prepend_body:
+            card_body = prepend_body
+        else:
+            card_body = body_rest
+
+        # Clean per-line orphan 'o' (PDF artifact) and promo links
+        body_lines = card_body.split('\n')
+        cleaned_lines = []
+        for line in body_lines:
+            line = re.sub(r'https\S+', '', line)
+            line = re.sub(r'Search @\S+', '', line)
+            line = re.sub(r'\s+o\s*$', '', line)  # trailing orphan 'o'
+            cleaned_lines.append(line)
+        card_body = '\n'.join(cleaned_lines).strip()
+
+        # Also clean title
+        raw_title = re.sub(r'\s+o\s*$', '', raw_title).strip()
+
+        return raw_title, card_body
+
+    def parse_md_value_add_cards(filepath, core_val_type, default_subject, default_paper):
+        if not os.path.exists(filepath):
+            print(f"  File not found: {filepath}")
+            return []
+            
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+        subject_match = re.search(r'^#\s+Subject:\s*(.+)$', content, re.MULTILINE)
+        subj = strip_clean(subject_match.group(1)) if subject_match else default_subject
+        
+        parsed_results = []
+        sec_parts = re.split(r'(?m)^\s*###\s+Section\s+Group:\s*', content)
+        for sec_part in sec_parts[1:]:
+            lines = sec_part.split('\n')
+            sec_grp = strip_clean(lines[0])
+            sec_content = "\n".join(lines[1:])
+            
+            micro_parts = re.split(r'(?m)^\s*####\s+Microtopic:\s*', sec_content)
+            for micro_part in micro_parts[1:]:
+                m_lines = micro_part.split('\n')
+                m_topic = strip_clean(m_lines[0])
+                micro_content = "\n".join(m_lines[1:])
+                
+                sub_parts = re.split(r'(?m)^\s*#####\s+Subtopic:\s*', micro_content)
+                for sub_part in sub_parts[1:]:
+                    s_lines = sub_part.split('\n')
+                    s_topic = strip_clean(s_lines[0])
+                    sub_content = "\n".join(s_lines[1:])
+                    
+                    cards = split_into_cards(sub_content)
+                    for card in cards:
+                        if not card.strip(): continue
+                        card_title, card_body = extract_title_and_body(card)
+                        if not card_title: continue
+                        
+                        # Determine Paper from Subject
+                        paper = default_paper
+                        if subj == "HISTORY" or subj == "SOCIETY":
+                            paper = "GS-I"
+                        elif subj == "POLITY" or subj == "GOVERNANCE" or subj == "SOCIAL JUSTICE" or subj == "INTERNATIONAL RELATIONS":
+                            paper = "GS-II"
+                        elif subj == "ECONOMY" or subj == "AGRICULTURE" or subj == "SCIENCE & TECHNOLOGY" or subj == "ENVIRONMENT" or subj == "DISASTER MANAGEMENT" or subj == "INTERNAL SECURITY":
+                            paper = "GS-III"
+                            
+                        h_path = build_hierarchy_path(paper, subj, sec_grp, m_topic, s_topic)
+                        
+                        parsed_results.append({
+                            "paper": paper,
+                            "subject": subj,
+                            "section_group": sec_grp,
+                            "microtopic": m_topic,
+                            "subtopic": s_topic,
+                            "title": card_title,
+                            "content_markdown": card_body,
+                            "core_values": [core_val_type],
+                            "hierarchy_path": h_path
+                        })
+        return parsed_results
+
+    # Write Ethics-only output (pure GS4 content)
     out_path = os.path.join(OUT_DIR, "mains_ethics_value_add.json")
     with open(out_path, 'w', encoding='utf-8') as out_f:
         json.dump(results, out_f, indent=2, ensure_ascii=False)
+        
+    out_path_admin = r"c:\Users\Dr. Yogesh\Videos\APP FOLDER - V1 - Copy\app\frontend-noji-2.6.2\3\pilot pro 10.2\admin-panel\mains-json\mains_ethics_value_add.json"
+    with open(out_path_admin, 'w', encoding='utf-8') as out_f:
+        json.dump(results, out_f, indent=2, ensure_ascii=False)
+        
     print(f"Parsed {len(results)} Ethics cards to {out_path}")
+
+
+# ==============================================================================
+# MODULE-LEVEL CARD PARSING HELPERS (used by parsers 7, 8, 9)
+# ==============================================================================
+def split_into_cards(sub_content):
+    """Handle both --- separator and numbered/bullet list formats."""
+    if '\n---' in sub_content:
+        parts = sub_content.split('\n---')
+        if len(parts) > 1:
+            return parts
+    numbered = re.split(r'\n(?=\d+\.\s)', sub_content)
+    if len(numbered) > 1:
+        return numbered
+    bulleted = re.split(r'\n(?=[-•]\s+\*\*)', sub_content)
+    if len(bulleted) > 1:
+        return bulleted
+    return [sub_content]
+
+def extract_title_and_body(card):
+    """Extract clean keyword title and body, handling bolded-phrase PDF artifacts."""
+    card = card.strip()
+    card = re.sub(r'^\d+\.\s+', '', card)
+    card = re.sub(r'^[-•]\s+', '', card)
+
+    title_match = re.search(r'\*\*(.+?)\*\*', card, re.DOTALL)
+    if not title_match:
+        return None, None
+
+    raw_title = title_match.group(1).strip()
+    raw_title = re.sub(r'^[-•\*\d\.]\s*', '', raw_title).strip()
+
+    is_case_study = '###' in card
+    
+    DEFN_SEPARATORS = [] if is_case_study else [
+        r'\s+refers to\s+', r'\s+is the\s+', r'\s+are the\s+',
+        r'\s+means\s+', r'\s+denotes\s+', r'\s+involves\s+',
+        r'\s+describes\s+', r'\s+is a\s+', r'\s+is an\s+',
+        r'\s+are a\s+', r'\s+signifies\s+', r'\s+represents\s+',
+        r'\s+indicates\s+', r'\s+refers\b', r'\s+is\s+(?:the|a|an)\s+',
+        r'\s+are\s+(?!the\b|a\b|an\b)', r'\s+uses\s+', r'\s+features\s+',
+        r'\s+integrates\s+', r'\s+allows\s+', r'\s+promotes\s+',
+        r'\s+emphasizes\s+', r'\s+ensures\s+', r'\s+combines\s+',
+        r'\s+blends\s+', r'\s+include\s+', r'\s+is\s+[a-z]',
+    ]
+    prepend_body = ''
+    for sep_pat in DEFN_SEPARATORS:
+        m = re.search(sep_pat, raw_title, re.IGNORECASE)
+        if m and m.start() > 2:
+            prepend_body = raw_title[m.start():].strip()
+            raw_title = raw_title[:m.start()].strip()
+            break
+
+    parts = card.split(title_match.group(0), 1)
+    body_rest = parts[1].strip() if len(parts) > 1 else ''
+    if not re.match(r'^[-*•]\s+\*\*', body_rest):
+        body_rest = re.sub(r'^[:\-–]\s*', '', body_rest).strip()
+
+    if prepend_body and body_rest:
+        card_body = prepend_body.rstrip(' ') + ' ' + body_rest
+    elif prepend_body:
+        card_body = prepend_body
+    else:
+        card_body = body_rest
+
+    body_lines = card_body.split('\n')
+    cleaned_lines = []
+    for line in body_lines:
+        line = re.sub(r'https\S+', '', line)
+        line = re.sub(r'Search @\S+', '', line)
+        line = line.replace('\uf0b7', '').replace('', '')
+        line = re.sub(r'\s+o\s*$', '', line)
+        cleaned_lines.append(line.strip())
+    card_body = '\n'.join(cleaned_lines).strip()
+    raw_title = re.sub(r'\s+o\s*$', '', raw_title).strip()
+    return raw_title, card_body
+
+
+def _parse_hierarchy_md(content, card_builder_fn):
+    """Generic hierarchy parser: splits by Section Group → Microtopic → Subtopic → cards."""
+    results = []
+    sec_parts = re.split(r'(?m)^\s*###\s+Section\s+Group:\s*', content)
+    for sec_part in sec_parts[1:]:
+        lines = sec_part.split('\n')
+        sec_grp = strip_clean(lines[0])
+        sec_content = "\n".join(lines[1:])
+        micro_parts = re.split(r'(?m)^\s*####\s+Microtopic:\s*', sec_content)
+        for micro_part in micro_parts[1:]:
+            m_lines = micro_part.split('\n')
+            m_topic = strip_clean(m_lines[0])
+            micro_content = "\n".join(m_lines[1:])
+            sub_parts = re.split(r'(?m)^\s*#####\s+Subtopic:[ \t]*', micro_content)
+            for sub_part in sub_parts[1:]:
+                s_lines = sub_part.split('\n')
+                s_topic = strip_clean(s_lines[0])
+                sub_content = "\n".join(s_lines[1:])
+                for card in split_into_cards(sub_content):
+                    if not card.strip(): continue
+                    card_title, card_body = extract_title_and_body(card)
+                    if not card_title: continue
+                    row = card_builder_fn(sec_grp, m_topic, s_topic, card_title, card_body)
+                    if row:
+                        results.append(row)
+    return results
+
+
+# ==============================================================================
+# 7. PARSE KEYWORDS
+# ==============================================================================
+def parse_keywords():
+    def parse_md_cards(filepath, core_val_type, default_subject, default_paper):
+        if not os.path.exists(filepath):
+            print(f"  File not found: {filepath}")
+            return []
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+        subject_match = re.search(r'^#\s+Subject:\s*(.+)$', content, re.MULTILINE)
+        subj = strip_clean(subject_match.group(1)) if subject_match else default_subject
+
+        def build_card(sec_grp, m_topic, s_topic, card_title, card_body):
+            paper = get_paper_from_subject(subj, default_paper)
+            seed = f"KEYWORD:{subj.upper()}:{card_title}"
+            card_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, seed))
+            
+            res = find_smart_match(paper, subj, sec_grp, m_topic, s_topic)
+            p_val = res['paper'] if res else paper
+            s_val = res['subject'] if res else subject_alias.get(subj.upper(), subj)
+            sg_val = res['section_group'] if res else sec_grp
+            mt_val = res['microtopic'] if res else m_topic
+            # ALWAYS keep original subtopic from the MD file — never overwrite with empty
+            st_val = s_topic if s_topic.strip() else (res['subtopic'] if res else "")
+            
+            return {
+                "id": card_id,
+                "paper": p_val,
+                "subject": s_val,
+                "section_group": sg_val,
+                "microtopic": mt_val,
+                "subtopic": st_val,
+                "title": card_title,
+                "content_markdown": card_body,
+                "core_values": [core_val_type],
+                "hierarchy_path": build_hierarchy_path(p_val, s_val, sg_val, mt_val, st_val)
+            }
+        return _parse_hierarchy_md(content, build_card)
+
+    results = []
+    kw_dir = os.path.join(VA_DIR, "keywords")
+    if os.path.exists(kw_dir):
+        for kw_file, subj, paper in [
+            ("GS1_History_Keywords.md", "HISTORY", "GS-I"),
+            ("GS1_Society_Keywords.md", "SOCIETY", "GS-I"),
+            ("GS2_Polity_Keywords.md", "POLITY", "GS-II"),
+            ("GS3_Keywords.md", "INDIAN ECONOMY", "GS-III"),
+        ]:
+            results.extend(parse_md_cards(os.path.join(kw_dir, kw_file), "general_keyword", subj, paper))
+
+    out_path = os.path.join(OUT_DIR, "mains_keywords.json")
+    with open(out_path, 'w', encoding='utf-8') as f:
+        json.dump(results, f, indent=2, ensure_ascii=False)
+    print(f"Parsed {len(results)} Keywords cards to {out_path}")
+
+
+# ==============================================================================
+# 8. PARSE CASE STUDIES
+# ==============================================================================
+def parse_case_studies():
+    cs_dir = os.path.join(VA_DIR, "case_studies")
+    cs_file = os.path.join(cs_dir, "GS2_GS3_Case_Studies.md") if os.path.exists(cs_dir) else None
+    if not cs_file or not os.path.exists(cs_file):
+        print("  Case studies file not found.")
+        return
+    with open(cs_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    def build_card(sec_grp, m_topic, s_topic, card_title, card_body):
+        # Strip paper and subject lines from card_body (which are redundant)
+        lines = card_body.split('\n')
+        cleaned_lines = []
+        for line in lines:
+            line_strip = line.strip().lower()
+            if re.match(r'^[-•\*]?\s*\*?(?:paper|subject)\*?\s*:', line_strip):
+                continue
+            cleaned_lines.append(line)
+        cleaned_body = "\n".join(cleaned_lines).strip()
+        
+        paper = get_paper_from_subject(sec_grp, "GS-III")
+        # Generates a stable UUID based on the case study subtopic name (independent of changing hierarchy)
+        seed = f"CASE-STUDY:{s_topic}"
+        card_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, seed))
+        
+        res = find_smart_match(paper, sec_grp, sec_grp, m_topic, s_topic)
+        p_val = res['paper'] if res else paper
+        s_val = res['subject'] if res else sec_grp
+        sg_val = res['section_group'] if res else sec_grp
+        mt_val = res['microtopic'] if res else m_topic
+        # ALWAYS keep original subtopic from MD — never overwrite with empty
+        st_val = s_topic if s_topic.strip() else (res['subtopic'] if res else "")
+        
+        return {
+            "id": card_id,
+            "paper": p_val,
+            "subject": s_val,
+            "section_group": sg_val,
+            "microtopic": mt_val,
+            "subtopic": st_val,
+            "title": card_title,
+            "content_markdown": cleaned_body,
+            "core_values": ["case_study"],
+            "hierarchy_path": build_hierarchy_path(p_val, s_val, sg_val, mt_val, st_val)
+        }
+
+    results = _parse_hierarchy_md(content, build_card)
+    out_path = os.path.join(OUT_DIR, "mains_case_studies.json")
+    with open(out_path, 'w', encoding='utf-8') as f:
+        json.dump(results, f, indent=2, ensure_ascii=False)
+    print(f"Parsed {len(results)} Case Studies to {out_path}")
+
+
+# ==============================================================================
+# 9. PARSE SC JUDGMENTS
+# ==============================================================================
+def parse_sc_judgments():
+    import uuid
+    jd_dir = os.path.join(VA_DIR, "judgments")
+    jd_file = os.path.join(jd_dir, "SC_Judgments.md") if os.path.exists(jd_dir) else None
+    if not jd_file or not os.path.exists(jd_file):
+        print("  SC Judgments file not found.")
+        return
+    with open(jd_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    results = []
+    sec_grp = ""
+    m_topic = ""
+    s_topic = ""
+    
+    lines = content.split('\n')
+    for line in lines:
+        line_strip = line.strip()
+        if not line_strip:
+            continue
+            
+        # Parse bracket tags
+        m_sec = re.match(r'^\[Section Group:\s*([^\]]+)\]', line_strip, re.IGNORECASE)
+        m_micro = re.match(r'^\[Microtopic:\s*([^\]]+)\]', line_strip, re.IGNORECASE)
+        m_theme = re.match(r'^\[Theme:\s*([^\]]+)\]', line_strip, re.IGNORECASE)
+        
+        if m_sec:
+            sec_grp = m_sec.group(1).strip()
+        elif m_micro:
+            m_topic = m_micro.group(1).strip()
+        elif m_theme:
+            s_topic = m_theme.group(1).strip()
+            
+        # Parse table rows starting with | [number] |
+        m_row = re.match(r'^\|\s*(\d+)\s*\|([^|]+)\|([^|]+)\|([^|]+)\|([^|]+)\|', line_strip)
+        if m_row:
+            case_name = m_row.group(2).replace('**', '').replace('*', '').strip()
+            key_issue = m_row.group(3).strip()
+            ruling = m_row.group(4).strip()
+            articles = m_row.group(5).strip()
+            
+            # Format content_markdown as a clean markdown table
+            content_markdown = f"| Key Issue | Supreme Court's Ruling | Related Articles / Laws |\n| :--- | :--- | :--- |\n| {key_issue} | {ruling} | {articles} |"
+            
+            # Generate a stable UUID (independent of changing hierarchy)
+            seed = f"SC-JUDGMENT:{case_name}"
+            card_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, seed))
+            
+            res = find_smart_match("GS-II", "POLITY", sec_grp or "Constitutional Framework & Evolution", m_topic or "Features, amendments, significant provisions and basic structure", s_topic)
+            p_val = res['paper'] if res else "GS-II"
+            s_val = res['subject'] if res else "POLITY"
+            sg_val = res['section_group'] if res else (sec_grp or "Constitutional Framework & Evolution")
+            mt_val = res['microtopic'] if res else (m_topic or "Features, amendments, significant provisions and basic structure")
+            # ALWAYS keep original subtopic from MD — never overwrite with empty
+            st_val = s_topic if s_topic.strip() else (res['subtopic'] if res else "")
+            
+            results.append({
+                "id": card_id,
+                "paper": p_val,
+                "subject": s_val,
+                "section_group": sg_val,
+                "microtopic": mt_val,
+                "subtopic": st_val,
+                "title": case_name,
+                "content_markdown": content_markdown,
+                "core_values": ["judgment"],
+                "hierarchy_path": build_hierarchy_path(p_val, s_val, sg_val, mt_val, st_val)
+            })
+
+    out_path = os.path.join(OUT_DIR, "mains_sc_judgments.json")
+    with open(out_path, 'w', encoding='utf-8') as f:
+        json.dump(results, f, indent=2, ensure_ascii=False)
+    print(f"Parsed {len(results)} SC Judgments to {out_path}")
+
 
 # ==============================================================================
 # MAIN EXECUTION
@@ -1020,6 +1835,9 @@ def main():
     parse_mnemonics()
     parse_frameworks()
     parse_ethics_value_add()
+    parse_keywords()
+    parse_case_studies()
+    parse_sc_judgments()
     print("Value Additions Parsing Completed Successfully!")
 
 if __name__ == "__main__":

@@ -1,0 +1,417 @@
+{
+  "course": "Civil Services",
+  "id": "forum-mgp-2026-csm26t04se",
+  "title": "Forum MGP 2026 - CSM26T04SE",
+  "launch_year": 2026,
+  "institute": "Forum IAS",
+  "program_id": "mgp",
+  "program_name": "MGP",
+  "series": "Test Series",
+  "level": null,
+  "paperType": "Sectional",
+  "defaultMinutes": 180,
+  "sourceMode": "sol-only",
+  "questions": [
+    {
+      "id": "forum-mgp-2026-csm26t04se-q01",
+      "questionNumber": 1,
+      "paper": "GS3",
+      "subject": "INDIAN ECONOMY",
+      "sectionGroup": "Macroeconomics & Fiscal Policy",
+      "microTopic": "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
+      "subTopic": "GDP",
+      "macrotag": "Descriptive, Analytical, Applied",
+      "microtag": "Define, Potential GDP, India",
+      "questionText": "Define potential GDP. What are the factors that prevent India from realizing its potential GDP? 10",
+      "marks": 10,
+      "year": 2026,
+      "answers": [
+        {
+          "id": "forum-mgp-2026-csm26t04se-q01-forumias",
+          "institute": "ForumIAS",
+          "answerText": "| **Approach:** • Introduce the answer by defining Potential GDP. <br>• In the body, discuss the factors that are preventing India from realizing its potential GDP. <br>• Next, suggest measures that need to be taken to realize potential GDP. <br>• Conclude by underlining the need for coordinated policy to realize potential GDP. |\n| --- |\n\n**Potential GDP** is defined as the **level of output** an economy can **sustain at full capacity utilization** and **full** **employment** without creating **inflationary pressures**. It represents the optimal use of resources (capital, labour, etc.) at sustainable levels. Following are the factors that **prevent India** from realizing its **potential GDP:**\n1. a) In the agriculture sector, **fragmented landholdings** (average 1.08 ha in 2015-16) hinder **mechanization** and limit **production scale**;\n   b) inadequate **storage and processing** infrastructure reduces **value addition**;\n   c) poor **price discovery** due to **market fragmentation** collectively restrict agriculture's GDP contribution to 16% (ES 24-25), despite employing a large workforce (46.1% - ES 24- 25).\n\n2. a) In the industrial sector, low **technology adoption** remains a significant challenge;\n   b) the **'missing** **middle'** phenomenon and regulations that **discourage business growth** (dwarfism) create a **low** **productivity trap**;\n   c) these factors reduce **competitiveness** and prevent integration into **global value** **chains**, leading to a **stagnant GDP contribution** (~ 30%) for decades.\n\n3. a) **Global economic slowdown** and **increasing protectionism** limit India's export potential and foreign investment inflows;\n   b) significant **skills gap** (only 2.3% of workers formally skilled) restricts **productivity growth**.\n\n4. a) Declining **Gross Fixed Capital Formation (GFCF)** from 40% (2011) to 33.5% (2024) indicates inadequate **infrastructure investment**;\n   b) **elevated logistics costs** (14% of GDP) reduce **competitiveness** of Indian goods in global markets.\n\nMeasures that can be taken **to realize potential GDP:**\n1. a) **Increasing agricultural productivity** through farmer collectives (FPOs) to improve **bargaining** **power** and achieve **economies of scale**;\n   b) promoting **land consolidation methods** (cooperative and corporate farming) to enable mechanization;\n   c) implementing **digital market platforms** (e-NAM) for transparent **price discovery**.\n\n2. a) Developing **integrated value chains** (PM Formalization of Food Processing Enterprises) to reduce post-harvest losses; enhancing **export competitiveness** of agricultural products through **dedicated** **infrastructure** [Trade Infrastructure for Export Scheme (TIES)] and market development initiatives.\n\n3. a) **Fostering entrepreneurship** to generate quality employment (Startup India Seed Fund, MUDRA loans);\n   b) increasing **women's economic participation** to utilize the untapped labor resource;\n   c) addressing the **skills mismatch** through targeted vocational training programs (Skill India Mission).\n\n4. a) Stimulating **indigenous innovation** (Atal Innovation Mission) to reduce technology dependence;\n   b) **investing strategically** in high-growth sectors (through the Rs. 1.5 lakh crore 50-year interest-free loan, Budget 2025-26).\n\n5. a) Accelerating **technological modernization** across manufacturing (PLI schemes);\n   b) enhancing **global market integration** through strategic trade agreements (India-EFTA TEPA) to position Indian industries within global **value chains**.\n\nBridging India's potential-actual **GDP gap** requires coordinated **short and long-term policies** that strengthen institutions and remove **structural barriers** to achieve sustainable economic transformation. (***413 words***)"
+        }
+      ],
+      "source_attribution_label": "Forum MGP 2026 (CSM26T04SE)",
+      "exam_info": {
+        "isPyq": false,
+        "is_ncert": false,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
+        "is_allied": false,
+        "is_others": false,
+        "exam_category": "cse",
+        "specific_exam": null,
+        "stage": "mains",
+        "paper": "mains_gs3"
+      },
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP"
+    },
+    {
+      "id": "forum-mgp-2026-csm26t04se-q02",
+      "questionNumber": 2,
+      "paper": "GS3",
+      "subject": "INDIAN ECONOMY",
+      "sectionGroup": "Macroeconomics & Fiscal Policy",
+      "microTopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "subTopic": "Manufacturing Sector",
+      "macrotag": "Descriptive, Comparative, Applied",
+      "microtag": "Elaborate, ELI, PLI, Economic growth",
+      "questionText": "“Both the Employment Linked Incentive (ELI) and Production Linked Incentive (PLI) schemes are  intended to promote economic growth, yet they employ different approaches and focus on distinct  outcomes.” Elaborate.",
+      "marks": 10,
+      "year": 2026,
+      "answers": [
+        {
+          "id": "forum-mgp-2026-csm26t04se-q02-forumias",
+          "institute": "ForumIAS",
+          "answerText": "| **Approach:** • Introduce the answer by giving a brief background of the ELI and PLI schemes. <br>• In the body, elaborate the different approaches they adopt to boost economic growth and achieve distinct outcomes. <br>• Conclude by highlighting the significance of the two schemes. |\n| --- |\n\nThe PLI scheme was launched in 2020-21 to offer companies **incentives on incremental sales** from **products** **manufactured in India** to promote **growth of domestic manufacturing** (Make in India). Meanwhile, the ELI scheme was launched in the **Union Budget 2024-25** to incentivize **job creation,** promote **formalization in the** **job market** and improve **employability.**\n\nBoth schemes employ **different approaches** and focus on **distinct outcomes**:\n\n**ELI Scheme** **PLI Scheme**\n\n1. a) Based on the **bottom-up model** of economic 1.\n   a) Based on the **trickle-down model** of development;\n   b) **full employment** linked to economic development;\n   b) **efficient production** greater purchasing power and demand in the linked to higher incomes, more jobs and greater economy.  prosperity.\n\n2. Emphasis on a **high social return** (job creation, 2. Emphasis on **high economic return** (GDP inclusive growth) from stimulus provided. growth) from stimulus provided.\n\n3. a) Direct bearing on employment scenario as 3. Direct bearing on economic growth as **incentives** provided for the number of **direct** **incentives** provided for achievement of **jobs** created;\n   b) encourages firms to **hire people** **incremental production levels.** rather than **deploy machinery**. 4. Does not necessarily **prioritize** job creation, as\n\n4. Allows the firm to strike the right **balance** incentives may instead be used to boost **between automation** and **labour** for optimal **marginal** **profits** or fund **technological** productivity. **upgradation**.\n\nThus, the **PLI** is an incentive for the economy to ‘**pour more into the top of a funnel’, while ELI** is an incentive to ‘**collect more at the bottom of the funnel’**. The transition from the PLI to the ELI seeks to address the **capital-labour imbalance**. Nevertheless, both the schemes seek job **creation** and enhanced **global** **competitiveness** of the economy and are critical in our journey towards a **$5 trillion economy**. (***279 words***)"
+        }
+      ],
+      "source_attribution_label": "Forum MGP 2026 (CSM26T04SE)",
+      "exam_info": {
+        "isPyq": false,
+        "is_ncert": false,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
+        "is_allied": false,
+        "is_others": false,
+        "exam_category": "cse",
+        "specific_exam": null,
+        "stage": "mains",
+        "paper": "mains_gs3"
+      },
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP"
+    },
+    {
+      "id": "forum-mgp-2026-csm26t04se-q03",
+      "questionNumber": 3,
+      "paper": "GS3",
+      "subject": "INDIAN ECONOMY",
+      "sectionGroup": "Macroeconomics & Fiscal Policy",
+      "microTopic": "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
+      "subTopic": "GDP",
+      "macrotag": "Analytical",
+      "microtag": "To what extent, GDP, Development",
+      "questionText": "To what extent, in your opinion, is GDP the best measure of a country's development? 10",
+      "marks": 10,
+      "year": 2026,
+      "answers": [
+        {
+          "id": "forum-mgp-2026-csm26t04se-q03-forumias",
+          "institute": "ForumIAS",
+          "answerText": "| **Approach:** • Introduce the answer by defining GDP. <br>• In the body, first discuss why GDP is considered as the best measure of a country's development. <br>• Then, present the counter-arguments. <br>• Conclude by highlighting the need to supplement GDP with other metrics. |\n| --- |\n\nGDP (Gross Domestic Product) represents the **aggregate monetary value** of **final goods and services** produced within a country during a specific **time period**. It can be calculated through three methods viz. **Income, Expenditure, and Product** or **Value-added.** GDP is considered the **best measure** of a country's development due to following **reasons**:\n1. a) **Broad consensus** among economists and policymakers;\n   b) provides **standardized data** enabling cross-country and temporal **comparisons** (e.g., comparing economic performance between India and China over decades).\n\n2. a) Can be **disaggregated** by sectors, regions, and districts;\n   b) allows both **macroeconomic** and **microeconomic analysis** (e.g., identifying which economic sectors are driving growth).\n\n3. a) Relies on **quantifiable economic outputs** rather than **subjective assessments** (e.g., happiness indices);\n   b) provides critical **economic signals** to various **stakeholders**;\n   c) guides **policy decisions** and **investment strategies** (e.g., interest rates decisions by Central Banks).\n\nHowever, critics argue that GDP has **significant limitations** as a development measure, such as:\n1. a) Measures **economic output** but not **overall well-being** or quality of life;\n   b) fails to capture **development dimensions** like health, education, and environmental quality, for e.g. India's consistent poor ranking in indices like  World Happiness Report, Global Gender Gap Report etc.\n   c) does not reflect **income distribution** or **regional disparities** (e.g., South Africa's high GDP per capita masks extreme **inequality**).\n\n2. a) Counts only **monetized transactions** and  disregards valuable **unpaid contributions** to society (domestic labour, caregiving);\n   b) **does not capture the externalities** (positive or negative) leading to **overestimation or underestimation of welfare**. E.g., an oil refinery polluting a nearby river; ease of living due to construction of roads.\n\nWhile GDP remains a valuable economic indicator, a **comprehensive development assessment** requires **supplementary metrics** like HDI, MPI, and SDG indicators. These measures provide a more holistic understanding of **social progress**, **environmental sustainability**, and overall well-being beyond economic production alone. ***(303 words)***"
+        }
+      ],
+      "source_attribution_label": "Forum MGP 2026 (CSM26T04SE)",
+      "exam_info": {
+        "isPyq": false,
+        "is_ncert": false,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
+        "is_allied": false,
+        "is_others": false,
+        "exam_category": "cse",
+        "specific_exam": null,
+        "stage": "mains",
+        "paper": "mains_gs3"
+      },
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP"
+    },
+    {
+      "id": "forum-mgp-2026-csm26t04se-q04",
+      "questionNumber": 4,
+      "paper": "GS3",
+      "subject": "INDIAN ECONOMY",
+      "sectionGroup": "Macroeconomics & Fiscal Policy",
+      "microTopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "subTopic": "Demographic Dividend",
+      "macrotag": "Analytical, Applied",
+      "microtag": "What are the reasons, Discuss, FLFPR, Inclusive development",
+      "questionText": "The Female Labour Force Participation Rate (FLFPR) has seen a significant increase in recent years.  What are the reasons for this rise? Discuss the opportunities it creates for inclusive development.10",
+      "marks": 10,
+      "year": 2026,
+      "answers": [
+        {
+          "id": "forum-mgp-2026-csm26t04se-q04-forumias",
+          "institute": "ForumIAS",
+          "answerText": "| **Approach:** • Begin by defining Female Labour Force Participation Rate (FLFPR) and citing the latest data. <br>• In the body, highlight the reasons for the increase in the FLFPR. <br>• Then, discuss the opportunities it creates for sustainable development. <br>• Conclude by highlighting associated challenges and suggesting a way forward. |\n| --- |\n\n**Female Labour Force Participation Rate (FLFPR)** is the **ratio** of the number of women who are **part of the** **labour force** to the number of women in the **working age**. According to **PLFS**, the FLFPR has increased from **23.3% (2017-18) to 41.7% (2023-2024)**.\n\n**Fig. Female Labour Force Participation Rate** (Usual status, 15 years and above)\n\nFollowing **factors** has contributed to the rise in FLFPR in India:\n1. a) **Economic necessity** of more earning hands (nuclear families, inflation)\n   b) changing **social norms** due to **modernization** (greater acceptance of working women, shifting gender roles, women role- models, etc.).\n\n2. a) **Rising casual wages** driving **family businesses** to **utilize household female labour** over external hiring (share of helpers in household enterprises grew from 38.7% 2017-18 to 42.3% in 2023-24);\n   b) \n\nimprovements in **women’s access to education**, particularly higher education (GER for women at 28.5% vs 28.3% for men).\n\n3. a) **Feminization of agriculture** (57% in 2017-18 to 64.4% in 2023-24) driven by **male migration** to non- agricultural sectors;\n   b) growth in **self-employment** post COVID-19 (highlighted by the Economic Survey 2024-25).\n\n4. a) Targeted **government initiatives** aimed at **skilling** (SANKALP) and easing **credit access** (Mudra Yojana, Stand-Up India);\n   b) strengthened statutory framework ensuring **motherhood support** (Maternity Benefits Amendment Act 2017) and **workplace safety** (POSH Act 2013).\n\n5. a) Enhanced support for **women grassroots organizations** facilitating women **entrepreneurship** (WSHGs, Namo Drone Didi, Lakhpati Didi scheme);\n   b) improvements in **employment estimation** methodology (better capture of female workers in unpaid work as highlighted by ES 2024-25).\n\n6. a) Structural economic shifts and emergence of **new employment models** (Gig worker, Work-from- home) with significant **opportunities** for women (personal care services);\n   b) these models enable women to **balance work** and **household responsibilities** more effectively.\n\nThis rise creates **opportunities** for inclusive development, as discussed:\n1. a) Reduction in household **poverty levels** and **income inequality** in the economy;\n   b) greater workforce participation by women can **reduce gender wage disparity** and enhance **gender equality.**\n\n2. a) Could boost **economic growth** significantly (1.5% rise in GDP if FLFPR reaches 50%: World Bank);\n   b) potential **spillover effects** on **education** and **healthcare** of families (women tend to invest their incomes more in these sectors: World Bank study).\n\n3. a) Enhanced **women’s agency** (greater say in family decision making), leading to their **empowerment**;\n   b) potential **shift in societal perceptions** about gender roles, promoting **social equality**.\n\nDespite these gains, **challenges persist**, such as the concentration of women in low-paying informal jobs, workplace discrimination, ‘dual burden’, etc. Addressing these requires **gender-sensitive policies**, improved skilling, and increased formal sector opportunities. A **holistic approach** can ensure sustained FLFPR growth, fostering both economic prosperity and **gender-inclusive development** **(SDG 5)**. (***422 words***)"
+        }
+      ],
+      "source_attribution_label": "Forum MGP 2026 (CSM26T04SE)",
+      "exam_info": {
+        "isPyq": false,
+        "is_ncert": false,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
+        "is_allied": false,
+        "is_others": false,
+        "exam_category": "cse",
+        "specific_exam": null,
+        "stage": "mains",
+        "paper": "mains_gs3"
+      },
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP"
+    },
+    {
+      "id": "forum-mgp-2026-csm26t04se-q05",
+      "questionNumber": 5,
+      "paper": "GS3",
+      "subject": "INDIAN ECONOMY",
+      "sectionGroup": "Macroeconomics & Fiscal Policy",
+      "microTopic": "Government Budgeting and fiscal management policies",
+      "subTopic": "Fiscal Policy",
+      "macrotag": "Descriptive, Analytical",
+      "microtag": "What do you understand, Fiscal deficit",
+      "questionText": "What do you understand by fiscal deficit? Why is it necessary for a country to keep its fiscal deficit  under check?",
+      "marks": 10,
+      "year": 2026,
+      "answers": [
+        {
+          "id": "forum-mgp-2026-csm26t04se-q05-forumias",
+          "institute": "ForumIAS",
+          "answerText": "| **Approach:** • Introduce by defining fiscal deficit. <br>• In the body, discuss the reasons that make it crucial for a country to control its fiscal deficit. <br>• Conclude with suggestions to improve fiscal management in the country. |\n| --- |\n\nFiscal deficit refers to the difference between the **government's total expenditure** and its **total receipts** excluding borrowing. It indicates the **total borrowings** needed by the government to **finance its spending** beyond available revenue.\n\n**Controlling fiscal deficit is crucial** for a country due to following **reasons**:\n1. a) High fiscal deficits can trigger **macroeconomic instability** (inflation, currency depreciation, and high interest rates) e.g., Sri Lanka's recent economic crisis resulting from unsustainable deficits;\n   b) erode **investor confidence**;\n   c) damage a country's **creditworthiness (credit rating downgrades)** making it difficult for the government to borrow from international markets.\n\n2. a) Persistent deficits accumulate as **public debt** and raise the risk of **debt traps** if borrowing becomes unsustainable;\n   b) create **structural impediments** to effective **monetary policy implementation** (Central banks are forced to monetize debt)\n\n3. a) Excessive government borrowing can **crowd out private investment** and raise economy-wide **borrowing costs** (due to increased demand for credit);\n   b) **discourage** both domestic and foreign **investment** in productive sectors (high capital cost);\n   c) reduce **capital formation** necessary for economic growth.\n\n4. a) High fiscal deficits and accrued debt place a **disproportionate burden** on future generations, impacting **intergenerational equity**;\n   b) necessitates fiscal adjustments (**higher taxes** or **reduced** **public services**), burdening common citizens.\n\n5. a) Elevated deficits reduce **fiscal space** for implementing **counter-cyclical measures**;\n   b) limits government's ability to respond effectively during **economic downturns or emergencies** (e.g., Global recession, Pandemic).\n\nMaintaining **fiscal discipline** through **FRBM targets** is essential for macroeconomic stability. The **N.K. Singh** **Committee's** recommendations for the establishment of a **Fiscal Council**, **debt-based rules**, and **escape** **clauses** provide a pragmatic framework to balance **fiscal prudence** with **growth imperatives**. ***( 266 words)***"
+        }
+      ],
+      "source_attribution_label": "Forum MGP 2026 (CSM26T04SE)",
+      "exam_info": {
+        "isPyq": false,
+        "is_ncert": false,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
+        "is_allied": false,
+        "is_others": false,
+        "exam_category": "cse",
+        "specific_exam": null,
+        "stage": "mains",
+        "paper": "mains_gs3"
+      },
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP"
+    },
+    {
+      "id": "forum-mgp-2026-csm26t04se-q06",
+      "questionNumber": 6,
+      "paper": "GS3",
+      "subject": "INDIAN ECONOMY",
+      "sectionGroup": "Macroeconomics & Fiscal Policy",
+      "microTopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "subTopic": "Economic Growth",
+      "macrotag": "Comparative, Descriptive, Analytical",
+      "microtag": "Distinguish, Human capital, Economic growth",
+      "questionText": "Distinguish between physical and human capital. How does human capital formation contribute to  the economic growth of a nation?",
+      "marks": 10,
+      "year": 2026,
+      "answers": [
+        {
+          "id": "forum-mgp-2026-csm26t04se-q06-forumias",
+          "institute": "ForumIAS",
+          "answerText": "| **Approach:** • Introduce the answer by briefly explaining capital. <br>• In the body, first bring out the differences between the two. <br>• Next, discuss how human capital formation contributes to the economic growth of a nation. <br>• Conclude by highlighting its significance. |\n| --- |\n\n**Capita**l is one of the **factors in economic production** (alongside land, labor, and entrepreneurship), broadly classified into physical capital and human capital. While both play a vital role in driving economic growth and development, they **differ in following aspects**:\n\n**Physical Capital**                                        **Human Capital**\n\n1. **Tangible,** **human-made** **assets** (machines, 1. I**ntangible knowledge, skills, and well-being** infrastructure, etc.) essential for production of acquired over a lifetime, enabling individuals to goods and services. reach their full potential as productive\n\n2. **Formation** results from the **conscious decisions** members of society. of the owner with a **well-defined objective.** 2. **Develops** through **individual efforts** and (targeted spending of ₹100 lakh crore through the **social processes** (investments in education National Investment Program). through Samagra Shiksha Abhiyan, PM SHRI\n\n3. a) Utilization **independent of the presence of the** Schools scheme). **owner** ;\n   b) can be sold or transferred (National 3.\n   a) Utilization not independent** of the owner; Monetisation Pipeline - leasing out public**\n   b) cannot be sold or transferred but **only the** infrastructure). **services** can be utilized (e.g., Gig Economy\n\n4. a) Faces **depreciation (**wear and tear) and workers under platforms like Urban Company). **obsolescence** (technological change);\n   b) **cannot** 4.\n   a) **Appreciates** with experience and **be overcome** beyond a **limit** and needs knowledge;\n   b) **depreciation** (from **ageing**)can **replacement (**modernization drive under Amrit be offset through investments in education, Bharat Station Scheme). health, skills etc (PMJAY, refresher training).\n\n5. Generally **benefits** the **owner** or those who **pay** for 5. **Benefits both** the owner and the **society** its use (Expressways used by toll payers). (knowledge spillover in technological clusters).\n\nWhile both are crucial, human capital formation plays a significant role in **driving a nation's economic growth** in following ways:\n\n1. a) **Skilled** and **educated** workers contribute to higher **efficiency** and **innovation (**exponential growth of India’ IT industry);\n   b) attract new **investments** and build **technological capacity (**rapidly growing **Global Capacity Centres** in India).\n\n2. a) Better healthcare leads to a **healthier workforce** (Fit India Movement, POSHAN Abhiyan), reducing absenteeism and healthcare costs;\n   b) ensures **sustained workforce participation**, especially for women (e.g., rising FLPR)\n\n3. a) Investment in human capital enhances **employability** (Skill India Mission, National Apprenticeship Promotion Scheme - 2);\n   b) boosts **job security**, economic stability and resilience against economic shocks (gig economy, self-employment through Mudra Yojana).\n\n4. a) Educated and skilled individuals earn **higher wages** (access to better opportunities and work environment);\n   b) raises **purchasing power**, **national** and **per capita income**, leading to improved living standards and reduced poverty.\n\nBoth human and physical capital drive economic growth, but **human capital formation** is **crucial** for **productivity, innovation**, and **social well-being**. Their synergy supports **SDG 3** (Health), **SDG 4** (Education), **SDG 8** (Decent Work), among others. **(*****429 words)***"
+        }
+      ],
+      "source_attribution_label": "Forum MGP 2026 (CSM26T04SE)",
+      "exam_info": {
+        "isPyq": false,
+        "is_ncert": false,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
+        "is_allied": false,
+        "is_others": false,
+        "exam_category": "cse",
+        "specific_exam": null,
+        "stage": "mains",
+        "paper": "mains_gs3"
+      },
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP"
+    },
+    {
+      "id": "forum-mgp-2026-csm26t04se-q07",
+      "questionNumber": 7,
+      "paper": "GS3",
+      "subject": "INDIAN ECONOMY",
+      "sectionGroup": "Macroeconomics & Fiscal Policy",
+      "microTopic": "Indian Economy and issues relating to planning, mobilization of resources, GDP, and monetary framework",
+      "subTopic": "Monetary policy",
+      "macrotag": "Analytical, Applied",
+      "microtag": "Bring out, Suggest, Food inflation, India",
+      "questionText": "Bring out the causes of persistent high food inflation in India and suggest measures for ensuring long-  term price stability.",
+      "marks": 10,
+      "year": 2026,
+      "answers": [
+        {
+          "id": "forum-mgp-2026-csm26t04se-q07-forumias",
+          "institute": "ForumIAS",
+          "answerText": "| **Approach:** • Introduce the answer by defining inflation and giving a brief background of the persistent high food inflation in India. <br>• In the body, first bring out the causes for the same. <br>• Next, suggest measures for ensuring long term price stability. <br>• Conclude by emphasizing their synergy and link to SDGs. |\n| --- |\n\n**Inflation** is the **rate of increase in prices** of goods and services in an economy over a given period of time. Economic Survey (2024-25) points out the **persistence in inflation**, particularly food inflation. Food inflation **surged after the pandemic** to 6.4 per cent on average (between 2020-21 and 2023-24), higher than the 5.9 per cent overall CPI inflation.\n\n**Fig. Comparison of retail and food inflation** (Jan 2024-Jan 2025).\n\nExperts have cited the **following factors** as being responsible for the **persistent high food inflation** in India:\n1. a) rise in prices of **vegetables and pulses** which combinedly hold a high **weightage** (8.99%) in overall CPI basket;\n   b) increase in **international prices** of cereals (wheat) and **fertilizers** due to the impact of **geopolitical conflicts** (Russia-Ukraine war).\n\n2. a) Lower harvest in **price-sensitive commodities** (onion) in major **producing regions** (Maharashtra, Rajasthan, Gujarat) due to **uneven monsoon**;\n   b) damage to **horticultural crops** due to **unseasonal** **pre-monsoonal rainfall,** which also trigger **temporary storage and transportation problems**.\n\n3. a) Highly **perishable** nature of certain commodities (tomato);\n   b) **temporal and spatial** concentration of production (tur dal in Maharashtra and Karnataka) makes it susceptible to **regional issues and** **supply chain** constraints;\n   c) **limited potential for import** during periods of shortage due to India’s status as a **major producer** (pointed out by Economic Survey 2024-25).\n\nEnsuring **long-term price stability** India requires a mix of **following** measures such as:.\n1. **Controlling artificial scarcity:**\n   a) prevent hoarding by strengthening **Essential Commodities Act,**\n   b) strict enforcement of **stock limits**\n   c) improve **real-time price monitoring** using digital tools.\n\n2. **Enhancing productivity:**\n   a) promoting **high-yield seeds, precision farming, efficient irrigation** (drip, sprinkler)\n   b) **crop diversification (**crop rotation, intercropping) for risk sharing.\n   c) expand **storage** **infrastructure** to reduce post-harvest losses\n   d) Strengthening **food processing capabilities (**PM FME) to stabilize supply throughout the year.\n\n3. **Reforming agricultural market:**\n   a) strengthening **e-NAM** to ensure better price discovery\n   b) expanding **DBT** for fertilizers subsidies to reduce production cost\n   c) flexible **MSP and procurement** **policy** that adjusts to production levels\n   d) exploring a **stable agri-EXIM policy regime** to ensure sustained availability of products.\n\nManaging persistent high food inflation requires **comprehensive measures** including **supply-side** **interventions, market reforms**, and **sustainable agriculture** to balance consumer affordability with farm income stability. ***(401 words)***"
+        }
+      ],
+      "source_attribution_label": "Forum MGP 2026 (CSM26T04SE)",
+      "exam_info": {
+        "isPyq": false,
+        "is_ncert": false,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
+        "is_allied": false,
+        "is_others": false,
+        "exam_category": "cse",
+        "specific_exam": null,
+        "stage": "mains",
+        "paper": "mains_gs3"
+      },
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP"
+    },
+    {
+      "id": "forum-mgp-2026-csm26t04se-q08",
+      "questionNumber": 8,
+      "paper": "GS2",
+      "subject": "SOCIAL JUSTICE",
+      "sectionGroup": "Poverty & Hunger",
+      "microTopic": "Issues and Challenges relating to Poverty & Hunger",
+      "subTopic": "Poverty",
+      "macrotag": "Comparative, Analytical",
+      "microtag": "Differ, Absolute poverty, Relative poverty, MPI",
+      "questionText": "How does absolute poverty differ from relative poverty? Do you think the Multidimensional Poverty  Index (MPI) provides a more comprehensive measure of poverty?",
+      "marks": 10,
+      "year": 2026,
+      "answers": [
+        {
+          "id": "forum-mgp-2026-csm26t04se-q08-forumias",
+          "institute": "ForumIAS",
+          "answerText": "| **Approach:** • Introduce the answer by defining poverty. <br>• In the body, first distinguish between absolute poverty and relative poverty. <br>• Next, analyse whether the Multidimensional Poverty Index (MPI), provides a more comprehensive measure of poverty, giving arguments both in favour and against. <br>• Conclude by suggesting a way forward. |\n| --- |\n\nAccording to the **World Bank,** poverty is a state of **pronounced** **deprivation in well-being** and often stems from **insufficient income**. Poverty can be quantified through **two primary methods** : absolute poverty and relative poverty. The two methods have the **following differences**:\n\n**Absolute Poverty** **Relative Poverty**\n\n1. a) Based on a **fixed minimum threshold** for **basic** 1.\n   a) Based on **comparison** to societal standards **needs** (food, shelter, clothing);\n   b) focuses on (quality of life); emphasizes **social exclusion**. **subsistence.** 2. **Variable** **threshold** (higher in wealthy\n\n2. a) Generally utilizes **universally** **applied** societies) and it is tied to a region's **median** consumption/income thresholds (e.g., World **income** (socioeconomic context). Bank's $2.15 per day);\n   b) does not adjust for **social** 3. **May persist** despite positive GDP growth due **context.** to income inequality.\n\n3. **Inversely correlated** with economic development 4. More frequently used in **developed countries** and per capita GDP growth. for social policy (addressing structural\n\n4. Commonly used for **global comparisons** and in inequalities). **developing nations** (creating social safety nets).\n\nThe **Multidimensional Poverty Index** (MPI), jointly released by the **UNDP** and **OPHI,** measures poverty by considering **deprivations beyond** the traditional **income-based approach**. It provides a **holistic view of** **poverty** in the following ways:\n1. a) **Complements** traditional monetary poverty measures by capturing the **acute deprivations** in health, education, and living standards that a person faces simultaneously;\n   b) estimates the **extent of** **poverty (**intensity) experienced at an **individual level** (through the percentage of deprivations).\n\n2. a) Permits **comparisons** both across countries and world regions; b); its **disaggregated data** structure facilitates **detailed analysis** across ethnic group, urban/rural areas, subnational region, and age demographics;\n   c) provides insight into key **household and community characteristics** (sanitation, electricity access).\n\n3. a) Helps identify **patterns of poverty** (dimensional breakdown) enabling **targeted interventions** (Swachch Bharat Abhiyan);\n   b) provides a **flexible framework** adaptable to **local contexts** (NITI Aayog’s National Multidimensional Poverty Index).\n\n4. a) Highlights **interconnected deprivations** that can lead to **poverty traps** (indicators on undernourishment, years of schooling);\n   b) acts as a critical tool to **mainstream SDG prioritization** (SDG 1,2,3,4 etc);\n   c) encourages policy makers to **address systemic issues** rather than the **symptoms** **of poverty**.\n\nDespite these advantages, some experts have argued that it **does not offer a comprehensive measure** of poverty, due to the following reasons:\n1. a) **Uniform weightage** oversimplifies poverty by ignoring the varying significance of different deprivations;\n   b) using **standardized** thresholds may not accurately reflect **regional diversity**.\n\n2. a) Inconsistent** quality, and availability of **data** across regions and indicators can hinder the accurate measurement of multidimensional poverty;**\n   b) may underemphasize the importance of **income growth** in poverty reduction.\n\n3. a) **Overlooks** **key dimensions** which play an important role in determination of poverty (ownership of technology, environmental degradation);\n   b) may conceal **intra-household differences** (gender, age, disability) by treating households uniformly.\n\nThough, MPI’s broader framework more accurately reflects the complex realities of poverty. Incorporating **other** **metrics such as income fluctuation** adjustments and the status of **environmental degradation** would make it a more **comprehensive tool** for monitoring and achieving sustainable development. ***(487 words).***"
+        }
+      ],
+      "source_attribution_label": "Forum MGP 2026 (CSM26T04SE)",
+      "exam_info": {
+        "isPyq": false,
+        "is_ncert": false,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
+        "is_allied": false,
+        "is_others": false,
+        "exam_category": "cse",
+        "specific_exam": null,
+        "stage": "mains",
+        "paper": "mains_gs3"
+      },
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP"
+    },
+    {
+      "id": "forum-mgp-2026-csm26t04se-q09",
+      "questionNumber": 9,
+      "paper": "GS3",
+      "subject": "INDIAN ECONOMY",
+      "sectionGroup": "Macroeconomics & Fiscal Policy",
+      "microTopic": "Government Budgeting and fiscal management policies",
+      "subTopic": "Fiscal Policy",
+      "macrotag": "Analytical, Applied",
+      "microtag": "Discuss, Fiscal policy, Sustainable development, India",
+      "questionText": "“Fiscal policy can serve as a cornerstone for sustainable development”. In light of this statement,  discuss the significance of fiscal policy in a developing economy like India.",
+      "marks": 10,
+      "year": 2026,
+      "answers": [
+        {
+          "id": "forum-mgp-2026-csm26t04se-q09-forumias",
+          "institute": "ForumIAS",
+          "answerText": "| **Approach:** • Introduce the answer by defining fiscal policy. <br>• In the body, discuss the significance of fiscal policy in a developing economy like India. <br>• Conclude by highlighting the importance of deficit management and coordination with monetary policy for sustainable development. |\n| --- |\n\nFiscal policy refers to the government's use of **expenditure and revenue measures** to influence various aspects of the national economy- levels of **economic activity, employment, price stability,** etc. In a developing country like India, fiscal policy holds **immense significance**, especially in **ensuring** **sustainable development,** as discussed:\n1. Enhancing people’s **disposable incomes** and **standard of living** through **wealth redistribution** and reducing **income inequality. (SDG 10)**\n   a. **Income support** schemes (PM-KISAN) and provision of b**asic goods and services** through dedicated schemes (PMAY, NFSA).\n\n   b. a) Reduction in **personal income taxes**;\n   b) **progressive taxation** policies (higher proportion of direct tax) and generational **wealth redistribution** (wealth tax, inheritance tax);\n   c) access to **basic** **goods and services** (lower GST on items of mass consumption).\n\n2. Provides fiscal stimulation and enhances **economic competitiveness** through infrastructural and industrial development (**SDG 9**).\n   a. \n   a) Capital expenditure** (11,11,111cr for 2024-25) creates a crowd**-in effec**t for private investment;**\n   b) support for the **manufacturing sector** (PLIs) and enhancing **job creation** (ELIs)\n   c) **strategic disinvestment policy** to optimize **resource allocation** (Air India, BPCL disinvestment) and improve **efficiency**.\n\n   b. \n   a) Tax incentives** for **infrastructure development** (Section 80IA deductions, infrastructure bond benefits);**\n   b) **targeted tax measures** to boost industrial growth (corporate tax cuts) and **entrepreneurship** (abolition of angel tax);\n   c) **infrastructure-specific levies** (infrastructure cess) to fund development projects.\n\n3. Provision for **social support system. (SDG 3,4,6):**\n   a. a) Expenditure on **public health** infrastructure, **education** infrastructure (PM-Shri Schools) leading to better health (reduced MMR) and education outcomes (near 100% GER in primary education);\n   b) **social security** through dedicated schemes (NSAP, One Rank One Pension).\n\n   b. a) Building **health and education services** (health and education cess);\n   b) allocation from the **Universal Service Obligation Fund** to improve **digital infrastructure** and connectivity in underserved areas.\n\n4. Furthering **inclusive growth** and **human development**. (**SDG 1,2,6**)\n   a. a) **Gender equity** through gender-responsive budgeting and supportive institutions (One Stop Centres)\n   b) empowerment of **vulnerable sections** of society (PM JANMAN)\n   c) **poverty alleviation** measures (MGNREGA) and schemes for **nutritional security** (PM POSHAN).\n\n   b. \n   a) Tax incentives for women** (lower stamp duty on women owned properties);**\n   b) agricultural promotion by **exempting agricultural income** from tax.\n\n5. Promote **desirable consumption** patterns to achieve **sustainable growth**. (**SDG 7,11,12**)\n   a. a) Access to **clean energy** sources (PM Ujjwala Yojana; PM Surya Ghar Bijli), reducing **carbon** **footprint** (FAME scheme).\n\n   b. a) **Sin tax** on energy generation from fossil fuels (clean energy cess on coal);\n   b) **excise and** **customs relief** to increase availability of components for renewable energy projects (solar panels);\n   c) **green financing instruments** (Green Bonds).\n\nIndia's developmental journey (**Viksit Bharat 2047**) requires balancing **growth with equity**. Within a framework of **prudent deficit management** (FRBM Act), and complemented by appropriate **monetary policy**, fiscal measures create an **enabling environment** for **inclusive** and **sustainable development**. (***454 words***)"
+        }
+      ],
+      "source_attribution_label": "Forum MGP 2026 (CSM26T04SE)",
+      "exam_info": {
+        "isPyq": false,
+        "is_ncert": false,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
+        "is_allied": false,
+        "is_others": false,
+        "exam_category": "cse",
+        "specific_exam": null,
+        "stage": "mains",
+        "paper": "mains_gs3"
+      },
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP"
+    },
+    {
+      "id": "forum-mgp-2026-csm26t04se-q10",
+      "questionNumber": 10,
+      "paper": "GS3",
+      "subject": "INDIAN ECONOMY",
+      "sectionGroup": "Macroeconomics & Fiscal Policy",
+      "microTopic": "Issues relating to overall economic growth, sector manufacturing, and employment generation",
+      "subTopic": "Manufacturing Sector",
+      "macrotag": "Analytical, Applied",
+      "microtag": "Identify, Elaborate, Services sector, Industrial sector, India",
+      "questionText": "Identify the reasons behind the significant growth of the services sector relative to the industrial  sector in the country. Also, elaborate on the importance of a strong industrial base for a ‘self-reliant India’.",
+      "marks": 10,
+      "year": 2026,
+      "answers": [
+        {
+          "id": "forum-mgp-2026-csm26t04se-q10-forumias",
+          "institute": "ForumIAS",
+          "answerText": "| **Approach:** • Introduce with data showing India's unique services-led growth pattern. <br>• In the body, first use a tabular comparison to analyze factors accelerating services versus constraining industry. <br>• Then, explain the importance of the industrial base for self-reliance. <br>• Conclude with suggestions for balanced growth. |\n| --- |\n\nIndia's **economic composition has shifted** significantly, with the **services sector's contribution** increasing from approximately 40% in the 1980s to about **55% in FY25**. This **deviates** from the **ideal agriculture-** **manufacturing-services progression**, creating comparative advantages in knowledge industries while posing strategic vulnerabilities in critical manufacturing capabilities.\n\nThis distinctive growth pattern stems from **specific factors** accelerating services while simultaneously constraining industrial development, as discussed: **Accelerating services** **Constraining industrial development**\n\n1. a) Lower **initial capital requirement** for many 1.\n   a) **Inadequate infrastructure** (reliable power, service businesses;\n   b) **lesser dependence** of transportation networks) increasing production highly **skilled services** (e.g. IT sector) on costs and hindering **supply chain efficiency**. **physical infrastructure** such as roads and 2.\n   a) **Early mover advantage** of China and its ports. emergence as the **world's factory**;\n   b) **stiff**\n\n2. a) **Global transition** towards a **knowledge-****competition** from China and other **emerging** **based economy;**\n   b) **emergence** of India as a **economies** (Vietnam) in both global and preferred **global outsourcing hub** due to its domestic markets. skilled labor force, cost-effectiveness, and 3.\n   a) **Sluggish pace** of land acquisition;\n   b) lack of English language proficiency. For e.g., Finance, ready-to-use **land** **banks** for industrial banking, IT-enabled services (ITES), BPO. development;\n   c) inflated **land costs** and\n\n3. a) Less cumbersome **labour laws** in service **regulatory complexities;**\n   d) **bureaucratic** industries (high threshold for regulatory **hurdles** slowing industrial projects. scrutiny);\n   b) easier business and environmental\n4. a) Low **R&D** **expenditure** compared to\n\n**permit acquisition**; c) lower land acquisition manufacturing competitors b) inadequate\n\ncosts due to **reduced space requirements;** d) **industry-academia** linkages; d) **skill**\n\n**liberalization** **policies** (allowing private **mismatches** and relatively **low productivity**\n\nparticipation, increasing FDI caps) in sectors like levels.\n\ntelecom, banking, and insurance.\n5. a) Stringent **environmental** **compliances**\n\n4. **Rapid urbanization** and **rising disposable** adding to costs;\n   b) environmental impact\n\n**incomes** have increased the demand for **mitigation** **requirements** for industrial\n\nservices [healthcare, education, legal, operations.\n\nentertainment (online gaming).]\n\nWhile the growth of the services sector is commendable, a **strong industrial base is imperativ**e **for** India's vision of **self-reliance ('Atmanirbhar Bharat')** as:\n1. a) Unlike the services sector, which is relatively **skill-intensive**, industries create a **wide range** of employment opportunities;\n   b) industrial growth provides jobs for **semi-skilled** and **unskilled** workers, promoting **inclusive growth**;\n   c) helps in realizing India's **'demographic dividend'** by employing the large working-age population.\n\n2. a) **Domestic manufacturing capabilities** in critical sectors (defense, pharmaceuticals, semiconductors, rare earth elements) reduce **dependence on imports** and vulnerability to global **supply chain disruptions;**\n   b) strengthens **national security** and **economic sovereignty** by ensuring control over **strategic technologies** and resources.\n\n3. a) Manufacturing creates crucial **forward and backward linkages**;\n   b) industrial clusters stimulate specialized **infrastructure development** (dedicated freight corridors, ports, power plants), creating a **‘multiplier effect’;**\n   c) ensures **economic stability** by **diversifying** the sources of income and **reducing overdependence** on a single sector.\n\nAchieving **“Atmanirbhar Bharat”** requires **integrating service excellence** with **manufacturing strength**. Policies like **PLI schemes** and **industrial corridors** are steps forward, but success demands **sustained focus** on infrastructure, R&D investment, skill development and **EoDB-2 reforms**. ***(485 words)***"
+        }
+      ],
+      "source_attribution_label": "Forum MGP 2026 (CSM26T04SE)",
+      "exam_info": {
+        "isPyq": false,
+        "is_ncert": false,
+        "exam": null,
+        "group": null,
+        "year": null,
+        "is_upsc_cse": false,
+        "is_allied": false,
+        "is_others": false,
+        "exam_category": "cse",
+        "specific_exam": null,
+        "stage": "mains",
+        "paper": "mains_gs3"
+      },
+      "course": "Civil Services",
+      "institute": "Forum IAS",
+      "program_id": "mgp",
+      "program_name": "MGP"
+    }
+  ],
+  "paper": "GS1"
+}

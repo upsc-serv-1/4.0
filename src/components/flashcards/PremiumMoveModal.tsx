@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Pressable
 } from 'react-native';
-import { X, CheckCircle2, Minus, Plus, Layers, Folder } from 'lucide-react-native';
+import { X, CheckCircle2, Minus, Plus, Zap, Folder } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { BranchSvc, BranchNode } from '../../services/BranchService';
 
@@ -56,7 +56,7 @@ export function PremiumMoveModal({ visible, node, tree, onClose, onConfirm, titl
                 style={[styles.moveRow, { borderBottomColor: colors.border + '40' }, selectedId === null && { backgroundColor: colors.primary + '10', borderRadius: 12 }]}
               >
                 <View style={styles.moveIconWrap}>
-                  <Layers size={20} color={colors.primary} />
+                  <Zap size={20} color={colors.primary} />
                 </View>
                 <Text style={[styles.moveRowText, { color: colors.textPrimary }]}>Home (Root)</Text>
                 {selectedId === null && <CheckCircle2 size={22} color={colors.primary} />}
@@ -83,7 +83,7 @@ export function PremiumMoveModal({ visible, node, tree, onClose, onConfirm, titl
                         </View>
                       ) : (
                         <View style={styles.smallToggle}>
-                           <Layers size={14} color={colors.textTertiary} />
+                           <Zap size={14} color={colors.textTertiary} />
                         </View>
                       )}
                     </View>

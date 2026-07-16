@@ -130,47 +130,13 @@ export const getPYQCategorization = (item: any) => {
     };
   }
 
-  let displayGroup = rawGroup || (isUPSC ? 'Civil Services' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ');
-
-  if (displayGroup) {
-    const hasMains = displayGroup.toLowerCase().includes('mains');
-    if (hasMains) {
-      // Keep UPSC, but remove CSE
-      displayGroup = displayGroup
-        .replace(/upsc\s+cse/gi, 'UPSC')
-        .replace(/cse/gi, '')
-        .replace(/\s+/g, ' ')
-        .trim();
-    } else {
-      // Remove both UPSC and CSE
-      displayGroup = displayGroup
-        .replace(/upsc\s+cse/gi, '')
-        .replace(/upsc/gi, '')
-        .replace(/cse/gi, '')
-        .replace(/\s+/g, ' ')
-        .trim();
-    }
-  }
-
-  if (!displayGroup && !year) {
-    return {
-      hasPYQData: false,
-      isUPSC,
-      isAllied,
-      isOther,
-      isGenericPYQ: true,
-      groupName: 'PYQ',
-      year: '',
-    };
-  }
-
   return {
     hasPYQData: true,
     isUPSC,
     isAllied,
     isOther,
     isGenericPYQ: !isUPSC && !isAllied && !isOther,
-    groupName: displayGroup,
+    groupName: rawGroup || (isUPSC ? 'Civil Services' : isAllied ? 'Allied' : isOther ? 'Other' : 'PYQ'),
     year,
   };
 };

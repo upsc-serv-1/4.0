@@ -16,7 +16,7 @@ import Animated, {
   Extrapolation,
 } from 'react-native-reanimated';
 import {
-  Plus, Search as SearchIcon, X, Flame, Clock, Sparkles, Layers, ArrowUpDown,
+  Plus, Search as SearchIcon, X, Flame, Clock, Sparkles, Layers, Zap, ArrowUpDown,
   Folder, CheckCircle2, Minus, ChevronLeft, ArrowUpRight, Settings, MoreVertical,
   FolderPlus, Play, ChevronRight, Trash, Check, FileDown
 } from 'lucide-react-native';
@@ -31,6 +31,7 @@ import { PremiumMoveModal } from '../src/components/flashcards/PremiumMoveModal'
 import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet';
 import type { ExportPayload, ExportFlashcard } from '../src/lib/unifiedExportEngine';
 import { BranchColors, DEFAULT_BRANCH_COLORS } from '../src/lib/branchColors';
+import { usePreventRemove } from '@react-navigation/native';
 
 function FlashcardsHub() {
   const { colors } = useTheme();
@@ -43,6 +44,14 @@ function FlashcardsHub() {
   const [search, setSearch] = useState('');
   const [searchVisible, setSearchVisible] = useState(false);
   const [currentFolder, setCurrentFolder] = useState<BranchNode | null>(null);
+
+  usePreventRemove(
+    currentFolder !== null,
+    () => {
+      setCurrentFolder(null);
+    }
+  );
+
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const navLock = React.useRef(false);
   
@@ -590,13 +599,28 @@ function FlashcardsHub() {
                 <Text style={[styles.statLabel, { color: colors.textTertiary }]}>New</Text>
               </TouchableOpacity>
               <View style={[styles.statBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                <Layers size={14} color={colors.textSecondary} />
+                <Zap size={14} color={colors.textSecondary} />
                 <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.total}</Text>
                 <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Total</Text>
               </View>
             </View>
           </View>
 
+          {loading ? (
+            <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <View key={i} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, gap: 12 }}>
+                  <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.border + '60' }} />
+                  <View style={{ flex: 1, gap: 6 }}>
+                    <View style={{ height: 14, width: `${70 - i * 8}%`, borderRadius: 6, backgroundColor: colors.border + '50' }} />
+                    <View style={{ height: 10, width: `${40 - i * 5}%`, borderRadius: 6, backgroundColor: colors.border + '30' }} />
+                  </View>
+                  <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: colors.border + '40' }} />
+                </View>
+              ))}
+            </View>
+          ) : (
+            <>
           {preparingExportId && (
             <View style={{ paddingHorizontal: 20, paddingBottom: 8 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -644,8 +668,10 @@ function FlashcardsHub() {
               );
             })}
           </View>
-          {displayRows.length === 0 && (
-            <View style={styles.empty}><Layers size={48} color={colors.border} /><Text style={{ color: colors.textTertiary, marginTop: 12 }}>Empty</Text></View>
+          {displayRows.length === 0 && !loading && (
+            <View style={styles.empty}><Zap size={48} color={colors.border} /><Text style={{ color: colors.textTertiary, marginTop: 12 }}>Empty</Text></View>
+          )}
+          </>
           )}
         </Animated.ScrollView>
 
@@ -659,7 +685,7 @@ function FlashcardsHub() {
           <Pressable style={styles.modalOverlay} onPress={() => setAddMenuVisible(false)}>
             <View style={[styles.addMenuContent, { backgroundColor: colors.surface }]}>
               <AddMenuItem 
-                icon={<Layers size={22} color={colors.textPrimary} />} 
+                icon={<Zap size={22} color={colors.textPrimary} />} 
                 title="Create deck" 
                 sub="Organize flashcards into decks" 
                 onPress={() => { setAddMenuVisible(false); setCreateModal({ type: 'deck' }); }} 
@@ -671,7 +697,7 @@ function FlashcardsHub() {
                 onPress={() => { setAddMenuVisible(false); setCreateModal({ type: 'folder' }); }} 
               />
               <AddMenuItem
-                icon={<Layers size={22} color="#06b6d4" />}
+                icon={<Zap size={22} color="#06b6d4" />}
                 title="Select to Manage"
                 sub="Select multiple decks to export or delete"
                 onPress={() => { setAddMenuVisible(false); setIsSelectionMode(true); setSelectedIds(new Set()); }}
@@ -714,7 +740,7 @@ function FlashcardsHub() {
                         {createModal?.type === 'folder' ? (
                           <Folder size={20} color={selectedColor} />
                         ) : (
-                          <Layers size={20} color={selectedColor} />
+                          <Zap size={20} color={selectedColor} />
                         )}
                       </View>
                       <View style={styles.colorsList}>

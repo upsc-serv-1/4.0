@@ -1,0 +1,205 @@
+Card ID: 435bc13b-65d1-55b1-b784-eaa784b7dafe
+Case Study Heading: The Preamble’s Role in Judicial Interpretation
+PDF Topic Title: 1. Indian Constitution: Historical Underpinnings, Evolution, Features
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: cff34593-016b-58bd-afac-8a0e8ce4c3c1
+Case Study Heading: The Lok Sabha’s Role in the GST Bill
+PDF Topic Title: 2. Parliament and State Legislatures: Structure, Functioning, Conduct of Business
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: 63236d17-45b9-5426-99ba-74430542f120
+Case Study Heading: The NITI Aayog’s Role in Policy Formulation
+PDF Topic Title: 3. Functioning of the Executive and Judiciary
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: e2dfafaa-698e-50bf-b0e6-59cb8b6f3331
+Case Study Heading: Maharashtra-Karnataka Border Dispute
+PDF Topic Title: 4. Federal Structure: Issues and Challenges
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: ac395471-4174-52e3-8bfe-6083b7c803e7
+Case Study Heading: Kerala’s Decentralized Planning
+PDF Topic Title: 5. Devolution of Powers and Finances: Local Levels
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: d64df4b4-3064-5e43-8654-50f4ab5dd184
+Case Study Heading: The Ayodhya Land Dispute Case
+PDF Topic Title: 6. Separation of Powers: Dispute Redressal Mechanisms
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: 168bd715-889a-55ab-b09e-6b0b50fe910b
+Case Study Heading: Federal Structure Comparison: India vs. USA
+PDF Topic Title: 7. Comparison of the Indian Constitutional Scheme with Other Countries
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: 53071c48-3601-5250-b98a-2a954cae97da
+Case Study Heading: The Role of Farmers' Unions in the Farm Bills Protest
+PDF Topic Title: 8. Pressure Groups and Formal/Informal Associations
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: 8843fd4d-9bf5-5a58-b14a-253949d4d2cf
+Case Study Heading: The Supreme Court's Judgment on Electoral Bonds
+PDF Topic Title: 9. Salient Features of the Representation of People’s Act
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: 37881f9a-5ac6-527d-b682-af161f1128a5
+Case Study Heading: The Appointment of CAG (Comptroller and Auditor General)
+PDF Topic Title: 10. Appointment to Various Constitutional Posts
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: 1c341dad-3887-507a-b06e-ef559fe12b91
+Case Study Heading: The Role of SEBI in the Sahara Case
+PDF Topic Title: 11. Statutory, Regulatory, and Quasi-Judicial Bodies
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: 91da15d2-dd02-5d66-a624-c8ea46f5c7ea
+Case Study Heading: India’s Stand on the Paris Agreement
+PDF Topic Title: 12. Indian Foreign Policy: Issues and Challenges
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: 2176bb47-e617-5186-b6f4-8bf9d02aa26d
+Case Study Heading: India’s Membership in the United Nations Security Council (UNSC)
+PDF Topic Title: 13. International Organizations and Institutions
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: d2667bbc-c99f-56da-b458-1bb03b5a6355
+Case Study Heading: The Demonetization Initiative (2016)
+PDF Topic Title: 14. Indian Economy: Issues and Challenges
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: a36145e0-600b-5d6c-a46e-86bfd82ddce5
+Case Study Heading: The Clean India Mission (Swachh Bharat Abhiyan)
+PDF Topic Title: 15. Public Administration
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: f8e2e369-1ece-516a-9aaf-8b763efbfe52
+Case Study Heading: The Beti Bachao Beti Padhao Scheme
+PDF Topic Title: 16. Social Justice and Empowerment
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: 8f5fe8bf-c3e6-54d7-8f14-4829156c3b4e
+Case Study Heading: The National Health Insurance Scheme (Ayushman Bharat)
+PDF Topic Title: 17. Health Sector Reforms
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: d231b627-4aeb-5382-a8d5-829f9b9b0ff7
+Case Study Heading: The Right to Education Act (RTE)
+PDF Topic Title: 18. Education Reforms
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: 3de90bc3-3aec-555b-b9dd-479b75d7f78b
+Case Study Heading: The Right to Information Act (RTI)
+PDF Topic Title: 19. Governance and Accountability
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: 8524d908-17a9-5aa9-88b9-c7dfdd217dcd
+Case Study Heading: Goods and Services Tax (GST) Implementation
+PDF Topic Title: 20. Economic Policies and Reforms
+Current Paper: GS-II
+--------------------------------------------------
+Card ID: 7412a244-cda6-577e-96f2-b84b204093a5
+Case Study Heading: Hiware Bazar Model
+PDF Topic Title: 1. Agriculture
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 91cb452e-472a-57ce-84d7-99b06fbd1e24
+Case Study Heading: PRADAN’s ‘Jal Jivan’ Project
+PDF Topic Title: 1. Agriculture
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 07d226b3-b2c7-5d6c-a313-462e823f3228
+Case Study Heading: Sundarbans Mangrove Conservation
+PDF Topic Title: 2. Environment and Ecology
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 45393d75-d775-57f2-86d9-5608eee49663
+Case Study Heading: Gujarat Earthquake Recovery (2001)
+PDF Topic Title: 3. Disaster Management
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 28e92d6a-f0df-5814-886e-de08603ccb80
+Case Study Heading: Delhi Metro Project
+PDF Topic Title: 4. Infrastructure
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 8c6a4c0d-a6aa-5880-bbf1-ffef3a0d4994
+Case Study Heading: Biocon's Affordable Insulin
+PDF Topic Title: 5. Science and Technology
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 08a48dea-b873-5bff-b7da-984f60edae1a
+Case Study Heading: Amul Dairy Cooperative
+PDF Topic Title: 6. Economic Development
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 560cdcc0-ac6e-5845-b87d-7ff77e09d83a
+Case Study Heading: Aarogya Setu App
+PDF Topic Title: 7. Health and Education
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 168d5995-ac97-5be7-b93c-e418265b5a4b
+Case Study Heading: Mumbai Police’s Counter-Terrorism Unit
+PDF Topic Title: 8. Internal Security
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 891fd196-8c5d-56a3-b704-a3f53b4c682f
+Case Study Heading: Barefoot College
+PDF Topic Title: 9. Rural Development
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 9bb308db-078f-5a50-8589-c500d910d777
+Case Study Heading: Alaknanda River Rejuvenation Project
+PDF Topic Title: 10. Environmental Protection
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 6e0c8ecb-753e-5010-80a5-49b53fa3328f
+Case Study Heading: Pune’s Waste Management Model
+PDF Topic Title: 11. Urbanization
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 011fe399-9e70-5cee-9066-8fddc6a16d99
+Case Study Heading: The Nanhi Kali Project
+PDF Topic Title: 12. Social Justice
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: beef295a-780b-57db-b27d-49c083bd2d57
+Case Study Heading: Bhopal Smart City Initiative
+PDF Topic Title: 13. Infrastructure and Connectivity
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: ff2dd894-d7f8-5c83-b592-74c44e7d8b9e
+Case Study Heading: BHEL’s Power Plant Projects
+PDF Topic Title: 14. Industrial Development
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: ee1f4487-e6cf-522b-8da2-6eb77816f318
+Case Study Heading: Ujjwala Yojana
+PDF Topic Title: 15. Climate Change
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 8833d471-f33e-59ce-912c-78bc11c74d21
+Case Study Heading: Rainwater Harvesting in Chennai
+PDF Topic Title: 16. Water Resources
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 201a261f-c8fe-5d40-86d3-e3061e62dc69
+Case Study Heading: NTPC’s Renewable Energy Initiatives
+PDF Topic Title: 17. Energy
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: d2a48ff1-79cb-5fc2-963d-77e28f124455
+Case Study Heading: Indian Institute of Technology (IIT) Bombay’s Innovation Center
+PDF Topic Title: 18. Innovation and Technology
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 178cc550-fb86-53fa-b4e9-719a60da5788
+Case Study Heading: Rurban Mission
+PDF Topic Title: 19. Rural Development
+Current Paper: GS-III
+--------------------------------------------------
+Card ID: 25881fa4-9bae-5426-919c-cbe87dbc1b9b
+Case Study Heading: Kachchh’s Salt Farming Sustainability
+PDF Topic Title: 20. Sustainable Development
+Current Paper: GS-III
+--------------------------------------------------

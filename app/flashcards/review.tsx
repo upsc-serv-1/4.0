@@ -30,11 +30,13 @@ import { fetchBestAnswer, saveBestAnswer, BestAnswer } from '../../src/services/
 import { aiExplainQuestion, aiImproveAnswer, aiAskDoubt } from '../../src/services/GeminiService';
 import { SkeletonFlashcardReview } from '../../src/components/common/SkeletonLoader';
 import { renderAIText } from '../../src/utils/renderAIText';
+import Markdown from 'react-native-markdown-display';
+import { getMarkdownStyles, getMarkdownRules, cleanMarkdownContent } from '../mains';
 
 const { width, height } = Dimensions.get('window');
 
 export default function ReviewScreen() {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const router = useRouter();
   const { session } = useAuth();
   const { microtopic, subject, section, mode, cardId, branchId, recursive } = useLocalSearchParams<any>();
@@ -1067,9 +1069,21 @@ export default function ReviewScreen() {
                     </View>
                   )}
 
-                  <Text style={[styles.answerText, { color: colors.textPrimary, fontSize: editorFontSize - 2, lineHeight: (editorFontSize - 2) * 1.5, textAlign: 'left' }]}>
-                    {renderAIText(resolvedAnswerText, { color: colors.textPrimary, fontSize: editorFontSize - 2, lineHeight: (editorFontSize - 2) * 1.5 })}
-                  </Text>
+                  <View style={{ minHeight: 40, width: '100%' }}>
+                    <Markdown
+                      style={{
+                        ...getMarkdownStyles(colors),
+                        body: {
+                          ...getMarkdownStyles(colors).body,
+                          fontSize: editorFontSize - 2,
+                          lineHeight: (editorFontSize - 2) * 1.5,
+                        }
+                      }}
+                      rules={getMarkdownRules(colors, isDark, (uri) => setZoomImageUrl(uri))}
+                    >
+                      {cleanMarkdownContent(resolvedAnswerText || '')}
+                    </Markdown>
+                  </View>
 
                   {currentCard.state?.user_note ? (
                     <View style={[styles.noteBox, { backgroundColor: colors.primary + '10', marginTop: 24 }]}>

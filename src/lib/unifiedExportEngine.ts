@@ -33,7 +33,7 @@ export type ExportFontFamily = 'sans' | 'serif' | 'handwriting' | 'mono';
 export type ExportTheme = 'modern' | 'classic' | 'sepia' | 'historical' | 'dark';
 export type ExportPaperStyle = 'plain' | 'lined' | 'grid' | 'dotted';
 export type ExportColumns = 1 | 2;
-export type ExportContentScope = 'q_only' | 'q_options' | 'q_options_expl';
+export type ExportContentScope = 'q_only' | 'q_options' | 'q_options_expl' | 'q_options_valuation';
 export type ExportAnswerPlacement = 'inline' | 'end';
 export type ExportSortBy = 'default' | 'subject' | 'microtopic' | 'difficulty' | 'date' | 'year' | 'subject_section' | 'subject_section_microtopic';
 export type ExportGroupingLevel = 'subject' | 'section_group' | 'microtopic';
@@ -687,23 +687,63 @@ const parseMarkdownLists = (txt: string): string => {
   return output.join('\n');
 };
 
+/** Convert markdown headings (# h1, ## h2, ### h3, etc.) to HTML before escaping */
+const parseMarkdownHeadings = (txt: string): string => {
+  // Process line by line so we only touch lines that START with # (not mid-sentence #)
+  return txt.split('\n').map(line => {
+    const m = line.match(/^(#{1,6})\s+(.+)$/);
+    if (!m) return line;
+    const level = m[1].length;
+    const content = m[2].trim();
+    const sizes: Record<number, string> = { 1: '15pt', 2: '13pt', 3: '11pt', 4: '10.5pt', 5: '10pt', 6: '9.5pt' };
+    const sz = sizes[level] || '11pt';
+    const mt = level <= 2 ? '4mm' : '2.5mm';
+    return `<div style="font-size:${sz};font-weight:800;color:#1E3A5F;margin:${mt} 0 1.5mm 0;line-height:1.3;">${content}</div>`;
+  }).join('\n');
+};
+
+/** Convert --- / *** standalone lines to an <hr> */
+const parseMarkdownHorizontalRule = (txt: string): string =>
+  txt.replace(/^[ \t]*(?:-{3,}|\*{3,}|_{3,})[ \t]*$/gm, '<hr style="border:none;border-top:1.5px solid #CBD5E1;margin:3mm 0;"/>');
+
 // Preserve rich HTML; convert markdown for plain text
 const renderInline = (txt: string = ''): string => {
   if (!txt) return '';
-  const html = HTML_TAG_REGEX.test(txt) ? sanitizeRichHtml(txt) : escapeHtml(txt);
-  
-  let formatted = parseMarkdownTables(html);
-  formatted = parseMarkdownLists(formatted);
-  
-  return formatted
+
+  // Step 1: If the content already has rich HTML tags, sanitize and use as-is.
+  // Otherwise, parse markdown FIRST (before escaping) so #, ---, | are converted to HTML.
+  let html: string;
+  if (HTML_TAG_REGEX.test(txt)) {
+    html = sanitizeRichHtml(txt);
+    // Still apply markdown parsing for any mixed content
+    html = parseMarkdownHeadings(html);
+    html = parseMarkdownHorizontalRule(html);
+    html = parseMarkdownTables(html);
+    html = parseMarkdownLists(html);
+  } else {
+    // Pure markdown text — parse structure BEFORE escaping individual chars
+    let md = txt;
+    md = parseMarkdownHeadings(md);
+    md = parseMarkdownHorizontalRule(md);
+    md = parseMarkdownTables(md);
+    md = parseMarkdownLists(md);
+    // Now escape only the non-HTML residue (the HTML tags we generated must survive)
+    // We do this by splitting on HTML tags and escaping only text nodes
+    html = md.replace(/(<[^>]+>)|([^<]+)/g, (_, tag, text) => {
+      if (tag) return tag; // keep HTML as-is
+      return escapeHtml(text); // escape plain text portions only
+    });
+  }
+
+  return html
     .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
     .replace(/__(.*?)__/g, '<u>$1</u>')
     .replace(/==(.*?)==/g, '<mark>$1</mark>')
     .replace(/\*(.*?)\*/g, '<i>$1</i>')
     .replace(/_(.*?)_/g, '<i>$1</i>')
     .replace(/\n/g, '<br/>')
-    .replace(/<br\/>\s*(<\/?(ul|ol|li|table|tr|th|td|div|h[1-6]|p)\b[^>]*>)/gi, '$1')
-    .replace(/(<\/?(ul|ol|li|table|tr|th|td|div|h[1-6]|p)\b[^>]*>)\s*<br\/>/gi, '$1');
+    .replace(/<br\/>\s*(<\/?(ul|ol|li|table|tr|th|td|div|h[1-6]|p|hr)\b[^>]*>)/gi, '$1')
+    .replace(/(<\/?(ul|ol|li|table|tr|th|td|div|h[1-6]|p|hr)\b[^>]*>)\s*<br\/>/gi, '$1');
 };
 
 const wrap = (o: ExportOptions, body: string, extras: string = '') => `<!doctype html>
@@ -928,9 +968,9 @@ const parseIntroductoryBox = (rawText: string | undefined | null) => {
 
 const renderApproachBoxHtml = (title: string, body: string, o: ExportOptions): string => {
   return `
-    <div class="mains-approach-box" style="margin-top: 3mm; margin-bottom: 3mm; padding: 3mm 4mm; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-left: 4px solid #10b981; border-radius: 6px; break-inside: avoid; page-break-inside: avoid;">
-      <div class="mains-approach-title" style="font-weight: 800; font-size: ${o.fontSize - 2}pt; color: #047857; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.5mm;">💡 ${escapeHtml(title)}</div>
-      <div class="mains-approach-content" style="font-size: ${o.fontSize - 0.5}pt; line-height: 1.5; color: var(--fg);">${renderInline(body)}</div>
+    <div class="mains-approach-box" style="margin-top: 4mm; margin-bottom: 4mm; padding: 4mm 5mm; background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #3b82f6; border-radius: 12px; break-inside: avoid; page-break-inside: avoid; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);">
+      <div class="mains-approach-title" style="font-weight: 800; font-size: ${o.fontSize - 2.5}pt; color: #3b82f6; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2mm; display: flex; align-items: center; gap: 6px;">✨ ${escapeHtml(title)}</div>
+      <div class="mains-approach-content" style="font-size: ${o.fontSize - 0.5}pt; line-height: 1.55; color: #334155;">${renderInline(body)}</div>
     </div>
   `;
 };
@@ -957,8 +997,46 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
 
   const showOpts = o.contentScope !== 'q_only';
   const showExpl = o.contentScope === 'q_options_expl';
+  const showValuation = o.contentScope === 'q_options_valuation';
   const isFlashStyle = o.visualStyle === 'flashcard';
   const inline = isFlashStyle ? true : o.answerPlacement === 'inline';
+
+  // Helper to build the rich model-answer HTML for a mains question
+  const buildMainsModelAnswerHtml = (q: ExportQuestion): string => {
+    const explList = filterExplanationsByInstitute(q._explanations, o);
+    if (Array.isArray(explList) && explList.length > 0) {
+      return explList
+        .map((expl: any) => {
+          const text = expl.text || expl.explanationText || expl.answerText || expl.explanation || '';
+          if (!text) return '';
+          const source = expl.source || expl.institute || 'Unknown Source';
+          const year = expl.year ? ` (${expl.year})` : '';
+          const header = `<div class="mains-ma-header">${escapeHtml(source)}${year} Answer:</div>`;
+          const parsed = parseIntroductoryBox(text);
+          let remainingText = text;
+          let approachHtml = '';
+          if (parsed) {
+            approachHtml = renderApproachBoxHtml(parsed.title, parsed.body, o);
+            remainingText = text.replace(parsed.fullTableText, '').trim();
+          }
+          return `<div class="mains-model-answer">${header}${approachHtml}<div class="mains-ma-content">${renderInline(remainingText)}</div></div>`;
+        })
+        .filter(Boolean)
+        .join('');
+    }
+    const singleExpl = q.explanation_markdown || q.explanation || '';
+    if (singleExpl) {
+      const parsed = parseIntroductoryBox(singleExpl);
+      let remainingText = singleExpl;
+      let approachHtml = '';
+      if (parsed) {
+        approachHtml = renderApproachBoxHtml(parsed.title, parsed.body, o);
+        remainingText = singleExpl.replace(parsed.fullTableText, '').trim();
+      }
+      return `<div class="mains-model-answer"><div class="mains-ma-header">Model Answer:</div>${approachHtml}<div class="mains-ma-content">${renderInline(remainingText)}</div></div>`;
+    }
+    return '';
+  };
 
   // Helper to render a single question item
   const renderQuestionItem = (q: ExportQuestion, i: number) => {
@@ -966,46 +1044,9 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
     const isQnMains = String(q.stage || '').toLowerCase() === 'mains' || String(q.id || '').startsWith('mains');
 
     if (isQnMains) {
-      const showMainsExpl = o.contentScope !== 'q_only';
-      let modelAnswerHtml = '';
-      
-      if (showMainsExpl && !o.hideResponses) {
-        const explList = filterExplanationsByInstitute(q._explanations, o);
-        if (Array.isArray(explList) && explList.length > 0) {
-          modelAnswerHtml = explList
-            .map((expl: any) => {
-              const text = expl.text || expl.explanationText || expl.answerText || expl.explanation || '';
-              if (!text) return '';
-              const source = expl.source || expl.institute || 'Unknown Source';
-              const year = expl.year ? ` (${expl.year})` : '';
-              const header = `<div class="mains-ma-header">${escapeHtml(source)}${year} Answer:</div>`;
-              
-              const parsed = parseIntroductoryBox(text);
-              let remainingText = text;
-              let approachHtml = '';
-              if (parsed) {
-                approachHtml = renderApproachBoxHtml(parsed.title, parsed.body, o);
-                remainingText = text.replace(parsed.fullTableText, '').trim();
-              }
-              
-              return `<div class="mains-model-answer">${header}${approachHtml}<div class="mains-ma-content">${renderInline(remainingText)}</div></div>`;
-            })
-            .filter(Boolean)
-            .join('');
-        } else {
-          const singleExpl = q.explanation_markdown || q.explanation || '';
-          if (singleExpl) {
-            const parsed = parseIntroductoryBox(singleExpl);
-            let remainingText = singleExpl;
-            let approachHtml = '';
-            if (parsed) {
-              approachHtml = renderApproachBoxHtml(parsed.title, parsed.body, o);
-              remainingText = singleExpl.replace(parsed.fullTableText, '').trim();
-            }
-            modelAnswerHtml = `<div class="mains-model-answer"><div class="mains-ma-header">Model Answer:</div>${approachHtml}<div class="mains-ma-content">${renderInline(remainingText)}</div></div>`;
-          }
-        }
-      }
+      // For mains: show answer inline OR defer to answer-key appendix based on answerPlacement
+      const showMainsExpl = (showOpts || showValuation) && !o.hideResponses && inline;
+      const modelAnswerHtml = showMainsExpl ? buildMainsModelAnswerHtml(q) : '';
 
       return `
         <div class="mains-item">
@@ -1135,19 +1176,25 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
     });
 
     // TOC with hierarchy
+    // tocLink generates href + JS onclick so it works in browsers (Chrome, Safari) and PDF viewers
+    const tocLink = (id: string, label: string) => {
+      const js = `var e=document.getElementById('${id}');if(e){e.scrollIntoView({behavior:'smooth',block:'start'});}return false;`;
+      return `<a href="#${id}" onclick="(function(){${js}})()" style="color:#1D4ED8;text-decoration:underline;cursor:pointer;">${label}</a>`;
+    };
+
     const tocItems: string[] = [];
     groups.forEach((secMap, sub) => {
       const subId = slugifyHeading(sub, 'subject-');
-      tocItems.push(`<div class="toc-item" style="font-weight:800"><a href="#${subId}">${escapeHtml(sub)}</a></div>`);
+      tocItems.push(`<div class="toc-item" style="font-weight:800">${tocLink(subId, escapeHtml(sub))}</div>`);
       if (renderLevel !== 'subject') {
         secMap.forEach((micMap, sec) => {
           const secId = slugifyHeading(sub + '-' + sec, 'section-');
-          tocItems.push(`<div class="toc-item" style="padding-left:12px;font-weight:600"><a href="#${secId}">${escapeHtml(sec)}</a></div>`);
+          tocItems.push(`<div class="toc-item" style="padding-left:12px;font-weight:600">${tocLink(secId, escapeHtml(sec))}</div>`);
           
           if (renderLevel === 'subject_section_microtopic') {
             micMap.forEach((questions, mic) => {
               const micId = slugifyHeading(sub + '-' + sec + '-' + mic, 'micro-');
-              tocItems.push(`<div class="toc-item" style="padding-left:24px"><a href="#${micId}">${escapeHtml(mic)}</a></div>`);
+              tocItems.push(`<div class="toc-item" style="padding-left:24px">${tocLink(micId, escapeHtml(mic))}</div>`);
               
               const subtopics: string[] = [];
               questions.forEach(q => {
@@ -1158,7 +1205,7 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
               
               subtopics.forEach(subT => {
                 const subTId = slugifyHeading(sub + '-' + sec + '-' + mic + '-' + subT, 'subtopic-');
-                tocItems.push(`<div class="toc-item" style="padding-left:36px;font-style:italic"><a href="#${subTId}">${escapeHtml(subT)}</a></div>`);
+                tocItems.push(`<div class="toc-item" style="padding-left:36px;font-style:italic">${tocLink(subTId, escapeHtml(subT))}</div>`);
               });
             });
           }
@@ -1232,8 +1279,16 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
     // Answer key appendix
     const answerKey = !isFlashStyle && !inline && !o.hideResponses && (o.contentScope !== 'q_only')
       ? `<div class="answer-key">
-          <h2>Answer Key${showExpl ? ' & Explanations' : ''}</h2>
+          <h2>Answer Key${(showExpl || showValuation) ? ' & Explanations' : ''}</h2>
           ${rows.map((q, i) => {
+        const isQnMains = String(q.stage || '').toLowerCase() === 'mains' || String(q.id || '').startsWith('mains');
+        if (isQnMains) {
+          const modelAnswerHtml = (showExpl || showValuation) ? buildMainsModelAnswerHtml(q) : '';
+          return `<div class="ak-row" style="margin-bottom:4mm; page-break-inside: avoid; break-inside: avoid;">
+                <span class="ak-num"><b>${i + 1}.</b></span>
+                <div class="mains-answer-key-content" style="margin-left:6mm; margin-top:-4mm;">${modelAnswerHtml}</div>
+              </div>`;
+        }
         const a = (q.correct_answer || '').toUpperCase();
         // Use merged explanations if available, otherwise fall back to single explanation
         let e = '';
@@ -1254,9 +1309,9 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
         } else {
           e = q.explanation_markdown || q.explanation || '';
         }
-        return `<div class="ak-row">
+        return `<div class="ak-row" style="page-break-inside: avoid; break-inside: avoid;">
               <span class="ak-num">${i + 1}.</span>${a ? `<b>Ans: ${a}</b>` : ''}
-              ${showExpl && e ? `<div class="expl" style="margin-top:1mm">${renderInline(e)}</div>` : ''}
+              ${(showExpl || showValuation) && e ? `<div class="expl" style="margin-top:1mm">${renderInline(e)}</div>` : ''}
             </div>`;
       }).join('')}
         </div>`
@@ -1295,8 +1350,16 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
   // Answer key appendix if not inline
   const answerKey = !isFlashStyle && !inline && !o.hideResponses && (o.contentScope !== 'q_only')
     ? `<div class="answer-key">
-        <h2>Answer Key${showExpl ? ' & Explanations' : ''}</h2>
+        <h2>Answer Key${(showExpl || showValuation) ? ' & Explanations' : ''}</h2>
         ${rows.map((q, i) => {
+      const isQnMains = String(q.stage || '').toLowerCase() === 'mains' || String(q.id || '').startsWith('mains');
+      if (isQnMains) {
+        const modelAnswerHtml = (showExpl || showValuation) ? buildMainsModelAnswerHtml(q) : '';
+        return `<div class="ak-row" style="margin-bottom:4mm; page-break-inside: avoid; break-inside: avoid;">
+              <span class="ak-num"><b>${i + 1}.</b></span>
+              <div class="mains-answer-key-content" style="margin-left:6mm; margin-top:-4mm;">${modelAnswerHtml}</div>
+            </div>`;
+      }
       const a = (q.correct_answer || '').toUpperCase();
       // Use merged explanations if available, otherwise fall back to single explanation
       let e = '';
@@ -1317,9 +1380,9 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
       } else {
         e = q.explanation_markdown || q.explanation || '';
       }
-      return `<div class="ak-row">
+      return `<div class="ak-row" style="page-break-inside: avoid; break-inside: avoid;">
             <span class="ak-num">${i + 1}.</span>${a ? `<b>Ans: ${a}</b>` : ''}
-            ${showExpl && e ? `<div class="expl" style="margin-top:1mm">${renderInline(e)}</div>` : ''}
+            ${(showExpl || showValuation) && e ? `<div class="expl" style="margin-top:1mm">${renderInline(e)}</div>` : ''}
           </div>`;
     }).join('')}
       </div>`
@@ -1704,6 +1767,7 @@ export interface BuildPyqAnalysisSummaryInput {
   examStage: string;
   selectedPaper: string;
   selectedRange: string;
+  showTOC?: boolean;
   customYearStart?: string;
   customYearEnd?: string;
   questionCount: number;
@@ -1726,6 +1790,8 @@ export interface BuildPyqAnalysisSummaryInput {
   primaryHeatmapLabel?: string;
   secondaryHeatmapTitle?: string;
   secondaryHeatmapLabel?: string;
+  /** Optional focused trend series (used for single-subject deep dive) */
+  focusTrendSeries?: Array<{ label: string; values: number[]; color?: string }>;
   /**
    * Optional Forecast (Predictive Insights) data — when supplied and
    * `selectedReports.forecast` (or `full_report`) is true, an executive
@@ -1783,6 +1849,10 @@ const hslToHex = (h: number, s: number, l: number): string => {
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
 };
 
+/** Produces a stable HTML-id slug from any section title, used for both headings and TOC anchors. */
+const slugifyId = (t: string): string =>
+  'heading-' + t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
 const renderPyqLineChartSvg = (
   title: string,
   labels: string[],
@@ -1833,9 +1903,10 @@ const renderPyqLineChartSvg = (
     return `<span class="legend-item"><span class="legend-dot" style="background:${color}"></span>${escHtml(item.label)}</span>`;
   }).join('');
 
+  const headingId = slugifyId(title);
   return `
     <section class="analysis-card">
-      <h3>${escHtml(title)}</h3>
+      <h3 id="${headingId}">${escHtml(title)}</h3>
       <div class="legend-wrap">${legend}</div>
       <div class="analysis-chart">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${widthSvg} ${heightSvg}" width="100%" height="${heightSvg}">
@@ -1874,9 +1945,10 @@ const renderPyqDonutSvg = (title: string, rows: Array<{ name: string; value: num
     return `<div class="donut-legend-row"><span class="donut-legend-dot" style="background:${color}"></span><span>${escHtml(item.name)}</span><strong>${item.value}</strong></div>`;
   }).join('');
 
+  const headingId = slugifyId(title);
   return `
     <section class="analysis-card">
-      <h3>${escHtml(title)}</h3>
+      <h3 id="${headingId}">${escHtml(title)}</h3>
       <div class="donut-wrap">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="200" height="200">
           <circle cx="90" cy="90" r="${radius}" fill="none" fill-opacity="1" stroke="#E2E8F0" stroke-width="34"/>
@@ -1898,9 +1970,10 @@ const renderPyqHeatmapSvg = (
   palette: PyqHeatmapPalette,
 ) => {
   if (!rows.length) return '';
+  const headingId = slugifyId(title);
   return `
     <section class="analysis-card">
-      <h3>${escHtml(title)}</h3>
+      <h3 id="${headingId}">${escHtml(title)}</h3>
       <table class="analysis-heatmap-table">
         <thead><tr><th>${escHtml(labelHeader)}</th>${years.map((year) => `<th>${escHtml(year)}</th>`).join('')}</tr></thead>
         <tbody>
@@ -1976,9 +2049,10 @@ const renderPyqForecastSection = (
     </tr>
   `).join('');
 
+  const headingId = slugifyId(title);
   return `
     <section class="analysis-card">
-      <h3>${escHtml(title)}</h3>
+      <h3 id="${headingId}">${escHtml(title)}</h3>
       <table class="analysis-heatmap-table">
         <thead>
           <tr>
@@ -2028,6 +2102,7 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
     secondaryHeatmapLabel,
     filteredQuestionsForSummary,
     selectedSubjectsList,
+    showTOC,
   } = input;
 
   const includeMomentum = !!selectedReports.subject_momentum;
@@ -2036,13 +2111,22 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
   const includeForecast = !!selectedReports.forecast;
 
   const sections: string[] = [];
+  const sectionTitles: string[] = [];
+
+  // Helper to push a titled section and track its title for the TOC
+  const pushSection = (title: string, html: string) => {
+    sectionTitles.push(title);
+    sections.push(html);
+  };
 
   if (includeMomentum && overviewSeries.length > 0) {
-    sections.push(renderPyqLineChartSvg(momentumTitle || 'Subject Momentum', years, overviewSeries));
+    const t = momentumTitle || 'Subject Momentum';
+    pushSection(t, renderPyqLineChartSvg(t, years, overviewSeries));
   }
 
   if (includeDistribution && distributionData.length > 0) {
-    sections.push(renderPyqDonutSvg(distributionTitle || 'Subject Distribution (Donut)', distributionData));
+    const t = distributionTitle || 'Subject Distribution (Donut)';
+    pushSection(t, renderPyqDonutSvg(t, distributionData));
   }
 
   const subjectsToRender = selectedSubjectsList && selectedSubjectsList.length > 0
@@ -2053,7 +2137,8 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
     if (subjectsToRender.length > 1) {
       // Global overview: only show Subject × Year Heatmap (shows counts per subject)
       if (subjectHeatmapRows.length > 0) {
-        sections.push(renderPyqHeatmapSvg(primaryHeatmapTitle || 'Subject × Year Heatmap', primaryHeatmapLabel || 'Subject', subjectHeatmapRows, years, heatmapPalette));
+        const t = primaryHeatmapTitle || 'Subject × Year Heatmap';
+        pushSection(t, renderPyqHeatmapSvg(t, primaryHeatmapLabel || 'Subject', subjectHeatmapRows, years, heatmapPalette));
       }
     }
     
@@ -2110,26 +2195,44 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
         `);
         
         if (secRows.length > 0) {
-          sections.push(renderPyqHeatmapSvg(`${subj} Section Group × Year Heatmap`, 'Section Group', secRows, years, heatmapPalette));
+          const t = `${subj} Section Group × Year Heatmap`;
+          pushSection(t, renderPyqHeatmapSvg(t, 'Section Group', secRows, years, heatmapPalette));
         }
         if (micRows.length > 0) {
-          sections.push(renderPyqHeatmapSvg(`${subj} Micro Topic × Year Heatmap`, 'Micro Topic', micRows, years, heatmapPalette));
+          const t = `${subj} Micro Topic × Year Heatmap`;
+          pushSection(t, renderPyqHeatmapSvg(t, 'Micro Topic', micRows, years, heatmapPalette));
         }
         if (subRows.length > 0 && examStage?.toLowerCase() === 'mains') {
-          sections.push(renderPyqHeatmapSvg(`${subj} Subtopic × Year Heatmap`, 'Subtopic', subRows, years, heatmapPalette));
+          const t = `${subj} Subtopic × Year Heatmap`;
+          pushSection(t, renderPyqHeatmapSvg(t, 'Subtopic', subRows, years, heatmapPalette));
         }
       });
     }
   }
 
   if (includeForecast && input.forecastRows && input.forecastRows.length > 0) {
-    sections.push(renderPyqForecastSection(input.forecastTitle || 'Forecast — Probable 2026 Topics', input.forecastRows));
+    const t = input.forecastTitle || 'Forecast — Probable 2026 Topics';
+    pushSection(t, renderPyqForecastSection(t, input.forecastRows));
   }
 
   if (!sections.length) return '';
 
   const customRangeLabel = selectedRange === 'Custom Range'
     ? ` (${escHtml(customYearStart || '')} - ${escHtml(customYearEnd || '')})`
+    : '';
+
+  // Build clickable TOC from the tracked section titles (slugifyId matches heading IDs exactly)
+  const tocHtml = (showTOC !== false && sectionTitles.length > 0)
+    ? `<div class="pyq-toc">
+        <div class="pyq-toc-title">📋 Table of Contents</div>
+        <ol class="pyq-toc-list">${
+          sectionTitles.map((t) => {
+            const id = slugifyId(t);
+            const js = `var e=document.getElementById('${id}');if(e){e.scrollIntoView({behavior:'smooth',block:'start'});}return false;`;
+            return `<li><a href="#${id}" onclick="(function(){${js}})()">${escHtml(t)}</a></li>`;
+          }).join('')
+        }</ol>
+      </div>`
     : '';
 
   return `
@@ -2159,10 +2262,18 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
       .analysis-summary tr,
       .analysis-summary svg,
       .analysis-summary svg * { break-inside: avoid !important; page-break-inside: avoid !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      /* === Clickable TOC === */
+      .analysis-summary .pyq-toc { background: #EFF6FF; border: 2px solid #BFDBFE; border-radius: 10px; padding: 5mm 6mm; margin-bottom: 6mm; break-inside: avoid; page-break-inside: avoid; }
+      .analysis-summary .pyq-toc-title { font-size: 13pt; font-weight: 800; color: #1E40AF; margin-bottom: 4mm; }
+      .analysis-summary .pyq-toc-list { margin: 0; padding-left: 6mm; list-style: decimal; }
+      .analysis-summary .pyq-toc-list li { margin-bottom: 2.5mm; font-size: 10pt; line-height: 1.5; }
+      .analysis-summary .pyq-toc-list li a { color: #1D4ED8; text-decoration: underline; font-weight: 600; cursor: pointer; display: block; padding: 1mm 0; }
+      .analysis-summary .pyq-toc-list li a:hover { color: #1E40AF; text-decoration: underline; }
     </style>
     <section class="analysis-summary">
       <h1>Executive Summary · PYQ Analysis Reports</h1>
       <p class="muted">${escHtml(examStage)} • ${escHtml(selectedPaper)} • ${escHtml(selectedRange)}${customRangeLabel} • ${questionCount} questions</p>
+      ${tocHtml}
       ${sections.join('')}
     </section>
   `;

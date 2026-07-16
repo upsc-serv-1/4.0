@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { 
   ChevronDown, ChevronRight, Plus, Sparkles, FolderTree, X, Check,
-  CheckCircle2, Minus, Layers, Search 
+  CheckCircle2, Minus, Layers, Search, Zap
 } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { BranchSvc, BranchNode } from '../../services/BranchService';

@@ -1,0 +1,2778 @@
+================================================================================
+GEMINI PROMPT INSTRUCTIONS FOR ANTHROPOLOGY OPTIONAL MODEL ANSWERS
+================================================================================
+Act as an expert Anthropology professor and UPSC civil services exam mentor.
+You are required to write high-scoring model answers for the following UPSC Anthropology Optional questions.
+
+Please strictly follow these formatting guidelines:
+1. The output must be written in high-quality Markdown, using standard markdown elements:
+   - Headings (###) and subheadings (####) for clean structure.
+   - Bullet points (-) and numbered lists (1.) for clarity.
+   - Tables (| Column 1 | Column 2 |) where comparison is needed.
+2. Highlight and BOLD key terms, important scholars, anthropological theories, case studies, tribal examples, and key data points.
+   - For example: **M.N. Srinivas**, **L.H. Morgan**, **Functionalism**, **Gond tribe**, **Sanskritization**, etc.
+3. Every answer must follow a standard high-scoring mains structure:
+   - Introduction: Define the core anthropological concept or term and give context.
+   - Body: Elaborate points, include scholars, case studies, and diagrams/flowcharts description where applicable.
+   - Conclusion: Summarize the anthropological significance or contemporary relevance.
+4. Surround each answer with the custom delimiters <<<START_ANSWER id="[QUESTION_ID]">>> and <<<END_ANSWER>>> exactly as shown below:
+
+<<<START_ANSWER id="[QUESTION_ID]">>>
+### Introduction
+[Intro text here...]
+
+### Body
+[Body text here...]
+
+### Conclusion
+[Conclusion text here...]
+<<<END_ANSWER>>>
+
+Do NOT include any extra conversational text or preambles outside these delimiters.
+================================================================================
+QUESTIONS LIST:
+================================================================================
+Question #1
+ID: mains-anthro1-q669
+Marks: 12 Marks
+Word Limit: 150 words
+Question: Write short notes on the following in about 150 words each: How 'natural selection' acts on variation?
+--------------------------------------------------------------------------------
+
+Question #2
+ID: mains-anthro1-q670
+Marks: 12 Marks
+Word Limit: 150 words
+Question: Write short notes on the following in about 150 words each: Ways of acquiring a spouse in simpler societies
+--------------------------------------------------------------------------------
+
+Question #3
+ID: mains-anthro1-q671
+Marks: 12 Marks
+Word Limit: 150 words
+Question: Write short notes on the following in about 150 words each: Post-modernism in Anthropology
+--------------------------------------------------------------------------------
+
+Question #4
+ID: mains-anthro1-q672
+Marks: 12 Marks
+Word Limit: 150 words
+Question: Write short notes on the following in about 150 words each: Relative dating methods
+--------------------------------------------------------------------------------
+
+Question #5
+ID: mains-anthro1-q673
+Marks: 12 Marks
+Word Limit: 150 words
+Question: Write short notes on the following in about 150 words each: Adaptive radiation in context of evolution
+--------------------------------------------------------------------------------
+
+Question #6
+ID: mains-anthro1-q674
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss race crossing in humans with suitable examples.
+--------------------------------------------------------------------------------
+
+Question #7
+ID: mains-anthro1-q675
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Distinguish between Religion, Magic and Science.
+--------------------------------------------------------------------------------
+
+Question #8
+ID: mains-anthro1-q676
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the role of ABO blood group system in resolving cases of disputed paternity.
+--------------------------------------------------------------------------------
+
+Question #9
+ID: mains-anthro1-q677
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Compare and contrast the skull of Gorilla and Man.
+--------------------------------------------------------------------------------
+
+Question #10
+ID: mains-anthro1-q678
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the typology and distribution of Upper Palaeolithic cultures in India.
+--------------------------------------------------------------------------------
+
+Question #11
+ID: mains-anthro1-q679
+Marks: 20 Marks
+Word Limit: Not specified
+Question: What are lethal and sub-lethal genes ? Explain.
+--------------------------------------------------------------------------------
+
+Question #12
+ID: mains-anthro1-q680
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Describe the types of kinship groups formed on the basis of different principles.
+--------------------------------------------------------------------------------
+
+Question #13
+ID: mains-anthro1-q681
+Marks: 30 Marks
+Word Limit: Not specified
+Question: Give a comparative account of variations in hemoglobin level and respiratory functions among the populations living under different environmental stresses.
+--------------------------------------------------------------------------------
+
+Question #14
+ID: mains-anthro1-q682
+Marks: 10 Marks
+Word Limit: Not specified
+Question: Comment briefly on the phylogenetic position of Australopithecines.
+--------------------------------------------------------------------------------
+
+Question #15
+ID: mains-anthro1-q683
+Marks: 12 Marks
+Word Limit: 150 words
+Question: Write short notes on the following in about 150 words each: Is family a social institution?
+--------------------------------------------------------------------------------
+
+Question #16
+ID: mains-anthro1-q684
+Marks: 12 Marks
+Word Limit: 150 words
+Question: Write short notes on the following in about 150 words each: Applications of Anthropometry in designing
+--------------------------------------------------------------------------------
+
+Question #17
+ID: mains-anthro1-q685
+Marks: 12 Marks
+Word Limit: 150 words
+Question: Write short notes on the following in about 150 words each: Band and Tribal societies
+--------------------------------------------------------------------------------
+
+Question #18
+ID: mains-anthro1-q686
+Marks: 12 Marks
+Word Limit: 150 words
+Question: Write short notes on the following in about 150 words each: Genetic counselling
+--------------------------------------------------------------------------------
+
+Question #19
+ID: mains-anthro1-q687
+Marks: 12 Marks
+Word Limit: 150 words
+Question: Write short notes on the following in about 150 words each: Epidemiological anthropology
+--------------------------------------------------------------------------------
+
+Question #20
+ID: mains-anthro1-q688
+Marks: 20 Marks
+Word Limit: Not specified
+Question: How does improved aerobic fitness increase exercise tolerance in warm humid climates? Give suitable examples in support of your answer.
+--------------------------------------------------------------------------------
+
+Question #21
+ID: mains-anthro1-q689
+Marks: 20 Marks
+Word Limit: Not specified
+Question: What are the tools of data collection? Discuss the advantages and limitations of participant-observations as a technique of data collection.
+--------------------------------------------------------------------------------
+
+Question #22
+ID: mains-anthro1-q690
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the chromosomal aberrations and manifestations of Klinefelter and Turner syndromes.
+--------------------------------------------------------------------------------
+
+Question #23
+ID: mains-anthro1-q691
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Explain any two biological theories of ageing based on purposeful events.
+--------------------------------------------------------------------------------
+
+Question #24
+ID: mains-anthro1-q692
+Marks: 20 Marks
+Word Limit: Not specified
+Question: What are the bases of social stratification? Discuss with examples.
+--------------------------------------------------------------------------------
+
+Question #25
+ID: mains-anthro1-q693
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Explain the concept of 'Status' and 'Role' in Anthropology.
+--------------------------------------------------------------------------------
+
+Question #26
+ID: mains-anthro1-q694
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Briefly discuss the important causes for the variations in occurrence and intensity of parasitic diseases among different populations.
+--------------------------------------------------------------------------------
+
+Question #27
+ID: mains-anthro1-q695
+Marks: 20 Marks
+Word Limit: Not specified
+Question: What are the genetic effects of consanguinity? Give examples.
+--------------------------------------------------------------------------------
+
+Question #28
+ID: mains-anthro1-q696
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Briefly discuss the applications of the knowledge of human osteology in forensic investigations.
+--------------------------------------------------------------------------------
+
+Question #29
+ID: mains-anthro1-q697
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: How do you situate Anthropology in Social Sciences?
+--------------------------------------------------------------------------------
+
+Question #30
+ID: mains-anthro1-q698
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Various types of descent
+--------------------------------------------------------------------------------
+
+Question #31
+ID: mains-anthro1-q699
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Totemism
+--------------------------------------------------------------------------------
+
+Question #32
+ID: mains-anthro1-q700
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Linguistic Anthropology
+--------------------------------------------------------------------------------
+
+Question #33
+ID: mains-anthro1-q701
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Carbon-14 method of dating
+--------------------------------------------------------------------------------
+
+Question #34
+ID: mains-anthro1-q702
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Why has the concept of Culture Relativism been so dear to Anthropologists?
+--------------------------------------------------------------------------------
+
+Question #35
+ID: mains-anthro1-q703
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Bring out the distinguishing features of culture and civilization.
+--------------------------------------------------------------------------------
+
+Question #36
+ID: mains-anthro1-q704
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Where do you situate 'live-in relationship' within the institution of marriage?
+--------------------------------------------------------------------------------
+
+Question #37
+ID: mains-anthro1-q705
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the impact of globalization on tribal economy.
+--------------------------------------------------------------------------------
+
+Question #38
+ID: mains-anthro1-q706
+Marks: 20 Marks
+Word Limit: Not specified
+Question: In what ways is Functionalism different from Structural Functionalism?
+--------------------------------------------------------------------------------
+
+Question #39
+ID: mains-anthro1-q707
+Marks: 10 Marks
+Word Limit: Not specified
+Question: Differentiate between Economics and Economic Anthropology.
+--------------------------------------------------------------------------------
+
+Question #40
+ID: mains-anthro1-q708
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the impact of urbanization and feminist movement on family.
+--------------------------------------------------------------------------------
+
+Question #41
+ID: mains-anthro1-q709
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Bring out the contribution of Turner and Geertz in symbolic and interpretive theories in Anthropology.
+--------------------------------------------------------------------------------
+
+Question #42
+ID: mains-anthro1-q710
+Marks: 15 Marks
+Word Limit: Not specified
+Question: How does taboo serve as a means of social control?
+--------------------------------------------------------------------------------
+
+Question #43
+ID: mains-anthro1-q711
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Role of primatology in Anthropological studies
+--------------------------------------------------------------------------------
+
+Question #44
+ID: mains-anthro1-q712
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Differentiation between Child Growth and Development
+--------------------------------------------------------------------------------
+
+Question #45
+ID: mains-anthro1-q713
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Ageing and Senescence
+--------------------------------------------------------------------------------
+
+Question #46
+ID: mains-anthro1-q714
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Twin method in human genetics
+--------------------------------------------------------------------------------
+
+Question #47
+ID: mains-anthro1-q715
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Demographic transition
+--------------------------------------------------------------------------------
+
+Question #48
+ID: mains-anthro1-q716
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Give a broad outline of Paleolithic culture emphasizing upon its tool technology.
+--------------------------------------------------------------------------------
+
+Question #49
+ID: mains-anthro1-q717
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What do you understand by 'Genetic Load' in a population? How is it measured and what are the important factors that can influence it?
+--------------------------------------------------------------------------------
+
+Question #50
+ID: mains-anthro1-q718
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Justify "Though human growth is under tight genetic control but it is influenced by various environmental factors.
+--------------------------------------------------------------------------------
+
+Question #51
+ID: mains-anthro1-q719
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the relevance of Case Study method of data collection.
+--------------------------------------------------------------------------------
+
+Question #52
+ID: mains-anthro1-q720
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Elaborate upon major human adaptations to heat and cold.
+--------------------------------------------------------------------------------
+
+Question #53
+ID: mains-anthro1-q721
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What are genetic markers and what is their usefulness? Why are blood groups considered as good genetic markers? Illustrate with examples.
+--------------------------------------------------------------------------------
+
+Question #54
+ID: mains-anthro1-q722
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss how Neo-Darwinism integrated the fields of Genetics and Evolution.
+--------------------------------------------------------------------------------
+
+Question #55
+ID: mains-anthro1-q723
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What is meant by epidemiological transition? Elaborate upon its causes and consequences highlighting major health problems of our adult population today.
+--------------------------------------------------------------------------------
+
+Question #56
+ID: mains-anthro1-q724
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Differentiate between Race and Racism. What are three major races of the world? Give important biological criteria used frequently for such a classification.
+--------------------------------------------------------------------------------
+
+Question #57
+ID: mains-anthro1-q725
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Double Descent
+--------------------------------------------------------------------------------
+
+Question #58
+ID: mains-anthro1-q726
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Genealogical Method
+--------------------------------------------------------------------------------
+
+Question #59
+ID: mains-anthro1-q727
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Major sub-divisions of Anthropology
+--------------------------------------------------------------------------------
+
+Question #60
+ID: mains-anthro1-q728
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Ecological Anthropology
+--------------------------------------------------------------------------------
+
+Question #61
+ID: mains-anthro1-q729
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Field work tradition in Anthropology
+--------------------------------------------------------------------------------
+
+Question #62
+ID: mains-anthro1-q730
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically examine the role of anthropology in Contemporary India.
+--------------------------------------------------------------------------------
+
+Question #63
+ID: mains-anthro1-q731
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Is culture unique to human beings? Critically examine.
+--------------------------------------------------------------------------------
+
+Question #64
+ID: mains-anthro1-q732
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the role of anthropology in the understanding of health and disease. What specific understanding is available with respect to infectious and non-infectious diseases ?
+--------------------------------------------------------------------------------
+
+Question #65
+ID: mains-anthro1-q733
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the nature of Law and Justice in simple societies citing suitable examples.
+--------------------------------------------------------------------------------
+
+Question #66
+ID: mains-anthro1-q734
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Define marriage and describe the various types of marriages in human societies.
+--------------------------------------------------------------------------------
+
+Question #67
+ID: mains-anthro1-q735
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Define Status and Role. Distinguish between Ascribed and Achieved Status.
+--------------------------------------------------------------------------------
+
+Question #68
+ID: mains-anthro1-q736
+Marks: 20 Marks
+Word Limit: Not specified
+Question: What is functionalism? Discuss the functional approach to the understanding of Religion.
+--------------------------------------------------------------------------------
+
+Question #69
+ID: mains-anthro1-q737
+Marks: 20 Marks
+Word Limit: Not specified
+Question: What is understood by 'Rites of Passage'? Describe the various phases of the 'Rites of Passage' and their significance.
+--------------------------------------------------------------------------------
+
+Question #70
+ID: mains-anthro1-q738
+Marks: 10 Marks
+Word Limit: Not specified
+Question: Differentiate between State and Stateless Societies.
+--------------------------------------------------------------------------------
+
+Question #71
+ID: mains-anthro1-q739
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Cross-sectional methods of studying human growth
+--------------------------------------------------------------------------------
+
+Question #72
+ID: mains-anthro1-q740
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Genetic Counselling
+--------------------------------------------------------------------------------
+
+Question #73
+ID: mains-anthro1-q741
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Epidemiological Anthropology
+--------------------------------------------------------------------------------
+
+Question #74
+ID: mains-anthro1-q742
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Asian Homo erectus
+--------------------------------------------------------------------------------
+
+Question #75
+ID: mains-anthro1-q743
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Fertility and Fecundity
+--------------------------------------------------------------------------------
+
+Question #76
+ID: mains-anthro1-q744
+Marks: 20 Marks
+Word Limit: Not specified
+Question: What are the different stages of Growth? Describe any one of them in detail.
+--------------------------------------------------------------------------------
+
+Question #77
+ID: mains-anthro1-q745
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe Turner and Klinefelter Syndromes in humans.
+--------------------------------------------------------------------------------
+
+Question #78
+ID: mains-anthro1-q746
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What are the stresses at high altitudes ? How do better cardio-respiratory functions help the native highlanders in combating low environmental pressure?
+--------------------------------------------------------------------------------
+
+Question #79
+ID: mains-anthro1-q747
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the factors affecting gene frequencies among human populations.
+--------------------------------------------------------------------------------
+
+Question #80
+ID: mains-anthro1-q748
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Elucidate the skeletal differences between humans and chimpanzees.
+--------------------------------------------------------------------------------
+
+Question #81
+ID: mains-anthro1-q749
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the relevance of menarche, menopause and other bio-events to fertility.
+--------------------------------------------------------------------------------
+
+Question #82
+ID: mains-anthro1-q750
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss Ageing and Senescence. Describe either the biological or social theories of Ageing.
+--------------------------------------------------------------------------------
+
+Question #83
+ID: mains-anthro1-q751
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe the absolute dating methods in Archaeology, highlighting the importance of each method.
+--------------------------------------------------------------------------------
+
+Question #84
+ID: mains-anthro1-q752
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe the Neolithic culture of India.
+--------------------------------------------------------------------------------
+
+Question #85
+ID: mains-anthro1-q753
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each : Archaeological Anthropology.
+--------------------------------------------------------------------------------
+
+Question #86
+ID: mains-anthro1-q754
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each : Society and Culture.
+--------------------------------------------------------------------------------
+
+Question #87
+ID: mains-anthro1-q755
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each : Incest Taboos.
+--------------------------------------------------------------------------------
+
+Question #88
+ID: mains-anthro1-q756
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each : Horticulture.
+--------------------------------------------------------------------------------
+
+Question #89
+ID: mains-anthro1-q757
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each : Historical Particularism.
+--------------------------------------------------------------------------------
+
+Question #90
+ID: mains-anthro1-q758
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Elucidate the biological and cultural factors in Human Evolution.
+--------------------------------------------------------------------------------
+
+Question #91
+ID: mains-anthro1-q759
+Marks: 20 Marks
+Word Limit: Not specified
+Question: How did Morgan explain the evolution of marriage, family and Socio-Political organization, and how did other evolutionists disagree with his explanation?
+--------------------------------------------------------------------------------
+
+Question #92
+ID: mains-anthro1-q760
+Marks: 15 Marks
+Word Limit: Not specified
+Question: How do diffusionism and evolutionism differ as explanations of Culture Change ?
+--------------------------------------------------------------------------------
+
+Question #93
+ID: mains-anthro1-q761
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Define family and critically examine the universality of family.
+--------------------------------------------------------------------------------
+
+Question #94
+ID: mains-anthro1-q762
+Marks: 15 Marks
+Word Limit: Not specified
+Question: How do you relate the concepts of 'Sacred' and 'Profane' in Durkheim's theory of religion with a focus on the role of totem?
+--------------------------------------------------------------------------------
+
+Question #95
+ID: mains-anthro1-q763
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Explain the basic features of 'Postmodernism' in Anthropology.
+--------------------------------------------------------------------------------
+
+Question #96
+ID: mains-anthro1-q764
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Critically examine the Formalists' and Substantivists' views on the applicability of economic laws in the study of primitive societies.
+--------------------------------------------------------------------------------
+
+Question #97
+ID: mains-anthro1-q765
+Marks: 10 Marks
+Word Limit: Not specified
+Question: Explain the difference between emic and etic, and how does the difference derive from the study of language ?
+--------------------------------------------------------------------------------
+
+Question #98
+ID: mains-anthro1-q766
+Marks: 20 Marks
+Word Limit: Not specified
+Question: What made Geertz's Interpretive Anthropology distinct from Turner's Symbolic Anthropology? What does each of them mean by the terms 'Symbol' and 'Symbolic'?
+--------------------------------------------------------------------------------
+
+Question #99
+ID: mains-anthro1-q767
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each : Palaeolithic culture.
+--------------------------------------------------------------------------------
+
+Question #100
+ID: mains-anthro1-q768
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each : Down's Syndrome.
+--------------------------------------------------------------------------------
+
+Question #101
+ID: mains-anthro1-q769
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each : Longitudinal method of studying growth.
+--------------------------------------------------------------------------------
+
+Question #102
+ID: mains-anthro1-q770
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each : Menopause and its impact.
+--------------------------------------------------------------------------------
+
+Question #103
+ID: mains-anthro1-q771
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each : DNA technology in Medicine.
+--------------------------------------------------------------------------------
+
+Question #104
+ID: mains-anthro1-q772
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Describe the salient characteristics and geographical distribution of Homo erectus.
+--------------------------------------------------------------------------------
+
+Question #105
+ID: mains-anthro1-q773
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically examine Darwin's theory of evolution in understanding evolution.
+--------------------------------------------------------------------------------
+
+Question #106
+ID: mains-anthro1-q774
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss chromosomal aberrations in man illustrating with examples.
+--------------------------------------------------------------------------------
+
+Question #107
+ID: mains-anthro1-q775
+Marks: 20 Marks
+Word Limit: Not specified
+Question: What is an anthropometric somatotype? Describe Heath and Carter's method of somatotyping.
+--------------------------------------------------------------------------------
+
+Question #108
+ID: mains-anthro1-q776
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically examine the physiological responses and acclimatization to cold climate in Man.
+--------------------------------------------------------------------------------
+
+Question #109
+ID: mains-anthro1-q777
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Elucidate the role of Anthropology in selection and monitoring of sports persons.
+--------------------------------------------------------------------------------
+
+Question #110
+ID: mains-anthro1-q778
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Forensic Science can help in criminal investigations. Discuss.
+--------------------------------------------------------------------------------
+
+Question #111
+ID: mains-anthro1-q779
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Define genetic polymorphism. Give details of its types with suitable examples.
+--------------------------------------------------------------------------------
+
+Question #112
+ID: mains-anthro1-q780
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What do you understand by Immunogenetics ? Explain with suitable examples.
+--------------------------------------------------------------------------------
+
+Question #113
+ID: mains-anthro1-q781
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Differences between Social Anthropology and Sociology
+--------------------------------------------------------------------------------
+
+Question #114
+ID: mains-anthro1-q782
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Cultural Relativism
+--------------------------------------------------------------------------------
+
+Question #115
+ID: mains-anthro1-q783
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Lineage and Clan
+--------------------------------------------------------------------------------
+
+Question #116
+ID: mains-anthro1-q784
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Totemism
+--------------------------------------------------------------------------------
+
+Question #117
+ID: mains-anthro1-q785
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Functionalism
+--------------------------------------------------------------------------------
+
+Question #118
+ID: mains-anthro1-q786
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Delineate the salient features of Chalcolithic cultures.
+--------------------------------------------------------------------------------
+
+Question #119
+ID: mains-anthro1-q787
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the impact of urbanization and feminist movements on family in India.
+--------------------------------------------------------------------------------
+
+Question #120
+ID: mains-anthro1-q788
+Marks: 15 Marks
+Word Limit: Not specified
+Question: According to Geertz, how does the cock-fight reveal aspects of Balinese culture?
+--------------------------------------------------------------------------------
+
+Question #121
+ID: mains-anthro1-q789
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Describe the cardinal points of descent and alliance theories.
+--------------------------------------------------------------------------------
+
+Question #122
+ID: mains-anthro1-q790
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss different social control mechanisms in simple societies.
+--------------------------------------------------------------------------------
+
+Question #123
+ID: mains-anthro1-q791
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically examine different Anthropological approaches to Religion.
+--------------------------------------------------------------------------------
+
+Question #124
+ID: mains-anthro1-q792
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the principles governing production, distribution and exchange in simple societies.
+--------------------------------------------------------------------------------
+
+Question #125
+ID: mains-anthro1-q793
+Marks: 15 Marks
+Word Limit: Not specified
+Question: How do the concepts of binary opposites and exchange figure in Levi-Strauss' structural analysis of kinship?
+--------------------------------------------------------------------------------
+
+Question #126
+ID: mains-anthro1-q794
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe the evolution of fieldwork tradition in Anthropology.
+--------------------------------------------------------------------------------
+
+Question #127
+ID: mains-anthro1-q795
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each : Rh-Blood Group
+--------------------------------------------------------------------------------
+
+Question #128
+ID: mains-anthro1-q796
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each : Rhodesian Man
+--------------------------------------------------------------------------------
+
+Question #129
+ID: mains-anthro1-q797
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each : Neolithic Cultures of India
+--------------------------------------------------------------------------------
+
+Question #130
+ID: mains-anthro1-q798
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each : Fertility and Fecundity
+--------------------------------------------------------------------------------
+
+Question #131
+ID: mains-anthro1-q799
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each : Forensic Anthropology
+--------------------------------------------------------------------------------
+
+Question #132
+ID: mains-anthro1-q800
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Elucidate the biological and cultural factors in human evolution.
+--------------------------------------------------------------------------------
+
+Question #133
+ID: mains-anthro1-q801
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Explain the role of heredity and environment in the formation of races.
+--------------------------------------------------------------------------------
+
+Question #134
+ID: mains-anthro1-q802
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss different factors affecting growth and development in human beings.
+--------------------------------------------------------------------------------
+
+Question #135
+ID: mains-anthro1-q803
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically discuss the Mendelian principles and their application to human populations.
+--------------------------------------------------------------------------------
+
+Question #136
+ID: mains-anthro1-q804
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Explain the significance of screening and counselling for genetic disorders.
+--------------------------------------------------------------------------------
+
+Question #137
+ID: mains-anthro1-q805
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Describe the scope of Epidemiological Anthropology in the study of infectious and non-infectious diseases.
+--------------------------------------------------------------------------------
+
+Question #138
+ID: mains-anthro1-q806
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe the role of Anthropology in designing defence and other equipments.
+--------------------------------------------------------------------------------
+
+Question #139
+ID: mains-anthro1-q807
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the genetic and non-genetic factors in the bio-cultural adaptations of human beings to different environments.
+--------------------------------------------------------------------------------
+
+Question #140
+ID: mains-anthro1-q808
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Explain the skeletal changes due to erect posture and their implications.
+--------------------------------------------------------------------------------
+
+Question #141
+ID: mains-anthro1-q809
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Bilineal and bilateral descents
+--------------------------------------------------------------------------------
+
+Question #142
+ID: mains-anthro1-q810
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Difference between religion and magic
+--------------------------------------------------------------------------------
+
+Question #143
+ID: mains-anthro1-q811
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Basic tenets of structural-functionalism
+--------------------------------------------------------------------------------
+
+Question #144
+ID: mains-anthro1-q812
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Non-verbal communication
+--------------------------------------------------------------------------------
+
+Question #145
+ID: mains-anthro1-q813
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Questionnaire
+--------------------------------------------------------------------------------
+
+Question #146
+ID: mains-anthro1-q814
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the development of the concept of culture in Anthropology.
+--------------------------------------------------------------------------------
+
+Question #147
+ID: mains-anthro1-q815
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Elucidate the determinants of Kinship terminology.
+--------------------------------------------------------------------------------
+
+Question #148
+ID: mains-anthro1-q816
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the different forms of preferential marriage with suitable examples from tribal societies in India.
+--------------------------------------------------------------------------------
+
+Question #149
+ID: mains-anthro1-q817
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the different traditional forms of religion in tribal societies.
+--------------------------------------------------------------------------------
+
+Question #150
+ID: mains-anthro1-q818
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Mention the characteristic features of band with suitable examples.
+--------------------------------------------------------------------------------
+
+Question #151
+ID: mains-anthro1-q819
+Marks: 15 Marks
+Word Limit: Not specified
+Question: With the help of appropriate examples, explain the various forms of exchange system.
+--------------------------------------------------------------------------------
+
+Question #152
+ID: mains-anthro1-q820
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Explain Ruth Benedict's patterns of culture.
+--------------------------------------------------------------------------------
+
+Question #153
+ID: mains-anthro1-q821
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Elucidate the basic characteristics of anthropological fieldwork methods.
+--------------------------------------------------------------------------------
+
+Question #154
+ID: mains-anthro1-q822
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically examine the Stewardian view of neo-evolutionism.
+--------------------------------------------------------------------------------
+
+Question #155
+ID: mains-anthro1-q823
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Hardy-Weinberg law
+--------------------------------------------------------------------------------
+
+Question #156
+ID: mains-anthro1-q824
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Salient features of Mesolithic culture
+--------------------------------------------------------------------------------
+
+Question #157
+ID: mains-anthro1-q825
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Concept of race
+--------------------------------------------------------------------------------
+
+Question #158
+ID: mains-anthro1-q826
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Age at menarche
+--------------------------------------------------------------------------------
+
+Question #159
+ID: mains-anthro1-q827
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Anthropology and designing of equipments
+--------------------------------------------------------------------------------
+
+Question #160
+ID: mains-anthro1-q828
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Define Anthropology. Describe the major branches of Anthropology elaborating on any one branch.
+--------------------------------------------------------------------------------
+
+Question #161
+ID: mains-anthro1-q829
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Bring out the comparative anatomical features of man and apes. Discuss their evolutionary significance.
+--------------------------------------------------------------------------------
+
+Question #162
+ID: mains-anthro1-q830
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What are dating methods? Discuss one absolute method and one relative method in detail.
+--------------------------------------------------------------------------------
+
+Question #163
+ID: mains-anthro1-q831
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Briefly describe the various methods used in the genetic study of man.
+--------------------------------------------------------------------------------
+
+Question #164
+ID: mains-anthro1-q832
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the responses and acclimatization to high altitude stresses.
+--------------------------------------------------------------------------------
+
+Question #165
+ID: mains-anthro1-q833
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe the biological and socio-ecological factors affecting fertility and mortality.
+--------------------------------------------------------------------------------
+
+Question #166
+ID: mains-anthro1-q834
+Marks: 20 Marks
+Word Limit: Not specified
+Question: What are the methods of personal identification? Critically examine how personal identification helps in criminal investigations.
+--------------------------------------------------------------------------------
+
+Question #167
+ID: mains-anthro1-q835
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe the various methods of studying growth highlighting their merits and demerits.
+--------------------------------------------------------------------------------
+
+Question #168
+ID: mains-anthro1-q836
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss Sheldon's method of somatotyping.
+--------------------------------------------------------------------------------
+
+Question #169
+ID: mains-anthro1-q837
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: The Relevance of Anthropology
+--------------------------------------------------------------------------------
+
+Question #170
+ID: mains-anthro1-q838
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Difference between Science and Magic
+--------------------------------------------------------------------------------
+
+Question #171
+ID: mains-anthro1-q839
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Town Planning of Harappan Culture
+--------------------------------------------------------------------------------
+
+Question #172
+ID: mains-anthro1-q840
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Kinship Terminology
+--------------------------------------------------------------------------------
+
+Question #173
+ID: mains-anthro1-q841
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Ways of Acquiring Mate in Tribal Society
+--------------------------------------------------------------------------------
+
+Question #174
+ID: mains-anthro1-q842
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Explain the biological changes that made human beings capable of making culture.
+--------------------------------------------------------------------------------
+
+Question #175
+ID: mains-anthro1-q843
+Marks: 15 Marks
+Word Limit: Not specified
+Question: How does customary law function in the tribal society? Discuss its different sources.
+--------------------------------------------------------------------------------
+
+Question #176
+ID: mains-anthro1-q844
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What do you understand by the National Character Study? Illustrate the concept.
+--------------------------------------------------------------------------------
+
+Question #177
+ID: mains-anthro1-q845
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Define ethnography and present a brief history of ethnographic studies.
+--------------------------------------------------------------------------------
+
+Question #178
+ID: mains-anthro1-q846
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Give an account of the consequences of food production of Neolithic culture.
+--------------------------------------------------------------------------------
+
+Question #179
+ID: mains-anthro1-q847
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically examine that the structure and content of language are influenced by culture.
+--------------------------------------------------------------------------------
+
+Question #180
+ID: mains-anthro1-q848
+Marks: 20 Marks
+Word Limit: Not specified
+Question: How is case study method helpful in understanding a social phenomena? Explain with suitable example.
+--------------------------------------------------------------------------------
+
+Question #181
+ID: mains-anthro1-q849
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe the culture related to Homo erectus.
+--------------------------------------------------------------------------------
+
+Question #182
+ID: mains-anthro1-q850
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Write the characteristics of hunting and gathering economy.
+--------------------------------------------------------------------------------
+
+Question #183
+ID: mains-anthro1-q851
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Gordon Childe's Theory of Cultural Evolution
+--------------------------------------------------------------------------------
+
+Question #184
+ID: mains-anthro1-q852
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Advanced Molecular Anthropology Techniques
+--------------------------------------------------------------------------------
+
+Question #185
+ID: mains-anthro1-q853
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Categorize Genes that influence Human Survival.
+--------------------------------------------------------------------------------
+
+Question #186
+ID: mains-anthro1-q854
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Race is a Myth. Justify its Present Day Relevance.
+--------------------------------------------------------------------------------
+
+Question #187
+ID: mains-anthro1-q855
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Issues of Elderly and Senescence in Developing and Developed Countries
+--------------------------------------------------------------------------------
+
+Question #188
+ID: mains-anthro1-q856
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Explain the mechanisms of human variation in gene frequencies.
+--------------------------------------------------------------------------------
+
+Question #189
+ID: mains-anthro1-q857
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Do Allen's rule and Bergmann's rule hold for human populations? Explain with examples.
+--------------------------------------------------------------------------------
+
+Question #190
+ID: mains-anthro1-q858
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Explain the impact of discovery of iron technology on contemporary society.
+--------------------------------------------------------------------------------
+
+Question #191
+ID: mains-anthro1-q859
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Describe the mechanisms for structural anomalies of autosomes with diagrams.
+--------------------------------------------------------------------------------
+
+Question #192
+ID: mains-anthro1-q860
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe the principles of radiocarbon dating. Mention its limitations.
+--------------------------------------------------------------------------------
+
+Question #193
+ID: mains-anthro1-q861
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Narrate evolution of disease and major causes of ill health in human populations.
+--------------------------------------------------------------------------------
+
+Question #194
+ID: mains-anthro1-q862
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Distinguish between adaptation, adaptability and acclimatization with examples.
+--------------------------------------------------------------------------------
+
+Question #195
+ID: mains-anthro1-q863
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Define fecundity and explain major factors affecting fecundity in Indian populations.
+--------------------------------------------------------------------------------
+
+Question #196
+ID: mains-anthro1-q864
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Give an account of the field methods used in the study of Archaeological Anthropology.
+--------------------------------------------------------------------------------
+
+Question #197
+ID: mains-anthro1-q865
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: The relationship between Linguistics and Social-Cultural Anthropology
+--------------------------------------------------------------------------------
+
+Question #198
+ID: mains-anthro1-q866
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Cultural Relativism
+--------------------------------------------------------------------------------
+
+Question #199
+ID: mains-anthro1-q867
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Pastoralism in India
+--------------------------------------------------------------------------------
+
+Question #200
+ID: mains-anthro1-q868
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Cultural Materialism
+--------------------------------------------------------------------------------
+
+Question #201
+ID: mains-anthro1-q869
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Relative Dating Methods
+--------------------------------------------------------------------------------
+
+Question #202
+ID: mains-anthro1-q870
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the evolutionary significance of bipedalism and erect posture.
+--------------------------------------------------------------------------------
+
+Question #203
+ID: mains-anthro1-q871
+Marks: 15 Marks
+Word Limit: Not specified
+Question: How did Radcliffe-Brown and Levi-Strauss study kinship in terms of social structure?
+--------------------------------------------------------------------------------
+
+Question #204
+ID: mains-anthro1-q872
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Elucidate Mesolithic culture and associated rock art with examples from India.
+--------------------------------------------------------------------------------
+
+Question #205
+ID: mains-anthro1-q873
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss social stratification according to any three major approaches.
+--------------------------------------------------------------------------------
+
+Question #206
+ID: mains-anthro1-q874
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Europeans are closer to Neanderthals." Critically discuss in view of the African origin of humankind.
+--------------------------------------------------------------------------------
+
+Question #207
+ID: mains-anthro1-q875
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss briefly the major traditions in the Upper Palaeolithic culture of Europe.
+--------------------------------------------------------------------------------
+
+Question #208
+ID: mains-anthro1-q876
+Marks: 20 Marks
+Word Limit: Not specified
+Question: With reference to the somatoscopic and morphometric characteristics commonly used for racial classification, make critical comments as to whether 'Race' is a valid concept.
+--------------------------------------------------------------------------------
+
+Question #209
+ID: mains-anthro1-q877
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically explain the anthropological approaches to religion.
+--------------------------------------------------------------------------------
+
+Question #210
+ID: mains-anthro1-q878
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Differentiate between transient and balanced genetic polymorphism. Illustrate your answer with suitable examples from human populations.
+--------------------------------------------------------------------------------
+
+Question #211
+ID: mains-anthro1-q879
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Adaptive primate radiation
+--------------------------------------------------------------------------------
+
+Question #212
+ID: mains-anthro1-q880
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Implications of mutation in evolution
+--------------------------------------------------------------------------------
+
+Question #213
+ID: mains-anthro1-q881
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Olduvai Gorge
+--------------------------------------------------------------------------------
+
+Question #214
+ID: mains-anthro1-q882
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Anthropological inputs in facial reconstruction
+--------------------------------------------------------------------------------
+
+Question #215
+ID: mains-anthro1-q883
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Genetico-environmental factors affecting human growth
+--------------------------------------------------------------------------------
+
+Question #216
+ID: mains-anthro1-q884
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Examine critically the contributions of Victor Turner and Clifford Geertz in anthropology.
+--------------------------------------------------------------------------------
+
+Question #217
+ID: mains-anthro1-q885
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Human adaptations are always bio-cultural in nature." Discuss with reference to human adaptation to high-altitude climate.
+--------------------------------------------------------------------------------
+
+Question #218
+ID: mains-anthro1-q886
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the methods of studying human growth with their merits and demerits.
+--------------------------------------------------------------------------------
+
+Question #219
+ID: mains-anthro1-q887
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss how indigenous people encounter globalization.
+--------------------------------------------------------------------------------
+
+Question #220
+ID: mains-anthro1-q888
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Applied human genetics has come to touch every sphere of human life." Discuss in light of recent advances in molecular anthropology.
+--------------------------------------------------------------------------------
+
+Question #221
+ID: mains-anthro1-q889
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Evaluate participant observation in producing anthropological knowledge.
+--------------------------------------------------------------------------------
+
+Question #222
+ID: mains-anthro1-q890
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss with examples the Megalithic culture of India in the archaeological context.
+--------------------------------------------------------------------------------
+
+Question #223
+ID: mains-anthro1-q891
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the bio-cultural factors influencing fertility in light of the relationship between fecundity and fertility.
+--------------------------------------------------------------------------------
+
+Question #224
+ID: mains-anthro1-q892
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss phenomenology as a research method in anthropological studies.
+--------------------------------------------------------------------------------
+
+Question #225
+ID: mains-anthro1-q893
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Natufian culture
+--------------------------------------------------------------------------------
+
+Question #226
+ID: mains-anthro1-q894
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Sapir-Whorf hypothesis
+--------------------------------------------------------------------------------
+
+Question #227
+ID: mains-anthro1-q895
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Human rights and Cultural relativism
+--------------------------------------------------------------------------------
+
+Question #228
+ID: mains-anthro1-q896
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Victor Turner and Liminality
+--------------------------------------------------------------------------------
+
+Question #229
+ID: mains-anthro1-q897
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Jane Goodall's contributions in studying primate behaviour
+--------------------------------------------------------------------------------
+
+Question #230
+ID: mains-anthro1-q898
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Critically evaluate the contesting theories of the emergence and dispersal of modern Homo Sapiens.
+--------------------------------------------------------------------------------
+
+Question #231
+ID: mains-anthro1-q899
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss Erving Goffman's concept of total institutions and its relevance in contemporary society.
+--------------------------------------------------------------------------------
+
+Question #232
+ID: mains-anthro1-q900
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Differentiate between Lower Palaeolithic culture and Middle Palaeolithic culture with suitable examples.
+--------------------------------------------------------------------------------
+
+Question #233
+ID: mains-anthro1-q901
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Explain the impact of feminist movement on universality of marriage and family structure.
+--------------------------------------------------------------------------------
+
+Question #234
+ID: mains-anthro1-q902
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically examine the demographic and epidemiological consequences with rise in food production and sedentism.
+--------------------------------------------------------------------------------
+
+Question #235
+ID: mains-anthro1-q903
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Elucidate how Darwin and Post-Darwin theories of evolution resulted in the development of Synthetic theory of evolution.
+--------------------------------------------------------------------------------
+
+Question #236
+ID: mains-anthro1-q904
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss various anthropological approaches to the study of personality and culture.
+--------------------------------------------------------------------------------
+
+Question #237
+ID: mains-anthro1-q905
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Illustrate with examples the various types of locomotion patterns among the non-human primates.
+--------------------------------------------------------------------------------
+
+Question #238
+ID: mains-anthro1-q906
+Marks: 15 Marks
+Word Limit: Not specified
+Question: How is the construct of power linked to the notion of conspicuous consumption and its impact on distributive justice ?
+--------------------------------------------------------------------------------
+
+Question #239
+ID: mains-anthro1-q907
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Racism and Eugenics
+--------------------------------------------------------------------------------
+
+Question #240
+ID: mains-anthro1-q908
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Genetic drift
+--------------------------------------------------------------------------------
+
+Question #241
+ID: mains-anthro1-q909
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Experiential Ethnography
+--------------------------------------------------------------------------------
+
+Question #242
+ID: mains-anthro1-q910
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Ethics and Genetic engineering
+--------------------------------------------------------------------------------
+
+Question #243
+ID: mains-anthro1-q911
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Senescence
+--------------------------------------------------------------------------------
+
+Question #244
+ID: mains-anthro1-q912
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Secular trend in human growth can be positive, negative or neutral. Illustrate with examples.
+--------------------------------------------------------------------------------
+
+Question #245
+ID: mains-anthro1-q913
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe the impact of infectious diseases on indigenous populations.
+--------------------------------------------------------------------------------
+
+Question #246
+ID: mains-anthro1-q914
+Marks: 15 Marks
+Word Limit: Not specified
+Question: How may numerical aberrations in sex chromosomes lead to genetic disorders?
+--------------------------------------------------------------------------------
+
+Question #247
+ID: mains-anthro1-q915
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Explain how variations in language usage is related to social inequality.
+--------------------------------------------------------------------------------
+
+Question #248
+ID: mains-anthro1-q916
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe the biocultural responses to extreme climatic events.
+--------------------------------------------------------------------------------
+
+Question #249
+ID: mains-anthro1-q917
+Marks: 15 Marks
+Word Limit: Not specified
+Question: How do marriage rules impact the gene pool of populations?
+--------------------------------------------------------------------------------
+
+Question #250
+ID: mains-anthro1-q918
+Marks: 20 Marks
+Word Limit: Not specified
+Question: How can synergising the core branches of anthropology reinvigorate the holistic spirit of the discipline ?
+--------------------------------------------------------------------------------
+
+Question #251
+ID: mains-anthro1-q919
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What are the applications of human genomic research in human welfare?
+--------------------------------------------------------------------------------
+
+Question #252
+ID: mains-anthro1-q920
+Marks: 15 Marks
+Word Limit: Not specified
+Question: How have interpretation and presentation of data changed from classical to contemporary writings in anthropological texts?
+--------------------------------------------------------------------------------
+
+Question #253
+ID: mains-anthro1-q921
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Animism and Deep Ecology
+--------------------------------------------------------------------------------
+
+Question #254
+ID: mains-anthro1-q922
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Marriage Regulations and Alliance Theory
+--------------------------------------------------------------------------------
+
+Question #255
+ID: mains-anthro1-q923
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Historical Particularism and Franz Boas
+--------------------------------------------------------------------------------
+
+Question #256
+ID: mains-anthro1-q924
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: "The bio-cultural approach is the hallmark of Biological Anthropology." Explain.
+--------------------------------------------------------------------------------
+
+Question #257
+ID: mains-anthro1-q925
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Thermoluminescence (TL) dating
+--------------------------------------------------------------------------------
+
+Question #258
+ID: mains-anthro1-q926
+Marks: 20 Marks
+Word Limit: Not specified
+Question: What are the physical and cultural characteristics of Homo erectus ? Discuss its phylogenetic status.
+--------------------------------------------------------------------------------
+
+Question #259
+ID: mains-anthro1-q927
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Elucidate the concept of "thick description" of Clifford Geertz with a suitable example.
+--------------------------------------------------------------------------------
+
+Question #260
+ID: mains-anthro1-q928
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe the features of early farming cultures and Neolithic of the Near East.
+--------------------------------------------------------------------------------
+
+Question #261
+ID: mains-anthro1-q929
+Marks: 20 Marks
+Word Limit: Not specified
+Question: How do political organisations of simple societies establish power, authority and legitimacy?
+--------------------------------------------------------------------------------
+
+Question #262
+ID: mains-anthro1-q930
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Explain the genetic mechanisms of micro and macro evolution.
+--------------------------------------------------------------------------------
+
+Question #263
+ID: mains-anthro1-q931
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the salient features of different traditions of European Mesolithic.
+--------------------------------------------------------------------------------
+
+Question #264
+ID: mains-anthro1-q932
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Elaborate the scope of anthropology and elucidate its uniqueness in the field of other social sciences.
+--------------------------------------------------------------------------------
+
+Question #265
+ID: mains-anthro1-q933
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Mention the major branches of linguistic anthropology and discuss language use in social and cultural settings.
+--------------------------------------------------------------------------------
+
+Question #266
+ID: mains-anthro1-q934
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Chromosomal aberrations can play havoc with the human body and mind." Explain with suitable examples.
+--------------------------------------------------------------------------------
+
+Question #267
+ID: mains-anthro1-q935
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Human adolescent growth spurt
+--------------------------------------------------------------------------------
+
+Question #268
+ID: mains-anthro1-q936
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: The losses and gains of erect posture
+--------------------------------------------------------------------------------
+
+Question #269
+ID: mains-anthro1-q937
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Is race a valid and biologically meaningful concept ?
+--------------------------------------------------------------------------------
+
+Question #270
+ID: mains-anthro1-q938
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Descent Groups
+--------------------------------------------------------------------------------
+
+Question #271
+ID: mains-anthro1-q939
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Modes of Subsistence
+--------------------------------------------------------------------------------
+
+Question #272
+ID: mains-anthro1-q940
+Marks: 20 Marks
+Word Limit: Not specified
+Question: What is acclimatization? Discuss adaptive responses to high altitude and cold climate.
+--------------------------------------------------------------------------------
+
+Question #273
+ID: mains-anthro1-q941
+Marks: 15 Marks
+Word Limit: Not specified
+Question: How are the cases of disputed paternity solved? Discuss the recent techniques.
+--------------------------------------------------------------------------------
+
+Question #274
+ID: mains-anthro1-q942
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically evaluate Lewis Morgan's classification of family.
+--------------------------------------------------------------------------------
+
+Question #275
+ID: mains-anthro1-q943
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Critically evaluate different types of social stratifications with suitable examples.
+--------------------------------------------------------------------------------
+
+Question #276
+ID: mains-anthro1-q944
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the bio-social determinants of fertility and fecundity.
+--------------------------------------------------------------------------------
+
+Question #277
+ID: mains-anthro1-q945
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What is Anthropometry? Discuss its role in assessing the nutritional status and sports capability of a person.
+--------------------------------------------------------------------------------
+
+Question #278
+ID: mains-anthro1-q946
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss various tools of data collection in conducting anthropological research.
+--------------------------------------------------------------------------------
+
+Question #279
+ID: mains-anthro1-q947
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the physiological and evolutionary theories of aging.
+--------------------------------------------------------------------------------
+
+Question #280
+ID: mains-anthro1-q948
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Explain the structural analysis of kinship as proposed by Lévi-Strauss.
+--------------------------------------------------------------------------------
+
+Question #281
+ID: mains-anthro1-q949
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Debate between formalist and substantivist approaches
+--------------------------------------------------------------------------------
+
+Question #282
+ID: mains-anthro1-q950
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Mesolithic rock art in Indian subcontinent
+--------------------------------------------------------------------------------
+
+Question #283
+ID: mains-anthro1-q951
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Radcliffe-Brown's ideas on status, role and institution
+--------------------------------------------------------------------------------
+
+Question #284
+ID: mains-anthro1-q952
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Pedigree analysis in genetic counselling
+--------------------------------------------------------------------------------
+
+Question #285
+ID: mains-anthro1-q953
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Participatory Rural Appraisal (PRA) and Participatory Learning and Action (PLA)
+--------------------------------------------------------------------------------
+
+Question #286
+ID: mains-anthro1-q954
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Anthropology is the systematic, objective and holistic study of human kind in all times and places". Elaborate the argument.
+--------------------------------------------------------------------------------
+
+Question #287
+ID: mains-anthro1-q955
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss different forms of primate social organisation.
+--------------------------------------------------------------------------------
+
+Question #288
+ID: mains-anthro1-q956
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss with suitable examples the typo-technological problems in Indian palaeolithic industry with reference to environmental hypotheses.
+--------------------------------------------------------------------------------
+
+Question #289
+ID: mains-anthro1-q957
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss how the rules of descent contradict the principles of residence in matrilineal society, mentioning suitable examples ?
+--------------------------------------------------------------------------------
+
+Question #290
+ID: mains-anthro1-q958
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Enumerate the evidence of animal domestication in Indian microlithic industry.
+--------------------------------------------------------------------------------
+
+Question #291
+ID: mains-anthro1-q959
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Should we still distinguish between 'classic' and 'progressive' Neanderthals ? Discuss the controversy surrounding Neanderthal's position in human evolution.
+--------------------------------------------------------------------------------
+
+Question #292
+ID: mains-anthro1-q960
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Why Heath and Carter used anthropometric measurements instead of photographs of an individual to assess the somatotype? Elaborate their method.
+--------------------------------------------------------------------------------
+
+Question #293
+ID: mains-anthro1-q961
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the historical and cultural contexts that led to superseding ethnocentrism with cultural relativism in anthropology.
+--------------------------------------------------------------------------------
+
+Question #294
+ID: mains-anthro1-q962
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically examine various anthropological interpretations about the Kula Ring.
+--------------------------------------------------------------------------------
+
+Question #295
+ID: mains-anthro1-q963
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Balanced and transient genetic polymorphism.
+--------------------------------------------------------------------------------
+
+Question #296
+ID: mains-anthro1-q964
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Genetic imprinting in human diseases.
+--------------------------------------------------------------------------------
+
+Question #297
+ID: mains-anthro1-q965
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Stages of human pre-natal development.
+--------------------------------------------------------------------------------
+
+Question #298
+ID: mains-anthro1-q966
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Shaman, sorcerer and medicine man.
+--------------------------------------------------------------------------------
+
+Question #299
+ID: mains-anthro1-q967
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Household and domestic group.
+--------------------------------------------------------------------------------
+
+Question #300
+ID: mains-anthro1-q968
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the mechanism of social control in different kinds of political systems.
+--------------------------------------------------------------------------------
+
+Question #301
+ID: mains-anthro1-q969
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What is meant by health? Is the burden of life style diseases on the rise? Justify your answer with suitable examples.
+--------------------------------------------------------------------------------
+
+Question #302
+ID: mains-anthro1-q970
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically evaluate the reasons of reduction in age at menarche in human females over the successive generations.
+--------------------------------------------------------------------------------
+
+Question #303
+ID: mains-anthro1-q971
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the role of evolutionary forces in creating human diversity.
+--------------------------------------------------------------------------------
+
+Question #304
+ID: mains-anthro1-q972
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Write the historical development of field work tradition in anthropology till recent times.
+--------------------------------------------------------------------------------
+
+Question #305
+ID: mains-anthro1-q973
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the approaches of Leslie White, Julian Steward and Marshall Sahlins in the light of cultural evolution.
+--------------------------------------------------------------------------------
+
+Question #306
+ID: mains-anthro1-q974
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the contemporary population problems in the light of various socio-cultural demographic theories.
+--------------------------------------------------------------------------------
+
+Question #307
+ID: mains-anthro1-q975
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What do you understand by blood group systems? How is HLA system different from those based on red cell antigens?
+--------------------------------------------------------------------------------
+
+Question #308
+ID: mains-anthro1-q976
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss how anthropological knowledge of the human body may be used in designing equipments and articles of human use.
+--------------------------------------------------------------------------------
+
+Question #309
+ID: mains-anthro1-q977
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Scope and relevance of Social and Cultural Anthropology
+--------------------------------------------------------------------------------
+
+Question #310
+ID: mains-anthro1-q978
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Cultural impact of Iron Age
+--------------------------------------------------------------------------------
+
+Question #311
+ID: mains-anthro1-q979
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Race and Ethnicity
+--------------------------------------------------------------------------------
+
+Question #312
+ID: mains-anthro1-q980
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Customary laws and Environmental conservation
+--------------------------------------------------------------------------------
+
+Question #313
+ID: mains-anthro1-q981
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Gene expression
+--------------------------------------------------------------------------------
+
+Question #314
+ID: mains-anthro1-q982
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss major species of Australopithecus discovered from South and East Africa. Describe the discovery, physical features and significance of Taung baby.
+--------------------------------------------------------------------------------
+
+Question #315
+ID: mains-anthro1-q983
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the Paleolithic environment in light of available evidences with special reference to India.
+--------------------------------------------------------------------------------
+
+Question #316
+ID: mains-anthro1-q984
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Elucidate the different forms of malnutrition. Describe protein-calorie malnutrition with suitable examples.
+--------------------------------------------------------------------------------
+
+Question #317
+ID: mains-anthro1-q985
+Marks: 20 Marks
+Word Limit: Not specified
+Question: What is hominization process? Discuss the major trends in human evolution with the help of suitable examples and illustrations.
+--------------------------------------------------------------------------------
+
+Question #318
+ID: mains-anthro1-q986
+Marks: 15 Marks
+Word Limit: Not specified
+Question: How did Clifford Geertz look at religion? Differentiate between anthropological and psychological approaches to the study of religion.
+--------------------------------------------------------------------------------
+
+Question #319
+ID: mains-anthro1-q987
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What is mixed-longitudinal method of studying human growth? Discuss its merits and demerits.
+--------------------------------------------------------------------------------
+
+Question #320
+ID: mains-anthro1-q988
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the role of marriage regulations in traditional societies in India for strengthening social solidarity.
+--------------------------------------------------------------------------------
+
+Question #321
+ID: mains-anthro1-q989
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss various methods of personal identification based on skeletal remains.
+--------------------------------------------------------------------------------
+
+Question #322
+ID: mains-anthro1-q990
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Identify the major Mesolithic sites and describe the typo-technological features with special reference to India.
+--------------------------------------------------------------------------------
+
+Question #323
+ID: mains-anthro1-q991
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Polygenic Inheritance
+--------------------------------------------------------------------------------
+
+Question #324
+ID: mains-anthro1-q992
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Prehistoric significance of Rakhigarhi
+--------------------------------------------------------------------------------
+
+Question #325
+ID: mains-anthro1-q993
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Glottochronology
+--------------------------------------------------------------------------------
+
+Question #326
+ID: mains-anthro1-q994
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Menopausal symptoms
+--------------------------------------------------------------------------------
+
+Question #327
+ID: mains-anthro1-q995
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: William Ogburn and Cultural lag
+--------------------------------------------------------------------------------
+
+Question #328
+ID: mains-anthro1-q996
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Critically discuss the controversies related to fieldwork of Bronislaw Malinowski and Margaret Mead.
+--------------------------------------------------------------------------------
+
+Question #329
+ID: mains-anthro1-q997
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the impact of globalization on the economic systems of indigenous communities.
+--------------------------------------------------------------------------------
+
+Question #330
+ID: mains-anthro1-q998
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe the practical applications of DNA technology in the current scenario.
+--------------------------------------------------------------------------------
+
+Question #331
+ID: mains-anthro1-q999
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Describe various methods of qualitative data analysis. Highlight some popular computer softwares used in qualitative analysis.
+--------------------------------------------------------------------------------
+
+Question #332
+ID: mains-anthro1-q1000
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What assumptions must be met for a population to be in genetic equilibrium? Explain the importance of genetic equilibrium.
+--------------------------------------------------------------------------------
+
+Question #333
+ID: mains-anthro1-q1001
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss political and methodological aspects of national character studies. Elucidate the contemporary relevance of such studies.
+--------------------------------------------------------------------------------
+
+Question #334
+ID: mains-anthro1-q1002
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Critically examine Arjun Appadurai's conceptualization of global cultural economy.
+--------------------------------------------------------------------------------
+
+Question #335
+ID: mains-anthro1-q1003
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe the causes of structural abnormalities of chromosomes with suitable examples.
+--------------------------------------------------------------------------------
+
+Question #336
+ID: mains-anthro1-q1004
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically discuss A.L. Kroeber's contribution to kinship studies.
+--------------------------------------------------------------------------------
+
+Question #337
+ID: mains-anthro1-q1005
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Attributes of culture
+--------------------------------------------------------------------------------
+
+Question #338
+ID: mains-anthro1-q1006
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Harappan maritime trade
+--------------------------------------------------------------------------------
+
+Question #339
+ID: mains-anthro1-q1007
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Critical perspective on avoidance and joking relationship
+--------------------------------------------------------------------------------
+
+Question #340
+ID: mains-anthro1-q1008
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Lethal and sublethal genes
+--------------------------------------------------------------------------------
+
+Question #341
+ID: mains-anthro1-q1009
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Hemoglobin in health and disease
+--------------------------------------------------------------------------------
+
+Question #342
+ID: mains-anthro1-q1010
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss historical particularism as a critical development to the classical evolutionism.
+--------------------------------------------------------------------------------
+
+Question #343
+ID: mains-anthro1-q1011
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe the evidences of food production and domestication of animals with special reference to Mehrgarh. Throw light on its significance.
+--------------------------------------------------------------------------------
+
+Question #344
+ID: mains-anthro1-q1012
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically comment on the lifestyle diseases and their impact on human health.
+--------------------------------------------------------------------------------
+
+Question #345
+ID: mains-anthro1-q1013
+Marks: 20 Marks
+Word Limit: Not specified
+Question: What is meant by karyotype? How does its analysis help in diagnosis of the chromosomal aberrations in man?
+--------------------------------------------------------------------------------
+
+Question #346
+ID: mains-anthro1-q1014
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Define urbanization and discuss its impact on family in India with examples.
+--------------------------------------------------------------------------------
+
+Question #347
+ID: mains-anthro1-q1015
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the contemporary challenges in fieldwork method in anthropological research.
+--------------------------------------------------------------------------------
+
+Question #348
+ID: mains-anthro1-q1016
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Critically discuss the characteristics of the psychological types in the cultures of the American South-West as observed by Ruth Benedict.
+--------------------------------------------------------------------------------
+
+Question #349
+ID: mains-anthro1-q1017
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the Acheulian and Oldowan traditions of Indian Paleolithic cultures with suitable illustrations.
+--------------------------------------------------------------------------------
+
+Question #350
+ID: mains-anthro1-q1018
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What is genetic counselling? Briefly discuss various steps involved in it.
+--------------------------------------------------------------------------------
+
+Question #351
+ID: mains-anthro1-q1019
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Chronometric dating
+--------------------------------------------------------------------------------
+
+Question #352
+ID: mains-anthro1-q1020
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Cultural relevance of the Kula
+--------------------------------------------------------------------------------
+
+Question #353
+ID: mains-anthro1-q1021
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Heritability and its estimation
+--------------------------------------------------------------------------------
+
+Question #354
+ID: mains-anthro1-q1022
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Authority and forms of political organization
+--------------------------------------------------------------------------------
+
+Question #355
+ID: mains-anthro1-q1023
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Single-gene mutation disorders in man
+--------------------------------------------------------------------------------
+
+Question #356
+ID: mains-anthro1-q1024
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the geographical distribution of Homo erectus. Taking into account its physical features, where does it fit in human evolutionary line?
+--------------------------------------------------------------------------------
+
+Question #357
+ID: mains-anthro1-q1025
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the applications of forensic anthropology with suitable examples.
+--------------------------------------------------------------------------------
+
+Question #358
+ID: mains-anthro1-q1026
+Marks: 15 Marks
+Word Limit: Not specified
+Question: How does Lévi-Strauss look at the Tsimshian myth of Asdiwal? Critically discuss Lévi-Strauss' theory of structuralism in the light of his study of mythologies.
+--------------------------------------------------------------------------------
+
+Question #359
+ID: mains-anthro1-q1027
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Critically explain the notion of 'deconstruction' in the light of the postmodern works of Jacques Derrida.
+--------------------------------------------------------------------------------
+
+Question #360
+ID: mains-anthro1-q1028
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What is a multifactorial trait? Illustrate your answer with suitable human examples.
+--------------------------------------------------------------------------------
+
+Question #361
+ID: mains-anthro1-q1029
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Discuss the applicability of various sampling techniques in selecting the study group.
+--------------------------------------------------------------------------------
+
+Question #362
+ID: mains-anthro1-q1030
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Examine critically the concept of social stratification as a basis for sustaining social inequality.
+--------------------------------------------------------------------------------
+
+Question #363
+ID: mains-anthro1-q1031
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe the genetics and inheritance patterns of the ABO and Rh blood groups in man.
+--------------------------------------------------------------------------------
+
+Question #364
+ID: mains-anthro1-q1032
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically discuss the synergistic effect of biological and cultural factors in human evolution.
+--------------------------------------------------------------------------------
+
+Question #365
+ID: mains-anthro1-q1033
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in 150 words each: Mendelian and non-Mendelian traits.
+--------------------------------------------------------------------------------
+
+Question #366
+ID: mains-anthro1-q1034
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in 150 words each: Theoretical significance of Purum kinship-system.
+--------------------------------------------------------------------------------
+
+Question #367
+ID: mains-anthro1-q1035
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in 150 words each: Osteodontokeratik culture and its makers.
+--------------------------------------------------------------------------------
+
+Question #368
+ID: mains-anthro1-q1036
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in 150 words each: Smell as a signal among non-human primates.
+--------------------------------------------------------------------------------
+
+Question #369
+ID: mains-anthro1-q1037
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in 150 words each: Culture and embodiment.
+--------------------------------------------------------------------------------
+
+Question #370
+ID: mains-anthro1-q1038
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Discuss the Miocene hominoid remains and their significance in evolution.
+--------------------------------------------------------------------------------
+
+Question #371
+ID: mains-anthro1-q1039
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Compare and contrast the symbolic approaches of Clifford Geertz and Victor Turner to understand culture.
+--------------------------------------------------------------------------------
+
+Question #372
+ID: mains-anthro1-q1040
+Marks: 15 Marks
+Word Limit: Not specified
+Question: How political economy is integrated with ecological and adaptability perspectives in bio-cultural anthropology?
+--------------------------------------------------------------------------------
+
+Question #373
+ID: mains-anthro1-q1041
+Marks: 20 Marks
+Word Limit: Not specified
+Question: How anthropologists assess the nutritional status of a community? Discuss the significance of intersectionality of ecology, culture, and social inequality in the study of nutritional anthropology.
+--------------------------------------------------------------------------------
+
+Question #374
+ID: mains-anthro1-q1042
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically examine the drawbacks in assuming culture as an 'integrated-closed' system in understanding of contemporary society.
+--------------------------------------------------------------------------------
+
+Question #375
+ID: mains-anthro1-q1043
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Differentiate between pedigree and genealogical analyses. Discuss the history and application of these methods in anthropological studies.
+--------------------------------------------------------------------------------
+
+Question #376
+ID: mains-anthro1-q1044
+Marks: 20 Marks
+Word Limit: Not specified
+Question: Anthropology provides a multidimensional understanding of human beings by bridging the gap between science and humanities. Elucidate.
+--------------------------------------------------------------------------------
+
+Question #377
+ID: mains-anthro1-q1045
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Write a note on Mousterian tool tradition, Mousterian culture and its makers.
+--------------------------------------------------------------------------------
+
+Question #378
+ID: mains-anthro1-q1046
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically examine James Frazer's theory of evolutionism. Elucidate the place of religion in modernity.
+--------------------------------------------------------------------------------
+
+Question #379
+ID: mains-anthro1-q1047
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Multispecies, Multi-sited and Critical Ethnography.
+--------------------------------------------------------------------------------
+
+Question #380
+ID: mains-anthro1-q1048
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Evolutionary significance of menopause.
+--------------------------------------------------------------------------------
+
+Question #381
+ID: mains-anthro1-q1049
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Fission track dating method and its applications.
+--------------------------------------------------------------------------------
+
+Question #382
+ID: mains-anthro1-q1050
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Mitochondrial DNA and human evolution.
+--------------------------------------------------------------------------------
+
+Question #383
+ID: mains-anthro1-q1051
+Marks: 10 Marks
+Word Limit: 150 words
+Question: Write notes on the following in about 150 words each: Foetal origin of adult diseases and contribution of David Barker.
+--------------------------------------------------------------------------------
+
+Question #384
+ID: mains-anthro1-q1052
+Marks: 20 Marks
+Word Limit: Not specified
+Question: What are genetic markers ? Discuss their applications in understanding population variation, disease association and forensics.
+--------------------------------------------------------------------------------
+
+Question #385
+ID: mains-anthro1-q1053
+Marks: 15 Marks
+Word Limit: Not specified
+Question: The agenda of biological anthropology became more scientific from the middle of the twentieth century." Justify.
+--------------------------------------------------------------------------------
+
+Question #386
+ID: mains-anthro1-q1054
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Describe briefly the theoretical perspectives in linguistic anthropology to explain the relationship of culture, language and thought.
+--------------------------------------------------------------------------------
+
+Question #387
+ID: mains-anthro1-q1055
+Marks: 20 Marks
+Word Limit: Not specified
+Question: How the study of variation in forms of marriage led to rethinking on the concepts of social reproduction, kinship and family?
+--------------------------------------------------------------------------------
+
+Question #388
+ID: mains-anthro1-q1056
+Marks: 15 Marks
+Word Limit: Not specified
+Question: What are the major theories proposed in support of the origin of food production? How the change in subsistence economy brought revolution during this period?
+--------------------------------------------------------------------------------
+
+Question #389
+ID: mains-anthro1-q1057
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Critically discuss the centrality of the African continent in the narrative of human evolution.
+--------------------------------------------------------------------------------
+
+Question #390
+ID: mains-anthro1-q1058
+Marks: 20 Marks
+Word Limit: Not specified
+Question: How the theories of postmodernism are relevant in promoting social justice and empowerment of marginalised communities?
+--------------------------------------------------------------------------------
+
+Question #391
+ID: mains-anthro1-q1059
+Marks: 15 Marks
+Word Limit: Not specified
+Question: 'Genome-wide Disease Association Studies (GWAS) advanced our understanding of health and disease.' Discuss.
+--------------------------------------------------------------------------------
+
+Question #392
+ID: mains-anthro1-q1060
+Marks: 15 Marks
+Word Limit: Not specified
+Question: Examine the utility of human remains in forensic analysis. Discuss the facial reconstruction technique.
+--------------------------------------------------------------------------------
+

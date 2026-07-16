@@ -629,8 +629,22 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
     // Capture all export data into local constants
     const prependHtml = includeReport ? buildAnalysisHtml() : '';
     const payload: ExportPayload | null = pyqPayload ? { kind: 'questions', rows: payloadRows } : null;
+
+    // Build a descriptive PDF title for PYQ exports: "Dr. UPSC - Ethics, Geography PYQ Analysis"
+    const pyqExportTitle = reportVariant === 'pyq'
+      ? (() => {
+          const subjsInData = Array.from(new Set(filteredQuestions.map(q => q.subject || '').filter(Boolean)));
+          const subjectList = selectedSubjects.length > 0 ? selectedSubjects : subjsInData;
+          const subjLabel = subjectList.length > 0
+            ? subjectList.slice(0, 4).join(', ') + (subjectList.length > 4 ? ', ...' : '')
+            : (pyqMeta?.selectedPaper || 'All Subjects');
+          return `Dr. UPSC - ${subjLabel} PYQ Analysis`;
+        })()
+      : opts.title;
+
     const exportOptions = {
       ...opts,
+      title: pyqExportTitle,
       groupingLevels: selectedGroupingLevels.length > 0 ? selectedGroupingLevels : undefined,
       columns,
       yearStart: yearBounds.start,
@@ -652,7 +666,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
           setIsExporting(false);
           return;
         }
-        await printStandaloneReport(prependHtml, opts);
+        await printStandaloneReport(prependHtml, { ...opts, title: pyqExportTitle });
       } else {
         if (!payload || (payload.kind === 'questions' && !payload.rows.length)) {
           Alert.alert('Nothing to export', 'No questions matched your filters.');

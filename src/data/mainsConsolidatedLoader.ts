@@ -48,6 +48,33 @@ export function normalizePaper(paper: string | null | undefined): string {
   return paper;
 }
 
+export function normalizeSubject(subject: string | null | undefined): string {
+  if (!subject) return '';
+  const s = subject.trim().toUpperCase();
+  if (s === 'ETHICS' || s.includes('INTEGRITY') || s.includes('APTITUDE')) {
+    return 'ETHICS, INTEGRITY & APTITUDE';
+  }
+  if (s === 'ECONOMY' || s === 'INDIAN ECONOMY') {
+    return 'INDIAN ECONOMY';
+  }
+  if (s === 'SCIENCE AND TECHNOLOGY' || s === 'SCIENCE & TECHNOLOGY' || s === 'S&T') {
+    return 'SCIENCE & TECHNOLOGY';
+  }
+  if (s === 'INTERNATIONAL RELATIONS' || s === 'IR') {
+    return 'INTERNATIONAL RELATIONS';
+  }
+  if (s === 'SOCIAL JUSTICE' || s === 'JUSTICE') {
+    return 'SOCIAL JUSTICE';
+  }
+  if (s === 'INTERNAL SECURITY' || s === 'SECURITY') {
+    return 'INTERNAL SECURITY';
+  }
+  if (s === 'DISASTER MANAGEMENT' || s === 'DM') {
+    return 'DISASTER MANAGEMENT';
+  }
+  return s;
+}
+
 // Statically load the parsed consolidated JSON files
 let gs1Questions: any[] = [];
 let gs2Questions: any[] = [];
@@ -155,13 +182,13 @@ for (let i = 1; i <= 15; i++) {
 
 // Standardize and export
 export const mainsConsolidatedQuestions: ConsolidatedQuestion[] = [
-  ...gs1Questions.map((q: any) => ({ ...q, paper: resolvePaper(q) })),
-  ...gs2Questions.map((q: any) => ({ ...q, paper: resolvePaper(q) })),
-  ...gs3Questions.map((q: any) => ({ ...q, paper: resolvePaper(q) })),
-  ...gs4Questions.map((q: any) => ({ ...q, paper: resolvePaper(q) })),
-  ...anthro1Questions.map((q: any) => ({ ...q, paper: resolvePaper(q) })),
-  ...anthro2Questions.map((q: any) => ({ ...q, paper: resolvePaper(q) })),
-  ...forumMGPQuestions.map((q: any) => ({ ...q, paper: resolvePaper(q), is_pyq: q.is_pyq || false })),
+  ...gs1Questions.map((q: any) => ({ ...q, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...gs2Questions.map((q: any) => ({ ...q, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...gs3Questions.map((q: any) => ({ ...q, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...gs4Questions.map((q: any) => ({ ...q, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...anthro1Questions.map((q: any) => ({ ...q, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...anthro2Questions.map((q: any) => ({ ...q, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...forumMGPQuestions.map((q: any) => ({ ...q, subject: normalizeSubject(q.subject), paper: resolvePaper(q), is_pyq: q.is_pyq || false })),
 ];
 
 import { supabase } from '../lib/supabase';
@@ -185,7 +212,8 @@ export async function fetchMainsQuestionsFromSupabase(): Promise<ConsolidatedQue
       break;
     }
     
-    allData = allData.concat(data);
+    const publishedData = data.filter((row: any) => row.status === undefined || row.status === 'published');
+    allData = allData.concat(publishedData);
     if (data.length < step) {
       break;
     }
@@ -198,7 +226,7 @@ export async function fetchMainsQuestionsFromSupabase(): Promise<ConsolidatedQue
     questionText: q.question_text,
     marks: q.marks,
     year: q.exam_year,
-    subject: q.subject,
+    subject: normalizeSubject(q.subject),
     sectionGroup: q.section_group,
     microTopic: q.microtopic,
     subTopic: q.subtopic,

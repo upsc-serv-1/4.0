@@ -11,6 +11,7 @@ export type WriteKind =
   | 'attempt_draft' 
   | 'question_state' 
   | 'mains_question_state' 
+  | 'mains_value_add_state' 
   | 'attempt_submit' 
   | 'user_note' 
   | 'note_content' 
@@ -133,6 +134,16 @@ class StudentSyncService {
         });
         await AsyncStorage.setItem(key, JSON.stringify(Array.from(map.values())));
       }
+      else if (kind === 'mains_value_add_state') {
+        const key = 'mains_value_add_tags';
+        const raw = await AsyncStorage.getItem(key);
+        const existing: Record<string, string[]> = raw ? JSON.parse(raw) : {};
+        const cardId = payload.cardId;
+        if (payload.patch && payload.patch.hasOwnProperty('review_tags')) {
+          existing[cardId] = payload.patch.review_tags || [];
+        }
+        await AsyncStorage.setItem(key, JSON.stringify(existing));
+      }
     } catch (err) {
       console.warn('[Sync] Dual-path local update failed:', err);
     }
@@ -204,6 +215,8 @@ class StudentSyncService {
         return this.saveQuestionState(payload);
       case 'mains_question_state':
         return this.saveMainsQuestionState(payload);
+      case 'mains_value_add_state':
+        return this.saveMainsValueAddState(payload);
       case 'user_note':
         return this.saveUserNote(payload);
       case 'tag_update':
@@ -397,6 +410,71 @@ class StudentSyncService {
       // Handle race condition
       if (error && error.code === '23505') {
         return this.saveMainsQuestionState(payload); // Retry
+      }
+      if (error) {
+        throw error;
+      }
+    }
+  }
+
+  private async saveMainsValueAddState(payload: any): Promise<void> {
+    const { userId, cardId, patch } = payload;
+    if (!cardId || !userId) {
+      console.warn('[Sync] Skipping mains_value_add_state because cardId/userId is missing');
+      return;
+    }
+
+    console.log(`[Sync] Saving mains value add state for Card:${cardId} User:${userId}`, patch);
+
+    const updateData: any = {
+      user_id: userId,
+      card_id: cardId,
+      updated_at: new Date().toISOString()
+    };
+
+    if (patch.hasOwnProperty('review_tags')) {
+      updateData.review_tags = patch.review_tags;
+    }
+
+    // SELECT + UPDATE/INSERT pattern (100% robust)
+    const { data: existingRows, error: selectError } = await supabase
+      .from('mains_value_add_states')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('card_id', cardId);
+
+    if (selectError) {
+      throw selectError;
+    }
+
+    const existing = existingRows && existingRows.length > 0 ? existingRows[0] : null;
+
+    if (existing?.id) {
+      const isEmpty = !updateData.review_tags || updateData.review_tags.length === 0;
+      if (isEmpty) {
+        const { error } = await supabase
+          .from('mains_value_add_states')
+          .delete()
+          .eq('id', existing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('mains_value_add_states')
+          .update(updateData)
+          .eq('id', existing.id);
+        if (error) throw error;
+      }
+    } else {
+      const isEmpty = !updateData.review_tags || updateData.review_tags.length === 0;
+      if (isEmpty) return; // Don't insert empty rows
+
+      const { error } = await supabase
+         .from('mains_value_add_states')
+         .insert(updateData);
+
+      // Handle race condition
+      if (error && error.code === '23505') {
+        return this.saveMainsValueAddState(payload); // Retry
       }
       if (error) {
         throw error;

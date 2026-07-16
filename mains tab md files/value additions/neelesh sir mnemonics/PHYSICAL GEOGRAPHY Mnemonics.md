@@ -168,7 +168,7 @@
 
 ###### Mnemonic 17: Key aspect of global distribution of volcanism
 
-- **Mnemonic Keyword:** `Mnemonics – “VOLCANIC”`
+- **Mnemonic Keyword:** `Mnemonics – VOLCANIC`
 - **Formula / Expansion:**
   - **V:** Volcanic Arcs at Subduction Zones
   - **O:** Oceanic Ridges
@@ -206,7 +206,7 @@
 
 ###### Mnemonic 19: Reason for the formation of thousands of Islands in Indonesia and Philippines
 
-- **Mnemonic Keyword:** `Mnemonics – “THOUSANDS`
+- **Mnemonic Keyword:** `Mnemonics – THOUSANDS`
 - **Formula / Expansion:**
   - **T:** Tectonic Convergence
   - **H:** Hotspot Volcanism
@@ -248,7 +248,7 @@
 
 ###### Mnemonic 23: Impact of major mountain ranges on local weather condition
 
-- **Mnemonic Keyword:** `Mnemonics – “LOCAL WEATHER`
+- **Mnemonic Keyword:** `Mnemonics – LOCAL WEATHER`
 - **Formula / Expansion:**
   - **L:** Leeward Side Dryness
   - **O:** Orographic Lift
@@ -307,7 +307,7 @@
 
 ###### Mnemonic 24: Impact of troposphere on weather process
 
-- **Mnemonic Keyword:** `Mnemonics – “TROPOSPHERE`
+- **Mnemonic Keyword:** `Mnemonics – TROPOSPHERE`
 - **Formula / Expansion:**
   - **T:** Temperature Gradients
   - **R:** Radiation Absorption
@@ -356,7 +356,7 @@
 
 ###### Mnemonic 30: Why major hot deserts lie in 20 – 30- degree North latitude and western side of the continent in the Northern Hemisphere?
 
-- **Mnemonic Keyword:** `Mnemonics – “DRY WESTERN”`
+- **Mnemonic Keyword:** `Mnemonics – DRY WESTERN`
 - **Formula / Expansion:**
   - **D:** Descending Air Masses
   - **R:** Rain Shadow Effect
@@ -402,7 +402,7 @@
 
 ###### Mnemonic 34: Why is India considered as Sub- continent?
 
-- **Mnemonic Keyword:** `Mnemonics – “SUB CONTINENT”`
+- **Mnemonic Keyword:** `Mnemonics – SUB CONTINENT`
 - **Formula / Expansion:**
   - **S:** South Asian Identity
   - **U:** Unique Geography
@@ -467,7 +467,7 @@
 
 ###### Mnemonic 35: Forest Resources of India
 
-- **Mnemonic Keyword:** `Mnemonics: “FOREST ASSETS”`
+- **Mnemonic Keyword:** `Mnemonics: FOREST ASSETS`
 - **Formula / Expansion:**
   - **F:** Fuelwood
   - **O:** Oxygen Production
@@ -521,7 +521,7 @@
 
 ###### Mnemonic 36: Importance / Significance of SACRED GROVES in INDIA
 
-- **Mnemonic Keyword:** `“SACRED GROVES”`
+- **Mnemonic Keyword:** `SACRED GROVES`
 - **Formula / Expansion:**
   - **S:** Sustainable Practices
   - **A:** Aesthetic and Cultural Significance
@@ -708,12 +708,64 @@
     - • **Explanation:** Sanctuaries often lead to successful conservation stories that can inspire other efforts globally.
     - • **Example:** The successful breeding program of the Great Indian Bustard in the Desert National Park in Rajasthan is a notable conservation success.
 
-###### Mnemonic 42: Multi- dimensional impact of
+###### Mnemonic 42: Multi-dimensional impact of ocean salinity
 
-- **Mnemonic Keyword:** `Mnemonics – SODIUM CHLORIDE`
+- **Mnemonic Keyword:** `SODIUM CHLORIDE`
+- **Formula / Expansion:**
+  - **S:** Species adaptation
+  - **O:** Osmoregulation in marine organisms
+  - **D:** Density-driven currents
+  - **I:** Impact on coastal agriculture
+  - **U:** Upwelling and nutrient cycling
+  - **M:** Marine biodiversity
+  - **C:** Climate influence
+  - **H:** Habitat distribution
+  - **L:** Larval development
+  - **R:** Reproductive success of species
+  - **E:** Ecosystem health
 - **Explanation & Examples:**
   - ❖ **S - Species adaptation**
     - • **Explanation:** Species living in different ocean regions have evolved various adaptations to cope with the salinity levels of their environments. Some species thrive in high-salinity areas, while others are adapted to lower salinity levels.
+  - ❖ - • **Example:** The European eel migrates from the saline Atlantic Ocean to the brackish waters of rivers and estuaries, showing remarkable adaptation to varying salinity.
+  - ❖ **O - Osmoregulation in marine organisms**
+    - • **Explanation:** Marine organisms regulate their internal salt and water balance (osmoregulation) to survive in environments with varying salinity levels. This process is crucial for maintaining cellular function.
+    - • **Example:** Sharks use specialized cells in their gills to excrete excess salt, helping them maintain osmoregulation in the salty ocean environment.
+  - ❖ **D - Density-driven currents**
+    - • **Explanation:** Salinity, along with temperature, affects the density of seawater, driving the formation of ocean currents that are crucial for distributing heat and nutrients around the globe.
+    - • **Example:** The thermohaline circulation, often referred to as the "global conveyor belt," is driven by differences in water density due to variations in salinity and temperature, influencing global climate patterns.
+  - ❖ **I - Impact on coastal agriculture**
+    - • **Explanation:** Changes in ocean salinity can influence coastal agriculture, particularly through the intrusion of saline water into freshwater systems, which can affect crop yields and soil health.
+    - • **Example:** In the Sundarbans of India and Bangladesh, rising salinity levels have led to reduced agricultural productivity, particularly affecting rice cultivation.
+  - ❖ **U - Upwelling and nutrient cycling**
+    - • **Explanation:** Salinity levels play a role in the process of upwelling, where nutrient-rich deep waters rise to the surface, fuelling primary production in marine ecosystems.
+    - • **Example:** The Peruvian coast experiences strong upwelling due to ocean currents, bringing nutrient-rich waters to the surface and supporting one of the world’s most productive fisheries.
+  - ❖ **M - Marine biodiversity**
+    - • **Explanation:** Salinity influences the distribution and diversity of marine species, with different organisms preferring varying salinity levels, thereby shaping marine biodiversity.
+    - • **Example:** Coral reefs thrive in stable, moderately saline environments, but significant deviations from these conditions can lead to reduced biodiversity and coral bleaching.
+  - ❖ **C - Climate influence**
+    - • **Explanation:** Ocean salinity impacts the global climate by influencing the water cycle, ocean circulation, and the exchange of heat between the ocean and atmosphere.
+    - • **Example:** Changes in the salinity of the North Atlantic can affect the Atlantic Meridional Overturning Circulation (AMOC), potentially leading to significant climate changes in Europe and North America.
+  - ❖ **H - Habitat distribution**
+    - • **Explanation:** Salinity levels determine the distribution of different marine habitats, from estuaries to open ocean, influencing which species can thrive in each area.
+    - • **Example:** Mangrove forests are found in coastal areas where saline water meets freshwater, providing critical habitat for a variety of species.
+  - ❖ **L - Larval development**
+    - • **Explanation:** The development of marine larvae is highly sensitive to salinity levels, affecting their survival rates and the distribution of marine species.
+    - • **Example:** The larvae of many fish species, such as herring, require specific salinity levels for proper development, which can be disrupted by changes in ocean salinity.
+  - ❖ **O - Oxygen solubility changes**
+    - • **Explanation:** Salinity affects the solubility of oxygen in seawater, with higher salinity generally reducing the amount of dissolved oxygen, which can impact marine life.
+    - • **Example:** In the Baltic Sea, where salinity is lower, oxygen levels tend to be higher, supporting a diverse array of marine life.
+  - ❖ **R - Reproductive success of species**
+    - • **Explanation:** The reproductive success of many marine species is influenced by salinity, which affects spawning behaviour, egg viability, and the development of offspring.
+    - • **Example:** The spawning of salmon is highly dependent on salinity, as they migrate from the ocean to freshwater rivers to reproduce.
+  - ❖ **I - Interaction with acidification**
+    - • **Explanation:** Salinity interacts with ocean acidification, influencing the chemical balance of seawater and affecting organisms, particularly those with calcium carbonate shells.
+    - • **Example:** In regions like the Arctic, where salinity is lower, the impact of ocean acidification is more pronounced, threatening shell-forming organisms like pteropods and mollusks
+  - ❖ **D - Dissolved oxygen levels**
+    - • **Explanation:** Salinity affects the amount of oxygen that can be dissolved in seawater, influencing the health of marine ecosystems, particularly in regions where oxygen levels are already low.
+    - • **Example:** In the Gulf of Mexico, the combination of high salinity and nutrient runoff has created a "dead zone" with low oxygen levels, severely affecting marine life.
+  - ❖ **E - Ecosystem health**
+    - • **Explanation:** Overall ecosystem health is influenced by salinity, as it affects the distribution of species, nutrient cycling, and the balance of marine food webs.
+    - • **Example:** The health of estuarine ecosystems, such as the Chesapeake Bay, is closely tied to salinity levels, which influence the diversity and abundance of species like oysters and crabs.
 
 ###### Mnemonic 51: Resources of Arctic Region (asked two times by UPSC and in news)
 
@@ -812,7 +864,7 @@
 
 ###### Mnemonic 53: Multi- Dimensional impact of Antarctic melting ice on weather pattern and human activities
 
-- **Mnemonic Keyword:** `“ANTARCTICA REACTION”`
+- **Mnemonic Keyword:** `ANTARCTICA REACTION`
 - **Formula / Expansion:**
   - **A:** Altered Ocean Currents
   - **N:** New Marine Habitats
@@ -948,7 +1000,7 @@
 
 ###### Mnemonic 60: Impact of development activities on Himalayan regions
 
-- **Mnemonic Keyword:** `Mnemonics – “HIM DEVELOPMENT`
+- **Mnemonic Keyword:** `Mnemonics – HIM DEVELOPMENT`
 - **Formula / Expansion:**
   - **H:** Habitat Destruction
   - **I:** Infrastructure Expansion (Roads, Dams)
@@ -1024,7 +1076,7 @@
 
 ###### Mnemonic 61: Impact of tourism on Himalayan regions
 
-- **Mnemonic Keyword:** `Mnemonics – “TOURISM IMPACT`
+- **Mnemonic Keyword:** `Mnemonics – TOURISM IMPACT`
 - **Formula / Expansion:**
   - **T:** Trash Accumulation
   - **O:** Overcrowding in Ecologically Fragile Areas
@@ -1211,7 +1263,7 @@
 
 ###### Mnemonic 68: Difference between El- Nino and La- Nina
 
-- **Mnemonic Keyword:** `Mnemonics – “TWO SIDES”`
+- **Mnemonic Keyword:** `Mnemonics – TWO SIDES`
 - **Formula / Expansion:**
   - **T:** Temperature anomalies
   - **W:** Wetter conditions in different regions
@@ -1257,7 +1309,7 @@
 
 ###### Mnemonic 70: Causes of the formation of heat island in the urban habitat of the world
 
-- **Mnemonic Keyword:** `“BUILDING MATERIAL”`
+- **Mnemonic Keyword:** `BUILDING MATERIAL`
 - **Formula / Expansion:**
   - **B:** Building Density U : Urbanization I : Industrial Activity L : Lack of Vegetation D : Dark Surfaces I : Insufficient Water Bodies N : Night-time Heat Retention G : Global Warming M : Motor Vehicle Emissions A : Air Conditioning T : Traffic Congestion E : Energy Consumption R : Reflective Loss I : Impervious Surfaces A : Anthropogenic Heat L : Lack of Wind
 - **Explanation & Examples:**
@@ -1312,7 +1364,7 @@
 
 ###### Mnemonic 71: Environmental implications of the reclamation of the water bodies into urban land use
 
-- **Mnemonic Keyword:** `“WETLAND DESTRUCTION”`
+- **Mnemonic Keyword:** `WETLAND DESTRUCTION`
 - **Formula / Expansion:**
   - **W:** Water Pollution
   - **E:** Ecosystem Collapse
@@ -1389,7 +1441,7 @@
 
 ###### Mnemonic 73: Causes of the depletion of mangroves
 
-- **Mnemonic Keyword:** `“MANGROVE CUT”`
+- **Mnemonic Keyword:** `MANGROVE CUT`
 - **Formula / Expansion:**
   - **M:** Mariculture Expansion
   - **A:** Agricultural Conversion
@@ -1437,16 +1489,41 @@
     - • **Explanation:** Tourism development leads to mangrove degradation as areas are cleared for resorts, beaches, and recreational activities. The influx of tourists also brings pollution and increased human pressure on these ecosystems.
     - • **Example: Goa:** Mangroves in Goa face threats from tourism activities, where areas are cleared for beach resorts and tourist attractions, affecting the natural habitat.
 
-###### Mnemonic 74: Reasons for the formation of dead zones in
+###### Mnemonic 74: Reasons for the formation of dead zones in marine ecosystem
 
 - **Mnemonic Keyword:** `DEAD ZONE`
 - **Formula / Expansion:**
   - **D:** Discharge of Nutrients
   - **E:** Eutrophication
   - **A:** Algal Blooms
+  - **Z:** Zero Oxygen (Hypoxia)
+  - **O:** Overfishing and Food Web Disruption
+  - **N:** Nutrient Cycling Disruption
 - **Explanation & Examples:**
   - ❖ **D - Discharge of Nutrients**
     - • **Explanation:** Nutrient runoff from agriculture, sewage, and industrial waste introduces excess nitrogen and phosphorus into water bodies, leading to nutrient pollution.
+  - ❖ - • **Example:** The Gulf of Mexico Dead Zone is largely caused by nutrient runoff from agricultural fields along the Mississippi River, which carries fertilizers high in nitrogen and phosphorus into the Gulf.
+  - ❖ **E - Eutrophication**
+    - • **Explanation:** Excessive nutrients in the water lead to eutrophication, which causes overgrowth of algae (algal blooms) that consume oxygen when they die and decompose.
+    - • **Example:** The Chesapeake Bay experiences eutrophication due to runoff from urban and agricultural areas, resulting in frequent and severe dead zones.
+  - ❖ **A - Algal Blooms**
+    - • **Explanation:** Algal blooms caused by nutrient overload rapidly increase phytoplankton, which blocks sunlight and depletes oxygen as they die and decompose.
+    - • **Example:** In the Baltic Sea, persistent algal blooms lead to oxygen depletion, creating extensive dead zones that affect marine life.
+  - ❖ **D - Decomposition of Organic Matter**
+    - • **Explanation:** When algal blooms die, the decomposition process by bacteria consumes large amounts of dissolved oxygen, creating hypoxic conditions.
+    - • **Example:** The Black Sea experiences significant dead zones due to organic matter decomposition, especially following heavy runoff events.
+  - ❖ **Z - Zero Oxygen (Hypoxia)**
+    - • **Explanation:** As oxygen levels drop due to algal bloom decomposition, areas become hypoxic, or "dead zones," where most marine life cannot survive.
+    - • **Example:** The dead zone in the Gulf of Mexico becomes hypoxic every summer, severely impacting fish and shellfish populations.
+  - ❖ **O - Overfishing and Food Web Disruption**
+    - • **Explanation:** Overfishing removes key species that help control algae and maintain balance, contributing to algal blooms and dead zones.
+    - • **Example**: In the Black Sea, overfishing has reduced populations of fish that consume algae, exacerbating dead zone conditions.
+  - ❖ **N - Nutrient Cycling Disruption**
+    - • **Explanation:** Disruption of natural nutrient cycling due to pollution and runoff leads to excess nutrient accumulation, promoting dead zones.
+    - • **Example:** The East China Sea has dead zones due to disrupted nutrient cycling from heavy agricultural and industrial activity along the Yangtze River.
+  - ❖ **E - Elevated Water Temperatures**
+    - • **Explanation:** Climate change and warming water temperatures exacerbate dead zones by reducing oxygen solubility in water and accelerating algal growth and decomposition.
+    - • **Example:** The increasing water temperatures in the Baltic Sea have led to more frequent and intense algal blooms, expanding the dead zone region.
 
 ###### Mnemonic 77: Reasons of desertification around the world with examples
 
@@ -1504,9 +1581,9 @@
     - • **Example (World):** In the Mediterranean region, increased temperatures have exacerbated arid conditions and desertification.
     - • **Example (India):** In Rajasthan, increased temperatures have intensified the effects of desertification, impacting local agriculture.
 
-###### Mnemonic 781 24: Impact of desertification across globe and India with example
+###### Mnemonic 24: Impact of desertification across globe and India with example
 
-- **Mnemonic Keyword:** `“ILL DESERTIFICATION”`
+- **Mnemonic Keyword:** `ILL DESERTIFICATION`
 - **Formula / Expansion:**
   - **I:** Increased Soil Erosion
   - **L:** Loss of Biodiversity
@@ -1616,7 +1693,7 @@
 
 ###### Mnemonic 25: Role of Air mass in macro climatic change
 
-- **Mnemonic Keyword:** `Mnemonics – “AIR MASS SHIFT”`
+- **Mnemonic Keyword:** `Mnemonics – AIR MASS SHIFT`
 - **Formula / Expansion:**
   - **A:** Alteration of Regional Climates
   - **I:** Influencing Precipitation Patterns
@@ -1870,7 +1947,7 @@
 
 ###### Mnemonic 29: Impact of temperature inversion on weather and habitants of the place
 
-- **Mnemonic Keyword:** `Mnemonics – “INVERTED AIR”`
+- **Mnemonic Keyword:** `Mnemonics – INVERTED AIR`
 - **Formula / Expansion:**
   - **I:** Increased Air Pollution
   - **N:** Nocturnal Cooling
@@ -1919,7 +1996,7 @@
 
 ###### Mnemonic 37: Impact of declining forest resources on climate change in India
 
-- **Mnemonic Keyword:** `“TREE IMBALANCE”`
+- **Mnemonic Keyword:** `TREE IMBALANCE`
 - **Formula / Expansion:**
   - **T:** Temperature Rise
   - **R:** Rainfall Decrease
@@ -2018,7 +2095,7 @@
 
 ###### Mnemonic 66: Impact of El- Nino on Climate
 
-- **Mnemonic Keyword:** `Mnemonics – “WARM OCEANS`
+- **Mnemonic Keyword:** `Mnemonics – WARM OCEANS`
 - **Formula / Expansion:**
   - **W:** Warming of sea surface
   - **A:** Altered rainfall patterns
@@ -2064,7 +2141,7 @@
 
 ###### Mnemonic 67: Impact of La- Nina on climate
 
-- **Mnemonic Keyword:** `Mnemonics – “COOL LA-NINA`
+- **Mnemonic Keyword:** `Mnemonics – COOL LA-NINA`
 - **Formula / Expansion:**
   - **C:** Cooler sea surface temperatures
   - **O:** Oceanic upwelling increases
@@ -2236,7 +2313,7 @@
 
 ###### Mnemonic 3: Characteristic of Secondary / Sedimentary rocks
 
-- **Mnemonic Keyword:** `Mnemonics – SECONDARY”`
+- **Mnemonic Keyword:** `Mnemonics – SECONDARY`
 - **Formula / Expansion:**
   - **S:** Stratification
   - **E:** Erosion
@@ -2278,7 +2355,7 @@
 
 ###### Mnemonic 4: Multi- dimensional significance of secondary rocks (How to remember – You Find Elements/Fossil s Etc. In Its Layers)
 
-- **Mnemonic Keyword:** `Mnemonics – “ELEMENTS`
+- **Mnemonic Keyword:** `Mnemonics – ELEMENTS`
 - **Formula / Expansion:**
   - **E:** Environmental Indicators
   - **L:** Life’s Record (Fossils)
@@ -2316,7 +2393,7 @@
 
 ###### Mnemonic 5: Characteristics of Metamorphic rock
 
-- **Mnemonic Keyword:** `Mnemonics – “METAMORPHIC`
+- **Mnemonic Keyword:** `Mnemonics – METAMORPHIC`
 - **Formula / Expansion:**
   - **M:** Mineral Alignment
   - **E:** Elevated Pressure
@@ -2366,7 +2443,7 @@
 
 ###### Mnemonic 6: Multi- Dimensional significance of metamorphic rocks
 
-- **Mnemonic Keyword:** `Mnemonics – “TRANSFORMED`
+- **Mnemonic Keyword:** `Mnemonics – TRANSFORMED`
 - **Formula / Expansion:**
   - **T:** Technological Applications
   - **R:** Reservoirs of Valuable Minerals
@@ -2416,7 +2493,7 @@
 
 ###### Mnemonic 8: Key aspects of Evidence of continental drift theory
 
-- **Mnemonic Keyword:** `Mnemonics – “DRIFT AWAY`
+- **Mnemonic Keyword:** `Mnemonics – DRIFT AWAY`
 - **Formula / Expansion:**
   - **D:** Distribution of Fossils
   - **R:** Rock Formations and Mountain Ranges
@@ -2508,7 +2585,7 @@
 
 ###### Mnemonic 11: Role of mantle in plate tectonic
 
-- **Mnemonic Keyword:** `Mnemonics – “MANTLE CONVECTION`
+- **Mnemonic Keyword:** `Mnemonics – MANTLE CONVECTION`
 - **Formula / Expansion:**
   - **M:** Mantle Material Movement
   - **A:** Asthenosphere's Role
@@ -2578,7 +2655,7 @@
 
 ###### Mnemonic 13: Key aspects of Global distribution of fold mountains
 
-- **Mnemonic Keyword:** `“FOLDED MAP”`
+- **Mnemonic Keyword:** `FOLDED MAP`
 - **Formula / Expansion:**
   - **F:** Formation at Convergent Boundaries
   - **O:** Oceanic-Continental Convergence
@@ -2620,7 +2697,7 @@
 
 ###### Mnemonic 14: Key aspects of global distribution of earthquake
 
-- **Mnemonic Keyword:** `Mnemonics – “EARTHQUAKE`
+- **Mnemonic Keyword:** `Mnemonics – EARTHQUAKE`
 - **Formula / Expansion:**
   - **E:** Epicentres Concentrated Along Plate Boundaries
   - **A:** Active Subduction Zones
@@ -2666,7 +2743,7 @@
 
 ###### Mnemonic 15: Impact of earthquake
 
-- **Mnemonic Keyword:** `“STRUCTURAL DAMAGE”`
+- **Mnemonic Keyword:** `STRUCTURAL DAMAGE`
 - **Formula / Expansion:**
   - **S:** Socio-Economic Losses
   - **T:** Tectonic Shifts
@@ -2784,7 +2861,7 @@
 
 ###### Mnemonic 58: Impact of melting of Himalayan Glacier on Indian Subcontinents
 
-- **Mnemonic Keyword:** `Mnemonics: “MOUNTAINS (Melt)”`
+- **Mnemonic Keyword:** `Mnemonics: MOUNTAINS (Melt)`
 - **Formula / Expansion:**
   - MELT (Melt aise hi daal diya – yaad rakhne ko :))
   - **M:** Water Supply
@@ -2827,7 +2904,7 @@
 
 ###### Mnemonic 63: Why no formation of delta in Western Ghat
 
-- **Mnemonic Keyword:** `Mnemonics – “NOO DELTA`
+- **Mnemonic Keyword:** `Mnemonics – NOO DELTA`
 - **Formula / Expansion:**
   - **N:** Narrow Continental Shelf
   - **O:** Ocean Currents Swift
@@ -2868,7 +2945,7 @@
 
 ###### Mnemonic 65: Characteristics of Monsoon Climate
 
-- **Mnemonic Keyword:** `“`
+- **Mnemonic Keyword:** ``
 - **Formula / Expansion:**
   - **R:** MONSOON**”
   - **R:** Regional Variation
@@ -2914,7 +2991,7 @@
 
 ###### Mnemonic 69: Impact of urbanization on Indian monsoon / climate
 
-- **Mnemonic Keyword:** `Mnemonics – “URBAN SHIFT”`
+- **Mnemonic Keyword:** `Mnemonics – URBAN SHIFT`
 - **Formula / Expansion:**
   - **U:** Urban heat islands
   - **R:** Reduction in vegetation
@@ -3013,7 +3090,7 @@
 
 ###### Mnemonic 32: Why more cyclones are formed in Bay of Bengal than Arabian sea?
 
-- **Mnemonic Keyword:** `Mnemonics – “BAY OF STORM`
+- **Mnemonic Keyword:** `Mnemonics – BAY OF STORM`
 - **Formula / Expansion:**
   - **B:** Bay's Warm Waters
   - **A:** Atmospheric Instability
@@ -3137,7 +3214,7 @@
 
 ###### Mnemonic 41: Reasons for the variation of Ocean Salinity
 
-- **Mnemonic Keyword:** `Mnemonics – “SALINITY`
+- **Mnemonic Keyword:** `Mnemonics – SALINITY`
 - **Formula / Expansion:**
   - **S:** Sun's heat (evaporation)
   - **A:** Atmospheric precipitation
@@ -3172,66 +3249,6 @@
   - ❖ **Y - Year-round wind patterns**
     - • **Explanation**: Wind drives ocean currents, mixing surface and deep-water layers. It also influences evaporation and precipitation patterns, which in turn affect salinity.
     - • **Example**: **Trade winds** in the Pacific Ocean push warm water westward, creating a salinity gradient across the ocean. In the **Western Pacific**, salinity is higher due to warm, evaporated water, while in the **Eastern Pacific**, it’s lower because of upwelling and cooler waters.
-
-###### Mnemonic : ocean salinity
-
-- **Mnemonic Keyword:** ``
-- **Formula / Expansion:**
-  - **S:** Species adaptation
-  - **O:** Osmoregulation in marine organisms
-  - **D:** Density-driven currents
-  - **I:** Impact on coastal agriculture
-  - **U:** Upwelling and nutrient cycling
-  - **M:** Marine biodiversity
-  - **C:** Climate influence
-  - **H:** Habitat distribution
-  - **L:** Larval development
-  - **O:** Oxygen solubility changes
-  - **R:** Reproductive success of species
-  - **I:** Interaction with acidification
-  - **D:** Dissolved oxygen levels
-  - **E:** Ecosystem health
-- **Explanation & Examples:**
-    - • **Example:** The European eel migrates from the saline Atlantic Ocean to the brackish waters of rivers and estuaries, showing remarkable adaptation to varying salinity.
-  - ❖ **O - Osmoregulation in marine organisms**
-    - • **Explanation:** Marine organisms regulate their internal salt and water balance (osmoregulation) to survive in environments with varying salinity levels. This process is crucial for maintaining cellular function.
-    - • **Example:** Sharks use specialized cells in their gills to excrete excess salt, helping them maintain osmoregulation in the salty ocean environment.
-  - ❖ **D - Density-driven currents**
-    - • **Explanation:** Salinity, along with temperature, affects the density of seawater, driving the formation of ocean currents that are crucial for distributing heat and nutrients around the globe.
-    - • **Example:** The thermohaline circulation, often referred to as the "global conveyor belt," is driven by differences in water density due to variations in salinity and temperature, influencing global climate patterns.
-  - ❖ **I - Impact on coastal agriculture**
-    - • **Explanation:** Changes in ocean salinity can influence coastal agriculture, particularly through the intrusion of saline water into freshwater systems, which can affect crop yields and soil health.
-    - • **Example:** In the Sundarbans of India and Bangladesh, rising salinity levels have led to reduced agricultural productivity, particularly affecting rice cultivation.
-  - ❖ **U - Upwelling and nutrient cycling**
-    - • **Explanation:** Salinity levels play a role in the process of upwelling, where nutrient-rich deep waters rise to the surface, fuelling primary production in marine ecosystems.
-    - • **Example:** The Peruvian coast experiences strong upwelling due to ocean currents, bringing nutrient-rich waters to the surface and supporting one of the world’s most productive fisheries.
-  - ❖ **M - Marine biodiversity**
-    - • **Explanation:** Salinity influences the distribution and diversity of marine species, with different organisms preferring varying salinity levels, thereby shaping marine biodiversity.
-    - • **Example:** Coral reefs thrive in stable, moderately saline environments, but significant deviations from these conditions can lead to reduced biodiversity and coral bleaching.
-  - ❖ **C - Climate influence**
-    - • **Explanation:** Ocean salinity impacts the global climate by influencing the water cycle, ocean circulation, and the exchange of heat between the ocean and atmosphere.
-    - • **Example:** Changes in the salinity of the North Atlantic can affect the Atlantic Meridional Overturning Circulation (AMOC), potentially leading to significant climate changes in Europe and North America.
-  - ❖ **H - Habitat distribution**
-    - • **Explanation:** Salinity levels determine the distribution of different marine habitats, from estuaries to open ocean, influencing which species can thrive in each area.
-    - • **Example:** Mangrove forests are found in coastal areas where saline water meets freshwater, providing critical habitat for a variety of species.
-  - ❖ **L - Larval development**
-    - • **Explanation:** The development of marine larvae is highly sensitive to salinity levels, affecting their survival rates and the distribution of marine species.
-    - • **Example:** The larvae of many fish species, such as herring, require specific salinity levels for proper development, which can be disrupted by changes in ocean salinity.
-  - ❖ **O - Oxygen solubility changes**
-    - • **Explanation:** Salinity affects the solubility of oxygen in seawater, with higher salinity generally reducing the amount of dissolved oxygen, which can impact marine life.
-    - • **Example:** In the Baltic Sea, where salinity is lower, oxygen levels tend to be higher, supporting a diverse array of marine life.
-  - ❖ **R - Reproductive success of species**
-    - • **Explanation:** The reproductive success of many marine species is influenced by salinity, which affects spawning behaviour, egg viability, and the development of offspring.
-    - • **Example:** The spawning of salmon is highly dependent on salinity, as they migrate from the ocean to freshwater rivers to reproduce.
-  - ❖ **I - Interaction with acidification**
-    - • **Explanation:** Salinity interacts with ocean acidification, influencing the chemical balance of seawater and affecting organisms, particularly those with calcium carbonate shells.
-    - • **Example:** In regions like the Arctic, where salinity is lower, the impact of ocean acidification is more pronounced, threatening shell-forming organisms like pteropods and mollusks
-  - ❖ **D - Dissolved oxygen levels**
-    - • **Explanation:** Salinity affects the amount of oxygen that can be dissolved in seawater, influencing the health of marine ecosystems, particularly in regions where oxygen levels are already low.
-    - • **Example:** In the Gulf of Mexico, the combination of high salinity and nutrient runoff has created a "dead zone" with low oxygen levels, severely affecting marine life.
-  - ❖ **E - Ecosystem health**
-    - • **Explanation:** Overall ecosystem health is influenced by salinity, as it affects the distribution of species, nutrient cycling, and the balance of marine food webs.
-    - • **Example:** The health of estuarine ecosystems, such as the Chesapeake Bay, is closely tied to salinity levels, which influence the diversity and abundance of species like oysters and crabs.
 
 ###### Mnemonic 43: Factors responsible for the origin of ocean currents?
 
@@ -3301,7 +3318,7 @@
 
 ###### Mnemonic 44: Impact of ocean current on marine life and coastal environment
 
-- **Mnemonic Keyword:** `MNEMONIC – “CURRENT ROUTE”`
+- **Mnemonic Keyword:** `MNEMONIC – CURRENT ROUTE`
 - **Formula / Expansion:**
   - **C:** Circulation of nutrients
   - **U:** Uplift of cold water (upwelling)
@@ -3505,7 +3522,7 @@
 
 ###### Mnemonic 48: Impact of water masses on marine life and coastal environment
 
-- **Mnemonic Keyword:** `Mnemonics – “MARINE FLOW`
+- **Mnemonic Keyword:** `Mnemonics – MARINE FLOW`
 - **Formula / Expansion:**
   - **M:** Mixing of nutrients
   - **A:** Adaptation of species
@@ -3601,7 +3618,7 @@
 
 ###### Mnemonic 54: Resource Potential of the long coastline of India
 
-- **Mnemonic Keyword:** `“COASTAL GEMS”`
+- **Mnemonic Keyword:** `COASTAL GEMS`
 - **Formula / Expansion:**
   - **C:** Coastal Tourism
   - **O:** Offshore Energy
@@ -3724,39 +3741,6 @@
     - • **Explanation:** Mangroves provide sustainable livelihood opportunities for coastal communities through eco-tourism, sustainable fishing, and honey collection.
     - • **Example:** In the Sundarbans, eco-tourism and sustainable practices like honey collection from mangroves provide income for local communities while promoting conservation efforts.
 
-###### Mnemonic : marine ecosystem (Kindly note – you will find some point overlapping e.g. discharge of nutrients is related to eutrophication – but in case, you need points, you can use this.)
-
-- **Mnemonic Keyword:** ``
-- **Formula / Expansion:**
-  - **D:** Decomposition of Organic Matter
-  - **Z:** Zero Oxygen (Hypoxia)
-  - **O:** Overfishing and Food Web Disruption
-  - **N:** Nutrient Cycling Disruption
-  - **E:** Elevated Water Temperatures
-- **Explanation & Examples:**
-    - • **Example:** The Gulf of Mexico Dead Zone is largely caused by nutrient runoff from agricultural fields along the Mississippi River, which carries fertilizers high in nitrogen and phosphorus into the Gulf.
-  - ❖ **E - Eutrophication**
-    - • **Explanation:** Excessive nutrients in the water lead to eutrophication, which causes overgrowth of algae (algal blooms) that consume oxygen when they die and decompose.
-    - • **Example:** The Chesapeake Bay experiences eutrophication due to runoff from urban and agricultural areas, resulting in frequent and severe dead zones.
-  - ❖ **A - Algal Blooms**
-    - • **Explanation:** Algal blooms caused by nutrient overload rapidly increase phytoplankton, which blocks sunlight and depletes oxygen as they die and decompose.
-    - • **Example:** In the Baltic Sea, persistent algal blooms lead to oxygen depletion, creating extensive dead zones that affect marine life.
-  - ❖ **D - Decomposition of Organic Matter**
-    - • **Explanation:** When algal blooms die, the decomposition process by bacteria consumes large amounts of dissolved oxygen, creating hypoxic conditions.
-    - • **Example:** The Black Sea experiences significant dead zones due to organic matter decomposition, especially following heavy runoff events.
-  - ❖ **Z - Zero Oxygen (Hypoxia)**
-    - • **Explanation:** As oxygen levels drop due to algal bloom decomposition, areas become hypoxic, or "dead zones," where most marine life cannot survive.
-    - • **Example:** The dead zone in the Gulf of Mexico becomes hypoxic every summer, severely impacting fish and shellfish populations.
-  - ❖ **O - Overfishing and Food Web Disruption**
-    - • **Explanation:** Overfishing removes key species that help control algae and maintain balance, contributing to algal blooms and dead zones.
-    - • **Example**: In the Black Sea, overfishing has reduced populations of fish that consume algae, exacerbating dead zone conditions.
-  - ❖ **N - Nutrient Cycling Disruption**
-    - • **Explanation:** Disruption of natural nutrient cycling due to pollution and runoff leads to excess nutrient accumulation, promoting dead zones.
-    - • **Example:** The East China Sea has dead zones due to disrupted nutrient cycling from heavy agricultural and industrial activity along the Yangtze River.
-  - ❖ **E - Elevated Water Temperatures**
-    - • **Explanation:** Climate change and warming water temperatures exacerbate dead zones by reducing oxygen solubility in water and accelerating algal growth and decomposition.
-    - • **Example:** The increasing water temperatures in the Baltic Sea have led to more frequent and intense algal blooms, expanding the dead zone region.
-
 ###### Mnemonic 75: Impact of formation of dead Zones in Marine ecosystem
 
 - **Mnemonic Keyword:** `LOWER OXYGEN`
@@ -3809,7 +3793,7 @@
 
 ###### Mnemonic 76: Impact of Global warming on Corals
 
-- **Mnemonic Keyword:** `“CORAL WARMTH”`
+- **Mnemonic Keyword:** `CORAL WARMTH`
 - **Formula / Expansion:**
   - **C:** Coral Bleaching
   - **O:** Ocean Acidification
@@ -3880,7 +3864,7 @@
 
 ###### Mnemonic 31: Reasons for the formation of CYCLONE
 
-- **Mnemonic Keyword:** `Mnemonic – “CYCLONE”`
+- **Mnemonic Keyword:** `Mnemonic – CYCLONE`
 - **Formula / Expansion:**
   - **C:** Coriolis Effect
   - **Y:** Year-Round Warm Ocean Waters
@@ -3914,7 +3898,7 @@
 
 ###### Mnemonic 33: Measures to minimize the effect of Tropical Cyclone
 
-- **Mnemonic Keyword:** `Mnemonic – “STORM SHIELD”`
+- **Mnemonic Keyword:** `Mnemonic – STORM SHIELD`
 - **Formula / Expansion:**
   - **S:** Strengthen Building Codes
   - **T:** Timely Warnings and Alerts
@@ -3977,7 +3961,7 @@
 
 ###### Mnemonic 55: Reasons for the landslides in India
 
-- **Mnemonic Keyword:** `Mnemonic – “LOOSE MUD”`
+- **Mnemonic Keyword:** `Mnemonic – LOOSE MUD`
 - **Formula / Expansion:**
   - **L:** Logging and Deforestation
   - **O:** Overgrazing
@@ -4015,7 +3999,7 @@
 
 ###### Mnemonic 56: Why is the Himalayas prone to Landslide?
 
-- **Mnemonic Keyword:** `“YOUNG ROCKS”`
+- **Mnemonic Keyword:** `YOUNG ROCKS`
 - **Formula / Expansion:**
   - **Y:** Youthful Mountains
   - **O:** Ongoing Tectonic Activity
@@ -4061,7 +4045,7 @@
 
 ###### Mnemonic 57: Reason of landslide in Himalayas is more than Western Ghat
 
-- **Mnemonic Keyword:** `Mnemonics – “LANDSLIDE`
+- **Mnemonic Keyword:** `Mnemonics – LANDSLIDE`
 - **Formula / Expansion:**
   - **L:** Loose Rock and Soil
   - **A:** Altitude
@@ -4106,7 +4090,7 @@
 
 ###### Mnemonic 20: Reason of Tsunami
 
-- **Mnemonic Keyword:** `“UNDERSEA SHAKE”`
+- **Mnemonic Keyword:** `UNDERSEA SHAKE`
 - **Formula / Expansion:**
   - **U:** Underwater Earthquakes
   - **N:** Nautical Volcanic Eruptions
@@ -4164,7 +4148,7 @@
 
 ###### Mnemonic 21: Impact of Tsunami
 
-- **Mnemonic Keyword:** `Mnemonics – “TSUNAMI WAVES`
+- **Mnemonic Keyword:** `Mnemonics – TSUNAMI WAVES`
 - **Formula / Expansion:**
   - **T:** Tidal Waves and Flooding
   - **S:** Structural Destruction
@@ -4218,7 +4202,7 @@
 
 ###### Mnemonic 22: Measures to minimize the effect of TSUNAMI
 
-- **Mnemonic Keyword:** `Mnemonic – “AFTERSHOCK”`
+- **Mnemonic Keyword:** `Mnemonic – AFTERSHOCK`
 - **Formula / Expansion:**
   - **A:** Alert Systems and Early Warning
   - **F:** Flood Barriers and Seawalls
@@ -4282,7 +4266,7 @@
 
 ###### Mnemonic 18: Impact of volcanic activity on the regional environment
 
-- **Mnemonic Keyword:** `“ASH DEPOSITION”`
+- **Mnemonic Keyword:** `ASH DEPOSITION`
 - **Formula / Expansion:**
   - **A:** Air Quality Degradation S  : Soil Fertility Enhancement H  : Habitat Destruction D : Disruption of Water Sources E : Ecosystem Alteration P : Pyroclastic Flow Hazards O : Ocean Acidification S : Seismic Activity Increase I : Infrastructure Damage T : Tourism Disruption I : Impact on Climate O : Obstruction of Sunlight N : New Land Formation
 - **Explanation & Examples:**
@@ -4325,3 +4309,4 @@
   - ❖ **N - New Land Formation**
     - • Volcanic eruptions can create new landforms, such as islands and mountains, reshaping the regional geography and providing new habitats.
     - • **Example:** The formation of Surtsey Island off the coast of Iceland in 1963 created new land from volcanic activity, which has since become a natural laboratory for studying ecological succession.
+

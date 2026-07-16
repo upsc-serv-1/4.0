@@ -3,8 +3,19 @@ import json
 import requests
 import time
 
-SUPABASE_URL = "https://ngwsuqzkndlxfoantnlf.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nd3N1cXprbmRseGZvYW50bmxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMjA0NjAsImV4cCI6MjA5Mjc5NjQ2MH0.u9-dnMmLXr_5fF243uzx6WyE_vR6dzERDuyFuF-HeZk"
+def load_env():
+    env_vars = {}
+    if os.path.exists(".env"):
+        with open(".env", "r", encoding="utf-8") as f:
+            for line in f:
+                if "=" in line and not line.strip().startswith("#"):
+                    k, v = line.strip().split("=", 1)
+                    env_vars[k.strip()] = v.strip().strip('"').strip("'")
+    return env_vars
+
+env = load_env()
+SUPABASE_URL = env.get("EXPO_PUBLIC_SUPABASE_URL") or "https://ngwsuqzkndlxfoantnlf.supabase.co"
+SUPABASE_KEY = env.get("EXPO_PUBLIC_SUPABASE_ANON_KEY") or "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nd3N1cXprbmRseGZvYW50bmxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMjA0NjAsImV4cCI6MjA5Mjc5NjQ2MH0.u9-dnMmLXr_5fF243uzx6WyE_vR6dzERDuyFuF-HeZk"
 JSON_DIR = "mains json files"
 
 HEADERS = {
@@ -20,12 +31,31 @@ def upload_batch(table_name, rows):
     batch_size = 20 if table_name == "mains_answers" else 50
     success_count = 0
     
+    # Clear existing rows first (to prevent orphaned/duplicate records from past bad parses)
+    if table_name not in ["mains_questions", "mains_answers"]:
+        print(f"  Clearing existing rows in {table_name}...")
+        del_url = f"{SUPABASE_URL}/rest/v1/{table_name}?id=not.is.null"
+        try:
+            del_resp = requests.delete(del_url, headers=HEADERS, timeout=30)
+            if del_resp.status_code not in [200, 204]:
+                print(f"  [WARNING] Failed to clear {table_name}: {del_resp.status_code} {del_resp.text}")
+        except Exception as e:
+            print(f"  [WARNING] Error clearing {table_name}: {e}")
+            
     # Clean frontend-only columns that do not exist in the database table
     cleaned_rows = []
+    seen_ids = set()
     for r in rows:
         c_row = r.copy()
         c_row.pop("ethicsData", None)
-        c_row.pop("ethics_data", None)
+        # Prevent "ON CONFLICT DO UPDATE command cannot affect row a second time" error by skipping duplicates in same request
+        row_id = c_row.get("id")
+        if row_id:
+            if row_id in seen_ids:
+                continue
+            seen_ids.add(row_id)
+        if table_name not in ["mains_questions", "mains_answers"]:
+            c_row["status"] = "published"
         if table_name == "mains_frameworks":
             c_row.pop("paper", None)
             c_row.pop("subject", None)
@@ -262,6 +292,30 @@ def upload_value_additions():
         with open(fw_path, "r", encoding="utf-8") as f:
             rows = json.load(f)
         upload_batch("mains_frameworks", rows)
+
+    # G. Keywords (dedicated table)
+    kw_path = os.path.join(JSON_DIR, "mains_keywords.json")
+    if os.path.exists(kw_path):
+        print("\n--- Processing Keywords ---")
+        with open(kw_path, "r", encoding="utf-8") as f:
+            rows = json.load(f)
+        upload_batch("mains_keywords", rows)
+
+    # H. Case Studies (dedicated table)
+    cs_path = os.path.join(JSON_DIR, "mains_case_studies.json")
+    if os.path.exists(cs_path):
+        print("\n--- Processing Case Studies ---")
+        with open(cs_path, "r", encoding="utf-8") as f:
+            rows = json.load(f)
+        upload_batch("mains_case_studies", rows)
+
+    # I. SC Judgments (dedicated table)
+    jd_path = os.path.join(JSON_DIR, "mains_sc_judgments.json")
+    if os.path.exists(jd_path):
+        print("\n--- Processing SC Judgments ---")
+        with open(jd_path, "r", encoding="utf-8") as f:
+            rows = json.load(f)
+        upload_batch("mains_sc_judgments", rows)
 
 # ==============================================================================
 # MAIN EXECUTION

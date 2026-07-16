@@ -11,27 +11,43 @@ interface MarkdownSection {
 const parseMarkdownToSections = (text: string | undefined | null): MarkdownSection[] => {
   if (!text) return [];
   const sections: MarkdownSection[] = [];
-  const regex = /(?:^|\n)(?:\*\s*)?\*\*([^*]+?):\*\*/g;
+  const lines = text.split('\n');
   
-  let match;
-  let lastIndex = 0;
   let currentHeading = '';
+  let currentLines: string[] = [];
   
-  while ((match = regex.exec(text)) !== null) {
-    if (lastIndex > 0 || currentHeading) {
-      const content = text.slice(lastIndex, match.index).trim();
-      if (content || currentHeading) {
-        sections.push({ heading: currentHeading || 'General', content });
+  for (const line of lines) {
+    const trimmed = line.trim();
+    const hMatch = trimmed.match(/^(?:###|####|##)\s*(.*?)$/);
+    const bMatch = trimmed.match(/^(?:[-*]\s*)?\*\*([^*]+?):\*\*\s*$/);
+    
+    if (hMatch) {
+      if (currentLines.length > 0 || currentHeading) {
+        sections.push({ heading: currentHeading || 'General', content: currentLines.join('\n') });
+        currentLines = [];
       }
+      currentHeading = hMatch[1].trim();
+    } else if (bMatch) {
+      if (currentLines.length > 0 || currentHeading) {
+        sections.push({ heading: currentHeading || 'General', content: currentLines.join('\n') });
+        currentLines = [];
+      }
+      currentHeading = bMatch[1].trim();
+    } else {
+      currentLines.push(line);
     }
-    currentHeading = match[1].trim();
-    lastIndex = regex.lastIndex;
   }
   
-  const content = text.slice(lastIndex).trim();
-  if (content || currentHeading) {
-    sections.push({ heading: currentHeading || 'General', content });
+  if (currentLines.length > 0 || currentHeading) {
+    sections.push({ heading: currentHeading || 'General', content: currentLines.join('\n') });
   }
+  
+  // Post-process: If a 'General' section starts with '>', change its heading to 'Quote'
+  sections.forEach(sec => {
+    if ((sec.heading === 'General' || !sec.heading) && sec.content.trim().startsWith('>')) {
+      sec.heading = 'Quote';
+    }
+  });
   
   return sections;
 };

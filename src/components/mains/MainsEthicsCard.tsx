@@ -80,8 +80,13 @@ export default function MainsEthicsCard({
        ethicsTab === 'comparisons' ? 'comparison' :
        ethicsTab === 'innovations' ? 'innovation' :
        ethicsTab === 'pyq_quotes' ? 'pyq_quote' :
-       ethicsTab === 'keywords' ? 'keyword' : ethicsTab)
-    : item.ethicsType;
+       ethicsTab === 'keywords' ? 'keyword' :
+       ethicsTab === 'philosophies' ? 'philosophy' :
+       ethicsTab === 'dilemmas' ? 'dilemma' :
+       ethicsTab === 'phrases' ? 'phrase' : ethicsTab)
+    : (item.core_values === 'philosophy' ? 'philosophy' :
+       item.core_values === 'dilemma' ? 'dilemma' :
+       item.core_values === 'phrase' ? 'phrase' : item.ethicsType);
 
   // Soft pastel box colors for sub-theme blocks (cycles through palette), replicated from Data & Facts
   const boxPalette = [
@@ -602,23 +607,101 @@ export default function MainsEthicsCard({
             );
           }
 
-         return (
-           <View style={[
-             localStyles.keywordWrapper,
-             {
-               backgroundColor: palette.bg,
-               borderColor: palette.border,
-               borderWidth: 1,
-               paddingVertical: 14,
-               paddingHorizontal: 12,
-             }
-           ]}>
-             <Markdown style={subPartBodyMarkdownStyle} rules={markdownRules}>
-               {cleanMarkdownContent((item.rawContent || item.ethicsData?.keywordDefinition || '').replace(/\n---+\s*$/gm, '').replace(/^---+\s*$/gm, ''))}
-             </Markdown>
-           </View>
-         );
-       })()}
+          // Render SC Judgments in a premium table-like grid layout
+          const isJudgment = item.category === 'sc_judgments_hub' || (item.core_values && item.core_values.includes('judgment'));
+          if (isJudgment) {
+            const raw = item.content_markdown || item.rawContent || '';
+            const lines = raw.split('\n');
+            const dataLine = lines.find(l => l.trim().startsWith('|') && !l.includes('Key Issue') && !l.includes(':---'));
+            if (dataLine) {
+              const cells = dataLine.split('|').map(c => c.trim()).filter(Boolean);
+              if (cells.length >= 3) {
+                const keyIssue = cells[0];
+                const ruling = cells[1];
+                const articles = cells[2];
+                
+                return (
+                  <View style={[
+                    localStyles.keywordWrapper,
+                    {
+                      backgroundColor: palette.bg,
+                      borderColor: palette.border,
+                      borderWidth: 1,
+                      padding: 0,
+                      borderRadius: 10,
+                      overflow: 'hidden',
+                    }
+                  ]}>
+                    {/* Key Issue Row */}
+                    <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.border }}>
+                      <View style={{ width: '32%', backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', padding: 10, borderRightWidth: 1, borderRightColor: colors.border, justifyContent: 'center' }}>
+                        <Text style={{ color: colors.textPrimary, fontSize: 11 * zoomScale, fontWeight: '800' }}>Key Issue</Text>
+                      </View>
+                      <View style={{ width: '68%', padding: 10, justifyContent: 'center' }}>
+                        <Text style={{ color: colors.textSecondary, fontSize: 12 * zoomScale, fontWeight: '600', lineHeight: 16 * zoomScale }}>{keyIssue}</Text>
+                      </View>
+                    </View>
+
+                    {/* Ruling Row */}
+                    <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.border }}>
+                      <View style={{ width: '32%', backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', padding: 10, borderRightWidth: 1, borderRightColor: colors.border, justifyContent: 'center' }}>
+                        <Text style={{ color: colors.textPrimary, fontSize: 11 * zoomScale, fontWeight: '800' }}>SC Ruling</Text>
+                      </View>
+                      <View style={{ width: '68%', padding: 10, justifyContent: 'center' }}>
+                        <Text style={{ color: colors.textSecondary, fontSize: 12 * zoomScale, fontWeight: '600', lineHeight: 16 * zoomScale }}>{ruling}</Text>
+                      </View>
+                    </View>
+
+                    {/* Related Articles / Laws Row */}
+                    <View style={{ flexDirection: 'row' }}>
+                      <View style={{ width: '32%', backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', padding: 10, borderRightWidth: 1, borderRightColor: colors.border, justifyContent: 'center' }}>
+                        <Text style={{ color: colors.textPrimary, fontSize: 11 * zoomScale, fontWeight: '800' }}>Articles / Laws</Text>
+                      </View>
+                      <View style={{ width: '68%', padding: 10, justifyContent: 'center' }}>
+                        <Text style={{ color: colors.textSecondary, fontSize: 12 * zoomScale, fontWeight: '700', lineHeight: 16 * zoomScale }}>{articles}</Text>
+                      </View>
+                    </View>
+                  </View>
+                );
+              }
+            }
+          }
+
+          return (
+            <View style={[
+              localStyles.keywordWrapper,
+              {
+                backgroundColor: palette.bg,
+                borderColor: palette.border,
+                borderWidth: 1,
+                paddingVertical: 14,
+                paddingHorizontal: 12,
+              }
+            ]}>
+              <Markdown style={subPartBodyMarkdownStyle} rules={markdownRules}>
+                {cleanMarkdownContent((item.rawContent || item.ethicsData?.keywordDefinition || '').replace(/\n---+\s*$/gm, '').replace(/^---+\s*$/gm, ''))}
+              </Markdown>
+            </View>
+          );
+        })()}
+
+      {/* 8. Philosophies, Ethical Dilemmas, and Phrases */}
+      {(type === 'philosophy' || type === 'dilemma' || type === 'phrase') && (
+        <View style={[
+          localStyles.keywordWrapper,
+          {
+            backgroundColor: palette.bg,
+            borderColor: palette.border,
+            borderWidth: 1,
+            paddingVertical: 14,
+            paddingHorizontal: 12,
+          }
+        ]}>
+          <Markdown style={subPartBodyMarkdownStyle} rules={markdownRules}>
+            {cleanMarkdownContent((item.rawContent || item.content_markdown || '').replace(/\n---+\s*$/gm, '').replace(/^---+\s*$/gm, ''))}
+          </Markdown>
+        </View>
+      )}
 
       {/* 7. Case Study Situations (Khemka Sir Hub) */}
       {(type === 'situation' || type === 'situations') && (() => {

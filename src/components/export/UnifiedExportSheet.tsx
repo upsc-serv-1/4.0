@@ -91,6 +91,7 @@ const CHOICES = {
     { id: 'q_only' as ExportContentScope, label: 'Q only' },
     { id: 'q_options' as ExportContentScope, label: 'Q + Options' },
     { id: 'q_options_expl' as ExportContentScope, label: 'Q + Options + Expl' },
+    { id: 'q_options_valuation' as ExportContentScope, label: 'Q + Options + Valuation' },
   ],
   answerPlacements: [
     { id: 'inline' as ExportAnswerPlacement, label: 'Inline' },
@@ -340,6 +341,45 @@ export const UnifiedExportSheet: React.FC<Props> = ({
               placeholderTextColor={colors.textTertiary}
             />
 
+            {!hideSections.includes('content') && payload?.kind !== 'notes' && payload?.kind !== 'flashcards' && payload?.kind !== 'hardnote' && (
+              <Section title="Content" colors={colors}>
+                <Label colors={colors}>INCLUDE</Label>
+                <Row>{CHOICES.contentScopes.map(c => <Chip key={c.id} active={opts.contentScope === c.id} onPress={() => set('contentScope', c.id)} testID={`export-scope-${c.id}`}>{c.label}</Chip>)}</Row>
+                {!hideSections.includes('answer') && opts.contentScope !== 'q_only' && (
+                  <>
+                    <Label colors={colors}>ANSWER PLACEMENT</Label>
+                    <Row>{CHOICES.answerPlacements.map(a => <Chip key={a.id} active={opts.answerPlacement === a.id} onPress={() => set('answerPlacement', a.id)}>{a.label}</Chip>)}</Row>
+                  </>
+                )}
+              </Section>
+            )}
+
+            {!hideSections.includes('sort') && (payload?.kind === 'questions' || payload?.kind === 'tags') && (
+              <Section title="Sort By" colors={colors}>
+                <Label colors={colors}>GROUP BY (multi-select hierarchy)</Label>
+                <Row>{CHOICES.groupingLevels.map(g => {
+                  const active = (opts.groupingLevels || []).includes(g.id);
+                  return (
+                    <Chip
+                      key={g.id}
+                      active={active}
+                      onPress={() => {
+                        const cur = opts.groupingLevels || [];
+                        const next = active ? cur.filter(x => x !== g.id) : [...cur, g.id];
+                        // Preserve canonical hierarchy order
+                        const order: ExportGroupingLevel[] = ['subject', 'section_group', 'microtopic'];
+                        next.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+                        set('groupingLevels', next);
+                      }}
+                      testID={`export-group-${g.id}`}
+                    >{g.label}</Chip>
+                  );
+                })}</Row>
+                <Label colors={colors}>SORT WITHIN GROUPS</Label>
+                <Row>{CHOICES.sortBys.map(s => <Chip key={s.id} active={opts.sortBy === s.id} onPress={() => set('sortBy', s.id)} testID={`export-sort-${s.id}`}>{s.label}</Chip>)}</Row>
+              </Section>
+            )}
+
             <Section title="Typography" colors={colors}>
               <Label colors={colors}>FONT</Label>
               <Row>{CHOICES.fonts.map(f => <Chip key={f.id} active={opts.fontFamily === f.id} onPress={() => set('fontFamily', f.id)} testID={`export-font-${f.id}`}>{f.label}</Chip>)}</Row>
@@ -439,45 +479,6 @@ export const UnifiedExportSheet: React.FC<Props> = ({
                     </Row>
                   </>
                 )}
-              </Section>
-            )}
-
-            {!hideSections.includes('content') && payload?.kind !== 'notes' && payload?.kind !== 'flashcards' && payload?.kind !== 'hardnote' && (
-              <Section title="Content" colors={colors}>
-                <Label colors={colors}>INCLUDE</Label>
-                <Row>{CHOICES.contentScopes.map(c => <Chip key={c.id} active={opts.contentScope === c.id} onPress={() => set('contentScope', c.id)} testID={`export-scope-${c.id}`}>{c.label}</Chip>)}</Row>
-                {!hideSections.includes('answer') && opts.contentScope !== 'q_only' && (
-                  <>
-                    <Label colors={colors}>ANSWER PLACEMENT</Label>
-                    <Row>{CHOICES.answerPlacements.map(a => <Chip key={a.id} active={opts.answerPlacement === a.id} onPress={() => set('answerPlacement', a.id)}>{a.label}</Chip>)}</Row>
-                  </>
-                )}
-              </Section>
-            )}
-
-            {!hideSections.includes('sort') && (payload?.kind === 'questions' || payload?.kind === 'tags') && (
-              <Section title="Sort By" colors={colors}>
-                <Label colors={colors}>GROUP BY (multi-select hierarchy)</Label>
-                <Row>{CHOICES.groupingLevels.map(g => {
-                  const active = (opts.groupingLevels || []).includes(g.id);
-                  return (
-                    <Chip
-                      key={g.id}
-                      active={active}
-                      onPress={() => {
-                        const cur = opts.groupingLevels || [];
-                        const next = active ? cur.filter(x => x !== g.id) : [...cur, g.id];
-                        // Preserve canonical hierarchy order
-                        const order: ExportGroupingLevel[] = ['subject', 'section_group', 'microtopic'];
-                        next.sort((a, b) => order.indexOf(a) - order.indexOf(b));
-                        set('groupingLevels', next);
-                      }}
-                      testID={`export-group-${g.id}`}
-                    >{g.label}</Chip>
-                  );
-                })}</Row>
-                <Label colors={colors}>SORT WITHIN GROUPS</Label>
-                <Row>{CHOICES.sortBys.map(s => <Chip key={s.id} active={opts.sortBy === s.id} onPress={() => set('sortBy', s.id)} testID={`export-sort-${s.id}`}>{s.label}</Chip>)}</Row>
               </Section>
             )}
 

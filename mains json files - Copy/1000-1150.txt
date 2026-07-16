@@ -1,0 +1,1352 @@
+[
+{
+"id": "1001",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Poverty and Related issues",
+"title": "Socio-Economic Disparities"
+},
+{
+"id": "1002",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "Effects of globalization on Indian society",
+"subtopic": "Globalisation",
+"title": "Technological Advancements"
+},
+{
+"id": "1003",
+"paper": "GS-III",
+"subject": "INDIAN ECONOMY",
+"section_group": "Industrial Dynamics & Reforms",
+"microtopic": "Effects of Liberalisation on the economy; Changes in Industrial policy & their effects on industrial growth",
+"subtopic": "LPG Reform and Impact",
+"title": "Trade Liberalization"
+},
+{
+"id": "1004",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "Effects of globalization on Indian society",
+"subtopic": "Globalisation",
+"title": "Westernization"
+},
+{
+"id": "1005",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
+"subtopic": "Fundamental Rights",
+"title": "Civic Secularism"
+},
+{
+"id": "1006",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Communal Bias"
+},
+{
+"id": "1007",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Communal Harmony"
+},
+{
+"id": "1008",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Communal Polarities"
+},
+{
+"id": "1009",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Communal Polarization"
+},
+{
+"id": "1010",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Communal Politics"
+},
+{
+"id": "1011",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Communal Riots"
+},
+{
+"id": "1012",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Communal Scapegoating"
+},
+{
+"id": "1013",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Communal Segregation"
+},
+{
+"id": "1014",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Communal Stereotyping"
+},
+{
+"id": "1015",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Communal Trigger Points"
+},
+{
+"id": "1016",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Communalization of Politics"
+},
+{
+"id": "1017",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cross-Cultural Understanding"
+},
+{
+"id": "1018",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Assimilation"
+},
+{
+"id": "1019",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Diversity Awareness"
+},
+{
+"id": "1020",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Diversity Preservation"
+},
+{
+"id": "1021",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Exchange Platforms"
+},
+{
+"id": "1022",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Exchange Programs"
+},
+{
+"id": "1023",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Harmony"
+},
+{
+"id": "1024",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Harmony Initiatives"
+},
+{
+"id": "1025",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Integration"
+},
+{
+"id": "1026",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Pluralism"
+},
+{
+"id": "1027",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Cultural Regionalism"
+},
+{
+"id": "1028",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Cultural Sensitivity"
+},
+{
+"id": "1029",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Decentralized Regionalism"
+},
+{
+"id": "1030",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Democratic Pluralism"
+},
+{
+"id": "1031",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Economic Regionalism"
+},
+{
+"id": "1032",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Ethnic Harmony"
+},
+{
+"id": "1033",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Ethnic Pluralism"
+},
+{
+"id": "1034",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Ethnic Regional Conflicts"
+},
+{
+"id": "1035",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Ethnic Regionalism"
+},
+{
+"id": "1036",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Ethno-Religious Identity"
+},
+{
+"id": "1037",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Faith-Based Mobilization"
+},
+{
+"id": "1038",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Harmonious Coexistence"
+},
+{
+"id": "1039",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Social empowerment",
+"title": "Inclusive Educational Practices"
+},
+{
+"id": "1040",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Social empowerment",
+"title": "Inclusive Governance"
+},
+{
+"id": "1041",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Social empowerment",
+"title": "Inclusive Social Policies"
+},
+{
+"id": "1042",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Integration of Immigrants"
+},
+{
+"id": "1043",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Inter-Communal Tolerance"
+},
+{
+"id": "1044",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Inter-Regional Cooperation"
+},
+{
+"id": "1045",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Interfaith Cooperation"
+},
+{
+"id": "1046",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Interfaith Dialogue"
+},
+{
+"id": "1047",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Interfaith Solidarity"
+},
+{
+"id": "1048",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Interregional Collaboration"
+},
+{
+"id": "1049",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Linguistic Chauvinism"
+},
+{
+"id": "1050",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Linguistic Federalism"
+},
+{
+"id": "1051",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Linguistic Identity Movements"
+},
+{
+"id": "1052",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Multiculturalism"
+},
+{
+"id": "1053",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "National Unity"
+},
+{
+"id": "1054",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Peaceful Coexistence"
+},
+{
+"id": "1055",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Pluralistic Society"
+},
+{
+"id": "1056",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regional Assertion"
+},
+{
+"id": "1057",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regional Autonomy"
+},
+{
+"id": "1058",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regional Cooperation"
+},
+{
+"id": "1059",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regional Development Gap"
+},
+{
+"id": "1060",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regional Development Strategies"
+},
+{
+"id": "1061",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regional Disparities"
+},
+{
+"id": "1062",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regional Identity Assertion"
+},
+{
+"id": "1063",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regional Identity Politics"
+},
+{
+"id": "1064",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regional Identity Preservation"
+},
+{
+"id": "1065",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regional Identity Representation"
+},
+{
+"id": "1066",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regional Integration"
+},
+{
+"id": "1067",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regional Power Dynamics"
+},
+{
+"id": "1068",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regional Sentiment Politics"
+},
+{
+"id": "1069",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regional Solidarity"
+},
+{
+"id": "1070",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regional Stability"
+},
+{
+"id": "1071",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Regionalism Resurgence"
+},
+{
+"id": "1072",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Religious Freedom"
+},
+{
+"id": "1073",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Religious Majoritarianism"
+},
+{
+"id": "1074",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Religious Pluralism"
+},
+{
+"id": "1075",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Communalism",
+"title": "Sectarian Dynamics"
+},
+{
+"id": "1076",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Secular Constitutionalism"
+},
+{
+"id": "1077",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Secular Education"
+},
+{
+"id": "1078",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Secular Education Policy"
+},
+{
+"id": "1079",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Secular Ethos"
+},
+{
+"id": "1080",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Secular Fabric"
+},
+{
+"id": "1081",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Secular Governance"
+},
+{
+"id": "1082",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Secular Nationalism"
+},
+{
+"id": "1083",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Secular Pluralism"
+},
+{
+"id": "1084",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Secular Principles"
+},
+{
+"id": "1085",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Secular Reforms"
+},
+{
+"id": "1086",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Secular Society"
+},
+{
+"id": "1087",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Secular Statecraft"
+},
+{
+"id": "1088",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Secularism",
+"title": "Secular Vigilance"
+},
+{
+"id": "1089",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Social empowerment",
+"title": "Social Cohesion"
+},
+{
+"id": "1090",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Social empowerment",
+"title": "Social Integration Programs"
+},
+{
+"id": "1091",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Poverty, Empowerment & Development",
+"microtopic": "Social empowerment, poverty and developmental issues",
+"subtopic": "Social empowerment",
+"title": "Social Justice Movements"
+},
+{
+"id": "1092",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Sub nationalism"
+},
+{
+"id": "1093",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Sub-State Nationalism"
+},
+{
+"id": "1094",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Social Dynamics & Ideologies",
+"microtopic": "National Integration, communalism, regionalism & secularism",
+"subtopic": "Regionalism",
+"title": "Sustainable Regional Development"
+},
+{
+"id": "1095",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Tolerance and Acceptance"
+},
+{
+"id": "1096",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Unity Amidst Diversity"
+},
+{
+"id": "1097",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Unity in Diversity"
+},
+{
+"id": "1098",
+"paper": "GS-I",
+"subject": "SOCIETY",
+"section_group": "Foundations & Diversity",
+"microtopic": "Diversity of India",
+"subtopic": "Diversity and pluralism",
+"title": "Unity Through Diversity"
+},
+{
+"id": "1099",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Foundational Magna Carta"
+},
+{
+"id": "1100",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Constitutional Mosaic"
+},
+{
+"id": "1101",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Living Document"
+},
+{
+"id": "1102",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Granite of Governance"
+},
+{
+"id": "1103",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Constitutional Renaissance"
+},
+{
+"id": "1104",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Democratic Bedrock"
+},
+{
+"id": "1105",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Sovereign Framework"
+},
+{
+"id": "1106",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Organs of Government & Dispute Redressal",
+"microtopic": "Structure, organization and functioning of the Judiciary (including Tribunals & ADR)",
+"subtopic": "Judiciary",
+"title": "Jurisdictional Keystone"
+},
+{
+"id": "1107",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Fundamental Charter"
+},
+{
+"id": "1108",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Republic's Covenant"
+},
+{
+"id": "1109",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
+"subtopic": "DPSP",
+"title": "Edifice of Equity"
+},
+{
+"id": "1110",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Democratic Edict"
+},
+{
+"id": "1111",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
+"subtopic": "Fundamental Rights",
+"title": "Charter of Liberty"
+},
+{
+"id": "1112",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Pillar of Pluralism"
+},
+{
+"id": "1113",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Organs of Government & Dispute Redressal",
+"microtopic": "Structure, organization and functioning of the Judiciary (including Tribunals & ADR)",
+"subtopic": "Judiciary",
+"title": "Guardian of Justice"
+},
+{
+"id": "1114",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
+"subtopic": "Fundamental Rights",
+"title": "Beacon of Rights"
+},
+{
+"id": "1115",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Federal Structure & Local Governance",
+"microtopic": "Issues and challenges pertaining to the federal structure",
+"subtopic": "Federalism",
+"title": "Framework of Federalism"
+},
+{
+"id": "1116",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Amendments",
+"title": "Amendment Evolution"
+},
+{
+"id": "1117",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Republican Blueprint"
+},
+{
+"id": "1118",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Constitutional Confluence"
+},
+{
+"id": "1119",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Sovereign Mandate"
+},
+{
+"id": "1120",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Legal Luminary"
+},
+{
+"id": "1121",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Federal Structure & Local Governance",
+"microtopic": "Issues and challenges pertaining to the federal structure",
+"subtopic": "Federalism",
+"title": "Federal Fabric"
+},
+{
+"id": "1122",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Democratic Nexus"
+},
+{
+"id": "1123",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Fundamental Edifice"
+},
+{
+"id": "1124",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Constitutional Canopy"
+},
+{
+"id": "1125",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Republican Edict"
+},
+{
+"id": "1126",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Principled Charter"
+},
+{
+"id": "1127",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Organs of Government & Dispute Redressal",
+"microtopic": "Structure, organization and functioning of the Judiciary (including Tribunals & ADR)",
+"subtopic": "Judiciary",
+"title": "Judicial Keystone"
+},
+{
+"id": "1128",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Constitutional Epoch"
+},
+{
+"id": "1129",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Constitutional Tapestry"
+},
+{
+"id": "1130",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Democratic Blueprint"
+},
+{
+"id": "1131",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Foundational Doctrine"
+},
+{
+"id": "1132",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Legal Mosaic"
+},
+{
+"id": "1133",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Constitutional Archetype"
+},
+{
+"id": "1134",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Civic Covenant"
+},
+{
+"id": "1135",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
+"subtopic": "Fundamental Rights",
+"title": "Juridical Pillar"
+},
+{
+"id": "1136",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Governance Charter"
+},
+{
+"id": "1137",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Sovereign Edict"
+},
+{
+"id": "1138",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
+"subtopic": "Fundamental Rights",
+"title": "Liberty Manifesto"
+},
+{
+"id": "1139",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
+"subtopic": "DPSP",
+"title": "Justice Paradigm"
+},
+{
+"id": "1140",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Constitutional Compass"
+},
+{
+"id": "1141",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Legislative Manuscript"
+},
+{
+"id": "1142",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Republican Codex"
+},
+{
+"id": "1143",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
+"subtopic": "Fundamental Rights",
+"title": "Equity Canon"
+},
+{
+"id": "1144",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Civic Treatise"
+},
+{
+"id": "1145",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Sovereignty Script"
+},
+{
+"id": "1146",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Federal Structure & Local Governance",
+"microtopic": "Issues and challenges pertaining to the federal structure",
+"subtopic": "Federalism",
+"title": "Jurisdictional Blueprint"
+},
+{
+"id": "1147",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Features, amendments, significant provisions and basic structure",
+"subtopic": "Constitutional Morality",
+"title": "Constitutional Mandala"
+},
+{
+"id": "1148",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
+"subtopic": "Fundamental Rights",
+"title": "Libertarian Charter"
+},
+{
+"id": "1149",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Constitutional Framework & Evolution",
+"microtopic": "Fundamental Rights, Preamble, DPSP, Fundamental Duties, etc.",
+"subtopic": "DPSP",
+"title": "Civic Codex"
+},
+{
+"id": "1150",
+"paper": "GS-II",
+"subject": "POLITY",
+"section_group": "Federal Structure & Local Governance",
+"microtopic": "Issues and challenges pertaining to the federal structure",
+"subtopic": "Federalism",
+"title": "Jurisdictional Framework"
+}
+]

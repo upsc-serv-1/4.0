@@ -1,6 +1,8 @@
 name: Build iOS IPA (Unsigned)
 
 on:
+  push:
+    branches: [ '10.2' ]
   workflow_dispatch:
 
 concurrency:

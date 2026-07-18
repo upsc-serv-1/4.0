@@ -167,6 +167,7 @@ const CHOICES = {
     { id: 'subject' as ExportSortBy, label: 'Subject' },
     { id: 'subject_section' as ExportSortBy, label: 'Subject + Section' },
     { id: 'subject_section_microtopic' as ExportSortBy, label: 'Subject + Section + Micro' },
+    { id: 'pyq_frequency' as ExportSortBy, label: 'PYQ Frequency (Most Frequent First)' },
   ],
   scopes: [
     { id: 'report_only' as AnalysisExportScope, label: 'Report only' },
@@ -242,7 +243,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
     });
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   });
-  const [selectedGroupingLevels, setSelectedGroupingLevels] = useState<Array<'subject' | 'section_group' | 'microtopic'>>([]);
+  const [selectedGroupingLevels, setSelectedGroupingLevels] = useState<Array<'subject' | 'section_group' | 'microtopic' | 'subtopic' | 'nanotopic'>>([]);
   const [yearMode, setYearMode] = useState<'all' | 'single' | 'range'>('all');
   const [singleYear, setSingleYear] = useState<string>('');
   const [yearStartIn, setYearStartIn] = useState<string>('');
@@ -253,15 +254,18 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
     title, moduleName: 'Analysis', headerText: 'Dr. UPSC · Analysis',
     contentScope: 'q_options_expl', answerPlacement: 'inline', sortBy: 'default',
     fontSize: 10, showTOC: true, watermark: 'Dr. UPSC',
+    showMetaChips: false,
   }));
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isDetailedReport, setIsDetailedReport] = useState(true);
   const [heatmapMetric, setHeatmapMetric] = useState<'count' | 'marks'>(pyqMeta?.heatmapMetric || 'count');
+  const [exportUri, setExportUri] = useState<string | null>(null);
 
   // Re-seed on open
   useEffect(() => {
     if (visible) {
+      setExportUri(null);
       setScope('report_only');
       setSelectedSubjects([]);
       setSelectedSections([]);
@@ -292,6 +296,7 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
         title, moduleName: 'Analysis', headerText: 'Dr. UPSC · Analysis',
         contentScope: 'q_options_expl', answerPlacement: 'inline', sortBy: 'default',
         fontSize: 10, showTOC: true, watermark: 'Dr. UPSC',
+        showMetaChips: false,
       }));
       setIsExporting(false);
       setShowAdvanced(false);
@@ -750,7 +755,42 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={{ maxHeight: 560 }} showsVerticalScrollIndicator={false}>
+          {exportUri ? (
+            <View style={{ padding: 24, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: colors.primary + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                <Check size={32} color={colors.primary} />
+              </View>
+              <Text style={{ fontSize: 18, fontWeight: '800', color: colors.textPrimary, marginBottom: 8, textAlign: 'center' }}>Export Complete!</Text>
+              <Text style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 24, textAlign: 'center', lineHeight: 18, paddingHorizontal: 16 }}>
+                Your PDF has been compiled. If the sharing menu did not open automatically, click the button below to share or print it.
+              </Text>
+              <TouchableOpacity
+                onPress={async () => {
+                  if (await Sharing.isAvailableAsync()) {
+                    await Sharing.shareAsync(exportUri, {
+                      mimeType: 'application/pdf',
+                      dialogTitle: pyqExportTitle,
+                      UTI: 'com.adobe.pdf',
+                    }).catch(() => {});
+                  } else {
+                    await Linking.openURL(exportUri).catch(() => null);
+                  }
+                }}
+                style={[styles.exportBtn, { backgroundColor: colors.primary, width: '100%', marginBottom: 12, paddingVertical: 14, justifyContent: 'center', alignItems: 'center', flexDirection: 'row', gap: 8 }]}
+              >
+                <Share size={18} color="#fff" />
+                <Text style={styles.exportBtnText}>Share / Print Report</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={onClose}
+                style={[styles.exportBtn, { backgroundColor: colors.surfaceStrong, width: '100%', paddingVertical: 14, justifyContent: 'center', alignItems: 'center' }]}
+              >
+                <Text style={[styles.exportBtnText, { color: colors.textSecondary }]}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <>
+              <ScrollView style={{ maxHeight: 560 }} showsVerticalScrollIndicator={false}>
             {reportVariant === 'pyq' && (
               <Section title="What to Export" colors={colors}>
                 <Row>
@@ -808,6 +848,48 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
                   >
                     Microtopic
                   </Chip>
+                  <Chip
+                    key="subtopic"
+                    active={selectedGroupingLevels.includes('subtopic')}
+                    onPress={() => setSelectedGroupingLevels(prev => 
+                      prev.includes('subtopic') 
+                        ? prev.filter(x => x !== 'subtopic')
+                        : [...prev, 'subtopic']
+                    )}
+                    testID="analysis-grouping-subtopic"
+                  >
+                    Subtopic
+                  </Chip>
+                  <Chip
+                    key="nanotopic"
+                    active={selectedGroupingLevels.includes('nanotopic')}
+                    onPress={() => setSelectedGroupingLevels(prev => 
+                      prev.includes('nanotopic') 
+                        ? prev.filter(x => x !== 'nanotopic')
+                        : [...prev, 'nanotopic']
+                    )}
+                    testID="analysis-grouping-nanotopic"
+                  >
+                    Nanotopic
+                  </Chip>
+                </Row>
+              </Section>
+            )}
+
+            {reportVariant === 'pyq' && includePyqs && (
+              <Section title="Sort By" colors={colors}>
+                <Label colors={colors}>HEADING SORT ORDER</Label>
+                <Row style={{ flexWrap: 'wrap', gap: 8 }}>
+                  {CHOICES.sortBys.map(s => (
+                    <Chip
+                      key={s.id}
+                      active={opts.sortBy === s.id}
+                      onPress={() => setOpts(prev => ({ ...prev, sortBy: s.id }))}
+                      testID={`analysis-sort-${s.id}`}
+                    >
+                      {s.label}
+                    </Chip>
+                  ))}
                 </Row>
               </Section>
             )}
@@ -1213,6 +1295,8 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
               </TouchableOpacity>
             )}
           </View>
+            </>
+          )}
         </View>
       </View>
     </Modal>
@@ -1253,10 +1337,11 @@ async function printStandaloneReport(fragmentHtml: string, o: ExportOptions): Pr
     // Use @page for top/bottom margins (re-applied at each page break) + .paper wrapper
     // with padding as fallback for left/right (reliable on Android WebView).
     // This mirrors the approach in unifiedExportEngine.ts line 335-352.
-    const mt = clamp(o.pageMarginTopCm, 1);
-    const mr = clamp(o.pageMarginRightCm, 1);
-    const mb = clamp(o.pageMarginBottomCm, 1);
-    const ml = clamp(o.pageMarginLeftCm, 1);
+    const isIos = Platform.OS === 'ios';
+    const mt = isIos ? 0 : clamp(o.pageMarginTopCm, 1);
+    const mr = isIos ? 0 : clamp(o.pageMarginRightCm, 1);
+    const mb = isIos ? 0 : clamp(o.pageMarginBottomCm, 1);
+    const ml = isIos ? 0 : clamp(o.pageMarginLeftCm, 1);
     const html = `<!doctype html><html><head><meta charset="utf-8"/>
     <style>
       @page { size: A4; margin: ${mt}cm ${mr}cm ${mb}cm ${ml}cm; }
@@ -1272,8 +1357,18 @@ async function printStandaloneReport(fragmentHtml: string, o: ExportOptions): Pr
       </div>
     </body></html>`;
     
+    const printOptions: any = { html, base64: false };
+    if (isIos) {
+      printOptions.margins = {
+        top: (o.pageMarginTopCm || 0) * 28.346,
+        bottom: (o.pageMarginBottomCm || 0) * 28.346,
+        left: (o.pageMarginLeftCm || 0) * 28.346,
+        right: (o.pageMarginRightCm || 0) * 28.346,
+      };
+    }
+
     const { uri } = await Promise.race([
-      Print.printToFileAsync({ html, base64: false }),
+      Print.printToFileAsync(printOptions),
       new Promise<{ uri: string }>((_, reject) => 
         setTimeout(() => reject(new Error('Print timeout')), 90000) // 90s timeout
       ),

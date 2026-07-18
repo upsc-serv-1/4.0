@@ -661,6 +661,7 @@ export default function NoteEditor() {
     setSaving(true);
     
     try {
+      const hasTable = content?.includes('|') && content?.includes('-|-');
       const html = buildNotesPdfHtml({
         title: title || 'Untitled Note',
         subject: subject || 'General',
@@ -670,7 +671,7 @@ export default function NoteEditor() {
           type: item.type,
           text: item.text || '',
           color: item.color,
-          sourceLabel: item.type === 'highlight' ? `Source: ${subject || 'General'} ΓÇó Q#${idx + 1}` : undefined,
+          sourceLabel: item.type === 'highlight' ? `Source: ${subject || 'General'} \u2022 Q#${idx + 1}` : undefined,
         })),
         checklist,
         selectedHeadingIds: exportSubheadings,
@@ -690,7 +691,10 @@ export default function NoteEditor() {
           pageMarginRightCm: 1,
           pageMarginBottomCm: 1,
           pageMarginLeftCm: 1,
-          marginMultiplier: 1,
+          qaBackgroundColor: '#f8fafc',
+          qaLayoutMode: 'unified',
+          continuousPage: hasTable ? false : true,
+          landscape: hasTable,
         },
       });
 

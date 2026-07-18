@@ -115,11 +115,15 @@ def parse_md_file(file_path):
                 current_q["sectionGroup"] = tax_match.group(2).strip()
                 current_q["microTopic"] = tax_match.group(3).strip()
                 current_q["subTopic"] = tax_match.group(4).strip()
+                if current_q["questionText"]:
+                    current_q["questionText"] = current_q["questionText"].strip()
                 continue
                 
             # Parse Metadata Bracket Line
             meta_match = METADATA_LINE_RE.match(line_stripped)
             if meta_match:
+                if current_q["questionText"]:
+                    current_q["questionText"] = current_q["questionText"].strip()
                 meta_dict = parse_metadata_brackets(meta_match.group(1))
                 current_q["macrotag"] = meta_dict.get("macrotag", "")
                 current_q["microtag"] = meta_dict.get("microtag", "")
@@ -159,7 +163,13 @@ def parse_md_file(file_path):
                 
                 state = 2 # Metadata loaded, now listening for answers
                 continue
-                
+
+            # If we are in state 1, and we have already parsed the first part of the question text,
+            # any other lines before the taxonomy line should be appended to the questionText.
+            if current_q and current_q["questionText"]:
+                current_q["questionText"] += "\n" + line_stripped
+                continue
+
         if state == 2:
             # Check for institute answer header
             inst_match = INSTITUTE_HEADER_RE.match(line_stripped)

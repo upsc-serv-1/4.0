@@ -86,7 +86,7 @@ const PAPERS = {
   Prelims: ['GS Paper 1', 'GS Paper 2 (CSAT)'],
   Mains: ['GS Paper 1', 'GS Paper 2', 'GS Paper 3', 'GS Paper 4', 'Optional'],
 };
-const RANGE_OPTIONS = ['Only 2025', 'Last 5 Years', 'Last 10 Years', 'All (2013-2025)', 'Custom Range'];
+const RANGE_OPTIONS = ['Only 2025', 'Last 5 Years', 'Last 10 Years', 'All Years', 'Custom Range'];
 const TREND_PALETTE = [
   '#2563eb', '#14b8a6', '#ef4444', '#f59e0b', '#8b5cf6', '#ec4899', // Original 6
   '#06b6d4', '#10b981', '#84cc16', '#eab308', '#f97316', '#6366f1', // Additional
@@ -230,6 +230,9 @@ function StickyHeatmapTable({
             <View style={[styles.heatmapStickyLabelHeader, { borderRightColor: colors.border, width: finalLabelWidth, height: finalRowHeight }]}> 
               <Text style={[styles.heatmapLabelHeaderText, { color: colors.textTertiary }]}>{labelHeader}</Text>
             </View>
+            <View style={[styles.heatmapStickyLabelHeader, { borderRightColor: colors.border, width: 62, height: finalRowHeight, paddingHorizontal: 4, alignItems: 'center', justifyContent: 'center' }]}> 
+              <Text style={[styles.heatmapLabelHeaderText, { color: colors.textTertiary, textAlign: 'center' }]}>Total</Text>
+            </View>
             <ScrollView
               horizontal
               ref={headerRef}
@@ -280,6 +283,30 @@ function StickyHeatmapTable({
                     </View>
                   </TouchableOpacity>
                 ))}
+              </View>
+
+              <View style={{ borderRightWidth: 1, borderRightColor: colors.border, width: 62 }}>
+                {rows.map((row) => {
+                  const rowTotal = years.reduce((sum, yr) => sum + (row.byYear[yr] || 0), 0);
+                  return (
+                    <View 
+                      key={`total-${row.key}`}
+                      style={{ 
+                        borderBottomWidth: 1, 
+                        borderBottomColor: colors.border + '55', 
+                        width: 62, 
+                        height: finalRowHeight, 
+                        justifyContent: 'center', 
+                        alignItems: 'center',
+                        backgroundColor: colors.surfaceStrong
+                      }}
+                    >
+                      <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textSecondary }}>
+                        {rowTotal}
+                      </Text>
+                    </View>
+                  );
+                })}
               </View>
 
               <ScrollView
@@ -425,6 +452,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const [selectedRange, setSelectedRange] = useState('Last 10 Years');
   const [customYearStart, setCustomYearStart] = useState('2020');
   const [customYearEnd, setCustomYearEnd] = useState('2025');
+  const [tempYearStart, setTempYearStart] = useState('2020');
+  const [tempYearEnd, setTempYearEnd] = useState('2025');
   const [activeHub, setActiveHub] = useState<HubKey>('pilot');
   const [pilotSubject, setPilotSubject] = useState<string | null>(null);
   const [pilotSection, setPilotSection] = useState<string | null>(null);
@@ -519,10 +548,12 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
   // Lapsed / Neglected Trends Analysis tab states
   const [lapsedSubject, setLapsedSubject] = useState<string>('All');
-  const [lapsedLevel, setLapsedLevel] = useState<'section' | 'micro' | 'subtopic'>('micro');
+  const [lapsedLevel, setLapsedLevel] = useState<'section' | 'micro' | 'subtopic' | 'nanotopic'>('micro');
   const [lapsedYears, setLapsedYears] = useState<number>(2);
   const [lapsedMinAsks, setLapsedMinAsks] = useState<number>(3);
   const [lapsedPriorityOnly, setLapsedPriorityOnly] = useState<boolean>(false);
+  const [lapsedFilterMode, setLapsedFilterMode] = useState<'all' | 'asked_within' | 'not_asked_within'>('all');
+  const [lapsedYYears, setLapsedYYears] = useState<number>(10);
 
   // Auto-scroll refs/coords for PYQ analysis heatmap (Issue #20)
   const mainScrollRef = useRef<ScrollView | null>(null);
@@ -634,6 +665,66 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     return Number.isFinite(num) && num > 1900 ? num : null;
   };
 
+  const getTaxonomyLevels = (q: any, stage: string | null) => {
+    const hp = q.hierarchy_path || [];
+    const subject = getAnalyticsSubject(q);
+
+    // Get database column values
+    const dbSectionGroup = q.sectionGroup || q.section_group;
+    const dbMicroTopic = q.microTopic || q.micro_topic || q.microtopic;
+    const dbSubTopic = q.subTopic || q.sub_topic || q.subtopic;
+    const dbNanoTopic = q.nanoTopic || q.nano_topic || q.nanotopic;
+
+    let sectionGroup = dbSectionGroup || 'General';
+    let microTopic = dbMicroTopic || 'General';
+    let subTopic = dbSubTopic || 'General';
+    let nanoTopic = dbNanoTopic || 'General';
+
+    // Check if hierarchy_path has valid data
+    if (Array.isArray(hp) && hp.length > 0) {
+      // If hp[0] is the subject, shift mapping by 1
+      const startsWithSubject = String(hp[0]).toLowerCase() === String(subject).toLowerCase();
+      let offset = startsWithSubject ? 1 : 0;
+
+      // For optional subjects, there is an extra Anthro-1/Anthro-2 level in hierarchy
+      const secondLevel = hp[1] ? String(hp[1]).toLowerCase() : '';
+      const thirdLevel = hp[2] ? String(hp[2]).toLowerCase() : '';
+      const isOptionalHierarchy = secondLevel.includes('anthro') || thirdLevel.includes('paper');
+      if (isOptionalHierarchy && startsWithSubject) {
+        offset = 2;
+      }
+
+      // Map according to depths
+      if (hp[0 + offset]) sectionGroup = hp[0 + offset];
+      if (hp[1 + offset]) microTopic = hp[1 + offset];
+      if (hp[2 + offset]) subTopic = hp[2 + offset];
+      if (hp[3 + offset]) nanoTopic = hp[3 + offset];
+    }
+
+    return {
+      subject,
+      sectionGroup,
+      microTopic,
+      subTopic,
+      nanoTopic
+    };
+  };
+
+  // Caches taxonomy mapping, subject name, and year for every question to avoid heavy redundant computations in loops
+  const taxonomyMappedQuestions = useMemo(() => {
+    return rawQuestions.map(q => {
+      const tax = getTaxonomyLevels(q, examStage);
+      const yr = getAnalyticsYear(q);
+      const subj = getAnalyticsSubject(q);
+      return {
+        ...q,
+        _taxonomy: tax,
+        _year: yr,
+        _subject: subj
+      };
+    });
+  }, [rawQuestions, examStage]);
+
   const parseYearRange = () => {
     const start = parseInt(customYearStart, 10);
     const end = parseInt(customYearEnd, 10);
@@ -730,7 +821,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const fetchPyqData = async (bypassCache = false) => {
     const stageNorm = examStage.toLowerCase();
     const targetPaperGroup = normalizePyqPaperGroup(selectedPaper, examStage);
-    const cacheKey = `pyq_cache_v3_${stageNorm}_${targetPaperGroup.replace(/\s+/g, '_')}_${selectedRange.replace(/\s+/g, '_')}`;
+    const rangeSuffix = selectedRange === 'Custom Range'
+      ? `Custom_Range_${customYearStart}_${customYearEnd}`
+      : selectedRange.replace(/\s+/g, '_');
+    const cacheKey = `pyq_cache_v3_${stageNorm}_${targetPaperGroup.replace(/\s+/g, '_')}_${rangeSuffix}`;
 
     if (!bypassCache) {
       try {
@@ -1314,9 +1408,9 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   }, [heatmapSubtopics]);
 
   const lapsedTopics = useMemo(() => {
-    let qSource = rawQuestions;
+    let qSource = taxonomyMappedQuestions;
     if (lapsedSubject && lapsedSubject !== 'All') {
-      qSource = rawQuestions.filter(q => getAnalyticsSubject(q) === lapsedSubject);
+      qSource = taxonomyMappedQuestions.filter(q => q._subject === lapsedSubject);
     }
 
     const groupMap: Record<string, {
@@ -1330,19 +1424,22 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       let keyName = '';
       let parentPath = '';
       if (lapsedLevel === 'section') {
-        keyName = q.section_group || 'General';
-        parentPath = getAnalyticsSubject(q);
+        keyName = q._taxonomy.sectionGroup || 'General';
+        parentPath = q._subject;
       } else if (lapsedLevel === 'micro') {
-        keyName = q.micro_topic || 'Other';
-        parentPath = `${getAnalyticsSubject(q)} · ${q.section_group || 'General'}`;
+        keyName = q._taxonomy.microTopic || 'Other';
+        parentPath = `${q._subject} · ${q._taxonomy.sectionGroup || 'General'}`;
+      } else if (lapsedLevel === 'subtopic') {
+        keyName = q._taxonomy.subTopic || 'Other';
+        parentPath = `${q._subject} · ${q._taxonomy.sectionGroup || 'General'} · ${q._taxonomy.microTopic || 'Other'}`;
       } else {
-        keyName = q.subTopic || q.sub_topic || 'Other';
-        parentPath = `${getAnalyticsSubject(q)} · ${q.section_group || 'General'} · ${q.micro_topic || 'Other'}`;
+        keyName = q._taxonomy.nanoTopic || 'Other';
+        parentPath = `${q._subject} · ${q._taxonomy.sectionGroup || 'General'} · ${q._taxonomy.microTopic || 'Other'} · ${q._taxonomy.subTopic || 'Other'}`;
       }
 
-      if (!keyName) return;
+      if (!keyName || keyName === 'General' || keyName === 'Other' || keyName === 'undefined' || keyName === 'null') return;
 
-      const year = getAnalyticsYear(q);
+      const year = q._year;
       const val = heatmapMetric === 'marks' ? (Number(q.marks) || 0) : 1;
 
       if (!groupMap[keyName]) {
@@ -1375,16 +1472,33 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         };
       })
       .filter(item => {
+        // Condition A: Not asked in the last X years (lapsedYears)
         if (item.lastAskedYear && item.lastAskedYear >= thresholdYear) {
           return false;
         }
+
+        // Condition B: Y-year recurrence window filter
+        if (lapsedFilterMode === 'asked_within') {
+          // Must have been asked at least once in the last Y years
+          const yThreshold = currentYear - lapsedYYears;
+          if (!item.lastAskedYear || item.lastAskedYear < yThreshold) {
+            return false;
+          }
+        } else if (lapsedFilterMode === 'not_asked_within') {
+          // Must NOT have been asked in the last Y years (exclude if asked in the last Y years)
+          const yThreshold = currentYear - lapsedYYears;
+          if (item.lastAskedYear && item.lastAskedYear >= yThreshold) {
+            return false;
+          }
+        }
+
         if (lapsedPriorityOnly && item.totalAsks < lapsedMinAsks) {
           return false;
         }
         return true;
       })
       .sort((a, b) => b.totalAsks - a.totalAsks);
-  }, [rawQuestions, lapsedSubject, lapsedLevel, lapsedYears, lapsedMinAsks, lapsedPriorityOnly, heatmapMetric]);
+  }, [taxonomyMappedQuestions, lapsedSubject, lapsedLevel, lapsedYears, lapsedMinAsks, lapsedPriorityOnly, heatmapMetric, lapsedFilterMode, lapsedYYears]);
 
   const trendColorMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -2697,65 +2811,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     );
   };
 
-  const getTaxonomyLevels = (q: any, stage: string | null) => {
-    const hp = q.hierarchy_path || [];
-    const subject = getAnalyticsSubject(q);
 
-    // Get database column values
-    const dbSectionGroup = q.sectionGroup || q.section_group;
-    const dbMicroTopic = q.microTopic || q.micro_topic || q.microtopic;
-    const dbSubTopic = q.subTopic || q.sub_topic || q.subtopic;
-    const dbNanoTopic = q.nanoTopic || q.nano_topic || q.nanotopic;
-
-    let sectionGroup = dbSectionGroup || 'General';
-    let microTopic = dbMicroTopic || 'General';
-    let subTopic = dbSubTopic || 'General';
-    let nanoTopic = dbNanoTopic || 'General';
-
-    // Check if hierarchy_path has valid data
-    if (Array.isArray(hp) && hp.length > 0) {
-      // If hp[0] is the subject, shift mapping by 1
-      const startsWithSubject = String(hp[0]).toLowerCase() === String(subject).toLowerCase();
-      let offset = startsWithSubject ? 1 : 0;
-
-      // For optional subjects, there is an extra Anthro-1/Anthro-2 level in hierarchy
-      const secondLevel = hp[1] ? String(hp[1]).toLowerCase() : '';
-      const thirdLevel = hp[2] ? String(hp[2]).toLowerCase() : '';
-      const isOptionalHierarchy = secondLevel.includes('anthro') || thirdLevel.includes('paper');
-      if (isOptionalHierarchy && startsWithSubject) {
-        offset = 2;
-      }
-
-      // Map according to depths
-      if (hp[0 + offset]) sectionGroup = hp[0 + offset];
-      if (hp[1 + offset]) microTopic = hp[1 + offset];
-      if (hp[2 + offset]) subTopic = hp[2 + offset];
-      if (hp[3 + offset]) nanoTopic = hp[3 + offset];
-    }
-
-    return {
-      subject,
-      sectionGroup,
-      microTopic,
-      subTopic,
-      nanoTopic
-    };
-  };
-
-  // Caches taxonomy mapping, subject name, and year for every question to avoid heavy redundant computations in loops
-  const taxonomyMappedQuestions = useMemo(() => {
-    return rawQuestions.map(q => {
-      const tax = getTaxonomyLevels(q, examStage);
-      const yr = getAnalyticsYear(q);
-      const subj = getAnalyticsSubject(q);
-      return {
-        ...q,
-        _taxonomy: tax,
-        _year: yr,
-        _subject: subj
-      };
-    });
-  }, [rawQuestions, examStage]);
 
   const renderPilot = () => {
     // Filter questions for the selected subject in Pilot mode
@@ -3150,16 +3206,16 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
           {/* Taxonomy Level Selector */}
           <Text style={[styles.exportGroupLabel, { color: colors.textTertiary, marginLeft: 4, marginTop: 12, marginBottom: 6 }]}>TAXONOMY LEVEL</Text>
-          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
-            {(['section', 'micro', 'subtopic'] as const).map(level => {
-              const label = level === 'section' ? 'Section Group' : level === 'micro' ? 'Micro-Topic' : 'Sub-Topic';
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+            {(['section', 'micro', 'subtopic', 'nanotopic'] as const).map(level => {
+              const label = level === 'section' ? 'Section Group' : level === 'micro' ? 'Micro-Topic' : level === 'subtopic' ? 'Sub-Topic' : 'Nano-Topic';
               return (
                 <TouchableOpacity
                   key={`lapsed-level-${level}`}
                   activeOpacity={0.7}
                   style={[
                     styles.filterChip,
-                    { borderColor: colors.border, backgroundColor: colors.surfaceStrong, flex: 1, alignItems: 'center' },
+                    { borderColor: colors.border, backgroundColor: colors.surfaceStrong },
                     lapsedLevel === level && { backgroundColor: colors.primary, borderColor: colors.primary }
                   ]}
                   onPress={() => setLapsedLevel(level)}
@@ -3170,14 +3226,14 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                 </TouchableOpacity>
               );
             })}
-          </View>
+          </ScrollView>
 
           {/* Lapse Duration & Priority Settings */}
           <View style={{ flexDirection: 'row', gap: 12, marginTop: 4, alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={{ flex: 1 }}>
               <Text style={[styles.exportGroupLabel, { color: colors.textTertiary, marginLeft: 4, marginBottom: 6 }]}>NOT ASKED IN LAST</Text>
               <View style={{ flexDirection: 'row', gap: 6 }}>
-                {[1, 2, 3, 4, 5].map(n => (
+                {[1, 2, 3, 5, 8, 10].map(n => (
                   <TouchableOpacity
                     key={`lapsed-yr-${n}`}
                     style={[
@@ -3209,6 +3265,55 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
               </TouchableOpacity>
             </View>
           </View>
+
+          {/* Y-Years Recurrence Filter Window */}
+          <Text style={[styles.exportGroupLabel, { color: colors.textTertiary, marginLeft: 4, marginTop: 12, marginBottom: 6 }]}>HISTORICAL RECURRENCE WINDOW (Y YEARS)</Text>
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
+            {[
+              { mode: 'all' as const, label: 'All Time' },
+              { mode: 'asked_within' as const, label: 'Asked within Y yrs' },
+              { mode: 'not_asked_within' as const, label: 'Not asked in last Y yrs' }
+            ].map(item => (
+              <TouchableOpacity
+                key={`lapsed-mode-${item.mode}`}
+                activeOpacity={0.7}
+                style={[
+                  styles.filterChip,
+                  { borderColor: colors.border, backgroundColor: colors.surfaceStrong, flex: 1, alignItems: 'center', paddingHorizontal: 4 },
+                  lapsedFilterMode === item.mode && { backgroundColor: colors.primary, borderColor: colors.primary }
+                ]}
+                onPress={() => setLapsedFilterMode(item.mode)}
+              >
+                <Text style={{ fontSize: 10, fontWeight: '700', color: lapsedFilterMode === item.mode ? '#fff' : colors.textSecondary, textAlign: 'center' }}>
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {lapsedFilterMode !== 'all' && (
+            <View style={{ padding: 10, borderRadius: 8, backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border, marginTop: 4 }}>
+              <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary, marginBottom: 6 }}>
+                Y YEARS WINDOW LIMIT: {lapsedYYears} YEARS
+              </Text>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                {[5, 8, 10, 15, 20].map(y => (
+                  <TouchableOpacity
+                    key={`lapsed-y-limit-${y}`}
+                    style={[
+                      { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
+                      lapsedYYears === y && { backgroundColor: colors.primary, borderColor: colors.primary }
+                    ]}
+                    onPress={() => setLapsedYYears(y)}
+                  >
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: lapsedYYears === y ? '#fff' : colors.textSecondary }}>
+                      {y} yrs
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          )}
 
           {/* Min Asks for High Probability Settings */}
           {lapsedPriorityOnly && (
@@ -3264,7 +3369,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                       };
                       if (lapsedLevel === 'section') opts.section = topic.name;
                       else if (lapsedLevel === 'micro') opts.micro = topic.name;
-                      else opts.subtopic = topic.name;
+                      else if (lapsedLevel === 'subtopic') opts.subtopic = topic.name;
+                      else opts.nanotopic = topic.name;
 
                       // Filter years before threshold
                       const targetYears = years.filter(y => Number(y) < (2026 - lapsedYears)).join(',');
@@ -3378,17 +3484,37 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
             styles.rangeBox, 
             { 
               backgroundColor: !isDark ? 'rgba(255, 255, 255, 0.45)' : 'rgba(30, 41, 59, 0.45)', 
-              borderColor: !isDark ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.15)' 
+              borderColor: !isDark ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.15)',
+              alignItems: 'center'
             }
           ]}>
             <View style={styles.rangeInputWrap}>
               <Text style={[styles.rangeLabel, { color: colors.textTertiary }]}>From</Text>
-              <TextInput value={customYearStart} onChangeText={setCustomYearStart} keyboardType="number-pad" maxLength={4} style={[styles.yearInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} />
+              <TextInput value={tempYearStart} onChangeText={setTempYearStart} keyboardType="number-pad" maxLength={4} style={[styles.yearInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} />
             </View>
             <View style={styles.rangeInputWrap}>
               <Text style={[styles.rangeLabel, { color: colors.textTertiary }]}>To</Text>
-              <TextInput value={customYearEnd} onChangeText={setCustomYearEnd} keyboardType="number-pad" maxLength={4} style={[styles.yearInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} />
+              <TextInput value={tempYearEnd} onChangeText={setTempYearEnd} keyboardType="number-pad" maxLength={4} style={[styles.yearInput, { color: colors.textPrimary, borderColor: colors.border, backgroundColor: colors.surfaceStrong }]} />
             </View>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={{
+                backgroundColor: colors.primary,
+                paddingHorizontal: 16,
+                paddingVertical: 10,
+                borderRadius: 12,
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'flex-end',
+                height: 38
+              }}
+              onPress={() => {
+                setCustomYearStart(tempYearStart);
+                setCustomYearEnd(tempYearEnd);
+              }}
+            >
+              <Text style={{ color: '#fff', fontWeight: '800', fontSize: 12 }}>Apply</Text>
+            </TouchableOpacity>
           </View>
         ) : null}
 
@@ -3851,6 +3977,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           review_tags: q.review_tags,
           _explanations: Array.isArray(q._explanations) ? q._explanations : [],
           _institutes: Array.isArray(q._institutes) ? q._institutes : [],
+          nanotopic: q.nanoTopic || q.nano_topic || q.nanotopic || q._taxonomy?.nanoTopic || '',
         }))}
         buildForecastRows={(rows) => {
           const predictive = buildPredictive(

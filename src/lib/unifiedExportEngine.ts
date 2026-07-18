@@ -28,6 +28,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Linking from 'expo-linking';
+import { Platform } from 'react-native';
 
 export type ExportFontFamily = 'sans' | 'serif' | 'handwriting' | 'mono';
 export type ExportTheme = 'modern' | 'classic' | 'sepia' | 'historical' | 'dark';
@@ -35,8 +36,8 @@ export type ExportPaperStyle = 'plain' | 'lined' | 'grid' | 'dotted';
 export type ExportColumns = 1 | 2;
 export type ExportContentScope = 'q_only' | 'q_options' | 'q_options_expl' | 'q_options_valuation';
 export type ExportAnswerPlacement = 'inline' | 'end';
-export type ExportSortBy = 'default' | 'subject' | 'microtopic' | 'difficulty' | 'date' | 'year' | 'subject_section' | 'subject_section_microtopic';
-export type ExportGroupingLevel = 'subject' | 'section_group' | 'microtopic';
+export type ExportSortBy = 'default' | 'subject' | 'microtopic' | 'difficulty' | 'date' | 'year' | 'subject_section' | 'subject_section_microtopic' | 'pyq_frequency';
+export type ExportGroupingLevel = 'subject' | 'section_group' | 'microtopic' | 'subtopic' | 'nanotopic';
 export type ExportQaLayoutMode = 'unified' | 'split';
 export type ExportVisualStyle = 'document' | 'flashcard';
 
@@ -97,6 +98,7 @@ export interface ExportOptions {
   // Notes-specific injections
   notesSubheadingColor?: string;
   notesChecklistMode?: boolean;
+  skipShare?: boolean;
 }
 
 export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): ExportOptions => ({
@@ -335,6 +337,14 @@ const baseCss = (o: ExportOptions) => {
   const aBg = o.qaAnswerBackgroundColor || qaBg;
   const anyBgVisible = qaBg !== 'transparent' || qBg !== 'transparent' || aBg !== 'transparent';
   const qaBorder = anyBgVisible ? 'rgba(15, 23, 42, 0.12)' : 'transparent';
+  
+  // On iOS, native printToFileAsync margins are used instead of CSS margins to ensure reliability.
+  const isIos = Platform.OS === 'ios';
+  const mTop = isIos ? 0 : clampCm(o.pageMarginTopCm);
+  const mRight = isIos ? 0 : clampCm(o.pageMarginRightCm);
+  const mBottom = isIos ? 0 : clampCm(o.pageMarginBottomCm);
+  const mLeft = isIos ? 0 : clampCm(o.pageMarginLeftCm);
+
   return `
     :root { --bg:${t.bg}; --fg:${t.fg}; --accent:${t.accent}; --rule:${t.rule}; --card:${t.card}; --qa-bg:${qaBg}; --qa-q-bg:${qBg}; --qa-a-bg:${aBg}; --qa-border:${qaBorder}; }
     /* 🔧 FIX: @page margin is unreliable on Android (Chromium WebView via expo-print
@@ -342,7 +352,7 @@ const baseCss = (o: ExportOptions) => {
        ONLY mechanism that re-applies top/bottom spacing at each page break in paged
        media), and additionally apply padding on the .paper wrapper for reliable
        left/right spacing on all platforms. */
-    @page { size: A4 !important; margin: ${clampCm(o.pageMarginTopCm)}cm ${clampCm(o.pageMarginRightCm)}cm ${clampCm(o.pageMarginBottomCm)}cm ${clampCm(o.pageMarginLeftCm)}cm; }
+    @page { size: A4 !important; margin: ${mTop}cm ${mRight}cm ${mBottom}cm ${mLeft}cm; }
     * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     html, body { margin: 0; padding: 0; }
     body {
@@ -354,7 +364,7 @@ const baseCss = (o: ExportOptions) => {
       orphans: 2;
       widows: 2;
     }
-    .paper { background-color: ${o.paperStyle === 'lined' ? '#ffffff' : 'var(--bg)'}; background-image: ${paperBg[o.paperStyle]}; padding: ${clampCm(o.pageMarginTopCm)}cm ${clampCm(o.pageMarginRightCm)}cm ${clampCm(o.pageMarginBottomCm)}cm ${clampCm(o.pageMarginLeftCm)}cm; min-height: 100%; }
+    .paper { background-color: ${o.paperStyle === 'lined' ? '#ffffff' : 'var(--bg)'}; background-image: ${paperBg[o.paperStyle]}; padding: ${mTop}cm ${mRight}cm ${mBottom}cm ${mLeft}cm; min-height: 100%; }
 
     h1.cover { font-size: ${o.fontSize + 14}pt; margin: 0 0 6mm 0; color: var(--accent); font-weight: 900; letter-spacing: -0.5px; }
     .meta { color: var(--accent); font-size: ${o.fontSize - 2}pt; margin-bottom: 6mm; }
@@ -465,9 +475,34 @@ const baseCss = (o: ExportOptions) => {
     code { background: rgba(0,0,0,0.06); padding: 1px 4px; border-radius: 3px; font-family: Menlo, monospace; font-size: 0.9em; }
 
     /* Flashcards */
-    .card { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; border: 1px solid var(--rule); border-radius: 6px; padding: 4mm; margin: 3mm 0; break-inside: avoid; }
-    .card .side { border-right: 1px dotted var(--rule); padding-right: 4mm; }
-    .card .side:last-child { border-right: none; padding-right: 0; }
+    .card {
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      background: var(--card);
+      margin: 3mm 0;
+      break-inside: avoid;
+      page-break-inside: avoid;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    div.card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6mm;
+      padding: 4mm;
+    }
+    table.card {
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      overflow: hidden;
+    }
+    table.card .side {
+      padding: 4mm;
+    }
+    table.card .side:first-child {
+      border-right: 1px dotted var(--rule);
+    }
     .card-face-label { font-size: ${o.fontSize - 3}pt; font-weight: 800; color: var(--accent); letter-spacing: 1px; margin-bottom: 1mm; text-transform: uppercase; }
     .card-state { display: inline-block; font-size: ${o.fontSize - 4}pt; padding: 0 6px; border-radius: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; background: var(--accent); color: #fff; }
 
@@ -497,6 +532,10 @@ const baseCss = (o: ExportOptions) => {
     /* Executive summary prepend support */
     .executive-summary { margin-bottom: 8mm; }
     .page-break { break-before: page; page-break-before: always; }
+    h1 + h2, h1 + h3, h1 + h4, h2 + h3, h2 + h4, h3 + h4 {
+      page-break-before: avoid !important;
+      break-before: avoid !important;
+    }
 
     /* Watermark */
     .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80pt; font-weight: 900; color: rgba(0,0,0,0.04); white-space: nowrap; pointer-events: none; z-index: -1; }
@@ -1043,6 +1082,38 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
     const stem = q.question_text || q.statement || '';
     const isQnMains = String(q.stage || '').toLowerCase() === 'mains' || String(q.id || '').startsWith('mains');
 
+    if (isFlashStyle) {
+      const chipsHtml = buildQuestionChips(q, o);
+      if (isQnMains) {
+        const showMainsExpl = (showOpts || showValuation) && !o.hideResponses && inline;
+        const modelAnswerHtml = showMainsExpl ? buildMainsModelAnswerHtml(q) : '';
+        const right = modelAnswerHtml || '';
+        const questionBlock = `
+          <div class="qstem"><span class="qnum">${i + 1}.</span>${q.marks ? `<span class="q-marks">[${q.marks} marks]</span>` : ''}${q.exam_year ? `<span class="q-year">${q.exam_year}</span>` : ''}${renderInline(stem)}</div>
+          ${o.showMetaChips ? buildHierarchyBreadcrumb(q) : ''}
+        `;
+        return `
+          <table class="card" style="border-collapse: separate !important; border-spacing: 0 !important; overflow: hidden; width: 100%; table-layout: fixed; border: 1px solid var(--rule); border-radius: 6px; margin: 2mm 0; break-inside: avoid; page-break-inside: avoid;">
+            <tr>
+              <td class="side" style="width: 30%; vertical-align: top; padding: 2.5mm; padding-right: 3.5mm; box-sizing: border-box;">
+                <div style="min-height: 48mm; box-sizing: border-box;">
+                  <div class="card-face-label">Question</div>
+                  ${chipsHtml}
+                  ${questionBlock}
+                </div>
+              </td>
+              <td class="side" style="width: 70%; vertical-align: top; padding: 2.5mm; padding-left: 3.5mm; box-sizing: border-box;">
+                <div style="min-height: 48mm; box-sizing: border-box;">
+                  <div class="card-face-label">Answer & Explanation</div>
+                  ${right}
+                </div>
+              </td>
+            </tr>
+          </table>
+        `;
+      }
+    }
+
     if (isQnMains) {
       // For mains: show answer inline OR defer to answer-key appendix based on answerPlacement
       const showMainsExpl = (showOpts || showValuation) && !o.hideResponses && inline;
@@ -1132,11 +1203,26 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
     `.trim();
 
     if (isFlashStyle) {
-      const right = answerBlock || `<div class="expl">Answer/explanation hidden for this card.</div>`;
-      return `<div class="card">
-        <div class="side"><div class="card-face-label">Question</div>${chipsHtml}${questionBlock}</div>
-        <div class="side"><div class="card-face-label">Answer & Explanation</div>${right}</div>
-      </div>`;
+      const right = answerBlock || '';
+      return `
+        <table class="card" style="border-collapse: separate !important; border-spacing: 0 !important; overflow: hidden; width: 100%; table-layout: fixed; border: 1px solid var(--rule); border-radius: 6px; margin: 2mm 0; break-inside: avoid; page-break-inside: avoid;">
+          <tr>
+            <td class="side" style="width: 30%; vertical-align: top; padding: 2.5mm; padding-right: 3.5mm; box-sizing: border-box;">
+              <div style="min-height: 48mm; box-sizing: border-box;">
+                <div class="card-face-label">Question</div>
+                ${chipsHtml}
+                ${questionBlock}
+              </div>
+            </td>
+            <td class="side" style="width: 70%; vertical-align: top; padding: 2.5mm; padding-left: 3.5mm; box-sizing: border-box;">
+              <div style="min-height: 48mm; box-sizing: border-box;">
+                <div class="card-face-label">Answer & Explanation</div>
+                ${right}
+              </div>
+            </td>
+          </tr>
+        </table>
+      `;
     }
     return `<div class="item">${renderQaLayoutBlock(questionBlock, answerBlock, chipsHtml, o)}</div>`;
   };
@@ -1161,57 +1247,109 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
           : 'subject');
 
   if (needsGrouping) {
-    // Build grouped structure: Subject → Section Group → Microtopic → Questions
-    const groups: Map<string, Map<string, Map<string, ExportQuestion[]>>> = new Map();
+    const activeLevels: ExportGroupingLevel[] = [];
+    if (lvls.length > 0) {
+      if (lvls.includes('subject')) activeLevels.push('subject');
+      if (lvls.includes('section_group')) activeLevels.push('section_group');
+      if (lvls.includes('microtopic')) activeLevels.push('microtopic');
+      if (lvls.includes('subtopic')) activeLevels.push('subtopic');
+      if (lvls.includes('nanotopic')) activeLevels.push('nanotopic');
+    } else {
+      activeLevels.push('subject');
+      if (o.sortBy === 'subject_section') activeLevels.push('section_group');
+      if (o.sortBy === 'subject_section_microtopic') {
+        activeLevels.push('section_group');
+        activeLevels.push('microtopic');
+      }
+    }
+
+    const rootMap = new Map<string, any>();
+
+    const getKeyValue = (q: ExportQuestion, lvl: ExportGroupingLevel): string => {
+      switch (lvl) {
+        case 'subject': return q.subject || 'General';
+        case 'section_group': return q.section_group || 'General';
+        case 'microtopic': return q.micro_topic || 'Other';
+        case 'subtopic': {
+          const s = q.sub_topic || q.subtopic || '';
+          return s && s !== 'Other' && s !== 'undefined' && s !== 'null' ? s : '';
+        }
+        case 'nanotopic': {
+          const n = (q as any).nanotopic || '';
+          return n && n !== 'Other' && n !== 'undefined' && n !== 'null' ? n : '';
+        }
+        default: return '';
+      }
+    };
+
     rows.forEach(q => {
-      const sub = q.subject || 'General';
-      const sec = q.section_group || 'General';
-      const mic = q.micro_topic || 'Other';
-      if (!groups.has(sub)) groups.set(sub, new Map());
-      const secMap = groups.get(sub)!;
-      if (!secMap.has(sec)) secMap.set(sec, new Map());
-      const micMap = secMap.get(sec)!;
-      if (!micMap.has(mic)) micMap.set(mic, []);
-      micMap.get(mic)!.push(q);
+      let currentMap = rootMap;
+      activeLevels.forEach((lvl, idx) => {
+        const val = getKeyValue(q, lvl);
+        if (idx === activeLevels.length - 1) {
+          if (!currentMap.has(val)) {
+            currentMap.set(val, []);
+          }
+          currentMap.get(val).push(q);
+        } else {
+          if (!currentMap.has(val)) {
+            currentMap.set(val, new Map());
+          }
+          currentMap = currentMap.get(val);
+        }
+      });
     });
 
     // TOC with hierarchy
-    // tocLink generates href + JS onclick so it works in browsers (Chrome, Safari) and PDF viewers
     const tocLink = (id: string, label: string) => {
       const js = `var e=document.getElementById('${id}');if(e){e.scrollIntoView({behavior:'smooth',block:'start'});}return false;`;
       return `<a href="#${id}" onclick="(function(){${js}})()" style="color:#1D4ED8;text-decoration:underline;cursor:pointer;">${label}</a>`;
     };
 
+    const countQuestions = (n: any): number => {
+      if (Array.isArray(n)) return n.length;
+      if (n instanceof Map) {
+        let sum = 0;
+        n.forEach(child => {
+          sum += countQuestions(child);
+        });
+        return sum;
+      }
+      return 0;
+    };
+
     const tocItems: string[] = [];
-    groups.forEach((secMap, sub) => {
-      const subId = slugifyHeading(sub, 'subject-');
-      tocItems.push(`<div class="toc-item" style="font-weight:800">${tocLink(subId, escapeHtml(sub))}</div>`);
-      if (renderLevel !== 'subject') {
-        secMap.forEach((micMap, sec) => {
-          const secId = slugifyHeading(sub + '-' + sec, 'section-');
-          tocItems.push(`<div class="toc-item" style="padding-left:12px;font-weight:600">${tocLink(secId, escapeHtml(sec))}</div>`);
-          
-          if (renderLevel === 'subject_section_microtopic') {
-            micMap.forEach((questions, mic) => {
-              const micId = slugifyHeading(sub + '-' + sec + '-' + mic, 'micro-');
-              tocItems.push(`<div class="toc-item" style="padding-left:24px">${tocLink(micId, escapeHtml(mic))}</div>`);
-              
-              const subtopics: string[] = [];
-              questions.forEach(q => {
-                const subT = q.sub_topic || q.subtopic || '';
-                const norm = subT && subT !== 'Other' && subT !== 'undefined' && subT !== 'null' ? subT : '';
-                if (norm && !subtopics.includes(norm)) subtopics.push(norm);
-              });
-              
-              subtopics.forEach(subT => {
-                const subTId = slugifyHeading(sub + '-' + sec + '-' + mic + '-' + subT, 'subtopic-');
-                tocItems.push(`<div class="toc-item" style="padding-left:36px;font-style:italic">${tocLink(subTId, escapeHtml(subT))}</div>`);
-              });
-            });
+    const buildToc = (node: any, levelIdx: number, parentSlug: string) => {
+      if (levelIdx === activeLevels.length) return;
+      if (node instanceof Map) {
+        const sortedKeys = Array.from(node.keys()).sort((a, b) => {
+          if (o.sortBy === 'pyq_frequency') {
+            const countA = countQuestions(node.get(a));
+            const countB = countQuestions(node.get(b));
+            if (countB !== countA) return countB - countA;
           }
+          return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+        });
+        sortedKeys.forEach(keyName => {
+          const childVal = node.get(keyName);
+          if (!keyName) {
+            buildToc(childVal, levelIdx + 1, parentSlug);
+            return;
+          }
+          const currentSlug = slugifyHeading(parentSlug + '-' + keyName, 'grp-');
+          const padding = levelIdx * 12;
+          const weight = levelIdx === 0 ? '800' : levelIdx === 1 ? '600' : '400';
+          const style = `padding-left:${padding}px;font-weight:${weight}${levelIdx === 3 ? ';font-style:italic' : ''}`;
+          tocItems.push(`<div class="toc-item" style="${style}">${tocLink(currentSlug, escapeHtml(keyName))}</div>`);
+          buildToc(childVal, levelIdx + 1, currentSlug);
         });
       }
-    });
+    };
+
+    if (o.showTOC) {
+      buildToc(rootMap, 0, '');
+    }
+
     const tocHtml = o.showTOC && tocItems.length > 0 ? `
       <div class="toc">
         <div class="toc-title">Table of Contents</div>
@@ -1222,59 +1360,48 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
     let globalIdx = 0;
     const sectionsHtml: string[] = [];
 
-    groups.forEach((secMap, sub) => {
-      const subId = slugifyHeading(sub, 'subject-');
-      sectionsHtml.push(`<h1 id="${subId}" style="color:var(--accent);font-size:${o.fontSize + 6}pt;font-weight:900;margin:8mm 0 4mm 0;border-bottom:2px solid var(--accent);padding-bottom:2mm">${escapeHtml(sub)}</h1>`);
-
-      if (renderLevel === 'subject') {
-        // Flat list under subject heading
-        secMap.forEach((micMap) => {
-          micMap.forEach((questions) => {
-            questions.forEach(q => {
-              sectionsHtml.push(renderQuestionItem(q, globalIdx++));
-            });
-          });
+    const renderGroupNode = (node: any, levelIdx: number, parentSlug: string) => {
+      if (Array.isArray(node)) {
+        node.forEach(q => {
+          sectionsHtml.push(renderQuestionItem(q, globalIdx++));
         });
-      } else {
-        secMap.forEach((micMap, sec) => {
-          const secId = slugifyHeading(sub + '-' + sec, 'section-');
-          sectionsHtml.push(`<h2 id="${secId}" style="color:var(--fg);font-size:${o.fontSize + 3}pt;font-weight:800;margin:6mm 0 3mm 0;opacity:0.85">${escapeHtml(sec)}</h2>`);
-
-          if (renderLevel === 'subject_section') {
-            // Flat list under section heading
-            micMap.forEach((questions) => {
-              questions.forEach(q => {
-                sectionsHtml.push(renderQuestionItem(q, globalIdx++));
-              });
-            });
-          } else {
-            // subject_section_microtopic — full 3-level hierarchy
-            micMap.forEach((questions, mic) => {
-              const micId = slugifyHeading(sub + '-' + sec + '-' + mic, 'micro-');
-              sectionsHtml.push(`<h3 id="${micId}" style="color:var(--accent);font-size:${o.fontSize + 1}pt;font-weight:700;margin:4mm 0 2mm 2mm;opacity:0.75">${escapeHtml(mic)}</h3>`);
-              
-              const subtopicMap: Map<string, ExportQuestion[]> = new Map();
-              questions.forEach(q => {
-                const subT = q.sub_topic || q.subtopic || '';
-                const key = subT && subT !== 'Other' && subT !== 'undefined' && subT !== 'null' ? subT : '';
-                if (!subtopicMap.has(key)) subtopicMap.set(key, []);
-                subtopicMap.get(key)!.push(q);
-              });
-
-              subtopicMap.forEach((subtQs, subT) => {
-                if (subT) {
-                  const subTId = slugifyHeading(sub + '-' + sec + '-' + mic + '-' + subT, 'subtopic-');
-                  sectionsHtml.push(`<h4 id="${subTId}" style="color:var(--fg);font-size:${o.fontSize}pt;font-weight:700;margin:3mm 0 2mm 4mm;opacity:0.65">${escapeHtml(subT)}</h4>`);
-                }
-                subtQs.forEach(q => {
-                  sectionsHtml.push(renderQuestionItem(q, globalIdx++));
-                });
-              });
-            });
+      } else if (node instanceof Map) {
+        const sortedKeys = Array.from(node.keys()).sort((a, b) => {
+          if (o.sortBy === 'pyq_frequency') {
+            const countA = countQuestions(node.get(a));
+            const countB = countQuestions(node.get(b));
+            if (countB !== countA) return countB - countA;
           }
+          return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+        });
+        sortedKeys.forEach(keyName => {
+          const childVal = node.get(keyName);
+          const currentSlug = slugifyHeading(parentSlug + '-' + keyName, 'grp-');
+          const cleanKey = escapeHtml(keyName || 'Other');
+          const headingTag = levelIdx === 0 ? 'h1' : levelIdx === 1 ? 'h2' : levelIdx === 2 ? 'h3' : levelIdx === 3 ? 'h4' : 'h5';
+          let headingStyle = '';
+          
+          if (levelIdx === 0) {
+            headingStyle = `style="color:var(--accent);font-size:${o.fontSize + 6}pt;font-weight:900;margin:8mm 0 4mm 0;border-bottom:2px solid var(--accent);padding-bottom:2mm;page-break-before:always;break-before:page"`;
+          } else if (levelIdx === 1) {
+            headingStyle = `style="color:var(--fg);font-size:${o.fontSize + 3}pt;font-weight:800;margin:6mm 0 3mm 0;opacity:0.85;page-break-before:always;break-before:page"`;
+          } else if (levelIdx === 2) {
+            headingStyle = `style="color:var(--accent);font-size:${o.fontSize + 1}pt;font-weight:700;margin:4mm 0 2mm 2mm;opacity:0.75;page-break-before:always;break-before:page"`;
+          } else if (levelIdx === 3) {
+            headingStyle = `style="color:var(--fg);font-size:${o.fontSize}pt;font-weight:700;margin:3mm 0 2mm 4mm;opacity:0.65;page-break-before:always;break-before:page"`;
+          } else {
+            headingStyle = `style="color:var(--accent);font-size:${o.fontSize - 1}pt;font-weight:700;margin:2mm 0 1mm 6mm;opacity:0.55"`;
+          }
+          
+          if (keyName) {
+            sectionsHtml.push(`<${headingTag} id="${currentSlug}" ${headingStyle}>${cleanKey}</${headingTag}>`);
+          }
+          renderGroupNode(childVal, levelIdx + 1, currentSlug);
         });
       }
-    });
+    };
+
+    renderGroupNode(rootMap, 0, '');
 
     // Answer key appendix
     const answerKey = !isFlashStyle && !inline && !o.hideResponses && (o.contentScope !== 'q_only')
@@ -1403,10 +1530,19 @@ export const buildFlashcardsHtml = (rows: ExportFlashcard[], o: ExportOptions): 
   const cardBorder = anyBgVisible ? 'rgba(15, 23, 42, 0.12)' : 'var(--rule)';
 
   const cards = rows.map(c => `
-    <div class="card" style="background:${boxBg};border-color:${cardBorder}">
-      <div class="side" style="${o.qaLayoutMode === 'split' ? `background:${qBg};` : ''}border-right-color:${cardBorder}"><div style="font-size:${o.fontSize - 3}pt;font-weight:800;color:var(--accent);letter-spacing:1px;margin-bottom:1mm">FRONT</div><div>${renderInline(c.front)}</div></div>
-      <div class="side" style="${o.qaLayoutMode === 'split' ? `background:${aBg};` : ''}border-right:none"><div style="font-size:${o.fontSize - 3}pt;font-weight:800;color:var(--accent);letter-spacing:1px;margin-bottom:1mm">BACK</div><div>${renderInline(c.back)}</div>${c.state ? `<div style="margin-top:2mm"><span class="card-state">${c.state}</span></div>` : ''}</div>
-    </div>`).join('');
+    <table class="card" style="border-collapse: separate !important; border-spacing: 0 !important; overflow: hidden; width: 100%; table-layout: fixed; border: 1px solid ${cardBorder}; border-radius: 6px; margin: 4mm 0; break-inside: avoid; page-break-inside: avoid; background: ${boxBg};">
+      <tr>
+        <td class="side" style="width: 30%; vertical-align: top; border-right: 1px dotted ${cardBorder}; padding: 4mm; padding-right: 6mm; box-sizing: border-box; ${o.qaLayoutMode === 'split' ? `background:${qBg};` : ''}">
+          <div style="font-size:${o.fontSize - 3}pt;font-weight:800;color:var(--accent);letter-spacing:1px;margin-bottom:1mm">FRONT</div>
+          <div>${renderInline(c.front)}</div>
+        </td>
+        <td class="side" style="width: 70%; vertical-align: top; padding: 4mm; padding-left: 6mm; box-sizing: border-box; ${o.qaLayoutMode === 'split' ? `background:${aBg};` : ''}">
+          <div style="font-size:${o.fontSize - 3}pt;font-weight:800;color:var(--accent);letter-spacing:1px;margin-bottom:1mm">BACK</div>
+          <div>${renderInline(c.back)}</div>
+          ${c.state ? `<div style="margin-top:2mm"><span class="card-state">${c.state}</span></div>` : ''}
+        </td>
+      </tr>
+    </table>`).join('');
   return wrap(o, cards);
 };
 
@@ -1521,11 +1657,25 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
         ${inline && showExpl && explanation ? `<div class="expl">${renderInline(explanation)}</div>` : ''}
       `.trim();
       if (isFlashStyle) {
-        const right = answerBlock || `<div class="expl">Answer/explanation hidden for this card.</div>`;
-        return `<div class="card">
-        <div class="side"><div class="card-face-label">Question</div>${chipsHtml}${questionBlock}</div>
-        <div class="side"><div class="card-face-label">Answer & Explanation</div>${right}</div>
-      </div>`;
+        const right = answerBlock || '';
+        return `
+          <table class="card" style="width: 100%; table-layout: fixed; border-collapse: collapse; border: 1px solid var(--rule); border-radius: 6px; margin: 2mm 0; break-inside: avoid; page-break-inside: avoid;">
+            <tr>
+              <td class="side" style="width: 50%; vertical-align: top; border-right: 1px dotted var(--rule); padding: 2.5mm; padding-right: 3.5mm; box-sizing: border-box;">
+                <div style="min-height: 48mm; box-sizing: border-box;">
+                  <div class="card-face-label">Question</div>
+                  ${chipsHtml}
+                  ${questionBlock}
+                </div>
+              </td>
+              <td class="side" style="width: 50%; vertical-align: top; padding: 2.5mm; padding-left: 3.5mm; box-sizing: border-box;">
+                <div style="min-height: 48mm; box-sizing: border-box;">
+                  ${right ? `<div class="card-face-label">Answer & Explanation</div>${right}` : ''}
+                </div>
+              </td>
+            </tr>
+          </table>
+        `;
       }
       return `<div class="item">${renderQaLayoutBlock(questionBlock, answerBlock, chipsHtml, o)}</div>`;
     }).join('');
@@ -1984,15 +2134,18 @@ const renderPyqHeatmapSvg = (
     <section class="analysis-card">
       <h3 id="${headingId}">${escHtml(title)}</h3>
       <table class="analysis-heatmap-table">
-        <thead><tr><th>${escHtml(labelHeader)}</th>${years.map((year) => `<th>${escHtml(year)}</th>`).join('')}</tr></thead>
+        <thead><tr><th>${escHtml(labelHeader)}</th><th>Total</th>${years.map((year) => `<th>${escHtml(year)}</th>`).join('')}</tr></thead>
         <tbody>
-          ${rows.map((row) => `
-            <tr>
-              <td>${escHtml(row.label)}</td>
-              ${years.map((year) => {
-    const count = row.byYear[year] || 0;
-    let bg = '#F8FAFC';
-    let tc = '#94A3B8';
+          ${rows.map((row) => {
+            const rowTotal = years.reduce((sum, yr) => sum + (row.byYear[yr] || 0), 0);
+            return `
+              <tr>
+                <td>${escHtml(row.label)}</td>
+                <td style="font-weight: 800; text-align: center; vertical-align: middle; font-size: 8.5pt; color: #374151; background: #F1F5F9; border-right: 1px solid #E2E8F0;">${rowTotal}</td>
+                ${years.map((year) => {
+                  const count = row.byYear[year] || 0;
+                  let bg = '#F8FAFC';
+                  let tc = '#94A3B8';
     if (count > 0) {
       const ratio = maxVal <= 1 ? 1.0 : (0.15 + (Math.min(1, count / maxVal) * 0.85));
       if (palette === 'spectral') {
@@ -2013,7 +2166,8 @@ const renderPyqHeatmapSvg = (
     return `<td style="background: ${normalizeHex(bg, '#F8FAFC')}; color: ${normalizeHex(tc, '#0F172A')}; font-weight: 800; text-align: center; vertical-align: middle; font-size: 8.5pt;">${count || ''}</td>`;
   }).join('')}
             </tr>
-          `).join('')}
+          `;
+          }).join('')}
         </tbody>
       </table>
     </section>
@@ -2351,8 +2505,17 @@ export async function exportToPdf(payload: ExportPayload, options: ExportOptions
     // Set timeout for print rendering - prevents hanging on large PDFs
     let uri: string;
     try {
+      const printOptions: any = { html, base64: false };
+      if (Platform.OS === 'ios') {
+        printOptions.margins = {
+          top: (options.pageMarginTopCm || 0) * 28.346,
+          bottom: (options.pageMarginBottomCm || 0) * 28.346,
+          left: (options.pageMarginLeftCm || 0) * 28.346,
+          right: (options.pageMarginRightCm || 0) * 28.346,
+        };
+      }
       const printResult = await Promise.race<any>([
-        Print.printToFileAsync({ html, base64: false }),
+        Print.printToFileAsync(printOptions),
         new Promise((_, reject) => setTimeout(() => reject(new Error('Print timeout after 90s')), 90000))
       ]);
       uri = printResult.uri;
@@ -2369,10 +2532,12 @@ export async function exportToPdf(payload: ExportPayload, options: ExportOptions
     const finalUri = info.exists ? dest : uri;
     tempUri = finalUri;
     
-    if (await Sharing.isAvailableAsync()) {
-      await sharePdfWithTimeout(finalUri, options.title);
-    } else {
-      await Linking.openURL(finalUri).catch(() => null);
+    if (!options.skipShare) {
+      if (await Sharing.isAvailableAsync()) {
+        await sharePdfWithTimeout(finalUri, options.title);
+      } else {
+        await Linking.openURL(finalUri).catch(() => null);
+      }
     }
     return finalUri;
   } catch (err) {

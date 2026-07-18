@@ -1,3 +1,5 @@
+import { markdownToHtml } from './textUtils';
+
 export type PdfPaperStyle = 'plain' | 'lined' | 'grid' | 'dots';
 export type PdfTheme = 'modern' | 'sepia' | 'historical';
 export type PdfSpacing = 'compact' | 'comfortable';
@@ -40,6 +42,8 @@ export interface NotesPdfEngineConfig {
   qaAnswerBackgroundColor?: string;
   qaLayoutMode: PdfQALayoutMode;
   pageBreakBetweenHeadings?: boolean;
+  continuousPage?: boolean;
+  landscape?: boolean;
 }
 
 export interface NotesPdfEngineInput {
@@ -61,8 +65,6 @@ export interface NotesPdfEngineInput {
  * it is returned AS-IS so the browser can render it properly inside the print HTML.
  * Otherwise, the lightweight markdown is converted to HTML.
  */
-const HTML_TAG_REGEX = /<\/?(b|strong|i|em|u|mark|span|ul|ol|li|p|br|div|h[1-6]|blockquote)(\s|>|\/)/i;
-
 const clampCm = (value: number, fallback = 1): number => {
   const n = Number(value);
   if (!Number.isFinite(n)) return fallback;
@@ -71,21 +73,19 @@ const clampCm = (value: number, fallback = 1): number => {
 
 const parseMD = (txt: string) => {
   if (!txt) return '';
-  // If already HTML (from rich editor), return unchanged so all formatting (incl. background color / mark / spans with inline styles) survives
-  if (HTML_TAG_REGEX.test(txt)) return txt;
+  
+  // If already HTML (starts with block tags from rich editor), return unchanged so formatting survives
+  if (/^\s*<(p|div|ul|ol|h[1-6]|table|blockquote)/i.test(txt.trim())) {
+    return txt;
+  }
 
-  // Fallback: markdown-lite -> HTML
-  return txt
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-    .replace(/__(.*?)__/g, '<u>$1</u>')
-    .replace(/\*(.*?)\*/g, '<i>$1</i>')
-    .replace(/_(.*?)_/g, '<i>$1</i>')
-    .replace(/==(.*?)==/g, '<mark>$1</mark>')
-    .replace(/^\s*[\-\*]\s+(.*)/gm, '• $1')
-    .replace(/\n/g, '<br/>');
+  // Fallback: Convert markdown using our shared parser (supports GFM tables, lists, headings, bold, underline)
+  let html = markdownToHtml(txt);
+  
+  // Support highlight syntax ==text== which markdownToHtml doesn't have yet
+  html = html.replace(/==(.*?)==/g, '<mark>$1</mark>');
+
+  return html;
 };
 
 export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
@@ -144,7 +144,10 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
         <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
         <style>
-          @page { margin: ${clampCm(config.pageMarginTopCm)}cm ${clampCm(config.pageMarginRightCm)}cm ${clampCm(config.pageMarginBottomCm)}cm ${clampCm(config.pageMarginLeftCm)}cm; }
+          @page {
+            size: ${config.continuousPage ? '210mm 5000mm' : config.landscape ? 'landscape' : 'auto'};
+            margin: ${clampCm(config.pageMarginTopCm)}cm ${clampCm(config.pageMarginRightCm)}cm ${clampCm(config.pageMarginBottomCm)}cm ${clampCm(config.pageMarginLeftCm)}cm;
+          }
           body {
             font-family: ${config.fontFamily === 'handwriting' ? "'Caveat', cursive" : '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'};
             /* left/right padding fallback for Android where @page margin is ignored */
@@ -188,6 +191,30 @@ export function buildNotesPdfHtml(input: NotesPdfEngineInput) {
           a { color: #2563eb; text-decoration: underline; }
           code { background: rgba(0,0,0,0.06); padding: 1px 4px; border-radius: 3px; font-family: 'Menlo', 'Consolas', monospace; font-size: 0.9em; }
           pre { background: rgba(0,0,0,0.06); padding: 8px 10px; border-radius: 6px; overflow-x: auto; }
+
+          /* Premium theme-aware tables */
+          table {
+            border-collapse: collapse !important;
+            width: 100% !important;
+            margin: 15px 0 !important;
+            font-size: 0.85em !important;
+            break-inside: avoid;
+            page-break-inside: avoid;
+          }
+          th, td {
+            border: 1px solid ${config.theme === 'sepia' ? '#d0c3b0' : config.theme === 'historical' ? '#dfd5be' : '#e2e8f0'} !important;
+            padding: 8px 10px !important;
+            text-align: left !important;
+            vertical-align: top !important;
+            font-size: 0.9em !important;
+          }
+          th {
+            background-color: ${config.theme === 'sepia' ? '#e9dfc9' : config.theme === 'historical' ? '#f4ebb5' : '#f1f5f9'} !important;
+            font-weight: 700 !important;
+          }
+          tr:nth-child(even) {
+            background-color: ${config.theme === 'sepia' ? '#f9f2e3' : config.theme === 'historical' ? '#faf3e0' : '#f8fafc'} !important;
+          }
 
           .subject-badge {
             color: #6366f1;

@@ -185,22 +185,7 @@ export default function MainsEthicsCard({
                 ))}
               </View>
             );
-          })() : (
-            <View style={{
-              height: 100,
-              backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-              borderRadius: 12,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderStyle: 'dashed',
-              borderWidth: 1.5,
-              borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
-            }}>
-              <Text style={{ color: colors.textSecondary, fontSize: 12 * zoomScale, fontWeight: '600' }}>
-                📷 Diagram image updating soon
-              </Text>
-            </View>
-          )}
+          })() : null}
 
           {/* Render PYQ content from content_markdown using proper Markdown */}
           {item.rawContent && item.rawContent.trim().length > 0 && (

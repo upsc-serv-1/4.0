@@ -92,9 +92,10 @@ export const boldYearsMarkdown = (text: string) => {
  * When AI explanations (markdown) are copied to the Notebook, we must convert first.
  */
 export function markdownToHtml(text: string): string {
-  if (!text) return '';
   // Already HTML — normalise newlines only
-  if (/<[a-zA-Z]/.test(text)) return text.replace(/\n/g, '<br/>');
+  if (/^\s*<(p|div|ul|ol|h[1-6]|table|blockquote)/i.test(text.trim())) {
+    return text.replace(/\n/g, '<br/>');
+  }
 
   // Handle GFM tables: | col | col | → <table>
   const lines = text.split('\n');
@@ -104,11 +105,11 @@ export function markdownToHtml(text: string): string {
     const line = lines[i];
     // Detect table: starts with |, has |, separator row is next line
     if (line.trim().startsWith('|') && i + 1 < lines.length && /^\s*\|[\s\-|:]+\|\s*$/.test(lines[i + 1])) {
-      const headers = line.split('|').filter(c => c.trim()).map(c => `<th style="padding:4px 8px;border:1px solid #d1d5db;background:#f3f4f6">${c.trim()}</th>`);
+      const headers = line.split('|').filter(c => c.trim()).map(c => `<th style="padding:4px 8px;border:1px solid #d1d5db;background:#f3f4f6"><div style="page-break-inside:avoid;break-inside:avoid;height:100%;width:100%">${c.trim()}</div></th>`);
       htmlLines.push(`<table style="border-collapse:collapse;width:100%;margin:8px 0"><thead><tr>${headers.join('')}</tr></thead><tbody>`);
       i += 2; // skip separator
       while (i < lines.length && lines[i].trim().startsWith('|')) {
-        const cells = lines[i].split('|').filter(c => c.trim()).map(c => `<td style="padding:4px 8px;border:1px solid #d1d5db">${c.trim()}</td>`);
+        const cells = lines[i].split('|').filter(c => c.trim()).map(c => `<td style="padding:4px 8px;border:1px solid #d1d5db"><div style="page-break-inside:avoid;break-inside:avoid;height:100%;width:100%">${c.trim()}</div></td>`);
         htmlLines.push(`<tr>${cells.join('')}</tr>`);
         i++;
       }

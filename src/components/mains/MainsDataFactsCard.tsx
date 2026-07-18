@@ -171,12 +171,19 @@ export default function MainsDataFactsCard({
   const activeSubSubThemes = filters.macrotags && filters.macrotags !== 'All' ? filters.macrotags.split('|') : [];
 
   const matchedSubThemes = subThemes.filter((st: any) => {
+    if (!st) return false;
+    const title = st.title || '';
+    const content = st.content || '';
+    
+    // Exclude empty blocks
+    if (!title.trim() && !content.trim()) return false;
+    
     const matchSearch = !search ||
-      st.title.toLowerCase().includes(search.toLowerCase()) ||
-      st.content.toLowerCase().includes(search.toLowerCase());
-    const matchSubTheme = activeSubThemes.length === 0 || activeSubThemes.includes(st.title);
+      title.toLowerCase().includes(search.toLowerCase()) ||
+      content.toLowerCase().includes(search.toLowerCase());
+    const matchSubTheme = activeSubThemes.length === 0 || activeSubThemes.includes(title);
     const matchSubSubTheme = activeSubSubThemes.length === 0 ||
-      splitSubSubThemes(st.content).some(sst => activeSubSubThemes.includes(sst));
+      splitSubSubThemes(content).some(sst => activeSubSubThemes.includes(sst));
     return matchSearch && matchSubTheme && matchSubSubTheme;
   });
 

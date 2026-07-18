@@ -3,7 +3,7 @@ import {
   Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet,
   TextInput, Switch, ActivityIndicator, Platform, Alert,
 } from 'react-native';
-import { X, FileDown, Layout, ChevronDown, ChevronRight, Settings, Check } from 'lucide-react-native';
+import { X, FileDown, Layout, ChevronDown, ChevronRight, Settings, Check, Share } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../../context/ThemeContext';
 import { useResponsive } from '../../hooks/useResponsive';
@@ -102,11 +102,14 @@ const CHOICES = {
     { id: 'year' as ExportSortBy, label: 'Year' },
     { id: 'difficulty' as ExportSortBy, label: 'Difficulty' },
     { id: 'date' as ExportSortBy, label: 'Latest Modified' },
+    { id: 'pyq_frequency' as ExportSortBy, label: 'PYQ Frequency (Most Frequent First)' },
   ],
   groupingLevels: [
     { id: 'subject' as const, label: 'Subject' },
     { id: 'section_group' as const, label: 'Section Group' },
     { id: 'microtopic' as const, label: 'Microtopic' },
+    { id: 'subtopic' as const, label: 'Subtopic' },
+    { id: 'nanotopic' as const, label: 'Nanotopic' },
   ],
   visualStyles: [
     { id: 'document' as ExportVisualStyle, label: 'Document' },
@@ -153,11 +156,13 @@ export const UnifiedExportSheet: React.FC<Props> = ({
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [selectedAnalysisReports, setSelectedAnalysisReports] = useState<Record<string, boolean>>({});
   const [notesSelectedHeadings, setNotesSelectedHeadings] = useState<Set<string>>(new Set());
+  const [exportUri, setExportUri] = useState<string | null>(null);
 
   // Re-seed when sheet opens
   const wasVisible = React.useRef(false);
   React.useEffect(() => {
     if (visible && !wasVisible.current) {
+      setExportUri(null);
       setOpts(defaultExportOptions({ title: title || initialOptions?.title || 'Export', ...(initialOptions || {}) }));
       // Recompute initial analysis state directly to avoid dependency issues
       const newAnalysisState = analysisReports.reduce((acc, report) => {
@@ -218,13 +223,27 @@ export const UnifiedExportSheet: React.FC<Props> = ({
         ? { ...finalPayload, selectedHeadingIds: notesSelectedHeadings }
         : finalPayload;
 
-      await exportToPdf(payloadForExport, { ...opts, columns: cols }, { prependHtml });
+      const finalUri = await exportToPdf(payloadForExport, { ...opts, columns: cols, skipShare: true }, { prependHtml });
+      setExportUri(finalUri);
+      setIsExporting(false);
+
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(finalUri, {
+          mimeType: 'application/pdf',
+          dialogTitle: opts.title || 'Exported PDF',
+          UTI: 'com.adobe.pdf',
+        }).catch(() => {
+          console.warn('[Export] Share operation completed/cancelled');
+        });
+      } else {
+        await Linking.openURL(finalUri).catch(() => null);
+      }
     } catch (e: any) {
       console.error('Export failed', e);
+      setIsExporting(false);
       Alert.alert('Export failed', e?.message || 'Could not generate PDF right now.');
     } finally {
       clearTimeout(watchdog);
-      setIsExporting(false);
     }
     // Note: we deliberately do NOT show a follow-up "Export ready" Alert here.
     // The OS share/print sheet is already on screen at this point; popping
@@ -310,7 +329,42 @@ export const UnifiedExportSheet: React.FC<Props> = ({
             <TouchableOpacity onPress={onClose} style={{ padding: 8, borderRadius: 20, backgroundColor: colors.surfaceStrong }}><X size={20} color={colors.textSecondary} /></TouchableOpacity>
           </View>
 
-          <ScrollView style={{ maxHeight: 520 }} showsVerticalScrollIndicator={false}>
+          {exportUri ? (
+            <View style={{ padding: 24, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: colors.primary + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                <Check size={32} color={colors.primary} />
+              </View>
+              <Text style={{ fontSize: 18, fontWeight: '800', color: colors.textPrimary, marginBottom: 8, textAlign: 'center' }}>Export Complete!</Text>
+              <Text style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 24, textAlign: 'center', lineHeight: 18, paddingHorizontal: 16 }}>
+                Your PDF has been compiled. If the sharing menu did not open automatically, click the button below to share or print it.
+              </Text>
+              <TouchableOpacity
+                onPress={async () => {
+                  if (await Sharing.isAvailableAsync()) {
+                    await Sharing.shareAsync(exportUri, {
+                      mimeType: 'application/pdf',
+                      dialogTitle: opts.title || 'Exported PDF',
+                      UTI: 'com.adobe.pdf',
+                    }).catch(() => {});
+                  } else {
+                    await Linking.openURL(exportUri).catch(() => null);
+                  }
+                }}
+                style={[styles.exportBtn, { backgroundColor: colors.primary, width: '100%', marginBottom: 12, paddingVertical: 14, justifyContent: 'center', alignItems: 'center', flexDirection: 'row', gap: 8 }]}
+              >
+                <Share size={18} color="#fff" />
+                <Text style={styles.exportBtnText}>Share / Print PDF</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={onClose}
+                style={[styles.exportBtn, { backgroundColor: colors.surfaceStrong, width: '100%', paddingVertical: 14, justifyContent: 'center', alignItems: 'center' }]}
+              >
+                <Text style={[styles.exportBtnText, { color: colors.textSecondary }]}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <>
+              <ScrollView style={{ maxHeight: 520 }} showsVerticalScrollIndicator={false}>
             {analysisReports.length > 0 && (
               <Section title="Analysis Reports (Optional)" colors={colors}>
                 <Text style={{ color: colors.textSecondary, fontSize: 11, marginBottom: 10 }}>
@@ -367,7 +421,7 @@ export const UnifiedExportSheet: React.FC<Props> = ({
                         const cur = opts.groupingLevels || [];
                         const next = active ? cur.filter(x => x !== g.id) : [...cur, g.id];
                         // Preserve canonical hierarchy order
-                        const order: ExportGroupingLevel[] = ['subject', 'section_group', 'microtopic'];
+                        const order: ExportGroupingLevel[] = ['subject', 'section_group', 'microtopic', 'subtopic', 'nanotopic'];
                         next.sort((a, b) => order.indexOf(a) - order.indexOf(b));
                         set('groupingLevels', next);
                       }}
@@ -661,6 +715,8 @@ export const UnifiedExportSheet: React.FC<Props> = ({
               <Text style={styles.exportBtnText}>Export 2-Column</Text>
             </TouchableOpacity>
           </View>
+            </>
+          )}
         </View>
       </View>
     </Modal>

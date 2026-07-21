@@ -1104,7 +1104,7 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
               </td>
               <td class="side" style="width: 70%; vertical-align: top; padding: 2.5mm; padding-left: 3.5mm; box-sizing: border-box;">
                 <div style="min-height: 48mm; box-sizing: border-box;">
-                  <div class="card-face-label">Answer & Explanation</div>
+                  ${o.contentScope !== 'q_only' ? '<div class="card-face-label">Answer & Explanation</div>' : ''}
                   ${right}
                 </div>
               </td>
@@ -1216,7 +1216,7 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
             </td>
             <td class="side" style="width: 70%; vertical-align: top; padding: 2.5mm; padding-left: 3.5mm; box-sizing: border-box;">
               <div style="min-height: 48mm; box-sizing: border-box;">
-                <div class="card-face-label">Answer & Explanation</div>
+                ${o.contentScope !== 'q_only' ? '<div class="card-face-label">Answer & Explanation</div>' : ''}
                 ${right}
               </div>
             </td>

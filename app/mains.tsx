@@ -4003,6 +4003,63 @@ function MainsLeftPanel({
         <SidebarPYQFilter filters={filters} onUpdateFilters={onUpdateFilters} colors={colors} />
       </View>
 
+      {/* ── GROUP: SEARCH IN ── */}
+      {!isSearchView && (
+        <View style={{ marginBottom: 4, marginTop: 8 }}>
+          <Text style={{ fontSize: 8, fontWeight: '900', color: colors.textTertiary + '80', letterSpacing: 1.5, paddingHorizontal: 4, marginBottom: 6 }}>
+            SEARCH IN
+          </Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingHorizontal: 2 }}>
+            {(['Questions', 'Answers', 'Value Additions'] as const).map(opt => {
+              const searchAcrossList = filters.searchAcross || ['Questions', 'Answers', 'Value Additions'];
+              const isSelected = searchAcrossList.includes(opt);
+              return (
+                <TouchableOpacity
+                  key={opt}
+                  onPress={() => {
+                    const list = [...searchAcrossList];
+                    const idx = list.indexOf(opt);
+                    let next: typeof list;
+                    if (idx >= 0) {
+                      next = list.filter(x => x !== opt);
+                      // always keep at least Questions
+                      if (next.length === 0) next = ['Questions'];
+                    } else {
+                      next = [...list, opt];
+                    }
+                    onUpdateFilters({ ...filters, searchAcross: next as any });
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 5,
+                    paddingHorizontal: 9,
+                    paddingVertical: 5,
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: isSelected ? colors.primary : colors.border,
+                    backgroundColor: isSelected ? colors.primary + '18' : colors.surface,
+                  }}
+                >
+                  <View style={{
+                    width: 12, height: 12, borderRadius: 3,
+                    borderWidth: 1.5,
+                    borderColor: isSelected ? colors.primary : colors.textTertiary,
+                    backgroundColor: isSelected ? colors.primary : 'transparent',
+                    alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    {isSelected && <View style={{ width: 6, height: 6, borderRadius: 1, backgroundColor: '#fff' }} />}
+                  </View>
+                  <Text style={{ fontSize: 10, fontWeight: '600', color: isSelected ? colors.primary : colors.textSecondary }}>
+                    {opt === 'Questions' ? 'Question Text' : opt === 'Answers' ? 'Answer Text' : 'Value Additions'}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      )}
+
       {/* ── GROUP: HIERARCHY ── */}
       <View style={{ marginBottom: 4, marginTop: 8 }}>
         <Text style={{ fontSize: 8, fontWeight: '900', color: colors.textTertiary + '80', letterSpacing: 1.5, paddingHorizontal: 4, marginBottom: 2 }}>
@@ -5038,7 +5095,11 @@ function QuestionBankView({
   }, [expandedId, selectedInstitutes, questions, onActiveQuestionChange]);
 
   const [filters, setFilters] = useState<MainsFilters>(() => {
-    return initialFilters || DEFAULT_MAINS_FILTERS;
+    const base = initialFilters || DEFAULT_MAINS_FILTERS;
+    return {
+      ...base,
+      searchAcross: base.searchAcross && base.searchAcross.length > 0 ? base.searchAcross : ['Questions', 'Answers', 'Value Additions'],
+    };
   });
 
   useEffect(() => {
@@ -5049,14 +5110,20 @@ function QuestionBankView({
     setTimeout(() => {
       setFilters(prev => {
         const next = typeof updater === 'function' ? (updater as Function)(prev) : updater;
-        return next;
+        return {
+          ...next,
+          searchAcross: next.searchAcross && next.searchAcross.length > 0 ? next.searchAcross : ['Questions'],
+        };
       });
     }, 16);
   }, []);
 
   useEffect(() => {
     if (initialFilters) {
-      setFilters(initialFilters);
+      setFilters({
+        ...initialFilters,
+        searchAcross: initialFilters.searchAcross && initialFilters.searchAcross.length > 0 ? initialFilters.searchAcross : ['Questions', 'Answers', 'Value Additions'],
+      });
     }
   }, [initialFilters]);
 
@@ -5320,6 +5387,7 @@ function QuestionBankView({
       // Filter Questions
       const result = questions.filter(q => {
         if (version !== filterVersionRef.current) return false; // stale, abort early
+        if (!filters.searchAcross.includes('Questions')) return false;
 
         // PYQ Filter
         if (filters.pyqFilter === 'PYQ Only' && !q.is_pyq) return false;
@@ -5344,10 +5412,16 @@ function QuestionBankView({
         }
 
         const subtopicVal = getQuestionSub(q);
+        // Search across fields controlled by the sidebar 'SEARCH IN' toggles
+        const searchInQuestions = filters.searchAcross.includes('Questions');
+        const searchInAnswers = filters.searchAcross.includes('Answers');
+        const qText = searchInQuestions ? (q.questionText?.toLowerCase() || '') : '';
+        const aText = searchInAnswers
+          ? (q.answers || []).map((a: any) => a.answerText || '').join(' ').toLowerCase()
+          : '';
         const matchSearch = !searchLower ||
-          (q.questionText?.toLowerCase() || '').includes(searchLower) ||
-          (subtopicVal.toLowerCase() || '').includes(searchLower) ||
-          (q.subject?.toLowerCase() || '').includes(searchLower);
+          (searchInQuestions && qText.includes(searchLower)) ||
+          (searchInAnswers && aText.includes(searchLower));
 
         if (!matchSearch) return false;
 
@@ -5387,6 +5461,7 @@ function QuestionBankView({
       // Filter Value Additions
       const valAddResult = valueAddItems.filter(va => {
         if (version !== filterVersionRef.current) return false; // stale, abort early
+        if (!filters.searchAcross.includes('Value Additions')) return false;
 
         // PYQ Filter: Value additions are not PYQs, so if pyqFilter is 'PYQ Only', we hide them
         if (filters.pyqFilter === 'PYQ Only') return false;
@@ -5429,11 +5504,10 @@ function QuestionBankView({
           if (!matchNano) return false;
         }
 
-        // Search text matching
+        // Search text matching — only content/title, NOT syllabus hierarchy labels
         if (searchLower) {
           const matchSearch = (va.title?.toLowerCase() || '').includes(searchLower) ||
-            (va.subject?.toLowerCase() || '').includes(searchLower) ||
-            (getValueAddSub(va).toLowerCase() || '').includes(searchLower);
+            (va.content?.toLowerCase() || '').includes(searchLower);
           if (!matchSearch) return false;
         }
 

@@ -182,13 +182,13 @@ for (let i = 1; i <= 15; i++) {
 
 // Standardize and export
 export const mainsConsolidatedQuestions: ConsolidatedQuestion[] = [
-  ...gs1Questions.map((q: any) => ({ ...q, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
-  ...gs2Questions.map((q: any) => ({ ...q, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
-  ...gs3Questions.map((q: any) => ({ ...q, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
-  ...gs4Questions.map((q: any) => ({ ...q, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
-  ...anthro1Questions.map((q: any) => ({ ...q, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
-  ...anthro2Questions.map((q: any) => ({ ...q, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
-  ...forumMGPQuestions.map((q: any) => ({ ...q, subject: normalizeSubject(q.subject), paper: resolvePaper(q), is_pyq: q.is_pyq || false })),
+  ...gs1Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...gs2Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...gs3Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...gs4Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...anthro1Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...anthro2Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...forumMGPQuestions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? false, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
 ];
 
 import { supabase } from '../lib/supabase';
@@ -235,7 +235,7 @@ export async function fetchMainsQuestionsFromSupabase(): Promise<ConsolidatedQue
     microtag: q.microtag || q.micro_tag || '',
     hierarchy_path: q.hierarchy_path || q.hierarchyPath || [],
     paper: resolvePaper(q),
-    is_pyq: q.is_pyq,
+    is_pyq: q.is_pyq ?? true,
     source_attribution_label: q.source_attribution_label,
     exam_info: q.exam_info,
     stage: q.stage,

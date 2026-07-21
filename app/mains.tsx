@@ -5102,7 +5102,10 @@ function QuestionBankView({
     };
   });
 
+  const lastSyncedFiltersRef = useRef<string>(JSON.stringify(filters));
+
   useEffect(() => {
+    lastSyncedFiltersRef.current = JSON.stringify(filters);
     onFilterChange?.(filters);
   }, [filters, onFilterChange]);
 
@@ -5120,10 +5123,18 @@ function QuestionBankView({
 
   useEffect(() => {
     if (initialFilters) {
-      setFilters({
-        ...initialFilters,
-        searchAcross: initialFilters.searchAcross && initialFilters.searchAcross.length > 0 ? initialFilters.searchAcross : ['Questions', 'Answers', 'Value Additions'],
-      });
+      const serialized = JSON.stringify(initialFilters);
+      if (serialized !== lastSyncedFiltersRef.current) {
+        lastSyncedFiltersRef.current = serialized;
+        setFilters(prev => {
+          const next = {
+            ...initialFilters,
+            searchAcross: initialFilters.searchAcross && initialFilters.searchAcross.length > 0 ? initialFilters.searchAcross : ['Questions', 'Answers', 'Value Additions'],
+          };
+          if (JSON.stringify(prev) === JSON.stringify(next)) return prev;
+          return next;
+        });
+      }
     }
   }, [initialFilters]);
 
@@ -5390,12 +5401,13 @@ function QuestionBankView({
         if (!filters.searchAcross.includes('Questions')) return false;
 
         // PYQ Filter
-        if (filters.pyqFilter === 'PYQ Only' && !q.is_pyq) return false;
-        if (filters.pyqFilter === 'Non-PYQ' && q.is_pyq) return false;
+        const isPyq = q.is_pyq !== false && q.is_pyq !== 'false';
+        if (filters.pyqFilter === 'PYQ Only' && !isPyq) return false;
+        if (filters.pyqFilter === 'Non-PYQ' && isPyq) return false;
 
         // Institute filter
         if (selectedInsts) {
-          const instName = q.institute || (q.is_pyq ? 'UPSC' : '');
+          const instName = q.institute || (isPyq ? 'UPSC' : '');
           if (!instName || !selectedInsts.includes(instName)) return false;
         }
 

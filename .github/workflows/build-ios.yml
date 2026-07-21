@@ -1,6 +1,8 @@
 name: Build iOS IPA (Unsigned)
 
 on:
+  push:
+    branches: [ '10.2' ]
   workflow_dispatch:
 
 concurrency:
@@ -37,7 +39,10 @@ jobs:
         id: detect-scheme
         run: |
           cd ios
-          SCHEME=$(xcodebuild -list -json | jq -r '.project.targets[0]')
+          SCHEME=$(xcodebuild -list -json | jq -r '(.workspace.schemes // .project.schemes // .project.targets)[0]')
+          if [ -z "$SCHEME" ] || [ "$SCHEME" = "null" ]; then
+            SCHEME=$(basename *.xcodeproj .xcodeproj)
+          fi
           echo "Detected Scheme: $SCHEME"
           echo "scheme=$SCHEME" >> $GITHUB_OUTPUT
 
@@ -47,12 +52,14 @@ jobs:
           xcodebuild archive \
             -workspace *.xcworkspace \
             -scheme "${{ steps.detect-scheme.outputs.scheme }}" \
+            -destination 'generic/platform=iOS' \
             -configuration Release \
             -archivePath build/App.xcarchive \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_ENTITLEMENTS="" \
-            CODE_SIGNING_INJECT_BASE_ENTITLEMENTS=NO
+            CODE_SIGNING_INJECT_BASE_ENTITLEMENTS=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO
 
       - name: Package as unsigned IPA
         run: |

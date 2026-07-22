@@ -2028,40 +2028,49 @@ const ValueAdditionCard = React.memo(function ValueAdditionCard({
   );
 });
 
-export const getMarkdownStyles = (colors: any): any => ({
-  body: {
-    color: colors.textSecondary,
-    fontSize: 14.5,
-    lineHeight: 22,
-  },
-  heading1: {
-    color: colors.textPrimary,
-    fontSize: 18,
-    fontWeight: '800',
-    marginTop: 18,
-    marginBottom: 8,
-  },
-  heading2: {
-    color: colors.textPrimary,
-    fontSize: 16,
-    fontWeight: '800',
-    marginTop: 16,
-    marginBottom: 6,
-  },
-  heading3: {
-    color: colors.textPrimary,
-    fontSize: 15,
-    fontWeight: '700',
-    marginTop: 14,
-    marginBottom: 6,
-  },
-  heading4: {
-    color: colors.textPrimary,
-    fontSize: 14,
-    fontWeight: '700',
-    marginTop: 12,
-    marginBottom: 4,
-  },
+export const getMarkdownStyles = (colors: any): any => {
+  const isDark = colors.textPrimary && (
+    colors.textPrimary.toLowerCase().startsWith('#f') || 
+    colors.textPrimary.toLowerCase().startsWith('#e') || 
+    colors.textPrimary.toLowerCase().startsWith('#d') ||
+    colors.textPrimary === 'white'
+  );
+  const headingColor = isDark ? '#60a5fa' : '#1d4ed8';
+
+  return {
+    body: {
+      color: colors.textSecondary,
+      fontSize: 14.5,
+      lineHeight: 22,
+    },
+    heading1: {
+      color: headingColor,
+      fontSize: 18,
+      fontWeight: '800',
+      marginTop: 18,
+      marginBottom: 8,
+    },
+    heading2: {
+      color: headingColor,
+      fontSize: 16,
+      fontWeight: '800',
+      marginTop: 16,
+      marginBottom: 6,
+    },
+    heading3: {
+      color: headingColor,
+      fontSize: 15,
+      fontWeight: '700',
+      marginTop: 14,
+      marginBottom: 6,
+    },
+    heading4: {
+      color: headingColor,
+      fontSize: 14,
+      fontWeight: '700',
+      marginTop: 12,
+      marginBottom: 4,
+    },
   paragraph: {
     marginTop: 6,
     marginBottom: 10,
@@ -2124,7 +2133,7 @@ export const getMarkdownStyles = (colors: any): any => ({
     resizeMode: 'contain',
     marginVertical: 12,
   },
-});
+};
 
 const toggleFilterValue = (currentVal: string, valueToToggle: string, delimiter: string = '|'): string => {
   if (!currentVal || currentVal === 'All') {

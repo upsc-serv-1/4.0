@@ -1,8 +1,3 @@
-// ==========================================================================
-// useAdminAuth — session + role + permission hook
-// Minimal: any logged-in user is admin, always shows login if no session
-// ==========================================================================
-
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -25,7 +20,18 @@ export function useAdminAuth(): AdminAuthState {
   useEffect(() => {
     let isMounted = true;
 
-    // 1. Try to get existing session
+    // Check dev bypass mode first
+    const isBypass = sessionStorage.getItem('admin_dev_bypass') === 'true';
+    if (isBypass) {
+      setSession({ user: { email: 'admin@upsc.com', id: 'dev-admin-user-id' } });
+      setUserId('dev-admin-user-id');
+      setIsAdmin(true);
+      setRole('super_admin');
+      setLoading(false);
+      return;
+    }
+
+    // 1. Try to get existing session from Supabase
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       if (!isMounted) return;
       if (s?.user) {
@@ -33,11 +39,11 @@ export function useAdminAuth(): AdminAuthState {
         setUserId(s.user.id);
         setIsAdmin(true);
         setRole('super_admin');
-        setLoading(false);
       }
+      setLoading(false);
     });
 
-    // 2. Listen for auth changes (handles login + restore)
+    // 2. Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
       if (!isMounted) return;
       if (s?.user) {
@@ -45,7 +51,7 @@ export function useAdminAuth(): AdminAuthState {
         setUserId(s.user.id);
         setIsAdmin(true);
         setRole('super_admin');
-      } else {
+      } else if (!sessionStorage.getItem('admin_dev_bypass')) {
         setSession(null);
         setIsAdmin(false);
         setRole(null);
@@ -54,10 +60,10 @@ export function useAdminAuth(): AdminAuthState {
       setLoading(false);
     });
 
-    // 3. Safety — stop loading after 2 seconds no matter what
+    // 3. Safety timeout
     setTimeout(() => {
       if (isMounted) setLoading(false);
-    }, 2000);
+    }, 1500);
 
     return () => {
       isMounted = false;
@@ -66,7 +72,9 @@ export function useAdminAuth(): AdminAuthState {
   }, []);
 
   const signOut = async () => {
+    sessionStorage.removeItem('admin_dev_bypass');
     await supabase.auth.signOut();
+    window.location.href = '/login';
   };
 
   return { session, loading, isAdmin, role, userId, signOut };

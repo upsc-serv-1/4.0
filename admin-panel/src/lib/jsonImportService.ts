@@ -278,37 +278,29 @@ export async function importJsonFile(file: File): Promise<ImportResult> {
         const qId = q.id || `mains-${paperName.toLowerCase()}-q${q.questionNumber}`;
         
         const examInfoVal = q.exam_info || null;
-        let isPyqVal = true;
-        let stageVal = "mains";
-        let examVal = "Mains";
-        let groupVal = "UPSC CSE";
-        let isUpscCseVal = true;
-        let isAlliedVal = false;
-        let isOthersVal = false;
-        let examCategoryVal = "cse";
-
-        if (examInfoVal && typeof examInfoVal === 'object') {
-          if ('isPyq' in examInfoVal) isPyqVal = Boolean(examInfoVal.isPyq);
-          if ('stage' in examInfoVal) stageVal = String(examInfoVal.stage);
-          if ('exam' in examInfoVal) examVal = String(examInfoVal.exam);
-          if ('group' in examInfoVal) groupVal = String(examInfoVal.group);
-          if ('is_upsc_cse' in examInfoVal) isUpscCseVal = Boolean(examInfoVal.is_upsc_cse);
-          if ('is_allied' in examInfoVal) isAlliedVal = Boolean(examInfoVal.is_allied);
-          if ('is_others' in examInfoVal) isOthersVal = Boolean(examInfoVal.is_others);
-          if ('exam_category' in examInfoVal) examCategoryVal = String(examInfoVal.exam_category);
-        }
+        
+        // Directly extract flag values from question or exam_info object in JSON
+        const isPyqVal = q.is_pyq ?? (examInfoVal?.isPyq ?? true);
+        const stageVal = q.stage || examInfoVal?.stage || "mains";
+        const examVal = q.exam || examInfoVal?.exam || "Mains";
+        const groupVal = q.exam_group || examInfoVal?.group || "UPSC CSE";
+        const isUpscCseVal = q.is_upsc_cse ?? (examInfoVal?.is_upsc_cse ?? true);
+        const isAlliedVal = q.is_allied ?? (examInfoVal?.is_allied ?? false);
+        const isOthersVal = q.is_others ?? (examInfoVal?.is_others ?? false);
+        const examCategoryVal = q.exam_category || examInfoVal?.exam_category || "cse";
 
         questions.push({
           id: qId,
-          question_number: q.questionNumber || null,
+          question_number: q.questionNumber ? String(q.questionNumber) : null,
           question_text: q.questionText || '',
           marks: q.marks || null,
           exam_year: q.year || null,
-          paper: paperName,
+          paper: q.paper || paperName || 'Optional',
           subject: q.subject || null,
           section_group: q.sectionGroup || null,
           microtopic: q.microTopic || null,
           subtopic: q.subTopic || null,
+          nanotopic: q.nanoTopic || null,
           macrotag: q.macrotag || null,
           microtag: q.microtag || null,
           hierarchy_path: q.hierarchy_path || null,
@@ -321,7 +313,11 @@ export async function importJsonFile(file: File): Promise<ImportResult> {
           is_upsc_cse: isUpscCseVal,
           is_allied: isAlliedVal,
           is_others: isOthersVal,
-          exam_category: examCategoryVal
+          exam_category: examCategoryVal,
+          course: q.course || data.course || 'Civil Services',
+          institute: q.institute || data.institute || 'UPSC',
+          program_id: q.program_id || data.program_id || 'cse',
+          program_name: q.program_name || data.program_name || 'CSE'
         });
 
         if (q.answers && Array.isArray(q.answers)) {

@@ -1,5 +1,6 @@
 import { ValueAdditionItem } from './mainsMockData';
 import { normalizePaper, normalizeSubject } from './mainsConsolidatedLoader';
+import { KVStore } from '../lib/kvStore';
 export { ValueAdditionItem };
 
 const cleanHierarchyString = (str: any, defaultVal: string = ''): string => {
@@ -962,7 +963,7 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     rawContent: item.content_markdown
   }));
 
-  return [
+  const res = [
     ...mappedDataFacts,
     ...mappedIntroConclusions,
     ...mappedEssayValueAdd,
@@ -973,5 +974,31 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
     ...mappedCaseStudies,
     ...mappedJudgments
   ];
+
+  if (res.length > 0) {
+    try {
+      KVStore.setJson(MAINS_VALUE_ADD_CACHE_KEY, res);
+      console.log('[MainsVALoader] Saved fresh Supabase value additions to KVStore cache:', res.length);
+    } catch (e) {
+      console.log('[MainsVALoader] Failed to save value additions to KVStore cache:', e);
+    }
+  }
+
+  return res;
+}
+
+export const MAINS_VALUE_ADD_CACHE_KEY = '@mains_cached_value_add_v2';
+
+export function getInitialValueAdditions(): ValueAdditionItem[] {
+  try {
+    const cached = KVStore.getJson<ValueAdditionItem[]>(MAINS_VALUE_ADD_CACHE_KEY);
+    if (cached && Array.isArray(cached) && cached.length > 0) {
+      console.log('[MainsVALoader] Synchronously loaded cached value additions from KVStore:', cached.length);
+      return cached;
+    }
+  } catch (e) {
+    console.log('[MainsVALoader] Failed to read cached value additions:', e);
+  }
+  return mainsConsolidatedValueAdd;
 }
 

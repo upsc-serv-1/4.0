@@ -24,7 +24,7 @@ export interface Question {
 
 export interface ValueAdditionItem {
   id: string;
-  category: "data_facts" | "intro_conclusion" | "quotes" | "mnemonics" | "frameworks" | "ethics";
+  category: "data_facts" | "intro_conclusion" | "quotes" | "mnemonics" | "frameworks" | "ethics" | "keywords_hub" | "case_studies_hub" | "sc_judgments_hub";
   paper?: string;
   subject?: string;
   sectionGroup?: string;

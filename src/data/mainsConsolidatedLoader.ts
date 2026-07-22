@@ -44,7 +44,7 @@ export function normalizePaper(paper: string | null | undefined): string {
   if (p.includes('GS3') || p.includes('GS-3') || p === 'GS-III' || p === 'GSIII') return 'GS3';
   if (p.includes('GS4') || p.includes('GS-4') || p === 'GS-IV' || p === 'GSIV') return 'GS4';
   if (p.includes('ESSAY')) return 'Essay';
-  if (p.includes('OPTIONAL') || p.includes('ANTHRO') || p === 'ANTHRO1') return 'Optional';
+  if (p.includes('OPTIONAL') || p.includes('ANTHRO') || p.includes('SOCIO') || p === 'ANTHRO1' || p === 'SOCIO1' || p === 'SOCIO2') return 'Optional';
   return paper;
 }
 
@@ -127,6 +127,22 @@ try {
   console.log('[MainsLoader] Anthro2 JSON files failed to load:', e);
 }
 
+let socio1Questions: any[] = [];
+try {
+  const socio1New = require('../../mains json files/mains_socio1_new_consolidated.json');
+  socio1Questions = socio1New.questions || [];
+} catch (e) {
+  console.log('[MainsLoader] Socio1 JSON file failed to load:', e);
+}
+
+let socio2Questions: any[] = [];
+try {
+  const socio2New = require('../../mains json files/mains_socio2_new_consolidated.json');
+  socio2Questions = socio2New.questions || [];
+} catch (e) {
+  console.log('[MainsLoader] Socio2 JSON file failed to load:', e);
+}
+
 export function resolvePaper(q: any): string {
   const norm = normalizePaper(q.paper);
   if (norm && ['GS1', 'GS2', 'GS3', 'GS4', 'Essay', 'Optional'].includes(norm)) {
@@ -134,11 +150,11 @@ export function resolvePaper(q: any): string {
   }
   if (q.hierarchy_path && q.hierarchy_path.length > 0) {
     const first = q.hierarchy_path[0];
-    if (first === 'Anthropology' || first === 'Anthro1' || first.toUpperCase().includes('ANTHRO') || first.toUpperCase().includes('OPTIONAL')) {
+    if (first === 'Anthropology' || first === 'Sociology' || first === 'Anthro1' || first === 'Socio1' || first.toUpperCase().includes('ANTHRO') || first.toUpperCase().includes('SOCIO') || first.toUpperCase().includes('OPTIONAL')) {
       return 'Optional';
     } else {
       const second = q.hierarchy_path[1];
-      if (second && (second === 'Anthropology' || second.toUpperCase().includes('ANTHRO') || second.toUpperCase().includes('OPTIONAL'))) {
+      if (second && (second === 'Anthropology' || second === 'Sociology' || second.toUpperCase().includes('ANTHRO') || second.toUpperCase().includes('SOCIO') || second.toUpperCase().includes('OPTIONAL'))) {
         return 'Optional';
       }
       return normalizePaper(first);
@@ -188,10 +204,28 @@ export const mainsConsolidatedQuestions: ConsolidatedQuestion[] = [
   ...gs4Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
   ...anthro1Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
   ...anthro2Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...socio1Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...socio2Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
   ...forumMGPQuestions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? false, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
 ];
 
 import { supabase } from '../lib/supabase';
+import { KVStore } from '../lib/kvStore';
+
+export const MAINS_QUESTIONS_CACHE_KEY = '@mains_cached_questions_v2';
+
+export function getInitialMainsQuestions(): ConsolidatedQuestion[] {
+  try {
+    const cached = KVStore.getJson<ConsolidatedQuestion[]>(MAINS_QUESTIONS_CACHE_KEY);
+    if (cached && Array.isArray(cached) && cached.length > 0) {
+      console.log('[MainsLoader] Synchronously loaded cached questions from KVStore:', cached.length);
+      return cached;
+    }
+  } catch (e) {
+    console.log('[MainsLoader] Failed to read cached questions:', e);
+  }
+  return mainsConsolidatedQuestions;
+}
 
 export async function fetchMainsQuestionsFromSupabase(): Promise<ConsolidatedQuestion[]> {
   let allData: any[] = [];
@@ -220,7 +254,7 @@ export async function fetchMainsQuestionsFromSupabase(): Promise<ConsolidatedQue
     from += step;
   }
   
-  return allData.map((q: any) => ({
+  const mapped = allData.map((q: any) => ({
     id: q.id,
     questionNumber: q.question_number,
     questionText: q.question_text,
@@ -255,5 +289,16 @@ export async function fetchMainsQuestionsFromSupabase(): Promise<ConsolidatedQue
       answerText: ans.answer_text,
     }))
   }));
+
+  if (mapped.length > 0) {
+    try {
+      KVStore.setJson(MAINS_QUESTIONS_CACHE_KEY, mapped);
+      console.log('[MainsLoader] Saved fresh Supabase questions to KVStore cache:', mapped.length);
+    } catch (e) {
+      console.log('[MainsLoader] Failed to save questions to KVStore cache:', e);
+    }
+  }
+
+  return mapped;
 }
 

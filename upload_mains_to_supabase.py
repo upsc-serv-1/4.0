@@ -109,6 +109,7 @@ def upload_mains_questions_answers():
         "mains_anthro2_new_consolidated.json",
         "mains_anthro1_pre2012.json",
         "mains_anthro2_pre2012.json",
+        "mains_socio1_new_consolidated.json",
         "forum mgp 2026/forum-mgp-2026-csm26t01se.json",
         "forum mgp 2026/forum-mgp-2026-csm26t02se.json",
         "forum mgp 2026/forum-mgp-2026-csm26t03se.json",
@@ -151,30 +152,16 @@ def upload_mains_questions_answers():
                 except (ValueError, TypeError):
                     marks_val = None
 
-            # Extract is_pyq and other sub-fields from exam_info if present
-            exam_info_val = q.get("exam_info")
-            is_pyq_val = True
-            stage_val = "mains"
-            exam_val = "Mains"
-            group_val = "UPSC CSE"
-            is_upsc_cse_val = True
-            is_allied_val = False
-            is_others_val = False
-            exam_category_val = "cse"
-
-            if isinstance(exam_info_val, dict):
-                if "isPyq" in exam_info_val:
-                    is_pyq_val = bool(exam_info_val["isPyq"])
-                stage_val = exam_info_val.get("stage", stage_val)
-                exam_val = exam_info_val.get("exam", exam_val)
-                group_val = exam_info_val.get("group", group_val)
-                if "is_upsc_cse" in exam_info_val:
-                    is_upsc_cse_val = bool(exam_info_val["is_upsc_cse"])
-                if "is_allied" in exam_info_val:
-                    is_allied_val = bool(exam_info_val["is_allied"])
-                if "is_others" in exam_info_val:
-                    is_others_val = bool(exam_info_val["is_others"])
-                exam_category_val = exam_info_val.get("exam_category", exam_category_val)
+            # Directly extract flag values from question or exam_info object in JSON
+            exam_info_val = q.get("exam_info") or {}
+            is_pyq_val = q.get("is_pyq", exam_info_val.get("isPyq", True))
+            stage_val = q.get("stage", exam_info_val.get("stage", "mains"))
+            exam_val = q.get("exam", exam_info_val.get("exam", "Mains"))
+            group_val = q.get("exam_group", exam_info_val.get("group", "UPSC CSE"))
+            is_upsc_cse_val = q.get("is_upsc_cse", exam_info_val.get("is_upsc_cse", True))
+            is_allied_val = q.get("is_allied", exam_info_val.get("is_allied", False))
+            is_others_val = q.get("is_others", exam_info_val.get("is_others", False))
+            exam_category_val = q.get("exam_category", exam_info_val.get("exam_category", "cse"))
 
             paper_val = q.get("paper") if q.get("paper") else paper_name
 

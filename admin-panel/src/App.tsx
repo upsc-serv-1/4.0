@@ -12,10 +12,11 @@ const TestsPage = lazy(() => import('./components/tests/TestsPage'));
 const FlashcardsPage = lazy(() => import('./components/flashcards/FlashcardsPage'));
 const UsersPage = lazy(() => import('./components/users/UsersPage'));
 const DedupManager = lazy(() => import('./pages/DedupManager'));
+const BulkOperationsPage = lazy(() => import('./pages/BulkOperationsPage'));
 
 const AdminSettingsPage = () => <PlaceholderPage name="Settings" />;
 
-// Placeholders for missing files
+// Placeholders for missing secondary files
 function PlaceholderPage({ name }: { name: string }) {
   return (
     <div className="p-8">
@@ -26,7 +27,7 @@ function PlaceholderPage({ name }: { name: string }) {
       <div className="bg-panel border border-border border-dashed rounded-xl p-12 text-center">
         <div className="text-lg font-bold mb-2">Under Construction</div>
         <p className="text-muted max-w-md mx-auto text-sm">
-          This page component is referenced in navigation but currently has no implementation file in the source tree.
+          This page component is currently under active development.
         </p>
       </div>
     </div>
@@ -35,7 +36,6 @@ function PlaceholderPage({ name }: { name: string }) {
 
 const AnalyticsPage = () => <PlaceholderPage name="Analytics" />;
 const DataHealthPage = () => <PlaceholderPage name="Data Health" />;
-const BulkOperationsPage = () => <PlaceholderPage name="Bulk Operations" />;
 const TaxonomyPage = () => <PlaceholderPage name="Taxonomy" />;
 const SoftNotesAdminPage = () => <PlaceholderPage name="Soft Notes" />;
 const NotesAdminPage = () => <PlaceholderPage name="Notes" />;
@@ -44,7 +44,7 @@ const QuestionStatesPage = () => <PlaceholderPage name="Question States" />;
 function Loading() {
   return (
     <div className="h-full flex items-center justify-center text-muted p-12">
-      <div className="text-sm">Loading...</div>
+      <div className="text-sm">Loading admin view…</div>
     </div>
   );
 }
@@ -53,7 +53,7 @@ export default function App() {
   const { session, loading, isAdmin } = useAdminAuth();
 
   if (loading) {
-    return <div className="h-screen flex items-center justify-center text-muted">Loading\u2026</div>;
+    return <div className="h-screen flex items-center justify-center text-muted">Loading…</div>;
   }
 
   if (!session) {
@@ -69,7 +69,7 @@ export default function App() {
       <div className="h-screen flex flex-col items-center justify-center gap-4 text-center px-6">
         <h1 className="text-2xl font-bold">Not authorized</h1>
         <p className="text-muted max-w-md">
-          Your account exists but is not in the <code>admin_users</code> table. Ask a super-admin to add you, then log in again.
+          Your account is not registered as an admin. Contact super-admin to enable access.
         </p>
       </div>
     );

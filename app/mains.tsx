@@ -234,11 +234,11 @@ export const getMarkdownRules = (colors: any, isDark: boolean, onImagePress?: (u
     // Strip block-level HTML tags (tables etc.) — markdown-display handles tables via its own rule
     return null;
   },
-  text: (node: any, children: any, parent: any, styles: any) => {
+  text: (node: any, children: any, parentNodes: any, styles: any, inheritedStyles: any = {}) => {
     const rawContent = node.content || '';
     const cleaned = rawContent.replace(/<br\s*\/?>|&lt;br\s*\/?&gt;|&amp;lt;br\s*\/?&amp;gt;/gi, '\n');
     return (
-      <Text key={node.key} style={styles.text}>
+      <Text key={node.key} style={[inheritedStyles, styles.text]}>
         {cleaned}
       </Text>
     );
@@ -252,12 +252,14 @@ import {
   mainsConsolidatedQuestions,
   ConsolidatedQuestion,
   fetchMainsQuestionsFromSupabase,
+  getInitialMainsQuestions,
   normalizeSubject
 } from '../src/data/mainsConsolidatedLoader';
 import {
   mainsConsolidatedValueAdd,
   ValueAdditionItem,
-  fetchValueAdditionFromSupabase
+  fetchValueAdditionFromSupabase,
+  getInitialValueAdditions
 } from '../src/data/mainsValueAdditionLoader';
 import { buildPredictive, probableHotsFor2026 } from '../src/lib/pyqPredictive';
 import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet';
@@ -334,6 +336,28 @@ export function MainsScreenInner() {
   const { width, height } = useWindowDimensions();
   const isTablet = width >= 768;
   const insets = useSafeAreaInsets();
+
+  const [textColorMode, setTextColorMode] = useState<'default' | 'black'>('default');
+
+  // Load text color mode from AsyncStorage
+  useEffect(() => {
+    AsyncStorage.getItem('@mains_text_color_mode')
+      .then(val => {
+        if (val === 'default' || val === 'black') {
+          setTextColorMode(val as 'default' | 'black');
+          setGlobalTextColorMode(val as 'default' | 'black');
+        }
+      })
+      .catch(err => console.log('Error loading text color mode:', err));
+  }, []);
+
+  const handleUpdateTextColorMode = (mode: 'default' | 'black') => {
+    setTextColorMode(mode);
+    setGlobalTextColorMode(mode);
+    AsyncStorage.setItem('@mains_text_color_mode', mode).catch(err => 
+      console.log('Error saving text color mode:', err)
+    );
+  };
 
   const params = useLocalSearchParams<{
     paper?: string;
@@ -1127,9 +1151,9 @@ export function MainsScreenInner() {
   // Theme state: 'gradient' or 'white'
   const [mainsTheme, setMainsTheme] = useState<'gradient' | 'white'>('gradient');
 
-  // Live Supabase synced states (fallback to local constants instantly)
-  const [questions, setQuestions] = useState<ConsolidatedQuestion[]>(mainsConsolidatedQuestions);
-  const [valueAddItems, setValueAddItems] = useState<ValueAdditionItem[]>(mainsConsolidatedValueAdd);
+  // Live Supabase synced states (reads from KVStore cache synchronously on boot, then syncs latest from Supabase)
+  const [questions, setQuestions] = useState<ConsolidatedQuestion[]>(() => getInitialMainsQuestions());
+  const [valueAddItems, setValueAddItems] = useState<ValueAdditionItem[]>(() => getInitialValueAdditions());
 
   // Mains Notes States
   const [mainsNotes, setMainsNotes] = useState<MainsNoteItem[]>([]);
@@ -1674,6 +1698,8 @@ export function MainsScreenInner() {
               onCreateTag={handleCreateDetailedTag}
               vaFavorites={vaFavorites}
               onToggleVaFavorite={handleToggleVaFavorite}
+              textColorMode={textColorMode}
+              onChangeTextColorMode={handleUpdateTextColorMode}
             />
           )}
           {currentScreen === 'value-add' && (
@@ -1748,6 +1774,8 @@ export function MainsScreenInner() {
               onCreateTag={handleCreateDetailedTag}
               vaFavorites={vaFavorites}
               onToggleVaFavorite={handleToggleVaFavorite}
+              textColorMode={textColorMode}
+              onChangeTextColorMode={handleUpdateTextColorMode}
             />
           )}
           {currentScreen === 'detailed-question' && detailedQuestion && (
@@ -3566,103 +3594,126 @@ export const ValueAdditionCard = React.memo(function ValueAdditionCard({
   );
 });
 
-export const getMarkdownStyles = (colors: any): any => ({
-  body: {
-    color: colors.textSecondary,
-    fontSize: 14.5,
-    lineHeight: 22,
-  },
-  heading1: {
-    color: colors.textPrimary,
-    fontSize: 18,
-    fontWeight: '800',
-    marginTop: 18,
-    marginBottom: 8,
-  },
-  heading2: {
-    color: colors.textPrimary,
-    fontSize: 16,
-    fontWeight: '800',
-    marginTop: 16,
-    marginBottom: 6,
-  },
-  heading3: {
-    color: colors.textPrimary,
-    fontSize: 15,
-    fontWeight: '700',
-    marginTop: 14,
-    marginBottom: 6,
-  },
-  heading4: {
-    color: colors.textPrimary,
-    fontSize: 14,
-    fontWeight: '700',
-    marginTop: 12,
-    marginBottom: 4,
-  },
-  paragraph: {
-    marginTop: 6,
-    marginBottom: 10,
-  },
-  strong: {
-    fontWeight: '800',
-    color: colors.textPrimary,
-  },
-  bullet_list: {
-    marginTop: 6,
-    marginBottom: 10,
-  },
-  ordered_list: {
-    marginTop: 6,
-    marginBottom: 10,
-  },
-  list_item: {
-    marginVertical: 3,
-  },
-  link: {
-    color: '#3b82f6',
-  },
-  code_inline: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 4,
-    borderRadius: 4,
-    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
-  },
-  table: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    marginVertical: 12,
-    overflow: 'hidden',
-  },
-  tr: {
-    borderBottomWidth: 1,
-    borderColor: colors.border,
-    flexDirection: 'row',
-  },
-  th: {
-    padding: 10,
-    backgroundColor: colors.surface + 'cc',
-    fontWeight: '800',
-    flex: 1,
-    minWidth: 110,
-    flexShrink: 1,
-    flexWrap: 'wrap',
-  },
-  td: {
-    padding: 10,
-    flex: 1,
-    minWidth: 110,
-    flexShrink: 1,
-    flexWrap: 'wrap',
-  },
-  image: {
-    width: '100%',
-    height: 220,
-    resizeMode: 'contain',
-    marginVertical: 12,
-  },
-});
+let globalTextColorMode: 'default' | 'black' = 'default';
+
+export const setGlobalTextColorMode = (mode: 'default' | 'black') => {
+  globalTextColorMode = mode;
+};
+
+export const getMarkdownStyles = (colors: any): any => {
+  const isDark = colors.textPrimary && (
+    colors.textPrimary.toLowerCase().startsWith('#f') || 
+    colors.textPrimary.toLowerCase().startsWith('#e') || 
+    colors.textPrimary.toLowerCase().startsWith('#d') ||
+    colors.textPrimary === 'white'
+  );
+  const headingColor = isDark ? '#60a5fa' : '#1d4ed8';
+
+  const baseTextColor = globalTextColorMode === 'black' 
+    ? (isDark ? '#ffffff' : '#000000') 
+    : colors.textSecondary;
+  const strongTextColor = globalTextColorMode === 'black'
+    ? (isDark ? '#ffffff' : '#000000')
+    : colors.textPrimary;
+
+  return {
+    body: {
+      color: baseTextColor,
+      fontSize: 14.5,
+      lineHeight: 22,
+    },
+    heading1: {
+      color: headingColor,
+      fontSize: 18,
+      fontWeight: '800',
+      marginTop: 18,
+      marginBottom: 8,
+    },
+    heading2: {
+      color: headingColor,
+      fontSize: 16,
+      fontWeight: '800',
+      marginTop: 16,
+      marginBottom: 6,
+    },
+    heading3: {
+      color: headingColor,
+      fontSize: 15,
+      fontWeight: '700',
+      marginTop: 14,
+      marginBottom: 6,
+    },
+    heading4: {
+      color: headingColor,
+      fontSize: 14,
+      fontWeight: '700',
+      marginTop: 12,
+      marginBottom: 4,
+    },
+    paragraph: {
+      marginTop: 6,
+      marginBottom: 10,
+    },
+    strong: {
+      fontWeight: '800',
+      color: strongTextColor,
+    },
+    bullet_list: {
+      marginTop: 6,
+      marginBottom: 10,
+    },
+    ordered_list: {
+      marginTop: 6,
+      marginBottom: 10,
+    },
+    list_item: {
+      marginVertical: 3,
+    },
+    link: {
+      color: '#3b82f6',
+    },
+    code_inline: {
+      backgroundColor: colors.surface,
+      paddingHorizontal: 4,
+      borderRadius: 4,
+      fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    },
+    table: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 12,
+      marginVertical: 12,
+      overflow: 'hidden',
+    },
+    tr: {
+      borderBottomWidth: 1,
+      borderColor: colors.border,
+      flexDirection: 'row',
+    },
+    th: {
+      padding: 10,
+      backgroundColor: colors.surface + 'cc',
+      fontWeight: '800',
+      flex: 1,
+      minWidth: 110,
+      flexShrink: 1,
+      flexWrap: 'wrap',
+    },
+    td: {
+      padding: 10,
+      flex: 1,
+      minWidth: 110,
+      flexShrink: 1,
+      flexWrap: 'wrap',
+    },
+    image: {
+      width: '100%',
+      height: 220,
+      resizeMode: 'contain',
+      marginVertical: 12,
+    },
+  };
+};
 
 const toggleFilterValue = (currentVal: string, valueToToggle: string, delimiter: string = '|'): string => {
   if (!currentVal || currentVal === 'All') {
@@ -3885,6 +3936,8 @@ interface MainsLeftPanelProps {
   userTags?: string[];
   onCloseSidebar?: () => void;
   allYears?: string[];
+  textColorMode?: 'default' | 'black';
+  onChangeTextColorMode?: (mode: 'default' | 'black') => void;
 }
 
 function MainsLeftPanel({
@@ -3918,6 +3971,8 @@ function MainsLeftPanel({
   userTags = [],
   onCloseSidebar,
   allYears = [],
+  textColorMode = 'default',
+  onChangeTextColorMode,
 }: MainsLeftPanelProps) {
   const { isDark } = useTheme();
   const isOptional = filters.paper !== 'All' && !filters.paper.split('|').some(p => ['GS1', 'GS2', 'GS3', 'GS4', 'Essay'].includes(p));
@@ -4268,6 +4323,65 @@ function MainsLeftPanel({
           })}
         </View>
       )}
+
+      {/* ── TEXT COLOR MODE CONTROL ── */}
+      <View style={{ marginTop: 24, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 16, paddingHorizontal: 4, marginBottom: 20 }}>
+        <Text style={{ fontSize: 9, fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginBottom: 8 }}>
+          TEXT READABILITY
+        </Text>
+        <View style={{ flexDirection: 'row', backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)', borderRadius: 8, padding: 3, gap: 4 }}>
+          <TouchableOpacity
+            onPress={() => onChangeTextColorMode?.('default')}
+            style={{
+              flex: 1,
+              paddingVertical: 8,
+              alignItems: 'center',
+              borderRadius: 6,
+              backgroundColor: textColorMode === 'default' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
+              ...Platform.select({
+                ios: textColorMode === 'default' ? {
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 2,
+                } : {},
+                android: textColorMode === 'default' ? {
+                  elevation: 1,
+                } : {},
+              }),
+            }}
+          >
+            <Text style={{ fontSize: 11, fontWeight: '700', color: textColorMode === 'default' ? colors.primary : colors.textSecondary }}>
+              Muted Grey
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => onChangeTextColorMode?.('black')}
+            style={{
+              flex: 1,
+              paddingVertical: 8,
+              alignItems: 'center',
+              borderRadius: 6,
+              backgroundColor: textColorMode === 'black' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
+              ...Platform.select({
+                ios: textColorMode === 'black' ? {
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 2,
+                } : {},
+                android: textColorMode === 'black' ? {
+                  elevation: 1,
+                } : {},
+              }),
+            }}
+          >
+            <Text style={{ fontSize: 11, fontWeight: '700', color: textColorMode === 'black' ? (isDark ? '#ffffff' : '#000000') : colors.textSecondary }}>
+              Deep Black
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </ScrollView>
   );
 }
@@ -5002,6 +5116,8 @@ function QuestionBankView({
   onCreateTag,
   vaFavorites = new Set<string>(),
   onToggleVaFavorite,
+  textColorMode = 'default',
+  onChangeTextColorMode,
 }: {
   colors: any;
   savedIds: string[];
@@ -5024,6 +5140,8 @@ function QuestionBankView({
   onCreateTag?: (tag: string) => void;
   vaFavorites?: Set<string>;
   onToggleVaFavorite?: (cardId: string) => void;
+  textColorMode?: 'default' | 'black';
+  onChangeTextColorMode?: (mode: 'default' | 'black') => void;
 }) {
   const { isDark } = useTheme();
   const [search, setSearch] = useState('');
@@ -5618,6 +5736,8 @@ function QuestionBankView({
               userTags={userTags}
               onCloseSidebar={() => setSidebarOpen(false)}
               allYears={allYears}
+              textColorMode={textColorMode}
+              onChangeTextColorMode={onChangeTextColorMode}
             />
           </View>
         )}
@@ -6176,7 +6296,12 @@ function QuestionBankView({
                   }}
                   style={[
                     styles.figmaQuestionCard,
-                    { backgroundColor: 'rgba(255, 255, 255, 0.45)', borderColor: 'rgba(255, 255, 255, 0.65)', marginBottom: 12 },
+                    {
+                      backgroundColor: 'rgba(255, 255, 255, 0.45)',
+                      borderColor: q.is_pyq ? 'rgba(34, 197, 94, 0.6)' : 'rgba(255, 255, 255, 0.65)',
+                      borderWidth: q.is_pyq ? 1.8 : 1.2,
+                      marginBottom: 12
+                    },
                   ]}
                 >
                   <TouchableOpacity
@@ -6199,9 +6324,30 @@ function QuestionBankView({
                   >
                     <View style={{ flex: 1 }}>
                       <View style={styles.badgeRow}>
+                        {!!q.is_pyq && (
+                          <View style={{
+                            backgroundColor: 'rgba(34, 197, 94, 0.12)',
+                            borderColor: 'rgba(34, 197, 94, 0.3)',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            paddingHorizontal: 6,
+                            paddingVertical: 1,
+                            marginRight: 8,
+                          }}>
+                            <Text style={{
+                              color: '#16a34a',
+                              fontSize: Math.round(zoomFontSize * 0.65),
+                              fontWeight: '900',
+                            }}>PYQ</Text>
+                          </View>
+                        )}
                         <Text style={[styles.paperBadgeText, { color: '#3b82f6', fontSize: Math.round(zoomFontSize * 0.65) }]}>{q.paper}</Text>
-                        <Text style={[styles.metaTextDot, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>•</Text>
-                        <Text style={[styles.metaText, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>{q.year}</Text>
+                        {!!q.year && (
+                          <>
+                            <Text style={[styles.metaTextDot, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>•</Text>
+                            <Text style={[styles.metaText, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>{q.year}</Text>
+                          </>
+                        )}
                         <Text style={[styles.metaTextDot, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>•</Text>
                         <Text style={[styles.metaText, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>{q.marks} Marks</Text>
                       </View>
@@ -8341,6 +8487,8 @@ function MainsAISearchView({
   onCreateTag,
   vaFavorites = new Set<string>(),
   onToggleVaFavorite,
+  textColorMode = 'default',
+  onChangeTextColorMode,
 }: {
   colors: any;
   isTablet: boolean;
@@ -8362,6 +8510,8 @@ function MainsAISearchView({
   onCreateTag?: (tag: string) => void;
   vaFavorites?: Set<string>;
   onToggleVaFavorite?: (cardId: string) => void;
+  textColorMode?: 'default' | 'black';
+  onChangeTextColorMode?: (mode: 'default' | 'black') => void;
 }) {
   const { isDark } = useTheme();
   const { session } = useAuth();
@@ -9577,6 +9727,8 @@ function MainsAISearchView({
               userTags={userTags}
               onCloseSidebar={() => setSidebarOpen(false)}
               allYears={allYears}
+              textColorMode={textColorMode}
+              onChangeTextColorMode={onChangeTextColorMode}
             />
           </View>
         )}

@@ -686,10 +686,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       const startsWithSubject = String(hp[0]).toLowerCase() === String(subject).toLowerCase();
       let offset = startsWithSubject ? 1 : 0;
 
-      // For optional subjects, there is an extra Anthro-1/Anthro-2 level in hierarchy
+      // For optional subjects, there is an extra Anthro-1/Anthro-2/Socio-1/Socio-2 level in hierarchy
       const secondLevel = hp[1] ? String(hp[1]).toLowerCase() : '';
       const thirdLevel = hp[2] ? String(hp[2]).toLowerCase() : '';
-      const isOptionalHierarchy = secondLevel.includes('anthro') || thirdLevel.includes('paper');
+      const isOptionalHierarchy = secondLevel.includes('anthro') || secondLevel.includes('socio') || thirdLevel.includes('paper');
       if (isOptionalHierarchy && startsWithSubject) {
         offset = 2;
       }
@@ -824,7 +824,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     const rangeSuffix = selectedRange === 'Custom Range'
       ? `Custom_Range_${customYearStart}_${customYearEnd}`
       : selectedRange.replace(/\s+/g, '_');
-    const cacheKey = `pyq_cache_v3_${stageNorm}_${targetPaperGroup.replace(/\s+/g, '_')}_${rangeSuffix}`;
+    const cacheKey = `pyq_cache_v4_${stageNorm}_${targetPaperGroup.replace(/\s+/g, '_')}_${rangeSuffix}`;
 
     if (!bypassCache) {
       try {
@@ -895,13 +895,27 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           }
           
           // Normalize Supabase column names to match the analytics code expectations
+          // Also normalize subject names so Sociology/Anthropology display correctly in heatmaps
+          const normalizeOptionalSubject = (subj: string | null | undefined): string => {
+            if (!subj) return 'Miscellaneous';
+            const s = subj.trim();
+            const u = s.toUpperCase();
+            if (u === 'ANTHROPOLOGY' || u.includes('ANTHRO')) return 'Anthropology';
+            if (u === 'SOCIOLOGY' || u.includes('SOCIO')) return 'Sociology';
+            if (u === 'GEOGRAPHY') return 'Geography';
+            if (u === 'HISTORY') return 'History';
+            if (u === 'PUBLIC ADMINISTRATION' || u === 'PUBLIC ADMIN') return 'Public Administration';
+            if (u === 'POLITICAL SCIENCE' || u === 'PSIR' || u.includes('POLITICAL')) return 'Political Science';
+            if (u === 'PHILOSOPHY') return 'Philosophy';
+            return s;
+          };
           const allMainsQuestions = mainsQs.map((q: any) => ({
             id: q.id,
             questionNumber: q.question_number,
             questionText: q.question_text,
             marks: q.marks,
             year: q.exam_year,
-            subject: q.subject,
+            subject: mappedPaper === 'Optional' ? normalizeOptionalSubject(q.subject) : (q.subject || ''),
             sectionGroup: q.section_group,
             microTopic: q.microtopic,
             subTopic: q.subtopic,

@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sociology Optional - Animated Orientation Presentation</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Exact PPT Theme Palette */
+      --ppt-navy: #1E2761;          /* Deep Classic Navy Blue */
+      --ppt-gold: #C9A227;          /* Rich Academic Gold Accent */
+      --ppt-gold-light: #FDF9EE;    /* Soft Gold Background Tint */
+      --ppt-canvas-bg: #F0F3F8;     /* PPT Widescreen Backdrop */
+      --ppt-slide-bg: #FFFFFF;      /* Clean Slide Background */
+      --ppt-card-white: #FFFFFF;     /* White Container Card */
+      --ppt-card-tint: #EDEFF7;      /* Light Navy-Tint Container */
+      
+      --ppt-text-dark: #1E2761;     /* Primary Dark Text */
+      --ppt-text-body: #2C3E50;     /* Body Text */
+      --ppt-text-muted: #64748B;    /* Muted Gray Text */
+      --ppt-bullet-gray: #AEB4C4;   /* Bullets */
+
+      --shadow-slide: 0 20px 40px -10px rgba(30, 39, 97, 0.15), 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+      --shadow-card: 0 6px 16px rgba(30, 39, 97, 0.08);
+    }
+
+    [data-theme="dark"] {
+      --ppt-canvas-bg: #0B0E1B;
+      --ppt-slide-bg: #141B36;
+      --ppt-card-white: #1E2761;
+      --ppt-card-tint: #18204D;
+      --ppt-text-dark: #FFFFFF;
+      --ppt-text-body: #E2E8F0;
+      --ppt-text-muted: #94A3B8;
+      --shadow-slide: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--ppt-canvas-bg);
+      color: var(--ppt-text-body);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.3s ease;
+    }
+
+    /* Top Control Bar */
+    header.app-control-bar {
+      height: 56px;
+      background-color: var(--ppt-navy);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-gold-tag {
+      background: var(--ppt-gold);
+      color: #000000;
+      font-weight: 800;
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .brand-title {
+      font-family: 'Georgia', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .control-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .slide-dropdown {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #FFFFFF;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .slide-dropdown option {
+      background: var(--ppt-navy);
+      color: #FFFFFF;
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #FFFFFF;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover, .btn-action.active-mode {
+      background: var(--ppt-gold);
+      color: #000000;
+      border-color: var(--ppt-gold);
+    }
+
+    /* Widescreen 16:9 Stage */
+    main.presentation-stage {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.2rem 2rem;
+    }
+
+    .slide-canvas {
+      position: absolute;
+      width: 100%;
+      max-width: 1280px;
+      aspect-ratio: 16 / 9;
+      height: auto;
+      max-height: 720px;
+      background: var(--ppt-slide-bg);
+      border-radius: 12px;
+      padding: 3rem 4rem 2.5rem 4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow-slide);
+      opacity: 0;
+      transform: scale(0.95) translateY(20px) rotateX(4deg);
+      pointer-events: none;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(201, 162, 39, 0.25);
+    }
+
+    .slide-canvas.active {
+      opacity: 1;
+      transform: scale(1) translateY(0) rotateX(0deg);
+      pointer-events: auto;
+      z-index: 10;
+    }
+
+    /* PPT Slide Header Layout */
+    .ppt-header {
+      margin-bottom: 1.5rem;
+      animation: fadeInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .ppt-category-tag {
+      color: var(--ppt-gold);
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+
+    .ppt-slide-title {
+      font-family: 'Georgia', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--ppt-text-dark);
+      line-height: 1.2;
+    }
+
+    .ppt-subtitle {
+      color: var(--ppt-text-muted);
+      font-size: 1.05rem;
+      margin-top: 6px;
+      font-weight: 500;
+    }
+
+    /* PPT Slide Content Area */
+    .ppt-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* PPT Slide Footer Bar */
+    .ppt-footer {
+      border-top: 1px solid rgba(201, 162, 39, 0.3);
+      padding-top: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--ppt-text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .ppt-footer-left { color: var(--ppt-text-muted); }
+    .ppt-footer-right { color: var(--ppt-gold); font-weight: 800; }
+
+    /* Grid Layouts */
+    .grid-cards {
+      display: grid;
+      gap: 1.2rem;
+      width: 100%;
+    }
+
+    .grid-2col { grid-template-columns: 1fr 1fr; }
+    .grid-3col { grid-template-columns: repeat(3, 1fr); }
+    .grid-4col { grid-template-columns: repeat(4, 1fr); }
+    .grid-5col { grid-template-columns: repeat(5, 1fr); }
+
+    /* PPT Animated Cards & Boxes */
+    .ppt-card-white, .ppt-card-navy, .thinker-box, .step-box {
+      opacity: 0;
+      transform: translateY(24px) scale(0.96);
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+      will-change: opacity, transform;
+    }
+
+    /* Animated State: Revealed */
+    .slide-canvas.active .anim-revealed {
+      opacity: 1 !important;
+      transform: translateY(0) scale(1) !important;
+    }
+
+    /* Staggered Delay Classes */
+    .delay-1 { transition-delay: 0.1s !important; }
+    .delay-2 { transition-delay: 0.25s !important; }
+    .delay-3 { transition-delay: 0.4s !important; }
+    .delay-4 { transition-delay: 0.55s !important; }
+    .delay-5 { transition-delay: 0.7s !important; }
+
+    .ppt-card-white {
+      background: var(--ppt-card-white);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      border-radius: 10px;
+      padding: 1.3rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .ppt-card-white:hover {
+      transform: translateY(-4px) scale(1.01) !important;
+      border-color: var(--ppt-gold);
+      box-shadow: 0 12px 24px rgba(201, 162, 39, 0.15);
+    }
+
+    .ppt-card-navy {
+      background: var(--ppt-navy);
+      color: #FFFFFF;
+      border-radius: 10px;
+      padding: 1.3rem;
+      box-shadow: 0 10px 20px rgba(30, 39, 97, 0.2);
+    }
+
+    .ppt-card-navy:hover {
+      transform: translateY(-4px) scale(1.01) !important;
+      box-shadow: 0 14px 28px rgba(30, 39, 97, 0.35);
+    }
+
+    .ppt-card-title {
+      font-family: 'Georgia', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--ppt-navy);
+      margin-bottom: 0.6rem;
+    }
+
+    .ppt-card-navy .ppt-card-title { color: var(--ppt-gold); }
+
+    .ppt-card-desc {
+      font-size: 0.92rem;
+      color: var(--ppt-text-body);
+      line-height: 1.55;
+    }
+
+    .ppt-card-navy .ppt-card-desc { color: #E2E8F0; }
+
+    .ppt-bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .ppt-bullet-list li {
+      font-size: 0.92rem;
+      color: var(--ppt-text-body);
+      position: relative;
+      padding-left: 1.2rem;
+      line-height: 1.5;
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .slide-canvas.active .anim-revealed .ppt-bullet-list li {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .ppt-bullet-list li::before {
+      content: "•";
+      color: var(--ppt-gold);
+      font-size: 1.4rem;
+      position: absolute;
+      left: 0;
+      top: -3px;
+    }
+
+    .ppt-card-navy .ppt-bullet-list li { color: #F1F5F9; }
+
+    /* Cover Layout */
+    .cover-layout {
+      text-align: left;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+
+    .cover-decorative-square {
+      position: absolute;
+      right: 0;
+      top: 10%;
+      width: 120px;
+      height: 120px;
+      background-color: var(--ppt-gold);
+      opacity: 0.9;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-size: 2.5rem;
+      box-shadow: 0 10px 20px rgba(201, 162, 39, 0.3);
+      animation: pulseGold 3s infinite ease-in-out;
+    }
+
+    .cover-tag {
+      color: var(--ppt-gold);
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+
+    .cover-title {
+      font-family: 'Georgia', serif;
+      font-size: 3.6rem;
+      font-weight: 700;
+      color: var(--ppt-navy);
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+
+    .cover-subtitle {
+      font-size: 1.4rem;
+      color: var(--ppt-text-body);
+      font-weight: 500;
+      margin-bottom: 2rem;
+    }
+
+    .cover-quote {
+      font-style: italic;
+      font-family: 'Georgia', serif;
+      font-size: 1.2rem;
+      color: var(--ppt-gold);
+      border-left: 3px solid var(--ppt-gold);
+      padding-left: 1rem;
+    }
+
+    /* SLIDE 4: 5 Thinker Avatars */
+    .thinker-box {
+      text-align: center;
+      background: var(--ppt-card-white);
+      border: 1px solid var(--ppt-card-tint);
+      border-radius: 10px;
+      padding: 1.4rem 0.8rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .thinker-icon {
+      width: 52px;
+      height: 52px;
+      background: var(--ppt-gold);
+      color: #000;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.2rem;
+      margin: 0 auto 0.8rem auto;
+      box-shadow: 0 4px 10px rgba(201, 162, 39, 0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .thinker-box:hover .thinker-icon {
+      transform: scale(1.15) rotate(5deg);
+    }
+
+    .thinker-name {
+      font-family: 'Georgia', serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--ppt-navy);
+      margin-bottom: 4px;
+    }
+
+    .thinker-role {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ppt-gold);
+      text-transform: uppercase;
+    }
+
+    /* Flow Banner Footer */
+    .flow-banner {
+      background: var(--ppt-card-tint);
+      border: 1px solid rgba(201, 162, 39, 0.3);
+      color: var(--ppt-navy);
+      text-align: center;
+      padding: 0.9rem;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: 0.5px;
+      margin-top: 1.2rem;
+      opacity: 0;
+      transform: translateY(15px);
+      transition: all 0.5s ease;
+    }
+
+    .slide-canvas.active .anim-revealed.flow-banner {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Bottom Dock Control Bar */
+    footer.dock-control-bar {
+      height: 60px;
+      background-color: var(--ppt-navy);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 3rem;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      z-index: 100;
+    }
+
+    .dock-counter {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .dock-counter span {
+      color: var(--ppt-gold);
+      font-size: 1.1rem;
+    }
+
+    .dock-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Keyframe Animations */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulseGold {
+      0%, 100% { transform: scale(1); box-shadow: 0 10px 20px rgba(201, 162, 39, 0.3); }
+      50% { transform: scale(1.05); box-shadow: 0 15px 30px rgba(201, 162, 39, 0.5); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Application Control Bar -->
+  <header class="app-control-bar">
+    <div class="brand-group">
+      <span class="brand-gold-tag">UPSC CSE</span>
+      <span class="brand-title">Sociology Optional Animated Deck</span>
+    </div>
+    <div class="control-actions">
+      <button class="btn-action active-mode" id="animModeBtn" onclick="toggleAnimMode()">
+        ⚡ Click-to-Reveal Animation: ON
+      </button>
+      
+      <select class="slide-dropdown" id="slideSelect" onchange="jumpToSlide(this.value)">
+        <option value="1">01 / 14: Title Cover</option>
+        <option value="2">02 / 14: The Case For This Optional</option>
+        <option value="3">03 / 14: What Is Sociology?</option>
+        <option value="4">04 / 14: Foundations - Thinkers</option>
+        <option value="5">05 / 14: Preparation Alone Isn't Enough</option>
+        <option value="6">06 / 14: About the Mentor (260+ Score)</option>
+        <option value="7">07 / 14: Learning Framework</option>
+        <option value="8">08 / 14: Where Preparation Goes Wrong</option>
+        <option value="9">09 / 14: Skill 1 - Answer Writing</option>
+        <option value="10">10 / 14: Skill 2 - Brainstorming</option>
+        <option value="11">11 / 14: Skill 3 - Note-Making</option>
+        <option value="12">12 / 14: Skill 4 - Analytical Thinking</option>
+        <option value="13">13 / 14: Skill 5 - Current Affairs</option>
+        <option value="14">14 / 14: Transformation & Goal</option>
+      </select>
+
+      <button class="btn-action" onclick="toggleTheme()">☀️ / 🌙 Theme</button>
+      <button class="btn-action" onclick="window.print()">📄 Export PDF</button>
+    </div>
+  </header>
+
+  <!-- Widescreen 16:9 Stage -->
+  <main class="presentation-stage">
+
+    <!-- SLIDE 1 -->
+    <div class="slide-canvas active" id="slide-1">
+      <div class="cover-layout">
+        <div class="cover-decorative-square">📖</div>
+        <div class="cover-tag">UPSC CSE MAINS · ORIENTATION SESSION</div>
+        <h1 class="cover-title">Sociology Optional</h1>
+        <div class="cover-subtitle">Understanding Society. Writing Better Answers.</div>
+        <div class="cover-quote">
+          “Don't just study Sociology. Learn to see society differently.”
+        </div>
+      </div>
+      <div class="ppt-footer">
+        <span class="ppt-footer-left">SOCIOLOGY OPTIONAL | UPSC CSE MAINS ORIENTATION</span>
+        <span class="ppt-footer-right">01 / 14</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 2 -->
+    <div class="slide-canvas" id="slide-2">
+      <div class="ppt-header">
+        <div class="ppt-category-tag">THE CASE FOR THIS OPTIONAL</div>
+        <h2 class="ppt-slide-title">Why Sociology, Why Now?</h2>
+      </div>
+      <div class="ppt-body">
+        <div class="grid-cards grid-2col">
+          <div class="ppt-card-white anim-item delay-1">
+            <div class="ppt-card-title">A High-Scoring Optional</div>
+            <div class="ppt-card-desc">A compact, static syllabus with predictable patterns — consistently among the better-scoring optionals when prepared systematically.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-2">
+            <div class="ppt-card-title">Synergy With the Rest of the Exam</div>
+            <div class="ppt-card-desc">Concepts overlap directly with GS-I, GS-II, Essay and the Interview — one subject, multiple returns.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-3">
+            <div class="ppt-card-title">Everyday Relevance</div>
+            <div class="ppt-card-desc">Helps you read and explain caste, gender, family, poverty and social change — the fabric of Indian society itself.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-4">
+            <div class="ppt-card-title">Stable, Learnable Syllabus</div>
+            <div class="ppt-card-desc">Thinkers and themes have stayed largely consistent for years — depth built once pays off across both papers.</div>
+          </div>
+        </div>
+      </div>
+      <div class="ppt-footer">
+        <span class="ppt-footer-left">SOCIOLOGY OPTIONAL | UPSC CSE MAINS ORIENTATION</span>
+        <span class="ppt-footer-right">02 / 14</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 3 -->
+    <div class="slide-canvas" id="slide-3">
+      <div class="ppt-header">
+        <div class="ppt-category-tag">THE DISCIPLINE, DEFINED</div>
+        <h2 class="ppt-slide-title">What Is Sociology?</h2>
+        <div class="ppt-subtitle">Sociology is the systematic study of society — of social relationships, institutions, and the shared patterns that hold group life together. It asks why people, groups and institutions behave the way they do.</div>
+      </div>
+      <div class="ppt-body">
+        <div style="font-weight: 800; font-size: 0.85rem; color: var(--ppt-gold); letter-spacing: 1.5px; margin-bottom: 0.8rem; text-transform: uppercase;">WHAT WE STUDY</div>
+        <div class="grid-cards grid-2col">
+          <div class="ppt-card-white anim-item delay-1">
+            <div class="ppt-card-title">Social Structure & Institutions</div>
+            <div class="ppt-card-desc">Family, marriage, religion, economy and polity as interlinked systems.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-2">
+            <div class="ppt-card-title">Stratification & Social Change</div>
+            <div class="ppt-card-desc">Class, caste, gender and the forces that drive or resist change.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-3">
+            <div class="ppt-card-title">Culture & Socialization</div>
+            <div class="ppt-card-desc">How norms, values and identity are learned, shared and passed on.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-4">
+            <div class="ppt-card-title">Sociological Theory</div>
+            <div class="ppt-card-desc">Thinkers and perspectives used to explain and interpret social life.</div>
+          </div>
+        </div>
+      </div>
+      <div class="ppt-footer">
+        <span class="ppt-footer-left">SOCIOLOGY OPTIONAL | UPSC CSE MAINS ORIENTATION</span>
+        <span class="ppt-footer-right">03 / 14</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 4 -->
+    <div class="slide-canvas" id="slide-4">
+      <div class="ppt-header">
+        <div class="ppt-category-tag">FOUNDATIONS OF SOCIOLOGICAL THOUGHT</div>
+        <h2 class="ppt-slide-title">The Thinkers You'll Meet</h2>
+      </div>
+      <div class="ppt-body">
+        <div class="grid-cards grid-5col">
+          <div class="thinker-box anim-item delay-1">
+            <div class="thinker-icon">AC</div>
+            <div class="thinker-name">Auguste Comte</div>
+            <div class="thinker-role">Father of Sociology</div>
+          </div>
+          <div class="thinker-box anim-item delay-2">
+            <div class="thinker-icon">KM</div>
+            <div class="thinker-name">Karl Marx</div>
+            <div class="thinker-role">Class & Conflict</div>
+          </div>
+          <div class="thinker-box anim-item delay-3">
+            <div class="thinker-icon">ED</div>
+            <div class="thinker-name">Émile Durkheim</div>
+            <div class="thinker-role">Social Facts & Solidarity</div>
+          </div>
+          <div class="thinker-box anim-item delay-4">
+            <div class="thinker-icon">MW</div>
+            <div class="thinker-name">Max Weber</div>
+            <div class="thinker-role">Social Action & Rationality</div>
+          </div>
+          <div class="thinker-box anim-item delay-5">
+            <div class="thinker-icon">MS</div>
+            <div class="thinker-name">M.N. Srinivas</div>
+            <div class="thinker-role">Sanskritisation & India</div>
+          </div>
+        </div>
+        <div class="flow-banner anim-item delay-5" style="margin-top: 1.5rem;">
+          Every theory we study traces back to one of these five minds — including India's own voice in the discipline.
+        </div>
+      </div>
+      <div class="ppt-footer">
+        <span class="ppt-footer-left">SOCIOLOGY OPTIONAL | UPSC CSE MAINS ORIENTATION</span>
+        <span class="ppt-footer-right">04 / 14</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 5 -->
+    <div class="slide-canvas" id="slide-5">
+      <div class="ppt-header">
+        <div class="ppt-category-tag">WHY GOOD EFFORT DOESN'T ALWAYS SCORE</div>
+        <h2 class="ppt-slide-title">Preparation Alone Isn't Enough</h2>
+        <div class="ppt-subtitle">Hard work matters — but the right strategy matters even more.</div>
+      </div>
+      <div class="ppt-body">
+        <div class="grid-cards grid-2col">
+          <div class="ppt-card-white anim-item delay-1" style="border-left: 4px solid #E11D48;">
+            <div class="ppt-card-title" style="color: #E11D48;">WHAT HOLDS STUDENTS BACK</div>
+            <ul class="ppt-bullet-list">
+              <li>Learning facts instead of concepts</li>
+              <li>Scattered notes from too many sources</li>
+              <li>Studying thinkers in isolation</li>
+              <li>Ignoring previous year questions</li>
+              <li>Starting answer writing too late</li>
+            </ul>
+          </div>
+          <div class="ppt-card-navy anim-item delay-2">
+            <div class="ppt-card-title">HOW THIS COURSE HELPS</div>
+            <ul class="ppt-bullet-list">
+              <li>Concept-first learning</li>
+              <li>Thinker-based understanding</li>
+              <li>Current affairs integration</li>
+              <li>PYQ-oriented preparation</li>
+              <li>Writing + revision framework</li>
+            </ul>
+          </div>
+        </div>
+        <div class="flow-banner anim-item delay-3">
+          Clear Concepts  →  Better Analysis  →  Better Answers  →  Higher Scores
+        </div>
+      </div>
+      <div class="ppt-footer">
+        <span class="ppt-footer-left">SOCIOLOGY OPTIONAL | UPSC CSE MAINS ORIENTATION</span>
+        <span class="ppt-footer-right">05 / 14</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 6 -->
+    <div class="slide-canvas" id="slide-6">
+      <div class="ppt-header">
+        <div class="ppt-category-tag">ABOUT THE MENTOR</div>
+        <h2 class="ppt-slide-title">Why Learn With Me?</h2>
+      </div>
+      <div class="ppt-body">
+        <div class="grid-cards grid-2col">
+          <div class="ppt-card-navy anim-item delay-1">
+            <div class="ppt-card-title">260+ Sociology Score</div>
+            <div class="ppt-card-desc">Strong command over Paper I & II, built through consistent concept-first preparation — not shortcuts.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-2">
+            <div class="ppt-card-title">What You'll Get</div>
+            <div class="ppt-card-desc">The same structured, repeatable framework that shaped this Sociology score — built here for you to follow.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-3">
+            <div class="ppt-card-title">UPSC-Oriented Approach</div>
+            <div class="ppt-card-desc">Integration of thinkers, current affairs and PYQs into every answer — not theory studied in isolation.</div>
+          </div>
+          <div class="ppt-card-navy anim-item delay-4">
+            <div class="ppt-card-title">Concept-First Foundation</div>
+            <div class="ppt-card-desc">A preparation journey built on conceptual clarity and answer writing — not rote memorisation.</div>
+          </div>
+        </div>
+      </div>
+      <div class="ppt-footer">
+        <span class="ppt-footer-left">SOCIOLOGY OPTIONAL | UPSC CSE MAINS ORIENTATION</span>
+        <span class="ppt-footer-right">06 / 14</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 7 -->
+    <div class="slide-canvas" id="slide-7">
+      <div class="ppt-header">
+        <div class="ppt-category-tag">THE LEARNING FRAMEWORK</div>
+        <h2 class="ppt-slide-title">How We'll Study Every Topic</h2>
+      </div>
+      <div class="ppt-body">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 1.5rem 0;">
+          <div class="ppt-card-white anim-item delay-1" style="flex:1; text-align:center; padding: 1.2rem 0.5rem;"><span style="color:var(--ppt-gold); font-weight:800;">1</span><br><strong>Concept</strong></div>
+          <span style="color:var(--ppt-gold); font-weight:800; font-size:1.4rem;">→</span>
+          <div class="ppt-card-white anim-item delay-2" style="flex:1; text-align:center; padding: 1.2rem 0.5rem;"><span style="color:var(--ppt-gold); font-weight:800;">2</span><br><strong>Thinker</strong></div>
+          <span style="color:var(--ppt-gold); font-weight:800; font-size:1.4rem;">→</span>
+          <div class="ppt-card-white anim-item delay-3" style="flex:1; text-align:center; padding: 1.2rem 0.5rem;"><span style="color:var(--ppt-gold); font-weight:800;">3</span><br><strong>Current Affairs</strong></div>
+          <span style="color:var(--ppt-gold); font-weight:800; font-size:1.4rem;">→</span>
+          <div class="ppt-card-white anim-item delay-4" style="flex:1; text-align:center; padding: 1.2rem 0.5rem;"><span style="color:var(--ppt-gold); font-weight:800;">4</span><br><strong>PYQ</strong></div>
+          <span style="color:var(--ppt-gold); font-weight:800; font-size:1.4rem;">→</span>
+          <div class="ppt-card-white anim-item delay-5" style="flex:1; text-align:center; padding: 1.2rem 0.5rem;"><span style="color:var(--ppt-gold); font-weight:800;">5</span><br><strong>Answer Writing</strong></div>
+          <span style="color:var(--ppt-gold); font-weight:800; font-size:1.4rem;">→</span>
+          <div class="ppt-card-navy anim-item delay-5" style="flex:1; text-align:center; padding: 1.2rem 0.5rem;"><span style="color:var(--ppt-gold); font-weight:800;">6</span><br><strong>Revision</strong></div>
+        </div>
+        <div class="flow-banner anim-item delay-5">
+          The goal isn't to memorise Sociology — it's to develop a sociological way of thinking.
+        </div>
+      </div>
+      <div class="ppt-footer">
+        <span class="ppt-footer-left">SOCIOLOGY OPTIONAL | UPSC CSE MAINS ORIENTATION</span>
+        <span class="ppt-footer-right">07 / 14</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 8 -->
+    <div class="slide-canvas" id="slide-8">
+      <div class="ppt-header">
+        <div class="ppt-category-tag">WHERE PREPARATION GOES WRONG</div>
+        <h2 class="ppt-slide-title">Why Are Students Not Scoring Well?</h2>
+        <div class="ppt-subtitle">Most attempts fail not from a lack of effort, but from a few avoidable, fixable gaps.</div>
+      </div>
+      <div class="ppt-body">
+        <div class="grid-cards grid-2col">
+          <div class="ppt-card-white anim-item delay-1" style="border-left: 4px solid #E11D48;">
+            <div class="ppt-card-title" style="color: #E11D48;">CONCEPTUAL & CONTENT GAPS</div>
+            <ul class="ppt-bullet-list">
+              <li>Lack of conceptual clarity</li>
+              <li>Memorising instead of understanding</li>
+              <li>Poor content structuring</li>
+              <li>Thinkers not linked to current issues</li>
+              <li>Inadequate revision and practice</li>
+            </ul>
+          </div>
+          <div class="ppt-card-navy anim-item delay-2">
+            <div class="ppt-card-title">WRITING & EXAM-CRAFT GAPS</div>
+            <ul class="ppt-bullet-list">
+              <li>Weak answer-writing skills</li>
+              <li>Missing diagrams, flowcharts, examples</li>
+              <li>Weak introductions and conclusions</li>
+              <li>Poor time and word-limit control</li>
+              <li>Theory and current affairs kept apart</li>
+            </ul>
+          </div>
+        </div>
+        <div class="flow-banner anim-item delay-3">
+          Spot the Gap  →  Fix the Approach  →  Write Better  →  Score Higher
+        </div>
+      </div>
+      <div class="ppt-footer">
+        <span class="ppt-footer-left">SOCIOLOGY OPTIONAL | UPSC CSE MAINS ORIENTATION</span>
+        <span class="ppt-footer-right">08 / 14</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 9 -->
+    <div class="slide-canvas" id="slide-9">
+      <div class="ppt-header">
+        <div class="ppt-category-tag">WHERE MARKS ARE ACTUALLY WON</div>
+        <h2 class="ppt-slide-title">Skill 1: Answer Writing Mastery</h2>
+        <div class="ppt-subtitle">How an answer is opened, argued and closed decides the score — not just how much is known.</div>
+      </div>
+      <div class="ppt-body">
+        <div class="grid-cards grid-2col">
+          <div class="ppt-card-white anim-item delay-1">
+            <div class="ppt-card-title">Structured Openings & Closings</div>
+            <div class="ppt-card-desc">Framing an answer with a crisp introduction and a value-added conclusion.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-2">
+            <div class="ppt-card-title">Thinkers & Examples in Support</div>
+            <div class="ppt-card-desc">Weaving in the right sociologist, study or illustration to back every claim.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-3">
+            <div class="ppt-card-title">Diagrams & Flowcharts</div>
+            <div class="ppt-card-desc">Using visual representation to communicate structure and save writing time.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-4">
+            <div class="ppt-card-title">Time & Word-Limit Discipline</div>
+            <div class="ppt-card-desc">Fitting depth into the space and minutes each question actually allows.</div>
+          </div>
+        </div>
+      </div>
+      <div class="ppt-footer">
+        <span class="ppt-footer-left">SOCIOLOGY OPTIONAL | UPSC CSE MAINS ORIENTATION</span>
+        <span class="ppt-footer-right">09 / 14</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 10 -->
+    <div class="slide-canvas" id="slide-10">
+      <div class="ppt-header">
+        <div class="ppt-category-tag">FROM BLANK PAGE TO FULL ANSWER</div>
+        <h2 class="ppt-slide-title">Skill 2: Brainstorming & Structuring</h2>
+      </div>
+      <div class="ppt-body">
+        <div class="grid-cards grid-2col">
+          <div class="ppt-card-white anim-item delay-1">
+            <div class="ppt-card-title">Brainstorming Techniques</div>
+            <ul class="ppt-bullet-list">
+              <li>Rapid keyword mapping the moment you read a question</li>
+              <li>Dimension-based recall — social, economic, political, cultural</li>
+              <li>Building a 60-second skeleton before writing a single line</li>
+            </ul>
+          </div>
+          <div class="ppt-card-navy anim-item delay-2">
+            <div class="ppt-card-title">Content Structuring</div>
+            <ul class="ppt-bullet-list">
+              <li>Thinker-wise vs theme-wise structuring, and when to use each</li>
+              <li>Point-wise paragraphing for easy examiner scanning</li>
+              <li>Logical sequencing: concept, dimensions, examples, critique</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="ppt-footer">
+        <span class="ppt-footer-left">SOCIOLOGY OPTIONAL | UPSC CSE MAINS ORIENTATION</span>
+        <span class="ppt-footer-right">10 / 14</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 11 -->
+    <div class="slide-canvas" id="slide-11">
+      <div class="ppt-header">
+        <div class="ppt-category-tag">NOTES YOU CAN ACTUALLY REVISE</div>
+        <h2 class="ppt-slide-title">Skill 3: Note-Making Strategies</h2>
+        <div class="ppt-subtitle">Good notes are built for the exam room, not for admiration — short, layered, and easy to revise.</div>
+      </div>
+      <div class="ppt-body">
+        <div class="grid-cards grid-2col">
+          <div class="ppt-card-white anim-item delay-1">
+            <div class="ppt-card-title">Thinker-Wise Compilation</div>
+            <div class="ppt-card-desc">One consolidated page per sociologist — core ideas, terms and criticism.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-2">
+            <div class="ppt-card-title">Theme-Wise Cross-Referencing</div>
+            <div class="ppt-card-desc">Linking the same thinker or concept across different topics of the syllabus.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-3">
+            <div class="ppt-card-title">A Running Current Affairs Diary</div>
+            <div class="ppt-card-desc">Capturing real-world examples as they happen, tagged to the right theme.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-4">
+            <div class="ppt-card-title">One-Page Revision Sheets</div>
+            <div class="ppt-card-desc">Condensing full topics down to exam-morning-ready summaries.</div>
+          </div>
+        </div>
+      </div>
+      <div class="ppt-footer">
+        <span class="ppt-footer-left">SOCIOLOGY OPTIONAL | UPSC CSE MAINS ORIENTATION</span>
+        <span class="ppt-footer-right">11 / 14</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 12 -->
+    <div class="slide-canvas" id="slide-12">
+      <div class="ppt-header">
+        <div class="ppt-category-tag">BEYOND ROTE LEARNING</div>
+        <h2 class="ppt-slide-title">Skill 4: Conceptual & Analytical Thinking</h2>
+        <div class="ppt-subtitle">Concepts are tools for thinking, not lines to memorise. This skill builds the habit of reasoning through a question rather than reproducing a memorised paragraph.</div>
+      </div>
+      <div class="ppt-body">
+        <div class="grid-cards grid-3col">
+          <div class="ppt-card-white anim-item delay-1">
+            <div class="ppt-card-title">Depth Over Definitions</div>
+            <div class="ppt-card-desc">Understanding why a concept was proposed, not only what it states.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-2">
+            <div class="ppt-card-title">Comparative Reading</div>
+            <div class="ppt-card-desc">Placing perspectives side by side to see where thinkers agree or clash.</div>
+          </div>
+          <div class="ppt-card-white anim-item delay-3">
+            <div class="ppt-card-title">Building a Critical Lens</div>
+            <div class="ppt-card-desc">Questioning and evaluating theories instead of accepting them at face value.</div>
+          </div>
+        </div>
+      </div>
+      <div class="ppt-footer">
+        <span class="ppt-footer-left">SOCIOLOGY OPTIONAL | UPSC CSE MAINS ORIENTATION</span>
+        <span class="ppt-footer-right">12 / 14</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 13 -->
+    <div class="slide-canvas" id="slide-13">
+      <div class="ppt-header">
+        <div class="ppt-category-tag">MAKING THEORY COUNT ON PAPER</div>
+        <h2 class="ppt-slide-title">Skill 5: Current Affairs & Scoring High</h2>
+      </div>
+      <div class="ppt-body">
+        <div class="ppt-card-white anim-item delay-1" style="border-left: 4px solid var(--ppt-gold); background: var(--ppt-gold-light); margin-bottom: 1rem;">
+          <div style="font-weight: 800; color: var(--ppt-gold); margin-bottom: 4px; font-size: 0.85rem; letter-spacing: 1px;">EXAMPLE — DURKHEIM'S LENS ON TODAY</div>
+          <div style="font-size: 0.95rem; color: var(--ppt-text-body); line-height: 1.5;">
+            Durkheim's ideas of social integration and anomie explain rising urban isolation and suicide rates in modern India — theory becomes a live analytical tool, not a memorised definition.
+          </div>
+        </div>
+
+        <div class="grid-cards grid-2col">
+          <div class="ppt-card-white anim-item delay-2">
+            <div class="ppt-card-title">Theory Meets Real Life</div>
+            <ul class="ppt-bullet-list">
+              <li>Pairing every classical theory with a live, contemporary example</li>
+              <li>Reading news through a sociological lens, not a current-affairs one</li>
+            </ul>
+          </div>
+          <div class="ppt-card-navy anim-item delay-3">
+            <div class="ppt-card-title">Scoring High in the Paper</div>
+            <ul class="ppt-bullet-list">
+              <li>Writing the way examiners are trained to reward, not just to inform</li>
+              <li>Smart value-addition — data, diagrams, committee references</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="ppt-footer">
+        <span class="ppt-footer-left">SOCIOLOGY OPTIONAL | UPSC CSE MAINS ORIENTATION</span>
+        <span class="ppt-footer-right">13 / 14</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 14 -->
+    <div class="slide-canvas" id="slide-14">
+      <div class="ppt-header">
+        <div class="ppt-category-tag">THE TRANSFORMATION</div>
+        <h2 class="ppt-slide-title">What You'll Become</h2>
+        <div class="ppt-subtitle">This course is designed to transform the way you study Sociology.</div>
+      </div>
+      <div class="ppt-body">
+        <div class="grid-cards grid-2col" style="margin-bottom: 1.2rem;">
+          <div class="ppt-card-white anim-item delay-1" style="display:flex; justify-space-between; align-items:center;">
+            <span style="color:#E11D48; font-weight:700;">Memorising</span>
+            <span style="color:var(--ppt-gold); font-weight:800;">→</span>
+            <span style="color:#059669; font-weight:800;">Analysing</span>
+          </div>
+          <div class="ppt-card-white anim-item delay-2" style="display:flex; justify-space-between; align-items:center;">
+            <span style="color:#E11D48; font-weight:700;">Confusion</span>
+            <span style="color:var(--ppt-gold); font-weight:800;">→</span>
+            <span style="color:#059669; font-weight:800;">Conceptual Clarity</span>
+          </div>
+          <div class="ppt-card-white anim-item delay-3" style="display:flex; justify-space-between; align-items:center;">
+            <span style="color:#E11D48; font-weight:700;">Scattered Notes</span>
+            <span style="color:var(--ppt-gold); font-weight:800;">→</span>
+            <span style="color:#059669; font-weight:800;">Structured Revision</span>
+          </div>
+          <div class="ppt-card-white anim-item delay-4" style="display:flex; justify-space-between; align-items:center;">
+            <span style="color:#E11D48; font-weight:700;">Average Answers</span>
+            <span style="color:var(--ppt-gold); font-weight:800;">→</span>
+            <span style="color:#059669; font-weight:800;">UPSC-Ready Answers</span>
+          </div>
+        </div>
+
+        <div class="ppt-card-navy anim-item delay-5" style="text-align:center; padding: 1.2rem;">
+          <span style="font-family:'Georgia', serif; font-size:1.5rem; font-weight:700; letter-spacing:2px; color:var(--ppt-gold);">
+            Think Better  ·  Write Better  ·  Score Better
+          </span>
+        </div>
+      </div>
+      <div class="ppt-footer">
+        <span class="ppt-footer-left">SOCIOLOGY OPTIONAL | UPSC CSE MAINS ORIENTATION</span>
+        <span class="ppt-footer-right">14 / 14</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Control Dock Bar -->
+  <footer class="dock-control-bar">
+    <div class="dock-counter">
+      Slide <span id="currentNum">1</span> of <span>14</span>
+    </div>
+    <div class="dock-buttons">
+      <button class="btn-action" onclick="prevStepOrSlide()">← Previous</button>
+      <button class="btn-action" style="background:var(--ppt-gold); color:#000; font-weight:800;" onclick="nextStepOrSlide()">Next / Reveal →</button>
+    </div>
+  </footer>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 14;
+    let animStepMode = true;
+
+    function getActiveAnimItems() {
+      const activeSlide = document.querySelector(`.slide-canvas#slide-${currentSlide}`);
+      if (!activeSlide) return [];
+      return Array.from(activeSlide.querySelectorAll('.anim-item'));
+    }
+
+    function updateDeck(revealAll = false) {
+      document.querySelectorAll('.slide-canvas').forEach((s, idx) => {
+        if (idx + 1 === currentSlide) {
+          s.classList.add('active');
+          const animItems = s.querySelectorAll('.anim-item');
+          if (!animStepMode || revealAll) {
+            animItems.forEach(item => item.classList.add('anim-revealed'));
+          } else {
+            animItems.forEach(item => item.classList.remove('anim-revealed'));
+            // Automatically reveal first item on slide change
+            if (animItems.length > 0) {
+              animItems[0].classList.add('anim-revealed');
+            }
+          }
+        } else {
+          s.classList.remove('active');
+          s.querySelectorAll('.anim-item').forEach(item => item.classList.remove('anim-revealed'));
+        }
+      });
+      document.getElementById('currentNum').innerText = currentSlide;
+      document.getElementById('slideSelect').value = currentSlide;
+    }
+
+    function nextStepOrSlide() {
+      if (animStepMode) {
+        const animItems = getActiveAnimItems();
+        const unrevealed = animItems.filter(item => !item.classList.contains('anim-revealed'));
+        if (unrevealed.length > 0) {
+          unrevealed[0].classList.add('anim-revealed');
+          return;
+        }
+      }
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateDeck();
+      }
+    }
+
+    function prevStepOrSlide() {
+      if (animStepMode) {
+        const animItems = getActiveAnimItems();
+        const revealed = animItems.filter(item => item.classList.contains('anim-revealed'));
+        if (revealed.length > 1) {
+          revealed[revealed.length - 1].classList.remove('anim-revealed');
+          return;
+        }
+      }
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateDeck();
+      }
+    }
+
+    function jumpToSlide(num) {
+      currentSlide = parseInt(num);
+      updateDeck();
+    }
+
+    function toggleAnimMode() {
+      animStepMode = !animStepMode;
+      const btn = document.getElementById('animModeBtn');
+      if (animStepMode) {
+        btn.classList.add('active-mode');
+        btn.innerText = '⚡ Click-to-Reveal Animation: ON';
+        updateDeck(false);
+      } else {
+        btn.classList.remove('active-mode');
+        btn.innerText = '⚡ Click-to-Reveal Animation: OFF';
+        updateDeck(true);
+      }
+    }
+
+    function toggleTheme() {
+      const htmlEl = document.documentElement;
+      const theme = htmlEl.getAttribute('data-theme');
+      htmlEl.setAttribute('data-theme', theme === 'light' ? 'dark' : 'light');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') {
+        e.preventDefault();
+        nextStepOrSlide();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevStepOrSlide();
+      }
+    });
+
+    updateDeck();
+  </script>
+</body>
+</html>

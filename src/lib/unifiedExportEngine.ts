@@ -2130,18 +2130,37 @@ const renderPyqHeatmapSvg = (
     return Math.max(max, ...vals);
   }, 1);
 
+  // Compute column widths to fit A4 (portrait ~170mm usable)
+  // Label col + Total col + N year cols
+  const totalCols = years.length + 2; // label + total + years
+  // label: 38%, total: 8%, years share rest equally
+  const yearPct = Math.max(3, Math.floor(54 / Math.max(1, years.length)));
+  const labelPct = Math.max(25, 100 - 8 - (yearPct * years.length));
+
+  // Short year label: 2025 → '25
+  const shortYear = (y: string) => `'${String(y).slice(-2)}`;
+
   return `
     <section class="analysis-card">
       <h3 id="${headingId}">${escHtml(title)}</h3>
-      <table class="analysis-heatmap-table">
-        <thead><tr><th>${escHtml(labelHeader)}</th><th>Total</th>${years.map((year) => `<th>${escHtml(year)}</th>`).join('')}</tr></thead>
+      <table class="analysis-heatmap-table" style="table-layout: fixed; width: 100%;">
+        <colgroup>
+          <col style="width: ${labelPct}%;">
+          <col style="width: 8%;">
+          ${years.map(() => `<col style="width: ${yearPct}%;">`).join('')}
+        </colgroup>
+        <thead><tr>
+          <th style="text-align:left; padding: 3px 4px; font-size: 8pt; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escHtml(labelHeader)}</th>
+          <th style="text-align:center; padding: 3px 2px; font-size: 8pt; white-space: nowrap;">Total</th>
+          ${years.map((year) => `<th style="text-align:center; padding: 3px 1px; font-size: 7.5pt; white-space: nowrap;">${shortYear(year)}</th>`).join('')}
+        </tr></thead>
         <tbody>
           ${rows.map((row) => {
             const rowTotal = years.reduce((sum, yr) => sum + (row.byYear[yr] || 0), 0);
             return `
               <tr>
-                <td>${escHtml(row.label)}</td>
-                <td style="font-weight: 800; text-align: center; vertical-align: middle; font-size: 8.5pt; color: #374151; background: #F1F5F9; border-right: 1px solid #E2E8F0;">${rowTotal}</td>
+                <td style="padding: 3px 4px; font-size: 7.5pt; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escHtml(row.label)}</td>
+                <td style="font-weight: 800; text-align: center; vertical-align: middle; font-size: 8pt; color: #374151; background: #F1F5F9; border-right: 1px solid #E2E8F0; padding: 3px 2px;">${rowTotal}</td>
                 ${years.map((year) => {
                   const count = row.byYear[year] || 0;
                   let bg = '#F8FAFC';
@@ -2163,10 +2182,10 @@ const renderPyqHeatmapSvg = (
       }
     }
 
-    return `<td style="background: ${normalizeHex(bg, '#F8FAFC')}; color: ${normalizeHex(tc, '#0F172A')}; font-weight: 800; text-align: center; vertical-align: middle; font-size: 8.5pt;">${count || ''}</td>`;
+    return `<td style="background: ${normalizeHex(bg, '#F8FAFC')}; color: ${normalizeHex(tc, '#0F172A')}; font-weight: 800; text-align: center; vertical-align: middle; font-size: 8pt; padding: 3px 1px;">${count || ''}</td>`;
   }).join('')}
-            </tr>
-          `;
+              </tr>
+            `;
           }).join('')}
         </tbody>
       </table>
@@ -2417,11 +2436,11 @@ export const buildPyqAnalysisSummaryHtml = (input: BuildPyqAnalysisSummaryInput)
       .analysis-summary .donut-legend-dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; margin-right: 7px; }
       .analysis-summary .analysis-heatmap-table { width: 100%; border-collapse: collapse; margin-top: 2mm; table-layout: fixed; }
       .analysis-summary .analysis-heatmap-table th,
-      .analysis-summary .analysis-heatmap-table td { border: 1px solid #CBD5E1; padding: 3px 5px; font-size: 7.5pt; line-height: 1.2; text-align: left; overflow: hidden; text-overflow: ellipsis; }
+      .analysis-summary .analysis-heatmap-table td { border: 1px solid #CBD5E1; padding: 3px 2px; font-size: 7.5pt; line-height: 1.2; overflow: hidden; }
       .analysis-summary .analysis-heatmap-table th:first-child,
-      .analysis-summary .analysis-heatmap-table td:first-child { width: 55%; font-weight: 600; white-space: normal; overflow-wrap: break-word; word-break: break-word; }
+      .analysis-summary .analysis-heatmap-table td:first-child { text-align: left; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .analysis-summary .analysis-heatmap-table th:not(:first-child),
-      .analysis-summary .analysis-heatmap-table td:not(:first-child) { text-align: center; padding: 3px 1px; font-size: 7.5pt; text-overflow: clip; overflow: visible; white-space: nowrap; }
+      .analysis-summary .analysis-heatmap-table td:not(:first-child) { text-align: center; white-space: nowrap; }
       .analysis-summary .analysis-heatmap-table th { background: #E2E8F0; font-weight: 800; }
       .analysis-summary table,
       .analysis-summary tr,

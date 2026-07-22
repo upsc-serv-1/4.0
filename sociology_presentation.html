@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sociology Optional - UPSC Mains Introductory Orientation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Light Theme (Default) */
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --border-card: #e2e8f0;
+      --accent-primary: #2563eb;
+      --accent-gold: #d97706;
+      --accent-teal: #0d9488;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-sub: #334155;
+      --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+    }
+
+    [data-theme="dark"] {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --border-card: #334155;
+      --accent-primary: #3b82f6;
+      --accent-gold: #f59e0b;
+      --accent-teal: #14b8a6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-sub: #cbd5e1;
+      --shadow-card: 0 20px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Top Bar Header */
+    .top-bar {
+      height: 60px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-card);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, var(--accent-gold), #b45309);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .brand-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      background: var(--bg-main);
+      border: 1px solid var(--border-card);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+
+    .btn-gold {
+      background: var(--accent-primary);
+      color: #fff;
+      border: none;
+    }
+
+    .btn-gold:hover {
+      background: #1d4ed8;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    /* Main Deck Container */
+    .deck-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 3rem 4rem 3rem;
+    }
+
+    .slide {
+      position: absolute;
+      width: 90%;
+      max-width: 1280px;
+      height: 82vh;
+      max-height: 720px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 24px;
+      padding: 2.5rem 3rem;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-card);
+      opacity: 0;
+      transform: scale(0.96) translateY(15px);
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+      z-index: 10;
+    }
+
+    /* Slide Header */
+    .slide-header {
+      margin-bottom: 1.8rem;
+      border-bottom: 1px solid var(--border-card);
+      padding-bottom: 0.8rem;
+    }
+
+    .slide-category {
+      color: var(--accent-gold);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+
+    .slide-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      line-height: 1.25;
+    }
+
+    .slide-subtitle {
+      color: var(--accent-teal);
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      flex: 1;
+    }
+
+    .cards-grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card {
+      background: var(--bg-main);
+      border: 1px solid var(--border-card);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 20px -5px rgba(37, 99, 235, 0.1);
+    }
+
+    .card-number {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--accent-gold);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.4rem;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      font-family: 'Outfit', sans-serif;
+      margin-bottom: 1rem;
+    }
+
+    .card-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .card-list li {
+      color: var(--text-sub);
+      font-size: 0.93rem;
+      line-height: 1.5;
+      position: relative;
+      padding-left: 1.2rem;
+    }
+
+    .card-list li::before {
+      content: "•";
+      color: var(--accent-teal);
+      font-size: 1.3rem;
+      position: absolute;
+      left: 0;
+      top: -3px;
+    }
+
+    .card-list li strong {
+      color: var(--text-main);
+      display: block;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    /* Hero Slide */
+    .slide-title-hero {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: radial-gradient(circle at center, var(--bg-card) 0%, var(--bg-main) 100%);
+      border: 2px solid var(--accent-primary);
+    }
+
+    .hero-badge {
+      background: rgba(37, 99, 235, 0.08);
+      border: 1px solid var(--accent-primary);
+      color: var(--accent-primary);
+      padding: 6px 18px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      margin-bottom: 0.8rem;
+    }
+
+    .hero-hinglish {
+      font-size: 1.5rem;
+      color: var(--accent-gold);
+      font-weight: 700;
+      margin-bottom: 2rem;
+    }
+
+    .hero-pills {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+    }
+
+    .pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+
+    .hero-mentor {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-card);
+      padding-top: 1rem;
+      width: 60%;
+    }
+
+    /* Bottom Navigation Bar */
+    .nav-bar {
+      height: 70px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-card);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 3rem;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      z-index: 100;
+    }
+
+    .slide-indicator {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .slide-indicator span {
+      color: var(--accent-primary);
+    }
+
+    /* Speaker Notes Drawer */
+    .notes-panel {
+      position: fixed;
+      right: -400px;
+      top: 60px;
+      width: 380px;
+      height: calc(100vh - 130px);
+      background: var(--bg-card);
+      border-left: 2px solid var(--accent-primary);
+      padding: 1.5rem;
+      box-shadow: -10px 0 25px rgba(0, 0, 0, 0.15);
+      transition: right 0.3s ease;
+      z-index: 90;
+      overflow-y: auto;
+    }
+
+    .notes-panel.open {
+      right: 0;
+    }
+
+    .notes-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      margin-bottom: 1rem;
+    }
+
+    .notes-body {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--text-sub);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <div class="top-bar">
+    <div class="brand">
+      <span class="brand-badge">UPSC CSE</span>
+      <span class="brand-title">Sociology Optional Master Plan</span>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="toggleTheme()" id="theme-btn">
+        ☀️ Light / 🌙 Dark
+      </button>
+      <button class="btn" onclick="toggleNotes()">
+        🎙️ Speaker Notes
+      </button>
+      <button class="btn btn-gold" onclick="window.print()">
+        📄 Print PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Slides Deck Container -->
+  <div class="deck-container">
+
+    <!-- SLIDE 1: Welcome -->
+    <div class="slide slide-title-hero active" id="slide-1">
+      <div class="hero-badge">TARGET 300+ IN SOCIOLOGY OPTIONAL</div>
+      <h1 class="hero-h1">Sociology Optional Strategy & Roadmap</h1>
+      <div class="hero-hinglish">Sociology Optional: Complete Strategy & Orientation Masterclass</div>
+      
+      <div class="hero-pills">
+        <span class="pill">✨ Concept Clarity</span>
+        <span class="pill">✍️ Answer Writing Mastery</span>
+        <span class="pill">🧠 360° Brainstorming</span>
+        <span class="pill">🔗 Thinker Linkages</span>
+        <span class="pill">📚 Smart Note Making</span>
+      </div>
+
+      <div class="hero-mentor">
+        Presented by: <strong>UPSC Mains Candidate & Sociology Mentor</strong> | Orientation Session
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Why Sociology? -->
+    <div class="slide" id="slide-2">
+      <div class="slide-header">
+        <div class="slide-category">Why Choose Sociology Optional?</div>
+        <div class="slide-title">Kyun Chune Sociology Optional? (Key Advantages)</div>
+      </div>
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-number">01. High Scoring</div>
+          <div class="card-title">300+ Target Achievable</div>
+          <ul class="card-list">
+            <li><strong>Predictable PYQs:</strong> Repeated question patterns make preparation laser-targeted.</li>
+            <li><strong>70% Static Syllabus:</strong> Finish core theoretical concepts before Prelims.</li>
+            <li><strong>Objective Evaluation:</strong> Thinker-anchored answers get top marks consistently.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-number">02. GS Overlap</div>
+          <div class="card-title">GS Paper 1, Essay & Ethics</div>
+          <ul class="card-list">
+            <li><strong>GS Paper 1 (Society):</strong> ~75 marks directly covered (Caste, Women, Urbanization).</li>
+            <li><strong>125-Mark Essay:</strong> Gives rich analytical frameworks for social essays.</li>
+            <li><strong>GS Paper 4 (Ethics):</strong> Enriches understanding of values, norms & case studies.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-number">03. Accessible</div>
+          <div class="card-title">Non-Background Friendly</div>
+          <ul class="card-list">
+            <li><strong>No Prior Background:</strong> Engineering, Science & Commerce students excel equally.</li>
+            <li><strong>Relatable Real Reality:</strong> Study family, caste, gender, and social movements.</li>
+            <li><strong>Compact Footprint:</strong> Smaller syllabus footprint compared to History/Geography.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: What is Sociology & Syllabus -->
+    <div class="slide" id="slide-3">
+      <div class="slide-header">
+        <div class="slide-category">Subject Essence & Structure</div>
+        <div class="slide-title">Sociology Me Kya Padhte Hain? (Syllabus Breakdown)</div>
+        <div class="slide-subtitle">Sociological Imagination (C. Wright Mills): Connecting personal experience to public issues</div>
+      </div>
+      <div class="cards-grid cards-grid-2">
+        <div class="card">
+          <div class="card-title">Paper 1: Fundamentals of Sociology</div>
+          <ul class="card-list">
+            <li><strong>Sociology as Science:</strong> Methodology, Positivism vs Interpretive paradigms.</li>
+            <li><strong>6 Core Western Thinkers:</strong> Karl Marx, Emile Durkheim, Max Weber, Talcott Parsons, Robert K. Merton, G.H. Mead.</li>
+            <li><strong>Social Stratification:</strong> Concepts of Class, Status, Gender & Social Mobility.</li>
+            <li><strong>Social Institutions:</strong> Work & Economy, Politics, Religion, Family & Kinship.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Paper 2: Indian Society Structure & Change</div>
+          <ul class="card-list">
+            <li><strong>Perspectives on India:</strong> Indology (Ghurye), Structural-Functionalism (Srinivas), Marxist (Desai).</li>
+            <li><strong>Social Structure:</strong> Caste system, agrarian class, untouchability, tribal issues.</li>
+            <li><strong>Social Transformation:</strong> Modernization, Green Revolution, Peasant/Tribal movements.</li>
+            <li><strong>Paper 1 + 2 Linkage:</strong> Applying Paper 1 thinkers' theories to Indian social realities.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Answer Writing Mastery -->
+    <div class="slide" id="slide-4">
+      <div class="slide-header">
+        <div class="slide-category">Pillar #1: Answer Writing Mastery</div>
+        <div class="slide-title">Answer Writing Ka Sahi Dhanga (10 / 15 / 20 Markers Structure)</div>
+      </div>
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-number">STEP 1</div>
+          <div class="card-title">Anatomy of 250+ Answer</div>
+          <ul class="card-list">
+            <li><strong>Intro (10-15%):</strong> Sociological definition or thinker reference.</li>
+            <li><strong>Body (75-80%):</strong> Multi-perspective arguments, thinker quotes, empirical data.</li>
+            <li><strong>Conclusion (10-15%):</strong> Synthesis of views & futuristic policy alignment.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-number">STEP 2</div>
+          <div class="card-title">Managing Marks Demands</div>
+          <ul class="card-list">
+            <li><strong>10-Marker (150w):</strong> Punchy, direct, 2 core thinkers + clean concept definition.</li>
+            <li><strong>15-Marker (250w):</strong> Multidimensional points, Indian context + counter-views.</li>
+            <li><strong>20-Marker (250-300w):</strong> Deep critical analysis, thinker comparisons & synthesis.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-number">STEP 3</div>
+          <div class="card-title">Sociological Value Additions</div>
+          <ul class="card-list">
+            <li><strong>Key Terminology:</strong> Anomie, Hegemony, Sanskritization, Little/Great Traditions.</li>
+            <li><strong>Thinker Anchoring:</strong> Avoid plain GS style; anchor arguments with sociologists.</li>
+            <li><strong>Empirical Data:</strong> Quote NFHS, Census, NITI Aayog & EPW studies.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: 360° Brainstorming -->
+    <div class="slide" id="slide-5">
+      <div class="slide-header">
+        <div class="slide-category">Pillar #2: Brainstorming Techniques</div>
+        <div class="slide-title">360° Brainstorming: 60 Seconds Mind Mapping Formula</div>
+      </div>
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-number">TOOL 1</div>
+          <div class="card-title">3 Sociological Lenses</div>
+          <ul class="card-list">
+            <li><strong>Functionalist Lens:</strong> Social order, consensus, harmony, and integration.</li>
+            <li><strong>Conflict / Marxist Lens:</strong> Power dynamics, class struggle, exploitation & inequality.</li>
+            <li><strong>Feminist Lens:</strong> Gender impact, patriarchy, unpaid labor, intersectionality.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-number">TOOL 2</div>
+          <div class="card-title">Analytical Frameworks</div>
+          <ul class="card-list">
+            <li><strong>PESTLE Model:</strong> Political, Economic, Social, Tech, Legal, Environmental angles.</li>
+            <li><strong>Micro vs. Macro:</strong> Individual agency (Mead/Goffman) vs. Macro structures (Marx/Parsons).</li>
+            <li><strong>Tradition vs Modernity:</strong> Continuity of traditional norms alongside modern institutions.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-number">TOOL 3</div>
+          <div class="card-title">60-Second Mind Map Drill</div>
+          <ul class="card-list">
+            <li><strong>Deconstruct Keyword:</strong> Understand 'Critically Examine', 'Elucidate', 'Discuss'.</li>
+            <li><strong>Draft 5 Points:</strong> Write 5 quick keywords in margin before writing full answer.</li>
+            <li><strong>Visual Presentation:</strong> Use mini-tables, side headings, and underlined key terms.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: Content Interlinkages -->
+    <div class="slide" id="slide-6">
+      <div class="slide-header">
+        <div class="slide-category">Pillar #3: Content Interlinkages</div>
+        <div class="slide-title">Content Structuring & Paper 1 + Paper 2 Linkage</div>
+      </div>
+      <div class="cards-grid cards-grid-2">
+        <div class="card">
+          <div class="card-title">Paper 1 + Paper 2 Interlinkage Matrix</div>
+          <ul class="card-list">
+            <li><strong>Karl Marx ➔ Agrarian Distress:</strong> Alienation & class struggle applied to Green Revolution inequality.</li>
+            <li><strong>Max Weber ➔ Indian Administration:</strong> Rational-legal authority vs patrimonialism in governance.</li>
+            <li><strong>Durkheim ➔ Anomie & Farmer Suicides:</strong> Breakdown of traditional social solidarity in modern times.</li>
+            <li><strong>Feminist Thinkers ➔ Dalit Feminism:</strong> Sharmila Rege's Dalit standpoint theory in Indian caste matrix.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Dynamic Value Addition & Presentation</div>
+          <ul class="card-list">
+            <li><strong>Current Affairs Integration:</strong> Link daily news (Caste Census, Gig Workers, Urbanization) to theory.</li>
+            <li><strong>Visual Flowcharts & Tables:</strong> Use thinker comparison tables, Venn diagrams, and process cycles.</li>
+            <li><strong>Empirical Field Studies:</strong> Cite Srinivas (Rampura), Beteille (Sripuram), Gail Omvedt, Sujata Patel.</li>
+            <li><strong>Clean Paragraphing:</strong> Structured 3-4 line paragraphs with bold key concepts.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Smart Note-Making Strategy -->
+    <div class="slide" id="slide-7">
+      <div class="slide-header">
+        <div class="slide-category">Pillar #4: Note-Making Strategy</div>
+        <div class="slide-title">Smart Notes Kaise Banayein? (Revision-Ready Notes)</div>
+      </div>
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-number">FORMAT 1</div>
+          <div class="card-title">1-Page Thinker Sheet</div>
+          <ul class="card-list">
+            <li><strong>Core Methodology:</strong> Positivist / Interpretive / Critical stance in 2 lines.</li>
+            <li><strong>Key Theories & Terms:</strong> Top 4-5 concepts with exact definitions.</li>
+            <li><strong>Major Critiques:</strong> Counter-thinkers and flaws.</li>
+            <li><strong>Mains PYQ Utility:</strong> Where to use this thinker in PYQs.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-number">FORMAT 2</div>
+          <div class="card-title">Value Addition Register</div>
+          <ul class="card-list">
+            <li><strong>Data & Fact Book:</strong> NFHS-5, Census, NITI Aayog & NCRB statistics.</li>
+            <li><strong>Sociologists & Books:</strong> Index of famous books and authors.</li>
+            <li><strong>Government Schemes:</strong> Sociological evaluation of welfare policies.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-number">FORMAT 3</div>
+          <div class="card-title">PYQ-Centric Micro-Notes</div>
+          <ul class="card-list">
+            <li><strong>10-Year PYQ Mapping:</strong> Group past questions topic-wise.</li>
+            <li><strong>Ready Intro-Conclusions:</strong> Templates for recurring sub-themes.</li>
+            <li><strong>50-Page Micro-Notes:</strong> Ultra-condensed rapid revision notes before Mains.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: Batch Methodology -->
+    <div class="slide" id="slide-8">
+      <div class="slide-header">
+        <div class="slide-category">Batch Learning Methodology</div>
+        <div class="slide-title">Hum Kaise Padhenge? (Classroom Methodology)</div>
+      </div>
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-number">STEP 1</div>
+          <div class="card-title">Zero-to-Hero Lectures</div>
+          <ul class="card-list">
+            <li><strong>Conceptual Clarity:</strong> Start from NCERT foundation up to Haralambos & Ritzer level.</li>
+            <li><strong>Bilingual (Hinglish):</strong> Easy Hinglish explanation with real-life Indian examples.</li>
+            <li><strong>Thinker Masterclasses:</strong> Dedicated deep-dive sessions on all core thinkers.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-number">STEP 2</div>
+          <div class="card-title">Daily & Weekly Drills</div>
+          <ul class="card-list">
+            <li><strong>Daily 1-Question Practice:</strong> Build daily writing habit without burnout.</li>
+            <li><strong>Live Answer Deconstruction:</strong> Break down model answers live in class.</li>
+            <li><strong>Brainstorming Workshops:</strong> Weekly live drills on complex PYQs.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-number">STEP 3</div>
+          <div class="card-title">Curated Deliverables</div>
+          <ul class="card-list">
+            <li><strong>Crisp Mind Maps:</strong> Handouts eliminating heavy multi-book reading.</li>
+            <li><strong>10-Year PYQ Bank:</strong> Solved model answers for 10 years' questions.</li>
+            <li><strong>Current Sociology Digest:</strong> Monthly compilation of sociological current affairs.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: Roadmap -->
+    <div class="slide" id="slide-9">
+      <div class="slide-header">
+        <div class="slide-category">Mentorship Roadmap</div>
+        <div class="slide-title">3-Phase Action Plan for Mains Readiness</div>
+      </div>
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-number">PHASE 1</div>
+          <div class="card-title">Foundation (W1-8)</div>
+          <ul class="card-list">
+            <li><strong>Focus:</strong> Paper 1 Fundamentals & 6 Western Thinkers.</li>
+            <li><strong>Activity:</strong> Concept building, note making & daily 1 answer.</li>
+            <li><strong>Milestone:</strong> Complete mastery over theoretical foundation.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-number">PHASE 2</div>
+          <div class="card-title">Application (W9-16)</div>
+          <ul class="card-list">
+            <li><strong>Focus:</strong> Paper 2 Indian Society & Paper 1-2 interlinkages.</li>
+            <li><strong>Activity:</strong> Sectional Tests + Value addition data integration.</li>
+            <li><strong>Milestone:</strong> 100% syllabus coverage & PYQ mapping.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-number">PHASE 3</div>
+          <div class="card-title">Mains Simulation</div>
+          <ul class="card-list">
+            <li><strong>Focus:</strong> Full Length Tests under real exam conditions.</li>
+            <li><strong>Activity:</strong> 1-on-1 Mentorship evaluation & speed optimization.</li>
+            <li><strong>Milestone:</strong> 300+ Marks Readiness in Mains!</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: Action Plan -->
+    <div class="slide" id="slide-10">
+      <div class="slide-header">
+        <div class="slide-category">Day 1 Action Plan</div>
+        <div class="slide-title">Aapka Pehla Kadam (Day 1 Next Steps)</div>
+      </div>
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-number">TASK 1</div>
+          <div class="card-title">Immediate Day 1 Tasks</div>
+          <ul class="card-list">
+            <li><strong>Print Syllabus:</strong> Keep printed syllabus on study table; read keywords daily.</li>
+            <li><strong>NCERT Reading:</strong> Read Class 11th & 12th Sociology NCERTs carefully.</li>
+            <li><strong>PYQ Scanning:</strong> Browse past 5 years' papers to understand question style.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-number">TASK 2</div>
+          <div class="card-title">Recommended Booklist</div>
+          <ul class="card-list">
+            <li><strong>Paper 1 Base:</strong> Haralambos & Holborn (Essential/Orange) or Ritzer (Thinkers).</li>
+            <li><strong>Paper 2 Base:</strong> Social Change in Modern India (MN Srinivas) & Ram Ahuja.</li>
+            <li><strong>Class Handouts:</strong> Our curated consolidated handouts will be primary!</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-number">TASK 3</div>
+          <div class="card-title">Golden Mantra & Q&A</div>
+          <ul class="card-list">
+            <li><strong>Consistency Over Intensity:</strong> Write 1 answer daily rather than 10 once a month.</li>
+            <li><strong>Trust the Process:</strong> Sociology is rewarding when approached logically.</li>
+            <li><strong>Open Floor for Doubts:</strong> Let's address all your questions and doubts now!</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <div class="nav-bar">
+    <div class="slide-indicator">
+      Slide <span id="current-slide-num">1</span> of <span id="total-slide-num">10</span>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn" onclick="prevSlide()">← Previous</button>
+      <button class="btn btn-gold" onclick="nextSlide()">Next →</button>
+    </div>
+  </div>
+
+  <!-- Speaker Notes Panel -->
+  <div class="notes-panel" id="notes-panel">
+    <div class="notes-title">🎙️ Speaker Notes (Teacher Speech Script)</div>
+    <div class="notes-body" id="notes-content">
+      <!-- Notes loaded dynamically -->
+    </div>
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 10;
+
+    const speakerNotes = {
+      1: "Welcome students. Explain 300+ score vision and demystify Sociology Optional.",
+      2: "Explain ROI of Sociology in Mains. Address myth: Non-humanities students can easily score 300+.",
+      3: "Define C. Wright Mills' Sociological Imagination. Highlight Paper 1 theory + Paper 2 application.",
+      4: "Explain difference between GS answer and Sociology answer. Focus on terminology and thinker quotes.",
+      5: "Teach 60-second mind map formula to avoid getting stuck during exam.",
+      6: "Highlight that 300+ marks toppers stand out because of seamless Paper 1 + Paper 2 interlinkage.",
+      7: "Warn against copying textbooks. Explain 1-Page Thinker Sheet & 50-Page micro-notes strategy.",
+      8: "Outline classroom workflow: Concept Lecture -> Live PYQ Discussion -> Student Writing -> Personal Evaluation.",
+      9: "Walk through 3-phase timeline. Highlight 1-on-1 personal mentorship.",
+      10: "Give Day 1 homework. Open floor for student Q&A."
+    };
+
+    function updateDeck() {
+      document.querySelectorAll('.slide').forEach((slide, idx) => {
+        if (idx + 1 === currentSlide) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+      document.getElementById('current-slide-num').innerText = currentSlide;
+      document.getElementById('notes-content').innerHTML = speakerNotes[currentSlide] || "No notes available.";
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateDeck();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateDeck();
+      }
+    }
+
+    function toggleNotes() {
+      document.getElementById('notes-panel').classList.toggle('open');
+    }
+
+    function toggleTheme() {
+      const htmlEl = document.documentElement;
+      const currentTheme = htmlEl.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      htmlEl.setAttribute('data-theme', newTheme);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+
+    updateDeck();
+  </script>
+</body>
+</html>

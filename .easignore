@@ -11,7 +11,6 @@ node_modules/
 admin-panel/
 data/
 lscs-thesis-app/
-mains json files/
 mains tab md files/
 unmapped_anthropology_questions.txt
 forum_mgp_2026_questions_to_tag.txt
@@ -20,12 +19,6 @@ mains.tsx.backup
 *.pdf
 *.zip
 *.tar.gz
-*.json
-!app.json
-!package.json
-!package-lock.json
-!tsconfig.json
-!eas.json
 
 # Virtual environments
 .venv/

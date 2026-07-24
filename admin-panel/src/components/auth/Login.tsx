@@ -53,7 +53,7 @@ export default function Login() {
 
         <div className="mb-4 text-xs text-muted flex items-center gap-1.5 bg-bg p-2.5 rounded border border-border">
           <ShieldCheck className="text-primary shrink-0" size={16} />
-          <span>Connected to Supabase: <strong>rnelxupyiejsqekmcrcz</strong></span>
+          <span>Connected to Supabase: <strong>ngwsuqzkndlxfoantnlf</strong></span>
         </div>
 
         <input 

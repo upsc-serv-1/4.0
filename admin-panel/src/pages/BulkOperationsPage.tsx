@@ -275,7 +275,7 @@ export default function BulkOperationsPage() {
             <span className="text-muted">Checking…</span>
           ) : supabaseConnected ? (
             <span className="text-emerald-500 font-bold flex items-center gap-1">
-              <CheckCircle2 size={14} /> Connected (ngwsuqzkndlxfoantnlf)
+              <CheckCircle2 size={14} /> Connected (rnelxupyiejsqekmcrcz)
             </span>
           ) : (
             <span className="text-danger font-bold flex items-center gap-1">

@@ -16,6 +16,7 @@
 import { supabase } from '../lib/supabase';
 import { KVStore } from '../lib/kvStore';
 import { QuestionCache } from './QuestionCache';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ─── Storage Keys ────────────────────────────────────────────────
 const OFFLINE_META_KEY     = '@offline_meta';
@@ -180,7 +181,8 @@ class OfflineManagerService {
   // ── FULL SYNC ─────────────────────────────────────────────────
   async syncAllContent(
     userId: string,
-    onProgress?: (p: SyncProgress) => void
+    onProgress?: (p: SyncProgress) => void,
+    selectedCourse?: string
   ) {
     // If a sync is already in progress, subscribe the new listener and return the existing promise
     if (this._fullSyncPromise) {
@@ -200,7 +202,7 @@ class OfflineManagerService {
     this._fullSyncPromise = this.runFullSync(userId, (p) => {
       this.currentSyncProgress = p;
       this._notifyListeners(p);
-    }).finally(() => {
+    }, selectedCourse).finally(() => {
       this._fullSyncPromise = null;
       this._syncListeners.clear();
     });
@@ -209,7 +211,8 @@ class OfflineManagerService {
 
   private async runFullSync(
     userId: string,
-    onProgress: (p: SyncProgress) => void
+    onProgress: (p: SyncProgress) => void,
+    selectedCourse?: string
   ) {
     this._cancelled = false;
     this.currentSyncProgress = null;
@@ -223,18 +226,31 @@ class OfflineManagerService {
     // ──────── 1. TESTS ──────────────────────────────────────────
     report({ phase: 'tests', current: 0, total: 1, detail: 'Fetching test catalogue...' });
 
-    const tests = await this.fetchAllRows('tests');
-    if (!tests || tests.length === 0) throw new Error('No tests found on server');
+    const allTests = await this.fetchAllRows('tests');
+    if (!allTests || allTests.length === 0) throw new Error('No tests found on server');
 
-    KVStore.setJson(OFFLINE_TESTS_KEY, tests);
-    report({ phase: 'tests', current: 1, total: 1, detail: `${tests.length} tests saved` });
+    KVStore.setJson(OFFLINE_TESTS_KEY, allTests);
+    report({ phase: 'tests', current: 1, total: 1, detail: `${allTests.length} tests saved` });
     if (this._cancelled) return;
 
+    // Resolve course preference
+    let course = selectedCourse;
+    if (!course) {
+      try {
+        const stored = await AsyncStorage.getItem('selectedCourse');
+        if (stored) course = stored;
+      } catch {}
+    }
+    if (!course) course = 'Civil Services';
+
+    // Only download questions for the active course (e.g. skip Civil Services when studying Medical Science)
+    const testsToSync = allTests.filter((t: any) => t.course === course);
+
     // ──────── 2. QUESTIONS (chunked by test) ────────────────────
-    const totalTests = tests.length;
+    const totalTests = testsToSync.length;
     for (let i = 0; i < totalTests; i++) {
       if (this._cancelled) return;
-      const test = tests[i];
+      const test = testsToSync[i];
       report({
         phase: 'questions',
         current: i,
@@ -243,6 +259,16 @@ class OfflineManagerService {
       });
 
       try {
+        const cachedQs = QuestionCache.getCachedQuestionsSync(test.id);
+        const expectedCount = test.question_count || 0;
+        const isAlreadyCached = cachedQs.length > 0 && (expectedCount === 0 || cachedQs.length === expectedCount);
+
+        if (isAlreadyCached) {
+          console.log(`[OfflineSync] Test ${test.id} is already cached (${cachedQs.length} Qs), skipping download.`);
+          totalQuestions += cachedQs.length;
+          continue;
+        }
+
         // Preserve the originally uploaded sequence so paper-wise learn/exam
         // can render the exact book order even from MMKV cache.
         const questions = await this.fetchAllRows(
@@ -415,7 +441,7 @@ class OfflineManagerService {
       lastIncrementalSync: Date.now(),
       syncVersion: OFFLINE_SYNC_VERSION,
       totalQuestions,
-      totalTests: tests.length,
+      totalTests: allTests.length,
       totalStates,
       totalNotes,
       totalAttempts,
@@ -690,27 +716,48 @@ class OfflineManagerService {
         // Determine course from test or fallback to first question's course
         const testCourse = t.course || 'Civil Services';
         if (questions.length === 0) {
+          const cat = String(t.program_id || '').toLowerCase();
+          let derivedInst = t.institute || (cat === 'inicet' ? 'AIIMS' : cat === 'neetpg' ? 'NBE' : cat === 'cms' ? 'UPSC' : null);
+          const derivedProg = t.program_name || (cat === 'inicet' ? 'INI-CET' : cat === 'neetpg' ? 'NEET PG' : cat === 'cms' ? 'CMS' : null);
+
           flattened.push({
             course: testCourse,
             subject: null, section_group: null, micro_topic: null,
             is_ncert: null,
-            test_id: t.id, institute: t.institute, program_name: t.program_name,
+            test_id: t.id, institute: derivedInst, program_name: derivedProg,
             series: t.series, title: t.title,
-            exam_category: null,
+            exam_category: t.program_id || null,
             exam_stage: null,
           });
         } else {
           for (const q of questions) {
+            const cat = String(q.exam_category || t.program_id || '').toLowerCase();
+            let derivedInst = t.institute || (
+              cat === 'inicet' || q.is_inicet ? 'AIIMS' :
+              cat === 'neetpg' || q.is_neetpg ? 'NBE' :
+              cat === 'cms' || q.is_upsc_cms ? 'UPSC' : null
+            );
+            const derivedProg = t.program_name || (
+              cat === 'inicet' || q.is_inicet ? 'INI-CET' :
+              cat === 'neetpg' || q.is_neetpg ? 'NEET PG' :
+              cat === 'cms' || q.is_upsc_cms ? 'CMS' : null
+            );
+
+            const qCourse = q.course || testCourse;
+
             flattened.push({
-              course: q.course || testCourse,
+              course: qCourse,
               subject: q.subject || null,
               section_group: q.section_group || null,
               micro_topic: q.micro_topic || null,
               is_ncert: q.is_ncert ?? null,
-              test_id: t.id, institute: t.institute, program_name: t.program_name,
+              test_id: t.id, institute: derivedInst, program_name: derivedProg,
               series: t.series, title: t.title,
-              exam_category: q.exam_category || null,
+              exam_category: q.exam_category || t.program_id || null,
               exam_stage: q.exam_stage || null,
+              is_inicet: q.is_inicet,
+              is_neetpg: q.is_neetpg,
+              is_upsc_cms: q.is_upsc_cms,
             });
           }
         }

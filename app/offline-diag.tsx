@@ -17,12 +17,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../src/context/ThemeContext';
 import { OfflineManager, OfflineMetadata } from '../src/services/OfflineManager';
 import { KVStore } from '../src/lib/kvStore';
 import { NetworkStatus } from '../src/lib/networkStatus';
+import { supabase } from '../src/lib/supabase';
 import {
   Wifi,
   WifiOff,
@@ -108,7 +110,47 @@ export default function OfflineDiagScreen() {
   const [blockedCalls, setBlockedCalls] = useState<BlockedCall[]>([]);
   const [simulating, setSimulating] = useState(false);
   const [diagEvents, setDiagEvents] = useState<OfflineDiagEvent[]>([]);
+  const [dbResult, setDbResult] = useState<string>('');
+  const [dbLoading, setDbLoading] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const runDbDiagnostics = async () => {
+    setDbLoading(true);
+    setDbResult('Querying Supabase...');
+    try {
+      const { data, error } = await supabase
+        .from('questions')
+        .select('id, course, test_id, subject, tests(id, series, institute, program_name, title)')
+        .eq('course', 'Medical Science')
+        .limit(20);
+        
+      if (error) {
+        setDbResult(`ERROR: ${error.message}\nDetails: ${error.details}\nHint: ${error.hint}`);
+      } else if (!data || data.length === 0) {
+        setDbResult('SUCCESS: No questions returned for "Medical Science" course.');
+      } else {
+        const totalCount = data.length;
+        const breakDown: Record<string, number> = {};
+        const subjectList: Set<string> = new Set();
+        data.forEach((q: any) => {
+          const test = q.tests;
+          const inst = (Array.isArray(test) ? test[0]?.institute : test?.institute) || 'NULL';
+          breakDown[inst] = (breakDown[inst] || 0) + 1;
+          if (q.subject) subjectList.add(q.subject);
+        });
+        setDbResult(
+          `SUCCESS: Fetched ${totalCount} questions.\n` +
+          `Institutes: ${JSON.stringify(breakDown, null, 2)}\n` +
+          `Subjects found: ${Array.from(subjectList).join(', ')}\n\n` +
+          `Sample row:\n${JSON.stringify(data[0], null, 2)}`
+        );
+      }
+    } catch (e: any) {
+      setDbResult(`EXCEPTION: ${e.message}`);
+    } finally {
+      setDbLoading(false);
+    }
+  };
 
   // Load diagnostic data
   const loadDiag = async () => {
@@ -336,6 +378,34 @@ export default function OfflineDiagScreen() {
               <Text style={styles.simBtnText}>Clear Log</Text>
             </TouchableOpacity>
           </View>
+        </View>
+
+        {/* Supabase Database Query Diagnostic Card */}
+        <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>SUPABASE QUERY TEST</Text>
+        <View style={[styles.card, { backgroundColor: colors.surface + '80', borderColor: colors.border }]}>
+          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
+            Live Medical Science Test
+          </Text>
+          <Text style={[styles.cardSub, { color: colors.textSecondary }]}>
+            Test if Supabase returns NEET PG / INI-CET / UPSC CMS with their institutes.
+          </Text>
+          
+          <TouchableOpacity 
+            style={[styles.simBtn, { backgroundColor: colors.primary, marginTop: 10 }]} 
+            onPress={runDbDiagnostics}
+            disabled={dbLoading}
+          >
+            <RefreshCw size={18} color="#fff" style={{ marginRight: 6 }} />
+            <Text style={styles.simBtnText}>{dbLoading ? 'Running...' : 'Run Query Diagnostic'}</Text>
+          </TouchableOpacity>
+
+          {dbResult ? (
+            <ScrollView style={{ maxHeight: 200, backgroundColor: colors.bg, padding: 10, borderRadius: 6, marginTop: 10 }}>
+              <Text style={{ fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace', fontSize: 11, color: colors.textPrimary }}>
+                {dbResult}
+              </Text>
+            </ScrollView>
+          ) : null}
         </View>
 
         {/* Cache Status */}

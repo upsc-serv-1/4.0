@@ -20,9 +20,11 @@ import { useAuth } from '../context/AuthContext';
 import { KVStore } from '../lib/kvStore';
 import { OfflineManager } from '../services/OfflineManager';
 import { startSyncQueueWorker, stopSyncQueueWorker, SyncQueue } from '../services/SyncQueue';
+import { useCourse } from '../context/CourseContext';
 
 export function useOfflineBootstrap() {
   const { session } = useAuth();
+  const { selectedCourse } = useCourse();
   const lastUserIdRef = useRef<string | null>(null);
   const fullSyncInFlight = useRef(false);
 
@@ -67,7 +69,7 @@ export function useOfflineBootstrap() {
             cachedCount: cachedQuestions.length 
           });
           // fire-and-forget — progress is surfaced by any screen that cares
-          OfflineManager.syncAllContent(userId)
+          OfflineManager.syncAllContent(userId, undefined, selectedCourse)
             .catch((e) => console.warn('[OfflineBootstrap] initial full sync failed', e))
             .finally(() => {
               fullSyncInFlight.current = false;

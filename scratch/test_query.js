@@ -1,28 +1,7 @@
-const url = 'https://ngwsuqzkndlxfoantnlf.supabase.co/rest/v1/mains_questions?paper=eq.GS1&select=id,exam_year,subject,section_group,paper';
-const apikey = 'sb_publishable_jvMJygEAm0GdUAiz4RvlYQ_DCTOBApa';
-
-async function run() {
-  console.time('query');
-  try {
-    const res = await fetch(url, {
-      headers: {
-        'apikey': apikey,
-        'Authorization': `Bearer ${apikey}`
-      }
-    });
-    console.timeEnd('query');
-    if (!res.ok) {
-      console.error('Error status:', res.status);
-      const text = await res.text();
-      console.error(text);
-      return;
-    }
-    const data = await res.json();
-    console.log(`Query returned ${data.length} rows`);
-  } catch (err) {
-    console.timeEnd('query');
-    console.error(err);
-  }
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient('https://rnelxupyiejsqekmcrcz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuZWx4dXB5aWVqc3Fla21jcmN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwMTgzODcsImV4cCI6MjA5OTU5NDM4N30.Cc4z8mFO4YoPbuHC40bnvEy6SQOyEbFobvMRqUqnmIQ');
+async function test() {
+  const { count, error } = await supabase.from('questions').select('id', { count: 'exact', head: true }).eq('course', 'Medical Science').not('subject', 'is', null);
+  console.log('Count:', count, 'Error:', error);
 }
-
-run();
+test();

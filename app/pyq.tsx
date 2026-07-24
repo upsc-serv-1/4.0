@@ -1056,7 +1056,11 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         }
 
         if (paperType && !['test-paper', 'question bank'].includes(paperType)) return false;
-        return resolveTestPaperGroup(test) === targetPaperGroup;
+        // For exams with no paper selection (e.g., INICET, NEET PG have null papers),
+        // skip the paper group filter since targetPaperGroup will be empty.
+        if (targetPaperGroup) {
+          if (resolveTestPaperGroup(test) !== targetPaperGroup) return false;
+        }
       });
       const visibleTests = relevantTests.filter((test: any) => matchesYearRange(getTestYear(test)));
 
@@ -2050,9 +2054,17 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         subject: s,
         year_start: yearStart,
         year_end: yearEnd,
-        stage: examStage,
         paper: selectedPaper || '',
       };
+      
+      // For Medical Science, INICET and NEET PG tests have series values like
+      // "Prelims (Official)" — not "INICET" or "NEET PG". The stage name comes
+      // from the UI dropdown. Don't pass stage for these, since the engine does
+      // `series ILIKE '%<stage>%'` which won't match. Instead rely on examCategory
+      // which correctly filters by is_inicet/is_neetpg boolean flags.
+      if (!selectedCourse?.includes('Medical') || (examStage !== 'INICET' && examStage !== 'NEET PG')) {
+        engineParams.stage = examStage;
+      }
       
       // Only add section/microtopic if they have actual values (not 'All')
       if (sec && sec !== 'All') engineParams.section = sec;

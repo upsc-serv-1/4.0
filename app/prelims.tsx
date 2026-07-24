@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../src/context/ThemeContext';
+import { useCourse } from '../src/context/CourseContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -32,6 +33,7 @@ function PrelimsScreen() {
   const { colors, isDark } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { selectedCourse } = useCourse();
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
   const [currentScreen, setCurrentScreen] = useState<'hub' | 'revision-tags'>('hub');
@@ -172,7 +174,7 @@ function PrelimsScreen() {
         {/* Hero Section */}
         <View style={styles.heroSection}>
           <Text style={[styles.heroHeading, { color: colors.textPrimary }]}>
-            Master UPSC Prelims
+            {selectedCourse === 'Medical Science' ? 'Master Medical Science Prelims' : 'Master UPSC Prelims'}
           </Text>
           <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>
             Your dedicated hub for prelims preparation.

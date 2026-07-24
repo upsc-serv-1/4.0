@@ -238,7 +238,7 @@ export default function Profile() {
           target = 0.05 + (p.current / p.total) * 0.65;
         }
         RNAnimated.timing(progressAnim, { toValue: target, duration: 300, useNativeDriver: false }).start();
-      });
+      }, selectedCourse);
       setSyncDone(true);
       const meta = await OfflineManager.getMetadata();
       setOfflineMeta(meta);

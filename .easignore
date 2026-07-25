@@ -1,5 +1,7 @@
-# Dependency directories
+# Dependency & Native directories
 node_modules/
+android/
+ios/
 
 # Cache directories
 .expo/
@@ -19,7 +21,11 @@ mains.tsx.backup
 *.pdf
 *.zip
 *.tar.gz
+*.bak*
+*.pptx
+*.html
 
 # Virtual environments
 .venv/
 __pycache__/
+*.pyc

@@ -13,7 +13,7 @@ dist/
 
 # Large data, duplicates, and admin folders (not needed for EAS mobile build)
 admin-panel/
-data/
+/data/
 lscs-thesis-app/
 mains tab md files/
 mains json files - Copy/

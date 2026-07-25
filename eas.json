@@ -12,13 +12,17 @@
         "buildType": "apk"
       },
       "env": {
-        "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
+        "NPM_CONFIG_LEGACY_PEER_DEPS": "true",
+        "NODE_OPTIONS": "--max-old-space-size=4096",
+        "EAS_SKIP_AUTO_FINGERPRINT": "1"
       }
     },
     "production": {
       "distribution": "store",
       "env": {
-        "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
+        "NPM_CONFIG_LEGACY_PEER_DEPS": "true",
+        "NODE_OPTIONS": "--max-old-space-size=4096",
+        "EAS_SKIP_AUTO_FINGERPRINT": "1"
       }
     }
   }

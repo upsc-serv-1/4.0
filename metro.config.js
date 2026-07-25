@@ -6,10 +6,19 @@ const { FileStore } = require('metro-cache');
 const config = getDefaultConfig(__dirname);
 
 // Use a stable on-disk store (shared across web/android)
+const fs = require('fs');
 const root = process.env.METRO_CACHE_ROOT || path.join(__dirname, '.metro-cache');
-config.cacheStores = [
-  new FileStore({ root: path.join(root, 'cache') }),
-];
+const cacheDir = path.join(root, 'cache');
+try {
+  if (!fs.existsSync(cacheDir)) {
+    fs.mkdirSync(cacheDir, { recursive: true });
+  }
+  config.cacheStores = [
+    new FileStore({ root: cacheDir }),
+  ];
+} catch (e) {
+  console.warn('[metro.config.js] Could not create cache directory:', e);
+}
 
 
 // // Exclude unnecessary directories from file watching

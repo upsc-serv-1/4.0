@@ -2,18 +2,21 @@
 node_modules/
 android/
 ios/
+dist/
 
 # Cache directories
 .expo/
 .metro-cache/
 .gradle/
 .idea/
+.kilo/
 
-# Large data and admin folders (not needed for EAS mobile build)
+# Large data, duplicates, and admin folders (not needed for EAS mobile build)
 admin-panel/
 data/
 lscs-thesis-app/
 mains tab md files/
+mains json files - Copy/
 unmapped_anthropology_questions.txt
 forum_mgp_2026_questions_to_tag.txt
 Theme 1 gemini i style.tsx

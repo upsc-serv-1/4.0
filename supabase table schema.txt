@@ -381,6 +381,7 @@ CREATE TABLE user_widgets (
 CREATE TABLE users (
   id uuid NOT NULL,
   email text,
+  name text,
   created_at timestamp without time zone
 );
 

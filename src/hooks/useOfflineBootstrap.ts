@@ -59,7 +59,7 @@ export function useOfflineBootstrap() {
       // re-run a full sync to repopulate MMKV.
       try {
         const meta = await OfflineManager.getMetadata();
-        const cachedQuestions = OfflineManager.getOfflineQuestionsAllSync();
+        const cachedQuestions = OfflineManager.getOfflineQuestionsForCourseSync(selectedCourse);
         const hasQuestions = cachedQuestions.length > 0;
 
         if ((!meta.lastFullSync || !hasQuestions) && !fullSyncInFlight.current) {
@@ -91,5 +91,5 @@ export function useOfflineBootstrap() {
     return () => {
       cancelled = true;
     };
-  }, [session?.user?.id]);
+  }, [session?.user?.id, selectedCourse]);
 }

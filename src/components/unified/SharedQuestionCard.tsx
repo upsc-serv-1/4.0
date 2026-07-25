@@ -251,19 +251,8 @@ export const SharedQuestionCard = ({
     };
 
     const questionChips = useMemo(() => {
-      const pyq = getPYQCategorization(item);
-      const hasTags = showPYQTags && (pyq.hasPYQData || item.is_ncert || item.exam_info?.is_ncert || item.source?.is_ncert);
-      if (!hasTags) return [];
-
-      const chips: { label: string; bg: string; fg: string; border: string }[] = [];
-      if (pyq.hasPYQData && pyq.isUPSC) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#dcfce7', fg: isZenMode ? '#433422' : '#15803d', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#22c55e' });
-      if (pyq.hasPYQData && pyq.isAllied) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#fef9c3', fg: isZenMode ? '#433422' : '#a16207', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#eab308' });
-      if (pyq.hasPYQData && pyq.isOther) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#f1f5f9', fg: isZenMode ? '#433422' : '#475569', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#94a3b8' });
-      if (pyq.hasPYQData && pyq.isGenericPYQ) chips.push({ label: `${pyq.groupName} ${pyq.year}`.trim(), bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : effectiveColors.primary + '10', fg: isZenMode ? '#433422' : effectiveColors.primary, border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : effectiveColors.primary });
-      if (item.is_ncert || item.exam_info?.is_ncert || item.source?.is_ncert || item.micro_topic === 'NCERT') chips.push({ label: 'NCERT', bg: isZenMode ? 'rgba(67, 52, 34, 0.05)' : '#e0f2fe', fg: isZenMode ? '#433422' : '#0369a1', border: isZenMode ? 'rgba(67, 52, 34, 0.2)' : '#0ea5e9' });
-
-      return chips;
-    }, [item, showPYQTags, isZenMode, effectiveColors]);
+      return [];
+    }, []);
 
     const isTablet = width >= 768;
 
@@ -281,24 +270,7 @@ export const SharedQuestionCard = ({
                 </View>
               </View>
               <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
-                {questionChips.length > 0 && (
-                  <View style={{ flexDirection: 'row', gap: 6 }}>
-                    {questionChips.map((chip, idx) => (
-                      <View key={`t-chip-${item.id}-${idx}`} style={[styles.inlineBadge, { backgroundColor: chip.bg, borderColor: chip.border, paddingHorizontal: 6, paddingVertical: 2, height: 20 }]}> 
-                        <Text style={{ color: chip.fg, fontWeight: '900', fontSize: 9 }}>{chip.label}</Text>
-                      </View>
-                    ))}
-                  </View>
-                )}
-                
                 <TouchableOpacity 
-                  onPress={() => onToggleReview && onToggleReview(item.id)}
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: effectiveAnswerData.isReview ? (isZenMode ? '#43342220' : '#fef9c3') : 'transparent' }}
-                >
-                   <Flag size={18} color={effectiveAnswerData.isReview ? (isZenMode ? '#433422' : '#eab308') : (isZenMode ? '#43342240' : effectiveColors.textTertiary)} fill={effectiveAnswerData.isReview ? (isZenMode ? '#433422' : '#eab308') : 'transparent'} />
-                </TouchableOpacity>
-                
-                 <TouchableOpacity 
                   onPress={() => onAddFlashcard(item)}
                   disabled={isSavingFlashcard}
                 >
@@ -331,19 +303,6 @@ export const SharedQuestionCard = ({
                      color={isZenMode ? '#433422' : effectiveColors.primary} 
                    />
                 </TouchableOpacity>
-
-                {arenaMode !== 'exam' && (
-                  <TouchableOpacity
-                    onPress={() => setShowNoteField(prev => !prev)}
-                    style={{ padding: 4, backgroundColor: showNoteField ? (isZenMode ? 'rgba(67,52,34,0.1)' : effectiveColors.primary + '15') : 'transparent', borderRadius: 6 }}
-                    testID={`note-toggle-shortcut-${item.id}`}
-                  >
-                     <PenTool
-                       size={18}
-                       color={isZenMode ? '#433422' : (showNoteField ? effectiveColors.primary : effectiveColors.textTertiary)}
-                     />
-                  </TouchableOpacity>
-                )}
               </View>
             </>
           ) : (
@@ -369,13 +328,6 @@ export const SharedQuestionCard = ({
               {/* Right Section: Action Shortcuts aligned to the top */}
               <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center', alignSelf: 'flex-start' }}>
                 <TouchableOpacity 
-                  onPress={() => onToggleReview && onToggleReview(item.id)}
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: effectiveAnswerData.isReview ? (isZenMode ? '#43342220' : '#fef9c3') : 'transparent' }}
-                >
-                   <Flag size={18} color={effectiveAnswerData.isReview ? (isZenMode ? '#433422' : '#eab308') : (isZenMode ? '#43342240' : effectiveColors.textTertiary)} fill={effectiveAnswerData.isReview ? (isZenMode ? '#433422' : '#eab308') : 'transparent'} />
-                </TouchableOpacity>
-                
-                 <TouchableOpacity 
                   onPress={() => onAddFlashcard(item)}
                   disabled={isSavingFlashcard}
                 >
@@ -408,19 +360,6 @@ export const SharedQuestionCard = ({
                      color={isZenMode ? '#433422' : effectiveColors.primary} 
                    />
                 </TouchableOpacity>
-
-                {arenaMode !== 'exam' && (
-                  <TouchableOpacity
-                    onPress={() => setShowNoteField(prev => !prev)}
-                    style={{ padding: 4, backgroundColor: showNoteField ? (isZenMode ? 'rgba(67,52,34,0.1)' : effectiveColors.primary + '15') : 'transparent', borderRadius: 6 }}
-                    testID={`note-toggle-shortcut-${item.id}`}
-                  >
-                     <PenTool
-                       size={18}
-                       color={isZenMode ? '#433422' : (showNoteField ? effectiveColors.primary : effectiveColors.textTertiary)}
-                     />
-                  </TouchableOpacity>
-                )}
               </View>
             </>
           )}

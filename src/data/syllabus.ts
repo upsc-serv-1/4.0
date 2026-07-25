@@ -1436,3 +1436,192 @@ export const ANTHROPOLOGY_SYLLABUS: any = {
     }
   }
 };
+
+export const MEDICAL_SCIENCE_SYLLABUS = {
+  "ANATOMY": {
+    "General": [
+      "Abdomen and Pelvis",
+      "General Anatomy",
+      "Head and Neck",
+      "Histology and Embryology",
+      "Neuro Anatomy",
+      "Thorax",
+      "Upper and Lower Limbs"
+    ]
+  },
+  "PHYSIOLOGY": {
+    "General": [
+      "General Physiology",
+      "Blood Physiology",
+      "Nerve Muscle Physiology",
+      "Cardiovascular System",
+      "Respiratory System",
+      "Excretory System",
+      "Gastrointestinal System",
+      "Endocrine and Reproductive System",
+      "The Nervous System",
+      "Special Senses"
+    ]
+  },
+  "BIOCHEMISTRY": {
+    "General": [
+      "Genetics",
+      "Vitamins",
+      "Carbohydrate Metabolism",
+      "Lipid Metabolism",
+      "Amino Acids and Proteins Chemistry",
+      "Oxidative Phosphorylation"
+    ]
+  },
+  "PATHOLOGY": {
+    "General": [
+      "Cell Injury",
+      "Immunity",
+      "Neoplasia",
+      "Hematology: Red Blood Cells",
+      "Hematology: White Blood Cells",
+      "Platelet and Bleeding Disorders",
+      "Gastrointestinal Tract",
+      "Skin and Musculoskeletal"
+    ]
+  },
+  "MICROBIOLOGY": {
+    "General": [
+      "General Microbiology",
+      "Immunology",
+      "Systemic Bacteriology",
+      "Virology",
+      "Mycology",
+      "Parasitology"
+    ]
+  },
+  "PHARMACOLOGY": {
+    "General": [
+      "General Pharmacology",
+      "ANS Pharmacology",
+      "CVS Pharmacology",
+      "Endocrine Pharmacology",
+      "Antimicrobials : Antibacterial Drugs",
+      "Anticancer Drugs",
+      "Renal Pharmacology",
+      "Respiratory Pharmacology"
+    ]
+  },
+  "FORENSIC MEDICINE": {
+    "General": [
+      "Indian Legal System & Medical Jurisprudence",
+      "Forensic Thanatology",
+      "Asphyxial Deaths",
+      "Sexual Jurisprudence",
+      "Forensic Toxicology",
+      "Forensic Identification"
+    ]
+  },
+  "SOCIAL & PREVENTIVE MEDICINE": {
+    "General": [
+      "Concept of Health and Disease",
+      "Epidemiology",
+      "Vaccines and Cold Chain",
+      "Nutrition and Health",
+      "Communicable and Non-communicable Diseases",
+      "National Health Programs",
+      "Family Planning and Contraceptives",
+      "Environment and Health"
+    ]
+  },
+  "MEDICINE": {
+    "General": [
+      "Cardiology",
+      "Neurology",
+      "Endocrinology",
+      "Gastroenterology",
+      "Nephrology and Kidney Disease",
+      "Haematology",
+      "Infectious Diseases and General Medicine",
+      "Rheumatology and Connective Tissue Disorders",
+      "Clinical Toxicology"
+    ]
+  },
+  "SURGERY": {
+    "General": [
+      "Surgical Fundamentals",
+      "Trauma and Critical Care",
+      "Gastrointestinal Surgery",
+      "Breast Surgery",
+      "Endocrine Surgery",
+      "Cardiothoracic and Vascular Surgery",
+      "Urology"
+    ]
+  },
+  "OBSTETRICS & GYNAECOLOGY": {
+    "General": [
+      "Obstetrics",
+      "Gynecology"
+    ]
+  },
+  "PEDIATRICS": {
+    "General": [
+      "Normal Development",
+      "Neonatology",
+      "Nutrition and Malnutrition",
+      "Infectious Diseases",
+      "Paediatric Neurology",
+      "Paediatric Cardiology"
+    ]
+  },
+  "ENT": {
+    "General": [
+      "Ear",
+      "Nose and Paranasal Sinuses",
+      "Larynx",
+      "Pharynx"
+    ]
+  },
+  "OPHTHALMOLOGY": {
+    "General": [
+      "Conjunctiva",
+      "Cornea",
+      "Glaucoma",
+      "Retina",
+      "Squint / Strabismus",
+      "Community Ophthalmology"
+    ]
+  },
+  "DERMATOLOGY": {
+    "General": [
+      "Cutaneous Infections",
+      "Bacterial Infections",
+      "Bullous and Pigmentary Disorders",
+      "Sexually Transmitted Infections"
+    ]
+  },
+  "PSYCHIATRY": {
+    "General": [
+      "Mood Disorders",
+      "Schizophrenia Spectrum and Other Psychotic Disorders",
+      "Substance-Related and Addictive Disorders"
+    ]
+  },
+  "RADIOLOGY": {
+    "General": [
+      "Basic Radiological Imaging",
+      "Thoracic Radiology",
+      "OBGYN Imaging"
+    ]
+  },
+  "ANAESTHESIA": {
+    "General": [
+      "Cardiopulmonary Cerebral Resuscitation",
+      "Mechanical Ventilation and Modes of Ventilation"
+    ]
+  },
+  "ORTHOPAEDICS": {
+    "General": [
+      "Spine + Pelvis + Lower Limb Traumatology",
+      "General + Upper Limb Traumatology",
+      "Tuberculosis of Bone and Joints",
+      "Metabolic Disorders"
+    ]
+  }
+};
+

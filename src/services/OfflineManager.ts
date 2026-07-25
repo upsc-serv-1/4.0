@@ -633,6 +633,20 @@ class OfflineManagerService {
     return out;
   }
 
+  getOfflineQuestionsForCourseSync(course: string): any[] {
+    const tests = this.getOfflineTestsSync().filter((t: any) => t.course === course);
+    const cachedTestIds = QuestionCache.getCachedTestIdsSync();
+    // Filter test IDs by matching tests for this course
+    const testIds = Array.from(new Set([
+      ...tests.map((t: any) => t.id).filter(Boolean),
+    ])).filter(id => cachedTestIds.includes(id));
+    const out: any[] = [];
+    for (const testId of testIds) {
+      out.push(...QuestionCache.getCachedQuestionsSync(testId));
+    }
+    return out;
+  }
+
   getOfflineQuestionsEnrichedSync() {
     const questions = this.getOfflineQuestionsAllSync();
     const tests = this.getOfflineTestsSync();

@@ -373,7 +373,9 @@ export default function Home() {
       const activeCategory = pyqExamType ? (pyqExamType.charAt(0).toUpperCase() + pyqExamType.slice(1)) : widgetCategory;
 
       let dataPool = {};
-      if (activeCategory === 'Optional') {
+      if (selectedCourse === 'Medical Science') {
+        dataPool = require('../../src/data/syllabus').MEDICAL_SCIENCE_SYLLABUS;
+      } else if (activeCategory === 'Optional') {
         const sourceSyllabus = (optionalChoice === 'Anthropology') ? require('../../src/data/syllabus').ANTHROPOLOGY_SYLLABUS : { "Paper 1": { "Fundamentals": [] }, "Paper 2": { "Indian Context": [] } };
         dataPool = { [`${optionalChoice} Paper 1`]: sourceSyllabus["Paper 1"], [`${optionalChoice} Paper 2`]: sourceSyllabus["Paper 2"] };
       } else if (activeCategory === 'Mains') {
@@ -441,7 +443,7 @@ export default function Home() {
       setStats(next);
       await cacheSet(`home:${userId}`, next);
     } catch (err) { console.error("Home Load Error:", err); }
-  }, [userId, widgetCategory, selectedSubjects, optionalChoice, pyqDisplayMode, pyqExamType, pyqReportMode]);
+  }, [userId, widgetCategory, selectedSubjects, optionalChoice, pyqDisplayMode, pyqExamType, pyqReportMode, selectedCourse]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
@@ -494,7 +496,7 @@ export default function Home() {
       const testIdSet = new Set(eligibleTests.map((t: any) => String(t.id)));
       
       // OFFLINE-FIRST: Filter cached questions
-      const cachedQuestions = OfflineManager.getOfflineQuestionsAllSync();
+      const cachedQuestions = OfflineManager.getOfflineQuestionsForCourseSync(selectedCourse);
       let qRows: any[] = [];
       if (cachedQuestions.length > 0) {
         qRows = cachedQuestions.filter((q: any) => testIdSet.has(String(q.test_id)));
@@ -1102,10 +1104,13 @@ function WidgetConfigModal({ visible, onClose, onSave, category, setCategory, se
   }, [selectedCourse]);
 
   const subjects = useMemo(() => {
+    if (selectedCourse === 'Medical Science') {
+      return Object.keys(require('../../src/data/syllabus').MEDICAL_SCIENCE_SYLLABUS);
+    }
     if (category === 'Optional') return [`${optionalChoice} Paper 1`, `${optionalChoice} Paper 2`];
     if (category === 'Mains') return Object.keys(require('../../src/data/syllabus').MAINS_SYLLABUS);
     return Object.keys(MICRO_SYLLABUS);
-  }, [category, optionalChoice]);
+  }, [category, optionalChoice, selectedCourse]);
 
   const toggleSubject = (s: string) => {
     if (selectedSubjects.includes(s)) setSelectedSubjects(selectedSubjects.filter((x: string) => x !== s));

@@ -140,11 +140,7 @@ function PrelimsScreen() {
           <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>Back</Text>
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
-          <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>UPSC Prelims</Text>
-          <View style={styles.premiumBadge}>
-            <Sparkles size={11} color="#f59e0b" style={{ marginRight: 2 }} />
-            <Text style={styles.premiumText}>PREMIUM</Text>
-          </View>
+          <Text style={[styles.headerTitle, { color: colors.textPrimary }]} />
         </View>
         <TouchableOpacity
           onPress={togglePrelimsTheme}
@@ -169,15 +165,15 @@ function PrelimsScreen() {
           )}
         </TouchableOpacity>
       </View>
-
+ 
       <ScrollView contentContainerStyle={styles.hubScroll} showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
         <View style={styles.heroSection}>
           <Text style={[styles.heroHeading, { color: colors.textPrimary }]}>
-            {selectedCourse === 'Medical Science' ? 'Master Medical Science Prelims' : 'Master UPSC Prelims'}
+            {selectedCourse === 'Medical Science' ? 'Master Medical Science' : 'Master UPSC Prelims'}
           </Text>
           <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>
-            Your dedicated hub for prelims preparation.
+            {selectedCourse === 'Medical Science' ? 'Your dedicated hub for Medical Science preparation.' : 'Your dedicated hub for prelims preparation.'}
           </Text>
 
           {/* Search Input */}
@@ -281,27 +277,7 @@ function PrelimsScreen() {
           })}
         </View>
 
-        {/* Recent Topics */}
-        <View style={styles.recentTopicsContainer}>
-          <Text style={[styles.recentTitle, { color: colors.textSecondary, textAlign: 'center' }]}>Popular Subjects</Text>
-          <View style={styles.topicsRowCentered}>
-            {recentTopics.map(topic => (
-              <TouchableOpacity
-                key={topic}
-                onPress={() => router.push({ pathname: '/unified/arena', params: { subject: topic, stage: 'Prelims' } })}
-                style={[
-                  styles.topicChip,
-                  {
-                    backgroundColor: !isDark ? 'rgba(255, 255, 255, 0.55)' : 'rgba(30, 41, 59, 0.55)',
-                    borderColor: !isDark ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.15)'
-                  }
-                ]}
-              >
-                <Text style={[styles.topicChipText, { color: colors.textSecondary, fontSize: isTablet ? 13 : 11 }]}>{topic}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
+
       </ScrollView>
         </>
       )}

@@ -9,7 +9,8 @@ import { radius, spacing } from '../../src/theme';
 import { ThemeSwitcher } from '../../src/components/ThemeSwitcher';
 import { PageWrapper } from '../../src/components/PageWrapper';
 import { SyllabusService } from '../../src/services/SyllabusService';
-import { MICRO_SYLLABUS } from '../../src/data/syllabus';
+import { MICRO_SYLLABUS, MEDICAL_SCIENCE_SYLLABUS } from '../../src/data/syllabus';
+import { useCourse } from '../../src/context/CourseContext';
 
 const { width } = Dimensions.get('window');
 
@@ -17,6 +18,8 @@ function ReviseTab() {
   const { colors } = useTheme();
   const { session } = useAuth();
   const userId = session?.user.id;
+  
+  const { selectedCourse } = useCourse();
   
   const [stats, setStats] = useState({
     syllabusPercent: 0,
@@ -36,19 +39,26 @@ function ReviseTab() {
     } catch (e) {
       console.error("Revise Progress Load Error:", e);
     }
-  }, [userId]);
+  }, [userId, selectedCourse]);
 
   const processProgress = (progress: any) => {
     let totalItems = 0;
     let completedItems = 0;
     
-    const subjectStats: Record<string, { total: number; completed: number; color: string }> = {
+    const isMedical = selectedCourse === 'Medical Science';
+    const syllabusData = isMedical ? MEDICAL_SCIENCE_SYLLABUS : MICRO_SYLLABUS;
+
+    const subjectStats: Record<string, { total: number; completed: number; color: string }> = isMedical ? {
+      'ANATOMY': { total: 0, completed: 0, color: '#007AFF' },
+      'PHYSIOLOGY': { total: 0, completed: 0, color: '#FF9500' },
+      'BIOCHEMISTRY': { total: 0, completed: 0, color: '#34C759' }
+    } : {
       'Polity': { total: 0, completed: 0, color: '#007AFF' },
       'History': { total: 0, completed: 0, color: '#FF9500' },
       'Geography': { total: 0, completed: 0, color: '#34C759' }
     };
 
-    Object.entries(MICRO_SYLLABUS).forEach(([sub, groups]) => {
+    Object.entries(syllabusData).forEach(([sub, groups]) => {
       Object.entries(groups).forEach(([group, topics]) => {
         (topics as string[]).forEach(topic => {
           totalItems++;

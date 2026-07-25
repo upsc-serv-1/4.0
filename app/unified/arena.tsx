@@ -34,6 +34,7 @@ import {
   Layout,
   XCircle,
   Brain,
+  Download,
 } from 'lucide-react-native';
 import { useTheme } from '../../src/context/ThemeContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
@@ -248,6 +249,27 @@ function UnifiedArenaSetup() {
       setRefreshing(false);
     }
   };
+
+  const startOfflineDownload = async () => {
+    if (!session?.user?.id) return;
+    try {
+      setSyncProgress({ phase: 'tests', current: 0, total: 1, detail: 'Starting download...' });
+      OfflineManager.syncAllContent(session.user.id, (progress) => {
+        setSyncProgress(progress);
+      }, selectedCourse).then(() => {
+        console.log('[ARENA-DOWNLOAD] ✅ Download completed successfully');
+        setSyncProgress(null);
+        fetchMetadata();
+        updateQuestionCount();
+      }).catch((err) => {
+        console.warn('[ARENA-DOWNLOAD] Download failed:', err);
+        setSyncProgress(null);
+      });
+    } catch (e) {
+      console.error(e);
+      setSyncProgress(null);
+    }
+  };
   const [userTags, setUserTags] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState<number | null>(null);
   const [calculatingCount, setCalculatingCount] = useState(false);
@@ -256,16 +278,40 @@ function UnifiedArenaSetup() {
   const fetchUserTags = useCallback(async () => {
     if (!session?.user?.id) return;
     try {
-      const { data: tagData } = await LocalQuery.from('question_states')
-        .select('review_tags')
-        .eq('user_id', session.user.id)
-        .not('review_tags', 'is', null);
+      let tags: string[] = [];
+      if (!isOffline()) {
+        const { data, error } = await supabase
+          .from('user_tags')
+          .select('name')
+          .eq('user_id', session.user.id);
+        if (!error && data) {
+          tags = data.map(t => t.name);
+        }
+      }
+      
+      // Offline / fallback: read from OfflineManager
+      if (tags.length === 0) {
+        const offlineTags = OfflineManager.getCollectionSync('user_tags', session.user.id) as any[];
+        if (offlineTags?.length > 0) {
+          tags = offlineTags.map(t => t.name);
+        }
+      }
 
-      const tags = new Set<string>();
-      tagData?.forEach(row => {
-        if (Array.isArray(row.review_tags)) row.review_tags.forEach(t => tags.add(t));
-      });
-      setUserTags(Array.from(tags).sort());
+      // If still empty, fall back to scanning question_states as a last resort
+      if (tags.length === 0) {
+        const { data: tagData } = await LocalQuery.from('question_states')
+          .select('review_tags')
+          .eq('user_id', session.user.id)
+          .not('review_tags', 'is', null);
+        
+        const scanTags = new Set<string>();
+        tagData?.forEach(row => {
+          if (Array.isArray(row.review_tags)) row.review_tags.forEach(t => scanTags.add(t));
+        });
+        tags = Array.from(scanTags);
+      }
+
+      setUserTags(tags.sort());
     } catch (e) {
       console.error("Error fetching tags", e);
     }
@@ -418,7 +464,7 @@ function UnifiedArenaSetup() {
 
       // OFFLINE-FIRST: if cached questions already satisfy this search,
       // render instantly and skip network.
-      const cachedQuestions = OfflineManager.getOfflineQuestionsAllSync() || [];
+      const cachedQuestions = OfflineManager.getOfflineQuestionsForCourseSync(selectedCourse) || [];
       if (term.length > 0 && cachedQuestions.length > 0) {
         const searchLower = term.toLowerCase();
         const filtered = cachedQuestions.filter((q: any) =>
@@ -854,7 +900,7 @@ function UnifiedArenaSetup() {
         return;
       }
 
-      const useOffline = OfflineManager.getOfflineQuestionsAllSync().length > 0 || isOffline();
+      const useOffline = OfflineManager.getOfflineQuestionsForCourseSync(selectedCourse).length > 0 || isOffline();
 
       const isDefaultAllQuestions =
         activeTab === 'topic' &&
@@ -1370,11 +1416,32 @@ function UnifiedArenaSetup() {
   return (
     <PageWrapper>
       <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
-        <View style={[styles.header, { paddingBottom: 16 }]}>
-          <View>
+        <View style={[styles.header, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 16 }]}>
+          <View style={{ flex: 1, marginRight: 16 }}>
             <Text style={[styles.title, { color: colors.textPrimary }]}>Unified Arena</Text>
             <Text style={[styles.subtitle, { color: colors.textTertiary }]}>Setup your focus session</Text>
           </View>
+          <TouchableOpacity
+            disabled={!!syncProgress}
+            onPress={startOfflineDownload}
+            style={[
+              styles.downloadBtn, 
+              { 
+                backgroundColor: syncProgress ? colors.surfaceStrong : (colors.primary + '15'),
+                borderColor: colors.primary + '30',
+                borderWidth: 1.5,
+              }
+            ]}
+          >
+            {syncProgress ? (
+              <ActivityIndicator size="small" color={colors.primary} />
+            ) : (
+              <Download size={16} color={colors.primary} />
+            )}
+            <Text style={[styles.downloadBtnText, { color: colors.primary, marginLeft: 6 }]}>
+              {syncProgress ? 'Syncing...' : 'Offline Sync'}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <ScrollView 
@@ -1592,6 +1659,14 @@ function UnifiedArenaSetup() {
                   selected={ncertFilter}
                   onSelect={setNcertFilter}
                 />
+                <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 12, opacity: 0.5 }} />
+                <FilterRow
+                  title="Revision Tags"
+                  items={userTags}
+                  selected={selectedTags}
+                  onSelect={setSelectedTags}
+                  multi
+                />
               </View>
 
               <View style={{ marginHorizontal: 20, marginBottom: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1791,6 +1866,19 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   header: { padding: 24, paddingBottom: 16 },
+  downloadBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  downloadBtnText: {
+    fontSize: 11,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+  },
   title: { fontSize: 28, fontWeight: '900', letterSpacing: -0.5 },
   subtitle: { fontSize: 14, fontWeight: '600', marginTop: 4 },
   scrollContent: { paddingBottom: 160 },

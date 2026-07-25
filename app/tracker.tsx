@@ -67,7 +67,7 @@ import { RadarChart, BarChart } from '../src/components/Charts';
 import { useTheme } from '../src/context/ThemeContext';
 import { PageWrapper } from '../src/components/PageWrapper';
 import { spacing } from '../src/theme';
-import { MICRO_SYLLABUS, MAINS_SYLLABUS, ANTHROPOLOGY_SYLLABUS } from '../src/data/syllabus';
+import { MICRO_SYLLABUS, MAINS_SYLLABUS, ANTHROPOLOGY_SYLLABUS, MEDICAL_SCIENCE_SYLLABUS } from '../src/data/syllabus';
 import { SyllabusService, SyllabusProgress } from '../src/services/SyllabusService';
 import { useAuth } from '../src/context/AuthContext';
 import { useCourse } from '../src/context/CourseContext';
@@ -569,7 +569,13 @@ function SyllabusTracker() {
     };
   }, [optionalChoice]);
 
-  const activeSyllabus = mode === 'prelims' ? MICRO_SYLLABUS : mode === 'mains' ? MAINS_SYLLABUS : activeOptionalSyllabus;
+  const activeSyllabus = selectedCourse === 'Medical Science'
+    ? MEDICAL_SCIENCE_SYLLABUS
+    : mode === 'prelims'
+      ? MICRO_SYLLABUS
+      : mode === 'mains'
+        ? MAINS_SYLLABUS
+        : activeOptionalSyllabus;
   const activeSyllabusMap = activeSyllabus as Record<string, any>;
 
   useEffect(() => {
@@ -1200,7 +1206,11 @@ function SyllabusTracker() {
                 <Text style={{ fontSize: 12, fontWeight: '700', color: colors.textSecondary, marginLeft: 4 }}>Back</Text>
               </TouchableOpacity>
               <Text style={[s.h1, { color: colors.textPrimary }]}>Syllabus Progress</Text>
-              <Text style={[s.subhead, { color: colors.textSecondary }]}>Track your completion, identify weak areas, and master the UPSC syllabus.</Text>
+              <Text style={[s.subhead, { color: colors.textSecondary }]}>
+                {selectedCourse === 'Medical Science'
+                  ? 'Track your completion, identify weak areas, and master the Medical Science syllabus.'
+                  : 'Track your completion, identify weak areas, and master the UPSC syllabus.'}
+              </Text>
             </View>
             <TouchableOpacity
               onPress={() => setIsExportSheetVisible(true)}
@@ -1302,7 +1312,11 @@ function SyllabusTracker() {
         <View style={s.header}>
           <View>
             <Text style={[s.h1, { color: colors.textPrimary }]}>Syllabus Progress</Text>
-            <Text style={[s.subhead, { color: colors.textSecondary }]}>Track your completion, identify weak areas, and master the UPSC syllabus.</Text>
+            <Text style={[s.subhead, { color: colors.textSecondary }]}>
+              {selectedCourse === 'Medical Science'
+                ? 'Track your completion, identify weak areas, and master the Medical Science syllabus.'
+                : 'Track your completion, identify weak areas, and master the UPSC syllabus.'}
+            </Text>
           </View>
         </View>
       )}

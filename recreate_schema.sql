@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS user_settings ( user_id uuid NOT NULL, full_name text
 CREATE TABLE IF NOT EXISTS user_subscriptions ( id uuid NOT NULL DEFAULT gen_random_uuid(), user_id uuid NOT NULL, plan_id uuid NOT NULL, is_active boolean DEFAULT true, starts_at timestamp with time zone DEFAULT now(), expires_at timestamp with time zone, auto_renew boolean DEFAULT false, payment_ref text DEFAULT ''::text, notes text DEFAULT ''::text, created_at timestamp with time zone DEFAULT now(), updated_at timestamp with time zone DEFAULT now(), course_name text );
 CREATE TABLE IF NOT EXISTS user_syllabus_progress ( id uuid NOT NULL DEFAULT gen_random_uuid(), user_id uuid, path text NOT NULL, status jsonb NOT NULL, updated_at timestamp with time zone DEFAULT now() );
 CREATE TABLE IF NOT EXISTS user_widgets ( id uuid NOT NULL DEFAULT gen_random_uuid(), user_id uuid NOT NULL, widget_key text NOT NULL, position integer NOT NULL DEFAULT 0, is_archived boolean NOT NULL DEFAULT false, created_at timestamp with time zone DEFAULT now(), size text NOT NULL DEFAULT 'half'::text );
-CREATE TABLE IF NOT EXISTS users ( id uuid NOT NULL, email text, created_at timestamp without time zone );
+CREATE TABLE IF NOT EXISTS users ( id uuid NOT NULL, email text, name text, created_at timestamp without time zone );
 CREATE TABLE IF NOT EXISTS v_deck_summary ( user_id uuid, subject text, section_group text, microtopic text, new_count bigint, learning_count bigint, mastered_count bigint, leech_count bigint, due_count bigint, total_count bigint );
 CREATE TABLE IF NOT EXISTS vitamin_versions ( id uuid NOT NULL DEFAULT gen_random_uuid(), user_id uuid NOT NULL, question_id character varying(100) NOT NULL, explanation_content text NOT NULL, template_used character varying(100), rating integer DEFAULT 0, is_primary boolean DEFAULT false, created_at timestamp without time zone DEFAULT now() );
 
@@ -795,6 +795,14 @@ DROP POLICY IF EXISTS "Auth can read all users" ON users;
 CREATE POLICY "Auth can read all users"
   ON users FOR SELECT
   USING (auth.role() = 'authenticated');
+
+-- Allow users to update their own user row
+DROP POLICY IF EXISTS "Users can update own row" ON users;
+
+CREATE POLICY "Users can update own row"
+  ON users FOR UPDATE
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
 
 -- Enable RLS on user_settings table if not already enabled
 ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;

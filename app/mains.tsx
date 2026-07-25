@@ -79,6 +79,7 @@ import {
 } from 'lucide-react-native';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
+import { useCourse } from '../src/context/CourseContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePreventRemove, useNavigation } from '@react-navigation/native';
 import Markdown from 'react-native-markdown-display';
@@ -333,6 +334,7 @@ export function MainsScreenInner() {
   const router = useRouter();
   const navigation = useNavigation();
   const { session } = useAuth();
+  const { selectedCourse } = useCourse();
   const { width, height } = useWindowDimensions();
   const isTablet = width >= 768;
   const insets = useSafeAreaInsets();
@@ -1605,11 +1607,7 @@ export function MainsScreenInner() {
                 <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>Back</Text>
               </TouchableOpacity>
               <View style={styles.headerTitleContainer}>
-                <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>UPSC Mains</Text>
-                <View style={styles.premiumBadge}>
-                  <Sparkles size={11} color="#f59e0b" style={{ marginRight: 2 }} />
-                  <Text style={styles.premiumText}>PREMIUM</Text>
-                </View>
+                <Text style={[styles.headerTitle, { color: colors.textPrimary }]} />
               </View>
               <TouchableOpacity
                 onPress={toggleMainsTheme}
@@ -2333,6 +2331,7 @@ function HubView({
   const router = useRouter();
   const { isDark } = useTheme();
   const { width } = useWindowDimensions();
+  const { selectedCourse } = useCourse();
 
   const primaryCards = [
     {
@@ -2366,7 +2365,7 @@ function HubView({
     {
       id: 'syllabus',
       title: 'Syllabus',
-      description: 'Interactive UPSC syllabus explorer',
+      description: selectedCourse === 'Medical Science' ? 'Interactive Medical Science syllabus explorer' : 'Interactive UPSC syllabus explorer',
       color: '#10b981',
       icon: Map,
     },
@@ -2399,7 +2398,7 @@ function HubView({
       {/* Hero Section */}
       <View style={styles.heroSection}>
         <Text style={[styles.heroHeading, { color: colors.textPrimary }]}>
-          Master UPSC Mains
+          {selectedCourse === 'Medical Science' ? 'Master Medical Science' : 'Master UPSC Mains'}
         </Text>
         <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>
           Everything required for answer writing in one place.
@@ -2507,26 +2506,7 @@ function HubView({
         })}
       </View>
 
-      {/* Recent Topics */}
-      <View style={styles.recentTopicsContainer}>
-        <Text style={[styles.recentTitle, { color: colors.textSecondary, textAlign: 'center' }]}>Recent Topics</Text>
-        <View style={styles.topicsRowCentered}>
-          {recentTopics.map(topic => (
-            <TouchableOpacity
-              key={topic}
-              style={[
-                styles.topicChip, 
-                { 
-                  backgroundColor: !isDark ? 'rgba(255, 255, 255, 0.55)' : 'rgba(30, 41, 59, 0.55)', 
-                  borderColor: !isDark ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.15)' 
-                }
-              ]}
-            >
-              <Text style={[styles.topicChipText, { color: colors.textSecondary, fontSize: isTablet ? 13 : 11 }]}>{topic}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
+
     </ScrollView>
   );
 }

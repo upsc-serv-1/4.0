@@ -1659,16 +1659,16 @@ export const buildTagsHtml = (groups: { tag: string; questions: ExportQuestion[]
       if (isFlashStyle) {
         const right = answerBlock || '';
         return `
-          <table class="card" style="width: 100%; table-layout: fixed; border-collapse: collapse; border: 1px solid var(--rule); border-radius: 6px; margin: 2mm 0; break-inside: avoid; page-break-inside: avoid;">
+          <table class="card" style="border-collapse: separate !important; border-spacing: 0 !important; overflow: hidden; width: 100%; table-layout: fixed; border: 1px solid var(--rule); border-radius: 6px; margin: 2mm 0; break-inside: avoid; page-break-inside: avoid;">
             <tr>
-              <td class="side" style="width: 50%; vertical-align: top; border-right: 1px dotted var(--rule); padding: 2.5mm; padding-right: 3.5mm; box-sizing: border-box;">
+              <td class="side" style="width: 30%; vertical-align: top; border-right: 1px dotted var(--rule); padding: 2.5mm; padding-right: 3.5mm; box-sizing: border-box;">
                 <div style="min-height: 48mm; box-sizing: border-box;">
                   <div class="card-face-label">Question</div>
                   ${chipsHtml}
                   ${questionBlock}
                 </div>
               </td>
-              <td class="side" style="width: 50%; vertical-align: top; padding: 2.5mm; padding-left: 3.5mm; box-sizing: border-box;">
+              <td class="side" style="width: 70%; vertical-align: top; padding: 2.5mm; padding-left: 3.5mm; box-sizing: border-box;">
                 <div style="min-height: 48mm; box-sizing: border-box;">
                   ${right ? `<div class="card-face-label">Answer & Explanation</div>${right}` : ''}
                 </div>

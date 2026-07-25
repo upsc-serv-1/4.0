@@ -775,7 +775,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const fetchQuestionsForTests = async (testIds: string[], bypassCache = false) => {
     // OFFLINE-FIRST: use cached questions when available unless bypassing cache.
     if (!bypassCache) {
-      const cachedQuestions = OfflineManager.getOfflineQuestionsAllSync() || [];
+      const cachedQuestions = OfflineManager.getOfflineQuestionsForCourseSync(selectedCourse) || [];
       if (cachedQuestions.length > 0) {
         const cachedRows = cachedQuestions.filter((q: any) => testIds.includes(q.test_id));
         if (cachedRows.length > 0) {
@@ -1061,6 +1061,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         if (targetPaperGroup) {
           if (resolveTestPaperGroup(test) !== targetPaperGroup) return false;
         }
+        return true;
       });
       const visibleTests = relevantTests.filter((test: any) => matchesYearRange(getTestYear(test)));
 
@@ -1134,6 +1135,9 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   };
 
   const [topicSubjectMap, setTopicSubjectMap] = useState<Record<string, string>>({});
+  // Tracks whether each topic in the heatmap came from micro_topic or section_group column.
+  // Used in cell-click navigation so the correct DB column filter is applied.
+  const [topicSourceMap, setTopicSourceMap] = useState<Record<string, 'micro' | 'section'>>({});
 
   const processAnalytics = (data: any[]) => {
     if (!data.length) {
@@ -1146,6 +1150,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     const topicMap: Record<string, number> = {};
     const topicYearMap: Record<string, Record<string, number>> = {};
     const topicToSubject: Record<string, string> = {};
+    const topicSourceLocal: Record<string, 'micro' | 'section'> = {};
 
     data.forEach(q => {
       const subject = getAnalyticsSubject(q);
@@ -1159,11 +1164,14 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       if (!yearSubjectMap[yearKey]) yearSubjectMap[yearKey] = {};
       yearSubjectMap[yearKey][subject] = (yearSubjectMap[yearKey][subject] || 0) + val;
 
+      const topicFromMicro = !!q.micro_topic;
       const topic = q.micro_topic || q.section_group || 'Other';
       topicMap[topic] = (topicMap[topic] || 0) + val;
       if (!topicYearMap[topic]) topicYearMap[topic] = {};
       topicYearMap[topic][yearKey] = (topicYearMap[topic][yearKey] || 0) + val;
       if (!topicToSubject[topic]) topicToSubject[topic] = subject;
+      // Track source column so cell-click can send the right filter
+      if (!topicSourceLocal[topic]) topicSourceLocal[topic] = topicFromMicro ? 'micro' : 'section';
     });
 
     const sortedSubjects = Object.entries(subjectMap).sort((a, b) => b[1] - a[1]);
@@ -1173,6 +1181,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     setHeatmapData(yearSubjectMap);
     setTopTopics(hottestTopics);
     setTopicSubjectMap(topicToSubject);
+    setTopicSourceMap(topicSourceLocal);
     // Default to Economy-only trend selection when available; otherwise fall back
     // to top subject. Users can add more via chips.
     const economy = sortedSubjects.find(([name]) => name.toLowerCase() === 'economy');
@@ -1253,17 +1262,17 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   }, [oneSub, oneSec, oneMicro, rawQuestions]);
 
   const years = useMemo(() => {
+    // Only use years from actual loaded questions (not test metadata).
+    // testYears could be outside the selected year range filter, causing heatmap
+    // columns to appear for years where no questions were loaded → 0 results on click.
     const questionYears = rawQuestions
       .map(getAnalyticsYear)
       .filter((value): value is number => typeof value === 'number' && Number.isFinite(value));
-    const testYears = Object.values(testsMetaById)
-      .map((test: any) => getTestYear(test))
-      .filter((value): value is number => typeof value === 'number' && Number.isFinite(value));
 
-    return Array.from(new Set([...questionYears, ...testYears]))
+    return Array.from(new Set(questionYears))
       .sort((a, b) => b - a)
       .map(String);
-  }, [rawQuestions, testsMetaById]);
+  }, [rawQuestions]);
 
   const heatmapSections = useMemo(() => {
     if (selSubjects.length === 0) return [];
@@ -2057,12 +2066,12 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         paper: selectedPaper || '',
       };
       
-      // For Medical Science, INICET and NEET PG tests have series values like
-      // "Prelims (Official)" — not "INICET" or "NEET PG". The stage name comes
-      // from the UI dropdown. Don't pass stage for these, since the engine does
+      // For Medical Science, tests have series values like "Prelims (Official)"
+      // — not "INICET", "NEET PG", or "UPSC CMS". The stage name comes from the
+      // UI dropdown. Don't pass stage for these, since the engine does
       // `series ILIKE '%<stage>%'` which won't match. Instead rely on examCategory
-      // which correctly filters by is_inicet/is_neetpg boolean flags.
-      if (!selectedCourse?.includes('Medical') || (examStage !== 'INICET' && examStage !== 'NEET PG')) {
+      // which correctly filters by is_inicet/is_neetpg/is_upsc_cms boolean flags.
+      if (!selectedCourse?.includes('Medical')) {
         engineParams.stage = examStage;
       }
       
@@ -2659,8 +2668,20 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       colors={colors}
       heatmapPalette={heatmapPalette}
       preferredCellWidth={72}
-      onCellPress={(topic, year) => handleHeatmapPress(topic, { subject: topicSubjectMap[topic], micro: topic }, year)}
-      onRowPress={(topic) => handleHeatmapPress(topic, { subject: topicSubjectMap[topic], micro: topic })}
+      onCellPress={(topic, year) => {
+        const src = topicSourceMap[topic];
+        const opts = src === 'section'
+          ? { subject: topicSubjectMap[topic], section: topic }
+          : { subject: topicSubjectMap[topic], micro: topic };
+        handleHeatmapPress(topic, opts, year);
+      }}
+      onRowPress={(topic) => {
+        const src = topicSourceMap[topic];
+        const opts = src === 'section'
+          ? { subject: topicSubjectMap[topic], section: topic }
+          : { subject: topicSubjectMap[topic], micro: topic };
+        handleHeatmapPress(topic, opts);
+      }}
     />
   );
 

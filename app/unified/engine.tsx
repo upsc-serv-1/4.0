@@ -1592,7 +1592,8 @@ export default function UnifiedQuizEngine() {
             const subList = typeof subs === 'string' ? subs.split(',').filter(Boolean) : [];
             if (subList.length > 0) {
               const beforeSubject = filtered.length;
-              filtered = filtered.filter((q: any) => subList.includes(q.subject));
+              const subListLower = subList.map(s => s.toLowerCase());
+              filtered = filtered.filter((q: any) => subListLower.includes(String(q.subject || '').toLowerCase()));
               console.log('[ENGINE-OFFLINE] Filtered by subject:', { 
                 subjects: subList, 
                 before: beforeSubject, 
@@ -1628,9 +1629,28 @@ export default function UnifiedQuizEngine() {
             filtered = filtered.filter((q: any) => !q.is_pyq);
           }
 
-          // Apply year range
-          if (params.year_start && Number(params.year_start)) filtered = filtered.filter((q: any) => q.exam_year >= Number(params.year_start));
-          if (params.year_end && Number(params.year_end)) filtered = filtered.filter((q: any) => q.exam_year <= Number(params.year_end));
+          // Apply year range — fall back to test.launch_year when exam_year is null
+          if (params.year_start && Number(params.year_start)) {
+            const ys = Number(params.year_start);
+            filtered = filtered.filter((q: any) => {
+              const qYear = q.exam_year || q.year;
+              if (qYear) return Number(qYear) >= ys;
+              // Fallback: use test metadata year
+              const tests = Array.isArray(q?.tests) ? q.tests[0] : q?.tests;
+              const tYear = Number(tests?.launch_year || tests?.exam_year || 0);
+              return tYear >= ys;
+            });
+          }
+          if (params.year_end && Number(params.year_end)) {
+            const ye = Number(params.year_end);
+            filtered = filtered.filter((q: any) => {
+              const qYear = q.exam_year || q.year;
+              if (qYear) return Number(qYear) <= ye;
+              const tests = Array.isArray(q?.tests) ? q.tests[0] : q?.tests;
+              const tYear = Number(tests?.launch_year || tests?.exam_year || 0);
+              return tYear <= ye;
+            });
+          }
 
           // Apply micro_topic
           const mt = params.microTopics || params.microtopic;
@@ -1734,16 +1754,47 @@ export default function UnifiedQuizEngine() {
           // Apply paper filter (e.g. "GS Paper 1") — matches online path which uses tests.title/paper_type
           const paper = params.paper;
           if (paper && paper !== 'All' && paper !== '' && paper !== '[]') {
-            const paperNorm = paper.replace('GS ', '');
+            const matchPaperGroup = (testTitle: string, filterPaper: string, testSeries = '', testLevel = '', testSectionGroup = ''): boolean => {
+              const t = testTitle.toLowerCase();
+              const f = filterPaper.toLowerCase();
+              const s = testSeries.toLowerCase();
+              const l = testLevel.toLowerCase();
+              const sg = testSectionGroup.toLowerCase();
+              
+              if (f === 'gs paper 1' || f === 'gs paper 1 (prelims)' || f === 'gs1') {
+                return l === 'gs1' || l === 'pre_gs1' || l.includes('gs paper 1') ||
+                       sg.includes('gs paper 1') || sg === 'gs1' || sg === 'pre_gs1' ||
+                       t.includes('gs paper 1') || t.includes('gs1') || (t.includes('paper 1') && !t.includes('csat') && !t.includes('essay'));
+              }
+              if (f === 'gs paper 2 (csat)' || f === 'csat' || f === 'gs paper 2' || f === 'gs2') {
+                return l === 'csat' || l === 'gs2' || l === 'pre_csat' || l.includes('csat') ||
+                       sg.includes('csat') || sg.includes('paper 2') || sg === 'gs2' || sg === 'pre_csat' ||
+                       t.includes('csat') || t.includes('paper 2') || t.includes('gs2') || t.includes('pre_csat') || t.includes('csat paper 2');
+              }
+              if (f === 'gs paper 3' || f === 'gs3') {
+                return l === 'gs3' || l === 'pre_gs3' || l.includes('gs paper 3') ||
+                       sg.includes('gs paper 3') || sg === 'gs3' || sg === 'pre_gs3' ||
+                       t.includes('gs paper 3') || t.includes('gs3') || t.includes('paper 3');
+              }
+              if (f === 'gs paper 4' || f === 'gs4') {
+                return l === 'gs4' || l === 'pre_gs4' || l.includes('gs paper 4') ||
+                       sg.includes('gs paper 4') || sg === 'gs4' || sg === 'pre_gs4' ||
+                       t.includes('gs paper 4') || t.includes('gs4') || t.includes('paper 4');
+              }
+              const paperNorm = filterPaper.replace('GS ', '').toLowerCase();
+              return t.includes(f) || t.includes(paperNorm) ||
+                     s.includes(f) || s.includes(paperNorm) ||
+                     l.includes(f) || l.includes(paperNorm) ||
+                     sg.includes(f) || sg.includes(paperNorm);
+            };
+            
             filtered = filtered.filter((q: any) => {
               const tests = Array.isArray(q?.tests) ? q.tests[0] : q?.tests;
               const title = String(tests?.title || q?.title || '').toLowerCase();
               const series = String(tests?.series || q?.series || '').toLowerCase();
               const level = String(tests?.level || q?.level || '').toLowerCase();
-              // Match by title, series, or level containing the paper name
-              return title.includes(paper.toLowerCase()) || title.includes(paperNorm.toLowerCase()) ||
-                     series.includes(paper.toLowerCase()) || series.includes(paperNorm.toLowerCase()) ||
-                     level.includes(paper.toLowerCase()) || level.includes(paperNorm.toLowerCase());
+              const sg = String(tests?.section_group || q?.section_group || '').toLowerCase();
+              return matchPaperGroup(title, paper, series, level, sg);
             });
           }
 
@@ -1852,70 +1903,120 @@ export default function UnifiedQuizEngine() {
 
             if ((insts && insts !== 'All' && insts !== '' && insts !== '[]') || 
                 (progs && progs !== 'All' && progs !== '' && progs !== '[]') ||
-                (stage && stage !== 'All' && stage !== '' && stage !== '[]')) {
+                (stage && stage !== 'All' && stage !== '' && stage !== '[]') ||
+                (paper && paper !== 'All' && paper !== '' && paper !== '[]')) {
               
-              let tQuery = LocalQuery.from('tests').select('id').eq('course', selectedCourse);
+              let testRows: any[] = [];
+              let localRes = await LocalQuery.from('tests').select('*').eq('course', selectedCourse);
+              let localTests = localRes.data || [];
+              
+              if ((!localTests || localTests.length === 0) && NetworkStatus.isOnline()) {
+                const { data: remoteTests } = await supabase
+                  .from('tests')
+                  .select('id, title, series, institute, program_name, program_id, course')
+                  .eq('course', selectedCourse);
+                testRows = remoteTests || [];
+              } else {
+                testRows = localTests || [];
+              }
+              
+              const pyqM = params.pyqMaster || params.pyqFilter;
+              if (pyqM === 'PYQ Only') {
+                if (selectedCourse === 'Civil Services') {
+                  testRows = testRows.filter(t => String(t.institute || '').toLowerCase() === 'upsc');
+                } else if (selectedCourse === 'Medical Science') {
+                  const examCat = (params.examCategory || '').toLowerCase();
+                  if (examCat.includes('cms')) {
+                    testRows = testRows.filter(t => String(t.institute || '').toLowerCase() === 'upsc');
+                  } else if (examCat.includes('neet')) {
+                    testRows = testRows.filter(t => String(t.institute || '').toLowerCase() === 'nbe');
+                  } else if (examCat.includes('ini')) {
+                    testRows = testRows.filter(t => String(t.institute || '').toLowerCase() === 'aiims');
+                  }
+                }
+              }
               
               if (insts && insts !== 'All' && insts !== '' && insts !== '[]') {
-                const instList = typeof insts === 'string' ? insts.split(',').filter(Boolean) : [];
-                if (instList.length > 0) tQuery = tQuery.in('institute', instList);
+                const instList = typeof insts === 'string' ? insts.split(',').filter(Boolean).map(x => x.toLowerCase()) : [];
+                if (instList.length > 0) {
+                  testRows = testRows.filter(t => instList.includes(String(t.institute || '').toLowerCase()));
+                }
               }
               
               if (progs && progs !== 'All' && progs !== '' && progs !== '[]') {
-                const progList = typeof progs === 'string' ? progs.split(',').filter(Boolean) : [];
-                if (progList.length > 0) tQuery = tQuery.in('program_name', progList);
-              }
-
-              if (stage && stage !== 'All' && stage !== '' && stage !== '[]') {
-                const pyqM = params.pyqMaster || params.pyqFilter;
-                if (pyqM === 'PYQ Only') {
-                  tQuery = tQuery.or(`series.ilike.%${stage}%,series.eq.PYQ Book`);
-                } else {
-                  tQuery = tQuery.ilike('series', `%${stage}%`);
+                const progList = typeof progs === 'string' ? progs.split(',').filter(Boolean).map(x => x.toLowerCase()) : [];
+                if (progList.length > 0) {
+                  testRows = testRows.filter(t => progList.includes(String(t.program_name || t.program_id || '').toLowerCase()));
                 }
-              }
-
-              if (paper && paper !== 'All' && paper !== '' && paper !== '[]') {
-                // Map "GS Paper 1" to "Paper 1" or similar for broader matching
-                const paperNorm = paper.replace('GS ', '');
-                tQuery = tQuery.or(`title.ilike.%${paper}%,title.ilike.%${paperNorm}%,series.ilike.%${paper}%`);
               }
               
-              let { data: testRows } = await tQuery;
-              if ((!testRows || testRows.length === 0) && NetworkStatus.isOnline()) {
-                let sQuery = supabase.from('tests').select('id').eq('course', selectedCourse);
-                if (insts && insts !== 'All' && insts !== '' && insts !== '[]') {
-                  const instList = typeof insts === 'string' ? insts.split(',').filter(Boolean) : [];
-                  if (instList.length > 0) sQuery = sQuery.in('institute', instList);
-                }
-                if (progs && progs !== 'All' && progs !== '' && progs !== '[]') {
-                  const progList = typeof progs === 'string' ? progs.split(',').filter(Boolean) : [];
-                  if (progList.length > 0) sQuery = sQuery.in('program_name', progList);
-                }
-                if (stage && stage !== 'All' && stage !== '' && stage !== '[]') {
-                  const pyqM = params.pyqMaster || params.pyqFilter;
-                  if (pyqM === 'PYQ Only') {
-                    sQuery = sQuery.or(`series.ilike.%${stage}%,series.eq.PYQ Book`);
-                  } else {
-                    sQuery = sQuery.ilike('series', `%${stage}%`);
-                  }
-                }
-                if (paper && paper !== 'All' && paper !== '' && paper !== '[]') {
-                  const paperNorm = paper.replace('GS ', '');
-                  sQuery = sQuery.or(`title.ilike.%${paper}%,title.ilike.%${paperNorm}%,series.ilike.%${paper}%`);
-                }
-                const res = await sQuery;
-                testRows = res.data;
+              if (stage && stage !== 'All' && stage !== '' && stage !== '[]') {
+                const stageNorm = stage.toLowerCase();
+                const pyqM = params.pyqMaster || params.pyqFilter;
+                testRows = testRows.filter(t => {
+                  const s = String(t.series || '').toLowerCase();
+                  if (pyqM === 'PYQ Only' && s.includes('pyq book')) return true;
+                  return s.includes(stageNorm);
+                });
               }
-              const tIds = (testRows || []).map((t: any) => t.id);
-              if (tIds.length > 0) query = query.in('test_id', tIds);
-              else break;
+              
+              if (paper && paper !== 'All' && paper !== '' && paper !== '[]') {
+                // matchPaperGroup mirrors pyq.tsx resolveTestPaperGroup:
+                // checks section_group first (highest priority), then level, then title/series.
+                const matchPaperGroup = (testTitle: string, filterPaper: string, testSeries = '', testLevel = '', testSectionGroup = ''): boolean => {
+                  const t = testTitle.toLowerCase();
+                  const f = filterPaper.toLowerCase();
+                  const s = testSeries.toLowerCase();
+                  const l = testLevel.toLowerCase();
+                  const sg = testSectionGroup.toLowerCase();
+                  
+                  if (f === 'gs paper 1' || f === 'gs paper 1 (prelims)' || f === 'gs1') {
+                    return l === 'gs1' || l === 'pre_gs1' || l.includes('gs paper 1') ||
+                           sg.includes('gs paper 1') || sg === 'gs1' || sg === 'pre_gs1' ||
+                           t.includes('gs paper 1') || t.includes('gs1') || (t.includes('paper 1') && !t.includes('csat') && !t.includes('essay'));
+                  }
+                  if (f === 'gs paper 2 (csat)' || f === 'csat' || f === 'gs paper 2' || f === 'gs2') {
+                    return l === 'csat' || l === 'gs2' || l === 'pre_csat' || l.includes('csat') ||
+                           sg.includes('csat') || sg.includes('paper 2') || sg === 'gs2' || sg === 'pre_csat' ||
+                           t.includes('csat') || t.includes('paper 2') || t.includes('gs2') || t.includes('pre_csat') || t.includes('csat paper 2');
+                  }
+                  if (f === 'gs paper 3' || f === 'gs3') {
+                    return l === 'gs3' || l === 'pre_gs3' || l.includes('gs paper 3') ||
+                           sg.includes('gs paper 3') || sg === 'gs3' || sg === 'pre_gs3' ||
+                           t.includes('gs paper 3') || t.includes('gs3') || t.includes('paper 3');
+                  }
+                  if (f === 'gs paper 4' || f === 'gs4') {
+                    return l === 'gs4' || l === 'pre_gs4' || l.includes('gs paper 4') ||
+                           sg.includes('gs paper 4') || sg === 'gs4' || sg === 'pre_gs4' ||
+                           t.includes('gs paper 4') || t.includes('gs4') || t.includes('paper 4');
+                  }
+                  const paperNorm = filterPaper.replace('GS ', '').toLowerCase();
+                  return t.includes(f) || t.includes(paperNorm) ||
+                         s.includes(f) || s.includes(paperNorm) ||
+                         l.includes(f) || l.includes(paperNorm) ||
+                         sg.includes(f) || sg.includes(paperNorm);
+                };
+                
+                testRows = testRows.filter(t => 
+                  matchPaperGroup(t.title || '', paper, t.series || '', t.level || '', t.section_group || '')
+                );
+              }
+              
+              const tIds = testRows.map(t => t.id);
+              if (tIds.length > 0) {
+                query = query.in('test_id', tIds);
+              } else {
+                break;
+              }
             }
           }
 
           const subs = params.subjects || params.subject;
           if (subs && subs !== 'All' && subs !== '' && subs !== '[]') {
-            const subList = typeof subs === 'string' ? subs.split(',').filter(Boolean) : [];
+            let subList = typeof subs === 'string' ? subs.split(',').filter(Boolean) : [];
+            if (selectedCourse === 'Medical Science') {
+              subList = subList.map(s => s.toUpperCase());
+            }
             if (subList.length > 0) query = query.in('subject', subList);
           }
           const sectionVal = params.section;
@@ -1967,12 +2068,22 @@ export default function UnifiedQuizEngine() {
 
           if (params.specificYear) {
             if (params.specificYear.includes(',')) {
-              query = query.in('exam_year', params.specificYear.split(','));
+              query = query.in('exam_year', params.specificYear.split(',').map(Number));
             } else {
-              query = query.eq('exam_year', params.specificYear);
+              query = query.eq('exam_year', parseInt(params.specificYear, 10));
             }
           } else if (params.year_start && params.year_end) {
-            query = query.gte('exam_year', params.year_start).lte('exam_year', params.year_end);
+            const ys = parseInt(params.year_start, 10);
+            const ye = parseInt(params.year_end, 10);
+            // Include questions with null exam_year when test_id filter already scopes them
+            // (some questions store year only in tests.launch_year not in exam_year column).
+            // When year_start === year_end (single year cell click), allow null exam_year through
+            // since test_id IN (...) already restricts to that year's test.
+            if (ys === ye) {
+              query = query.or(`exam_year.eq.${ys},exam_year.is.null`);
+            } else {
+              query = query.gte('exam_year', ys).lte('exam_year', ye);
+            }
           }
 
           if (params.ncertFilter === 'NCERT Only') {
@@ -2069,47 +2180,113 @@ export default function UnifiedQuizEngine() {
                  fuzzyPatterns.push(`explanation_markdown.ilike.%${pattern}%`);
                }
              }
-             
+
              let fuzzyQ = LocalQuery.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_upsc_cms, is_neetpg, is_inicet, is_allied, is_others, source, test_id, tests(*)').eq('course', selectedCourse).or(fuzzyPatterns.join(',')).limit(100);
              // Re-apply same filters
              const insts = params.institutes || params.institute;
              const progs = params.programs || params.program;
              const stage = params.stage || params.examStage || params.series;
-             if ((insts && insts !== 'All' && insts !== '' && insts !== '[]') || (progs && progs !== 'All' && progs !== '' && progs !== '[]') || (stage && stage !== 'All' && stage !== '' && stage !== '[]')) {
-                let tQuery = LocalQuery.from('tests').select('id').eq('course', selectedCourse);
-                if (insts && insts !== 'All' && insts !== '' && insts !== '[]') tQuery = tQuery.in('institute', insts.split(',').filter(Boolean));
-                if (progs && progs !== 'All' && progs !== '' && progs !== '[]') tQuery = tQuery.in('program_name', progs.split(',').filter(Boolean));
-                if (stage && stage !== 'All' && stage !== '' && stage !== '[]') {
-                  const pyqM = params.pyqMaster || params.pyqFilter;
-                  if (pyqM === 'PYQ Only') {
-                    tQuery = tQuery.or(`series.ilike.%${stage}%,series.eq.PYQ Book`);
-                  } else {
-                    tQuery = tQuery.ilike('series', `%${stage}%`);
-                  }
-                }
-                let { data: tRows } = await tQuery;
-                if ((!tRows || tRows.length === 0) && NetworkStatus.isOnline()) {
-                  let sQuery = supabase.from('tests').select('id').eq('course', selectedCourse);
-                  if (insts && insts !== 'All' && insts !== '' && insts !== '[]') sQuery = sQuery.in('institute', insts.split(',').filter(Boolean));
-                  if (progs && progs !== 'All' && progs !== '' && progs !== '[]') sQuery = sQuery.in('program_name', progs.split(',').filter(Boolean));
-                  if (stage && stage !== 'All' && stage !== '' && stage !== '[]') {
-                    const pyqM = params.pyqMaster || params.pyqFilter;
-                    if (pyqM === 'PYQ Only') {
-                      sQuery = sQuery.or(`series.ilike.%${stage}%,series.eq.PYQ Book`);
-                    } else {
-                      sQuery = sQuery.ilike('series', `%${stage}%`);
-                    }
-                  }
-                  const res = await sQuery;
-                  tRows = res.data;
-                }
-                const tIds = (tRows || []).map((t: any) => t.id);
-                if (tIds.length > 0) fuzzyQ = fuzzyQ.in('test_id', tIds);
-                else fuzzyQ = fuzzyQ.in('test_id', ['__NO_MATCH__']);
+             const paper = params.paper;
+             if ((insts && insts !== 'All' && insts !== '' && insts !== '[]') || 
+                 (progs && progs !== 'All' && progs !== '' && progs !== '[]') || 
+                 (stage && stage !== 'All' && stage !== '' && stage !== '[]') ||
+                 (paper && paper !== 'All' && paper !== '' && paper !== '[]') ||
+                 (params.pyqMaster || params.pyqFilter) === 'PYQ Only') {
+                 
+                 let tRows: any[] = [];
+                 let localRes = await LocalQuery.from('tests').select('*').eq('course', selectedCourse);
+                 let localTests = localRes.data || [];
+                 
+                 if ((!localTests || localTests.length === 0) && NetworkStatus.isOnline()) {
+                   const { data: remoteTests } = await supabase
+                     .from('tests')
+                     .select('id, title, series, institute, program_name, program_id, course')
+                     .eq('course', selectedCourse);
+                   tRows = remoteTests || [];
+                 } else {
+                   tRows = localTests || [];
+                 }
+                 
+                 const pyqM = params.pyqMaster || params.pyqFilter;
+                 if (pyqM === 'PYQ Only') {
+                   if (selectedCourse === 'Civil Services') {
+                     tRows = tRows.filter(t => String(t.institute || '').toLowerCase() === 'upsc');
+                   } else if (selectedCourse === 'Medical Science') {
+                     const examCat = (params.examCategory || '').toLowerCase();
+                     if (examCat.includes('cms')) {
+                       tRows = tRows.filter(t => String(t.institute || '').toLowerCase() === 'upsc');
+                     } else if (examCat.includes('neet')) {
+                       tRows = tRows.filter(t => String(t.institute || '').toLowerCase() === 'nbe');
+                     } else if (examCat.includes('ini')) {
+                       tRows = tRows.filter(t => String(t.institute || '').toLowerCase() === 'aiims');
+                     }
+                   }
+                 }
+                 
+                 if (insts && insts !== 'All' && insts !== '' && insts !== '[]') {
+                   const instList = typeof insts === 'string' ? insts.split(',').filter(Boolean).map(x => x.toLowerCase()) : [];
+                   if (instList.length > 0) {
+                     tRows = tRows.filter(t => instList.includes(String(t.institute || '').toLowerCase()));
+                   }
+                 }
+                 
+                 if (progs && progs !== 'All' && progs !== '' && progs !== '[]') {
+                   const progList = typeof progs === 'string' ? progs.split(',').filter(Boolean).map(x => x.toLowerCase()) : [];
+                   if (progList.length > 0) {
+                     tRows = tRows.filter(t => progList.includes(String(t.program_name || t.program_id || '').toLowerCase()));
+                   }
+                 }
+                 
+                 if (stage && stage !== 'All' && stage !== '' && stage !== '[]') {
+                   const stageNorm = stage.toLowerCase();
+                   const pyqM = params.pyqMaster || params.pyqFilter;
+                   tRows = tRows.filter(t => {
+                     const s = String(t.series || '').toLowerCase();
+                     if (pyqM === 'PYQ Only' && s.includes('pyq book')) return true;
+                     return s.includes(stageNorm);
+                   });
+                 }
+                 
+                 if (paper && paper !== 'All' && paper !== '' && paper !== '[]') {
+                   const matchPaperGroup = (testTitle: string, filterPaper: string, testSeries = '', testLevel = ''): boolean => {
+                     const t = testTitle.toLowerCase();
+                     const f = filterPaper.toLowerCase();
+                     const s = testSeries.toLowerCase();
+                     const l = testLevel.toLowerCase();
+                     
+                     if (f === 'gs paper 1' || f === 'gs paper 1 (prelims)' || f === 'gs1') {
+                       return t.includes('gs paper 1') || t.includes('gs1') || (t.includes('paper 1') && !t.includes('csat') && !t.includes('essay'));
+                     }
+                     if (f === 'gs paper 2 (csat)' || f === 'csat' || f === 'gs paper 2' || f === 'gs2') {
+                       return t.includes('csat') || t.includes('paper 2') || t.includes('gs2') || t.includes('pre_csat') || t.includes('csat paper 2');
+                     }
+                     if (f === 'gs paper 3' || f === 'gs3') {
+                       return t.includes('gs paper 3') || t.includes('gs3') || t.includes('paper 3');
+                     }
+                     if (f === 'gs paper 4' || f === 'gs4') {
+                       return t.includes('gs paper 4') || t.includes('gs4') || t.includes('paper 4');
+                     }
+                     const paperNorm = filterPaper.replace('GS ', '').toLowerCase();
+                     return t.includes(f) || t.includes(paperNorm) ||
+                            s.includes(f) || s.includes(paperNorm) ||
+                            l.includes(f) || l.includes(paperNorm);
+                   };
+                   
+                   tRows = tRows.filter(t => 
+                     matchPaperGroup(t.title || '', paper, t.series || '', t.level || '')
+                   );
+                 }
+                 
+                 const tIds = tRows.map(t => t.id);
+                 if (tIds.length > 0) fuzzyQ = fuzzyQ.in('test_id', tIds);
+                 else fuzzyQ = fuzzyQ.in('test_id', ['__NO_MATCH__']);
              }
              const subs = params.subjects || params.subject;
              if (subs && subs !== 'All' && subs !== '' && subs !== '[]') {
-                const subList = typeof subs === 'string' ? subs.split(',').filter(Boolean) : [];
+                let subList = typeof subs === 'string' ? subs.split(',').filter(Boolean) : [];
+                if (selectedCourse === 'Medical Science') {
+                  subList = subList.map(s => s.toUpperCase());
+                }
                 if (subList.length > 0) fuzzyQ = fuzzyQ.in('subject', subList);
              }
              const pyqM = params.pyqMaster || params.pyqFilter;

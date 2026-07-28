@@ -134,25 +134,20 @@ const replaceBrInChildren = (children: any): any => {
  */
 export const getMarkdownRules = (colors: any, isDark: boolean, onImagePress?: (uri: string) => void) => ({
   table: (node: any, children: any) => {
-    const tableWidth = Math.max(680, Dimensions.get('window').width - 32);
     return (
-      <ScrollView
+      <View
         key={node.key}
-        horizontal
-        showsHorizontalScrollIndicator={true}
-        style={{ marginVertical: 10 }}
-        contentContainerStyle={{
+        style={{
+          marginVertical: 10,
           borderWidth: 1,
           borderColor: isDark ? '#374151' : '#d1d5db',
           borderRadius: 6,
           overflow: 'hidden',
-          minWidth: '100%',
+          width: '100%',
         }}
       >
-        <View style={{ width: tableWidth }}>
-          {children}
-        </View>
-      </ScrollView>
+        {children}
+      </View>
     );
   },
   thead: (node: any, children: any) => (
@@ -242,6 +237,47 @@ export const getMarkdownRules = (colors: any, isDark: boolean, onImagePress?: (u
       <Text key={node.key} style={[inheritedStyles, styles.text]}>
         {cleaned}
       </Text>
+    );
+  },
+  bullet_list: (node: any, children: any) => (
+    <View key={node.key} style={{ marginVertical: 3 }}>
+      {children}
+    </View>
+  ),
+  ordered_list: (node: any, children: any) => (
+    <View key={node.key} style={{ marginVertical: 3 }}>
+      {children}
+    </View>
+  ),
+  list_item: (node: any, children: any, parentNodes: any) => {
+    const isOrdered = parentNodes[parentNodes.length - 1]?.type === 'ordered_list';
+    const listParents = parentNodes.filter((n: any) => n.type === 'bullet_list' || n.type === 'ordered_list');
+    const depth = listParents.length;
+
+    const bulletSymbols = ['•', '◦', '▪', '–'];
+    const bulletSymbol = bulletSymbols[Math.min(Math.max(depth - 1, 0), bulletSymbols.length - 1)];
+    const indent = Math.max(0, depth - 1) * 14;
+    const textColor = colors.textPrimary || (isDark ? '#f3f4f6' : '#111827');
+
+    if (isOrdered) {
+      const index = node.index !== undefined ? node.index + 1 : 1;
+      return (
+        <View key={node.key} style={{ flexDirection: 'row', alignItems: 'flex-start', marginVertical: 2, marginLeft: indent }}>
+          <Text style={{ width: 22, fontSize: 13.5, lineHeight: 21, fontWeight: '700', color: textColor }}>
+            {index}.
+          </Text>
+          <View style={{ flex: 1 }}>{children}</View>
+        </View>
+      );
+    }
+
+    return (
+      <View key={node.key} style={{ flexDirection: 'row', alignItems: 'flex-start', marginVertical: 2, marginLeft: indent }}>
+        <Text style={{ width: 16, fontSize: depth === 2 ? 14 : 11, lineHeight: 21, fontWeight: depth === 1 ? '900' : '700', color: textColor, textAlign: 'center' }}>
+          {bulletSymbol}
+        </Text>
+        <View style={{ flex: 1 }}>{children}</View>
+      </View>
     );
   },
 });
@@ -2717,12 +2753,15 @@ export const cleanMarkdownContent = (text: string | undefined | null): string =>
   // Normalize consecutive asterisks (e.g., **** -> **)
   cleaned = cleaned.replace(/\*{3,}/g, '**');
 
-  // Normalize leading horizontal spaces/&nbsp; to prevent markdown indented code block parsing (symmetric to cleanDataFactsMarkdown)
-  cleaned = cleaned.replace(/^(?:[ \t]|&nbsp;){8,}/gm, '    ');
-  cleaned = cleaned.replace(/^(?:[ \t]|&nbsp;){4,7}/gm, '  ');
+  // Normalize excessive tabs/spaces while preserving markdown list indentation (2, 4, 6 spaces)
+  cleaned = cleaned.replace(/^\t+/gm, (match) => '  '.repeat(match.length));
 
-  // Collapse spaces between lists (Issue 3 & 4 fix)
-  cleaned = cleaned.replace(/\n{2,}(\s*)(?=[-*•\d])/g, '\n$1');
+  // Automatically format section markers (ANSWER, Conclusion, Aspects, Structure, Don'ts) into distinct H3 headings with proper margins
+  cleaned = cleaned.replace(/(?:^|\n)\s*(?:###?\s*)?\*{0,2}ANSWER\*{0,2}\s*[:\-]?\s*/gi, '\n\n### **ANSWER**\n\n');
+  cleaned = cleaned.replace(/(?:^|\n)\s*(?:###?\s*)?\*{0,2}Conclusion\*{0,2}\s*[:\-]?\s*/gi, '\n\n### **Conclusion**\n\n');
+  cleaned = cleaned.replace(/(?:^|\n)\s*(?:###?\s*)?\*{0,2}Aspects to Take into Account\*{0,2}\s*[:\-]?\s*/gi, '\n\n### **Aspects to Take into Account**\n\n');
+  cleaned = cleaned.replace(/(?:^|\n)\s*(?:###?\s*)?\*{0,2}Structure to Follow\*{0,2}\s*[:\-]?\s*/gi, '\n\n### **Structure to Follow**\n\n');
+  cleaned = cleaned.replace(/(?:^|\n)\s*(?:###?\s*)?\*{0,2}Don'?ts\*{0,2}\s*[:\-]?\s*/gi, '\n\n### **Don\'ts**\n\n');
 
   return cleaned.trim();
 };
@@ -2926,7 +2965,7 @@ const getUniqueValueAddItems = (items: any[]): any[] => {
 
 export const parseIntroductoryBox = (rawText: string | undefined | null) => {
   if (!rawText) return null;
-  const tableRegex = /^\s*(\|\s*[^\n]*\|\s*(?:\r?\n\s*\|\s*---+\s*\|)?(?:\r?\n\s*\|\s*[^\n]*\|\s*)*)/i;
+  const tableRegex = /^\s*(?:(?:#{1,4}\s*)?(?:\*\*|__)?\s*ANSWER\s*(?:\*\*|__)?\s*\n\s*)?(\|[^\n]+\|(?:\r?\n\|[^\n]+\|)*)/i;
   const match = rawText.match(tableRegex);
   if (!match) {
     return null;
@@ -2957,34 +2996,15 @@ export const parseIntroductoryBox = (rawText: string | undefined | null) => {
     }
   });
   
-  if (cellTexts.length === 0) return null;
-  
-  // Combine cell texts. If there are multiple rows, we can join them with newlines
-  const combinedContent = cellTexts.join('\n');
-  
-  // Extract title and body from the combined content
-  // Look for bold text at the beginning of the combined content
-  const headerRegex = /^\s*(?:\*\*|__)?\s*([^*:\n]+?)\s*(?:\*\*|__)?\s*:\s*(?:<br\s*\/?>|\n)?\s*([\s\S]*)$/i;
-  let title = 'APPROACH';
-  let body = combinedContent;
-  
-  const headerMatch = combinedContent.match(headerRegex);
-  if (headerMatch) {
-    title = headerMatch[1].trim().toUpperCase();
-    body = headerMatch[2].trim();
-  } else {
-    // If no colon separator, check if it starts with a bold header followed by <br> or newline
-    const boldHeaderRegex = /^\s*(?:\*\*|__)\s*([^\n*]+?)\s*(?:\*\*|__)\s*(?:<br\s*\/?>|\n)\s*([\s\S]*)$/i;
-    const boldMatch = combinedContent.match(boldHeaderRegex);
-    if (boldMatch) {
-      title = boldMatch[1].trim().toUpperCase();
-      body = boldMatch[2].trim();
-    }
+  // If the introductory text is a markdown table (e.g. 3-column table), return the table markdown intact as body
+  if (fullTableText.trim().startsWith('|')) {
+    return {
+      rawMatch: fullTableText,
+      title: 'APPROACH',
+      body: fullTableText.trim(),
+    };
   }
-  
-  // Clean up body (e.g. remove leading/trailing <br> or newlines)
-  body = body.replace(/^(?:<br\s*\/?>|\s)+/gi, '').replace(/(?:<br\s*\/?>|\s)+$/gi, '').trim();
-  
+
   return {
     rawMatch: fullTableText,
     title,
@@ -11533,7 +11553,9 @@ const styles = StyleSheet.create({
 });
 
 function ApproachBox({ content, title = 'APPROACH', colors, zoomFontSize, isDark }: { content: string; title?: string; colors: any; zoomFontSize: number; isDark: boolean }) {
-  const cleaned = content.replace(/<br\s*\/?>/gi, '\n').trim();
+  // If content is a markdown table, keep <br> intact so table cells are not broken by real newlines
+  const isTable = content.trim().startsWith('|');
+  const cleaned = isTable ? content.trim() : content.replace(/<br\s*\/?>/gi, '\n').trim();
   
   const base = getMarkdownStyles(colors);
   const ratio = (zoomFontSize - 2.5) / 16;

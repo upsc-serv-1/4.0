@@ -246,7 +246,7 @@ export async function fetchMainsQuestionsFromSupabase(): Promise<ConsolidatedQue
       break;
     }
     
-    const publishedData = data.filter((row: any) => row.status === undefined || row.status === 'published');
+    const publishedData = data.filter((row: any) => row.status === undefined || row.status === null || row.status === 'published');
     allData = allData.concat(publishedData);
     if (data.length < step) {
       break;

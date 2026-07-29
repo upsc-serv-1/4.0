@@ -602,7 +602,7 @@ async function fetchAllRows(tableName: string): Promise<{ data: any[]; error: an
     if (!data || data.length === 0) {
       break;
     }
-    const publishedData = data.filter((row: any) => row.status === undefined || row.status === 'published');
+    const publishedData = data.filter((row: any) => row.status === undefined || row.status === null || row.status === 'published');
     allData = [...allData, ...publishedData];
     if (data.length < step) {
       break;

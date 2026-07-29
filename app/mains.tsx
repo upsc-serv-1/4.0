@@ -89,6 +89,7 @@ import { supabase } from '../src/lib/supabase';
 import { useFlashcardAction } from '../src/hooks/useFlashcardAction';
 import { AddToFlashcardSheet } from '../src/components/flashcards/AddToFlashcardSheet';
 import { StudentSync } from '../src/services/StudentSync';
+import { KVStore } from '../src/lib/kvStore';
 import { useTagStore } from '../src/store/tagStore';
 import * as Haptics from 'expo-haptics';
 import { PinchGestureHandler, PanGestureHandler, State as GHState } from 'react-native-gesture-handler';
@@ -1539,6 +1540,56 @@ export function MainsScreenInner() {
     syncSupabaseData();
   }, []);
 
+  const [syncingMains, setSyncingMains] = useState(false);
+
+  const handleForceSync = async () => {
+    if (syncingMains) return;
+    setSyncingMains(true);
+    try {
+      KVStore.delete('@mains_cached_questions_v2');
+      KVStore.delete('@mains_cached_value_add_v2');
+      const liveQuestions = await fetchMainsQuestionsFromSupabase();
+      const liveValueAdd = await fetchValueAdditionFromSupabase();
+      
+      if (liveQuestions && liveQuestions.length > 0) {
+        setQuestions(liveQuestions);
+        console.log('[MainsScreen] Force sync questions loaded:', liveQuestions.length);
+      }
+      
+      if (liveValueAdd && liveValueAdd.length > 0) {
+        const merged = liveValueAdd.map(item => {
+          if (item.category === 'ethics') {
+            const cleanText = (str: string) => (str || '').toLowerCase().replace(/[^a-z0-9]/g, '').trim();
+            const targetTitle = cleanText(item.title);
+            const localMatch = mainsConsolidatedValueAdd.find(
+              l => l.category === 'ethics' && cleanText(l.title) === targetTitle
+            );
+            if (localMatch) {
+              const nextItem = { ...item };
+              if (localMatch.ethicsData?.diagramsList) {
+                nextItem.ethicsData = {
+                  ...nextItem.ethicsData,
+                  diagramsList: localMatch.ethicsData.diagramsList
+                };
+              }
+              return nextItem;
+            }
+          }
+          return item;
+        });
+        setValueAddItems(merged);
+        console.log('[MainsScreen] Force sync value additions loaded:', merged.length);
+      }
+      
+      Alert.alert('Done', 'Mains database synced successfully! All fresh answers loaded.');
+    } catch (err: any) {
+      console.log('[MainsScreen] Force sync failed:', err);
+      Alert.alert('Sync Failed', err.message || 'Error loading live data from Supabase');
+    } finally {
+      setSyncingMains(false);
+    }
+  };
+
   const toggleBookmark = async (id: string) => {
     try {
       const next = savedQuestionIds.includes(id)
@@ -1861,6 +1912,8 @@ export function MainsScreenInner() {
               onChangeKeyBoxMode={handleUpdateKeyBoxMode}
               keyBoxColor={keyBoxColor}
               onChangeKeyBoxColor={handleUpdateKeyBoxColor}
+              onForceSync={handleForceSync}
+              syncing={syncingMains}
             />
           )}
           {currentScreen === 'value-add' && (
@@ -1892,6 +1945,8 @@ export function MainsScreenInner() {
               onChangeKeyBoxMode={handleUpdateKeyBoxMode}
               keyBoxColor={keyBoxColor}
               onChangeKeyBoxColor={handleUpdateKeyBoxColor}
+              onForceSync={handleForceSync}
+              syncing={syncingMains}
             />
           )}
           {currentScreen === 'revision-tags' && (
@@ -1947,6 +2002,8 @@ export function MainsScreenInner() {
               onChangeKeyBoxMode={handleUpdateKeyBoxMode}
               keyBoxColor={keyBoxColor}
               onChangeKeyBoxColor={handleUpdateKeyBoxColor}
+              onForceSync={handleForceSync}
+              syncing={syncingMains}
             />
           )}
           {currentScreen === 'detailed-question' && detailedQuestion && (
@@ -4111,6 +4168,8 @@ interface MainsLeftPanelProps {
   onChangeKeyBoxMode?: (mode: 'boxed' | 'bold') => void;
   keyBoxColor?: KeyBoxColor;
   onChangeKeyBoxColor?: (color: KeyBoxColor) => void;
+  onForceSync?: () => void;
+  syncing?: boolean;
 }
 
 function MainsLeftPanel({
@@ -4150,6 +4209,8 @@ function MainsLeftPanel({
   onChangeKeyBoxMode,
   keyBoxColor = 'yellow',
   onChangeKeyBoxColor,
+  onForceSync,
+  syncing = false,
 }: MainsLeftPanelProps) {
   const { isDark } = useTheme();
   const isOptional = filters.paper !== 'All' && !filters.paper.split('|').some(p => ['GS1', 'GS2', 'GS3', 'GS4', 'Essay'].includes(p));
@@ -4611,6 +4672,35 @@ function MainsLeftPanel({
           ))}
         </View>
       </View>
+      {onForceSync && (
+        <View style={{ marginTop: 24, paddingHorizontal: 4, marginBottom: 20 }}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={onForceSync}
+            disabled={syncing}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: colors.primary + '12',
+              borderColor: colors.primary + '30',
+              borderWidth: 1,
+              paddingVertical: 10,
+              borderRadius: 10,
+              gap: 8
+            }}
+          >
+            {syncing ? (
+              <ActivityIndicator size="small" color={colors.primary} />
+            ) : (
+              <RefreshCw size={14} color={colors.primary} />
+            )}
+            <Text style={{ fontSize: 12, fontWeight: '700', color: colors.primary }}>
+              {syncing ? 'Syncing...' : 'Sync Mains Database'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -5351,6 +5441,8 @@ function QuestionBankView({
   onChangeKeyBoxMode,
   keyBoxColor = 'yellow',
   onChangeKeyBoxColor,
+  onForceSync,
+  syncing = false,
 }: {
   colors: any;
   savedIds: string[];
@@ -5379,6 +5471,8 @@ function QuestionBankView({
   onChangeKeyBoxMode?: (mode: 'boxed' | 'bold') => void;
   keyBoxColor?: KeyBoxColor;
   onChangeKeyBoxColor?: (color: KeyBoxColor) => void;
+  onForceSync?: () => void;
+  syncing?: boolean;
 }) {
   const { isDark } = useTheme();
   const [search, setSearch] = useState('');
@@ -5979,6 +6073,8 @@ function QuestionBankView({
               onChangeKeyBoxMode={onChangeKeyBoxMode}
               keyBoxColor={keyBoxColor}
               onChangeKeyBoxColor={onChangeKeyBoxColor}
+              onForceSync={onForceSync}
+              syncing={syncing}
             />
           </View>
         )}
@@ -6778,6 +6874,8 @@ function ValueAdditionView({
   onChangeKeyBoxMode,
   keyBoxColor = 'yellow',
   onChangeKeyBoxColor,
+  onForceSync,
+  syncing = false,
 }: {
   colors: any;
   copiedId: string | null;
@@ -6806,6 +6904,8 @@ function ValueAdditionView({
   onChangeKeyBoxMode?: (mode: 'boxed' | 'bold') => void;
   keyBoxColor?: KeyBoxColor;
   onChangeKeyBoxColor?: (color: KeyBoxColor) => void;
+  onForceSync?: () => void;
+  syncing?: boolean;
 }) {
   const { isDark } = useTheme();
   const { width } = useWindowDimensions();
@@ -7558,6 +7658,8 @@ function ValueAdditionView({
               onChangeKeyBoxMode={onChangeKeyBoxMode}
               keyBoxColor={keyBoxColor}
               onChangeKeyBoxColor={onChangeKeyBoxColor}
+              onForceSync={onForceSync}
+              syncing={syncing}
             />
           </View>
         )}
@@ -8835,6 +8937,8 @@ function MainsAISearchView({
   onChangeKeyBoxMode,
   keyBoxColor = 'yellow',
   onChangeKeyBoxColor,
+  onForceSync,
+  syncing = false,
 }: {
   colors: any;
   isTablet: boolean;
@@ -8862,6 +8966,8 @@ function MainsAISearchView({
   onChangeKeyBoxMode?: (mode: 'boxed' | 'bold') => void;
   keyBoxColor?: KeyBoxColor;
   onChangeKeyBoxColor?: (color: KeyBoxColor) => void;
+  onForceSync?: () => void;
+  syncing?: boolean;
 }) {
   const { isDark } = useTheme();
   const { session } = useAuth();
@@ -10083,6 +10189,8 @@ function MainsAISearchView({
               onChangeKeyBoxMode={onChangeKeyBoxMode}
               keyBoxColor={keyBoxColor}
               onChangeKeyBoxColor={onChangeKeyBoxColor}
+              onForceSync={onForceSync}
+              syncing={syncing}
             />
           </View>
         )}

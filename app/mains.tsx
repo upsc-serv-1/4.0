@@ -302,6 +302,73 @@ export const getMarkdownRules = (colors: any, isDark: boolean, onImagePress?: (u
       </View>
     );
   },
+  blockquote: (node: any, children: any) => {
+    const getNodeText = (n: any): string => {
+      if (!n) return '';
+      if (typeof n === 'string') return n;
+      if (typeof n === 'number') return String(n);
+      if (n.content) return String(n.content);
+      if (Array.isArray(n.children)) return n.children.map(getNodeText).join(' ');
+      return '';
+    };
+
+    const textContent = getNodeText(node);
+    const isAbbr = /^\s*(?:\*\*)?\s*Abbreviations\s*:?/i.test(textContent);
+    const isExtra = /^\s*(?:\*\*)?\s*Extra\s*marks\s*:?/i.test(textContent);
+
+    if (isAbbr) {
+      return (
+        <View
+          key={node.key}
+          style={{
+            backgroundColor: isDark ? 'rgba(99, 102, 241, 0.12)' : '#f0f3ff',
+            borderColor: isDark ? '#6366f1' : '#a5b4fc',
+            borderWidth: 1,
+            borderRadius: 10,
+            padding: 12,
+            marginVertical: 10,
+          }}
+        >
+          {children}
+        </View>
+      );
+    }
+
+    if (isExtra) {
+      return (
+        <View
+          key={node.key}
+          style={{
+            backgroundColor: isDark ? 'rgba(16, 185, 129, 0.12)' : '#ecfdf5',
+            borderColor: isDark ? '#10b981' : '#6ee7b7',
+            borderWidth: 1,
+            borderRadius: 10,
+            padding: 12,
+            marginVertical: 10,
+          }}
+        >
+          {children}
+        </View>
+      );
+    }
+
+    return (
+      <View
+        key={node.key}
+        style={{
+          backgroundColor: isDark ? 'rgba(30, 41, 59, 0.4)' : '#f8fafc',
+          borderLeftWidth: 4,
+          borderLeftColor: colors.primary || '#3b82f6',
+          paddingHorizontal: 12,
+          paddingVertical: 8,
+          marginVertical: 8,
+          borderRadius: 4,
+        }}
+      >
+        {children}
+      </View>
+    );
+  },
 });
 
 /** @deprecated use getMarkdownRules(colors, isDark) */
@@ -3056,51 +3123,34 @@ const getUniqueValueAddItems = (items: any[]): any[] => {
 
 export const parseIntroductoryBox = (rawText: string | undefined | null) => {
   if (!rawText) return null;
+
+  // 1. Markdown Table format check (e.g. | Approach: ... |)
   const tableRegex = /^\s*(?:(?:#{1,4}\s*)?(?:\*\*|__)?\s*ANSWER\s*(?:\*\*|__)?\s*\n\s*)?(\|[^\n]+\|(?:\r?\n\|[^\n]+\|)*)/i;
   const match = rawText.match(tableRegex);
-  if (!match) {
-    return null;
+  if (match) {
+    const fullTableText = match[1];
+    if (fullTableText.trim().startsWith('|')) {
+      return {
+        rawMatch: fullTableText,
+        title: 'APPROACH',
+        body: fullTableText.trim(),
+      };
+    }
   }
-  
-  const fullTableText = match[1];
-  
-  // Parse rows of the table
-  const lines = fullTableText.split(/\r?\n/);
-  const cellTexts: string[] = [];
-  
-  lines.forEach(line => {
-    const trimmed = line.trim();
-    if (!trimmed.startsWith('|')) return;
-    
-    // Ignore separator row (e.g. | --- |)
-    if (/^\|\s*:-*-*:?\s*(?:\|\s*:-*-*:?\s*)*\|$/.test(trimmed) || /^\|\s*---+\s*\|$/.test(trimmed)) {
-      return;
-    }
-    
-    // Extract cell contents by splitting by '|' and filtering out empty elements
-    const cells = trimmed.split('|')
-      .map(c => c.trim())
-      .filter((c, idx, arr) => idx > 0 && idx < arr.length - 1); // remove outer empty elements
-      
-    if (cells.length > 0) {
-      cellTexts.push(cells.join(' '));
-    }
-  });
-  
-  // If the introductory text is a markdown table (e.g. 3-column table), return the table markdown intact as body
-  if (fullTableText.trim().startsWith('|')) {
+
+  // 2. Bold / Text format check (e.g. **Approach:** *Introduce the answer by...*)
+  const approachMatch = rawText.match(/^\s*(?:>\s*)?(?:\*\*|__)?Approach:?\s*(?:\*\*|__)?\s*\*?([^\n]+(?:\n(?!#{1,6}\s|\*\*Answer|\*\*Model Answer|---|ANSWER|\n\n##|\n##).*)*)/i);
+  if (approachMatch && approachMatch[1].trim()) {
+    let bodyText = approachMatch[1].trim();
+    bodyText = bodyText.replace(/^\*+|\*+$/g, '').trim();
     return {
-      rawMatch: fullTableText,
+      rawMatch: approachMatch[0],
       title: 'APPROACH',
-      body: fullTableText.trim(),
+      body: bodyText,
     };
   }
 
-  return {
-    rawMatch: fullTableText,
-    title,
-    body,
-  };
+  return null;
 };
 
 export const cleanDataFactsMarkdown = (text: string | undefined | null, item: any): string => {
@@ -7180,6 +7230,8 @@ function ValueAdditionView({
     });
     return Array.from(sstSet).sort();
   }, [activeCategoryItems, filters.subtopics, activeCategory]);
+
+  const nanotopicOptions: string[] = [];
 
   const itemsToFilter = useMemo(() => {
     if (activeCategory === 'notes') {

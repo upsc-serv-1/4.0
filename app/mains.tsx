@@ -217,6 +217,26 @@ export const getMarkdownRules = (colors: any, isDark: boolean, onImagePress?: (u
       </TouchableOpacity>
     );
   },
+  mark: (node: any, children: any) => (
+    <View
+      key={node.key}
+      style={{
+        backgroundColor: isDark ? 'rgba(234, 179, 8, 0.25)' : '#fef08a',
+        borderWidth: 1,
+        borderColor: isDark ? '#eab308' : '#ca8a04',
+        borderRadius: 3,
+        paddingHorizontal: 4,
+        paddingVertical: 1,
+        marginHorizontal: 2,
+        alignSelf: 'inline',
+        display: 'inline-flex'
+      }}
+    >
+      <Text style={{ fontSize: 13, fontWeight: '700', color: isDark ? '#fef08a' : '#854d0e' }}>
+        {children}
+      </Text>
+    </View>
+  ),
   html_inline: (node: any) => {
     const raw: string = node.content || '';
     // Render <br> / <br/> / <br /> as a real newline
@@ -249,21 +269,20 @@ export const getMarkdownRules = (colors: any, isDark: boolean, onImagePress?: (u
       {children}
     </View>
   ),
-  list_item: (node: any, children: any, parentNodes: any) => {
-    const isOrdered = parentNodes[parentNodes.length - 1]?.type === 'ordered_list';
-    const listParents = parentNodes.filter((n: any) => n.type === 'bullet_list' || n.type === 'ordered_list');
-    const depth = listParents.length;
+  list_item: (node: any, children: any, parentNodes: any = []) => {
+    const listParents = (parentNodes || []).filter((n: any) => n && (n.type === 'bullet_list' || n.type === 'ordered_list'));
+    const depth = Math.max(1, listParents.length);
+    const lastParent = listParents[listParents.length - 1];
+    const isOrdered = lastParent?.type === 'ordered_list' || node?.index !== undefined;
 
-    const bulletSymbols = ['•', '◦', '▪', '–'];
-    const bulletSymbol = bulletSymbols[Math.min(Math.max(depth - 1, 0), bulletSymbols.length - 1)];
     const indent = Math.max(0, depth - 1) * 14;
     const textColor = colors.textPrimary || (isDark ? '#f3f4f6' : '#111827');
 
     if (isOrdered) {
-      const index = node.index !== undefined ? node.index + 1 : 1;
+      const index = node.index !== undefined ? node.index + 1 : (node.attributes?.index ?? 1);
       return (
-        <View key={node.key} style={{ flexDirection: 'row', alignItems: 'flex-start', marginVertical: 2, marginLeft: indent }}>
-          <Text style={{ width: 22, fontSize: 13.5, lineHeight: 21, fontWeight: '700', color: textColor }}>
+        <View key={node.key} style={{ flexDirection: 'row', alignItems: 'flex-start', marginVertical: 2.5, marginLeft: indent }}>
+          <Text style={{ width: 24, fontSize: 13.5, lineHeight: 21, fontWeight: '700', color: textColor }}>
             {index}.
           </Text>
           <View style={{ flex: 1 }}>{children}</View>
@@ -271,9 +290,12 @@ export const getMarkdownRules = (colors: any, isDark: boolean, onImagePress?: (u
       );
     }
 
+    const bulletSymbols = ['•', '◦', '▪', '–'];
+    const bulletSymbol = bulletSymbols[Math.min(depth - 1, bulletSymbols.length - 1)];
+
     return (
-      <View key={node.key} style={{ flexDirection: 'row', alignItems: 'flex-start', marginVertical: 2, marginLeft: indent }}>
-        <Text style={{ width: 16, fontSize: depth === 2 ? 14 : 11, lineHeight: 21, fontWeight: depth === 1 ? '900' : '700', color: textColor, textAlign: 'center' }}>
+      <View key={node.key} style={{ flexDirection: 'row', alignItems: 'flex-start', marginVertical: 2.5, marginLeft: indent }}>
+        <Text style={{ width: 18, fontSize: depth === 2 ? 14 : 11, lineHeight: 21, fontWeight: depth === 1 ? '900' : '700', color: textColor, textAlign: 'center' }}>
           {bulletSymbol}
         </Text>
         <View style={{ flex: 1 }}>{children}</View>
@@ -376,6 +398,40 @@ export function MainsScreenInner() {
   const insets = useSafeAreaInsets();
 
   const [textColorMode, setTextColorMode] = useState<'default' | 'black'>('default');
+  const [keyBoxMode, setKeyBoxMode] = useState<'boxed' | 'bold'>('boxed');
+  const [keyBoxColor, setKeyBoxColor] = useState<KeyBoxColor>('yellow');
+
+  useEffect(() => {
+    AsyncStorage.getItem('@mains_key_box_mode')
+      .then(val => {
+        if (val === 'boxed' || val === 'bold') {
+          setKeyBoxMode(val as any);
+          setGlobalKeyBoxMode(val as any);
+        }
+      })
+      .catch(() => {});
+      
+    AsyncStorage.getItem('@mains_key_box_color')
+      .then(val => {
+        if (['yellow', 'green', 'blue', 'pink'].includes(val || '')) {
+          setKeyBoxColor(val as any);
+          setGlobalKeyBoxColor(val as any);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleUpdateKeyBoxMode = (mode: 'boxed' | 'bold') => {
+    setKeyBoxMode(mode);
+    setGlobalKeyBoxMode(mode);
+    AsyncStorage.setItem('@mains_key_box_mode', mode).catch(() => {});
+  };
+
+  const handleUpdateKeyBoxColor = (color: KeyBoxColor) => {
+    setKeyBoxColor(color);
+    setGlobalKeyBoxColor(color);
+    AsyncStorage.setItem('@mains_key_box_color', color).catch(() => {});
+  };
 
   // Load text color mode from AsyncStorage
   useEffect(() => {
@@ -1734,6 +1790,10 @@ export function MainsScreenInner() {
               onToggleVaFavorite={handleToggleVaFavorite}
               textColorMode={textColorMode}
               onChangeTextColorMode={handleUpdateTextColorMode}
+              keyBoxMode={keyBoxMode}
+              onChangeKeyBoxMode={handleUpdateKeyBoxMode}
+              keyBoxColor={keyBoxColor}
+              onChangeKeyBoxColor={handleUpdateKeyBoxColor}
             />
           )}
           {currentScreen === 'value-add' && (
@@ -1759,6 +1819,12 @@ export function MainsScreenInner() {
               onAddNewNoteClick={handleAddNewNoteClick}
               mainsNotes={mainsNotes}
               onViewNoteFullscreen={handleViewNoteFullscreen}
+              textColorMode={textColorMode}
+              onChangeTextColorMode={handleUpdateTextColorMode}
+              keyBoxMode={keyBoxMode}
+              onChangeKeyBoxMode={handleUpdateKeyBoxMode}
+              keyBoxColor={keyBoxColor}
+              onChangeKeyBoxColor={handleUpdateKeyBoxColor}
             />
           )}
           {currentScreen === 'revision-tags' && (
@@ -1810,6 +1876,10 @@ export function MainsScreenInner() {
               onToggleVaFavorite={handleToggleVaFavorite}
               textColorMode={textColorMode}
               onChangeTextColorMode={handleUpdateTextColorMode}
+              keyBoxMode={keyBoxMode}
+              onChangeKeyBoxMode={handleUpdateKeyBoxMode}
+              keyBoxColor={keyBoxColor}
+              onChangeKeyBoxColor={handleUpdateKeyBoxColor}
             />
           )}
           {currentScreen === 'detailed-question' && detailedQuestion && (
@@ -1845,6 +1915,9 @@ export function MainsScreenInner() {
               detailedBestAnswer={detailedBestAnswer}
               onDeleteBestAnswer={handleDeleteBestAnswer}
               onActiveAnswerChange={handleDetailedQuestionActiveAnswerChange}
+              textColorMode={textColorMode}
+              keyBoxMode={keyBoxMode}
+              keyBoxColor={keyBoxColor}
             />
           )}
         </View>
@@ -2551,12 +2624,12 @@ function HubView({
 // 2. QUESTION BANK VIEW
 // ─────────────────────────────────────────────────────────────────────────────
 // Helper functions for Markdown Answer rendering
-const cleanMarkdown = (text: string) => {
+const cleanMarkdown = (text: string, keyBoxMode: 'boxed' | 'bold' = globalKeyBoxMode) => {
   if (!text) return '';
   const r2BaseUrl = 'https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev';
   
   // Clean all HTML entities, standard markdown images, bullet points and bold/italics
-  let cleaned = cleanMarkdownContent(text);
+  let cleaned = cleanMarkdownContent(text, keyBoxMode);
   
   // Replace relative Markdown images to point to R2 Bucket
   cleaned = cleaned.replace(/!\[(.*?)\]\(((?!https?:\/\/|data:)[^\)]+)\)/gi, (match, alt, path) => {
@@ -2709,7 +2782,7 @@ const renderTaxonomyStrip = (q: any, colors: any, isDark: boolean) => {
   );
 };
 
-export const cleanMarkdownContent = (text: string | undefined | null): string => {
+export const cleanMarkdownContent = (text: string | undefined | null, keyBoxMode: 'boxed' | 'bold' = globalKeyBoxMode): string => {
   if (!text) return '';
   let cleaned = preProcessMarkdownTables(text);
 
@@ -2727,6 +2800,24 @@ export const cleanMarkdownContent = (text: string | undefined | null): string =>
 
   // 0. Strip leading empty bullet points (Issue 3 fix)
   cleaned = cleaned.replace(/^\s*[-*•]\s*$/gm, '');
+
+    // Replace <mark class="key-box"> and <mark> tags cleanly
+  if (cleaned) {
+    if (keyBoxMode === 'bold') {
+      cleaned = cleaned.replace(/<mark[^>]*>(.*?)<\/mark>/gi, '**$1**');
+    } else {
+      // Boxed Mode: Replace with inline code backticks styled as yellow highlight box
+      cleaned = cleaned.replace(/<mark[^>]*>(.*?)<\/mark>/gi, '`$1`');
+      
+      // Also convert standard markdown bold into boxed keywords when Boxed mode is active
+      cleaned = cleaned.replace(/\*\*(.*?)\*\*/g, '`$1`');
+      cleaned = cleaned.replace(/__(.*?)__/g, '`$1`');
+    }
+  }
+
+    // Prevent (c). or (C). from being converted into copyright symbol ©
+  cleaned = cleaned.replace(/\(c\)\./gi, '(c\u200B).');
+  cleaned = cleaned.replace(/\(c\)\s/gi, '(c\u200B) ');
 
   // Replace HTML entities
   cleaned = cleaned.replace(/&nbsp;/gi, ' ');
@@ -3595,9 +3686,19 @@ export const ValueAdditionCard = React.memo(function ValueAdditionCard({
 });
 
 let globalTextColorMode: 'default' | 'black' = 'default';
-
 export const setGlobalTextColorMode = (mode: 'default' | 'black') => {
   globalTextColorMode = mode;
+};
+
+let globalKeyBoxMode: 'boxed' | 'bold' = 'boxed';
+export const setGlobalKeyBoxMode = (mode: 'boxed' | 'bold') => {
+  globalKeyBoxMode = mode;
+};
+
+export type KeyBoxColor = 'yellow' | 'green' | 'blue' | 'pink';
+let globalKeyBoxColor: KeyBoxColor = 'yellow';
+export const setGlobalKeyBoxColor = (color: KeyBoxColor) => {
+  globalKeyBoxColor = color;
 };
 
 export const getMarkdownStyles = (colors: any): any => {
@@ -3673,10 +3774,28 @@ export const getMarkdownStyles = (colors: any): any => {
       color: '#3b82f6',
     },
     code_inline: {
-      backgroundColor: colors.surface,
-      paddingHorizontal: 4,
+      backgroundColor: 
+        globalKeyBoxColor === 'yellow' ? (isDark ? 'rgba(234, 179, 8, 0.25)' : '#fef08a') :
+        globalKeyBoxColor === 'green' ? (isDark ? 'rgba(34, 197, 94, 0.25)' : '#bbf7d0') :
+        globalKeyBoxColor === 'blue' ? (isDark ? 'rgba(59, 130, 246, 0.25)' : '#bfdbfe') :
+        (isDark ? 'rgba(236, 72, 153, 0.25)' : '#fbcfe8'), // pink
+      color: 
+        globalKeyBoxColor === 'yellow' ? (isDark ? '#fef08a' : '#854d0e') :
+        globalKeyBoxColor === 'green' ? (isDark ? '#bbf7d0' : '#14532d') :
+        globalKeyBoxColor === 'blue' ? (isDark ? '#bfdbfe' : '#1e3a8a') :
+        (isDark ? '#fbcfe8' : '#831843'), // pink
+      borderColor: 
+        globalKeyBoxColor === 'yellow' ? (isDark ? '#eab308' : '#ca8a04') :
+        globalKeyBoxColor === 'green' ? (isDark ? '#22c55e' : '#16a34a') :
+        globalKeyBoxColor === 'blue' ? (isDark ? '#3b82f6' : '#2563eb') :
+        (isDark ? '#ec4899' : '#db2777'), // pink
+      borderWidth: 1,
       borderRadius: 4,
-      fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+      paddingHorizontal: 5,
+      paddingVertical: 1,
+      fontSize: 13,
+      fontWeight: '700',
+      fontFamily: undefined,
     },
     table: {
       borderWidth: 1,
@@ -3938,6 +4057,10 @@ interface MainsLeftPanelProps {
   allYears?: string[];
   textColorMode?: 'default' | 'black';
   onChangeTextColorMode?: (mode: 'default' | 'black') => void;
+  keyBoxMode?: 'boxed' | 'bold';
+  onChangeKeyBoxMode?: (mode: 'boxed' | 'bold') => void;
+  keyBoxColor?: KeyBoxColor;
+  onChangeKeyBoxColor?: (color: KeyBoxColor) => void;
 }
 
 function MainsLeftPanel({
@@ -3973,6 +4096,10 @@ function MainsLeftPanel({
   allYears = [],
   textColorMode = 'default',
   onChangeTextColorMode,
+  keyBoxMode = 'boxed',
+  onChangeKeyBoxMode,
+  keyBoxColor = 'yellow',
+  onChangeKeyBoxColor,
 }: MainsLeftPanelProps) {
   const { isDark } = useTheme();
   const isOptional = filters.paper !== 'All' && !filters.paper.split('|').some(p => ['GS1', 'GS2', 'GS3', 'GS4', 'Essay'].includes(p));
@@ -4064,7 +4191,7 @@ function MainsLeftPanel({
           <Text style={{ fontSize: 8, fontWeight: '900', color: colors.textTertiary + '80', letterSpacing: 1.5, paddingHorizontal: 4, marginBottom: 6 }}>
             SEARCH IN
           </Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingHorizontal: 2 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5, paddingHorizontal: 2 }}>
             {(['Questions', 'Answers', 'Value Additions'] as const).map(opt => {
               const searchAcrossList = filters.searchAcross || ['Questions', 'Answers', 'Value Additions'];
               const isSelected = searchAcrossList.includes(opt);
@@ -4084,29 +4211,11 @@ function MainsLeftPanel({
                     }
                     onUpdateFilters({ ...filters, searchAcross: next as any });
                   }}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 5,
-                    paddingHorizontal: 9,
-                    paddingVertical: 5,
-                    borderRadius: 8,
-                    borderWidth: 1,
-                    borderColor: isSelected ? colors.primary : colors.border,
-                    backgroundColor: isSelected ? colors.primary + '18' : colors.surface,
-                  }}
+                  activeOpacity={0.8}
+                  style={[styles.sidebarFchip, isSelected && [styles.sidebarFchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                 >
-                  <View style={{
-                    width: 12, height: 12, borderRadius: 3,
-                    borderWidth: 1.5,
-                    borderColor: isSelected ? colors.primary : colors.textTertiary,
-                    backgroundColor: isSelected ? colors.primary : 'transparent',
-                    alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {isSelected && <View style={{ width: 6, height: 6, borderRadius: 1, backgroundColor: '#fff' }} />}
-                  </View>
-                  <Text style={{ fontSize: 10, fontWeight: '600', color: isSelected ? colors.primary : colors.textSecondary }}>
-                    {opt === 'Questions' ? 'Question Text' : opt === 'Answers' ? 'Answer Text' : 'Value Additions'}
+                  <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>
+                    {opt === 'Questions' ? 'Question Text' : opt === 'Answers' ? 'Answer Text' : 'Value Adds'}
                   </Text>
                 </TouchableOpacity>
               );
@@ -4380,6 +4489,76 @@ function MainsLeftPanel({
               Deep Black
             </Text>
           </TouchableOpacity>
+        </View>
+        <Text style={{ fontSize: 10, fontFamily: 'PlusJakartaSans-Bold', fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginTop: 14, marginBottom: 8 }}>
+          KEYWORD BOXES
+        </Text>
+        <View style={{ flexDirection: 'row', backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)', borderRadius: 8, padding: 3, gap: 4 }}>
+          <TouchableOpacity
+            onPress={() => onChangeKeyBoxMode?.('boxed')}
+            style={{
+              flex: 1,
+              paddingVertical: 8,
+              alignItems: 'center',
+              borderRadius: 6,
+              backgroundColor: keyBoxMode === 'boxed' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
+              ...Platform.select({
+                ios: keyBoxMode === 'boxed' ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2 } : {},
+                android: keyBoxMode === 'boxed' ? { elevation: 1 } : {},
+              }),
+            }}
+          >
+            <Text style={{ fontSize: 11, fontWeight: '700', color: keyBoxMode === 'boxed' ? colors.primary : colors.textSecondary }}>
+              Boxed
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => onChangeKeyBoxMode?.('bold')}
+            style={{
+              flex: 1,
+              paddingVertical: 8,
+              alignItems: 'center',
+              borderRadius: 6,
+              backgroundColor: keyBoxMode === 'bold' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
+              ...Platform.select({
+                ios: keyBoxMode === 'bold' ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2 } : {},
+                android: keyBoxMode === 'bold' ? { elevation: 1 } : {},
+              }),
+            }}
+          >
+            <Text style={{ fontSize: 11, fontWeight: '700', color: keyBoxMode === 'bold' ? (isDark ? '#ffffff' : '#000000') : colors.textSecondary }}>
+              Plain Bold
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={{ fontSize: 10, fontFamily: 'PlusJakartaSans-Bold', fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginTop: 14, marginBottom: 8 }}>
+          HIGHLIGHT COLOR
+        </Text>
+        <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
+          {(['yellow', 'green', 'blue', 'pink'] as KeyBoxColor[]).map((c) => (
+            <TouchableOpacity
+              key={c}
+              onPress={() => onChangeKeyBoxColor?.(c)}
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: 14,
+                backgroundColor: 
+                  c === 'yellow' ? (isDark ? '#ca8a04' : '#fef08a') :
+                  c === 'green' ? (isDark ? '#16a34a' : '#bbf7d0') :
+                  c === 'blue' ? (isDark ? '#2563eb' : '#bfdbfe') :
+                  (isDark ? '#db2777' : '#fbcfe8'),
+                borderWidth: keyBoxColor === c ? 2 : 1,
+                borderColor: keyBoxColor === c ? (isDark ? '#ffffff' : '#000000') : (isDark ? '#334155' : '#e2e8f0'),
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: keyBoxColor === c ? 0.3 : 0,
+                shadowRadius: 2,
+                elevation: keyBoxColor === c ? 2 : 0,
+              }}
+            />
+          ))}
         </View>
       </View>
     </ScrollView>
@@ -5118,6 +5297,10 @@ function QuestionBankView({
   onToggleVaFavorite,
   textColorMode = 'default',
   onChangeTextColorMode,
+  keyBoxMode = 'boxed',
+  onChangeKeyBoxMode,
+  keyBoxColor = 'yellow',
+  onChangeKeyBoxColor,
 }: {
   colors: any;
   savedIds: string[];
@@ -5142,6 +5325,10 @@ function QuestionBankView({
   onToggleVaFavorite?: (cardId: string) => void;
   textColorMode?: 'default' | 'black';
   onChangeTextColorMode?: (mode: 'default' | 'black') => void;
+  keyBoxMode?: 'boxed' | 'bold';
+  onChangeKeyBoxMode?: (mode: 'boxed' | 'bold') => void;
+  keyBoxColor?: KeyBoxColor;
+  onChangeKeyBoxColor?: (color: KeyBoxColor) => void;
 }) {
   const { isDark } = useTheme();
   const [search, setSearch] = useState('');
@@ -5193,7 +5380,7 @@ function QuestionBankView({
       heading3: { ...base.heading3, fontSize: Math.round(15 * ratio) },
       heading4: { ...base.heading4, fontSize: Math.round(14 * ratio) },
     };
-  }, [colors, zoomFontSize]);
+  }, [colors, zoomFontSize, keyBoxColor, textColorMode]);
 
   // View mode selector state: 'all' | 'questions' | 'valueAdd'
   const [viewMode, setViewMode] = useState<'all' | 'questions' | 'valueAdd'>('all');
@@ -5738,6 +5925,10 @@ function QuestionBankView({
               allYears={allYears}
               textColorMode={textColorMode}
               onChangeTextColorMode={onChangeTextColorMode}
+              keyBoxMode={keyBoxMode}
+              onChangeKeyBoxMode={onChangeKeyBoxMode}
+              keyBoxColor={keyBoxColor}
+              onChangeKeyBoxColor={onChangeKeyBoxColor}
             />
           </View>
         )}
@@ -5762,6 +5953,7 @@ function QuestionBankView({
               <FlatList
                 ref={flatListRef}
           data={activeContent}
+            extraData={[keyBoxMode, keyBoxColor, textColorMode, zoomFontSize, expandedId]}
             keyExtractor={item => item.id}
             contentContainerStyle={styles.listScroll}
             showsVerticalScrollIndicator={false}
@@ -6435,16 +6627,16 @@ function QuestionBankView({
                                 return (
                                   <View style={{ marginTop: 8 }}>
                                     <ApproachBox content={parsed.body} title={parsed.title} colors={colors} zoomFontSize={approachZoom} isDark={isDark} />
-                                    <Markdown style={dynamicMarkdownStyles} rules={getMarkdownRules(colors, isDark)}>
-                                      {cleanMarkdown(activeAnswer.answerText.replace(parsed.rawMatch, '').trim())}
+                                    <Markdown key={`${keyBoxMode}-${keyBoxColor}-${textColorMode}-${zoomFontSize}`} style={dynamicMarkdownStyles} rules={getMarkdownRules(colors, isDark)}>
+                                      {cleanMarkdown(activeAnswer.answerText.replace(parsed.rawMatch, '').trim(), keyBoxMode)}
                                     </Markdown>
                                   </View>
                                 );
                               }
                               return (
                                 <View style={{ marginTop: 8 }}>
-                                  <Markdown style={dynamicMarkdownStyles} rules={getMarkdownRules(colors, isDark)}>
-                                    {cleanMarkdown(activeAnswer.answerText)}
+                                  <Markdown key={`${keyBoxMode}-${keyBoxColor}-${textColorMode}-${zoomFontSize}`} style={dynamicMarkdownStyles} rules={getMarkdownRules(colors, isDark)}>
+                                    {cleanMarkdown(activeAnswer.answerText, keyBoxMode)}
                                   </Markdown>
                                 </View>
                               );
@@ -6530,6 +6722,12 @@ function ValueAdditionView({
   onAddNewNoteClick,
   mainsNotes = [],
   onViewNoteFullscreen,
+  textColorMode = 'default',
+  onChangeTextColorMode,
+  keyBoxMode = 'boxed',
+  onChangeKeyBoxMode,
+  keyBoxColor = 'yellow',
+  onChangeKeyBoxColor,
 }: {
   colors: any;
   copiedId: string | null;
@@ -6552,9 +6750,16 @@ function ValueAdditionView({
   onAddNewNoteClick?: () => void;
   mainsNotes?: any[];
   onViewNoteFullscreen?: (item: any) => void;
+  textColorMode?: 'default' | 'black';
+  onChangeTextColorMode?: (mode: 'default' | 'black') => void;
+  keyBoxMode?: 'boxed' | 'bold';
+  onChangeKeyBoxMode?: (mode: 'boxed' | 'bold') => void;
+  keyBoxColor?: KeyBoxColor;
+  onChangeKeyBoxColor?: (color: KeyBoxColor) => void;
 }) {
   const { isDark } = useTheme();
   const { width } = useWindowDimensions();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [ethicsTab, setEthicsTab] = useState<'diagrams' | 'dimensions' | 'comparisons' | 'innovations' | 'pyq_quotes' | 'keywords' | 'philosophies' | 'dilemmas' | 'phrases' | 'khemka_toolkit' | 'all_formats'>('diagrams');
   const [khemkaSubTab, setKhemkaSubTab] = useState<'skeleton' | 'rules' | 'toolkit' | 'cases'>('cases');
@@ -7271,6 +7476,40 @@ function ValueAdditionView({
 
   return (
     <View style={styles.subContainer}>
+      <View style={styles.ipadBody}>
+        {sidebarOpen && (
+          <View style={{ width: 260, borderRightWidth: 0.5, borderRightColor: colors.border }}>
+            <MainsLeftPanel
+              colors={colors}
+              insets={insets}
+              isTablet={isTablet}
+              filters={filters}
+              onUpdateFilters={setFilters}
+              allPapers={allPapers}
+              subjectOptions={subjectOptions}
+              sectionOptions={sectionOptions}
+              microtopicOptions={microtopicOptions}
+              subtopicOptions={subtopicOptions}
+              nanotopicOptions={nanotopicOptions}
+              macrotagOptions={macrotagOptions}
+              microtagOptions={[]}
+              isSearchView={false}
+              totalCount={filteredItems.length}
+              allInstitutes={[]}
+              allPrograms={[]}
+              userTags={userTags}
+              onCloseSidebar={() => setSidebarOpen(false)}
+              allYears={[]}
+              textColorMode={textColorMode}
+              onChangeTextColorMode={onChangeTextColorMode}
+              keyBoxMode={keyBoxMode}
+              onChangeKeyBoxMode={onChangeKeyBoxMode}
+              keyBoxColor={keyBoxColor}
+              onChangeKeyBoxColor={onChangeKeyBoxColor}
+            />
+          </View>
+        )}
+        <View style={{ flex: 1 }}>
       {showZoomIndicator && (
         <View style={{
           position: 'absolute',
@@ -7292,6 +7531,7 @@ function ValueAdditionView({
           key={layoutColumns}
           numColumns={1}
           data={layoutColumns === 2 ? [1] : visibleItems}
+          extraData={[keyBoxMode, keyBoxColor, textColorMode, zoomFontSize]}
           keyExtractor={(item, index) => (layoutColumns === 2 ? 'masonry-root' : (item as any).id)}
           contentContainerStyle={styles.listScroll}
           showsVerticalScrollIndicator={false}
@@ -7305,9 +7545,33 @@ function ValueAdditionView({
 
               {/* Header Row */}
               <View style={[styles.subAppHeaderRow, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
-                <Text style={[styles.subAppHeaderTitle, { color: colors.textPrimary, marginVertical: 0 }]}>
-                  {submodules.find(s => s.id === activeCategory)?.title}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  {!sidebarOpen && (
+                    <TouchableOpacity
+                      onPress={() => setSidebarOpen(true)}
+                      style={{
+                        width: 38,
+                        height: 38,
+                        borderRadius: 12,
+                        backgroundColor: colors.surface,
+                        borderWidth: 1,
+                        borderColor: colors.border,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        shadowColor: colors.primary,
+                        shadowOpacity: 0.1,
+                        shadowRadius: 4,
+                        shadowOffset: { width: 0, height: 2 },
+                        elevation: 3,
+                      }}
+                    >
+                      <ChevronRight size={20} color={colors.primary} />
+                    </TouchableOpacity>
+                  )}
+                  <Text style={[styles.subAppHeaderTitle, { color: colors.textPrimary, marginVertical: 0 }]}>
+                    {submodules.find(s => s.id === activeCategory)?.title}
+                  </Text>
+                </View>
                 {activeCategory === 'notes' && onAddNewNoteClick && (
                   <TouchableOpacity
                     activeOpacity={0.8}
@@ -8152,7 +8416,31 @@ function ValueAdditionView({
         <ScrollView contentContainerStyle={styles.listScroll} showsVerticalScrollIndicator={false}>
           {/* Spacer for floating back button */}
           <View style={{ height: insets.top + 48 }} />
-          <Text style={[styles.secTitleHeader, { color: colors.textPrimary }]}>Choose Category</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            {!sidebarOpen && (
+              <TouchableOpacity
+                onPress={() => setSidebarOpen(true)}
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 12,
+                  backgroundColor: colors.surface,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  shadowColor: colors.primary,
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  shadowOffset: { width: 0, height: 2 },
+                  elevation: 3,
+                }}
+              >
+                <ChevronRight size={20} color={colors.primary} />
+              </TouchableOpacity>
+            )}
+            <Text style={[styles.secTitleHeader, { color: colors.textPrimary, marginBottom: 0 }]}>Choose Category</Text>
+          </View>
           <View style={styles.cardsGrid}>
             {submodules.map(sub => {
               const Icon = sub.icon;
@@ -8220,6 +8508,8 @@ function ValueAdditionView({
           </View>
         </ScrollView>
       )}
+      </View>
+    </View>
 
       <HierarchyModal
         visible={hierarchyModalVisible}
@@ -8489,6 +8779,10 @@ function MainsAISearchView({
   onToggleVaFavorite,
   textColorMode = 'default',
   onChangeTextColorMode,
+  keyBoxMode = 'boxed',
+  onChangeKeyBoxMode,
+  keyBoxColor = 'yellow',
+  onChangeKeyBoxColor,
 }: {
   colors: any;
   isTablet: boolean;
@@ -8512,6 +8806,10 @@ function MainsAISearchView({
   onToggleVaFavorite?: (cardId: string) => void;
   textColorMode?: 'default' | 'black';
   onChangeTextColorMode?: (mode: 'default' | 'black') => void;
+  keyBoxMode?: 'boxed' | 'bold';
+  onChangeKeyBoxMode?: (mode: 'boxed' | 'bold') => void;
+  keyBoxColor?: KeyBoxColor;
+  onChangeKeyBoxColor?: (color: KeyBoxColor) => void;
 }) {
   const { isDark } = useTheme();
   const { session } = useAuth();
@@ -9729,6 +10027,10 @@ function MainsAISearchView({
               allYears={allYears}
               textColorMode={textColorMode}
               onChangeTextColorMode={onChangeTextColorMode}
+              keyBoxMode={keyBoxMode}
+              onChangeKeyBoxMode={onChangeKeyBoxMode}
+              keyBoxColor={keyBoxColor}
+              onChangeKeyBoxColor={onChangeKeyBoxColor}
             />
           </View>
         )}
@@ -9745,34 +10047,33 @@ function MainsAISearchView({
               </Text>
             </View>
 
-            {/* 3-Mode Engine Toggle */}
-            <View style={{ flexDirection: 'row', gap: 4, paddingHorizontal: 12, paddingTop: 6, paddingBottom: 4 }}>
-              {([
-                { mode: 'AI' as const, icon: <Brain size={10} color={searchEngineMode === 'AI' ? '#fff' : '#7c3aed'} />, label: 'AI Semantic' },
-                { mode: 'AI+Fuzzy' as const, icon: <Zap size={10} color={searchEngineMode === 'AI+Fuzzy' ? '#fff' : '#06b6d4'} />, label: 'AI+Fuzzy' },
-                { mode: 'Matching' as const, icon: <Zap size={10} color={searchEngineMode === 'Matching' ? '#fff' : colors.textSecondary} />, label: 'Fuzzy' },
-                { mode: 'Exact' as const, icon: <Target size={10} color={searchEngineMode === 'Exact' ? '#fff' : colors.textSecondary} />, label: 'Exact' },
-              ]).map(({ mode, icon, label }) => (
-                <TouchableOpacity
-                  key={mode}
-                  onPress={() => {
-                    setSearchEngineMode(mode);
-                    if (hasSearched && query.trim()) runMainsSearch(query, filters, mode);
-                  }}
-                  style={{
-                    flexDirection: 'row', alignItems: 'center', gap: 3,
-                    paddingHorizontal: 8, paddingVertical: 4, borderRadius: 14,
-                    backgroundColor: searchEngineMode === mode
-                      ? (mode === 'AI' ? '#7c3aed' : (mode === 'AI+Fuzzy' ? '#06b6d4' : (mode === 'Matching' ? '#0ea5e9' : '#f59e0b')))
-                      : colors.surface,
-                    borderWidth: 1,
-                    borderColor: searchEngineMode === mode ? 'transparent' : colors.border,
-                  }}
-                >
-                  {icon}
-                  <Text style={{ fontSize: 10, fontWeight: '800', color: searchEngineMode === mode ? '#fff' : colors.textSecondary }}>{label}</Text>
-                </TouchableOpacity>
-              ))}
+            {/* Premium Segmented Engine Toggle */}
+            <View style={{ paddingHorizontal: 12, paddingTop: 6, paddingBottom: 4 }}>
+              <View style={{ flexDirection: 'row', backgroundColor: isDark ? '#1e293b' : '#f1f5f9', borderRadius: 8, padding: 3 }}>
+                {([
+                  { mode: 'AI' as const, label: 'AI Semantic' },
+                  { mode: 'AI+Fuzzy' as const, label: 'Hybrid' },
+                  { mode: 'Matching' as const, label: 'Fuzzy' },
+                  { mode: 'Exact' as const, label: 'Exact' },
+                ]).map(({ mode, label }) => (
+                  <TouchableOpacity
+                    key={mode}
+                    onPress={() => {
+                      setSearchEngineMode(mode);
+                      if (hasSearched && query.trim()) runMainsSearch(query, filters, mode);
+                    }}
+                    style={{
+                      flex: 1, alignItems: 'center', paddingVertical: 5, borderRadius: 6,
+                      backgroundColor: searchEngineMode === mode ? (isDark ? '#334155' : '#ffffff') : 'transparent',
+                      ...(searchEngineMode === mode ? {
+                        shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 1, elevation: 1
+                      } : {})
+                    }}
+                  >
+                    <Text style={{ fontSize: 10, fontWeight: searchEngineMode === mode ? '800' : '600', color: searchEngineMode === mode ? (isDark ? '#ffffff' : '#0f172a') : (isDark ? '#94a3b8' : '#64748b') }}>{label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
 
             {/* AI Search Input Row */}
@@ -10292,16 +10593,16 @@ function MainsAISearchView({
                                     return (
                                       <View style={{ marginTop: 8 }}>
                                         <ApproachBox content={parsed.body} title={parsed.title} colors={colors} zoomFontSize={14} isDark={isDark} />
-                                        <Markdown style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
-                                          {cleanMarkdown(activeAnswer.answerText.replace(parsed.rawMatch, '').trim())}
+                                        <Markdown key={`${keyBoxMode}-${keyBoxColor}-${textColorMode}`} style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
+                                          {cleanMarkdown(activeAnswer.answerText.replace(parsed.rawMatch, '').trim(), keyBoxMode)}
                                         </Markdown>
                                       </View>
                                     );
                                   }
                                   return (
                                     <View style={{ marginTop: 8 }}>
-                                      <Markdown style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
-                                        {cleanMarkdown(activeAnswer.answerText)}
+                                      <Markdown key={`${keyBoxMode}-${keyBoxColor}-${textColorMode}`} style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
+                                        {cleanMarkdown(activeAnswer.answerText, keyBoxMode)}
                                       </Markdown>
                                     </View>
                                   );
@@ -11639,6 +11940,9 @@ export interface DetailedQuestionViewProps {
   detailedBestAnswer: BestAnswer | null;
   onDeleteBestAnswer: () => void;
   onActiveAnswerChange?: (activeText: string, activeInst: string, allAnswers: any[]) => void;
+  textColorMode?: 'default' | 'black';
+  keyBoxMode?: 'boxed' | 'bold';
+  keyBoxColor?: KeyBoxColor;
 }
 
 export function DetailedQuestionView({
@@ -11667,6 +11971,9 @@ export function DetailedQuestionView({
   detailedBestAnswer,
   onDeleteBestAnswer,
   onActiveAnswerChange,
+  textColorMode = 'default',
+  keyBoxMode = 'boxed',
+  keyBoxColor = 'yellow',
 }: DetailedQuestionViewProps) {
   const isBookmarked = savedIds.includes(question.id);
   const answers = useMemo(() => getCleanAvailableAnswers(question.answers || []), [question.answers]);
@@ -11737,7 +12044,7 @@ export function DetailedQuestionView({
         fontSize: Math.round(14 * ratio),
       },
     };
-  }, [colors, zoomFontSize]);
+  }, [colors, zoomFontSize, globalKeyBoxColor, globalTextColorMode]);
   
   useEffect(() => {
     if (detailedBestAnswer) {
@@ -12014,8 +12321,8 @@ export function DetailedQuestionView({
             ) : null}
 
             {/* Model Answer Body */}
-            <Markdown style={dynamicMarkdownStyles} rules={getMarkdownRules(colors, isDark)}>
-              {cleanMarkdown(remainingAnswerText)}
+            <Markdown key={`${globalKeyBoxMode}-${globalKeyBoxColor}-${globalTextColorMode}-${zoomFontSize}`} style={dynamicMarkdownStyles} rules={getMarkdownRules(colors, isDark)}>
+              {cleanMarkdown(remainingAnswerText, keyBoxMode)}
             </Markdown>
           </View>
 

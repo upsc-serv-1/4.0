@@ -275,7 +275,7 @@ export const getMarkdownRules = (colors: any, isDark: boolean, onImagePress?: (u
     const lastParent = listParents[listParents.length - 1];
     const isOrdered = lastParent?.type === 'ordered_list';
 
-    const indent = Math.max(0, depth - 1) * 14;
+    const indent = 12 + (depth - 1) * 16;
     const textColor = colors.textPrimary || (isDark ? '#f3f4f6' : '#111827');
 
     if (isOrdered) {
@@ -290,7 +290,7 @@ export const getMarkdownRules = (colors: any, isDark: boolean, onImagePress?: (u
       );
     }
 
-    const bulletSymbols = ['■', '›', '◦', '–'];
+    const bulletSymbols = ['•', '›', '◦', '–'];
     const bulletSymbol = bulletSymbols[Math.min(depth - 1, bulletSymbols.length - 1)];
 
     return (

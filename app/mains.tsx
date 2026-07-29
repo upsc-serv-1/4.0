@@ -76,6 +76,7 @@ import {
   Trash2,
   Edit,
   Maximize2,
+  RefreshCw,
 } from 'lucide-react-native';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';

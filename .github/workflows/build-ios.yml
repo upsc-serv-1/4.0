@@ -2,8 +2,6 @@ name: Build iOS IPA (Unsigned)
 # Trigger run: 2026-08-02-10.2
 
 on:
-  push:
-    branches: [ '10.2' ]
   workflow_dispatch:
 
 concurrency:

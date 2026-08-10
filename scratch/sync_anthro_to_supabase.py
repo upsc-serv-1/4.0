@@ -159,7 +159,8 @@ def main():
                 "course": q.get("course", "Civil Services"),
                 "institute": q.get("institute", "UPSC"),
                 "program_id": q.get("program_id", "cse"),
-                "program_name": q.get("program_name", "CSE")
+                "program_name": q.get("program_name", "CSE"),
+                "status": "published"
             })
 
             for ans in q.get("answers", []):

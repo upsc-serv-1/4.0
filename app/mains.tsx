@@ -5503,7 +5503,9 @@ function QuestionBankView({
   const onPinchHandlerStateChange = (event: any) => {
     if (event.nativeEvent.state === GHState.END || event.nativeEvent.state === GHState.CANCELLED) {
       baseFontSizeRef.current = zoomFontSize;
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+      if (Platform.OS !== 'android') {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+      }
     }
   };
 
@@ -6990,7 +6992,9 @@ function ValueAdditionView({
   const onPinchHandlerStateChange = (event: any) => {
     if (event.nativeEvent.state === GHState.END || event.nativeEvent.state === GHState.CANCELLED) {
       baseFontSizeRef.current = zoomFontSize;
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+      if (Platform.OS !== 'android') {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+      }
     }
   };
 
@@ -12173,7 +12177,9 @@ export function DetailedQuestionView({
   const onPinchHandlerStateChange = (event: any) => {
     if (event.nativeEvent.state === GHState.END || event.nativeEvent.state === GHState.CANCELLED) {
       baseFontSizeRef.current = zoomFontSize;
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+      if (Platform.OS !== 'android') {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+      }
     }
   };
 

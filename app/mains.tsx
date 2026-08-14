@@ -2927,24 +2927,29 @@ export const cleanMarkdownContent = (text: string | undefined | null, keyBoxMode
   if (!text) return '';
   let cleaned = preProcessMarkdownTables(text);
 
-  // Master List Indentation & Bullet Normalizer
-  // Replaces all previous list blocks. Safely converts manual spaced indentation into unbreakable 
-  // visual spaces (ZWNJ + NBSP) so that React Native perfectly renders the exact indent without 
-  // markdown-it either stripping them (flush left) or turning them into grey code blocks.
-  cleaned = cleaned.replace(/(?:^|<br\s*\/?>)[\r\n]*([ \t\xa0]*)([\u2022\u25e6*+\-]|\d+\.)\s+/gim, (match, spaces, bullet) => {
+  // 0. Normalize leading non-breaking spaces to regular spaces. 
+  // The database contains lists indented with \xa0. Markdown-it ignores \xa0 for block parsing,
+  // which causes lists to break and render as flush-left paragraphs.
+  cleaned = cleaned.replace(/^[ \t\xa0]+/gm, (match) => {
+    return match.replace(/\xa0/g, ' ');
+  });
+
+  // 1. Normalize custom bullets (•, ◦, –) to standard markdown dash (-) so markdown-it parses them as native lists.
+  cleaned = cleaned.replace(/^([ \t\xa0]*)([\u2022\u25e6\u2013])\s+/gm, (match, spaces, bullet) => {
+    return spaces + '- ';
+  });
+
+  // 2. Fix `<br>` tags that break lists. If a list item follows one or more <br> tags, they must be converted to \n\n to parse as a list.
+  cleaned = cleaned.replace(/(?:<br\s*\/?>[\r\n\s]*?)+([ \t\xa0]*)([*+\-]|\d+\.)\s+/gi, (match, spaces, bullet) => {
+    return '\n\n' + spaces + bullet + ' ';
+  });
+
+  // 3. Space Scaler: Fix 4+ space indented code block triggers.
+  // Scales spaces down by 25% (4->3, 8->6, 12->9). This prevents code blocks while keeping deep native sub-list nesting!
+  cleaned = cleaned.replace(/^([ \t]{4,})([*+\-]|\d+\.) /gm, (match, spaces, bullet) => {
     const spaceCount = spaces.replace(/\t/g, '    ').length;
-    
-    // Only apply the ZWNJ trick if there's actual indentation.
-    // If it's 0 spaces, let standard markdown handle it (just normalize the bullet)
-    if (spaceCount === 0) {
-      const newBullet = /^[\u2022\u25e6*+\-]$/.test(bullet.trim()) ? '-' : bullet.trim();
-      return '\n\n' + newBullet + ' ';
-    }
-    
-    const nbsps = '\u00A0'.repeat(spaceCount);
-    // Normalize indented bullets to •, keep indented numbers as numbers
-    const newBullet = /^[\u2022\u25e6*+\-]$/.test(bullet.trim()) ? '•' : bullet.trim();
-    return '\n\n\u200C' + nbsps + newBullet + ' ';
+    const newSpacesCount = Math.floor(spaceCount * 0.75);
+    return ' '.repeat(newSpacesCount) + bullet + ' ';
   });
 
   // Convert HTML img tags to Markdown image syntax (react-native-markdown-display compatible)

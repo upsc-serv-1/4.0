@@ -274,14 +274,21 @@ export const getMarkdownRules = (colors: any, isDark: boolean, onImagePress?: (u
   list_item: (node: any, children: any, parentNodes: any = []) => {
     const listParents = (parentNodes || []).filter((n: any) => n && (n.type === 'bullet_list' || n.type === 'ordered_list'));
     const depth = Math.max(1, listParents.length);
-    const lastParent = listParents[listParents.length - 1];
+    const lastParent = listParents[0];
     const isOrdered = lastParent?.type === 'ordered_list';
 
     const indent = 12 + (depth - 1) * 16;
     const textColor = colors.textPrimary || (isDark ? '#f3f4f6' : '#111827');
 
     if (isOrdered) {
-      const index = node.index !== undefined ? node.index + 1 : (node.attributes?.index ?? 1);
+      let startOffset = 1;
+      if (lastParent?.attributes?.start) {
+        const parsedStart = parseInt(lastParent.attributes.start, 10);
+        if (!isNaN(parsedStart)) {
+          startOffset = parsedStart;
+        }
+      }
+      const index = node.index !== undefined ? node.index + startOffset : startOffset;
       return (
         <View key={node.key} style={{ flexDirection: 'row', alignItems: 'flex-start', marginVertical: 2.5, marginLeft: indent }}>
           <Text style={{ width: 24, fontSize: 13.5, lineHeight: 21, fontWeight: '700', color: textColor }}>
@@ -438,7 +445,7 @@ interface MainsFilters {
 }
 
 const DEFAULT_MAINS_FILTERS: MainsFilters = {
-  searchAcross: ['Questions', 'Answers', 'Value Additions'],
+  searchAcross: ['Questions', 'Value Additions'],
   pyqFilter: 'All',
   revisionTags: 'All',
   institutes: 'All',
@@ -468,7 +475,7 @@ export function MainsScreenInner() {
 
   const [textColorMode, setTextColorMode] = useState<'default' | 'black'>('default');
   const [keyBoxMode, setKeyBoxMode] = useState<'boxed' | 'bold'>('boxed');
-  const [keyBoxColor, setKeyBoxColor] = useState<KeyBoxColor>('yellow');
+  const [keyBoxColor, setKeyBoxColor] = useState<KeyBoxColor>('blue');
 
   useEffect(() => {
     AsyncStorage.getItem('@mains_key_box_mode')
@@ -2749,6 +2756,15 @@ function HubView({
 // 2. QUESTION BANK VIEW
 // ─────────────────────────────────────────────────────────────────────────────
 // Helper functions for Markdown Answer rendering
+
+export const getWordCount = (text: string): number => {
+  if (!text) return 0;
+  let clean = text.replace(/<[^>]*>/g, ' ');
+  clean = clean.replace(/[#*_\-\|\[\]()]/g, ' ');
+  const words = clean.trim().split(/\s+/);
+  return words.filter(w => w.length > 0 && /[a-zA-Z0-9]/.test(w)).length;
+};
+
 const cleanMarkdown = (text: string, keyBoxMode: 'boxed' | 'bold' = globalKeyBoxMode) => {
   if (!text) return '';
   const r2BaseUrl = 'https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev';
@@ -2910,6 +2926,26 @@ const renderTaxonomyStrip = (q: any, colors: any, isDark: boolean) => {
 export const cleanMarkdownContent = (text: string | undefined | null, keyBoxMode: 'boxed' | 'bold' = globalKeyBoxMode): string => {
   if (!text) return '';
   let cleaned = preProcessMarkdownTables(text);
+
+  // Master List Indentation & Bullet Normalizer
+  // Replaces all previous list blocks. Safely converts manual spaced indentation into unbreakable 
+  // visual spaces (ZWNJ + NBSP) so that React Native perfectly renders the exact indent without 
+  // markdown-it either stripping them (flush left) or turning them into grey code blocks.
+  cleaned = cleaned.replace(/(?:^|<br\s*\/?>)[\r\n]*([ \t\xa0]*)([\u2022\u25e6*+\-]|\d+\.)\s+/gim, (match, spaces, bullet) => {
+    const spaceCount = spaces.replace(/\t/g, '    ').length;
+    
+    // Only apply the ZWNJ trick if there's actual indentation.
+    // If it's 0 spaces, let standard markdown handle it (just normalize the bullet)
+    if (spaceCount === 0) {
+      const newBullet = /^[\u2022\u25e6*+\-]$/.test(bullet.trim()) ? '-' : bullet.trim();
+      return '\n\n' + newBullet + ' ';
+    }
+    
+    const nbsps = '\u00A0'.repeat(spaceCount);
+    // Normalize indented bullets to •, keep indented numbers as numbers
+    const newBullet = /^[\u2022\u25e6*+\-]$/.test(bullet.trim()) ? '•' : bullet.trim();
+    return '\n\n\u200C' + nbsps + newBullet + ' ';
+  });
 
   // Convert HTML img tags to Markdown image syntax (react-native-markdown-display compatible)
   cleaned = cleaned.replace(/<img([\s\S]*?)src=["']([^"']+)["']([\s\S]*?)\/?>/gi, (match, before, src, after) => {
@@ -3804,7 +3840,7 @@ export const setGlobalKeyBoxMode = (mode: 'boxed' | 'bold') => {
 };
 
 export type KeyBoxColor = 'yellow' | 'green' | 'blue' | 'pink';
-let globalKeyBoxColor: KeyBoxColor = 'yellow';
+let globalKeyBoxColor: KeyBoxColor = 'blue';
 export const setGlobalKeyBoxColor = (color: KeyBoxColor) => {
   globalKeyBoxColor = color;
 };
@@ -4208,7 +4244,7 @@ function MainsLeftPanel({
   onChangeTextColorMode,
   keyBoxMode = 'boxed',
   onChangeKeyBoxMode,
-  keyBoxColor = 'yellow',
+  keyBoxColor = 'blue',
   onChangeKeyBoxColor,
   onForceSync,
   syncing = false,
@@ -4217,15 +4253,26 @@ function MainsLeftPanel({
   const isOptional = filters.paper !== 'All' && !filters.paper.split('|').some(p => ['GS1', 'GS2', 'GS3', 'GS4', 'Essay'].includes(p));
 
   return (
-    <ScrollView
-      style={[
-        styles.leftPanel,
-        { backgroundColor: isDark ? 'rgba(15, 23, 42, 0.45)' : 'rgba(255, 255, 255, 0.45)', borderRightColor: colors.border },
-      ]}
-      contentContainerStyle={{ flexGrow: 1, paddingBottom: 100, paddingTop: insets.top + 50 }}
-      showsVerticalScrollIndicator={true}
-      nestedScrollEnabled
-    >
+    <View style={[
+      styles.leftPanel,
+      { backgroundColor: isDark ? 'rgba(15, 23, 42, 0.45)' : 'rgba(255, 255, 255, 0.45)', borderRightColor: colors.border, height: '100%' }
+    ]}>
+      {/* Floating Close Button */}
+      {onCloseSidebar && (
+        <TouchableOpacity 
+          onPress={onCloseSidebar} 
+          style={{ position: 'absolute', top: insets.top + 16, right: 12, padding: 6, borderRadius: 8, backgroundColor: isDark ? colors.surfaceStrong : '#ffffff', zIndex: 100, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 2 }}
+        >
+          <ChevronLeft size={18} color={colors.textSecondary} />
+        </TouchableOpacity>
+      )}
+
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 100, paddingTop: insets.top + 50 }}
+        showsVerticalScrollIndicator={true}
+        nestedScrollEnabled
+      >
       {/* Excludable keywords for search */}
       {isSearchView && keywords.length > 0 && (
         <View style={{ marginBottom: 12 }}>
@@ -4282,11 +4329,6 @@ function MainsLeftPanel({
             <Text style={{ fontSize: 9, fontWeight: '800', color: colors.textTertiary }}>{totalCount}</Text>
           </View>
         </View>
-        {onCloseSidebar && (
-          <TouchableOpacity onPress={onCloseSidebar} style={{ padding: 4, borderRadius: 6, backgroundColor: colors.surfaceStrong }}>
-            <ChevronLeft size={16} color={colors.textSecondary} />
-          </TouchableOpacity>
-        )}
       </View>
 
       {/* ── GROUP: SOURCE ── */}
@@ -4491,6 +4533,7 @@ function MainsLeftPanel({
           onSelect={(val) => onUpdateFilters({ ...filters, institutes: val })}
           colors={colors}
           delimiter=","
+          defaultExpanded={true}
         />
 
         <SidebarFilterRow
@@ -4703,6 +4746,7 @@ function MainsLeftPanel({
         </View>
       )}
     </ScrollView>
+    </View>
   );
 }
 
@@ -5440,7 +5484,7 @@ function QuestionBankView({
   onChangeTextColorMode,
   keyBoxMode = 'boxed',
   onChangeKeyBoxMode,
-  keyBoxColor = 'yellow',
+  keyBoxColor = 'blue',
   onChangeKeyBoxColor,
   onForceSync,
   syncing = false,
@@ -6773,12 +6817,18 @@ function QuestionBankView({
                               const parsed = parseIntroductoryBox(activeAnswer.answerText);
                               if (parsed) {
                                 const approachZoom = Math.round(14 * zoomScale);
+                                const remText = activeAnswer.answerText.replace(parsed.rawMatch, '').trim();
                                 return (
                                   <View style={{ marginTop: 8 }}>
                                     <ApproachBox content={parsed.body} title={parsed.title} colors={colors} zoomFontSize={approachZoom} isDark={isDark} />
                                     <Markdown key={`${keyBoxMode}-${keyBoxColor}-${textColorMode}-${zoomFontSize}`} style={dynamicMarkdownStyles} rules={getMarkdownRules(colors, isDark)}>
-                                      {cleanMarkdown(activeAnswer.answerText.replace(parsed.rawMatch, '').trim(), keyBoxMode)}
+                                      {cleanMarkdown(remText, keyBoxMode)}
                                     </Markdown>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12, paddingRight: 8, opacity: 0.7 }}>
+                                      <Text style={{ fontSize: 11, color: colors.textTertiary, fontStyle: 'italic', fontWeight: '600' }}>
+                                        (~{getWordCount(remText)} words)
+                                      </Text>
+                                    </View>
                                   </View>
                                 );
                               }
@@ -6787,6 +6837,11 @@ function QuestionBankView({
                                   <Markdown key={`${keyBoxMode}-${keyBoxColor}-${textColorMode}-${zoomFontSize}`} style={dynamicMarkdownStyles} rules={getMarkdownRules(colors, isDark)}>
                                     {cleanMarkdown(activeAnswer.answerText, keyBoxMode)}
                                   </Markdown>
+                                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12, paddingRight: 8, opacity: 0.7 }}>
+                                    <Text style={{ fontSize: 11, color: colors.textTertiary, fontStyle: 'italic', fontWeight: '600' }}>
+                                      (~{getWordCount(activeAnswer.answerText)} words)
+                                    </Text>
+                                  </View>
                                 </View>
                               );
                             })()}
@@ -6875,7 +6930,7 @@ function ValueAdditionView({
   onChangeTextColorMode,
   keyBoxMode = 'boxed',
   onChangeKeyBoxMode,
-  keyBoxColor = 'yellow',
+  keyBoxColor = 'blue',
   onChangeKeyBoxColor,
   onForceSync,
   syncing = false,
@@ -8940,7 +8995,7 @@ function MainsAISearchView({
   onChangeTextColorMode,
   keyBoxMode = 'boxed',
   onChangeKeyBoxMode,
-  keyBoxColor = 'yellow',
+  keyBoxColor = 'blue',
   onChangeKeyBoxColor,
   onForceSync,
   syncing = false,
@@ -10755,12 +10810,18 @@ function MainsAISearchView({
                                 {(() => {
                                   const parsed = parseIntroductoryBox(activeAnswer.answerText);
                                   if (parsed) {
+                                    const remText = activeAnswer.answerText.replace(parsed.rawMatch, '').trim();
                                     return (
                                       <View style={{ marginTop: 8 }}>
                                         <ApproachBox content={parsed.body} title={parsed.title} colors={colors} zoomFontSize={14} isDark={isDark} />
                                         <Markdown key={`${keyBoxMode}-${keyBoxColor}-${textColorMode}`} style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
-                                          {cleanMarkdown(activeAnswer.answerText.replace(parsed.rawMatch, '').trim(), keyBoxMode)}
+                                          {cleanMarkdown(remText, keyBoxMode)}
                                         </Markdown>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12, paddingRight: 8, opacity: 0.7 }}>
+                                          <Text style={{ fontSize: 11, color: colors.textTertiary, fontStyle: 'italic', fontWeight: '600' }}>
+                                            (~{getWordCount(remText)} words)
+                                          </Text>
+                                        </View>
                                       </View>
                                     );
                                   }
@@ -10769,6 +10830,11 @@ function MainsAISearchView({
                                       <Markdown key={`${keyBoxMode}-${keyBoxColor}-${textColorMode}`} style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
                                         {cleanMarkdown(activeAnswer.answerText, keyBoxMode)}
                                       </Markdown>
+                                      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12, paddingRight: 8, opacity: 0.7 }}>
+                                        <Text style={{ fontSize: 11, color: colors.textTertiary, fontStyle: 'italic', fontWeight: '600' }}>
+                                          (~{getWordCount(activeAnswer.answerText)} words)
+                                        </Text>
+                                      </View>
                                     </View>
                                   );
                                 })()}
@@ -12138,7 +12204,7 @@ export function DetailedQuestionView({
   onActiveAnswerChange,
   textColorMode = 'default',
   keyBoxMode = 'boxed',
-  keyBoxColor = 'yellow',
+  keyBoxColor = 'blue',
 }: DetailedQuestionViewProps) {
   const isBookmarked = savedIds.includes(question.id);
   const answers = useMemo(() => getCleanAvailableAnswers(question.answers || []), [question.answers]);
@@ -12491,6 +12557,12 @@ export function DetailedQuestionView({
             <Markdown key={`${globalKeyBoxMode}-${globalKeyBoxColor}-${globalTextColorMode}-${zoomFontSize}`} style={dynamicMarkdownStyles} rules={getMarkdownRules(colors, isDark)}>
               {cleanMarkdown(remainingAnswerText, keyBoxMode)}
             </Markdown>
+
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12, paddingRight: 8, opacity: 0.7 }}>
+              <Text style={{ fontSize: 11, color: colors.textTertiary, fontStyle: 'italic', fontWeight: '600' }}>
+                (~{getWordCount(remainingAnswerText)} words)
+              </Text>
+            </View>
           </View>
 
           {/* Personal Notes Section */}

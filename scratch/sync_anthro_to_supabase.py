@@ -23,8 +23,8 @@ DELETE_HEADERS = {
 }
 
 target_files = [
-    r"C:\Users\Dr. Yogesh\Videos\APP FOLDER - V1 - Copy\app\frontend-noji-2.6.2\3\pilot pro 10.2\mains json files\mains-upsc_anthro_paper_1_2012-2025_levelup+compass.json",
-    r"C:\Users\Dr. Yogesh\Videos\APP FOLDER - V1 - Copy\app\frontend-noji-2.6.2\3\pilot pro 10.2\mains json files\mains-upsc_anthro_paper_2_2012-2025_levelup+compass.json"
+    r"C:\Users\Dr. Yogesh\Downloads\compass antrho\final 2 - Copy\backup\mains-upsc_anthro_paper_1_2012-2025_compass_updated_v3.json",
+    r"C:\Users\Dr. Yogesh\Downloads\compass antrho\final 2 - Copy\backup\mains-upsc_anthro_paper_2_2012-2025_compass_updated_v3.json"
 ]
 
 def delete_existing_anthro_records():

@@ -98,6 +98,7 @@ import { PilotV2Provider } from '../src/context/PilotV2Context';
 import { PilotV2AIChat } from '../src/components/pilot-v2/PilotV2AIChat';
 import { PilotV2SaveSheet } from '../src/components/pilot-v2/PilotV2SaveSheet';
 import { MyVitaminEditorSheet } from '../src/components/unified/MyVitaminEditorSheet';
+import { AdvancedCopyModal } from '../src/components/unified/AdvancedCopyModal';
 import { fetchBestAnswer, saveBestAnswer, deleteBestAnswer, BestAnswer } from '../src/services/BestAnswerService';
 import { markdownToHtml } from '../src/utils/textUtils';
 
@@ -5528,6 +5529,7 @@ function QuestionBankView({
   const [search, setSearch] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedInstitutes, setSelectedInstitutes] = useState<Record<string, string>>({});
+  const [copyModalQuestion, setCopyModalQuestion] = useState<any>(null);
   const flatListRef = useRef<FlatList>(null);
   const cardYOffsets = useRef<Record<string, number>>({});
   const [exportSheetVisible, setExportSheetVisible] = useState(false);
@@ -6783,39 +6785,57 @@ function QuestionBankView({
 
                         return (
                           <View>
-                            {/* Horizontal Tab Bar of Institutes */}
-                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
-                              {cleanAnsList.map(ans => (
-                                <TouchableOpacity
-                                  key={ans.institute}
-                                  onPress={() => setSelectedInstitutes(prev => ({ ...prev, [q.id]: ans.institute }))}
-                                  style={[
-                                    styles.segmentButton,
-                                    {
-                                      marginRight: 6,
-                                      paddingHorizontal: 12,
-                                      paddingVertical: 6,
-                                      borderRadius: 8,
-                                      borderWidth: 0.5,
-                                      borderColor: currentInst === ans.institute ? '#3b82f6' : colors.border
-                                    },
-                                    currentInst === ans.institute
-                                      ? { backgroundColor: '#3b82f6' }
-                                      : { backgroundColor: colors.surface + '88' }
-                                  ]}
-                                >
-                                  <Text
-                                    style={{
-                                      fontSize: 12,
-                                      fontWeight: '800',
-                                      color: currentInst === ans.institute ? '#ffffff' : colors.textTertiary
-                                    }}
+                            {/* Horizontal Tab Bar of Institutes & Copy Button */}
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1, marginRight: 8 }}>
+                                {cleanAnsList.map(ans => (
+                                  <TouchableOpacity
+                                    key={ans.institute}
+                                    onPress={() => setSelectedInstitutes(prev => ({ ...prev, [q.id]: ans.institute }))}
+                                    style={[
+                                      styles.segmentButton,
+                                      {
+                                        marginRight: 6,
+                                        paddingHorizontal: 12,
+                                        paddingVertical: 6,
+                                        borderRadius: 8,
+                                        borderWidth: 0.5,
+                                        borderColor: currentInst === ans.institute ? '#3b82f6' : colors.border
+                                      },
+                                      currentInst === ans.institute
+                                        ? { backgroundColor: '#3b82f6' }
+                                        : { backgroundColor: colors.surface + '88' }
+                                    ]}
                                   >
-                                    {ans.institute}
-                                  </Text>
-                                </TouchableOpacity>
-                              ))}
-                            </ScrollView>
+                                    <Text
+                                      style={{
+                                        fontSize: 12,
+                                        fontWeight: '800',
+                                        color: currentInst === ans.institute ? '#ffffff' : colors.textTertiary
+                                      }}
+                                    >
+                                      {ans.institute}
+                                    </Text>
+                                  </TouchableOpacity>
+                                ))}
+                              </ScrollView>
+                              
+                              <TouchableOpacity
+                                onPress={() => setCopyModalQuestion(q)}
+                                style={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: 16,
+                                  backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : colors.surface + 'dd',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  borderWidth: 1,
+                                  borderColor: colors.border
+                                }}
+                              >
+                                <Copy size={14} color={colors.textSecondary} />
+                              </TouchableOpacity>
+                            </View>
 
                             {/* Render Answer Text in Markdown */}
                             {(() => {
@@ -6902,6 +6922,20 @@ function QuestionBankView({
           footerText: 'Generated by Dr. UPSC',
         }}
       />
+
+      {copyModalQuestion && (
+        <AdvancedCopyModal
+          visible={!!copyModalQuestion}
+          onClose={() => setCopyModalQuestion(null)}
+          questionText={copyModalQuestion.questionText}
+          currentAnswer={{
+            institute: selectedInstitutes[copyModalQuestion.id] || getCleanAvailableAnswers(copyModalQuestion.answers)[0]?.institute || 'Vision IAS',
+            text: (getCleanAvailableAnswers(copyModalQuestion.answers).find((a: any) => a.institute === (selectedInstitutes[copyModalQuestion.id] || getCleanAvailableAnswers(copyModalQuestion.answers)[0]?.institute)) || getCleanAvailableAnswers(copyModalQuestion.answers)[0])?.answerText || ''
+          }}
+          allAnswers={getCleanAvailableAnswers(copyModalQuestion.answers).map((ans: any) => ({ source: ans.institute || 'Vision IAS', text: ans.answerText }))}
+          colors={colors}
+        />
+      )}
     </View>
   );
 }
@@ -12335,31 +12369,7 @@ export function DetailedQuestionView({
     setShowCopyModal(true);
   };
 
-  const handleCopyOnlyQuestion = async () => {
-    await Clipboard.setStringAsync(question.questionText);
-    setShowCopyModal(false);
-    Alert.alert('Copied', 'Question copied to clipboard.');
-  };
 
-  const handleCopyQuestionAndCurrentAnswer = async () => {
-    const textToCopy = `Question:\n${question.questionText}\n\nModel Answer (${activeInst}):\n${activeAnswer.answerText}`;
-    await Clipboard.setStringAsync(textToCopy);
-    setShowCopyModal(false);
-    Alert.alert('Copied', 'Question and selected answer copied.');
-  };
-
-  const handleCopyQuestionAndAllAnswers = async () => {
-    let textToCopy = `Question:\n${question.questionText}\n\n`;
-    answers.forEach((ans, i) => {
-      textToCopy += `--- Model Answer ${i+1} (${ans.institute || 'Vision IAS'}) ---\n${ans.answerText}\n\n`;
-    });
-    if (detailedBestAnswer) {
-      textToCopy += `--- My Vitamin Answer ---\n${detailedBestAnswer.answer_text}\n\n`;
-    }
-    await Clipboard.setStringAsync(textToCopy.trim());
-    setShowCopyModal(false);
-    Alert.alert('Copied', 'Question and all model answers copied.');
-  };
 
   return (
     <KeyboardAvoidingView
@@ -12368,49 +12378,18 @@ export function DetailedQuestionView({
     >
       <View style={{ flex: 1 }}>
       {/* Copy Options Modal */}
-      <Modal
+      <AdvancedCopyModal
         visible={showCopyModal}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowCopyModal(false)}
-      >
-        <Pressable 
-          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 }}
-          onPress={() => setShowCopyModal(false)}
-        >
-          <View style={{ backgroundColor: colors.surface, borderRadius: 16, width: '100%', maxWidth: 340, padding: 20, borderWidth: 1, borderColor: colors.border }}>
-            <Text style={{ fontSize: 16, fontWeight: '800', color: colors.textPrimary, marginBottom: 16, textAlign: 'center' }}>Copy Options</Text>
-            
-            <TouchableOpacity 
-              onPress={handleCopyOnlyQuestion}
-              style={{ paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: colors.border, alignItems: 'center' }}
-            >
-              <Text style={{ fontSize: 14, fontWeight: '600', color: colors.primary }}>Copy Question Only</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              onPress={handleCopyQuestionAndCurrentAnswer}
-              style={{ paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: colors.border, alignItems: 'center' }}
-            >
-              <Text style={{ fontSize: 14, fontWeight: '600', color: colors.primary }}>Copy Question & Current Answer</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              onPress={handleCopyQuestionAndAllAnswers}
-              style={{ paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: colors.border, alignItems: 'center' }}
-            >
-              <Text style={{ fontSize: 14, fontWeight: '600', color: colors.primary }}>Copy Question & All Answers</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              onPress={() => setShowCopyModal(false)}
-              style={{ marginTop: 12, paddingVertical: 8, alignItems: 'center' }}
-            >
-              <Text style={{ fontSize: 14, fontWeight: '700', color: colors.textSecondary }}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </Pressable>
-      </Modal>
+        onClose={() => setShowCopyModal(false)}
+        questionText={question.questionText}
+        currentAnswer={{
+          institute: activeInst,
+          text: activeAnswer.answerText
+        }}
+        allAnswers={answers.map(ans => ({ source: ans.institute || 'Vision IAS', text: ans.answerText }))}
+        myVitaminAnswer={detailedBestAnswer?.answer_text}
+        colors={colors}
+      />
 
       {/* Floating Back Button */}
       <TouchableOpacity

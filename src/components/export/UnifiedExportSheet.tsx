@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { X, FileDown, Layout, ChevronDown, ChevronRight, Settings, Check, Share } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
+import * as Sharing from 'expo-sharing';
 import { useTheme } from '../../context/ThemeContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import {

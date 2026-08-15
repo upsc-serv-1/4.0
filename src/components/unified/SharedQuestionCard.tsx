@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Platform, ActivityIndicator, StyleSheet, Animated, TextInput, Dimensions, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Platform, ActivityIndicator, StyleSheet, Animated, TextInput, Dimensions, Alert, Modal, Pressable } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
 import * as Clipboard from 'expo-clipboard';
@@ -15,17 +15,9 @@ import RenderHtml from 'react-native-render-html';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
-import { 
-  buildCanonicalExplanations, 
-  getPYQCategorization, 
-  normalizeInstituteLabel, 
-  normalizeProgramLabel, 
-  normalizeExplText, 
-  extractYearFromText, 
-  toBool, 
-  getExamInfo 
-} from '../../utils/questionUtils';
+import { buildCanonicalExplanations, getPYQCategorization, normalizeInstituteLabel, normalizeProgramLabel, normalizeExplText, extractYearFromText, toBool, getExamInfo } from '../../utils/questionUtils';
 import { AIExplanationChat } from './AIExplanationChat';
+import { AdvancedCopyModal } from './AdvancedCopyModal';
 
 const { width, height } = Dimensions.get('window');
 
@@ -118,6 +110,7 @@ export const SharedQuestionCard = ({
     // Initialize showNoteField based on whether note exists
     // Also watch for changes to automatically show/hide if note is cleared
     const [showNoteField, setShowNoteField] = useState<boolean>(!!effectiveAnswerData?.note);
+    const [showCopyModal, setShowCopyModal] = useState(false);
     
     // Update showNoteField whenever note content changes
     useEffect(() => {
@@ -241,6 +234,12 @@ export const SharedQuestionCard = ({
       viewerKind = 'markdown';
     }
 
+    const qText = item.statement_line || item.question_text || item.text || '';
+    const currentAns = {
+      institute: selectedExplSourceRaw === 'all' ? 'All Institutes' : selectedExplSourceRaw,
+      text: effectiveExplanationText
+    };
+
     const handleCopy = async (text: string) => {
       await Clipboard.setStringAsync(text);
       if (Platform.OS === 'android') {
@@ -258,6 +257,16 @@ export const SharedQuestionCard = ({
 
     return (
       <View style={[styles.questionCard, { backgroundColor: isZenMode ? 'transparent' : effectiveColors.surface, borderColor: isZenMode ? 'rgba(67, 52, 34, 0.1)' : effectiveColors.border, borderWidth: isZenMode ? 0 : 1 }]}>
+        <AdvancedCopyModal
+          visible={showCopyModal}
+          onClose={() => setShowCopyModal(false)}
+          questionText={qText}
+          currentAnswer={currentAns}
+          allAnswers={displayExplanations.map((a: any) => ({ source: a.source || 'Vision IAS', text: a.text || '' }))}
+          myVitaminAnswer={savedBest?.answer_text}
+          colors={effectiveColors}
+        />
+
         <View style={styles.qHeader}>
           {isTablet ? (
             /* 📱 TABLET/IPAD LAYOUT: Beautiful Single-Row Inline */
@@ -626,6 +635,20 @@ export const SharedQuestionCard = ({
                     >
                       <Plus size={16} color={effectiveColors.primary} />
                     </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => setShowCopyModal(true)}
+                      activeOpacity={0.7}
+                      style={{
+                        width: 28, height: 28, borderRadius: 14,
+                        backgroundColor: effectiveColors.surfaceStrong,
+                        alignItems: 'center', justifyContent: 'center',
+                        borderWidth: 1, borderColor: effectiveColors.border,
+                        marginLeft: 'auto'
+                      }}
+                    >
+                      <Copy size={13} color={effectiveColors.textSecondary} />
+                    </TouchableOpacity>
                   </View>
                 )}
 
@@ -676,25 +699,7 @@ export const SharedQuestionCard = ({
                   </Markdown>
                 )}
 
-                {/* Copy to Clipboard shortcut for Institute Explanations */}
-                {showExplanation && selectedExplSource !== 'my_note' && viewerKind !== 'vitamin' && effectiveExplanationText && (
-                  <TouchableOpacity
-                    onPress={() => handleCopy(effectiveExplanationText)}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 6,
-                      marginTop: 12,
-                      padding: 8,
-                      borderRadius: 8,
-                      backgroundColor: effectiveColors.primary + '10',
-                      alignSelf: 'flex-start'
-                    }}
-                  >
-                    <Copy size={14} color={effectiveColors.primary} />
-                    <Text style={{ fontSize: 11, fontWeight: '800', color: effectiveColors.primary }}>Copy</Text>
-                  </TouchableOpacity>
-                )}
+                {/* Copy to Clipboard shortcut for Institute Explanations has been moved to modal */}
 
                 {/* Source metadata — institute, program, test, source info */}
                 {showExplanation && selectedExplSource !== 'my_note' && (

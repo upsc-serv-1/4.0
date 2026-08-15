@@ -3126,11 +3126,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                   }}
                   onLabelActionPress={(mic) => {
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                    if (isPrelims) {
-                      handleHeatmapPress(mic, { subject: pilotSubject, section: pilotSectionGroup || undefined, micro: mic });
-                    } else {
-                      selectMicroTopic(mic === pilotMicro ? null : mic);
-                    }
+                    handleHeatmapPress(mic, { subject: pilotSubject, section: pilotSectionGroup || undefined, micro: mic });
                   }}
                   onYearPress={(year) => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -3162,11 +3158,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                   }}
                   onLabelActionPress={(sub) => {
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                    if (isMains) {
-                      handleHeatmapPress(sub, { subject: pilotSubject, section: pilotSectionGroup || undefined, micro: pilotMicro || undefined, subtopic: sub });
-                    } else {
-                      selectSubtopic(sub === pilotSubtopic ? null : sub);
-                    }
+                    handleHeatmapPress(sub, { subject: pilotSubject, section: pilotSectionGroup || undefined, micro: pilotMicro || undefined, subtopic: sub });
                   }}
                   onYearPress={(year) => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

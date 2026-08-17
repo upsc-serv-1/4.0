@@ -1,0 +1,70 @@
+## ANSWER
+| **Approach:** <br> <br> • Intro: Fission track dating development.  Body: Principles, procedure, applications in archaeology, advantages, and limitations.  Conclusion: Extends dating beyond radiocarbon, crucial for deep prehistory timelines. |
+| --- |
+
+**INTRODUCTION:Fission Track Dating (FTD)** is a **radiometric dating technique** developed independently by **Price and Walker (1963)** and **Fleischer, Price and Walker (1965)**, the method has become an important tool in geology, archaeology and paleoanthropology, particularly for dating volcanic deposits associated with early human fossils.
+
+**BODY:**
+
+## Subheading 1 - Fission track datingI. Principle of Fission Track Dating
+
+- Uranium-238 occasionally undergoes **spontaneous fission** instead of alpha decay.
+        • The fission fragments are highly energetic and leave behind **linear damage tracks** in the mineral lattice.<br>
+        • These tracks accumulate in proportion to the uranium content and the passage of time.<br>
+        • By revealing, counting, and calibrating these tracks against uranium concentration, the sample's geological or archaeological age can be calculated.<br>
+
+**II. Procedure and Materials** 1. **Sample selection:** Suitable minerals and materials include zircon, apatite, sphene (titanite), volcanic glass, and obsidian artefacts.
+
+2. **Etching:** Samples are polished and etched with acid (e.g., hydrofluoric acid for zircon) to make tracks visible.
+
+3. **Microscopy:** Tracks are counted under an optical microscope.
+
+4. **Uranium estimation:** Achieved through neutron irradiation or mass spectrometry.
+
+5. **Age determination:** Age = track density ÷ uranium concentration × decay constant. **III. Chronological Range and Accuracy** - Effective range: **~100,000 years to >400 million years** .<br>
+        • Accuracy: Generally within ±10–20%, depending on uranium content, preservation, and thermal history.<br>
+        • Works across a timescale far beyond radiocarbon dating, making it crucial for deep prehistory.<br>
+
+## Subheading 2 - Applications in Anthropology and Archaeology
+
+1. **Dating Hominin Sites:** East African Rift Valley: Fission track dating of volcanic tuffs around **Koobi Fora, Olduvai Gorge, and Hadar** constrained ages of Australopithecus and Homo fossils. India: Used in the **Siwalik Hills and Narmada Basin** to date Middle–Late Pleistocene deposits containing hominin fossils.
+
+2. **Archaeological Contexts:** Dating obsidian artefacts (microliths, blades) — both their age and their geological source — helps reconstruct prehistoric **trade and exchange networks** . At sites in Turkey and the Near East, obsidian sourcing via fission tracks has shown long-distance trade in Neolithic times.
+
+3. **Volcanic and Geological Applications:** Dating volcanic eruptions that formed cultural horizons. Example: Dating the **Campanian Ignimbrite eruption (~39,000 years ago)**, which influenced Neanderthal survival in Europe.
+
+4. **Tectonics and Landscape Evolution:** Used in **Himalayan uplift studies** to reconstruct erosion rates, which indirectly affected river systems and settlement patterns. Understanding landscape history aids anthropologists in reconstructing dispersals and ecological niches of early humans.
+
+## Subheading 3 - Advantages
+
+-**Wide range:** Effective over hundreds of millions of years.<br>
+        • **Versatility:** Can be applied to volcanic glass, obsidian tools, and fossil-bearing sediments.<br>
+        • **Bridges dating gap:** Useful where radiocarbon and potassium-argon are less effective.<br>
+        • **Cross-checking:** Often combined with Ar–Ar and U-series dating to strengthen chronologies.<br>
+        • **Direct relation to human past:** Crucial for obsidian tool trade, volcanic contexts of hominin sites, and tectonic reconstructions.<br>
+
+## Subheading 4 - Limitations / Drawbacks
+
+1. **Thermal sensitivity:** Fission tracks anneal (fade) if the mineral is exposed to high temperatures (>200°C), resetting the clock. This complicates interpretation.
+
+2. **Precision issues:** Less precise than radiocarbon or uranium-series dating; errors may reach ±20%.
+
+3. **Sample constraints:** Requires uranium-bearing minerals; not applicable to all archaeological materials.
+
+4. **Complex laboratory requirements:** Etching, irradiation, and microscopy require specialised labs and training.
+
+5. **Calibration challenges:** Uranium distribution within a sample may be uneven, introducing uncertainty.
+
+6. **Not effective for young samples (<100,000 years):** Tracks may be too few to detect reliably.
+
+**CONCLUSION:**
+
+ Despite certain limitations, it continues to play a significant role in reconstructing the evolutionary history of humankind and the chronology of prehistoric cultures.
+
+**Words: 602**
+
+---
+
+---
+
+---

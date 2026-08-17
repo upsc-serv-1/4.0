@@ -27,6 +27,43 @@ export async function pickAndCompress(): Promise<string | null> {
 export async function uploadCompressedImage(localUri: string, userId: string = 'public'): Promise<string> {
   const provider = await StorageConfig.getStorageProvider();
 
+  if (provider === 'cloudflare_edge') {
+    try {
+      // 1. Ask Edge Function for Pre-signed URL
+      const fileName = localUri.split('/').pop() || `image_${Date.now()}.jpg`;
+      const { data, error } = await supabase.functions.invoke('r2-presigned-url', {
+        body: { fileName, contentType: 'image/jpeg', userId },
+      });
+
+      if (error) throw error;
+      if (!data || !data.uploadUrl) throw new Error("No upload URL returned");
+
+      // 2. Fetch local image file
+      const response = await fetch(localUri);
+      const fileBlob = await response.blob();
+
+      // 3. Upload directly to Cloudflare R2 using the presigned URL
+      const uploadRes = await fetch(data.uploadUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'image/jpeg',
+        },
+        body: fileBlob,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error(`R2 Upload failed: ${uploadRes.status} ${uploadRes.statusText}`);
+      }
+
+      // 4. Return the public URL
+      return data.publicUrl;
+    } catch (err: any) {
+      console.error('Cloudflare Edge upload error:', err);
+      Alert.alert('Secure Upload Failed', `${err.message}\n\nUploading to Supabase fallback.`);
+      // Fallback to Supabase
+    }
+  }
+
   if (provider === 'cloudflare') {
     const cfConfig = await StorageConfig.getCloudflareConfig();
     if (!cfConfig || !cfConfig.accountId || !cfConfig.accessKeyId || !cfConfig.secretAccessKey || !cfConfig.bucketName) {

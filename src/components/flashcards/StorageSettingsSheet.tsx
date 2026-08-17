@@ -79,7 +79,11 @@ export function StorageSettingsSheet({
 
       Alert.alert(
         'Storage Provider Saved',
-        `Image uploads will now use ${provider === 'cloudflare' ? 'Cloudflare R2' : 'Supabase Storage'}.`
+        `Image uploads will now use ${
+          provider === 'cloudflare' ? 'Cloudflare R2 (App Direct)' 
+          : provider === 'cloudflare_edge' ? 'Cloudflare R2 (Edge Secure)' 
+          : 'Supabase Storage'
+        }.`
       );
       onClose();
     } catch (err: any) {
@@ -124,7 +128,7 @@ export function StorageSettingsSheet({
               {provider === 'supabase' && <Check size={20} color={colors.primary} />}
             </TouchableOpacity>
 
-            {/* Provider Option 2: Cloudflare R2 */}
+            {/* Provider Option 2: Cloudflare R2 (Direct) */}
             <TouchableOpacity
               onPress={() => setProvider('cloudflare')}
               style={[
@@ -136,14 +140,33 @@ export function StorageSettingsSheet({
                 <Cloud size={22} color={provider === 'cloudflare' ? colors.primary : colors.textTertiary} />
               </View>
               <View style={s.providerTextWrap}>
-                <Text style={s.providerTitle}>Cloudflare R2 Storage</Text>
-                <Text style={s.providerSub}>Zero egress fees, ultra-fast global CDN</Text>
+                <Text style={s.providerTitle}>Cloudflare R2 (Direct App)</Text>
+                <Text style={s.providerSub}>Requires secret keys on device</Text>
               </View>
               {provider === 'cloudflare' && <Check size={20} color={colors.primary} />}
             </TouchableOpacity>
 
+            {/* Provider Option 3: Cloudflare R2 (Edge Secure) */}
+            <TouchableOpacity
+              onPress={() => setProvider('cloudflare_edge')}
+              style={[
+                s.providerCard,
+                provider === 'cloudflare_edge' && s.providerCardActive,
+                { marginTop: 12 }
+              ]}
+            >
+              <View style={s.providerIconWrap}>
+                <ShieldCheck size={22} color={provider === 'cloudflare_edge' ? colors.primary : colors.textTertiary} />
+              </View>
+              <View style={s.providerTextWrap}>
+                <Text style={s.providerTitle}>Cloudflare R2 (Secure Edge)</Text>
+                <Text style={s.providerSub}>Uses Pre-signed URLs via Supabase Edge Function</Text>
+              </View>
+              {provider === 'cloudflare_edge' && <Check size={20} color={colors.primary} />}
+            </TouchableOpacity>
+
             {/* Cloudflare R2 Config Inputs */}
-            {provider === 'cloudflare' && (
+            {(provider === 'cloudflare') && (
               <View style={s.cfConfigContainer}>
                 <View style={s.cfHeader}>
                   <Key size={16} color={colors.primary} />

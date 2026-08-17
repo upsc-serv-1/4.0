@@ -339,7 +339,11 @@ export default function NewCard() {
             >
               <Server size={12} color={colors.primary} />
               <Text style={[s.storagePillText, { color: colors.textPrimary }]}>
-                {activeStorageProvider === 'cloudflare' ? 'Cloudflare R2' : 'Supabase'}
+                {activeStorageProvider === 'cloudflare_edge'
+                  ? 'R2 Edge'
+                  : activeStorageProvider === 'cloudflare'
+                  ? 'Cloudflare R2'
+                  : 'Supabase'}
               </Text>
             </TouchableOpacity>
           </View>

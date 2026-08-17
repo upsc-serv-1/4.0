@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type StorageProvider = 'supabase' | 'cloudflare';
+export type StorageProvider = 'supabase' | 'cloudflare' | 'cloudflare_edge';
 
 export interface CloudflareR2Config {
   accountId: string;
@@ -18,6 +18,7 @@ export const StorageConfig = {
     try {
       const val = await AsyncStorage.getItem(STORAGE_PROVIDER_KEY);
       if (val === 'cloudflare') return 'cloudflare';
+      if (val === 'cloudflare_edge') return 'cloudflare_edge';
       return 'supabase';
     } catch {
       return 'supabase';

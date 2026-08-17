@@ -59,8 +59,19 @@ export default function MicrotopicScreen() {
   const isRecursive = recursive === '1';
 
   const [loading, setLoading] = useState(true);
+  const [showSkeleton, setShowSkeleton] = useState(false);
   const [cards, setCards] = useState<CardItem[]>([]);
   const [stats, setStats] = useState<Stats>({ for_today: 0, not_studied: 0, learning: 0, mastered: 0, total: 0 });
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (loading && cards.length === 0) {
+      timer = setTimeout(() => setShowSkeleton(true), 150);
+    } else {
+      setShowSkeleton(false);
+    }
+    return () => clearTimeout(timer);
+  }, [loading, cards.length]);
 
   const [sortBy, setSortBy] = useState<SortKey>('newest');
   const [filter, setFilter] = useState<FilterValue>(EMPTY_FILTER);
@@ -106,39 +117,67 @@ export default function MicrotopicScreen() {
           const offlineById = new Map(offlineCards.filter((c: any) => idSet.has(c.id)).map((c: any) => [c.id, c]));
           const missingIds = cardIds.filter((id) => !offlineById.has(id));
 
-          // 🔌 OFFLINE GUARD: When offline, skip the Supabase `cards` fetch entirely.
-          const fetchedCards: any[] = [];
-          if (missingIds.length > 0) {
-            if (NetworkStatus.isOffline()) {
-              logDiagEvent('MicrotopicScreen.loadAll', 'offline_cards_fetch_skipped',
-                `Skipping fetch for ${missingIds.length} missing cards while offline (branch=${branchId})`);
-            } else {
+          // Render what we have in cache immediately
+          baseCards = cardIds.map(id => offlineById.get(id)).filter(Boolean);
+          
+          const progressMap = new Map<string, any>();
+          let progress = ((OfflineManager as any).getCollectionSync('user_cards', uid) ?? [])
+            .filter((p: any) => p.user_id === uid && idSet.has(p.card_id));
+          progress?.forEach((p: any) => progressMap.set(p.card_id, p));
+
+          const merged: CardItem[] = baseCards.map((bc: any) => {
+            const p = progressMap.get(bc.id);
+            return {
+              id: bc.id,
+              front_text: bc.front_text || bc.question_text || '',
+              back_text: bc.back_text || bc.answer_text || '',
+              status: p?.status || 'active',
+              learning_status: p?.learning_status || 'not_studied',
+              next_review: p?.next_review,
+              last_reviewed: p?.last_reviewed,
+              updated_at: p?.updated_at || bc.created_at,
+              interval_days: p?.interval_days,
+            };
+          }).filter(c => c.status !== 'deleted');
+          setCards(merged);
+          setLoading(false); // 🔥 Instant UI! No skeleton!
+
+          // 🔌 BACKGROUND: Fetch missing cards from Supabase without blocking UI
+          if (missingIds.length > 0 && NetworkStatus.isOnline()) {
+            Promise.resolve().then(async () => {
+              const fetchedCards: any[] = [];
               const CHUNK = 200;
               for (let i = 0; i < missingIds.length; i += CHUNK) {
                 const slice = missingIds.slice(i, i + CHUNK);
-                const { data, error } = await supabase
-                  .from('cards')
-                  .select('*')
-                  .in('id', slice)
-                  .eq('is_deleted', false);
-                if (error) {
-                  logDiagEvent('MicrotopicScreen.loadAll', 'offline_cards_fetch_fail',
-                    `slice error for cards: ${error.message}`);
-                  throw error;
-                }
+                const { data } = await supabase.from('cards').select('*').in('id', slice).eq('is_deleted', false);
                 fetchedCards.push(...(data ?? []));
               }
-            }
+              if (fetchedCards.length > 0) {
+                setCards(prevCards => {
+                  const newMerged = [...prevCards];
+                  fetchedCards.forEach((c: any) => {
+                    if (!newMerged.find(pc => pc.id === c.id)) {
+                      const p = progressMap.get(c.id);
+                      newMerged.push({
+                        id: c.id,
+                        front_text: c.front_text || c.question_text || '',
+                        back_text: c.back_text || c.answer_text || '',
+                        status: p?.status || 'active',
+                        learning_status: p?.learning_status || 'not_studied',
+                        next_review: p?.next_review,
+                        last_reviewed: p?.last_reviewed,
+                        updated_at: p?.updated_at || c.created_at,
+                        interval_days: p?.interval_days,
+                      });
+                    }
+                  });
+                  const orderMap = new Map(cardIds.map((id, idx) => [id, idx]));
+                  newMerged.sort((a, b) => (orderMap.get(a.id) ?? 9999) - (orderMap.get(b.id) ?? 9999));
+                  return newMerged;
+                });
+              }
+            });
           }
-
-          const mergedById = new Map<string, any>();
-          Array.from(offlineById.entries()).forEach(([k, v]) => mergedById.set(k, v));
-          fetchedCards.forEach((c: any) => mergedById.set(c.id, c));
-
-          // Preserve branch order so the newest inserted card appears deterministically.
-          baseCards = cardIds
-            .map((id) => mergedById.get(id))
-            .filter(Boolean);
         }
       } else {
         // Legacy subject/section/microtopic mode
@@ -148,32 +187,30 @@ export default function MicrotopicScreen() {
             ? c.section_group === section
             : !c.section_group || c.section_group === 'General');
         cardIds = baseCards.map(c => c.id);
+        
+        const cardIdSet = new Set(cardIds);
+        const progressMap = new Map<string, any>();
+        let progress = ((OfflineManager as any).getCollectionSync('user_cards', uid) ?? [])
+          .filter((p: any) => p.user_id === uid && cardIdSet.has(p.card_id));
+        progress?.forEach((p: any) => progressMap.set(p.card_id, p));
+
+        const merged: CardItem[] = baseCards.map((bc: any) => {
+          const p = progressMap.get(bc.id);
+          return {
+            id: bc.id,
+            front_text: bc.front_text || bc.question_text || '',
+            back_text: bc.back_text || bc.answer_text || '',
+            status: p?.status || 'active',
+            learning_status: p?.learning_status || 'not_studied',
+            next_review: p?.next_review,
+            last_reviewed: p?.last_reviewed,
+            updated_at: p?.updated_at || bc.created_at,
+            interval_days: p?.interval_days,
+          };
+        }).filter(c => c.status !== 'deleted');
+        setCards(merged);
+        setLoading(false); // 🔥 Instant UI
       }
-
-      const cardIdSet = new Set(cardIds);
-      // Show from local cache immediately
-      let progress = ((OfflineManager as any).getCollectionSync('user_cards', uid) ?? [])
-        .filter((p: any) => p.user_id === uid && cardIdSet.has(p.card_id));
-
-      const progressMap = new Map<string, any>();
-      progress?.forEach((p: any) => progressMap.set(p.card_id, p));
-
-      const merged: CardItem[] = baseCards.map((bc: any) => {
-        const p = progressMap.get(bc.id);
-        return {
-          id: bc.id,
-          front_text: bc.front_text || bc.question_text || '',
-          back_text: bc.back_text || bc.answer_text || '',
-          status: p?.status || 'active',
-          learning_status: p?.learning_status || 'not_studied',
-          next_review: p?.next_review,
-          last_reviewed: p?.last_reviewed,
-          updated_at: p?.updated_at || bc.created_at,
-          interval_days: p?.interval_days,
-        };
-      }).filter(c => c.status !== 'deleted');
-      setCards(merged);
-      setLoading(false); // Show cached data immediately
 
       // Background: fetch fresh progress from Supabase and update silently
       if (cardIds.length > 0 && NetworkStatus.isOnline()) {
@@ -187,33 +224,25 @@ export default function MicrotopicScreen() {
             if (!progressErr && freshProgress) {
               const freshMap = new Map<string, any>();
               freshProgress.forEach((p: any) => freshMap.set(p.card_id, p));
-              const updatedCards: CardItem[] = baseCards.map((bc: any) => {
-                const fresh = freshMap.get(bc.id);
-                const local = progressMap.get(bc.id);
-                
-                let p = local;
+              setCards(prevCards => prevCards.map(c => {
+                const fresh = freshMap.get(c.id);
                 if (fresh) {
-                  // Only accept server data if it's genuinely newer or we have no local cache
-                  const localTime = local?.updated_at ? new Date(local.updated_at).getTime() : 0;
-                  const freshTime = fresh?.updated_at ? new Date(fresh.updated_at).getTime() : 0;
-                  if (!local || freshTime >= localTime) {
-                    p = fresh;
+                  const localTime = c.updated_at ? new Date(c.updated_at).getTime() : 0;
+                  const freshTime = fresh.updated_at ? new Date(fresh.updated_at).getTime() : 0;
+                  if (freshTime >= localTime) {
+                    return {
+                      ...c,
+                      status: fresh.status || 'active',
+                      learning_status: fresh.learning_status || 'not_studied',
+                      next_review: fresh.next_review,
+                      last_reviewed: fresh.last_reviewed,
+                      updated_at: fresh.updated_at || c.updated_at,
+                      interval_days: fresh.interval_days,
+                    };
                   }
                 }
-
-                return {
-                  id: bc.id,
-                  front_text: bc.front_text || bc.question_text || '',
-                  back_text: bc.back_text || bc.answer_text || '',
-                  status: p?.status || 'active',
-                  learning_status: p?.learning_status || 'not_studied',
-                  next_review: p?.next_review,
-                  last_reviewed: p?.last_reviewed,
-                  updated_at: p?.updated_at || bc.created_at,
-                  interval_days: p?.interval_days,
-                };
-              }).filter(c => c.status !== 'deleted');
-              setCards(updatedCards);
+                return c;
+              }));
             }
           }).catch(() => {});
       }
@@ -285,30 +314,37 @@ export default function MicrotopicScreen() {
 
     const now = new Date();
     const reviewDate = new Date(c.next_review);
-    
-    // Normalize to midnight to compare days easily
-    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    const reviewMidnight = new Date(reviewDate.getFullYear(), reviewDate.getMonth(), reviewDate.getDate()).getTime();
-    
-    const dayMs = 24 * 60 * 60 * 1000;
-    const diffDays = Math.round((reviewMidnight - todayMidnight) / dayMs);
-    
-    if (diffDays === 0) {
-      return 'Today';
-    } else if (diffDays === 1) {
-      return 'in 1 day';
-    } else if (diffDays > 1) {
-      if (diffDays < 30) return `in ${diffDays} days`;
-      const months = Math.round(diffDays / 30);
-      if (months < 12) return `in ${months} months`;
-      return `in ${Math.round(diffDays/365)} years`;
-    } else {
-      // diffDays < 0
-      const overdueDays = Math.abs(diffDays);
+    const diffMs = reviewDate.getTime() - now.getTime();
+
+    if (diffMs <= 0) {
+      const overdueDays = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60 * 24));
+      if (overdueDays === 0) {
+        const overdueHours = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60));
+        const overdueMins = Math.floor((Math.abs(diffMs) % (1000 * 60 * 60)) / (1000 * 60));
+        if (overdueHours > 0) return `Overdue ${overdueHours}h ${overdueMins}m`;
+        if (overdueMins > 0) return `Overdue ${overdueMins}m`;
+        return 'Due now';
+      }
       if (overdueDays < 30) return `Overdue ${overdueDays}d`;
       const months = Math.round(overdueDays / 30);
       if (months < 12) return `Overdue ${months}mo`;
-      return `Overdue ${Math.round(overdueDays/365)}y`;
+      return `Overdue ${Math.round(overdueDays / 365)}y`;
+    }
+
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays === 0) {
+      const hours = Math.floor(diffMs / (1000 * 60 * 60));
+      const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      if (hours > 0) return `in ${hours}h ${mins}m`;
+      return `in ${mins}m`;
+    } else if (diffDays === 1) {
+      return 'in 1 day';
+    } else if (diffDays < 30) {
+      return `in ${diffDays} days`;
+    } else {
+      const months = Math.round(diffDays / 30);
+      if (months < 12) return `in ${months} months`;
+      return `in ${Math.round(diffDays / 365)} years`;
     }
   };
 
@@ -506,18 +542,18 @@ export default function MicrotopicScreen() {
             </View>
           }
           ListEmptyComponent={
-            loading ? (
+            showSkeleton ? (
               <View style={{ gap: 10 }}>
                 {[1, 2, 3].map((key) => (
                   <SkeletonCard key={key} style={{ backgroundColor: colors.surface, borderColor: colors.border, padding: 14, borderRadius: 16, borderWidth: 1, marginBottom: 10 }} />
                 ))}
               </View>
-            ) : (
+            ) : !loading && cards.length === 0 ? (
               <View style={{ alignItems: 'center', marginTop: 60 }}>
                 <BookOpen size={48} color={colors.border} />
                 <Text style={{ color: colors.textTertiary, marginTop: 12 }}>No cards match your filter</Text>
               </View>
-            )
+            ) : null
           }
           ListFooterComponent={<View style={{ height: 100 }} />}
         />
@@ -551,6 +587,8 @@ export default function MicrotopicScreen() {
           subject={String(subject || '')}
           section={String(section || '')}
           microtopic={String(microtopic || '')}
+          branchId={branchId ? String(branchId) : null}
+          branchName={branchName ? String(branchName) : null}
           onClose={() => setAlgoModal(false)}
           onSaved={loadAll}
         />

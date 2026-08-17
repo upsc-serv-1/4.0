@@ -403,20 +403,27 @@ export class BranchSvc {
   }
 
   static async listCardIdsInBranch(branchId: string, opts: { recursive?: boolean; userId?: string } = {}): Promise<string[]> {
-    // OFFLINE: read from OfflineManager cache
-    if (NetworkStatus.isOffline()) {
-      try {
-        const allLinks = OfflineManager.getCollectionSync('flashcard_branch_cards') as any[] || [];
-        const filtered = allLinks.filter((r: any) => r.branch_id === branchId).map((r: any) => r.card_id);
-        logDiagEvent('BranchService.listCardIdsInBranch', 'offline_cache_hit',
-          `Returning ${filtered.length} card IDs from cache for branch=${branchId}`);
-        return filtered;
-      } catch (e) {
-        logDiagEvent('BranchService.listCardIdsInBranch', 'offline_cache_error',
-          `Cache read failed: ${(e as Error).message}`);
-        return [];
+    // 1. CACHE-FIRST
+    try {
+      const allLinks = OfflineManager.getCollectionSync('flashcard_branch_cards', opts.userId) as any[];
+      if (allLinks && allLinks.length > 0) {
+        let targetIds = [branchId];
+        if (opts.recursive && opts.userId) {
+          const cachedBranches = OfflineManager.getCollectionSync('flashcard_branches') as any[] || [];
+          if (cachedBranches.length > 0) {
+            const descIds = this.collectDescendantIds(cachedBranches, branchId);
+            targetIds = [branchId, ...descIds];
+          }
+        }
+        const targetSet = new Set(targetIds);
+        const filtered = allLinks.filter((r: any) => targetSet.has(r.branch_id)).map((r: any) => r.card_id);
+        return Array.from(new Set(filtered));
       }
-    }
+    } catch (e) {}
+
+    // 2. NETWORK FALLBACK
+    if (NetworkStatus.isOffline()) return [];
+
     if (!opts.recursive) {
       const { data, error } = await supabase
         .from('flashcard_branch_cards')
@@ -425,12 +432,14 @@ export class BranchSvc {
       if (error) throw error;
       return (data ?? []).map((r: any) => r.card_id);
     }
-    // Recursive: first get all descendant branch ids
+    
+    // Recursive network fetch
     if (!opts.userId) throw new Error('userId required for recursive branch card fetch');
     const branches = await this.listAll(opts.userId);
     const descIds = this.collectDescendantIds(branches, branchId);
     const targetIds = [branchId, ...descIds];
     if (targetIds.length === 0) return [];
+    
     const { data, error } = await supabase
       .from('flashcard_branch_cards')
       .select('card_id')

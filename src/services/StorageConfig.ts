@@ -18,10 +18,10 @@ export const StorageConfig = {
     try {
       const val = await AsyncStorage.getItem(STORAGE_PROVIDER_KEY);
       if (val === 'cloudflare') return 'cloudflare';
-      if (val === 'cloudflare_edge') return 'cloudflare_edge';
-      return 'supabase';
+      if (val === 'supabase') return 'supabase';
+      return 'cloudflare_edge';
     } catch {
-      return 'supabase';
+      return 'cloudflare_edge';
     }
   },
 

@@ -23,14 +23,16 @@ export interface FolderSettingsRow {
   updated_at?: string;
 }
 
-export function makeFolderKey(subject?: string | null, section?: string | null, microtopic?: string | null): FolderKey {
+export function makeFolderKey(subject?: string | null, section?: string | null, microtopic?: string | null, branchId?: string | null): FolderKey {
+  if (branchId) return `branch:${branchId}`;
   const parts = [subject, section, microtopic].filter(Boolean) as string[];
   return parts.join('|');
 }
 
 /** Return the chain from most-specific to least-specific (ends with ""/GLOBAL). */
-export function folderChain(subject?: string | null, section?: string | null, microtopic?: string | null): FolderKey[] {
+export function folderChain(subject?: string | null, section?: string | null, microtopic?: string | null, branchId?: string | null): FolderKey[] {
   const chain: FolderKey[] = [];
+  if (branchId) chain.push(`branch:${branchId}`);
   if (subject && section && microtopic) chain.push(`${subject}|${section}|${microtopic}`);
   if (subject && section) chain.push(`${subject}|${section}`);
   if (subject) chain.push(subject);
@@ -85,13 +87,14 @@ export class FolderSettingsSvc {
     userId: string,
     subject?: string | null,
     section?: string | null,
-    microtopic?: string | null
+    microtopic?: string | null,
+    branchId?: string | null
   ): Promise<AlgorithmSettings> {
     const rows = await this.listAll(userId);
     const map = new Map<FolderKey, FolderSettingsRow>();
     rows.forEach(r => map.set(r.folder_key, r));
 
-    const chain = folderChain(subject, section, microtopic);
+    const chain = folderChain(subject, section, microtopic, branchId);
     // Start with DEFAULTS, then apply from least-specific to most-specific.
     let merged: AlgorithmSettings = { ...DEFAULT_SETTINGS };
     const reversed = [...chain].reverse(); // global first, then subject, then ...

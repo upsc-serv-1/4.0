@@ -13,6 +13,8 @@ interface Props {
   subject?: string | null;
   section?: string | null;
   microtopic?: string | null;
+  branchId?: string | null;
+  branchName?: string | null;
   onClose: () => void;
   onSaved?: () => void;
 }
@@ -32,14 +34,15 @@ const LABELS: { key: keyof AlgorithmSettings; label: string; hint: string; unit:
   { key: 'mastered_threshold',       label: 'Mastered threshold',        hint: 'Once interval ≥ this ⇒ card is mastered',             unit: 'days',  min: 14, max: 365 },
 ];
 
-function folderTitle(subject?: string|null, section?: string|null, microtopic?: string|null) {
+function folderTitle(subject?: string|null, section?: string|null, microtopic?: string|null, branchName?: string|null) {
+  if (branchName) return branchName;
   if (microtopic) return `${microtopic} (microtopic)`;
   if (section)    return `${section} (section)`;
   if (subject)    return `${subject} (subject)`;
   return 'Global defaults';
 }
 
-export function FolderAlgorithmModal({ visible, userId, subject, section, microtopic, onClose, onSaved }: Props) {
+export function FolderAlgorithmModal({ visible, userId, subject, section, microtopic, branchId, branchName, onClose, onSaved }: Props) {
   const { colors } = useTheme();
   const [loading, setLoading] = useState(false);
   const [resolved, setResolved] = useState<AlgorithmSettings>(DEFAULT_SETTINGS);
@@ -47,7 +50,7 @@ export function FolderAlgorithmModal({ visible, userId, subject, section, microt
   const [learningSteps, setLearningSteps] = useState<string>('1,10');
   const [relearningSteps, setRelearningSteps] = useState<string>('10');
 
-  const folderKey = makeFolderKey(subject, section, microtopic);
+  const folderKey = makeFolderKey(subject, section, microtopic, branchId);
 
   useEffect(() => {
     if (!visible || !userId) return;
@@ -55,7 +58,7 @@ export function FolderAlgorithmModal({ visible, userId, subject, section, microt
       setLoading(true);
       try {
         FolderSettingsSvc.invalidate(userId);
-        const eff = await FolderSettingsSvc.resolve(userId, subject, section, microtopic);
+        const eff = await FolderSettingsSvc.resolve(userId, subject, section, microtopic, branchId);
         setResolved(eff);
         const row = await FolderSettingsSvc.getRaw(userId, folderKey);
         const ov = (row?.settings || {}) as Partial<AlgorithmSettings>;
@@ -139,8 +142,8 @@ export function FolderAlgorithmModal({ visible, userId, subject, section, microt
         <Pressable style={[styles.sheet, { backgroundColor: colors.surface }]} onPress={(e) => e.stopPropagation()} testID="folder-algo-modal">
           <View style={styles.header}>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.titleSm, { color: colors.textTertiary }]}>Learning algorithm</Text>
-              <Text style={[styles.title, { color: colors.textPrimary }]}>{folderTitle(subject, section, microtopic)}</Text>
+              <Text style={{ fontSize: 13, color: colors.textSecondary, fontWeight: '500' }}>Algorithm overrides for:</Text>
+              <Text style={[styles.title, { color: colors.textPrimary }]}>{folderTitle(subject, section, microtopic, branchName)}</Text>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.iconBtn}><X size={22} color={colors.textPrimary} /></TouchableOpacity>
           </View>

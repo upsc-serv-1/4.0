@@ -25,6 +25,7 @@ import { useAuth } from '../src/context/AuthContext';
 import { useTheme } from '../src/context/ThemeContext';
 import { ThemeSwitcher } from '../src/components/ThemeSwitcher';
 import { PageWrapper } from '../src/components/PageWrapper';
+import { FolderAlgorithmModal } from '../src/components/flashcards/FolderAlgorithmModal';
 import { BranchSvc, BranchNode } from '../src/services/BranchService';
 import { DeckRow, type DeckRowAction } from '../src/components/flashcards/DeckRow';
 import { PremiumMoveModal } from '../src/components/flashcards/PremiumMoveModal';
@@ -61,6 +62,7 @@ function FlashcardsHub() {
   const [renameModal, setRenameModal] = useState<{ node: BranchNode } | null>(null);
   const [moveModal, setMoveModal] = useState<{ node: BranchNode } | null>(null);
   const [emptyCardModal, setEmptyCardModal] = useState<'due' | 'new' | null>(null);
+  const [algorithmModalVisible, setAlgorithmModalVisible] = useState(false);
   const [nameDraft, setNameDraft] = useState('');
 
   // Bulk Delete Selection
@@ -573,6 +575,9 @@ function FlashcardsHub() {
                 </Text>
               </View>
               <View style={styles.headerBtns}>
+                <TouchableOpacity onPress={() => setAlgorithmModalVisible(true)} style={styles.iconBtn}>
+                  <Settings size={22} color={colors.textPrimary} />
+                </TouchableOpacity>
                 <TouchableOpacity onPress={() => setSearchVisible(v => !v)} style={styles.iconBtn}>
                   <SearchIcon size={22} color={colors.textPrimary} />
                 </TouchableOpacity>
@@ -834,6 +839,12 @@ function FlashcardsHub() {
             sortBy: 'subject',
           }), [exportTitle])}
           hideSections={['content', 'answer', 'sort', 'filters']}
+        />
+
+        <FolderAlgorithmModal
+          visible={algorithmModalVisible}
+          userId={uid}
+          onClose={() => setAlgorithmModalVisible(false)}
         />
 
       </View>

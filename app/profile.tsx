@@ -57,7 +57,8 @@ import { useCourse } from '../src/context/CourseContext';
 import { AvatarPicker } from '../src/components/AvatarPicker';
 import { useAccessControl } from '../src/context/AccessControlContext';
 import { emitShowSubscription } from '../src/utils/subscriptionEvents';
-import { Crown } from 'lucide-react-native';
+import { Crown, Settings2 } from 'lucide-react-native';
+import { FolderAlgorithmModal } from '../src/components/flashcards/FolderAlgorithmModal';
 
 import { AVATARS } from '../src/constants/avatars';
 const AVATAR_MAP = Object.fromEntries(AVATARS.map(a => [a.id, a.uri]));
@@ -91,6 +92,7 @@ export default function Profile() {
   const [selectedAvatar, setSelectedAvatar] = useState(avatarId);
   const [layoutAdminVisible, setLayoutAdminVisible] = useState(false);
   const [analyticsLayout, setAnalyticsLayout] = useState(DEFAULT_ANALYTICS_LAYOUT);
+  const [algorithmModalVisible, setAlgorithmModalVisible] = useState(false);
   
   const ADMIN_EMAILS = [
     'your@email.com',
@@ -442,6 +444,7 @@ export default function Profile() {
 
         <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>SETTINGS</Text>
         <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
+          <Row testID="profile-algorithm" icon={<Settings2 color={colors.primary} size={20} />} label="Algorithm Defaults" sub="Set global spaced repetition rules" onPress={() => setAlgorithmModalVisible(true)} />
           <Row testID="profile-theme" icon={<Palette color={colors.primary} size={20} />} label="Zen Theme" sub="Change global appearance" onPress={() => router.push('/theme-preview')} />
           <Row testID="profile-tabs" icon={<LayoutList color={colors.primary} size={20} />} label="Customize Tabs" sub="Reorder bottom bar" onPress={() => router.push('/customize_tabs')} />
           <Row testID="profile-dedup" icon={<Layers color={colors.primary} size={20} />} label="Dedup Manager" sub="Smart-merge UPSC PYQs across institutes" onPress={() => router.push('/dedup-manager')} />
@@ -931,6 +934,13 @@ export default function Profile() {
           </View>
         </View>
       </Modal>
+
+      <FolderAlgorithmModal
+        visible={algorithmModalVisible}
+        userId={uid}
+        onClose={() => setAlgorithmModalVisible(false)}
+      />
+
     </PageWrapper>
   );
 }

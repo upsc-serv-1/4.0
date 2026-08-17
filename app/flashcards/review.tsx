@@ -28,6 +28,7 @@ import { parseImageUrls } from '../../src/utils/imageHelpers';
 import { BranchSvc, BranchNode } from '../../src/services/BranchService';
 import { PremiumMoveModal } from '../../src/components/flashcards/PremiumMoveModal';
 import { OfflineManager } from '../../src/services/OfflineManager';
+import { NetworkStatus } from '../../src/lib/networkStatus';
 import { buildCanonicalExplanations } from '../unified/engine';
 import { fetchBestAnswer, saveBestAnswer, BestAnswer } from '../../src/services/BestAnswerService';
 import { aiExplainQuestion, aiImproveAnswer, aiAskDoubt } from '../../src/services/GeminiService';
@@ -187,17 +188,29 @@ export default function ReviewScreen() {
         let row: any = userCards.find((u: any) => u.card_id === cardId);
         let c: any = allCards.find((card: any) => card.id === cardId);
 
-        if (!row || !c) {
-          const { data: remoteRow, error } = await supabase
-            .from('user_cards')
-            .select('*, cards!inner(*)')
-            .eq('user_id', uid).eq('card_id', cardId).maybeSingle();
-          if (error) throw error;
-          row = remoteRow;
-          c = (remoteRow as any)?.cards;
+        // If card not found in cache, fetch it
+        if (!c) {
+          const { data: remoteCard, error: cErr } = await supabase
+            .from('cards')
+            .select('*')
+            .eq('id', cardId)
+            .maybeSingle();
+          if (remoteCard) c = remoteCard;
         }
 
-        if (row && c) {
+        // If progress not found in cache, try fetching it
+        if (!row && NetworkStatus.isOnline()) {
+          const { data: remoteRow } = await supabase
+            .from('user_cards')
+            .select('*')
+            .eq('user_id', uid)
+            .eq('card_id', cardId)
+            .maybeSingle();
+          if (remoteRow) row = remoteRow;
+        }
+
+        if (c) {
+          const settings = await FolderSettingsSvc.resolve(uid!, c.subject, c.section_group, c.microtopic, branchId);
           cards = [{
             id: c.id,
             front_text: c.front_text || c.question_text || '',
@@ -207,15 +220,19 @@ export default function ReviewScreen() {
             card_type: c.card_type || 'qa', source: c.source || {},
             correct_answer: c.correct_answer,
             state: {
-              status: row.status, learning_status: row.learning_status,
-              next_review: row.next_review, last_reviewed: row.last_reviewed,
-              user_note: row.user_note,
-              repetitions: row.repetitions ?? 0, interval_days: row.interval_days ?? 0,
-              ease_factor: row.ease_factor ?? DEFAULT_SETTINGS.starting_ease,
-              lapses: row.lapses ?? 0, learning_step: row.learning_step ?? null,
-              is_relearning: row.is_relearning ?? false,
+              status: row?.status || 'active', 
+              learning_status: row?.learning_status || 'not_studied',
+              next_review: row?.next_review || null, 
+              last_reviewed: row?.last_reviewed || null,
+              user_note: row?.user_note || '',
+              repetitions: row?.repetitions ?? 0, 
+              interval_days: row?.interval_days ?? 0,
+              ease_factor: row?.ease_factor ?? settings.starting_ease,
+              lapses: row?.lapses ?? 0, 
+              learning_step: row?.learning_step ?? null,
+              is_relearning: row?.is_relearning ?? false,
             },
-            queue: 'learning',
+            queue: (row?.learning_status === 'not_studied' || !row) ? 'new' : 'learning',
           }];
         }
       } else if (branchId) {
@@ -259,7 +276,7 @@ export default function ReviewScreen() {
   }, [uid, subject, section, microtopic, cardId]);
 
   const updatePreview = useCallback(async (c: QueueCard) => {
-    const settings = await FolderSettingsSvc.resolve(uid!, c.subject, c.section_group, c.microtopic);
+    const settings = await FolderSettingsSvc.resolve(uid!, c.subject, c.section_group, c.microtopic, branchId);
     const p = previewAllGrades({
       ease_factor: c.state.ease_factor ?? settings.starting_ease,
       interval_days: c.state.interval_days ?? 0,
@@ -785,8 +802,8 @@ export default function ReviewScreen() {
           <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
             <ScrollView 
               ref={scrollViewRef}
-              style={{ flex: 1 }} 
-              contentContainerStyle={{ padding: 12, paddingBottom: 100 }}
+              style={{ flex: 1, width: '100%' }} 
+              contentContainerStyle={{ padding: 12, paddingBottom: 100, width: '100%', alignItems: 'center' }}
               showsVerticalScrollIndicator={false}
               maximumZoomScale={5}
               minimumZoomScale={1}
@@ -805,12 +822,11 @@ export default function ReviewScreen() {
               )}
               
               {parseImageUrls(currentCard.front_image_url).map((url, idx) => (
-                <TouchableOpacity key={url + idx} onPress={() => setZoomImageUrl(url)}>
+                <TouchableOpacity key={url + idx} activeOpacity={0.9} onPress={() => setZoomImageUrl(url)} style={{ width: '100%', alignItems: 'center', alignSelf: 'center' }}>
                   <Image 
                     source={{ uri: url }} 
                     contentFit="contain"
                     cachePolicy="memory-disk"
-                    transition={150}
                     style={{ width: '100%', height: 400, borderRadius: 12, marginBottom: 16 }} 
                   />
                 </TouchableOpacity>
@@ -868,12 +884,11 @@ export default function ReviewScreen() {
                   <View style={[styles.divider, { backgroundColor: colors.border, marginBottom: 24 }]} />
                   
                   {parseImageUrls(currentCard.back_image_url).map((url, idx) => (
-                    <TouchableOpacity key={url + idx} onPress={() => setZoomImageUrl(url)}>
+                    <TouchableOpacity key={url + idx} activeOpacity={0.9} onPress={() => setZoomImageUrl(url)} style={{ width: '100%', alignItems: 'center', alignSelf: 'center' }}>
                       <Image 
                         source={{ uri: url }} 
                         contentFit="contain"
                         cachePolicy="memory-disk"
-                        transition={150}
                         style={{ width: '100%', height: 400, borderRadius: 12, marginBottom: 20 }} 
                       />
                     </TouchableOpacity>
@@ -1435,7 +1450,7 @@ const styles = StyleSheet.create({
   headerRight: { flexDirection: 'row', alignItems: 'center' },
   progressPill: { paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20 },
   progressText: { fontSize: 14, fontWeight: '900' },
-  immersiveCard: { padding: 12, borderRadius: 28, minHeight: 400 },
+  immersiveCard: { padding: 16, borderRadius: 28, minHeight: 400, width: '100%', alignSelf: 'center' },
   sectionHeader: { alignItems: 'center', marginBottom: 16 },
   cardSideLabel: { fontSize: 10, fontWeight: '900', letterSpacing: 2, textAlign: 'center', color: '#8e8e93' },
   cardText: { fontWeight: '700', textAlign: 'left' },

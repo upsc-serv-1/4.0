@@ -134,7 +134,7 @@ export class FlashcardSvc {
    * Excludes: frozen, deleted, future-dated cards.
    */
   static async getStudyQueue(userId: string, folder: StudyQueueFolder = {}, opts: { limit?: number } = {}): Promise<QueueCard[]> {
-    const settings = await FolderSettingsSvc.resolve(userId, folder.subject, folder.section, folder.microtopic);
+    const settings = await FolderSettingsSvc.resolve(userId, folder.subject, folder.section, folder.microtopic, folder.branch_id);
     const nowIso = new Date().toISOString();
 
     // AnkiPro branch mode: resolve card_ids via flashcard_branch_cards (possibly recursive).
@@ -169,8 +169,8 @@ export class FlashcardSvc {
       // Offline cache failed, continue to network fallback
     }
 
-    // If offline cache returned nothing, try network
-    if (data.length === 0) {
+    // If offline cache returned nothing or is incomplete (e.g. missing card data), try network
+    if (data.length === 0 || (branchSet && data.length < branchSet.size)) {
       try {
         let query = supabase
           .from('user_cards')
@@ -309,7 +309,10 @@ export class FlashcardSvc {
           .eq('user_id', userId)
           .in('card_id', Array.from(branchSet));
         if (freshUserCards && freshUserCards.length > 0) {
-          data = freshUserCards;
+          const mergedMap = new Map(freshUserCards.map((r: any) => [r.card_id, r]));
+          // Local optimistic data wins over stale server data
+          data.forEach((r: any) => mergedMap.set(r.card_id, r));
+          data = Array.from(mergedMap.values());
         }
       } catch (e) {}
     }
@@ -355,11 +358,14 @@ export class FlashcardSvc {
       const reviews = ((OfflineManager as any).getCollectionSync('card_reviews', userId) ?? [])
         .filter((r: any) => r.user_id === userId && Number(r.prev_interval) === 0
           && r.reviewed_at && new Date(r.reviewed_at) >= startOfDay);
+      
+      const uniqueCardIds = Array.from(new Set(reviews.map((r: any) => r.card_id)));
+      
       // Filter by folder using the cached cards table.
       const cardsById = new Map(((OfflineManager as any).getCollectionSync('cards') ?? [])
         .map((c: any) => [c.id, c]));
-      const introducedToday = reviews.filter((r: any) => {
-        const c: any = cardsById.get(r.card_id);
+      const introducedToday = uniqueCardIds.filter((cardId: any) => {
+        const c: any = cardsById.get(cardId);
         if (!c || c.is_deleted) return false;
         if (folder.subject && c.subject !== folder.subject) return false;
         if (folder.section && folder.section !== 'General' && c.section_group !== folder.section) return false;
@@ -373,7 +379,7 @@ export class FlashcardSvc {
     try {
       let q = supabase
         .from('card_reviews')
-        .select('id, card_id, cards!inner(subject, section_group, microtopic)', { count: 'exact', head: true })
+        .select('card_id, cards!inner(subject, section_group, microtopic)')
         .eq('user_id', userId)
         .eq('prev_interval', 0)
         .eq('cards.is_deleted', false)
@@ -382,9 +388,11 @@ export class FlashcardSvc {
       if (folder.section && folder.section !== 'General') q = q.eq('cards.section_group', folder.section);
       if (folder.microtopic) q = q.eq('cards.microtopic', folder.microtopic);
 
-      const { count, error } = await q;
-      if (error) return settings.new_cards_per_day;
-      return Math.max(0, settings.new_cards_per_day - (count ?? 0));
+      const { data, error } = await q;
+      if (error || !data) return settings.new_cards_per_day;
+      
+      const uniqueCardIds = new Set(data.map((r: any) => r.card_id));
+      return Math.max(0, settings.new_cards_per_day - uniqueCardIds.size);
     } catch {
       return settings.new_cards_per_day;
     }

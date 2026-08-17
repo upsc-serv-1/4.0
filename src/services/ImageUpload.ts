@@ -11,14 +11,14 @@ export async function pickAndCompress(): Promise<string | null> {
 
   const res = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    quality: 0.8,
+    quality: 1.0,
   });
   if (res.canceled || !res.assets[0]) return null;
 
   const compressed = await ImageManipulator.manipulateAsync(
     res.assets[0].uri,
-    [{ resize: { width: 2048 } }],
-    { compress: 0.92, format: ImageManipulator.SaveFormat.JPEG }
+    [],
+    { compress: 1.0, format: ImageManipulator.SaveFormat.JPEG }
   );
 
   return compressed.uri;

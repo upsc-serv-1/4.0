@@ -149,7 +149,7 @@ export function DeckRow({ node, expanded, onToggle, onOpen, onAction, color }: P
                 {node.name}
               </Text>
               <Text style={[styles.subtitle, { color: colors.textTertiary }]}>
-                Cards for today: {node.due_count}/{node.total_count}
+                Due: {node.due_count} • New: {node.new_count} • Total: {node.total_count}
               </Text>
             </View>
             <ChevronRight size={20} color={colors.border} />

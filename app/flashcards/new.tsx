@@ -10,8 +10,8 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
-  Image,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import {
@@ -23,15 +23,24 @@ import {
   MapPin,
   Sparkles,
   Edit,
+  X,
+  ClipboardPaste,
+  Server,
 } from 'lucide-react-native';
+import * as Clipboard from 'expo-clipboard';
+import { DragDropContentView } from 'expo-drag-drop-content-view';
 import { useAuth } from '../../src/context/AuthContext';
 import { useTheme } from '../../src/context/ThemeContext';
 import { spacing, radius } from '../../src/theme';
 import { PageWrapper } from '../../src/components/PageWrapper';
-import { pickAndUploadFlashcardImage } from '../../src/services/ImageUpload';
+import { pickAndUploadFlashcardImage, uploadCompressedImage } from '../../src/services/ImageUpload';
+import { StorageConfig, StorageProvider } from '../../src/services/StorageConfig';
+import { StorageSettingsSheet } from '../../src/components/flashcards/StorageSettingsSheet';
 import { FlashcardSvc } from '../../src/services/FlashcardService';
+import { BranchSvc } from '../../src/services/BranchService';
 import { BranchPlacement } from '../../src/services/BranchPlacement';
 import { AddToFlashcardSheet } from '../../src/components/flashcards/AddToFlashcardSheet';
+import { parseImageUrls, serializeImageUrls } from '../../src/utils/imageHelpers';
 import { useFlashcardAI } from '../../src/hooks/useFlashcardAI';
 
 type DeckSelection = {
@@ -53,11 +62,35 @@ export default function NewCard() {
     branchName?: string;
     aiPrefilledContent?: string;
     mode?: 'ai' | 'manual';
+    cardId?: string;
   }>();
+
+  const editingCardId = params.cardId;
+  const isEditing = Boolean(editingCardId);
+  const [loadingCard, setLoadingCard] = useState(false);
+  const [originalBranchId, setOriginalBranchId] = useState<string | null>(null);
+
+  // Non-blocking toast notification state
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 2500);
+  };
 
   const [front, setFront] = useState('');
   const [back, setBack] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // Storage provider state
+  const [activeStorageProvider, setActiveStorageProvider] = useState<StorageProvider>('supabase');
+  const [storageSettingsVisible, setStorageSettingsVisible] = useState(false);
+
+  useEffect(() => {
+    StorageConfig.getStorageProvider().then(setActiveStorageProvider);
+  }, []);
 
   // AI-related state
   const { generateFlashcard, loading: aiGenerating, error: aiError } = useFlashcardAI();
@@ -65,10 +98,12 @@ export default function NewCard() {
   const [aiInput, setAiInput] = useState(params.aiPrefilledContent || '');
   const [aiLoading, setAiLoading] = useState(false);
 
-  const [frontImageUrl, setFrontImageUrl] = useState<string | null>(null);
-  const [backImageUrl, setBackImageUrl] = useState<string | null>(null);
+  const [frontImageUrls, setFrontImageUrls] = useState<string[]>([]);
+  const [backImageUrls, setBackImageUrls] = useState<string[]>([]);
   const [frontUploading, setFrontUploading] = useState(false);
   const [backUploading, setBackUploading] = useState(false);
+  const [isDraggingFront, setIsDraggingFront] = useState(false);
+  const [isDraggingBack, setIsDraggingBack] = useState(false);
 
   const [destination, setDestination] = useState<DeckSelection | null>(null);
   const [destinationPicker, setDestinationPicker] = useState(false);
@@ -79,20 +114,39 @@ export default function NewCard() {
     microtopic: String(params.microtopic || 'General'),
   }), [params.subject, params.section, params.microtopic]);
 
-  // Auto-populate destination from branchId if coming from inside a deck
-  React.useEffect(() => {
-    if (params.branchId && params.branchName) {
-      setDestination({
-        id: String(params.branchId),
-        name: String(params.branchName),
-        path: String(params.branchName),
-      });
-    }
-  }, [params.branchId, params.branchName]);
-  
+  // Load existing card details if editing
+  useEffect(() => {
+    if (!editingCardId || !uid) return;
+    (async () => {
+      setLoadingCard(true);
+      try {
+        const c = await FlashcardSvc.getCardDetails(editingCardId);
+        if (c) {
+          setFront(c.front_text || c.question_text || '');
+          setBack(c.back_text || c.answer_text || '');
+          setFrontImageUrls(parseImageUrls(c.front_image_url));
+          setBackImageUrls(parseImageUrls(c.back_image_url));
+        }
+        const branch = await BranchSvc.getBranchForCard(uid, editingCardId);
+        if (branch) {
+          setOriginalBranchId(branch.id);
+          setDestination({
+            id: branch.id,
+            name: branch.name,
+            path: branch.name,
+          });
+        }
+      } catch (e: any) {
+        console.error('Failed to load card details for edit:', e);
+      } finally {
+        setLoadingCard(false);
+      }
+    })();
+  }, [editingCardId, uid]);
+
   // Auto-populate destination from branchId if coming from inside a deck
   useEffect(() => {
-    if (params.branchId && params.branchName) {
+    if (params.branchId && params.branchName && !destination) {
       const path = params.branchName ? String(params.branchName) : '';
       setDestination({
         id: String(params.branchId),
@@ -126,26 +180,118 @@ export default function NewCard() {
     }
   };
 
+  const handlePasteClipboardImage = async (side: 'front' | 'back') => {
+    if (!uid) return;
+    try {
+      const hasImage = await Clipboard.hasImageAsync();
+      if (!hasImage) {
+        Alert.alert('No Image in Clipboard', 'Copy an image from Photos or browser first, then tap Paste.');
+        return;
+      }
+      if (side === 'front') setFrontUploading(true);
+      else setBackUploading(true);
+
+      const image = await Clipboard.getImageAsync({ format: 'jpeg' });
+      if (image?.data) {
+        let uri = image.data;
+        if (!uri.startsWith('file://') && !uri.startsWith('http') && !uri.startsWith('data:')) {
+          uri = `data:image/jpeg;base64,${uri}`;
+        }
+        const url = await uploadCompressedImage(uri, uid);
+        if (url) {
+          if (side === 'front') setFrontImageUrls(prev => [...prev, url]);
+          else setBackImageUrls(prev => [...prev, url]);
+        }
+      }
+    } catch (err: any) {
+      console.error('Clipboard paste error:', err);
+      Alert.alert('Paste Error', err.message || 'Could not paste image from clipboard.');
+    } finally {
+      if (side === 'front') setFrontUploading(false);
+      else setBackUploading(false);
+    }
+  };
+
+  // Quick paste: auto-detect which side needs the image
+  const handleQuickPaste = async () => {
+    if (!uid) return;
+    const targetSide: 'front' | 'back' = frontImageUrls.length === 0 ? 'front' : (backImageUrls.length === 0 ? 'back' : 'front');
+    await handlePasteClipboardImage(targetSide);
+  };
+
+  // Handle dropped image from iPadOS Photos/Files drag-and-drop
+  const handleDroppedAssets = async (assets: any[], side: 'front' | 'back') => {
+    if (!uid || !assets || assets.length === 0) return;
+    if (side === 'front') setIsDraggingFront(false);
+    else setIsDraggingBack(false);
+
+    const asset = assets[0];
+    const uri = asset.uri || asset.path;
+    if (!uri) return;
+
+    if (side === 'front') setFrontUploading(true);
+    else setBackUploading(true);
+    try {
+      const url = await uploadCompressedImage(uri, uid);
+      if (url) {
+        if (side === 'front') setFrontImageUrls(prev => [...prev, url]);
+        else setBackImageUrls(prev => [...prev, url]);
+      }
+    } catch (err: any) {
+      console.error('Drop upload error:', err);
+      Alert.alert('Upload Error', err.message || 'Could not upload dropped image.');
+    } finally {
+      if (side === 'front') setFrontUploading(false);
+      else setBackUploading(false);
+    }
+  };
+
   const save = async () => {
     if (!uid) return;
     
-    const hasFront = front.trim() || frontImageUrl;
-    const hasBack = back.trim() || backImageUrl;
+    const hasFront = front.trim() || frontImageUrls.length > 0;
+    const hasBack = back.trim() || backImageUrls.length > 0;
 
     if (!hasFront || !hasBack) {
-      return Alert.alert('Missing Fields', 'Both front and back sides must have either text or an image.');
+      showToast('Both front & back need text or image', 'error');
+      return;
     }
     if (!destination) {
-      return Alert.alert('Select destination', 'Please choose a deck/folder before saving this card.');
+      showToast('Please select a destination deck', 'error');
+      return;
     }
 
     setSaving(true);
     try {
+      const frontImgVal = serializeImageUrls(frontImageUrls);
+      const backImgVal = serializeImageUrls(backImageUrls);
+
+      if (isEditing && editingCardId) {
+        await FlashcardSvc.updateCardForUser(uid, editingCardId, {
+          front_text: front.trim(),
+          back_text: back.trim(),
+          front_image_url: frontImgVal,
+          back_image_url: backImgVal,
+        });
+
+        if (destination && destination.id !== originalBranchId) {
+          if (originalBranchId) {
+            await BranchPlacement.moveCard(uid, editingCardId, originalBranchId, destination.id);
+          } else {
+            await BranchPlacement.placeAt(uid, editingCardId, destination.id);
+          }
+        }
+
+        showToast('Card updated', 'success');
+        setTimeout(() => router.back(), 500);
+        return;
+      }
+
       const cardId = await FlashcardSvc.createCard(uid, {
         front_text: front.trim(),
         back_text: back.trim(),
-        front_image_url: frontImageUrl ?? null,
-        back_image_url: backImageUrl ?? null,
+        front_image_url: frontImgVal,
+        back_image_url: backImgVal,
         subject: hint.subject,
         section_group: hint.section_group,
         microtopic: hint.microtopic,
@@ -155,11 +301,18 @@ export default function NewCard() {
 
       await BranchPlacement.placeAt(uid, cardId, destination.id);
 
-      Alert.alert('Success', `Card added to ${destination.path}`);
-      router.back();
+      // Clear input fields for next card (keep destination selected)
+      setFront('');
+      setBack('');
+      setFrontImageUrls([]);
+      setBackImageUrls([]);
+
+      // Show non-blocking bottom-right toast for 2.5 seconds — stay on screen!
+      const deckName = destination.name || destination.path || 'deck';
+      showToast(`Card saved to ${deckName}`, 'success');
     } catch (error: any) {
       console.error(error);
-      Alert.alert('Error', error.message || 'Failed to save card');
+      showToast(error.message || 'Failed to save card', 'error');
     } finally {
       setSaving(false);
     }
@@ -176,7 +329,21 @@ export default function NewCard() {
           <TouchableOpacity onPress={() => router.back()} style={s.backBtn} testID="btn-back-new-card">
             <ChevronLeft size={24} color={colors.textPrimary} />
           </TouchableOpacity>
-          <Text style={[s.title, { color: colors.textPrimary }]}>Add cards</Text>
+
+          <View style={s.headerTitleGroup}>
+            <Text style={[s.title, { color: colors.textPrimary }]}>{isEditing ? 'Edit card' : 'Add cards'}</Text>
+            <TouchableOpacity 
+              onPress={() => setStorageSettingsVisible(true)}
+              style={[s.storagePill, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}
+              testID="btn-storage-settings"
+            >
+              <Server size={12} color={colors.primary} />
+              <Text style={[s.storagePillText, { color: colors.textPrimary }]}>
+                {activeStorageProvider === 'cloudflare' ? 'Cloudflare R2' : 'Supabase'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           <TouchableOpacity 
             onPress={save} 
             disabled={saving}
@@ -261,39 +428,114 @@ export default function NewCard() {
           )}
 
           <View style={s.inputContainer}>
-            <Text style={[s.label, { color: colors.textTertiary }]}>Front side</Text>
-            <TextInput
-              value={front}
-              onChangeText={setFront}
-              placeholder="Enter text here"
-              placeholderTextColor={colors.textTertiary + '80'}
-              multiline
-              textAlignVertical="top"
-              style={[s.textArea, { backgroundColor: colors.surfaceStrong, color: colors.textPrimary }]}
-              testID="input-front"
-            />
-            {frontImageUrl && <Image source={{ uri: frontImageUrl }} style={s.previewImage} />}
+            {/* FRONT SIDE — Drop zone for iPadOS drag & drop */}
+            <DragDropContentView
+              onDrop={(e) => handleDroppedAssets(e.assets || [], 'front')}
+              onEnter={() => setIsDraggingFront(true)}
+              onExit={() => setIsDraggingFront(false)}
+              allowedMimeTypes={[/^image\/.*/]}
+              style={[
+                s.dropZone,
+                { borderColor: isDraggingFront ? colors.primary : 'transparent' },
+                isDraggingFront && { backgroundColor: colors.primary + '10' },
+              ]}
+            >
+              <Text style={[s.label, { color: colors.textTertiary }]}>
+                Front side {isDraggingFront ? ' — Drop image here! 📷' : ''}
+              </Text>
+              <TextInput
+                value={front}
+                onChangeText={setFront}
+                placeholder="Enter text here or drag image from Photos..."
+                placeholderTextColor={colors.textTertiary + '80'}
+                multiline
+                textAlignVertical="top"
+                style={[s.textArea, { backgroundColor: colors.surfaceStrong, color: colors.textPrimary }]}
+                testID="input-front"
+              />
+              {frontUploading && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                  <ActivityIndicator size="small" color={colors.primary} />
+                  <Text style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>Uploading image...</Text>
+                </View>
+              )}
+              {frontImageUrls.length > 0 && (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10 }} contentContainerStyle={{ gap: 10 }}>
+                  {frontImageUrls.map((url, idx) => (
+                    <View key={url + idx} style={s.previewContainer}>
+                      <Image source={{ uri: url }} style={s.previewImage} contentFit="cover" cachePolicy="memory-disk" />
+                      <TouchableOpacity
+                        style={s.removeImageBtn}
+                        onPress={() => setFrontImageUrls(prev => prev.filter((_, i) => i !== idx))}
+                        activeOpacity={0.8}
+                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                        testID={`btn-remove-front-image-${idx}`}
+                      >
+                        <X size={14} color="#FFFFFF" strokeWidth={3} />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </ScrollView>
+              )}
+            </DragDropContentView>
             
             <View style={{ height: 24 }} />
 
-            <Text style={[s.label, { color: colors.textTertiary }]}>Back side</Text>
-            <TextInput
-              value={back}
-              onChangeText={setBack}
-              placeholder="Enter text here"
-              placeholderTextColor={colors.textTertiary + '80'}
-              multiline
-              textAlignVertical="top"
-              style={[s.textArea, { backgroundColor: colors.surfaceStrong, color: colors.textPrimary }]}
-              testID="input-back"
-            />
-            {backImageUrl && <Image source={{ uri: backImageUrl }} style={s.previewImage} />}
+            {/* BACK SIDE — Drop zone for iPadOS drag & drop */}
+            <DragDropContentView
+              onDrop={(e) => handleDroppedAssets(e.assets || [], 'back')}
+              onEnter={() => setIsDraggingBack(true)}
+              onExit={() => setIsDraggingBack(false)}
+              allowedMimeTypes={[/^image\/.*/]}
+              style={[
+                s.dropZone,
+                { borderColor: isDraggingBack ? colors.primary : 'transparent' },
+                isDraggingBack && { backgroundColor: colors.primary + '10' },
+              ]}
+            >
+              <Text style={[s.label, { color: colors.textTertiary }]}>
+                Back side {isDraggingBack ? ' — Drop image here! 📷' : ''}
+              </Text>
+              <TextInput
+                value={back}
+                onChangeText={setBack}
+                placeholder="Enter text here or drag image from Photos..."
+                placeholderTextColor={colors.textTertiary + '80'}
+                multiline
+                textAlignVertical="top"
+                style={[s.textArea, { backgroundColor: colors.surfaceStrong, color: colors.textPrimary }]}
+                testID="input-back"
+              />
+              {backUploading && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                  <ActivityIndicator size="small" color={colors.primary} />
+                  <Text style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>Uploading image...</Text>
+                </View>
+              )}
+              {backImageUrls.length > 0 && (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10 }} contentContainerStyle={{ gap: 10 }}>
+                  {backImageUrls.map((url, idx) => (
+                    <View key={url + idx} style={s.previewContainer}>
+                      <Image source={{ uri: url }} style={s.previewImage} contentFit="cover" cachePolicy="memory-disk" />
+                      <TouchableOpacity
+                        style={s.removeImageBtn}
+                        onPress={() => setBackImageUrls(prev => prev.filter((_, i) => i !== idx))}
+                        activeOpacity={0.8}
+                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                        testID={`btn-remove-back-image-${idx}`}
+                      >
+                        <X size={14} color="#FFFFFF" strokeWidth={3} />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </ScrollView>
+              )}
+            </DragDropContentView>
 
             <View style={{ height: 32 }} />
 
             <Text style={[s.label, { color: colors.textTertiary }]}>DESTINATION</Text>
             {params.branchId ? (
-              // If coming from inside a deck, show destination as read-only
               <View
                 style={[s.destinationBtn, { borderColor: colors.primary, backgroundColor: colors.surfaceStrong }]}
                 testID="destination-readonly"
@@ -313,7 +555,6 @@ export default function NewCard() {
                 <CheckCircle2 size={18} color={colors.primary} />
               </View>
             ) : (
-              // If starting fresh, show picker button
               <TouchableOpacity
                 style={[s.destinationBtn, { borderColor: destination ? colors.primary : colors.border, backgroundColor: colors.surfaceStrong }]}
                 onPress={() => setDestinationPicker(true)}
@@ -337,7 +578,43 @@ export default function NewCard() {
           </View>
         </ScrollView>
 
+        {/* Bottom bar with image actions */}
         <View style={[s.bottomBar, { borderTopColor: colors.border, backgroundColor: colors.surface }]}> 
+          {/* Paste Clipboard Images Row — Left: Front, Right: Back */}
+          <View style={s.pasteRow}>
+            <TouchableOpacity
+              onPress={() => handlePasteClipboardImage('front')}
+              disabled={frontUploading || backUploading}
+              style={[s.pasteBtn, { backgroundColor: colors.primary }]}
+              testID="btn-paste-front"
+            >
+              {frontUploading ? (
+                <ActivityIndicator size="small" color="#FFF" />
+              ) : (
+                <ClipboardPaste size={16} color="#FFF" />
+              )}
+              <Text style={s.pasteBtnText}>
+                {frontUploading ? 'Uploading...' : 'Paste Front'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => handlePasteClipboardImage('back')}
+              disabled={frontUploading || backUploading}
+              style={[s.pasteBtn, { backgroundColor: colors.primary }]}
+              testID="btn-paste-back"
+            >
+              {backUploading ? (
+                <ActivityIndicator size="small" color="#FFF" />
+              ) : (
+                <ClipboardPaste size={16} color="#FFF" />
+              )}
+              <Text style={s.pasteBtnText}>
+                {backUploading ? 'Uploading...' : 'Paste Back'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           <View style={s.mediaRow}>
             <TouchableOpacity
               onPress={async () => {
@@ -345,7 +622,7 @@ export default function NewCard() {
                 setFrontUploading(true);
                 try {
                   const url = await pickAndUploadFlashcardImage(uid);
-                  if (url) setFrontImageUrl(url);
+                  if (url) setFrontImageUrls(prev => [...prev, url]);
                 } finally { setFrontUploading(false); }
               }}
               style={[s.mediaBtn, { borderColor: colors.border, backgroundColor: colors.bg }]}
@@ -362,7 +639,7 @@ export default function NewCard() {
                 setBackUploading(true);
                 try {
                   const url = await pickAndUploadFlashcardImage(uid);
-                  if (url) setBackImageUrl(url);
+                  if (url) setBackImageUrls(prev => [...prev, url]);
                 } finally { setBackUploading(false); }
               }}
               style={[s.mediaBtn, { borderColor: colors.border, backgroundColor: colors.bg }]}
@@ -387,12 +664,33 @@ export default function NewCard() {
         title="Move card to deck"
         onSelectDeck={(deck) => {
           setDestination(deck);
-          Alert.alert('Destination selected', deck.path);
+          showToast(`Destination: ${deck.name || deck.path}`);
         }}
       />
+
+      <StorageSettingsSheet
+        visible={storageSettingsVisible}
+        onClose={() => setStorageSettingsVisible(false)}
+        onProviderChanged={setActiveStorageProvider}
+      />
+
+      {/* Non-blocking bottom-right Toast notification */}
+      {toast && (
+        <View style={s.bottomRightToast} pointerEvents="none">
+          <View style={[s.toastCard, { backgroundColor: toast.type === 'error' ? '#ef4444' : '#22c55e' }]}>
+            {toast.type === 'error' ? (
+              <Info size={18} color="#FFF" />
+            ) : (
+              <CheckCircle2 size={18} color="#FFF" />
+            )}
+            <Text style={s.toastText}>{toast.message}</Text>
+          </View>
+        </View>
+      )}
     </PageWrapper>
   );
 }
+
 
 const s = StyleSheet.create({
   container: { flex: 1 },
@@ -403,6 +701,24 @@ const s = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
+  },
+  headerTitleGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  storagePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  storagePillText: {
+    fontSize: 11,
+    fontWeight: '800',
   },
   backBtn: { padding: 8 },
   title: { fontSize: 20, fontWeight: '900', letterSpacing: -0.5 },
@@ -426,11 +742,31 @@ const s = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
-  previewImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 10,
+  previewContainer: {
+    position: 'relative',
+    alignSelf: 'flex-start',
     marginTop: 10,
+  },
+  previewImage: {
+    width: 130,
+    height: 130,
+    borderRadius: 12,
+  },
+  removeImageBtn: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    backgroundColor: '#EF4444',
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
   },
   headerSaveBtn: {
     width: 44,
@@ -507,4 +843,54 @@ const s = StyleSheet.create({
     fontWeight: '500',
     marginTop: spacing.sm,
   },
+  pasteRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 8,
+  },
+  pasteBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    height: 44,
+    borderRadius: 12,
+  },
+  pasteBtnText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  dropZone: {
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderRadius: 16,
+    padding: 4,
+  },
+  bottomRightToast: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 95 : 75,
+    right: 16,
+    zIndex: 9999,
+  },
+  toastCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  toastText: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 13,
+  },
 });
+

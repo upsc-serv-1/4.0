@@ -31,7 +31,7 @@ interface CardItem {
   front_text: string;
   back_text: string;
   status: 'active' | 'frozen' | 'deleted';
-  learning_status: 'not_studied' | 'learning' | 'review' | 'mastered' | 'leech';
+  learning_status: 'not_studied' | 'new' | 'learning' | 'review' | 'mastered' | 'leech' | string;
   next_review?: string | null;
   last_reviewed?: string | null;
   updated_at: string;
@@ -86,9 +86,10 @@ export default function MicrotopicScreen() {
 
   const loadAll = useCallback(async () => {
     if (!uid) return;
-    setLoading(true);
+    // Only show skeleton if we have no cached cards yet
+    if (cards.length === 0) setLoading(true);
     try {
-      const t = await BranchSvc.buildTree(uid);
+      const t = await BranchSvc.buildTreeCacheFirst(uid);
       setTree(t);
       
       let cardIds: string[] = [];
@@ -106,8 +107,6 @@ export default function MicrotopicScreen() {
           const missingIds = cardIds.filter((id) => !offlineById.has(id));
 
           // 🔌 OFFLINE GUARD: When offline, skip the Supabase `cards` fetch entirely.
-          // Fetched cards that aren't in the local cache will simply be absent —
-          // better than throwing an error and showing nothing.
           const fetchedCards: any[] = [];
           if (missingIds.length > 0) {
             if (NetworkStatus.isOffline()) {
@@ -132,10 +131,9 @@ export default function MicrotopicScreen() {
             }
           }
 
-          const mergedById = new Map<string, any>([
-            ...Array.from(offlineById.entries()),
-            ...fetchedCards.map((c: any) => [c.id, c]),
-          ]);
+          const mergedById = new Map<string, any>();
+          Array.from(offlineById.entries()).forEach(([k, v]) => mergedById.set(k, v));
+          fetchedCards.forEach((c: any) => mergedById.set(c.id, c));
 
           // Preserve branch order so the newest inserted card appears deterministically.
           baseCards = cardIds
@@ -153,20 +151,9 @@ export default function MicrotopicScreen() {
       }
 
       const cardIdSet = new Set(cardIds);
+      // Show from local cache immediately
       let progress = ((OfflineManager as any).getCollectionSync('user_cards', uid) ?? [])
         .filter((p: any) => p.user_id === uid && cardIdSet.has(p.card_id));
-
-      // Skip network fetch when offline — cached progress is sufficient
-      if (cardIds.length > 0 && NetworkStatus.isOnline()) {
-        const { data: freshProgress, error: progressErr } = await supabase
-          .from('user_cards')
-          .select('card_id, status, learning_status, next_review, last_reviewed, updated_at, interval_days')
-          .eq('user_id', uid)
-          .in('card_id', cardIds);
-        if (!progressErr && freshProgress) {
-          progress = freshProgress;
-        }
-      }
 
       const progressMap = new Map<string, any>();
       progress?.forEach((p: any) => progressMap.set(p.card_id, p));
@@ -186,6 +173,50 @@ export default function MicrotopicScreen() {
         };
       }).filter(c => c.status !== 'deleted');
       setCards(merged);
+      setLoading(false); // Show cached data immediately
+
+      // Background: fetch fresh progress from Supabase and update silently
+      if (cardIds.length > 0 && NetworkStatus.isOnline()) {
+        Promise.resolve(
+          supabase
+            .from('user_cards')
+            .select('card_id, status, learning_status, next_review, last_reviewed, updated_at, interval_days')
+            .eq('user_id', uid)
+            .in('card_id', cardIds)
+        ).then(({ data: freshProgress, error: progressErr }) => {
+            if (!progressErr && freshProgress) {
+              const freshMap = new Map<string, any>();
+              freshProgress.forEach((p: any) => freshMap.set(p.card_id, p));
+              const updatedCards: CardItem[] = baseCards.map((bc: any) => {
+                const fresh = freshMap.get(bc.id);
+                const local = progressMap.get(bc.id);
+                
+                let p = local;
+                if (fresh) {
+                  // Only accept server data if it's genuinely newer or we have no local cache
+                  const localTime = local?.updated_at ? new Date(local.updated_at).getTime() : 0;
+                  const freshTime = fresh?.updated_at ? new Date(fresh.updated_at).getTime() : 0;
+                  if (!local || freshTime >= localTime) {
+                    p = fresh;
+                  }
+                }
+
+                return {
+                  id: bc.id,
+                  front_text: bc.front_text || bc.question_text || '',
+                  back_text: bc.back_text || bc.answer_text || '',
+                  status: p?.status || 'active',
+                  learning_status: p?.learning_status || 'not_studied',
+                  next_review: p?.next_review,
+                  last_reviewed: p?.last_reviewed,
+                  updated_at: p?.updated_at || bc.created_at,
+                  interval_days: p?.interval_days,
+                };
+              }).filter(c => c.status !== 'deleted');
+              setCards(updatedCards);
+            }
+          }).catch(() => {});
+      }
 
       // Folder-aware stats (respects daily caps)
       const s = await FlashcardSvc.getFolderStats(uid, isBranchMode
@@ -249,33 +280,36 @@ export default function MicrotopicScreen() {
   }, [cards, sortBy, filter]);
 
   const dueLabel = (c: CardItem) => {
+    if (!c.learning_status || c.learning_status === 'not_studied' || c.learning_status === 'new') return 'New';
     if (!c.next_review) return 'New';
-    const now = Date.now();
-    const t = new Date(c.next_review).getTime();
-    const diff = t - now;
-    const day = 24 * 60 * 60 * 1000;
-    if (diff <= 0) {
-      const overdue = Math.abs(diff);
-      if (overdue < day) {
-        const hrs = Math.round(overdue / (60 * 60 * 1000));
-        return hrs < 1 ? 'Overdue' : `Overdue ${hrs}h`;
-      }
-      const days = Math.round(overdue / day);
-      if (days < 30) return `Overdue ${days}d`;
-      const months = Math.round(days / 30);
-      return months < 12 ? `Overdue ${months}mo` : `Overdue ${Math.round(days/365)}y`;
+
+    const now = new Date();
+    const reviewDate = new Date(c.next_review);
+    
+    // Normalize to midnight to compare days easily
+    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const reviewMidnight = new Date(reviewDate.getFullYear(), reviewDate.getMonth(), reviewDate.getDate()).getTime();
+    
+    const dayMs = 24 * 60 * 60 * 1000;
+    const diffDays = Math.round((reviewMidnight - todayMidnight) / dayMs);
+    
+    if (diffDays === 0) {
+      return 'Today';
+    } else if (diffDays === 1) {
+      return 'in 1 day';
+    } else if (diffDays > 1) {
+      if (diffDays < 30) return `in ${diffDays} days`;
+      const months = Math.round(diffDays / 30);
+      if (months < 12) return `in ${months} months`;
+      return `in ${Math.round(diffDays/365)} years`;
+    } else {
+      // diffDays < 0
+      const overdueDays = Math.abs(diffDays);
+      if (overdueDays < 30) return `Overdue ${overdueDays}d`;
+      const months = Math.round(overdueDays / 30);
+      if (months < 12) return `Overdue ${months}mo`;
+      return `Overdue ${Math.round(overdueDays/365)}y`;
     }
-    if (diff < day) {
-      const hrs = Math.round(diff / (60 * 60 * 1000));
-      return hrs < 1 ? 'Soon' : `in ${hrs}h`;
-    }
-    const days = Math.round(diff / day);
-    if (days === 1) return 'Tomorrow';
-    if (days <= 7) return `${days}d`;
-    if (days < 30) return `${days}d`;
-    const months = Math.round(days / 30);
-    if (months < 12) return `${months}mo`;
-    return `${Math.round(days/365)}y`;
   };
 
   const openMenu = (card: CardItem) => { setMenuCard(card); setMenuVisible(true); };
@@ -288,9 +322,7 @@ export default function MicrotopicScreen() {
       switch (action) {
         case 'edit':
           closeMenu();
-          setEditFront(menuCard.front_text || '');
-          setEditBack(menuCard.back_text || '');
-          setEditVisible(true);
+          router.push({ pathname: '/flashcards/new', params: { cardId: menuCard.id } });
           return;
         case 'freeze':
           await FlashcardSvc.toggleFreeze(uid, menuCard.id, menuCard.status);

@@ -235,19 +235,29 @@ function FlashcardsHub() {
   const [preparingExportId, setPreparingExportId] = useState<string | null>(null);
   const [capAwareStats, setCapAwareStats] = useState<{ due: number; new: number; total: number } | null>(null);
 
+  const treeRef = React.useRef(tree);
+  treeRef.current = tree;
 
   const load = useCallback(async () => {
     if (!uid) return;
-    setLoading(true);
     try {
-      const t = await BranchSvc.buildTree(uid);
-      setTree(t);
-      
-      setCurrentFolder(prev => {
-        if (!prev) return null;
-        const flat = BranchSvc.flatten(t);
-        return flat.find(n => n.id === prev.id) ?? null;
-      });
+      const updateTreeState = (freshTree: BranchNode[]) => {
+        setTree(freshTree);
+        setCurrentFolder(prev => {
+          if (!prev) return null;
+          const flat = BranchSvc.flatten(freshTree);
+          return flat.find(n => n.id === prev.id) ?? null;
+        });
+      };
+
+      if (treeRef.current.length > 0) {
+        // Already have data in memory — just do background refresh, don't flash stale cache
+        BranchSvc.buildTree(uid).then(updateTreeState).catch(() => {});
+      } else {
+        // First load — use cache-first for instant render
+        const t = await BranchSvc.buildTreeCacheFirst(uid, updateTreeState);
+        updateTreeState(t);
+      }
     } catch (e: any) {
       console.error('[DrUPSCHub] load error:', e?.message);
     } finally {

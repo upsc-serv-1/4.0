@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ActivityIndicator,
-  Animated, Dimensions, Modal, TextInput, ScrollView, Alert, Image,
+  Animated, Dimensions, Modal, TextInput, ScrollView, Alert,
   KeyboardAvoidingView, Platform, Pressable,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { 
   X, RotateCcw, Check, MoreVertical, Snowflake, Maximize2, ChevronLeft, Search, 
   Share2, Pencil, Plus, MoreHorizontal, Type, CheckCircle2, Minus, Sparkles,
@@ -22,6 +24,7 @@ import { FolderSettingsSvc } from '../../src/services/FolderSettingsService';
 import { PageWrapper } from '../../src/components/PageWrapper';
 import { supabase } from '../../src/lib/supabase';
 import { CardOverflowMenu, CardMenuAction } from '../../src/components/flashcards/CardOverflowMenu';
+import { parseImageUrls } from '../../src/utils/imageHelpers';
 import { BranchSvc, BranchNode } from '../../src/services/BranchService';
 import { PremiumMoveModal } from '../../src/components/flashcards/PremiumMoveModal';
 import { OfflineManager } from '../../src/services/OfflineManager';
@@ -99,7 +102,37 @@ export default function ReviewScreen() {
   const revealAnim = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef<ScrollView>(null);
 
+
+
   useEffect(() => { if (uid) { loadQueue(); loadZoomSetting(); } }, [uid]);
+
+  // Refresh current card when screen comes back into focus (e.g. after editing card in new.tsx)
+  useFocusEffect(
+    useCallback(() => {
+      if (queue.length > 0 && currentIndex < queue.length) {
+        const cId = queue[currentIndex].id;
+        FlashcardSvc.getCardDetails(cId).then(updatedCard => {
+          if (updatedCard) {
+            setQueue(prevQueue => {
+              if (prevQueue.length === 0 || currentIndex >= prevQueue.length) return prevQueue;
+              const nq = [...prevQueue];
+              const idx = nq.findIndex(c => c.id === cId);
+              if (idx !== -1) {
+                nq[idx] = {
+                  ...nq[idx],
+                  front_text: updatedCard.front_text || updatedCard.question_text || '',
+                  back_text: updatedCard.back_text || updatedCard.answer_text || '',
+                  front_image_url: updatedCard.front_image_url || null,
+                  back_image_url: updatedCard.back_image_url || null,
+                };
+              }
+              return nq;
+            });
+          }
+        }).catch(() => {});
+      }
+    }, [currentIndex, queue.length])
+  );
 
   // ── FIX 8 — institute / vitamin chips on the flashcard review screen ─────
   // Must be here (before early returns) to satisfy Rules of Hooks.
@@ -141,7 +174,8 @@ export default function ReviewScreen() {
 
   const loadQueue = useCallback(async () => {
     if (!uid) return;
-    setLoading(true);
+    // Only show skeleton if queue is empty (first load)
+    if (queue.length === 0) setLoading(true);
     try {
       let cards: QueueCard[] = [];
       if (cardId) {
@@ -210,6 +244,14 @@ export default function ReviewScreen() {
       reviewedCount.current = 0;
       correctCount.current = 0;
       if (cards.length > 0) await updatePreview(cards[0]);
+
+      // Prefetch images for the next few cards so they load instantly on swipe
+      const PREFETCH_COUNT = 5;
+      const toPrefetch = cards.slice(0, PREFETCH_COUNT);
+      toPrefetch.forEach(c => {
+        parseImageUrls(c.front_image_url).forEach(url => Image.prefetch(url).catch(() => {}));
+        parseImageUrls(c.back_image_url).forEach(url => Image.prefetch(url).catch(() => {}));
+      });
     } catch (err: any) {
       console.error(err);
       Alert.alert('Error', err?.message || 'Could not load queue');
@@ -253,6 +295,13 @@ export default function ReviewScreen() {
       setCurrentIndex(nextIdx);
       cardStart.current = Date.now();
       await updatePreview(queue[nextIdx]);
+      // Prefetch images for upcoming cards
+      for (let i = nextIdx + 1; i < Math.min(nextIdx + 4, queue.length); i++) {
+        if (queue[i]) {
+          parseImageUrls(queue[i].front_image_url).forEach(url => Image.prefetch(url).catch(() => {}));
+          parseImageUrls(queue[i].back_image_url).forEach(url => Image.prefetch(url).catch(() => {}));
+        }
+      }
     } else {
       // Session complete
       setSessionSummary({
@@ -316,8 +365,7 @@ export default function ReviewScreen() {
       switch (action) {
         case 'edit':
           setMenuVisible(false);
-          setPersonalNote(card.state?.user_note || '');
-          setShowEditModal(true);
+          router.push({ pathname: '/flashcards/new', params: { cardId: card.id } });
           break;
         case 'freeze':
           await FlashcardSvc.toggleFreeze(uid, card.id, card.state.status);
@@ -756,15 +804,17 @@ export default function ReviewScreen() {
                 </View>
               )}
               
-              {currentCard.front_image_url && (
-                <TouchableOpacity onPress={() => setZoomImageUrl(currentCard.front_image_url!)}>
+              {parseImageUrls(currentCard.front_image_url).map((url, idx) => (
+                <TouchableOpacity key={url + idx} onPress={() => setZoomImageUrl(url)}>
                   <Image 
-                    source={{ uri: currentCard.front_image_url }} 
-                    resizeMode="contain" 
+                    source={{ uri: url }} 
+                    contentFit="contain"
+                    cachePolicy="memory-disk"
+                    transition={150}
                     style={{ width: '100%', height: 400, borderRadius: 12, marginBottom: 16 }} 
                   />
                 </TouchableOpacity>
-              )}
+              ))}
 
               <Text style={[styles.cardText, { color: colors.textPrimary, fontSize: editorFontSize, lineHeight: editorFontSize * 1.5 }]}>
                 {questionText}
@@ -817,11 +867,17 @@ export default function ReviewScreen() {
                 <Animated.View style={{ opacity: revealAnim, marginTop: 24 }}>
                   <View style={[styles.divider, { backgroundColor: colors.border, marginBottom: 24 }]} />
                   
-                  {currentCard.back_image_url && (
-                    <TouchableOpacity onPress={() => setZoomImageUrl(currentCard.back_image_url!)}>
-                      <Image source={{ uri: currentCard.back_image_url }} style={{ width: '100%', height: 400, borderRadius: 12, marginBottom: 20 }} resizeMode="contain" />
+                  {parseImageUrls(currentCard.back_image_url).map((url, idx) => (
+                    <TouchableOpacity key={url + idx} onPress={() => setZoomImageUrl(url)}>
+                      <Image 
+                        source={{ uri: url }} 
+                        contentFit="contain"
+                        cachePolicy="memory-disk"
+                        transition={150}
+                        style={{ width: '100%', height: 400, borderRadius: 12, marginBottom: 20 }} 
+                      />
                     </TouchableOpacity>
-                  )}
+                  ))}
 
                   <Text style={[styles.cardSideLabel, { color: '#34c759', textAlign: 'left', marginBottom: 12 }]}>ANSWER & EXPLANATION</Text>
 
@@ -1224,11 +1280,12 @@ export default function ReviewScreen() {
                 {zoomImageUrl && (
                   <Image 
                     source={{ uri: zoomImageUrl }} 
+                    contentFit="contain"
+                    cachePolicy="memory-disk"
                     style={{ 
                       width: width, 
                       height: height * 0.8,
                     }} 
-                    resizeMode="contain" 
                   />
                 )}
               </ScrollView>

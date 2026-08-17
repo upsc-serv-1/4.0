@@ -287,14 +287,32 @@ export class FlashcardSvc {
     const allCards = ((OfflineManager as any).getCollectionSync('cards') ?? [])
       .filter((c: any) => !c.deleted && !c.is_deleted);
     const cardById = new Map(allCards.map((c: any) => [c.id, c]));
-    const data = ((OfflineManager as any).getCollectionSync('user_cards', userId) ?? [])
+    let data = ((OfflineManager as any).getCollectionSync('user_cards', userId) ?? [])
       .filter((r: any) => r.user_id === userId)
       .filter((r: any) => !branchSet || branchSet.has(r.card_id))
-      .map((r: any) => ({ ...r, cards: cardById.get(r.card_id) }))
-      .filter((r: any) => r.cards)
-      .filter((r: any) => !folder.subject || r.cards.subject === folder.subject)
-      .filter((r: any) => !folder.section || folder.section === 'General' || r.cards.section_group === folder.section)
-      .filter((r: any) => !folder.microtopic || r.cards.microtopic === folder.microtopic);
+      .map((r: any) => ({ ...r, cards: cardById.get(r.card_id) || { id: r.card_id } }))
+      .filter((r: any) => {
+        if (branchSet) return true; // Branch mode already filtered by branchSet
+        if (!r.cards || !r.cards.subject) return false;
+        if (folder.subject && r.cards.subject !== folder.subject) return false;
+        if (folder.section && folder.section !== 'General' && r.cards.section_group !== folder.section) return false;
+        if (folder.microtopic && r.cards.microtopic !== folder.microtopic) return false;
+        return true;
+      });
+
+    // If cache is empty or incomplete in branch mode, fetch user_cards directly from Supabase
+    if (branchSet && (data.length === 0 || data.length < branchSet.size) && NetworkStatus.isOnline()) {
+      try {
+        const { data: freshUserCards } = await supabase
+          .from('user_cards')
+          .select('card_id, status, learning_status, next_review, user_id')
+          .eq('user_id', userId)
+          .in('card_id', Array.from(branchSet));
+        if (freshUserCards && freshUserCards.length > 0) {
+          data = freshUserCards;
+        }
+      } catch (e) {}
+    }
 
     const now = Date.now();
     const active = (data ?? []).filter((r: any) => r.status === 'active');
@@ -341,7 +359,7 @@ export class FlashcardSvc {
       const cardsById = new Map(((OfflineManager as any).getCollectionSync('cards') ?? [])
         .map((c: any) => [c.id, c]));
       const introducedToday = reviews.filter((r: any) => {
-        const c = cardsById.get(r.card_id);
+        const c: any = cardsById.get(r.card_id);
         if (!c || c.is_deleted) return false;
         if (folder.subject && c.subject !== folder.subject) return false;
         if (folder.section && folder.section !== 'General' && c.section_group !== folder.section) return false;
@@ -452,6 +470,47 @@ export class FlashcardSvc {
     }
 
     // Update local cache with the new card
+    try {
+      const allCards = ((OfflineManager as any).getCollectionSync('cards') ?? []) as any[];
+      const newCardObj = {
+        id: card!.id,
+        user_id: userId,
+        front_text: frontText,
+        back_text: backText,
+        question_text: frontText,
+        answer_text: backText,
+        front_image_url: input.front_image_url || null,
+        back_image_url: input.back_image_url || null,
+        subject: input.subject || 'General',
+        section_group: input.section_group || 'General',
+        microtopic: input.microtopic || 'General',
+        card_type: input.card_type || 'manual',
+        source: input.source || {},
+        deleted: false,
+        is_deleted: false,
+        updated_at: new Date().toISOString(),
+      };
+      allCards.unshift(newCardObj);
+      KVStore.setJson('@cards_all', allCards);
+
+      const userCards = ((OfflineManager as any).getCollectionSync('user_cards', userId) ?? []) as any[];
+      const newUserCardObj = {
+        user_id: userId,
+        card_id: card!.id,
+        ease_factor: DEFAULT_SETTINGS.starting_ease,
+        interval_days: 0,
+        repetitions: 0,
+        lapses: 0,
+        next_review: new Date().toISOString(),
+        status: 'active',
+        learning_status: 'not_studied',
+        learning_step: 0,
+        is_relearning: false,
+      };
+      userCards.unshift(newUserCardObj);
+      KVStore.setJson(`@user_cards_${userId}`, userCards);
+    } catch (e) {}
+
     const { upsertFlashcard } = await import('../repositories/flashcards.repo');
     upsertFlashcard({
       id: card!.id,
@@ -523,12 +582,34 @@ export class FlashcardSvc {
   }
 
   // ============ EDIT / DELETE ============
+  static async getCardDetails(cardId: string) {
+    try {
+      const cards = ((OfflineManager as any).getCollectionSync('cards') ?? []) as any[];
+      const found = cards.find((c: any) => c.id === cardId);
+      if (found) return found;
+    } catch (e) {}
+
+    const { data, error } = await supabase.from('cards').select('*').eq('id', cardId).maybeSingle();
+    if (error) throw error;
+    return data;
+  }
+
   static async updateCard(cardId: string, patch: Partial<NewCardInput>) {
     const updateData: any = { ...patch, updated_at: new Date().toISOString() };
-    if (patch.front_text) updateData.question_text = patch.front_text;
-    if (patch.back_text) updateData.answer_text = patch.back_text;
+    if (patch.front_text !== undefined) updateData.question_text = patch.front_text;
+    if (patch.back_text !== undefined) updateData.answer_text = patch.back_text;
     const { error } = await supabase.from('cards').update(updateData).eq('id', cardId);
     if (error) throw error;
+
+    // Update local OfflineManager MMKV cache immediately
+    try {
+      const cards = ((OfflineManager as any).getCollectionSync('cards') ?? []) as any[];
+      const idx = cards.findIndex((c: any) => c.id === cardId);
+      if (idx !== -1) {
+        cards[idx] = { ...cards[idx], ...updateData };
+        KVStore.setJson('@cards_all', cards);
+      }
+    } catch (e) {}
   }
 
   static async deleteCardForUser(userId: string, cardId: string) {

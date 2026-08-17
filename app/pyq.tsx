@@ -86,7 +86,7 @@ const PAPERS = {
   Prelims: ['GS Paper 1', 'GS Paper 2 (CSAT)'],
   Mains: ['GS Paper 1', 'GS Paper 2', 'GS Paper 3', 'GS Paper 4', 'Optional'],
 };
-const RANGE_OPTIONS = ['Only 2025', 'Last 5 Years', 'Last 10 Years', 'All Years', 'Custom Range'];
+const RANGE_OPTIONS = ['2013-latest', 'Last 5 Years', 'Last 10 Years', 'All Years', 'Custom Range'];
 const TREND_PALETTE = [
   '#2563eb', '#14b8a6', '#ef4444', '#f59e0b', '#8b5cf6', '#ec4899', // Original 6
   '#06b6d4', '#10b981', '#84cc16', '#eab308', '#f97316', '#6366f1', // Additional
@@ -449,7 +449,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       }
     }
   }, [params.fromTab, currentStages, currentPapersByStage]);
-  const [selectedRange, setSelectedRange] = useState('Last 10 Years');
+  const [selectedRange, setSelectedRange] = useState('2013-latest');
   const [customYearStart, setCustomYearStart] = useState('2020');
   const [customYearEnd, setCustomYearEnd] = useState('2025');
   const [tempYearStart, setTempYearStart] = useState('2020');
@@ -761,7 +761,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
   const matchesYearRange = (year: number | null) => {
     if (!year) return false;
-    if (selectedRange === 'Only 2025') return year === 2025;
+    if (selectedRange === '2013-latest') return year >= 2013;
     if (selectedRange === 'Last 5 Years') return year >= 2021;
     if (selectedRange === 'Last 10 Years') return year >= 2016;
     if (selectedRange === 'Custom Range') {
@@ -769,7 +769,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       if (!range) return true;
       return year >= range.start && year <= range.end;
     }
-    return true;
+    return true; // 'All Years' explicitly returns true to show everything
   };
 
   const fetchQuestionsForTests = async (testIds: string[], bypassCache = false) => {
@@ -824,7 +824,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     const rangeSuffix = selectedRange === 'Custom Range'
       ? `Custom_Range_${customYearStart}_${customYearEnd}`
       : selectedRange.replace(/\s+/g, '_');
-    const cacheKey = `pyq_cache_v4_${stageNorm}_${targetPaperGroup.replace(/\s+/g, '_')}_${rangeSuffix}`;
+    const cacheKey = `pyq_cache_v5_${stageNorm}_${targetPaperGroup.replace(/\s+/g, '_')}_${rangeSuffix}`;
 
     if (!bypassCache) {
       try {

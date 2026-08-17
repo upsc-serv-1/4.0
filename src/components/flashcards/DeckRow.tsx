@@ -41,7 +41,7 @@ export function DeckRow({ node, expanded, onToggle, onOpen, onAction, color }: P
 
   const renderRightActions = () => {
     return (
-      <View style={[styles.actionsRow, { backgroundColor: colors.bg }]}>
+      <View style={[styles.actionsRow, { backgroundColor: colors.surface }]}>
         <ActionBtn
           icon={<FolderPlus size={18} />} bg="#10b981"
           label="Add" onPress={() => { closeSwipe(); onAction('add'); }}
@@ -82,7 +82,7 @@ export function DeckRow({ node, expanded, onToggle, onOpen, onAction, color }: P
       friction={2}
       rightThreshold={40}
     >
-      <View style={[styles.row, { backgroundColor: colors.bg, borderBottomColor: colors.border + 'A0' }]}>
+      <View style={[styles.row, { backgroundColor: 'transparent', borderBottomColor: colors.border + 'A0' }]}>
         {color ? (
           <View
             pointerEvents="none"
@@ -128,13 +128,7 @@ export function DeckRow({ node, expanded, onToggle, onOpen, onAction, color }: P
                 </View>
               </TouchableOpacity>
             ) : (
-              color && !node.is_folder ? (
-                <View style={[styles.circleIcon, { backgroundColor: color, borderColor: darken(color, 0.2) }]}>
-                  <Zap size={12} color={darken(color)} />
-                </View>
-              ) : (
-                <View style={styles.circlePlaceholder} />
-              )
+              <View style={styles.circlePlaceholder} />
             )}
           </View>
 

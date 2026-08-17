@@ -36,10 +36,11 @@ export type ExportPaperStyle = 'plain' | 'lined' | 'grid' | 'dotted';
 export type ExportColumns = 1 | 2;
 export type ExportContentScope = 'q_only' | 'q_options' | 'q_options_expl' | 'q_options_valuation';
 export type ExportAnswerPlacement = 'inline' | 'end';
-export type ExportSortBy = 'default' | 'subject' | 'microtopic' | 'difficulty' | 'date' | 'year' | 'subject_section' | 'subject_section_microtopic' | 'pyq_frequency';
+export type ExportSortBy = 'default' | 'subject' | 'microtopic' | 'difficulty' | 'date' | 'year' | 'year_desc' | 'subject_section' | 'subject_section_microtopic' | 'pyq_frequency';
 export type ExportGroupingLevel = 'subject' | 'section_group' | 'microtopic' | 'subtopic' | 'nanotopic';
 export type ExportQaLayoutMode = 'unified' | 'split';
 export type ExportVisualStyle = 'document' | 'flashcard';
+export type ExportHighlightColor = 'yellow' | 'green' | 'blue' | 'pink';
 
 export interface ExportOptions {
   title: string;
@@ -54,6 +55,7 @@ export interface ExportOptions {
   /** Multi-select grouping levels — composes hierarchical export structure
    *  independently of filters. e.g. ['subject','section_group'] groups by both. */
   groupingLevels?: ExportGroupingLevel[];
+  highlightColor?: ExportHighlightColor;
 
   // Page setup (cm)
   pageMarginTopCm: number;
@@ -100,6 +102,8 @@ export interface ExportOptions {
   notesChecklistMode?: boolean;
   skipShare?: boolean;
 }
+
+let _currentOptions: ExportOptions | null = null;
 
 export const defaultExportOptions = (overrides: Partial<ExportOptions> = {}): ExportOptions => ({
   title: 'Dr. UPSC PYQ Analysis',
@@ -465,7 +469,21 @@ const baseCss = (o: ExportOptions) => {
     i, em { font-style: italic; }
     u { text-decoration: underline; text-decoration-skip-ink: auto; text-underline-offset: 2px; text-underline-position: under; vertical-align: baseline; }
     s, strike, del { text-decoration: line-through; }
-    mark, .highlight { background-color: #FFF59D; color: inherit; padding: 0 2px; border-radius: 2px; font-size: inherit !important; line-height: inherit !important; }
+    
+    /* UI Element Styles */
+    .chip { display: inline-block; padding: 2px 8px; border-radius: 12px; background: #e2e8f0; color: #475569; font-size: ${o.fontSize - 2}pt; font-weight: 600; margin: 0 4px 4px 0; border: 1px solid #cbd5e1; }
+    
+    /* Highlight and Code Box Styles (based on o.highlightColor) */
+    ${o.highlightColor === 'yellow' ? `
+      mark, .highlight, code { background-color: rgba(234, 179, 8, 0.25); color: #854d0e; border: 1px solid #eab308; padding: 1px 5px; border-radius: 4px; font-size: inherit !important; line-height: inherit !important; font-weight: 700; font-family: inherit; }
+    ` : o.highlightColor === 'green' ? `
+      mark, .highlight, code { background-color: rgba(34, 197, 94, 0.25); color: #14532d; border: 1px solid #22c55e; padding: 1px 5px; border-radius: 4px; font-size: inherit !important; line-height: inherit !important; font-weight: 700; font-family: inherit; }
+    ` : o.highlightColor === 'pink' ? `
+      mark, .highlight, code { background-color: rgba(236, 72, 153, 0.25); color: #831843; border: 1px solid #ec4899; padding: 1px 5px; border-radius: 4px; font-size: inherit !important; line-height: inherit !important; font-weight: 700; font-family: inherit; }
+    ` : `
+      mark, .highlight, code { background-color: rgba(59, 130, 246, 0.25); color: #1e3a8a; border: 1px solid #3b82f6; padding: 1px 5px; border-radius: 4px; font-size: inherit !important; line-height: inherit !important; font-weight: 700; font-family: inherit; }
+    `}
+    
     span[style*="background"] { padding: 0 2px; border-radius: 2px; font-size: inherit !important; line-height: inherit !important; }
     blockquote { border-left: 3px solid var(--accent); padding: 4px 12px; margin: 6px 0; color: var(--fg); background: rgba(0,0,0,0.04); border-radius: 4px; }
     ul, ol { padding-left: 22px; margin: 4px 0; }
@@ -745,6 +763,9 @@ const parseMarkdownHeadings = (txt: string): string => {
 const parseMarkdownHorizontalRule = (txt: string): string =>
   txt.replace(/^[ \t]*(?:-{3,}|\*{3,}|_{3,})[ \t]*$/gm, '<hr style="border:none;border-top:1.5px solid #CBD5E1;margin:3mm 0;"/>');
 
+const parseMarkdownImages = (txt: string): string =>
+  txt.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" style="max-width:100%;height:auto;margin:2mm 0;display:block;" />');
+
 // Preserve rich HTML; convert markdown for plain text
 const renderInline = (txt: string = ''): string => {
   if (!txt) return '';
@@ -757,6 +778,7 @@ const renderInline = (txt: string = ''): string => {
     // Still apply markdown parsing for any mixed content
     html = parseMarkdownHeadings(html);
     html = parseMarkdownHorizontalRule(html);
+    html = parseMarkdownImages(html);
     html = parseMarkdownTables(html);
     html = parseMarkdownLists(html);
   } else {
@@ -764,6 +786,7 @@ const renderInline = (txt: string = ''): string => {
     let md = txt;
     md = parseMarkdownHeadings(md);
     md = parseMarkdownHorizontalRule(md);
+    md = parseMarkdownImages(md);
     md = parseMarkdownTables(md);
     md = parseMarkdownLists(md);
     // Now escape only the non-HTML residue (the HTML tags we generated must survive)
@@ -774,10 +797,19 @@ const renderInline = (txt: string = ''): string => {
     });
   }
 
+  if (_currentOptions?.highlightColor) {
+    html = html
+      .replace(/\*\*(.*?)\*\*/g, '<code>$1</code>')
+      .replace(/__(.*?)__/g, '<mark>$1</mark>');
+  } else {
+    html = html
+      .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+      .replace(/__(.*?)__/g, '<u>$1</u>');
+  }
+
   return html
-    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-    .replace(/__(.*?)__/g, '<u>$1</u>')
     .replace(/==(.*?)==/g, '<mark>$1</mark>')
+    .replace(/`(.*?)`/g, '<code>$1</code>')
     .replace(/\*(.*?)\*/g, '<i>$1</i>')
     .replace(/_(.*?)_/g, '<i>$1</i>')
     .replace(/\n/g, '<br/>')
@@ -799,12 +831,24 @@ const wrap = (o: ExportOptions, body: string, extras: string = '') => `<!doctype
   </div>
 </body></html>`;
 
+const isValidExplanation = (e: any): boolean => {
+  const text = e.text || e.explanationText || e.answerText || e.explanation || '';
+  const lower = text.toLowerCase();
+  if (!text.trim() || lower.includes('not covered') || lower.includes('no answer compiled') || lower.includes('no answer text available')) {
+    return false;
+  }
+  return true;
+};
+
 // ---------- Helper: filter _explanations by institute filters ----------
 const filterExplanationsByInstitute = (explanations: any[] | undefined, o: ExportOptions): any[] => {
   if (!Array.isArray(explanations)) return [];
-  if (!o.instituteFilters || o.instituteFilters.length === 0) return explanations;
+  
+  const validExpls = explanations.filter(isValidExplanation);
+
+  if (!o.instituteFilters || o.instituteFilters.length === 0) return validExpls;
   const filterSet = new Set(o.instituteFilters.map((s: string) => s.toLowerCase().trim()));
-  return explanations.filter((e: any) => filterSet.has((e.source || e.institute || '').toLowerCase().trim()));
+  return validExpls.filter((e: any) => filterSet.has((e.source || e.institute || '').toLowerCase().trim()));
 };
 
 // ---------- Filtering & Sorting ----------
@@ -882,7 +926,14 @@ export const sortQuestions = (rows: ExportQuestion[], o: ExportOptions): ExportQ
         const cmp = av.localeCompare(bv);
         if (cmp !== 0) return cmp;
       }
-      return String(a.exam_year || '').localeCompare(String(b.exam_year || ''));
+      
+      const ay = Number(a.exam_year) || 0;
+      const by = Number(b.exam_year) || 0;
+      if (o.sortBy === 'year_desc') return by - ay;
+      if (o.sortBy === 'year') return ay - by;
+      
+      // Default to ascending if sorting isn't explicitly requested as descending
+      return ay - by;
     });
     return out;
   }
@@ -908,6 +959,13 @@ export const sortQuestions = (rows: ExportQuestion[], o: ExportOptions): ExportQ
       out.sort((a, b) => String(b.attempted_at || '').localeCompare(String(a.attempted_at || '')));
       break;
     case 'year':
+      out.sort((a, b) => {
+        const ay = Number(a.exam_year) || 0;
+        const by = Number(b.exam_year) || 0;
+        return ay - by;
+      });
+      break;
+    case 'year_desc':
       out.sort((a, b) => {
         const ay = Number(a.exam_year) || 0;
         const by = Number(b.exam_year) || 0;
@@ -2474,6 +2532,7 @@ export type ExportPayload =
   | { kind: 'snapshot'; base64: string; pageWidth: number; pageHeight: number; title: string };
 
 export const renderHtml = (payload: ExportPayload, options: ExportOptions): string => {
+  _currentOptions = options;
   switch (payload.kind) {
     case 'questions': return buildQuestionsHtml(payload.rows, options);
     case 'flashcards': return buildFlashcardsHtml(payload.rows, options);

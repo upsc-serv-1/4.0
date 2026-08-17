@@ -129,12 +129,15 @@ export const SkeletonGridItem: React.FC<{ style?: any }> = ({ style }) => (
 
 // Flashcard Review Skeleton
 export const SkeletonFlashcardReview: React.FC<{ colors: any }> = ({ colors }) => (
-  <View style={{ flex: 1, backgroundColor: colors.bg, padding: 16 }}>
+  <View style={{ flex: 1, backgroundColor: colors.bg, padding: 12, paddingTop: 60, paddingBottom: 40 }}>
     {/* Header */}
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
-      <SkeletonCircle size={32} />
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+      <SkeletonCircle size={28} />
       <SkeletonLine width={100} height={32} borderRadius={16} />
-      <SkeletonCircle size={32} />
+      <View style={{ flexDirection: 'row', gap: 16 }}>
+        <SkeletonCircle size={28} />
+        <SkeletonCircle size={28} />
+      </View>
     </View>
 
     {/* Main Card Area */}
@@ -173,10 +176,9 @@ export const SkeletonFlashcardReview: React.FC<{ colors: any }> = ({ colors }) =
       ))}
     </View>
 
-    {/* Action Buttons */}
-    <View style={{ flexDirection: 'row', gap: 12 }}>
-      <SkeletonLine width="50%" height={48} borderRadius={10} />
-      <SkeletonLine width="50%" height={48} borderRadius={10} />
+    {/* Action Buttons (Show Answer style) */}
+    <View style={{ width: '100%', alignItems: 'center', marginTop: 10 }}>
+      <SkeletonLine width="100%" height={56} borderRadius={28} />
     </View>
   </View>
 );

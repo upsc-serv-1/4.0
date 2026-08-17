@@ -7,7 +7,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
-  ArrowLeft, Play, Plus, ArrowUpDown, SlidersHorizontal, MoreHorizontal, BookOpen, X, Check, Info, Clock,
+  ArrowLeft, Play, Plus, ArrowUpDown, SlidersHorizontal, MoreHorizontal, BookOpen, X, Check, Info, Clock, Settings, GraduationCap, Calendar
 } from 'lucide-react-native';
 import { supabase } from '../../src/lib/supabase';
 import { NetworkStatus } from '../../src/lib/networkStatus';
@@ -16,6 +16,7 @@ import { useTheme } from '../../src/context/ThemeContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
 import { SkeletonCard } from '../../src/components/common/SkeletonLoader';
 import { FlashcardSvc } from '../../src/services/FlashcardService';
+import { Sparkles } from 'lucide-react-native';
 import { logDiagEvent } from '../../src/../app/offline-diag';
 import { CardOverflowMenu, CardMenuAction } from '../../src/components/flashcards/CardOverflowMenu';
 import { SortSheet, SortKey } from '../../src/components/flashcards/SortSheet';
@@ -321,7 +322,7 @@ export default function MicrotopicScreen() {
       if (overdueDays === 0) {
         const overdueHours = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60));
         const overdueMins = Math.floor((Math.abs(diffMs) % (1000 * 60 * 60)) / (1000 * 60));
-        if (overdueHours > 0) return `Overdue ${overdueHours}h ${overdueMins}m`;
+        if (overdueHours > 0) return `Overdue ${overdueHours}h`;
         if (overdueMins > 0) return `Overdue ${overdueMins}m`;
         return 'Due now';
       }
@@ -335,7 +336,7 @@ export default function MicrotopicScreen() {
     if (diffDays === 0) {
       const hours = Math.floor(diffMs / (1000 * 60 * 60));
       const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-      if (hours > 0) return `in ${hours}h ${mins}m`;
+      if (hours > 0) return `in ${hours}h`;
       return `in ${mins}m`;
     } else if (diffDays === 1) {
       return 'in 1 day';
@@ -420,16 +421,31 @@ export default function MicrotopicScreen() {
       item.learning_status === 'learning' || item.learning_status === 'review' ? '#22c55e' :
       item.learning_status === 'leech' ? '#ef4444' : colors.textTertiary;
 
+    const label = dueLabel(item);
+    const isFuture = label.startsWith('in ') && (label.includes('day') || label.includes('month') || label.includes('year'));
+    
+    let IconComp = Clock;
+    if (label === 'New') {
+      IconComp = Sparkles;
+    } else if (label.startsWith('in ')) {
+      IconComp = GraduationCap;
+    } else {
+      IconComp = Clock;
+    }
+
     return (
       <TouchableOpacity
         style={[styles.cardItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
-        onPress={() => router.push({ pathname: '/flashcards/review', params: { subject, section, microtopic, cardId: item.id, mode: 'single' } })}
+        onPress={() => router.push({ 
+          pathname: '/flashcards/browse', 
+          params: { branchId, subject, section, microtopic, recursive, cardId: item.id } 
+        })}
         testID={`card-row-${item.id}`}
       >
         <View style={styles.cardTop}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <Clock size={16} color={statusColor} />
-            <Text style={[styles.cardDueLabel, { color: statusColor }]}>{dueLabel(item)}</Text>
+            <IconComp size={16} color={statusColor} />
+            <Text style={[styles.cardDueLabel, { color: statusColor, textTransform: 'capitalize' }]}>{label}</Text>
             {isFrozen && <Text style={[styles.tag, { color: '#ef4444', borderColor: '#ef4444' }]}>FROZEN</Text>}
           </View>
           <TouchableOpacity onPress={() => openMenu(item)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} testID={`card-menu-${item.id}`}>
@@ -457,7 +473,14 @@ export default function MicrotopicScreen() {
               {isBranchMode ? (isRecursive ? 'Includes all sub-decks' : 'Direct cards only') : `${subject} • ${section}`}
             </Text>
           </View>
-          <TouchableOpacity onPress={() => router.push('/flashcards/new')} style={styles.iconBtn} testID="btn-add"><Plus size={24} color={colors.primary} /></TouchableOpacity>
+          
+          <TouchableOpacity 
+            onPress={() => setAlgoModal(true)} 
+            style={styles.iconBtn} 
+            testID="open-algo"
+          >
+            <Settings size={24} color={colors.textPrimary} />
+          </TouchableOpacity>
         </View>
 
         <FlatList
@@ -467,15 +490,6 @@ export default function MicrotopicScreen() {
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 120 }}
           ListHeaderComponent={
             <View>
-              {/* Algorithm row */}
-              <View style={styles.algoRow}>
-                <Text style={{ color: colors.textTertiary, fontSize: 13 }}>Learning algorithm: </Text>
-                <TouchableOpacity onPress={() => setAlgoModal(true)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }} testID="open-algo">
-                  <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 13 }}>Custom</Text>
-                  <Info size={14} color={colors.primary} />
-                </TouchableOpacity>
-              </View>
-
               {/* Hero */}
               <View style={[styles.hero, { backgroundColor: colors.surface, borderColor: colors.border }]} testID="hero">
                 <Text style={[styles.heroNum, { color: colors.textPrimary }]}>{stats.for_today}</Text>

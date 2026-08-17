@@ -100,7 +100,8 @@ const CHOICES = {
   ],
   sortBys: [
     { id: 'default' as ExportSortBy, label: 'Default' },
-    { id: 'year' as ExportSortBy, label: 'Year' },
+    { id: 'year_desc' as ExportSortBy, label: 'Year (Latest First)' },
+    { id: 'year' as ExportSortBy, label: 'Year (Oldest First)' },
     { id: 'difficulty' as ExportSortBy, label: 'Difficulty' },
     { id: 'date' as ExportSortBy, label: 'Latest Modified' },
     { id: 'pyq_frequency' as ExportSortBy, label: 'PYQ Frequency (Most Frequent First)' },
@@ -115,6 +116,12 @@ const CHOICES = {
   visualStyles: [
     { id: 'document' as ExportVisualStyle, label: 'Document' },
     { id: 'flashcard' as ExportVisualStyle, label: 'Flashcard Style' },
+  ],
+  highlightColors: [
+    { id: 'yellow' as const, label: 'Yellow' },
+    { id: 'green' as const, label: 'Green' },
+    { id: 'blue' as const, label: 'Blue' },
+    { id: 'pink' as const, label: 'Pink' },
   ],
   statusFilters: [
     { id: 'all', label: 'All' },
@@ -451,8 +458,10 @@ export const UnifiedExportSheet: React.FC<Props> = ({
 
 
             {payload && (
-              <Section title="Visual Style" colors={colors}>
+              <Section title="Visual Style & Colors" colors={colors}>
                 <Row>{CHOICES.visualStyles.map(v => <Chip key={v.id} active={opts.visualStyle === v.id} onPress={() => set('visualStyle', v.id)}>{v.label}</Chip>)}</Row>
+                <Text style={[styles.subLabel, { color: colors.textSecondary }]}>Highlight Color</Text>
+                <Row>{CHOICES.highlightColors.map(c => <Chip key={c.id} active={opts.highlightColor === c.id} onPress={() => set('highlightColor', c.id)}>{c.label}</Chip>)}</Row>
               </Section>
             )}
 

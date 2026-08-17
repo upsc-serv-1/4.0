@@ -77,15 +77,18 @@ export function PremiumMoveModal({ visible, node, tree, onClose, onConfirm, titl
                     style={[styles.moveRow, { borderBottomColor: colors.border + '40', paddingLeft: 16 + indent }, isSelected && { backgroundColor: colors.primary + '10', borderRadius: 12 }]}
                   >
                     <View style={styles.moveToggleArea}>
-                      {n.is_folder ? (
+                      {hasKids ? (
+                        <Pressable 
+                          onPress={(e) => { e.stopPropagation(); toggle(n.id); }}
+                          style={[styles.smallToggle, { backgroundColor: expanded.has(n.id) ? '#f2f2f7' : '#e0f2fe' }]}
+                        >
+                          {expanded.has(n.id) ? <Minus size={16} color={colors.textPrimary} /> : <Plus size={16} color="#0ea5e9" />}
+                        </Pressable>
+                      ) : n.is_folder ? (
                         <View style={[styles.smallToggle, { backgroundColor: '#e0f2fe' }]}>
                            <Folder size={16} color="#0ea5e9" />
                         </View>
-                      ) : (
-                        <View style={styles.smallToggle}>
-                           <Zap size={14} color={colors.textTertiary} />
-                        </View>
-                      )}
+                      ) : null}
                     </View>
                     <Text style={[styles.moveRowText, { color: colors.textPrimary }]}>{n.name}</Text>
                     {isSelected && <CheckCircle2 size={20} color={colors.primary} />}

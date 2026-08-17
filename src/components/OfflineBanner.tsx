@@ -3,12 +3,15 @@ import { View, Text, StyleSheet } from 'react-native';
 import { useNetwork } from '../context/NetworkContext';
 
 export const OfflineBanner = () => {
-  const { online, pending } = useNetwork();
-  if (online && pending === 0) return null;
+  const { online } = useNetwork();
+  
+  // Hide completely when online (sync happens silently in the background)
+  if (online) return null;
+
   return (
-    <View style={[styles.bar, online ? styles.sync : styles.offline]}>
+    <View style={[styles.bar, styles.offline]}>
       <Text style={styles.txt}>
-        {online ? `Syncing ${pending} change${pending === 1 ? '' : 's'}…` : 'Offline — cached data'}
+        Offline — cached data
       </Text>
     </View>
   );

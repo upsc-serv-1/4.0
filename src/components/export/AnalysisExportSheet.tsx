@@ -164,6 +164,9 @@ const CHOICES = {
   ],
   sortBys: [
     { id: 'default' as ExportSortBy, label: 'Default' },
+    { id: 'year_desc' as ExportSortBy, label: 'Year (Latest First)' },
+    { id: 'year_asc' as ExportSortBy, label: 'Year (Oldest First)' },
+    { id: 'difficulty' as ExportSortBy, label: 'Difficulty' },
     { id: 'subject' as ExportSortBy, label: 'Subject' },
     { id: 'subject_section' as ExportSortBy, label: 'Subject + Section' },
     { id: 'subject_section_microtopic' as ExportSortBy, label: 'Subject + Section + Micro' },
@@ -177,6 +180,12 @@ const CHOICES = {
   visualStyles: [
     { id: 'document' as ExportVisualStyle, label: 'Document' },
     { id: 'flashcard' as ExportVisualStyle, label: 'Flashcard Style' },
+  ],
+  highlightColors: [
+    { id: 'yellow' as const, label: 'Yellow' },
+    { id: 'green' as const, label: 'Green' },
+    { id: 'blue' as const, label: 'Blue' },
+    { id: 'pink' as const, label: 'Pink' },
   ],
 };
 
@@ -1135,7 +1144,8 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
             {/* Only show PYQ specific settings if in PYQ variant and scope includes them */}
             {reportVariant === 'pyq' && includePyqs && (
               <>
-                <Section title="Visual Style" colors={colors}>
+                <Section title="Visual Style & Colors" colors={colors}>
+                  <Label colors={colors}>STYLE</Label>
                   <Row>
                     {CHOICES.visualStyles.map(v => (
                       <Chip
@@ -1153,6 +1163,20 @@ export const AnalysisExportSheet: React.FC<AnalysisExportSheetProps> = ({
                       Each question is printed as a two-sided card (Question | Answer & Explanation)
                     </Text>
                   )}
+                  
+                  <Label colors={colors} style={{ marginTop: 12 }}>HIGHLIGHT COLOR</Label>
+                  <Row>
+                    {CHOICES.highlightColors.map(c => (
+                      <Chip
+                        key={c.id}
+                        active={opts.highlightColor === c.id}
+                        onPress={() => set('highlightColor', c.id)}
+                        testID={`analysis-export-highlight-${c.id}`}
+                      >
+                        {c.label}
+                      </Chip>
+                    ))}
+                  </Row>
                 </Section>
 
                 <Section title="Q&A Highlight" colors={colors}>

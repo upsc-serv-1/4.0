@@ -3,7 +3,7 @@ import FeatureGate from '../src/components/FeatureGate';
 import {
   View, Text, StyleSheet, ActivityIndicator, ScrollView,
   TouchableOpacity, Modal, TextInput, Alert, FlatList, RefreshControl, Pressable,
-  KeyboardAvoidingView, Platform, Keyboard,
+  KeyboardAvoidingView, Platform, Keyboard, useWindowDimensions
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -26,6 +26,7 @@ import { useTheme } from '../src/context/ThemeContext';
 import { ThemeSwitcher } from '../src/components/ThemeSwitcher';
 import { PageWrapper } from '../src/components/PageWrapper';
 import { FolderAlgorithmModal } from '../src/components/flashcards/FolderAlgorithmModal';
+
 import { BranchSvc, BranchNode } from '../src/services/BranchService';
 import { DeckRow, type DeckRowAction } from '../src/components/flashcards/DeckRow';
 import { PremiumMoveModal } from '../src/components/flashcards/PremiumMoveModal';
@@ -35,6 +36,8 @@ import { BranchColors, DEFAULT_BRANCH_COLORS } from '../src/lib/branchColors';
 import { usePreventRemove } from '@react-navigation/native';
 
 function FlashcardsHub() {
+  const { width } = useWindowDimensions();
+  const paddingH = width > 768 ? 64 : 16;
   const { colors } = useTheme();
   const { session } = useAuth();
   const uid = session?.user?.id;
@@ -601,26 +604,7 @@ function FlashcardsHub() {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />} 
           contentContainerStyle={{ paddingTop: 110, paddingBottom: 100 }}
         >
-          <View style={styles.topActionArea}>
-            <View style={[styles.statsBar, { marginHorizontal: 0, width: '100%' }]}>
-              <TouchableOpacity onPress={() => startStudy('due')} style={[styles.statBox, { backgroundColor: '#ef444412', borderColor: '#ef444430' }]}>
-                <Clock size={14} color="#ef4444" />
-                <Text style={[styles.statNum, { color: '#ef4444' }]}>{aggregateStats.due}</Text>
-                <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Due</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => startStudy('new')} style={[styles.statBox, { backgroundColor: '#3b82f612', borderColor: '#3b82f630' }]}>
-                <Sparkles size={14} color="#3b82f6" />
-                <Text style={[styles.statNum, { color: '#3b82f6' }]}>{aggregateStats.new}</Text>
-                <Text style={[styles.statLabel, { color: colors.textTertiary }]}>New</Text>
-              </TouchableOpacity>
-              <View style={[styles.statBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                <Zap size={14} color={colors.textSecondary} />
-                <Text style={[styles.statNum, { color: colors.textPrimary }]}>{aggregateStats.total}</Text>
-                <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Total</Text>
-              </View>
-            </View>
-          </View>
-
+          {/* Global Stats removed per user request */}
           {loading ? (
             <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
               {Array.from({ length: 6 }).map((_, i) => (
@@ -644,7 +628,8 @@ function FlashcardsHub() {
               </View>
             </View>
           )}
-          <View style={{ paddingHorizontal: 4 }}>
+          <View style={{ paddingHorizontal: paddingH }}>
+            <View style={{ backgroundColor: colors.surface, borderRadius: 20, overflow: 'hidden' }}>
             {displayRows.map((item) => {
               const isSelected = selectedIds.has(item.id);
               return (
@@ -682,6 +667,7 @@ function FlashcardsHub() {
                 </View>
               );
             })}
+            </View>
           </View>
           {displayRows.length === 0 && !loading && (
             <View style={styles.empty}><Zap size={48} color={colors.border} /><Text style={{ color: colors.textTertiary, marginTop: 12 }}>Empty</Text></View>

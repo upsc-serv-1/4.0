@@ -397,8 +397,9 @@ export class BranchSvc {
     } catch {}
   }
 
-  static async listCardIdsInBranch(branchId: string, opts: { recursive?: boolean; userId?: string } = {}): Promise<string[]> {
-    // 1. CACHE-FIRST
+  static async listCardIdsInBranch(branchId: string, opts: { recursive?: boolean; userId?: string; forceNetwork?: boolean } = {}): Promise<string[]> {
+    // 1. CACHE-FIRST (unless forced)
+    if (!opts.forceNetwork) {
     try {
       const allLinks = OfflineManager.getCollectionSync('flashcard_branch_cards', opts.userId) as any[];
       if (allLinks && allLinks.length > 0) {
@@ -415,6 +416,7 @@ export class BranchSvc {
         return Array.from(new Set(filtered));
       }
     } catch (e) {}
+    }
 
     // 2. NETWORK FALLBACK
     if (NetworkStatus.isOffline()) return [];

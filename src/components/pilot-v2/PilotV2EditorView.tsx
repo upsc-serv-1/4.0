@@ -417,7 +417,7 @@ export function PilotV2EditorView() {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         base64: true,
-        quality: 0.7,
+        quality: 1.0,
       });
       if (result.canceled || !result.assets?.[0]) return;
       const asset = result.assets[0];

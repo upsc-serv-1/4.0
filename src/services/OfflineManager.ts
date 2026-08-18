@@ -15,6 +15,7 @@
  */
 import { supabase } from '../lib/supabase';
 import { KVStore } from '../lib/kvStore';
+import { NetworkStatus } from '../lib/networkStatus';
 import { QuestionCache } from './QuestionCache';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -448,6 +449,67 @@ class OfflineManagerService {
       totalCards,
     });
     report({ phase: 'done', current: 1, total: 1, detail: 'All data downloaded!' });
+  }
+
+  /** Independently sync flashcards incrementally (used by pull-to-refresh and auto-sync) */
+  async syncFlashcards(userId: string): Promise<void> {
+    if (NetworkStatus.isOffline()) return;
+    try {
+      const meta = await this.getMetadata();
+      const since = meta.lastFullSync ? (meta.lastIncrementalSync || meta.lastFullSync) : null;
+      const sinceStr = since ? new Date(since).toISOString() : null;
+
+      // 1. Cards (Incremental)
+      let cardsQuery = supabase.from('cards').select('*');
+      if (sinceStr) cardsQuery = cardsQuery.gte('updated_at', sinceStr);
+      const { data: newCards } = await cardsQuery;
+      
+      if (newCards && newCards.length > 0) {
+        const existingCards = KVStore.getJson<any[]>(CARDS_PREFIX) ?? [];
+        const map = new Map(existingCards.map(c => [c.id, c]));
+        newCards.forEach(c => map.set(c.id, c));
+        // Filter out deleted cards before saving
+        const finalCards = Array.from(map.values()).filter(c => !c.is_deleted && !c.deleted);
+        KVStore.setJson(CARDS_PREFIX, finalCards);
+      }
+
+      // 2. User Cards (Incremental)
+      let userCardsQuery = supabase.from('user_cards').select('*').eq('user_id', userId);
+      if (sinceStr) userCardsQuery = userCardsQuery.gte('updated_at', sinceStr);
+      const { data: newUserCards } = await userCardsQuery;
+
+      if (newUserCards && newUserCards.length > 0) {
+        const existingUC = KVStore.getJson<any[]>(`${USER_CARDS_PREFIX}${userId}`) ?? [];
+        const map = new Map(existingUC.map(uc => [uc.card_id, uc]));
+        newUserCards.forEach(uc => map.set(uc.card_id, uc));
+        const finalUC = Array.from(map.values()).filter(uc => uc.status !== 'deleted');
+        KVStore.setJson(`${USER_CARDS_PREFIX}${userId}`, finalUC);
+      }
+      
+      // 3. Branches / Folders (Incremental)
+      let branchesQuery = supabase.from('flashcard_branches').select('*').eq('user_id', userId);
+      if (sinceStr) branchesQuery = branchesQuery.gte('updated_at', sinceStr);
+      const { data: newBranches } = await branchesQuery;
+      
+      if (newBranches && newBranches.length > 0) {
+        const existingBranches = KVStore.getJson<any[]>(`${USER_BRANCHES_PREFIX}${userId}`) ?? [];
+        const map = new Map(existingBranches.map(b => [b.id, b]));
+        newBranches.forEach(b => map.set(b.id, b));
+        KVStore.setJson(`${USER_BRANCHES_PREFIX}${userId}`, Array.from(map.values()));
+      }
+      
+      // 4. Branch Links (Always fetch all, small payload and may lack updated_at)
+      const branchCards = await this.fetchAllRows('flashcard_branch_cards', (q) => q);
+      if (branchCards) KVStore.setJson(`${USER_BRANCH_CARDS_PREFIX}${userId}`, branchCards);
+      
+      const folderAlgos = await this.fetchAllRows('folder_algorithm_settings', (q) => q.eq('user_id', userId));
+      if (folderAlgos) KVStore.setJson(`${USER_FOLDER_ALGO_SETTINGS_PREFIX}${userId}`, folderAlgos);
+      
+      // Update last sync time so future auto-syncs are fast
+      await this.setMetadata({ ...meta, lastIncrementalSync: Date.now() });
+    } catch (err) {
+      console.warn('syncFlashcards error:', err);
+    }
   }
 
   // ── INCREMENTAL SYNC ──────────────────────────────────────────

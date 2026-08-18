@@ -16,6 +16,9 @@ import Markdown from 'react-native-markdown-display';
 import { getMarkdownStyles, getMarkdownRules, cleanMarkdownContent } from '../mains';
 import { parseImageUrls } from '../../src/utils/imageHelpers';
 import { renderAIText } from '../../src/utils/renderAIText';
+import { supabase } from '../../src/lib/supabase';
+import { KVStore } from '../../src/lib/kvStore';
+import { NetworkStatus } from '../../src/lib/networkStatus';
 
 const { width, height: windowHeight } = Dimensions.get('window');
 
@@ -163,6 +166,23 @@ export default function BrowseScreen() {
            const cardIds = await BranchSvc.listCardIdsInBranch(String(branchId), { recursive: recursive === '1', userId: uid });
            const idSet = new Set(cardIds);
            filtered = cardIds.map(id => offlineCards.find(c => c.id === id)).filter(Boolean);
+           
+           // Network Fallback for missing cards
+           if (filtered.length < cardIds.length && NetworkStatus.isOnline()) {
+             const missingIds = cardIds.filter(id => !filtered.find(c => c.id === id));
+             if (missingIds.length > 0) {
+               try {
+                 const { data } = await supabase.from('cards').select('*').in('id', missingIds).eq('is_deleted', false);
+                 if (data && data.length > 0) {
+                   filtered = [...filtered, ...data];
+                   // Update local cache
+                   const allCached = (((OfflineManager as any).getCollectionSync('cards') ?? []) as any[]);
+                   const merged = [...allCached, ...data];
+                   KVStore.setJson('@cards_all', merged);
+                 }
+               } catch (e) {}
+             }
+           }
         } else {
            filtered = offlineCards
             .filter((c: any) => c.subject === subject && c.microtopic === microtopic)

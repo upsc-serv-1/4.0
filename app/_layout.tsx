@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
 import { Stack } from 'expo-router';
+
+SplashScreen.preventAutoHideAsync();
 import { StatusBar } from 'expo-status-bar';
 import { View, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -55,6 +58,14 @@ function RootStack() {
   useEffect(() => onShowSubscription(setShowSubscription), []);
   // Wire offline-first behaviour: auto-sync on login, background queue drain.
   useOfflineBootstrap();
+
+  useEffect(() => {
+    // Keep splash screen visible for at least 2 seconds
+    const timer = setTimeout(() => {
+      SplashScreen.hideAsync().catch(() => {});
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
   
   // Use the luminance-based isDark flag from ThemeContext
   const statusBarStyle = isDark ? 'light' : 'dark';

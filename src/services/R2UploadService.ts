@@ -23,8 +23,8 @@ class R2UploadService {
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        quality: 0.8,
+        allowsEditing: false, // Android cropper severely degrades quality
+        quality: 1.0,
         base64: true,
       });
 

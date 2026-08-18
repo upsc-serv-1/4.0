@@ -20,6 +20,8 @@ import {
   Folder, CheckCircle2, Minus, ChevronLeft, ArrowUpRight, Settings, MoreVertical,
   FolderPlus, Play, ChevronRight, Trash, Check, FileDown, Cloud, CloudOff, RefreshCw
 } from 'lucide-react-native';
+import { NetworkStatus } from '../src/lib/networkStatus';
+import { OfflineManager } from '../src/services/OfflineManager';
 import { supabase } from '../src/lib/supabase';
 import { SyncQueue } from '../src/services/SyncQueue';
 import { useAuth } from '../src/context/AuthContext';
@@ -275,9 +277,26 @@ function FlashcardsHub() {
     navLock.current = false; 
     setPendingSyncCount(SyncQueue.pendingCount());
     load(); 
-  }, [load]));
+    
+    // Automatic background sync for flashcards
+    if (NetworkStatus.isOnline() && uid) {
+      OfflineManager.syncFlashcards(uid).then(() => {
+        load();
+      }).catch(() => {});
+    }
+  }, [load, uid]));
 
-  const onRefresh = async () => { setRefreshing(true); await load(); };
+  const onRefresh = async () => { 
+    setRefreshing(true); 
+    try {
+      if (NetworkStatus.isOnline() && uid) {
+        await OfflineManager.syncFlashcards(uid);
+      }
+      await load(); 
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const handleForceSync = async () => {
     setIsSyncing(true);

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import {
   View, Text, StyleSheet, TouchableOpacity, FlatList,
-  ActivityIndicator, TextInput, Modal, ScrollView, Alert, Image,
+  ActivityIndicator, TextInput, Modal, ScrollView, Alert, Image, RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -16,6 +16,7 @@ import { useTheme } from '../../src/context/ThemeContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
 import { SkeletonCard } from '../../src/components/common/SkeletonLoader';
 import { FlashcardSvc } from '../../src/services/FlashcardService';
+import { KVStore } from '../../src/lib/kvStore';
 import { Sparkles } from 'lucide-react-native';
 import { logDiagEvent } from '../../src/../app/offline-diag';
 import { CardOverflowMenu, CardMenuAction } from '../../src/components/flashcards/CardOverflowMenu';
@@ -97,7 +98,7 @@ export default function MicrotopicScreen() {
   const [moveSection, setMoveSection] = useState('');
   const [moveMicrotopic, setMoveMicrotopic] = useState('');
 
-  const loadAll = useCallback(async () => {
+  const loadAll = useCallback(async (forceNetwork: boolean = false) => {
     if (!uid) return;
     // Only show skeleton if we have no cached cards yet
     if (cards.length === 0) setLoading(true);
@@ -113,7 +114,7 @@ export default function MicrotopicScreen() {
       if (isBranchMode) {
         // AnkiPro branch mode: get cards from this branch (+ descendants if recursive)
         const { BranchSvc } = await import('../../src/services/BranchService');
-        cardIds = await BranchSvc.listCardIdsInBranch(String(branchId), { recursive: isRecursive, userId: uid });
+        cardIds = await BranchSvc.listCardIdsInBranch(String(branchId), { recursive: isRecursive, userId: uid, forceNetwork });
         if (cardIds.length > 0) {
           const idSet = new Set(cardIds);
           const offlineById = new Map(offlineCards.filter((c: any) => idSet.has(c.id)).map((c: any) => [c.id, c]));
@@ -158,6 +159,19 @@ export default function MicrotopicScreen() {
                 fetchedCards.push(...(data ?? []));
               }
               if (fetchedCards.length > 0) {
+                try {
+                  const allCached = KVStore.getJson<any[]>('@cards_all') || [];
+                  const cachedIds = new Set(allCached.map(c => c.id));
+                  let updatedCache = false;
+                  for (const c of fetchedCards) {
+                    if (!cachedIds.has(c.id)) {
+                      allCached.push(c);
+                      updatedCache = true;
+                    }
+                  }
+                  if (updatedCache) KVStore.setJson('@cards_all', allCached);
+                } catch (e) {}
+                
                 setCards(prevCards => {
                   const newMerged = [...prevCards];
                   fetchedCards.forEach((c: any) => {
@@ -181,7 +195,11 @@ export default function MicrotopicScreen() {
                   return newMerged;
                 });
               }
+            }).finally(() => {
+              setRefreshing(false);
             });
+          } else {
+            setRefreshing(false);
           }
         }
       } else {
@@ -277,7 +295,10 @@ export default function MicrotopicScreen() {
                 return c;
               }));
             }
-          }).catch(() => {});
+          }).catch(() => {})
+            .finally(() => setRefreshing(false));
+      } else {
+        setRefreshing(false);
       }
 
       // Folder-aware stats (respects daily caps)
@@ -294,13 +315,27 @@ export default function MicrotopicScreen() {
     }
   }, [uid, subject, section, microtopic, branchId, isBranchMode, isRecursive]);
 
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    if (NetworkStatus.isOnline() && uid) {
+      await (OfflineManager as any).syncFlashcards(uid);
+    }
+    loadAll(true); // force network fetch
+  }, [loadAll, uid]);
+
   useEffect(() => { loadAll(); }, [loadAll]);
 
   // Reload cards whenever the screen comes back into focus (after adding/editing cards)
   useFocusEffect(
     useCallback(() => {
       loadAll();
-    }, [loadAll])
+      if (NetworkStatus.isOnline() && uid) {
+        (OfflineManager as any).syncFlashcards(uid).then(() => {
+          loadAll();
+        }).catch(() => {});
+      }
+    }, [loadAll, uid])
   );
 
   const filteredSortedCards = useMemo(() => {
@@ -331,8 +366,16 @@ export default function MicrotopicScreen() {
         const bd = b.next_review ? new Date(b.next_review).getTime() : Number.POSITIVE_INFINITY;
         return ad - bd;
       }
-      if (sortBy === 'newest') return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
-      if (sortBy === 'oldest') return new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime();
+      if (sortBy === 'newest') {
+        const tA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+        const tB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+        return (isNaN(tB) ? 0 : tB) - (isNaN(tA) ? 0 : tA);
+      }
+      if (sortBy === 'oldest') {
+        const tA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+        const tB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+        return (isNaN(tA) ? 0 : tA) - (isNaN(tB) ? 0 : tB);
+      }
       if (sortBy === 'az') return (a.front_text || '').localeCompare(b.front_text || '');
       if (sortBy === 'za') return (b.front_text || '').localeCompare(a.front_text || '');
       return 0;
@@ -535,6 +578,7 @@ export default function MicrotopicScreen() {
         <FlatList
           data={filteredSortedCards}
           keyExtractor={(i) => i.id}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
           renderItem={renderCardItem}
           contentContainerStyle={{ paddingHorizontal: 40, paddingBottom: 120 }}
           ListHeaderComponent={

@@ -29,7 +29,7 @@
     },
     "plugins": [
       "expo-router",
-      "./withAsyncStorage.js"
+      ["./withAsyncStorage.js", 100]
     ],
     "extra": {
       "router": {},

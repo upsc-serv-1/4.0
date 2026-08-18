@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Animated, Modal, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Animated, Modal, Platform, Image as RNImage } from 'react-native';
 import { Image } from 'expo-image';
+import ImageViewer from 'react-native-image-zoom-viewer';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ChevronLeft, ChevronRight, X, Search, Share2, MoreVertical } from 'lucide-react-native';
@@ -52,9 +53,11 @@ function BrowseCardView({ card, isActive, onImagePress }: { card: any, isActive:
           <TouchableOpacity key={url + idx} activeOpacity={0.9} onPress={() => onImagePress(url)} style={{ width: '100%', alignItems: 'center' }}>
             <Image 
               source={{ uri: url }} 
+              style={{ width: '100%', height: 250, borderRadius: 8, marginBottom: 12 }}
               contentFit="contain"
+              contentPosition="center"
+              allowDownscaling={false}
               cachePolicy="memory-disk"
-              style={{ width: '100%', height: 400, borderRadius: 12, marginBottom: 16 }} 
             />
           </TouchableOpacity>
         ))}
@@ -89,9 +92,11 @@ function BrowseCardView({ card, isActive, onImagePress }: { card: any, isActive:
           <TouchableOpacity key={url + idx} activeOpacity={0.9} onPress={() => onImagePress(url)} style={{ width: '100%', alignItems: 'center' }}>
             <Image 
                 source={{ uri: url }} 
+                style={{ width: '100%', height: 250, borderRadius: 8, marginBottom: 12 }}
                 contentFit="contain"
+                contentPosition="center"
+                allowDownscaling={false}
                 cachePolicy="memory-disk"
-                style={{ width: '100%', height: 400, borderRadius: 12, marginBottom: 16 }} 
               />
           </TouchableOpacity>
             ))}
@@ -263,61 +268,14 @@ export default function BrowseScreen() {
         </ScrollView>
       )}
 
-      {/* IMAGE ZOOM MODAL */}
-      <Modal 
-        visible={!!zoomImageUrl} 
-        transparent 
-        animationType="fade" 
-        onRequestClose={() => setZoomImageUrl(null)}
-      >
-        <View style={{ flex: 1, backgroundColor: 'black' }}>
-          <SafeAreaView style={{ flex: 1 }}>
-            <View style={{ 
-              position: 'absolute', 
-              top: Platform.OS === 'ios' ? 60 : 20, 
-              right: 20, 
-              zIndex: 999 
-            }}>
-              <TouchableOpacity 
-                onPress={() => setZoomImageUrl(null)} 
-                style={{ 
-                  width: 44, 
-                  height: 44, 
-                  borderRadius: 22, 
-                  backgroundColor: 'rgba(255,255,255,0.3)', 
-                  alignItems: 'center', 
-                  justifyContent: 'center' 
-                }}
-              >
-                <X size={24} color="white" />
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView
-              style={{ flex: 1 }}
-              contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
-              maximumZoomScale={5}
-              minimumZoomScale={1}
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}
-              scrollEnabled={true}
-              pinchGestureEnabled={true}
-            >
-              {zoomImageUrl && (
-                <Image 
-                  source={{ uri: zoomImageUrl }} 
-                  contentFit="contain"
-                  cachePolicy="memory-disk"
-                  style={{ 
-                    width: width, 
-                    height: Dimensions.get('window').height * 0.8,
-                  }} 
-                />
-              )}
-            </ScrollView>
-          </SafeAreaView>
-        </View>
-      </Modal>
+        <Modal visible={!!zoomImageUrl} transparent={true} onRequestClose={() => setZoomImageUrl(null)}>
+          <ImageViewer
+            imageUrls={zoomImageUrl ? [{ url: zoomImageUrl }] : []}
+            enableSwipeDown={true}
+            onSwipeDown={() => setZoomImageUrl(null)}
+            renderIndicator={() => <View />}
+          />
+        </Modal>
 
       <CardOverflowMenu 
         visible={menuVisible} 

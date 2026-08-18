@@ -26,6 +26,7 @@ import { AddToFlashcardSheet } from '../../src/components/flashcards/AddToFlashc
 import { PremiumMoveModal } from '../../src/components/flashcards/PremiumMoveModal';
 import { BranchSvc, BranchNode } from '../../src/services/BranchService';
 import { OfflineManager } from '../../src/services/OfflineManager';
+import { LocalStore } from '../../src/lib/localStore';
 
 interface CardItem {
   id: string;
@@ -127,17 +128,20 @@ export default function MicrotopicScreen() {
           progress?.forEach((p: any) => progressMap.set(p.card_id, p));
 
           const merged: CardItem[] = baseCards.map((bc: any) => {
+            // Check LocalStore first — it has the freshest review data
+            const local = LocalStore.get(uid!, bc.id);
             const p = progressMap.get(bc.id);
+            const src = (local && local.next_review) ? local : p;
             return {
               id: bc.id,
               front_text: bc.front_text || bc.question_text || '',
               back_text: bc.back_text || bc.answer_text || '',
-              status: p?.status || 'active',
-              learning_status: p?.learning_status || 'not_studied',
-              next_review: p?.next_review,
-              last_reviewed: p?.last_reviewed,
-              updated_at: p?.updated_at || bc.created_at,
-              interval_days: p?.interval_days,
+              status: src?.status || 'active',
+              learning_status: src?.learning_status || 'not_studied',
+              next_review: src?.next_review,
+              last_reviewed: src?.last_reviewed,
+              updated_at: src?.updated_at || src?.client_updated_at || bc.created_at,
+              interval_days: src?.interval_days,
             };
           }).filter(c => c.status !== 'deleted');
           setCards(merged);
@@ -196,17 +200,20 @@ export default function MicrotopicScreen() {
         progress?.forEach((p: any) => progressMap.set(p.card_id, p));
 
         const merged: CardItem[] = baseCards.map((bc: any) => {
+          // Check LocalStore first — it has the freshest review data
+          const local = LocalStore.get(uid!, bc.id);
           const p = progressMap.get(bc.id);
+          const src = (local && local.next_review) ? local : p;
           return {
             id: bc.id,
             front_text: bc.front_text || bc.question_text || '',
             back_text: bc.back_text || bc.answer_text || '',
-            status: p?.status || 'active',
-            learning_status: p?.learning_status || 'not_studied',
-            next_review: p?.next_review,
-            last_reviewed: p?.last_reviewed,
-            updated_at: p?.updated_at || bc.created_at,
-            interval_days: p?.interval_days,
+            status: src?.status || 'active',
+            learning_status: src?.learning_status || 'not_studied',
+            next_review: src?.next_review,
+            last_reviewed: src?.last_reviewed,
+            updated_at: src?.updated_at || src?.client_updated_at || bc.created_at,
+            interval_days: src?.interval_days,
           };
         }).filter(c => c.status !== 'deleted');
         setCards(merged);
@@ -226,6 +233,31 @@ export default function MicrotopicScreen() {
               const freshMap = new Map<string, any>();
               freshProgress.forEach((p: any) => freshMap.set(p.card_id, p));
               setCards(prevCards => prevCards.map(c => {
+                // Check LocalStore first — it has the most recent review data
+                // that may not have synced to Supabase yet
+                const local = LocalStore.get(uid!, c.id);
+                if (local && local.next_review) {
+                  const localTime = local.client_updated_at
+                    ? new Date(local.client_updated_at).getTime()
+                    : 0;
+                  const fresh = freshMap.get(c.id);
+                  const freshTime = fresh?.updated_at
+                    ? new Date(fresh.updated_at).getTime()
+                    : 0;
+                  // LocalStore is newer → use it (review hasn't synced yet)
+                  if (localTime > freshTime) {
+                    return {
+                      ...c,
+                      status: local.status || 'active',
+                      learning_status: local.learning_status || 'not_studied',
+                      next_review: local.next_review,
+                      last_reviewed: local.last_reviewed,
+                      updated_at: local.client_updated_at || c.updated_at,
+                      interval_days: local.interval_days,
+                    };
+                  }
+                }
+
                 const fresh = freshMap.get(c.id);
                 if (fresh) {
                   const localTime = c.updated_at ? new Date(c.updated_at).getTime() : 0;

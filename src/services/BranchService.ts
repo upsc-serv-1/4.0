@@ -98,21 +98,16 @@ export class BranchSvc {
       const rows = (data ?? []) as Branch[];
       if (!opts.includeArchived) {
         try {
-          await safeSetItem(cacheKey, JSON.stringify(rows));
-          KVStore.setJson(`@user_flashcard_branches_${userId}`, rows);
-          KVStore.setJson('@flashcard_branches', rows);
+          KVStore.setJson(cacheKey, rows);
         } catch {}
       }
       return rows;
     } catch (err) {
       // Network failed -> fallback to cache.
       try {
-        const cached = await AsyncStorage.getItem(cacheKey);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return filterRows(parsed as Branch[]);
-          }
+        const cached = KVStore.getJson<Branch[]>(cacheKey);
+        if (cached && Array.isArray(cached) && cached.length > 0) {
+          return filterRows(cached);
         }
       } catch {}
       // Last resort: try OfflineManager KVStore
@@ -662,16 +657,13 @@ export class BranchSvc {
       if (linkErr) throw linkErr;
       links = data ?? [];
       try {
-        await safeSetItem(linksCacheKey, JSON.stringify(links));
-        KVStore.setJson(`@user_flashcard_branch_cards_${userId}`, links);
-        KVStore.setJson('@flashcard_branch_cards', links);
+        KVStore.setJson(linksCacheKey, links);
       } catch {}
     } catch (err) {
       try {
-        const cached = await AsyncStorage.getItem(linksCacheKey);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed)) links = parsed;
+        const cached = KVStore.getJson<any[]>(linksCacheKey);
+        if (cached && Array.isArray(cached)) {
+          links = cached;
         }
       } catch {}
       if (!links || links.length === 0) {
@@ -720,15 +712,13 @@ export class BranchSvc {
         }
         userCardsRows = fetchedRows;
         try {
-          await safeSetItem(userCardsCacheKey, JSON.stringify(userCardsRows));
-          KVStore.setJson(`@user_cards_${userId}`, userCardsRows);
+          KVStore.setJson(userCardsCacheKey, userCardsRows);
         } catch {}
       } catch (err) {
         try {
-          const cached = await AsyncStorage.getItem(userCardsCacheKey);
-          if (cached) {
-            const parsed = JSON.parse(cached);
-            if (Array.isArray(parsed)) userCardsRows = parsed;
+          const cached = KVStore.getJson<any[]>(userCardsCacheKey);
+          if (cached && Array.isArray(cached)) {
+            userCardsRows = cached;
           }
         } catch {}
         if (!userCardsRows || userCardsRows.length === 0) {

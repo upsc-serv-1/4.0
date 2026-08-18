@@ -29,6 +29,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
+import { Image as ExpoImage } from 'expo-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Clipboard from 'expo-clipboard';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -212,10 +213,12 @@ export const getMarkdownRules = (colors: any, isDark: boolean, onImagePress?: (u
         onPress={() => onImagePress?.(src)}
         style={{ width: '100%', alignItems: 'center', marginVertical: 12 }}
       >
-        <Image
+        <ExpoImage
           source={{ uri: src }}
           style={{ width: '100%', height: Dimensions.get('window').width >= 768 ? 320 : 220 }}
-          resizeMode="contain"
+          contentFit="contain"
+          transition={200}
+          allowDownscaling={false}
         />
       </TouchableOpacity>
     );
@@ -1136,12 +1139,12 @@ export function MainsScreenInner() {
     const loadVaFavorites = async () => {
       if (!session?.user?.id) return;
       try {
-        const cached = await AsyncStorage.getItem('user_va_favorites');
-        if (cached) {
-          setVaFavorites(new Set(JSON.parse(cached)));
+        const cached = KVStore.getJson<string[]>('user_va_favorites');
+        if (cached && Array.isArray(cached)) {
+          setVaFavorites(new Set(cached));
         }
       } catch (err) {
-        console.warn('Failed to load user_va_favorites from AsyncStorage:', err);
+        console.warn('Failed to load user_va_favorites from KVStore:', err);
       }
       try {
         const { data, error } = await supabase
@@ -1151,7 +1154,7 @@ export function MainsScreenInner() {
         if (!error && data) {
           const cardIds = data.map((r: any) => r.card_id);
           setVaFavorites(new Set(cardIds));
-          await AsyncStorage.setItem('user_va_favorites', JSON.stringify(cardIds));
+          KVStore.setJson('user_va_favorites', cardIds);
         }
       } catch (err) {
         console.error('[VA Favorites] Failed to load from Supabase:', err);
@@ -1183,7 +1186,7 @@ export function MainsScreenInner() {
     const nextSet = new Set(vaFavorites);
     if (isFav) nextSet.delete(cardId); else nextSet.add(cardId);
     setVaFavorites(nextSet);
-    await AsyncStorage.setItem('user_va_favorites', JSON.stringify(Array.from(nextSet))).catch(() => {});
+    KVStore.setJson('user_va_favorites', Array.from(nextSet));
 
     try {
       if (isFav) {
@@ -1203,7 +1206,7 @@ export function MainsScreenInner() {
       const revertSet = new Set(vaFavorites);
       if (isFav) revertSet.add(cardId); else revertSet.delete(cardId);
       setVaFavorites(revertSet);
-      await AsyncStorage.setItem('user_va_favorites', JSON.stringify(Array.from(revertSet))).catch(() => {});
+      KVStore.setJson('user_va_favorites', Array.from(revertSet));
     }
   };
 

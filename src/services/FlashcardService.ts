@@ -630,13 +630,19 @@ export class FlashcardSvc {
    * Main review method. `grade` is 'again'|'hard'|'good'|'easy' (Dr. UPSC 4-button).
    * Settings are resolved from the card's folder hierarchy.
    */
-  static async reviewCard(userId: string, cardId: string, grade: Grade, opts: { durationSeconds?: number } = {}) {
+  static async reviewCard(userId: string, cardId: string, grade: Grade, opts: { durationSeconds?: number, currentState?: any } = {}) {
     // 1) Load user_card + card folder
-    const localUserCards = ((OfflineManager as any).getCollectionSync('user_cards', userId) ?? [])
-      .filter((u: any) => u.user_id === userId);
-    const localCards = ((OfflineManager as any).getCollectionSync('cards') ?? []);
-    let cur: any = localUserCards.find((u: any) => u.card_id === cardId);
-    let card: any = localCards.find((c: any) => c.id === cardId);
+    let cur: any = opts.currentState;
+    let card: any = null;
+
+    if (!cur || !cur.subject) {
+      const localUserCards = ((OfflineManager as any).getCollectionSync('user_cards', userId) ?? [])
+        .filter((u: any) => u.user_id === userId);
+      const localCards = ((OfflineManager as any).getCollectionSync('cards') ?? []);
+      
+      if (!cur) cur = localUserCards.find((u: any) => u.card_id === cardId);
+      card = localCards.find((c: any) => c.id === cardId);
+    }
 
     if (!cur || !card) {
       if (!NetworkStatus.isOnline()) {
@@ -696,7 +702,7 @@ export class FlashcardSvc {
     });
 
     // 4) Server write — best-effort. On failure the row stays in LocalStore's dirty queue.
-    const userCardPayload = {
+    const fullPayload = {
       user_id: userId,
       card_id: cardId,
       status: 'active',
@@ -714,16 +720,16 @@ export class FlashcardSvc {
       again_count: (cur.again_count ?? 0) + (grade === 'again' ? 1 : 0),
       times_seen: (cur.times_seen ?? 0) + 1,
       client_updated_at: nowIso,
-      dirty: true,
       updated_at: nowIso,
+      dirty: false,
     };
 
-    SyncQueue.enqueue('user_card_upsert', userCardPayload);
+    SyncQueue.enqueue('user_card_upsert', fullPayload);
     const offlineKey = `@user_cards_${userId}`;
     const offlineRows = KVStore.getJson<any[]>(offlineKey) ?? [];
     const idx = offlineRows.findIndex((r) => r.user_id === userId && r.card_id === cardId);
-    if (idx >= 0) offlineRows[idx] = { ...offlineRows[idx], ...userCardPayload };
-    else offlineRows.push(userCardPayload);
+    if (idx >= 0) offlineRows[idx] = { ...offlineRows[idx], ...fullPayload };
+    else offlineRows.push(fullPayload);
     KVStore.setJson(offlineKey, offlineRows);
 
     // 5) Audit log — also best-effort

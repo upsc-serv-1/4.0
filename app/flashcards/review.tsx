@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ActivityIndicator,
   Animated, Dimensions, Modal, TextInput, ScrollView, Alert,
-  KeyboardAvoidingView, Platform, Pressable,
+  KeyboardAvoidingView, Platform, Pressable, Image as RNImage
 } from 'react-native';
 import { Image } from 'expo-image';
+import ImageViewer from 'react-native-image-zoom-viewer';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
@@ -336,7 +337,10 @@ export default function ReviewScreen() {
       reviewedCount.current += 1;
       if (grade === 'good' || grade === 'easy') correctCount.current += 1;
       const durationSeconds = Math.max(0, Math.round((Date.now() - cardStart.current) / 1000));
-      await FlashcardSvc.reviewCard(uid, card.id, grade, { durationSeconds });
+      await FlashcardSvc.reviewCard(uid, card.id, grade, { 
+        durationSeconds, 
+        currentState: card.state 
+      });
       setIsFlipped(false); setShowCorrect(false); revealAnim.setValue(0);
       await nextCard();
     } catch (err: any) {
@@ -822,11 +826,13 @@ export default function ReviewScreen() {
               )}
               
               {parseImageUrls(currentCard.front_image_url).map((url, idx) => (
-                <TouchableOpacity key={url + idx} activeOpacity={0.9} onPress={() => setZoomImageUrl(url)} style={{ width: '100%', alignItems: 'center', alignSelf: 'center' }}>
+                <TouchableOpacity key={url + idx} activeOpacity={0.9} onPress={() => setZoomImageUrl(url)} style={{ width: '100%', alignItems: 'center', justifyContent: 'center' }}>
                   <Image 
                     source={{ uri: url }} 
                     contentFit="contain"
+                    contentPosition="center"
                     cachePolicy="memory-disk"
+                    allowDownscaling={false}
                     style={{ width: '100%', height: 400, borderRadius: 12, marginBottom: 16 }} 
                   />
                 </TouchableOpacity>
@@ -884,12 +890,14 @@ export default function ReviewScreen() {
                   <View style={[styles.divider, { backgroundColor: colors.border, marginBottom: 24 }]} />
                   
                   {parseImageUrls(currentCard.back_image_url).map((url, idx) => (
-                    <TouchableOpacity key={url + idx} activeOpacity={0.9} onPress={() => setZoomImageUrl(url)} style={{ width: '100%', alignItems: 'center', alignSelf: 'center' }}>
+                    <TouchableOpacity key={url + idx} activeOpacity={0.9} onPress={() => setZoomImageUrl(url)} style={{ width: '100%', alignItems: 'center', justifyContent: 'center' }}>
                       <Image 
                         source={{ uri: url }} 
                         contentFit="contain"
+                        contentPosition="center"
                         cachePolicy="memory-disk"
-                        style={{ width: '100%', height: 400, borderRadius: 12, marginBottom: 20 }} 
+                        allowDownscaling={false}
+                        style={{ width: '100%', height: 400, borderRadius: 12, marginBottom: 16 }} 
                       />
                     </TouchableOpacity>
                   ))}
@@ -1252,60 +1260,13 @@ export default function ReviewScreen() {
         </Modal>
 
         {/* IMAGE ZOOM MODAL */}
-        <Modal 
-          visible={!!zoomImageUrl} 
-          transparent 
-          animationType="fade" 
-          onRequestClose={() => setZoomImageUrl(null)}
-        >
-          <View style={{ flex: 1, backgroundColor: 'black' }}>
-            <SafeAreaView style={{ flex: 1 }}>
-              {/* Close Button Header */}
-              <View style={{ 
-                position: 'absolute', 
-                top: Platform.OS === 'ios' ? 60 : 20, 
-                right: 20, 
-                zIndex: 999 
-              }}>
-                <TouchableOpacity 
-                  onPress={() => setZoomImageUrl(null)} 
-                  style={{ 
-                    width: 44, 
-                    height: 44, 
-                    borderRadius: 22, 
-                    backgroundColor: 'rgba(255,255,255,0.3)', 
-                    alignItems: 'center', 
-                    justifyContent: 'center' 
-                  }}
-                >
-                  <X size={24} color="white" />
-                </TouchableOpacity>
-              </View>
-              
-              <ScrollView
-                style={{ flex: 1 }}
-                contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
-                maximumZoomScale={5}
-                minimumZoomScale={1}
-                showsHorizontalScrollIndicator={false}
-                showsVerticalScrollIndicator={false}
-                scrollEnabled={true}
-                pinchGestureEnabled={true}
-              >
-                {zoomImageUrl && (
-                  <Image 
-                    source={{ uri: zoomImageUrl }} 
-                    contentFit="contain"
-                    cachePolicy="memory-disk"
-                    style={{ 
-                      width: width, 
-                      height: height * 0.8,
-                    }} 
-                  />
-                )}
-              </ScrollView>
-            </SafeAreaView>
-          </View>
+        <Modal visible={!!zoomImageUrl} transparent={true} onRequestClose={() => setZoomImageUrl(null)}>
+          <ImageViewer
+            imageUrls={zoomImageUrl ? [{ url: zoomImageUrl }] : []}
+            enableSwipeDown={true}
+            onSwipeDown={() => setZoomImageUrl(null)}
+            renderIndicator={() => <View />}
+          />
         </Modal>
 
         <CardOverflowMenu 

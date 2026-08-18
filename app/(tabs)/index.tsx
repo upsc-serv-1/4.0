@@ -23,7 +23,7 @@ import { OfflineManager } from '../../src/services/OfflineManager';
 import { NetworkStatus } from '../../src/lib/networkStatus';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppInfoGuide from '../../src/components/AppInfoGuide';
-import { Check, X } from 'lucide-react-native';
+import { Check, X, CheckCircle2 } from 'lucide-react-native';
 import { Alert } from 'react-native';
 import { WidgetService, Widget } from '../../src/services/WidgetService';
 import { useWidgetData } from '../../src/hooks/useWidgetData';
@@ -725,8 +725,11 @@ export default function Home() {
                 {shortcuts
                   .filter(s => s.visible && (!['q_bank', 'data_facts', 'intro_conclusion', 'ethics', 'quotes', 'syllabus', 'pyq_analysis'].includes(s.id) || selectedCourse !== 'Medical Science'))
                   .map(s => {
+                    const isDueZero = s.id === 'due_cards' && stats.dueCards === 0;
+                    const dynamicColor = isDueZero ? '#10b981' : s.color;
+                    
                     const gradientColors = s.id === 'due_cards' 
-                      ? ['rgba(245, 158, 11, 0.09)', 'rgba(245, 158, 11, 0)']
+                      ? (isDueZero ? ['rgba(16, 185, 129, 0.09)', 'rgba(16, 185, 129, 0)'] : ['rgba(245, 158, 11, 0.09)', 'rgba(245, 158, 11, 0)'])
                       : s.id === 'random_pyq'
                       ? ['rgba(99, 102, 241, 0.09)', 'rgba(99, 102, 241, 0)']
                       : s.id === 'data_facts' || s.id === 'q_bank'
@@ -759,10 +762,13 @@ export default function Home() {
                     else if (s.icon === 'Map') IconComp = Map;
 
                     let titleValue: string | number = s.label;
-                    if (s.id === 'due_cards') titleValue = stats.dueCards;
+                    if (s.id === 'due_cards') {
+                      titleValue = stats.dueCards === 0 ? 'All caught up!' : stats.dueCards;
+                      if (stats.dueCards === 0) IconComp = CheckCircle2;
+                    }
                     else if (s.id === 'random_pyq') titleValue = pyqQuestionCount;
 
-                    const isNumberTitle = typeof titleValue === 'number' || s.id === 'due_cards' || s.id === 'random_pyq';
+                    const isNumberTitle = typeof titleValue === 'number' || (s.id === 'due_cards' && stats.dueCards > 0) || s.id === 'random_pyq';
 
                     return (
                       <TouchableOpacity 
@@ -775,13 +781,13 @@ export default function Home() {
                           start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                           style={StyleSheet.absoluteFillObject}
                         />
-                        <View style={[styles.resumeIconWrap, { backgroundColor: s.color }]}>
+                        <View style={[styles.resumeIconWrap, { backgroundColor: dynamicColor }]}>
                           <IconComp size={18} color="#fff" />
                         </View>
-                        <Text style={[styles.pulseActionTitle, { color: colors.textPrimary }, isNumberTitle ? { fontSize: 28, marginTop: 14 } : { fontSize: 16, marginTop: 12 }]} numberOfLines={1}>
+                        <Text style={[styles.pulseActionTitle, { color: (s.id === 'due_cards' && stats.dueCards === 0) ? dynamicColor : (isNumberTitle ? dynamicColor : colors.textPrimary) }, isNumberTitle ? { fontSize: 28, marginTop: 14 } : { fontSize: 16, marginTop: 12 }]} numberOfLines={1}>
                           {titleValue}
                         </Text>
-                        <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>{s.sub}</Text>
+                        <Text style={[styles.pulseActionSub, { color: colors.textTertiary }]}>{(s.id === 'due_cards' && stats.dueCards === 0) ? '0 cards due' : s.sub}</Text>
                       </TouchableOpacity>
                     );
                   })}

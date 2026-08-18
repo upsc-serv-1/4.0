@@ -630,7 +630,7 @@ export class FlashcardSvc {
    * Main review method. `grade` is 'again'|'hard'|'good'|'easy' (Dr. UPSC 4-button).
    * Settings are resolved from the card's folder hierarchy.
    */
-  static async reviewCard(userId: string, cardId: string, grade: Grade, opts: { durationSeconds?: number, currentState?: any } = {}) {
+  static async reviewCard(userId: string, cardId: string, grade: Grade, opts: { durationSeconds?: number, currentState?: any, branchId?: string } = {}) {
     // 1) Load user_card + card folder
     let cur: any = opts.currentState;
     let card: any = null;
@@ -657,7 +657,7 @@ export class FlashcardSvc {
       card = (data as any).cards;
     }
     const settings = await FolderSettingsSvc.resolve(
-      userId, card.subject, card.section_group, card.microtopic
+      userId, card.subject, card.section_group, card.microtopic, opts.branchId
     );
 
     // 2) Apply SM-2 with folder settings

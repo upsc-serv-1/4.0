@@ -339,7 +339,8 @@ export default function ReviewScreen() {
       const durationSeconds = Math.max(0, Math.round((Date.now() - cardStart.current) / 1000));
       await FlashcardSvc.reviewCard(uid, card.id, grade, { 
         durationSeconds, 
-        currentState: card.state 
+        currentState: card.state,
+        branchId: branchId || undefined,
       });
       setIsFlipped(false); setShowCorrect(false); revealAnim.setValue(0);
       await nextCard();

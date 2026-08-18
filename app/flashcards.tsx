@@ -255,14 +255,9 @@ function FlashcardsHub() {
         });
       };
 
-      if (treeRef.current.length > 0) {
-        // Already have data in memory — just do background refresh, don't flash stale cache
-        BranchSvc.buildTree(uid).then(updateTreeState).catch(() => {});
-      } else {
-        // First load — use cache-first for instant render
-        const t = await BranchSvc.buildTreeCacheFirst(uid, updateTreeState);
-        updateTreeState(t);
-      }
+      // Always use cache-first for instant render of local reviews, which will also trigger a background refresh
+      const t = await BranchSvc.buildTreeCacheFirst(uid, updateTreeState);
+      updateTreeState(t);
     } catch (e: any) {
       console.error('[DrUPSCHub] load error:', e?.message);
     } finally {

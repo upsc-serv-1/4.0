@@ -142,7 +142,7 @@ export class BranchSvc {
       .single();
     if (error) throw error;
     try {
-      await AsyncStorage.removeItem(`flashcard_branches_${userId}`);
+      KVStore.delete(`flashcard_branches_${userId}`);
     } catch {}
     return data as Branch;
   }
@@ -156,7 +156,7 @@ export class BranchSvc {
     if (error) throw error;
     if (b?.user_id) {
       try {
-        await AsyncStorage.removeItem(`flashcard_branches_${b.user_id}`);
+        KVStore.delete(`flashcard_branches_${b.user_id}`);
       } catch {}
     }
   }
@@ -179,7 +179,7 @@ export class BranchSvc {
     if (error) throw error;
     if (b?.user_id) {
       try {
-        await AsyncStorage.removeItem(`flashcard_branches_${b.user_id}`);
+        KVStore.delete(`flashcard_branches_${b.user_id}`);
       } catch {}
     }
   }
@@ -193,7 +193,7 @@ export class BranchSvc {
     if (error) throw error;
     if (b?.user_id) {
       try {
-        await AsyncStorage.removeItem(`flashcard_branches_${b.user_id}`);
+        KVStore.delete(`flashcard_branches_${b.user_id}`);
       } catch {}
     }
   }
@@ -460,8 +460,13 @@ export class BranchSvc {
     // 1. Try to build from local cache synchronously (same logic as offline path)
     let cachedTree: BranchNode[] | null = null;
     try {
-      const cachedBranches = OfflineManager.getCollectionSync('flashcard_branches') as any[] || [];
-      if (cachedBranches.length > 0) {
+      const cacheKey = `flashcard_branches_${userId}`;
+      let cachedBranches = KVStore.getJson<any[]>(cacheKey);
+      if (!cachedBranches || cachedBranches.length === 0) {
+        cachedBranches = OfflineManager.getCollectionSync('flashcard_branches') as any[] || [];
+      }
+      
+      if (cachedBranches && cachedBranches.length > 0) {
         const branches = cachedBranches
           .filter((r: any) => !r.is_deleted && !r.is_archived)
           .sort((a: any, b: any) => (a.sort_order - b.sort_order) || a.name.localeCompare(b.name));
@@ -521,6 +526,15 @@ export class BranchSvc {
             nodeMap.get(node.parent_id)!.children.push(node);
           } else { roots.push(node); }
         });
+        const sortChildren = (arr: any[]) => {
+          arr.sort((a, b) => {
+            if (a.is_folder && !b.is_folder) return -1;
+            if (!a.is_folder && b.is_folder) return 1;
+            return (a.sort_order - b.sort_order) || a.name.localeCompare(b.name);
+          });
+          arr.forEach(n => sortChildren(n.children));
+        };
+        sortChildren(roots);
         const assignPath = (nodes: any[], depth: number, parentPath: string) => {
           nodes.forEach(n => {
             n.depth = depth; n.path = parentPath ? `${parentPath}/${n.name}` : n.name;
@@ -619,6 +633,15 @@ export class BranchSvc {
           nodeMap2.get(node.parent_id)!.children.push(node);
         } else { roots2.push(node); }
       });
+      const sortChildren2 = (arr: any[]) => {
+        arr.sort((a, b) => {
+          if (a.is_folder && !b.is_folder) return -1;
+          if (!a.is_folder && b.is_folder) return 1;
+          return (a.sort_order - b.sort_order) || a.name.localeCompare(b.name);
+        });
+        arr.forEach(n => sortChildren2(n.children));
+      };
+      sortChildren2(roots2);
       // Set depth + path
       const assignPath2 = (nodes: any[], depth: number, parentPath: string) => {
         nodes.forEach(n => {
@@ -704,14 +727,36 @@ export class BranchSvc {
           const slice = cardIds.slice(i, i + CHUNK);
           const { data, error } = await supabase
             .from('user_cards')
-            .select('card_id, learning_status, status, next_review')
+            .select('card_id, learning_status, status, next_review, updated_at')
             .eq('user_id', userId)
             .in('card_id', slice);
           if (error) throw error;
           fetchedRows.push(...(data ?? []));
         }
-        userCardsRows = fetchedRows;
+        
+        // Merge with local KVStore cache which may have fresher data (from recent reviews)
+        const offlineUserCards = OfflineManager.getCollectionSync('user_cards', userId) as any[] || [];
+        const localMap = new Map<string, any>(offlineUserCards.map(c => [c.card_id, c]));
+        
+        userCardsRows = fetchedRows.map(row => {
+          const local = localMap.get(row.card_id);
+          // If local has a newer updated_at timestamp, use local
+          if (local && local.updated_at && row.updated_at && new Date(local.updated_at).getTime() > new Date(row.updated_at).getTime()) {
+            return local;
+          }
+          return row;
+        });
+
+        // Also add any local cards that are in the branch but weren't in the remote fetch (e.g. newly added and not synced)
+        const fetchedSet = new Set(fetchedRows.map(r => r.card_id));
+        offlineUserCards.forEach(local => {
+          if (!fetchedSet.has(local.card_id) && cardIdSet.has(local.card_id)) {
+            userCardsRows.push(local);
+          }
+        });
+
         try {
+          // Keep the merged rows in KVStore so OfflineManager's cache stays fresh
           KVStore.setJson(userCardsCacheKey, userCardsRows);
         } catch {}
       } catch (err) {
@@ -722,7 +767,6 @@ export class BranchSvc {
           }
         } catch {}
         if (!userCardsRows || userCardsRows.length === 0) {
-          // Try OfflineManager KVStore
           const offlineUserCards = OfflineManager.getCollectionSync('user_cards', userId) as any[];
           if (offlineUserCards && offlineUserCards.length > 0) {
             userCardsRows = offlineUserCards
@@ -732,6 +776,7 @@ export class BranchSvc {
                 learning_status: uc.learning_status,
                 status: uc.status,
                 next_review: uc.next_review,
+                updated_at: uc.updated_at,
               }));
           }
         }

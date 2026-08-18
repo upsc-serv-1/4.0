@@ -364,7 +364,7 @@ export default function MicrotopicScreen() {
       return `Overdue ${Math.round(overdueDays / 365)}y`;
     }
 
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
     if (diffDays === 0) {
       const hours = Math.floor(diffMs / (1000 * 60 * 60));
       const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));

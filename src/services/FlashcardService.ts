@@ -169,8 +169,8 @@ export class FlashcardSvc {
       // Offline cache failed, continue to network fallback
     }
 
-    // If offline cache returned nothing or is incomplete (e.g. missing card data), try network
-    if (data.length === 0 || (branchSet && data.length < branchSet.size)) {
+    // If offline cache returned nothing, try network
+    if (data.length === 0) {
       try {
         let query = supabase
           .from('user_cards')

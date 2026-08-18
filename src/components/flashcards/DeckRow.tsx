@@ -249,12 +249,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   name: {
-    fontSize: 17,
-    fontWeight: '600',
-    marginBottom: 2,
+    fontSize: 19,
+    fontWeight: '700',
+    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '500',
   },
 });

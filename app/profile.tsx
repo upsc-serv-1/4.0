@@ -937,7 +937,7 @@ export default function Profile() {
 
       <FolderAlgorithmModal
         visible={algorithmModalVisible}
-        userId={uid}
+        userId={session?.user?.id || ''}
         onClose={() => setAlgorithmModalVisible(false)}
       />
 

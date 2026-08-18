@@ -446,7 +446,7 @@ export default function MicrotopicScreen() {
     router.push({ pathname: '/flashcards/review', params });
   };
 
-  const renderCardItem = ({ item }: { item: CardItem }) => {
+  const renderCardItem = ({ item, index }: { item: CardItem, index: number }) => {
     const isFrozen = item.status === 'frozen';
     const statusColor =
       item.learning_status === 'mastered' ? '#3b82f6' :
@@ -465,9 +465,26 @@ export default function MicrotopicScreen() {
       IconComp = Clock;
     }
 
+    const isFirst = index === 0;
+    const isLast = index === filteredSortedCards.length - 1;
+
     return (
       <TouchableOpacity
-        style={[styles.cardItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        style={[
+          styles.cardItem, 
+          { 
+            backgroundColor: colors.surface, 
+            borderColor: colors.border,
+            borderWidth: 0,
+            borderBottomWidth: isLast ? 0 : 1,
+            borderRadius: 0,
+            borderTopLeftRadius: isFirst ? 20 : 0,
+            borderTopRightRadius: isFirst ? 20 : 0,
+            borderBottomLeftRadius: isLast ? 20 : 0,
+            borderBottomRightRadius: isLast ? 20 : 0,
+            marginBottom: 0,
+          }
+        ]}
         onPress={() => router.push({ 
           pathname: '/flashcards/browse', 
           params: { branchId, subject, section, microtopic, recursive, cardId: item.id } 
@@ -519,7 +536,7 @@ export default function MicrotopicScreen() {
           data={filteredSortedCards}
           keyExtractor={(i) => i.id}
           renderItem={renderCardItem}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 120 }}
+          contentContainerStyle={{ paddingHorizontal: 40, paddingBottom: 120 }}
           ListHeaderComponent={
             <View>
               {/* Hero */}

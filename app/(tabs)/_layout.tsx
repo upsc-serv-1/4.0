@@ -1,5 +1,5 @@
 import { Tabs, useSegments, useRouter, Redirect, useFocusEffect } from 'expo-router';
-import { Home, BarChart2, RotateCcw, LayoutList, Tag, Target, FileText, TrendingUp, BarChart3, Database, PenTool, Sparkles, BookOpen, Compass, Globe, Search, Zap } from 'lucide-react-native';
+import { Home, BarChart2, RotateCcw, LayoutList, Tag, Target, FileText, TrendingUp, BarChart3, Database, PenTool, Sparkles, BookOpen, Compass, Globe, Search, Zap, Layers } from 'lucide-react-native';
 import { useAuth } from '../../src/context/AuthContext';
 import { useCourse } from '../../src/context/CourseContext';
 import { View, ActivityIndicator, ScrollView, TouchableOpacity, Text, StyleSheet, useWindowDimensions } from 'react-native';
@@ -86,7 +86,7 @@ export default function TabsLayout() {
     analyse: { title: 'Analyse', icon: BarChart2 },
     mains: { title: 'Mains', icon: PenTool },
     pyq: { title: 'PYQ Analysis', icon: BarChart3 },
-    flashcards: { title: 'Flashcards', icon: Zap },
+    flashcards: { title: 'Flashcards', icon: Layers },
     tags: { title: 'Tags', icon: Tag },
     notes: { title: 'Notes', icon: FileText },
     hardnotes: { title: 'Hardnotes', icon: PenTool },

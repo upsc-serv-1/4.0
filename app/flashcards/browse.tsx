@@ -17,11 +17,13 @@ import { getMarkdownStyles, getMarkdownRules, cleanMarkdownContent } from '../ma
 import { parseImageUrls } from '../../src/utils/imageHelpers';
 import { renderAIText } from '../../src/utils/renderAIText';
 
-const { width } = Dimensions.get('window');
+const { width, height: windowHeight } = Dimensions.get('window');
 
 function BrowseCardView({ card, isActive, onImagePress }: { card: any, isActive: boolean, onImagePress: (url: string) => void }) {
   const { colors, isDark } = useTheme();
   const [revealed, setRevealed] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
+  const answerYRef = useRef<number>(0);
   
   // reset revealed when card changes
   useEffect(() => {
@@ -36,6 +38,7 @@ function BrowseCardView({ card, isActive, onImagePress }: { card: any, isActive:
 
   return (
     <ScrollView 
+      ref={scrollRef}
       style={{ width }} 
       contentContainerStyle={styles.cardScroll}
       maximumZoomScale={5}
@@ -53,7 +56,7 @@ function BrowseCardView({ card, isActive, onImagePress }: { card: any, isActive:
           <TouchableOpacity key={url + idx} activeOpacity={0.9} onPress={() => onImagePress(url)} style={{ width: '100%', alignItems: 'center' }}>
             <Image 
               source={{ uri: url }} 
-              style={{ width: '100%', height: 250, borderRadius: 8, marginBottom: 12 }}
+              style={{ width: '100%', height: Math.max(400, windowHeight * 0.65), borderRadius: 8, marginBottom: 12 }}
               contentFit="contain"
               contentPosition="center"
               allowDownscaling={false}
@@ -78,12 +81,24 @@ function BrowseCardView({ card, isActive, onImagePress }: { card: any, isActive:
         {!revealed ? (
           <TouchableOpacity 
             style={[styles.showAnswerBtn, { backgroundColor: colors.primary }]}
-            onPress={() => setRevealed(true)}
+            onPress={() => {
+              setRevealed(true);
+              setTimeout(() => {
+                if (answerYRef.current > 0) {
+                  scrollRef.current?.scrollTo({ y: answerYRef.current - 20, animated: true });
+                } else {
+                  scrollRef.current?.scrollToEnd({ animated: true });
+                }
+              }, 100);
+            }}
           >
             <Text style={styles.showAnswerText}>Show Answer</Text>
           </TouchableOpacity>
         ) : (
-          <View style={[styles.backContainer, { borderColor: colors.border }]}>
+          <View 
+            style={[styles.backContainer, { borderColor: colors.border }]}
+            onLayout={(e) => { answerYRef.current = e.nativeEvent.layout.y; }}
+          >
             <View style={styles.cardHeader}>
               <Text style={[styles.cardHeaderTitle, { color: colors.textSecondary }]}>Back</Text>
             </View>
@@ -92,7 +107,7 @@ function BrowseCardView({ card, isActive, onImagePress }: { card: any, isActive:
           <TouchableOpacity key={url + idx} activeOpacity={0.9} onPress={() => onImagePress(url)} style={{ width: '100%', alignItems: 'center' }}>
             <Image 
                 source={{ uri: url }} 
-                style={{ width: '100%', height: 250, borderRadius: 8, marginBottom: 12 }}
+                style={{ width: '100%', height: Math.max(400, windowHeight * 0.65), borderRadius: 8, marginBottom: 12 }}
                 contentFit="contain"
                 contentPosition="center"
                 allowDownscaling={false}

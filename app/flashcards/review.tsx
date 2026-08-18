@@ -103,8 +103,8 @@ export default function ReviewScreen() {
 
   const revealAnim = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef<ScrollView>(null);
-
-
+  const answerYRef = useRef<number>(0);
+  const { height: windowHeight } = Dimensions.get('window');
 
   useEffect(() => { if (uid) { loadQueue(); loadZoomSetting(); } }, [uid]);
 
@@ -302,7 +302,11 @@ export default function ReviewScreen() {
     
     // Auto-scroll to answer
     setTimeout(() => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
+      if (answerYRef.current > 0) {
+        scrollViewRef.current?.scrollTo({ y: answerYRef.current - 20, animated: true });
+      } else {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }
     }, 100);
   };
 
@@ -834,7 +838,7 @@ export default function ReviewScreen() {
                     contentPosition="center"
                     cachePolicy="memory-disk"
                     allowDownscaling={false}
-                    style={{ width: '100%', height: 400, borderRadius: 12, marginBottom: 16 }} 
+                    style={{ width: '100%', height: Math.max(400, windowHeight * 0.65), borderRadius: 12, marginBottom: 16 }} 
                   />
                 </TouchableOpacity>
               ))}
@@ -887,7 +891,10 @@ export default function ReviewScreen() {
 
               {/* ANSWER SECTION (Conditional) */}
               {isFlipped && (
-                <Animated.View style={{ opacity: revealAnim, marginTop: 24 }}>
+                <Animated.View 
+                  style={{ opacity: revealAnim, marginTop: 24, width: '100%' }}
+                  onLayout={(e) => { answerYRef.current = e.nativeEvent.layout.y; }}
+                >
                   <View style={[styles.divider, { backgroundColor: colors.border, marginBottom: 24 }]} />
                   
                   {parseImageUrls(currentCard.back_image_url).map((url, idx) => (
@@ -898,7 +905,7 @@ export default function ReviewScreen() {
                         contentPosition="center"
                         cachePolicy="memory-disk"
                         allowDownscaling={false}
-                        style={{ width: '100%', height: 400, borderRadius: 12, marginBottom: 16 }} 
+                        style={{ width: '100%', height: Math.max(400, windowHeight * 0.65), borderRadius: 12, marginBottom: 16 }} 
                       />
                     </TouchableOpacity>
                   ))}

@@ -18,9 +18,10 @@ import Animated, {
 import {
   Plus, Search as SearchIcon, X, Flame, Clock, Sparkles, Layers, Zap, ArrowUpDown,
   Folder, CheckCircle2, Minus, ChevronLeft, ArrowUpRight, Settings, MoreVertical,
-  FolderPlus, Play, ChevronRight, Trash, Check, FileDown
+  FolderPlus, Play, ChevronRight, Trash, Check, FileDown, Cloud, CloudOff, RefreshCw
 } from 'lucide-react-native';
 import { supabase } from '../src/lib/supabase';
+import { SyncQueue } from '../src/services/SyncQueue';
 import { useAuth } from '../src/context/AuthContext';
 import { useTheme } from '../src/context/ThemeContext';
 import { ThemeSwitcher } from '../src/components/ThemeSwitcher';
@@ -58,6 +59,9 @@ function FlashcardsHub() {
 
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const navLock = React.useRef(false);
+  const [syncStatusVisible, setSyncStatusVisible] = useState(false);
+  const [pendingSyncCount, setPendingSyncCount] = useState(0);
+  const [isSyncing, setIsSyncing] = useState(false);
   
   // Modals
   const [addMenuVisible, setAddMenuVisible] = useState(false);
@@ -269,10 +273,28 @@ function FlashcardsHub() {
 
   useFocusEffect(useCallback(() => { 
     navLock.current = false; 
+    setPendingSyncCount(SyncQueue.pendingCount());
     load(); 
   }, [load]));
 
   const onRefresh = async () => { setRefreshing(true); await load(); };
+
+  const handleForceSync = async () => {
+    setIsSyncing(true);
+    try {
+      const result = await SyncQueue.drain();
+      setPendingSyncCount(SyncQueue.pendingCount());
+      if (result.flushed > 0 || result.failed > 0) {
+        Alert.alert('Sync Complete', `Successfully synced ${result.flushed} items.\nFailed: ${result.failed}`);
+      } else {
+        Alert.alert('Sync Status', 'Everything is up to date.');
+      }
+    } catch (e: any) {
+      Alert.alert('Sync Error', e?.message || 'An error occurred during sync.');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   // Fetch cap-aware stats (applies daily limits matching the review screen)
   useEffect(() => {
@@ -573,6 +595,18 @@ function FlashcardsHub() {
                 </Text>
               </View>
               <View style={styles.headerBtns}>
+                <TouchableOpacity onPress={() => { setPendingSyncCount(SyncQueue.pendingCount()); setSyncStatusVisible(true); }} style={styles.iconBtn}>
+                  {pendingSyncCount > 0 && !isSyncing && (
+                    <View style={{ position: 'absolute', top: 6, right: 6, width: 8, height: 8, borderRadius: 4, backgroundColor: '#ef4444', zIndex: 10 }} />
+                  )}
+                  {isSyncing ? (
+                    <ActivityIndicator size="small" color={colors.primary} />
+                  ) : pendingSyncCount > 0 ? (
+                    <CloudOff size={22} color={colors.textPrimary} />
+                  ) : (
+                    <Cloud size={22} color={colors.textPrimary} />
+                  )}
+                </TouchableOpacity>
                 <TouchableOpacity onPress={() => setAlgorithmModalVisible(true)} style={styles.iconBtn}>
                   <Settings size={22} color={colors.textPrimary} />
                 </TouchableOpacity>
@@ -676,6 +710,44 @@ function FlashcardsHub() {
         </TouchableOpacity>
 
         {/* Modals */}
+        {/* Sync Status Modal */}
+        <Modal visible={syncStatusVisible} transparent animationType="fade" onRequestClose={() => setSyncStatusVisible(false)}>
+          <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setSyncStatusVisible(false)}>
+            <View style={[styles.modalContent, { backgroundColor: colors.surface, padding: 24, alignItems: 'center' }]}>
+              <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: pendingSyncCount > 0 ? '#fef08a' : '#bbf7d0', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                {pendingSyncCount > 0 ? <CloudOff size={32} color="#ca8a04" /> : <Cloud size={32} color="#16a34a" />}
+              </View>
+              <Text style={{ fontSize: 20, fontWeight: '700', color: colors.textPrimary, marginBottom: 8 }}>
+                Sync Status
+              </Text>
+              <Text style={{ fontSize: 16, color: colors.textSecondary, textAlign: 'center', marginBottom: 24 }}>
+                {pendingSyncCount > 0 
+                  ? `You have ${pendingSyncCount} offline changes waiting to sync to the cloud.`
+                  : 'All your flashcards and progress are safely backed up to the cloud!'}
+              </Text>
+              
+              <TouchableOpacity 
+                onPress={handleForceSync}
+                disabled={isSyncing || pendingSyncCount === 0}
+                style={{
+                  width: '100%', paddingVertical: 14, borderRadius: 12, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8,
+                  backgroundColor: pendingSyncCount > 0 ? colors.primary : colors.border,
+                  opacity: (isSyncing || pendingSyncCount === 0) ? 0.6 : 1
+                }}
+              >
+                {isSyncing ? <ActivityIndicator color="#fff" /> : <RefreshCw size={20} color={pendingSyncCount > 0 ? "#fff" : colors.textTertiary} />}
+                <Text style={{ color: pendingSyncCount > 0 ? "#fff" : colors.textTertiary, fontWeight: '700', fontSize: 16 }}>
+                  {isSyncing ? 'Syncing...' : pendingSyncCount > 0 ? 'Sync Now' : 'Up to Date'}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => setSyncStatusVisible(false)} style={{ marginTop: 16, padding: 8 }}>
+                <Text style={{ color: colors.textTertiary, fontWeight: '600' }}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+
         {/* Add Menu Modal */}
         <Modal visible={addMenuVisible} transparent animationType="fade" onRequestClose={() => setAddMenuVisible(false)}>
           <Pressable style={styles.modalOverlay} onPress={() => setAddMenuVisible(false)}>

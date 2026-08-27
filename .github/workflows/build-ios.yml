@@ -3,6 +3,9 @@ name: Build iOS IPA (Unsigned)
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - clone-version-2
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

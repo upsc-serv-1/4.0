@@ -5698,11 +5698,20 @@ function QuestionBankView({
 
   const allYears = useMemo(() => {
     const yearSet = new Set<string>();
+    let hasNonYear = false;
     questions.forEach(q => {
       const yr = q.year;
-      if (yr) yearSet.add(String(yr));
+      if (yr !== null && yr !== undefined && String(yr).trim() !== '' && String(yr).trim() !== '0' && String(yr).toLowerCase() !== 'non-year') {
+        yearSet.add(String(yr).trim());
+      } else {
+        hasNonYear = true;
+      }
     });
-    return Array.from(yearSet).sort((a, b) => Number(b) - Number(a));
+    const sorted = Array.from(yearSet).sort((a, b) => Number(b) - Number(a));
+    if (hasNonYear || questions.length > 0) {
+      sorted.push('Non-Year');
+    }
+    return sorted;
   }, [questions]);
 
 
@@ -5991,7 +6000,12 @@ function QuestionBankView({
         const matchMicroTag = microFilter.length === 0 || (q.microtag || '').split(',').map(t => t.trim()).some(t => microFilter.includes(t));
         if (!matchMicroTag) return false;
 
-        const matchYear = yearFilter.length === 0 || yearFilter.includes(String(q.year || ''));
+        const isNonYearQ = q.year === null || q.year === undefined || !String(q.year).trim() || String(q.year).trim() === '0' || String(q.year).toLowerCase() === 'non-year';
+        const matchYear = yearFilter.length === 0 || (
+          isNonYearQ
+            ? yearFilter.includes('Non-Year')
+            : yearFilter.includes(String(q.year).trim())
+        );
         if (!matchYear) return false;
 
         return true;
@@ -9063,6 +9077,10 @@ function countActiveMainsFilters(f: MainsFilters): number {
   if (f.sections !== 'All') count++;
   if (f.microtopics !== 'All') count++;
   if (f.subtopics !== 'All') count++;
+  if (f.nanotopics !== 'All') count++;
+  if (f.macrotags !== 'All') count++;
+  if (f.microtags !== 'All') count++;
+  if (f.years !== 'All') count++;
   return count;
 }
 
@@ -9165,11 +9183,20 @@ function MainsAISearchView({
 
   const allYears = useMemo(() => {
     const yearSet = new Set<string>();
+    let hasNonYear = false;
     questions.forEach(q => {
       const yr = q.year;
-      if (yr) yearSet.add(String(yr));
+      if (yr !== null && yr !== undefined && String(yr).trim() !== '' && String(yr).trim() !== '0' && String(yr).toLowerCase() !== 'non-year') {
+        yearSet.add(String(yr).trim());
+      } else {
+        hasNonYear = true;
+      }
     });
-    return Array.from(yearSet).sort((a, b) => Number(b) - Number(a));
+    const sorted = Array.from(yearSet).sort((a, b) => Number(b) - Number(a));
+    if (hasNonYear || questions.length > 0) {
+      sorted.push('Non-Year');
+    }
+    return sorted;
   }, [questions]);
 
   // User Revision Tags (passed as props)

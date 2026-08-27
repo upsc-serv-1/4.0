@@ -3,7 +3,7 @@ import FeatureGate from '../src/components/FeatureGate';
 import {
   View, Text, StyleSheet, ActivityIndicator, ScrollView,
   TouchableOpacity, Modal, TextInput, Alert, FlatList, RefreshControl, Pressable,
-  KeyboardAvoidingView, Platform, Keyboard, useWindowDimensions
+  KeyboardAvoidingView, Platform, Keyboard, useWindowDimensions, BackHandler
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -18,7 +18,7 @@ import Animated, {
 import {
   Plus, Search as SearchIcon, X, Flame, Clock, Sparkles, Layers, Zap, ArrowUpDown,
   Folder, CheckCircle2, Minus, ChevronLeft, ArrowUpRight, Settings, MoreVertical,
-  FolderPlus, Play, ChevronRight, Trash, Check, FileDown, Cloud, CloudOff, RefreshCw
+  FolderPlus, Play, ChevronRight, Trash, Check, FileDown, Cloud, CloudOff, RefreshCw, BookOpen, BarChart3
 } from 'lucide-react-native';
 import { NetworkStatus } from '../src/lib/networkStatus';
 import { OfflineManager } from '../src/services/OfflineManager';
@@ -59,6 +59,22 @@ function FlashcardsHub() {
     () => {
       setCurrentFolder(null);
     }
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        if (currentFolder !== null) {
+          setCurrentFolder(null);
+          return true;
+        }
+        router.replace('/(tabs)');
+        return true;
+      };
+
+      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () => subscription.remove();
+    }, [currentFolder])
   );
 
   const expandedLoadedRef = React.useRef(false);
@@ -655,31 +671,69 @@ function FlashcardsHub() {
           ) : (
             <View style={styles.headerTop}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <TouchableOpacity onPress={() => currentFolder ? setCurrentFolder(null) : router.back()} style={styles.iconBtn}>
+                <TouchableOpacity onPress={() => currentFolder ? setCurrentFolder(null) : router.replace('/(tabs)')} style={styles.iconBtn}>
                   <ChevronLeft size={28} color={colors.primary} />
                 </TouchableOpacity>
                 <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
                   {currentFolder ? currentFolder.name : 'Home'}
                 </Text>
               </View>
-              <View style={styles.headerBtns}>
-                <TouchableOpacity onPress={() => { setPendingSyncCount(SyncQueue.pendingCount()); setSyncStatusVisible(true); }} style={styles.iconBtn}>
+              <View style={[styles.headerBtns, { gap: 6 }]}>
+                <TouchableOpacity 
+                  onPress={() => router.navigate({ pathname: '/mains', params: { initialScreen: 'questions' } })} 
+                  style={{
+                    backgroundColor: colors.primary + '18',
+                    borderRadius: 12,
+                    paddingHorizontal: 8,
+                    height: 34,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 3,
+                    borderWidth: 1,
+                    borderColor: colors.primary + '35'
+                  }}
+                  accessibilityLabel="Mains Question Bank"
+                >
+                  <BookOpen size={13} color={colors.primary} />
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: colors.primary }}>Mains</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  onPress={() => router.navigate({ pathname: '/pyq', params: { fromTab: 'flashcards' } })} 
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderRadius: 12,
+                    paddingHorizontal: 8,
+                    height: 34,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 3,
+                    borderWidth: 1,
+                    borderColor: colors.border
+                  }}
+                  accessibilityLabel="PYQ Analysis"
+                >
+                  <BarChart3 size={13} color={colors.textSecondary} />
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textPrimary }}>PYQ</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => { setPendingSyncCount(SyncQueue.pendingCount()); setSyncStatusVisible(true); }} style={[styles.iconBtn, { width: 34, height: 34 }]}>
                   {pendingSyncCount > 0 && !isSyncing && (
-                    <View style={{ position: 'absolute', top: 6, right: 6, width: 8, height: 8, borderRadius: 4, backgroundColor: '#ef4444', zIndex: 10 }} />
+                    <View style={{ position: 'absolute', top: 4, right: 4, width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#ef4444', zIndex: 10 }} />
                   )}
                   {isSyncing ? (
                     <ActivityIndicator size="small" color={colors.primary} />
                   ) : pendingSyncCount > 0 ? (
-                    <CloudOff size={22} color={colors.textPrimary} />
+                    <CloudOff size={18} color={colors.textPrimary} />
                   ) : (
-                    <Cloud size={22} color={colors.textPrimary} />
+                    <Cloud size={18} color={colors.textPrimary} />
                   )}
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setAlgorithmModalVisible(true)} style={styles.iconBtn}>
-                  <Settings size={22} color={colors.textPrimary} />
+                <TouchableOpacity onPress={() => setAlgorithmModalVisible(true)} style={[styles.iconBtn, { width: 34, height: 34 }]}>
+                  <Settings size={18} color={colors.textPrimary} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setSearchVisible(v => !v)} style={styles.iconBtn}>
-                  <SearchIcon size={22} color={colors.textPrimary} />
+                <TouchableOpacity onPress={() => setSearchVisible(v => !v)} style={[styles.iconBtn, { width: 34, height: 34 }]}>
+                  <SearchIcon size={18} color={colors.textPrimary} />
                 </TouchableOpacity>
                 <ThemeSwitcher />
               </View>

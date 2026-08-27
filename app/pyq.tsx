@@ -14,13 +14,14 @@ import {
   View,
   Animated,
   RefreshControl,
+  BackHandler,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { KVStore } from '../src/lib/kvStore';
 import { OfflineManager } from '../src/services/OfflineManager';
 import { QuestionCache } from '../src/services/QuestionCache';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
@@ -35,6 +36,8 @@ import {
   X,
   FileStack,
   HelpCircle,
+  BookOpen,
+  Zap,
 } from 'lucide-react-native';
 import { supabase } from '../src/lib/supabase';
 import { PieChart, LineChart } from '../src/components/Charts';
@@ -442,6 +445,17 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        router.replace('/(tabs)');
+        return true;
+      };
+      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () => subscription.remove();
+    }, [])
+  );
   const [examStage, setExamStage] = useState(() => {
     if (savedState?.examStage) return savedState.examStage;
     if (params.fromTab === 'mains') {
@@ -2588,12 +2602,50 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       paddingTop: isEmbedded ? 12 : Math.max(insets.top, 16)
     }]}>
       {!isEmbedded ? (
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerIcon}>
+        <TouchableOpacity onPress={() => router.replace('/(tabs)')} style={styles.headerIcon}>
           <ChevronLeft color={colors.textPrimary} size={22} />
         </TouchableOpacity>
       ) : <View style={styles.headerIcon} />}
       <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>PYQ Analysis</Text>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        <TouchableOpacity 
+          onPress={() => router.navigate({ pathname: '/mains', params: { initialScreen: 'questions' } })} 
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: colors.primary + '18',
+            borderColor: colors.primary + '35',
+            borderWidth: 1,
+            borderRadius: 12,
+            paddingHorizontal: 8,
+            height: 36,
+            gap: 3,
+          }}
+          accessibilityLabel="Mains Question Bank"
+        >
+          <BookOpen size={13} color={colors.primary} />
+          <Text style={{ fontSize: 11, fontWeight: '800', color: colors.primary }}>Mains</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          onPress={() => router.navigate('/flashcards')} 
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+            borderWidth: 1,
+            borderRadius: 12,
+            paddingHorizontal: 8,
+            height: 36,
+            gap: 3,
+          }}
+          accessibilityLabel="Flashcards"
+        >
+          <Zap size={13} color="#f59e0b" />
+          <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textPrimary }}>Flashcards</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity 
           onPress={() => {
             Alert.alert(
@@ -2601,12 +2653,12 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
               "• Tap a row label (left) to open deep-dive sections & micro-topics.\n\n• Tap any cell number to directly open those questions in Learn Mode.\n\n• Tap the 📚 question-bank icon on a row to open all questions for that topic."
             );
           }} 
-          style={[styles.headerIcon, { borderColor: colors.border, backgroundColor: colors.surface }]}
+          style={[styles.headerIcon, { width: 36, height: 36, borderColor: colors.border, backgroundColor: colors.surface }]}
         >
-          <HelpCircle color={colors.primary} size={18} />
+          <HelpCircle color={colors.primary} size={16} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setQuestionExportVisible(true)} style={[styles.headerIcon, { borderColor: colors.border, backgroundColor: colors.surface }]}>
-          <Download color={colors.primary} size={18} />
+        <TouchableOpacity onPress={() => setQuestionExportVisible(true)} style={[styles.headerIcon, { width: 36, height: 36, borderColor: colors.border, backgroundColor: colors.surface }]}>
+          <Download color={colors.primary} size={16} />
         </TouchableOpacity>
       </View>
     </View>

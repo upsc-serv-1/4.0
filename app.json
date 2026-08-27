@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Dr. UPSC V2",
-    "slug": "upsc-study-app-v2",
+    "slug": "upsc-study-app",
     "scheme": "upsc-study-app-v2",
     "version": "1.0.0",
     "orientation": "portrait",

@@ -431,37 +431,116 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     return papers?.[0] || null;
   }, [selectedCourse, initialStage]);
 
+  const savedState = useMemo(() => {
+    try {
+      const key = `@pyq_analysis_state_${selectedCourse || 'default'}`;
+      return KVStore.getJson<any>(key);
+    } catch {
+      return null;
+    }
+  }, [selectedCourse]);
+
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [examStage, setExamStage] = useState(initialStage);
-  const [selectedPaper, setSelectedPaper] = useState<string | null>(initialPaper);
-
-  useEffect(() => {
+  const [examStage, setExamStage] = useState(() => {
+    if (savedState?.examStage) return savedState.examStage;
     if (params.fromTab === 'mains') {
       const mainsIndex = currentStages.findIndex(s => s.toLowerCase() === 'mains');
-      if (mainsIndex !== -1) {
-        const targetStage = currentStages[mainsIndex];
-        setExamStage(targetStage);
-        
-        const papersForStage = currentPapersByStage[targetStage as keyof typeof currentPapersByStage];
-        const firstPaper = papersForStage?.[0] || null;
-        setSelectedPaper(firstPaper);
-      }
+      return mainsIndex !== -1 ? currentStages[mainsIndex] : initialStage;
     }
-  }, [params.fromTab, currentStages, currentPapersByStage]);
-  const [selectedRange, setSelectedRange] = useState('2013-latest');
-  const [customYearStart, setCustomYearStart] = useState('2020');
-  const [customYearEnd, setCustomYearEnd] = useState('2025');
+    return initialStage;
+  });
+  const [selectedPaper, setSelectedPaper] = useState<string | null>(() => {
+    if (savedState?.selectedPaper !== undefined) return savedState.selectedPaper;
+    return initialPaper;
+  });
+
+  const [selectedRange, setSelectedRange] = useState(() => savedState?.selectedRange || '2013-latest');
+  const [customYearStart, setCustomYearStart] = useState(() => savedState?.customYearStart || '2020');
+  const [customYearEnd, setCustomYearEnd] = useState(() => savedState?.customYearEnd || '2025');
   const [tempYearStart, setTempYearStart] = useState('2020');
   const [tempYearEnd, setTempYearEnd] = useState('2025');
-  const [activeHub, setActiveHub] = useState<HubKey>('pilot');
-  const [pilotSubject, setPilotSubject] = useState<string | null>(null);
-  const [pilotSection, setPilotSection] = useState<string | null>(null);
-  const [pilotSectionGroup, setPilotSectionGroup] = useState<string | null>(null);
-  const [pilotMacroTopic, setPilotMacroTopic] = useState<string | null>(null);
-  const [pilotMicro, setPilotMicro] = useState<string | null>(null);
-  const [pilotSubtopic, setPilotSubtopic] = useState<string | null>(null);
+  const [activeHub, setActiveHub] = useState<HubKey>(() => savedState?.activeHub || 'pilot');
+  const [pilotSubject, setPilotSubject] = useState<string | null>(() => savedState?.pilotSubject ?? null);
+  const [pilotSection, setPilotSection] = useState<string | null>(() => savedState?.pilotSection ?? null);
+  const [pilotSectionGroup, setPilotSectionGroup] = useState<string | null>(() => savedState?.pilotSectionGroup ?? null);
+  const [pilotMacroTopic, setPilotMacroTopic] = useState<string | null>(() => savedState?.pilotMacroTopic ?? null);
+  const [pilotMicro, setPilotMicro] = useState<string | null>(() => savedState?.pilotMicro ?? null);
+  const [pilotSubtopic, setPilotSubtopic] = useState<string | null>(() => savedState?.pilotSubtopic ?? null);
   const [refreshing, setRefreshing] = useState(false);
+
+  const pyqPersistLoaded = useRef(true);
+
+  // AsyncStorage fallback hydration
+  useEffect(() => {
+    const key = `@pyq_analysis_state_${selectedCourse || 'default'}`;
+    if (!savedState) {
+      AsyncStorage.getItem(key).then(val => {
+        if (val) {
+          try {
+            const parsed = JSON.parse(val);
+            if (parsed && typeof parsed === 'object') {
+              if (parsed.examStage && params.fromTab !== 'mains') setExamStage(parsed.examStage);
+              if (parsed.selectedPaper && params.fromTab !== 'mains') setSelectedPaper(parsed.selectedPaper);
+              if (parsed.selectedRange) setSelectedRange(parsed.selectedRange);
+              if (parsed.customYearStart) setCustomYearStart(parsed.customYearStart);
+              if (parsed.customYearEnd) setCustomYearEnd(parsed.customYearEnd);
+              if (parsed.activeHub) setActiveHub(parsed.activeHub);
+              if (parsed.pilotSubject !== undefined) setPilotSubject(parsed.pilotSubject);
+              if (parsed.pilotSection !== undefined) setPilotSection(parsed.pilotSection);
+              if (parsed.pilotSectionGroup !== undefined) setPilotSectionGroup(parsed.pilotSectionGroup);
+              if (parsed.pilotMacroTopic !== undefined) setPilotMacroTopic(parsed.pilotMacroTopic);
+              if (parsed.pilotMicro !== undefined) setPilotMicro(parsed.pilotMicro);
+              if (parsed.pilotSubtopic !== undefined) setPilotSubtopic(parsed.pilotSubtopic);
+              if (parsed.heatmapPalette) setHeatmapPalette(parsed.heatmapPalette);
+              if (parsed.heatmapMetric) setHeatmapMetric(parsed.heatmapMetric);
+            }
+          } catch {}
+        }
+      }).catch(() => {});
+    }
+  }, [selectedCourse]);
+
+  // Persist state changes
+  useEffect(() => {
+    if (pyqPersistLoaded.current) {
+      const stateObj = {
+        examStage,
+        selectedPaper,
+        selectedRange,
+        customYearStart,
+        customYearEnd,
+        activeHub,
+        pilotSubject,
+        pilotSection,
+        pilotSectionGroup,
+        pilotMacroTopic,
+        pilotMicro,
+        pilotSubtopic,
+        heatmapPalette,
+        heatmapMetric,
+      };
+      const key = `@pyq_analysis_state_${selectedCourse || 'default'}`;
+      KVStore.setJson(key, stateObj);
+      AsyncStorage.setItem(key, JSON.stringify(stateObj)).catch(() => {});
+    }
+  }, [
+    selectedCourse,
+    examStage,
+    selectedPaper,
+    selectedRange,
+    customYearStart,
+    customYearEnd,
+    activeHub,
+    pilotSubject,
+    pilotSection,
+    pilotSectionGroup,
+    pilotMacroTopic,
+    pilotMicro,
+    pilotSubtopic,
+    heatmapPalette,
+    heatmapMetric,
+  ]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -600,20 +679,26 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   // Fade animation
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  // Reset stage and paper when course changes
+  const prevCourseRef = useRef(selectedCourse);
+
+  // Reset stage and paper ONLY when course actually changes
   useEffect(() => {
     if (isFirstMount.current) {
       isFirstMount.current = false;
-      if (params.fromTab === 'mains') return;
+      prevCourseRef.current = selectedCourse;
+      return;
     }
-    const newStages = STAGES_BY_COURSE[selectedCourse] || STAGES_BY_COURSE['UPSC CSE'];
-    const newStage = newStages[0];
-    setExamStage(newStage);
-    
-    const newPapersByStage = PAPERS_BY_COURSE[selectedCourse] || PAPERS_BY_COURSE['UPSC CSE'];
-    const newPapers = newPapersByStage[newStage as keyof typeof newPapersByStage];
-    const newPaper = newPapers?.[0] || null;
-    setSelectedPaper(newPaper);
+    if (prevCourseRef.current !== selectedCourse) {
+      prevCourseRef.current = selectedCourse;
+      const newStages = STAGES_BY_COURSE[selectedCourse] || STAGES_BY_COURSE['UPSC CSE'];
+      const newStage = newStages[0];
+      setExamStage(newStage);
+      
+      const newPapersByStage = PAPERS_BY_COURSE[selectedCourse] || PAPERS_BY_COURSE['UPSC CSE'];
+      const newPapers = newPapersByStage[newStage as keyof typeof newPapersByStage];
+      const newPaper = newPapers?.[0] || null;
+      setSelectedPaper(newPaper);
+    }
   }, [selectedCourse]);
 
   useEffect(() => {
@@ -1110,25 +1195,27 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     }
   };
 
-  const clearComputedState = () => {
+  const clearComputedState = (clearSelections = false) => {
     setDistributionData([]);
     setHeatmapData({});
     setTopicYearHeatmap({});
     setTopTopics([]);
     setTrendSubjects([]);
     
-    // Clear selection states
-    setPilotSubject(null);
-    setPilotSection(null);
-    setPilotSectionGroup(null);
-    setPilotMacroTopic(null);
-    setPilotMicro(null);
-    setPilotSubtopic(null);
-    setOneSub(null);
-    setOneSec(null);
-    setSelSubjects([]);
-    setSelSections([]);
-    setSelMicros([]);
+    if (clearSelections) {
+      // Clear selection states
+      setPilotSubject(null);
+      setPilotSection(null);
+      setPilotSectionGroup(null);
+      setPilotMacroTopic(null);
+      setPilotMicro(null);
+      setPilotSubtopic(null);
+      setOneSub(null);
+      setOneSec(null);
+      setSelSubjects([]);
+      setSelSections([]);
+      setSelMicros([]);
+    }
     
     setSectionData([]);
     setMicroTopicData([]);
@@ -1141,7 +1228,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
   const processAnalytics = (data: any[]) => {
     if (!data.length) {
-      clearComputedState();
+      clearComputedState(false);
       return;
     }
 

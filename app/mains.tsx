@@ -6157,6 +6157,24 @@ function QuestionBankView({
           </View>
         )}
         <View style={{ flex: 1 }}>
+          {!sidebarOpen && (
+            <TouchableOpacity
+              onPress={() => setSidebarOpen(true)}
+              style={[
+                styles.floatingBackButton,
+                {
+                  left: 105,
+                  top: Math.max(insets.top, 12),
+                  backgroundColor: colors.surface + 'e6',
+                  borderColor: colors.border,
+                  gap: 4,
+                },
+              ]}
+            >
+              <ChevronRight size={18} color={colors.primary} />
+              <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>Filters</Text>
+            </TouchableOpacity>
+          )}
           {showZoomIndicator && (
             <View style={{
               position: 'absolute',
@@ -7787,6 +7805,24 @@ function ValueAdditionView({
           </View>
         )}
         <View style={{ flex: 1 }}>
+          {!sidebarOpen && activeCategory && (
+            <TouchableOpacity
+              onPress={() => setSidebarOpen(true)}
+              style={[
+                styles.floatingBackButton,
+                {
+                  left: 105,
+                  top: Math.max(insets.top, 12),
+                  backgroundColor: colors.surface + 'e6',
+                  borderColor: colors.border,
+                  gap: 4,
+                },
+              ]}
+            >
+              <ChevronRight size={18} color={colors.primary} />
+              <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>Filters</Text>
+            </TouchableOpacity>
+          )}
       {showZoomIndicator && (
         <View style={{
           position: 'absolute',

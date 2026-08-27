@@ -39,6 +39,90 @@ import Markdown from 'react-native-markdown-display';
 import { getMarkdownStyles, getMarkdownRules, cleanMarkdownContent } from '../mains';
 
 const { width, height } = Dimensions.get('window');
+const windowHeight = height;
+
+function AutoCardImage({
+  url,
+  onPress,
+  maxHeight = Math.max(400, windowHeight * 0.65),
+  borderRadius = 12,
+  marginBottom = 16,
+}: {
+  url: string;
+  onPress: () => void;
+  maxHeight?: number;
+  borderRadius?: number;
+  marginBottom?: number;
+}) {
+  const windowW = Dimensions.get('window').width;
+  const [containerWidth, setContainerWidth] = useState(windowW - 32);
+  const [imgDimensions, setImgDimensions] = useState<{ width: number; height: number } | null>(null);
+
+  useEffect(() => {
+    if (!url) return;
+    RNImage.getSize(
+      url,
+      (w, h) => {
+        if (w > 0 && h > 0) {
+          setImgDimensions({ width: w, height: h });
+        }
+      },
+      () => {}
+    );
+  }, [url]);
+
+  let renderedWidth = containerWidth;
+  let renderedHeight: number | null = null;
+
+  if (imgDimensions && imgDimensions.width > 0 && imgDimensions.height > 0) {
+    const ar = imgDimensions.width / imgDimensions.height;
+    const hIfFullW = containerWidth / ar;
+    if (hIfFullW <= maxHeight) {
+      renderedHeight = Math.round(hIfFullW);
+      renderedWidth = containerWidth;
+    } else {
+      renderedHeight = maxHeight;
+      renderedWidth = Math.round(Math.min(containerWidth, maxHeight * ar));
+    }
+  }
+
+  return (
+    <View
+      onLayout={(e) => {
+        const w = e.nativeEvent.layout.width;
+        if (w > 0 && Math.abs(w - containerWidth) > 2) {
+          setContainerWidth(w);
+        }
+      }}
+      style={{ width: '100%', alignItems: 'center', marginBottom }}
+    >
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={onPress}
+        style={{
+          width: renderedWidth,
+          height: renderedHeight ?? Math.min(260, maxHeight),
+          borderRadius,
+          overflow: 'hidden',
+        }}
+      >
+        <Image
+          source={{ uri: url }}
+          onLoad={(e) => {
+            if (e.source.width && e.source.height) {
+              setImgDimensions({ width: e.source.width, height: e.source.height });
+            }
+          }}
+          contentFit="contain"
+          contentPosition="center"
+          allowDownscaling={false}
+          cachePolicy="memory-disk"
+          style={{ width: '100%', height: '100%', borderRadius }}
+        />
+      </TouchableOpacity>
+    </View>
+  );
+}
 
 export default function ReviewScreen() {
   const { colors, isDark } = useTheme();
@@ -310,20 +394,28 @@ export default function ReviewScreen() {
     }, 100);
   };
 
-  const nextCard = async () => {
+  const nextCard = () => {
     if (currentIndex < queue.length - 1) {
-      revealAnim.setValue(0); setIsFlipped(false); setSelectedOption(null); setShowCorrect(false);
+      revealAnim.setValue(0);
+      setIsFlipped(false);
+      setSelectedOption(null);
+      setShowCorrect(false);
       const nextIdx = currentIndex + 1;
       setCurrentIndex(nextIdx);
       cardStart.current = Date.now();
-      await updatePreview(queue[nextIdx]);
-      // Prefetch images for upcoming cards
-      for (let i = nextIdx + 1; i < Math.min(nextIdx + 4, queue.length); i++) {
-        if (queue[i]) {
-          parseImageUrls(queue[i].front_image_url).forEach(url => Image.prefetch(url).catch(() => {}));
-          parseImageUrls(queue[i].back_image_url).forEach(url => Image.prefetch(url).catch(() => {}));
+      
+      // Update preview in background
+      updatePreview(queue[nextIdx]).catch(() => {});
+      
+      // Prefetch images for upcoming cards in background
+      setTimeout(() => {
+        for (let i = nextIdx + 1; i < Math.min(nextIdx + 4, queue.length); i++) {
+          if (queue[i]) {
+            parseImageUrls(queue[i].front_image_url).forEach(url => Image.prefetch(url).catch(() => {}));
+            parseImageUrls(queue[i].back_image_url).forEach(url => Image.prefetch(url).catch(() => {}));
+          }
         }
-      }
+      }, 50);
     } else {
       // Session complete
       setSessionSummary({
@@ -334,20 +426,27 @@ export default function ReviewScreen() {
     }
   };
 
-  const rate = async (grade: Grade) => {
+  const rate = (grade: Grade) => {
     const card = queue[currentIndex];
     if (!card || !uid) return;
     try {
       reviewedCount.current += 1;
       if (grade === 'good' || grade === 'easy') correctCount.current += 1;
       const durationSeconds = Math.max(0, Math.round((Date.now() - cardStart.current) / 1000));
-      await FlashcardSvc.reviewCard(uid, card.id, grade, { 
+      
+      // Optimistic background save
+      FlashcardSvc.reviewCard(uid, card.id, grade, { 
         durationSeconds, 
         currentState: card.state,
         branchId: branchId || undefined,
+      }).catch((err: any) => {
+        console.error('Error saving review in background:', err);
       });
-      setIsFlipped(false); setShowCorrect(false); revealAnim.setValue(0);
-      await nextCard();
+
+      setIsFlipped(false);
+      setShowCorrect(false);
+      revealAnim.setValue(0);
+      nextCard();
     } catch (err: any) {
       Alert.alert('Error', err?.message || 'Could not save review.');
       console.error(err);
@@ -831,16 +930,13 @@ export default function ReviewScreen() {
               )}
               
               {parseImageUrls(currentCard.front_image_url).map((url, idx) => (
-                <TouchableOpacity key={url + idx} activeOpacity={0.9} onPress={() => setZoomImageUrl(url)} style={{ width: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                  <Image 
-                    source={{ uri: url }} 
-                    contentFit="contain"
-                    contentPosition="center"
-                    cachePolicy="memory-disk"
-                    allowDownscaling={false}
-                    style={{ width: '100%', height: Math.max(400, windowHeight * 0.65), borderRadius: 12, marginBottom: 16 }} 
-                  />
-                </TouchableOpacity>
+                <AutoCardImage 
+                  key={url + idx} 
+                  url={url} 
+                  onPress={() => setZoomImageUrl(url)} 
+                  borderRadius={12} 
+                  marginBottom={16} 
+                />
               ))}
 
               <Text style={[styles.cardText, { color: colors.textPrimary, fontSize: editorFontSize, lineHeight: editorFontSize * 1.5 }]}>
@@ -898,16 +994,13 @@ export default function ReviewScreen() {
                   <View style={[styles.divider, { backgroundColor: colors.border, marginBottom: 24 }]} />
                   
                   {parseImageUrls(currentCard.back_image_url).map((url, idx) => (
-                    <TouchableOpacity key={url + idx} activeOpacity={0.9} onPress={() => setZoomImageUrl(url)} style={{ width: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                      <Image 
-                        source={{ uri: url }} 
-                        contentFit="contain"
-                        contentPosition="center"
-                        cachePolicy="memory-disk"
-                        allowDownscaling={false}
-                        style={{ width: '100%', height: Math.max(400, windowHeight * 0.65), borderRadius: 12, marginBottom: 16 }} 
-                      />
-                    </TouchableOpacity>
+                    <AutoCardImage 
+                      key={url + idx} 
+                      url={url} 
+                      onPress={() => setZoomImageUrl(url)} 
+                      borderRadius={12} 
+                      marginBottom={16} 
+                    />
                   ))}
 
                   <Text style={[styles.cardSideLabel, { color: '#34c759', textAlign: 'left', marginBottom: 12 }]}>ANSWER & EXPLANATION</Text>

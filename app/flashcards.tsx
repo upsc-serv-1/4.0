@@ -22,6 +22,8 @@ import {
 } from 'lucide-react-native';
 import { NetworkStatus } from '../src/lib/networkStatus';
 import { OfflineManager } from '../src/services/OfflineManager';
+import { KVStore } from '../src/lib/kvStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../src/lib/supabase';
 import { SyncQueue } from '../src/services/SyncQueue';
 import { useAuth } from '../src/context/AuthContext';
@@ -59,7 +61,54 @@ function FlashcardsHub() {
     }
   );
 
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const expandedLoadedRef = React.useRef(false);
+  const [expanded, setExpanded] = useState<Set<string>>(() => {
+    try {
+      const key = uid ? `@flashcards_expanded_${uid}` : '@flashcards_expanded';
+      const saved = KVStore.getJson<string[]>(key);
+      if (Array.isArray(saved)) {
+        expandedLoadedRef.current = true;
+        return new Set(saved);
+      }
+    } catch {}
+    return new Set();
+  });
+
+  // Restore saved expanded deck IDs if uid loads asynchronously
+  useEffect(() => {
+    if (!uid) return;
+    try {
+      const key = `@flashcards_expanded_${uid}`;
+      const saved = KVStore.getJson<string[]>(key);
+      if (Array.isArray(saved)) {
+        setExpanded(new Set(saved));
+        expandedLoadedRef.current = true;
+      } else {
+        AsyncStorage.getItem(key).then(val => {
+          if (val) {
+            try {
+              const parsed = JSON.parse(val);
+              if (Array.isArray(parsed)) setExpanded(new Set(parsed));
+            } catch {}
+          }
+        }).catch(() => {}).finally(() => {
+          expandedLoadedRef.current = true;
+        });
+      }
+    } catch {
+      expandedLoadedRef.current = true;
+    }
+  }, [uid]);
+
+  // Persist expanded deck IDs on changes
+  useEffect(() => {
+    if (expandedLoadedRef.current && uid) {
+      const key = `@flashcards_expanded_${uid}`;
+      const arr = Array.from(expanded);
+      KVStore.setJson(key, arr);
+      AsyncStorage.setItem(key, JSON.stringify(arr)).catch(() => {});
+    }
+  }, [expanded, uid]);
   const navLock = React.useRef(false);
   const [syncStatusVisible, setSyncStatusVisible] = useState(false);
   const [pendingSyncCount, setPendingSyncCount] = useState(0);

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Animated, Modal, Platform, Image as RNImage } from 'react-native';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, FlatList, Animated, Modal, Platform, Pressable, Image as RNImage } from 'react-native';
 import { Image } from 'expo-image';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,7 +22,90 @@ import { NetworkStatus } from '../../src/lib/networkStatus';
 
 const { width, height: windowHeight } = Dimensions.get('window');
 
-function BrowseCardView({ card, isActive, onImagePress }: { card: any, isActive: boolean, onImagePress: (url: string) => void }) {
+function AutoCardImage({
+  url,
+  onPress,
+  maxHeight = Math.max(400, windowHeight * 0.65),
+  borderRadius = 8,
+  marginBottom = 12,
+}: {
+  url: string;
+  onPress: () => void;
+  maxHeight?: number;
+  borderRadius?: number;
+  marginBottom?: number;
+}) {
+  const windowW = Dimensions.get('window').width;
+  const [containerWidth, setContainerWidth] = useState(windowW - 32);
+  const [imgDimensions, setImgDimensions] = useState<{ width: number; height: number } | null>(null);
+
+  useEffect(() => {
+    if (!url) return;
+    RNImage.getSize(
+      url,
+      (w, h) => {
+        if (w > 0 && h > 0) {
+          setImgDimensions({ width: w, height: h });
+        }
+      },
+      () => {}
+    );
+  }, [url]);
+
+  let renderedWidth = containerWidth;
+  let renderedHeight: number | null = null;
+
+  if (imgDimensions && imgDimensions.width > 0 && imgDimensions.height > 0) {
+    const ar = imgDimensions.width / imgDimensions.height;
+    const hIfFullW = containerWidth / ar;
+    if (hIfFullW <= maxHeight) {
+      renderedHeight = Math.round(hIfFullW);
+      renderedWidth = containerWidth;
+    } else {
+      renderedHeight = maxHeight;
+      renderedWidth = Math.round(Math.min(containerWidth, maxHeight * ar));
+    }
+  }
+
+  return (
+    <View
+      onLayout={(e) => {
+        const w = e.nativeEvent.layout.width;
+        if (w > 0 && Math.abs(w - containerWidth) > 2) {
+          setContainerWidth(w);
+        }
+      }}
+      style={{ width: '100%', alignItems: 'center', marginBottom }}
+    >
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={onPress}
+        style={{
+          width: renderedWidth,
+          height: renderedHeight ?? Math.min(260, maxHeight),
+          borderRadius,
+          overflow: 'hidden',
+        }}
+      >
+        <Image
+          source={{ uri: url }}
+          onLoad={(e) => {
+            if (e.source.width && e.source.height) {
+              setImgDimensions({ width: e.source.width, height: e.source.height });
+            }
+          }}
+          contentFit="contain"
+          contentPosition="center"
+          allowDownscaling={false}
+          cachePolicy="memory-disk"
+          style={{ width: '100%', height: '100%', borderRadius }}
+        />
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const BrowseCardView = React.memo(function BrowseCardView({ card, isActive, onImagePress }: { card: any, isActive: boolean, onImagePress: (url: string) => void }) {
   const { colors, isDark } = useTheme();
   const [revealed, setRevealed] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
@@ -39,6 +122,19 @@ function BrowseCardView({ card, isActive, onImagePress }: { card: any, isActive:
   const hasOptions = card.source?.options && Object.keys(card.source.options).length > 0;
   const opts = hasOptions ? card.source.options : {};
 
+  const handleShowAnswer = () => {
+    if (!revealed) {
+      setRevealed(true);
+      setTimeout(() => {
+        if (answerYRef.current > 0) {
+          scrollRef.current?.scrollTo({ y: answerYRef.current - 20, animated: true });
+        } else {
+          scrollRef.current?.scrollToEnd({ animated: true });
+        }
+      }, 100);
+    }
+  };
+
   return (
     <ScrollView 
       ref={scrollRef}
@@ -49,23 +145,24 @@ function BrowseCardView({ card, isActive, onImagePress }: { card: any, isActive:
       pinchGestureEnabled={true}
       bouncesZoom={true}
       showsVerticalScrollIndicator={false}
+      removeClippedSubviews={Platform.OS === 'android'}
     >
-      <View style={[styles.cardContainer, { backgroundColor: colors.surface }]}>
+      <Pressable 
+        onPress={handleShowAnswer}
+        style={[styles.cardContainer, { backgroundColor: colors.surface }]}
+      >
         <View style={styles.cardHeader}>
           <Text style={[styles.cardHeaderTitle, { color: colors.textSecondary }]}>Front</Text>
         </View>
 
         {parseImageUrls(card.front_image_url).map((url, idx) => (
-          <TouchableOpacity key={url + idx} activeOpacity={0.9} onPress={() => onImagePress(url)} style={{ width: '100%', alignItems: 'center' }}>
-            <Image 
-              source={{ uri: url }} 
-              style={{ width: '100%', height: Math.max(400, windowHeight * 0.65), borderRadius: 8, marginBottom: 12 }}
-              contentFit="contain"
-              contentPosition="center"
-              allowDownscaling={false}
-              cachePolicy="memory-disk"
-            />
-          </TouchableOpacity>
+          <AutoCardImage 
+            key={url + idx} 
+            url={url} 
+            onPress={() => onImagePress(url)} 
+            borderRadius={8} 
+            marginBottom={12} 
+          />
         ))}
 
         <Markdown style={mdStyles} rules={mdRules}>
@@ -84,16 +181,7 @@ function BrowseCardView({ card, isActive, onImagePress }: { card: any, isActive:
         {!revealed ? (
           <TouchableOpacity 
             style={[styles.showAnswerBtn, { backgroundColor: colors.primary }]}
-            onPress={() => {
-              setRevealed(true);
-              setTimeout(() => {
-                if (answerYRef.current > 0) {
-                  scrollRef.current?.scrollTo({ y: answerYRef.current - 20, animated: true });
-                } else {
-                  scrollRef.current?.scrollToEnd({ animated: true });
-                }
-              }, 100);
-            }}
+            onPress={handleShowAnswer}
           >
             <Text style={styles.showAnswerText}>Show Answer</Text>
           </TouchableOpacity>
@@ -107,16 +195,13 @@ function BrowseCardView({ card, isActive, onImagePress }: { card: any, isActive:
             </View>
 
             {parseImageUrls(card.back_image_url).map((url, idx) => (
-          <TouchableOpacity key={url + idx} activeOpacity={0.9} onPress={() => onImagePress(url)} style={{ width: '100%', alignItems: 'center' }}>
-            <Image 
-                source={{ uri: url }} 
-                style={{ width: '100%', height: Math.max(400, windowHeight * 0.65), borderRadius: 8, marginBottom: 12 }}
-                contentFit="contain"
-                contentPosition="center"
-                allowDownscaling={false}
-                cachePolicy="memory-disk"
+              <AutoCardImage 
+                key={url + idx} 
+                url={url} 
+                onPress={() => onImagePress(url)} 
+                borderRadius={8} 
+                marginBottom={12} 
               />
-          </TouchableOpacity>
             ))}
 
             <Markdown style={mdStyles} rules={mdRules}>
@@ -124,10 +209,10 @@ function BrowseCardView({ card, isActive, onImagePress }: { card: any, isActive:
             </Markdown>
           </View>
         )}
-      </View>
+      </Pressable>
     </ScrollView>
   );
-}
+});
 
 export default function BrowseScreen() {
   const { colors, isDark } = useTheme();
@@ -149,7 +234,7 @@ export default function BrowseScreen() {
   const [showMoveModal, setShowMoveModal] = useState(false);
   const [branchTree, setBranchTree] = useState<any[]>([]);
   
-  const scrollRef = useRef<ScrollView>(null);
+  const flatListRef = useRef<FlatList>(null);
   const hasScrolledToInitial = useRef(false);
 
   useEffect(() => {
@@ -209,11 +294,15 @@ export default function BrowseScreen() {
 
   // Initial scroll to the selected card
   useEffect(() => {
-    if (!loading && cards.length > 0 && !hasScrolledToInitial.current && scrollRef.current) {
-      setTimeout(() => {
-        scrollRef.current?.scrollTo({ x: currentIndex * width, animated: false });
+    if (!loading && cards.length > 0 && !hasScrolledToInitial.current && flatListRef.current) {
+      if (currentIndex > 0) {
+        setTimeout(() => {
+          flatListRef.current?.scrollToIndex({ index: currentIndex, animated: false });
+          hasScrolledToInitial.current = true;
+        }, 100);
+      } else {
         hasScrolledToInitial.current = true;
-      }, 100);
+      }
     }
   }, [loading, cards.length, currentIndex]);
 
@@ -224,6 +313,10 @@ export default function BrowseScreen() {
       setCurrentIndex(idx);
     }
   };
+
+  const renderCardItem = useCallback(({ item, index }: { item: any, index: number }) => (
+    <BrowseCardView card={item} isActive={index === currentIndex} onImagePress={setZoomImageUrl} />
+  ), [currentIndex]);
 
   const handleMenuAction = async (action: CardMenuAction) => {
     const card = cards[currentIndex];
@@ -270,7 +363,6 @@ export default function BrowseScreen() {
           break;
         default:
           setMenuVisible(false);
-          // For advanced actions, just alert for now in Browse mode
           alert(`Action '${action}' is available in full Study Mode.`);
           break;
       }
@@ -310,19 +402,28 @@ export default function BrowseScreen() {
           <Text style={{ color: colors.textSecondary }}>No cards found.</Text>
         </View>
       ) : (
-        <ScrollView
-          ref={scrollRef}
+        <FlatList
+          ref={flatListRef}
+          data={cards}
+          keyExtractor={(item) => item.id}
+          renderItem={renderCardItem}
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           onMomentumScrollEnd={handleScroll}
+          getItemLayout={(_, index) => ({ length: width, offset: width * index, index })}
+          initialNumToRender={2}
+          maxToRenderPerBatch={2}
+          windowSize={3}
+          removeClippedSubviews={Platform.OS === 'android'}
+          onScrollToIndexFailed={(info) => {
+            setTimeout(() => {
+              flatListRef.current?.scrollToIndex({ index: info.index, animated: false });
+            }, 100);
+          }}
           decelerationRate="fast"
           style={{ flex: 1 }}
-        >
-          {cards.map((c, idx) => (
-            <BrowseCardView key={c.id} card={c} isActive={idx === currentIndex} onImagePress={setZoomImageUrl} />
-          ))}
-        </ScrollView>
+        />
       )}
 
         <Modal visible={!!zoomImageUrl} transparent={true} onRequestClose={() => setZoomImageUrl(null)}>

@@ -246,6 +246,28 @@ export default function BrowseScreen() {
           setBranchTree(tree);
           setShowMoveModal(true);
           break;
+        case 'delete':
+          setMenuVisible(false);
+          import('react-native').then(({ Alert }) => {
+            Alert.alert('Delete card?', 'This will remove it from your deck.', [
+              { text: 'Cancel', style: 'cancel' },
+              { 
+                text: 'Delete', 
+                style: 'destructive', 
+                onPress: async () => { 
+                  try { 
+                    setMenuBusy(true);
+                    await FlashcardSvc.softDeleteCardForUser(uid, card.id); 
+                    const nq = cards.filter((_, i) => i !== currentIndex);
+                    setCards(nq);
+                    if (currentIndex >= nq.length) setCurrentIndex(Math.max(0, nq.length - 1));
+                  } catch (e: any) { alert(e?.message); }
+                  finally { setMenuBusy(false); }
+                } 
+              },
+            ]);
+          });
+          break;
         default:
           setMenuVisible(false);
           // For advanced actions, just alert for now in Browse mode

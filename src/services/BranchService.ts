@@ -405,8 +405,11 @@ export class BranchSvc {
       if (allLinks && allLinks.length > 0) {
         let targetIds = [branchId];
         if (opts.recursive && opts.userId) {
-          const cachedBranches = OfflineManager.getCollectionSync('flashcard_branches') as any[] || [];
-          if (cachedBranches.length > 0) {
+          let cachedBranches = KVStore.getJson<any[]>(`flashcard_branches_${opts.userId}`);
+          if (!cachedBranches || cachedBranches.length === 0) {
+            cachedBranches = OfflineManager.getCollectionSync('flashcard_branches', opts.userId) as any[] || [];
+          }
+          if (cachedBranches && cachedBranches.length > 0) {
             const descIds = this.collectDescendantIds(cachedBranches, branchId);
             targetIds = [branchId, ...descIds];
           }

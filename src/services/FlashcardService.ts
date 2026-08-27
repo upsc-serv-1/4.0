@@ -271,7 +271,7 @@ export class FlashcardSvc {
 
   /** Summary counts (stats panel on microtopic.tsx, matching screenshot's "1 card for today / 0 new / 1 learning / 0 mastered"). */
   static async getFolderStats(userId: string, folder: StudyQueueFolder = {}) {
-    const settings = await FolderSettingsSvc.resolve(userId, folder.subject, folder.section, folder.microtopic);
+    const settings = await FolderSettingsSvc.resolve(userId, folder.subject, folder.section, folder.microtopic, folder.branch_id);
 
     // AnkiPro branch mode
     let branchCardIds: string[] | null = null;
@@ -354,6 +354,17 @@ export class FlashcardSvc {
   ): Promise<number> {
     // OFFLINE-FIRST: compute from cached card_reviews if possible.
     const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+
+    // Pre-compute the set of card IDs belonging to this branch (if branch mode)
+    let branchCardIdSet: Set<string> | null = null;
+    if (folder.branch_id) {
+      try {
+        const { BranchSvc } = await import('./BranchService');
+        const branchCardIds = await BranchSvc.listCardIdsInBranch(folder.branch_id, { recursive: !!folder.recursive, userId });
+        branchCardIdSet = new Set(branchCardIds);
+      } catch {}
+    }
+
     try {
       const reviews = ((OfflineManager as any).getCollectionSync('card_reviews', userId) ?? [])
         .filter((r: any) => r.user_id === userId && Number(r.prev_interval) === 0
@@ -367,6 +378,8 @@ export class FlashcardSvc {
       const introducedToday = uniqueCardIds.filter((cardId: any) => {
         const c: any = cardsById.get(cardId);
         if (!c || c.is_deleted) return false;
+        // Branch mode: only count cards that belong to this branch
+        if (branchCardIdSet) return branchCardIdSet.has(cardId);
         if (folder.subject && c.subject !== folder.subject) return false;
         if (folder.section && folder.section !== 'General' && c.section_group !== folder.section) return false;
         if (folder.microtopic && c.microtopic !== folder.microtopic) return false;
@@ -377,6 +390,26 @@ export class FlashcardSvc {
 
     // Fallback to server (will fast-fail offline; treat as full cap).
     try {
+      if (branchCardIdSet && branchCardIdSet.size > 0) {
+        // Branch mode server fallback: filter reviews by branch card IDs
+        const branchArr = Array.from(branchCardIdSet);
+        const CHUNK = 500;
+        let allReviewCardIds: string[] = [];
+        for (let i = 0; i < branchArr.length; i += CHUNK) {
+          const slice = branchArr.slice(i, i + CHUNK);
+          const { data, error } = await supabase
+            .from('card_reviews')
+            .select('card_id')
+            .eq('user_id', userId)
+            .eq('prev_interval', 0)
+            .gte('reviewed_at', startOfDay.toISOString())
+            .in('card_id', slice);
+          if (!error && data) allReviewCardIds.push(...data.map((r: any) => r.card_id));
+        }
+        const uniqueCardIds = new Set(allReviewCardIds);
+        return Math.max(0, settings.new_cards_per_day - uniqueCardIds.size);
+      }
+
       let q = supabase
         .from('card_reviews')
         .select('card_id, cards!inner(subject, section_group, microtopic)')

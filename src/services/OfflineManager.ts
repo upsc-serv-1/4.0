@@ -399,7 +399,7 @@ class OfflineManagerService {
         ['flashcard_branches', `${USER_BRANCHES_PREFIX}${userId}`, 
           (q) => q.eq('user_id', userId)],
         ['flashcard_branch_cards', `${USER_BRANCH_CARDS_PREFIX}${userId}`, 
-          (q) => q],
+          (q) => q.eq('user_id', userId)],
         ['draft_attempts', `${USER_DRAFT_ATTEMPTS_PREFIX}${userId}`, 
           (q) => q.eq('user_id', userId)],
         ['user_settings', `${USER_SETTINGS_PREFIX}${userId}`, 
@@ -499,7 +499,7 @@ class OfflineManagerService {
       }
       
       // 4. Branch Links (Always fetch all, small payload and may lack updated_at)
-      const branchCards = await this.fetchAllRows('flashcard_branch_cards', (q) => q);
+      const branchCards = await this.fetchAllRows('flashcard_branch_cards', (q) => q.eq('user_id', userId));
       if (branchCards) KVStore.setJson(`${USER_BRANCH_CARDS_PREFIX}${userId}`, branchCards);
       
       const folderAlgos = await this.fetchAllRows('folder_algorithm_settings', (q) => q.eq('user_id', userId));

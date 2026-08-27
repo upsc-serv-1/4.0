@@ -550,6 +550,27 @@ export function MainsScreenInner() {
 
   const [currentScreen, setCurrentScreen] = useState<'hub' | 'questions' | 'value-add' | 'search' | 'detailed-question' | 'revision-tags'>('hub');
   const [sessionFilters, setSessionFilters] = useState<MainsFilters | null>(null);
+
+  // ── Persist QB filters across tab switches ──
+  const qbPersistLoaded = useRef(false);
+  useEffect(() => {
+    AsyncStorage.getItem('@mains_qb_filters').then(val => {
+      if (val) {
+        try {
+          const parsed = JSON.parse(val);
+          if (parsed && typeof parsed === 'object') setSessionFilters(parsed);
+        } catch {}
+      }
+    }).catch(() => {}).finally(() => { qbPersistLoaded.current = true; });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (qbPersistLoaded.current && sessionFilters) {
+      AsyncStorage.setItem('@mains_qb_filters', JSON.stringify(sessionFilters)).catch(() => {});
+    }
+  }, [sessionFilters]);
+
   // Guard so params-based navigation only fires once on initial mount.
   // Without this, navigating back from a heatmap-opened question keeps
   // re-setting currentScreen to 'detailed-question' (infinite loop).

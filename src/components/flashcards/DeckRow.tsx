@@ -142,13 +142,9 @@ export function DeckRow({ node, expanded, onToggle, onOpen, onAction, color }: P
               <Text style={[styles.name, { color: colors.textPrimary }]} numberOfLines={1}>
                 {node.name}
               </Text>
-              {node.due_count > 0 ? (
+              {(node.due_count + node.new_count) > 0 ? (
                 <Text style={[styles.subtitle, { color: colors.textTertiary }]}>
-                  Cards for today: {node.due_count}
-                </Text>
-              ) : node.new_count > 0 ? (
-                <Text style={[styles.subtitle, { color: colors.textTertiary }]}>
-                  New cards available: {node.new_count}
+                  Cards for today: {node.due_count + node.new_count}
                 </Text>
               ) : node.total_count === 0 ? (
                 <Text style={[styles.subtitle, { color: colors.textTertiary }]}>

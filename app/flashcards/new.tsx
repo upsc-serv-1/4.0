@@ -463,25 +463,25 @@ export default function NewCard() {
                   <Text style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>Uploading image...</Text>
                 </View>
               )}
-              {frontImageUrls.length > 0 && (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10 }} contentContainerStyle={{ gap: 10 }}>
-                  {frontImageUrls.map((url, idx) => (
-                    <View key={url + idx} style={s.previewContainer}>
-                      <Image source={{ uri: url }} style={s.previewImage} contentFit="cover" cachePolicy="memory-disk" />
-                      <TouchableOpacity
-                        style={s.removeImageBtn}
-                        onPress={() => setFrontImageUrls(prev => prev.filter((_, i) => i !== idx))}
-                        activeOpacity={0.8}
-                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                        testID={`btn-remove-front-image-${idx}`}
-                      >
-                        <X size={14} color="#FFFFFF" strokeWidth={3} />
-                      </TouchableOpacity>
-                    </View>
-                  ))}
-                </ScrollView>
-              )}
             </DragDropContentView>
+            {frontImageUrls.length > 0 && (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10 }} contentContainerStyle={{ gap: 10 }}>
+                {frontImageUrls.map((url, idx) => (
+                  <View key={url + idx} style={s.previewContainer}>
+                    <Image source={{ uri: url }} style={s.previewImage} contentFit="cover" cachePolicy="memory-disk" />
+                    <TouchableOpacity
+                      style={s.removeImageBtn}
+                      onPress={() => setFrontImageUrls(prev => prev.filter((_, i) => i !== idx))}
+                      activeOpacity={0.8}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      testID={`btn-remove-front-image-${idx}`}
+                    >
+                      <X size={14} color="#FFFFFF" strokeWidth={3} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
             
             <View style={{ height: 24 }} />
 
@@ -516,25 +516,25 @@ export default function NewCard() {
                   <Text style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>Uploading image...</Text>
                 </View>
               )}
-              {backImageUrls.length > 0 && (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10 }} contentContainerStyle={{ gap: 10 }}>
-                  {backImageUrls.map((url, idx) => (
-                    <View key={url + idx} style={s.previewContainer}>
-                      <Image source={{ uri: url }} style={s.previewImage} contentFit="cover" cachePolicy="memory-disk" />
-                      <TouchableOpacity
-                        style={s.removeImageBtn}
-                        onPress={() => setBackImageUrls(prev => prev.filter((_, i) => i !== idx))}
-                        activeOpacity={0.8}
-                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                        testID={`btn-remove-back-image-${idx}`}
-                      >
-                        <X size={14} color="#FFFFFF" strokeWidth={3} />
-                      </TouchableOpacity>
-                    </View>
-                  ))}
-                </ScrollView>
-              )}
             </DragDropContentView>
+            {backImageUrls.length > 0 && (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10 }} contentContainerStyle={{ gap: 10 }}>
+                {backImageUrls.map((url, idx) => (
+                  <View key={url + idx} style={s.previewContainer}>
+                    <Image source={{ uri: url }} style={s.previewImage} contentFit="cover" cachePolicy="memory-disk" />
+                    <TouchableOpacity
+                      style={s.removeImageBtn}
+                      onPress={() => setBackImageUrls(prev => prev.filter((_, i) => i !== idx))}
+                      activeOpacity={0.8}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      testID={`btn-remove-back-image-${idx}`}
+                    >
+                      <X size={14} color="#FFFFFF" strokeWidth={3} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
 
             <View style={{ height: 32 }} />
 

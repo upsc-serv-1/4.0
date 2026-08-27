@@ -104,7 +104,8 @@ const CHOICES = {
     { id: 'year' as ExportSortBy, label: 'Year (Oldest First)' },
     { id: 'difficulty' as ExportSortBy, label: 'Difficulty' },
     { id: 'date' as ExportSortBy, label: 'Latest Modified' },
-    { id: 'pyq_frequency' as ExportSortBy, label: 'PYQ Frequency (Most Frequent First)' },
+    { id: 'pyq_frequency' as ExportSortBy, label: 'PYQ Frequency (Oldest First)' },
+    { id: 'pyq_frequency_desc' as ExportSortBy, label: 'PYQ Frequency (Latest First)' },
   ],
   groupingLevels: [
     { id: 'subject' as const, label: 'Subject' },

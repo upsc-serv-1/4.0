@@ -36,7 +36,7 @@ export type ExportPaperStyle = 'plain' | 'lined' | 'grid' | 'dotted';
 export type ExportColumns = 1 | 2;
 export type ExportContentScope = 'q_only' | 'q_options' | 'q_options_expl' | 'q_options_valuation';
 export type ExportAnswerPlacement = 'inline' | 'end';
-export type ExportSortBy = 'default' | 'subject' | 'microtopic' | 'difficulty' | 'date' | 'year' | 'year_desc' | 'subject_section' | 'subject_section_microtopic' | 'pyq_frequency';
+export type ExportSortBy = 'default' | 'subject' | 'microtopic' | 'difficulty' | 'date' | 'year' | 'year_desc' | 'subject_section' | 'subject_section_microtopic' | 'pyq_frequency' | 'pyq_frequency_desc';
 export type ExportGroupingLevel = 'subject' | 'section_group' | 'microtopic' | 'subtopic' | 'nanotopic';
 export type ExportQaLayoutMode = 'unified' | 'split';
 export type ExportVisualStyle = 'document' | 'flashcard';
@@ -929,8 +929,8 @@ export const sortQuestions = (rows: ExportQuestion[], o: ExportOptions): ExportQ
       
       const ay = Number(a.exam_year) || 0;
       const by = Number(b.exam_year) || 0;
-      if (o.sortBy === 'year_desc') return by - ay;
-      if (o.sortBy === 'year') return ay - by;
+      if (o.sortBy === 'year_desc' || o.sortBy === 'pyq_frequency_desc') return by - ay;
+      if (o.sortBy === 'year' || o.sortBy === 'pyq_frequency') return ay - by;
       
       // Default to ascending if sorting isn't explicitly requested as descending
       return ay - by;
@@ -1381,7 +1381,7 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
       if (levelIdx === activeLevels.length) return;
       if (node instanceof Map) {
         const sortedKeys = Array.from(node.keys()).sort((a, b) => {
-          if (o.sortBy === 'pyq_frequency') {
+          if (o.sortBy === 'pyq_frequency' || o.sortBy === 'pyq_frequency_desc') {
             const countA = countQuestions(node.get(a));
             const countB = countQuestions(node.get(b));
             if (countB !== countA) return countB - countA;
@@ -1425,7 +1425,7 @@ export const buildQuestionsHtml = (rowsRaw: ExportQuestion[], o: ExportOptions):
         });
       } else if (node instanceof Map) {
         const sortedKeys = Array.from(node.keys()).sort((a, b) => {
-          if (o.sortBy === 'pyq_frequency') {
+          if (o.sortBy === 'pyq_frequency' || o.sortBy === 'pyq_frequency_desc') {
             const countA = countQuestions(node.get(a));
             const countB = countQuestions(node.get(b));
             if (countB !== countA) return countB - countA;

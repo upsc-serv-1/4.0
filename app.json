@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Dr. UPSC",
-    "slug": "upsc-study-app",
-    "scheme": "upsc-study-app",
+    "name": "Dr. UPSC V2",
+    "slug": "upsc-study-app-v2",
+    "scheme": "upsc-study-app-v2",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,14 +16,14 @@
       "assets/**/*"
     ],
     "android": {
-      "package": "com.dryogesh.drupsc",
+      "package": "com.dryogesh.drupscv2",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1A1A1A"
       }
     },
     "ios": {
-      "bundleIdentifier": "com.dryogesh.drupsc",
+      "bundleIdentifier": "com.dryogesh.drupscv2",
       "supportsTablet": true
     },
     "web": {

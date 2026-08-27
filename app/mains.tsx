@@ -26,13 +26,14 @@ import {
   KeyboardAvoidingView,
   AppState,
   AppStateStatus,
+  BackHandler,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Image as ExpoImage } from 'expo-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Clipboard from 'expo-clipboard';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import {
   Search,
   Bookmark,
@@ -704,6 +705,31 @@ export function MainsScreenInner() {
         setCurrentScreen('hub');
       }
     }
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        if (currentScreen === 'value-add' && valueAddCategory !== null) {
+          setValueAddCategory(null);
+          return true;
+        }
+        if (currentScreen === 'detailed-question') {
+          setDetailedQuestion(null);
+          setCurrentScreen(previousScreen || 'questions');
+          return true;
+        }
+        if (currentScreen !== 'hub') {
+          setCurrentScreen('hub');
+          return true;
+        }
+        router.replace('/(tabs)');
+        return true;
+      };
+
+      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () => subscription.remove();
+    }, [currentScreen, valueAddCategory, previousScreen, router])
   );
 
   useEffect(() => {
@@ -1843,11 +1869,11 @@ export function MainsScreenInner() {
           {currentScreen === 'hub' ? (
             <View style={[styles.header, { borderBottomWidth: 0, backgroundColor: 'transparent', paddingTop: insets.top, height: 64 + insets.top }]}>
               <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={() => router.replace('/(tabs)')}
                 style={[styles.backButton, { backgroundColor: colors.surface + '88', borderColor: colors.border }]}
               >
                 <ChevronLeft size={20} color={colors.textPrimary} />
-                <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>Back</Text>
+                <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>Home</Text>
               </TouchableOpacity>
               <View style={styles.headerTitleContainer}>
                 <Text style={[styles.headerTitle, { color: colors.textPrimary }]} />
@@ -1880,13 +1906,10 @@ export function MainsScreenInner() {
               onPress={() => {
                 if (currentScreen === 'value-add' && valueAddCategory !== null) {
                   setTimeout(() => setValueAddCategory(null), 0);
-                } else if (currentScreen === 'questions' && cameFromExternalRoute.current) {
-                  // Questions list opened from PYQ heatmap — go back to PYQ Analysis
-                  cameFromExternalRoute.current = false;
+                } else if (currentScreen !== 'hub') {
                   setCurrentScreen('hub');
-                  router.back();
                 } else {
-                  setCurrentScreen('hub');
+                  router.navigate('/(tabs)');
                 }
               }}
               style={[styles.floatingBackButton, { backgroundColor: colors.surface + 'b3', borderColor: colors.border, top: Math.max(insets.top, 12) }]}
@@ -1895,10 +1918,65 @@ export function MainsScreenInner() {
               <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>
                 {currentScreen === 'value-add' && valueAddCategory !== null 
                   ? 'Back' 
-                  : cameFromExternalRoute.current ? 'Back' : 'Hub'}
+                  : currentScreen !== 'hub' ? 'Hub' : 'Home'}
               </Text>
             </TouchableOpacity>
           ) : null}
+
+          {/* Top-Right Shortcuts (PYQ & Flashcards) */}
+          {currentScreen !== 'detailed-question' && currentScreen !== 'revision-tags' && (
+            <View
+              style={{
+                position: 'absolute',
+                right: 16,
+                top: Math.max(insets.top, 12),
+                zIndex: 999,
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => router.navigate({ pathname: '/pyq', params: { fromTab: 'mains' } })}
+                style={[
+                  styles.floatingTopRightButton,
+                  {
+                    position: 'relative',
+                    right: undefined,
+                    top: undefined,
+                    backgroundColor: colors.surface + 'f0',
+                    borderColor: colors.border,
+                    gap: 4,
+                    paddingHorizontal: 10,
+                  },
+                ]}
+                accessibilityLabel="PYQ Analysis"
+              >
+                <BarChart3 size={15} color={colors.primary} />
+                <Text style={[styles.backButtonText, { color: colors.textPrimary, fontWeight: '700' }]}>PYQ</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => router.navigate('/flashcards')}
+                style={[
+                  styles.floatingTopRightButton,
+                  {
+                    position: 'relative',
+                    right: undefined,
+                    top: undefined,
+                    backgroundColor: colors.surface + 'f0',
+                    borderColor: colors.border,
+                    gap: 4,
+                    paddingHorizontal: 10,
+                  },
+                ]}
+                accessibilityLabel="Flashcards"
+              >
+                <Zap size={15} color="#f59e0b" />
+                <Text style={[styles.backButtonText, { color: colors.textPrimary, fontWeight: '700' }]}>Flashcards</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* Screen Switching */}
           {currentScreen === 'hub' && (
@@ -5550,6 +5628,7 @@ function QuestionBankView({
   syncing?: boolean;
 }) {
   const { isDark } = useTheme();
+  const router = useRouter();
   const [search, setSearch] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedInstitutes, setSelectedInstitutes] = useState<Record<string, string>>({});
@@ -11162,6 +11241,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  floatingTopRightButton: {
+    position: 'absolute',
+    right: 16,
+    zIndex: 999,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
   header: {
     height: 64,

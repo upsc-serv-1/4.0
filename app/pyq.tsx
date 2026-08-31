@@ -260,31 +260,37 @@ function StickyHeatmapTable({
           <View style={styles.heatmapBodyLayout}>
               <View style={[styles.heatmapStickyLabelColumn, { borderRightColor: colors.border, width: finalLabelWidth }]}> 
                 {rows.map((row) => (
-                  <TouchableOpacity 
+                  <View 
                     key={`label-${row.key}`} 
                     style={[styles.heatmapStickyLabelCell, { borderBottomColor: colors.border + '55', width: finalLabelWidth, height: finalRowHeight }]}
-                    onPress={() => onRowPress?.(row.label)}
-                    activeOpacity={0.7}
                   > 
                     <View style={styles.heatmapLabelRow}>
-                      <Text 
-                        style={[styles.heatmapStickyLabelText, { color: colors.textSecondary, flex: 1, fontSize: 10.5, lineHeight: 13.5 }]} 
-                        numberOfLines={4}
-                        adjustsFontSizeToFit
-                        minimumFontScale={0.8}
+                      <TouchableOpacity
+                        style={{ flex: 1, height: '100%', justifyContent: 'center' }}
+                        onPress={() => onRowPress?.(row.label)}
+                        activeOpacity={0.7}
                       >
-                        {row.displayLabel || row.label}
-                      </Text>
+                        <Text 
+                          style={[styles.heatmapStickyLabelText, { color: colors.textSecondary, fontSize: 10.5, lineHeight: 13.5 }]} 
+                          numberOfLines={4}
+                          adjustsFontSizeToFit
+                          minimumFontScale={0.8}
+                        >
+                          {row.displayLabel || row.label}
+                        </Text>
+                      </TouchableOpacity>
                       {onLabelActionPress && (
                         <TouchableOpacity 
                           onPress={() => onLabelActionPress(row.label)}
                           style={styles.labelActionBtn}
+                          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                          activeOpacity={0.6}
                         >
                           <FileStack size={14} color={colors.primary || '#7c3aed'} />
                         </TouchableOpacity>
                       )}
                     </View>
-                  </TouchableOpacity>
+                  </View>
                 ))}
               </View>
 
@@ -2123,6 +2129,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     const isPrelimsStage = examStage?.toLowerCase() === 'prelims';
 
     if (isMainsStage) {
+      const activeYears = (!opts.year || opts.year === 'All') 
+        ? (years && years.length > 0 ? years.join(',') : 'All')
+        : opts.year;
+        
       router.push({
         pathname: '/mains',
         params: {
@@ -2132,9 +2142,11 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           microtopic: m,
           subtopic: opts.subtopic || '',
           nanotopic: opts.nanotopic || '',
-          year: yearParam,
+          year: activeYears,
+          pyqFilter: 'PYQ Only',
           initialScreen: 'questions',
           from: 'pyq',
+          _ts: String(Date.now()),
         }
       });
     } else {
@@ -2190,7 +2202,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   };
 
   const handleHeatmapPress = (label: string, opts: any, targetYear?: string) => {
-    const yearToUse = targetYear || years.join(',');
+    const yearToUse = targetYear ? String(targetYear).trim() : 'All';
     navigateToLearning({ ...opts, year: yearToUse, mode: 'learning' });
   };
 
@@ -2609,7 +2621,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>PYQ Analysis</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
         <TouchableOpacity 
-          onPress={() => router.navigate({ pathname: '/mains', params: { initialScreen: 'questions' } })} 
+          onPress={() => router.replace({ pathname: '/mains', params: { initialScreen: 'questions' } })} 
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -2628,7 +2640,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         </TouchableOpacity>
 
         <TouchableOpacity 
-          onPress={() => router.navigate('/flashcards')} 
+          onPress={() => router.replace('/flashcards')} 
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -2814,6 +2826,13 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           : { subject: topicSubjectMap[topic], micro: topic };
         handleHeatmapPress(topic, opts, year);
       }}
+      onLabelActionPress={(topic) => {
+        const src = topicSourceMap[topic];
+        const opts = src === 'section'
+          ? { subject: topicSubjectMap[topic], section: topic }
+          : { subject: topicSubjectMap[topic], micro: topic };
+        handleHeatmapPress(topic, opts);
+      }}
       onRowPress={(topic) => {
         const src = topicSourceMap[topic];
         const opts = src === 'section'
@@ -2948,7 +2967,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                 colors={colors}
                 heatmapPalette={heatmapPalette}
                 onCellPress={(section, year) => handleHeatmapPress(section, { subjects: selSubjects, section }, year)}
-                onRowPress={(section) => handleHeatmapPress(section, { subjects: selSubjects, section })}
+                onLabelActionPress={(section) => handleHeatmapPress(section, { subjects: selSubjects, section })}
+                onRowPress={(section) => setSelSections([section])}
               />
             )}
 
@@ -2961,15 +2981,10 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                 baseColor="#1d4ed8"
                 colors={colors}
                 heatmapPalette={heatmapPalette}
-                onCellPress={(micro, year) => {
-                  if (examStage?.toLowerCase() === 'mains') {
-                    setSelMicros([micro]);
-                  } else {
-                    handleHeatmapPress(micro, { subjects: selSubjects, sections: selSections, micro }, year);
-                  }
-                }}
+                onCellPress={(micro, year) => handleHeatmapPress(micro, { subjects: selSubjects, sections: selSections, micro }, year)}
+                onLabelActionPress={(micro) => handleHeatmapPress(micro, { subjects: selSubjects, sections: selSections, micro })}
                 onRowPress={(micro) => {
-                  if (examStage?.toLowerCase() === 'mains') {
+                  if (examStage?.toLowerCase() === 'mains' && allSubtopics.length > 0) {
                     setSelMicros([micro]);
                   } else {
                     handleHeatmapPress(micro, { subjects: selSubjects, sections: selSections, micro });
@@ -2988,6 +3003,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
                 colors={colors}
                 heatmapPalette={heatmapPalette}
                 onCellPress={(subtopic, year) => handleHeatmapPress(subtopic, { subjects: selSubjects, sections: selSections, micros: selMicros, subtopic }, year)}
+                onLabelActionPress={(subtopic) => handleHeatmapPress(subtopic, { subjects: selSubjects, sections: selSections, micros: selMicros, subtopic })}
                 onRowPress={(subtopic) => handleHeatmapPress(subtopic, { subjects: selSubjects, sections: selSections, micros: selMicros, subtopic })}
               />
             )}

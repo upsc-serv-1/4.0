@@ -542,6 +542,7 @@ export function MainsScreenInner() {
     subtopic?: string;
     nanotopic?: string;
     year?: string;
+    pyqFilter?: string;
     initialScreen?: string;
     from?: string;
     category?: string;
@@ -580,70 +581,40 @@ export function MainsScreenInner() {
   // (e.g., tapping a heatmap cell that opens a specific question). In this case,
   // pressing Back should return to the calling screen (PYQ Analysis), not go to hub.
   const cameFromExternalRoute = React.useRef(false);
-
-  useEffect(() => {
-    if (hasHandledInitialParams.current) return;
-    hasHandledInitialParams.current = true;
-
-    if (params.initialScreen === 'questions') {
-      if (params.questionId) {
-        const q = mainsConsolidatedQuestions.find(item => String(item.id) === String(params.questionId));
-        if (q) {
-          setDetailedQuestion(q);
-          setCurrentScreen('detailed-question');
-          setPreviousScreen('questions');
-          // Mark that we jumped directly here — back should exit to calling screen
-          cameFromExternalRoute.current = true;
-          return;
-        }
-      }
-      // Opened question list directly (e.g. from heatmap without a specific questionId)
-      if (params.from === 'pyq') {
-        cameFromExternalRoute.current = true;
-      }
-      setCurrentScreen('questions');
-    } else if (params.initialScreen === 'value-add' || params.initialScreen === 'value-addition') {
-      setCurrentScreen('value-add');
-      if (params.category) {
-        setValueAddCategory(params.category);
-      } else {
-        setValueAddCategory(null);
-      }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run only once on mount — params are stable URL values
+  const lastHandledParamsRef = React.useRef('');
 
   const initialFiltersFromParams = useMemo(() => {
-    if (!params.initialScreen) return null;
+    if (!params.from && !params.paper && !params.subject) return null;
 
     const cleanParam = (val: string | undefined | null) => {
-      if (!val) return 'All';
-      return val;
+      if (!val || val === 'All' || !val.trim()) return 'All';
+      return val.trim();
     };
 
     const cleanYearsParam = (val: string | undefined | null) => {
-      if (!val) return 'All';
-      return val.replace(/,/g, '|');
+      if (!val || val === 'All' || !val.trim()) return 'All';
+      return val.replace(/,/g, '|').trim();
     };
 
     let mappedPaper = 'All';
     if (params.paper) {
       const p = params.paper;
-      if (p === 'GS Paper 1') mappedPaper = 'GS1';
-      else if (p === 'GS Paper 2') mappedPaper = 'GS2';
-      else if (p === 'GS Paper 3') mappedPaper = 'GS3';
-      else if (p === 'GS Paper 4') mappedPaper = 'GS4';
+      if (p === 'GS Paper 1') mappedPaper = 'GS Paper 1|GS1';
+      else if (p === 'GS Paper 2') mappedPaper = 'GS Paper 2|GS2';
+      else if (p === 'GS Paper 3') mappedPaper = 'GS Paper 3|GS3';
+      else if (p === 'GS Paper 4') mappedPaper = 'GS Paper 4|GS4';
       else if (p === 'Optional') mappedPaper = 'Optional';
       else mappedPaper = cleanParam(p);
     }
 
     const cleanSubjectParam = (val: string | undefined | null) => {
-      if (!val || val === 'All') return 'All';
-      return normalizeSubject(val);
+      if (!val || val === 'All' || !val.trim()) return 'All';
+      return val.split(',').map(s => s.trim()).join('|');
     };
 
     return {
       ...DEFAULT_MAINS_FILTERS,
+      pyqFilter: (params.from === 'pyq' || params.pyqFilter === 'PYQ Only') ? 'PYQ Only' : (params.pyqFilter as any || 'All'),
       paper: mappedPaper,
       subjects: cleanSubjectParam(params.subject),
       sections: cleanParam(params.section),
@@ -652,7 +623,52 @@ export function MainsScreenInner() {
       nanotopics: cleanParam(params.nanotopic),
       years: cleanYearsParam(params.year),
     };
-  }, [params.initialScreen, params.paper, params.subject, params.section, params.microtopic, params.subtopic, params.nanotopic, params.year]);
+  }, [params.initialScreen, params.from, params.pyqFilter, params.paper, params.subject, params.section, params.microtopic, params.subtopic, params.nanotopic, params.year]);
+
+  useEffect(() => {
+    const paramKey = `${params.initialScreen || ''}_${params.from || ''}_${params._ts || ''}_${params.paper || ''}_${params.subject || ''}_${params.section || ''}_${params.microtopic || ''}_${params.subtopic || ''}_${params.nanotopic || ''}_${params.year || ''}_${params.questionId || ''}`;
+    if (!paramKey.replace(/_/g, '') || paramKey === lastHandledParamsRef.current) return;
+    lastHandledParamsRef.current = paramKey;
+
+    if (params.initialScreen === 'questions' || params.from === 'pyq') {
+      if (params.questionId) {
+        const q = mainsConsolidatedQuestions.find(item => String(item.id) === String(params.questionId));
+        if (q) {
+          setDetailedQuestion(q);
+          setCurrentScreen('detailed-question');
+          setPreviousScreen('questions');
+          cameFromExternalRoute.current = true;
+          return;
+        }
+      }
+
+      if (params.from === 'pyq') {
+        cameFromExternalRoute.current = true;
+      }
+
+      if (initialFiltersFromParams) {
+        setSessionFilters(initialFiltersFromParams);
+      }
+      setCurrentScreen('questions');
+    } else if (params.initialScreen === 'value-add' || params.initialScreen === 'value-addition') {
+      setCurrentScreen('value-add');
+      setValueAddCategory(params.category || null);
+    }
+  }, [
+    params.initialScreen,
+    params.from,
+    params.questionId,
+    params.paper,
+    params.subject,
+    params.section,
+    params.microtopic,
+    params.subtopic,
+    params.nanotopic,
+    params.year,
+    params._ts,
+    params.category,
+    initialFiltersFromParams,
+  ]);
 
   const [previousScreen, setPreviousScreen] = useState<'questions' | 'search'>('questions');
   const [detailedQuestion, setDetailedQuestion] = useState<ConsolidatedQuestion | null>(null);
@@ -664,11 +680,25 @@ export function MainsScreenInner() {
   // isNotAtRoot: true when we are inside a sub-screen, false when at the Mains hub root.
   // The second condition in the original OR was always false (value-add AND not hub is already
   // covered by the first clause), simplified here for clarity.
+  const [pendingAction, setPendingAction] = useState<any>(null);
+
+  useEffect(() => {
+    if (pendingAction) {
+      navigation.dispatch(pendingAction);
+      setPendingAction(null);
+    }
+  }, [pendingAction, navigation]);
+
   const isNotAtRoot = currentScreen !== 'hub';
 
   usePreventRemove(
-    isNotAtRoot,
-    ({ data }) => {
+    isNotAtRoot && !pendingAction,
+    (e) => {
+      const { data } = e;
+      if (data.action.type !== 'GO_BACK' && data.action.type !== 'POP') {
+        setPendingAction(data.action);
+        return;
+      }
       if (currentScreen === 'value-add' && valueAddCategory !== null) {
         setValueAddCategory(null);
       } else if (currentScreen === 'detailed-question') {
@@ -1937,7 +1967,7 @@ export function MainsScreenInner() {
               }}
             >
               <TouchableOpacity
-                onPress={() => router.navigate({ pathname: '/pyq', params: { fromTab: 'mains' } })}
+                onPress={() => router.replace('/pyq')}
                 style={[
                   styles.floatingTopRightButton,
                   {
@@ -1957,7 +1987,7 @@ export function MainsScreenInner() {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => router.navigate('/flashcards')}
+                onPress={() => router.replace('/flashcards')}
                 style={[
                   styles.floatingTopRightButton,
                   {
@@ -1991,7 +2021,8 @@ export function MainsScreenInner() {
             />
           )}
           {currentScreen === 'questions' && (
-          <QuestionBankView
+            <QuestionBankView
+              key={params._ts || (initialFiltersFromParams ? JSON.stringify(initialFiltersFromParams) : 'qb-view')}
               colors={colors}
               savedIds={savedQuestionIds}
               onToggleSaved={toggleBookmark}
@@ -2010,7 +2041,7 @@ export function MainsScreenInner() {
                 setCurrentScreen('detailed-question');
               }}
               onActiveQuestionChange={handleActiveQuestionChange}
-              initialFilters={sessionFilters || initialFiltersFromParams}
+              initialFilters={initialFiltersFromParams || sessionFilters}
               onFilterChange={setSessionFilters}
               valueAddTags={valueAddTags}
               onToggleValueAddTag={handleToggleValueAddTag}
@@ -5710,35 +5741,29 @@ function QuestionBankView({
 
   const lastSyncedFiltersRef = useRef<string>(JSON.stringify(filters));
 
-  useEffect(() => {
-    lastSyncedFiltersRef.current = JSON.stringify(filters);
-    onFilterChange?.(filters);
-  }, [filters, onFilterChange]);
-
   const setFiltersDeferred = useCallback((updater: MainsFilters | ((prev: MainsFilters) => MainsFilters)) => {
     setTimeout(() => {
       setFilters(prev => {
         const next = typeof updater === 'function' ? (updater as Function)(prev) : updater;
-        return {
+        const finalFilters = {
           ...next,
           searchAcross: next.searchAcross && next.searchAcross.length > 0 ? next.searchAcross : ['Questions'],
         };
+        lastSyncedFiltersRef.current = JSON.stringify(finalFilters);
+        onFilterChange?.(finalFilters);
+        return finalFilters;
       });
     }, 16);
-  }, []);
+  }, [onFilterChange]);
 
   useEffect(() => {
     if (initialFilters) {
       const serialized = JSON.stringify(initialFilters);
       if (serialized !== lastSyncedFiltersRef.current) {
         lastSyncedFiltersRef.current = serialized;
-        setFilters(prev => {
-          const next = {
-            ...initialFilters,
-            searchAcross: initialFilters.searchAcross && initialFilters.searchAcross.length > 0 ? initialFilters.searchAcross : ['Questions', 'Answers', 'Value Additions'],
-          };
-          if (JSON.stringify(prev) === JSON.stringify(next)) return prev;
-          return next;
+        setFilters({
+          ...initialFilters,
+          searchAcross: initialFilters.searchAcross && initialFilters.searchAcross.length > 0 ? initialFilters.searchAcross : ['Questions', 'Answers', 'Value Additions'],
         });
       }
     }
@@ -6016,7 +6041,7 @@ function QuestionBankView({
         if (!filters.searchAcross.includes('Questions')) return false;
 
         // PYQ Filter
-        const isPyq = q.is_pyq !== false && q.is_pyq !== 'false';
+        const isPyq = !!q.is_pyq && String(q.is_pyq).toLowerCase() !== 'false' && String(q.is_pyq) !== '0';
         if (filters.pyqFilter === 'PYQ Only' && !isPyq) return false;
         if (filters.pyqFilter === 'Non-PYQ' && isPyq) return false;
 
@@ -6055,22 +6080,42 @@ function QuestionBankView({
         // 1. by default dont show optional question unless chose optional in stage filter in sidebar
         const matchPaper = paperFilter.length === 0
           ? q.paper !== 'Optional'
-          : paperFilter.includes(q.paper);
+          : paperFilter.some(pf => {
+              const pNorm = pf.trim().toLowerCase().replace(/\s+/g, '');
+              const qNorm = (q.paper || '').trim().toLowerCase().replace(/\s+/g, '');
+              return pNorm === qNorm ||
+                (pNorm === 'gs1' && qNorm === 'gspaper1') || (pNorm === 'gspaper1' && qNorm === 'gs1') ||
+                (pNorm === 'gs2' && qNorm === 'gspaper2') || (pNorm === 'gspaper2' && qNorm === 'gs2') ||
+                (pNorm === 'gs3' && qNorm === 'gspaper3') || (pNorm === 'gspaper3' && qNorm === 'gs3') ||
+                (pNorm === 'gs4' && qNorm === 'gspaper4') || (pNorm === 'gspaper4' && qNorm === 'gs4');
+            });
         if (!matchPaper) return false;
 
-        const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
+        const matchSubject = subjectFilter.length === 0 || subjectFilter.some(sf => {
+          const sfNorm = sf.trim().toLowerCase();
+          const qNorm = (q.subject || '').trim().toLowerCase();
+          return sfNorm === qNorm || (sfNorm === 'ethics' && qNorm.includes('ethics'));
+        });
         if (!matchSubject) return false;
 
-        const matchSection = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
+        const matchSection = sectionFilter.length === 0 || sectionFilter.some(sec => {
+          return sec.trim().toLowerCase() === getQuestionSection(q).trim().toLowerCase();
+        });
         if (!matchSection) return false;
 
-        const matchMicrotopic = microtopicFilter.length === 0 || microtopicFilter.includes(getQuestionMicro(q));
+        const matchMicrotopic = microtopicFilter.length === 0 || microtopicFilter.some(mf => {
+          return mf.trim().toLowerCase() === getQuestionMicro(q).trim().toLowerCase();
+        });
         if (!matchMicrotopic) return false;
 
-        const matchSubtopic = subtopicFilter.length === 0 || subtopicFilter.includes(subtopicVal);
+        const matchSubtopic = subtopicFilter.length === 0 || subtopicFilter.some(sub => {
+          return sub.trim().toLowerCase() === subtopicVal.trim().toLowerCase();
+        });
         if (!matchSubtopic) return false;
 
-        const matchNanotopic = nanotopicFilter.length === 0 || nanotopicFilter.includes(getQuestionNano(q));
+        const matchNanotopic = nanotopicFilter.length === 0 || nanotopicFilter.some(nano => {
+          return nano.trim().toLowerCase() === getQuestionNano(q).trim().toLowerCase();
+        });
         if (!matchNanotopic) return false;
 
         const matchMacro = macroFilter.length === 0 || (q.macrotag || '').split(',').map(t => t.trim()).some(t => macroFilter.includes(t));
@@ -6082,8 +6127,8 @@ function QuestionBankView({
         const isNonYearQ = q.year === null || q.year === undefined || !String(q.year).trim() || String(q.year).trim() === '0' || String(q.year).toLowerCase() === 'non-year';
         const matchYear = yearFilter.length === 0 || (
           isNonYearQ
-            ? yearFilter.includes('Non-Year')
-            : yearFilter.includes(String(q.year).trim())
+            ? yearFilter.some(yf => yf.toLowerCase() === 'non-year')
+            : yearFilter.some(yf => String(yf).trim() === String(q.year).trim())
         );
         if (!matchYear) return false;
 

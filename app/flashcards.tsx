@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect, useNavigation } from 'expo-router';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -41,6 +41,7 @@ import { BranchColors, DEFAULT_BRANCH_COLORS } from '../src/lib/branchColors';
 import { usePreventRemove } from '@react-navigation/native';
 
 function FlashcardsHub() {
+  const navigation = useNavigation();
   const { width } = useWindowDimensions();
   const paddingH = width > 768 ? 64 : 16;
   const { colors } = useTheme();
@@ -54,9 +55,23 @@ function FlashcardsHub() {
   const [searchVisible, setSearchVisible] = useState(false);
   const [currentFolder, setCurrentFolder] = useState<BranchNode | null>(null);
 
+  const [pendingAction, setPendingAction] = useState<any>(null);
+
+  useEffect(() => {
+    if (pendingAction) {
+      navigation.dispatch(pendingAction);
+      setPendingAction(null);
+    }
+  }, [pendingAction, navigation]);
+
   usePreventRemove(
-    currentFolder !== null,
-    () => {
+    currentFolder !== null && !pendingAction,
+    (e) => {
+      const { data } = e;
+      if (data.action.type !== 'GO_BACK' && data.action.type !== 'POP') {
+        setPendingAction(data.action);
+        return;
+      }
       setCurrentFolder(null);
     }
   );
@@ -680,7 +695,7 @@ function FlashcardsHub() {
               </View>
               <View style={[styles.headerBtns, { gap: 6 }]}>
                 <TouchableOpacity 
-                  onPress={() => router.navigate({ pathname: '/mains', params: { initialScreen: 'questions' } })} 
+                  onPress={() => router.replace({ pathname: '/mains', params: { initialScreen: 'questions' } })} 
                   style={{
                     backgroundColor: colors.primary + '18',
                     borderRadius: 12,
@@ -699,7 +714,7 @@ function FlashcardsHub() {
                 </TouchableOpacity>
 
                 <TouchableOpacity 
-                  onPress={() => router.navigate({ pathname: '/pyq', params: { fromTab: 'flashcards' } })} 
+                  onPress={() => router.replace({ pathname: '/pyq', params: { fromTab: 'flashcards' } })} 
                   style={{
                     backgroundColor: colors.surface,
                     borderRadius: 12,

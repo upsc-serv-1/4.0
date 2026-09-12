@@ -25,3 +25,20 @@ __pycache__/
 # Backups
 *.backup
 *.bak
+
+# Topper copies (PDFs, images, and MD files - large, not needed in repo)
+anthro-toppers/
+anthro-toppers-paper-2/
+gs1-*/
+gs2-*/
+gs3-*/
+gs4-*/
+*.pdf
+
+# Scratch, test files and transcription dumps
+gs2_p2_*
+gathered_gs2_p2_questions.json
+all_found_questions.json
+scratch_transcription.txt
+sample_layout.jpg
+test_p*.jpg

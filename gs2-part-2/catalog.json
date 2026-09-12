@@ -1,0 +1,2962 @@
+{
+  "paper_title": "GS2 Part-2",
+  "subject": "GS2-Part-2",
+  "total_pdf_pages": 469,
+  "license_pages_skipped": [
+    28,
+    39,
+    48,
+    103,
+    161,
+    279,
+    296,
+    297,
+    332,
+    373,
+    455
+  ],
+  "syllabus_index": [
+    {
+      "topic_id": 1,
+      "title": "Governance - Social Justice",
+      "page": 1,
+      "slug": "01-governance-social-justice"
+    },
+    {
+      "topic_id": 2,
+      "title": "Development processes and the development industry",
+      "page": 7,
+      "slug": "02-development-processes-and-the-development-industry"
+    },
+    {
+      "topic_id": 3,
+      "title": "E- Governance",
+      "page": 88,
+      "slug": "03-e-governance"
+    },
+    {
+      "topic_id": 4,
+      "title": "Role of Civil services in a democracy",
+      "page": 110,
+      "slug": "04-role-of-civil-services-in-a-democracy"
+    },
+    {
+      "topic_id": 5,
+      "title": "Welfare Schemes",
+      "page": 134,
+      "slug": "05-welfare-schemes"
+    },
+    {
+      "topic_id": 6,
+      "title": "Health",
+      "page": 185,
+      "slug": "06-health"
+    },
+    {
+      "topic_id": 7,
+      "title": "Education",
+      "page": 222,
+      "slug": "07-education"
+    },
+    {
+      "topic_id": 8,
+      "title": "Poverty and hunger",
+      "page": 252,
+      "slug": "08-poverty-and-hunger"
+    },
+    {
+      "topic_id": 9,
+      "title": "India and its neighbourhood",
+      "page": 278,
+      "slug": "09-india-and-its-neighbourhood"
+    },
+    {
+      "topic_id": 10,
+      "title": "Bilateral,Regional and Global Grouping",
+      "page": 316,
+      "slug": "10-bilateralregional-and-global-grouping"
+    },
+    {
+      "topic_id": 11,
+      "title": "Effect of policies and polticis of developed - and developing countries",
+      "page": 355,
+      "slug": "11-effect-of-policies-and-polticis-of-developed-and-d"
+    },
+    {
+      "topic_id": 12,
+      "title": "Important international institutions, - agenices and fora",
+      "page": 392,
+      "slug": "12-important-international-institutions-agenices-and-"
+    },
+    {
+      "topic_id": 13,
+      "title": "Foreign Policy Issues",
+      "page": 441,
+      "slug": "13-foreign-policy-issues"
+    }
+  ],
+  "entries": [
+    {
+      "kind": "answer",
+      "global_id": 1,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Sustainable alliance between Non-Governmental Organizations (NGOs) and the State is critical for social change and development. Highlighting hurdles in this developmental alliance, suggest remedial measures for a more productive partnership.",
+      "pdf_pages": [
+        8,
+        9
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 2,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "Sustainable alliance between Non-Governmental Organizations (NGOs) and the State is critical for social change and development. Highlighting hurdles in this developmental alliance, suggest remedial measures for a more productive partnership.",
+      "pdf_pages": [
+        10,
+        11
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 3,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 10,
+      "score": "108",
+      "question": "Recent Foreign Contribution Regulation Act (FCRA) amendment is a blunt instrument that has led to considerable shrink in working space for NGOs and civil society. Discuss.",
+      "pdf_pages": [
+        12,
+        13
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 4,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "As a social safety-valve, non-governmental organisations (NGOs) can be the principal vehicles through which communities voice their concerns. Discuss.",
+      "pdf_pages": [
+        14,
+        15
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 5,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 15,
+      "score": "128",
+      "question": "The rise of NGOs reflects the failure of Indian state and markets to usher in equitable development and economic redistribution. Examine.",
+      "pdf_pages": [
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 6,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Rishabh Choudhary",
+      "air": "28",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "Technology has a crucial role to play in advancing the NGO sector and improving outcomes for beneficiaries. Discuss with examples.",
+      "pdf_pages": [
+        19,
+        20
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 7,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "Self-help groups (SHGs) have contributed towards rural development and women empowerment, but their uneven geographical impact and rising loan defaults are serious concerns that need attention. Discuss.",
+      "pdf_pages": [
+        21,
+        22,
+        23
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 8,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "Explain the role that SHGs play in poverty alleviation in India. Highlighting the shortcomings of the SHG-Bank Linkage programme, give some suggestions to improve its performance.",
+      "pdf_pages": [
+        24,
+        25,
+        26
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 9,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 15,
+      "score": "120",
+      "question": "Discuss the unique challenges and opportunities Self Help Groups (SHGs) encounter in urban areas compared to rural ones and how can microfinance be adapted to tackle urban poverty.",
+      "pdf_pages": [
+        27,
+        29,
+        30
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 10,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 10,
+      "score": "121",
+      "question": "Critically examine the contribution of Self-Help Groups to the progress of rural development in India.",
+      "pdf_pages": [
+        31,
+        32,
+        33
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 11,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 15,
+      "score": "108",
+      "question": "Self-Help Groups can play a key role in ensuring women's empowerment and socio-economic development in the rural India. Explain with examples. What steps have been taken by the government for the promotion of SHGs in India?",
+      "pdf_pages": [
+        34,
+        35,
+        36
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 12,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 15,
+      "score": "115",
+      "question": "Self-Help Groups (SHGs) can play a crucial role in alleviating rural poverty by providing women with access to microfinance, enabling them to start small businesses and improve their livelihoods. Examine.",
+      "pdf_pages": [
+        37,
+        38,
+        40
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 13,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "Self-Help Groups (SHGs) are an effective model of social entrepreneurship for women empowerment and have multiplier effects on developmental processes in rural areas. Elaborate with suitable examples.",
+      "pdf_pages": [
+        41,
+        42,
+        43
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 14,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "How far do you agree that use of Self-Help Groups (SHGs) as instruments of delivery of services and implementation of projects by the government has led to undermining of legitimate authority of Panchayati Raj Institutions (PRIs)?",
+      "pdf_pages": [
+        44,
+        45
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 15,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 15,
+      "score": "121",
+      "question": "Analyze the potential challenges and benefits involved in leveraging SHGs as platforms for skill development, entrepreneurship, and income generation among marginalized communities to effectively counter poverty.",
+      "pdf_pages": [
+        46,
+        47,
+        49
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 16,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "Self-Help Groups (SHGs) are an effective model of social entrepreneurship for women empowerment and have multiplier effects on developmental processes in rural areas. Elaborate with suitable examples.",
+      "pdf_pages": [
+        50,
+        51,
+        52
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 17,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 10,
+      "score": "116",
+      "question": "How do corporate donors aid NGOs in facilitating holistic development in India?",
+      "pdf_pages": [
+        53,
+        54
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 18,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 10,
+      "score": "124",
+      "question": "How do corporate donors aid NGOs in facilitating holistic development in India?",
+      "pdf_pages": [
+        55,
+        56
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 19,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 15,
+      "score": "115",
+      "question": "The true test of good governance is the degree to which it ensures accountability towards citizens and delivers on the promise of sustainable and inclusive human development. Discuss in the context of challenges to good governance in India.",
+      "pdf_pages": [
+        57,
+        58,
+        59
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 20,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 10,
+      "score": "121",
+      "question": "'Corruption corrodes the fabric of governance, eroding the public's faith in democratic institutions.' Examine the potential for harmonizing the Right to Information (RTI) Act, the Whistleblower Protection Act (WBPA), and the Lokpal & Lokayukta Act, 2013, to enhance the effectiveness of the anticorruption regime.",
+      "pdf_pages": [
+        60,
+        61,
+        62
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 21,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 10,
+      "score": "116",
+      "question": "How can India make Citizens' Charter a powerful tool for improving governance and empowering citizens?",
+      "pdf_pages": [
+        63,
+        64
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 22,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 20,
+      "score": "108",
+      "question": "Indian experience shows that promises made in the citizen charter have become more pious declarations with no mechanism to enforce them. In this context, enumerate the challenges in implementation of a successful citizen charter. Also, suggest measures to make it effective.",
+      "pdf_pages": [
+        65,
+        66
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 23,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 10,
+      "score": "124",
+      "question": "How can India make Citizens' Charter a powerful tool for improving governance and empowering citizens?",
+      "pdf_pages": [
+        67,
+        68
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 24,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 15,
+      "score": "120",
+      "question": "The Right to Information (RTI) Act is hailed for its transformative impact on the quest for transparency and accountability in Indian governance. However, multifaceted challenges and systemic limitations impede its effective implementation. Discuss. Also, suggest measures for its effective implementation.",
+      "pdf_pages": [
+        69,
+        70,
+        71
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 25,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 10,
+      "score": "121",
+      "question": "The Right to Information Act is a Handicapped Law. Discuss.",
+      "pdf_pages": [
+        72,
+        73
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 26,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 10,
+      "score": "108",
+      "question": "Though RTI was meant to strengthen participatory democracy in India, various factors have hindered its utilization to full potential. In this context, examine the issues pertaining to the implementation of the RTI Act.",
+      "pdf_pages": [
+        74,
+        75
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 27,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Though RTI was meant to strengthen participatory democracy in India, various factors have hindered its utilization to full potential. In this context, examine the issues pertaining to the implementation of the RTI Act.",
+      "pdf_pages": [
+        76,
+        77
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 28,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 10,
+      "score": "121",
+      "question": "Highlighting the rationale behind continuance of the Official Secrets Act, critically discuss whether the Right to Information should be given precedence over it.",
+      "pdf_pages": [
+        78,
+        79
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 29,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Though RTI was meant to strengthen participatory democracy in India, various factors have hindered its utilization to full potential. In this context, examine the issues pertaining to the implementation of the RTI Act.",
+      "pdf_pages": [
+        80,
+        81
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 30,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 15,
+      "score": "108",
+      "question": "The institutions that have been given the responsibility of ensuring transparency and accountability in governance are also responsible for bureaucratic inertia. Do you agree with this view? Justify.",
+      "pdf_pages": [
+        82,
+        83,
+        84
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 31,
+      "topic_id": 2,
+      "topic_name": "Development processes and the development industry",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "There is an urgent need for effective whistle-blowing mechanisms and ensuring that necessary safeguards for the protection of whistle-blowers are established in both public and private spheres in India. Discuss.",
+      "pdf_pages": [
+        85,
+        86,
+        87
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 32,
+      "topic_id": 3,
+      "topic_name": "E- Governance",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "E-governance is not just about efficiency; it's about making governance accessible and inclusive for every citizen. Explain.",
+      "pdf_pages": [
+        89,
+        90
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 33,
+      "topic_id": 3,
+      "topic_name": "E- Governance",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 15,
+      "score": "116",
+      "question": "What do you understand by interoperability in e-governance? What steps have been taken by the government to ensure interoperability and integration of various e-governance systems?",
+      "pdf_pages": [
+        91,
+        92,
+        93
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 34,
+      "topic_id": 3,
+      "topic_name": "E- Governance",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 15,
+      "score": "124",
+      "question": "What do you understand by interoperability in e-governance? What steps have been taken by the government to ensure interoperability and integration of various e-governance systems?",
+      "pdf_pages": [
+        94,
+        95,
+        96
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 35,
+      "topic_id": 3,
+      "topic_name": "E- Governance",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 15,
+      "score": "108",
+      "question": "'The rapid expansion of mobile network, proliferation of smart phones and data-revolution have made m-governance an integral part of government welfare programmes.' Discuss.",
+      "pdf_pages": [
+        97,
+        98,
+        99
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 36,
+      "topic_id": 3,
+      "topic_name": "E- Governance",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "Digital Public Infrastructure (DPI) allows for innovative and convenient public services, help overcome inclusion or accessibility barriers, and increase transparency and accountability with real-time data. Discuss with examples.",
+      "pdf_pages": [
+        100,
+        101,
+        102
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 37,
+      "topic_id": 3,
+      "topic_name": "E- Governance",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "'The rapid expansion of mobile network, proliferation of smart phones and data revolution have made m-governance an integral part of government welfare programmes.' Discuss.",
+      "pdf_pages": [
+        104,
+        105,
+        106
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 38,
+      "topic_id": 3,
+      "topic_name": "E- Governance",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "Harnessing public sector data is vital for informed decision making, accelerating socio-economic transformation and democratizing innovation in the country. In this context, highlight the various bottlenecks in public data sharing and suggest strategies for unlocking true value of data.",
+      "pdf_pages": [
+        107,
+        108,
+        109
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 39,
+      "topic_id": 4,
+      "topic_name": "Role of Civil services in a democracy",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "What is the rationale behind having a mandatory 'cooling-off' period for retired civil servants? In light of numerous instances of violation of this provision, do you think there is a need to have a relook at Civil Services Conduct Rules?",
+      "pdf_pages": [
+        111,
+        112
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 40,
+      "topic_id": 4,
+      "topic_name": "Role of Civil services in a democracy",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "131",
+      "question": "'Technology serves as the catalyst for reshaping the traditional contours of bureaucracy, propelling it to become more efficient, transparent, and citizen-centric.' Explain and also explore how the integration of technology can expedite governmental efforts aimed at modernizing the civil service.",
+      "pdf_pages": [
+        113,
+        114,
+        115
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 41,
+      "topic_id": 4,
+      "topic_name": "Role of Civil services in a democracy",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "'Civil services reforms must go beyond recruitment and standardised training to cope with the present day challenges.' Analyse.",
+      "pdf_pages": [
+        116,
+        117
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 42,
+      "topic_id": 4,
+      "topic_name": "Role of Civil services in a democracy",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 15,
+      "score": "131",
+      "question": "'Technology serves as the catalyst for reshaping the traditional contours of bureaucracy, propelling it to become more efficient, transparent, and citizen-centric.' Explain and also explore how the integration of technology can expedite governmental efforts aimed at modernizing the civil service.",
+      "pdf_pages": [
+        118,
+        119,
+        120
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 43,
+      "topic_id": 4,
+      "topic_name": "Role of Civil services in a democracy",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 15,
+      "score": "121",
+      "question": "'Neo-liberal reforms and globalization have deeply transformed the institutions of the welfare state and set the ground for a new type of civil services.' In this context examine the challenges faced in service delivery and suggest adequate reforms.",
+      "pdf_pages": [
+        121,
+        122,
+        123
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 44,
+      "topic_id": 4,
+      "topic_name": "Role of Civil services in a democracy",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "What are the various ways in which emerging technologies can be utilised by civil servants in ensuring efficient public service delivery and affecting change in India?",
+      "pdf_pages": [
+        124,
+        125
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 45,
+      "topic_id": 4,
+      "topic_name": "Role of Civil services in a democracy",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 10,
+      "score": "113",
+      "question": "Discuss the importance of cultivating a culture of life-long learning among Indian civil servants. How has Mission Karmayogi contributed to this objective? Illustrate with examples.",
+      "pdf_pages": [
+        126,
+        127
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 46,
+      "topic_id": 4,
+      "topic_name": "Role of Civil services in a democracy",
+      "topper": "Shreya Tyagi",
+      "air": "31",
+      "year": "2024",
+      "marks": 10,
+      "score": "",
+      "question": "Discuss the importance of cultivating a culture of life-long learning among Indian civil servants. How has Mission Karmayogi contributed to this objective? Illustrate with examples.",
+      "pdf_pages": [
+        128,
+        129
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 47,
+      "topic_id": 4,
+      "topic_name": "Role of Civil services in a democracy",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Instead of performing a transformative role, traditional bureaucracy has contributed to perpetuation of old order. Comment.",
+      "pdf_pages": [
+        130,
+        131
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 48,
+      "topic_id": 4,
+      "topic_name": "Role of Civil services in a democracy",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "Instead of performing a transformative role, traditional bureaucracy has contributed to perpetuation of old order. Comment.",
+      "pdf_pages": [
+        132,
+        133
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 49,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "The focus of welfare schemes in India is shifting from 'well-being' towards 'over-dependency'. In light of this, do you agree that welfare schemes have inculcated a 'freebies culture' in India leading to a divergence of focus from poverty and hunger alleviation?",
+      "pdf_pages": [
+        135,
+        136
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 50,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "Success of welfare schemes depends on whether they are built on principles of participation and work within structures of accountability. Discuss.",
+      "pdf_pages": [
+        137,
+        138,
+        139
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 51,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "Success of welfare schemes depends on whether they are built on principles of participation and work within structures of accountability. Discuss.",
+      "pdf_pages": [
+        140,
+        141,
+        142
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 52,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "Discuss the different determinants of the occurrence of child labour in India. What measures can be taken to tackle the issue of child labour in the country?",
+      "pdf_pages": [
+        143,
+        144
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 53,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 15,
+      "score": "131",
+      "question": "Discuss the significance of the POCSO Act in ensuring the safety and protection of children against sexual offences. What changes would you suggest to the present Act to enhance its effective implementation?",
+      "pdf_pages": [
+        145,
+        146,
+        147
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 54,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 10,
+      "score": "116",
+      "question": "Despite its merits, should the POCSO Act be revisited to correct the existing inadequacies?",
+      "pdf_pages": [
+        148,
+        149
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 55,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 15,
+      "score": "113",
+      "question": "What are the implications of the POCSO Act on the rights and welfare of children in India? Analyze the role of the POCSO Act in transforming India's legal framework for child protection.",
+      "pdf_pages": [
+        150,
+        151,
+        152
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 56,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 10,
+      "score": "124",
+      "question": "Despite its merits, should the POCSO Act be revisited to correct the existing inadequacies?",
+      "pdf_pages": [
+        153,
+        154
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 57,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Ruhani",
+      "air": "5",
+      "year": "2023",
+      "marks": 10,
+      "score": "",
+      "question": "How has the implementation of the POSH Act resulted in limited success in raising awareness about sexual harassment, and what factors have hindered its effective outreach to women employed in the unorganized sector? Propose strategies to bridge this gap and ensure comprehensive protection for women in the unorganized sector against workplace harassment.",
+      "pdf_pages": [
+        155,
+        156,
+        157
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 58,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 10,
+      "score": "121",
+      "question": "What are the legal provisions governing abortion in India? Discuss the recent amendments and their impact on abortion practices to date.",
+      "pdf_pages": [
+        158,
+        159
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 59,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 15,
+      "score": "128",
+      "question": "Medical Termination of Pregnancy (Amendment) Act, 2021 has expanded access of women to safe and legal abortion services, but it fails to address the critical issues of reproductive rights and bodily autonomy of women. Examine.",
+      "pdf_pages": [
+        160,
+        162,
+        163
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 60,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Rishabh Choudhary",
+      "air": "28",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "Recent developments have brought to light the issue of criminalizing marital rape in India. Analyse the implications of ensuring legal protection for victims of marital rape in the country.",
+      "pdf_pages": [
+        164,
+        165,
+        166
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 61,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "The offence of rape cannot be condoned by marital relationship between victim and culprit. In light of this statement, discuss the issues involved in criminalization of marital rape.",
+      "pdf_pages": [
+        167,
+        168,
+        169
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 62,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 10,
+      "score": "121",
+      "question": "How has the implementation of the POSH Act resulted in limited success in raising awareness about sexual harassment, and what factors have hindered its effective outreach to women employed in the unorganized sector? Propose strategies to bridge this gap and ensure comprehensive protection for women in the unorganized sector against workplace harassment.",
+      "pdf_pages": [
+        170,
+        171,
+        172
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 63,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "The wide gap between the number of females graduating every year and those entering the workspace is an issue of paramount importance that needs to be addressed. Discuss in the context of India.",
+      "pdf_pages": [
+        173,
+        174
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 64,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 10,
+      "score": "134",
+      "question": "In order to pass the ultimate test of good governance, welfare state should be close to the people, responsive to their aspirations, and inclusive in its approach. Discuss with special reference to PM PVTG Development Mission.",
+      "pdf_pages": [
+        175,
+        176
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 65,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 10,
+      "score": "134",
+      "question": "Legislation like Scheduled Caste and Scheduled Tribe (Prevention of Atrocities) Act 1989 remains mere letter of law due to lack of implementation in letter and spirit. Discuss.",
+      "pdf_pages": [
+        177,
+        178,
+        179
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 66,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 10,
+      "score": "115",
+      "question": "Without addressing the issues that hinder the full and effective participation of persons with disabilities in society, achieving genuine inclusivity remains a distant goal. Comment.",
+      "pdf_pages": [
+        180,
+        181
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 67,
+      "topic_id": 5,
+      "topic_name": "Welfare Schemes",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "The 'third gender' has not yet been engendered in the Indian society despite legislative nudge. Analyse.",
+      "pdf_pages": [
+        182,
+        183,
+        184
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 68,
+      "topic_id": 6,
+      "topic_name": "Health",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "Discuss the critical role of Accredited Social Health Activists (ASHA) and Anganwadi workers as a connecting link between the government and the marginalized sections of the community.",
+      "pdf_pages": [
+        186,
+        187
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 69,
+      "topic_id": 6,
+      "topic_name": "Health",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "Highlighting the need of generic medicines in India, give an account of the reasons behind their lower availability and adoption. Also, mention some steps taken by the government in this regard.",
+      "pdf_pages": [
+        188,
+        189
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 70,
+      "topic_id": 6,
+      "topic_name": "Health",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 10,
+      "score": "115",
+      "question": "How effective has India been in enhancing immunization coverage over the years? What challenges continue to affect immunization efforts in the country?",
+      "pdf_pages": [
+        190,
+        191
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 71,
+      "topic_id": 6,
+      "topic_name": "Health",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 15,
+      "score": "116",
+      "question": "How effective has India been in enhancing immunization coverage over the years? What challenges continue to affect immunization efforts in the country?",
+      "pdf_pages": [
+        192,
+        193,
+        194
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 72,
+      "topic_id": 6,
+      "topic_name": "Health",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 15,
+      "score": "124",
+      "question": "Despite being lauded for its patient centric approach, the Mental Healthcare Act, 2017, remains sluggish and mired with various issues. Discuss.",
+      "pdf_pages": [
+        195,
+        196,
+        197
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 73,
+      "topic_id": 6,
+      "topic_name": "Health",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "To address the limitations of the public health system, how can the private sector contribute effectively to bridging the gap to ensure equitable and accessible healthcare for all?",
+      "pdf_pages": [
+        198,
+        199
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 74,
+      "topic_id": 6,
+      "topic_name": "Health",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 20,
+      "score": "131",
+      "question": "Recently, the Central government exempted all foods and drugs for rare diseases imported by people for personal use from customs duty. What are the concerns related to rare diseases as a public health issue in India? How can these be resolved?",
+      "pdf_pages": [
+        200,
+        201
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 75,
+      "topic_id": 6,
+      "topic_name": "Health",
+      "topper": "Rishabh Choudhary",
+      "air": "28",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "In the context of India, despite the presence of constitutional provisions, legal precedents, and international commitments, that establish a robust foundation for a right to health, why has there been a lack of explicit legal recognition of this right?",
+      "pdf_pages": [
+        202,
+        203,
+        204
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 76,
+      "topic_id": 6,
+      "topic_name": "Health",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 10,
+      "score": "121",
+      "question": "Besides legislation, the full realisation of the right to health for all in India demands plugging of social, financial, and infrastructural gaps. Examine.",
+      "pdf_pages": [
+        205,
+        206
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 77,
+      "topic_id": 6,
+      "topic_name": "Health",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "When it comes to sexual and reproductive health of women in India, rights-based discourse has largely been bypassed not just by the societal norms but also by the legal norms. Discuss.",
+      "pdf_pages": [
+        207,
+        208,
+        209
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 78,
+      "topic_id": 6,
+      "topic_name": "Health",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 15,
+      "score": "116",
+      "question": "When it comes to sexual and reproductive health of women in India, rights-based discourse has largely been bypassed not just by the societal norms but also by the legal norms. Discuss.",
+      "pdf_pages": [
+        210,
+        211,
+        212
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 79,
+      "topic_id": 6,
+      "topic_name": "Health",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 15,
+      "score": "124",
+      "question": "The persistent health equity challenges in India pose a critical barrier in achieving Universal Health Coverage. In this context discuss the role of the public and private sectors in ensuring adequate health access and outcomes across rural and urban areas.",
+      "pdf_pages": [
+        213,
+        214,
+        215
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 80,
+      "topic_id": 6,
+      "topic_name": "Health",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 15,
+      "score": "113",
+      "question": "Investment in education yields both private and social returns, yet India shies away from investing in it. Do you agree?",
+      "pdf_pages": [
+        216,
+        217,
+        218
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 81,
+      "topic_id": 6,
+      "topic_name": "Health",
+      "topper": "Shreya Tyagi",
+      "air": "31",
+      "year": "2024",
+      "marks": 10,
+      "score": "",
+      "question": "Do you agree with the view that the deep-rooted problems in India's school education system cannot be solved by digital transformation alone?",
+      "pdf_pages": [
+        219,
+        220,
+        221
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 82,
+      "topic_id": 7,
+      "topic_name": "Education",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "Despite the implementation of numerous policies and schemes aimed at combating hunger and malnutrition in the country, their effectiveness remains limited. Analyse.",
+      "pdf_pages": [
+        223,
+        224,
+        225
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 83,
+      "topic_id": 7,
+      "topic_name": "Education",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "Despite substantial rise in per capita income and surplus production of food grains, high level of malnutrition and hunger continues to persist in India. Examine the reasons for this divergence keeping in mind findings of Global Hunger Index 2021.",
+      "pdf_pages": [
+        226,
+        227,
+        228
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 84,
+      "topic_id": 7,
+      "topic_name": "Education",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "The Institutions of Eminence (IoE) scheme was conceived to develop 'world-class' centres of higher education in India but six years later, it is yet to become the game changer it was intended to be. Discuss.",
+      "pdf_pages": [
+        229,
+        230,
+        231
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 85,
+      "topic_id": 7,
+      "topic_name": "Education",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "Why do Indian universities find it difficult to break into the ranks of top global universities? How can Indian institutions of higher education be transformed into global centres of learning?",
+      "pdf_pages": [
+        232,
+        233,
+        234
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 86,
+      "topic_id": 7,
+      "topic_name": "Education",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "131",
+      "question": "Can the infusion of foreign educational institutions be a transformative step in enhancing the global competitiveness of higher education in India and addressing the prevailing quality challenges? Justify with reason.",
+      "pdf_pages": [
+        235,
+        236
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 87,
+      "topic_id": 7,
+      "topic_name": "Education",
+      "topper": "Rishabh Choudhary",
+      "air": "28",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "Discuss the implications associated with the entry of foreign educational institutions for technical and higher education in India.",
+      "pdf_pages": [
+        237,
+        238
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 88,
+      "topic_id": 7,
+      "topic_name": "Education",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 20,
+      "score": "131",
+      "question": "Addressing the problem of chronic malnutrition in the country requires nutrition-specific as well as nutrition-sensitive interventions. Analyse.",
+      "pdf_pages": [
+        239,
+        240
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 89,
+      "topic_id": 7,
+      "topic_name": "Education",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 15,
+      "score": "120",
+      "question": "Understanding the extent, source, and complexity of deprivations among the multidimensionally poor contributes to more informed policymaking. In this context, analyze the latest National Multidimensional Poverty Index Report by NITI Aayog.",
+      "pdf_pages": [
+        241,
+        242,
+        243
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 90,
+      "topic_id": 7,
+      "topic_name": "Education",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "There is need for convergence of 'nutrition-specific' and 'nutrition-sensitive' interventions to effectively tackle child undernutrition in India.",
+      "pdf_pages": [
+        244,
+        245,
+        246
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 91,
+      "topic_id": 7,
+      "topic_name": "Education",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "There is an urgent need for effective global cooperation to eradicate poverty and hunger. In this context analyse how international cooperation can impact efforts to address the challenges of poverty and hunger.",
+      "pdf_pages": [
+        247,
+        248
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 92,
+      "topic_id": 7,
+      "topic_name": "Education",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "Comprehensive National Nutritional Survey (CNNS) paints a grim picture of health and nutrition of children in India. Discuss the effects of intergenerational poverty on nutrition and health. Also, suggest ways to break the poverty-undernutrition vicious cycle.",
+      "pdf_pages": [
+        249,
+        250,
+        251
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 93,
+      "topic_id": 8,
+      "topic_name": "Poverty and hunger",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 15,
+      "score": "115",
+      "question": "The foray of China into the Indian ocean through OBOR poses strategic, commercial, and diplomatic challenges for India. Comment.",
+      "pdf_pages": [
+        253,
+        254,
+        255
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 94,
+      "topic_id": 8,
+      "topic_name": "Poverty and hunger",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "Real reason for rising Indo-China tension is that China is determined to reshape the global political and economic order in a manner aligned to its own interest in which it no longer regards India as a source of support. Explain with suitable examples.",
+      "pdf_pages": [
+        256,
+        257,
+        258
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 95,
+      "topic_id": 8,
+      "topic_name": "Poverty and hunger",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "The problem of chronic malnutrition in the country requires nutrition-specific as well as nutrition-sensitive interventions. Analyse. The first stop to eradicating poverty is reliable poverty assessment for program design, implementation, and monitoring. In this context discuss the methodology and significance of NITI Aayog's National Multidimensional Poverty Index.",
+      "pdf_pages": [
+        259,
+        260,
+        261
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 96,
+      "topic_id": 8,
+      "topic_name": "Poverty and hunger",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 15,
+      "score": "134",
+      "question": "Normalization of poverty as a feature of large population overshadows the lack of intent and capacity of political and administrative institutions. Do you agree? Justify using suitable examples.",
+      "pdf_pages": [
+        262,
+        263,
+        264
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 97,
+      "topic_id": 8,
+      "topic_name": "Poverty and hunger",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 10,
+      "score": "121",
+      "question": "The first step to eradicating poverty is reliable poverty assessment for program design, implementation, and monitoring. In this context discuss the methodology and significance of NITI Aayog's National Multidimensional Poverty Index.",
+      "pdf_pages": [
+        265,
+        266
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 98,
+      "topic_id": 8,
+      "topic_name": "Poverty and hunger",
+      "topper": "Ruhani",
+      "air": "5",
+      "year": "2023",
+      "marks": 10,
+      "score": "",
+      "question": "What is debt-trap diplomacy? How does China's debt-trap diplomacy impact India's interests in its neighbourhood?",
+      "pdf_pages": [
+        267,
+        268
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 99,
+      "topic_id": 8,
+      "topic_name": "Poverty and hunger",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 10,
+      "score": "113",
+      "question": "China views India as its 'Asian rival' with an innate ability to counter its hegemonic goals in Asia. Despite these difficulties in India-China relations, there are also many areas of convergence. Discuss.",
+      "pdf_pages": [
+        269,
+        270
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 100,
+      "topic_id": 8,
+      "topic_name": "Poverty and hunger",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "The ongoing internal crisis in Myanmar is impeding India's Act East Policy. In light of the statement, discuss the measures taken by India to deal with the crisis and associated challenges.",
+      "pdf_pages": [
+        271,
+        272
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 101,
+      "topic_id": 8,
+      "topic_name": "Poverty and hunger",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 15,
+      "score": "131",
+      "question": "ASEAN is not only important for development of North-East but also it remains India's gateway to East Asia and beyond. Discuss.",
+      "pdf_pages": [
+        273,
+        274
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 102,
+      "topic_id": 8,
+      "topic_name": "Poverty and hunger",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 15,
+      "score": "128",
+      "question": "Sri Lanka is a region where India can not only display its neighborhood first policy but also give credence to its SAGAR doctrine. Elaborate.",
+      "pdf_pages": [
+        275,
+        276,
+        277
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 103,
+      "topic_id": 9,
+      "topic_name": "India and its neighbourhood",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 10,
+      "score": "108",
+      "question": "Among other factors, strained ties with China and Pakistan make it difficult for India to fulfil its expectations from the Shanghai Cooperation Organisation (SCO). Discuss.",
+      "pdf_pages": [
+        280,
+        281
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 104,
+      "topic_id": 9,
+      "topic_name": "India and its neighbourhood",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "The recently concluded initiative on Critical and Emerging Technology (iCET) between the United States and India promises a long overdue transformation of their partnership in the field of technology. Examine.",
+      "pdf_pages": [
+        282,
+        283,
+        284
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 105,
+      "topic_id": 9,
+      "topic_name": "India and its neighbourhood",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 10,
+      "score": "116",
+      "question": "India and US have had an oscillating relationship in the past; to what extent has the relationship acquired depth in recent times? How should New Delhi navigate its relationship with the US after its sharp divergence with Washington on the issue of the Russia-Ukraine war?",
+      "pdf_pages": [
+        285,
+        286
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 106,
+      "topic_id": 9,
+      "topic_name": "India and its neighbourhood",
+      "topper": "Rishabh Choudhary",
+      "air": "28",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "Examine the influence of human rights issues and democratic values on the diplomatic relationship between the U.S. and India. How have these concerns affected bilateral engagements and what can be done to mitigate tensions arising from these issues?",
+      "pdf_pages": [
+        287,
+        288
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 107,
+      "topic_id": 9,
+      "topic_name": "India and its neighbourhood",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 15,
+      "score": "121",
+      "question": "India's response to Ukraine crisis is an expression of strategic autonomy and not a reflection of strategic compulsions. Examine.",
+      "pdf_pages": [
+        289,
+        290,
+        291
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 108,
+      "topic_id": 9,
+      "topic_name": "India and its neighbourhood",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 10,
+      "score": "115",
+      "question": "The ongoing internal crisis in Myanmar is impeding India's Act East Policy. In light of the statement, discuss the measures taken by India to deal with the crisis and associated challenges.",
+      "pdf_pages": [
+        292,
+        293
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 109,
+      "topic_id": 9,
+      "topic_name": "India and its neighbourhood",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "ASEAN is not only important for development of North-East but also it remains India's gateway to East Asia and beyond. Discuss.",
+      "pdf_pages": [
+        294,
+        295,
+        298
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 110,
+      "topic_id": 9,
+      "topic_name": "India and its neighbourhood",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "Despite certain hiccups, recent developments suggest that continuity still looms large in the Indo-Bhutan relationship. Discuss.",
+      "pdf_pages": [
+        299,
+        300
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 111,
+      "topic_id": 9,
+      "topic_name": "India and its neighbourhood",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "The relationship between India and Bangladesh has improved significantly in past few years, but current situation presents devastating challenges for their relations. Discuss and what should be India's option in this situation?",
+      "pdf_pages": [
+        301,
+        302
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 112,
+      "topic_id": 9,
+      "topic_name": "India and its neighbourhood",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 10,
+      "score": "121",
+      "question": "India Bangladesh relation reflects an all-encompassing bilateral partnership based on equality, trust and mutual understanding despite some unresolved issues. In light of this statement, discuss the accomplishments and contentions between India and Bangladesh as they complete fifty years of bilateral diplomatic ties.",
+      "pdf_pages": [
+        303,
+        304,
+        305
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 113,
+      "topic_id": 9,
+      "topic_name": "India and its neighbourhood",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 10,
+      "score": "108",
+      "question": "In light of the recent demands to amend the Indus Waters Treaty, discuss the possible implications it could have on the water-sharing mechanism between India and Pakistan.",
+      "pdf_pages": [
+        306,
+        307
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 114,
+      "topic_id": 9,
+      "topic_name": "India and its neighbourhood",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 10,
+      "score": "121",
+      "question": "Examine the geopolitical challenges India faces in South Asia despite its global rise. How can India navigate these challenges to strengthen its regional leadership?",
+      "pdf_pages": [
+        308,
+        309
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 115,
+      "topic_id": 9,
+      "topic_name": "India and its neighbourhood",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 15,
+      "score": "113",
+      "question": "There is a need to address the underlying challenges, both internal and external, in the North-Eastern region of India before it can serve as a pivot to balance the creating space between India and its neighbours. Comment.",
+      "pdf_pages": [
+        310,
+        311,
+        312
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 116,
+      "topic_id": 9,
+      "topic_name": "India and its neighbourhood",
+      "topper": "Rishabh Choudhary",
+      "air": "28",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "How has the India-ASEAN partnership evolved since the implementation of the 'Look East Policy'? In what ways can India leverage the increasing strength of its economy alongside geopolitical realities as opportunities to foster closer India and ASEAN relations?",
+      "pdf_pages": [
+        313,
+        314,
+        315
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 117,
+      "topic_id": 10,
+      "topic_name": "Bilateral,Regional and Global Grouping",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "131",
+      "question": "India used its Presidency of the G20 to bring the voice of the Global South to the centre stage. Discuss with special reference to Africa.",
+      "pdf_pages": [
+        317,
+        318,
+        319
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 118,
+      "topic_id": 10,
+      "topic_name": "Bilateral,Regional and Global Grouping",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "131",
+      "question": "India used its Presidency of the G20 to bring the voice of the Global South to the centre stage. Discuss with special reference to Africa.",
+      "pdf_pages": [
+        320,
+        321,
+        322
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 119,
+      "topic_id": 10,
+      "topic_name": "Bilateral,Regional and Global Grouping",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 15,
+      "score": "116",
+      "question": "India used its Presidency of the G20 to bring the voice of the Global South to the centre stage. Discuss with special reference to Africa.",
+      "pdf_pages": [
+        323,
+        324,
+        325
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 120,
+      "topic_id": 10,
+      "topic_name": "Bilateral,Regional and Global Grouping",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 15,
+      "score": "124",
+      "question": "For realistic and effective collaboration to take place in the Indo-Pacific region, there is a need to acknowledge and recognize the underlying intention of the various countries with stakes in the region. Discuss.",
+      "pdf_pages": [
+        326,
+        327,
+        328
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 121,
+      "topic_id": 10,
+      "topic_name": "Bilateral,Regional and Global Grouping",
+      "topper": "Rishabh Choudhary",
+      "air": "28",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "How do ASEAN centrality, rules-based order, and development partnership with Pacific Island nations make Indo-Pacific a theatre of opportunity for India? What are the hurdles in realisation of an inclusive Indo-Pacific construct?",
+      "pdf_pages": [
+        329,
+        330,
+        331
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 122,
+      "topic_id": 10,
+      "topic_name": "Bilateral,Regional and Global Grouping",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 15,
+      "score": "134",
+      "question": "Indo-Pacific reflects both the interdependence as well as interpenetration which are evident in an era of multipolarity and globalization. Discuss this statement keeping in mind India's Indo-Pacific vision.",
+      "pdf_pages": [
+        333,
+        334,
+        335
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 123,
+      "topic_id": 10,
+      "topic_name": "Bilateral,Regional and Global Grouping",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "The Indo-Pacific Economic Framework for Prosperity (IPEF) is born from a collective desire to make the Indo-Pacific region an engine of global economic growth. Comment. Also, discuss India's concerns in this context.",
+      "pdf_pages": [
+        336,
+        337
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 124,
+      "topic_id": 10,
+      "topic_name": "Bilateral,Regional and Global Grouping",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Though the changing paradigm towards dialogue and diplomacy in West Asia augurs well for India's interests in this otherwise restive region, presence of inimical actors remains the gains. Explain.",
+      "pdf_pages": [
+        338,
+        339,
+        340
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 125,
+      "topic_id": 10,
+      "topic_name": "Bilateral,Regional and Global Grouping",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 10,
+      "score": "134",
+      "question": "India's relation with West Asia has acquired depth and diversity that can navigate geopolitical hurdles. Comment.",
+      "pdf_pages": [
+        341,
+        342
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 126,
+      "topic_id": 10,
+      "topic_name": "Bilateral,Regional and Global Grouping",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "In recent years, India's relationship with West Asia has evolved from the confines of geopolitics to expanse of geoeconomics. Discuss.",
+      "pdf_pages": [
+        343,
+        344
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 127,
+      "topic_id": 10,
+      "topic_name": "Bilateral,Regional and Global Grouping",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "The flourishing relationship between India and countries of Latin America has become a critical element of India's foreign policy. Examine.",
+      "pdf_pages": [
+        345,
+        346
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 128,
+      "topic_id": 10,
+      "topic_name": "Bilateral,Regional and Global Grouping",
+      "topper": "Rishabh Choudhary",
+      "air": "28",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "India's intersection with world is no more restricted by the policy of non-alignment but is based on careful assessment of conditions confronting India. Explain with relevant examples.",
+      "pdf_pages": [
+        347,
+        348
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 129,
+      "topic_id": 10,
+      "topic_name": "Bilateral,Regional and Global Grouping",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 15,
+      "score": "108",
+      "question": "The arrangements like 'Bi-laterals', 'pluri-laterals' and 'Mini-laterals' are gaining more traction in contemporary international relations. Give a reasoned account for such rise citing suitable examples and the challenges that come along with it.",
+      "pdf_pages": [
+        349,
+        350,
+        351
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 130,
+      "topic_id": 10,
+      "topic_name": "Bilateral,Regional and Global Grouping",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 15,
+      "score": "108",
+      "question": "Highlight the major impediments affecting India-US trade relations. What possible consequences can the recent withdrawal of Generalized System of Preference (GSP) have on India-US trade relations?",
+      "pdf_pages": [
+        352,
+        353,
+        354
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 131,
+      "topic_id": 11,
+      "topic_name": "Effect of policies and polticis of developed - and developing countries",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 10,
+      "score": "121",
+      "question": "India and US have had an oscillating relationship in the past; to what extent has the relationship acquired depth in recent times? How should New Delhi navigate its relationship with the US after its sharp divergence with Washington on the issue of the Russia-Ukraine war?",
+      "pdf_pages": [
+        356,
+        357
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 132,
+      "topic_id": 11,
+      "topic_name": "Effect of policies and polticis of developed - and developing countries",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 15,
+      "score": "131",
+      "question": "India and US have had an oscillating relationship in the past; to what extent has the relationship acquired depth in recent times? How should New Delhi navigate its relationship with the US after its sharp divergence with Washington on the issue of the Russia-Ukraine war?",
+      "pdf_pages": [
+        358,
+        359,
+        360
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 133,
+      "topic_id": 11,
+      "topic_name": "Effect of policies and polticis of developed - and developing countries",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 15,
+      "score": "113",
+      "question": "Examine the influence of human rights issues and democratic values on the diplomatic relationship between the U.S. and India. How have these concerns affected bilateral engagements and what can be done to mitigate tensions arising from these issues?",
+      "pdf_pages": [
+        361,
+        362,
+        363
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 134,
+      "topic_id": 11,
+      "topic_name": "Effect of policies and polticis of developed - and developing countries",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "The recently concluded initiative on Critical and Emerging Technology (iCET) between the United States and India promises a long overdue transformation of their partnership in the field of technology. Examine.",
+      "pdf_pages": [
+        364,
+        365,
+        366
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 135,
+      "topic_id": 11,
+      "topic_name": "Effect of policies and polticis of developed - and developing countries",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 10,
+      "score": "121",
+      "question": "What are the reasons behind Israel and Iran conflict? And discuss its impact on India.",
+      "pdf_pages": [
+        367,
+        368
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 136,
+      "topic_id": 11,
+      "topic_name": "Effect of policies and polticis of developed - and developing countries",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 10,
+      "score": "108",
+      "question": "Discuss the implications of Israel-Palestine conflict on India's interests. Evaluate India's de-hyphenation policy in this context.",
+      "pdf_pages": [
+        369,
+        370
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 137,
+      "topic_id": 11,
+      "topic_name": "Effect of policies and polticis of developed - and developing countries",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "India's response to Ukraine crisis is an expression of strategic autonomy and not a reflection of strategic compulsions. Examine.",
+      "pdf_pages": [
+        371,
+        372
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 138,
+      "topic_id": 11,
+      "topic_name": "Effect of policies and polticis of developed - and developing countries",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "India's response to Ukraine crisis is an expression of strategic autonomy and not a reflection of strategic compulsions. Examine.",
+      "pdf_pages": [
+        374,
+        375
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 139,
+      "topic_id": 11,
+      "topic_name": "Effect of policies and polticis of developed - and developing countries",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "India and Japan may have long enjoyed very cordial relations with substantial shared interests at the strategic level, but it also tends to be one on ambition, limited in its caution, and low in its rhetoric. Critically examine.",
+      "pdf_pages": [
+        376,
+        377
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 140,
+      "topic_id": 11,
+      "topic_name": "Effect of policies and polticis of developed - and developing countries",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 15,
+      "score": "115",
+      "question": "The synergy of shared values and vibrant people-to-people connections between India and Australia creates a fertile ground for fostering long-lasting trade relations and strategic collaboration between the two nations. Analyse.",
+      "pdf_pages": [
+        378,
+        379,
+        380
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 141,
+      "topic_id": 11,
+      "topic_name": "Effect of policies and polticis of developed - and developing countries",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 15,
+      "score": "121",
+      "question": "India's relationship with the UAE has witnessed a remarkable expansion across various domains in the last decade. Discuss.",
+      "pdf_pages": [
+        381,
+        382,
+        383
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 142,
+      "topic_id": 11,
+      "topic_name": "Effect of policies and polticis of developed - and developing countries",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 15,
+      "score": "124",
+      "question": "India's relationship with the UAE has witnessed a remarkable expansion across various domains in the last decade. Discuss.",
+      "pdf_pages": [
+        384,
+        385,
+        386
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 143,
+      "topic_id": 11,
+      "topic_name": "Effect of policies and polticis of developed - and developing countries",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "With the advent of new regional and multilateral agreements like AUKUS, I2U2, Quad, BRICS, NAM, Davos and G7, is the old world order represented by organizations like NAM, Davos and G7 losing its relevance?",
+      "pdf_pages": [
+        387,
+        388
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 144,
+      "topic_id": 11,
+      "topic_name": "Effect of policies and polticis of developed - and developing countries",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "Despite the recent rise in politically contentious issues, the India-Canada bilateral relationship has remained committed to shared values of democracy, pluralism, expanding economic engagement and long-standing people-to-people ties. Highlighting the significant pillars of the India-Canada relationship, discuss the potential areas of cooperation and collaboration between India and Canada.",
+      "pdf_pages": [
+        389,
+        390,
+        391
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 145,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Discuss the relevance of BIMSTEC as a regional organisation to fulfil India's strategic aspirations in the Indian Ocean Region.",
+      "pdf_pages": [
+        393,
+        394
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 146,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "BRICS has a potential to lead the path towards reformed multilateralism but suffer from numerous internal contradictions. Discuss, in light of recently concluded 14th BRICS summit.",
+      "pdf_pages": [
+        395,
+        396,
+        397
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 147,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 10,
+      "score": "121",
+      "question": "The collective strength of BRICS nations allows for meaningful cooperation on myriad issues, however, the platform's ability to influence the trajectory of bilateral relationships remains limited. Do you agree?",
+      "pdf_pages": [
+        398,
+        399
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 148,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "Evaluate the significance of BRICS in shaping the emerging global order given the internal contradictions and divergent interests of its member countries.",
+      "pdf_pages": [
+        400,
+        401
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 149,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "The second decade of 21st century marks a collective failure of UN and its agencies. Examine this statement citing suitable examples.",
+      "pdf_pages": [
+        402,
+        403,
+        404
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 150,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 15,
+      "score": "108",
+      "question": "The second decade of 21st century marks a collective failure of UN and its agencies. Examine this statement citing suitable examples.",
+      "pdf_pages": [
+        405,
+        406,
+        407
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 151,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 15,
+      "score": "115",
+      "question": "As the principal judicial organ of the United Nations, the International Court of Justice (ICJ) provides a judicial mechanism for the peaceful resolution of international disputes. In this context, throw light on the structure and mandate of ICJ. Also, highlight the challenges it faces in fulfilling its mandate.",
+      "pdf_pages": [
+        408,
+        409,
+        410
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 152,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "The second decade of 21st century marks a collective failure of UN and its agencies. Examine this statement citing suitable examples.",
+      "pdf_pages": [
+        411,
+        412,
+        413
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 153,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 10,
+      "score": "115",
+      "question": "The current composition of the UNSC, with under-representation and un-representation of key regions, is detrimental to its legitimacy and effectiveness, underscoring the urgent need for reforms. Elaborate. Also, present a case for India's permanent membership in the UNSC.",
+      "pdf_pages": [
+        414,
+        415
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 154,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "Among other factors, strained ties with China and Pakistan make it difficult for India to fulfil its expectations from the Shanghai Cooperation Organisation (SCO). Discuss.",
+      "pdf_pages": [
+        416,
+        417,
+        418
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 155,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "What are the key areas of reform if the International Monetary Fund (IMF) has to align with the current economic realities?",
+      "pdf_pages": [
+        419,
+        420
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 156,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 10,
+      "score": "108",
+      "question": "The spirit of the Quadrilateral Security Dialogue (QUAD) is to prioritize the role of international law and promote a stronger regional architecture in the Indo-Pacific. How can India leverage its participation in the grouping? Does membership of Quad mark a shift in approach in India's foreign policy?",
+      "pdf_pages": [
+        421,
+        422,
+        423
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 157,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "USA-led Indo-Pacific Economic Framework for prosperity (IPEF) is an economic initiative to complement its existing security partnerships in the Indo-Pacific region. Analyse the significance of and challenges to IPEF in the present scenario.",
+      "pdf_pages": [
+        424,
+        425,
+        426
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 158,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "USA-led Indo-Pacific Economic Framework for prosperity (IPEF) is an economic initiative to complement its existing security partnerships in the Indo-Pacific region. Analyse the significance of and challenges to IPEF in the present scenario.",
+      "pdf_pages": [
+        427,
+        428,
+        429
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 159,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 10,
+      "score": "108",
+      "question": "Nations around the world might be queuing up to offer assistance to India as it battles a devastating Covid-19 wave, but the scene playing out at the World Trade Organization (WTO) contrasts significantly. In light of this statement discuss the challenge that India faces in the WTO.",
+      "pdf_pages": [
+        430,
+        431
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 160,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "131",
+      "question": "The changing global dynamics require prompt effective and meaningful reforms within the World Trade Organization (WTO), to ensure its relevance and capacity to address modern trade complexities. Discuss.",
+      "pdf_pages": [
+        432,
+        433
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 161,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 10,
+      "score": "121",
+      "question": "World Trade Organization (WTO) has fallen victim to diverging interest of developed and developing countries, great power rivalries and the inability to resolve dispute. Examine the statement and discuss the role that G-20 can play in creating broader consensus on contentious issues in WTO.",
+      "pdf_pages": [
+        434,
+        435
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 162,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "131",
+      "question": "Examine the pertinence of the Gujral Doctrine concerning India's current relations with its immediate neighbours.",
+      "pdf_pages": [
+        436,
+        437
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 163,
+      "topic_id": 12,
+      "topic_name": "Important international institutions, - agenices and fora",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "Discuss the relevance of the Gujral Doctrine for India with regard to its relations with its immediate neighbours in the present times.",
+      "pdf_pages": [
+        438,
+        439,
+        440
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 164,
+      "topic_id": 13,
+      "topic_name": "Foreign Policy Issues",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 10,
+      "score": "121",
+      "question": "The year 1991 marked a watershed moment not only for economy but also for India's foreign policy. Discuss the evolution of India's foreign policy since 1991 highlighting the factors for the changes henceforth.",
+      "pdf_pages": [
+        442,
+        443
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 165,
+      "topic_id": 13,
+      "topic_name": "Foreign Policy Issues",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Island nations of the Indian Ocean hold immense strategic value in shaping the geopolitical contours of the region and ensuring maritime security of India. Discuss.",
+      "pdf_pages": [
+        444,
+        445
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 166,
+      "topic_id": 13,
+      "topic_name": "Foreign Policy Issues",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 15,
+      "score": "128",
+      "question": "India is uniquely positioned on the world map for its rich culture. In this context discuss the role of India culture, diaspora, and democracy as instruments of India's soft power diplomacy. To what extent India has been able to position itself as a 'smart power'?",
+      "pdf_pages": [
+        446,
+        447,
+        448
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 167,
+      "topic_id": 13,
+      "topic_name": "Foreign Policy Issues",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "India has placed soft power as an important pillar of its foreign policy to enhance its global standing and image abroad. Discuss the statement along with the initiatives taken by the government.",
+      "pdf_pages": [
+        449,
+        450,
+        451
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 168,
+      "topic_id": 13,
+      "topic_name": "Foreign Policy Issues",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 15,
+      "score": "121",
+      "question": "Comment on the utility and effectiveness of soft power for furthering national interest. Can soft power replace hard power in international politics?",
+      "pdf_pages": [
+        452,
+        453,
+        454
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 169,
+      "topic_id": 13,
+      "topic_name": "Foreign Policy Issues",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "125",
+      "question": "Give an account of the challenges that the multilateral rule-based trading system is facing. With the WTO, discuss how these challenges can be addressed effectively.",
+      "pdf_pages": [
+        456,
+        457,
+        458
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 170,
+      "topic_id": 13,
+      "topic_name": "Foreign Policy Issues",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "The changing global dynamics require prompt effective and meaningful reforms within the World Trade Organization (WTO), to ensure its relevance and capacity to address modern trade complexities. Discuss.",
+      "pdf_pages": [
+        459,
+        460
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 171,
+      "topic_id": 13,
+      "topic_name": "Foreign Policy Issues",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "India needs to identify the priority areas to further its techno-diplomacy amidst the complexities of expanding digital space and New and Emerging Strategic Technologies. Discuss.",
+      "pdf_pages": [
+        461,
+        462,
+        463
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 172,
+      "topic_id": 13,
+      "topic_name": "Foreign Policy Issues",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 10,
+      "score": "121",
+      "question": "The United Nations is often criticized for its failure to maintain peace and security in the world, despite its commendable work. Analyze the challenges faced by it and suggest some reforms to enhance the UN's role and effectiveness in the 21st century.",
+      "pdf_pages": [
+        464,
+        465,
+        466
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 173,
+      "topic_id": 13,
+      "topic_name": "Foreign Policy Issues",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 10,
+      "score": "134",
+      "question": "Water diplomacy can redefine the contours of regional cooperation in South Asia. Discuss with special reference to Indus water treaty 1960.",
+      "pdf_pages": [
+        467,
+        468,
+        469
+      ]
+    }
+  ]
+}

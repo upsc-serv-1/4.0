@@ -1,0 +1,783 @@
+import React, { useState } from 'react';
+import {
+  Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet,
+  TextInput, Switch, ActivityIndicator, Platform, Alert,
+} from 'react-native';
+import { X, FileDown, Layout, ChevronDown, ChevronRight, Settings, Check, Share } from 'lucide-react-native';
+import * as Haptics from 'expo-haptics';
+import * as Sharing from 'expo-sharing';
+import { useTheme } from '../../context/ThemeContext';
+import { useResponsive } from '../../hooks/useResponsive';
+import {
+  ExportOptions, ExportPayload, defaultExportOptions, exportToPdf,
+  ExportFontFamily, ExportTheme, ExportPaperStyle, ExportContentScope,
+  ExportAnswerPlacement, ExportSortBy, ExportQaLayoutMode, ExportVisualStyle,
+  ExportGroupingLevel,
+} from '../../lib/unifiedExportEngine';
+
+export interface AnalysisReportOption {
+  key: string;
+  label: string;
+  defaultSelected?: boolean;
+}
+
+interface Props {
+  visible: boolean;
+  onClose: () => void;
+  payload: ExportPayload | null;
+  initialOptions?: Partial<ExportOptions>;
+  title?: string;
+  /**
+   * Optional executive-summary report toggles shown at the top of the sheet.
+   * These are intentionally isolated from core export options state.
+   */
+  analysisReports?: AnalysisReportOption[];
+  /**
+   * Build optional HTML summary pages from selected analysis toggles.
+   * Returned HTML is prepended before main export content with a page break.
+   */
+  onBuildAnalysisHtml?: (selectedAnalysisReports: Record<string, boolean>) => string;
+  /**
+   * Module-specific filter extras shown under "Filters". Optional.
+   * Example: revision tags chips, or flashcard state chips.
+   */
+  renderExtraFilters?: (opts: ExportOptions, setOpts: React.Dispatch<React.SetStateAction<ExportOptions>>) => React.ReactNode;
+  /**
+   * Hide specific sections of the sheet (use when irrelevant for a module).
+   */
+  hideSections?: Array<'content' | 'sort' | 'answer' | 'filters' | 'advanced'>;
+  /**
+   * Optional async hook called immediately before exporting begins.
+   * Useful for time-of-export captures (e.g. view snapshot).
+   * If it returns a payload, that payload overrides the default prop payload.
+   */
+  onPreExport?: (cols: 1 | 2, opts: ExportOptions) => Promise<ExportPayload | null>;
+}
+
+const CHOICES = {
+  fonts: [
+    { id: 'sans' as ExportFontFamily, label: 'Sans' },
+    { id: 'serif' as ExportFontFamily, label: 'Serif' },
+    { id: 'mono' as ExportFontFamily, label: 'Mono' },
+    { id: 'handwriting' as ExportFontFamily, label: 'Hand' },
+  ],
+  fontSizes: [6, 8, 10, 11, 12, 13, 14, 16, 18, 20, 24],
+  marginsCm: [0.5, 0.75, 1, 1.25, 1.5, 2],
+  qaLayouts: [
+    { id: 'unified' as ExportQaLayoutMode, label: 'Unified Box' },
+    { id: 'split' as ExportQaLayoutMode, label: 'Split Boxes' },
+  ],
+  qaColors: [
+    { id: 'transparent', label: 'None', swatch: 'transparent' },
+    { id: '#f8fafc', label: 'Mist', swatch: '#f8fafc' },
+    { id: '#fefce8', label: 'Cream', swatch: '#fefce8' },
+    { id: '#ecfeff', label: 'Aqua', swatch: '#ecfeff' },
+    { id: '#fdf2f8', label: 'Blush', swatch: '#fdf2f8' },
+    { id: '#f0fdf4', label: 'Mint', swatch: '#f0fdf4' },
+  ],
+  themes: [
+    { id: 'modern' as ExportTheme, label: 'Modern' },
+    { id: 'classic' as ExportTheme, label: 'Classic' },
+    { id: 'sepia' as ExportTheme, label: 'Sepia' },
+    { id: 'historical' as ExportTheme, label: 'Historical' },
+    { id: 'dark' as ExportTheme, label: 'Dark' },
+  ],
+  papers: [
+    { id: 'plain' as ExportPaperStyle, label: 'Plain' },
+    { id: 'lined' as ExportPaperStyle, label: 'Lined' },
+    { id: 'grid' as ExportPaperStyle, label: 'Grid' },
+    { id: 'dotted' as ExportPaperStyle, label: 'Dotted' },
+  ],
+  contentScopes: [
+    { id: 'q_only' as ExportContentScope, label: 'Q only' },
+    { id: 'q_options' as ExportContentScope, label: 'Q + Options' },
+    { id: 'q_options_expl' as ExportContentScope, label: 'Q + Options + Expl' },
+    { id: 'q_options_valuation' as ExportContentScope, label: 'Q + Options + Valuation' },
+  ],
+  answerPlacements: [
+    { id: 'inline' as ExportAnswerPlacement, label: 'Inline' },
+    { id: 'end' as ExportAnswerPlacement, label: 'End (Answer Key)' },
+  ],
+  sortBys: [
+    { id: 'default' as ExportSortBy, label: 'Default' },
+    { id: 'year_desc' as ExportSortBy, label: 'Year (Latest First)' },
+    { id: 'year' as ExportSortBy, label: 'Year (Oldest First)' },
+    { id: 'difficulty' as ExportSortBy, label: 'Difficulty' },
+    { id: 'date' as ExportSortBy, label: 'Latest Modified' },
+    { id: 'pyq_frequency' as ExportSortBy, label: 'PYQ Frequency (Oldest First)' },
+    { id: 'pyq_frequency_desc' as ExportSortBy, label: 'PYQ Frequency (Latest First)' },
+  ],
+  groupingLevels: [
+    { id: 'subject' as const, label: 'Subject' },
+    { id: 'section_group' as const, label: 'Section Group' },
+    { id: 'microtopic' as const, label: 'Microtopic' },
+    { id: 'subtopic' as const, label: 'Subtopic' },
+    { id: 'nanotopic' as const, label: 'Nanotopic' },
+  ],
+  visualStyles: [
+    { id: 'document' as ExportVisualStyle, label: 'Document' },
+    { id: 'flashcard' as ExportVisualStyle, label: 'Flashcard Style' },
+  ],
+  highlightColors: [
+    { id: 'yellow' as const, label: 'Yellow' },
+    { id: 'green' as const, label: 'Green' },
+    { id: 'blue' as const, label: 'Blue' },
+    { id: 'pink' as const, label: 'Pink' },
+  ],
+  statusFilters: [
+    { id: 'all', label: 'All' },
+    { id: 'correct', label: 'Correct' },
+    { id: 'incorrect', label: 'Incorrect' },
+    { id: 'unattempted', label: 'Unattempted' },
+  ],
+  noteHeadingColors: [
+    { id: '#f3f4f6', label: 'Slate' },
+    { id: '#FF6A8820', label: 'Rose' },
+    { id: '#6A5BFF20', label: 'Indigo' },
+    { id: '#4FC3F720', label: 'Cyan' },
+    { id: '#81C78420', label: 'Green' },
+    { id: '#FFB74D20', label: 'Amber' },
+  ],
+};
+
+const DEFAULT_ANALYSIS_REPORTS: AnalysisReportOption[] = [];
+const DEFAULT_HIDE_SECTIONS: Array<'content' | 'sort' | 'answer' | 'filters' | 'advanced'> = [];
+
+export const UnifiedExportSheet: React.FC<Props> = ({
+  visible,
+  onClose,
+  payload,
+  initialOptions,
+  title,
+  analysisReports = DEFAULT_ANALYSIS_REPORTS,
+  onBuildAnalysisHtml,
+  renderExtraFilters,
+  hideSections = DEFAULT_HIDE_SECTIONS,
+  onPreExport,
+}) => {
+  const { colors } = useTheme();
+  const { isTablet } = useResponsive();
+  const [opts, setOpts] = useState<ExportOptions>(() => defaultExportOptions({
+    title: title || initialOptions?.title || 'Export',
+    ...(initialOptions || {}),
+  }));
+  const [isExporting, setIsExporting] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [selectedAnalysisReports, setSelectedAnalysisReports] = useState<Record<string, boolean>>({});
+  const [notesSelectedHeadings, setNotesSelectedHeadings] = useState<Set<string>>(new Set());
+  const [exportUri, setExportUri] = useState<string | null>(null);
+
+  // Re-seed when sheet opens
+  const wasVisible = React.useRef(false);
+  React.useEffect(() => {
+    if (visible && !wasVisible.current) {
+      setExportUri(null);
+      setOpts(defaultExportOptions({ title: title || initialOptions?.title || 'Export', ...(initialOptions || {}) }));
+      // Recompute initial analysis state directly to avoid dependency issues
+      const newAnalysisState = analysisReports.reduce((acc, report) => {
+        acc[report.key] = !!report.defaultSelected;
+        return acc;
+      }, {} as Record<string, boolean>);
+      setSelectedAnalysisReports(newAnalysisState);
+
+      if (payload?.kind === 'notes') {
+        const allHeadingIds = payload.blocks
+          .filter((b) => b.type === 'microTopicHeading')
+          .map((b) => b.id);
+        const seeded = payload.selectedHeadingIds && payload.selectedHeadingIds.size > 0
+          ? new Set(payload.selectedHeadingIds)
+          : new Set(allHeadingIds);
+        setNotesSelectedHeadings(seeded);
+      } else {
+        setNotesSelectedHeadings(new Set());
+      }
+
+      setIsExporting(false);
+    }
+    wasVisible.current = visible;
+  }, [visible, title, initialOptions, analysisReports, payload]);
+
+  React.useEffect(() => {
+    if (!visible) setIsExporting(false);
+  }, [visible]);
+
+  const set = <K extends keyof ExportOptions>(k: K, v: ExportOptions[K]) => {
+    setOpts(prev => ({ ...prev, [k]: v }));
+  };
+
+  const run = async (cols: 1 | 2) => {
+    if (!payload || isExporting) return;
+    const watchdog = setTimeout(() => setIsExporting(false), 12000);
+    try {
+      setIsExporting(true);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+      const hasAnalysisSelection = Object.values(selectedAnalysisReports).some(Boolean);
+      const prependHtml = hasAnalysisSelection && onBuildAnalysisHtml
+        ? onBuildAnalysisHtml(selectedAnalysisReports)
+        : '';
+
+      // Hook to inject dynamic content (like screen snapshots) just before generation
+      let finalPayload = payload;
+      if (onPreExport) {
+        const override = await onPreExport(cols, opts);
+        if (override) finalPayload = override;
+      }
+
+      if (!finalPayload) {
+        throw new Error('Export content preparation failed');
+      }
+
+      const payloadForExport: ExportPayload = finalPayload.kind === 'notes'
+        ? { ...finalPayload, selectedHeadingIds: notesSelectedHeadings }
+        : finalPayload;
+
+      const finalUri = await exportToPdf(payloadForExport, { ...opts, columns: cols, skipShare: true }, { prependHtml });
+      setExportUri(finalUri);
+      setIsExporting(false);
+
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(finalUri, {
+          mimeType: 'application/pdf',
+          dialogTitle: opts.title || 'Exported PDF',
+          UTI: 'com.adobe.pdf',
+        }).catch(() => {
+          console.warn('[Export] Share operation completed/cancelled');
+        });
+      } else {
+        await Linking.openURL(finalUri).catch(() => null);
+      }
+    } catch (e: any) {
+      console.error('Export failed', e);
+      setIsExporting(false);
+      Alert.alert('Export failed', e?.message || 'Could not generate PDF right now.');
+    } finally {
+      clearTimeout(watchdog);
+    }
+    // Note: we deliberately do NOT show a follow-up "Export ready" Alert here.
+    // The OS share/print sheet is already on screen at this point; popping
+    // another modal on top of (or right after) it is what was making the
+    // app appear unresponsive when the user returned from the share sheet.
+  };
+
+  const Chip = ({ active, onPress, children, testID }: any) => (
+    <TouchableOpacity
+      onPress={onPress}
+      testID={testID}
+      style={[styles.chip, {
+        backgroundColor: active ? colors.primary : colors.surfaceStrong,
+        borderColor: active ? colors.primary : colors.border,
+        shadowColor: active ? colors.primary : 'transparent',
+        shadowOpacity: active ? 0.18 : 0,
+        shadowRadius: active ? 6 : 0,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: active ? 2 : 0,
+      }]}
+    >
+      <Text style={{ color: active ? '#fff' : colors.textPrimary, fontWeight: active ? '900' : '700', fontSize: 12.5, letterSpacing: 0.2 }}>{children}</Text>
+    </TouchableOpacity>
+  );
+
+  const AnalysisChip = ({ active, onPress, label }: { active: boolean; onPress: () => void; label: string }) => (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[
+        styles.analysisChip,
+        {
+          backgroundColor: active ? colors.primary + '16' : colors.surfaceStrong,
+          borderColor: active ? colors.primary : colors.border,
+        },
+      ]}
+    >
+      <View style={[
+        styles.analysisCheckbox,
+        {
+          borderColor: active ? colors.primary : colors.textTertiary,
+          backgroundColor: active ? colors.primary : 'transparent',
+        },
+      ]}>
+        {active ? <Check size={11} color="#fff" /> : null}
+      </View>
+      <Text style={{ color: active ? colors.primary : colors.textPrimary, fontWeight: '800', fontSize: 12 }}>{label}</Text>
+    </TouchableOpacity>
+  );
+
+  const noteHeadings = payload?.kind === 'notes'
+    ? payload.blocks.filter((b) => b.type === 'microTopicHeading')
+    : [];
+
+  const sheetBorderRadius = isTablet ? 24 : undefined;
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <View
+        style={[
+          styles.overlay,
+          isTablet && { justifyContent: 'center', alignItems: 'center', padding: 40 },
+        ]}
+      >
+        <TouchableOpacity style={StyleSheet.absoluteFill} onPress={onClose} />
+        <View
+          style={[
+            styles.sheet,
+            { backgroundColor: colors.surface, maxHeight: isTablet ? '85%' : '92%' },
+            isTablet && {
+              width: 540,
+              borderRadius: sheetBorderRadius,
+              borderBottomLeftRadius: sheetBorderRadius,
+              borderBottomRightRadius: sheetBorderRadius,
+            },
+          ]}
+        >
+          {!isTablet && <View style={styles.sheetHandle} />}
+          <View style={styles.header}>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.title, { color: colors.textPrimary }]}>{title || 'Export'}</Text>
+              <Text style={{ fontSize: 12, color: colors.textTertiary, fontWeight: '700', marginTop: 2 }}>Customize and export to PDF</Text>
+            </View>
+            <TouchableOpacity onPress={onClose} style={{ padding: 8, borderRadius: 20, backgroundColor: colors.surfaceStrong }}><X size={20} color={colors.textSecondary} /></TouchableOpacity>
+          </View>
+
+          {exportUri ? (
+            <View style={{ padding: 24, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: colors.primary + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                <Check size={32} color={colors.primary} />
+              </View>
+              <Text style={{ fontSize: 18, fontWeight: '800', color: colors.textPrimary, marginBottom: 8, textAlign: 'center' }}>Export Complete!</Text>
+              <Text style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 24, textAlign: 'center', lineHeight: 18, paddingHorizontal: 16 }}>
+                Your PDF has been compiled. If the sharing menu did not open automatically, click the button below to share or print it.
+              </Text>
+              <TouchableOpacity
+                onPress={async () => {
+                  if (await Sharing.isAvailableAsync()) {
+                    await Sharing.shareAsync(exportUri, {
+                      mimeType: 'application/pdf',
+                      dialogTitle: opts.title || 'Exported PDF',
+                      UTI: 'com.adobe.pdf',
+                    }).catch(() => {});
+                  } else {
+                    await Linking.openURL(exportUri).catch(() => null);
+                  }
+                }}
+                style={[styles.exportBtn, { backgroundColor: colors.primary, width: '100%', marginBottom: 12, paddingVertical: 14, justifyContent: 'center', alignItems: 'center', flexDirection: 'row', gap: 8 }]}
+              >
+                <Share size={18} color="#fff" />
+                <Text style={styles.exportBtnText}>Share / Print PDF</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={onClose}
+                style={[styles.exportBtn, { backgroundColor: colors.surfaceStrong, width: '100%', paddingVertical: 14, justifyContent: 'center', alignItems: 'center' }]}
+              >
+                <Text style={[styles.exportBtnText, { color: colors.textSecondary }]}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <>
+              <ScrollView style={{ maxHeight: 520 }} showsVerticalScrollIndicator={false}>
+            {analysisReports.length > 0 && (
+              <Section title="Analysis Reports (Optional)" colors={colors}>
+                <Text style={{ color: colors.textSecondary, fontSize: 11, marginBottom: 10 }}>
+                  Add executive-summary analysis pages before the question bank in the same PDF.
+                </Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.analysisRow}>
+                  {analysisReports.map((report) => {
+                    const active = !!selectedAnalysisReports[report.key];
+                    return (
+                      <AnalysisChip
+                        key={`analysis-${report.key}`}
+                        active={active}
+                        label={report.label}
+                        onPress={() => setSelectedAnalysisReports((prev) => ({ ...prev, [report.key]: !prev[report.key] }))}
+                      />
+                    );
+                  })}
+                </ScrollView>
+              </Section>
+            )}
+
+            <TextInput
+              testID="export-title-input"
+              style={[styles.titleInput, { color: colors.textPrimary, backgroundColor: colors.bg, borderColor: colors.border }]}
+              value={opts.title}
+              onChangeText={(t) => set('title', t)}
+              placeholder="Document title"
+              placeholderTextColor={colors.textTertiary}
+            />
+
+            {!hideSections.includes('content') && payload?.kind !== 'notes' && payload?.kind !== 'flashcards' && payload?.kind !== 'hardnote' && (
+              <Section title="Content" colors={colors}>
+                <Label colors={colors}>INCLUDE</Label>
+                <Row>{CHOICES.contentScopes.map(c => <Chip key={c.id} active={opts.contentScope === c.id} onPress={() => set('contentScope', c.id)} testID={`export-scope-${c.id}`}>{c.label}</Chip>)}</Row>
+                {!hideSections.includes('answer') && opts.contentScope !== 'q_only' && (
+                  <>
+                    <Label colors={colors}>ANSWER PLACEMENT</Label>
+                    <Row>{CHOICES.answerPlacements.map(a => <Chip key={a.id} active={opts.answerPlacement === a.id} onPress={() => set('answerPlacement', a.id)}>{a.label}</Chip>)}</Row>
+                  </>
+                )}
+              </Section>
+            )}
+
+            {!hideSections.includes('sort') && (payload?.kind === 'questions' || payload?.kind === 'tags') && (
+              <Section title="Sort By" colors={colors}>
+                <Label colors={colors}>GROUP BY (multi-select hierarchy)</Label>
+                <Row>{CHOICES.groupingLevels.map(g => {
+                  const active = (opts.groupingLevels || []).includes(g.id);
+                  return (
+                    <Chip
+                      key={g.id}
+                      active={active}
+                      onPress={() => {
+                        const cur = opts.groupingLevels || [];
+                        const next = active ? cur.filter(x => x !== g.id) : [...cur, g.id];
+                        // Preserve canonical hierarchy order
+                        const order: ExportGroupingLevel[] = ['subject', 'section_group', 'microtopic', 'subtopic', 'nanotopic'];
+                        next.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+                        set('groupingLevels', next);
+                      }}
+                      testID={`export-group-${g.id}`}
+                    >{g.label}</Chip>
+                  );
+                })}</Row>
+                <Label colors={colors}>SORT WITHIN GROUPS</Label>
+                <Row>{CHOICES.sortBys.map(s => <Chip key={s.id} active={opts.sortBy === s.id} onPress={() => set('sortBy', s.id)} testID={`export-sort-${s.id}`}>{s.label}</Chip>)}</Row>
+              </Section>
+            )}
+
+            <Section title="Typography" colors={colors}>
+              <Label colors={colors}>FONT</Label>
+              <Row>{CHOICES.fonts.map(f => <Chip key={f.id} active={opts.fontFamily === f.id} onPress={() => set('fontFamily', f.id)} testID={`export-font-${f.id}`}>{f.label}</Chip>)}</Row>
+              <Label colors={colors}>FONT SIZE</Label>
+              <Row>{CHOICES.fontSizes.map(sz => <Chip key={sz} active={opts.fontSize === sz} onPress={() => set('fontSize', sz)}>{sz}</Chip>)}</Row>
+            </Section>
+
+            <Section title="Look & Feel" colors={colors}>
+              <Label colors={colors}>THEME</Label>
+              <Row>{CHOICES.themes.map(t => <Chip key={t.id} active={opts.theme === t.id} onPress={() => set('theme', t.id)} testID={`export-theme-${t.id}`}>{t.label}</Chip>)}</Row>
+              <Label colors={colors}>PAPER</Label>
+              <Row>{CHOICES.papers.map(p => <Chip key={p.id} active={opts.paperStyle === p.id} onPress={() => set('paperStyle', p.id)}>{p.label}</Chip>)}</Row>
+            </Section>
+
+
+            {payload && (
+              <Section title="Visual Style & Colors" colors={colors}>
+                <Row>{CHOICES.visualStyles.map(v => <Chip key={v.id} active={opts.visualStyle === v.id} onPress={() => set('visualStyle', v.id)}>{v.label}</Chip>)}</Row>
+                <Text style={[styles.subLabel, { color: colors.textSecondary }]}>Highlight Color</Text>
+                <Row>{CHOICES.highlightColors.map(c => <Chip key={c.id} active={opts.highlightColor === c.id} onPress={() => set('highlightColor', c.id)}>{c.label}</Chip>)}</Row>
+              </Section>
+            )}
+
+            {(payload?.kind === 'questions' || payload?.kind === 'tags' || payload?.kind === 'flashcards') && (
+              <Section title="Q&A Highlight" colors={colors}>
+                <Label colors={colors}>LAYOUT</Label>
+                <Row>{CHOICES.qaLayouts.map(q => <Chip key={q.id} active={opts.qaLayoutMode === q.id} onPress={() => set('qaLayoutMode', q.id)}>{q.label}</Chip>)}</Row>
+
+                {opts.qaLayoutMode === 'split' ? (
+                  <>
+                    <Label colors={colors}>QUESTION BOX COLOR</Label>
+                    <Row>
+                      {CHOICES.qaColors.map(color => {
+                        const active = opts.qaQuestionBackgroundColor === color.id;
+                        return (
+                          <TouchableOpacity
+                            key={`q-${color.id}`}
+                            onPress={() => set('qaQuestionBackgroundColor', color.id)}
+                            style={[
+                              styles.colorChip,
+                              {
+                                borderColor: active ? colors.primary : colors.border,
+                                backgroundColor: color.id === 'transparent' ? colors.surfaceStrong : color.swatch,
+                              },
+                            ]}
+                          >
+                            <Text style={{ color: colors.textPrimary, fontSize: 11, fontWeight: '700' }}>{color.label}</Text>
+                            {active ? <Check size={13} color={colors.primary} /> : null}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </Row>
+                    <Label colors={colors}>ANSWER BOX COLOR</Label>
+                    <Row>
+                      {CHOICES.qaColors.map(color => {
+                        const active = opts.qaAnswerBackgroundColor === color.id;
+                        return (
+                          <TouchableOpacity
+                            key={`a-${color.id}`}
+                            onPress={() => set('qaAnswerBackgroundColor', color.id)}
+                            style={[
+                              styles.colorChip,
+                              {
+                                borderColor: active ? colors.primary : colors.border,
+                                backgroundColor: color.id === 'transparent' ? colors.surfaceStrong : color.swatch,
+                              },
+                            ]}
+                          >
+                            <Text style={{ color: colors.textPrimary, fontSize: 11, fontWeight: '700' }}>{color.label}</Text>
+                            {active ? <Check size={13} color={colors.primary} /> : null}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </Row>
+                  </>
+                ) : (
+                  <>
+                    <Label colors={colors}>UNIFIED BOX COLOR</Label>
+                    <Row>
+                      {CHOICES.qaColors.map(color => {
+                        const active = opts.qaBackgroundColor === color.id;
+                        return (
+                          <TouchableOpacity
+                            key={`u-${color.id}`}
+                            onPress={() => set('qaBackgroundColor', color.id)}
+                            style={[
+                              styles.colorChip,
+                              {
+                                borderColor: active ? colors.primary : colors.border,
+                                backgroundColor: color.id === 'transparent' ? colors.surfaceStrong : color.swatch,
+                              },
+                            ]}
+                          >
+                            <Text style={{ color: colors.textPrimary, fontSize: 11, fontWeight: '700' }}>{color.label}</Text>
+                            {active ? <Check size={13} color={colors.primary} /> : null}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </Row>
+                  </>
+                )}
+              </Section>
+            )}
+
+            {!hideSections.includes('filters') && (payload?.kind === 'questions' || payload?.kind === 'tags') && (
+              <Section title="Filters" colors={colors}>
+                <Label colors={colors}>STATUS</Label>
+                <Row>{CHOICES.statusFilters.map(s => <Chip key={s.id} active={(opts.statusFilter || 'all') === (s.id as any)} onPress={() => set('statusFilter', s.id as any)} testID={`export-status-${s.id}`}>{s.label}</Chip>)}</Row>
+                <ToggleRow label="PYQ only" value={!!opts.pyqOnly} onChange={v => set('pyqOnly', v)} colors={colors} />
+                <ToggleRow label="NCERT only" value={!!opts.ncertOnly} onChange={v => set('ncertOnly', v)} colors={colors} />
+                <ToggleRow label="Hide all answers (fresh practice test)" value={!!opts.hideResponses} onChange={v => set('hideResponses', v)} colors={colors} />
+                <ToggleRow label="Show my responses (red/green coloring)" value={!!opts.showMyResponses} onChange={v => set('showMyResponses', v)} colors={colors} />
+                {renderExtraFilters && renderExtraFilters(opts, setOpts)}
+                <ToggleRow label="Performance metrics (time / correctness)" value={!!opts.includePerformanceMetrics} onChange={v => set('includePerformanceMetrics', v)} colors={colors} />
+              </Section>
+            )}
+
+            {!hideSections.includes('filters') && payload?.kind !== 'questions' && payload?.kind !== 'tags' && renderExtraFilters && (
+              <Section title="Filters" colors={colors}>
+                {renderExtraFilters(opts, setOpts)}
+              </Section>
+            )}
+
+            {payload?.kind === 'notes' && (
+              <Section title="Notes Export Options" colors={colors}>
+                <Label colors={colors}>SUBHEADING HIGHLIGHT COLOR</Label>
+                <Row>
+                  {CHOICES.noteHeadingColors.map((color) => {
+                    const active = (opts.notesSubheadingColor || '#f3f4f6') === color.id;
+                    return (
+                      <TouchableOpacity
+                        key={`notes-heading-${color.id}`}
+                        onPress={() => set('notesSubheadingColor', color.id)}
+                        style={[
+                          styles.colorChip,
+                          {
+                            borderColor: active ? colors.primary : colors.border,
+                            backgroundColor: color.id === '#f3f4f6' ? '#e5e7eb' : color.id,
+                          },
+                        ]}
+                      >
+                        <Text style={{ color: colors.textPrimary, fontSize: 11, fontWeight: '700' }}>{color.label}</Text>
+                        {active ? <Check size={13} color={colors.primary} /> : null}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </Row>
+
+                <ToggleRow label="Checklist mode export" value={!!opts.notesChecklistMode} onChange={(v: boolean) => set('notesChecklistMode', v)} colors={colors} />
+                <ToggleRow label="Table of Contents" value={!!opts.showTOC} onChange={(v: boolean) => set('showTOC', v)} colors={colors} />
+
+                <Label colors={colors}>SUBHEADINGS TO INCLUDE</Label>
+                {noteHeadings.length === 0 ? (
+                  <Text style={{ color: colors.textTertiary, fontSize: 12, fontStyle: 'italic' }}>No subheadings found in this note.</Text>
+                ) : (
+                  <>
+                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 8 }}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          const allIds = noteHeadings.map((h) => h.id);
+                          if (notesSelectedHeadings.size === allIds.length) setNotesSelectedHeadings(new Set());
+                          else setNotesSelectedHeadings(new Set(allIds));
+                        }}
+                        style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: colors.primary + '14' }}
+                      >
+                        <Text style={{ color: colors.primary, fontSize: 10, fontWeight: '800' }}>
+                          {notesSelectedHeadings.size === noteHeadings.length ? 'DESELECT ALL' : 'SELECT ALL'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={{ gap: 8 }}>
+                      {noteHeadings.map((heading) => {
+                        const active = notesSelectedHeadings.has(heading.id);
+                        return (
+                          <TouchableOpacity
+                            key={`heading-toggle-${heading.id}`}
+                            onPress={() => {
+                              setNotesSelectedHeadings((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(heading.id)) next.delete(heading.id);
+                                else next.add(heading.id);
+                                return next;
+                              });
+                            }}
+                            style={{
+                              borderWidth: 1,
+                              borderColor: active ? colors.primary : colors.border,
+                              backgroundColor: active ? colors.primary + '10' : colors.surfaceStrong,
+                              borderRadius: 10,
+                              paddingHorizontal: 10,
+                              paddingVertical: 10,
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              gap: 8,
+                            }}
+                          >
+                            <View style={{ width: 16, height: 16, borderRadius: 4, borderWidth: 1.5, borderColor: active ? colors.primary : colors.textTertiary, backgroundColor: active ? colors.primary : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+                              {active ? <Check size={11} color="#fff" /> : null}
+                            </View>
+                            <Text style={{ color: colors.textPrimary, fontSize: 12, fontWeight: '700', flex: 1 }} numberOfLines={1}>{heading.text || 'Untitled heading'}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </>
+                )}
+              </Section>
+            )}
+
+            <TouchableOpacity
+              style={[styles.advToggle, { borderTopColor: colors.border }]}
+              onPress={() => setShowAdvanced(v => !v)}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Settings size={16} color={colors.textTertiary} />
+                <Text style={{ color: colors.textSecondary, fontWeight: '800', fontSize: 12 }}>Advanced Configuration</Text>
+              </View>
+              {showAdvanced ? <ChevronDown size={18} color={colors.textTertiary} /> : <ChevronRight size={18} color={colors.textTertiary} />}
+            </TouchableOpacity>
+
+            {showAdvanced && !hideSections.includes('advanced') && (
+              <Section title="" colors={colors}>
+                <ToggleRow label="Table of Contents" value={!!opts.showTOC} onChange={v => set('showTOC', v)} colors={colors} />
+                <ToggleRow label="Subject / Section / Microtopic chips" value={!!opts.showMetaChips} onChange={v => set('showMetaChips', v)} colors={colors} />
+                <ToggleRow label="PYQ categorization chip" value={!!opts.showPYQChips} onChange={v => set('showPYQChips', v)} colors={colors} />
+                <Label colors={colors}>PAGE MARGINS (CM)</Label>
+                <Text style={{ fontSize: 11, color: colors.textTertiary, marginBottom: 6 }}>Default is 1cm on all sides.</Text>
+                <Label colors={colors}>LEFT</Label>
+                <Row>{CHOICES.marginsCm.map(m => <Chip key={`m-left-${m}`} active={opts.pageMarginLeftCm === m} onPress={() => set('pageMarginLeftCm', m)}>{m}</Chip>)}</Row>
+                <Label colors={colors}>RIGHT</Label>
+                <Row>{CHOICES.marginsCm.map(m => <Chip key={`m-right-${m}`} active={opts.pageMarginRightCm === m} onPress={() => set('pageMarginRightCm', m)}>{m}</Chip>)}</Row>
+                <Label colors={colors}>TOP</Label>
+                <Row>{CHOICES.marginsCm.map(m => <Chip key={`m-top-${m}`} active={opts.pageMarginTopCm === m} onPress={() => set('pageMarginTopCm', m)}>{m}</Chip>)}</Row>
+                <Label colors={colors}>BOTTOM</Label>
+                <Row>{CHOICES.marginsCm.map(m => <Chip key={`m-bottom-${m}`} active={opts.pageMarginBottomCm === m} onPress={() => set('pageMarginBottomCm', m)}>{m}</Chip>)}</Row>
+                <Label colors={colors}>HEADER</Label>
+                <TextInput
+                  style={[styles.input, { color: colors.textPrimary, backgroundColor: colors.bg, borderColor: colors.border }]}
+                  value={opts.headerText} onChangeText={t => set('headerText', t)}
+                  placeholder="App / author name (top right)" placeholderTextColor={colors.textTertiary}
+                />
+                <Label colors={colors}>FOOTER</Label>
+                <TextInput
+                  style={[styles.input, { color: colors.textPrimary, backgroundColor: colors.bg, borderColor: colors.border }]}
+                  value={opts.footerText} onChangeText={t => set('footerText', t)}
+                  placeholder="e.g. Generated by Dr. UPSC" placeholderTextColor={colors.textTertiary}
+                />
+                <Label colors={colors}>WATERMARK</Label>
+                <TextInput
+                  style={[styles.input, { color: colors.textPrimary, backgroundColor: colors.bg, borderColor: colors.border }]}
+                  value={opts.watermark} onChangeText={t => set('watermark', t)}
+                  placeholder="e.g. DRAFT, CONFIDENTIAL" placeholderTextColor={colors.textTertiary}
+                />
+                <Label colors={colors}>MODULE NAME</Label>
+                <TextInput
+                  style={[styles.input, { color: colors.textPrimary, backgroundColor: colors.bg, borderColor: colors.border }]}
+                  value={opts.moduleName || ''} onChangeText={t => set('moduleName', t)}
+                  placeholder="e.g. Quiz Arena, Tags, Analysis" placeholderTextColor={colors.textTertiary}
+                />
+              </Section>
+            )}
+          </ScrollView>
+
+          <View style={styles.footer}>
+            <TouchableOpacity
+              testID="export-1col-button"
+              disabled={isExporting || !payload}
+              onPress={() => run(1)}
+              style={[styles.exportBtn, { backgroundColor: colors.primary, opacity: isExporting ? 0.6 : 1 }]}
+            >
+              {isExporting ? <ActivityIndicator color="#fff" /> : <FileDown size={18} color="#fff" />}
+              <Text style={styles.exportBtnText}>Export 1-Column</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              testID="export-2col-button"
+              disabled={isExporting || !payload}
+              onPress={() => run(2)}
+              style={[styles.exportBtn, { backgroundColor: colors.primary, opacity: isExporting ? 0.6 : 1 }]}
+            >
+              {isExporting ? <ActivityIndicator color="#fff" /> : <Layout size={18} color="#fff" />}
+              <Text style={styles.exportBtnText}>Export 2-Column</Text>
+            </TouchableOpacity>
+          </View>
+            </>
+          )}
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+const Section = ({ title, children, colors }: any) => (
+  <View style={{ marginTop: 22, paddingTop: 4 }}>
+    {!!title && (
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+        <View style={{ width: 3, height: 16, borderRadius: 2, backgroundColor: colors.primary, marginRight: 10 }} />
+        <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary, letterSpacing: 0.3 }}>{title}</Text>
+      </View>
+    )}
+    {children}
+  </View>
+);
+
+const Row = ({ children }: any) => (
+  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>{children}</View>
+);
+
+const Label = ({ children, colors }: any) => (
+  <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textTertiary, letterSpacing: 1.2, marginTop: 6, marginBottom: 8, textTransform: 'uppercase' }}>{children}</Text>
+);
+
+const ToggleRow = ({ label, value, onChange, colors }: any) => (
+  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8 }}>
+    <Text style={{ color: colors.textPrimary, fontSize: 13, fontWeight: '600', flex: 1 }}>{label}</Text>
+    <Switch value={value} onValueChange={onChange} trackColor={{ true: colors.primary, false: colors.border }} />
+  </View>
+);
+
+const styles = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  sheet: { borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 20, paddingBottom: Platform.OS === 'ios' ? 36 : 20, maxHeight: '92%' },
+  sheetHandle: { alignSelf: 'center', width: 38, height: 4, borderRadius: 2, backgroundColor: '#ccc', marginBottom: 12 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  title: { fontSize: 20, fontWeight: '900', letterSpacing: -0.2 },
+  titleInput: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, fontWeight: '700' },
+  input: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, fontSize: 13, marginBottom: 8 },
+  chip: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, borderWidth: 1 },
+  analysisRow: { gap: 8, paddingBottom: 4 },
+  analysisChip: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  analysisCheckbox: { width: 16, height: 16, borderRadius: 5, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  colorChip: { paddingHorizontal: 10, paddingVertical: 8, borderRadius: 10, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 6 },
+  advToggle: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 14, paddingBottom: 6, marginTop: 10, borderTopWidth: 1 },
+  footer: { flexDirection: 'row', gap: 10, marginTop: 16 },
+  exportBtn: { flex: 1, height: 52, borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  exportBtnText: { color: '#fff', fontWeight: '900', fontSize: 14, letterSpacing: 0.3 },
+});
+
+export default UnifiedExportSheet;

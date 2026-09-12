@@ -1,0 +1,4067 @@
+{
+  "paper_title": "GS2 Part-1 — Constitution, Polity & Social Justice",
+  "subject": "GS2-Part-1",
+  "total_pdf_pages": 635,
+  "license_pages_skipped": [
+    44,
+    85,
+    94,
+    101,
+    103,
+    134,
+    157,
+    174,
+    175,
+    181,
+    204,
+    241,
+    442,
+    506,
+    624
+  ],
+  "syllabus_index": [
+    {
+      "topic_id": 1,
+      "title": "Part 1- Polity and Governance",
+      "page": 1,
+      "slug": "01-part-1-polity-and-governance"
+    },
+    {
+      "topic_id": 2,
+      "title": "Preamble",
+      "page": 8,
+      "slug": "02-preamble"
+    },
+    {
+      "topic_id": 3,
+      "title": "Fundamental Rights",
+      "page": 13,
+      "slug": "03-fundamental-rights"
+    },
+    {
+      "topic_id": 4,
+      "title": "DPSPs",
+      "page": 84,
+      "slug": "04-dpsps"
+    },
+    {
+      "topic_id": 5,
+      "title": "Constitutional Features",
+      "page": 93,
+      "slug": "05-constitutional-features"
+    },
+    {
+      "topic_id": 6,
+      "title": "Fundamental Duty",
+      "page": 130,
+      "slug": "06-fundamental-duty"
+    },
+    {
+      "topic_id": 7,
+      "title": "Amendment and Basic structure",
+      "page": 141,
+      "slug": "07-amendment-and-basic-structure"
+    },
+    {
+      "topic_id": 8,
+      "title": "Federal Structure",
+      "page": 161,
+      "slug": "08-federal-structure"
+    },
+    {
+      "topic_id": 9,
+      "title": "Local Government",
+      "page": 218,
+      "slug": "09-local-government"
+    },
+    {
+      "topic_id": 10,
+      "title": "Separation of Power",
+      "page": 272,
+      "slug": "10-separation-of-power"
+    },
+    {
+      "topic_id": 11,
+      "title": "Dispute redressal mechanisms",
+      "page": 284,
+      "slug": "11-dispute-redressal-mechanisms"
+    },
+    {
+      "topic_id": 12,
+      "title": "Comparison of Indian Constitution",
+      "page": 295,
+      "slug": "12-comparison-of-indian-constitution"
+    },
+    {
+      "topic_id": 13,
+      "title": "Parliament and State Legislatures",
+      "page": 311,
+      "slug": "13-parliament-and-state-legislatures"
+    },
+    {
+      "topic_id": 14,
+      "title": "Executive",
+      "page": 364,
+      "slug": "14-executive"
+    },
+    {
+      "topic_id": 15,
+      "title": "Judiciary",
+      "page": 394,
+      "slug": "15-judiciary"
+    },
+    {
+      "topic_id": 16,
+      "title": "Pressure Groups and Formal/informal - association",
+      "page": 459,
+      "slug": "16-pressure-groups-and-formalinformal-association"
+    },
+    {
+      "topic_id": 17,
+      "title": "RoPA,1951 and Election issues",
+      "page": 501,
+      "slug": "17-ropa1951-and-election-issues"
+    },
+    {
+      "topic_id": 18,
+      "title": "Constitutional bodies",
+      "page": 542,
+      "slug": "18-constitutional-bodies"
+    },
+    {
+      "topic_id": 19,
+      "title": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "page": 568,
+      "slug": "19-statutory-regulatory-and-quasi-judicial-bodies"
+    }
+  ],
+  "entries": [
+    {
+      "kind": "answer",
+      "global_id": 1,
+      "topic_id": 2,
+      "topic_name": "Preamble",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "The core ideals of the Preamble - sovereignty, socialism, secularism, and democracy - form the bedrock of India's constitutional framework. Elucidate.",
+      "pdf_pages": [
+        9,
+        10
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 2,
+      "topic_id": 2,
+      "topic_name": "Preamble",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "The preamble is not a mere solemn resolution; but majestic expression of philosophy, principles and purpose of the constitution. Elaborate.",
+      "pdf_pages": [
+        11,
+        12
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 3,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "Every person has a fundamental right to entertain such religious practices as approved by his/her conscience. Do you think that 'doctrine of essentiality' restricts this autonomy?",
+      "pdf_pages": [
+        14,
+        15
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 4,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Every person has a fundamental right to entertain such religious practices as approved by his/her conscience. Do you think that 'doctrine of essentiality' restricts this autonomy?",
+      "pdf_pages": [
+        16,
+        17
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 5,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "Discuss the 'Doctrine of Essentiality' referred to by the courts in the context of religious practices in India.",
+      "pdf_pages": [
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 6,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 10,
+      "score": "121",
+      "question": "What is the meaning of the essential religious practice test? Explain how the test is used to determine the importance of religious identity in relation to fundamental rights.",
+      "pdf_pages": [
+        21,
+        22,
+        23
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 7,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "Right to freedom of religion cannot be allowed to deny right to equality and individual dignity. Discuss in the light of constitutional provisions and recent judicial pronouncements.",
+      "pdf_pages": [
+        24,
+        25,
+        26
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 8,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 10,
+      "score": "113",
+      "question": "Discuss the role of the judiciary in navigating the tension between the right to religion and constitutional morality in India in recent times. Refer to relevant case laws.",
+      "pdf_pages": [
+        27,
+        28
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 9,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "Freedom of speech and expression goes well beyond spoken words and written texts; however, neither the right enjoyed by citizens, nor the power of the State to impose restrictions is absolute. Analyze.",
+      "pdf_pages": [
+        29,
+        30
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 10,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "'Disturbing public order or inciting violence cannot be allowed under the garb of the freedom of speech and expression.' Discuss with help of the recent Supreme Court judgment on hate speech.",
+      "pdf_pages": [
+        31,
+        32
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 11,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 10,
+      "score": "134",
+      "question": "Discuss the role of the 'Fourth Estate' in upholding democratic values and analyse the issues affecting press freedom in India.",
+      "pdf_pages": [
+        33,
+        34
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 12,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "'The menace of paid news often rears its ugly head during elections.' Discuss the need for making paid news an electoral offence in India.",
+      "pdf_pages": [
+        35,
+        36,
+        37
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 13,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 10,
+      "score": "134",
+      "question": "Discuss the role of the 'Fourth Estate' in upholding democratic values and analyse the issues affecting press freedom in India.",
+      "pdf_pages": [
+        38,
+        39
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 14,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 15,
+      "score": "128",
+      "question": "Invisibilizing destitute through criminalizing of begging amounts to complete denial of a socio-economic problem and abject failure of the state. In light of this statement, discuss the reasons behind the problem of begging and suggest suitable welfare measures to address various problems faced by them.",
+      "pdf_pages": [
+        40,
+        41,
+        42
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 15,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Discuss the status of death penalty in the country. Can a governor pardon a death penalty? What are various limitations of pardoning power of governor?",
+      "pdf_pages": [
+        43,
+        45
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 16,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "Discuss the status of death penalty in the country. Can a governor pardon a death penalty? What are various limitations of pardoning power of governor?",
+      "pdf_pages": [
+        46,
+        47
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 17,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 10,
+      "score": "134",
+      "question": "Human dignity, stemming from right to life, does not end with death penalty. In this context, throw light on various controversies surrounding capital punishment in the country.",
+      "pdf_pages": [
+        48,
+        49
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 18,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "Comment on status of prisoners and custodial violence in the country keeping in mind Supreme Court guidelines in the DK Basu case.",
+      "pdf_pages": [
+        50,
+        51
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 19,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 15,
+      "score": "128",
+      "question": "What was held in Kedar Nath Singh Case 1962? Do you think that the judgement has outlived its utility and needs review? Discuss in light of recent controversies.",
+      "pdf_pages": [
+        52,
+        53,
+        54
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 20,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Sedition law, in any form, is a threat to civil liberties and presents an opportunity for its weaponization against dissenters and detractors. Should India do away with the sedition law? Justify your opinion.",
+      "pdf_pages": [
+        55,
+        56
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 21,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Rishabh Choudhary",
+      "air": "28",
+      "year": "2024",
+      "marks": 15,
+      "score": "120",
+      "question": "Re-examination and reconsideration of the provisions of Section 124A of the Indian Penal Code (IPC) requires striking a balance between concerns of civil liberties and human rights and maintaining and protecting the sovereignty and integrity of the nation. Discuss.",
+      "pdf_pages": [
+        57,
+        58
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 22,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "Sedition law, in any form, is a threat to civil liberties and presents an opportunity for its weaponization against dissenters and detractors. Should India do away with the sedition law? Justify your opinion.",
+      "pdf_pages": [
+        59,
+        60
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 23,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 15,
+      "score": "115",
+      "question": "The Constitution of India provides several rights that empower the individual, yet it balances these freedoms with reasonable restrictions in the larger public interest. Discuss how constitutional restrictions on fundamental rights strike a fine balance between individual interests and societal interests. Also, mention the principles that are considered in evaluating the reasonableness of restrictions with reference case laws.",
+      "pdf_pages": [
+        61,
+        62,
+        63
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 24,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "Assess the implications of the 103rd Constitutional Amendment, which introduced a ten per cent reservation for Economically Weaker Sections (EWS), on the principle of social justice in India.",
+      "pdf_pages": [
+        64,
+        65
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 25,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 15,
+      "score": "128",
+      "question": "Reservations have morphed into a populist exercise to deal with an employment crisis, making it a political response to resolve an economic issue through the prism of identity. Analyze in the backdrop of rising demand for caste census and reservation for locals in private job.",
+      "pdf_pages": [
+        66,
+        67,
+        68
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 26,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "The offence of rape cannot be condoned by marital relationship between victim and culprit. In light of this statement, discuss the issues involved in criminalization of marital rape.",
+      "pdf_pages": [
+        69,
+        70,
+        71
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 27,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 15,
+      "score": "121",
+      "question": "Fundamental rights are not gifts bestowed upon by the state rather an individual possesses them independently of the state. In this context discuss the desirability of reasonable restrictions on various fundamental rights.",
+      "pdf_pages": [
+        72,
+        73,
+        74
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 28,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "131",
+      "question": "The recent Supreme Court judgments on human rights issues mark a remarkable shift in using International law and treaties not just as a source of inspiration but as a source of law. Examine with reference to relevant case laws.",
+      "pdf_pages": [
+        75,
+        76
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 29,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "The recent acknowledgment of sex work as a 'profession' by the Supreme Court is merely the first step in ensuring basic rights and equality for sex workers in India. Examine.",
+      "pdf_pages": [
+        77,
+        78
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 30,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 15,
+      "score": "128",
+      "question": "Scholars and activists argue that misuse of draconian UAPA to curb every dissenting voice can put democracy in peril. What sections of UAPA make it a threat to democratic rights? Critically analyze the issues related to UAPA while evaluating the requirement of such a stringent law.",
+      "pdf_pages": [
+        79,
+        80,
+        81
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 31,
+      "topic_id": 3,
+      "topic_name": "Fundamental Rights",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 10,
+      "score": "115",
+      "question": "Recently, the Supreme Court has expanded the scope of Articles 14 and 21 to include the 'right against the adverse effects of climate change'. In this context, citing relevant case laws, discuss the role played by Indian judiciary in 'constitutionalization' of environmental issues.",
+      "pdf_pages": [
+        82,
+        83
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 32,
+      "topic_id": 4,
+      "topic_name": "DPSPs",
+      "topper": "Rishabh Choudhary",
+      "air": "28",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "Constitutionally reconciling Fundamental Rights with the Directive Principles of State Policy (DPSPs) has been a tough task since the inception of the Indian Constitution. Discuss with the help of relevant case laws.",
+      "pdf_pages": [
+        86,
+        87
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 33,
+      "topic_id": 4,
+      "topic_name": "DPSPs",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 10,
+      "score": "121",
+      "question": "The question of gender equality is central to the debate on Uniform Civil Code. In this light what are the challenges in reconciling UCC with gender equality as enshrined in the constitution?",
+      "pdf_pages": [
+        88,
+        89
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 34,
+      "topic_id": 4,
+      "topic_name": "DPSPs",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 15,
+      "score": "121",
+      "question": "Explain the importance and necessity of a Uniform Civil Code considering the diverse nature of Indian society, focusing on the argument of replacing individual personal customs and practices related to marriage, divorce, adoption, and successions with a unified code. Also, analyze the relevance of Article 44 in this context.",
+      "pdf_pages": [
+        90,
+        91,
+        92
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 35,
+      "topic_id": 5,
+      "topic_name": "Constitutional Features",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 15,
+      "score": "131",
+      "question": "The Ninth Schedule fabricated a constitutional paradox to safeguard laws related to socio-economic justice from being challenged under the fundamental right to property. Does the ninth schedule have any relevance in present times? How did the IR Coelho judgment resolve this paradox?",
+      "pdf_pages": [
+        95,
+        96,
+        97
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 36,
+      "topic_id": 5,
+      "topic_name": "Constitutional Features",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 15,
+      "score": "131",
+      "question": "The Ninth Schedule fabricated a constitutional paradox to safeguard laws related to socio-economic justice from being challenged under the fundamental right to property. Does the ninth schedule have any relevance in present times? How did the IR Coelho judgment resolve this paradox?",
+      "pdf_pages": [
+        98,
+        99,
+        100
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 37,
+      "topic_id": 5,
+      "topic_name": "Constitutional Features",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 10,
+      "score": "115",
+      "question": "The foundational strength of the Indian Constitution stems from its ability to integrate diverse socio-political perspectives. Elucidate.",
+      "pdf_pages": [
+        102,
+        104
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 38,
+      "topic_id": 5,
+      "topic_name": "Constitutional Features",
+      "topper": "Rishabh Choudhary",
+      "air": "28",
+      "year": "2024",
+      "marks": 15,
+      "score": "120",
+      "question": "Despite being an amalgamation of various constitutions from across the world, the Indian Constitution imbibes social justice, pluralism, and equality through its various provisions. Comment.",
+      "pdf_pages": [
+        105,
+        106,
+        107
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 39,
+      "topic_id": 5,
+      "topic_name": "Constitutional Features",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "125",
+      "question": "Elaborate on the fundamental aspects in which the Indian Constitution differed from its contemporaries despite being a post-colonial document.",
+      "pdf_pages": [
+        108,
+        109,
+        110
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 40,
+      "topic_id": 5,
+      "topic_name": "Constitutional Features",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 10,
+      "score": "121",
+      "question": "Constitution is a mere skeleton whereas constitutionalism is the soul of democracy. Discuss.",
+      "pdf_pages": [
+        111,
+        112
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 41,
+      "topic_id": 5,
+      "topic_name": "Constitutional Features",
+      "topper": "Ruhani",
+      "air": "5",
+      "year": "2023",
+      "marks": 10,
+      "score": "",
+      "question": "Constitution is a mere skeleton whereas constitutionalism is the soul of democracy. Discuss.",
+      "pdf_pages": [
+        113,
+        114
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 42,
+      "topic_id": 5,
+      "topic_name": "Constitutional Features",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "The Indian Constitution has been successful in providing a framework for liberal democracy to flourish in India. Analyse.",
+      "pdf_pages": [
+        115,
+        116
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 43,
+      "topic_id": 5,
+      "topic_name": "Constitutional Features",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "125",
+      "question": "How can a 'rule of law culture' contribute towards promoting individual liberty and democratic governance in a society like India? What are the challenges in fostering such a culture?",
+      "pdf_pages": [
+        117,
+        118,
+        119
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 44,
+      "topic_id": 5,
+      "topic_name": "Constitutional Features",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "Secularism under the Indian constitution is encapsulated in the broader concept of constitutional commitment to equality. Discuss.",
+      "pdf_pages": [
+        120,
+        121
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 45,
+      "topic_id": 5,
+      "topic_name": "Constitutional Features",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "State the reasons behind the poor performance of cooperatives in India. Also, discuss the reforms undertaken by the government to overcome the shortcomings.",
+      "pdf_pages": [
+        122,
+        123,
+        124
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 46,
+      "topic_id": 5,
+      "topic_name": "Constitutional Features",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 10,
+      "score": "134",
+      "question": "Discuss the significance of the cooperative model of development in addressing the issues of rural growth.",
+      "pdf_pages": [
+        125,
+        126
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 47,
+      "topic_id": 5,
+      "topic_name": "Constitutional Features",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "125",
+      "question": "With 98% coverage in rural India, cooperatives are the mainstay of rural economy ensuring sustainable livelihoods and income for people. Discuss. Also, state the recent initiatives taken by the government to improve the functioning of cooperative societies and make them more effective.",
+      "pdf_pages": [
+        127,
+        128,
+        129
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 48,
+      "topic_id": 6,
+      "topic_name": "Fundamental Duty",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "131",
+      "question": "Fundamental Duties are a reminder that citizenship is not merely a passive status but an active engagement. Discuss. What are the challenges in their legal enforcement?",
+      "pdf_pages": [
+        131,
+        132
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 49,
+      "topic_id": 6,
+      "topic_name": "Fundamental Duty",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "'The moral value of fundamental duties would not be to smother rights but to establish a democratic balance by making the people conscious of their duties equally as they are conscious of their rights'. Discuss.",
+      "pdf_pages": [
+        133,
+        135
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 50,
+      "topic_id": 6,
+      "topic_name": "Fundamental Duty",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "131",
+      "question": "Fundamental Duties are a reminder that citizenship is not merely a passive status but an active engagement. Discuss. What are the challenges in their legal enforcement?",
+      "pdf_pages": [
+        136,
+        137
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 51,
+      "topic_id": 6,
+      "topic_name": "Fundamental Duty",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "While fundamental rights have strengthened our democracy, fundamental duties are essential to strengthen our society. In this context examine the importance of fundamental duties for Indian society.",
+      "pdf_pages": [
+        138,
+        139,
+        140
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 52,
+      "topic_id": 7,
+      "topic_name": "Amendment and Basic structure",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 10,
+      "score": "113",
+      "question": "The rule of law and judicial review are interdependent, as one cannot truly exist without the other. In this context can judicial review be considered the most important aspect among those that constitute the basic structure of the Constitution?",
+      "pdf_pages": [
+        142,
+        143
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 53,
+      "topic_id": 7,
+      "topic_name": "Amendment and Basic structure",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "125",
+      "question": "The tussle between the legislature and judiciary culminated in the 'basic structure' doctrine in the Kesavananda Bharati case. Discuss. What is the significance of the case in limiting the power of the Parliament to amend the constitution?",
+      "pdf_pages": [
+        144,
+        145,
+        146
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 54,
+      "topic_id": 7,
+      "topic_name": "Amendment and Basic structure",
+      "topper": "Shreya Tyagi",
+      "air": "31",
+      "year": "2024",
+      "marks": 10,
+      "score": "",
+      "question": "The rule of law and judicial review are interdependent, as one cannot truly exist without the other. In this context can judicial review be considered the most important aspect among those that constitute the basic structure of the Constitution?",
+      "pdf_pages": [
+        147,
+        148
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 55,
+      "topic_id": 7,
+      "topic_name": "Amendment and Basic structure",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 15,
+      "score": "121",
+      "question": "Explain the circumstances that led to the emergence of the basic structure doctrine and analyze its significance in safeguarding the fundamental framework of the constitution, despite its non-constitutional nature.",
+      "pdf_pages": [
+        149,
+        150,
+        151
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 56,
+      "topic_id": 7,
+      "topic_name": "Amendment and Basic structure",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "The biggest critique of Basic Structure doctrine from its inception has been it being shrouded in confusion, vagueness and a formulation which is loose and not precise. Critically examine.",
+      "pdf_pages": [
+        152,
+        153
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 57,
+      "topic_id": 7,
+      "topic_name": "Amendment and Basic structure",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 15,
+      "score": "115",
+      "question": "'The Basic Structure Doctrine, lauded for safeguarding the core principles of the Constitution against majoritarian impulses, is also criticized for enabling judicial overreach and disturbing the balance of power as envisioned by the Constitution.' Elaborate.",
+      "pdf_pages": [
+        154,
+        155,
+        156
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 58,
+      "topic_id": 7,
+      "topic_name": "Amendment and Basic structure",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 15,
+      "score": "121",
+      "question": "Critics assert that limitless judicial authority rests on the structural ambiguity of the basic structure doctrine. Has the elastic nature of the basic structure doctrine made the judiciary more powerful than the executive?",
+      "pdf_pages": [
+        158,
+        159,
+        160
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 59,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "Explain why it is argued that India is a sui generis case of federalism.",
+      "pdf_pages": [
+        162,
+        163,
+        164
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 60,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "A major responsibility in a federal country with strong centralizing tendency is to maintain the balance, as well as mutual respect, between political structures at the central and state levels. Explain in light of recent events.",
+      "pdf_pages": [
+        165,
+        166
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 61,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Despite the constitutional division of powers, Centre-state disputes have been a perennial feature of Indian democracy. Discuss with examples.",
+      "pdf_pages": [
+        167,
+        168
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 62,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "Why did constitution makers prefer 'union of states' over 'federation of states' to describe India? To what extent this preference is responsible for tensions in centre-state relations?",
+      "pdf_pages": [
+        169,
+        170,
+        171
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 63,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "Why did constitution makers prefer 'union of states' over 'federation of states' to describe India? To what extent this preference is responsible for tensions in centre-state relations?",
+      "pdf_pages": [
+        172,
+        173,
+        176
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 64,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 15,
+      "score": "121",
+      "question": "'S.R. Bommai v. Union of India signified a paradigm shift in the judicial interpretation of the union's authority to assume control of a state's administration.' In this context discuss the significance and impact of the judgement on cementing the federal structure.",
+      "pdf_pages": [
+        177,
+        178,
+        179
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 65,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 10,
+      "score": "116",
+      "question": "The Supreme Court of India has upheld unique asymmetry in India's federalism by intricately balancing centralized authority and regional autonomy. Discuss with the help of relevant case laws.",
+      "pdf_pages": [
+        180,
+        182
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 66,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 15,
+      "score": "115",
+      "question": "The cooperative nature of Indian federalism is being increasingly challenged by emerging differences in Centre-State relations. Discuss. What steps can be taken to strengthen the cooperative spirit of Indian federalism?",
+      "pdf_pages": [
+        183,
+        184,
+        185
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 67,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 15,
+      "score": "120",
+      "question": "The Constitution envisages the 'principle of federal supremacy' in the executive space of Indian federal polity. Discuss while referring to the relevant Constitutional provisions and case laws. How are contentious issues regarding the distribution of powers resolved?",
+      "pdf_pages": [
+        186,
+        187,
+        188
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 68,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Rishabh Choudhary",
+      "air": "28",
+      "year": "2024",
+      "marks": 15,
+      "score": "120",
+      "question": "'The Indian model of federalism has been criticized for being too centralized, but it also provides adequate space and autonomy to the states.' Analyse.",
+      "pdf_pages": [
+        189,
+        190,
+        191
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 69,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 10,
+      "score": "124",
+      "question": "The Supreme Court of India has upheld unique asymmetry in India's federalism by intricately balancing centralized authority and regional autonomy. Discuss with the help of relevant case laws.",
+      "pdf_pages": [
+        192,
+        193
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 70,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 10,
+      "score": "121",
+      "question": "'Interstate border disputes, if not promptly and impartially settled, can transform into persistent issues that impede development and generate friction'. Highlighting the constitutional and legal framework to resolve interstate disputes, explain why Independent India has failed to resolve inter-state border disputes.",
+      "pdf_pages": [
+        194,
+        195
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 71,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Do you agree with the view that time has come to revisit the Seventh Schedule of the Indian Constitution? Discuss with suitable arguments.",
+      "pdf_pages": [
+        196,
+        197
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 72,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "The Seventh Schedule is a relic from the colonial past inherited from the Government of India Act, 1935 which needs to be revisited for improving Centre-state relations. Discuss.",
+      "pdf_pages": [
+        198,
+        199
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 73,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "There has been an increasing demand for doing away with the concurrent list. Examine the utility of concurrent list in the light of recent events.",
+      "pdf_pages": [
+        200,
+        201,
+        202
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 74,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "Do you agree that presence of a concurrent list in 7th schedule goes against the federal spirit of distribution of power? How has judiciary applied the doctrine of pith and substance for resolving the issue of legislative competence on different lists under 7th schedule?",
+      "pdf_pages": [
+        203,
+        205
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 75,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "There are arguments that bills of national importance should be placed before the Inter-State Council prior to their introduction in the Parliament. Discuss in light of the issues that have been observed in the passage of bills in the Parliament in recent times.",
+      "pdf_pages": [
+        206,
+        207
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 76,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 10,
+      "score": "121",
+      "question": "Examine the role of the Inter-state Council in promoting vertical (Centre-State) and horizontal (Inter-State) Intergovernmental cooperation and coordination.",
+      "pdf_pages": [
+        208,
+        209
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 77,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "125",
+      "question": "Governance of inter-state rivers in India suffers from various issues due to conflictual federalism. Discuss. Also, highlight the mechanisms which can be utilised to resolve inter-state river water disputes in India.",
+      "pdf_pages": [
+        210,
+        211,
+        212
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 78,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 15,
+      "score": "128",
+      "question": "Obsession with ethnic identity and lack of economic development is the root cause of various interstate land border and river water disputes in the country. Discuss with relevant examples.",
+      "pdf_pages": [
+        213,
+        214,
+        215
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 79,
+      "topic_id": 8,
+      "topic_name": "Federal Structure",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 10,
+      "score": "134",
+      "question": "Assess the effectiveness of Inter-State River Water Disputes Act, 1956 in resolution of river-water disputes. Also describe the potential impact of delays in resolution of water disputes.",
+      "pdf_pages": [
+        216,
+        217
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 80,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "Success of the institutions of local self-governance depends largely on the attitude of state governments. Discuss in the context of constitutional provisions and recent experience of the working of these institutions in India.",
+      "pdf_pages": [
+        219,
+        220,
+        221
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 81,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 15,
+      "score": "134",
+      "question": "Despite constitutional backing to the institutions of local governance, the idea of decentralisation has remained hostage to several structural bottlenecks. Elucidate.",
+      "pdf_pages": [
+        222,
+        223,
+        224
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 82,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 15,
+      "score": "128",
+      "question": "The project of grass root democracy remains incomplete as administrative decentralization has not accompanied political decentralization. Highlight the critical administrative challenges faced by local institutions and give your views to improve the situation.",
+      "pdf_pages": [
+        225,
+        226,
+        227
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 83,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 10,
+      "score": "121",
+      "question": "The reservation of seats for women in the institution of local self government has had a limited impact on the patriarchal character of the Indian political process. Comment.",
+      "pdf_pages": [
+        228,
+        229,
+        230
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 84,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Ruhani",
+      "air": "5",
+      "year": "2023",
+      "marks": 15,
+      "score": "",
+      "question": "The key to effective decentralization is, 'political decentralization should follow finance and functional decentralization'. Discuss in the context of impediments faced by local governance in India.",
+      "pdf_pages": [
+        231,
+        232,
+        233
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 85,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 15,
+      "score": "121",
+      "question": "The key to effective decentralization is, 'political decentralization should follow finance and functional decentralization'. Discuss in the context of impediments faced by local governance in India.",
+      "pdf_pages": [
+        234,
+        235,
+        236
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 86,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "Political decentralization without devolution of funds and functions to panchayats has resulted in representation but not empowerment. Examine whether devolution of funds and functions alone can transform panchayats into effective institutions of self-governance.",
+      "pdf_pages": [
+        237,
+        238,
+        239
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 87,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "Political decentralization without devolution of funds and functions to panchayats has resulted in representation but not empowerment. Examine whether devolution of funds and functions alone can transform panchayats into effective institutions of self-governance.",
+      "pdf_pages": [
+        240,
+        242,
+        243
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 88,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "125",
+      "question": "Even after three decades of constitutional amendments, India is yet to decentralise power to local self-government institutions in the true sense. Discuss. Do you agree with the view that Rashtriya Gram Swaraj Abhiyaan will be able to develop the governance capabilities of the Panchayati Raj Institutions (PRIs)?",
+      "pdf_pages": [
+        244,
+        245,
+        246
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 89,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "What do you understand by the 'principle of subsidiarity'? Discuss its importance in the context of India.",
+      "pdf_pages": [
+        247,
+        248
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 90,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 15,
+      "score": "116",
+      "question": "Though Panchayati Raj Institutions (PRIs) have become a platform for competitive politics, they have not emerged as an agency of planning and service delivery. Why?",
+      "pdf_pages": [
+        249,
+        250,
+        251
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 91,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "125",
+      "question": "The limited revenue generation capacity of municipal corporations has increased their dependence on taxes and grants from the states. What are the issues associated with this trend? What measures are required to improve the finances of the municipal corporations in India?",
+      "pdf_pages": [
+        252,
+        253,
+        254
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 92,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "Successful and long-lasting urban transformation critically depends on reforming the way our cities are governed. In this context, highlight the challenges plaguing urban governance in India and suggest some strategies to overcome those challenges.",
+      "pdf_pages": [
+        255,
+        256,
+        257
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 93,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 10,
+      "score": "121",
+      "question": "Recognizing the pivotal role of urbanization as a driver of national economic growth, the Fifteenth Finance Commission has suggested major reforms for Urban Local Bodies. Evaluate the recommendations put forward by the Fifteenth Finance Commission in promoting and revitalizing ULBs in India.",
+      "pdf_pages": [
+        258,
+        259
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 94,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 15,
+      "score": "124",
+      "question": "Though Panchayati Raj Institutions (PRIs) have become a platform for competitive politics, they have not emerged as an agency of planning and service delivery. Why?",
+      "pdf_pages": [
+        260,
+        261,
+        262
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 95,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 10,
+      "score": "113",
+      "question": "The Sixth Schedule of the Indian Constitution is more than a legal provision that empowers tribal regions with self-rule. How does the sixth schedule foster development while respecting their traditional governance systems and cultural practices?",
+      "pdf_pages": [
+        263,
+        264
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 96,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 15,
+      "score": "113",
+      "question": "Achievement of Sustainable Development Goals requires consideration of regional context and local situations. In light of this statement examine the role of Panchayats as catalysts for grassroot development and advancing sustainable development.",
+      "pdf_pages": [
+        265,
+        266,
+        267
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 97,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Shreya Tyagi",
+      "air": "31",
+      "year": "2024",
+      "marks": 10,
+      "score": "",
+      "question": "The Sixth Schedule of the Indian Constitution is more than a legal provision that empowers tribal regions with self-rule. How does the sixth schedule foster development while respecting their traditional governance systems and cultural practices?",
+      "pdf_pages": [
+        268,
+        269
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 98,
+      "topic_id": 9,
+      "topic_name": "Local Government",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 10,
+      "score": "121",
+      "question": "Highlight the reasons behind underperformance of the Autonomous District Councils (ADCs). How can their performance be improved?",
+      "pdf_pages": [
+        270,
+        271
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 99,
+      "topic_id": 10,
+      "topic_name": "Separation of Power",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 10,
+      "score": "121",
+      "question": "Do you think that constitution of India does not accept principle of strict separation of powers rather it is based on the principle of 'checks and balance'? explain.",
+      "pdf_pages": [
+        273,
+        274
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 100,
+      "topic_id": 10,
+      "topic_name": "Separation of Power",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 10,
+      "score": "113",
+      "question": "The principle of 'Separation of Powers' is a key feature of the American Constitution. In this context, compare how the Indian Constitution's functional separation of powers distinguishes itself from the US system. What are the advantages of a check and balance system over a rigid Separation of Powers?",
+      "pdf_pages": [
+        275,
+        276
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 101,
+      "topic_id": 10,
+      "topic_name": "Separation of Power",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 10,
+      "score": "115",
+      "question": "The Indian Constitution does not embody a strict separation of powers rather it introduces a system of checks and balances, with overlapping functions and interdependencies among the legislature, executive, and judiciary. Elaborate.",
+      "pdf_pages": [
+        277,
+        278
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 102,
+      "topic_id": 10,
+      "topic_name": "Separation of Power",
+      "topper": "Shreya Tyagi",
+      "air": "31",
+      "year": "2024",
+      "marks": 10,
+      "score": "",
+      "question": "The principle of 'Separation of Powers' is a key feature of the American Constitution. In this context, compare how the Indian Constitution's functional separation of powers distinguishes itself from the US system. What are the advantages of a check and balance system over a rigid Separation of Powers?",
+      "pdf_pages": [
+        279,
+        280
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 103,
+      "topic_id": 10,
+      "topic_name": "Separation of Power",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 15,
+      "score": "121",
+      "question": "'The declining role of Parliament undermines the fundamental principle of separation of powers, as it diminishes the legislature's ability to serve as a check on the executive branch and ensure a balanced exercise of power.' Discuss.",
+      "pdf_pages": [
+        281,
+        282,
+        283
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 104,
+      "topic_id": 11,
+      "topic_name": "Dispute redressal mechanisms",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "Highlighting different Alternate Dispute Resolution (ADR) mechanisms available in India, explain their importance. Also, mention different measures that have been adopted to further improve the framework of ADR in India.",
+      "pdf_pages": [
+        285,
+        286,
+        287
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 105,
+      "topic_id": 11,
+      "topic_name": "Dispute redressal mechanisms",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "Discuss the role played by District Legal Services Authorities (DLSAs) in providing free legal aid and disseminating legal awareness in India.",
+      "pdf_pages": [
+        288,
+        289
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 106,
+      "topic_id": 11,
+      "topic_name": "Dispute redressal mechanisms",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 15,
+      "score": "121",
+      "question": "'Satisfactory and timely redressal of grievances is the cornerstone of 'minimum government, maximum governance.' In this context discuss the challenges associated with current grievance redress mechanisms and suggest measures to strengthen the process.",
+      "pdf_pages": [
+        290,
+        291,
+        292
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 107,
+      "topic_id": 11,
+      "topic_name": "Dispute redressal mechanisms",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Highlighting the advantages of online dispute resolution (ODR) mechanism for justice delivery, discuss the challenges associated with its effective implementation in India.",
+      "pdf_pages": [
+        293,
+        294
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 108,
+      "topic_id": 12,
+      "topic_name": "Comparison of Indian Constitution",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 15,
+      "score": "116",
+      "question": "Both India and the USA adhere to democratic principles but their electoral systems exhibit significant differences. What are the key differences in electoral practices between the two countries?",
+      "pdf_pages": [
+        296,
+        297,
+        298
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 109,
+      "topic_id": 12,
+      "topic_name": "Comparison of Indian Constitution",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 15,
+      "score": "124",
+      "question": "Both India and the USA adhere to democratic principles but their electoral systems exhibit significant differences. What are the key differences in electoral practices between the two countries?",
+      "pdf_pages": [
+        299,
+        300,
+        301
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 110,
+      "topic_id": 12,
+      "topic_name": "Comparison of Indian Constitution",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 15,
+      "score": "121",
+      "question": "The doctrine of Parliamentary sovereignty and judicial supremacy has exerted considerable influence in shaping the constitutional frameworks of India and the USA. Citing relevant case laws discuss the role of the judiciary in influencing the constitutions in these countries. Is the scope of judicial review wider in India?",
+      "pdf_pages": [
+        302,
+        303,
+        304
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 111,
+      "topic_id": 12,
+      "topic_name": "Comparison of Indian Constitution",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "The practice of separation of powers in the Constitutional scheme of India and USA is distinct in its own way. Examine.",
+      "pdf_pages": [
+        305,
+        306
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 112,
+      "topic_id": 12,
+      "topic_name": "Comparison of Indian Constitution",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "131",
+      "question": "The United States and India have their own distinctive jurisprudence on freedom of speech and expression despite the similarities in constitutional provisions. Analyse.",
+      "pdf_pages": [
+        307,
+        308
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 113,
+      "topic_id": 12,
+      "topic_name": "Comparison of Indian Constitution",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 10,
+      "score": "121",
+      "question": "Independent India adopted a modified version of the Westminster model of government. In this context discuss the commonalities and differences between the political system of India and UK.",
+      "pdf_pages": [
+        309,
+        310
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 114,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 10,
+      "score": "121",
+      "question": "List the parliamentary mechanisms available for the scrutiny of regulators. Also, discuss major steps through which parliamentary oversight of regulators can be strengthened.",
+      "pdf_pages": [
+        312,
+        313
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 115,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "Concerns regarding Parliamentary performance most often relate to the drastic reduction in the level and extent of deliberation, representation and scrutiny. In this context, highlight the recent instances which have led decline in effective functioning of the parliament.",
+      "pdf_pages": [
+        314,
+        315,
+        316
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 116,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 15,
+      "score": "115",
+      "question": "Parliamentary privileges are fundamental for lawmakers to discharge their duties without undue influence. However, ensuring the responsible exercise of these privileges is crucial for fostering public trust and ensuring the accountability of public institutions. Analyse.",
+      "pdf_pages": [
+        317,
+        318,
+        319
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 117,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 10,
+      "score": "121",
+      "question": "Highlight the key differences in the scope of Freedom of speech and expression as provided under Parliamentary privileges vis a vis Fundamental rights. Why is it necessary to maintain a balance between parliamentary privilege and fundamental rights?",
+      "pdf_pages": [
+        320,
+        321
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 118,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 15,
+      "score": "113",
+      "question": "Compare and contrast the powers and working of the Ethics Committee and the Privileges Committee in addressing cases of 'unethical' conduct and breach of privileges. How do these Committees complement each other in maintaining parliamentary discipline?",
+      "pdf_pages": [
+        322,
+        323,
+        324
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 119,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Shreya Tyagi",
+      "air": "31",
+      "year": "2024",
+      "marks": 15,
+      "score": "",
+      "question": "Compare and contrast the powers and working of the Ethics Committee and the Privileges Committee in addressing cases of 'unethical' conduct and breach of privileges. How do these Committees complement each other in maintaining parliamentary discipline?",
+      "pdf_pages": [
+        325,
+        326,
+        327
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 120,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 10,
+      "score": "116",
+      "question": "Executive accountability to the legislature through Parliamentary Committees has been the hallmark of the Indian political system. Comment.",
+      "pdf_pages": [
+        328,
+        329
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 121,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 10,
+      "score": "121",
+      "question": "Parliamentary committees play an important role in exercising effective control over executive. How far do you agree with the argument that role of parliamentary committees has been declining in Indian parliamentary functioning?",
+      "pdf_pages": [
+        330,
+        331,
+        332
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 122,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 10,
+      "score": "124",
+      "question": "Executive accountability to the legislature through Parliamentary Committees has been the hallmark of the Indian political system. Comment.",
+      "pdf_pages": [
+        333,
+        334
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 123,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 10,
+      "score": "115",
+      "question": "Parliamentary committees serve as vital tools for legislative oversight, ensuring accountability and transparency in governance processes. In light of the statement, examine the role of the Public Accounts Committee in establishing financial accountability of the executive.",
+      "pdf_pages": [
+        335,
+        336
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 124,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "What is the significance of the Leader of Opposition in the Indian parliamentary system? How does the role of the opposition contribute to the checks and balances in a democracy?",
+      "pdf_pages": [
+        337,
+        338
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 125,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 10,
+      "score": "116",
+      "question": "Expression of dissent is central to the functioning of the Parliament. In light of this, discuss the role of the Leader of Opposition (LoP) in India's parliamentary system.",
+      "pdf_pages": [
+        339,
+        340
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 126,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "Discuss the role of the Leader of the Opposition (LoP) for the effective functioning of democracy in India.",
+      "pdf_pages": [
+        341,
+        342
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 127,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 10,
+      "score": "124",
+      "question": "Expression of dissent is central to the functioning of the Parliament. In light of this, discuss the role of the Leader of Opposition (LoP) in India's parliamentary system.",
+      "pdf_pages": [
+        343,
+        344
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 128,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "In the light of criticism surrounding the composition and functioning of Rajya Sabha, do you think it exists merely as a secondary house of the Parliament?",
+      "pdf_pages": [
+        345,
+        346,
+        347
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 129,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "Highlight the pivotal role of the 'Officers of Parliament' in the Indian Parliamentary system. Also, discuss the constitutional and statutory provisions for their impartial functioning.",
+      "pdf_pages": [
+        348,
+        349,
+        350
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 130,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 10,
+      "score": "121",
+      "question": "Discuss the issue of 'office of profit' as it has featured in the recent practices and debates in Indian polity.",
+      "pdf_pages": [
+        351,
+        352
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 131,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 10,
+      "score": "115",
+      "question": "The Speaker's inclination to cater to party loyalties often undermines the dignity and impartiality of the office, eroding public trust in the legislative process. Analyse with the help of recent examples.",
+      "pdf_pages": [
+        353,
+        354
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 132,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "The divergence between intent and impact of the tenth schedule necessitates calling into question its relevance in the present times. Analyze.",
+      "pdf_pages": [
+        355,
+        356
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 133,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 15,
+      "score": "121",
+      "question": "How has the Anti-Defection Law impacted the relationship between political parties and individual legislators in India? In light of the recent incidents also discuss the unintended consequences it has on the functioning of democracy in India.",
+      "pdf_pages": [
+        357,
+        358,
+        359
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 134,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "125",
+      "question": "To what extent has the anti-defection law been able to address the issue of political instability in India? Discuss with suitable arguments.",
+      "pdf_pages": [
+        360,
+        361
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 135,
+      "topic_id": 13,
+      "topic_name": "Parliament and State Legislatures",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "The divergence between intent and impact of the tenth schedule necessitates calling into question its relevance in the present times. Analyze.",
+      "pdf_pages": [
+        362,
+        363
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 136,
+      "topic_id": 14,
+      "topic_name": "Executive",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "Compare and contrast the National Emergency and President's Rule in terms of their declaration and effects on fundamental rights as well as centre-state relations.",
+      "pdf_pages": [
+        365,
+        366,
+        367
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 137,
+      "topic_id": 14,
+      "topic_name": "Executive",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "Use of ordinance making power to bring in governance reforms not only dilutes the accountability of executive to the legislature but also fails to generate popular consensus on the issues of national importance. Examine with examples.",
+      "pdf_pages": [
+        368,
+        369
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 138,
+      "topic_id": 14,
+      "topic_name": "Executive",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 10,
+      "score": "113",
+      "question": "How does the power and authority of Delhi's lieutenant governor compare to that of the governors of other states, particularly in terms of acting on the aid and advice of the council of ministers?",
+      "pdf_pages": [
+        370,
+        371
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 139,
+      "topic_id": 14,
+      "topic_name": "Executive",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 15,
+      "score": "131",
+      "question": "Under what circumstances can the Governor reserve a state bill for the consideration of the President and why is the provision controversial? Also, discuss the reforms suggested by Punchhi Commission in this regard.",
+      "pdf_pages": [
+        372,
+        373,
+        374
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 140,
+      "topic_id": 14,
+      "topic_name": "Executive",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 10,
+      "score": "121",
+      "question": "Highlight the ordinance-making powers of the Governor. Also enumerate the range of steps open to him when a Bill is presented after its passage by the state legislature.",
+      "pdf_pages": [
+        375,
+        376
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 141,
+      "topic_id": 14,
+      "topic_name": "Executive",
+      "topper": "Shreya Tyagi",
+      "air": "31",
+      "year": "2024",
+      "marks": 10,
+      "score": "",
+      "question": "How does the power and authority of Delhi's lieutenant governor compare to that of the governors of other states, particularly in terms of acting on the aid and advice of the council of ministers?",
+      "pdf_pages": [
+        377,
+        378
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 142,
+      "topic_id": 14,
+      "topic_name": "Executive",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 15,
+      "score": "131",
+      "question": "Under what circumstances can the Governor reserve a state bill for the consideration of the President and why is the provision controversial? Also, discuss the reforms suggested by Punchhi Commission in this regard.",
+      "pdf_pages": [
+        379,
+        380,
+        381
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 143,
+      "topic_id": 14,
+      "topic_name": "Executive",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 10,
+      "score": "121",
+      "question": "'The Governor's office is neither decorative nor inconsequential, it assumes a constitutional role of profound essence' To what extent does the Governor, actively contribute to the governance of a state and reinforce the principles of federalism in the country?",
+      "pdf_pages": [
+        382,
+        383
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 144,
+      "topic_id": 14,
+      "topic_name": "Executive",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 15,
+      "score": "116",
+      "question": "Governors in India often overstep their constitutional role and fail to act effectively when needed. Comment.",
+      "pdf_pages": [
+        384,
+        385,
+        386
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 145,
+      "topic_id": 14,
+      "topic_name": "Executive",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 15,
+      "score": "124",
+      "question": "Governors in India often overstep their constitutional role and fail to act effectively when needed. Comment.",
+      "pdf_pages": [
+        387,
+        388,
+        389
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 146,
+      "topic_id": 14,
+      "topic_name": "Executive",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "The office of Governor needs to be transformed to preserve constitutional governance in India. Discuss in the light of recent controversies surrounding the Governors' office.",
+      "pdf_pages": [
+        390,
+        391
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 147,
+      "topic_id": 14,
+      "topic_name": "Executive",
+      "topper": "Ruhani",
+      "air": "5",
+      "year": "2023",
+      "marks": 10,
+      "score": "",
+      "question": "'The Governor's office is neither decorative nor inconsequential, it assumes a constitutional role of profound essence' To what extent does the Governor, actively contribute to the governance of a state and reinforce the principles of federalism in the country?",
+      "pdf_pages": [
+        392,
+        393
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 148,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 15,
+      "score": "131",
+      "question": "'Constitution envisages an independent judiciary, not insulated judiciary'; In the light of the given statement, discuss the issues associated with the appointment of judges in the higher judiciary and explore alternatives to the current system.",
+      "pdf_pages": [
+        395,
+        396,
+        397
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 149,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "'The collegium system has become a victim of its own success, with the concentration of power in the hands of a few, leading to questions about its legitimacy.' Comment.",
+      "pdf_pages": [
+        398,
+        399
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 150,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 15,
+      "score": "131",
+      "question": "'Constitution envisages an independent judiciary, not insulated judiciary'; In the light of the given statement, discuss the issues associated with the appointment of judges in the higher judiciary and explore alternatives to the current system.",
+      "pdf_pages": [
+        400,
+        401,
+        402
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 151,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 15,
+      "score": "128",
+      "question": "How far do you agree that collegium system of judicial appointment and transfer falls short in striking a balance between judicial independence and other democratic principles? In this context, suggest some practical solutions for making the collegium system more transparent.",
+      "pdf_pages": [
+        403,
+        404,
+        405
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 152,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 15,
+      "score": "113",
+      "question": "In the context of persistent legislative dysfunction in India, analyze the evolving role of judicial activism in shaping public policy and governance. Using examples from landmark court cases, evaluate the effectiveness of judicial interventions in addressing governance gaps and safeguarding citizens' rights.",
+      "pdf_pages": [
+        406,
+        407,
+        408
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 153,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Shreya Tyagi",
+      "air": "31",
+      "year": "2024",
+      "marks": 15,
+      "score": "",
+      "question": "In the context of persistent legislative dysfunction in India, analyze the evolving role of judicial activism in shaping public policy and governance. Using examples from landmark court cases, evaluate the effectiveness of judicial interventions in addressing governance gaps and safeguarding citizens' rights.",
+      "pdf_pages": [
+        409,
+        410,
+        411
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 154,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 15,
+      "score": "128",
+      "question": "Judicial review and soliciting constitutional justification for policies formulated by the executive is an essential function entrusted to judiciary by the constitution, but there is a fine line between judicial activism and judicial overreach. Discuss.",
+      "pdf_pages": [
+        412,
+        413,
+        414
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 155,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "Highlighting the need of an All-India Judicial Services (AIJS), enumerate the various challenges associated with creation of an AIJS.",
+      "pdf_pages": [
+        415,
+        416
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 156,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "Identify the key areas of reforms required in the judicial system in India. In this context, examine the significance of the idea of putting in place an All-India Judicial Service.",
+      "pdf_pages": [
+        417,
+        418,
+        419
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 157,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "In a democratic setup, it is imperative that independence be balanced with accountability. Discuss in the context of judiciary in India.",
+      "pdf_pages": [
+        420,
+        421,
+        422
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 158,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Rishabh Choudhary",
+      "air": "28",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "Do you agree with the view that there is a need to enact a new law for ensuring judicial accountability in India?",
+      "pdf_pages": [
+        423,
+        424
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 159,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 10,
+      "score": "116",
+      "question": "How can the integration of technology into judicial processes enhance accessibility, capability, and efficiency in justice delivery?",
+      "pdf_pages": [
+        425,
+        426
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 160,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 10,
+      "score": "124",
+      "question": "How can the integration of technology into judicial processes enhance accessibility, capability, and efficiency in justice delivery?",
+      "pdf_pages": [
+        427,
+        428
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 161,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "125",
+      "question": "Technology has the potential to bring drastic changes in the field of law and transform the court system. In this context, discuss the need for digitization of Indian judiciary and challenges faced in this regard.",
+      "pdf_pages": [
+        429,
+        430,
+        431
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 162,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "125",
+      "question": "A dysfunctional criminal justice system, (absence of well-considered legislation and need for domain expertise, are being seen as the new challenges for the Indian judiciary. Discuss.",
+      "pdf_pages": [
+        432,
+        433,
+        434
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 163,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "What are the issues plaguing tribunals in India? Examine whether an independent autonomous body such as a National Tribunals Commission (NTC) can help in remedying these issues.",
+      "pdf_pages": [
+        435,
+        436,
+        437
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 164,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "125",
+      "question": "The tribunalisation of justice though considered to be an effective step is fraught with several challenges. Discuss in light of the Law Commission of India's report on the working of tribunals in India.",
+      "pdf_pages": [
+        438,
+        439,
+        440
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 165,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 15,
+      "score": "108",
+      "question": "Tribunals have been instrumental in providing alternate avenues for delivery of justice. In this context, critically examine the 'Tribunal, Appellate Tribunal and other Authorities, Rules, 2020'.",
+      "pdf_pages": [
+        441,
+        443,
+        444
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 166,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "What is the Doctrine of Severability? Discuss with the help of relevant judicial decisions.",
+      "pdf_pages": [
+        445,
+        446
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 167,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 15,
+      "score": "134",
+      "question": "Independent judiciary, as envisaged by the constitution, provides the bedrock for a thriving polity; however, executive encroachment may erode its credibility and affect its efficacy. Evaluate.",
+      "pdf_pages": [
+        447,
+        448,
+        449
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 168,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 15,
+      "score": "120",
+      "question": "To what extent can the PIL system be held responsible for shifting the focus of the higher Courts from constitutional matters to day-to-day matters? What role can the trial Courts play in reducing the overall burden on higher Courts?",
+      "pdf_pages": [
+        450,
+        451,
+        452
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 169,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "Discuss the role of the judiciary in electoral reforms citing suitable cases. How far do you agree that judiciary induced reforms violate the principle of separation of power?",
+      "pdf_pages": [
+        453,
+        454,
+        455
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 170,
+      "topic_id": 15,
+      "topic_name": "Judiciary",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "125",
+      "question": "Despite the benefits of wider representation of women in the judiciary, Indian courts have significantly fewer women as compared to men. Discuss. Also, suggest some measures to bridge the gender gap in Indian judiciary.",
+      "pdf_pages": [
+        456,
+        457,
+        458
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 171,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 10,
+      "score": "121",
+      "question": "Illustrate how pressure groups have emerged as a strong mechanism for making democracy participatory and responsive.",
+      "pdf_pages": [
+        460,
+        461
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 172,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "131",
+      "question": "Pressure groups and political parties are inherently similar in their objective to democratise the political process, however, more and more pressure groups today aspire to transform into political parties. Elaborate and highlight the factors that are encouraging this transformation.",
+      "pdf_pages": [
+        462,
+        463
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 173,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "131",
+      "question": "Pressure groups and political parties are inherently similar in their objective to democratise the political process, however, more and more pressure groups today aspire to transform into political parties. Elaborate and highlight the factors that are encouraging this transformation.",
+      "pdf_pages": [
+        464,
+        465
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 174,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "Since the paradigm shift from government to governance and further to good governance, pressure groups have emerged as a strong mechanism for making the democracy participatory, transparent, accountable and responsive. Elucidate.",
+      "pdf_pages": [
+        466,
+        467,
+        468
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 175,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "What are the methods used by pressure groups to influence public policy in India? In your opinion, whether pressure groups broaden democratic participation by voicing group concerns or subvert larger public interest to narrow group interests?",
+      "pdf_pages": [
+        469,
+        470
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 176,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 15,
+      "score": "120",
+      "question": "Pressure groups form the social foundation of a democracy. In this context, discuss pressure groups' key contributions in promoting social security measures for workers in India and how they address the gaps in existing policies.",
+      "pdf_pages": [
+        471,
+        472,
+        473
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 177,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "With suitable examples, discuss how environmental pressure groups enhance public participation and responsiveness with regard to environmental policies in India.",
+      "pdf_pages": [
+        474,
+        475
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 178,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 15,
+      "score": "121",
+      "question": "'Pressure groups have a significant impact on shaping public policy decisions in India.' Elucidate the contribution of business associations in influencing public policy formulation.",
+      "pdf_pages": [
+        476,
+        477,
+        478
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 179,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 10,
+      "score": "113",
+      "question": "How do partnerships between Civil Society Organizations and Government Entities contribute to India's development goals?",
+      "pdf_pages": [
+        479,
+        480
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 180,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Shreya Tyagi",
+      "air": "31",
+      "year": "2024",
+      "marks": 10,
+      "score": "",
+      "question": "How do partnerships between Civil Society Organizations and Government Entities contribute to India's development goals?",
+      "pdf_pages": [
+        481,
+        482
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 181,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "125",
+      "question": "Civil Society Organizations (CSOs) are not just engaged in charitable work but also involved in political processes for building a just, peaceful, humane, and sustainable future. Discuss with examples.",
+      "pdf_pages": [
+        483,
+        484,
+        485
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 182,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 15,
+      "score": "128",
+      "question": "Civil society organizations (CSOs) have played a stellar role in extension of human rights, protection of civil liberties and voicing the concerns of unheard, but critics argue that civil society has emerged as the new frontier of war and CSOs have hindered the socio-economic development of the nation. Give your opinion.",
+      "pdf_pages": [
+        486,
+        487,
+        488
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 183,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 10,
+      "score": "121",
+      "question": "Civil society organizations, play a pivotal role in fostering 'collective private action for the public good'. What challenges do they face in local resource mobilization (LRM) and corporate funding through corporate social responsibility (CSR)? Also, suggest measures.",
+      "pdf_pages": [
+        489,
+        490
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 184,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 15,
+      "score": "113",
+      "question": "To what extent does the level of internal democracy within political parties impact the functioning and legitimacy of the Indian party system? What reforms can address the challenges of inadequate intraparty democracy in India?",
+      "pdf_pages": [
+        491,
+        492,
+        493
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 185,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 10,
+      "score": "121",
+      "question": "To what extent has the inadequate intra-party democracy affected the functioning of Indian democracy.",
+      "pdf_pages": [
+        494,
+        495
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 186,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Do you agree with the view that adopting a framework for lobbying will strengthen participative governance and ease of doing business in India?",
+      "pdf_pages": [
+        496,
+        497
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 187,
+      "topic_id": 16,
+      "topic_name": "Pressure Groups and Formal/informal - association",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 15,
+      "score": "134",
+      "question": "Though lifeblood of a representative democracy, political parties are beset with challenges of their own, limiting their larger role in democratization of the society.",
+      "pdf_pages": [
+        498,
+        499,
+        500
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 188,
+      "topic_id": 17,
+      "topic_name": "RoPA,1951 and Election issues",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "'There is a need to shift the focus of Section 8 of the Representation of People Act, 1951 from the duration of the sentence to the gravity of the offence.' Comment on how the current classification under Section 8 leads to arbitrary categorisation of offences. Also, mention the remedies available to a person disqualified under this section.",
+      "pdf_pages": [
+        502,
+        503
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 189,
+      "topic_id": 17,
+      "topic_name": "RoPA,1951 and Election issues",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 15,
+      "score": "115",
+      "question": "Enumerate the salient features of Representation of People's Act, 1951. In your opinion, what amendments are needed in the Act to further the cause of free and fair elections in light of contemporary challenges.",
+      "pdf_pages": [
+        504,
+        505,
+        507
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 190,
+      "topic_id": 17,
+      "topic_name": "RoPA,1951 and Election issues",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 10,
+      "score": "121",
+      "question": "There is a need to resolve the ambiguity in the disqualification provisions under section 8 of the Representation of People Act 1951. Discuss.",
+      "pdf_pages": [
+        508,
+        509
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 191,
+      "topic_id": 17,
+      "topic_name": "RoPA,1951 and Election issues",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 15,
+      "score": "108",
+      "question": "Examine the significance of Representation of People's Act, 1951 in maintaining the sanctity of electoral politics in India. In light of recent events, evaluate the demands of Election Commission of India for reforms in RPA 1951 and Model Code of Conduct.",
+      "pdf_pages": [
+        510,
+        511,
+        512
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 192,
+      "topic_id": 17,
+      "topic_name": "RoPA,1951 and Election issues",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "Examine the significance of Representation of People's Act, 1951 in maintaining the sanctity of electoral politics in India. In light of recent events, evaluate the demands of Election Commission of India for reforms in RPA 1951 and Model Code of Conduct.",
+      "pdf_pages": [
+        513,
+        514,
+        515
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 193,
+      "topic_id": 17,
+      "topic_name": "RoPA,1951 and Election issues",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 15,
+      "score": "120",
+      "question": "Delimitation of seats is essential to ensure fair representation and uphold the principles of one vote, one value. Highlighting the challenges posed by misrepresentation in constituencies, analyse the ramifications of population-based delimitation in creating federal tension.",
+      "pdf_pages": [
+        516,
+        517,
+        518
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 194,
+      "topic_id": 17,
+      "topic_name": "RoPA,1951 and Election issues",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 15,
+      "score": "121",
+      "question": "Delimitation of seats is essential to ensure fair representation and uphold the principles of one vote, one value. Highlighting the challenges posed by misrepresentation in constituencies, analyse the ramifications of population-based delimitation in creating federal tension.",
+      "pdf_pages": [
+        519,
+        520,
+        521
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 195,
+      "topic_id": 17,
+      "topic_name": "RoPA,1951 and Election issues",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "Critically assess whether according statutory backing to the Model Code of Conduct will contribute towards free and fair elections in India.",
+      "pdf_pages": [
+        522,
+        523,
+        524
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 196,
+      "topic_id": 17,
+      "topic_name": "RoPA,1951 and Election issues",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "121",
+      "question": "Despite legislative changes with respect to funding of political parties in recent years, many challenges still exist with regards to transparency in electoral funding. Discuss. Can state funding of elections help in addressing these challenges?",
+      "pdf_pages": [
+        525,
+        526,
+        527
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 197,
+      "topic_id": 17,
+      "topic_name": "RoPA,1951 and Election issues",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "Subsidies have morphed into a populist tool to achieve electoral objectives rather than developmental goals. Examine.",
+      "pdf_pages": [
+        528,
+        529
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 198,
+      "topic_id": 17,
+      "topic_name": "RoPA,1951 and Election issues",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 10,
+      "score": "108",
+      "question": "Cleansing elections is the most important route to improve ethical standards in politics, to curb corruption and rectify maladministration. Examine.",
+      "pdf_pages": [
+        530,
+        531
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 199,
+      "topic_id": 17,
+      "topic_name": "RoPA,1951 and Election issues",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 15,
+      "score": "128",
+      "question": "Examine various existing mechanisms for controlling money and muscle power in elections. Discuss why criminal elements find it easy to succeed in politics and how the trend of increasing criminalization of politics can be reversed.",
+      "pdf_pages": [
+        532,
+        533,
+        534
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 200,
+      "topic_id": 17,
+      "topic_name": "RoPA,1951 and Election issues",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 15,
+      "score": "120",
+      "question": "Electoral funding in India is fraught with the double whammy of legal loopholes and political inefficiencies. In this context, discuss the challenges to electoral funding. What lessons can India draw from global best practices in this regard?",
+      "pdf_pages": [
+        535,
+        536,
+        537
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 201,
+      "topic_id": 17,
+      "topic_name": "RoPA,1951 and Election issues",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 10,
+      "score": "128",
+      "question": "Though necessary; timely, free and fair elections are not sufficient to ensure a vibrant democracy. In your opinion, what are the essential requirements for a vibrant democracy?",
+      "pdf_pages": [
+        538,
+        539
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 202,
+      "topic_id": 17,
+      "topic_name": "RoPA,1951 and Election issues",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Subsidies have morphed into a populist tool to achieve electoral objectives rather than developmental goals. Examine.",
+      "pdf_pages": [
+        540,
+        541
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 203,
+      "topic_id": 18,
+      "topic_name": "Constitutional bodies",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 10,
+      "score": "121",
+      "question": "Examine how the Comptroller and Auditor General of India contributes to enhancing transparency and accountability within government operations.",
+      "pdf_pages": [
+        543,
+        544
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 204,
+      "topic_id": 18,
+      "topic_name": "Constitutional bodies",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 10,
+      "score": "108",
+      "question": "The role of CAG as the highest auditing authority is intrinsically linked to augmenting the efficacy of government policies and undertakings. In this context, examine how independent and efficient working of the CAG can ensure good governance?",
+      "pdf_pages": [
+        545,
+        546
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 205,
+      "topic_id": 18,
+      "topic_name": "Constitutional bodies",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "The role of CAG as the highest auditing authority is intrinsically linked to augmenting the efficacy of government policies and undertakings. In this context, examine how independent and efficient working of the CAG can ensure good governance?",
+      "pdf_pages": [
+        547,
+        548
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 206,
+      "topic_id": 18,
+      "topic_name": "Constitutional bodies",
+      "topper": "Rishabh Choudhary",
+      "air": "28",
+      "year": "2024",
+      "marks": 15,
+      "score": "120",
+      "question": "The recent judgment of the Supreme Court on appointments to the Election Commission of India (ECI) has fundamentally changed the appointment process and can have potentially far-reaching implications. Discuss.",
+      "pdf_pages": [
+        549,
+        550,
+        551
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 207,
+      "topic_id": 18,
+      "topic_name": "Constitutional bodies",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2021",
+      "marks": 15,
+      "score": "128",
+      "question": "While the Election Commission of India has quite effectively neutralized the effect of muscle power and incumbency power, the commission has newer challenges to face. Discuss in the light of several long pending reform proposals that aim to clean up electoral process.",
+      "pdf_pages": [
+        552,
+        553,
+        554
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 208,
+      "topic_id": 18,
+      "topic_name": "Constitutional bodies",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 10,
+      "score": "108",
+      "question": "The Constitution of India envisages the Finance Commission as the balancing wheel of fiscal federalism in India. Discuss.",
+      "pdf_pages": [
+        555,
+        556
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 209,
+      "topic_id": 18,
+      "topic_name": "Constitutional bodies",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 15,
+      "score": "113",
+      "question": "In what ways are the terms of reference of the 16th Finance Commission different from that of the previous Finance Commissions? Despite increasingly progressive devolution by subsequent Finance Commissions, examine the factors that propel economic disparities across various States.",
+      "pdf_pages": [
+        557,
+        558,
+        559
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 210,
+      "topic_id": 18,
+      "topic_name": "Constitutional bodies",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "The Finance Commission plays a crucial role in balancing fiscal federalism in India. In this context, examine the recommendations given by the 15th Finance Commission.",
+      "pdf_pages": [
+        560,
+        561,
+        562
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 211,
+      "topic_id": 18,
+      "topic_name": "Constitutional bodies",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 10,
+      "score": "121",
+      "question": "Highlight the importance of State Finance Commission in strengthening fiscal federalism in India. Do you agree with the view that they have not been provided with the necessary environment to play their rightful role?",
+      "pdf_pages": [
+        563,
+        564
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 212,
+      "topic_id": 18,
+      "topic_name": "Constitutional bodies",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 15,
+      "score": "108",
+      "question": "Despite the provisions for independence of State Election Commissioners, recent instances show that they are not functioning according to their mandate. In this context, highlight the various issues in the functioning of the SECs and suggest measures to improve upon them.",
+      "pdf_pages": [
+        565,
+        566,
+        567
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 213,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "131",
+      "question": "Discuss the mandate of the Central Administrative Tribunal (CAT). To what extent earlier SC verdicts have resolved the jurisdictional tussle between CAT and High courts?",
+      "pdf_pages": [
+        569,
+        570
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 214,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 15,
+      "score": "116",
+      "question": "While the Central Bureau of Investigation (CBI) plays a crucial role in combating corruption, its functioning is often criticized for being partisan and acting against the federal spirit. Discuss with the help of suitable examples.",
+      "pdf_pages": [
+        571,
+        572,
+        573
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 215,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 15,
+      "score": "124",
+      "question": "While the Central Bureau of Investigation (CBI) plays a crucial role in combating corruption, its functioning is often criticized for being partisan and acting against the federal spirit. Discuss with the help of suitable examples.",
+      "pdf_pages": [
+        574,
+        575,
+        576
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 216,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 15,
+      "score": "131",
+      "question": "'Central Information Commission stands as the guardian of democracy, with an unwavering relevance to good governance.' Justify the context in terms of the mandate of the CIC. Has the statutory status limited the effectiveness of the commission in recent times?",
+      "pdf_pages": [
+        577,
+        578,
+        579
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 217,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "The Central Information Commission plays a key role in empowering people through information. In this context, discuss the issues faced by it and suggest measures that are required to strengthen the institution.",
+      "pdf_pages": [
+        580,
+        581
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 218,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 15,
+      "score": "130",
+      "question": "The market disruption caused by digital revolution warrants renewed focus and perspective to ensure fair competition in the digital economy. In this light, discuss the need to revamp the Competition Commission of India (CCI).",
+      "pdf_pages": [
+        582,
+        583,
+        584
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 219,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Do you think the Competition Commission of India (CCI) has been as successful in protecting consumer rights, promoting fair competition and restricting monopolistic tendencies, vis a vis its western counter part?",
+      "pdf_pages": [
+        585,
+        586
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 220,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 15,
+      "score": "132",
+      "question": "The role of the Competition Commission of India (CCI) is significant in furthering healthy competitiveness aimed at inspiring stakeholders to innovate and augment effectiveness. Comment.",
+      "pdf_pages": [
+        587,
+        588,
+        589
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 221,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "125",
+      "question": "Discuss the role played by the Directorate of Enforcement in the investigation of offence of money laundering and violations of foreign exchange laws.",
+      "pdf_pages": [
+        590,
+        591
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 222,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 15,
+      "score": "134",
+      "question": "Executive agencies, working as the watchdog against impropriety, are vital to act against the corrupt; however, pandering to vested interests may have the effect of turning the idea of rule of law on its head. Comment, with special reference to controversies associated with the Enforcement Directorate (ED).",
+      "pdf_pages": [
+        592,
+        593,
+        594
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 223,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "Contrary to expectations surrounding its enactment, the institution of Lokpal has not proved path-breaking in dismantling the structures of corruption in public life. Analyze.",
+      "pdf_pages": [
+        595,
+        596
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 224,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Kunal Rastogi",
+      "air": "15",
+      "year": "2023",
+      "marks": 15,
+      "score": "134",
+      "question": "Critically analyse the role of National Commission for Women (NCW) in wake of its mandate to safeguard women's rights and uphold their socio-economic wellbeing.",
+      "pdf_pages": [
+        597,
+        598,
+        599
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 225,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Thakur Anjali Ajay",
+      "air": "43",
+      "year": "2023",
+      "marks": 15,
+      "score": "121",
+      "question": "Discuss the crucial role played by the National Commission of Women in shaping the discourse on gender-sensitive laws in India. To what extent the elevation of the National Commission for Women to a constitutional body would reinforce its authority?",
+      "pdf_pages": [
+        600,
+        601,
+        602
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 226,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 15,
+      "score": "108",
+      "question": "While providing constitutional recognition to the National Commission for Backward Classes (NCBC) is a step forward for the welfare of Socially and Economically Backward Classes, it might not be sufficient to improve the effectiveness of Commission's working and outcomes. Elucidate.",
+      "pdf_pages": [
+        603,
+        604,
+        605
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 227,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 10,
+      "score": "116",
+      "question": "Evaluate the effectiveness of the National Commission for Scheduled Castes in safeguarding the interests of the Scheduled Castes in India.",
+      "pdf_pages": [
+        606,
+        607
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 228,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Trilok Singh",
+      "air": "20",
+      "year": "2024",
+      "marks": 10,
+      "score": "124",
+      "question": "Evaluate the effectiveness of the National Commission for Scheduled Castes in safeguarding the interests of the Scheduled Castes in India.",
+      "pdf_pages": [
+        608,
+        609
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 229,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "130",
+      "question": "National Commission for Scheduled Tribes (NCST) can be most effective when its tasks are adequately supported by other mechanisms that improve the voice of the tribals. Discuss.",
+      "pdf_pages": [
+        610,
+        611
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 230,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 15,
+      "score": "131",
+      "question": "The National Commission for Scheduled Tribe (NCST) has largely been confined to a monitoring and advisory role. What are the impediments in the functioning of NCST despite the constitutional status, also suggests reforms.",
+      "pdf_pages": [
+        612,
+        613,
+        614
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 231,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Aditya Srivastava",
+      "air": "1",
+      "year": "2023",
+      "marks": 10,
+      "score": "132",
+      "question": "National Commission for Scheduled Tribes (NCST) can be most effective when its tasks are adequately supported by other mechanisms that improve the voice of the tribals. Discuss.",
+      "pdf_pages": [
+        615,
+        616
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 232,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Banna Venkatesh",
+      "air": "15",
+      "year": "2024",
+      "marks": 15,
+      "score": "116",
+      "question": "How far do you agree with the view that the National Green Tribunal (NGT) has met its objective of ensuring environmental justice in India?",
+      "pdf_pages": [
+        617,
+        618,
+        619
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 233,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 15,
+      "score": "113",
+      "question": "'The NHRC must not only be a watchdog but also a beacon of hope for the marginalized and oppressed.' In this context discuss the role and mandate of the National Human Rights Commission (NHRC) in India. How does the current composition and functioning of the NHRC affect its independence and effectiveness?",
+      "pdf_pages": [
+        620,
+        621,
+        622
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 234,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 15,
+      "score": "108",
+      "question": "How far do you think NHRC has been successful in preserving the human rights in India? Critically examine how the Protection of Human Rights (Amendment) Act, 2019 will influence the functioning of the commission.",
+      "pdf_pages": [
+        623,
+        625,
+        626
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 235,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 10,
+      "score": "121",
+      "question": "Explain the structure and functions of the National Human Rights Commission. In view of its functioning since its inception, suggest measures for further improvement.",
+      "pdf_pages": [
+        627,
+        628
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 236,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Mayur Hazarika",
+      "air": "5",
+      "year": "2022",
+      "marks": 10,
+      "score": "108",
+      "question": "What is the mandate of Securities and Exchange Board of India? How will consolidation of the provisions of SEBI Act, 1992, Depositories Act, 1996, Securities Contracts Regulation Act (SCRA), 1956 and Government Securities Act, 2007 into a single Securities Markets Code benefit functioning of SEBI?",
+      "pdf_pages": [
+        629,
+        630
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 237,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Mudita Bansal",
+      "air": "44",
+      "year": "2024",
+      "marks": 10,
+      "score": "115",
+      "question": "Assess the effectiveness of SEBI in fulfilling its envisaged role of regulating the securities market, ensuring transparency, and protecting investors' interests.",
+      "pdf_pages": [
+        631,
+        632
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 238,
+      "topic_id": 19,
+      "topic_name": "Statutory , Regulatory and Quasi - Judicial bodies",
+      "topper": "Ashi Sharma",
+      "air": "12",
+      "year": "2024",
+      "marks": 10,
+      "score": "120",
+      "question": "Federal governance is characterised by institutionalized arrangements for solving problems generated by pluralism based on consultation and mutual consent. How have Zonal Councils evolved from merely advisory bodies to proactive platforms for action?",
+      "pdf_pages": [
+        633,
+        634,
+        635
+      ]
+    }
+  ]
+}

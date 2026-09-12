@@ -1,0 +1,1977 @@
+{
+  "paper_title": "General Studies 1 — Geography",
+  "subject": "Geography",
+  "total_pdf_pages": 314,
+  "license_pages_skipped": [
+    15,
+    136,
+    186,
+    195,
+    292,
+    298,
+    306
+  ],
+  "syllabus_index": [
+    {
+      "topic_id": 1,
+      "title": "Geography",
+      "page": 1,
+      "slug": "01-geography"
+    },
+    {
+      "topic_id": 2,
+      "title": "Geomorphology",
+      "page": 5,
+      "slug": "02-geomorphology"
+    },
+    {
+      "topic_id": 3,
+      "title": "Climatology",
+      "page": 51,
+      "slug": "03-climatology"
+    },
+    {
+      "topic_id": 4,
+      "title": "Oceanography",
+      "page": 94,
+      "slug": "04-oceanography"
+    },
+    {
+      "topic_id": 5,
+      "title": "Indian Geography",
+      "page": 127,
+      "slug": "05-indian-geography"
+    },
+    {
+      "topic_id": 6,
+      "title": "Distribution of key natural resources",
+      "page": 162,
+      "slug": "06-distribution-of-key-natural-resources"
+    },
+    {
+      "topic_id": 7,
+      "title": "Factors responsible for location of industries",
+      "page": 219,
+      "slug": "07-factors-responsible-for-location-of-industries"
+    },
+    {
+      "topic_id": 8,
+      "title": "Environmental issues",
+      "page": 244,
+      "slug": "08-environmental-issues"
+    },
+    {
+      "topic_id": 9,
+      "title": "Disasters",
+      "page": 264,
+      "slug": "09-disasters"
+    }
+  ],
+  "entries": [
+    {
+      "kind": "answer",
+      "global_id": 1,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "112",
+      "question": "How does the theory of plate tectonics help in explaining the differences in the formation of the Himalayas and Andes mountains?",
+      "pdf_pages": [
+        6,
+        7
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 2,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "119",
+      "question": "How does plate tectonic theory help in explaining the causes of earthquakes and volcanoes? Discuss and give an account of various volcanic landforms.",
+      "pdf_pages": [
+        8,
+        9
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 3,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 15,
+      "score": "92",
+      "question": "Compare the Continental Drift Theory and Plate Tectonic Theory. How does Plate Tectonic Theory explain orogenesis and volcanism?",
+      "pdf_pages": [
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 4,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 15,
+      "score": "17",
+      "question": "Explain the mechanism and occurrence of earthquake. With the help of map given below, throw light upon the vulnerability of regions affected by earthquake and earthquake related disasters.",
+      "pdf_pages": [
+        13,
+        14,
+        16
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 5,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 10,
+      "score": "92",
+      "question": "What are seismic waves? How do seismic waves help in understanding of internal structure of the earth?",
+      "pdf_pages": [
+        17,
+        18
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 6,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Nausheen",
+      "air": "9",
+      "year": "2023",
+      "marks": 10,
+      "score": "",
+      "question": "To what extent does seismic investigation contribute to our understanding of the Earth's interior structure? Analyze its significance in detail.",
+      "pdf_pages": [
+        19,
+        20
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 7,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 10,
+      "score": "109",
+      "question": "Despite being destructive in nature, volcanoes are critical for the existence of human life on earth. Elucidate.",
+      "pdf_pages": [
+        21,
+        22
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 8,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 15,
+      "score": "102",
+      "question": "Explain the process of formation of volcanic calderas. How do they contribute to the scenic beauty of the region?",
+      "pdf_pages": [
+        23,
+        24,
+        25
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 9,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Shreya Tyagi",
+      "air": "31",
+      "year": "2024",
+      "marks": 10,
+      "score": "",
+      "question": "Discuss the processes involved in volcanism. Highlight the major volcanic regions in the world and their associated tectonic settings.",
+      "pdf_pages": [
+        26,
+        27
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 10,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Aayushi Bansal",
+      "air": "7",
+      "year": "2024",
+      "marks": 10,
+      "score": "",
+      "question": "Briefly discuss the role of plate tectonics theory in explaining the location of volcanoes. Also, explain the multifarious impacts of volcanoes on the surrounding regions.",
+      "pdf_pages": [
+        28,
+        29
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 11,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 10,
+      "score": "92",
+      "question": "Describe different types of mass movements and their impacts.",
+      "pdf_pages": [
+        30,
+        31
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 12,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Aishwarya Verma",
+      "air": "4",
+      "year": "2021",
+      "marks": 10,
+      "score": "",
+      "question": "What are endogenic forces? Highlight their types and discuss the role played by them in forming various landforms on the earth.",
+      "pdf_pages": [
+        32,
+        33
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 13,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 15,
+      "score": "109",
+      "question": "Highlighting the factors behind the formation of different types of deserts, give a brief account of the major landforms found in them.",
+      "pdf_pages": [
+        34,
+        35,
+        36
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 14,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Prashant Raj",
+      "air": "97",
+      "year": "2022",
+      "marks": 15,
+      "score": "120",
+      "question": "How are plateaus formed? Also, briefly discuss the features of the Deccan plateau and its economic significance.",
+      "pdf_pages": [
+        37,
+        38
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 15,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Shubham Kumar",
+      "air": "1",
+      "year": "2020",
+      "marks": 15,
+      "score": "115",
+      "question": "How are plateaus formed? Also, briefly discuss the features of the Deccan plateau and its economic significance.",
+      "pdf_pages": [
+        39,
+        40,
+        41
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 16,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Shubham Kumar",
+      "air": "1",
+      "year": "2020",
+      "marks": 15,
+      "score": "115",
+      "question": "Describe the process of rift valley formation, with special emphasis on the Great Rift Valley System.",
+      "pdf_pages": [
+        42,
+        43,
+        44
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 17,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Divyank Gupta",
+      "air": "21",
+      "year": "2024",
+      "marks": 15,
+      "score": "111",
+      "question": "What are the various types of glacial landforms formed in the Indian Himalayas. How do these features impact local ecosystems and human activities?",
+      "pdf_pages": [
+        45,
+        46,
+        47
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 18,
+      "topic_id": 2,
+      "topic_name": "Geomorphology",
+      "topper": "Shreya Tyagi",
+      "air": "31",
+      "year": "2024",
+      "marks": 15,
+      "score": "",
+      "question": "What are the various types of glacial landforms formed in the Indian Himalayas. How do these features impact local ecosystems and human activities?",
+      "pdf_pages": [
+        48,
+        49,
+        50
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 19,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 10,
+      "score": "",
+      "question": "What are air masses? Highlight their role in affecting the local climate.",
+      "pdf_pages": [
+        52,
+        53,
+        54
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 20,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 15,
+      "score": "92",
+      "question": "Describe the tri-cellular model of global atmospheric circulation. Examine its significance in explaining the world climatic patterns.",
+      "pdf_pages": [
+        55,
+        56,
+        57
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 21,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Aishwarya Verma",
+      "air": "4",
+      "year": "2021",
+      "marks": 10,
+      "score": "",
+      "question": "What is Madden-Julian Oscillation? How does it differ from El-Nino? Discuss its impact on Indian Monsoon.",
+      "pdf_pages": [
+        58,
+        59
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 22,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Shruti Sharma",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "119",
+      "question": "Closed wind circulations in the form of cells aids and abates transportation of heat in atmosphere as well as determine the global weather pattern. Explain.",
+      "pdf_pages": [
+        60,
+        61,
+        62
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 23,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Nausheen",
+      "air": "9",
+      "year": "2023",
+      "marks": 10,
+      "score": "",
+      "question": "Discuss the various factors responsible for the uneven temperature distribution on Earth's surface.",
+      "pdf_pages": [
+        63,
+        64
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 24,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "",
+      "question": "Despite continuous incidence of solar energy, earth's average temperature remains almost constant. Explain the reasons behind this. In this regard, discuss the heat budget of earth and enumerate the factors that control the distribution of temperature on earth's surface.",
+      "pdf_pages": [
+        65,
+        66,
+        67
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 25,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 10,
+      "score": "109",
+      "question": "Discuss why the Bay of Bengal is more prone to cyclones than the Arabian Sea. Also, explain the reasons for the decrease in frequency of tropical cyclones during the Southwest monsoon season.",
+      "pdf_pages": [
+        68,
+        69
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 26,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Aditya Vikran Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 10,
+      "score": "17",
+      "question": "What are the suitable conditions for the formation of a tropical cyclone? Also, bring out differences between a tropical and an extra-tropical cyclone.",
+      "pdf_pages": [
+        70,
+        71
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 27,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 10,
+      "score": "92",
+      "question": "What are the suitable conditions for the formation of a tropical cyclone? Also, bring out differences between a tropical and an extra-tropical cyclone.",
+      "pdf_pages": [
+        72,
+        73
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 28,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 15,
+      "score": "121",
+      "question": "Cryosphere changes have a tendency to bring about a devastating impact on the ecosystem and its people. Discuss. Also, enlist measures to tackle this threat.",
+      "pdf_pages": [
+        74,
+        75,
+        76
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 29,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 10,
+      "score": "92",
+      "question": "Why is Antarctic becoming an area of renewed human interest? Examine the significance of Antarctic bill, 2022 in protecting India's interest in the region.",
+      "pdf_pages": [
+        77,
+        78
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 30,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Aditya Vikran Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 10,
+      "score": "17",
+      "question": "Why is Antarctic becoming an area of renewed human interest? Examine the significance of Antarctic bill, 2022 in protecting India's interest in the region.",
+      "pdf_pages": [
+        79,
+        80
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 31,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Shreya Tyagi",
+      "air": "31",
+      "year": "2024",
+      "marks": 10,
+      "score": "",
+      "question": "What are the potential consequences of Arctic ice melt on biodiversity and ecosystems? How might these changes impact global ecological balance?",
+      "pdf_pages": [
+        81,
+        82
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 32,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "112",
+      "question": "Discuss the potential of natural resources in the Arctic region as drivers of economic development, while also considering the environmental and social impacts of their exploitation.",
+      "pdf_pages": [
+        83,
+        84,
+        85
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 33,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Aayushi Bansal",
+      "air": "7",
+      "year": "2024",
+      "marks": 15,
+      "score": "",
+      "question": "Examine the impacts of climate change on the hydrological cycle and suggest suitable mitigation and adaptation strategies to contain the harmful implications.",
+      "pdf_pages": [
+        86,
+        87,
+        88
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 34,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Nausheen",
+      "air": "9",
+      "year": "2023",
+      "marks": 10,
+      "score": "",
+      "question": "The melting of glaciers due to climate change has serious implications for the ecosystem and human society. Discuss the effects of melting glaciers on the environment and the measures that can be taken to address this issue.",
+      "pdf_pages": [
+        89,
+        90
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 35,
+      "topic_id": 3,
+      "topic_name": "Climatology",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 15,
+      "score": "92",
+      "question": "What makes India one of the most vulnerable regions to climate change? Discuss the role of governments, citizens, and businesses in building climate resilience.",
+      "pdf_pages": [
+        91,
+        92,
+        93
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 36,
+      "topic_id": 4,
+      "topic_name": "Oceanography",
+      "topper": "Aayushi Bansal",
+      "air": "7",
+      "year": "2024",
+      "marks": 15,
+      "score": "",
+      "question": "Defining continental shelf, highlight its resource potential and ecological significance.",
+      "pdf_pages": [
+        95,
+        96,
+        97
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 37,
+      "topic_id": 4,
+      "topic_name": "Oceanography",
+      "topper": "Saikiran Nandala",
+      "air": "27",
+      "year": "2023",
+      "marks": 15,
+      "score": "99",
+      "question": "Defining continental shelf, highlight its resource potential and ecological significance.",
+      "pdf_pages": [
+        98,
+        99,
+        100
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 38,
+      "topic_id": 4,
+      "topic_name": "Oceanography",
+      "topper": "Nausheen",
+      "air": "9",
+      "year": "2023",
+      "marks": 15,
+      "score": "",
+      "question": "The configuration of the ocean floor provides essential information about the geological processes that have shaped the Earth's surface. Discuss the major features of the ocean floor and their significance in the study of oceanography.",
+      "pdf_pages": [
+        101,
+        102,
+        103
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 39,
+      "topic_id": 4,
+      "topic_name": "Oceanography",
+      "topper": "Shreya Tyagi",
+      "air": "31",
+      "year": "2024",
+      "marks": 15,
+      "score": "",
+      "question": "Discuss the unique geographical features of the Indian Ocean and their impact on global oceanic circulation patterns. How do these features influence the climate of the Indian subcontinent?",
+      "pdf_pages": [
+        104,
+        105
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 40,
+      "topic_id": 4,
+      "topic_name": "Oceanography",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 10,
+      "score": "102",
+      "question": "How are ocean trenches formed? Describe the significant characteristics of these oceanic relief formations.",
+      "pdf_pages": [
+        106,
+        107
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 41,
+      "topic_id": 4,
+      "topic_name": "Oceanography",
+      "topper": "Smriti Mishra",
+      "air": "4",
+      "year": "2022",
+      "marks": 15,
+      "score": "113",
+      "question": "Account for variations in oceanic temperature and discuss its multi-dimensional effects.",
+      "pdf_pages": [
+        108,
+        109,
+        110
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 42,
+      "topic_id": 4,
+      "topic_name": "Oceanography",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 10,
+      "score": "121",
+      "question": "It is said that the world's oceans are losing their 'memory' due to human-induced warming. Comment. Also, discuss the consequences of the phenomenon.",
+      "pdf_pages": [
+        111,
+        112
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 43,
+      "topic_id": 4,
+      "topic_name": "Oceanography",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 15,
+      "score": "121",
+      "question": "Account for variations in oceanic temperature and discuss its multi-dimensional effects.",
+      "pdf_pages": [
+        113,
+        114,
+        115
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 44,
+      "topic_id": 4,
+      "topic_name": "Oceanography",
+      "topper": "Aditya Vikran Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 15,
+      "score": "17",
+      "question": "Discuss the causes for salinity ingress along with its various consequences and potential solutions.",
+      "pdf_pages": [
+        116,
+        117,
+        118
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 45,
+      "topic_id": 4,
+      "topic_name": "Oceanography",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "93",
+      "question": "How does oceanic salinity vary across different regions of the world's oceans, and what factors contribute to these variations?",
+      "pdf_pages": [
+        119,
+        120
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 46,
+      "topic_id": 4,
+      "topic_name": "Oceanography",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 15,
+      "score": "17",
+      "question": "Enumerating different types of tides highlight their significance. Also, explain how tides are different from waves.",
+      "pdf_pages": [
+        121,
+        122,
+        123
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 47,
+      "topic_id": 4,
+      "topic_name": "Oceanography",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 15,
+      "score": "92",
+      "question": "Describe the various factors responsible for formation of ocean currents and discuss their impact on different human activities.",
+      "pdf_pages": [
+        124,
+        125,
+        126
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 48,
+      "topic_id": 5,
+      "topic_name": "Indian Geography",
+      "topper": "Aditya Vikran Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 10,
+      "score": "17",
+      "question": "How does the Eastern coast of India differ in its geographical features from the western coast?",
+      "pdf_pages": [
+        128,
+        129
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 49,
+      "topic_id": 5,
+      "topic_name": "Indian Geography",
+      "topper": "Smriti Mishra",
+      "air": "4",
+      "year": "2022",
+      "marks": 10,
+      "score": "113",
+      "question": "Why does Western Ghat receive more rainfall than Eastern Ghat? How does the rainfall variation impact the vegetation and human activities in these regions?",
+      "pdf_pages": [
+        130,
+        131
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 50,
+      "topic_id": 5,
+      "topic_name": "Indian Geography",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 10,
+      "score": "121",
+      "question": "Why does Western Ghat receive more rainfall than Eastern Ghat? How does the rainfall variation impact the vegetation and human activities in these regions?",
+      "pdf_pages": [
+        132,
+        133
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 51,
+      "topic_id": 5,
+      "topic_name": "Indian Geography",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 10,
+      "score": "92",
+      "question": "How does the Eastern coast of India differ in its geographical features from the western coast?",
+      "pdf_pages": [
+        134,
+        135
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 52,
+      "topic_id": 5,
+      "topic_name": "Indian Geography",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 10,
+      "score": "102",
+      "question": "Identify the reasons behind increasing number of extreme rainfall events throughout India in recent times. Assess their socio-economic impact.",
+      "pdf_pages": [
+        137,
+        138
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 53,
+      "topic_id": 5,
+      "topic_name": "Indian Geography",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 15,
+      "score": "93",
+      "question": "Explain the various stages of the formation of The Great Himalayas. How Eastern Himalayas is different from Western Himalayas?",
+      "pdf_pages": [
+        139,
+        140,
+        141
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 54,
+      "topic_id": 5,
+      "topic_name": "Indian Geography",
+      "topper": "Aishwarya Verma",
+      "air": "4",
+      "year": "2021",
+      "marks": 10,
+      "score": "",
+      "question": "In context of the significance of the Himalayan mountain system for South Asia, explain the factors responsible for melting of glaciers and its impact on the region.",
+      "pdf_pages": [
+        142,
+        143
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 55,
+      "topic_id": 5,
+      "topic_name": "Indian Geography",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 10,
+      "score": "92",
+      "question": "Explain the impacts of Himalayas on the climatic condition of the country.",
+      "pdf_pages": [
+        144,
+        145
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 56,
+      "topic_id": 5,
+      "topic_name": "Indian Geography",
+      "topper": "Aishwarya Verma",
+      "air": "4",
+      "year": "2021",
+      "marks": 15,
+      "score": "",
+      "question": "Pre-monsoon season in India is characterised by thunderstorms, lightning and many such events. In this context, explain how thunderstorms are formed and discuss the impact of pre-monsoonal rainfall in various regions of India.",
+      "pdf_pages": [
+        146,
+        147,
+        148
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 57,
+      "topic_id": 5,
+      "topic_name": "Indian Geography",
+      "topper": "Nausheen",
+      "air": "9",
+      "year": "2023",
+      "marks": 15,
+      "score": "",
+      "question": "The Indian monsoon is a complex phenomenon influenced by various climatic factors. Critically examine the role of oceanic and atmospheric factors in determining the intensity and distribution of monsoon rainfall in India.",
+      "pdf_pages": [
+        149,
+        150,
+        151
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 58,
+      "topic_id": 5,
+      "topic_name": "Indian Geography",
+      "topper": "Aditya Vikran Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 10,
+      "score": "17",
+      "question": "Examining the reasons behind erratic Monsoon, highlight the possible outcomes of the same.",
+      "pdf_pages": [
+        152,
+        153
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 59,
+      "topic_id": 5,
+      "topic_name": "Indian Geography",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 10,
+      "score": "",
+      "question": "Explain the phenomenon of El Nino and La Nina. How do they affect the weather system in various parts of the world?",
+      "pdf_pages": [
+        154,
+        155,
+        156
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 60,
+      "topic_id": 5,
+      "topic_name": "Indian Geography",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "93",
+      "question": "Explain the origin of Indian islands in the Bay of Bengal and the Indian Ocean.",
+      "pdf_pages": [
+        157,
+        158
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 61,
+      "topic_id": 5,
+      "topic_name": "Indian Geography",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 15,
+      "score": "92",
+      "question": "Analyze the significance of topography of a region in determining its climatic conditions. Also, discuss the other factors that influence the climate of a region with relevant examples.",
+      "pdf_pages": [
+        159,
+        160,
+        161
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 62,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 10,
+      "score": "93",
+      "question": "What are critical minerals, and how do they influence technological advancement and national security?",
+      "pdf_pages": [
+        163,
+        164
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 63,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "112",
+      "question": "While critical minerals are driving the clean energy transition, they bring new vulnerabilities with regard to energy security. Discuss.",
+      "pdf_pages": [
+        165,
+        166
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 64,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Nausheen",
+      "air": "9",
+      "year": "2023",
+      "marks": 15,
+      "score": "",
+      "question": "With the growing demand for rare earth elements, their distribution has become a critical aspect of the global economy. Discuss the distribution of rare earth elements across the world, their uses, and the environmental impact of their extraction.",
+      "pdf_pages": [
+        167,
+        168,
+        169
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 65,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Aishwarya Verma",
+      "air": "4",
+      "year": "2021",
+      "marks": 15,
+      "score": "",
+      "question": "Diversification of energy basket is no longer a choice for India, it has become a necessity. Elucidate.",
+      "pdf_pages": [
+        170,
+        171,
+        172
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 66,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Shubham Kumar",
+      "air": "1",
+      "year": "2020",
+      "marks": 15,
+      "score": "115",
+      "question": "Identify the major Uranium reserves in the world and the countries from where India sources it. What measures are required to ensure supply security of fuel for nuclear plants in the country?",
+      "pdf_pages": [
+        173,
+        174,
+        175
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 67,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 15,
+      "score": "109",
+      "question": "Giving an account of the major lithium-producing countries, discuss the geo-political aspects of lithium production and its environmental implications.",
+      "pdf_pages": [
+        176,
+        177,
+        178
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 68,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Aditya Vikram Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 15,
+      "score": "17",
+      "question": "The economic and strategic significance of mineral wealth of a country cannot be seen in isolation from the associated socio-ecological impacts of their extraction. Discuss in light of the newfound lithium reserves in Northern India.",
+      "pdf_pages": [
+        179,
+        180,
+        181
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 69,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 15,
+      "score": "121",
+      "question": "What do you understand by the Arctic Paradox? Highlight the spatial distribution of mineral and energy resources in the Arctic region.",
+      "pdf_pages": [
+        182,
+        183,
+        184
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 70,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 10,
+      "score": "92",
+      "question": "Discuss the economic significance of the 'Chotanagpur Plateau' region.",
+      "pdf_pages": [
+        185,
+        187
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 71,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "",
+      "question": "Which are the major iron ore producing regions in the world? With examples, discuss the factors that influence the location of Iron and Steel industry.",
+      "pdf_pages": [
+        188,
+        189,
+        190
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 72,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Shubham Kumar",
+      "air": "1",
+      "year": "2020",
+      "marks": 10,
+      "score": "115",
+      "question": "Analyse the phenomenon of 'Resource Curse', by giving adequate examples from around the world as well as India.",
+      "pdf_pages": [
+        191,
+        192
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 73,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 15,
+      "score": "109",
+      "question": "Discuss the reasons behind unsustainable management of sand resources in India. Highlighting its impact, enumerate the remedial measures taken in this context.",
+      "pdf_pages": [
+        193,
+        194,
+        196
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 74,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 15,
+      "score": "121",
+      "question": "Sand is not only critical for economic development but also provides crucial ecosystem services. Elaborate. In this context, discuss the importance of sustainable sand mining in India.",
+      "pdf_pages": [
+        197,
+        198,
+        199
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 75,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Prashant Raj",
+      "air": "97",
+      "year": "2022",
+      "marks": 15,
+      "score": "120",
+      "question": "Natural gas has become an important primary energy source and its consumption is projected to increase further. Identify various usages of natural gas and give a brief account of its distribution globally.",
+      "pdf_pages": [
+        200,
+        201,
+        202
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 76,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 10,
+      "score": "92",
+      "question": "Natural resource-based planning is the key to achieving sustainability and addressing regional imbalances in development. Examine.",
+      "pdf_pages": [
+        203,
+        204
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 77,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 15,
+      "score": "92",
+      "question": "All deserts are rain deficit, but are formed due to different reasons. Discuss. Also, analyse various adaptations in the flora and fauna to survive the water deficit conditions.",
+      "pdf_pages": [
+        205,
+        206,
+        207
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 78,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 15,
+      "score": "121",
+      "question": "Assess India's vulnerability to water related disasters. How can better management of water resource make the country more resilient towards such disasters?",
+      "pdf_pages": [
+        208,
+        209,
+        210
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 79,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Prashant Raj",
+      "air": "97",
+      "year": "2022",
+      "marks": 15,
+      "score": "120",
+      "question": "India's water resources have witnessed rapid depletion due to a mix of economic, geographic, and political factors. Explain and discuss its implications.",
+      "pdf_pages": [
+        211,
+        212,
+        213
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 80,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Shubham Kumar",
+      "air": "1",
+      "year": "2020",
+      "marks": 15,
+      "score": "115",
+      "question": "India's water resources have witnessed rapid depletion due to a mix of economic, geographic, and political factors. Explain and discuss its implications.",
+      "pdf_pages": [
+        214,
+        215,
+        216
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 81,
+      "topic_id": 6,
+      "topic_name": "Distribution of key natural resources",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "112",
+      "question": "Critical issues surrounding the condition of groundwater in India need overarching solutions for a water-secure future. Discuss.",
+      "pdf_pages": [
+        217,
+        218
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 82,
+      "topic_id": 7,
+      "topic_name": "Factors responsible for location of industries",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 10,
+      "score": "109",
+      "question": "State the key factors behind the growth of the pharmaceutical industry in India. Additionally, discuss its significance with regard to India's economy and public health.",
+      "pdf_pages": [
+        220,
+        221
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 83,
+      "topic_id": 7,
+      "topic_name": "Factors responsible for location of industries",
+      "topper": "Shreya Tyagi",
+      "air": "31",
+      "year": "2024",
+      "marks": 15,
+      "score": "",
+      "question": "Evaluate the primary factors contributing to regional disparities in the sugar industry between North India and Peninsular India. What measures can be undertaken to reduce the surplus sugar production?",
+      "pdf_pages": [
+        222,
+        223,
+        224
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 84,
+      "topic_id": 7,
+      "topic_name": "Factors responsible for location of industries",
+      "topper": "Smriti Mishra",
+      "air": "4",
+      "year": "2022",
+      "marks": 15,
+      "score": "113",
+      "question": "Enumerate the factors that helped 'Bombay' emerge as center of cotton-textile industry. Also, present reasons for the dispersion of cotton textile industries to other parts of the country.",
+      "pdf_pages": [
+        225,
+        226,
+        227
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 85,
+      "topic_id": 7,
+      "topic_name": "Factors responsible for location of industries",
+      "topper": "Aditya Vikran Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 10,
+      "score": "17",
+      "question": "Despite being rich in forest resources, why do tropical regions have limited growth of the lumbering industry in comparison to temperate regions?",
+      "pdf_pages": [
+        228,
+        229
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 86,
+      "topic_id": 7,
+      "topic_name": "Factors responsible for location of industries",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 15,
+      "score": "92",
+      "question": "De-industrialization of India in 19th century was not accidental, rather it was a direct result of deliberate British policies in the country. Examine the statement and analyze the consequences of destruction of Indian industries.",
+      "pdf_pages": [
+        230,
+        231,
+        232
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 87,
+      "topic_id": 7,
+      "topic_name": "Factors responsible for location of industries",
+      "topper": "Shubham Kumar",
+      "air": "1",
+      "year": "2020",
+      "marks": 10,
+      "score": "115",
+      "question": "Discuss the factors responsible for location of high-tech industries in the vicinity of major metropolitan regions.",
+      "pdf_pages": [
+        233,
+        234
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 88,
+      "topic_id": 7,
+      "topic_name": "Factors responsible for location of industries",
+      "topper": "Aayushi Bansal",
+      "air": "7",
+      "year": "2024",
+      "marks": 10,
+      "score": "",
+      "question": "Describe the critical factors for location of defense industries and suggest measures to overcome the challenges.",
+      "pdf_pages": [
+        235,
+        236
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 89,
+      "topic_id": 7,
+      "topic_name": "Factors responsible for location of industries",
+      "topper": "Aishwarya Verma",
+      "air": "4",
+      "year": "2021",
+      "marks": 15,
+      "score": "",
+      "question": "Identifying the factors affecting the location of semiconductor and electronic chip making industry, discuss the reasons behind their current global shortage. What steps has India taken in recent times to support its electronic manufacturing ecosystem?",
+      "pdf_pages": [
+        237,
+        238,
+        239
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 90,
+      "topic_id": 7,
+      "topic_name": "Factors responsible for location of industries",
+      "topper": "Aditya Vikran Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 10,
+      "score": "17",
+      "question": "Discuss the multi-dimensional implications of uneven distribution of semiconductor industry in the world.",
+      "pdf_pages": [
+        240,
+        241
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 91,
+      "topic_id": 7,
+      "topic_name": "Factors responsible for location of industries",
+      "topper": "Smriti Mishra",
+      "air": "4",
+      "year": "2022",
+      "marks": 10,
+      "score": "113",
+      "question": "Semiconductor industry has assumed great geopolitical significance in the present context. Comment and highlight the reasons for current global shortage in microprocessor availability.",
+      "pdf_pages": [
+        242,
+        243
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 92,
+      "topic_id": 8,
+      "topic_name": "Environmental issues",
+      "topper": "Kunal Rastogi",
+      "air": "16",
+      "year": "2023",
+      "marks": 15,
+      "score": "92",
+      "question": "With the help of a map, explain the distribution and characteristic features of different types of forests in India. Highlighting the major causes of deforestation, suggest steps needed to conserve forest resource of the country.",
+      "pdf_pages": [
+        245,
+        246,
+        247
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 93,
+      "topic_id": 8,
+      "topic_name": "Environmental issues",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 15,
+      "score": "93",
+      "question": "Although desert landscapes across the world reflect many similarities the process of desertification is influenced by local factors. Elaborate with suitable examples.",
+      "pdf_pages": [
+        248,
+        249,
+        250
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 94,
+      "topic_id": 8,
+      "topic_name": "Environmental issues",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "",
+      "question": "Discuss the reasons and implications of land degradation and desertification as major environmental challenges facing India. Suggest the measures needed to address them.",
+      "pdf_pages": [
+        251,
+        252,
+        253
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 95,
+      "topic_id": 8,
+      "topic_name": "Environmental issues",
+      "topper": "Medha Anand",
+      "air": "13",
+      "year": "2023",
+      "marks": 15,
+      "score": "93",
+      "question": "Describe the significance of eco-sensitive zones in environmental conservation and provide examples of how they are designated and managed in different geographical regions?",
+      "pdf_pages": [
+        254,
+        255,
+        256
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 96,
+      "topic_id": 8,
+      "topic_name": "Environmental issues",
+      "topper": "Prashant Raj",
+      "air": "97",
+      "year": "2022",
+      "marks": 10,
+      "score": "120",
+      "question": "How can eco-tourism be used to sustainably harness the potential of tourism industry in India? Discuss the challenges and steps taken by the government in this context.",
+      "pdf_pages": [
+        257,
+        258
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 97,
+      "topic_id": 8,
+      "topic_name": "Environmental issues",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 15,
+      "score": "109",
+      "question": "Mountains are fragile ecosystems vulnerable to the adverse impact of climate change and other anthropogenic interventions. Illustrate with examples. Also, highlight the initiatives taken for their sustainable management.",
+      "pdf_pages": [
+        259,
+        260,
+        261
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 98,
+      "topic_id": 8,
+      "topic_name": "Environmental issues",
+      "topper": "Prashant Raj",
+      "air": "97",
+      "year": "2022",
+      "marks": 10,
+      "score": "120",
+      "question": "What is an urban forest? Highlight its benefits and steps taken by the government to promote urban forestry in India.",
+      "pdf_pages": [
+        262,
+        263
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 99,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Vishakha Yadav",
+      "air": "6",
+      "year": "2019",
+      "marks": 15,
+      "score": "",
+      "question": "List the different flood prone regions in India and identify the reasons behind their frequent flooding. What are the NDMA guidelines for management of floods?",
+      "pdf_pages": [
+        265,
+        266,
+        267
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 100,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 15,
+      "score": "121",
+      "question": "The frequent instances of urban flooding pose a severe risk to the urban ecosystem in India. Discuss with special emphasis on its impact on the critical infrastructure.",
+      "pdf_pages": [
+        268,
+        269,
+        270
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 101,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Smriti Mishra",
+      "air": "3",
+      "year": "2022",
+      "marks": 10,
+      "score": "97",
+      "question": "Managing risks, rather than impacts, lies at the core of effective disaster management strategy. In light of this statement, describe the flood risk profile of India and evaluate preparedness for effective flood management.",
+      "pdf_pages": [
+        271,
+        272
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 102,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Shubham Kumar",
+      "air": "1",
+      "year": "2020",
+      "marks": 15,
+      "score": "",
+      "question": "The reasons for recurring floods in the regions of Eastern India such as Bihar and Assam go far beyond their topography. Discuss. Also, suggest measures to control this menace.",
+      "pdf_pages": [
+        273,
+        274,
+        275
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 103,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Smriti Mishra",
+      "air": "4",
+      "year": "2022",
+      "marks": 15,
+      "score": "113",
+      "question": "What do you understand by heat waves? Identify the reasons for the rising frequency and intensity of heat waves in the country. Also, discuss the environmental and economic impacts of heat wave.",
+      "pdf_pages": [
+        276,
+        277,
+        278
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 104,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 15,
+      "score": "102",
+      "question": "What are the reasons behind the increased frequency and intensity of heat waves globally? How will it impact global food security?",
+      "pdf_pages": [
+        279,
+        280,
+        281
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 105,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Vikram Aditya Agarwal",
+      "air": "9",
+      "year": "2024",
+      "marks": 10,
+      "score": "111",
+      "question": "In light of the increased intensity, frequency and duration of heat waves in the last decade, do you think the time has come to include \"heat waves\" as a notified disaster under the Disaster Management Act, 2005?",
+      "pdf_pages": [
+        282,
+        283
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 106,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 15,
+      "score": "112",
+      "question": "Though land subsidence can happen for a host of reasons, it is imperative to estimate its possible impact and chalk out a sustainable plan to minimise the adverse impact. Discuss.",
+      "pdf_pages": [
+        284,
+        285,
+        286
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 107,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Neelesh Goyal",
+      "air": "77",
+      "year": "2024",
+      "marks": 10,
+      "score": "",
+      "question": "Landslides have become more of a human-induced phenomenon rather than a natural phenomenon. Highlighting the reasons for increasing incidences of landslides, suggest measures that can be undertaken to mitigate the disaster.",
+      "pdf_pages": [
+        287,
+        288
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 108,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Vibhor Bhardwaj",
+      "air": "19",
+      "year": "2024",
+      "marks": 15,
+      "score": "120",
+      "question": "Explain the causes and impacts of landslides. Also, discuss the various measures to mitigate their impact, with a special emphasis on National Disaster Management Authority (NDMA) guidelines.",
+      "pdf_pages": [
+        289,
+        290,
+        291
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 109,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Harshita Goyal",
+      "air": "2",
+      "year": "2024",
+      "marks": 15,
+      "score": "",
+      "question": "Examine why the prevailing development paradigm in India has remained largely unchanged, despite the escalating and frequent incidents of landslides witnessed in the country during the past decade.",
+      "pdf_pages": [
+        293,
+        294,
+        295
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 110,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Ishita Kishore",
+      "air": "1",
+      "year": "2022",
+      "marks": 15,
+      "score": "88",
+      "question": "Despite increased and regular occurrences of landslides over the past decade in India, the dominant development paradigm has largely not been modified. Examine.",
+      "pdf_pages": [
+        296,
+        297,
+        299
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 111,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Khushhali Solanki",
+      "air": "61",
+      "year": "2023",
+      "marks": 10,
+      "score": "106",
+      "question": "Aseismic structures are touted as a viable solution to combat earthquake destruction. In this context, highlight the need of a National Program on Seismic Retrofitting of Buildings and Structures in India.",
+      "pdf_pages": [
+        300,
+        301
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 112,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Animesh Pradhan",
+      "air": "2",
+      "year": "2023",
+      "marks": 15,
+      "score": "103",
+      "question": "Some regions in India, including Delhi, are highly vulnerable to the impact of earthquakes originating in the Himalayas. Discuss. What institutional measures have been taken to mitigate earthquake losses in India? Do you think there are significant gaps that still exist?",
+      "pdf_pages": [
+        302,
+        303,
+        304
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 113,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Neelesh Goyal",
+      "air": "77",
+      "year": "2024",
+      "marks": 15,
+      "score": "",
+      "question": "In addition to being the centres of growth, urban areas are also centres of accumulating disaster risks. Why is disaster management particularly complex in mega-urban cities? What measures can be undertaken to address the problems of disaster management and risk reduction in urban areas?",
+      "pdf_pages": [
+        305,
+        307,
+        308
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 114,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Shakti Dubey",
+      "air": "1",
+      "year": "2024",
+      "marks": 10,
+      "score": "",
+      "question": "Discuss the impact of wildfires on the ecosystem. Describe the significance of the UNEP's Fire Ready Formula in dealing with the menace of wildfires.",
+      "pdf_pages": [
+        309,
+        310
+      ]
+    },
+    {
+      "kind": "answer",
+      "global_id": 115,
+      "topic_id": 9,
+      "topic_name": "Disasters",
+      "topper": "Aayushi Bansal",
+      "air": "7",
+      "year": "2024",
+      "marks": 15,
+      "score": "",
+      "question": "Enumerate the reasons behind rising intensity and frequency of cyclones in the Arabian Sea in recent years. Giving special reference to NDMA guidelines, recommend measures to check the adverse impacts of cyclones.",
+      "pdf_pages": [
+        311,
+        312,
+        313,
+        314
+      ]
+    }
+  ]
+}

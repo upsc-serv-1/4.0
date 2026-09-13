@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { KVStore } from '../lib/kvStore';
 import { fetchAllPilotV2Nodes } from '../repositories/pilotV2Repo';
 
 export interface DailyTask {
@@ -61,28 +62,102 @@ const DEFAULT_INSIGHTS: DailyInsight[] = [
 
 export const HomescreenService = {
   async getTodayTasks(userId?: string): Promise<DailyTask[]> {
-    const todayStr = new Date().toISOString().split('T')[0];
-    const storageKey = `daily_tasks_${userId || 'guest'}_${todayStr}`;
+    const unifiedKey = `daily_tasks_${userId || 'guest'}`;
     
     try {
-      const cached = await AsyncStorage.getItem(storageKey);
-      if (cached !== null) {
-        return JSON.parse(cached);
+      // 1. Try MMKV (ultra-fast synchronous)
+      const mmkvTasks = KVStore.getJson<DailyTask[]>(unifiedKey);
+      if (mmkvTasks && Array.isArray(mmkvTasks) && mmkvTasks.length > 0) {
+        HomescreenService.syncFromCloud(userId, unifiedKey);
+        return mmkvTasks;
       }
 
+      // 2. Try AsyncStorage unified key
+      const cached = await AsyncStorage.getItem(unifiedKey);
+      if (cached !== null) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          KVStore.setJson(unifiedKey, parsed);
+          HomescreenService.syncFromCloud(userId, unifiedKey);
+          return parsed;
+        }
+      }
+
+      // 3. RECOVERY: Check older date-based keys (e.g. daily_tasks_*_2026-09-12 from yesterday!)
+      const allKeys = await AsyncStorage.getAllKeys();
+      const taskKeys = allKeys.filter(k => k.startsWith('daily_tasks_'));
+      const recoveredMap = new Map<string, DailyTask>();
+
+      for (const k of taskKeys) {
+        try {
+          const raw = await AsyncStorage.getItem(k);
+          if (raw) {
+            const arr = JSON.parse(raw);
+            if (Array.isArray(arr)) {
+              arr.forEach((t: any) => {
+                if (t && t.id && t.title) {
+                  recoveredMap.set(t.id, {
+                    id: String(t.id),
+                    title: String(t.title),
+                    time_slot: String(t.time_slot || ''),
+                    is_completed: !!t.is_completed,
+                    task_date: t.task_date
+                  });
+                }
+              });
+            }
+          }
+        } catch {}
+      }
+
+      if (recoveredMap.size > 0) {
+        const recovered = Array.from(recoveredMap.values());
+        await AsyncStorage.setItem(unifiedKey, JSON.stringify(recovered));
+        KVStore.setJson(unifiedKey, recovered);
+        HomescreenService.syncToCloud(userId, recovered);
+        return recovered;
+      }
+
+      // 4. Check Supabase
       if (userId) {
-        const { data, error } = await supabase
+        // First try user_notes backup (rock-solid, no RLS issue)
+        const { data: noteBackup } = await supabase
+          .from('user_notes')
+          .select('content')
+          .eq('user_id', userId)
+          .eq('subject', '__daily_tasks__')
+          .maybeSingle();
+
+        if (noteBackup?.content) {
+          try {
+            const parsed = JSON.parse(noteBackup.content);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              await AsyncStorage.setItem(unifiedKey, JSON.stringify(parsed));
+              KVStore.setJson(unifiedKey, parsed);
+              return parsed;
+            }
+          } catch {}
+        }
+
+        // Second try daily_tasks table without restricting to today only
+        const { data: dbTasks, error } = await supabase
           .from('daily_tasks')
           .select('*')
           .eq('user_id', userId)
-          .eq('task_date', todayStr)
           .order('created_at', { ascending: true });
         
-        if (!error && data) {
-          await AsyncStorage.setItem(storageKey, JSON.stringify(data));
-          return data;
+        if (!error && dbTasks && dbTasks.length > 0) {
+          const formatted: DailyTask[] = dbTasks.map(t => ({
+            id: String(t.id),
+            title: t.title,
+            time_slot: t.time_slot || '',
+            is_completed: !!t.is_completed,
+            task_date: t.task_date
+          }));
+          await AsyncStorage.setItem(unifiedKey, JSON.stringify(formatted));
+          KVStore.setJson(unifiedKey, formatted);
+          return formatted;
         }
-        return [];
       }
     } catch (e) {
       console.log('Error loading tasks:', e);
@@ -91,36 +166,91 @@ export const HomescreenService = {
     return userId ? [] : DEFAULT_TASKS;
   },
 
+  async syncToCloud(userId?: string, tasks?: DailyTask[]) {
+    if (!userId || !tasks) return;
+    try {
+      // 1. Guaranteed cloud backup in user_notes with subject '__daily_tasks__'
+      const { data: existing } = await supabase
+        .from('user_notes')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('subject', '__daily_tasks__')
+        .maybeSingle();
+
+      if (existing?.id) {
+        await supabase
+          .from('user_notes')
+          .update({ content: JSON.stringify(tasks), updated_at: new Date().toISOString() })
+          .eq('id', existing.id);
+      } else {
+        await supabase
+          .from('user_notes')
+          .insert({
+            user_id: userId,
+            subject: '__daily_tasks__',
+            title: 'Daily Tasks',
+            content: JSON.stringify(tasks)
+          });
+      }
+
+      // 2. Also attempt daily_tasks table sync
+      for (const t of tasks) {
+        if (!t.id.startsWith('default')) {
+          supabase.from('daily_tasks').upsert({
+            id: t.id.length > 20 ? t.id : undefined,
+            user_id: userId,
+            title: t.title,
+            time_slot: t.time_slot || '',
+            is_completed: !!t.is_completed,
+            task_date: t.task_date || new Date().toISOString().split('T')[0]
+          }).then();
+        }
+      }
+    } catch (e) {
+      console.log('Error syncing tasks to cloud:', e);
+    }
+  },
+
+  async syncFromCloud(userId?: string, unifiedKey?: string) {
+    if (!userId || !unifiedKey) return;
+    try {
+      const { data: noteBackup } = await supabase
+        .from('user_notes')
+        .select('content')
+        .eq('user_id', userId)
+        .eq('subject', '__daily_tasks__')
+        .maybeSingle();
+
+      if (noteBackup?.content) {
+        const cloudTasks: DailyTask[] = JSON.parse(noteBackup.content);
+        if (Array.isArray(cloudTasks) && cloudTasks.length > 0) {
+          KVStore.setJson(unifiedKey, cloudTasks);
+          await AsyncStorage.setItem(unifiedKey, JSON.stringify(cloudTasks));
+        }
+      }
+    } catch {}
+  },
+
   async toggleTaskCompletion(taskId: string, userId?: string, currentTasks?: DailyTask[]): Promise<DailyTask[]> {
-    const todayStr = new Date().toISOString().split('T')[0];
-    const storageKey = `daily_tasks_${userId || 'guest'}_${todayStr}`;
-    
+    const unifiedKey = `daily_tasks_${userId || 'guest'}`;
     const updated = (currentTasks || DEFAULT_TASKS).map(t =>
       t.id === taskId ? { ...t, is_completed: !t.is_completed } : t
     );
     
-    await AsyncStorage.setItem(storageKey, JSON.stringify(updated));
-    
-    if (userId && !taskId.startsWith('default')) {
-      const target = updated.find(t => t.id === taskId);
-      if (target) {
-        supabase
-          .from('daily_tasks')
-          .update({ is_completed: target.is_completed })
-          .eq('id', taskId)
-          .then();
-      }
-    }
+    KVStore.setJson(unifiedKey, updated);
+    await AsyncStorage.setItem(unifiedKey, JSON.stringify(updated));
+    HomescreenService.syncToCloud(userId, updated);
     
     return updated;
   },
 
   async deleteTask(taskId: string, userId?: string, currentTasks?: DailyTask[]): Promise<DailyTask[]> {
-    const todayStr = new Date().toISOString().split('T')[0];
-    const storageKey = `daily_tasks_${userId || 'guest'}_${todayStr}`;
-    
+    const unifiedKey = `daily_tasks_${userId || 'guest'}`;
     const updated = (currentTasks || []).filter(t => t.id !== taskId);
-    await AsyncStorage.setItem(storageKey, JSON.stringify(updated));
+    
+    KVStore.setJson(unifiedKey, updated);
+    await AsyncStorage.setItem(unifiedKey, JSON.stringify(updated));
+    HomescreenService.syncToCloud(userId, updated);
     
     if (userId && !taskId.startsWith('default')) {
       supabase
@@ -135,7 +265,7 @@ export const HomescreenService = {
 
   async addTask(title: string, timeSlot: string, userId?: string, currentTasks?: DailyTask[]): Promise<DailyTask[]> {
     const todayStr = new Date().toISOString().split('T')[0];
-    const storageKey = `daily_tasks_${userId || 'guest'}_${todayStr}`;
+    const unifiedKey = `daily_tasks_${userId || 'guest'}`;
     const newTask: DailyTask = {
       id: Date.now().toString(),
       title,
@@ -145,17 +275,9 @@ export const HomescreenService = {
     };
     
     const updated = [...(currentTasks || []), newTask];
-    await AsyncStorage.setItem(storageKey, JSON.stringify(updated));
-    
-    if (userId) {
-      supabase.from('daily_tasks').insert({
-        user_id: userId,
-        title,
-        time_slot: timeSlot,
-        is_completed: false,
-        task_date: todayStr
-      }).then();
-    }
+    KVStore.setJson(unifiedKey, updated);
+    await AsyncStorage.setItem(unifiedKey, JSON.stringify(updated));
+    HomescreenService.syncToCloud(userId, updated);
     
     return updated;
   },

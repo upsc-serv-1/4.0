@@ -951,32 +951,68 @@ export default function HomeScreen() {
 
               <ScrollView 
                 style={{ marginVertical: 8, maxHeight: 380 }}
-                contentContainerStyle={{ gap: 8, paddingBottom: 4 }}
+                contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, paddingBottom: 4 }}
                 showsVerticalScrollIndicator={true}
                 nestedScrollEnabled={true}
               >
                 {tasks.length === 0 ? (
-                  <View style={styles.emptyTaskState}>
+                  <View style={[styles.emptyTaskState, { width: '100%' }]}>
                     <Check size={24} color="#8B5CF6" style={{ marginBottom: 4, opacity: 0.8 }} />
                     <Text style={{ fontSize: 12, color: '#8B5CF6', fontWeight: '600' }}>All clear for today! 🎉</Text>
                   </View>
                 ) : (
                   tasks.map((task) => (
-                    <View key={task.id} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, paddingHorizontal: 14, backgroundColor: task.is_completed ? 'rgba(255,255,255,0.4)' : '#FFFFFF', borderRadius: 14, shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}>
+                    <View
+                      key={task.id}
+                      style={{
+                        width: IS_TABLET ? '48.5%' : '100%',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        paddingVertical: 10,
+                        paddingHorizontal: 12,
+                        backgroundColor: task.is_completed ? 'rgba(255,255,255,0.45)' : '#FFFFFF',
+                        borderRadius: 14,
+                        borderWidth: 1,
+                        borderColor: task.is_completed ? '#E2E8F0' : '#EDE9FE',
+                        shadowColor: '#7C3AED',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.04,
+                        shadowRadius: 4,
+                        elevation: 1
+                      }}
+                    >
                       <TouchableOpacity
-                        style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
+                        style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 6 }}
                         onPress={() => handleTaskToggle(task.id)}
                       >
                         <View style={{ width: 22, height: 22, borderRadius: 7, borderWidth: 1.5, borderColor: task.is_completed ? '#8B5CF6' : '#C4B5FD', backgroundColor: task.is_completed ? '#8B5CF6' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
                           {task.is_completed && <Check size={14} color="#FFF" />}
                         </View>
-                        <View style={{ flex: 1, marginLeft: 12 }}>
-                          <Text style={{ fontSize: 14, fontWeight: '700', color: task.is_completed ? '#94A3B8' : '#1E293B', textDecorationLine: task.is_completed ? 'line-through' : 'none' }}>{task.title}</Text>
-                          {task.time_slot ? <Text style={{ fontSize: 11, color: task.is_completed ? '#CBD5E1' : '#8B5CF6', fontWeight: '600', marginTop: 2 }}>{task.time_slot}</Text> : null}
+                        <View style={{ flex: 1, marginLeft: 10 }}>
+                          <Text
+                            style={{
+                              fontSize: 13,
+                              fontWeight: '700',
+                              color: task.is_completed ? '#94A3B8' : '#1E293B',
+                              textDecorationLine: task.is_completed ? 'line-through' : 'none'
+                            }}
+                            numberOfLines={2}
+                          >
+                            {task.title}
+                          </Text>
+                          {task.time_slot ? (
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 3 }}>
+                              <Clock size={11} color={task.is_completed ? '#CBD5E1' : '#8B5CF6'} style={{ marginRight: 3 }} />
+                              <Text style={{ fontSize: 11, color: task.is_completed ? '#CBD5E1' : '#8B5CF6', fontWeight: '600' }}>
+                                {task.time_slot}
+                              </Text>
+                            </View>
+                          ) : null}
                         </View>
                       </TouchableOpacity>
-                      <TouchableOpacity style={{ padding: 6, opacity: task.is_completed ? 0.5 : 1 }} onPress={() => handleTaskDelete(task.id)}>
-                        <Trash2 size={16} color={task.is_completed ? '#CBD5E1' : '#FCA5A5'} />
+                      <TouchableOpacity style={{ padding: 4, opacity: task.is_completed ? 0.4 : 0.8 }} onPress={() => handleTaskDelete(task.id)}>
+                        <Trash2 size={15} color={task.is_completed ? '#CBD5E1' : '#EF4444'} />
                       </TouchableOpacity>
                     </View>
                   ))
